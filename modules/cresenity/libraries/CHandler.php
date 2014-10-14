@@ -1,0 +1,72 @@
+<?php
+
+class CHandler extends CObject  {
+	protected $name;
+	protected $handlers;
+	protected $driver;
+	
+	protected function __construct($owner,$event,$name) {
+		parent::__construct();
+		
+		
+		$this->name = $name;
+		
+		$driver = 'CHandler_'.ucfirst($this->name).'_Driver';
+		$driver_file = dirname(__FILE__)."/drivers/CHandler/".ucfirst($this->name).EXT;
+		if(!class_exists('CHandler_Driver')) {
+			require_once dirname(__FILE__)."/drivers/CHandler".EXT;
+		}
+		if(!file_exists($driver_file)) {
+			throw new CHandler_Exception('core.driver_not_found', $this->name, get_class($this));
+		} else {
+			if(!class_exists($driver)) {
+				require_once $driver_file;
+			}
+		}
+		
+		$this->driver = new $driver($owner,$event,$this->name);
+		
+	}
+	
+	
+	public static function factory($owner,$event,$name) {
+		return new CHandler($owner,$event,$name);
+	}	
+	
+	public function js() {
+		return $this->driver->script();
+	}
+	
+
+	
+	public function set_url_param($param) {
+		$this->driver->set_url_param($param);
+	}
+	
+	public function __call($method, $args) {
+		if ( !count($args) ) {
+            $this->driver->$method($args);
+        } else {
+            $str = '';
+            $values = array_values($args);
+            for ( $i=0; $i<count($values); $i++ ) {
+                $str .= "'".$values[$i]."' ,";
+            }   
+            $str = substr($str, 0, -2);
+            eval('$this->driver->'.$method.'('.$str.');');
+        }   
+		
+		//$this->driver->$method($args);
+		return $this;
+	}
+	
+	public function content() {
+		return $this->driver->content();
+	}
+}
+
+class CHandler_Exception extends CF_Exception {
+
+	protected $code = E_HANDLER_ERROR;
+
+} // End Kohana Database Exception

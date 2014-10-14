@@ -1,0 +1,88 @@
+<?php
+
+
+/**
+ * @package Cresenity
+ */
+class CObject {
+	
+	protected $id;
+	protected $valid_prop = array();
+	protected $prop = array();
+	protected $domain = "";
+	
+	private $friends = array();
+	
+	public function add_friend($classname) {
+		$this->friends[] = $classname;
+	}
+	
+	public function set_domain($domain) {
+		$this->domain = $domain;
+	}
+	
+    public function __get($key)
+    {
+        $trace = debug_backtrace();
+
+        if(isset($trace[1]['class']) && in_array($trace[1]['class'], $this->friends)) {
+            return $this->$key;
+        }
+
+        // normal __get() code here
+
+        trigger_error('Cannot access private property ' . __CLASS__ . '::$' . $key, E_USER_ERROR);
+    }
+
+    public function __set($key, $value)
+    {
+        $trace = debug_backtrace();
+        if(isset($trace[1]['class']) && in_array($trace[1]['class'], $this->friends)) {
+            return $this->$key = $value;
+        }
+
+        // normal __set() code here
+
+        trigger_error('Cannot access private property ' . __CLASS__ . '::$' . $key, E_USER_ERROR);
+    }
+	
+	protected function __construct($id="") {
+		$observer = CObserver::instance();
+		if($id=="") {
+			$id=$observer->new_id();
+		}
+		$this->id = $id;
+		$this->domain = crouter::domain();
+		$observer->add($this);
+		
+	}
+	
+	public function regenerate_id() {
+		
+		$this->id = CObserver::instance()->new_id();
+	}
+	
+	
+	public function id() {
+		return $this->id;
+	}
+	
+	public function class_name() {
+		return get_class($this);
+	}
+	
+	public function domain() {
+		return $this->domain;
+	}
+	
+	
+	static public function is_instanceof($value) {
+		if (is_object($value)) {
+			return ($value instanceof CObject);
+		}
+		return false;
+	}
+		
+		
+}
+
