@@ -7,7 +7,10 @@ RewriteEngine On
 RewriteBase /
 
 # Protect application and system files from being viewed
-RewriteRule ^(application|core) - [F,L]
+RewriteRule ^(application|modules|system) - [F,L]
+RewriteRule ^(wp)($|/) - [L]
+RewriteCond %{REQUEST_URI} !^/?(wp)/
+RewriteRule ^coba.php$ coba.php [QSA,L]
 
 # Allow any files or directories that exist to be displayed directly
 RewriteCond %{REQUEST_FILENAME} !-f
