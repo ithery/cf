@@ -238,6 +238,12 @@ class CCurl {
         $this->set_opt(CURLOPT_TIMEOUT, $milisecond);
         return $this;
     }
+    
+    public function set_raw_post($string) {
+        $this->set_opt(CURLOPT_POST, TRUE);
+        $this->set_opt(CURLOPT_POSTFIELDS, $string);
+        return $this;
+    }
 
     public function set_post($data) {
         $post_data = curl::as_post_string($data);
@@ -259,6 +265,11 @@ class CCurl {
 
     public function set_useragent($useragent) {
         $this->set_opt(CURLOPT_USERAGENT, $useragent);
+        return $this;
+    }
+    
+    public function set_http_header($http_header) {
+        $this->set_opt(CURLOPT_HTTPHEADER, $http_header);
         return $this;
     }
 
