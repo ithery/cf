@@ -1,0 +1,118 @@
+.bg-color-blue {
+	background-color: #57889c!important;
+}
+
+.bg-color-pink {
+	background-color: #ac5287!important;
+}
+
+.bg-color-greenlight {
+	background-color: #71843f!important;
+}
+
+.bg-color-purple {
+	background-color: #6e587a!important;
+}
+
+.txt-color-white {
+color: #fff!important;
+}
+
+
+.isotope,
+.isotope .isotope-item {
+	-webkit-transition-duration: 0.8s;
+	 -moz-transition-duration: 0.8s;
+	-ms-transition-duration: 0.8s;
+	-o-transition-duration: 0.8s;
+	 transition-duration: 0.8s;
+}
+
+.isotope {
+	-webkit-transition-property: height, width;
+	-moz-transition-property: height, width;
+	-ms-transition-property: height, width;
+	-o-transition-property: height, width;
+	transition-property: height, width;
+}
+
+.isotope .isotope-item {
+	-webkit-transition-property: -webkit-transform, opacity;
+	-moz-transition-property:    -moz-transform, opacity;
+	-ms-transition-property:     -ms-transform, opacity;
+	-o-transition-property:         top, left, opacity;
+	transition-property:         transform, opacity;
+}
+
+/* Disabling Isotope CSS3 transitions
+=================================================================== */
+
+.isotope.no-transition,
+.isotope.no-transition .isotope-item,
+.isotope .isotope-item.no-transition {
+	-webkit-transition-duration: 0s;
+	-moz-transition-duration: 0s;
+	-ms-transition-duration: 0s;
+	-o-transition-duration: 0s;
+	 transition-duration: 0s;
+}
+
+/* Disable CSS transitions for containers with infinite scrolling
+====================================*/
+.isotope.infinite-scrolling {
+	-webkit-transition: none;
+	-moz-transition: none;
+	-ms-transition: none;
+	-o-transition: none;
+	transition: none;
+}
+
+
+.well.well-isotope  {
+	margin-top:5px;
+	margin-bottom:5px;
+	
+}
+
+.isotope-filter {
+	margin-top:5px;
+	margin-bottom:5px;
+	
+}
+
+.widget-title .badge {
+	top:5px;
+}
+.isotope-container {
+	margin-top:20px;
+}
+
+.isotope-container .widget-box{
+	margin-bottom:10px;
+	
+}
+
+.isotope-container  .item {
+	margin: 0px;
+	margin-right:15px;
+	
+	
+}
+.isotope-container  .item .image img{
+	background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #B6BCBF;
+    float: left;
+    height: 60px;
+    width: 60px;
+    margin-right: 10px;
+    margin-top: 5px;
+    padding: 2px;
+}
+
+.isotope-container  .item .meta {
+	margin-top: 10px;
+    border-top: 1px dashed #B6BCBF;
+	padding-top:5px;
+    
+}
+
