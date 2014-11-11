@@ -23,12 +23,14 @@ class CObserver {
 	public function new_id() {
 		//$this->autoid++;
 		//return md5("capp_autoid_".$this->autoid.date("YmdHis"));
-		return uniqid();
+                $uniqid = uniqid(time(),true);
+                $uniqid = str_replace(".", "", $uniqid);
+		return $uniqid;
 	}
 	
     public function add(CObject $obj) {
 		if (array_key_exists($obj->id(),$this->obj_list)) {
-			trigger_error("Object '".$obj->id()."' is exists.", E_USER_WARNING);
+                    trigger_error("Object '".$obj->id()."' is exists.", E_USER_WARNING);
 		}
 		
 		

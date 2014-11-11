@@ -41,31 +41,37 @@ class crequest {
     }
 
     public static function browser() {
+        return "";
         $browser = CBrowser::instance()->browser();
         return $browser->Browser;
     }
 
     public static function browser_version() {
+        return "";
         $browser = CBrowser::instance()->browser();
         return $browser->Version;
     }
 
     public static function browser_major_version() {
+        return "";
         $browser = CBrowser::instance()->browser();
         return $browser->MajorVer;
     }
 
     public static function browser_minor_version() {
+        return "";
         $browser = CBrowser::instance()->browser();
         return $browser->MinorVer;
     }
 
     public static function platform() {
+        return "";
         $browser = CBrowser::instance()->browser();
         return $browser->Platform;
     }
 
     public static function platform_version() {
+        return "";
         $browser = CBrowser::instance()->browser();
         return $browser->Platform_Version;
     }

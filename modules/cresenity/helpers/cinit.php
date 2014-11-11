@@ -1,6 +1,6 @@
 <?php
 class cinit{
-	public static function check_for_extension($arrExt = array()) 
+	public static function check_for_extension($arrExt = array()) {
         if (PHP_OS == "Minix") 
            $arrReq = array('simplexml', 'pcre', 'xml', 'dom');
         if (PHP_OS == "WINNT") 

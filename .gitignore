@@ -3,4 +3,5 @@
 /nbproject/private/
 composer.json
 application/*
+logs/*
 
