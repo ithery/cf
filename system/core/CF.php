@@ -130,7 +130,13 @@ final class CF {
             self::$store_id = isset($data['store_id']) ? $data['store_id'] : null;
             self::$store_code = isset($data['store_code']) ? $data['store_code'] : null;
         }
-
+		$capp_path = APPPATH;
+		if(strlen(self::$app_code)>0) $capp_path.=self::$app_code.DS;
+		if(strlen(self::$org_code)>0) $capp_path.=self::$org_code.DS;
+		if(strlen(self::$store_code)>0) $capp_path.=self::$store_code.DS;
+		$capp_path.="default".DS;
+		
+		define('CAPPPATH',$capp_path);
         // Define CF error constant
         define('E_CF', 42);
 
