@@ -5,4 +5,6 @@ composer.json
 application/*
 logs/*
 /logs/*
+*.idea/
+*.iml
 
