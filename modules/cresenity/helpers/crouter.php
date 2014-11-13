@@ -2,39 +2,39 @@
 
 class crouter {
 	
-	public function domain() {
+	public static function domain() {
 		return $_SERVER["SERVER_NAME"];
 	}
 	
-	public function controller() {
+	public static function controller() {
 		return CFRouter::$controller;
 	}
-	public function method() {
+	public static function method() {
 		return CFRouter::$method;
 	}
 	
-	public function routed_uri() {
+	public static function routed_uri() {
 		return CFRouter::$routed_uri;
 	}
-	public function complete_uri() {
+	public static function complete_uri() {
 		return CFRouter::$complete_uri;
 	}
-	public function query_string() {
+	public static function query_string() {
 		return CFRouter::$query_string;
 	}
-	public function current_uri() {
+	public static function current_uri() {
 		return CFRouter::$current_uri;
 	}
-	public function url_suffix() {
+	public static function url_suffix() {
 		return CFRouter::$url_suffix;
 	}
-	public function segments() {
+	public static function segments() {
 		return CFRouter::$segments;
 	}
-	public function controller_path() {
+	public static function controller_path() {
 		return CFRouter::$controller_path;
 	}
-	public function arguments() {
+	public static function arguments() {
 		return CFRouter::$arguments;
 	}
 } // End crouter

@@ -30,11 +30,11 @@ return array(
 		'connection'    => array (
 			'type'     => 'mysql',
 			'user'     => 'root',
-			'pass'     => '',
-			'host'     => 'localhost',
+			'pass'     => 'rodex0909',
+			'host'     => '192.168.1.222',
 			'port'     => FALSE,
 			'socket'   => FALSE,
-			'database' => 'capp'
+			'database' => 'torsapi3'
 		),
 		'character_set' => 'utf8',
 		'table_prefix'  => '',
