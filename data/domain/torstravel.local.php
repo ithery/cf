@@ -6,5 +6,5 @@ return array(
 	'org_code'=>'torstravel',
 	'store_id'=>NULL,
 	'store_code'=>NULL,
-	'domain'=>'torsb2b.local',
+	'domain'=>'torstravel.local',
 );

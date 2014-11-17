@@ -57,12 +57,16 @@ class CTreeDB {
         $q = "
 			SELECT " . $db->escape_column($this->pk_column) . " , CONCAT( REPEAT(" . $db->escape($indent) . ", depth), node.name) AS name
 			FROM " . $db->escape_table($this->table_name) . " AS node
-			WHERE status>0 and org_id=" . $db->escape($this->org_id) . "
+			WHERE status>0 ";
+		
+		if(strlen($this->org_id)>0){
+			$q.=" and org_id=" . $db->escape($this->org_id) . "";
+		}
+        $q.="
 			" . $this->filter_where() . "
 			ORDER BY node.lft
 		";
-
-        return cdbutils::get_list($q);
+		return cdbutils::get_list($q);
     }
 
     public function insert($data, $parent_id = null) {
