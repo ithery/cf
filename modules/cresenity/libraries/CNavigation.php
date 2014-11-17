@@ -11,7 +11,7 @@ class CNavigation extends CObject {
             $app_code = CF::app_code();
         }
 		
-		$path = CAPPPATH.'config'.DS.'nav'.DS;
+		$path = CAPPPATH.'config'.DS;
 
 		if (!is_file($path . 'nav' . EXT)) {
 			$path = DOCROOT . 'config' . DIRECTORY_SEPARATOR . 'nav' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR;
