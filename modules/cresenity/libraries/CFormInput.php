@@ -12,6 +12,7 @@ class CFormInput extends CElement {
     protected $list;
     protected $validation;
     protected $disabled;
+    protected $readonly;
 
     public function __construct($id = "") {
 
@@ -57,7 +58,12 @@ class CFormInput extends CElement {
         $this->size = $size;
         return $this;
     }
-
+    
+    public function set_readonly($bool) {
+        $this->readonly = $bool;
+        return $this;
+    }
+    
     public function get_field_id() {
         return $this->field_id;
     }
@@ -132,6 +138,9 @@ class CFormInput extends CElement {
 		$data = array();
 		if($this->disabled) {
 			$data['attr']['disabled']="disabled";
+		}
+                if($this->readonly) {
+			$data['attr']['readonly']="readonly";
 		}
 		if(strlen($this->name)>0) {
 			$data['attr']['name']=$this->name;

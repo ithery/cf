@@ -216,5 +216,8 @@ return array(
         "js" => array("plugins" . DS . "google-code-prettify" . DS . "prettify.js"),
         "css" => array("plugins" . DS . "google-code-prettify" . DS . "prettify.css"),
     ),
+    "torsb2b" => array(
+        "css" => array("torsb2b.css"),
+    ),
 );
 ?>

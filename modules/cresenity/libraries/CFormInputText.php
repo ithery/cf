@@ -47,6 +47,10 @@ class CFormInputText extends CFormInput {
         $disabled = "";
         if ($this->disabled)
             $disabled = ' disabled="disabled"';
+        
+        if ($this->readonly)
+            $disabled = ' readonly="readonly"';
+        
         $classes = $this->classes;
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
