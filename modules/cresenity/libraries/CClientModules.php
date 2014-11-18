@@ -114,6 +114,10 @@ final class CClientModules {
 		
 	}
 	
+        /**
+         * 
+         * @return CClientModules
+         */
 	public static function instance() {
 		if(self::$_instance==null) {
 			self::$_instance = new CClientModules();

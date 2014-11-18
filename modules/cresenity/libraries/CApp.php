@@ -250,11 +250,21 @@ class CApp extends CObservable {
         return $this->app_id() == 0;
     }
 
+    /**
+     * 
+     * @param boolean $install
+     * @return CApp
+     */
     public static function factory($install = false) {
         //return new CApp($install);
         return self::instance($install);
     }
 
+    /**
+     * 
+     * @param boolean $install
+     * @return CApp
+     */
     public static function instance($install = false) {
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);

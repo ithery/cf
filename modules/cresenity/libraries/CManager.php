@@ -8,6 +8,10 @@ final class CManager {
     protected $controls = array();
     protected $controls_code = array();
 
+    /**
+     * 
+     * @return CManager
+     */
     public static function instance() {
         if (self::$_instance == null) {
             self::$_instance = new CManager();
