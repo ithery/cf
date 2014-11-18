@@ -50,7 +50,7 @@ class CApp extends CObservable {
                 $this->_org = cstg::get($org_id);
             }
         }
-
+		
         //check for admin or app
         $router_uri = CFRouter::routed_uri(CFRouter::$current_uri);
         $rsegment = explode('/', $router_uri);
@@ -552,7 +552,7 @@ class CApp extends CObservable {
     public function org() {
         if ($this->_org == null) {
             $role = $this->role();
-            if ($role != null) {
+			if ($role != null) {
                 $this->_org = corg::get($role->org_id);
             }
         }

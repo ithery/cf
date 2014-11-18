@@ -9,8 +9,7 @@ class corg {
             "name" => "",
             "abbr" => "",
         );
-
-
+		
         $data = cdata::get($id, 'org');
         if ($data == null)
             return null;
