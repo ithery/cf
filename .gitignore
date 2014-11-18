@@ -3,6 +3,7 @@
 /nbproject/private/
 composer.json
 application/*
+temp/*
 logs/*
 /logs/*
 *.idea/
