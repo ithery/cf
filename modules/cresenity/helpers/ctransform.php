@@ -71,10 +71,14 @@ class ctransform {
                 if(strlen($date_format)==0) return $x;
 		return date($date_format,strtotime($x));
 	}
-	public static function long_date_formattted($x) {
+	public static function long_date_formatted($x) {
 		if(strlen($x)==0) return $x;
 		$long_date_format = ccfg::get('long_date_formatted');
 		if(strlen($long_date_format)==0) return $x;
 		return date($long_date_format,strtotime($x));
 	}
+        
+        public static function date_unformat($x){
+                return date('Y-m-d H:i:s',strtotime($x));
+        }
 }
