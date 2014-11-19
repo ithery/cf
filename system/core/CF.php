@@ -343,8 +343,17 @@ final class CF {
         return self::$instance;
     }
 	
-	public static function get_include_paths($domain) {
 	
+	public static function get_dir($directory,$domain=null) {
+		$include_paths = CF::include_paths();
+		foreach($include_paths as $p) {
+			$path = $p.$directory.DS;
+			if(is_dir($path)) {
+				return $path;
+			}
+		}
+		return null;
+		
 	}
 	
 	public static function get_files($directory,$filename,$domain=null) {
