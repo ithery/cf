@@ -44,8 +44,8 @@ class CFormInputCurrency extends CFormInput {
         $html = new CStringBuilder();
         $html->set_indent($indent);
         $disabled = "";
-        if ($this->disabled)
-            $disabled = ' disabled="disabled"';
+        if ($this->disabled) $disabled = ' disabled="disabled"';
+        if ($this->readonly) $disabled = ' readonly="readonly"';
         $classes = $this->classes;
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)

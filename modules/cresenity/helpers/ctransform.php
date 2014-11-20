@@ -78,11 +78,22 @@ class ctransform {
 		return date($long_date_format,strtotime($x));
 	}
         
-        public static function date_unformat($x){
+        public static function format_date($x){
+            return self::date_formatted($x);
+        }
+        public static function unformat_date($x){
+                return date('Y-m-d',strtotime($x));
+        }
+        public static function format_long_date($x){
+            return self::long_date_formatted($x);
+        }
+        public static function unformat_long_date($x){
                 return date('Y-m-d H:i:s',strtotime($x));
         }
-        
+        public static function format_currency($x){
+            return self::thousand_separator($x);
+        }
         public static function unformat_currency($x){
-            return $x;
+            return str_replace(",", "", $x);
         }
 }
