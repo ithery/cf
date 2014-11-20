@@ -81,4 +81,8 @@ class ctransform {
         public static function date_unformat($x){
                 return date('Y-m-d H:i:s',strtotime($x));
         }
+        
+        public static function unformat_currency($x){
+            return $x;
+        }
 }
