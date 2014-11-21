@@ -53,7 +53,7 @@ class cimage {
 
 		
         $id_directory = $type_directory . $id . DIRECTORY_SEPARATOR;
-
+        ctemp::makedir($id_directory);
         $original_directory = $id_directory . 'original' . DIRECTORY_SEPARATOR;
         ctemp::makedir($original_directory);
 		$wide_directory = $id_directory . 'wide' . DIRECTORY_SEPARATOR;
