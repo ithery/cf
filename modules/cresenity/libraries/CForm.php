@@ -423,9 +423,12 @@ class CForm extends CElement {
 					" . $script_redirect_url . "
 				}
 			";
+			$on_before_submit="";
 			if(strlen($this->ajax_submit_target)>0) {
 				$on_before_submit = "
-					
+					jQuery('#".$this->ajax_submit_target."').empty();
+					jQuery('#".$this->ajax_submit_target."').append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+			
 				";
 				
 				$this->ajax_datatype="json";
@@ -484,6 +487,7 @@ class CForm extends CElement {
 								$('#" . $this->id . "').find('*').removeClass('disabled');
 							}
 						}
+						".$on_before_submit."
 						$('#" . $this->id . "').ajaxSubmit(options); 
 						
 					}
