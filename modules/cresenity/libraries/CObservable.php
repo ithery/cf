@@ -137,6 +137,11 @@ abstract class CObservable extends CRenderable {
 		return $widget;
 	}
 	
+        /**
+         * 
+         * @param string $id
+         * @return CForm
+         */
 	public function add_form($id="") {
 		$form = CForm::factory($id);
 		$this->add($form);

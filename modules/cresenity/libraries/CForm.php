@@ -68,6 +68,11 @@ class CForm extends CElement {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $method
+     * @return CForm
+     */
     public function set_method($method) {
         $this->method = $method;
         return $this;
@@ -146,6 +151,11 @@ class CForm extends CElement {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $handler_name
+     * @return CHandler
+     */
     public function add_ajax_submit_handler($handler_name) {
         $handler = CHandler::factory($this->id, 'submit', $handler_name);
         $this->ajax_submit_handlers[] = $handler;

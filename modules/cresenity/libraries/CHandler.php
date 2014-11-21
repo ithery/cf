@@ -38,9 +38,13 @@ class CHandler extends CObject  {
 	}
 	
 
-	
+        /**
+         * 
+         * @param string $param
+         * @return CHandler
+         */
 	public function set_url_param($param) {
-		$this->driver->set_url_param($param);
+		$this->driver->set_url_param($param); return $this;
 	}
 	
 	public function __call($method, $args) {
