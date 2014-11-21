@@ -424,19 +424,21 @@ class CForm extends CElement {
 				}
 			";
 			if(strlen($this->ajax_submit_target)>0) {
+				$on_before_submit = "
+					
+				";
+				
 				$this->ajax_datatype="json";
 				//the response is json
 				$on_success_script = "
 				jQuery('#".$this->ajax_submit_target."').html(data.html);
 				var script = $.cresenity.base64.decode(data.js);
-				console.log(script);
-				eval(script);
+
 				
 				jQuery('#".$this->ajax_submit_target."').removeClass('loading');
 				jQuery('#".$this->ajax_submit_target."').data('xhr',false);
 				if(jQuery('#".$this->ajax_submit_target."').find('.prettyprint').length>0) {
 					window.prettyPrint && prettyPrint();
-
 				}
 				";
 			}
@@ -465,6 +467,8 @@ class CForm extends CElement {
 							},
 							success: function(data) {
 								//do callback
+								$('#" . $this->id . "').find('*').removeClass('disabled');
+								$('#" . $this->id . "').removeClass('loading');
 								" . $upload_progress_success . "
 								" . $ajax_process_done_script . "
 								" . $on_success_script . "
@@ -473,6 +477,7 @@ class CForm extends CElement {
 							},
 							
 							error: function(xhr, status, error) {
+								$('#" . $this->id . "').find('*').removeClass('disabled');
 								" . $ajax_process_done_script . "
 								$('#" . $this->id . "').removeClass('loading');
 								$.cresenity.message('error','[AJAX] ' + status + ' - Server reponse is: ' + xhr.responseText);
