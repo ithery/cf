@@ -437,7 +437,7 @@ class CForm extends CElement {
 			if(strlen($this->ajax_submit_target)>0) {
 				$on_before_submit = "
 					jQuery('#".$this->ajax_submit_target."').empty();
-					jQuery('#".$this->ajax_submit_target."').append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+					jQuery('#".$this->ajax_submit_target."').append(jQuery('<div>').attr('id','#".$this->ajax_submit_target."-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
 			
 				";
 				
