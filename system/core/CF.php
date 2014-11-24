@@ -355,6 +355,18 @@ final class CF {
 		return null;
 		
 	}
+	public static function get_dirs($directory,$domain=null) {
+		$include_paths = CF::include_paths();
+		$dirs = array();
+		foreach($include_paths as $p) {
+			$path = $p.$directory.DS;
+			if(is_dir($path)) {
+				$dirs[] = $path;
+			}
+		}
+		return $dirs;
+		
+	}
 	
 	public static function get_files($directory,$filename,$domain=null) {
 		if($domain==null) $domain = crouter::domain();
@@ -369,7 +381,9 @@ final class CF {
 		// Add APPPATH as the first path
 		$include_paths = array();
 		//self::$include_paths[] = APPPATH;
-
+		
+		
+		
 		if ($store_code != null) {
 			$include_paths[] = APPPATH . $app_code . DS . $org_code . DS . $store_code . DS;
 			$include_paths[] = APPPATH . $app_code . DS . $org_code . DS . $store_code . DS . "default" . DS;
@@ -387,13 +401,14 @@ final class CF {
 
 		
 
-
 		foreach (self::$configuration['core']['modules'] as $path) {
 			if ($path = str_replace('\\', '/', realpath($path))) {
 				// Add a valid path
 				$include_paths[] = $path . '/';
 			}
 		}
+		
+		$include_paths[] = DOCROOT;
 		
 		$result = array();
 		foreach($include_paths as $path) {
@@ -456,6 +471,8 @@ final class CF {
 
             // Add SYSPATH as the last path
             self::$include_paths[] = SYSPATH;
+			
+			self::$include_paths[] = DOCROOT;
         }
 
         return self::$include_paths;

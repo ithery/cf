@@ -48,7 +48,24 @@ class csync {
             $code = $app->code();
         }
         $data_path.=$code.DIRECTORY_SEPARATOR."synchronize.php";
-        $data = include $data_path;
+		$data =array();
+		if(file_exists($data_path)) {
+			$data = include $data_path;
+		}
+		
+		$app_files = CF::get_files('config','synchronize');
+		//$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
+		$app_files = array_reverse($app_files);
+		
+		foreach ($app_files as $file) {
+			$app_modules = include $file;
+			if(!is_array($app_modules)) {
+				trigger_error("Invalid Client Modules Config Format On ".$file);
+			}
+			
+			$data = array_merge($data,$app_modules);
+		}
+		
         return $data;
     }
 }

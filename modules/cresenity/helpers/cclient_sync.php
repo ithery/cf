@@ -7,11 +7,29 @@ class cclient_sync {
 		$app = CApp::instance();
 		$data = csync::data();
 		$tables = array();
-		if(strlen($org_id)==0) $org_id = $app->org()->org_id;
-		if(strlen($store_id)==0) $store_id = $app->store()->store_id;
+		$org = $app->org();
+		$store = $app->store();
 		
+		if(strlen($org_id)==0) {
+			if($org!=null) {
+				$org_id = $org->org_id;
+			}
+		}
+		if(strlen($store_id)==0) {
+			if($store!=null) {
+				$store_id = $store->store_id;
+			}
+		
+		}
+
 			
-		$q = "select count(1) total from ".$db->escape_table($table)." where sync_status=0 and org_id=".$db->escape($org_id)." and store_id=".$db->escape($store_id);
+		$q = "select count(1) total from ".$db->escape_table($table)." where sync_status=0";
+		if(strlen($org_id)>0) {
+			$q.=" and org_id=".$db->escape($org_id)."";
+		}
+		if(strlen($store_id)>0) {
+			$q.=" and store_id=".$db->escape($store_id)."";
+		}
 		
 		return cdbutils::get_value($q); 
 		

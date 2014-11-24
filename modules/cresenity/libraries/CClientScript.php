@@ -36,10 +36,21 @@ class CClientScript extends CObject {
 	}
 	
 	public function fullpath_js_file($file) {
+		
+		
 		$path = DOCROOT."media".DS.'js'.DS;
 		return $path.$file;
 	}
 	public function fullpath_css_file($file) {
+		$dirs = CF::get_dirs('media');
+		
+		foreach($dirs as $dir) {
+			$path = $dir.'css'.DS.$file;
+			if(file_exists($path)) {
+				return $path;
+			}
+		
+		}
 		$path = DOCROOT."media".DS.'css'.DS;
 		return $path.$file;
 	}
@@ -54,9 +65,11 @@ class CClientScript extends CObject {
 		}
 		//return CResource::instance('js')->url($file);
 		
-		$path = curl::base()."media/js/";
+		//$path = curl::base()."media/js/";
+		$docroot=str_replace(DS,"/",DOCROOT);
 		$file=str_replace(DS,"/",$file);
-		return $path.$file;
+		$file=str_replace($docroot,curl::base(),$file);
+		return $file;
 	}
 	public function url_css_file($file=null) {
 		if($file==null) {
@@ -69,9 +82,10 @@ class CClientScript extends CObject {
 			return $urls;
 		}
 		//return CResource::instance('css')->url($file);
-		$path = curl::base()."media/css/";
+		$docroot=str_replace(DS,"/",DOCROOT);
 		$file=str_replace(DS,"/",$file);
-		return $path.$file;
+		$file=str_replace($docroot,curl::base(),$file);
+		return $file;
 	}
 	
 	public function register_js_files($files,$pos="end") {
@@ -89,18 +103,20 @@ class CClientScript extends CObject {
 		
 	}
 	public function register_js_file($file,$pos="end") {
-		if(!file_exists($this->fullpath_js_file($file))) {
-			trigger_error('JS File not exists, '.$this->fullpath_js_file($file));
+		$js_file = $this->fullpath_js_file($file);
+		if(!file_exists($js_file)) {
+			trigger_error('JS File not exists, '.$file);
 			
 		}
-		$this->scripts[$pos]['js_file'][] = $file;
+		$this->scripts[$pos]['js_file'][] = $js_file;
 	}
 	public function register_css_file($file,$pos="head") {
-		if(!file_exists($this->fullpath_css_file($file))) {
-			trigger_error('CSS File not exists, '.$this->fullpath_css_file($file));
+		$css_file = $this->fullpath_css_file($file);
+		if(!file_exists($css_file)) {
+			trigger_error('CSS File not exists, '.$file);
 			
 		}
-		$this->scripts[$pos]['css_file'][] = $file;
+		$this->scripts[$pos]['css_file'][] = $css_file;
 	}
 	
 	public function js_files() {

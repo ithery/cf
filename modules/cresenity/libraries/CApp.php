@@ -141,10 +141,15 @@ class CApp extends CObservable {
     public function app_id() {
         return $this->_app_id;
     }
-
+	
+	public function manager() {
+		return CManager::instance();
+	}
+	
     public function name() {
         //$app = CJDB::instance()->get("app", array("app_id" => $this->app_id()));
         //return $app[0]->name;
+		return CF::app_name();
     }
 
     public function code() {

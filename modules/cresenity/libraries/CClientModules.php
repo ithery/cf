@@ -13,6 +13,21 @@ final class CClientModules {
 	public function all_modules() {
 		if($this->all_modules==null) {
 			$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
+			$app_files = CF::get_files('config','client_modules');
+			//$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
+			$app_files = array_reverse($app_files);
+			
+			foreach ($app_files as $file) {
+				$app_modules = include $file;
+				if(!is_array($app_modules)) {
+					trigger_error("Invalid Client Modules Config Format On ".$file);
+				}
+				
+				$this->all_modules = array_merge($this->all_modules,$app_modules);
+			}
+			
+			
+			
 		}
 		return $this->all_modules;
 	}

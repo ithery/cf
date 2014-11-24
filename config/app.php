@@ -1,5 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
+
+
+
 $config["app_id"] = 1;
 $config["install"] = false;
 $config["title"] = "CRESENITY";
@@ -25,4 +28,4 @@ $config["minify_js"] = true;
 $config["merge_css"] = false;
 $config["minify_css"] = true;
 
-
+return $config;
