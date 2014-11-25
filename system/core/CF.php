@@ -70,7 +70,7 @@ final class CF {
 
         return self::$app_id;
     }
-
+	
     public static function app_code() {
         return self::$app_code;
     }

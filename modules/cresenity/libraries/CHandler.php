@@ -52,11 +52,13 @@ class CHandler extends CObject  {
             $this->driver->$method($args);
         } else {
             $str = '';
-            $values = array_values($args);
+			
+			$values = array_values($args);
             for ( $i=0; $i<count($values); $i++ ) {
-                $str .= "'".$values[$i]."' ,";
+				if(strlen($str)>0) $str.=",";
+				$str .= "".cphp::string_value($values[$i])."";
             }   
-            $str = substr($str, 0, -2);
+            //$str = substr($str, 0, -2);
             eval('$this->driver->'.$method.'('.$str.');');
         }   
 		
