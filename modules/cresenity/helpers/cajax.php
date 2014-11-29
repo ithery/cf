@@ -129,11 +129,11 @@ class cajax {
 		*/
 		
 		$sWhere = "";
-		if (strlen($term)>0&&strlen($search_field)>0) {
+		if (strlen($term)>0&&(!empty($search_field))) {
 			$sWhere = "WHERE (";
 			if(is_array($search_field)) {
 				foreach($search_field as $f) {
-					$sWhere .= "`".$f."` LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
+					$sWhere .= "`".$f."` LIKE '%".mysql_real_escape_string( $term )."%' OR ";
 				}
 			} else {
 				$sWhere .= "`".$search_field."` LIKE '%".mysql_real_escape_string( $term )."%' OR ";
