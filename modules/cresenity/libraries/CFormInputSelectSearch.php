@@ -9,16 +9,7 @@ class CFormInputSelectSearch extends CFormInput {
 
 	public function __construct($id) {
 		parent::__construct($id);
-		$valid_prop = array(
-			"query",
-			"format_selection",
-			"format_result",
-			"key_field",
-			"search_field",
-			"placeholder",
-			
-		);
-		$this->add_valid_prop($valid_prop);
+		
 		$this->type="selectsearch";
 		$this->query = "";
 		$this->format_selection = "";
@@ -65,9 +56,13 @@ class CFormInputSelectSearch extends CFormInput {
 	
 	public function html($indent=0) {
 		$html = new CStringBuilder();
-		$html = new CStringBuilder();
+		$custom_css = $this->custom_css;
+		$custom_css = crenderer::render_style($custom_css);
+		if(strlen($custom_css)>0) {
+			$custom_css = ' style="'.$custom_css.'"';
+		}
 		$html->set_indent($indent);
-		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'">')->br();
+		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'" '.$custom_css.'>')->br();
 		return $html->text();	
 	}
 	public function js($indent=0) {
@@ -131,7 +126,7 @@ class CFormInputSelectSearch extends CFormInput {
 			";
 		}
 		$str = "
-			
+			console.log('a');
 			$('#".$this->id."').select2({
 				placeholder: '".$placeholder."',
 				minimumInputLength: 0,
@@ -169,7 +164,7 @@ class CFormInputSelectSearch extends CFormInput {
 		
 		$js = new CStringBuilder();
 		$js->set_indent($indent);
-		
+		//echo $str;
 		$js->append($str)->br();
 		
 		return $js->text();

@@ -436,7 +436,7 @@ class CForm extends CElement {
 			$on_before_submit="";
 			if(strlen($this->ajax_submit_target)>0) {
 				$on_before_submit = "
-					jQuery('#".$this->ajax_submit_target."').empty();
+					jQuery('#".$this->ajax_submit_target."').children().hide();
 					jQuery('#".$this->ajax_submit_target."').append(jQuery('<div>').attr('id','#".$this->ajax_submit_target."-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
 			
 				";
@@ -447,7 +447,7 @@ class CForm extends CElement {
 				jQuery('#".$this->ajax_submit_target."').html(data.html);
 				var script = $.cresenity.base64.decode(data.js);
 
-				
+				eval(script);
 				jQuery('#".$this->ajax_submit_target."').removeClass('loading');
 				jQuery('#".$this->ajax_submit_target."').data('xhr',false);
 				if(jQuery('#".$this->ajax_submit_target."').find('.prettyprint').length>0) {

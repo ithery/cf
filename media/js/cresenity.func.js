@@ -376,7 +376,7 @@
 					type: method,
 					url: url,
 					dataType: 'json',
-					data:additional_data,
+					data:additional_data
 				}).done(function( data ) {
 					
 					$.cresenity._handle_response(data,function() {
@@ -399,7 +399,7 @@
 				})
 			);
 		},
-		show_dialog : function(id_target,url,method,title) {
+		show_dialog : function(id_target,url,method,title,additional_data) {
 			if(!title) title = 'Dialog';
 			
 			
@@ -418,6 +418,7 @@
 			var selection = jQuery('#'+id_target);
             var handle;
 			var dialog_is_remove = false;
+			
 			if(selection.length==0) {
 				selection = jQuery('<div/>').attr('id',id_target);
 				dialog_is_remove = true;
@@ -481,7 +482,7 @@
 					type: method,
 					url: url,
 					dataType: 'json',
-					
+					data:additional_data
 				}).done(function( data ) {
 					
 					$.cresenity._handle_response(data,function() {
