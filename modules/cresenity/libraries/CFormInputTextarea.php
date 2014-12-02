@@ -41,7 +41,7 @@
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
-            $html->appendln('<textarea cols="' . $this->col . '" rows="' . $this->row . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" ' . $disabled . '>' . $custom_css . $this->value . '</textarea>')->br();
+            $html->appendln('<textarea cols="' . $this->col . '" rows="' . $this->row . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" ' . $disabled . $custom_css . '>' . $this->value . '</textarea>')->br();
             //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
             return $html->text();
         }
