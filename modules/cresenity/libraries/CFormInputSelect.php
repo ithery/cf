@@ -8,7 +8,7 @@ class CFormInputSelect extends CFormInput {
 		$this->tag = "select";
 		$this->multiple=false;
 		$this->type="select";
-		$this->applyjs="select2";
+		$this->applyjs="false";
 	}
 	
 	public static function factory($id) {
