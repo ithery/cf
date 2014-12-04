@@ -445,16 +445,16 @@ final class CF {
             //self::$include_paths[] = APPPATH;
 
             if (self::$store_code != null) {
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
                 self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS;
+                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
             }
             if (self::$org_code != null) {
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
                 self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
+                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
             }
             if (self::$app_code != null) {
-                self::$include_paths[] = APPPATH . self::$app_code . DS;
                 self::$include_paths[] = APPPATH . self::$app_code . DS . "default" . DS;
+                self::$include_paths[] = APPPATH . self::$app_code . DS;
             }
 
             self::$include_paths[] = APPPATH . "default" . DS;

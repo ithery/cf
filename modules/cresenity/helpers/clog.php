@@ -287,6 +287,42 @@ class clog {
         $db->insert("log_cleanup", $data);
     }
 
+    public static function log($filename,$type,$message) {
+            $date = date("Y-m-d H:i:s");
+            $str = $date." ".$type." ".$message."\r\n";
+            $filename = DOCROOT."/log/".date("Ymd")."_".$filename;
+            $fh = @fopen($filename, 'a+');
+            fwrite($fh,$str);
+            @fclose($fh); 	
+    }
+    
+    /**
+     * This function is used for log for any statement. <br/>
+     * Here is inline an example: 
+     * <pre>
+     *  <code>
+     *      <?php clog::write('Test');?>
+     *  </code>
+     * </pre>
+     * 
+     * @param array/string $options     
+     * @return boolean
+     * @ex
+     */
+    public static function write($options){
+        $clogger_instance = CLogger::instance();
+        
+        $message = $options;
+        if (is_array($options)) {
+            $message = carr::get($options, 'message');
+            $filename = carr::get($options, 'filename');
+            $level = carr::get($options, 'level');
+            
+            if (strlen($filename) > 0) $clogger_instance->set_suffix_filename($filename);
+            if (strlen($level) > 0) $clogger_instance->set_level($level);
+        }
+        return $clogger_instance->write($message);
+    }
 }
 
 ?>

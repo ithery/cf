@@ -149,8 +149,7 @@ class CApp extends CObservable {
     public function name() {
         //$app = CJDB::instance()->get("app", array("app_id" => $this->app_id()));
         //return $app[0]->name;
-		//return CF::app_name();
-		return "";
+//		return CF::app_name();
     }
 
     public function code() {
@@ -478,7 +477,7 @@ class CApp extends CObservable {
 			$js = $cs->render_js_require($js);
 			
 			if(ccfg::get("minify_js")) {
-				//$js = CJSMin::minify($js);
+				$js = CJSMin::minify($js);
 			}
 			
 			$v->js = $js;
