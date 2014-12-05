@@ -1,7 +1,6 @@
 <?php
 
 class CTable extends CElement {
-
     public $default_paging_list = array(
         "10" => "10",
         "25" => "25",
@@ -58,6 +57,7 @@ class CTable extends CElement {
 
     public function __construct($id = "") {
         parent::__construct($id);
+		$this->default_paging_list["-1"] = clang::__("ALL");
 		$this->tag = "table";
         $this->db = CDatabase::instance();
         $this->db_config = $this->db->config();
@@ -950,7 +950,7 @@ class CTable extends CElement {
                     if ($this->action_style == "btn-dropdown") {
                         $action_width = 70;
                     }
-                    $html->appendln('<th data-align="align-center" scope="col" width="' . $action_width . '" class="align-center' . $th_class . '">Actions</th>')->br();
+                    $html->appendln('<th data-align="align-center" scope="col" width="' . $action_width . '" class="align-center' . $th_class . '">'.clang::__('Actions').'</th>')->br();
                 }
                 $html->dec_indent()->appendln("</tr>")->br();
             }
@@ -1352,6 +1352,18 @@ class CTable extends CElement {
                     ->appendln("'iDisplayLength': " . $this->display_length . ",")->br()
                     ->appendln("'bSortCellsTop': " . $hs_val . ",")->br()
                     ->appendln("'aaSorting': [],")->br()
+                    ->appendln("'oLanguage': { 
+						sSearch : '".clang::__('Search')."',
+						sProcessing : '".clang::__('Processing')."',
+						sLengthMenu  : '".clang::__('Show')." _MENU_ ".clang::__('Entries')."',
+						oPaginate  : {'sFirst' : '".clang::__('First')."',
+										'sLast' : '".clang::__('Last')."',
+										'sNext' : '".clang::__('Next')."',
+										'sPrevious' : '".clang::__('Previous	')."'},
+						sInfoEmpty  : '".clang::__('No data available in table')."',
+						sEmptyTable  : '".clang::__('No data available in table')."',
+						sInfoThousands   : '".clang::__('')."',
+					},")->br()
                     ->appendln("'bDeferRender': " . ($this->get_option("defer_render") ? "true" : "false") . ",")->br()
                     ->appendln("'bFilter': " . ($this->get_option("filter") ? "true" : "false") . ",")->br()
                     ->appendln("'bInfo': " . ($this->get_option("info") ? "true" : "false") . ",")->br()
@@ -1423,6 +1435,7 @@ class CTable extends CElement {
               $js->append("
               },");
              */
+			
             $js->append("")
                     ->dec_indent()->appendln("});")->br();
 

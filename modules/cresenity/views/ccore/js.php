@@ -77,7 +77,16 @@ var scrolltotop={
 
 scrolltotop.init();
 
-
+	jQuery(document).on('click','a.confirm',function(e) {
+		var ahref = $(this).attr('href');
+		e.preventDefault();
+		e.stopPropagation();
+		bootbox.confirm("<?php echo clang::__('Are you sure?'); ?>", function(confirmed) {
+			if(confirmed) {
+				window.location.href=ahref;
+			}
+		});
+	});
 	jQuery(document).ready(function() {
         jQuery("#toggle-subnavbar").click(function() {
             var cmd = jQuery("#toggle-subnavbar span").html();
@@ -94,7 +103,7 @@ scrolltotop.init();
         jQuery("#toggle-fullscreen").click(function() {
             $.cresenity.fullscreen(document.documentElement);
         });
-
+		
     });
 <?php if (ccfg::get("have_clock")) : ?>
 	

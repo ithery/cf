@@ -147,16 +147,7 @@ jQuery(document).ready(function() {
 	});	
 	
 	
-	$(document).on('click','a.confirm',function(e) {
-		var ahref = $(this).attr('href');
-		e.preventDefault();
-		e.stopPropagation();
-		bootbox.confirm("Are you sure?", function(confirmed) {
-			if(confirmed) {
-				window.location.href=ahref;
-			}
-		});
-	});
+	
 	
 	$(document).on('click','a.ajax-load',function(e) {
 		event.preventDefault();
