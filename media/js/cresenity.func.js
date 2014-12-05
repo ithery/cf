@@ -55,7 +55,7 @@
 			$.cresenity._filesneeded=0;
 			if(data.css_require&&data.css_require.length>0) $.cresenity._filesneeded+=data.css_require.length;
 			if(data.js_require&&data.js_require.length>0) $.cresenity._filesneeded+=data.js_require.length;
-			//console.log('needed:'+$.cresenity._filesneeded);
+			console.log('needed:'+$.cresenity._filesneeded);
 			if(data.css_require&&data.css_require.length>0) {
 				for(var i=0;i<data.css_require.length;i++) {
 					$.cresenity.require(data.css_require[i],'css',callback);
@@ -72,7 +72,7 @@
 		},
 		_handle_response_callback: function (callback) {
 			$.cresenity._filesloaded++;
-			//console.log('dynamic loaded:'+$.cresenity._filesloaded);
+			console.log('dynamic loaded:'+$.cresenity._filesloaded);
 			if($.cresenity._filesloaded==$.cresenity._filesneeded) {
 				callback();
 			}
@@ -83,7 +83,7 @@
 				$.cresenity._filesadded+="["+filename+"]" //List of files added in the form "[filename1],[filename2],etc"
 			} else {
 				$.cresenity._filesloaded++;
-				//console.log('already loaded:'+$.cresenity._filesloaded);
+				console.log('already loaded:'+$.cresenity._filesloaded);
 				if($.cresenity._filesloaded==$.cresenity._filesneeded) {
 					callback();
 				}
@@ -159,26 +159,25 @@
 			
 
 		},
-		message: function(type,message) {
-			
+		message: function(type,message,alert_type) {
+			alert_type = typeof alert_type !== 'undefined' ? alert_type : 'notify';
 			var container = $('#container');
+			if(alert_type=='bootbox') {
+				bootbox.alert(message);
+			}
 			
-			obj = $('<div>');
-			/*
-			obj.addClass('alert');
-			obj.addClass('alert-'+type);
-			btnd = $('<button>').addClass('close').attr('data-dismiss','alert').html('&times;');;
-			obj.append(btnd).append(message);
-			*/
-			container.prepend(obj);
-			obj.addClass('notifications');
-			obj.addClass('top-right');
-			
-			
-			obj.notify({
-				'message': { text: message },
-				'type': type
-			}).show();	
+			if(alert_type=='notify') {
+				obj = $('<div>');
+				container.prepend(obj);
+				obj.addClass('notifications');
+				obj.addClass('top-right');
+				
+				
+				obj.notify({
+					'message': { text: message },
+					'type': type
+				}).show();	
+			}
 			
 		},
 		thousand_separator: function(rp) {
@@ -357,7 +356,7 @@
 				return url;
 			}
 		},
-		reload : function(id_target,url,method,additional_data) {
+		reload : function(id_target,url,method) {
 			
 			if(!method) method="get";
 			var xhr = jQuery('#'+id_target).data('xhr');
@@ -376,13 +375,13 @@
 					type: method,
 					url: url,
 					dataType: 'json',
-					data:additional_data
+					
 				}).done(function( data ) {
 					
 					$.cresenity._handle_response(data,function() {
 						jQuery('#'+id_target).html(data.html);
 						var script = $.cresenity.base64.decode(data.js);
-						//console.log(script);
+						console.log(script);
 						eval(script);
 						
 						jQuery('#'+id_target).removeClass('loading');
@@ -399,7 +398,7 @@
 				})
 			);
 		},
-		show_dialog : function(id_target,url,method,title,additional_data) {
+		show_dialog : function(id_target,url,method,title) {
 			if(!title) title = 'Dialog';
 			
 			
@@ -418,7 +417,6 @@
 			var selection = jQuery('#'+id_target);
             var handle;
 			var dialog_is_remove = false;
-			
 			if(selection.length==0) {
 				selection = jQuery('<div/>').attr('id',id_target);
 				dialog_is_remove = true;
@@ -482,7 +480,7 @@
 					type: method,
 					url: url,
 					dataType: 'json',
-					data:additional_data
+					
 				}).done(function( data ) {
 					
 					$.cresenity._handle_response(data,function() {

@@ -25,7 +25,7 @@
 	 * @param object options - optional (see defaults for a complete list)
 	 * @return jQuery the messages nodes
 	 */
-	$.fn.message = function(message, options)
+	$.fn.message = function(message, options, type)
 	{
 		// Settings
 		var globalSettings = $.extend({}, $.fn.message.defaults, options),
