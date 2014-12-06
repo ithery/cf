@@ -356,7 +356,7 @@
 				return url;
 			}
 		},
-		reload : function(id_target,url,method) {
+		reload : function(id_target,url,method,data_addition) {
 			
 			if(!method) method="get";
 			var xhr = jQuery('#'+id_target).data('xhr');
@@ -365,7 +365,7 @@
 			url = $.cresenity.url.replace_param(url);
 			
 			
-			
+			if(typeof data_addition == 'undefined') data_addition={};
 			url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
 			jQuery('#'+id_target).addClass('loading');
 			jQuery('#'+id_target).empty();
@@ -375,6 +375,7 @@
 					type: method,
 					url: url,
 					dataType: 'json',
+					data: data_addition,
 					
 				}).done(function( data ) {
 					
