@@ -399,9 +399,10 @@
 				})
 			);
 		},
-		show_dialog : function(id_target,url,method,title) {
+		show_dialog : function(id_target,url,method,title,data_addition) {
 			if(!title) title = 'Dialog';
 			
+			if(typeof data_addition == 'undefined') data_addition={};
 			
 			var _dialog_html = "<div class='modal' style=\"display: none;\">" + 
 				"<div class='modal-header loading'>" +
@@ -481,6 +482,7 @@
 					type: method,
 					url: url,
 					dataType: 'json',
+					data: data_addition,
 					
 				}).done(function( data ) {
 					
