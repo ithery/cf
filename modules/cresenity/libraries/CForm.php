@@ -22,6 +22,7 @@ class CForm extends CElement {
     protected $ajax_process_id;
     protected $ajax_submit_handlers;
 	protected $ajax_submit_target;
+	protected $auto_set_focus;
 
     public function __construct($form_id = "") {
         parent::__construct($form_id);
@@ -46,6 +47,7 @@ class CForm extends CElement {
         $this->ajax_redirect_url = "";
         $this->ajax_submit_handlers = array();
 		$this->ajax_submit_target = false;
+		$this->auto_set_focus = true;
 		
     }
 
@@ -531,8 +533,13 @@ class CForm extends CElement {
                 }
             }
         }
+		if($this->auto_set_focus) {
+			$js->appendln("
+				$('#" . $this->id . "').find(':input:enabled:visible:first').focus();
+			");
+		}
         $js->appendln(parent::js($js->get_indent()))->br();
-
+		
         return $js->text();
     }
 

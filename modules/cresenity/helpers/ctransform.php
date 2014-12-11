@@ -3,6 +3,16 @@ class ctransform {
 	public static function thousand_separator($rp,$decimal=null,$always_decimal=false) {
 		$minus_str = "";
 		
+		$ds = ccfg::get('decimal_separator');
+		if($ds==null) {
+			$ds = "."; //decimal separator
+		}
+		$ts = ccfg::get('thousand_separator');
+		if($ts==null) {
+			$ts = ","; //thousand separator
+		}
+		
+		
 		if (strpos($rp,"-")!==false) {
 			$minus_str = substr($rp,0,strpos($rp,"-")+1);
 			$rp = substr($rp,strpos($rp,"-")+1);
@@ -27,7 +37,7 @@ class ctransform {
 		
 		$p = strlen($rp);                    
 		while($p > 3) {
-			$rupiah = "," . substr($rp,-3) . $rupiah;
+			$rupiah = $ts . substr($rp,-3) . $rupiah;
 			$l = strlen($rp) - 3;
 			$rp = substr($rp,0,$l);
 			$p = strlen($rp);
@@ -37,6 +47,7 @@ class ctransform {
 			if (strlen($float)>$decimal) $float = substr($float,0,$decimal+1);
 		
 		}
+		$float = str_replace(".",$ds,$float);
 		if($always_decimal==false) {
 			if($float==".00") $float = "";
 		} 
@@ -94,6 +105,17 @@ class ctransform {
             return self::thousand_separator($x);
         }
         public static function unformat_currency($x){
-            return str_replace(",", "", $x);
+			$ds = ccfg::get('decimal_separator');
+			if($ds==null) {
+				$ds = "."; //decimal separator
+			}
+			$ts = ccfg::get('thousand_separator');
+			if($ts==null) {
+				$ts = ","; //thousand separator
+			}
+			$ret = $x;
+            $ret = str_replace($ts, "", $ret);
+			$ret = str_replace($ds, ".", $ret);
+			return $ret;
         }
 }
