@@ -105,6 +105,7 @@ class CCurl {
 
         //exec curl
         $result = curl_exec($this->handle);
+        
         $this->last_response = $result;
         $this->last_response_header = null;
         $this->last_response_body = $result;

@@ -46,9 +46,8 @@
 			</a>
 			
 			<a class="brand" href="<?php echo curl::base(); ?>">
-				<?php //echo ccfg::get('title'); ?>				
-                            aksdjasjdf
-			</a>		
+				<?php echo ccfg::get('title'); ?>				
+        	</a>		
 			
 			<div class="nav-collapse">
 				<ul class="nav pull-right">

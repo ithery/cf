@@ -46,7 +46,7 @@ class Roles_Controller extends CController {
     public function index2() {
         $app = CApp::instance();
         $org = $app->org();
-        $org_id = "";
+        $org_id = null;
         if ($org != null) {
             $org_id = $org->org_id;
         }
@@ -66,7 +66,7 @@ class Roles_Controller extends CController {
         $table->add_column('name')->set_label('Name');
         $table->add_column('created')->set_label('Created')->set_editable(false);
         $table->add_column('createdby')->set_label('Created By')->set_editable(false);
-        $q = 'select p.name as parent_name,r.role_id,r.name,r.created,r.createdby,r.updated from roles as r left join roles as p on p.role_id=r.parent_id where r.status>0 and r.org_id=' . $db->escape($org_id) . ' and r.role_level>' . $db->escape($role->role_level);
+        $q = 'select p.name as parent_name,r.role_id,r.name,r.created,r.createdby,r.updated from roles as r left join roles as p on p.role_id=r.parent_id where r.status>0  and r.role_level>' . $db->escape($role->role_level);
         $table->set_data_from_query($q)->set_key('role_id');
         //$table->add_row_action('edit')->set_label('Edit')->set_icon('pencil');
         //$table->add_row_action('delete')->set_icon('trash');
@@ -143,7 +143,11 @@ class Roles_Controller extends CController {
 
 
                 if ($error == 0) {
-                    $qcheck = "select * from roles where name=" . $db->escape($name) . " and status>0 and org_id=" . $db->escape($org_id);
+                    $qcheck = "select * from roles where name=" . $db->escape($name) . " and status>0 ";
+                    if(strlen($org_id)>0){
+                        $qcheck.="and org_id=" . $db->escape($org_id) ;
+                    }
+
                     if ($is_add == 0)
                         $qcheck .= " and name<>" . $db->escape($name) . "";
                     $rcheck = $db->query($qcheck);
@@ -184,7 +188,7 @@ class Roles_Controller extends CController {
                         $tree->update($id, $data, $parent_id);
                     }
                 }
-            } catch (Kohana_Exception $e) {
+            } catch (Exception $e) {
                 $error++;
                 $error_message = "Error, call administrator..." . $e->getMessage();
                 ;
@@ -295,7 +299,7 @@ class Roles_Controller extends CController {
                 $tree->delete($id);
                 //$db->update("roles",array("status"=>"0","updated"=>date("Y-m-d H:i:s"),"updatedby"=>$app->user()->username),array("role_id" => $id));
                 //$db->delete("roles", array("role_id" => $id));
-            } catch (Kohana_Exception $e) {
+            } catch (Exception $e) {
                 $error++;
                 $error_message = "Fail on delete, please call the administrator...";
             }
@@ -314,9 +318,9 @@ class Roles_Controller extends CController {
     private function update_recursive($data, $parent_id) {
         $db = CDatabase::instance();
         $app = CApp::instance();
-        $org = $app->org();
+
         $user = $app->user();
-        $org_id = $org->org_id;
+        $org_id = null;
 
         foreach ($data as $d) {
             $id = $d['id'];
@@ -333,13 +337,13 @@ class Roles_Controller extends CController {
 
     public function ordering() {
         $app = CApp::instance();
-        $app->title(clang::__("Roles"));
+        $app->title(clang::__("Change Order"));
         $app->add_breadcrumb(clang::__("Roles"), curl::base() . "roles");
         $user = $app->user();
         $role = $app->role();
         $app_role_id = $role->role_id;
-        $org = $app->org();
-        $org_id = $org->org_id;
+
+        $org_id = null;
         $db = CDatabase::instance();
         $tree = CTreeDB::factory('roles');
         $post = $_POST;
@@ -347,19 +351,27 @@ class Roles_Controller extends CController {
             $error = 0;
             $data = $post['data_order'];
             $data = cjson::decode($data);
+			
             try {
                 $db->begin();
+				if(!is_array($data)) {
+					throw new Exception('Invalid Data');
+				}
                 $this->update_recursive($data, $app_role_id);
-                $q = "select * from roles where org_id=" . $db->escape($org_id) . " and parent_id is null";
+                $q = "select * from roles where parent_id is null ";
+                if(strlen($org_id)>0){
+                    $q.=" and org_id=" . $db->escape($org_id) . " ";
+                }
+
                 $r = $db->query($q);
                 $left = 1;
                 foreach ($r as $row) {
                     $tree->rebuild_tree($row->role_id, $left);
                     $left = cdbutils::get_value('select rgt from roles where role_id=' . $db->escape($row->role_id)) + 1;
                 }
-            } catch (Kohana_Exception $e) {
+            } catch (Exception $e) {
                 $error++;
-                $error_message = clang::__("system_update_fail") . $e->getMessage();
+                $error_message = clang::__("system_update_fail") ." ". $e->getMessage();
             }
             if ($error == 0) {
                 $db->commit();

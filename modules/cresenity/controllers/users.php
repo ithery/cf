@@ -32,7 +32,9 @@ class Users_Controller extends CController {
                 " ,u.created" .
                 " ,u.createdby" .
                 " from users u inner join roles as r on u.role_id=r.role_id where u.status>0 and r.role_level>" . $role->role_level;
-        $q.= ' and u.org_id=' . $db->escape($org_id);
+        if(strlen($org_id)>0) {
+			$q.= ' and u.org_id=' . $db->escape($org_id);
+		}
         $table->set_data_from_query($q)->set_key('user_id');
         //$table->add_row_action('edit')->set_label('Edit')->set_icon('pencil');
         //$table->add_row_action('delete')->set_icon('trash');
@@ -220,9 +222,7 @@ class Users_Controller extends CController {
         $form->add_field('role-field')->set_label('Role')->add_control('role_id', 'select')->add_validation(null)->set_value($role_id)->set_list($role_list);
         $form->add_field('username-field')->set_label('Username')->add_control('username', 'text')->add_validation('required')->set_value($username);
         $form->add_field('password-field')->set_label('Password')->add_control('password', 'password')->add_validation(null)->set_value('');
-        if ($app->have_store()) {
-            $form->add_field()->set_label('Store')->add_control('store_id', 'checkbox-list')->add_validation(null)->set_value($store_id)->set_list($app->store_list());
-        }
+
         $form->add_field('description-field')->set_label('Description')->add_control('description', 'textarea')->add_validation(null)->set_value($description);
         $form->add_control('id', 'hidden')->add_validation(null)->set_value($id);
         $actions = $form->add_action_list();

@@ -368,6 +368,17 @@ final class CF {
 		
 	}
 	
+	public static function get_config($filename,$domain=null) {
+		$files = self::get_files('config',$filename,$domain);
+		$files = array_reverse($files);
+		$ret = array();
+		foreach($files as $file) {
+			$cfg = include $file;
+			$ret = array_merge($ret,$cfg);
+		}
+		return $ret;
+	}
+	
 	public static function get_files($directory,$filename,$domain=null) {
 		if($domain==null) $domain = crouter::domain();
 		

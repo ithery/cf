@@ -162,7 +162,7 @@ class User_permission_Controller extends CController {
         $user = $app->user();
 
         $html = '';
-        $app_list = $app->app_list();
+         $app_list = array('101'=>'MINITORS');
         $app_id = "";
         if (isset($_GET["app_id"])) {
             $app_id = $_GET["app_id"];
@@ -207,14 +207,9 @@ class User_permission_Controller extends CController {
         $form->add_field('application-field')->set_label('Application')->add_control('app_id', 'select')->set_value($app_id)->set_list($app_list)->add_validation(null);
         $form->add_field('role-field')->set_label('Role')->add_control('role_id', 'select')->set_value($role_id)->set_list($role_list)->add_validation(null);
         $form->add_field('check-all-field')->set_label('Check All')->add_control('check_all', 'checkbox')->set_value("1");
-        $domain = "";
-        $cdb = CJDB::instance();
-        $domain_data = $cdb->get('domain', array("org_id" => $app->org()->org_id, "app_id" => $app_id))->result_array();
+        $domain = CF::domain();
 
-        if (count($domain_data) > 0) {
-            $domain_row = $domain_data[0];
-            $domain = $domain_row['domain'];
-        }
+      
         $data = cnav::app_user_rights_array($app_id, $role_id, $app->role()->role_id, $domain);
 
 
