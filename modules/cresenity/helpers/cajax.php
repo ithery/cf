@@ -141,21 +141,32 @@ class cajax {
 			
 			$sWhere = substr_replace( $sWhere, "", -3 );
 			$sWhere .= ')';
+                        
+                        //order
+                        if(is_array($search_field)) {
+				foreach($search_field as $f) {
+                                    if(strlen($sOrder)>0) $sOrder.=",";
+                                    $sOrder.= "`".$f."` = '".mysql_real_escape_string( $term )."' DESC";
+				}
+                        }
+                        
 		}
 		
-		
+		if(strlen($sOrder)>0) {
+                    $sOrder = " ORDER BY ".$sOrder;
+                }
 		$qfilter = "select * from (".$q.") as a ".$sWhere.' '.$sOrder.' '.$sLimit;
-		
+		//echo $qfilter;
 		$r=$db->query($qfilter);
 		
 		$result = $r->result(false);
 		$data = array();
 		foreach ($r as $row) {
 			$p = array();
-			$p["id"]=$row[$key_field];
 			foreach($row as $k=>$v) {
 				$p[$k]=$v;
 			}
+			$p["id"]=$row[$key_field];
 			//$p["id"]=$row["item_id"];
 			$data[] = $p;
 		}
