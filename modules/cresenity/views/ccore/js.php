@@ -81,7 +81,7 @@ scrolltotop.init();
 		var ahref = $(this).attr('href');
 		e.preventDefault();
 		e.stopPropagation();
-		bootbox.confirm("<?php echo clang::__('Are you sure?'); ?>", function(confirmed) {
+		bootbox.confirm("<?php echo clang::__('Are you sure').' ?'; ?>", function(confirmed) {
 			if(confirmed) {
 				window.location.href=ahref;
 			}
