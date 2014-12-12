@@ -195,7 +195,7 @@ class CAction extends CElement {
 
             if ($this->submit)
                 $input_type = "submit";
-            $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . '/>');
+            $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class. $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . '/>');
         } else {
             if ($this->type == "jsfunc") {
                 $link = 'javascript:;';
