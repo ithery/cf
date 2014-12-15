@@ -88,7 +88,7 @@ scrolltotop.init();
 		});
 	});
 	jQuery(document).on('click','input[type=submit].confirm',function(e) {
-		bootbox.confirm("<?php echo clang::__('Are you sure?'); ?>", function(confirmed) {
+		bootbox.confirm("<?php echo clang::__('Are you sure').' ?'; ?>", function(confirmed) {
 			if(confirmed) {
 				jQuery(e.target).closest('form').submit();
 			}
