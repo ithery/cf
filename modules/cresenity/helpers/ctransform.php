@@ -50,10 +50,20 @@ class ctransform {
 		$float = str_replace(".",$ds,$float);
 		if($always_decimal==false) {
 			if($float==".00") $float = "";
-		} 
+		}
+                $digit = ccfg::get('decimal_digit');
+                if($digit!=null) {
+                    $float = substr($float,0,$digit+1);
+                    if($float=="") {
+                        $float = $ds.str_repeat("0", $digit);
+                    }
+                }
+                /*
 		if(strlen($float)>3) {
 			$float = substr($float,0,3);
 		}
+                 
+                 */
 		return $minus_str.$rupiah.$float;
 	}
 	public static function short_date_format($x) {
