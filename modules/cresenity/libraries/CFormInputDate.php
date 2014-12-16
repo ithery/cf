@@ -12,7 +12,15 @@ class CFormInputDate extends CFormInput {
         CManager::instance()->register_module('datepicker');
 
         $this->type = "date";
-        $this->date_format = "yyyy-mm-dd";
+		$this->date_format = "yyyy-mm-dd";
+        $date_format = ccfg::get('date_formatted');
+		if($date_format!=null) {
+			$date_format = str_replace('Y','yyyy',$date_format);
+			$date_format = str_replace('m','mm',$date_format);
+			$date_format = str_replace('d','dd',$date_format);
+			$this->date_format = $date_format;
+		}
+		
         $this->have_button = false;
         $this->start_date = "";
         $this->disable_day = array();

@@ -61,6 +61,10 @@ class cutils {
         $m1 = Date('m');
         $y1 = Date('Y');
         $date1 = $y1 . "-" . $m1 . "-" . $d1;
+		$date_format = ccfg::get('date_formatted');
+		if($date_format!=null) {
+			$date1 = date($date_format,strtotime($date1));
+		}
         return $date1;
     }
 
@@ -69,6 +73,10 @@ class cutils {
         $m2 = Date('m');
         $y2 = Date('Y');
         $date2 = $y2 . "-" . $m2 . "-" . $d2;
+		$date_format = ccfg::get('date_formatted');
+		if($date_format!=null) {
+			$date2 = date($date_format,strtotime($date2));
+		}
         return $date2;
     }
 
