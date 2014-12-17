@@ -28,10 +28,10 @@ class CMessage extends CRenderable {
 		$html->set_indent($indent);
 		$class = ""; $header = "";
 		switch($this->type) {
-			case "warning": $class=" alert-warning"; $header = "Warning!"; break;
-			case "info": $class=" alert-info"; $header = "Info!"; break;
-			case "success": $class=" alert-success"; $header = "Success!"; break;
-			default : $class=" alert-error"; $header = "Error!"; break;
+			case "warning": $class=" alert-warning"; $header = clang::__("Warning")."!"; break;
+			case "info": $class=" alert-info"; $header = clang::__("Info")."!"; break;
+                        case "success": $class=" alert-success"; $header = clang::__("Success")."!"; break;
+                        default : $class=" alert-error"; $header = clang::__("Error")."!"; break;
 		
 		}
 		$html->appendln('<div class="alert '.$class.'">')->inc_indent()->br();

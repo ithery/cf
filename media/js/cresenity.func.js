@@ -55,7 +55,7 @@
 			$.cresenity._filesneeded=0;
 			if(data.css_require&&data.css_require.length>0) $.cresenity._filesneeded+=data.css_require.length;
 			if(data.js_require&&data.js_require.length>0) $.cresenity._filesneeded+=data.js_require.length;
-			console.log('needed:'+$.cresenity._filesneeded);
+			//console.log('needed:'+$.cresenity._filesneeded);
 			if(data.css_require&&data.css_require.length>0) {
 				for(var i=0;i<data.css_require.length;i++) {
 					$.cresenity.require(data.css_require[i],'css',callback);
@@ -72,7 +72,7 @@
 		},
 		_handle_response_callback: function (callback) {
 			$.cresenity._filesloaded++;
-			console.log('dynamic loaded:'+$.cresenity._filesloaded);
+			//console.log('dynamic loaded:'+$.cresenity._filesloaded);
 			if($.cresenity._filesloaded==$.cresenity._filesneeded) {
 				callback();
 			}
@@ -83,7 +83,7 @@
 				$.cresenity._filesadded+="["+filename+"]" //List of files added in the form "[filename1],[filename2],etc"
 			} else {
 				$.cresenity._filesloaded++;
-				console.log('already loaded:'+$.cresenity._filesloaded);
+				//console.log('already loaded:'+$.cresenity._filesloaded);
 				if($.cresenity._filesloaded==$.cresenity._filesneeded) {
 					callback();
 				}
@@ -382,7 +382,7 @@
 					$.cresenity._handle_response(data,function() {
 						jQuery('#'+id_target).html(data.html);
 						var script = $.cresenity.base64.decode(data.js);
-						console.log(script);
+						//console.log(script);
 						eval(script);
 						
 						jQuery('#'+id_target).removeClass('loading');

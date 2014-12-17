@@ -193,12 +193,14 @@ class CTabList extends CElement {
 					
 					var data_icon = jQuery(this).attr('data-icon');
 					var data_class = jQuery(this).attr('data-class');
+					console.log(this);
 					var data_text = jQuery(this).text();
 					if(data_icon) widget_tab.find('.widget-title .icon i').attr('class',data_icon);
 					
 					if(data_text) widget_tab.find('.widget-title h5').html(data_text);
 					var widget_content = widget_tab.find('.widget-content');
-					widget_content.removeAttr('class').addClass('widget-content')
+					widget_content.removeAttr('class').addClass('widget-content');
+					
 					if(data_class) widget_content.addClass(data_class);
 				}
 				

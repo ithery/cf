@@ -108,9 +108,19 @@ class ctransform {
         public static function format_long_date($x){
             return self::long_date_formatted($x);
         }
+		
+		public static function format_datetime($x) {
+			return self::long_date_formatted($x);
+		}
+		
         public static function unformat_long_date($x){
                 return date('Y-m-d H:i:s',strtotime($x));
         }
+		
+		public static function unformat_datetime($x) {
+			return date('Y-m-d H:i:s',strtotime($x));
+		}
+		
         public static function format_currency($x){
             return self::thousand_separator($x);
         }

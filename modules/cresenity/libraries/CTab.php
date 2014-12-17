@@ -8,6 +8,7 @@ class CTab extends CElement {
     protected $target;
     protected $ajax_url;
     protected $ajax;
+	protected $nopadding;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -18,6 +19,7 @@ class CTab extends CElement {
         $this->ajax_url = "";
         $this->ajax = true;
         $this->active = false;
+		$this->nopadding = false;
     }
 
     public static function factory($id = "") {
@@ -28,9 +30,15 @@ class CTab extends CElement {
         $this->active = $bool;
         return $this;
     }
-
-    public function set_label($label) {
-        $this->label = $label;
+	
+	public function set_nopadding($bool) {
+        $this->nopadding = $bool;
+        return $this;
+    }
+	
+    public function set_label($label,$lang=true) {
+        if($lang) $label = clang::__($label);
+		$this->label = $label;
         return $this;
     }
 
@@ -74,10 +82,21 @@ class CTab extends CElement {
         }
 
         $tab_class = "";
+		
+		
+		$classes = "";
+		
         if (count($this->classes) > 0) {
             $classes = implode(" ", $this->classes);
-            $tab_class = ' data-class="' . $classes . '"';
+			
+            
         }
+		if($this->nopadding) {
+			$classes.=" nopadding";
+		}
+		if(strlen($classes)>0) {
+			$tab_class = ' data-class="' . $classes . '"';
+		}
         $tab_tab = "";
         if (strlen($this->id) > 0) {
             $tab_tab = ' data-tab="' . $this->id . '"';

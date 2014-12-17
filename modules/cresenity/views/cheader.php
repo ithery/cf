@@ -126,7 +126,7 @@ $org = $app->org();
                                     <li><a href="javascript:;">My Groups</a></li>
                                     <li class="divider"></li>
                                     -->
-                                    <li><a href="<?php echo curl::base(); ?>account/profile"<i class="icon icon-user"></i>&nbsp;&nbsp;<?php echo clang::__('My Profile'); ?></a></li>
+                                    <li><a href="<?php echo curl::base(); ?>account/profile"><i class="icon icon-user"></i>&nbsp;&nbsp;<?php echo clang::__('My Profile'); ?></a></li>
                                     <li><a href="<?php echo curl::base(); ?>account/settings"><i class="icon icon-wrench"></i>&nbsp;&nbsp;<?php echo clang::__('My Settings'); ?></a></li>
                                     <li class="divider"></li>
                                     <li><a href="<?php echo curl::base(); ?>account/change_password"><i class="icon icon-key"></i>&nbsp;&nbsp;<?php echo clang::__('Change Password'); ?></a></li>
@@ -199,7 +199,7 @@ $org = $app->org();
                                 <?php foreach ($breadcrumb as $k => $b) : ?>
                                     <a href="<?php echo $b ?>" class=""><?php echo $k; ?></a>
                                 <?php endforeach; ?>
-                                <a href="<?php echo $_SERVER['PHP_SELF']; ?>" class="current"><?php echo $title; ?></a>
+                                <a href="javascript:;" class="current"><?php echo $title; ?></a>
                             </div>
                             <?php
                         endif;

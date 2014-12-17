@@ -53,8 +53,9 @@ class CAction extends CElement {
         return $this;
     }
 
-    public function set_label($label) {
-        $this->label = $label;
+    public function set_label($label,$lang=true) {
+        if($lang) $label = clang::__($label);
+		$this->label = $label;
         return $this;
     }
 

@@ -63,8 +63,9 @@ class CWidget extends CElement {
         $this->header_action_list->set_style($style);
     }
 
-    public function set_title($title) {
-        $this->title = $title;
+    public function set_title($title,$lang=true) {
+        if($lang) $title = clang::__($title);
+		$this->title = $title;
         return $this;
     }
 

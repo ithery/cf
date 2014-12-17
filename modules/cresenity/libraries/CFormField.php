@@ -55,8 +55,9 @@ class CFormField extends CElement {
         return $this;
     }
 
-    public function set_label($text) {
-        $this->label = $text;
+    public function set_label($text,$lang=true) {
+        if($lang) $text = clang::__($text);
+		$this->label = $text;
         return $this;
     }
 
