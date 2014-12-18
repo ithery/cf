@@ -67,7 +67,7 @@ abstract class CHandler_Driver {
 	
 	protected function script() {
 		if(strlen($this->target)==0) {
-			$this->target = crequest::current_container_id();
+			//$this->target = crequest::current_container_id();
 		}
 		$js = "";
 		return $js;

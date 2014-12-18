@@ -205,7 +205,7 @@ class CTabList extends CElement {
 				}
 				
 				if(jQuery('#" . $this->id . "').hasClass('ajax')) {
-					
+					console.log('tab_target:'+target);
 					$.cresenity.reload(target,url,method);
 				} else {
 					var tab_id = jQuery(this).attr('data-tab');

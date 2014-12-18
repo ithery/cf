@@ -419,10 +419,16 @@
 			var selection = jQuery('#'+id_target);
             var handle;
 			var dialog_is_remove = false;
+                        console.log('selection');
+			console.log(selection);
 			if(selection.length==0) {
 				selection = jQuery('<div/>').attr('id',id_target);
 				dialog_is_remove = true;
+                                
 			}
+			console.log(dialog_is_remove);
+                        console.log('=======================');
+			
 			
 			
 			
@@ -435,9 +441,12 @@
 				jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function(event) {
 					event.preventDefault();
 					if(dialog_is_remove) {
-						handle.parent().prev(".modal-backdrop").remove();
+                                            console.log('is_remove');
+                                            handle.parent().prev(".modal-backdrop").remove();
+                                                
 						jQuery(this).parents(".modal").find(".modal-body").parent().remove();
 					} else {
+                                            console.log('not_remove');
 						handle.parent().prev(".modal-backdrop").hide();
 						jQuery(this).parents(".modal").find(".modal-body").parent().hide();
 

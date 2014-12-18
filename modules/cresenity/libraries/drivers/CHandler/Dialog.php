@@ -40,7 +40,6 @@ class CHandler_Dialog_Driver extends CHandler_Driver {
 	
 	public function script() {
 		$js = parent::script();
-		
 		if(strlen($this->target)==0) {
 			$this->target = "modal_opt_".$this->event."_".$this->owner."_dialog";
 		}
