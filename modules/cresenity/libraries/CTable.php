@@ -128,7 +128,8 @@ class CTable extends CElement {
         return $this->export_excel || $this->export_excelxml || $this->export_excelcsv || $this->export_pdf;
     }
 
-    public function set_title($title) {
+    public function set_title($title,$lang=true) {
+		if($lang) $title = clang::__($title);
         $this->title = $title;
         return $this;
     }

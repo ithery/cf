@@ -1,6 +1,6 @@
 <?php
 class cselect2 {
-	public static function jsonp($query,$key_field,$search_field,$callback,$term,$page,$limit) {
+	public static function jsonp($query,$key_field,$search_field,$callback,$term,$page,$limit,$callback_function=null) {
 	
 		$db = CDatabase::instance();
 		$q=$query;
@@ -69,6 +69,9 @@ class cselect2 {
 			$p = array();
 			$p["id"]=$row[$key_field];
 			foreach($row as $k=>$v) {
+                                if($callback_function!=null) {
+                                    $v = call_user_func($callback_function,$k,$row,$v);
+                                }
 				$p[$k]=$v;
 			}
 			//$p["id"]=$row["item_id"];
