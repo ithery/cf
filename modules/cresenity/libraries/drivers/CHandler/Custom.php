@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class CHandler_Reload_Driver extends CHandler_Driver {
+class CHandler_Custom_Driver extends CHandler_Driver {
 
 	
 
-	
+	protected $target;
 	protected $js;
 	
 	public function __construct($owner,$event,$name){
@@ -14,7 +14,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
 	}
 	
 	
-	public function set_js($target) {
+	public function set_js($js) {
 		
 		$this->js = $js;
 		

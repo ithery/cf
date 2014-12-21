@@ -86,10 +86,12 @@ class CDatabase {
      * @throws  CDatabase_Exception
      */
     public function __construct($config = array(),$domain=null) {
+        
         if($domain==null) {
 			$domain=crouter::domain();
 		}
 		$load_config = true;
+                
 		if(!empty($config)) {
 			if (is_array($config) AND count($config) > 0) {
 				if (!array_key_exists('connection', $config)) {
@@ -115,7 +117,7 @@ class CDatabase {
 			}
 			
 			$all_config = include $file;
-			
+                        
 			if(isset($all_config[$config_name])) {
 				$config = $all_config[$config_name];
 				$found=true;
@@ -133,7 +135,6 @@ class CDatabase {
 		
         // Merge the default config with the passed config
         $this->config = array_merge($this->config, $config);
-		
         if (is_string($this->config['connection'])) {
             // Make sure the connection is valid
             if (strpos($this->config['connection'], '://') === FALSE)
