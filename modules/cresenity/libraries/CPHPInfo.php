@@ -5,7 +5,7 @@ class CPHPInfo {
 	private $_info = array();
 	public function __construct() {
 		ob_start();
-		phpinfo();
+		@phpinfo();
 		$phpinfo = array('phpinfo' => array());
 		if(preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER))
 			foreach($matches as $match)
