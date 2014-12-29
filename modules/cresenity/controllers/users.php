@@ -181,9 +181,9 @@ class Users_Controller extends CController {
             }
             if ($error == 0) {
                 if ($id > 0) {
-                    cmsg::add("flash_success", clang::__("User") . " \"" . $username . "\" " . clang::__("Successfully Modified");
+                    cmsg::add("flash_success", clang::__("User") . " \"" . $username . "\" " . clang::__("Successfully Modified"));
                 } else {
-                    cmsg::add("success", clang::__("User") . " \"" . $username . "\" " . clang::__("Successfully Added");
+                    cmsg::add("success", clang::__("User") . " \"" . $username . "\" " . clang::__("Successfully Added"));
                 }
                 curl::redirect("users");
             } else {
@@ -332,7 +332,7 @@ class Users_Controller extends CController {
         }
 
         if ($error == 0) {
-            cmsg::add('success', clang::__("Role") . " \"" . $id . "\" " . clang::__("Successfully Deleted");
+            cmsg::add('success', clang::__("Role") . " \"" . $id . "\" " . clang::__("Successfully Deleted"));
         } else {
             //proses gagal
             cmsg::add('error', $error_message);

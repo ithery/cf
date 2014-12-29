@@ -190,15 +190,14 @@ class Roles_Controller extends CController {
                 }
             } catch (Exception $e) {
                 $error++;
-                $error_message = clang::__("Error, call administrator...") . $e->getMessage();
-                ;
+                $error_message = clang::__("Error, call administrator") . "..." . $e->getMessage();
             }
             if ($error == 0) {
                 if ($id > 0) {
-                    cmsg::add("success", clang::__("Role") . " [" . $name . "] " . clang::__("Successfully Modified !");
+                    cmsg::add("success", clang::__("Role") . " [" . $name . "] " . clang::__("Successfully Modified !"));
                     clog::activity($user->user_id, 'edit', clang::__("Role") . " [" . $name . "] " . clang::__("Successfully Modified") . " !");
                 } else {
-                    cmsg::add("success", clang::__("Role") . " [" . $name . "] " . clang::__("Successfully Added !");
+                    cmsg::add("success", clang::__("Role") . " [" . $name . "] " . clang::__("Successfully Added !"));
                     clog::activity($user->user_id, 'add', clang::__("Role") . " [" . $name . "] " . clang::__("Successfully Added") . " !");
                 }
                 curl::redirect("roles");
@@ -306,7 +305,7 @@ class Roles_Controller extends CController {
         }
 
         if ($error == 0) {
-            cmsg::add('success', clang::__("Role") . "[" . $role->name . "]" . clang::__("Successfully Deleted !");
+            cmsg::add('success', clang::__("Role") . "[" . $role->name . "]" . clang::__("Successfully Deleted"));
             clog::activity($user->user_id, 'delete', clang::__("Role") . " [" . $i->name . "] " . clang::__("Successfully Deleted") . " !");
         } else {
             //proses gagal
