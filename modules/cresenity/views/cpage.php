@@ -1,6 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
 <?php 
-	$h = CView::factory('cheader');
+        if (!isset($cheader)) 
+            $cheader = 'cheader';
+        if (!isset($cfooter)) 
+            $cfooter = 'cfooter';
+    
+	$h = CView::factory($cheader);
 	$h->show_breadcrumb = $show_breadcrumb;
 	$h->show_title = $show_title;
 	$h->breadcrumb = $breadcrumb;
@@ -11,7 +16,7 @@
 	$h->css_hash = $css_hash;
 	$h->js_hash = $css_hash;
 	
-	$f = CView::factory('cfooter');
+	$f = CView::factory($cfooter);
 	$f->js = $js;
 	$f->custom_js = $custom_js;
 	$f->custom_footer = $custom_footer;

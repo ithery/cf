@@ -27,7 +27,8 @@
         public static $_instance = null;
         private $app_list = null;
         private $run;
-
+        protected $_template = array();
+        
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
 
@@ -135,6 +136,24 @@
             $this->_org = corg::get(CF::org_code());
 
             $this->run = false;
+            
+            $theme_path = "";
+            $theme_path = ctheme::path();
+            $this->_template = array(
+                    'install' => $theme_path . 'cinstall/page',
+                    'sign_up' => $theme_path . 'ccore/signup',
+                    'resend_activation' => $theme_path . 'ccore/resend_activation',
+                    'activation' => $theme_path . 'ccore/activation',
+                    'login' => $theme_path . 'ccore/login',
+                    'static_login' => $theme_path . 'ccore/static_login',
+                    'cpage' => $theme_path . 'cpage',
+                    'cheader' => $theme_path . 'cheader',
+                    'cfooter' => $theme_path . 'cfooter',
+                );
+        }
+        
+        public function set_template($k, $v) {
+            $this->_template[$k] = $v;
         }
 
         public function app_id() {
@@ -401,111 +420,213 @@
                 $this->register_client_module('servertime');
             }
         }
+        
 
-    public function render() {
-		
-		if(crequest::is_ajax()) {
-			return $this->json();
-			
-		}
-		
-        $theme_path = "";
-        $theme_path = ctheme::path();
-
-        if (ccfg::get("install")) {
-            $v = CView::factory($theme_path . 'cinstall/page');
-            /*
-              } else if ($this->is_admin()) {
-              if (!$this->is_admin_login()) {
-              $v = CView::factory('admin/login');
-              } else {
-              $v = CView::factory('admin/cpage');
-              $this->content = parent::html();
-              $this->js = parent::js();
-              $v->content = $this->content;
-              $v->title = $this->title;
-              $v->js = $this->js;
-              $cs = CClientScript::instance();
-              $v->head_client_script = $cs->render('head');
-              $v->begin_client_script = $cs->render('begin');
-              $v->end_client_script = $cs->render('end');
-              $v->load_client_script = $cs->render('load');
-              $v->ready_client_script = $cs->render('ready');
-
-              $v->custom_js = $this->custom_js;
-              $v->custom_header = $this->custom_header;
-              $v->custom_footer = $this->custom_footer;
-              $v->show_breadcrumb = $this->show_breadcrumb;
-              $v->show_title = $this->show_title;
-              $v->breadcrumb = $this->breadcrumb;
-              }
-             */
-        } else if ($this->signup) {
-            $v = CView::factory($theme_path . 'ccore/signup');
-        } else if ($this->resend) {
-            $v = CView::factory($theme_path . 'ccore/resend_activation');
-        } else if ($this->activation) {
-            $v = CView::factory($theme_path . 'ccore/activation');
-        } else if (!$this->is_user_login() && ccfg::get("have_user_login")) {
-            $v = CView::factory($theme_path . 'ccore/login');
-        } else if (!$this->is_user_login() && ccfg::get("have_static_login")) {
-            $v = CView::factory($theme_path . 'ccore/static_login');
-        } else {
-            $v = CView::factory($theme_path . 'cpage');
-
-            $this->content = parent::html();
-            $this->js = parent::js();
-            $v->content = $this->content;
-            $v->title = $this->title;
-            $cs = CClientScript::instance();
-			$css_urls = $cs->url_css_file();
-			
-			$js_urls = $cs->url_js_file();
-			$additional_js = "";
-			
-			foreach($css_urls as $url) {
-				
-				$additional_js .= "
-					$.cresenity._filesadded+='['+'".$url."'+']'
-				";
-			}
-			$js = '';
-			$vjs = CView::factory('ccore/js');
-			$js.=PHP_EOL.$vjs->render();
-			$js.= $this->js.$additional_js;
-			
-			$js = $cs->render_js_require($js);
-			
-			if(ccfg::get("minify_js")) {
-			
-				$js = CJSMin::minify($js);
-			}
-			
-			$v->js = $js;
+        public function render_template() {
             
-			$v->css_hash = "";
-			$v->js_hash = "";
-			if(ccfg::get("merge_css")) {
-				$v->css_hash = $cs->create_css_hash();
-			}
-			if(ccfg::get("merge_js")) {
-				$v->js_hash = $cs->create_js_hash();
-			}
+            if (crequest::is_ajax()) {
+                return $this->json();
+            }
+             $theme_path = "";
+            $theme_path = ctheme::path();
+            
+//            var_dump($this->_template);
+            if (ccfg::get("install")) {
+                $v = CView::factory($this->_template['install']);
+            }
+            else if ($this->signup) {
+                $v = CView::factory($this->_template['sign_up']);
+            }
+            else if ($this->resend) {
+                $v = CView::factory($this->_template['resend_activation']);
+            }
+            else if ($this->activation) {
+                $v = CView::factory($this->_template['activation']);
+            }
+            else if (!$this->is_user_login() && ccfg::get("have_user_login")) {
+                $v = CView::factory($this->_template['login']);
+            }
+            else if (!$this->is_user_login() && ccfg::get("have_static_login")) {
+                $v = CView::factory($this->_template['static_login']);
+            }
+            else {
+                
+                $v = CView::factory($this->_template['cpage']);
 
-			$v->head_client_script = "";
-            $v->begin_client_script = "";
-            $v->end_client_script = "";
+                $this->content = parent::html();
+                $this->js = parent::js();
+                $v->content = $this->content;
+                $v->title = $this->title;
+                $cs = CClientScript::instance();
+                $css_urls = $cs->url_css_file();
 
-            $v->load_client_script = "";
-            $v->ready_client_script = "";
-			
-			
-			$v->head_client_script = $cs->render('head');
-            $v->begin_client_script = $cs->render('begin');
-            // $v->end_client_script = $cs->render('end');
+                $js_urls = $cs->url_js_file();
+                $additional_js = "";
 
-            $v->load_client_script = $cs->render('load');
-            $v->ready_client_script = $cs->render('ready');
+                foreach ($css_urls as $url) {
+
+                    $additional_js .= "
+					$.cresenity._filesadded+='['+'" . $url . "'+']'
+				";
+                }
+
+                $js = $this->js . $additional_js;
+                $vjs = CView::factory('ccore/js');
+                $js.=PHP_EOL . $vjs->render();
+
+                $js = $cs->render_js_require($js);
+
+                if (ccfg::get("minify_js")) {
+                    $js = CJSMin::minify($js);
+                }
+
+                $v->js = $js;
+
+                $v->css_hash = "";
+                $v->js_hash = "";
+                if (ccfg::get("merge_css")) {
+                    $v->css_hash = $cs->create_css_hash();
+                }
+                if (ccfg::get("merge_js")) {
+                    $v->js_hash = $cs->create_js_hash();
+                }
+
+                $v->head_client_script = "";
+                $v->begin_client_script = "";
+                $v->end_client_script = "";
+
+                $v->load_client_script = "";
+                $v->ready_client_script = "";
+
+
+                $v->head_client_script = $cs->render('head');
+                $v->begin_client_script = $cs->render('begin');
+                // $v->end_client_script = $cs->render('end');
+
+                $v->load_client_script = $cs->render('load');
+                $v->ready_client_script = $cs->render('ready');
+
+                $v->custom_js = $this->custom_js;
+                $v->custom_header = $this->custom_header;
+                $v->custom_footer = $this->custom_footer;
+                $v->show_breadcrumb = $this->show_breadcrumb;
+                $v->show_title = $this->show_title;
+                $v->breadcrumb = $this->breadcrumb;
+                $v->cheader = $this->_template['cheader'];
+                $v->cfooter = $this->_template['cfooter'];
+            }
+
+            return $v->render();
+        }
+        
+        public function render() {
+            
+            if (crequest::is_ajax()) {
+                return $this->json();
+            }
+
+            $theme_path = "";
+            $theme_path = ctheme::path();
+
+            if (ccfg::get("install")) {
+                $v = CView::factory($theme_path . 'cinstall/page');
+                /*
+                  } else if ($this->is_admin()) {
+                  if (!$this->is_admin_login()) {
+                  $v = CView::factory('admin/login');
+                  } else {
+                  $v = CView::factory('admin/cpage');
+                  $this->content = parent::html();
+                  $this->js = parent::js();
+                  $v->content = $this->content;
+                  $v->title = $this->title;
+                  $v->js = $this->js;
+                  $cs = CClientScript::instance();
+                  $v->head_client_script = $cs->render('head');
+                  $v->begin_client_script = $cs->render('begin');
+                  $v->end_client_script = $cs->render('end');
+                  $v->load_client_script = $cs->render('load');
+                  $v->ready_client_script = $cs->render('ready');
+
+                  $v->custom_js = $this->custom_js;
+                  $v->custom_header = $this->custom_header;
+                  $v->custom_footer = $this->custom_footer;
+                  $v->show_breadcrumb = $this->show_breadcrumb;
+                  $v->show_title = $this->show_title;
+                  $v->breadcrumb = $this->breadcrumb;
+                  }
+                 */
+            }
+            else if ($this->signup) {
+                $v = CView::factory($theme_path . 'ccore/signup');
+            }
+            else if ($this->resend) {
+                $v = CView::factory($theme_path . 'ccore/resend_activation');
+            }
+            else if ($this->activation) {
+                $v = CView::factory($theme_path . 'ccore/activation');
+            }
+            else if (!$this->is_user_login() && ccfg::get("have_user_login")) {
+                $v = CView::factory($theme_path . 'ccore/login');
+            }
+            else if (!$this->is_user_login() && ccfg::get("have_static_login")) {
+                $v = CView::factory($theme_path . 'ccore/static_login');
+            }
+            else {
+                $v = CView::factory($theme_path . 'cpage');
+
+                $this->content = parent::html();
+                $this->js = parent::js();
+                $v->content = $this->content;
+                $v->title = $this->title;
+                $cs = CClientScript::instance();
+                $css_urls = $cs->url_css_file();
+
+                $js_urls = $cs->url_js_file();
+                $additional_js = "";
+
+                foreach ($css_urls as $url) {
+
+                    $additional_js .= "
+					$.cresenity._filesadded+='['+'" . $url . "'+']'
+				";
+                }
+
+                $js = $this->js . $additional_js;
+                $vjs = CView::factory('ccore/js');
+                $js.=PHP_EOL . $vjs->render();
+
+                $js = $cs->render_js_require($js);
+
+                if (ccfg::get("minify_js")) {
+                    $js = CJSMin::minify($js);
+                }
+
+                $v->js = $js;
+
+                $v->css_hash = "";
+                $v->js_hash = "";
+                if (ccfg::get("merge_css")) {
+                    $v->css_hash = $cs->create_css_hash();
+                }
+                if (ccfg::get("merge_js")) {
+                    $v->js_hash = $cs->create_js_hash();
+                }
+
+                $v->head_client_script = "";
+                $v->begin_client_script = "";
+                $v->end_client_script = "";
+
+                $v->load_client_script = "";
+                $v->ready_client_script = "";
+
+
+                $v->head_client_script = $cs->render('head');
+                $v->begin_client_script = $cs->render('begin');
+                // $v->end_client_script = $cs->render('end');
+
+                $v->load_client_script = $cs->render('load');
+                $v->ready_client_script = $cs->render('ready');
 
                 $v->custom_js = $this->custom_js;
                 $v->custom_header = $this->custom_header;

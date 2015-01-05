@@ -111,7 +111,7 @@ final class CF {
         // This function can only be run once
         if ($run === TRUE)
             return;
-
+        
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
