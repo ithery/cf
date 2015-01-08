@@ -535,7 +535,7 @@ class CForm extends CElement {
         }
 		if($this->auto_set_focus) {
 			$js->appendln("
-				$('#" . $this->id . "').find(':input:enabled:visible:first').focus();
+				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
 			");
 		}
         $js->appendln(parent::js($js->get_indent()))->br();

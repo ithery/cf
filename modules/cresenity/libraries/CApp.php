@@ -469,10 +469,11 @@
 					$.cresenity._filesadded+='['+'" . $url . "'+']'
 				";
                 }
-
-                $js = $this->js . $additional_js;
+				$js = "";
                 $vjs = CView::factory('ccore/js');
-                $js.=PHP_EOL . $vjs->render();
+                $js .= PHP_EOL . $vjs->render();
+				
+                $js .= PHP_EOL . $this->js . $additional_js;
 
                 $js = $cs->render_js_require($js);
 
@@ -591,11 +592,12 @@
 					$.cresenity._filesadded+='['+'" . $url . "'+']'
 				";
                 }
-
-                $js = $this->js . $additional_js;
-                $vjs = CView::factory('ccore/js');
+				$js = "";
+				$vjs = CView::factory('ccore/js');
                 $js.=PHP_EOL . $vjs->render();
 
+                $js .= PHP_EOL . $this->js . $additional_js;
+                
                 $js = $cs->render_js_require($js);
 
                 if (ccfg::get("minify_js")) {

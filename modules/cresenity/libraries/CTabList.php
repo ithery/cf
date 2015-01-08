@@ -193,7 +193,6 @@ class CTabList extends CElement {
 					
 					var data_icon = jQuery(this).attr('data-icon');
 					var data_class = jQuery(this).attr('data-class');
-					console.log(this);
 					var data_text = jQuery(this).text();
 					if(data_icon) widget_tab.find('.widget-title .icon i').attr('class',data_icon);
 					
@@ -205,7 +204,6 @@ class CTabList extends CElement {
 				}
 				
 				if(jQuery('#" . $this->id . "').hasClass('ajax')) {
-					console.log('tab_target:'+target);
 					$.cresenity.reload(target,url,method);
 				} else {
 					var tab_id = jQuery(this).attr('data-tab');
