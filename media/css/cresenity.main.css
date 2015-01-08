@@ -1483,7 +1483,7 @@ background: none repeat scroll 0 0 #F9F9F9;
 
 .DataTables_sort_icon {
 	display:inline-block;
-
+	position: absolute;
 }
 
 
