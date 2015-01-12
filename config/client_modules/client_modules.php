@@ -50,6 +50,30 @@ return array(
         ),
         "requirements" => array("jquery", "bootstrap"),
     ),
+	"jquery.datatable.tabletools" => array(
+        "js" => array(
+            "plugins" . DS . "datatable" . DS . "TableTools.min.js",
+        ),
+        "requirements" => array("jquery.datatable"),
+    ),
+	"jquery.datatable.colreorder" => array(
+        "js" => array(
+            "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
+        ),
+        "requirements" => array("jquery.datatable"),
+    ),
+	"jquery.datatable.colvis" => array(
+        "js" => array(
+            "plugins" . DS . "datatable" . DS . "ColVis.min.js",
+        ),
+        "requirements" => array("jquery.datatable"),
+    ),
+	"jquery.datatable.columnfilter" => array(
+        "js" => array(
+            "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
+        ),
+        "requirements" => array("jquery.datatable"),
+    ),
     "chosen" => array(
         "js" => array("plugins" . DS . "chosen" . DS . "chosen.jquery.min.js"),
         "css" => array("plugins" . DS . "chosen" . DS . "chosen.css"),
@@ -216,6 +240,5 @@ return array(
         "js" => array("plugins" . DS . "google-code-prettify" . DS . "prettify.js"),
         "css" => array("plugins" . DS . "google-code-prettify" . DS . "prettify.css"),
     ),
-    
 );
 ?>
