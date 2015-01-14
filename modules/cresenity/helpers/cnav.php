@@ -81,6 +81,8 @@ class cnav {
 		$db = CDatabase::instance($domain);
 		$q = "select * from role_permission where name=".$db->escape($action)." and nav=".$db->escape($navname)." and role_id=".$db->escape($role_id)." and app_id=".$db->escape($app_id);
 		
+		
+		
 		$r = $db->query($q);
 		return $r->count()>0;
 		

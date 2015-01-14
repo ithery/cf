@@ -312,7 +312,7 @@
         }
 
         public function title($title) {
-            $this->title = $title;
+            $this->title = clang::__($title);
             return $this;
         }
 
