@@ -30,7 +30,7 @@ class cmsg {
 		}
 		cmsg::clear($type);
 		if(strlen($message)>0) {
-			$message = CMessage::factory('cmsg-'.$type)->set_type($type)->set_message($message)->html();
+			$message = CMessage::factory()->set_type($type)->set_message($message)->html();
 		}
 		return $message;
 	}

@@ -3,7 +3,7 @@ class CMessage extends CRenderable {
 	protected $type;
 	protected $message;
 	
-	public function __construct($id) {
+	public function __construct($id="") {
 		parent::__construct($id);
 		
 		$this->type="error";
@@ -20,7 +20,7 @@ class CMessage extends CRenderable {
 		$this->message = $msg;
 		return $this;
 	}
-	public static function factory($id) {
+	public static function factory($id="") {
 		return new CMessage($id);
 	}
 	public function html($indent=0) {
