@@ -1,9 +1,9 @@
 <?php
 
 return array(
-	"org_id"=>3,
-	"org_code"=>"travons",
-	"org_name"=>"TRAVONS",
+	"org_id"=>4,
+	"org_code"=>"telindo",
+	"org_name"=>"TELINDO",
 	
 );
 
