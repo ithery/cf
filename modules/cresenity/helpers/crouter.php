@@ -9,6 +9,11 @@ class crouter {
 	public static function controller() {
 		return CFRouter::$controller;
 	}
+	
+	public static function controller_dir() {
+		return CFRouter::$controller_dir;
+	}
+	
 	public static function method() {
 		return CFRouter::$method;
 	}

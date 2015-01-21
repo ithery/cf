@@ -1,9 +1,12 @@
 <?php
 class cnav {
 	
-	public function nav($nav=null,$controller=null,$method=null) {
+	public function nav($nav=null,$controller=null,$method=null,$path=null) {
 		if($controller==null) $controller=crouter::controller();
 		if($method==null) $method=crouter::method();
+		if($path==null) $path=crouter::controller_dir();
+		
+		
 		if($nav==null) { 
 			$navs = CNavigation::instance()->navs();
 			if($navs==null) return null;
@@ -12,12 +15,20 @@ class cnav {
 				if($res!==false) return $res;
 			}
 		} else {
-			if(isset($nav["controller"])&&isset($nav["method"])&&$nav["controller"]==$controller&&$nav["method"]==$method) {
+			$nav_path = carr::get($nav,'path','');
+			$nav_method = carr::get($nav,'method','');
+			$nav_controller = carr::get($nav,'controller','');
+			
+			
+			if($nav_controller!=''&&$nav_method!=''&&$nav_controller==$controller&&$nav_method==$method&&$nav_path==$path) {
 				return $nav;
 			}
 			if(isset($nav["action"])) {
 				foreach($nav["action"] as $act) {
-					if(isset($act["controller"])&&isset($act["method"])&&$act["controller"]==$controller&&$act["method"]==$method) {
+					$act_path = carr::get($nav,'path',$nav_path);
+					$act_method = carr::get($nav,'method',$nav_method);
+					$act_controller = carr::get($nav,'controller',$nav_controller);
+					if($act_controller!=''&&$act_method!=''&&$act_controller==$controller&&$act_method==$method&&$act_path==$path) {
 						return $nav;
 					}
 				}
@@ -145,13 +156,17 @@ class cnav {
 	public static function url($nav) {
 		$controller = "";
 		$method = "";
+		$path = "";
+		
+		if(isset($nav["path"])) $path = $nav["path"];
 		if(isset($nav["controller"])) $controller = $nav["controller"];
 		if(isset($nav["method"])) $method = $nav["method"];
 		
+		if (strlen($path)>0) $path.='/';
 		if (strlen($controller)==0) return "";
 		if (strlen($method)==0) return "";
-		$url =curl::base()."".$controller."/".$method; 
-   
+		$url =curl::base().$path.$controller."/".$method; 
+		
 		if(CApp::instance()->is_admin()) {
 			//$url =curl::base().'admin/'.$controller."/".$method; 
 		
@@ -191,7 +206,7 @@ class cnav {
 			}
 		
 			$url = cnav::url($d);
-				
+			
 			if (!isset($url)||$url==null) $url = "";
 			
 			if(strlen($child_html)>0||strlen($url)>0) {
@@ -209,6 +224,7 @@ class cnav {
 				
 				
 				$find_nav = cnav::nav($d);
+				
 				if ($find_nav!==false) {
 					$active_class = " active";
 				}

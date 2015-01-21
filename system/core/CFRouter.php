@@ -14,6 +14,7 @@ class CFRouter {
 	public static $rsegments;
 
 	public static $controller;
+	public static $controller_dir;
 	public static $controller_path;
 
 	public static $method    = 'index';
@@ -79,6 +80,7 @@ class CFRouter {
 
 		// Prepare to find the controller
 		$controller_path = '';
+		$c_dir = '';
 		$method_segment  = NULL;
 
 		// Paths to search
@@ -107,8 +109,12 @@ class CFRouter {
 					    AND is_file($c) )
 					{
 						
+					
 						// Set controller name
 						self::$controller = $segment;
+
+						// Set controller dir
+						self::$controller_dir = $c_dir;
 
 						// Change controller path
 						self::$controller_path = $c;
@@ -119,6 +125,7 @@ class CFRouter {
 						// Stop searching
 						break;
 					}
+					$c_dir = $controller_path;
 				}
 			}
 
@@ -127,11 +134,10 @@ class CFRouter {
 				// Maximum depth has been reached, stop searching
 				break;
 			}
-
 			// Add another slash
 			$controller_path .= '/';
 		}
-
+		
 		if ($method_segment !== NULL AND isset(self::$rsegments[$method_segment]))
 		{
 			// Set method
