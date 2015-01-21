@@ -59,9 +59,19 @@
                     $this->_app_id = 0;
                 }
             }
-
+			
             //we load another configuration for this app
-            $app_boot_file = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
+            //org configuration
+			if(strlen(CF::org_code())>0) {
+				$org_boot_file = DOCROOT . "application" . DS . $this->code() . DS . CF::org_code() . DS . CF::org_code() . EXT;
+				if (file_exists($org_boot_file)) {
+					include($org_boot_file);
+				}
+			}
+			
+			
+			$app_boot_file = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
+			
             if (file_exists($app_boot_file)) {
                 include($app_boot_file);
             }
