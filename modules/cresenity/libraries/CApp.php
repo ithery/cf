@@ -28,7 +28,7 @@
         private $app_list = null;
         private $run;
         protected $_template = array();
-        
+        protected $rendered = false;
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
 
@@ -530,8 +530,17 @@
             return $v->render();
         }
         
+		public function rendered() {
+			return $this->rendered;
+		}
+		
         public function render() {
             
+			if($this->rendered) {
+				trigger_error('CApp already rendered');
+				
+			}
+			$this->rendered = true;
             if (crequest::is_ajax()) {
                 return $this->json();
             }
