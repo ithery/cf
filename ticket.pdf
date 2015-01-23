@@ -1,0 +1,162 @@
+
+
+<html>
+    <head>
+        <style>
+            html{
+                margin-left:1.2cm;
+                margin-top:0.3cm;
+            }
+			/*body{
+				margin-left:1cm;
+				margin-top:0.3cm;
+			}*/
+            .tors-space {
+                height: 15px;
+            }
+            .tors-head {
+                width: 720px;
+                height: 40px;
+                font-size: 20pt;
+                text-align: center;
+                /*padding-top: 10px;*/
+                margin-left:0cm;
+                margin-right:0.2cm;
+                color: white;
+                font-weight: bold;
+                background-color: #ff0000;
+                /*background-color: #E95931;*/
+            }
+            .tors-body {
+                width: 706px;
+                height: 20px;
+                font-size: 10pt;
+                /*line-height: 25px;*/
+                padding-left: 10px;
+                padding-top: 5px;
+                color: white;
+                font-weight: bold;
+                background-color: #ff0000;
+                /*background-color: #E95931;*/
+            }
+            .footer { 
+                position: fixed; bottom: 0px; 
+            }
+            body{
+                margin-left:1cm;
+                font-family:Times New Roman;
+                font-size:11px;
+                margin:auto;
+            }
+            #table-content td{
+                padding:1px 3px;
+            }
+        </style>
+    </head>
+    <div class="tors-head">ELECTRONIC TICKET</div>
+    <body>
+        <div>
+            <div class="tors-space"></div>
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <td style="padding-left: 50px; padding-top: -10px;"><img src="application/torsb2b/travons/media/img/vlogo2.png" style="height: 60px;"></td>
+                
+                    <td style='float:right;padding-left: 70px; padding-top: 0px;'><img src='application/torsb2b/default/media/img/ticket/TG.jpg' style='height: 100px;'></td>                </tr>
+            </table>
+        </div>
+        <div class="tors-space"></div>
+        <div class="tors-space"></div>
+        <div class="tors-space"></div>
+        <div class="tors-space"></div>
+        <div>
+            <div>
+                <div style="padding-left: 10pt;" class="tors-body">Reservation Details</div>
+                <table cellpadding="3" style="width: 700px;">
+                    <thead style="font-weight: bold; font-size: 10pt;">
+                        <tr>
+                            <td></td>
+                            <td>Agency Name</td>
+                            <td>Status</td>
+                            <td align="center">Date Of Issued</td>
+                            <td align="center">PNR</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="font-size: 10pt;">
+                            <td></td>
+                            <td>Travons</td><td>TICKETED</td><td align=center>25-02-2015</td><td align=center>MFEE94</td>                        </tr>
+                    </tbody>
+                </table>
+                <div class="tors-space"></div>
+            </div>
+            <div>
+                <div style="padding-left: 10pt;" class="tors-body">Passenger Details</div>
+                <table cellpadding="3" style="width: 720px;">
+                    <thead style="font-weight: bold; font-size: 10pt; text-align: center; border-bottom:2px solid #ff0000;">
+                        <tr>
+                            <td>GENDER</td>
+                            <td>NAMA</td>
+                            <td>SEAT</td>
+                            <td>BAGASI</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style='font-size: 10pt;'><td align=center>MR</td><td align=center>BOKO</td><td align=center>-</td><td align=center><b>-</b></td></tr>                    </tbody>
+                </table>
+                <div class="tors-space"></div>
+            </div>
+            <div>
+                <div style="padding-left: 10pt;" class="tors-body">Itinerary Details</div>
+                <table cellpadding="3" style="width: 720px;">
+                    <thead style="font-weight: bold; font-size: 8pt; text-align: center; border-bottom:2px solid #ff0000;" >
+                        <tr>
+                            <td>DEPART DATE</td>
+                            <td>ARRIVE DATE</td>
+                            <td>FLIGHT</td>
+                            <td>DEPART AIRPORT</td>
+                            <td>ARRIVE AIRPORT</td>
+                            <td>DEPART TIME</td>
+                            <td>ARRIVE TIME</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+						<tr style='font-size: 9pt;'><td align=center>28-02-2015</td><td align=center>28-02-2015</td><td align=center>Q1 200</td><td align=center>SUB</td><td align=center>UPG</td><td align=center>07:30</td><td align=center>09:30</td></tr>					</tbody>
+                </table>
+                <div class="tors-space"></div>
+                <div class="tors-space"></div>
+                <div class="tors-space"></div>
+                <div class="tors-space"></div>
+            </div>
+            
+
+            <div>
+                <div style="padding-left: 10pt;" class="tors-body">Important Notes</div>
+                <div class="tors-space"></div>
+                <table style="width: 720px;">
+                    <tbody>
+                        <tr style="font-size: 12pt;">
+                            <td style="padding-left: 10pt;"><img src="application/torsb2b/travons/media/img/listnumber.jpg" style="width: 1%; height: 1%;"></td>
+                            <td style="padding-left: -10pt;">Mohon tiba di Bandara selambat - lambatnya 90 menit sebelum keberangkatan untuk domestik</td>
+                        </tr>
+                        <tr style="font-size: 12pt;">
+                            <td style="padding-left: 10pt;"></td>
+                            <td style="padding-left: -10pt;">atau 2 jam untuk internasional.</td>
+                        </tr>
+                        <tr style="font-size: 12pt;">
+                            <td style="padding-left: 10pt;"><img src="application/torsb2b/travons/media/img/listnumber.jpg" style="width: 1%; height: 1%;"></td>
+                            <td style="padding-left: -10pt;">Penumpang / pemegang tiket ini tunduk kepada syarat & ketentuan penerbangan yang</td>
+                        </tr>
+                        <tr style="font-size: 12pt;">
+                            <td style="padding-left: 10pt;" ></td>
+                            <td style="padding-left: -10pt;">ditetapkan oleh Maskapai.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tors-space"></div>
+            </div>
+            <!--<div class="footer" style="text-align: right; font-size: 10pt; font-style: italic; font-weight: bold;">Printed by TORS System <span> 25-02-2015 09:20</span></div>-->
+        </div>
+    </body>
+</html>

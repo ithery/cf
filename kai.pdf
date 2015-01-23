@@ -1,0 +1,167 @@
+<html>
+    <head>
+        <style>
+            html{
+                margin-left:0.5cm;
+                margin-top:0.5cm;
+            }
+            .tors-space {
+                height: 12px;
+            }
+            .tors-head {
+                font-size: 16pt;
+                text-align: left;
+            }
+            .cobna {
+                display: inline-block;
+                padding-left: -300px;
+            }
+            .tors-body {
+                width: 680px;
+                height: 20px;
+                font-size: 11pt;
+                /*line-height: 25px;*/
+                padding-top: 5px;
+                color: black;
+                background-color: #dddddd;
+            }
+            .footer { 
+                position: fixed; bottom: 0px; 
+            }
+            body{
+                font-family:Times New Roman;
+                font-size:11px;
+                margin:auto; line-height: 100%;  
+            }
+            #table-content td{
+                padding:1px 3px;
+            }
+            #watermark { position: fixed; bottom: 0px; right: 0px; width: 200px; height: 200px; opacity: .1; }
+            body { background-image: url(assets/images/ticket/logo_kai_transparan.png); background-repeat: no-repeat; background-position: center 150px top; height: 100%; width: 100%;}
+        </style>
+    </head>
+    <body>
+	        <div cellpadding="3" style="border-bottom: 1px solid black; width: 760px;"></div>
+        <div class="tors-head">
+            <table>
+                <tr>
+                    <td><img src="application/torsb2b/travons/media/img/vlogo2.png" style="height: 60px;"></td>
+                    <td style="font-weight: bold; line-height: 150%; vertical-align:text-top; font-size: 14pt; padding-top: 5px; padding-left: 10px;">
+                        BUKTI PEMBELIAN TIKET KERETA API 
+                        <br>AGEN RESMI PT. KERETA API INDONESIA (PERSERO)
+                    </td>
+                    <td>
+                </tr>
+            </table>
+        </div>
+        <div cellpadding="3" style="border-bottom: 1px solid black; width: 760px;"></div>
+        <div class="tors-space"></div>
+        <div>
+            <div>
+                <table style="font-size: 12pt; width: 400px;">
+                    <tr style="height: 200px;">
+                        <td style="font-weight: bold;">Kode Booking</td>
+                        <td>:</td>
+                        <td style="font-weight: bold;">9NU7L3</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:text-top;">Nama KA</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">ARGO BROMO</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:text-top;">Tgl Berangkat</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">12 FEBRUARY 2015</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:text-top;">St Asal</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">
+                            BANDUNG                            <br><span>TGL 12-02-2015 15:00 WIB</span>
+                        </td>
+                    </tr>
+                    <tr style="vertical-align:text-top;">
+                        <td style="vertical-align:text-top;">St Tujuan</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;"> 
+                            YOGYAKARTA                            <br><span>TGL 12-02-2015 15:30 WIB</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:text-top;">Kelas</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">
+                            EKSEKUTIF                            <!--E-->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:text-top;">Tempat Duduk</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">
+							                                                                                                EKSASL-1/1C,
+                                                                                    </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:text-top;">Jml Penumpang</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">1 DEWASA, 0 ANAK</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:text-top;">Harga Tiket</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">Rp. 99.000,00</td>
+                    </tr>
+                                            <tr>
+                            <td style="vertical-align:text-top;">Diskon (-)</td>
+                            <td style="vertical-align:text-top;">:</td>
+                            <td style="vertical-align:text-top;">Rp. 0,00</td>
+                        </tr>
+                                                                                <tr>
+                        <td style="vertical-align:text-top;">Total</td>
+                        <td style="vertical-align:text-top;">:</td>
+                        <td style="vertical-align:text-top;">Rp. 99.000,00</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="cobna">
+                <table style="font-size: 12pt;">
+                    <tr>
+                        <td style="padding-left: 150px;">
+                            <!--<img src="assets/images/ticket/barcode.jpg" >--> 
+							                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAIAAACzY+a1AAAABmJLR0QA/wD/AP+gvaeTAAACjElEQVR4nO3dy47aQBBA0SHK//8yWWSHEgvT5cdB92yHgGeuSmkZt/14Pp8/kf26+gCyqoS8EvJKyCshr4S8EvJKyCshr4S8EvJKyCshr4S8EvJKyCshr4S8EvJKyCsh7/f6Wzwej/U3ecf2xXYvh/Hy4u2D3PXiQSOXDzaFvBLySsgrIW9gOfNi8Ar/lWXFrvXLtpv8Rv/TFPJKyCshr4S8+eXMi13/ge9aOKyccNk+lbPyuduHcYSmkFdCXgl5JeQdvpw5zso3RN90k4imkFdCXgl5JeTBy5kX26ubXT+1NIW8EvJKyCsh7/DlzFUrheM+925rn6aQV0JeCXkl5M0vZ07bFnTa+ZfTfqPPNIW8EvJKyCsh73G3cw3vG9x77f4RfprCL1BCXgl5JeQNLGdWrsG96sTHcYud86/KaQp5JeSVkFdC3tlnZwb3H522Bfyqw3hTU8grIa+EvBLy7nXtzGnfEG0vWFZuP7z94iM0hbwS8krIKyFv/uzM4MMGBj/3uLcaXL59pinklZBXQl4JeRffFXjwPMgu3RU4N1JCXgl5JeR97c6mbYP33Lt8z1RTyCshr4S8EvK+54nag3umbnKR8ZuaQl4JeSXklZD3tU/U3vUIypV/e/njE5pCXgl5JeSVkAc/UXvlcwcXO7t+eoSmkFdCXgl5JeTBj6AcvIbltC+quu9M/qGEvBLySsiDlzODu5NW7juz7YSvoppCXgl5JeSVkPe1T9TetrJgGdz3NKIp5JWQV0JeCXn3uivwoMELdk/b1f2ZppBXQl4JeSXkwfedyV9NIa+EvBLySsgrIa+EvBLySsgrIa+EvBLySsgrIa+EvBLySsgrIa+EvBLySsgrIa+EvD9/ogY32ibMjQAAAABJRU5ErkJggg==">   
+                        </td>
+                    </tr>
+                </table>
+                                    <table style="font-size: 12pt;">
+                        <tr>
+                            <td>Nama Penumpang</td>
+                            <td> : RUDY </td>
+                        </tr>
+                        <tr>
+                            <td>Kategori</td>
+                            <td> : 
+                                Dewasa 
+                            </td>
+                        </tr>
+                    </table>
+                    <table cellpadding="3" style="border-bottom: 1px solid black; width: 300px;"></table>
+                            </div>
+        </div>
+        <div style="padding-top: -190px;">
+            <div cellpadding="3" style="border-bottom: 1px solid black; width: 760px;"></div>
+            <div class="tors-space"></div>
+            <div style="font-size: 12pt; text-align: justify">Struk ini tidak berlaku sebagai tiket. Struk ini harus ditukarkan dengan tiket di stasiun online selambat-lambatnya 1 jam sebelum jadwal keberangkatan KA.</div>
+            <div class="tors-space"></div>
+            <div cellpadding="3" style="border-bottom: 1px solid black; width: 760px;"></div>
+        </div>
+<!--        <div class="footer">
+            <table style="width: 680px;">
+                <tr>
+                    <td style="text-align: left;">Printed by TORS System</td>
+                    <td style="text-align: right;">16-02-2015 16:05</td>
+                </tr>
+            </table>
+        </div>-->
+    </body>
+</html>

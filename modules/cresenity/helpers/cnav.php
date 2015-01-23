@@ -210,6 +210,9 @@ class cnav {
 			if (!isset($url)||$url==null) $url = "";
 			
 			if(strlen($child_html)>0||strlen($url)>0) {
+				if(!cnav::access_available($d,CF::app_id(),CF::domain())) {
+					continue;
+				}
 				if(isset($d["controller"])&&$d["controller"]!="") {
 					if(!$is_admin&&ccfg::get("have_user_access")) {
 						
@@ -289,7 +292,7 @@ class cnav {
 		if($nav==null) $nav = cnav::nav();
 		if($nav===false) return false;
 		$navname = $nav["name"];
-		
+		$app = CApp::instance();
 		if(isset($nav["requirements"])) {
 			$requirements = $nav["requirements"];
 			foreach($requirements as $k=>$v) {
@@ -300,14 +303,20 @@ class cnav {
 				}
 			}
 		}
+		if(strlen($app_role_id)==0) {
+			if($app->user()!=null) {
+				$app_role_id = cobj::get($app->user(),'role_id');
+			}
+		}
 		
 		if(strlen($app_role_id)>0) {
-			$parent_role= crole::get($app_role_id);
-			if($parent_role!=null&&(!isset($nav["subnav"])||count($nav["subnav"])==0)) {
+			$app_role= crole::get($app_role_id);
+			
+			if($app_role!=null&&(!isset($nav["subnav"])||count($nav["subnav"])==0)) {
 				
-				$parent_role_id = $parent_role->parent_id;
+				$parent_role_id = $app_role->parent_id;
 				if($parent_role_id!=null) {
-					if(!cnav::have_access($nav,$parent_role_id,$app_id)) {
+					if(!cnav::have_access($nav,$app_role_id,$app_id)) {
 						
 						return false;
 					}

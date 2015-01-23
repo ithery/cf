@@ -2,7 +2,7 @@
 class ctransform {
 	public static function thousand_separator($rp,$decimal=null,$always_decimal=false) {
 		$minus_str = "";
-		
+		if(strlen($rp)==0) return $rp;
 		$ds = ccfg::get('decimal_separator');
 		if($ds==null) {
 			$ds = "."; //decimal separator

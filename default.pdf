@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <style>
+            body{
+                font-family:sans-serif;
+                font-size:14px;
+            }
+            #rsvn-room, #policy{
+                border:1px solid black;
+            }
+            #rsvn-room th, #policy th{
+                border-right:1px solid black;
+                border-bottom:1px solid black;
+            }
+            #rsvn-room td, #policy td{
+                border-right:1px solid black;
+            }
+            
+        </style>
+    </head>
+    <body>
+		        
+                <img src="application/torsb2b/travons/media/img/vlogo2.png" height="65px">
+                <br/><br/>
+        <div id='title' style='text-decoration:underline;font-weight:bold;text-align:center;'>
+            HOTEL VOUCHER
+        </div>
+        <br/><br/>
+        <table id="rsvn-info" width="100%">
+            <tr>
+                <td width="360px" style="padding-right:20px">
+                    <table id="hotel-info" width="100%">
+                        <tr>
+                            <td width="40px" valign="top">ATTN</td><td width="5px" valign="top">:</td><td>RESERVATION</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">HOTEL</td><td valign="top">:</td>
+                            <td>Asia Airport</td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td>
+                            <td>99/2 Moo 8</td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td>
+                            <td>Bangkok</td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td>
+                            <td>(66) 2992 - 6999</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table id="trans-info" width="100%">
+                        <tr>
+                            <td width="110px" valign="top">Voucher No</td><td width="5px" valign="top">:</td><td>VBMA1502000428</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">TORS Sale Code</td><td valign="top">:</td><td>TRHT-00024</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">Issued Date</td><td valign="top">:</td><td>12-02-2015 11:07:09</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">Booking Code</td><td valign="top">:</td><td>RTMGMA150201959</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">Booking By</td><td valign="top">:</td><td> </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">Confirm Hotel By</td><td valign="top">:</td><td>superadmin</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <br/><br/><br/>
+        <div id="rsvn-detail">
+            Name of Pax :              <table cellpadding="5px" cellspacing="0px" width="100%" id="rsvn-room">
+                <tr>
+                    <th width="60px">Qty</th>
+                    <th>Room Type</th>
+                                        <th width="140px">NTA</th>
+                                        <th width="120px">Check In</th>
+                    <th width="120px">Check Out</th>
+                </tr>
+				                                                                            <tr>
+                        <td>1</td>
+                        <td>STANDARD Single</td>
+                                                <td align="right">48.543,69</td>
+                                                <td align="center">13-02-2015</td>
+                        <td align="center">14-02-2015</td>
+                    </tr>
+                                                                    </table>
+            <br/><br/>
+            <table>
+                <tr>
+                    <td>Remarks</td>
+                    <td>:</td>
+                    <td>PAX CHECK IN WITHOUT VOUCHER</td>
+                </tr>
+                <tr>
+                    <td>Request</td>
+                    <td>:</td>
+                    <td> -</td>
+                </tr>
+            </table>
+                    </div>
+        
+        <br/><br/>
+        * This document is printed by <img src="application/torsb2b/travons/media/img/vlogo2.png" height="15px">, no signature is required.
+    </body>
+</html>
