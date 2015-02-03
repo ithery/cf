@@ -39,7 +39,7 @@
 			//save this object to file.
 			$json = json_encode($this);
 			
-			$ajax_method = cutils::randmd5();
+			$ajax_method = date('Ymd').cutils::randmd5();
 			$file = ctemp::makepath("ajax",$ajax_method.".tmp");
 			file_put_contents($file,$json);
 			return curl::base()."ccore/ajax/".$ajax_method;
