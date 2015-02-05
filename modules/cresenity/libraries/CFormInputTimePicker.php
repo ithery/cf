@@ -61,7 +61,7 @@ class CFormInputTimePicker extends CFormInput {
 		}
 		$html->appendln('<div class="bootstrap-timepicker">');
 		$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled '.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.$placeholder.'>')->br();
-		$html->appendln('<div>');
+		$html->appendln('</div>');
 		return $html->text();	
 	}
 	public function js($indent=0) {
