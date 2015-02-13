@@ -292,7 +292,7 @@ class cajax {
 			}
 			
 			if($table->checkbox) {
-				$arr[] = '<input type="checkbox" name="'.$table->id().'-check[]" id="'.$table->id().'-'.$key.'" value="1" class="checkbox-'.$table->id().'">';
+				$arr[] = '<input type="checkbox" name="'.$table->id().'-check[]" id="'.$table->id().'-'.$key.'" value="'.$key.'" class="checkbox-'.$table->id().'">';
 			}
 			foreach($table->columns as $col) {
 				$col_found = false;
