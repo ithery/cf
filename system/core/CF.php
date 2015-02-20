@@ -283,7 +283,6 @@
                 catch (ReflectionException $e) {
                     try {
                         $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
-                        echo 'Controller_' .$class_name .ucfirst(CFRouter::$controller);
                         // Start validation of the controller
                         $class = new ReflectionClass('Controller_' .$class_name .ucfirst(CFRouter::$controller));
                     }
