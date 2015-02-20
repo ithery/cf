@@ -11,7 +11,7 @@
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
-class Cache_Core {
+class Cache {
 
 	protected static $instances = array();
 
@@ -28,7 +28,7 @@ class Cache_Core {
 	 * Returns a singleton instance of Cache.
 	 *
 	 * @param   string  configuration
-	 * @return  Cache_Core
+	 * @return  Cache
 	 */
 	public static function & instance($config = FALSE)
 	{

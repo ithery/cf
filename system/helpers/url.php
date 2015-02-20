@@ -2,7 +2,7 @@
 
 trigger_error('url is deprecated please use curl');
 
-class url_Core {
+class url {
 
 	/**
 	 * Fetches the current URI.

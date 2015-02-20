@@ -9,7 +9,7 @@
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
-class date_Core {
+class date {
 
 	/**
 	 * Converts a UNIX timestamp to DOS format.

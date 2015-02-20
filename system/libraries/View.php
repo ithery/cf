@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class View_Core {
+class View {
 
     // The view file name and type
     protected $kohana_filename = FALSE;

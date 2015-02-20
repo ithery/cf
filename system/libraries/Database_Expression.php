@@ -9,7 +9,7 @@
  * @copyright  (c) 2007-2009 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
-class Database_Expression_Core {
+class Database_Expression {
 
 	protected $expression;
 

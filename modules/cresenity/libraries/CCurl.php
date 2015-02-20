@@ -13,8 +13,10 @@ class CCurl {
     private $last_response_body;
     private $last_response_header;
     private $url;
+    private $engine;
+    private $soap_action;
 
-    private function __construct($url = null) {
+    private function __construct($url = null,$engine='curl') {
         $this->autoinit = true;
         $this->opened = false;
         $this->handle = null;
@@ -27,6 +29,7 @@ class CCurl {
         $this->last_response_body = null;
         $this->last_response_header = null;
         $this->url = $url;
+        $this->engine=$engine;
     }
 
     private function clear_last_exec() {
@@ -39,8 +42,8 @@ class CCurl {
         $this->last_response_header = null;
     }
 
-    public static function factory($url) {
-        return new CCurl($url);
+    public static function factory($url,$engine='curl') {
+        return new CCurl($url,$engine);
     }
 
     public function opened() {
@@ -52,16 +55,45 @@ class CCurl {
             $this->close();
         }
     }
-
+    
+    public function set_soap_action($action) {
+        $this->soap_action = $action;
+        return $this;
+    
+    }
+    
+    public function set_engine($engine) {
+        $this->engine = $engine;
+        return $this;
+    }
+    
     public function open() {
-        $this->handle = curl_init();
+        switch($this->engine) {
+            case "curl":
+                $this->handle = curl_init();
+            break;
+            case "soapclient":
+                $http_header = array(
+
+                    'trace' => true,
+                    'location' => $this->url,
+                    'uri' => $this->url,
+                );
+                $this->handle = new SoapClient(null, $http_header);
+            break;
+        
+        }
         return $this;
     }
 
     public function close() {
-        @curl_close($this->handle);
-        $this->handle = null;
-        return $this;
+         switch($this->engine) {
+            case "curl":
+                @curl_close($this->handle);
+            break;
+         }
+         $this->handle = null;
+         return $this;
     }
 
     public function set_opt($key, $value, $overwrite = true) {
@@ -90,6 +122,14 @@ class CCurl {
             $this->open();
         }
         //set default options
+       
+        if($this->engine=="soapclient") {
+            $request = $this->get_opt(CURLOPT_POSTFIELDS);
+            
+            $this->last_response_body = $this->last_response = $this->handle->__doRequest($request, $this->url, $this->soap_action, 1);
+            
+            return true;
+        }
         curl_setopt($this->handle, CURLOPT_TIMEOUT, 3000);
         curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->handle, CURLOPT_URL, $this->url);
@@ -181,7 +221,16 @@ class CCurl {
     }
 
     public function get_http_code() {
-        $httpcode = curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
+        $httpcode=0;
+        switch($this->engine) {
+            case "curl":
+                $httpcode = curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
+            break;
+            case "soapclient":
+                $httpcode = '200';
+            break;
+        }
+        
         return $httpcode;
     }
 

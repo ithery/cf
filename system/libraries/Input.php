@@ -9,7 +9,7 @@
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
-class Input_Core {
+class Input {
 
 	// Enable or disable automatic XSS cleaning
 	protected $use_xss_clean = FALSE;

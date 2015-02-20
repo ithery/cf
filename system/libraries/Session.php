@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class Session_Core {
+class Session {
 
 	// Session singleton
 	protected static $instance;

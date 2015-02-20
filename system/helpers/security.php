@@ -9,7 +9,7 @@
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
-class security_Core {
+class security {
 
 	/**
 	 * Sanitize a string with the xss_clean method.

@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class cookie_Core {
+class cookie {
 
 	/**
 	 * Sets a cookie with the given parameters.

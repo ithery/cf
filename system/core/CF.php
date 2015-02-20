@@ -281,8 +281,16 @@
                     $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
                 }
                 catch (ReflectionException $e) {
-                    // Controller does not exist
-                    CFEvent::run('system.404');
+                    try {
+                        $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
+                        echo 'Controller_' .$class_name .ucfirst(CFRouter::$controller);
+                        // Start validation of the controller
+                        $class = new ReflectionClass('Controller_' .$class_name .ucfirst(CFRouter::$controller));
+                    }
+                    catch (ReflectionException $e) {
+                        // Controller does not exist
+                        CFEvent::run('system.404');
+                    }
                 }
 
                 if ($class->isAbstract() OR (IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE)) {
@@ -1067,9 +1075,28 @@
          * @param   string  name of class
          * @return  bool
          */
-        public static function auto_load($class) {
+        public static function auto_load($class, $directory = 'libraries') {
             if (class_exists($class, FALSE)) return TRUE;
 
+            // Transform the class name according to PSR-0
+            $routing_class = ltrim($class, '\\');
+            $routing_file = '';
+            $namespace = '';
+
+            if ($last_namespace_position = strripos($routing_class, '\\')) {
+                $namespace = substr($routing_class, 0, $last_namespace_position);
+                $routing_class = substr($routing_class, $last_namespace_position + 1);
+                $routing_file = str_replace('\\', DS, $namespace) . DS;
+            }
+
+            $routing_file .= str_replace('_', DS, $routing_class);
+            if ($path = self::find_file($directory, $routing_file)) {
+                // Load the class file
+                require $path;
+                return TRUE;
+                
+            }
+            
             if (($suffix = strrpos($class, '_')) > 0) {
                 // Find the class suffix
                 $suffix = substr($class, $suffix + 1);
@@ -1109,6 +1136,7 @@
                 $type = ($class[0] < 'a') ? 'libraries' : 'helpers';
                 $file = $class;
             }
+            
             
             if ($filename = self::find_file($type, $file)) {
                 require $filename;
