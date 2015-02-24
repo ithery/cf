@@ -1,5 +1,5 @@
 <?php
-	class CAjax extends CRenderable{
+	class CAjaxObject extends CRenderable{
 		
 		public $name = "";
 		public $method = "GET";
@@ -16,7 +16,7 @@
 			parent::__construct();
 		}
 		public static function factory() {
-			return new CAjax();
+			return new CAjaxObject();
 		}
 		
 		public function set_type($type) {

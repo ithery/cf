@@ -1081,7 +1081,7 @@
             $routing_class = ltrim($class, '\\');
             $routing_file = '';
             $namespace = '';
-
+            
             if ($last_namespace_position = strripos($routing_class, '\\')) {
                 $namespace = substr($routing_class, 0, $last_namespace_position);
                 $routing_class = substr($routing_class, $last_namespace_position + 1);
@@ -1104,7 +1104,7 @@
                 // No suffix
                 $suffix = FALSE;
             }
-
+            
             if ($suffix === 'Core') {
                 $type = 'libraries';
                 $file = substr($class, 0, -5);
@@ -1133,6 +1133,7 @@
                 // always be capitalized, so we check if the first character is
                 // uppercase. If it is, we are loading a library, not a helper.
                 $type = ($class[0] < 'a') ? 'libraries' : 'helpers';
+                
                 $file = $class;
             }
             

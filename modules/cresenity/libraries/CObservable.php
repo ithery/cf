@@ -97,7 +97,7 @@ abstract class CObservable extends CRenderable {
 		return $tabs;
 	}
 	public function add_ajax() {
-		$ajax = CAjax::factory();
+		$ajax = CAjaxObject::factory();
 		$this->add($ajax);
 		return $ajax;
 	}
