@@ -286,12 +286,10 @@ class CTreeDB {
 
     public function get_children_data($id = null) {
         $db = $this->db;
-        $q = "select * from " . $db->escape_table($this->table_name) . " where status>0 " . $this->filter_where() ;
+        $q = "select * from " . $db->escape_table($this->table_name) . " where status>0 " . $this->filter_where() . " order by lft asc";
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
-
         }
-        $q.= " order by lft asc";
         if ($id != null) {
             $qrgt="select rgt from " . $db->escape_table($this->table_name) . " where " . $db->escape_column($this->pk_column) . " = " . $db->escape($id)."";
             if(strlen($this->org_id)>0){

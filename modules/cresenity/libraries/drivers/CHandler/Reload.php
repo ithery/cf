@@ -55,7 +55,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
 		$data_addition = '{'.$data_addition.'}';
 		$js.= "
 			$.cresenity.reload('".$this->target."','".$this->generated_url()."','".$this->method."',".$data_addition.");
-                        
+                        console.log(".$data_addition.");
 		";
 		
 		return $js;

@@ -126,6 +126,7 @@ class CFormInputSelectSearch extends CFormInput {
 			";
 		}
 		$str = "
+			console.log('a');
 			$('#".$this->id."').select2({
 				placeholder: '".$placeholder."',
 				minimumInputLength: 0,

@@ -39,7 +39,7 @@ class Users_Controller extends CController {
         //$table->add_row_action('edit')->set_label('Edit')->set_icon('pencil');
         //$table->add_row_action('delete')->set_icon('trash');
         $table->set_action_style("btn-dropdown");
-        $table->set_title(clang::__('Users'));
+        $table->set_title('Users');
 
         $actedit = $table->add_row_action();
         $actedit->set_label("")->set_icon("search")->set_link(curl::base() . "users/detail/{param1}")->set_confirm(false)->set_label(clang::__('Detail User'));
@@ -97,7 +97,7 @@ class Users_Controller extends CController {
                 //checking
                 if ($error == 0) {
                     if (strlen($username) == 0) {
-                        $error_message = clang::__("Username") . " " . clang::__("is required");
+                        $error_message = "Username is required !";
                         $error++;
                     }
                 }
@@ -105,7 +105,7 @@ class Users_Controller extends CController {
                 if ($error == 0) {
                     if ($is_add == 1) {
                         if (strlen($password) == 0) {
-                            $error_message = clang::__("Password") . " " . clang::__("is required");
+                            $error_message = "Password is required !";
                             $error++;
                         }
                     }
@@ -119,7 +119,7 @@ class Users_Controller extends CController {
                         $qcheck .= " and user_id<>" . $db->escape($id) . "";
                     $rcheck = $db->query($qcheck);
                     if ($rcheck->count() > 0) {
-                        $error_message = clang::__("Username is already exist, please try another name");
+                        $error_message = "Username is already exist, please try another name !";
                         $error++;
                     }
                 }
@@ -176,14 +176,14 @@ class Users_Controller extends CController {
                 }
             } catch (Kohana_Exception $e) {
                 $error++;
-                $error_message = clang::__("Error, call administrator...") . $e->getMessage();
+                $error_message = "Error, call administrator..." . $e->getMessage();
                 ;
             }
             if ($error == 0) {
                 if ($id > 0) {
-                    cmsg::add("flash_success", clang::__("User") . " \"" . $username . "\" " . clang::__("Successfully Modified"));
+                    cmsg::add("flash_success", "User \"" . $username . "\" Successfully Modified !");
                 } else {
-                    cmsg::add("success", clang::__("User") . " \"" . $username . "\" " . clang::__("Successfully Added"));
+                    cmsg::add("success", "User \"" . $username . "\" Successfully Added !");
                 }
                 curl::redirect("users");
             } else {
@@ -219,16 +219,16 @@ class Users_Controller extends CController {
         //$role_list = cdbutils::get_list("select role_id as k,concat(name) as v from roles where org_id=".$db->escape($org_id)."order by role_id asc,name asc;");
         $role_list = $app->get_role_child_list();
         $form = $widget->add_form();
-        $form->add_field('role-field')->set_label(clang::__('Role'))->add_control('role_id', 'select')->add_validation(null)->set_value($role_id)->set_list($role_list);
-        $form->add_field('username-field')->set_label(clang::__('Username'))->add_control('username', 'text')->add_validation('required')->set_value($username);
-        $form->add_field('password-field')->set_label(clang::__('Password'))->add_control('password', 'password')->add_validation(null)->set_value('');
+        $form->add_field('role-field')->set_label('Role')->add_control('role_id', 'select')->add_validation(null)->set_value($role_id)->set_list($role_list);
+        $form->add_field('username-field')->set_label('Username')->add_control('username', 'text')->add_validation('required')->set_value($username);
+        $form->add_field('password-field')->set_label('Password')->add_control('password', 'password')->add_validation(null)->set_value('');
 
-        $form->add_field('description-field')->set_label(clang::__('Description'))->add_control('description', 'textarea')->add_validation(null)->set_value($description);
+        $form->add_field('description-field')->set_label('Description')->add_control('description', 'textarea')->add_validation(null)->set_value($description);
         $form->add_control('id', 'hidden')->add_validation(null)->set_value($id);
         $actions = $form->add_action_list();
         $actions->set_style('form-action');
         $act = $actions->add_action();
-        $act->set_label(clang::__('Submit'))->set_submit(true);
+        $act->set_label('Submit')->set_submit(true);
 
 
         echo $app->render();
@@ -271,7 +271,7 @@ class Users_Controller extends CController {
         if (isset($_GET["user_id"]))
             $user_id = $_GET["user_id"];
         if (strlen($user_id) == 0) {
-            die(clang::__("Error, No Transaction ID Passed"));
+            die("Error, No Transaction ID Passed");
         }
         $view = CView::factory("users/detail/tab/" . $method);
         $view->user_id = $user_id;
@@ -289,17 +289,17 @@ class Users_Controller extends CController {
         $widget = $form->add_widget();
         $widget = $app->add_widget()->set_nopadding(true)->set_title(clang::__('My Last Activity'));
         $table = $widget->add_table();
-        $table->set_title(clang::__('My Last Activity'));
+        $table->set_title('My Last Activity');
         $q = "select * from log_activity order by activity_date desc limit 10 where user_id=" . $user_id;
         $table->set_data_from_query($q);
-        $table->add_column('activity_date')->set_label(clang::__("Activity Date"));
-        $table->add_column('description')->set_label(clang::__("Description"));
+        $table->add_column('activity_date')->set_label("Activity Date");
+        $table->add_column('description')->set_label("Description");
         $table->set_apply_data_table(false);
     }
 
     public function delete($id = "") {
         if (strlen($id) == 0) {
-            curl::redirect('users');
+            curl::redirect(Router::$controller);
         }
         $app = CApp::instance();
         $user = $app->user();
@@ -313,13 +313,13 @@ class Users_Controller extends CController {
         if ($error == 0) {
             if ($userapp->user_id == $user->user_id) {
                 $error++;
-                $error_message = clang::__("Fail on delete, you can't delete your own account...");
+                $error_message = "Fail on delete, you can't delete your own account...";
             }
         }
         if ($error == 0) {
             if ($user->is_base == 1) {
                 $error++;
-                $error_message = clang::__("Fail on delete, data is required by system...");
+                $error_message = "Fail on delete, data is required by system...";
             }
         }
         if ($error == 0) {
@@ -327,17 +327,17 @@ class Users_Controller extends CController {
                 $db->update("users", array("status" => 0, "updated" => date("Y-m-d H:i:s"), "updatedby" => $userapp->username), array("user_id" => $id));
             } catch (Kohana_Exception $e) {
                 $error++;
-                $error_message = clang::__("Fail on delete, please call the administrator...");
+                $error_message = "Fail on delete, please call the administrator...";
             }
         }
 
         if ($error == 0) {
-            cmsg::add('success', clang::__("Role") . " \"" . $id . "\" " . clang::__("Successfully Deleted"));
+            cmsg::add('success', "Role \"" . $id . "\" Successfully Deleted !");
         } else {
             //proses gagal
             cmsg::add('error', $error_message);
         }
-        curl::redirect('users');
+        curl::redirect(Router::$controller);
     }
 
 }

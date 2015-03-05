@@ -36,15 +36,7 @@ class CClientScript extends CObject {
 	}
 	
 	public function fullpath_js_file($file) {
-		$dirs = CF::get_dirs('media');
 		
-		foreach($dirs as $dir) {
-			$path = $dir.'js'.DS.$file;
-			if(file_exists($path)) {
-				return $path;
-			}
-		
-		}
 		
 		$path = DOCROOT."media".DS.'js'.DS;
 		return $path.$file;

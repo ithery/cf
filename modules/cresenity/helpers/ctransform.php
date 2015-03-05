@@ -13,6 +13,16 @@ class ctransform {
 		}
 		
 		
+		$ds = ccfg::get('decimal_separator');
+		if($ds==null) {
+			$ds = "."; //decimal separator
+		}
+		$ts = ccfg::get('thousand_separator');
+		if($ts==null) {
+			$ts = ","; //thousand separator
+		}
+		
+		
 		if (strpos($rp,"-")!==false) {
 			$minus_str = substr($rp,0,strpos($rp,"-")+1);
 			$rp = substr($rp,strpos($rp,"-")+1);

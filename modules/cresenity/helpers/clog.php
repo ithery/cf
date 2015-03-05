@@ -307,6 +307,7 @@ class clog {
      * 
      * @param array/string $options     
      * @return boolean
+     * @ex
      */
     public static function write($options){
         $clogger_instance = CLogger::instance();
