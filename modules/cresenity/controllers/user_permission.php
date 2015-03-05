@@ -83,7 +83,7 @@ class User_permission_Controller extends CController {
                     $role_id = null;
                 if (!isset($post['access'])) {
                     $error++;
-                    $error_message = 'Please select minimal one access for this role';
+                    $error_message = clang::__('Please select minimal one access for this role');
                 }
                 if ($error == 0) {
                     if ($role_id == null) {
@@ -125,7 +125,7 @@ class User_permission_Controller extends CController {
                 }
             } catch (Kohana_Exception $e) {
                 $error++;
-                $error_message = "Error, call administrator..." . $e->getMessage();
+                $error_message = clang::__("Error, call administrator") . "... " . $e->getMessage();
                 ;
             }
             if ($error == 0) {
@@ -204,9 +204,9 @@ class User_permission_Controller extends CController {
 
         $form = $app->add_div()->add_class("row-fluid")->add_div()->add_class("span12")->add_widget()->set_title(clang::__('User Permission'))->set_icon('user')->add_form('user_filter_form')->set_method('get');
 
-        $form->add_field('application-field')->set_label('Application')->add_control('app_id', 'select')->set_value($app_id)->set_list($app_list)->add_validation(null);
-        $form->add_field('role-field')->set_label('Role')->add_control('role_id', 'select')->set_value($role_id)->set_list($role_list)->add_validation(null);
-        $form->add_field('check-all-field')->set_label('Check All')->add_control('check_all', 'checkbox')->set_value("1");
+        $form->add_field('application-field')->set_label(clang::__('Application'))->add_control('app_id', 'select')->set_value($app_id)->set_list($app_list)->add_validation(null);
+        $form->add_field('role-field')->set_label(clang::__('Role'))->add_control('role_id', 'select')->set_value($role_id)->set_list($role_list)->add_validation(null);
+        $form->add_field('check-all-field')->set_label(clang::__('Check All'))->add_control('check_all', 'checkbox')->set_value("1");
         $domain = CF::domain();
 
       
@@ -219,9 +219,9 @@ class User_permission_Controller extends CController {
 
         $table->set_key("menu_id");
         $table->set_data_from_array($data);
-        $table->add_column('label')->set_label('Label');
-        $table->add_column('access')->set_label('Access')->set_align('center');
-        $table->add_column('permission')->set_label('Permission')->set_align('left');
+        $table->add_column('label')->set_label(clang::__('Label'));
+        $table->add_column('access')->set_label(clang::__('Access'))->set_align('center');
+        $table->add_column('permission')->set_label(clang::__('Permission'))->set_align('left');
 
         $table->cell_callback_func(array("User_permission_Controller", "cell_callback"), __FILE__);
         $table->set_apply_data_table(false);

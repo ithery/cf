@@ -196,7 +196,7 @@ class CAction extends CElement {
 
             if ($this->submit)
                 $input_type = "submit";
-            $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class. $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . '/>');
+            $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class. $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . $custom_css. '/>');
         } else {
             if ($this->type == "jsfunc") {
                 $link = 'javascript:;';
@@ -208,9 +208,9 @@ class CAction extends CElement {
                 $html->appendln('<li>');
             }
             if ($this->style == "btn-dropdown") {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '"' . $disabled . $add_attr . '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '"' . $disabled . $add_attr . $custom_css. '>');
             } else {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '"' . $disabled . $add_attr . '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '"' . $disabled . $add_attr . $custom_css . '>');
             }
             if (strlen($this->icon) > 0) {
                 $html->append('<i class="icon icon-' . $this->icon . '"></i> ');

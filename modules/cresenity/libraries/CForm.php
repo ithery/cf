@@ -407,6 +407,8 @@ class CForm extends CElement {
 			$on_success_script = "
 				$('#" . $this->id . "').removeClass('loading');
 				$('#" . $this->id . "').find('*').removeClass('disabled');
+				
+					
 				if(typeof data=='object') {
 					var result = data.result;
 					var message = data.message;
@@ -417,7 +419,7 @@ class CForm extends CElement {
 						$.cresenity.message('error',message);
 					}
 				} else if(typeof data== 'string') {
-					if(data.toLowerCase().indexOf('error') === -1) {
+					if(data.toLowerCase().substring(0,5) != 'error') {
 						if(data!='') {
 							$.cresenity.message('success',data);
 						} else {
@@ -535,7 +537,7 @@ class CForm extends CElement {
         }
 		if($this->auto_set_focus) {
 			$js->appendln("
-				$('#" . $this->id . "').find(':input:enabled:visible:first').focus();
+				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
 			");
 		}
         $js->appendln(parent::js($js->get_indent()))->br();
