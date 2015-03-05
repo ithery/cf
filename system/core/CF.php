@@ -1077,24 +1077,7 @@
         public static function auto_load($class, $directory = 'libraries') {
             if (class_exists($class, FALSE)) return TRUE;
 
-            // Transform the class name according to PSR-0
-            $routing_class = ltrim($class, '\\');
-            $routing_file = '';
-            $namespace = '';
             
-            if ($last_namespace_position = strripos($routing_class, '\\')) {
-                $namespace = substr($routing_class, 0, $last_namespace_position);
-                $routing_class = substr($routing_class, $last_namespace_position + 1);
-                $routing_file = str_replace('\\', DS, $namespace) . DS;
-            }
-
-            $routing_file .= str_replace('_', DS, $routing_class);
-            if ($path = self::find_file($directory, $routing_file)) {
-                // Load the class file
-                require $path;
-                return TRUE;
-                
-            }
             
             if (($suffix = strrpos($class, '_')) > 0) {
                 // Find the class suffix
@@ -1104,7 +1087,7 @@
                 // No suffix
                 $suffix = FALSE;
             }
-            
+
             if ($suffix === 'Core') {
                 $type = 'libraries';
                 $file = substr($class, 0, -5);
@@ -1133,17 +1116,35 @@
                 // always be capitalized, so we check if the first character is
                 // uppercase. If it is, we are loading a library, not a helper.
                 $type = ($class[0] < 'a') ? 'libraries' : 'helpers';
-                
                 $file = $class;
             }
             
             
             if ($filename = self::find_file($type, $file)) {
                 require $filename;
+                return TRUE;
             }
             else {
                 // The class could not be found
                 return FALSE;
+            }
+            
+            // Transform the class name according to PSR-0
+            $routing_class = ltrim($class, '\\');
+            $routing_file = '';
+            $namespace = '';
+
+            if ($last_namespace_position = strripos($routing_class, '\\')) {
+                $namespace = substr($routing_class, 0, $last_namespace_position);
+                $routing_class = substr($routing_class, $last_namespace_position + 1);
+                $routing_file = str_replace('\\', DS, $namespace) . DS;
+            }
+
+            $routing_file .= str_replace('_', DS, $routing_class);
+            if ($path = self::find_file($directory, $routing_file)) {
+                // Load the class file
+                require $path;
+                return TRUE;
             }
 
             if ($filename = self::find_file($type, self::$configuration['core']['extension_prefix'] . $class)) {
