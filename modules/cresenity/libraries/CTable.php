@@ -30,6 +30,7 @@ class CTable extends CElement {
     public $display_length;
     public $paging_list;
     public $storage;
+    public $responsive;
     public $options;
     public $apply_data_table;
     public $group_by;
@@ -59,6 +60,7 @@ class CTable extends CElement {
         parent::__construct($id);
 		$this->default_paging_list["-1"] = clang::__("ALL");
 		$this->tag = "table";
+        $this->responsive = false;
         $this->db = CDatabase::instance();
         $this->db_config = $this->db->config();
         $this->display_length = "10";
@@ -141,6 +143,11 @@ class CTable extends CElement {
 
     public function set_footer($bool) {
         $this->footer = $bool;
+        return $this;
+    }
+
+    public function set_responsive($bool) {
+        $this->responsive = $bool;
         return $this;
     }
 
@@ -924,7 +931,13 @@ class CTable extends CElement {
             $html->dec_indent()->appendln('</div>');
             $html->appendln('<div class="widget-content nopadding">')->inc_indent();
         }
-        $html->appendln('<table ' . $pdf_table_attr . ' class="table table-bordered table-striped responsive" id="' . $this->id . '">')
+        $data_responsive_open = '';
+        $data_responsive_close = '';
+        if($this->responsive) {
+            $data_responsive_open = '<div class="span12" style="overflow: auto;margin-left: 0;">';
+            $data_responsive_close = '</div>';
+        }
+        $html->appendln($data_responsive_open .'<table ' . $pdf_table_attr . ' class="table table-bordered table-striped responsive" id="' . $this->id . '">')
                 ->inc_indent()->br();
         if ($this->show_header) {
 
@@ -958,7 +971,7 @@ class CTable extends CElement {
             $html->dec_indent()->appendln("</thead>")->br();
         }
 
-        $html->appendln("<tbody>")->inc_indent()->br();
+        $html->appendln("<tbody>" . $data_responsive_close)->inc_indent()->br();
         //render body;
         $no = 0;
         if (!$this->ajax) {
