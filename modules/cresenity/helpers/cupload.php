@@ -54,7 +54,8 @@ class cupload {
 		}
 
 		if ( ! is_writable($directory))
-			throw new Kohana_Exception('upload.not_writable', $directory);
+			// throw new Kohana_Exception('upload.not_writable', $directory);
+			throw new Exception('upload.not_writable', $directory);
 
 		if (is_uploaded_file($file['tmp_name']) AND move_uploaded_file($file['tmp_name'], $filename = $directory.$filename))
 		{
