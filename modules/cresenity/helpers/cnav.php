@@ -63,6 +63,9 @@ class cnav {
 			$role_id = null;
 		}
 		
+		$role = cdbutils::get_row('select * from roles where role_id='.$db->escape($role_id));
+		if($role->parent_id==null) return true;
+		
 		$q = "select * from role_nav where nav=".$db->escape($nav["name"])." and role_id=".$db->escape($role_id)." and app_id=".$db->escape($app_id);
 		if($role_id==null) {
 			$q = "select * from role_nav where nav=".$db->escape($nav["name"])." and role_id is null and app_id=".$db->escape($app_id);
@@ -74,29 +77,40 @@ class cnav {
 	}
 	public static function have_permission($action,$nav=null,$role_id=null,$app_id=null,$domain=null) {
 		$app=CApp::instance();
-		if($nav==null) $nav = cnav::nav();
+        if($role_id==null) {
+            $role = $app->role();
+            if($role==null) return false;
+            $role_id = $role->role_id;
+        }
+        if($app_id==null) {
+            $app_id = $app->app_id();
+        }
+
+        $db = CDatabase::instance($domain);
+        $q = "select * from role_permission where name=".$db->escape($action)." and role_id=".$db->escape($role_id)." and app_id=".$db->escape($app_id);
+        $r = $db->query($q);
+
+        return $r->count()>0;
+
+
+        /*
+        if($nav==null) $nav = cnav::nav();
+		
 		if($nav===false) return false;
 		
 		$navname = $nav;
 		if(is_array($navname)) {
 			$navname = $nav["name"];
 		}
-		if($role_id==null) {
-			$role = $app->role();
-			if($role==null) return false;
-			$role_id = $role->role_id;
-		}
-		if($app_id==null) {
-			$app_id = $app->app_id();
-		}
-		$db = CDatabase::instance($domain);
+
+
 		$q = "select * from role_permission where name=".$db->escape($action)." and nav=".$db->escape($navname)." and role_id=".$db->escape($role_id)." and app_id=".$db->escape($app_id);
 		
 		
 		
 		$r = $db->query($q);
 		return $r->count()>0;
-		
+		*/
 	}
 	public static function app_user_rights_array($app_code,$role_id,$app_role_id="",$domain="") {
 		$navs=CNavigation::instance($app_code)->navs();

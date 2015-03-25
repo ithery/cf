@@ -31,7 +31,7 @@ class CPDFTable extends PDFTable {
             $this->AddPage($this->CurOrientation, $this->CurPageSize);
         };
 
-        parent::_tableWrite(&$table);
+        parent::_tableWrite($table);
     }
 
 }

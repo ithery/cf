@@ -54,6 +54,8 @@ class CTable extends CElement {
     public $pdf_orientation;
     public $show_header;
 	
+	public $report_header=array();
+	
 	protected $js_cell;
 
     public function __construct($id = "") {
@@ -110,6 +112,8 @@ class CTable extends CElement {
         $this->pdf_orientation = 'P';
         $this->requires = array();
 		$this->js_cell='';
+		
+		$this->report_header = array();
 		
 		CClientModules::instance()->register_module('jquery.datatable');
 		
@@ -730,24 +734,38 @@ class CTable extends CElement {
         echo '</html>';
         exit;
     }
-
+	
+	public function add_report_header($line) {
+		$this->report_header[] = $line;
+		return $this;
+	}
+	
     public function export_excel($filename, $sheet_name) {
         $this->export_excel = true;
         $excel = CExcel::factory()->set_creator("cresenity_system")->set_subject("Cresenity Report");
         $excel->set_active_sheet_name($sheet_name);
-        $i = 0;
+        $header_count = count($this->report_header);
+		
+		for($ii=1;$ii<=$header_count;$ii++) {
+			$excel->write_by_index(0, $ii, $this->report_header[$ii-1]);
+		
+		}
+		
+		$i = 0;
         if ($this->numbering) {
-            $excel->write_by_index($i, 1, "No");
+            $excel->write_by_index($i, $header_count+1, "No");
             $i++;
         }
         foreach ($this->columns as $col) {
-            $excel->write_by_index($i, 1, $col->label);
+            $excel->write_by_index($i, $header_count+1, $col->label);
             $i++;
         }
 
-
+		
+		
+		
         $i = 0;
-        $j = 2;
+        $j = 2+$header_count;
         $no = 0;
         foreach ($this->data as $row) {
             $i = 0;
@@ -820,7 +838,7 @@ class CTable extends CElement {
 
                 $excel->write_by_index($i, $j, $new_v);
                 $excel->set_align_by_index($i, $j, $col->get_align());
-
+				
                 $i++;
                 $col_found = true;
             }
@@ -889,7 +907,7 @@ class CTable extends CElement {
             }
         }
         $excel->set_auto_width();
-        $excel->set_header_style();
+        $excel->set_header_style($header_count+1);
         $sfn = cstr::sanitize($filename, true);
 
         $fn = cexport::makepath("excel", $sfn);

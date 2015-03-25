@@ -136,8 +136,9 @@ class CExcel {
         $sheet->mergeCells($col1 . $row1 . ":" . $col2 . $row2);
     }
 
-    public function set_header_style($style = array(), $col_start = "", $col_end = "") {
-        $sheet = $this->phpexcel->getActiveSheet();
+    public function set_header_style($row=null,$style = array(), $col_start = "", $col_end = "") {
+        if($row==null) $row = '1';
+		$sheet = $this->phpexcel->getActiveSheet();
         if (empty($style)) {
             $style = array(
                 'fill' => array(
@@ -159,8 +160,8 @@ class CExcel {
             $col_start = $this->num2alpha($col_start);
         if (is_numeric($col_end))
             $col_end = $this->num2alpha($col_end);
-
-        $sheet->getStyle($col_start . '1' . ':' . $col_end . '1')->applyFromArray($style);
+		
+        $sheet->getStyle($col_start . $row . ':' . $col_end . $row)->applyFromArray($style);
     }
 
     public function set_row_style($row, $style = array(), $col_start = "", $col_end = "") {

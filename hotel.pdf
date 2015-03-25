@@ -35,11 +35,11 @@
                         </tr>
                         <tr>
                             <td valign="top">HOTEL</td><td valign="top">:</td>
-                            <td>Amari Boulevard</td>
+                            <td>Asia Airport</td>
                         </tr>
                         <tr>
                             <td></td><td></td>
-                            <td>2 Soi 5</td>
+                            <td>99/2 Moo 8</td>
                         </tr>
                         <tr>
                             <td></td><td></td>
@@ -47,27 +47,27 @@
                         </tr>
                         <tr>
                             <td></td><td></td>
-                            <td>(66) 2255 - 2930</td>
+                            <td>(66) 2992 - 6999</td>
                         </tr>
                     </table>
                 </td>
                 <td>
                     <table id="trans-info" width="100%">
                         <tr>
-                            <td width="110px" valign="top">Voucher No</td><td width="5px" valign="top">:</td><td>VBMA1502000551</td>
+                            <td width="110px" valign="top">Voucher No</td><td width="5px" valign="top">:</td><td>VBMA1503000470</td>
                         </tr>
                         <tr>
-                            <td valign="top">TORS Sale Code</td><td valign="top">:</td><td>TRHT-00042</td>
+                            <td valign="top">TORS Sale Code</td><td valign="top">:</td><td>TRHT-00049</td>
                         </tr>
                         <tr>
-                            <td valign="top">Issued Date</td><td valign="top">:</td><td>16-02-2015 15:00:09</td>
+                            <td valign="top">Issued Date</td><td valign="top">:</td><td>18-03-2015 09:58:06</td>
                         </tr>
                         <tr>
                             <td valign="top">Booking Code</td><td valign="top">:</td><td>
-							RTMGMA150202048</td>
+							RTMGMA150302706</td>
                         </tr>
                         <tr>
-                            <td valign="top">Booking By</td><td valign="top">:</td><td>abcd abcd</td>
+                            <td valign="top">Booking By</td><td valign="top">:</td><td>Hery Kurniawan</td>
                         </tr>
                         <tr>
                             <td valign="top">Confirm Hotel By</td><td valign="top">:</td><td>superadmin</td>
@@ -78,7 +78,7 @@
         </table>
         <br/><br/><br/>
         <div id="rsvn-detail">
-            Name of Pax : abcd abcd            <table cellpadding="5px" cellspacing="0px" width="100%" id="rsvn-room">
+            Name of Pax : Hery Kurniawan            <table cellpadding="5px" cellspacing="0px" width="100%" id="rsvn-room">
                 <tr>
                     <th width="60px">Qty</th>
                     <th>Room Type</th>
@@ -88,10 +88,10 @@
                 </tr>
 				                                                                            <tr>
                         <td>1</td>
-                        <td>DELUXE Single</td>
-                                                <!--<td align="right">841.423,94</td>-->
-                                                <td align="center">17-02-2015</td>
-                        <td align="center">18-02-2015</td>
+                        <td>STANDARD Single</td>
+                                                <!--<td align="right">48.543,69</td>-->
+                                                <td align="center">24-03-2015</td>
+                        <td align="center">25-03-2015</td>
                     </tr>
                                                                     </table>
             <br/><br/>
@@ -100,11 +100,6 @@
                     <td>Remarks</td>
                     <td>:</td>
                     <td>PAX CHECK IN WITHOUT VOUCHER</td>
-                </tr>
-                <tr>
-                    <td>Request</td>
-                    <td>:</td>
-                    <td> -</td>
                 </tr>
             </table>
                     </div>

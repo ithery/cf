@@ -67,10 +67,10 @@ class CFormInputCurrency extends CFormInput {
         }
 
         $js->append("$('#" . $this->id . "').focus( function() {
-				$('#" . $this->id . "').val($('#" . $this->id . "').val().replace(/,/g,\"\"))
+				$('#" . $this->id . "').val($.cresenity.unformat_currency($('#" . $this->id . "').val()))
 			});")->br();
         $js->append("$('#" . $this->id . "').blur(function() {
-				$('#" . $this->id . "').val($.cresenity.thousand_separator($('#" . $this->id . "').val()))
+				$('#" . $this->id . "').val($.cresenity.format_currency($('#" . $this->id . "').val()))
 			});")->br();
 
 

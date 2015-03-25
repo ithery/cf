@@ -30,7 +30,10 @@ class CFormInputCheckbox extends CFormInput {
         return $this;
     }
 
-    public function set_label($label) {
+    public function set_label($label,$lang=true) {
+		if($lang==true) {
+			$label = clang::__($label);
+		}
         $this->label = $label;
         return $this;
     }
@@ -64,6 +67,7 @@ class CFormInputCheckbox extends CFormInput {
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->set_indent($indent);
+		$js->append(parent::js($indent))->br();
         if ($this->applyjs == "uniform") {
             //$js->append("$('#".$this->id."').uniform();")->br();
         }

@@ -37,6 +37,10 @@ class cimage {
             $org_folder = $org->code . DIRECTORY_SEPARATOR;
         }
 		$upload_directory = DOCROOT.'upload'.DIRECTORY_SEPARATOR;
+		
+		$upload_directory = CF::get_dir('upload');
+		
+		
 		ctemp::makedir($upload_directory);
 		$org_directory = $upload_directory . $org_folder;
 		ctemp::makedir($org_directory);

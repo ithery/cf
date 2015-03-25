@@ -235,7 +235,12 @@ class View {
         if (is_string($this->kohana_filetype)) {
             // Merge global and local data, local overrides global with the same name
             $data = array_merge(View::$kohana_global_data, $this->kohana_local_data);
-
+			
+			if(CF::$instance==null) {
+				var_dump(debug_backtrace());
+				
+			}
+			
 //            var_dump(CF::$instance);
             // Load the view in the controller for access to $this
             $output = CF::$instance->_kohana_load_view($this->kohana_filename, $data);

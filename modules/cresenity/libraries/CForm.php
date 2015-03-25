@@ -460,7 +460,10 @@ class CForm extends CElement {
 				";
 			}
             $js->appendln("
-			
+				$('#" . $this->id . " input[type=submit]').click(function() {
+					$('input[type=submit]', $(this).parents('form')).removeAttr('clicked');
+					$(this).attr('clicked', 'true');
+				});
 				$('#" . $this->id . "').submit(function(event) {
 					if ($('#" . $this->id . "').validationEngine('validate') ) {
 						if($('#" . $this->id . "').hasClass('loading')) return false;
@@ -468,6 +471,8 @@ class CForm extends CElement {
 						$('#" . $this->id . "').addClass('loading');
 						$('#" . $this->id . "').find('*').addClass('disabled');
 						" . $ajax_process_without_upload . "
+						
+						
 						
 						var form_ajax_url = $('#" . $this->id . "').attr('action');
 						if(!form_ajax_url) form_ajax_url = '" . $ajax_url . "';

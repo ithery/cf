@@ -95,6 +95,7 @@ if(file_exists($file)) {
 	$content = file_get_contents($file);
 	$data = json_decode($content,true);
 	$app_code = $data['app_code'];
+	
 	$kohana_application = 'application'.DIRECTORY_SEPARATOR.$app_code;
 }
 

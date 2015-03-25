@@ -9,6 +9,7 @@ class ctemp {
 		return $path;		
 	}
 	public static function makedir($path) {
+		die($path);
 		if(!is_dir($path)) {
 			mkdir($path);
 		}

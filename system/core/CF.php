@@ -272,7 +272,9 @@
 
             if (self::$instance === NULL) {
                 CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
-
+				if(empty(CFRouter::$controller_path)) {
+					exit;
+				}
                 // Include the Controller file
                 require CFRouter::$controller_path;
 
@@ -936,7 +938,12 @@
          * @return  void
          */
         public static function show_404($page = FALSE, $template = FALSE) {
-            throw new CF_404_Exception($page, $template);
+            if(CView::exists('ccore/404')) {
+				echo CView::factory('ccore/404')->render();
+			} else {
+			
+				throw new CF_404_Exception($page, $template);
+			}
         }
 
         /**

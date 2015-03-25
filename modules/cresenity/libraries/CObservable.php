@@ -178,6 +178,12 @@ abstract class CObservable extends CRenderable {
 		return $act;
 	}
 	
+	public function add_pie_chart($id="") {
+		$pie_chart = CPieChartElement::factory($id);
+		$this->add($pie_chart);
+		return $pie_chart;
+	}
+	
 	public function clear_both() {
 		$this->add('<div class="clear-both"></div>');
 		

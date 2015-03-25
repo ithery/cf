@@ -1507,3 +1507,8 @@ body .modal{
     width: 80%; /* respsonsive width */
     margin-left:-40%; /* width/2) */ 
 }
+
+
+.form-horizontal input[type="text"].datepicker{
+    width:100px;
+}

@@ -49,7 +49,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
 		
 		foreach($this->param_inputs as $inp) {
 			if(strlen($data_addition)>0) $data_addition.=',';
-			$data_addition.="'".$inp."':$('#".$inp."').val()";
+			$data_addition.="'".$inp."':$.cresenity.value('#".$inp."')";
 			
 		}
 		$data_addition = '{'.$data_addition.'}';

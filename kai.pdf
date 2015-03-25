@@ -62,7 +62,7 @@
                     <tr style="height: 200px;">
                         <td style="font-weight: bold;">Kode Booking</td>
                         <td>:</td>
-                        <td style="font-weight: bold;">9NU7L3</td>
+                        <td style="font-weight: bold;">4AQUKK</td>
                     </tr>
                     <tr>
                         <td style="vertical-align:text-top;">Nama KA</td>
@@ -72,20 +72,20 @@
                     <tr>
                         <td style="vertical-align:text-top;">Tgl Berangkat</td>
                         <td style="vertical-align:text-top;">:</td>
-                        <td style="vertical-align:text-top;">12 FEBRUARY 2015</td>
+                        <td style="vertical-align:text-top;">28 JANUARY 2015</td>
                     </tr>
                     <tr>
                         <td style="vertical-align:text-top;">St Asal</td>
                         <td style="vertical-align:text-top;">:</td>
                         <td style="vertical-align:text-top;">
-                            BANDUNG                            <br><span>TGL 12-02-2015 15:00 WIB</span>
+                            BANDUNG                            <br><span>TGL 28-01-2015 15:00 WIB</span>
                         </td>
                     </tr>
                     <tr style="vertical-align:text-top;">
                         <td style="vertical-align:text-top;">St Tujuan</td>
                         <td style="vertical-align:text-top;">:</td>
                         <td style="vertical-align:text-top;"> 
-                            YOGYAKARTA                            <br><span>TGL 12-02-2015 15:30 WIB</span>
+                            YOGYAKARTA                            <br><span>TGL 28-01-2015 15:30 WIB</span>
                         </td>
                     </tr>
                     <tr>
@@ -99,7 +99,7 @@
                         <td style="vertical-align:text-top;">Tempat Duduk</td>
                         <td style="vertical-align:text-top;">:</td>
                         <td style="vertical-align:text-top;">
-							                                                                                                EKSASL-1/1C,
+							                                                                                                EKSASL-1/3C,
                                                                                     </td>
                     </tr>
                     <tr>
@@ -120,7 +120,7 @@
                                                                                 <tr>
                         <td style="vertical-align:text-top;">Total</td>
                         <td style="vertical-align:text-top;">:</td>
-                        <td style="vertical-align:text-top;">Rp. 99.000,00</td>
+                        <td style="vertical-align:text-top;">Rp. 106.500,00</td>
                     </tr>
                 </table>
             </div>
@@ -129,7 +129,7 @@
                     <tr>
                         <td style="padding-left: 150px;">
                             <!--<img src="assets/images/ticket/barcode.jpg" >--> 
-							                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAIAAACzY+a1AAAABmJLR0QA/wD/AP+gvaeTAAACjElEQVR4nO3dy47aQBBA0SHK//8yWWSHEgvT5cdB92yHgGeuSmkZt/14Pp8/kf26+gCyqoS8EvJKyCshr4S8EvJKyCshr4S8EvJKyCshr4S8EvJKyCshr4S8EvJKyCsh7/f6Wzwej/U3ecf2xXYvh/Hy4u2D3PXiQSOXDzaFvBLySsgrIW9gOfNi8Ar/lWXFrvXLtpv8Rv/TFPJKyCshr4S8+eXMi13/ge9aOKyccNk+lbPyuduHcYSmkFdCXgl5JeQdvpw5zso3RN90k4imkFdCXgl5JeTBy5kX26ubXT+1NIW8EvJKyCsh7/DlzFUrheM+925rn6aQV0JeCXkl5M0vZ07bFnTa+ZfTfqPPNIW8EvJKyCsh73G3cw3vG9x77f4RfprCL1BCXgl5JeQNLGdWrsG96sTHcYud86/KaQp5JeSVkFdC3tlnZwb3H522Bfyqw3hTU8grIa+EvBLy7nXtzGnfEG0vWFZuP7z94iM0hbwS8krIKyFv/uzM4MMGBj/3uLcaXL59pinklZBXQl4JeRffFXjwPMgu3RU4N1JCXgl5JeR97c6mbYP33Lt8z1RTyCshr4S8EvK+54nag3umbnKR8ZuaQl4JeSXklZD3tU/U3vUIypV/e/njE5pCXgl5JeSVkAc/UXvlcwcXO7t+eoSmkFdCXgl5JeTBj6AcvIbltC+quu9M/qGEvBLySsiDlzODu5NW7juz7YSvoppCXgl5JeSVkPe1T9TetrJgGdz3NKIp5JWQV0JeCXn3uivwoMELdk/b1f2ZppBXQl4JeSXkwfedyV9NIa+EvBLySsgrIa+EvBLySsgrIa+EvBLySsgrIa+EvBLySsgrIa+EvBLySsgrIa+EvD9/ogY32ibMjQAAAABJRU5ErkJggg==">   
+							                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAIAAACzY+a1AAAABmJLR0QA/wD/AP+gvaeTAAACkElEQVR4nO3dy27bMBRAQbno//+yuyiQhYCoUUlKPsLMNo6j5IDIBa3H6/1+b5T9uvsAGCVhnoR5EuZJmCdhnoR5EuZJmCdhnoR5EuZJmCdhnoR5EuZJmCdhnoR5EuZJmPd7/C1er9f4m/zE8cl2u8PYvfj4IE+9eKIppw9ahXkS5kmYJ2HehHFmZ+IZ/iNjxan55diH/EbfsQrzJMyTME/CvPnjzM6pf+CnBoeRDZfjrZyRn3t8GCtYhXkS5kmYJ2He8nFmnZFPiJ50kwirME/CPAnzJMwLjzM7x9PNqa+2WIV5EuZJmCdh3vJx5q5JYd3P/bTZxyrMkzBPwjwJ8+aPM5ddFnTZ/stlv9H/sQrzJMyTME/CvNen7TX83MRrr7t/hM0qfAAJ8yTMkzBvwjgzcg7uXRsf64ad68/KsQrzJMyTME/CvOW7M+s+9Lns06VTt+87xW302DYJH0DCPAnz5o8zE/+9T9z3mTj73D6/7FiFeRLmSZgnYd5n7c6se/EprXe2CvMkzJMwT8K8m5/ZdPy9E/dQ1u3O3PW8hC9WYZ6EeRLmSZj32Cubjk38ZOr2+/VZhXkS5kmYJ2Hec56offziUwf5mefsfMcqzJMwT8I8CfMe+0TtkXde9/jKFazCPAnzJMyTMC/8RO0RpwaW4+899dUVrMI8CfMkzJMwL/wIyonXPa27uZ9zZ/g3CfMkzJMwLzzOTLyiajdlXDYoOXeGbZPwASTMkzDvOU/UnnjB9MiZNdc/xcEqzJMwT8I8CfPCT9QesW6H5frpxirMkzBPwjwJ88L3neEvqzBPwjwJ8yTMkzBPwjwJ8yTMkzBPwjwJ8yTMkzBPwjwJ8yTMkzBPwjwJ8yTMkzBPwrw/Sf4PLv2LLbAAAAAASUVORK5CYII=">   
                         </td>
                     </tr>
                 </table>
@@ -159,7 +159,7 @@
             <table style="width: 680px;">
                 <tr>
                     <td style="text-align: left;">Printed by TORS System</td>
-                    <td style="text-align: right;">16-02-2015 16:05</td>
+                    <td style="text-align: right;">04-03-2015 11:30</td>
                 </tr>
             </table>
         </div>-->
