@@ -21,12 +21,23 @@
             return $obj;
         }
         
-        public static function xml_set_key($object, $key1, $key2){
+        public static function xml_set_key($object, $key1, $key2 = NULL){
             $obj = cobj::xml_get($object, $key1);
             if ($obj != NULL) {
-                $obj_2 = cobj::xml_get($obj, $key2);
-                if ($obj_2 == NULL) $obj_2[] = $obj;
-                return $obj_2;
+                if ($key2 == NULL) {
+                    $obj[] = $obj;
+//                    if ($key1 == "BookingInfo") {
+//                        cdbg::var_dump($obj);
+//                        echo $key1;
+//                        cdbg::var_dump($obj);
+//                    }
+                    return $obj;
+                }
+                else {
+                    $obj_2 = cobj::xml_get($obj, $key2);
+                    if ($obj_2 == NULL) $obj_2[] = $obj;
+                    return $obj_2;
+                }
             }
             return NULL;
         }
