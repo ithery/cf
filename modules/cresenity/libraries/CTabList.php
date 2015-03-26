@@ -86,6 +86,10 @@ class CTabList extends CElement {
         if ($this->ajax) {
             $ajax_class = "ajax";
             //we create the ajax url if there are no url on tab
+        } else {
+            foreach($this->tabs as $tab) {
+                $tab->set_ajax(false);
+            }
         }
         $html->appendln('<div class="row-fluid ' . $ajax_class . '" id="' . $this->id . '">');
         $html->appendln('	<div class="span12">');

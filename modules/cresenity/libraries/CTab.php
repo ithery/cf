@@ -65,10 +65,12 @@ class CTab extends CElement {
     public function header_html($indent = 0) {
 
         if (strlen($this->ajax_url) == 0) {
-            $ajax_url = CAjaxMethod::factory()->set_type('reload')
-                    ->set_data('json', $this->json())
-                    ->makeurl();
-            $this->set_ajax_url($ajax_url);
+            if($this->ajax) {
+                $ajax_url = CAjaxMethod::factory()->set_type('reload')
+                        ->set_data('json', $this->json())
+                        ->makeurl();
+                $this->set_ajax_url($ajax_url);
+            }
         }
 
 
