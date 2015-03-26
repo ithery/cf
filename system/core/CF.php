@@ -476,10 +476,12 @@
 
                 self::$include_paths[] = APPPATH . "default" . DS;
 
-                foreach (self::$configuration['core']['modules'] as $path) {
-                    if ($path = str_replace('\\', '/', realpath($path))) {
-                        // Add a valid path
-                        self::$include_paths[] = $path . '/';
+                if (isset(self::$configuration['core']['modules'])) {
+                    foreach (self::$configuration['core']['modules'] as $path) {
+                        if ($path = str_replace('\\', '/', realpath($path))) {
+                            // Add a valid path
+                            self::$include_paths[] = $path . '/';
+                        }
                     }
                 }
 
@@ -502,9 +504,12 @@
          */
         public static function config($key, $slash = FALSE, $required = TRUE) {
             if (self::$configuration === NULL) {
+                // Re-parse the include paths
+                self::include_paths(TRUE);
+                
                 // Load core configuration
                 self::$configuration['core'] = self::config_load('core');
-
+                
                 // Re-parse the include paths
                 self::include_paths(TRUE);
             }
@@ -579,8 +584,25 @@
          */
         public static function config_load($name, $required = TRUE) {
             if ($name === 'core') {
-                // Load the application configuration file
-                require DOCROOT . 'config/config' . EXT;
+                $found = FALSE;
+                
+                // find config file at all available paths
+                if ($files = self::find_file('config', 'config', $required)) {
+                    foreach ($files as $file) {
+                        if (file_exists($file)) {
+                            require $file;
+                            $found = TRUE;
+                        }
+                    }
+                }
+                
+                if ($found == FALSE) {
+                    // Load the application configuration file
+                    if (file_exists(DOCROOT . 'config/config' . EXT)) {
+                        require DOCROOT . 'config/config' . EXT;
+                        $found = TRUE;
+                    }
+                }
 
                 if (!isset($config['site_domain'])) {
                     // Invalid config file
@@ -1223,7 +1245,7 @@
             if ($directory === 'config' OR $directory === 'i18n') {
                 // Search in reverse, for merging
                 $paths = array_reverse($paths);
-
+                
                 foreach ($paths as $path) {
                     if (is_file($path . $search)) {
                         // A matching file has been found

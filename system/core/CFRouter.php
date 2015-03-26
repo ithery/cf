@@ -94,7 +94,7 @@ class CFRouter {
 		{
 			// Add the segment to the search path
                         $c_dir = $controller_path;
-                        $c_dir_ucfirst = $controller_path_ucfirst;
+                        $c_dir_ucfirst = strtolower($controller_path_ucfirst);
 			$controller_path .= $segment;
                         $controller_path_ucfirst .= ucfirst($segment);
 			$found = FALSE;
