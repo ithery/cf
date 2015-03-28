@@ -139,18 +139,18 @@ class CTreeDB {
         }
         $rgt = cdbutils::get_value($qrgt);
         $lft = cdbutils::get_value($qlft);
-        $width = $rgt - $lft;
+        $width = ($rgt - $lft) + 1;
         $q="update " . $db->escape_table($this->table_name) . " set status=0, updated=" . $db->escape(date('Y-m-d H:i:s')) . ",updatedby=" . $db->escape($user->username) . " where lft between " . $db->escape($lft) . " and " . $db->escape($rgt) . " ";
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
         $db->query($q);
-        $q="update " . $db->escape_table($this->table_name) . " set rgt=rgt+" . $db->escape($width) . " where status>0 and rgt>" . $db->escape($rgt);
+        $q="update " . $db->escape_table($this->table_name) . " set rgt=rgt-" . $db->escape($width) . " where status>0 and rgt>" . $db->escape($rgt);
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
         $db->query($q);
-        $q="update " . $db->escape_table($this->table_name) . " set lft=lft+" . $db->escape($width) . " where status>0 and  lft>" . $db->escape($rgt);
+        $q="update " . $db->escape_table($this->table_name) . " set lft=lft-" . $db->escape($width) . " where status>0 and  lft>" . $db->escape($rgt);
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
