@@ -62,6 +62,8 @@ class cnav {
 		if($role_id=="PUBLIC") {
 			$role_id = null;
 		}
+		$role = cdbutils::get_row('select * from roles where role_id='.$db->escape($role_id));
+		if($role->parent_id==null) return true;
 		
 		$role = cdbutils::get_row('select * from roles where role_id='.$db->escape($role_id));
 		if($role->parent_id==null) return true;
