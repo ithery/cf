@@ -1174,13 +1174,12 @@
                     $class_not_found = TRUE;
                     return TRUE;
                 }
-                
                 // check route file at helpers
                 if (!$class_not_found) {
-                    $temp_routing_file = explode('\\', $routing_file);
-                    if (strtolower($temp_routing_file[0]) == 'helpers') {
+				    $temp_routing_file = explode(DS, $routing_file);
+					if (strtolower($temp_routing_file[0]) == 'helpers') {
                         $temp_routing_file[0] = 'helpers';
-                        $routing_file = str_replace('Helpers\\', '', $routing_file);
+                        $routing_file = str_replace('Helpers' .DS, '', $routing_file);
                         $directory = 'helpers';
                         if ($path = self::find_file($directory, $routing_file)) {
                             // Load the class file
