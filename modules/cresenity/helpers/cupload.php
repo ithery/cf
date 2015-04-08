@@ -163,19 +163,19 @@ class cupload {
 	public static function create_upload_folder($type,$id) {
 		
 		
-		$upload_directory = DOCROOT.'upload'.DIRECTORY_SEPARATOR;
+		$upload_directory = DOCROOT.'upload'."/";
 		ctemp::makedir($upload_directory);
 		$type = explode(".",$type);
 		$type_directory = $upload_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t.DIRECTORY_SEPARATOR;
+				$type_directory =  $type_directory.$t."/";
 				ctemp::makedir($type_directory);
 			}
 		}
 		
 		
-		$id_directory =  $type_directory.$id.DIRECTORY_SEPARATOR;
+		$id_directory =  $type_directory.$id."/";
 		
 		
 
@@ -191,16 +191,16 @@ class cupload {
 		
 	}
 	public static function get_upload_path($type,$id) {
-		$upload_directory = DOCROOT.'upload'.DIRECTORY_SEPARATOR;
+		$upload_directory = DOCROOT.'upload'."/";
 		
 		$type = explode(".",$type);
 		$type_directory = $upload_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t.DIRECTORY_SEPARATOR;
+				$type_directory =  $type_directory.$t."/";
 			}
 		}
-		$id_directory =  $type_directory.$id.DIRECTORY_SEPARATOR;
+		$id_directory =  $type_directory.$id."/";
 		return $id_directory;
 	}
 	public static function get_upload_src($type,$id,$filename) {
@@ -209,7 +209,7 @@ class cupload {
 		$type_directory = $upload_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t.DIRECTORY_SEPARATOR;
+				$type_directory =  $type_directory.$t."/";
 			}
 		}
 		$id_directory =  $type_directory.$id.'/';

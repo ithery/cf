@@ -1,8 +1,17 @@
+<?php defined('SYSPATH') OR die('No direct access allowed.'); 
+
+	$username = "";
+	$password = "";
+	if(isset($_GET["demo"])) {
+		$username = "demo";
+		$password = "demo";
+	}
+?>
 <!DOCTYPE html>
 <html class="no-js" lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cresenity</title>
+<title>404 Page Not Found</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="<?php echo curl::base(); ?>media/css/cresenity.reset.css" rel="stylesheet">
 <link href="<?php echo curl::base(); ?>media/css/bootstrap.css" rel="stylesheet">
@@ -38,6 +47,7 @@
 			
 			<a class="brand" href="<?php echo curl::base(); ?>">
 				<?php echo ccfg::get('title'); ?>				
+                            
 			</a>		
 			
 			<div class="nav-collapse">
@@ -86,37 +96,44 @@
 </div> <!-- /navbar -->
 
 
-
-<div class="account-container">
-	<div class="logo">
-		<img src="<?php echo curl::base(); ?>media/img/cresenity-logo.png" />
-	</div>
-	<div class="content clearfix" id="container">
-		
-		<form method="post" action="" id="form-login">
-		
-			<h1 class="align-center"><?php echo clang::__('NOT FOUND'); ?></h1>		
-			
-			
-			
-			
-			
-		</form>
-		
-	</div> <!-- /content -->
+<div class="main"  style="margin-top:50px">
 	
-</div> <!-- /account-container -->
+	<div class="main-inner">
 
-<?php if(ccfg::get("signup")): ?>
+	    <div id="container" class="container login-container">
+			<div class="row-fluid">
+				<div class="span12">
+					<div class="well">
+						<h1>404 Page Not Found</h1>
+						<p>Sorry, an error has occured, Requested page not found!</p>
+						<a href="<?php echo curl::base(); ?>" class="btn btn-primary"><i class="icon icon-home"></i> Take me to home</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="footer">
+	
+	<div class="footer-inner">
+		
+		<div class="container">
 			
-<!-- Text Under Box -->
-<div class="login-extra">
-	Don't have an account? <a href="<?php echo curl::base(); ?>cresenity/signup"><?php echo clang::__('Sign Up'); ?></a><br/>
-	<!--
-	<?php echo clang::__('Remind'); ?> <a href="<?php echo curl::base(); ?>/cresenity/forget_password"><?php echo clang::__('Password'); ?></a>
-	-->
-</div> <!-- /login-extra -->
-<?php endif; ?>
+			<div class="row">
+				
+    			<div class="span12">
+    				Copyright &copy; 2015.
+    			</div> <!-- /span12 -->
+    			
+    		</div> <!-- /row -->
+    		
+		</div> <!-- /container -->
+		
+	</div> <!-- /footer-inner -->
+	
+</div> <!-- /footer -->
+
 <!--
 <div id="container">
 

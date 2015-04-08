@@ -79,16 +79,20 @@ scrolltotop.init();
 
 	jQuery(document).on('click','a.confirm',function(e) {
 		var ahref = $(this).attr('href');
+		var message = $(this).attr('data-confirm-message');
+		if(!message) message = "<?php echo clang::__('Are you sure').' ?'; ?>";
 		e.preventDefault();
 		e.stopPropagation();
-		bootbox.confirm("<?php echo clang::__('Are you sure').' ?'; ?>", function(confirmed) {
+		bootbox.confirm(message, function(confirmed) {
 			if(confirmed) {
 				window.location.href=ahref;
 			}
 		});
 	});
 	jQuery(document).on('click','input[type=submit].confirm',function(e) {
-		bootbox.confirm("<?php echo clang::__('Are you sure').' ?'; ?>", function(confirmed) {
+		var message = $(this).attr('data-confirm-message');
+		if(!message) message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+		bootbox.confirm(message, function(confirmed) {
 			if(confirmed) {
 				jQuery(e.target).closest('form').submit();
 			}
@@ -312,14 +316,14 @@ cresenity.func.js
 			
 		},
 		thousand_separator: function(rp) {
-
+			
 			rp =""+rp;
 			var rupiah = "";
 			var vfloat = "";
 			
 			var ds='<?php echo (ccfg::get('decimal_separator')==null?'.':ccfg::get('decimal_separator')); ?>';
 			var ts='<?php echo (ccfg::get('thousand_separator')==null?',':ccfg::get('thousand_separator')); ?>';
-			var dd= <?php echo (ccfg::get('decimal_digit')==null?'2':ccfg::get('decimal_digit')); ?>;
+			var dd= <?php echo (ccfg::get('decimal_digit')==null?'0':ccfg::get('decimal_digit')); ?>;
 			var dd= parseInt(dd);
 			var minus_str = "";
 			
@@ -342,19 +346,31 @@ cresenity.func.js
 			rupiah = rp + rupiah;
 			vfloat = vfloat.replace('.', ds);
 			
+			
+			
 			if (vfloat.length>dd) vfloat = vfloat.substring(0,dd+1);
 			return minus_str+rupiah+vfloat;
+		},
+		replace_all: function(string, find, replace) {
+			escaped_find = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+			return string.replace(new RegExp(escaped_find, 'g'), replace);
 		},
 		format_currency: function(rp) {
 			return $.cresenity.thousand_separator(rp);
 			
 		},
+		
 		unformat_currency: function(rp) {
+			if(typeof rp == "undefined") {
+				rp = '';
+			}
 			var ds='<?php echo (ccfg::get('decimal_separator')==null?'.':ccfg::get('decimal_separator')); ?>';
 			var ts='<?php echo (ccfg::get('thousand_separator')==null?',':ccfg::get('thousand_separator')); ?>';
 			
 			
-            rp = rp.replace(ts, "");
+			rp = this.replace_all(rp,ts,'');
+			
+			
 			rp = rp.replace(ds, ".");
 			return rp;
 			
@@ -709,10 +725,18 @@ cresenity.func.js
 		value : function(elm) {
 			elm = jQuery(elm);
 			if(elm.length==0) return null;
+			if(elm.attr('type')=='checkbox') {
+					
+				if(!elm.is(':checked')) {
+					return null;
+				}
+			}
 			if(elm.val()!='undefined') {
 				return elm.val();
 			}
 			if(elm.attr('value')!='undefined') {
+				
+				
 				return elm.attr('value');
 			}
 			return elm.html();

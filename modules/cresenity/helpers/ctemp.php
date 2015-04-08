@@ -9,12 +9,11 @@ class ctemp {
 		return $path;		
 	}
 	public static function makedir($path) {
-		die($path);
 		if(!is_dir($path)) {
 			mkdir($path);
 		}
-		
-		return $path;
+
+        return $path;
 	}
 	public static function makefolder($path,$folder) {
 		$path = $path.$folder.DIRECTORY_SEPARATOR;

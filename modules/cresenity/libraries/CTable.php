@@ -746,9 +746,22 @@ class CTable extends CElement {
         $excel->set_active_sheet_name($sheet_name);
         $header_count = count($this->report_header);
 		
-		for($ii=1;$ii<=$header_count;$ii++) {
-			$excel->write_by_index(0, $ii, $this->report_header[$ii-1]);
+		$total_column = count($this->columns);
+		$addition_column = 0;
+		if ($this->numbering)
+			$addition_column++;
+		if ($total_column < 2)
+			$total_column = 2;
 		
+
+		
+		$total_column += $addition_column-1;
+
+		
+		for($ii=1;$ii<=$header_count;$ii++) {
+			
+			$excel->write_by_index(0, $ii, $this->report_header[$ii-1]);
+			$excel->merge_cell(0, $ii, $total_column, $ii);
 		}
 		
 		$i = 0;

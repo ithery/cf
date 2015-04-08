@@ -34,13 +34,12 @@ class cimage {
         $org = CApp::instance()->org();
         $org_folder = "";
         if ($org != null) {
-            $org_folder = $org->code . DIRECTORY_SEPARATOR;
+            $org_folder = $org->code . "/";
         }
-		$upload_directory = DOCROOT.'upload'.DIRECTORY_SEPARATOR;
+		$upload_directory = DOCROOT.'upload'."/";
 		
 		$upload_directory = CF::get_dir('upload');
-		
-		
+
 		ctemp::makedir($upload_directory);
 		$org_directory = $upload_directory . $org_folder;
 		ctemp::makedir($org_directory);
@@ -48,27 +47,27 @@ class cimage {
 		$type_directory = $org_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t.DIRECTORY_SEPARATOR;
+				$type_directory =  $type_directory.$t."/";
 				ctemp::makedir($type_directory);
 			}
 		}
-        
-        
 
-		
-        $id_directory = $type_directory . $id . DIRECTORY_SEPARATOR;
+
+
+
+        $id_directory = $type_directory . $id . "/";
         ctemp::makedir($id_directory);
-        $original_directory = $id_directory . 'original' . DIRECTORY_SEPARATOR;
+        $original_directory = $id_directory . 'original' . "/";
         ctemp::makedir($original_directory);
-		$wide_directory = $id_directory . 'wide' . DIRECTORY_SEPARATOR;
+		$wide_directory = $id_directory . 'wide' . "/";
 		ctemp::makedir($wide_directory);
-        $large_directory = $id_directory . 'large' . DIRECTORY_SEPARATOR;
+        $large_directory = $id_directory . 'large' . "/";
 		ctemp::makedir($large_directory);
-        $medium_directory = $id_directory . 'medium' . DIRECTORY_SEPARATOR;
+        $medium_directory = $id_directory . 'medium' . "/";
 		ctemp::makedir($medium_directory);
-        $small_directory = $id_directory . 'small' . DIRECTORY_SEPARATOR;
+        $small_directory = $id_directory . 'small' . "/";
 		ctemp::makedir($small_directory);
-        $thumbnail_directory = $id_directory . 'thumbnail' . DIRECTORY_SEPARATOR;
+        $thumbnail_directory = $id_directory . 'thumbnail' . "/";
 		ctemp::makedir($thumbnail_directory);
 
         
@@ -106,10 +105,10 @@ class cimage {
 
     public static function get_upload_path($type, $id, $size) {
         $org = CApp::instance()->org();
-        $upload_directory = DOCROOT . 'upload' . DIRECTORY_SEPARATOR;
+        $upload_directory = DOCROOT . 'upload' . "/";
         $org_folder = "";
         if ($org != null) {
-            $org_folder = $org->code . DIRECTORY_SEPARATOR;
+            $org_folder = $org->code . "/";
         }
         $org_directory = $upload_directory . $org_folder;
 		
@@ -117,12 +116,12 @@ class cimage {
 		$type_directory = $org_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t.DIRECTORY_SEPARATOR;
+				$type_directory =  $type_directory.$t."/";
 			}
 		}
         
-        $id_directory = $type_directory . $id . DIRECTORY_SEPARATOR;
-        $size_directory = $id_directory . $size . DIRECTORY_SEPARATOR;
+        $id_directory = $type_directory . $id . "/";
+        $size_directory = $id_directory . $size . "/";
         return $size_directory;
     }
 
@@ -175,7 +174,7 @@ class cimage {
 
     public static function get_image_src($type, $id, $size, $filename) {
         
-		$upload_directory = curl::base().'upload'.'/';
+		$upload_directory = curl::base().'upload/';
 		
 		$org = CApp::instance()->org();
         $org_path = "";
@@ -188,7 +187,7 @@ class cimage {
 		$type_directory = $org_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t.DIRECTORY_SEPARATOR;
+				$type_directory =  $type_directory.$t."/";
 			}
 		}
 		$id_directory =  $type_directory.$id.'/';
@@ -203,7 +202,7 @@ class cimage {
 
     public static function get_image_path($type, $id, $size, $filename = "") {
 
-        return cimage::get_upload_path($type, $id, $size) . DIRECTORY_SEPARATOR . $filename;
+        return cimage::get_upload_path($type, $id, $size) . "/" . $filename;
     }
 
 }
