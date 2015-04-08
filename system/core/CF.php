@@ -715,11 +715,12 @@
          */
         public static function log_directory($dir = NULL) {
             static $directory;
-
+			
+			$dir = CF::get_dir('logs');
+			
             if (!empty($dir)) {
                 // Get the directory path
                 $dir = realpath($dir);
-
                 if (is_dir($dir) AND is_writable($dir)) {
                     // Change the log directory
                     $directory = str_replace('\\', '/', $dir) . '/';
