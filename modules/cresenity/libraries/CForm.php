@@ -488,12 +488,14 @@ class CForm extends CElement {
 								//console.log(percentVal, position, total);
 							},
 							success: function(data) {
-								//do callback
-								$('#" . $this->id . "').find('*').removeClass('disabled');
-								$('#" . $this->id . "').removeClass('loading');
-								" . $upload_progress_success . "
-								" . $ajax_process_done_script . "
-								" . $on_success_script . "
+								$.cresenity._handle_response(data,function() {
+                                                                    $('#" . $this->id . "').find('*').removeClass('disabled');
+                                                                    $('#" . $this->id . "').removeClass('loading');
+                                                                    " . $upload_progress_success . "
+                                                                    " . $ajax_process_done_script . "
+                                                                    " . $on_success_script . "
+                                                                });
+                                                                //do callback
 								
 								
 							},

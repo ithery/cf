@@ -24,6 +24,7 @@
         protected $http_method = 'POST';
         protected $data_calendar = array();
         protected $attributes = array();
+        protected $post_data = array();
 
         public function __construct($id) {
             parent::__construct($id);
@@ -165,7 +166,10 @@
             $selected_date = "jQuery('#select_val').val()";
             $params = "";
             foreach ($this->attributes as $attr_k => $attr_v) {
-                $params .= ", '{$attr_k}': {$attr_v}";
+                $params .= ", '" .$attr_k ."': " .$attr_v;
+            }
+            foreach ($this->post_data as $k => $v) {
+                $params .= ", '" .$k ."': " .$v;
             }
             $post_data = "{'selected-date':" . $selected_date . $params ."}";
             $return = "jQuery('#btn_edit').click(function() {                         
