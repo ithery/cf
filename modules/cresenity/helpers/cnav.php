@@ -65,8 +65,6 @@ class cnav {
 		$role = cdbutils::get_row('select * from roles where role_id='.$db->escape($role_id));
 		if($role->parent_id==null) return true;
 		
-		$role = cdbutils::get_row('select * from roles where role_id='.$db->escape($role_id));
-		if($role->parent_id==null) return true;
 		
 		$q = "select * from role_nav where nav=".$db->escape($nav["name"])." and role_id=".$db->escape($role_id)." and app_id=".$db->escape($app_id);
 		if($role_id==null) {
@@ -79,8 +77,6 @@ class cnav {
 	public static function have_permission($action,$nav=null,$role_id=null,$app_id=null,$domain=null) {
 		$app=CApp::instance();
 		
-
-		
         if($role_id==null) {
             $role = $app->role();
             if($role==null) return false;
@@ -90,6 +86,7 @@ class cnav {
             $app_id = $app->app_id();
         }
 		$db = CDatabase::instance($domain);
+
 		$role = cdbutils::get_row('select * from roles where role_id='.$db->escape($role_id));
 		if($role->parent_id==null) return true;
 		

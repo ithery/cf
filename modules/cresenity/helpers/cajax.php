@@ -156,7 +156,9 @@ class cajax {
                     $sOrder = " ORDER BY ".$sOrder;
                 }
 		$qfilter = "select * from (".$q.") as a ".$sWhere.' '.$sOrder.' '.$sLimit;
-		//echo $qfilter;
+		
+		
+		
 		$r=$db->query($qfilter);
 		
 		$result = $r->result(false);
@@ -205,6 +207,16 @@ class cajax {
 		$row_action_list = $table->row_action_list;
 		$key = $obj->data->key_field;
 		$base_q = $q;
+		
+		
+		$pos_order_by = strpos(strtolower($base_q), "order by",strpos(strtolower($base_q),'from'));
+		$temp_order_by = '';
+		if($pos_order_by!==false) {
+			$temp_order_by = substr($base_q,$pos_order_by,strlen($base_q)-$pos_order_by);
+			$base_q =  substr($base_q,0,$pos_order_by);
+		}
+
+		
 		$qtotal = "select count(*) as cnt from (".$q.") as a";
 		$rtotal = $db->query($qtotal);
 		$total_record = 0;
@@ -259,13 +271,14 @@ class cajax {
 			}
 		}
 		
-		$qfilter = "select * from (".$q.") as a ".$sWhere.' '.$sOrder;
+		$qfilter = "select * from (".$base_q.") as a ".$sWhere.' '.$sOrder;
 		$qtotal = "select count(*) as cnt from (".$qfilter.") as a";
 		$rtotal = $db->query($qtotal);
 		$filtered_record = 0;
 		if($rtotal->count()>0) $filtered_record = $rtotal[0]->cnt;
 		
-		$qfilter .= ' '.$sLimit;
+		$qfilter .= " ".$temp_order_by.' '.$sLimit;
+		
 		$r = $db->query($qfilter);
 		//$filtered_record = $r->count();
 		$rarr = $r->result(false);

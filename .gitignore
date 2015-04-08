@@ -8,3 +8,6 @@ logs/*
 .idea/*
 *.iml
 temp/*
+export/
+upload/
+Thumbs.db
