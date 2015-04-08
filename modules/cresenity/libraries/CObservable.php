@@ -84,6 +84,12 @@ abstract class CObservable extends CRenderable {
 		$this->add($table);
 		return $table;
 	}
+        
+        public function add_calendar($calendar_id="") {
+		$calendar = CCalendar::factory($calendar_id);
+		$this->add($calendar);
+		return $calendar;
+	}
 	
 	public function add_tab_list($tabs_id="") {
 		$tabs = CTabList::factory($tabs_id);

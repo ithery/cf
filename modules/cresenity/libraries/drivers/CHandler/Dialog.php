@@ -10,13 +10,15 @@ class CHandler_Dialog_Driver extends CHandler_Driver {
 	protected $param;
 	protected $title;
 	protected $actions;
-	
+	protected $param_inputs;
+        
 	public function __construct($owner,$event,$name){
 		parent::__construct($owner,$event,$name);
 		$this->method = "get";
 		$this->target = "";
 		$this->content = CHandlerElement::factory();
 		$this->actions = CActionList::factory();
+                $this->param_inputs=array();
 	}
 
 	public function set_title($title) {
@@ -27,6 +29,16 @@ class CHandler_Dialog_Driver extends CHandler_Driver {
 		
 		$this->target = $target;
 		
+		return $this;
+	}
+        
+        public function add_param_input($inputs) {
+		if(!is_array($inputs)) {
+			$inputs = array($inputs);
+		}
+		foreach($inputs as $inp) {
+			$this->param_inputs[] = $inp;
+		}
 		return $this;
 	}
 	
@@ -43,6 +55,15 @@ class CHandler_Dialog_Driver extends CHandler_Driver {
 		if(strlen($this->target)==0) {
 			$this->target = "modal_opt_".$this->event."_".$this->owner."_dialog";
 		}
+                
+                $data_addition = '';
+		
+		foreach($this->param_inputs as $inp) {
+			if(strlen($data_addition)>0) $data_addition.=',';
+			$data_addition.="'".$inp."':$.cresenity.value('#".$inp."')";
+			
+		}
+		$data_addition = '{'.$data_addition.'}';                
 		/*
 		$js.= "
 			var modal_opt_".$this->event."_".$this->owner." = {
@@ -63,7 +84,7 @@ class CHandler_Dialog_Driver extends CHandler_Driver {
 		";
 		*/
 		$js.= "
-			$.cresenity.show_dialog('".$this->target."','".$this->generated_url()."','".$this->method."','".$this->title."');
+			$.cresenity.show_dialog('".$this->target."','".$this->generated_url()."','".$this->method."','".$this->title."',".$data_addition.");
 		";
 		return $js;
 			
