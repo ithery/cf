@@ -253,34 +253,36 @@
                             var res_date = '';
                             
                             selectable_event();
-                            function selectable_event(){ 
-                                $( '#selectable' ).selectable({
-                                        start : function(event, ui){
+                            
+                        });
+                        function selectable_event(){ 
+                            $( '#selectable' ).selectable({
+                                    start : function(event, ui){
 
-                                        },
-                                        selected: function(event, ui) {
-                                                var date_selected = $(ui.selected).attr('data-date');
+                                    },
+                                    selected: function(event, ui) {
+                                            var date_selected = $(ui.selected).attr('data-date');
 
-                                        },
-                                        stop : function(event, ui){
-                                                var result_date = $( '#select-result-date' ).empty();
+                                    },
+                                    stop : function(event, ui){
+                                            var result_date = $( '#select-result-date' ).empty();
 
-                                                var all_date_selected = [];
-                                                $( 'li.ui-selected', this ).each(function() {
-                                                        var index = $( '#selectable li' ).index( this );
-                                                        var val_date = {
-                                                            'id' : $(this).attr('id'),
-                                                            'date': $(this).attr('data-date')
-                                                        };
+                                            var all_date_selected = [];
+                                            $( 'li.ui-selected', this ).each(function() {
+                                                    var index = $( '#selectable li' ).index( this );
+                                                    var val_date = {
+                                                        'id' : $(this).attr('id'),
+                                                        'date': $(this).attr('data-date')
+                                                    };
 
-                                                        all_date_selected.push(val_date);
-                                                });
-                                                res_date = JSON.stringify(all_date_selected);                                            
-                                                jQuery('#select_val').val(res_date);
-                                        }
-                                });
-                            }
-                        });";
+                                                    all_date_selected.push(val_date);
+                                            });
+                                            res_date = JSON.stringify(all_date_selected);                                            
+                                            jQuery('#select_val').val(res_date);
+                                    }
+                            });
+                        }
+";
 
             return $return;
         }
