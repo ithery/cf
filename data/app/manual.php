@@ -1,6 +1,6 @@
 <?php 
 return array(
-	'app_id'=>'10',
+	'app_id'=>'80',
 	'code'=>'manual',
-	'name'=>'Manual APPLICATION',
+	'name'=>'MANUAL',
 );
