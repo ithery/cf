@@ -76,5 +76,6 @@ class CFormInputCurrency extends CFormInput {
 
         return $js->text();
     }
+    
 
 }

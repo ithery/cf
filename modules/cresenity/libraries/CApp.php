@@ -29,6 +29,7 @@
         private $run;
         protected $_template = array();
         protected $rendered = false;
+
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
 
@@ -59,19 +60,19 @@
                     $this->_app_id = 0;
                 }
             }
-			
+
             //we load another configuration for this app
             //org configuration
-			if(strlen(CF::org_code())>0) {
-				$org_boot_file = DOCROOT . "application" . DS . $this->code() . DS . CF::org_code() . DS . CF::org_code() . EXT;
-				if (file_exists($org_boot_file)) {
-					include($org_boot_file);
-				}
-			}
-			
-			
-			$app_boot_file = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
-			
+            if (strlen(CF::org_code()) > 0) {
+                $org_boot_file = DOCROOT . "application" . DS . $this->code() . DS . CF::org_code() . DS . CF::org_code() . EXT;
+                if (file_exists($org_boot_file)) {
+                    include($org_boot_file);
+                }
+            }
+
+
+            $app_boot_file = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
+
             if (file_exists($app_boot_file)) {
                 include($app_boot_file);
             }
@@ -146,22 +147,22 @@
             $this->_org = corg::get(CF::org_code());
 
             $this->run = false;
-            
+
             $theme_path = "";
             $theme_path = ctheme::path();
             $this->_template = array(
-                    'install' => $theme_path . 'cinstall/page',
-                    'sign_up' => $theme_path . 'ccore/signup',
-                    'resend_activation' => $theme_path . 'ccore/resend_activation',
-                    'activation' => $theme_path . 'ccore/activation',
-                    'login' => $theme_path . 'ccore/login',
-                    'static_login' => $theme_path . 'ccore/static_login',
-                    'cpage' => $theme_path . 'cpage',
-                    'cheader' => $theme_path . 'cheader',
-                    'cfooter' => $theme_path . 'cfooter',
-                );
+                'install' => $theme_path . 'cinstall/page',
+                'sign_up' => $theme_path . 'ccore/signup',
+                'resend_activation' => $theme_path . 'ccore/resend_activation',
+                'activation' => $theme_path . 'ccore/activation',
+                'login' => $theme_path . 'ccore/login',
+                'static_login' => $theme_path . 'ccore/static_login',
+                'cpage' => $theme_path . 'cpage',
+                'cheader' => $theme_path . 'cheader',
+                'cfooter' => $theme_path . 'cfooter',
+            );
         }
-        
+
         public function set_template($k, $v) {
             $this->_template[$k] = $v;
         }
@@ -430,16 +431,15 @@
                 $this->register_client_module('servertime');
             }
         }
-        
 
         public function render_template() {
-            
+
             if (crequest::is_ajax()) {
                 return $this->json();
             }
-             $theme_path = "";
+            $theme_path = "";
             $theme_path = ctheme::path();
-            
+
 //            var_dump($this->_template);
             if (ccfg::get("install")) {
                 $v = CView::factory($this->_template['install']);
@@ -460,7 +460,7 @@
                 $v = CView::factory($this->_template['static_login']);
             }
             else {
-                
+
                 $v = CView::factory($this->_template['cpage']);
 
                 $this->content = parent::html();
@@ -479,10 +479,10 @@
 					$.cresenity._filesadded+='['+'" . $url . "'+']'
 				";
                 }
-				$js = "";
+                $js = "";
                 $vjs = CView::factory('ccore/js');
                 $js .= PHP_EOL . $vjs->render();
-				
+
                 $js .= PHP_EOL . $this->js . $additional_js;
 
                 $js = $cs->render_js_require($js);
@@ -529,18 +529,17 @@
 
             return $v->render();
         }
-        
-		public function rendered() {
-			return $this->rendered;
-		}
-		
+
+        public function rendered() {
+            return $this->rendered;
+        }
+
         public function render() {
-            
-			if($this->rendered) {
-				trigger_error('CApp already rendered');
-				
-			}
-			$this->rendered = true;
+
+            if ($this->rendered) {
+                trigger_error('CApp already rendered');
+            }
+            $this->rendered = true;
             if (crequest::is_ajax()) {
                 return $this->json();
             }
@@ -611,12 +610,12 @@
 					$.cresenity._filesadded+='['+'" . $url . "'+']'
 				";
                 }
-				$js = "";
-				$vjs = CView::factory('ccore/js');
+                $js = "";
+                $vjs = CView::factory('ccore/js');
                 $js.=PHP_EOL . $vjs->render();
 
                 $js .= PHP_EOL . $this->js . $additional_js;
-                
+
                 $js = $cs->render_js_require($js);
 
                 if (ccfg::get("minify_js")) {
@@ -780,7 +779,7 @@
                 $PHP_ERROR = (func_num_args() === 5);
 
                 // Test to see if errors should be displayed
-                if ($PHP_ERROR AND (error_reporting() & $exception) === 0)
+                if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
                         return;
 
                 // Error handling will use exactly 5 args, every time

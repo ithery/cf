@@ -15,6 +15,7 @@ class CTableColumn extends CObject{
 	public $hidden_phone;
 	public $hidden_tablet;
 	public $hidden_desktop;
+        
 	public function __construct($fieldname) {
 		parent::__construct();
 		
@@ -74,6 +75,10 @@ class CTableColumn extends CObject{
 	}
 	public function set_sortable($bool) {
 		$this->sortable = $bool;
+		return $this;
+	}
+        public function set_searchable($bool) {
+		$this->searchable = $bool;
 		return $this;
 	}
 	public function set_editable($bool) {
@@ -151,10 +156,10 @@ class CTableColumn extends CObject{
 		if($this->hidden_tablet) $class.=" hidden-tablet";
 		if($this->hidden_desktop) $class.=" hidden-desktop";
 		if($export_pdf) {
-		$html->appendln('<th '.$pdf_thead_td_attr.' align="center" class="thead '.$th_class.$class.'" scope="col"'.$addition_attr.'>'.$this->label.'</th>');
+		$html->appendln('<th '.$pdf_thead_td_attr.' field_name = "' .$this->fieldname .'" align="center" class="thead '.$th_class.$class.'" scope="col"'.$addition_attr.'>'.$this->label.'</th>');
 		
 		} else {
-		$html->appendln('<th '.$pdf_thead_td_attr.' data-no-line-break="'.$data_no_line_break.'" data-align="'.$data_align.'" class="thead '.$th_class.$class.'" scope="col"'.$addition_attr.'>'.$this->label.'</th>');
+		$html->appendln('<th '.$pdf_thead_td_attr.' field_name = "' .$this->fieldname .'" data-no-line-break="'.$data_no_line_break.'" data-align="'.$data_align.'" class="thead '.$th_class.$class.'" scope="col"'.$addition_attr.'>'.$this->label.'</th>');
 		
 		}
 		return $html->text();

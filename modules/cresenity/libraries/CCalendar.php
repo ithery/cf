@@ -64,7 +64,7 @@
             $html->appendln($this->css());
 
             $html->appendln('<div>');
-            $html->appendln('<div class="row-fluid" id="' . $this->id . '">
+            $html->appendln('<div class="row" id="' . $this->id . '">
                                 <div class="span12">');
             if ($this->use_navigate) {
                 $html->appendln($this->button());
@@ -166,12 +166,12 @@
             $selected_date = "jQuery('#select_val').val()";
             $params = "";
             foreach ($this->attributes as $attr_k => $attr_v) {
-                $params .= ", '" .$attr_k ."': " .$attr_v;
+                $params .= ", '" . $attr_k . "': '" . $attr_v . "'";
             }
             foreach ($this->post_data as $k => $v) {
-                $params .= ", '" .$k ."': " .$v;
+                $params .= ", '" . $k . "': " . $v;
             }
-            $post_data = "{'selected-date':" . $selected_date . $params ."}";
+            $post_data = "{'selected-date':" . $selected_date . $params . "}";
             $return = "jQuery('#btn_edit').click(function() {                         
 			$.cresenity.show_dialog('" . uniqid() . "','" . $this->dialog_url . "','" . $this->http_method
                     . "','" . $this->title . "'," . $post_data . ");
@@ -184,6 +184,7 @@
                     var month_names = JSON.parse('" . json_encode($this->month_names) . "');
                         
                     jQuery('.calendar-link-action').on('click', function() {
+                        
                         month = jQuery(this).attr('month');
                         year = jQuery(this).attr('year');
                         action = jQuery(this).attr('action');
@@ -203,7 +204,8 @@
                             data: {
                                 'month': month,
                                 'year': year,
-                                'calendar_id':'" . $this->id . "',
+                                'calendar_id':'" . $this->id . "'
+                                " . $params . "
                             }
                         }).done(function(data){                                      
                             cctrl_" . $this->id . ".html(data.html);
@@ -322,13 +324,13 @@
                         #feedback { font-size: 1.4em; }
                         #selectable .ui-selecting { background-color: #FECA40; }
                         #selectable .ui-selected { background-color: #F39814; color: white; }
-                        #selectable { list-style-type: none; margin: 0; padding: 0; width: 800px; }
+                        #selectable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
                         #selectable li { 
                             /*border: 1px solid #CCCCCC;*/
                             margin: 0px; 
                             padding: 1px; 
                             float: left; 
-                            width: 100px; 
+                            width: 14%; 
                             height: 80px; /*font-size: 4em;*/
                             font-size: 1em; 
                             text-align: left; 
@@ -341,15 +343,15 @@
                         #selectable .blank-date { background-color: #F5F5F5; }
                         #selectable .right-over { border-right: 1px solid #D9D7D9; }
                         #selectable .left-over { border-left: 1px solid #D9D7D9; }
-                        #selectable-day { list-style-type: none; margin: 0; padding: 0; width: 800px; }
+                        #selectable-day { list-style-type: none; margin: 0; padding: 0; width: 100%; }
                         #selectable-day li { 
                             margin: 0px; 
                             padding: 1px; 
                             float: left; 
-                            width: 100px; 
+                            width: 14%; 
                             height: 40px; /*font-size: 4em;*/
                             font-size: 1em; 
-                            text-align: right; 
+                            text-align: center; 
                         }
                     </style>';
         }

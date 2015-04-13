@@ -97,7 +97,22 @@ class CElement extends CObservable {
         $data = array_merge_recursive($data, parent::toarray());
         return $data;
     }
-
+    
+    public function __to_string() {
+        $return = "<h3> HTML </h3>"
+                . "<pre>"
+                . "<code>"
+                . htmlspecialchars($this->html())
+                . "</code>"
+                . "</pre>";
+        $return .= "<h3> JS </h3>"
+                . "<pre>"
+                . "<code>"
+                . htmlspecialchars($this->js())
+                . "</code>"
+                . "</pre>";
+        return $return;
+    }
 }
 
 ?>

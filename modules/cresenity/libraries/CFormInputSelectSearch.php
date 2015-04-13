@@ -162,6 +162,7 @@ class CFormInputSelectSearch extends CFormInput {
 	";
 		
 		$js = new CStringBuilder();
+                $js->append(parent::js($indent))->br();
 		$js->set_indent($indent);
 		//echo $str;
 		$js->append($str)->br();

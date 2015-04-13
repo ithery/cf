@@ -1,6 +1,14 @@
 <?php
 
 class CHandler extends CObject  {
+        const TYPE_REMOVE = 'remove';
+        const TYPE_RELOAD = 'reload';
+        const TYPE_SUBMIT = 'submit';
+        const TYPE_DIALOG = 'dialog';
+        const TYPE_EMPTY = 'empty';
+        const TYPE_CUSTOM = 'custom';
+        const TYPE_APPEND = 'append';
+        
 	protected $name;
 	protected $handlers;
 	protected $driver;
