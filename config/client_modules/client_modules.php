@@ -42,7 +42,7 @@ return array(
     ),
     "jquery.datatable" => array(
         "js" => array(
-            "plugins" . DS . "datatable" . DS . "jquery.dataTables.min.js",
+            "plugins" . DS . "datatable" . DS . "jquery.dataTables.js",
             "plugins" . DS . "datatable" . DS . "TableTools.min.js",
             "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
             "plugins" . DS . "datatable" . DS . "ColVis.min.js",
