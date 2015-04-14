@@ -34,7 +34,8 @@ class cimage {
         $org = CApp::instance()->org();
         $org_folder = "";
         if ($org != null) {
-            $org_folder = $org->code . "/";
+            $org_folder = $org->org_code . "/";
+           
         }
 		$upload_directory = DOCROOT.'upload'."/";
 		
@@ -106,9 +107,10 @@ class cimage {
     public static function get_upload_path($type, $id, $size) {
         $org = CApp::instance()->org();
         $upload_directory = DOCROOT . 'upload' . "/";
+        $upload_directory = CF::get_dir('upload');
         $org_folder = "";
         if ($org != null) {
-            $org_folder = $org->code . "/";
+            $org_folder = $org->org_code . "/";
         }
         $org_directory = $upload_directory . $org_folder;
 		
@@ -202,7 +204,7 @@ class cimage {
 
     public static function get_image_path($type, $id, $size, $filename = "") {
 
-        return cimage::get_upload_path($type, $id, $size) . "/" . $filename;
+        return cimage::get_upload_path($type, $id, $size) .  $filename;
     }
 
 }
