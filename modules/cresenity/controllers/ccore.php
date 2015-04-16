@@ -129,6 +129,9 @@
                 case "datatable":
                     $response = cajax::datatable($obj, $input);
                     break;
+                case "callback":
+                    $response = cajax::callback($obj, $input);
+                    break;
                 case "reload":
                 case "handler_reload":
                     $response = cajax::handler_reload($obj, $input);
