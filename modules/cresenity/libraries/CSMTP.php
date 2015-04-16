@@ -21,7 +21,7 @@ class CSMTP {
 		$this->smtp = new PHPMailer();
 		$this->smtp->IsSMTP();
 		$this->smtp->CharSet = 'UTF-8';
-		$mail->smtp->SMTPDebug = 2;
+		$this->smtp->SMTPDebug = 0;
 		$this->smtp->IsHTML(false);
 		
 	}

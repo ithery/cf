@@ -13,6 +13,7 @@
 <div id="framework_error" style="width:42em;margin:20px auto;">
 <h3><?php echo chtml::specialchars($error) ?></h3>
 <p><?php echo chtml::specialchars($description) ?></p>
+<?php  if (!IN_PRODUCTION): ?>
 <?php if ( ! empty($line) AND ! empty($file)): ?>
 <p><?php echo CF::lang('core.error_file_line', $file, $line) ?></p>
 <?php endif ?>
@@ -22,6 +23,7 @@
 <?php echo $trace ?>
 <?php endif ?>
 <p class="stats"><?php echo CF::lang('core.stats_footer') ?></p>
+<?php  endif; ?>
 </div>
 </body>
 </html>

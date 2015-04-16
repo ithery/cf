@@ -1071,7 +1071,17 @@
                         // Beautify backtrace
                         $trace = self::backtrace($trace);
                     }
-
+					if (IN_PRODUCTION) {
+						$data = array(
+							'description'=>$description,
+							'error'=>$error,
+							
+							
+						);
+						$view = CView::factory('kohana_error_page',$data);
+						cmail::error_mail($view->render());
+				
+					}
                     // Load the error
                     require self::find_file('views', empty($template) ? 'kohana_error_page' : $template);
                 }
