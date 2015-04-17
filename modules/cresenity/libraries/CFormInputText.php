@@ -22,7 +22,12 @@ class CFormInputText extends CFormInput {
         $this->vk_opt = $default_option;
     }
 
-    public static function factory($id) {
+    /**
+     * 
+     * @param type $id
+     * @return \CFormInputText
+     */
+    public static function factory($id = '') {
         return new CFormInputText($id);
     }
 
@@ -41,6 +46,10 @@ class CFormInputText extends CFormInput {
         return $this;
     }
 
+    public function set_name($name){
+        $this->name = $name; return $this;
+    }
+    
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -67,6 +76,7 @@ class CFormInputText extends CFormInput {
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->set_indent($indent);
+        $js->append(parent::js());
         if ($this->vk) {
             $js->append("$('#" . $this->id . "').keyboard(" . json_encode($this->vk_opt) . ");")->br();
         }

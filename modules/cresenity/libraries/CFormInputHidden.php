@@ -4,7 +4,7 @@ class CFormInputHidden extends CFormInput {
 		parent::__construct($id);
 		$this->type="text";
 	}		
-	public static function factory($id) {			
+	public static function factory($id = '') {			
 		return new CFormInputHidden($id);
 	}		
 	public function toarray() {

@@ -54,8 +54,6 @@
         public $pdf_orientation;
         public $show_header;
         public $report_header = array();
-        protected $quick_search = FALSE;
-        protected $tbody_id;
         protected $js_cell;
 
         public function __construct($id = "") {
@@ -112,8 +110,6 @@
             $this->pdf_orientation = 'P';
             $this->requires = array();
             $this->js_cell = '';
-            $this->quick_search = FALSE;
-            $this->tbody_id = '';
 
             $this->report_header = array();
 
@@ -159,14 +155,6 @@
         public function set_show_header($bool) {
             $this->show_header = $bool;
             return $this;
-        }
-        
-        public function set_quick_search($quick_search) {
-            $this->quick_search = $quick_search; return $this;
-        }
-        
-        public function set_tbody_id($id){
-            $this->tbody_id = $id; return $this;
         }
 
         public function add_footer_field($label, $value, $align = "left", $labelcolspan = 0) {
@@ -970,8 +958,10 @@
             $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered table-striped responsive" id="' . $this->id . '">')
                     ->inc_indent()->br();
             if ($this->show_header) {
+
                 $html->appendln('<thead>')
                         ->inc_indent()->br();
+
                 if (strlen($this->custom_column_header) > 0) {
                     $html->appendln($this->custom_column_header);
                 }
@@ -1000,9 +990,7 @@
                 $html->dec_indent()->appendln("</thead>")->br();
             }
 
-            $tbody_id =(strlen($this->tbody_id) > 0 ? "id='" .$this->tbody_id ."' " : "");
-            
-            $html->appendln("<tbody " .$tbody_id ." >" . $data_responsive_close)->inc_indent()->br();
+            $html->appendln("<tbody>" . $data_responsive_close)->inc_indent()->br();
             //render body;
             $no = 0;
             if (!$this->ajax) {
@@ -1034,9 +1022,6 @@
                         $ori_v = "";
                         //do print from query
                         foreach ($row as $k => $v) {
-                            if ($v instanceof CRenderable) {
-                                $v = $v->html();
-                            }
                             if ($k == $col->get_fieldname()) {
                                 $col_v = $v;
                                 $ori_v = $col_v;
@@ -1229,8 +1214,6 @@
               $html->append($modal->html($html->get_indent()));
               }
              */
-            
-            
 
 
             return $html->text();
@@ -1301,9 +1284,7 @@
                     $aojson["bSortable"] = $col->sortable && $this->header_sortable;
                     $aojson["bSearchable"] = $col->searchable;
                     $aojson["bVisible"] = $col->visible;
-                    
                     $js->appendln("
-                            
 					vaoColumns.push( " . json_encode($aojson) . " );");
                 }
                 if ($this->have_action()) {
@@ -1312,13 +1293,24 @@
                     $aojson["bSearchable"] = false;
                     $aojson["bVisible"] = true;
                     $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
+                    ;
                 }
-                
-                
 
+                $js->appendln("var quick_search = jQuery('<tr>');");
+//                $js->appendln(".each( function () {
+//                            var title = jQuery('#" .$this->id ." thead th').eq( $(this).index() ).text();
+//                            var input = jQuery('<input>');
+//                            input.attr('type', 'text');
+//                            input.attr('placeholder', \'Search '+title+'\');
+//                            jQuery(this).append(input);
+//                        });");
+                $js->appendln("table.children('thead').append(quick_search);");
+                
                 $js->appendln("var tableStyled_" . $this->id . " = false;")->br()->
                         appendln("var oTable = table.dataTable({")->br()->inc_indent();
-                
+
+
+
                 if ($this->ajax) {
                     $js->append("")
                             ->appendln("'bRetrieve': true,")->br()
@@ -1327,32 +1319,23 @@
                             ->appendln("'sAjaxSource': '" . $ajax_url . "',")->br()
                             ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
                             ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
-                                            var data_quick_search = [];
-                                            jQuery('.data_table-quick_search').each(function(){
-                                                if (jQuery(this).val() != '') {
-                                                    var input_name = jQuery(this).attr('name');
-                                                    var cur_transforms = jQuery(this).attr('transforms');
-                                                    data_quick_search.push({'name': input_name, 'value': jQuery(this).val(), 'transforms': cur_transforms});
-                                                }
-                                            });
-                                            aoData.push({'name': 'dttable_quick_search', 'value': JSON.stringify(data_quick_search)});
-                                            oSettings.jqXHR = $.ajax( {
-                                                    'dataType': 'json',
-                                                    'type': '" . strtoupper($this->ajax_method) . "',
-                                                    'url': sSource,
-                                                    'data': aoData,
-                                                    'success': function(data) {
-                                                            fnCallback(data.datatable);
-                                                            var script = $.cresenity.base64.decode(data.js);
-                                                            eval(script);
-
-                                                    },
-                                                    'error': function(a,b,c) {
-                                                            $.cresenity.message(a);
-                                                    }
-                                            })
-                                        },
-                                    ")
+								oSettings.jqXHR = $.ajax( {
+									'dataType': 'json',
+									'type': '" . strtoupper($this->ajax_method) . "',
+									'url': sSource,
+									'data': aoData,
+									'success': function(data) {
+										fnCallback(data.datatable);
+										var script = $.cresenity.base64.decode(data.js);
+										eval(script);
+										
+									},
+									'error': function(a,b,c) {
+										$.cresenity.message(a);
+									}
+								})
+							},
+						")
                             ->appendln("'fnRowCallback': function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
 						// Bold the grade for all 'A' grade browsers
 						
@@ -1493,59 +1476,17 @@
                         ->dec_indent()->appendln("});")->br();
 
 
-//                $js->append("oTable.columns().every( function () {
-//                                var that = this;
-//
-//                                $( 'input', this.footer() ).on( 'keyup change', function () {
-//                                    that
-//                                        .search( this.value )
-//                                        .draw();
-//                                } );
-//                            } );");
+                $js->append("oTable.columns().every( function () {
+                                var that = this;
+
+                                $( 'input', this.footer() ).on( 'keyup change', function () {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                } );
+                            } );");
                 
                 //$js->appendln("oTable.fnSortOnOff( '_all', false );")->br();
-                
-                $js->appendln('function buildFilters() {')->br()
-                    ->appendln("var quick_search = jQuery('<tr>');")->br()
-                    ->appendln("jQuery('#" . $this->id . " thead th').each( function (i) {
-                            var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
-                            var have_action = ".($this->have_action()?"1":"0").";
-                            
-                           
-                            var total_th = jQuery('#" . $this->id . " thead th').length;
-                            var input = '';
-                            if(!(have_action==1&&(total_th-1==jQuery(this).index()))) {
-                                
-                            
-                                var all_column = ".json_encode($this->columns).";
-                                var column = all_column[jQuery(this).index()];
-                                var transforms = JSON.stringify(column.transforms);
-                                if(column.searchable) {
-                                    input = jQuery('<input>');
-                                    input.attr('type', 'text');
-                                    input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
-                                    input.attr('class', 'data_table-quick_search');
-
-                                    input.attr('transforms', transforms);
-                                    input.attr('placeholder', 'Search ' + title );
-                                    input.css('width','90%');
-                                }
-                                
-                            }
-                            var td = jQuery('<td>').append(input);
-                            quick_search.append(td);
-                        });")->br()
-                    ->appendln("table.children('thead').append(quick_search);")->br()
-                    ->appendln('}')->br()
-                    ->appendln('var dttable_quick_search = ' .($this->quick_search ? "1" : "0") .';')->br()
-                    ->appendln('if (dttable_quick_search == "1") { buildFilters(); }')
-                        ;
-                
-                $js->appendln("jQuery('.data_table-quick_search').on('keyup', function(){
-                            table.fnClearTable( 0 );
-                            table.fnDraw();
-                        });")
-                        ;
             }
             if ($this->checkbox) {
                 $js->appendln("
@@ -1562,21 +1503,9 @@
 			");
             }
             $js->appendln($this->js_cell);
-            if (!$this->ajax) {
-                foreach ($this->data as $row) {
-                    foreach ($row as $row_k => $row_v) {
-                        if ($row_v instanceof CRenderable) {
-                            $js->appendln($row_v->js())->br();
-                        }
-                    }
-                }
-            }
-//            clog::write($js->text());
             return $js->text();
         }
-        
-        
-        
+
     }
 
 ?>
