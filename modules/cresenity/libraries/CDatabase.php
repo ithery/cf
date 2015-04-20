@@ -52,7 +52,7 @@ class CDatabase {
      * Returns a singleton instance of Database.
      *
      * @param   mixed   configuration array or DSN
-     * @return  Database_Core
+     * @return  CDatabase
      */
     public static function & instance($domain='', $name = 'default', $config = NULL) {
         if(strlen($domain)==0) {

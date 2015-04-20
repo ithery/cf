@@ -260,7 +260,7 @@
             $this->columns[] = $col;
             return $col;
         }
-
+        
         public function set_group_by($group_by) {
             $this->group_by = $group_by;
             return $this;
@@ -1007,6 +1007,11 @@
             $no = 0;
             if (!$this->ajax) {
                 foreach ($this->data as $row) {
+                    if ($row instanceof CRenderable) {
+                        $html->appendln($row->html());
+                        continue;
+                    }
+                    
                     $no++;
                     $key = "";
 

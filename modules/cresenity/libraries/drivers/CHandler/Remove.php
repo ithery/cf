@@ -15,6 +15,7 @@
         protected $content;
         protected $param;
         protected $param_inputs;
+        protected $parent;
 
         public function __construct($owner, $event, $name) {
             parent::__construct($owner, $event, $name);
@@ -23,10 +24,20 @@
             $this->content = CHandlerElement::factory();
             $this->param_inputs = array();
         }
+        
+        public function set_parent($parent){
+            $this->parent = $parent;
+        }
 
         public function script() {
             $js = parent::script();
-            $js .= 'jQuery("#' .$this->target .'").remove();';
+            
+            
+            $js .= 'jQuery("#' .$this->target .'")';
+            if (strlen($this->parent) > 0) {
+                $js .= '.parents("' .$this->parent .'")';
+            }
+            $js .= '.remove();';
             
             return $js;
         }

@@ -34,7 +34,7 @@ class CAction extends CElement {
         $this->confirm = false;
     }
 
-    public static function factory($id) {
+    public static function factory($id = '') {
         return new CAction($id);
     }
 
