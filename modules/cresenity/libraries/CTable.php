@@ -1569,6 +1569,10 @@
             $js->appendln($this->js_cell);
             if (!$this->ajax) {
                 foreach ($this->data as $row) {
+                    if ($row instanceof CRenderable) {
+                        $js->appendln($row->js())->br();
+                        continue;
+                    }
                     foreach ($row as $row_k => $row_v) {
                         if ($row_v instanceof CRenderable) {
                             $js->appendln($row_v->js())->br();
