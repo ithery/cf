@@ -117,16 +117,14 @@ class cnav {
 		return $r->count()>0;
 		*/
 	}
-	public static function app_user_rights_array($app_code,$role_id,$app_role_id="",$domain="") {
-		$navs=CNavigation::instance($app_code)->navs();
-		return cnav::as_user_rights_array($app_code,$role_id,$navs,$app_role_id,$domain);
+	public static function app_user_rights_array($app_id,$role_id,$app_role_id="",$domain="") {
+		$navs=CNavigation::instance($app_id)->navs();
+		return cnav::as_user_rights_array($app_id,$role_id,$navs,$app_role_id,$domain);
 	}
-	public static function as_user_rights_array($app_code,$role_id,$navs=null,$app_role_id="",$domain="",$level=0) {
+	public static function as_user_rights_array($app_id,$role_id,$navs=null,$app_role_id="",$domain="",$level=0) {
 		if($navs==null) $navs = CNavigation::instance()->navs();
-		//get app_id from app_code
-		$app_data = $data= cdata::get($app_code, "app");
 		
-		$app_id = carr::get($app_data,'app_id');
+		
 		
 		$result = array();
 		
@@ -142,7 +140,7 @@ class cnav {
 			$res["domain"]=$domain;
 			$subnav=array();
 			if(isset($d["subnav"])&&is_array($d["subnav"])) {
-				$subnav = cnav::as_user_rights_array($app_code,$role_id,$d["subnav"],$app_role_id,$domain,$level+1);
+				$subnav = cnav::as_user_rights_array($app_id,$role_id,$d["subnav"],$app_role_id,$domain,$level+1);
 			}
 			if(count($subnav)==0&&(!isset($d["controller"])||strlen($d["controller"])==0)) continue;
 			$result[]=$res;

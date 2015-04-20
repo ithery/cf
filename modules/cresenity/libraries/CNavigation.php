@@ -11,10 +11,26 @@ class CNavigation extends CObject {
             $app_code = CF::app_code();
         }
 		
-		$path = DOCROOT . 'application' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR .'default'. DIRECTORY_SEPARATOR .'config' . DIRECTORY_SEPARATOR;
-
-		if (!is_file($path . 'nav' . EXT)) {
-			$path = DOCROOT . 'config' . DIRECTORY_SEPARATOR . 'nav' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR;
+		$path = '';
+		$temp_path = '';
+		$org_code = CF::org_code();
+		if(strlen($org_code)>0) {
+			if(strlen($path)==0) {
+				$temp_path = DOCROOT . 'application' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR . $org_code. DIRECTORY_SEPARATOR. 'config' . DIRECTORY_SEPARATOR;
+				if (is_file($temp_path . 'nav' . EXT)) {
+					$path = DOCROOT . 'application' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR . $org_code. DIRECTORY_SEPARATOR. 'config' . DIRECTORY_SEPARATOR;
+				}
+			}
+		}
+		if(strlen($path)==0) {
+			$temp_path = DOCROOT . 'application' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR .'default'. DIRECTORY_SEPARATOR .'config' . DIRECTORY_SEPARATOR;
+			if (is_file($temp_path . 'nav' . EXT)) {
+				$path = DOCROOT . 'application' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR .'default'. DIRECTORY_SEPARATOR .'config' . DIRECTORY_SEPARATOR;
+			}
+		}
+		if(strlen($path)==0) {
+		
+				$path = DOCROOT . 'config' . DIRECTORY_SEPARATOR . 'nav' . DIRECTORY_SEPARATOR . $app_code . DIRECTORY_SEPARATOR;
 		}
         $this->navs = null;
 

@@ -16,6 +16,7 @@
         private $signup = false;
         private $activation = false;
         private $resend = false;
+		private $login_required = true;
         private $_store = null;
         private $_role = null;
         private $_org = null;
@@ -166,7 +167,11 @@
         public function set_template($k, $v) {
             $this->_template[$k] = $v;
         }
-
+		
+		public function set_login_required($bool) {
+            return $this->login_required=$bool;
+        }
+		
         public function app_id() {
             return $this->_app_id;
         }
@@ -585,10 +590,10 @@
             else if ($this->activation) {
                 $v = CView::factory($theme_path . 'ccore/activation');
             }
-            else if (!$this->is_user_login() && ccfg::get("have_user_login")) {
+            else if (!$this->is_user_login() && ccfg::get("have_user_login") && $this->login_required) {
                 $v = CView::factory($theme_path . 'ccore/login');
             }
-            else if (!$this->is_user_login() && ccfg::get("have_static_login")) {
+            else if (!$this->is_user_login() && ccfg::get("have_static_login") && $this->login_required) {
                 $v = CView::factory($theme_path . 'ccore/static_login');
             }
             else {
