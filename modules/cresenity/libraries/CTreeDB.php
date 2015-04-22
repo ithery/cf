@@ -249,6 +249,7 @@ class CTreeDB {
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
+        $q.=$this->filter_where();
         $q.=" ORDER BY node.lft";
 
 
