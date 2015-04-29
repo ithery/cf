@@ -62,6 +62,7 @@ class CFormInputCurrency extends CFormInput {
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->set_indent($indent);
+        $js->append(parent::js());
         if ($this->vk) {
             $js->append("$('#" . $this->id . "').keyboard(" . json_encode($this->vk_opt) . ");")->br();
         }
