@@ -241,7 +241,7 @@ class cnav {
 				
 				$child_count++;
 				
-				
+				$border = carr::get($d,'border');
 				
 				$find_nav = cnav::nav($d);
 				
@@ -259,9 +259,16 @@ class cnav {
 						$li_class.=" dropdown-submenu ";
 					}
 				}
-				
-				
-				$html.='<li class="'.$li_class.$active_class.'">';
+
+                $addition_style='';
+                if($border=='top') {
+                    $addition_style=' style="border-top:1px solid #bbb"';
+                }
+                if($border=='bottom') {
+                    $addition_style=' style="border-bottom:1px solid #bbb"';
+                }
+
+				$html.='<li class="'.$li_class.$active_class.'" '.$addition_style.'>';
 				$icon_html = "";
 				if(isset($d["icon"])&&strlen($d["icon"])>0) {
 					$icon_html = '<i class="icon-'.$d["icon"].'"></i>';
