@@ -113,6 +113,10 @@ class CFormInputDate extends CFormInput {
                 $option .= ",";
             $option .= "daysOfWeekDisabled: '" . $disable_day_str . "'";
         }
+        $autoclose="true";
+        $option .= "autoclose: " . $autoclose . "";
+
+
         if (strlen($option) > 0) {
             $option = "{" . $option . "}";
         }
