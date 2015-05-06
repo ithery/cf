@@ -19,6 +19,8 @@
         protected $url;
         protected $ajax_url;
         protected $use_navigate = true;
+        protected $use_edit = true;
+        protected $use_modal = false;
         protected $selected_value;
         protected $title = "Dialog";
         protected $http_method = 'POST';
@@ -68,6 +70,8 @@
                                 <div class="span12">');
             if ($this->use_navigate) {
                 $html->appendln($this->button());
+            }
+            if ($this->use_edit) {
                 $html->appendln($this->button_edit());
             }
 
@@ -80,7 +84,7 @@
             $this_month = getdate($timestamp);
             $start_day = $this_month['wday'];
             $html->appendln('<ol id="selectable">');
-
+            $modal_data = '';
             for ($i = 0; $i < ($max_day + $start_day); $i++) {
                 //if(($i % 7) == 0 ) echo "<tr>";
                 if ($i < $start_day) {
@@ -115,7 +119,9 @@
                     foreach ($this->attributes as $attr_k => $attr_v) {
                         $attributes .= $attr_k . '="' . $attr_v . '" ';
                     }
-
+                    if($this->use_modal) {
+                        $modal_data .= $this->modal($the_date_complete, $the_date_complete_convert, $date_content);
+                    }
                     $html->appendln('<li data-date="' . $the_date_complete_convert . '" ' . $id . ' '
                             . $attributes . ' class="' . $li_right . '">' . $date_content . '</li>');
                 }
@@ -131,6 +137,10 @@
             $html->appendln('</div>');
 
             $html->appendln('</div>');
+            if($this->use_modal) {
+                $html->appendln('<div class="label label-warning span3" style="margin-top:20px;font-size:12px;">' . clang::__('Click on date for show more detail') . '</div>');
+            }
+            $html->appendln($modal_data);
             return $html->text();
         }
 
@@ -144,6 +154,21 @@
                         href="javascript:void(0)" class="btn-large btn calendar-link-action" action="next-month">
                         <i class="icon icon-arrow-right"></i></a>
                     </div>';
+        }
+        public function modal($the_date_complete, $the_date_complete_convert, $date_content) {
+            return '<div class="modal fade" id="modal' . $the_date_complete_convert . '">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">' . $the_date_complete . '</h4>
+                          </div>
+                          <div class="modal-body">
+                            ' . $date_content . '
+                          </div>
+                        </div><!-- /.modal-content -->
+                      </div><!-- /.modal-dialog -->
+                    </div><!-- /.modal -->';
         }
 
         public function button_edit() {
@@ -255,6 +280,12 @@
                     }
                     ";
 
+            $modal_js = '';
+
+            if($this->use_modal) {
+                $modal_js = "$('#modal'+date_selected).modal('toggle');";
+            }
+
             $return .= "$(function() {
                             var res_date = '';
                             
@@ -268,7 +299,7 @@
                                     },
                                     selected: function(event, ui) {
                                             var date_selected = $(ui.selected).attr('data-date');
-
+                                            " . $modal_js . "
                                     },
                                     stop : function(event, ui){
                                             var result_date = $( '#select-result-date' ).empty();
@@ -381,6 +412,14 @@
 
         public function set_navigate($use_navigate) {
             $this->use_navigate = $use_navigate;
+        }
+
+        public function set_edit($use_edit) {
+            $this->use_edit = $use_edit;
+        }
+
+        public function set_modal($use_modal) {
+            $this->use_modal = $use_modal;
         }
 
         public function get_selected_value() {
