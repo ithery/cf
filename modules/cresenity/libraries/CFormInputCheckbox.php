@@ -5,6 +5,7 @@ class CFormInputCheckbox extends CFormInput {
     protected $checked = "";
     protected $label = "";
     protected $applyjs = "";
+	protected $display_inline = "";
 
     public function __construct($id) {
         parent::__construct($id);
@@ -14,6 +15,7 @@ class CFormInputCheckbox extends CFormInput {
         $this->label = "";
         $this->applyjs = "uniform";
         $this->checked = false;
+        $this->display_inline = false;
     }
 
     public static function factory($id) {
@@ -37,6 +39,10 @@ class CFormInputCheckbox extends CFormInput {
         $this->label = $label;
         return $this;
     }
+	public function set_display_inline($bool) {
+		$this->display_inline = $bool;
+		return $this;
+	}
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
@@ -47,12 +53,25 @@ class CFormInputCheckbox extends CFormInput {
             $checked = ' checked="checked"';
         if ($this->disabled)
             $disabled = ' disabled="disabled"';
-        $html->append('<label class="checkbox">');
+		
+		$label_addition_attr= '';
+		if($this->display_inline) {
+			$label_addition_attr='style="display:inline-block;padding-right:5px"';
+		} 
+        $html->append('<label class="checkbox" '.$label_addition_attr.'>');
         if ($this->applyjs == "switch") {
             $html->append('<div class="switch">');
         }
-
-        $html->append('<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $checked . '>');
+		$classes = $this->classes;
+        $classes = implode(" ", $classes);
+        if (strlen($classes) > 0)
+            $classes = " " . $classes;
+        $custom_css = $this->custom_css;
+        $custom_css = crenderer::render_style($custom_css);
+        if (strlen($custom_css) > 0) {
+            $custom_css = ' style="' . $custom_css . '"';
+        }
+        $html->append('<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled '.$classes .'' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $checked . '>');
         if (strlen($this->label) > 0) {
             $html->appendln('&nbsp;' . $this->label);
         }
