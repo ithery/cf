@@ -137,9 +137,6 @@
             $html->appendln('</div>');
 
             $html->appendln('</div>');
-            if($this->use_modal) {
-                $html->appendln('<div class="label label-warning span3" style="margin-top:20px;font-size:12px;">' . clang::__('Click on date for show more detail') . '</div>');
-            }
             $html->appendln($modal_data);
             return $html->text();
         }
