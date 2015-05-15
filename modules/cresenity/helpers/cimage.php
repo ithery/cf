@@ -35,23 +35,22 @@ class cimage {
         $org_folder = "";
         if ($org != null) {
             $org_folder = $org->org_code . "/";
-           
         }
-		$upload_directory = DOCROOT.'upload'."/";
-		
-		$upload_directory = CF::get_dir('upload');
+        $upload_directory = DOCROOT . 'upload' . "/";
 
-		ctemp::makedir($upload_directory);
-		$org_directory = $upload_directory . $org_folder;
-		ctemp::makedir($org_directory);
-		$type = explode(".",$type);
-		$type_directory = $org_directory;
-		foreach($type as $t) {
-			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t."/";
-				ctemp::makedir($type_directory);
-			}
-		}
+        $upload_directory = CF::get_dir('upload');
+
+        ctemp::makedir($upload_directory);
+        $org_directory = $upload_directory . $org_folder;
+        ctemp::makedir($org_directory);
+        $type = explode(".", $type);
+        $type_directory = $org_directory;
+        foreach ($type as $t) {
+            if (strlen(trim($t)) > 0) {
+                $type_directory = $type_directory . $t . "/";
+                ctemp::makedir($type_directory);
+            }
+        }
 
 
 
@@ -60,27 +59,21 @@ class cimage {
         ctemp::makedir($id_directory);
         $original_directory = $id_directory . 'original' . "/";
         ctemp::makedir($original_directory);
-		$wide_directory = $id_directory . 'wide' . "/";
-		ctemp::makedir($wide_directory);
+        $wide_directory = $id_directory . 'wide' . "/";
+        ctemp::makedir($wide_directory);
         $large_directory = $id_directory . 'large' . "/";
-		ctemp::makedir($large_directory);
+        ctemp::makedir($large_directory);
         $medium_directory = $id_directory . 'medium' . "/";
-		ctemp::makedir($medium_directory);
+        ctemp::makedir($medium_directory);
         $small_directory = $id_directory . 'small' . "/";
-		ctemp::makedir($small_directory);
+        ctemp::makedir($small_directory);
         $thumbnail_directory = $id_directory . 'thumbnail' . "/";
-		ctemp::makedir($thumbnail_directory);
+        ctemp::makedir($thumbnail_directory);
 
-        
+
         ctemp::makedir($org_directory);
         ctemp::makedir($type_directory);
         ctemp::makedir($id_directory);
-        
-       
-        
-        
-        
-        
     }
 
     public static function delete_all_image($type, $id, $filename) {
@@ -113,15 +106,15 @@ class cimage {
             $org_folder = $org->org_code . "/";
         }
         $org_directory = $upload_directory . $org_folder;
-		
-		$type = explode(".",$type);
-		$type_directory = $org_directory;
-		foreach($type as $t) {
-			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t."/";
-			}
-		}
-        
+
+        $type = explode(".", $type);
+        $type_directory = $org_directory;
+        foreach ($type as $t) {
+            if (strlen(trim($t)) > 0) {
+                $type_directory = $type_directory . $t . "/";
+            }
+        }
+
         $id_directory = $type_directory . $id . "/";
         $size_directory = $id_directory . $size . "/";
         return $size_directory;
@@ -175,27 +168,27 @@ class cimage {
     }
 
     public static function get_image_src($type, $id, $size, $filename) {
+
+        $upload_directory = curl::base() . 'upload/';
+//        $upload_directory = curl::base() . 'upload';
         
-		$upload_directory = curl::base().'upload/';
-		
-		$org = CApp::instance()->org();
+        $org = CApp::instance()->org();
         $org_path = "";
         if ($org != null) {
-            $org_path = $org->code . "/";
+            $org_path = $org->org_code . "/";
         }
-		$org_directory = $upload_directory.$org_path;
-		
-		$type = explode(".",$type);
-		$type_directory = $org_directory;
-		foreach($type as $t) {
-			if(strlen(trim($t))>0) {
-				$type_directory =  $type_directory.$t."/";
-			}
-		}
-		$id_directory =  $type_directory.$id.'/';
-		$size_directory =  $id_directory.$size.'/';
-		return $size_directory.$filename;
+        $org_directory = $upload_directory . $org_path;
 
+        $type = explode(".", $type);
+        $type_directory = $org_directory;
+        foreach ($type as $t) {
+            if (strlen(trim($t)) > 0) {
+                $type_directory = $type_directory . $t . "/";
+            }
+        }
+        $id_directory = $type_directory . $id . '/';
+        $size_directory = $id_directory . $size . '/';
+        return $size_directory . $filename;
     }
 
     public static function get_upload_url($type, $id, $size, $filename) {
@@ -204,7 +197,7 @@ class cimage {
 
     public static function get_image_path($type, $id, $size, $filename = "") {
 
-        return cimage::get_upload_path($type, $id, $size) .  $filename;
+        return cimage::get_upload_path($type, $id, $size) . $filename;
     }
 
 }
