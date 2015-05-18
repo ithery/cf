@@ -10,7 +10,8 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 	protected $param;
 	protected $param_inputs;
     protected $check_duplicate_tr;
-	
+    protected $value_duplicate_tr;
+
 	public function __construct($owner,$event,$name){
 		parent::__construct($owner,$event,$name);
 		$this->method = "get";
@@ -45,8 +46,13 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 	}
 
     //set check duplicate tr must using hidden field and validate by hidden value.
-    public function set_check_duplicate_tr($param=true){
+    public function set_check_duplicate_tr($param='true'){
         $this->check_duplicate_tr=$param;
+        return $this;
+    }
+
+    public function set_value_duplicate_tr($data=array()){
+        $this->value_duplicate_tr=$data;
         return $this;
     }
 	
@@ -59,17 +65,26 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 			$data_addition.="'".$inp."':$('#".$inp."').val()";
 		}
 		$data_addition = '{'.$data_addition.'}';
+
+
+        $param_duplicate='';
+        foreach ($this->value_duplicate_tr as $inp) {
+            if (strlen($param_duplicate) > 0) $param_duplicate .= ',';
+            $param_duplicate .= "'" . $inp . "':$('#" . $inp . "').val()";
+        }
+        $param_duplicate = '{' . $param_duplicate . '}';
+
+
 		$js.= "
                     var is_duplicate = false;
 
-                    var check_duplicate = ".$this->check_duplicate_tr.";
+                    var check_duplicate = '".$this->check_duplicate_tr."';
 
-                    if(check_duplicate){
-                        var p = ".$data_addition.";
+                    if(check_duplicate=='true'){
+                        var p = ".$param_duplicate.";
                         var param=[];
                         for (var key in p) {
                           if (p.hasOwnProperty(key)) {
-                            //var input=key+'_'+p[key];
                             param.push(p[key]);
                           }
                         }
