@@ -11,6 +11,8 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 	protected $param_inputs;
     protected $check_duplicate_tr;
     protected $value_duplicate_tr;
+    protected $bulk_data;
+    protected $bulk_url;
 
 	public function __construct($owner,$event,$name){
 		parent::__construct($owner,$event,$name);
@@ -18,6 +20,7 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 		$this->target = "";
 		$this->content = CHandlerElement::factory();
 		$this->param_inputs=array();
+		$this->bulk_data = false;
 		
 	}
 	public function add_param_input($inputs) {
@@ -37,8 +40,16 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 		return $this;
 	}
 	
-	public function set_method($method) {
+	public function set_method($bulk_data) {
 		$this->method = $method;
+	}
+	
+	public function set_bulk($bulk_data) {
+		$this->bulk_data = $bulk_data;
+	}
+
+	public function set_bulk_url($bulk_url) {
+		$this->bulk_url = $bulk_url;
 	}
 	
 	public function content() {
@@ -64,22 +75,43 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 			if(strlen($data_addition)>0) $data_addition.=',';
 			$data_addition.="'".$inp."':$('#".$inp."').val()";
 		}
-		$data_addition = '{'.$data_addition.'}';
 
+		// $js_get_data = "";
+		// $data_addition = '{'.$data_addition.'}';
+		// if($this->bulk_data) {
+		// 	$js_get_data = "
+		// 	var bulk_value=[];
+		// 	jQuery.ajax({
+		//         type: 'get',
+		//         url: '" . curl::base() . $this->bulk_url . "',
+		//         dataType: 'json',
+		//         data: " . $data_addition . "
+		//     }).done(function( data ) {
+		// 		console.log(data);
+		// 		jQuery('#".$this->target." tr').each(function() {
+		// 			var hidden_elem= tr.find(':hidden').get(i);
+  //                   console.log(hidden_elem);
+  //                   var hidden_value=jQuery(hidden_elem).val();
+		// 			bulk_value.push(hidden_value);
+		// 		});
+		// 		console.log(bulk_value);
+		//     }).error(function(obj,t,msg) {
+  //       	});";
+		// 	$js .= $js_get_data;
+		// }
+  //       $param_duplicate='';
+  //       foreach ($this->value_duplicate_tr as $inp) {
 
-        $param_duplicate='';
-        foreach ($this->value_duplicate_tr as $inp) {
-            if (strlen($param_duplicate) > 0) $param_duplicate .= ',';
-            $param_duplicate .= "'" . $inp . "':$('#" . $inp . "').val()";
-        }
-        $param_duplicate = '{' . $param_duplicate . '}';
+  //           if (strlen($param_duplicate) > 0) $param_duplicate .= ',';
+  //           $param_duplicate .= "'" . $inp . "':$('#" . $inp . "').val()";
+  //       }
+  //       $param_duplicate = '{' . $param_duplicate . '}';
 
-
+  //       if(!$this->bulk_data) {
 		$js.= "
                     var is_duplicate = false;
 
                     var check_duplicate = '".$this->check_duplicate_tr."';
-
                     if(check_duplicate=='true'){
                         var p = ".$param_duplicate.";
                         var param=[];
@@ -90,6 +122,7 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
                         }
 
                         jQuery('#".$this->target." tr').each(function() {
+                        	
                             var tr = $(this);
                             var lengthparam = param.length;
                             var counter=0;
@@ -97,7 +130,6 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 
                                 var hidden_elem= tr.find(':hidden').get(i);
                                 var hidden_value=jQuery(hidden_elem).val();
-
                                 if(hidden_value==param[i]){
                                     counter++;
                                 }
@@ -116,7 +148,7 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
                     }
 
 		";
-		
+		// }
 		return $js;
 			
 	}
