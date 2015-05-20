@@ -75,9 +75,9 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
 			if(strlen($data_addition)>0) $data_addition.=',';
 			$data_addition.="'".$inp."':$('#".$inp."').val()";
 		}
+		$data_addition = '{'.$data_addition.'}';
 
 		// $js_get_data = "";
-		// $data_addition = '{'.$data_addition.'}';
 		// if($this->bulk_data) {
 		// 	$js_get_data = "
 		// 	var bulk_value=[];
@@ -99,13 +99,13 @@ class CHandler_Appendtr_Driver extends CHandler_Driver {
   //       	});";
 		// 	$js .= $js_get_data;
 		// }
-  //       $param_duplicate='';
-  //       foreach ($this->value_duplicate_tr as $inp) {
+        $param_duplicate='';
+        foreach ($this->value_duplicate_tr as $inp) {
 
-  //           if (strlen($param_duplicate) > 0) $param_duplicate .= ',';
-  //           $param_duplicate .= "'" . $inp . "':$('#" . $inp . "').val()";
-  //       }
-  //       $param_duplicate = '{' . $param_duplicate . '}';
+            if (strlen($param_duplicate) > 0) $param_duplicate .= ',';
+            $param_duplicate .= "'" . $inp . "':$('#" . $inp . "').val()";
+        }
+        $param_duplicate = '{' . $param_duplicate . '}';
 
   //       if(!$this->bulk_data) {
 		$js.= "
