@@ -42,6 +42,7 @@
             $this->manager->register_control('wysiwyg', 'CFormInputWysiwyg');
             $this->manager->register_control('ckeditor', 'CFormInputCKEditor');
             $this->manager->register_control('hidden', 'CFormInputHidden');
+            $this->manager->register_control('radio', 'CFormInputRadio');
         }
 
         /**

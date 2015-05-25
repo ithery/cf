@@ -53,6 +53,7 @@ class CFormInputRadio extends CFormInput {
 	public function js($indent=0) {
 		$js = new CStringBuilder();
 		$js->set_indent($indent);
+		$js->append(parent::js($indent))->br();
 		if($this->applyjs=="uniform") {
 			//$js->append("$('#".$this->id."').uniform();")->br();
 		}
