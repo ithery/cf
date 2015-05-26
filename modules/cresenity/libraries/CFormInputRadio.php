@@ -34,7 +34,17 @@ class CFormInputRadio extends CFormInput {
 		$checked = "";
 		if($this->checked) $checked =  ' checked="checked"';
 		if($this->disabled) $disabled = ' disabled="disabled"';
-		$html->append('<label class="checkbox">');
+		
+		$classes = $this->classes;
+		$classes = implode(" ",$classes);
+		if(strlen($classes)>0) $classes=" ".$classes;
+		$custom_css = $this->custom_css;
+		$custom_css = crenderer::render_style($custom_css);
+		if(strlen($custom_css)>0) {
+			$custom_css = ' style="'.$custom_css.'"';
+		}
+		
+		$html->append('<label class="checkbox'.$classes.'" >');
 		if($this->applyjs=="switch") {
 			$html->append('<div class="switch">');
 		}

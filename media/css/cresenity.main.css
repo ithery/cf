@@ -947,6 +947,12 @@ textarea {
 .display-inline {
 	display:inline;
 }
+
+
+.checkbox.display-inline, .radio.display-inline {
+	padding-left:0px;
+}
+
 .display-block {
 	display:block;
 }
