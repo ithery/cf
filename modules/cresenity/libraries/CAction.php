@@ -16,7 +16,7 @@ class CAction extends CElement {
     protected $confirm;
     protected $style;
 
-    public function __construct($id) {	
+    public function __construct($id) {
         parent::__construct($id);
 
         $this->jsfunc = "";
@@ -53,9 +53,10 @@ class CAction extends CElement {
         return $this;
     }
 
-    public function set_label($label,$lang=true) {
-        if($lang) $label = clang::__($label);
-		$this->label = $label;
+    public function set_label($label, $lang = true) {
+        if ($lang)
+            $label = clang::__($label);
+        $this->label = $label;
         return $this;
     }
 
@@ -119,25 +120,26 @@ class CAction extends CElement {
             }
         }
     }
-	public function toarray() {
-		$data = array();
-		
-		
-		$data = array_merge_recursive($data,parent::toarray());
-		if($this->submit) {
-			$data['tag']='input';
-			$data['attr']['type']='submit';
-			$data['attr']['value']=$this->label;
-			unset($data['text']);
-		} else {
-			$data['tag']='a';
-			$data['attr']['href']=$this->link;
-			$data['text']=$this->label;
-			
-		}
-		
-		return $data;
-	}
+
+    public function toarray() {
+        $data = array();
+
+
+        $data = array_merge_recursive($data, parent::toarray());
+        if ($this->submit) {
+            $data['tag'] = 'input';
+            $data['attr']['type'] = 'submit';
+            $data['attr']['value'] = $this->label;
+            unset($data['text']);
+        } else {
+            $data['tag'] = 'a';
+            $data['attr']['href'] = $this->link;
+            $data['text'] = $this->label;
+        }
+
+        return $data;
+    }
+
     public function html($indent = 0) {
         $this->reassign_confirm();
         $html = new CStringBuilder();
@@ -154,6 +156,10 @@ class CAction extends CElement {
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
+        }
+        $addition_attribute = "";
+        foreach ($this->attr as $k => $v) {
+            $addition_attribute.=" " . $k . '="' . $v . '"';
         }
         foreach ($jsparam as $k => $p) {
             $i++;
@@ -196,7 +202,7 @@ class CAction extends CElement {
 
             if ($this->submit)
                 $input_type = "submit";
-            $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class. $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . $custom_css. '/>');
+            $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '/>');
         } else {
             if ($this->type == "jsfunc") {
                 $link = 'javascript:;';
@@ -208,9 +214,9 @@ class CAction extends CElement {
                 $html->appendln('<li>');
             }
             if ($this->style == "btn-dropdown") {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '"' . $disabled . $add_attr . $custom_css. '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '>');
             } else {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '"' . $disabled . $add_attr . $custom_css . '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '>');
             }
             if (strlen($this->icon) > 0) {
                 $html->append('<i class="icon icon-' . $this->icon . '"></i> ');

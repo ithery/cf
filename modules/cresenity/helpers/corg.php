@@ -5,8 +5,8 @@ class corg {
     public static function get($id) {
         $default_data = array(
             "org_id" => "",
-            "code" => "",
-            "name" => "",
+            "org_code" => "",
+            "org_name" => "",
             "abbr" => "",
         );
 		
@@ -14,7 +14,8 @@ class corg {
         if ($data == null)
             return null;
         foreach ($default_data as $k => $v) {
-            if (!isset($data[$k])) {
+            
+			if (!isset($data[$k])) {
                 $data[$k] = $v;
             }
         }

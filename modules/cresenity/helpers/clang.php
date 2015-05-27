@@ -15,6 +15,7 @@ class clang {
             $lang = clang::getlang();
             $files = CF::get_files('lang',$lang);
 			
+			$files = array_reverse($files);
 			foreach ($files as $file) {
 				$lang = include $file;
 				// Merge in configuration

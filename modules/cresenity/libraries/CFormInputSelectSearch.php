@@ -9,7 +9,6 @@ class CFormInputSelectSearch extends CFormInput {
 
 	public function __construct($id) {
 		parent::__construct($id);
-		
 		$this->type="selectsearch";
 		$this->query = "";
 		$this->format_selection = "";

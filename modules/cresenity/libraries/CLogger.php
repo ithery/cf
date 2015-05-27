@@ -44,7 +44,13 @@
 
         private function __create_log_path() {
             $include_paths = CF::include_paths();
-            $this->_log_path = $include_paths[0] . 'logs' .DS;
+			$this->_log_path = $include_paths[0] . 'logs' .DS;
+            foreach($include_paths as $path) {
+				if(is_dir($path)) {
+					$this->_log_path = $path . 'logs' .DS;
+					break;
+				}
+			}
             
             if (!is_dir($this->_log_path)) {
                 mkdir($this->_log_path);

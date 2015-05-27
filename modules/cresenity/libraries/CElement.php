@@ -60,6 +60,9 @@ class CElement extends CObservable {
         $this->attr[$k] = $v;
         return $this;
     }
+    public function add_attr($k, $v) {
+        return $this->set_attr($k,$v);
+    }
 
     public function get_attr($k) {
         if (isset($this->attr[$k])) {

@@ -54,6 +54,9 @@
         public $pdf_orientation;
         public $show_header;
         public $report_header = array();
+		public $footer_action_list = array();
+		public $footer_action_style;
+		
         protected $quick_search = FALSE;
         protected $tbody_id;
         protected $js_cell;
@@ -116,7 +119,12 @@
             $this->tbody_id = '';
 
             $this->report_header = array();
-
+			$this->footer_action_list = CActionList::factory();
+			$this->footer_action_style = 'btn-dropdown';
+			$this->footer_action_list->set_style('btn-dropdown');
+			
+			//$this->add_footer_action('export_excel');
+			
             CClientModules::instance()->register_module('jquery.datatable');
         }
 
@@ -130,7 +138,22 @@
 
             return $this;
         }
-
+		
+		public function add_footer_action($id = "") {
+			$row_act = CAction::factory($id);
+			$this->footer_action_list->add($row_act);
+			if($id=='export_excel') {
+				$row_act->set_label('Download Excel');
+				$row_act->add_listener('click')->add_handler('custom')->set_js("alert('a');");
+			}
+			return $row_act;
+		}
+		
+		public function have_footer_action() {
+			//return $this->can_edit||$this->can_delete||$this->can_view;
+			return $this->footer_action_list->child_count() > 0;
+		}
+		
         public function is_exported() {
             return $this->export_excel || $this->export_excelxml || $this->export_excelcsv || $this->export_pdf;
         }
@@ -1364,6 +1387,13 @@
 							//$('td:eq(4)', nRow).html( '<b>A</b>' );
 						//$.cresenity.set_confirm($('a.confirm',nRow));
 						
+						var footer_action = $('#footer_action_".$this->id."');
+						
+						".($this->have_footer_action()?"footer_action.html(".json_encode($this->footer_action_list->html()).");":"")." 
+           
+						".($this->have_footer_action()?"".$this->footer_action_list->js()."":"")." 
+						
+						footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
 						
 						for(i=0;i<$(nRow).find('td').length;i++) {
 							
@@ -1445,7 +1475,7 @@
 
                 $js->append("")
                         ->appendln("'sPaginationType': 'full_numbers',")->br()
-                        ->appendln("'sDom': '<\"\"l>t<\"F\"frp>',")->br()
+                        ->appendln("'sDom': '<\"\"l>t<\"F\"f<\"#footer_action_".$this->id."\">rp>',")->br()
                 ;
                 /*
                   $js->append("
@@ -1510,7 +1540,7 @@
                 
                 //$js->appendln("oTable.fnSortOnOff( '_all', false );")->br();
                 
-                $js->appendln('function buildFilters() {')->br()
+                $js->appendln('function buildFilters_'.$this->id.'() {')->br()
                     ->appendln("var quick_search = jQuery('<tr>');")->br()
                     ->appendln("jQuery('#" . $this->id . " thead th').each( function (i) {
                             var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
@@ -1543,7 +1573,7 @@
                     ->appendln("table.children('thead').append(quick_search);")->br()
                     ->appendln('}')->br()
                     ->appendln('var dttable_quick_search = ' .($this->quick_search ? "1" : "0") .';')->br()
-                    ->appendln('if (dttable_quick_search == "1") { buildFilters(); }')
+                    ->appendln('if (dttable_quick_search == "1") { buildFilters_'.$this->id.'(); }')
                         ;
                 
                 $js->appendln("jQuery('.data_table-quick_search').on('keyup', function(){

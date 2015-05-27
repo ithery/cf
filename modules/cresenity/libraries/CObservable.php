@@ -189,11 +189,28 @@
             $this->add('<br />');
         }
 
-        public function add_element($tag, $id = "") {
-            $elm = CElement::factory($id, $tag);
-            $this->add($elm);
-            return $elm;
+        // public function add_element($tag, $id = "") {
+            // $elm = CElement::factory($id, $tag);
+            // $this->add($elm);
+            // return $elm;
+        // }
+		
+		public function add_element($type,$id="") {
+            $element = null;
+            if ($this->manager->is_registered_element($type)) {
+                $element = $this->manager->create_element($id, $type);
+            }
+            else {
+                trigger_error('Unknown element type ' . $type);
+            }
+			
+			
+			
+            $this->add($element);
+
+            return $element;
         }
+
 
         public function add_action_list($id = "") {
             $actlist = CActionList::factory($id);

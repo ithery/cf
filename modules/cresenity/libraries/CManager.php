@@ -8,6 +8,9 @@ final class CManager {
     protected $controls = array();
     protected $controls_code = array();
 
+	protected $elements = array();
+	protected $elements_code = array();
+	
     /**
      * 
      * @return CManager
@@ -34,9 +37,25 @@ final class CManager {
             }
         }
     }
+	public function register_element($type, $class, $code_path = '') {
+        $this->elements[$type] = $class;
+        $this->elements_code[$type] = $code_path;
+        if (strlen($code_path) > 0) {
+            if (file_exists($code_path)) {
+                include $code_path;
+            } else {
+                trigger_error('File ' . $code_path . ' Not Exists');
+            }
+        }
+    }
 
     public function is_registered_control($type) {
         return isset($this->controls[$type]);
+    }
+	
+	public function is_registered_element($type) {
+        return isset($this->elements[$type]);
+		
     }
 
     public function create_control($id, $type) {
@@ -44,6 +63,18 @@ final class CManager {
             trigger_error('Type of control ' . $type . ' not registered');
         }
         $class = $this->controls[$type];
+        return call_user_func(array($class, 'factory'), ($id));
+
+        //$obj = eval('new '.$class.'::factory("'.$id.'")');
+        //return $obj;
+        //return $class::factory($id);
+    }
+	
+	public function create_element($id, $type) {
+        if (!isset($this->elements[$type])) {
+            trigger_error('Type of element ' . $type . ' not registered');
+        }
+        $class = $this->elements[$type];
         return call_user_func(array($class, 'factory'), ($id));
 
         //$obj = eval('new '.$class.'::factory("'.$id.'")');

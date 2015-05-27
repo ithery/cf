@@ -172,6 +172,7 @@
             return $this->login_required=$bool;
         }
 		
+		
         public function app_id() {
             return $this->_app_id;
         }

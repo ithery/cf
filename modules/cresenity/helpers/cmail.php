@@ -9,26 +9,30 @@ class cmail {
 
         $app = CApp::instance();
         $org = $app->org();
+		$org_name = 'CAPP';
+		$org_email = $org_name;
         if ($org != null) {
             $org_email = $org->name;
-            $subject = "Error Cresenity APP - " . $org->name . " on " . crouter::complete_uri();
+			$org_name = $org->name;
+		}
+		$subject = "Error Cresenity APP - " . $org_name . " on " . crouter::complete_uri();
 
-            $headers = "From: " . strip_tags($org_email) . "\r\n";
-            $headers .= "Reply-To: " . strip_tags($org_email) . "\r\n";
-            //$headers .= "CC: susan@example.com\r\n";
-            $headers .= "MIME-Version: 1.0\r\n";
-            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+		$headers = "From: " . strip_tags($org_email) . "\r\n";
+		$headers .= "Reply-To: " . strip_tags($org_email) . "\r\n";
+		//$headers .= "CC: susan@example.com\r\n";
+		$headers .= "MIME-Version: 1.0\r\n";
+		$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
-            $message = $html;
-            $admin_email = ccfg::get("admin_email");
+		$message = $html;
+		$admin_email = ccfg::get("admin_email");
 
-            if (ccfg::get("mail_error_smtp")) {
+		if (ccfg::get("mail_error_smtp")) {
+			$ret = cmail::send_smtp($admin_email, $subject . " [FOR ADMINISTRATOR]", $message);
+		} else {
 
-                $ret = cmail::send_smtp($admin_email, $subject . " [FOR ADMINISTRATOR]", $message);
-            } else {
-                $ret = cmail::send($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, $headers);
-            }
-        }
+			$ret = cmail::send($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, $headers);
+		}
+       
         //echo $message;
     }
 
@@ -152,7 +156,13 @@ class cmail {
 
         $mail->set_message_html($message);
         $mail->set_subject($subject);
-        $mail->add_to($to);
+        if(!is_array($to)) {
+			$to = array($to);
+		}
+		foreach($to as $em) {
+			$mail->add_to($em);
+		
+		}
         try {
             $mail->send();
         } catch (Exception $ex) {

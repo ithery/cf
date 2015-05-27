@@ -7,7 +7,7 @@ class CDivElement extends CElement {
     public function __construct($id = "") {
 
         parent::__construct($id);
-		$this->tag="div";
+        $this->tag = "div";
     }
 
     public static function factory($id = "") {
@@ -27,7 +27,11 @@ class CDivElement extends CElement {
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $html->appendln('<div id="' . $this->id . '" class="' . $classes . '"' . $custom_css . '>');
+        $addition_attribute = "";
+        foreach ($this->attr as $k => $v) {
+            $addition_attribute.=" " . $k . '="' . $v . '"';
+        }
+        $html->appendln('<div id="' . $this->id . '" class="' . $classes . '"' . $custom_css . $addition_attribute . '>');
 
 
         $html->appendln(parent::html($html->get_indent()))->br();
@@ -41,4 +45,3 @@ class CDivElement extends CElement {
     }
 
 }
-

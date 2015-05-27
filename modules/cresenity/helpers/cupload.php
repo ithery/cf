@@ -204,9 +204,19 @@ class cupload {
 		return $id_directory;
 	}
 	public static function get_upload_src($type,$id,$filename) {
-		$upload_directory = curl::base().'upload'.'/';
+		$org = CApp::instance()->org();
+        $upload_directory = DOCROOT . 'upload' . "/";
+        $upload_directory = CF::get_dir('upload');
+        $upload_directory = curl::base().'upload/';
+		$org_folder = "";
+        if ($org != null) {
+            $org_folder = $org->org_code . "/";
+        }
+        $org_directory = $upload_directory . $org_folder;
+		
+		//$upload_directory = curl::base().'upload'.'/';
 		$type = explode(".",$type);
-		$type_directory = $upload_directory;
+		$type_directory = $org_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
 				$type_directory =  $type_directory.$t."/";
