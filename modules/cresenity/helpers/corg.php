@@ -24,6 +24,9 @@ class corg {
         if ($data != null) {
             $data = carr::to_object($data);
         }
+		if(isset($data->org_code)) $data->code = $data->org_code;
+		if(isset($data->org_code)) $data->name = $data->org_name;
+		
         return $data;
 
         /*
