@@ -5,10 +5,12 @@ class CFormInputSelectSearch extends CFormInput {
 	protected $format_result;
 	protected $key_field;
 	protected $search_field;
+	
 	protected $placeholder;
 
 	public function __construct($id) {
 		parent::__construct($id);
+		
 		$this->type="selectsearch";
 		$this->query = "";
 		$this->format_selection = "";
@@ -64,13 +66,20 @@ class CFormInputSelectSearch extends CFormInput {
 		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'" '.$custom_css.'>')->br();
 		return $html->text();	
 	}
-	public function js($indent=0) {
-		$ajax_url = CAjaxMethod::factory()
+	
+	public function create_ajax_url() {
+		return CAjaxMethod::factory()
 			->set_type('searchselect')
 			->set_data('query',$this->query)
 			->set_data('key_field',$this->key_field)
 			->set_data('search_field',$this->search_field)
+			
 			->makeurl();
+		
+	}
+	
+	public function js($indent=0) {
+		$ajax_url = $this->create_ajax_url();
 		
 		$str_selection = $this->format_selection;
 		$str_result = $this->format_result;
