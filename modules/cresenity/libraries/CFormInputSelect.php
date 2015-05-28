@@ -1,5 +1,4 @@
 <?php
-
 class CFormInputSelect extends CFormInput {
 
     protected $group_list = array();
