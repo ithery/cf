@@ -21,6 +21,7 @@
         protected $use_navigate = true;
         protected $use_edit = true;
         protected $use_modal = false;
+        protected $use_block = true;
         protected $selected_value;
         protected $title = "Dialog";
         protected $http_method = 'POST';
@@ -283,7 +284,8 @@
                 $modal_js = "$('#modal'+date_selected).modal('toggle');";
             }
 
-            $return .= "$(function() {
+            if($this->use_block) {
+                $return .= "$(function() {
                             var res_date = '';
                             
                             selectable_event();
@@ -316,7 +318,26 @@
                                     }
                             });
                         }
-";
+                ";
+            } else {
+                $return .= "$(function() {
+                            var res_date = '';
+                            
+                            selectable_event();
+                            
+                        });
+                        function selectable_event(){ 
+                            $( '#selectable li' ).each(function() {
+                                $(this).click(function(event, ui) {
+                                    var date_selected = $(this).attr('data-date');
+                                    " . $modal_js . "
+                                });
+                            });
+                        }
+                ";
+            }
+
+            
 
             return $return;
         }
@@ -413,6 +434,10 @@
 
         public function set_edit($use_edit) {
             $this->use_edit = $use_edit;
+        }
+
+        public function set_block($use_block) {
+            $this->use_block = $use_block;
         }
 
         public function set_modal($use_modal) {
