@@ -19,7 +19,11 @@ class CFormInputHidden extends CFormInput {
 	public function html($indent=0) {
 		$html = new CStringBuilder();
 		$html->set_indent($indent);
-		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'">')->br();
+        $classes = $this->classes;
+        $classes = implode(" ", $classes);
+        if (strlen($classes) > 0)
+            $classes = " " . $classes;
+		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" class="'.$classes.'" value="'.$this->value.'">')->br();
 		return $html->text();
 	}		
 	public function js($indent=0) {			
