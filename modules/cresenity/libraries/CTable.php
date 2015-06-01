@@ -716,6 +716,7 @@
                     }
 
                     $fval = $f["value"];
+                    
                     if (is_array($fval)) {
                         $skip_column = 0;
 
@@ -1188,7 +1189,11 @@
                     }
 
                     $fval = $f["value"];
-                    if (is_array($fval)) {
+                    if($fval instanceof CRenderable) {
+                        $html->inc_indent()->appendln('<td class="' . $class . '">')->br();
+                        $html->appendln($fval->html($indent))->br();
+                        $html->dec_indent()->appendln('</td>')->br();
+                    } else if (is_array($fval)) {
                         $skip_column = 0;
 
                         foreach ($this->columns as $col) {
@@ -1610,6 +1615,18 @@
                     }
                 }
             }
+            
+            if ($this->footer) {
+               
+                foreach ($this->footer_field as $f) {
+                    $fval = $f["value"];
+                    if($fval instanceof CRenderable) {
+                         $js->appendln($fval->js())->br();
+                    }
+                }
+            }
+            
+            
 //            clog::write($js->text());
             return $js->text();
         }

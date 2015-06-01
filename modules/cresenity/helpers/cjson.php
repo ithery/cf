@@ -1,7 +1,7 @@
 <?php
 
 class cjson {
-	function encode($json) {
+	public static function encode($json) {
 		
 		if (!is_string($json)) {
 			if (phpversion() && phpversion() >= 5.4) {
@@ -65,7 +65,7 @@ class cjson {
 
 		return $result;
 	}
-	function decode($json) {
+	public static function decode($json) {
 		if (is_string($json)) {
 			return json_decode($json, true);
 		}

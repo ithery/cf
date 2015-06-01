@@ -164,9 +164,15 @@ class cupload {
 		
 		
 		$upload_directory = DOCROOT.'upload'."/";
-		ctemp::makedir($upload_directory);
+		$org = CApp::instance()->org();
+		$org_path = "";
+        if ($org != null) {
+            $org_path = $org->org_code . "/";
+        }
+        $org_directory = $upload_directory . $org_path;
+		ctemp::makedir($org_directory);
 		$type = explode(".",$type);
-		$type_directory = $upload_directory;
+		$type_directory = $org_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
 				$type_directory =  $type_directory.$t."/";
@@ -176,10 +182,6 @@ class cupload {
 		
 		
 		$id_directory =  $type_directory.$id."/";
-		
-		
-
-		
 		
 		ctemp::makedir($id_directory);
 	
@@ -192,27 +194,40 @@ class cupload {
 	}
 	public static function get_upload_path($type,$id) {
 		$upload_directory = DOCROOT.'upload'."/";
+		$org = CApp::instance()->org();
+		$org_path = "";
+        if ($org != null) {
+            $org_path = $org->org_code . "/";
+        }
+        $org_directory = $upload_directory . $org_path;
 		
 		$type = explode(".",$type);
-		$type_directory = $upload_directory;
+		$type_directory = $org_directory;
 		foreach($type as $t) {
 			if(strlen(trim($t))>0) {
 				$type_directory =  $type_directory.$t."/";
 			}
 		}
 		$id_directory =  $type_directory.$id."/";
+		//die("cupload#210 ".$id_directory);
 		return $id_directory;
 	}
 	public static function get_upload_src($type,$id,$filename) {
 		$org = CApp::instance()->org();
-        $upload_directory = DOCROOT . 'upload' . "/";
-        $upload_directory = CF::get_dir('upload');
+        //$upload_directory = DOCROOT . 'upload' . "/";
+        //$upload_directory = CF::get_dir('upload');
         $upload_directory = curl::base().'upload/';
-		$org_folder = "";
-        if ($org != null) {
+		//$org_folder = "";
+        /*if ($org != null) {
             $org_folder = $org->org_code . "/";
         }
-        $org_directory = $upload_directory . $org_folder;
+        $org_directory = $upload_directory . $org_folder;*/
+		
+		$org_path = "";
+        if ($org != null) {
+            $org_path = $org->org_code . "/";
+        }
+        $org_directory = $upload_directory . $org_path;
 		
 		//$upload_directory = curl::base().'upload'.'/';
 		$type = explode(".",$type);
@@ -223,6 +238,7 @@ class cupload {
 			}
 		}
 		$id_directory =  $type_directory.$id.'/';
+		//die("cupload#239 ".$id_directory);
 		return $id_directory.$filename;
 	}
 } // End upload

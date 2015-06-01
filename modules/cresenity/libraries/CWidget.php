@@ -14,6 +14,7 @@ class CWidget extends CElement {
     public $nopadding;
     public $info;
     public $info_tip;
+    public $custom_html;
     public $header_action_style;
     public $height;
 
@@ -29,6 +30,7 @@ class CWidget extends CElement {
         $this->scroll = false;
         $this->info = "";
         $this->info_tip = "";
+        $this->custom_html = "";
         $this->nopadding = false;
         $this->header_action_list = CActionList::factory();
         $this->header_action_style = 'widget-action';
@@ -98,6 +100,11 @@ class CWidget extends CElement {
         $this->info = $info;
         return $this;
     }
+    
+    public function add_html($custom_html) {
+        $this->custom_html = $custom_html;
+        return $this;
+    }
 
     public function set_info_tip($info_tip) {
         $this->info_tip = $info_tip;
@@ -123,6 +130,10 @@ class CWidget extends CElement {
         if (strlen($this->info) > 0) {
             $info = '<span class="label label-info tip-left " data-original-title="' . $this->info_tip . '">' . $this->info . '</span>';
         }
+        $custom_html = "";
+        if (strlen($this->custom_html) > 0) {
+            $custom_html = $this->custom_html;
+        }
         $classes = $this->classes;
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
@@ -135,6 +146,7 @@ class CWidget extends CElement {
         $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
         $html->appendln('		</span>');
         $html->appendln('		<h5>' . $this->title . '</h5>');
+        $html->appendln('		' . $custom_html. '');
         $html->appendln('		' . $info . '');
         if ($this->have_header_action()) {
             $html->appendln($this->header_action_list->html($html->get_indent()));
