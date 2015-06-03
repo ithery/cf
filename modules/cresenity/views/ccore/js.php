@@ -294,11 +294,17 @@ cresenity.func.js
 			
 
 		},
-		message: function(type,message,alert_type) {
+		message: function(type,message,alert_type,callback) {
 			alert_type = typeof alert_type !== 'undefined' ? alert_type : 'notify';
 			var container = $('#container');
 			if(alert_type=='bootbox') {
-				bootbox.alert(message);
+				
+				if(typeof callback == 'undefined') {
+					bootbox.alert(message);
+					
+				} else {
+					bootbox.alert(message,callback);
+				}
 			}
 			
 			if(alert_type=='notify') {
