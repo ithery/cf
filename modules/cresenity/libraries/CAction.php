@@ -15,6 +15,7 @@ class CAction extends CElement {
     protected $jsparam;
     protected $confirm;
     protected $style;
+    protected $confirm_message;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -32,6 +33,7 @@ class CAction extends CElement {
         $this->style = "";
         $this->disabled = false;
         $this->confirm = false;
+        $this->confirm_message = "";
     }
 
     public static function factory($id = '') {
@@ -47,6 +49,12 @@ class CAction extends CElement {
         $this->confirm = $bool;
         return $this;
     }
+    
+    public function set_confirm_message($message) {
+        $this->confirm_message = $message;
+        return $this;
+    }
+
 
     public function set_type($type) {
         $this->type = $type;
@@ -114,7 +122,7 @@ class CAction extends CElement {
             //we check the listener
             if (count($this->listeners) > 0) {
                 foreach ($this->listeners as $lis) {
-                    $lis->set_confirm(true);
+                    $lis->set_confirm(true)->set_confirm_message($this->confirm_message);
                 }
                 $this->set_confirm(false);
             }
@@ -197,6 +205,9 @@ class CAction extends CElement {
             $add_class .= " tip-top";
             $add_attr .= ' data-original-title="' . $this->label . '"';
         }
+        if (strlen($this->confirm_message)>0) {
+            $add_attr .= ' data-confirm-message="' . base64_encode($this->confirm_message) . '"';
+        }
         if ($this->render_as_input()) {
             $input_type = "button";
 
@@ -214,9 +225,9 @@ class CAction extends CElement {
                 $html->appendln('<li>');
             }
             if ($this->style == "btn-dropdown") {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr .$addition_attribute. $custom_css . '>');
             } else {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr .$addition_attribute. $custom_css . '>');
             }
             if (strlen($this->icon) > 0) {
                 $html->append('<i class="icon icon-' . $this->icon . '"></i> ');

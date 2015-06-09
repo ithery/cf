@@ -80,7 +80,11 @@ scrolltotop.init();
 	jQuery(document).on('click','a.confirm',function(e) {
 		var ahref = $(this).attr('href');
 		var message = $(this).attr('data-confirm-message');
-		if(!message) message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+		if(!message) {
+                    message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+                } else {
+                    message = $.cresenity.base64.decode(message);
+                }
 		e.preventDefault();
 		e.stopPropagation();
 		bootbox.confirm(message, function(confirmed) {
@@ -91,7 +95,11 @@ scrolltotop.init();
 	});
 	jQuery(document).on('click','input[type=submit].confirm',function(e) {
 		var message = $(this).attr('data-confirm-message');
-		if(!message) message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+		if(!message) {
+                    message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+                } else {
+                    message = $.cresenity.base64.decode(message);
+                }
 		bootbox.confirm(message, function(confirmed) {
 			if(confirmed) {
 				jQuery(e.target).closest('form').submit();
