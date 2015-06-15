@@ -9,5 +9,5 @@ logs/*
 *.iml
 temp/*
 export/
-upload/
+upload/*
 Thumbs.db
