@@ -77,7 +77,7 @@
 
                 $confirm_message=$this->confirm_message;
                 if(strlen($confirm_message)==0) {
-                    $confirm_message = 'Are you sure?';
+                    $confirm_message = clang::__('Are you sure') ." ?";
                 }
                 $confirm_start_script = "
 				bootbox.confirm('".$confirm_message."', function(confirmed) {
