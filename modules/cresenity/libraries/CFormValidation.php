@@ -52,7 +52,6 @@ class CFormValidation {
     }
 
     public function validation_class() {
-
         return ' validate[' . $this->render_class() . ']';
     }
 

@@ -15,6 +15,7 @@ class CCurl {
     private $url;
     private $engine;
     private $soap_action;
+    private $http_user_agent;
 
     private function __construct($url = null,$engine='curl') {
         $this->autoinit = true;
@@ -30,6 +31,10 @@ class CCurl {
         $this->last_response_header = null;
         $this->url = $url;
         $this->engine=$engine;
+        $this->http_user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64)';
+        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+            $this->http_user_agent = $_SERVER['HTTP_USER_AGENT'];
+        }
     }
 
     private function clear_last_exec() {
@@ -112,6 +117,10 @@ class CCurl {
         }
         return null;
     }
+    
+    public function set_http_user_agent($http_user_agent){
+        $this->http_user_agent = $http_user_agent; return $this;
+    }
 
     public function exec() {
         //clear last exec 
@@ -130,10 +139,11 @@ class CCurl {
             
             return true;
         }
+        
         curl_setopt($this->handle, CURLOPT_TIMEOUT, 3000);
         curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->handle, CURLOPT_URL, $this->url);
-        curl_setopt($this->handle, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+        curl_setopt($this->handle, CURLOPT_USERAGENT, $this->http_user_agent);
         curl_setopt($this->handle, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($this->handle, CURLOPT_REFERER, $this->url);
         curl_setopt($this->handle, CURLOPT_HEADER, false);
