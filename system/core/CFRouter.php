@@ -15,7 +15,7 @@ class CFRouter {
 
 	public static $controller;
 	public static $controller_dir;
-        public static $controller_dir_ucfirst;
+    public static $controller_dir_ucfirst;
 	public static $controller_path;
         
 

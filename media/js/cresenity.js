@@ -27,6 +27,7 @@ jQuery(document).ready(function() {
 	//jQuery('select').select2();
 	// === Sidebar navigation === //
 	$('.subnavbar ul li.dropdown > a').click(function(e) {
+		
 		e.stopPropagation();
 		e.preventDefault();
 		var li = $(this).parent();

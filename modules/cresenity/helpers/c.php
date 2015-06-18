@@ -3,7 +3,11 @@
  * Common helper class.
  */
 class c {
-	
+
+	public static function manimgurl($path) {
+		return curl::base()."public/manual/".$path;
+	}
+
 	public static function get_empty( & $var, $default = NULL ){
 		if ( isset( $var )&&!empty($var)) {
 			return $var;

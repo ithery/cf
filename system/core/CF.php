@@ -419,7 +419,6 @@
             $include_paths[] = APPPATH . "default" . DS;
 
 
-
             foreach (self::$configuration['core']['modules'] as $path) {
                 if ($path = str_replace('\\', '/', realpath($path))) {
                     // Add a valid path
