@@ -285,8 +285,32 @@
                     $options['path'] = $this->config['log_path'];
                 }
                 
-//                $log_query = carr::get($this->config,  '')
-                clog::write($options);
+                $is_write = TRUE;
+                $log_query_options = carr::get($this->config,  'log_query_options', array());
+                if (is_array($log_query_options)) {
+                    $prefix = '';
+                    $log_sql = ltrim($log_sql);
+                    $has_found = FALSE;
+                    
+                    // get query options
+                    foreach ($log_query_options as $k => $v) {
+                        $prefix = $k;
+                        if ($has_found == TRUE) break;
+                        if ($v == TRUE) continue;
+                        
+                        $log_sql = strtoupper($log_sql);
+                        $v = strtoupper($v);
+                        
+                        // compare query sql with prefix
+                        if (strlen($log_sql) >= strlen($prefix)) {
+                            if (substr($log_sql, 0, strlen($prefix)) == $prefix) {
+                                $has_found = TRUE;
+                                $is_write = FALSE;
+                            }
+                        }
+                    }
+                }
+                if ($is_write) clog::write($options);
             }
 
             // Fetch the result
