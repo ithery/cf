@@ -7,21 +7,20 @@
      * @license http://piposystem.com Piposystem
      */
     class CLogger {
-        const __EXT = ".log";
 
+        const __EXT = ".log";
         // Log message levels - Windows users see PHP Bug #18090
-	const EMERGENCY = 0;
-	const ALERT     = 1;
-	const CRITICAL  = 2;
-	const ERROR     = 3;
-	const WARNING   = 4;
-	const NOTICE    = 5;
-	const INFO      = 6;
-	const DEBUG     = 7;
-	const TRACE     = 8;
+        const EMERGENCY = 0;
+        const ALERT = 1;
+        const CRITICAL = 2;
+        const ERROR = 3;
+        const WARNING = 4;
+        const NOTICE = 5;
+        const INFO = 6;
+        const DEBUG = 7;
+        const TRACE = 8;
 
         private static $_instance = NULL;
-        
         private $_log_threshold;
         private $_log_path = '';
         private $_file_path = '';
@@ -29,35 +28,40 @@
         private $_additional_path = NULL;
         private $_level = 6;
         private $_level_name;
-        
+
         private function __construct() {
             $this->__create_log_path();
 
             $this->_log_threshold = CF::config('core.log_threshold');
             $log_threshold = ccfg::get('log_threshold');
             if ($log_threshold != NULL) $this->_log_threshold = $log_threshold;
-            
-            $filename = date("Ymd") ."_" .$this->_suffix_filename .self::__EXT;
-            $this->_file_path = $this->_log_path .$filename;
-            
+
+            $filename = date("Ymd") . "_" . $this->_suffix_filename . self::__EXT;
+            $this->_file_path = $this->_log_path . $filename;
         }
 
         private function __create_log_path() {
             $include_paths = CF::include_paths();
-			$this->_log_path = $include_paths[0] . 'logs' .DS;
-            foreach($include_paths as $path) {
-				if(is_dir($path)) {
-					$this->_log_path = $path . 'logs' .DS;
-					break;
-				}
-			}
-            
-            if (!is_dir($this->_log_path)) {
+            $this->_log_path = $include_paths[0] . 'logs' . DS;
+            foreach ($include_paths as $path) {
+                if (is_dir($path)) {
+                    $this->_log_path = $path . 'logs' . DS;
+                    break;
+                }
+            }
+
+            if (!file_exists($this->_log_path) && !is_dir($this->_log_path)) {
                 mkdir($this->_log_path);
             }
-            
+
             if ($this->_additional_path != NULL) {
-                
+                $temp_dir = explode(DS, $this->_additional_path);
+                foreach ($temp_dir as $k => $v) {
+                    $this->_log_path .= $v .DS;
+                    if (!file_exists($this->_log_path) && !is_dir($this->_log_path)) {
+                        mkdir($this->_log_path);
+                    }
+                }
             }
         }
 
@@ -74,19 +78,19 @@
 
         public function write($message) {
             $this->__get_level_name_by_const();
-            
+
             if ($this->_level >= self::DEBUG) {
                 $trace = array_slice(debug_backtrace(), 1);
                 $msg_trace = $this->__backtrace($trace);
-                $message .= $msg_trace ."\n";
+                $message .= "\n" .$msg_trace . "\n";
             }
-                
+
             if (!$fp = @fopen($this->_file_path, 'ab')) {
                 return FALSE;
             }
-            
-            $message = date("H:i:s") ." " .$this->_level_name ." ".$message ."\n";
-            
+
+            $message = date("H:i:s") . " " . $this->_level_name . " " . $message . "\n";
+
             flock($fp, LOCK_EX);
             fwrite($fp, $message);
             flock($fp, LOCK_UN);
@@ -96,19 +100,20 @@
             return TRUE;
         }
 
-        private function __backtrace($trace){
+        private function __backtrace($trace) {
             if (!is_array($trace)) return "";
-            
+
             $output = array();
-            
+
             foreach ($trace as $key => $t) {
 //                if ($key > 2) break;
                 $temp = "";
-                if (isset($t['file'])) $temp .= $t['file'] ." " .$t['line'] ."\n";
-                if (isset($t['class'])) $temp .= $t['class'] .$t['type'];
-                
+                if (isset($t['file']))
+                        $temp .= $t['file'] . " " . $t['line'] . "\n";
+                if (isset($t['class'])) $temp .= $t['class'] . $t['type'];
+
                 $temp .= $t['function'] . '( ';
-                
+
                 if ($this->_level >= self::TRACE) {
                     if (isset($t['args']) && is_array($t['args'])) {
                         $sep = '';
@@ -128,33 +133,34 @@
                 $temp .= " )";
                 $output[] = $temp;
             }
-            
+
             return implode("\n", $output);
         }
-        
+
         public function get_log_path() {
             return $this->_log_path;
         }
 
         public function set_log_path($_log_path) {
-            $this->_log_path = $_log_path; return $this;
+            $this->_log_path = $_log_path;
+            return $this;
         }
 
         public function set_additional_path($_additional_path) {
-            $this->_additional_path = $_additional_path; return $this;
-        }
-        
-        public function set_suffix_filename($_suffix_filename) {
-            $this->_suffix_filename = $_suffix_filename; 
-            $filename = date("Ymd") ."_" .$this->_suffix_filename .self::__EXT;
-            $this->_file_path = $this->_log_path .$filename;
+            $this->_additional_path = $_additional_path;
             return $this;
         }
-        
+
+        public function set_suffix_filename($_suffix_filename) {
+            $this->_suffix_filename = $_suffix_filename;
+            $filename = date("Ymd") . "_" . $this->_suffix_filename . self::__EXT;
+            $this->_file_path = $this->_log_path . $filename;
+            return $this;
+        }
 
         public function set_level($_level) {
             if (is_string($_level)) {
-                $this->_level_name = strtoupper($_level); 
+                $this->_level_name = strtoupper($_level);
                 $this->__get_level_by_name();
             }
             else {
@@ -163,8 +169,8 @@
             }
             return $this;
         }
-        
-        private function __get_level_by_name(){
+
+        private function __get_level_by_name() {
             switch ($this->_level_name) {
                 case 'ALERT':
                     $this->_level = self::ALERT;
@@ -194,8 +200,8 @@
                     break;
             }
         }
-        
-        private function __get_level_name_by_const(){
+
+        private function __get_level_name_by_const() {
             switch ($this->_level) {
                 case self::ALERT:
                     $this->_level_name = 'ALERT';

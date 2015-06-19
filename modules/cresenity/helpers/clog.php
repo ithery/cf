@@ -330,10 +330,12 @@
                 $message = carr::get($options, 'message');
                 $filename = carr::get($options, 'filename');
                 $level = carr::get($options, 'level');
+                $path = carr::get($options, 'path');
 
                 if (strlen($filename) > 0)
                         $clogger_instance->set_suffix_filename($filename);
                 if (strlen($level) > 0) $clogger_instance->set_level($level);
+                if (strlen($path) > 0) $clogger_instance->set_additional_path($path);
             }
             return $clogger_instance->write($message);
         }
