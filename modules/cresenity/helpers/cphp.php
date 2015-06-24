@@ -40,10 +40,10 @@ class cphp {
 	}
 	
 	public static function load_value($filename) {
-                if(!file_exists($filename)){
-                    throw new Exception($filename." Not found");
-                }
-		return include $filename;
+            if(!file_exists($filename)){
+                throw new Exception($filename." Not found");
+            }
+            return include $filename;
 	}
 	
 	
