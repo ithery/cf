@@ -67,7 +67,7 @@
             $html->appendln($this->css());
 
             $html->appendln('<div>');
-            $html->appendln('<div class="row" id="' . $this->id . '">
+            $html->appendln('<div class="row calendar-body" id="' . $this->id . '">
                                 <div class="span12">');
             if ($this->use_navigate) {
                 $html->appendln($this->button());
@@ -84,6 +84,7 @@
             $max_day = date("t", $timestamp);
             $this_month = getdate($timestamp);
             $start_day = $this_month['wday'];
+            $html->appendln('<div class="calendar-container">');
             $html->appendln('<ol id="selectable">');
             $modal_data = '';
             for ($i = 0; $i < ($max_day + $start_day); $i++) {
@@ -103,7 +104,7 @@
                         $li_right = "left-over";
                     }
 
-                    $date_content = $the_date;
+                    $date_content = '<span class="calendar-date-point">'.$the_date.'</span>';
 
                     $curr_data_date = carr::get($this->data_calendar, $the_date_complete_convert);
 
@@ -131,6 +132,7 @@
             }
             $html->appendln('</ol>');
             $html->appendln('</div>');
+            $html->appendln('</div>');
             // end body
 
             $html->appendln('</div>');
@@ -143,7 +145,7 @@
         }
 
         public function button() {
-            return '<div class="btn-group">
+            return '<div class="btn-group calendar-navigation">
                         <a month="' . $this->prev_month . '" year="' . $this->prev_year . '" '
                     . 'href="javascript:void(0)" class="btn-large btn calendar-link-action" action="prev-month">'
                     . '<i class="icon icon-arrow-left"></i></a>'
@@ -368,39 +370,83 @@
 
         protected function css() {
             return '<style>
+                        @import url(http://fonts.googleapis.com/css?family=Oxygen:400,300);
+                        
+                        .calendar-body {
+                            font-family: "Oxygen", sans-serif;
+                            font-weight: lighter;
+                        }
+                        
                         #cms-calendar {
                         }
                         #feedback { font-size: 1.4em; }
-                        #selectable .ui-selecting { background-color: #FECA40; }
-                        #selectable .ui-selected { background-color: #F39814; color: white; }
-                        #selectable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+                        #selectable { list-style-type: none; margin: 0; padding: 0; width: 100%;}
+                        #selectable .ui-selecting { background-color: #2A9BDD; }
+                        #selectable .ui-selected,
+                        #selectable .ui-selected:hover{ 
+                            background-color: #2AB2EA; color: white; 
+                        }
                         #selectable li { 
                             /*border: 1px solid #CCCCCC;*/
-                            margin: 0px; 
-                            padding: 1px; 
+                            margin: 0px;
                             float: left; 
-                            width: 14%; 
-                            height: 80px; /*font-size: 4em;*/
-                            font-size: 1em; 
-                            text-align: left; 
-                            background-color: #FEFEFE;
-                            font-weight: bold;
+                            min-height: 110px;
+                            /*height: 80px; */
+                            /*font-size: 4em;*/
+                            font-size: 1.2em; 
+                            text-align: right; 
+                            /* background-color: #FEFEFE; */
+                            font-weight: normal;
+                            border-right: 1px solid #CCCCCC;
+                            border-bottom: 1px solid #CCCCCC;
+                            background-color: #ebebeb;
+                            padding: 5px;
+                            width: 152px;
+                            /* width: 14%; */
                         }
                         #selectable li:hover {
                             cursor: pointer;
+                            background-color: #f0f0f0;
                         }
-                        #selectable .blank-date { background-color: #F5F5F5; }
-                        #selectable .right-over { border-right: 1px solid #D9D7D9; }
-                        #selectable .left-over { border-left: 1px solid #D9D7D9; }
-                        #selectable-day { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+                        
+                        #selectable li.left-over { border-left: none; }
+                        #selectable li.right-over { border-right: 1px solid #cccccc; width: 180px; }
+                        #selectable .blank-date { }
+                        
+                        #selectable-day { 
+                            list-style-type: none; 
+                            margin: 0; 
+                            padding: 0; 
+                            /* width: 100%; */
+                            overflow: hidden;
+                            border-left: 1px solid #CCCCCC;
+                            border-top: 1px solid #CCCCCC;
+                            border-right: 1px solid #CCCCCC;
+                        }
                         #selectable-day li { 
                             margin: 0px; 
-                            padding: 1px; 
+                            padding: 20px 0px 10px 0px; 
                             float: left; 
                             width: 14%; 
-                            height: 40px; /*font-size: 4em;*/
-                            font-size: 1em; 
-                            text-align: center; 
+                            height: auto; /*font-size: 4em;*/
+                            font-size: 1.2em; 
+                            text-align: right;                             
+                        }
+                        
+                        #calendar-content {
+                            background-color: #FFFFFF;
+                            overflow: hidden;
+                            margin-top: 20px;
+                        }
+                        .calendar-container {
+                            border-top: 1px solid #CCCCCC;
+                            border-left: 1px solid #CCCCCC;
+                            overflow: hidden;
+                        }
+                        .calendar-date-point {
+                            display: block;
+                            font-size: 20px;
+                            margin: 5px;
                         }
                     </style>';
         }

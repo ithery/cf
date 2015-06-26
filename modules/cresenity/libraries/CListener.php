@@ -7,6 +7,7 @@
         protected $owner;
         protected $confirm;
         protected $confirm_message;
+		protected $no_double;
 
         protected function __construct($owner, $event) {
             parent::__construct();
@@ -16,6 +17,7 @@
             $this->handlers = array();
             $this->confirm = false;
             $this->confirm_message = "";
+            $this->no_double = false;
             $this->event = $event;
         }
 
@@ -26,6 +28,10 @@
 
         public function set_confirm($bool) {
             $this->confirm = $bool;
+            return $this;
+        }
+        public function set_no_double($bool) {
+            $this->no_double = $bool;
             return $this;
         }
         
@@ -67,7 +73,21 @@
         public function js($indent = 0) {
             $js = new CStringBuilder();
             $js->set_indent($indent);
-            $handlers_script = "";
+            
+			
+			$start_script = "
+				var thiselm=jQuery(this);
+				var clicked = thiselm.attr('data-clicked');
+			";
+			if($this->no_double) {
+				$start_script.="
+					if(clicked) return false;
+				";
+			}
+			$start_script.="
+				thiselm.attr('data-clicked','1');
+			";
+			$handlers_script = "";
             foreach ($this->handlers as $handler) {
                 $handlers_script.= $handler->js();
             }
@@ -80,11 +100,16 @@
                     $confirm_message = clang::__('Are you sure') ." ?";
                 }
                 $confirm_start_script = "
+				
+				
+				
 				bootbox.confirm('".$confirm_message."', function(confirmed) {
 					if(confirmed) {
 			";
 
                 $confirm_end_script = "
+					} else {
+						thiselm.removeAttr('data-clicked');
 					}
 				});
 			";
@@ -93,6 +118,7 @@
             $js->append("
 			jQuery('#" . $this->owner . "')." . $this->event . "(function() {				
 				
+				" . $start_script . "
 				" . $confirm_start_script . "
 				" . $handlers_script . "
 				" . $confirm_end_script . "

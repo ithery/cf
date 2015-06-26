@@ -27,9 +27,10 @@ class CForm extends CElement {
     public function __construct($form_id = "") {
         parent::__construct($form_id);
 		$this->tag = 'form';
-        $this->name = $form_id;
+        
+		$this->name = $this->id;
         $this->method = "POST";
-        $this->target = "";
+        $this->target = "_self";
         $this->layout = "horizontal";
         $this->action = "";
         $this->autocomplete = true;

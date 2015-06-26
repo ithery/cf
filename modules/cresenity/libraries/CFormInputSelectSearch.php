@@ -8,7 +8,7 @@ class CFormInputSelectSearch extends CFormInput {
 	
 	protected $placeholder;
 
-	public function __construct($id) {
+        public function __construct($id) {
 		parent::__construct($id);
 		
 		$this->type="selectsearch";
@@ -40,6 +40,7 @@ class CFormInputSelectSearch extends CFormInput {
 		$this->query = $query;
 		return $this;
 	}
+       
 	public function set_format_result($fmt) {
 		$this->format_result = $fmt;
 		return $this;
@@ -54,7 +55,7 @@ class CFormInputSelectSearch extends CFormInput {
 		$this->placeholder = $placeholder;
 		return $this;
 	}
-	
+        
 	public function html($indent=0) {
 		$html = new CStringBuilder();
 		$custom_css = $this->custom_css;

@@ -157,7 +157,7 @@ class CTreeDB {
         $db->query($q);
     }
 
-    public function update($id, $data, $parent_id = NULL) {
+    public function update($id, $data, $parent_id) {
         $app = CApp::instance();
         $user = $app->user();
         $db = $this->db;

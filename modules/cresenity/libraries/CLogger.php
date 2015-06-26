@@ -50,18 +50,12 @@
                 }
             }
 
-            if (!file_exists($this->_log_path) && !is_dir($this->_log_path)) {
+            if (!is_dir($this->_log_path)) {
                 mkdir($this->_log_path);
             }
 
             if ($this->_additional_path != NULL) {
-                $temp_dir = explode(DS, $this->_additional_path);
-                foreach ($temp_dir as $k => $v) {
-                    $this->_log_path .= $v .DS;
-                    if (!file_exists($this->_log_path) && !is_dir($this->_log_path)) {
-                        mkdir($this->_log_path);
-                    }
-                }
+                
             }
         }
 
@@ -82,7 +76,7 @@
             if ($this->_level >= self::DEBUG) {
                 $trace = array_slice(debug_backtrace(), 1);
                 $msg_trace = $this->__backtrace($trace);
-                $message .= "\n" .$msg_trace . "\n";
+                $message .= $msg_trace . "\n";
             }
 
             if (!$fp = @fopen($this->_file_path, 'ab')) {

@@ -17,6 +17,7 @@ class CWidget extends CElement {
     public $custom_html;
     public $header_action_style;
     public $height;
+    public $attr;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -35,6 +36,7 @@ class CWidget extends CElement {
         $this->header_action_list = CActionList::factory();
         $this->header_action_style = 'widget-action';
         $this->header_action_list->set_style('widget-action');
+        $this->attr = array();
     }
 	
 	
@@ -110,7 +112,12 @@ class CWidget extends CElement {
         $this->info_tip = $info_tip;
         return $this;
     }
-
+    
+    public function add_content_attr($k, $v) {
+        $this->attr[$k] = $v;
+        return $this;
+    }
+    
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -160,8 +167,17 @@ class CWidget extends CElement {
         if (strlen($this->height) > 0) {
             $str_height = ' height="' . $this->height . 'px"';
         }
+        
+//        cdbg::var_dump($this->attr);
+        $content_attr = '';
+        if (count($this->attr) > 0) {
+            foreach ($this->attr as $attr_k => $attr_v) {
+                $content_attr .= $attr_k.'="'.$attr_v.'" ';
+            }
+        }
+        
         $html->appendln('	</div>');
-        $html->appendln('	<div class="widget-content ' . $nopadding . $scroll_class . '"' . $str_height . '>');
+        $html->appendln('	<div class="widget-content ' . $nopadding . $scroll_class . '"' . $str_height . $content_attr. '>');
         $html->appendln('		' . parent::html() . '');
         $html->appendln('	</div>');
         $html->appendln('</div>');
