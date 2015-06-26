@@ -80,31 +80,58 @@ scrolltotop.init();
 	jQuery(document).on('click','a.confirm',function(e) {
 		var ahref = $(this).attr('href');
 		var message = $(this).attr('data-confirm-message');
+		var no_double = $(this).attr('data-no-double');
+		var clicked = $(this).attr('data-clicked');
+		var btn=jQuery(this);
+		btn.attr('data-clicked','1');
+		if(no_double) {
+			if(clicked==1) return false;
+		}
+		
 		if(!message) {
-                    message = "<?php echo clang::__('Are you sure').' ?'; ?>";
-                } else {
-                    message = $.cresenity.base64.decode(message);
-                }
+			message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+		} else {
+			message = $.cresenity.base64.decode(message);
+		}
+		
+		str_confirm = "<?php echo clang::__('OK'); ?>";
+		str_cancel = "<?php echo clang::__('Cancel'); ?>";
 		e.preventDefault();
 		e.stopPropagation();
 		bootbox.confirm(message, function(confirmed) {
 			if(confirmed) {
 				window.location.href=ahref;
+			} else {
+				btn.removeAttr('data-clicked');
 			}
 		});
+		return false;
 	});
 	jQuery(document).on('click','input[type=submit].confirm',function(e) {
+		
+		var submitted = $(this).attr('data-submitted');
+		var btn = jQuery(this);
+		if(submitted=='1') return false; 
+		btn.attr('data-submitted','1');
 		var message = $(this).attr('data-confirm-message');
 		if(!message) {
-                    message = "<?php echo clang::__('Are you sure').' ?'; ?>";
-                } else {
-                    message = $.cresenity.base64.decode(message);
-                }
-		bootbox.confirm(message, function(confirmed) {
+			message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+		} else {
+			message = $.cresenity.base64.decode(message);
+		}
+		
+		
+		str_confirm = "<?php echo clang::__('OK'); ?>";
+		str_cancel = "<?php echo clang::__('Cancel'); ?>";
+		
+		bootbox.confirm(message,str_cancel,str_confirm, function(confirmed) {
 			if(confirmed) {
 				jQuery(e.target).closest('form').submit();
+			} else {
+				btn.removeAttr('data-submitted');
 			}
 		});
+	
 		return false;
 	});
 
