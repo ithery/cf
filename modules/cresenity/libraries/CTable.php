@@ -54,9 +54,8 @@
         public $pdf_orientation;
         public $show_header;
         public $report_header = array();
-		public $footer_action_list = array();
-		public $footer_action_style;
-		
+        public $footer_action_list = array();
+        public $footer_action_style;
         protected $quick_search = FALSE;
         protected $tbody_id;
         protected $js_cell;
@@ -119,12 +118,12 @@
             $this->tbody_id = '';
 
             $this->report_header = array();
-			$this->footer_action_list = CActionList::factory();
-			$this->footer_action_style = 'btn-dropdown';
-			$this->footer_action_list->set_style('btn-dropdown');
-			
-			//$this->add_footer_action('export_excel');
-			
+            $this->footer_action_list = CActionList::factory();
+            $this->footer_action_style = 'btn-dropdown';
+            $this->footer_action_list->set_style('btn-dropdown');
+
+            //$this->add_footer_action('export_excel');
+
             CClientModules::instance()->register_module('jquery.datatable');
         }
 
@@ -138,22 +137,22 @@
 
             return $this;
         }
-		
-		public function add_footer_action($id = "") {
-			$row_act = CAction::factory($id);
-			$this->footer_action_list->add($row_act);
-			if($id=='export_excel') {
-				$row_act->set_label('Download Excel');
-				$row_act->add_listener('click')->add_handler('custom')->set_js("alert('a');");
-			}
-			return $row_act;
-		}
-		
-		public function have_footer_action() {
-			//return $this->can_edit||$this->can_delete||$this->can_view;
-			return $this->footer_action_list->child_count() > 0;
-		}
-		
+
+        public function add_footer_action($id = "") {
+            $row_act = CAction::factory($id);
+            $this->footer_action_list->add($row_act);
+            if ($id == 'export_excel') {
+                $row_act->set_label('Download Excel');
+                $row_act->add_listener('click')->add_handler('custom')->set_js("alert('a');");
+            }
+            return $row_act;
+        }
+
+        public function have_footer_action() {
+            //return $this->can_edit||$this->can_delete||$this->can_view;
+            return $this->footer_action_list->child_count() > 0;
+        }
+
         public function is_exported() {
             return $this->export_excel || $this->export_excelxml || $this->export_excelcsv || $this->export_pdf;
         }
@@ -183,13 +182,15 @@
             $this->show_header = $bool;
             return $this;
         }
-        
+
         public function set_quick_search($quick_search) {
-            $this->quick_search = $quick_search; return $this;
+            $this->quick_search = $quick_search;
+            return $this;
         }
-        
-        public function set_tbody_id($id){
-            $this->tbody_id = $id; return $this;
+
+        public function set_tbody_id($id) {
+            $this->tbody_id = $id;
+            return $this;
         }
 
         public function add_footer_field($label, $value, $align = "left", $labelcolspan = 0) {
@@ -283,7 +284,7 @@
             $this->columns[] = $col;
             return $col;
         }
-        
+
         public function set_group_by($group_by) {
             $this->group_by = $group_by;
             return $this;
@@ -524,30 +525,37 @@
                         </link></meta>
                         <style>
 
-                        table {mso-displayed-decimal-separator:"\.";
-                        mso-displayed-thousand-separator:"\,";}
-                        col{mso-width-source:auto;}
+                        table {
+                            mso-displayed-decimal-separator:"\.";
+                            mso-displayed-thousand-separator:"\,";
+                        }
+                        col{
+                            mso-width-source:auto;
+                        }
                         td{
                                 font-size:8pt;
                                 font-family:Arial;
 
                         }
-                        th{font-size:8pt;font-family:Arial;}
+                        th{
+                            font-size:8pt;font-family:Arial;
+                        }
+                        table thead th {
+                             background:#000;
+                            border-top:.5pt solid #545454;
+                            border-left:.5pt solid #545454;
+                            border-right:.5pt solid #545454;
+                            border-bottom:.5pt solid #545454;
+                            color:#fff;
+                        }
                         @Page{
-                        mso-header-data:"&L&BInternational&B&C&BAsia Pacific&B&R&BPage &P&B";
-                        mso-footer-data:"&L&022Arial022Asia Pacific&R2011-09-08";
-                        margin:1.0in .75in 1.0in .75in;
-                        mso-header-margin:.5in;
-                        mso-footer-margin:.5in;
+                            mso-header-data:"&L&BInternational&B&C&BAsia Pacific&B&R&BPage &P&B";
+                            mso-footer-data:"&L&022Arial022Asia Pacific&R2011-09-08";
+                            margin:1.0in .75in 1.0in .75in;
+                            mso-header-margin:.5in;
+                            mso-footer-margin:.5in;
                         }
-                        table.data th.thead{
-                          background:#000;
-                          border-top:.5pt solid #545454;
-                          border-left:.5pt solid #545454;
-                          border-right:.5pt solid #545454;
-                          border-bottom:.5pt solid #545454;
-                          color:#fff;
-                        }
+                       
 
                         .tfoot{
                           background:#000;
@@ -582,6 +590,14 @@
                         <body>';
             echo '<table class="data table table-bordered table-striped responsive" id="' . $this->id . '">';
             echo '<thead>';
+
+            $header_count = count($this->report_header);
+            $total_column = count($this->columns);
+            $addition_column = 0;
+            if ($this->numbering) $addition_column++;
+            for ($ii = 1; $ii <= $header_count; $ii++) {
+                echo '<tr><td colspan="' . ($total_column + $addition_column) . '">' . $this->report_header[$ii - 1] . '</td></tr>';
+            }
             if (strlen($this->custom_column_header) > 0) {
                 echo $this->custom_column_header;
             }
@@ -716,7 +732,7 @@
                     }
 
                     $fval = $f["value"];
-                    
+
                     if (is_array($fval)) {
                         $skip_column = 0;
 
@@ -1024,9 +1040,9 @@
                 $html->dec_indent()->appendln("</thead>")->br();
             }
 
-            $tbody_id =(strlen($this->tbody_id) > 0 ? "id='" .$this->tbody_id ."' " : "");
-            
-            $html->appendln("<tbody " .$tbody_id ." >" . $data_responsive_close)->inc_indent()->br();
+            $tbody_id = (strlen($this->tbody_id) > 0 ? "id='" . $this->tbody_id . "' " : "");
+
+            $html->appendln("<tbody " . $tbody_id . " >" . $data_responsive_close)->inc_indent()->br();
             //render body;
             $no = 0;
             if (!$this->ajax) {
@@ -1035,7 +1051,7 @@
                         $html->appendln($row->html());
                         continue;
                     }
-                    
+
                     $no++;
                     $key = "";
 
@@ -1189,11 +1205,12 @@
                     }
 
                     $fval = $f["value"];
-                    if($fval instanceof CRenderable) {
+                    if ($fval instanceof CRenderable) {
                         $html->inc_indent()->appendln('<td class="' . $class . '">')->br();
                         $html->appendln($fval->html($indent))->br();
                         $html->dec_indent()->appendln('</td>')->br();
-                    } else if (is_array($fval)) {
+                    }
+                    else if (is_array($fval)) {
                         $skip_column = 0;
 
                         foreach ($this->columns as $col) {
@@ -1262,8 +1279,8 @@
               $html->append($modal->html($html->get_indent()));
               }
              */
-            
-            
+
+
 
 
             return $html->text();
@@ -1334,7 +1351,7 @@
                     $aojson["bSortable"] = $col->sortable && $this->header_sortable;
                     $aojson["bSearchable"] = $col->searchable;
                     $aojson["bVisible"] = $col->visible;
-                    
+
                     $js->appendln("
                             
 					vaoColumns.push( " . json_encode($aojson) . " );");
@@ -1346,12 +1363,12 @@
                     $aojson["bVisible"] = true;
                     $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
                 }
-                
-                
+
+
 
                 $js->appendln("var tableStyled_" . $this->id . " = false;")->br()->
                         appendln("var oTable = table.dataTable({")->br()->inc_indent();
-                
+
                 if ($this->ajax) {
                     $js->append("")
                             ->appendln("'bRetrieve': true,")->br()
@@ -1392,11 +1409,11 @@
 							//$('td:eq(4)', nRow).html( '<b>A</b>' );
 						//$.cresenity.set_confirm($('a.confirm',nRow));
 						
-						var footer_action = $('#footer_action_".$this->id."');
+						var footer_action = $('#footer_action_" . $this->id . "');
 						
-						".($this->have_footer_action()?"footer_action.html(".json_encode($this->footer_action_list->html()).");":"")." 
+						" . ($this->have_footer_action() ? "footer_action.html(" . json_encode($this->footer_action_list->html()) . ");" : "") . " 
            
-						".($this->have_footer_action()?"".$this->footer_action_list->js()."":"")." 
+						" . ($this->have_footer_action() ? "" . $this->footer_action_list->js() . "" : "") . " 
 						
 						footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
 						
@@ -1480,7 +1497,7 @@
 
                 $js->append("")
                         ->appendln("'sPaginationType': 'full_numbers',")->br()
-                        ->appendln("'sDom': '<\"\"l>t<\"F\"f<\"#footer_action_".$this->id."\">rp>',")->br()
+                        ->appendln("'sDom': '<\"\"l>t<\"F\"f<\"#footer_action_" . $this->id . "\">rp>',")->br()
                 ;
                 /*
                   $js->append("
@@ -1542,14 +1559,13 @@
 //                                        .draw();
 //                                } );
 //                            } );");
-                
                 //$js->appendln("oTable.fnSortOnOff( '_all', false );")->br();
-                
-                $js->appendln('function buildFilters_'.$this->id.'() {')->br()
-                    ->appendln("var quick_search = jQuery('<tr>');")->br()
-                    ->appendln("jQuery('#" . $this->id . " thead th').each( function (i) {
+
+                $js->appendln('function buildFilters_' . $this->id . '() {')->br()
+                        ->appendln("var quick_search = jQuery('<tr>');")->br()
+                        ->appendln("jQuery('#" . $this->id . " thead th').each( function (i) {
                             var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
-                            var have_action = ".($this->have_action()?"1":"0").";
+                            var have_action = " . ($this->have_action() ? "1" : "0") . ";
                             
                            
                             var total_th = jQuery('#" . $this->id . " thead th').length;
@@ -1557,7 +1573,7 @@
                             if(!(have_action==1&&(total_th-1==jQuery(this).index()))) {
                                 
                             
-                                var all_column = ".json_encode($this->columns).";
+                                var all_column = " . json_encode($this->columns) . ";
                                 var column = all_column[jQuery(this).index()];
                                 var transforms = JSON.stringify(column.transforms);
                                 if(column.searchable) {
@@ -1575,17 +1591,17 @@
                             var td = jQuery('<td>').append(input);
                             quick_search.append(td);
                         });")->br()
-                    ->appendln("table.children('thead').append(quick_search);")->br()
-                    ->appendln('}')->br()
-                    ->appendln('var dttable_quick_search = ' .($this->quick_search ? "1" : "0") .';')->br()
-                    ->appendln('if (dttable_quick_search == "1") { buildFilters_'.$this->id.'(); }')
-                        ;
-                
+                        ->appendln("table.children('thead').append(quick_search);")->br()
+                        ->appendln('}')->br()
+                        ->appendln('var dttable_quick_search = ' . ($this->quick_search ? "1" : "0") . ';')->br()
+                        ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }')
+                ;
+
                 $js->appendln("jQuery('.data_table-quick_search').on('keyup', function(){
                             table.fnClearTable( 0 );
                             table.fnDraw();
                         });")
-                        ;
+                ;
             }
             if ($this->checkbox) {
                 $js->appendln("
@@ -1615,24 +1631,22 @@
                     }
                 }
             }
-            
+
             if ($this->footer) {
-               
+
                 foreach ($this->footer_field as $f) {
                     $fval = $f["value"];
-                    if($fval instanceof CRenderable) {
-                         $js->appendln($fval->js())->br();
+                    if ($fval instanceof CRenderable) {
+                        $js->appendln($fval->js())->br();
                     }
                 }
             }
-            
-            
+
+
 //            clog::write($js->text());
             return $js->text();
         }
-        
-        
-        
+
     }
 
 ?>
