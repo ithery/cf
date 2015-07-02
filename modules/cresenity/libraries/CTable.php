@@ -118,12 +118,12 @@
             $this->tbody_id = '';
 
             $this->report_header = array();
-            $this->footer_action_list = CActionList::factory();
-            $this->footer_action_style = 'btn-dropdown';
-            $this->footer_action_list->set_style('btn-dropdown');
-
-            //$this->add_footer_action('export_excel');
-
+			$this->footer_action_list = CActionList::factory();
+			$this->footer_action_style = 'btn-dropdown';
+			$this->footer_action_list->set_style('btn-dropdown');
+			
+			$this->add_footer_action('export_excel');
+			
             CClientModules::instance()->register_module('jquery.datatable');
         }
 
@@ -555,7 +555,14 @@
                             mso-header-margin:.5in;
                             mso-footer-margin:.5in;
                         }
-                       
+                        table.data th.thead{
+                          background:#000;
+                          border-top:.5pt solid #545454;
+                          border-left:.5pt solid #545454;
+                          border-right:.5pt solid #545454;
+                          border-bottom:.5pt solid #545454;
+                          color:#fff;
+                        }
 
                         .tfoot{
                           background:#000;

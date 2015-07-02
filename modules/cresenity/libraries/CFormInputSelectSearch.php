@@ -128,8 +128,9 @@ class CFormInputSelectSearch extends CFormInput {
 		
 			$str_js_init = "
 				initSelection : function (element, callback) {
-			
+					
 				var data = ".$rjson."
+				
 				callback(data);
 			},
 			";

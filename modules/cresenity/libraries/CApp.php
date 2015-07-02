@@ -374,6 +374,7 @@
                 $this->register_client_module('font-awesome');
                 $this->register_client_module('jquery.ui');
                 $this->register_client_module('jquery.dialog2');
+                $this->register_client_module('slimscroll');
                 $this->register_client_module('cresenity');
                 $this->register_client_module('fileupload');
                 $this->register_client_module('wysihtml5');
@@ -382,7 +383,6 @@
                 $this->register_client_module('form');
                 $this->register_client_module('controls');
                 $this->register_client_module('event');
-                $this->register_client_module('slimscroll');
                 $this->register_client_module('effects');
                 $this->register_client_module('validation');
 
