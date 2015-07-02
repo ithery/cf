@@ -122,7 +122,7 @@
 			$this->footer_action_style = 'btn-dropdown';
 			$this->footer_action_list->set_style('btn-dropdown');
 			
-			$this->add_footer_action('export_excel');
+			//$this->add_footer_action('export_excel');
 			
             CClientModules::instance()->register_module('jquery.datatable');
         }
