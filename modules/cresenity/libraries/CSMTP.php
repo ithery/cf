@@ -101,6 +101,14 @@ class CSMTP {
 		$this->smtp->AddReplyTo($email,$name);
 		return $this;
 	}
+	public function add_attachment($path,$name="") {
+		$this->smtp->AddAttachment($path,$name);
+		return $this;
+	}
+	public function add_attachment_string($str,$filename="", $encoding = 'base64', $type = 'application/octet-stream') {
+		$this->smtp->AddStringAttachment($str, $filename, $encoding, $type);
+		return $this;
+	}
 	
 	public function add_to($email,$name="") {
 		if(strlen($name)==0) $name = $email;
