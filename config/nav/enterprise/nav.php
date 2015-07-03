@@ -84,6 +84,12 @@ return array(
 		"subnav"=>include dirname(__FILE__)."/subnav/transaction.php",
 	),
 	array(
+		"name"=>"cost_menu",
+		"label"=>"Cost",
+		"icon"=>"list-alt",
+		"subnav"=>include dirname(__FILE__)."/subnav/cost.php",
+	),
+	array(
 		
 		"name"=>"cash_bank_menu",
 		"label"=>"Cash Bank",

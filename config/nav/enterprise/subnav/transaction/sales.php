@@ -144,6 +144,9 @@ return array(
 		"label"=>"Sales Revision List",
 		"controller"=>"sales_revision",
 		"method"=>"index",
+		"requirements"=>array(
+			"have_sales_revision"=>true,
+		),
 		'action'=>array(
 			array(
 				'name'=>'detail_sales_revision',

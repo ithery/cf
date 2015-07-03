@@ -116,36 +116,6 @@ return array(
 				"have_warehouse"=>true,
 			),
 		),
-		array(
-			"name"=>"cost",
-			"label"=>"Cost",
-			"controller"=>"cost",
-			"method"=>"index",
-			'action'=>array(
-				array(
-					'name'=>'add_cost',
-					'label'=>'Add',
-					'controller'=>'cost',
-					'method'=>'add',
-				),
-				array(
-					'name'=>'edit_cost',
-					'label'=>'Edit',
-					'controller'=>'cost',
-					'method'=>'edit',
-				),
-				array(
-					'name'=>'delete_cost',
-					'label'=>'Delete',
-					'controller'=>'cost',
-					'method'=>'delete',
-				),
-			),
-			"requirements"=>array(
-				"have_cost"=>true,
-			),
-			//end action cost
-		),
 		
 		array(
 			"name"=>"bank",
