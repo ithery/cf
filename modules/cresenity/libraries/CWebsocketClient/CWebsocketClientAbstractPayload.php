@@ -41,9 +41,11 @@ abstract class CWebsocketClientAbstractPayload {
     protected function mask_data($data) {
         $masked = '';
         $data   = str_split($data);
-        $key    = str_split($this->maskKey);
+        $key    = str_split($this->mask_key);
+		
         foreach ($data as $i => $letter) {
             $masked .= $letter ^ $key[$i % 4];
+			
         }
         return $masked;
     }

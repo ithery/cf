@@ -25,12 +25,14 @@ class CWebsocketClientEncoder extends CWebsocketClientAbstractPayload
         $this->mask    = (bool) $mask;
         if (true === $this->mask) {
             $this->mask_key = $this->generateRandomdMT(4);
+			
         }
+		
     }
 	public function generateRandomdMT($length) {
 	   $validCharacters = 'abcdefghijklmnopqrstuvwxyz0123456789';
 	   $myKeeper = '';
-	   for ($n = 1; $n < $length; $n++) {
+	   for ($n = 1; $n <= $length; $n++) {
 		  $whichCharacter = mt_rand(0, strlen($validCharacters)-1);
 		  $myKeeper .= $validCharacters{$whichCharacter};
 	   }
@@ -63,10 +65,13 @@ class CWebsocketClientEncoder extends CWebsocketClientAbstractPayload
         $payload = ($payload   << 4) | $this->op_code;
         $payload = ($payload   << 1) | $this->mask;
         $payload = ($payload   << 7) | $length;
+		
         $data    = $this->data;
         $payload = pack('n', $payload) . $pack;
+		
         if (true === $this->mask) {
             $payload .= $this->mask_key;
+			
             $data     = $this->mask_data($data);
         }
         $this->payload = $payload . $data;

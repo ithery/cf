@@ -22,9 +22,10 @@ class CWebsocketClientDecoder extends CWebsocketClientAbstractPayload
         if (null !== $this->data) {
             return;
         }
-        $length = count($this);
+        $length = $this->count();
         // if ($payload !== null) and ($payload packet error)?
         // invalid websocket packet data or not (text, binary opCode)
+		
         if (3 > $length) {
             return;
         }
@@ -45,6 +46,7 @@ class CWebsocketClientDecoder extends CWebsocketClientAbstractPayload
             $payload_offset += 4;
         }
         $data = substr($payload, $payload_offset, $length);
+		
         if (true === $this->mask) {
             $data = $this->mask_data($data);
         }
