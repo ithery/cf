@@ -1,334 +1,176 @@
 <html>
     <head>
         <style>
-            html{
-                margin-left:2.0cm;
-                margin-top:1.5cm;
-            }
-            .tors-space {
-                height: 10px;
-            }
-            .spacing { 
-                word-spacing: 2px; 
-                letter-spacing: 3px;  
-            } 
-            .tors-head {
-                width: 720px;
-                height: 40px;
-                font-size: 8pt;
-                padding-top: 10px;
-                font-weight: bold;
-            }
-            .tors-body {
-                width: 720px;
-                height: 20px;
-                font-size: 7pt;
-                /*line-height: 25px;*/
-                padding-top: 5px;
-                font-weight: bold;
-            }
-            #date {
-                padding-left: 50px;
-            }
-            #jajal {
-                padding-left: 10px;
-            }
-            .footer { 
-                position: fixed; 
-                bottom: 0px; 
-                /*page-break-after:always;*/
-                /*position: relative;*/
-            }
             body{
-                font-family:Helvetica;
+                font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 font-size:12px;
-                margin:auto;
             }
-            #table-content td{
-                padding:1px 3px;
+            .row {
+                overflow: hidden;
+                width: 100%;
+                display: block;
+            }
+            .span6 { width: 50%; float:left;}
+            .left { text-align: left; float:left;}
+            .right { text-align: right; float:right;}
+            #voucher-header { border: 1px solid #000;}
+            .border { border: 1px solid #464646;}
+            h2 { font-size: 20px; font-weight: bold;}
+            .bottom-row { text-decoration: underline;}
+            table.table { width: 100%; margin: 0; padding: 0;}
+            table.table-pax { width: 97%;}
+            table.table-pax thead {
+                background-color : #E75214;
+            }
+            table.table-pax tfoot {
+                background-color : #CCCCCC;
+                font-weight: bold;
             }
         </style>
     </head>
     <body>
-        <div>
-            <table>
-                <tr>
-                    <td><img src="application/torsb2b/default/media/img/ticket/xpress-air.jpg" style="height: 90px;"/></td>
-                    <td style="padding-left: 170px;"><img src="application/torsb2b/default/media/img//ticket/barcode_ea.jpg" style="height: 80px;"/></td>
-                </tr>
-            </table>
-        </div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div>
-            <table style="width: 650px;">
-                <tr>
-                    <td style="color: #006dcc; font-size: 18pt;">TIKET</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 11pt; font-style: italic;">Silahkan cetak konfirmasi ini dan bawalah ke check-in counter. Konfirmasi ini<br>juga akan dikirim ke alamat e-mail anda.</td>
-                </tr>
-            </table>
-        </div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div>
-            <table style="width: 650px;">
-                <tr>
-                    <td style="font-size: 11pt;">NOMOR RESERVASI: ECMJYP</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 11pt;">KODE PIN: 6095</td>
-                </tr>
-            </table>
-        </div>
-        <div class="tors-space"></div>
-        <div>
-            <table style="width: 650px;">
-                <tr>
-                    <td style="font-size: 11pt;">ID Penjual: 
-					superadmin di Travons, Telpon: </td>
-                </tr>
-            </table>
-        </div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div class="tors-space"></div>
-        <div>
-            <table style="width: 500px;">
-                <tr>
-                    <td colspan="7" style="color: #006dcc; font-size: 12pt;">Kontak Utama pemimpin group</td>
-                </tr>
-                <tr>
-                    <td colspan="7" style="color: #006dcc; font-size: 1pt;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">Nama Depan dan Belakang</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">Bambang Anggoro</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">Perusahaan</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">ITB</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">Alamat</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">Bandung</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">Negara</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">Indonesia</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">No Ponsel</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">+62 811210564</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">No. Telpon lainnya</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">+62</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">Email</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">heranku@gmail.com</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 9pt;">Jenis Pembayaran</td>
-                    <td>:</td>
-                    <td style="font-size: 9pt;">Voucher</td>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-            </table>
-        </div>
-        <div style="page-break-before: always;"></div>
-                        <div>
+                <table class="table">
+            <tr>
+                <td colspan="2" align="left">
                     <table>
                         <tr>
-                            <td><img src="application/torsb2b/default/media/img/ticket/xpress-air.jpg" style="height: 90px;"/></td>
-                            <td style="padding-left: 190px;"><img src="application/torsb2b/default/media/img/ticket/barcode_ea.jpg" style="height: 80px;"/></td>
+                            <td><img src="application/torsb2b/default/media/img/invoice/invoice_logo.png" height="65px"></td>
+                            <td style="padding-left: 20px; font-size: 10px;">
+                                Rodex Tours and Travel<br>
+                                Head Office<br>
+                                Jl. Raya Darmo 177 B Surabaya 60241<br>
+                                Hunting (031)-5662000, Fax (031)-5619909
+                            </td>
                         </tr>
                     </table>
-                </div>
-                <div class="tors-space"></div>
-                <div class="tors-space"></div>
-                <div class="tors-space"></div>
-                <div>
-                    <table style="width: 630px;">
+                </td>
+                <td colspan="2" align="center" valign="center">
+                    <h2>LETTER OF GUARANTEE</h2>
+                </td>
+            </tr>
+        </table>
+        <table class="table">
+            <tr>
+                <td class="border" width="260">
+                    <table>
                         <tr>
-                            <td colspan="7" style="font-size: 12pt;">TICKET </td>
+                            <td colspan="3">To :</td>
                         </tr>
                         <tr>
-                            <td colspan="7" style="color: #006dcc; font-size: 1pt;">&nbsp;</td>
+                            <td colspan="3">Trans Studio Bandung</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"></td>
                         </tr>
 
-                        <thead width="500px" style="font-weight: bold; font-size: 7.5pt; border-top: 2px solid black;">
-                                                                                    <tr>
-                                <td width="180px" style="padding-top: 10px; padding-bottom: 10px; padding-left: 10px; border-top: 1px solid black; background-color: #C8C8C8; font-size: 9pt;">Khumbaka<br>&nbsp;<span style="font-size: 8pt;">Pria</span></td>
-                                <td width="150px" style="padding-left: 10px; border-top: 1px solid black; background-color: #C8C8C8;">Tanggal</td>
-																	<td align="center" width="50px" style="border-top: 1px solid black; background-color: #C8C8C8;">Penerbangan</td>
-									<td align="center" width="50px" style="border-top: 1px solid black; background-color: #C8C8C8;">Berangkat</td>
-									<td align="center" width="30px" style="border-top: 1px solid black; background-color: #C8C8C8;">Tiba</td>
-									<td align="center" width="120px" style="padding-left: 10px; border-top: 1px solid black; background-color: #C8C8C8;">Harga</td>
-								                            </tr>
-                        </thead>
-                        <tbody style="font-size: 7.5pt;">
-							
-											<tr style="font-size: 8pt;">
-												<td style="vertical-align:text-top;">Sorong SOQ - Manokwari MKW Normal Tiket</td>
-												<td style="vertical-align:text-top;">Thu 01 January 1970<br>Boeing 737</td>
-												<td style="vertical-align:text-top;">55825</td>
-												<td style="vertical-align:text-top;">07:00</td>
-												<td style="vertical-align:text-top;">07:00</td>
-												<td align="right" style="vertical-align:text-top;"> Rp. 366.000,00</td>
-											</tr>
-										                                                        <tr>
-                                <td colspan="6">TCK#: </td>
-                            </tr>
-                            <tr>
-                                <td colspan="6">Telah naik ke pesawat</td>
-                            </tr>
-							                            <tr>
-                                <td colspan="5" style="font-weight: bold;">HARGA TIKET</td>
-                                <td align="right">Rp. 366.000,00</td>
-                            </tr>
-							                        </tbody>
                     </table>
-                </div>
-                <div class="tors-space"></div>
-                <div class="tors-space"></div>
-                <div class="tors-space"></div>
-                <div style="background-color: #ECE1CB; width: 660px;">
-                    <table style="padding-left: 5px; font-size: 7.5pt;;">
-                        <tr><td>&nbsp;</td></tr>
+                </td>
+                <td class="border" width="260">
+                    <table>
                         <tr>
-                            <td>Beberapa hal yang harus di ingat</td>
-                        </tr>
-                        <tr><td>&nbsp;</td></tr>
-                        <tr>
-                            <td style="font-weight: bold;">Check in</td>
+                            <td>Date Of Booking</td>
+                            <td> : </td>
+                            <td>02-07-2015</td>
                         </tr>
                         <tr>
-                            <td>Check in dibuka 2 jam sebelum keberangkatan. Check in ditutup 45 menit sebelum keberangkatan</td>
-                        </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="font-weight: bold;">Tiket</td>
+                            <td>Booking Code</td>
+                            <td> : </td>
+                            <td>TRTP1507-00006</td>
                         </tr>
                         <tr>
-                            <td>Tiket untuk perjalanan anda adalah e-tiket. Mohon membawa kode reservasi dan duplikat konfirmasi anda serta identitas diri padasaat cek in</td>
-                        </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="font-weight: bold;">Bagasi</td>
-                        </tr>
-                        <tr>
-                            <td style="text-decoration: underline;">Peraturan khusus Boeing 737</td>
-                        </tr>
-                        <tr>
-                            <td>1. Untuk kenyamanan penumpang dan keselamatan penerbangan, setiap penumpang diijinkan membawa 1 (satu) bagasi ke dalam kabin atau tas tenteng, dengan ukuran 50cm x 32cm x 16cm dan berat maksimum 7 (lima) kilogram.</td>
-                        </tr>
-                        <tr>
-                            <td>2. Berat bagasi Cuma-Cuma maksimum 20 kilogram untuk setiap penumpang.</td>
-                        </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="text-decoration: underline;">Peraturan khusus Dornier</td>
-                        </tr>
-                        <tr>
-                            <td>1. Untuk kenyamanan penumpang dan keselamatan penerbnagan, setiap penumpang diijinkan membawa 1 (satu) bagasi kedalam kabin atau tas tenteng dengan ukuran 25cm x 15cm x 8cm dan berat maksimum 2 (dua) kilogram.</td>
-                        </tr>
-                        <tr>
-                            <td>2. Berat bagasi Cuma-Cuma maksimum 10 kilogram untuk setiap penumpang.</td>
-                        </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="font-weight: bold;">Perubahan Tiket</td>
-                        </tr>
-                        <tr>
-                            <td>Anda dapat mengubah reservasi anda sendiri melalui website kami www.xpressair.co.id atau travel agen atau nomor layanan pelanggan Xpress Air 500 890 (24 jam).</td>
-                        </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="font-weight: bold;">Peraturan Harga: Normal</td>
+                            <td>Operator</td>
+                            <td> : </td>
+                            <td>system</td>
                         </tr>
                     </table>
-                    <table width="650px" style="margin-left: 10px; border: 1px solid black; font-size: 7.5pt;;">
-                        <thead style="margin-left: -4px; background-color: #C8C8C8;">
+                </td>
+            </tr>
+        </table>
+        <table class="table border">
+            <tr>
+                <td width="100">Visit Date</td>
+                <td width="10"> : </td>
+                <td colspan="2">02-07-2015</td>
+            </tr>
+            <tr>
+                <td>Contact Person</td>
+                <td> : </td>
+                <td>MR. Rudy Wijaya, abcd</td>
+            </tr>
                             <tr>
-                                <td width="150px" valign="top">Flight Changes</td>
-                                <td width="150px" valign="top">&nbsp;</td>
-                                <td width="150px" valign="top">Calcellations</td>
-                                <td width="150px" valign="top">&nbsp;</td>
-                            </tr>
-                        </thead>
-                        <tbody style="margin-left: -4px; background-color: white;">
-                            <tr>
-                                <td valign="top" style="border-bottom: 1px solid black;">&gt;24 Hrs to departure</td>
-                                <td valign="top" style="border-bottom: 1px solid black;">Free, Following the available<br>class</td>
-                                <td valign="top" style="border-bottom: 1px solid black;">&gt;24 Hrs to departure</td>
-                                <td valign="top" style="border-bottom: 1px solid black;">Refund Fee 50% x Basic<br>Fare<</td>
-                            </tr>
-                            <tr>
-                                <td valign="top" style="border-bottom: 1px solid black;">&lt;24 Hrs to departure</td>
-                                <td valign="top" style="border-bottom: 1px solid black;">Late Cancel Fee 25% x Basic<br>Fare</td>
-                                <td valign="top" style="border-bottom: 1px solid black;">&lt;24 Hrs prior to STD</td>
-                                <td valign="top" style="border-bottom: 1px solid black;">Refund Fee 75% x Basic<br>Fare</td>
-                            </tr>
-                            <tr>
-                                <td valign="top">&lt;3 Hrs prior to STD / No<br>Show</td>
-                                <td valign="top">Late Cancel Fee 50% x Basic<br>Fare</td>
-                                <td valign="top">&lt;3 Hrs prior to STD / No<br>Show</td>
-                                <td valign="top">Refund Fee 90% x Basic<br>Fare</td>
-                            </tr>
-                        </tbody>
+                    <td>Hotel Detail</td>
+                    <td> : </td>
+                    <td>abcd</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td> : </td>
+                    <td>abcd</td>
+                </tr>
                     </table>
-                    <table style="padding-left: 5px; font-size: 7.5pt;">
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td>Tiket NORMAL berlaku untuk 1 bulan.</td>
+
+        <div class="row">
+            <h2 class="bottom-row">RINCIAN PEMESANAN</h2>
+        </div>
+        <table class="table" style="margin-top: 20px; font-style: italic;">
+            <tr>
+                <td colspan="2" align="left">&nbsp;</td>
+                <td align="right"><b>Jenis Tiket : VOUCHER</b></td>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+        <table class="table-pax">
+            <thead>
+                <tr>
+                    <td width="15">No</td>
+                    <td width="140">Nama Tamu</td>
+                    <td width="20">Qty</td>
+                    <td width="100">Usia</td>
+                    <td>Nomor Paspor</td>
+                    <td>Expired Paspor</td>
+                    <td width="10"></td>
+                    <td align="center">Harga</td>
+                </tr>
+            </thead>
+            <tbody>
+                                        <tr>
+                            <td colspan="8" style="font-style: italic;"><b>Nama Paket / Sesi : Trans Studio Bandung / Paket Trans </b></td>
                         </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="text-decoration: underline;">Peraturan Khusus untuk Pembatalan dan Refund</td>
+                                                    <tr>
+                                <td>1</td>
+                                <td>MR.Rudy Wijaya</td>
+                                <td align="center">1</td>
+                                <td></td>
+                                <td>abcd</td>
+                                <td>01-01-1970</td>
+                                <td>IDR</td>
+                                <td align="right">
+                                    2,00                                </td>
+                            </tr>
+                                                    <tr>
+                            <td colspan="8">&nbsp;</td>
                         </tr>
-                        <tr>
-                            <td>Penumpang Off Load setelah Check In atau Bayi kurang dari 24 jam sebelum keberangkatan: Ticket akan hangus dan aturan ini berlaku untuk seluruh kelas dan jenis tiket.</td>
-                        </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="font-weight: bold;">Pesawat</td>
-                        </tr>
-                        <tr>
-                            <td>Seluruh rute penerbangan dioperasikan oleh Xpress Air</td>
-                        </tr>
-                        <tr><td style="font-size: 1pt;">&nbsp;</td></tr>
-                        <tr>
-                            <td style="font-weight: bold;">Syarat dan Kondisi Maskapai Penerbangan</td>
-                        </tr>
-                        <tr>
-                            <td>Dengan diterimanya tiket ini maka saya menyatakan bahwa Saya Mengerti dan Menyetujui Syarat & Kondisi Serta Peraturan Harga dari Maskapai Penerbangan.</td>
-                        </tr>
-                        <tr><td>&nbsp;</td></tr>
-                    </table>
-                </div>
-                                                </body>
+                                    </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6">GRAND TOTAL</td>
+                    <td>IDR</td>
+                    <td align="right">2,00</td>
+                </tr>
+            </tfoot>
+        </table>
+        <table>
+            <tr><td colspan="2">&nbsp;</td></tr>
+            <tr>
+                <td class="border" width="240" style="padding: 10px;">
+                    <p>We Guarantee this reservation made and Pay by Rodex Tours and Travel</p>
+                </td>
+                <td class="border" width="260">
+                    <p style="text-align: center; margin: 0;">Sincerely Yours,</p>
+                    <p>&nbsp;</p>
+                    <p style="text-align: center;">(system)</p>
+                </td>
+            </tr>
+        </table>
+    </body>
 </html>
