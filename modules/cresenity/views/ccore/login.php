@@ -270,7 +270,7 @@
 							var result = data.result;
 							var message = data.message;
 							if(result=="OK") {
-								document.location.href = '<?php echo curl::base(); ?>';
+								document.location.href = '<?php echo curl::base().curl::current().CFRouter::$query_string; ?>';
 							} else {
 								formLogin.clearMessages();
 								displayError(message);
