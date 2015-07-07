@@ -272,7 +272,8 @@
             // log each query into log file based on domain and org
             $is_log = carr::get($this->config, 'log', FALSE);
             if ($is_log == TRUE) {
-                $log_sql = $sql;
+                $log_sql = trim($sql);
+                $log_sql = preg_replace('#\s+#ims', ' ', $sql);
                 if (is_array($sql)) {
                     $log_sql = json_encode($sql);
                 }

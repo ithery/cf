@@ -54,9 +54,6 @@
                 mkdir($this->_log_path);
             }
 
-            if ($this->_additional_path != NULL) {
-                
-            }
         }
 
         /**
@@ -71,6 +68,17 @@
         }
 
         public function write($message) {
+            if ($this->_additional_path != NULL) {
+                $filename = date("Ymd") . "_" . $this->_suffix_filename . self::__EXT;
+                $this->_file_path = $this->_log_path;
+                $add_paths = explode('/', $this->_additional_path);
+                foreach ( $add_paths as $key => $value ) {
+                    $this->_file_path .= $value .DS;
+                    if (!file_exists($this->_file_path)) mkdir($this->_file_path);
+                }
+                $this->_file_path .= $filename;
+            }
+            
             $this->__get_level_name_by_const();
 
             if ($this->_level >= self::DEBUG) {
@@ -142,6 +150,7 @@
 
         public function set_additional_path($_additional_path) {
             $this->_additional_path = $_additional_path;
+            
             return $this;
         }
 
