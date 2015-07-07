@@ -134,7 +134,6 @@ return array(
 				'controller'=>'payable_purchase_giro_payment_list',
 				'method'=>'reject',
 			),
-			
 		),//end action purchase_giro_payment 
 	),
 	array(

@@ -19,6 +19,12 @@ return array(
 				'controller'=>'receiving',
 				'method'=>'detail',
 			),
+			array(
+				'name'=>'delete_receiving',
+				'label'=>'Delete Receiving',
+				'controller'=>'receiving',
+				'method'=>'delete',
+			),
 		),//end action receiving_list 
 	),
 );
