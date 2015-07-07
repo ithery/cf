@@ -1,6 +1,6 @@
 <?php 
 return array(
 	'app_id'=>'1',
-	'code'=>'manandang',
+	'code'=>'bosagnes',
 	'name'=>'Manandang',
 );
