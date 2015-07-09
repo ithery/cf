@@ -57,7 +57,7 @@ class cupload {
 			// throw new Kohana_Exception('upload.not_writable', $directory);
 			throw new Exception(CF::lang('upload.not_writable'));
 
-		if (is_uploaded_file($file['tmp_name']) AND move_uploaded_file($file['tmp_name'], $filename = $directory.$filename))
+		if (is_uploaded_file($file['tmp_name']) OR move_uploaded_file($file['tmp_name'], $filename = $directory.$filename))
 		{
 			if ($chmod !== FALSE)
 			{
@@ -67,7 +67,9 @@ class cupload {
 
 			// Return new file path
 			return $filename;
-		}
+		}else{
+            var_dump($file) or die();
+        }
 
 		return FALSE;
 	}
