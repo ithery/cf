@@ -2,6 +2,7 @@
 class CFormInputFileDrop extends CFormInput {
 	protected $multiple;
 	protected $applyjs;
+	protected $uniqid;
 	
 	public function __construct($id) {
 		parent::__construct($id);
@@ -9,6 +10,7 @@ class CFormInputFileDrop extends CFormInput {
 		$this->multiple=false;
 		$this->type="filedrop";
 		$this->applyjs="dropzone";
+        $this->uniqid = uniqid();
 		CClientModules::instance()->register_module('dropzone');
 	}
 	
@@ -27,8 +29,6 @@ class CFormInputFileDrop extends CFormInput {
 	public function set_lookup($query) {
 		
 	}
-	
-	
 	
 	public function html($indent=0) {
 		$html = new CStringBuilder();
@@ -52,7 +52,7 @@ class CFormInputFileDrop extends CFormInput {
 			<div id="'.$div_id.'" class="dropzone">
 				<div class="dz-message">
 					Drop files here or click to upload.<br />
-					<input type="hidden" id="'.$this->id.'" name="'.$this->id.'" value="'.$this->id.'" />
+					<input type="hidden" id="'.$this->id.'" name="'.$this->id.'" value="'.$this->id."_".$this->uniqid.'" />
 				</div>
 			</div>
 		');
@@ -62,15 +62,19 @@ class CFormInputFileDrop extends CFormInput {
 	public static function handle_file_drop($data) {
 		$session = Session::instance();
 		$id = $data->element_id;
+		$uniqid = $data->uniqid;
 		$files = array();
-		if($session->get($id.'_filedrop')) {
-			$files = $session->get($id.'_filedrop');
+		if($session->get($id."_".$uniqid.'_filedrop')) {
+			$files = $session->get($id."_".$uniqid.'_filedrop');
 		}
-		foreach($_FILES as $f) {
-			$files[] = $f;
+        
+        $temp_path = DOCROOT . "temp" . DS . "document";
+        foreach($_FILES as $f) {
+            move_uploaded_file($f['tmp_name'], $temp_path.DIRECTORY_SEPARATOR.$f['name']);
+			$f['tmp_name'] = $temp_path;
+            $files[] = $f;
 		}
-		$session->set($id.'_filedrop',$files);
-		
+		$session->set($id."_".$uniqid.'_filedrop',$files);
 	}
 	
 	
@@ -80,9 +84,8 @@ class CFormInputFileDrop extends CFormInput {
 			->set_type('callback')
 			->set_data('callable',array('CFormInputFileDrop','handle_file_drop'))
 			->set_data('element_id',$this->id)
-			
+			->set_data('uniqid',$this->uniqid)
 			->makeurl();
-		
 	}
 	
 	public static function get_files($id) {
@@ -101,9 +104,11 @@ class CFormInputFileDrop extends CFormInput {
 		$js->set_indent($indent);
 		if($this->applyjs=="dropzone") {
 			$js->appendln("
-				$('#".$div_id."').dropzone({url:'http://it-desk.local/project_issue/edit/problem/'});
+				$('#".$div_id."').dropzone({url:'".$ajax_url."'});
+			
 			");
 		}
+		
 		
 		return $js->text();
 		
