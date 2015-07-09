@@ -133,7 +133,7 @@
       acceptedFiles: null,
       acceptedMimeTypes: null,
       autoProcessQueue: true,
-      autoQueue: false,
+      autoQueue: true,
       addRemoveLinks: true,
       previewsContainer: null,
       capture: null,
