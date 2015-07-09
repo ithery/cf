@@ -244,5 +244,9 @@
             "js" => array("plugins" . DS . "jstree" . DS . "jstree.min.js"),
             "css" => array("plugins" . DS . "jstree" . DS . "style.min.css"),
         ),
+		"dropzone" => array(
+            "js" => array("plugins" . DS . "dropzone" . DS . "dropzone.js"),
+            "css" => array("plugins" . DS . "dropzone" . DS . "dropzone.css"),
+        ),
     );
 ?>

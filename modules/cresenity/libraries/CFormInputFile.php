@@ -7,7 +7,7 @@ class CFormInputFile extends CFormInput {
 		parent::__construct($id);
 		
 		$this->multiple=false;
-		$this->type="select";
+		$this->type="file";
 		$this->applyjs="file-upload";
 	}
 	
