@@ -258,7 +258,9 @@
             foreach ($this->listeners as $listener) {
                 $js->appendln($listener->js($js->get_indent()));
             }
+			
             $js->appendln(parent::js($js->get_indent()))->br();
+				
             return $js->text();
         }
 

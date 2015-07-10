@@ -6,7 +6,7 @@
      * @since  Apr 17, 2015
      * @license http://piposystem.com Piposystem
      */
-    class CTableRow extends CFormInput {
+    class CTableRow extends CElement {
 
         protected $columns = array();
 
@@ -48,12 +48,15 @@
         public function js($indent = 0) {
             $js = new CStringBuilder();
             $js->set_indent($indent);
-
+			$js->append(parent::js($indent))->br();
+			
             foreach ($this->columns as $column_k => $column_v) {
                 if ($column_v instanceof CRenderable) {
                     $js->append($column_v->js());
                 }
             }
+			
+
             return $js->text();
         }
 

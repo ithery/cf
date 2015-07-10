@@ -18,7 +18,11 @@ class CRenderable extends CObject implements IRenderable {
     public function child_count() {
         return count($this->renderable);
     }
-
+	
+	public function childs() {
+		return $this->renderable;
+	}
+	
     public function apply($key, $value, $class_name = '') {
         foreach ($this->renderable as $r) {
 
@@ -78,7 +82,8 @@ class CRenderable extends CObject implements IRenderable {
         $js->set_indent($indent);
         foreach ($this->renderable as $r) {
             if (CRenderable::is_instanceof($r)) {
-                $js->append($r->js($js->get_indent()));
+				$js->append($r->js($js->get_indent()));
+				
             }
         }
         $js->append($this->additional_js);
