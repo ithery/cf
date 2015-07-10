@@ -1956,6 +1956,7 @@
             }
             $js->appendln($this->js_cell);
             if (!$this->ajax) {
+		$js->append(parent::js($indent))->br();
                 foreach ($this->data as $row) {
                     if ($row instanceof CRenderable) {
                         $js->appendln($row->js())->br();
