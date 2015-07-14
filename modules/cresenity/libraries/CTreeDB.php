@@ -10,16 +10,25 @@ class CTreeDB {
     private $org_id = null;
     protected $filters = array();
 
-    public function __construct($table_name, $domain = null, $db = null) {
+    public function __construct($table_name, $domain = null, $db = null,$prefix='') {
         if ($db == null)
             $db = CDatabase::instance($domain);
         if ($domain == null)
             $domain = crouter::domain();
         $data = cdata::get($domain, "domain");
         $this->org_id = CF::org_id();
-
-
-        $this->pk_column = $table_name . "_id";
+		
+		$pk_column=$table_name . "_id";
+		if(strlen($prefix)>0){
+			$table_name_split=explode($prefix,$table_name);
+			if(is_array($table_name_split)){
+				if(isset($table_name_split[1])){
+					$pk_column=$table_name_split[1]."_id";
+				}
+			}
+		}
+		
+        $this->pk_column = $pk_column;
         if ($table_name == "roles")
             $this->pk_column = 'role_id';
         $this->table_name = $table_name;
