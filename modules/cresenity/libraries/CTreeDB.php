@@ -36,8 +36,8 @@ class CTreeDB {
         $this->filters = array();
     }
 
-    public static function factory($table_name, $domain = null, $db = null) {
-        return new CTreeDB($table_name, $domain, $db);
+    public static function factory($table_name, $domain = null, $db = null,$prefix='') {
+        return new CTreeDB($table_name, $domain, $db,$prefix);
     }
 
     public function set_display_callback() {
