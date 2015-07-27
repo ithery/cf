@@ -28,6 +28,7 @@
         protected $data_calendar = array();
         protected $attributes = array();
         protected $post_data = array();
+        protected $css_custom = '';
 
         public function __construct($id) {
             parent::__construct($id);
@@ -58,6 +59,10 @@
             $this->next_year = $this->curr_year;
             $this->data_calendar = array();
         }
+        
+        public function add_css_custom($css) {
+            $this->css_custom = $css; return $this;
+        }
 
         public function html($indent = 0) {
             $this->calculate_month_year();
@@ -65,6 +70,11 @@
             $html = new CStringBuilder();
 
             $html->appendln($this->css());
+            if (strlen($this->css_custom) > 0) {
+                $html->appendln('<style>');
+                $html->appendln($this->css_custom);
+                $html->appendln('</style>');
+            }
 
             $html->appendln('<div>');
             $html->appendln('<div class="row calendar-body" id="' . $this->id . '">
@@ -110,13 +120,22 @@
 
                     $id = carr::get($curr_data_date, 'id', '');
                     if (strlen($id) > 0) $id = ' id = "' . $id . '"';
-                    $date_content .= carr::get($curr_data_date, 'content', '<br><br><span style="font-size:12px;color:red;">-</span>');
+                    
+                    $content = carr::get($curr_data_date, 'content');
+                    if ($content instanceof CRenderable) {
+                        $date_content .= $content->html();
+                    }
+                    else {
+                        $date_content .= carr::get($curr_data_date, 'content', '<br><br><span style="font-size:12px;color:red;">-</span>');
+                    }
 
                     $attributes = '';
                     $all_attributes = carr::get($curr_data_date, 'attr', array());
                     foreach ($all_attributes as $all_attributes_k => $all_attributes_v) {
                         $attributes .= $all_attributes_k . '="' . $all_attributes_v . '" ';
                     }
+                    
+                    $additional_class = carr::get($curr_data_date, 'class');
 
                     foreach ($this->attributes as $attr_k => $attr_v) {
                         $attributes .= $attr_k . '="' . $attr_v . '" ';
@@ -125,7 +144,7 @@
                         $modal_data .= $this->modal($the_date_complete, $the_date_complete_convert, $date_content);
                     }
                     $html->appendln('<li data-date="' . $the_date_complete_convert . '" ' . $id . ' '
-                            . $attributes . ' class="' . $li_right . '">' . $date_content . '</li>');
+                            . $attributes . ' class="' . $li_right . ' ' .$additional_class .'">' . $date_content . '</li>');
                 }
 
                 //            if(($i % 7) == 6 ) echo "<li class='blank-date'>".$i."</li>";

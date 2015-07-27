@@ -44,11 +44,14 @@ class cimage {
         $org_directory = $upload_directory . $org_folder;
         ctemp::makedir($org_directory);
         $type = explode(".", $type);
-        $type_directory = $org_directory;
         foreach ($type as $t) {
+            $type_directory = $org_directory;
             if (strlen(trim($t)) > 0) {
-                $type_directory = $type_directory . $t . "/";
-                ctemp::makedir($type_directory);
+                $temp_dir = explode('/', $t);
+                foreach ($temp_dir as $temp_dir_k => $temp_dir_v) {
+                    $type_directory = $type_directory . $temp_dir_v . "/";
+                    ctemp::makedir($type_directory);
+                }
             }
         }
 
