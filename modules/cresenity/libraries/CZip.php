@@ -18,17 +18,21 @@ class CZip {
 	public static function factory($file) {
 		return new CZip($file);
 	}
-    public function zip($dest){
+	
+    public function zip($dest,$zip_path=null){
         $cont = true;
         $result = 1;
         if(!file_exists($dest)){
             $cont = false;
             $result = 'file / directory does not exist';
         }
-
+		
+		
         if($cont){
             $pclzip = $this->pclzip;
-            $res = $pclzip->create($dest,PCLZIP_OPT_REMOVE_PATH,$dest);
+            $res = $pclzip->create($dest,
+                             PCLZIP_OPT_REMOVE_PATH, $dest,
+                             PCLZIP_OPT_ADD_PATH, $zip_path);
             if ($res == 0) {
                 $result =  $pclzip->errorInfo(true);
             }

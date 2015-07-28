@@ -207,6 +207,8 @@
         }
 
         public function js($indent = 0) {
+            $js = new CStringBuilder();
+            $js->set_indent($indent);
             $selected_date = "jQuery('#select_val').val()";
             $params = "";
             foreach ($this->attributes as $attr_k => $attr_v) {
@@ -215,13 +217,15 @@
             foreach ($this->post_data as $k => $v) {
                 $params .= ", '" . $k . "': " . $v;
             }
+			foreach($this->data_calendar as $k=>$v){
+				$js->appendln($v['content']->js());
+			}
             $post_data = "{'selected-date':" . $selected_date . $params . "}";
-            $return = "jQuery('#btn_edit').click(function() {                         
+            $js->appendln("jQuery('#btn_edit').click(function() {                         
 			$.cresenity.show_dialog('" . uniqid() . "','" . $this->dialog_url . "','" . $this->http_method
                     . "','" . $this->title . "'," . $post_data . ");
-                    });";
-
-            $return .= "
+                    });")->br();
+            $js->appendln("
                     var month;
                     var year;
                     var action;
@@ -297,7 +301,7 @@
 
                         });
                     }
-                    ";
+                    ")->br();
 
             $modal_js = '';
 
@@ -306,7 +310,7 @@
             }
 
             if($this->use_block) {
-                $return .= "$(function() {
+                $js->appendln("$(function() {
                             var res_date = '';
                             
                             selectable_event();
@@ -339,9 +343,9 @@
                                     }
                             });
                         }
-                ";
+                ")->br();
             } else {
-                $return .= "$(function() {
+                $js->appendln("$(function() {
                             var res_date = '';
                             
                             selectable_event();
@@ -355,12 +359,10 @@
                                 });
                             });
                         }
-                ";
+                ")->br();
             }
 
-            
-
-            return $return;
+            return $js->text();
         }
 
         /**
