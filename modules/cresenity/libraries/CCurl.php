@@ -67,6 +67,10 @@ class CCurl {
     
     }
     
+    public function get_info() {
+        return curl_getinfo($this->handle);
+    }
+    
     public function set_engine($engine) {
         $this->engine = $engine;
         return $this;

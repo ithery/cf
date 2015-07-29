@@ -140,7 +140,7 @@
             return $html;
         }
 
-        public static function send_smtp($to, $subject, $message, $attachments = array()) {
+        public static function send_smtp($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array()) {
             $mail = CSMTP::factory();
             $mail->set_username(ccfg::get('smtp_username'));
             $mail->set_password(ccfg::get('smtp_password'));
@@ -161,6 +161,16 @@
             foreach ( $to as $em ) {
                 $mail->add_to($em);
             }
+            
+            if (!is_array($cc)) $cc = array($cc);
+            foreach ($cc as $cc_k => $cc_v) {
+                $mail->add_cc($cc_v);
+            }
+            if (!is_array($bcc)) $bcc = array($bcc);
+            foreach ($bcc as $bcc_k => $bcc_v) {
+                $mail->add_bcc($bcc_v);
+            }
+            
             foreach ( $attachments as $attachment ) {
                 $data = carr::get($attachment,'data');
                 $name = carr::get($attachment,'name');
