@@ -1,6 +1,15 @@
 <?php
 return array(
 	array(
+		"name"=>"sales_cashier",
+		"label"=>"Cashier",
+		"controller"=>"retail",
+		"method"=>"sales_cashier",
+		"requirements"=>array(
+			"have_sales_cashier"=>true,
+		),
+	),
+	array(
 		"name"=>"sales",
 		"label"=>"Sales",
 		"controller"=>"retail",

@@ -1,0 +1,142 @@
+
+<html>
+    <head>
+        <style>
+            html{
+                margin:0.4cm;
+            }
+            body{
+                font-family:Helvetica;
+                font-size:10px;
+                margin:auto;
+            }
+            /*        #table-content th{
+                        font-weight:normal;
+                    }*/
+            #table-content td{
+                padding:1px 3px;
+            }
+        </style>
+    </head>
+    <body>
+                <table id='table-header' width="100%">
+            <tr>
+                <td width="32%" >
+                    <div style="display:inline-block;width:150px;height:75px;">
+                        <!--<img src="http://travons.b2b.local/application/torsb2b/travons/media/img/invoice/invoice/rodex_logo.png" height="80">-->
+                        <img src="application/torsb2b/travons/media/img/invoice/invoice_logo.png" height="80">
+                    </div>
+                </td>
+                <td width="32%" align="center" style="font-size:1.5em;" >
+                    I&nbsp;&nbsp;&nbsp;&nbsp;N&nbsp;&nbsp;&nbsp;&nbsp;V&nbsp;&nbsp;&nbsp;&nbsp;O&nbsp;&nbsp;&nbsp;&nbsp;I&nbsp;&nbsp;&nbsp;&nbsp;C&nbsp;&nbsp;&nbsp;&nbsp;E
+                </td>
+                <td width="32%" valign="bottom" style="padding-left:40px;"> No. IV150700006</td>
+            </tr>
+        </table>
+        <table id='table-header' width="100%">
+            <tr>
+                <td width="32%" style="padding-right:10px; padding-top: 10px;">
+                    Head Office Travons<br/>
+                    Raya Darmo 177ba<br/>
+                    Kabupaten Alor <br/>
+                    <br/>
+                    <br/>
+                </td>
+                <td width="32%">
+                    <table style='border-collapse:collapse;' align="center">
+                        <tr><td valign='top' width="70px">Tgl Invoices</td><td valign='top' width="3px">:</td><td>13/07/2015</td></tr>
+                        <tr><td valign='top'>Operator</td><td valign='top' >:</td><td>
+                                123                            </td></tr>
+                        <tr><td valign='top'>Ket</td><td valign='top' >:</td><td style="word-wrap:break-word;"></td></tr>
+                    </table>
+                </td>
+                <td width="32%" style="padding-left:40px" valign="top">
+                    <div>
+                        Nama Pelanggan:<br/>
+                        123                        <br/>
+                        123<br/>
+                        Telp. 123<br/>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <br/>
+        <br/>
+        <table id="table-content" width='100%'>
+                        <tr>
+                <td colspan="9" style="border-bottom:1px solid black"></td>
+            </tr>
+            <tr>
+                <th width="20px">NO</th>
+                <th width="150px" align='left'>NAMA PELANGGAN</th>
+                <th width='75px'>RUTE</th>
+                <th width='95px'>TGL PERJALANAN</th>
+                <th width='120px'>MASKAPAI</th>
+                <th align='left' width='50px'>PNR</th>
+                <th width='90px' align='left'>NO. TIKET</th>
+                <th width="20px">&nbsp;</th>
+                <th width="80px">HARGA</th>
+            </tr>
+            <tr>
+                <td colspan="9" style="border-top:1px double black"></td>
+            </tr>
+                                <tr>
+                        <td valign="top" align='center'>1</td>
+                        <td valign="top">123</td>
+                        <td valign="top" align="center">123</td>
+                        <td valign="top" align="center">14/07/2015</td>
+                        <td valign="top" align="center">123</td>
+                        <td valign="top" align="left">123</td>
+                        <td valign="top" align='left'>123</td>
+                        <td valign="top" align="right">S$</td>
+                        <td valign="top" align="right">100.000,00</td>
+                    </tr>
+                    <tr><td colspan="9">&nbsp;</td></tr><tr><td colspan="9">&nbsp;</td></tr><tr><td colspan="9">&nbsp;</td></tr><tr><td colspan="9">&nbsp;</td></tr><tr><td colspan="9">&nbsp;</td></tr><tr><td colspan="9">&nbsp;</td></tr><tr><td colspan="9">&nbsp;</td></tr><tr><td colspan="9">&nbsp;</td></tr>            <tr>
+                <td colspan="9" style="border-bottom:1px solid black"></td>
+            </tr>
+        </table>
+                <table width='100%' id="table-content">
+            <tr>
+                <td rowspan="2" valign="top" style='padding-right:10px;'>
+                    <table style="border-collapse:collapse">
+                        <tr><td valign="top">Terbilang :</td><td> Seratus  Ribu  SGD</td></tr>
+                    </table>
+                </td>
+                <td align="right" width='100px'>Subtotal : </td>
+                <td align="right" width='20px'>S$</td>
+                <td align="right" width='80px'>100.000,00</td>
+            </tr>
+            <tr>
+                <td align="right">Grand Total : </td>
+                <td align="right">S$</td>
+                <td align="right">100.000,00</td>
+            </tr>
+        </table>
+        <br/>
+        <table id='table-footer'>
+			<tr>
+                <td colspan="4" valign="top" style='padding-right:10px;'>
+                    <table style="border-collapse:collapse">
+                        <tr><td valign="top">Note :</td><td>Invoice ini berlaku resmi sebagai alat bukti pembayaran yang sah apabila disertakan stempel perusahaan</td></tr>
+                    </table>
+                </td>
+			</tr>
+            <tr>
+                <td colspan="4">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="370px">&nbsp;</td>
+                <td></td><td align='center' width='80px'>Menerima</td><td></td>
+                <td></td><td align='center' width='80px'>Menyiapkan</td><td></td>
+                <td></td><td align='center' width='80px'>Menyetujui</td><td></td>
+            </tr>
+            <tr>
+                <td width="370px">&nbsp;</td>
+                <td valign='top' align='center' style="width:10px"><br/><br/><br/>(</td><td valign='top' align='center'><br/><br/><br/><!--Menerima--></td><td valign='top' align='center' style="width:10px"><br/><br/><br/>)&nbsp;&nbsp;</td>
+                <td valign='top' align='center' style="width:10px"><br/><br/><br/>(</td><td valign='top' align='center'><br/><br/><br/><!--Menyiapkan--></td><td valign='top' align='center' style="width:10px"><br/><br/><br/>)&nbsp;&nbsp;</td>
+                <td valign='top' align='center' style="width:10px"><br/><br/><br/>(</td><td valign='top' align='center'><br/><br/><br/><!--Accounting--></td><td valign='top' align='center' style="width:10px"><br/><br/><br/>)</td>
+            </tr>
+        </table>
+    </body>
+</html>

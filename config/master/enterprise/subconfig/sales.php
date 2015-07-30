@@ -443,6 +443,14 @@ $sales = array(
 			"have_credit_note"=>true,
 		),
 	),
-	
+	array(
+		"name"=>"have_sales_cashier",
+		"label"=>"Have Sales Cashier",
+		"default"=>false,
+		"type"=>"checkbox",
+		"requirement"=>array(
+			"have_sales"=>true,
+		),
+	),
 	
 );
