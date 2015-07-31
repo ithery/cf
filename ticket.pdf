@@ -16,7 +16,7 @@
             #voucher-header { border: 1px solid #000;}
             .border { border: 1px solid #464646;}
             h2 { font-size: 20px; font-weight: bold;}
-			h3.sub-header { font-size: 16px; }
+            h3.sub-header { font-size: 16px; }
             .bottom-row { text-decoration: underline;}
             table.table { width: 100%; margin: 0; padding: 0;}
             table.table-pax { width: 97%;}
@@ -35,13 +35,9 @@
                 <td colspan="2" align="left">
                     <table>
                         <tr>
-                            <td><img src="application/torsb2b/default/media/img/invoice/rodex_logo.png" height="65px"></td>
+                            <td><img src="application/torsb2b/default/media/img/invoice/invoice_logo.png" height="65px"></td>
                             <td style="padding-left: 20px; font-size: 10px;">
-                                Rodex Tours and Travel<br>
-                                Head Office<br>
-                                Jl. Raya Darmo 177 B Surabaya 60241<br>
-                                Hunting (031)-5662000, Fax (031)-5619909
-                            </td>
+                                Rodex Tours and Travel<br>Head Office<br>Jl. Raya Darmo 177 B Surabaya 60241<br>Hunting (031)-5662000, Fax (031)-5619909                            </td>
                         </tr>
                     </table>
                 </td>
@@ -58,10 +54,10 @@
                             <td colspan="3">To :</td>
                         </tr>
                         <tr>
-                            <td colspan="3">Theme Park surabaya</td>
+                            <td colspan="3">Vans Peninda Denpasar</td>
                         </tr>
                         <tr>
-                            <td colspan="3"></td>
+                            <td colspan="3">Jl. Raya Bali 406 A- D, Denpasar, Bali</td>
                         </tr>
 
                     </table>
@@ -76,7 +72,7 @@
                         <tr>
                             <td>Booking Code</td>
                             <td> : </td>
-                            <td>TORSOID-3guq1b</td>
+                            <td>TORSOID-ibyk2f</td>
                         </tr>
                         <tr>
                             <td>Operator</td>
@@ -87,34 +83,34 @@
                 </td>
             </tr>
         </table>
-		<table class="table">
-			<tr>
-				<td class="border">
-					<table class="table">
-						<tr>
-							<td width="100">Visit Date</td>
-							<td width="10"> : </td>
-							<td colspan="2">28-07-2015</td>
-						</tr>
-						<tr>
-							<td>Contact Person</td>
-							<td> : </td>
-							<td>MR. Rudy Wijaya, abcd</td>
-						</tr>
-													<tr>
-								<td>Hotel Detail</td>
-								<td> : </td>
-								<td>abcd</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td> : </td>
-								<td>abcd</td>
-							</tr>
-											</table>
-				</td>
-			</tr>
-		</table>
+        <table class="table">
+            <tr>
+                <td class="border">
+                    <table class="table">
+                        <tr>
+                            <td width="100">Visit Date</td>
+                            <td width="10"> : </td>
+                            <td colspan="2">28-07-2015</td>
+                        </tr>
+                        <tr>
+                            <td>Contact Person</td>
+                            <td> : </td>
+                            <td>MS. Yong Arseng, 085644445555</td>
+                        </tr>
+                                                    <tr>
+                                <td>Hotel Detail</td>
+                                <td> : </td>
+                                <td>Majapahit</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td> : </td>
+                                <td>Jl. Mojokerjo 46A</td>
+                            </tr>
+                                            </table>
+                </td>
+            </tr>
+        </table>
 
         <div class="row">
             <h3 class="bottom-row sub-header">RINCIAN PEMESANAN</h3>
@@ -122,8 +118,8 @@
         <table class="table" style="font-style: italic;">
             <tr>
                 <td colspan="2" align="left">&nbsp;</td>
-                <!--<td colspan="0" style="font-style: italic;"><b>Nama Paket / Sesi : Theme Park surabaya / </b></td>-->
-                <td align="right"><b>Jenis Tiket : PHYSICAL</b></td>
+                <!--<td colspan="0" style="font-style: italic;"><b>Nama Paket / Sesi : Vans Peninda Denpasar / </b></td>-->
+                <td align="right"><b>Jenis Tiket : VOUCHER</b></td>
                 <td>&nbsp;</td>
             </tr>
         </table>
@@ -141,30 +137,29 @@
                 </tr>
             </thead>
             <tbody>
-                                    <tr>
-                        <td colspan="8" style="font-style: italic;"><b>Nama Paket / Sesi : Theme Park surabaya / Paket Tes 2</b></td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>MR. Rudy Wijaya</td>
-                        <td align="center">1</td>
-                        <!--<td></td>-->
-                        <td>Paket Tes 2</td>
-                        <td></td>
-                        <td></td>
-                        <td>IDR</td>
-                        <td align="right">
-                            200.000,00                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="8">&nbsp;</td>
-                    </tr>
-                                </tbody>
+                                        <tr>
+                            <td colspan="8" style="font-style: italic;"><b>Nama Paket / Sesi : Vans Peninda Denpasar / Paket Wisata</b></td>
+                        </tr>
+                                                    <tr>
+                                <td>1</td>
+                                <td>MS.Harun aaa</td>
+                                <td align="center">1</td>
+                                <td></td>
+                                <td>123456</td>
+                                <td>01-01-1970</td>
+                                <td>IDR</td>
+                                <td align="right">
+                                    100.000,00                                </td>
+                            </tr>
+                                                    <tr>
+                            <td colspan="8">&nbsp;</td>
+                        </tr>
+                                    </tbody>
             <tfoot>
                 <tr>
                     <td colspan="6">GRAND TOTAL</td>
                     <td>IDR</td>
-                    <td align="right">200.000,00</td>
+                    <td align="right">100.000,00</td>
                 </tr>
             </tfoot>
         </table>
