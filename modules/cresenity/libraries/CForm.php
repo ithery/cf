@@ -27,7 +27,7 @@ class CForm extends CElement {
     public function __construct($form_id = "") {
         parent::__construct($form_id);
 		$this->tag = 'form';
-        
+
 		$this->name = $this->id;
         $this->method = "POST";
         $this->target = "_self";
@@ -49,7 +49,8 @@ class CForm extends CElement {
         $this->ajax_submit_handlers = array();
 		$this->ajax_submit_target = false;
 		$this->auto_set_focus = true;
-		
+		CManager::instance()->register_module('validation');
+
     }
 
     public static function factory($form_id) {
@@ -72,7 +73,7 @@ class CForm extends CElement {
     }
 
     /**
-     * 
+     *
      * @param string $method
      * @return CForm
      */
@@ -111,14 +112,14 @@ class CForm extends CElement {
         return $this;
     }
 
-	
-	
+
+
 	public function set_ajax_submit_target($target) {
         $this->ajax_submit_target = $target;
         return $this;
     }
 
-	
+
     public function set_ajax_success_script_callback($jsfunc) {
         $this->ajax_success_script_callback = $jsfunc;
         return $this;
@@ -155,7 +156,7 @@ class CForm extends CElement {
     }
 
     /**
-     * 
+     *
      * @param string $handler_name
      * @return CHandler
      */
@@ -164,11 +165,11 @@ class CForm extends CElement {
         $this->ajax_submit_handlers[] = $handler;
         return $handler;
     }
-	
+
 	public function toarray($indent=0) {
 		$data = array();
 		$data = array_merge_recursive($data,parent::toarray());
-		
+
 		if(strlen($this->action)>0) {
 			$data['attr']['action']=$this->action;
 		}
@@ -177,8 +178,8 @@ class CForm extends CElement {
 		}
 		return $data;
 	}
-	
-	
+
+
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -231,10 +232,10 @@ class CForm extends CElement {
                         ->makeurl();
                 $ajax_process_script_buttons = "	buttons: {}, ";
                 if ($this->ajax_process_progress_cancel) {
-                    $ajax_process_script_buttons = "	
+                    $ajax_process_script_buttons = "
 											'buttons': {
-												'Cancel': { 
-													'primary': true, 
+												'Cancel': {
+													'primary': true,
 													'click': function() {
 														jQuery.ajax('" . $ajax_process_url . "', {
 															dataType: 'json',
@@ -247,17 +248,17 @@ class CForm extends CElement {
 																$.cresenity.message('error','[AJAX PROCESS] ' + status + ' - Server reponse is: ' + xhr.responseText);
 															}
 														});
-														
+
 													}
 												}
-											}, 
+											},
 					";
                 }
                 $ajax_process_script = "
 					 if(cprocess_run_once_" . $this->id . "==false) {
 						cprocess_run_once" . $this->id . "=true;
 						ctimer_" . $this->id . " = setInterval(function()  {
-							
+
 							jQuery.ajax('" . $ajax_process_url . "', {
 								dataType: 'json',
 								type: 'POST',
@@ -280,13 +281,13 @@ class CForm extends CElement {
 										$.cresenity.dialog.show(div,{
 											" . $ajax_process_script_buttons . "
 											showCloseHandle: false,
-											closeOnEscape: false, 
+											closeOnEscape: false,
 											closeOnOverlayClick: false,
-											title: 'Progress', 
+											title: 'Progress',
 											autoOpen: true,
 											removeOnClose: true
 										});
-										
+
 									};
 									var percentVal = percentComplete + '%';
 									$('#bar_" . $this->id . "').width(percentVal);
@@ -331,7 +332,7 @@ class CForm extends CElement {
             }
             $script_callback = '';
             if ($this->ajax_redirect) {
-                
+
             }
             if (count($this->ajax_submit_handlers) > 0) {
                 $script_redirect_url = "";
@@ -359,18 +360,18 @@ class CForm extends CElement {
 							span.append(progress);
 							$.cresenity.dialog.show(div,{
 								showCloseHandle: false,
-								closeOnEscape: false, 
+								closeOnEscape: false,
 								closeOnOverlayClick: false,
-								title: 'Uploading', 
+								title: 'Uploading',
 								autoOpen: true,
-								buttons: {}, 
+								buttons: {},
 								removeOnClose: true
 							});
-							
+
 						};
-				
-						
-						
+
+
+
 					} else {
 						var percentVal = '0%';
 						$('#bar_" . $this->id . "').width(percentVal);
@@ -404,12 +405,12 @@ class CForm extends CElement {
             if ($this->ajax_upload_progress) {
                 $ajax_process_without_upload = "";
             }
-			
+
 			$on_success_script = "
 				$('#" . $this->id . "').removeClass('loading');
 				$('#" . $this->id . "').find('*').removeClass('disabled');
-				
-					
+
+
 				if(typeof data=='object') {
 					var result = data.result;
 					var message = data.message;
@@ -431,8 +432,8 @@ class CForm extends CElement {
 					} else {
 						$.cresenity.message('error',data);
 					}
-					
-					
+
+
 				} else {
 					$.cresenity.message('success',data);
 					" . $script_redirect_url . "
@@ -443,9 +444,9 @@ class CForm extends CElement {
 				$on_before_submit = "
 					jQuery('#".$this->ajax_submit_target."').children().hide();
 					jQuery('#".$this->ajax_submit_target."').append(jQuery('<div>').attr('id','#".$this->ajax_submit_target."-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
-			
+
 				";
-				
+
 				$this->ajax_datatype="json";
 				//the response is json
 				$on_success_script = "
@@ -472,20 +473,20 @@ class CForm extends CElement {
 						$('#" . $this->id . "').addClass('loading');
 						$('#" . $this->id . "').find('*').addClass('disabled');
 						" . $ajax_process_without_upload . "
-						
-						
-						
+
+
+
 						var form_ajax_url = $('#" . $this->id . "').attr('action');
 						if(!form_ajax_url) form_ajax_url = '" . $ajax_url . "';
-						var options = { 
+						var options = {
 							url: form_ajax_url,
 							dataType: '" . $this->ajax_datatype . "',
 							type: '" . $this->method . "',
-							beforeSubmit: function(arr, form, options) { 
-								" . $upload_progress_before_submit . "         
+							beforeSubmit: function(arr, form, options) {
+								" . $upload_progress_before_submit . "
 							},
 							uploadProgress: function(event, position, total, percentComplete) {
-								" . $upload_progress_upload . "  
+								" . $upload_progress_upload . "
 								//console.log(percentVal, position, total);
 							},
 							success: function(data) {
@@ -497,10 +498,10 @@ class CForm extends CElement {
                                                                     " . $on_success_script . "
                                                                 });
                                                                 //do callback
-								
-								
+
+
 							},
-							
+
 							error: function(xhr, status, error) {
 								$('#" . $this->id . "').find('*').removeClass('disabled');
 								" . $ajax_process_done_script . "
@@ -560,7 +561,7 @@ class CForm extends CElement {
 			");
 		}
         $js->appendln(parent::js($js->get_indent()))->br();
-		
+
         return $js->text();
     }
 

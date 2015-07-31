@@ -10,9 +10,9 @@ final class CManager {
 
 	protected $elements = array();
 	protected $elements_code = array();
-	
+
     /**
-     * 
+     *
      * @return CManager
      */
     public static function instance() {
@@ -24,6 +24,9 @@ final class CManager {
 
     public function register_module($module) {
         return CClientModules::instance()->register_module($module);
+    }
+    public function unregister_module($module) {
+        return CClientModules::instance()->unregister_module($module);
     }
 
     public function register_control($type, $class, $code_path = '') {
@@ -52,10 +55,10 @@ final class CManager {
     public function is_registered_control($type) {
         return isset($this->controls[$type]);
     }
-	
+
 	public function is_registered_element($type) {
         return isset($this->elements[$type]);
-		
+
     }
 
     public function create_control($id, $type) {
@@ -69,7 +72,7 @@ final class CManager {
         //return $obj;
         //return $class::factory($id);
     }
-	
+
 	public function create_element($id, $type) {
         if (!isset($this->elements[$type])) {
             trigger_error('Type of element ' . $type . ' not registered');
