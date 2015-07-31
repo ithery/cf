@@ -11,10 +11,10 @@ class CTreeDB {
     protected $filters = array();
 
     public function __construct($table_name, $domain = null, $db = null,$prefix='') {
-        if ($db == null)
-            $db = CDatabase::instance($domain);
         if ($domain == null)
             $domain = crouter::domain();
+        if ($db == null)
+            $db = CDatabase::instance($domain);
         $data = cdata::get($domain, "domain");
         $this->org_id = CF::org_id();
 		
@@ -81,7 +81,7 @@ class CTreeDB {
     public function insert($data, $parent_id = null) {
         $db = $this->db;
         if ($parent_id != null) {
-
+               
             $q="select rgt from " . $db->escape_table($this->table_name) . " where  " . $db->escape_column($this->pk_column) . " = " . $db->escape($parent_id);
             if(strlen($this->org_id)>0){
                 $q.=" and org_id=" . $db->escape($this->org_id) . "";
@@ -118,7 +118,19 @@ class CTreeDB {
 
             $data['depth'] = $depth + 1;
         } else {
-            $rgt = cdbutils::get_value("select max(rgt) from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . "");
+            $q="
+                select 
+                    max(rgt) 
+                from 
+                    " . $db->escape_table($this->table_name) . "   
+                where
+                    1=1
+            ";
+            if(strlen($this->org_id)>0){
+                $q.=" and org_id=" . $db->escape($this->org_id) . "";
+            }
+                    
+            $rgt = cdbutils::get_value($q);
 
             if ($rgt == null) {
                 $rgt = 0;
@@ -170,6 +182,7 @@ class CTreeDB {
         $app = CApp::instance();
         $user = $app->user();
         $db = $this->db;
+        
         $r = $db->update($this->table_name, $data, array($this->pk_column => $id));
 
         $this->rebuild_tree_all();
