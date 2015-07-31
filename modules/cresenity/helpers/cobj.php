@@ -13,6 +13,10 @@
             return isset($object->$key) ? $object->$key : NULL;
         }
         
+        public static function xml_to_string($object){
+            return trim($object->__toString());
+        }
+        
         public static function xml_get($object, $key, $toString = 0){
             $obj = cobj::get($object, $key);
             if ($toString) {

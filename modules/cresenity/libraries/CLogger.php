@@ -30,14 +30,13 @@
         private $_level_name;
 
         private function __construct() {
-            $this->__create_log_path();
+            
 
             $this->_log_threshold = CF::config('core.log_threshold');
             $log_threshold = ccfg::get('log_threshold');
             if ($log_threshold != NULL) $this->_log_threshold = $log_threshold;
 
-            $filename = date("Ymd") . "_" . $this->_suffix_filename . self::__EXT;
-            $this->_file_path = $this->_log_path . $filename;
+            
         }
 
         private function __create_log_path() {
@@ -50,10 +49,19 @@
                 }
             }
 
-            if (!is_dir($this->_log_path)) {
+            if (!file_exists($this->_log_path) && !is_dir($this->_log_path)) {
                 mkdir($this->_log_path);
             }
-
+            
+            if ($this->_additional_path != NULL) {
+                $temp_dir = explode(DS, $this->_additional_path);
+                foreach ($temp_dir as $k => $v) {
+                    $this->_log_path .= $v .DS;
+                    if (!file_exists($this->_log_path) && !is_dir($this->_log_path)) {
+                        mkdir($this->_log_path);
+                    }
+                }
+            }
         }
 
         /**
@@ -68,23 +76,16 @@
         }
 
         public function write($message) {
-            if ($this->_additional_path != NULL) {
-                $filename = date("Ymd") . "_" . $this->_suffix_filename . self::__EXT;
-                $this->_file_path = $this->_log_path;
-                $add_paths = explode('/', $this->_additional_path);
-                foreach ( $add_paths as $key => $value ) {
-                    $this->_file_path .= $value .DS;
-                    if (!file_exists($this->_file_path)) mkdir($this->_file_path);
-                }
-                $this->_file_path .= $filename;
-            }
+            $this->__create_log_path();
+            $filename = date("Ymd") . "_" . $this->_suffix_filename . self::__EXT;
+            $this->_file_path = $this->_log_path . $filename;
             
             $this->__get_level_name_by_const();
 
             if ($this->_level >= self::DEBUG) {
                 $trace = array_slice(debug_backtrace(), 1);
                 $msg_trace = $this->__backtrace($trace);
-                $message .= $msg_trace . "\n";
+                $message .= "\n" .$msg_trace . "\n";
             }
 
             if (!$fp = @fopen($this->_file_path, 'ab')) {
@@ -150,7 +151,6 @@
 
         public function set_additional_path($_additional_path) {
             $this->_additional_path = $_additional_path;
-            
             return $this;
         }
 
