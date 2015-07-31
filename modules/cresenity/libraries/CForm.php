@@ -515,7 +515,6 @@ class CForm extends CElement {
 						
 					} else {
 						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
-						console.log('sadsd');
 					}
 					//never submit form
 					return false;
