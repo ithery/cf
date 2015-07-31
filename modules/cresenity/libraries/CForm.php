@@ -512,6 +512,9 @@ class CForm extends CElement {
 						".$on_before_submit."
 						$('#" . $this->id . "').ajaxSubmit(options); 
 						
+					} else {
+						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
+						console.log('sadsd');
 					}
 					//never submit form
 					return false;
@@ -519,7 +522,15 @@ class CForm extends CElement {
 			");
         } else {
             $js->appendln("//Form validation")->br();
-            $js->appendln("$('#" . $this->id . "').validationEngine();")->br();
+            $js->appendln("
+                $('#" . $this->id . "').validationEngine();
+				$('#" . $this->id . "').bind('jqv.form.result', function(event , errorFound){
+					if(errorFound) {
+						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
+					}
+				});
+
+            ")->br();
         }
         if (count($this->trigger_submit) > 0) {
             foreach ($this->trigger_submit as $t) {
