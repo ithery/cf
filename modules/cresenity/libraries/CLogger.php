@@ -55,6 +55,10 @@
             
             if ($this->_additional_path != NULL) {
                 $temp_dir = explode(DS, $this->_additional_path);
+                $temp_dir2 = explode('/', $this->_additional_path);
+                if(count($temp_dir2)>1) {
+                    $temp_dir = $temp_dir2;
+                }
                 foreach ($temp_dir as $k => $v) {
                     $this->_log_path .= $v .DS;
                     if (!file_exists($this->_log_path) && !is_dir($this->_log_path)) {
