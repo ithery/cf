@@ -5,6 +5,7 @@ class CFormInputSelectSearch extends CFormInput {
 	protected $format_result;
 	protected $key_field;
 	protected $search_field;
+	protected $multiple;
 	
 	protected $placeholder;
 
@@ -18,13 +19,14 @@ class CFormInputSelectSearch extends CFormInput {
 		$this->key_field = "";
 		$this->search_field = "";
 		$this->placeholder = "Search for a item";
+        $this->multiple = false;
 	}
 	
 	public static function factory($id) {
 		return new CFormInputSelectSearch($id);
 	}
 	public function set_multiple($bool) {
-		$this->multiple = true;
+		$this->multiple = $bool;
 		return $this;
 	}
 	public function set_key_field($key_field) {
@@ -60,11 +62,15 @@ class CFormInputSelectSearch extends CFormInput {
 		$html = new CStringBuilder();
 		$custom_css = $this->custom_css;
 		$custom_css = crenderer::render_style($custom_css);
+        $multiple = "";
+        if ($this->multiple){
+            $multiple = ' multiple="multiple"';
+		}
 		if(strlen($custom_css)>0) {
 			$custom_css = ' style="'.$custom_css.'"';
 		}
 		$html->set_indent($indent);
-		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'" '.$custom_css.'>')->br();
+		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'" '.$custom_css.$multiple.'>')->br();
 		return $html->text();	
 	}
 	
@@ -135,6 +141,10 @@ class CFormInputSelectSearch extends CFormInput {
 			},
 			";
 		}
+        $str_multiple = "";
+        if ($this->multiple)
+            $str_multiple = " multiple:'true',";
+			
 		$str = "
 			$('#".$this->id."').select2({
 				placeholder: '".$placeholder."',
@@ -142,6 +152,7 @@ class CFormInputSelectSearch extends CFormInput {
 				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 					url: '".$ajax_url."',
 					dataType: 'jsonp',
+					".$str_multiple."
 					data: function (term, page) {
 						return {
 							term: term, // search term

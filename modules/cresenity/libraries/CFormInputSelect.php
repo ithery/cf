@@ -18,7 +18,7 @@ class CFormInputSelect extends CFormInput {
     }
 
     public function set_multiple($bool) {
-        $this->multiple = true;
+        $this->multiple = $bool;
         return $this;
     }
 
