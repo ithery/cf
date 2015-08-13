@@ -67,12 +67,12 @@
                         <tr>
                             <td>Date Of Booking</td>
                             <td> : </td>
-                            <td>28-07-2015</td>
+                            <td>03-08-2015</td>
                         </tr>
                         <tr>
                             <td>Booking Code</td>
                             <td> : </td>
-                            <td>TORSOID-ibyk2f</td>
+                            <td>TORSOID-HWDHT</td>
                         </tr>
                         <tr>
                             <td>Operator</td>
@@ -90,23 +90,13 @@
                         <tr>
                             <td width="100">Visit Date</td>
                             <td width="10"> : </td>
-                            <td colspan="2">28-07-2015</td>
+                            <td colspan="2">03-08-2015</td>
                         </tr>
                         <tr>
                             <td>Contact Person</td>
                             <td> : </td>
-                            <td>MS. Yong Arseng, 085644445555</td>
+                            <td>MR. Yong Arseng, 085644445555</td>
                         </tr>
-                                                    <tr>
-                                <td>Hotel Detail</td>
-                                <td> : </td>
-                                <td>Majapahit</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td> : </td>
-                                <td>Jl. Mojokerjo 46A</td>
-                            </tr>
                                             </table>
                 </td>
             </tr>
@@ -119,7 +109,7 @@
             <tr>
                 <td colspan="2" align="left">&nbsp;</td>
                 <!--<td colspan="0" style="font-style: italic;"><b>Nama Paket / Sesi : Vans Peninda Denpasar / </b></td>-->
-                <td align="right"><b>Jenis Tiket : VOUCHER</b></td>
+                <td align="right"><b>Jenis Tiket : PHYSICAL</b></td>
                 <td>&nbsp;</td>
             </tr>
         </table>
@@ -138,20 +128,21 @@
             </thead>
             <tbody>
                                         <tr>
-                            <td colspan="8" style="font-style: italic;"><b>Nama Paket / Sesi : Vans Peninda Denpasar / Paket Wisata</b></td>
+                            <td colspan="8" style="font-style: italic;"><b>Nama Paket / Sesi : Vans Peninda Denpasar / Product IDR 1</b></td>
                         </tr>
-                                                    <tr>
-                                <td>1</td>
-                                <td>MS.Harun aaa</td>
-                                <td align="center">1</td>
-                                <td></td>
-                                <td>123456</td>
-                                <td>01-01-1970</td>
-                                <td>IDR</td>
-                                <td align="right">
-                                    100.000,00                                </td>
-                            </tr>
-                                                    <tr>
+                        <tr>
+                            <td>1</td>
+                            <td>MR. Yong Arseng</td>
+                            <td align="center">1</td>
+                            <!--<td></td>-->
+                            <td>Product IDR 1</td>
+                            <td></td>
+                            <td></td>
+                            <td>IDR</td>
+                            <td align="right">
+                                80.000,00                            </td>
+                        </tr>
+                        <tr>
                             <td colspan="8">&nbsp;</td>
                         </tr>
                                     </tbody>
@@ -159,7 +150,7 @@
                 <tr>
                     <td colspan="6">GRAND TOTAL</td>
                     <td>IDR</td>
-                    <td align="right">100.000,00</td>
+                    <td align="right">80.000,00</td>
                 </tr>
             </tfoot>
         </table>

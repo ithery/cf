@@ -140,7 +140,8 @@
             return count($res);
         }
 
-        public static function get_table_info() {
+        public static function get_table_info($db = null) {
+            if ($db == null) $db = CDatabase::instance();
             $db = CDatabase::instance();
             $q = 'SHOW table status';
 
@@ -176,8 +177,8 @@
             return $result;
         }
 
-        public static function get_column_info($table) {
-            $db = CDatabase::instance();
+        public static function get_column_info($table,$db = null) {
+            if ($db == null) $db = CDatabase::instance();
             $q = 'SHOW FULL COLUMNS FROM ' . $db->escape_table($table);
 
             $res = $db->query($q);
@@ -255,8 +256,8 @@
             return $result;
         }
 
-        public static function convert_table_engine($engine = "InnoDB") {
-            $db = CDatabase::instance();
+        public static function convert_table_engine($engine = "InnoDB", $db=null) {
+            if ($db == null) $db = CDatabase::instance();
             $tables = cdbutils::get_array("show tables");
             foreach ($tables as $table) {
                 $db->query("alter table `" . $table . "` ENGINE=" . $engine);

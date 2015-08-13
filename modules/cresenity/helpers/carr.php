@@ -15,6 +15,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class carr {
 
     public static function get($array, $key, $default = null) {
+        if(is_object($array)) {
+            trigger_error('Parameter is object');
+        }
         return isset($array[$key]) ? $array[$key] : $default;
     }
 
