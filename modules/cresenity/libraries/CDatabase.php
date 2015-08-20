@@ -75,8 +75,13 @@
          * @param   CDatabase  instance of CDatabase
          * @return  string
          */
-        public static function instance_name(CDatabase $db) {
-            return array_search($db, CDatabase::$instances, TRUE);
+        public static function instance_name(CDatabase $db,$domain=null) {
+            if (strlen($domain) == 0) {
+                //get current domain
+                $domain = crouter::domain();
+            }
+            return array_search($db, CDatabase::$instances[$domain], TRUE);
+
         }
 
         /**
@@ -96,6 +101,8 @@
                     if (!array_key_exists('connection', $config)) {
                         $config = array('connection' => $config);
                         $load_config = false;
+                    } else {
+                        $load_config = false;
                     }
                 }
                 if (is_string($config)) {
@@ -105,6 +112,7 @@
                     }
                 }
             }
+
             if ($load_config) {
                 $file = CF::get_file('config', 'database', $domain);
 
@@ -129,10 +137,13 @@
                     $this->config_file = $file;
                 }
             }
+            
 
             // Merge the default config with the passed config
             $this->config = array_merge($this->config, $config);
+
             if (is_string($this->config['connection'])) {
+
                 // Make sure the connection is valid
                 if (strpos($this->config['connection'], '://') === FALSE)
                         throw new CDatabase_Exception('database.invalid_dsn', $this->config['connection']);

@@ -202,8 +202,7 @@
             }
 
             $table = unserialize($obj->data->table);
-            $db = CDatabase::instance($table->domain());
-
+            $db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
             $request = $_GET;
 
             if (strtoupper($table->ajax_method) == "POST") {
@@ -333,8 +332,10 @@
 
             $qfilter .= " " . $temp_order_by . ' ' . $sLimit;
             //die(substr($temp_order_by,0,9).$sub[1]);
+            //var_dump($db->query('select * from transaction limit 1')->result_array());
 
             $r = $db->query($qfilter);
+
             //$filtered_record = $r->count();
             $rarr = $r->result(false);
             $data = $rarr;
