@@ -202,7 +202,10 @@
             }
 
             $table = unserialize($obj->data->table);
-            $db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
+            //$db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
+            $db = CDatabase::instance();
+            
+            
             $request = $_GET;
 
             if (strtoupper($table->ajax_method) == "POST") {
