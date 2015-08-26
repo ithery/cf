@@ -106,8 +106,13 @@ class CWebsocketClientSocketIOEngine extends CWebsocketClientAbstractSocketIOEng
         }
 		
         $sess = explode(':', $result);
+        
+        if(count($sess)<2) {
+            trigger_error("Response ".$url." websocket error : ".$result);
+        }
         $decoded['sid'] = $sess[0];
         $decoded['pingInterval'] = $sess[1];
+            
         $decoded['pingTimeout'] = $sess[2];
         $decoded['upgrades'] = array_flip(explode(',', $sess[3]));
 		
