@@ -33,6 +33,11 @@ class CView extends View {
 		return ob_get_clean();
 	}
 	
+	public static function exists($name) {
+        $filename = CF::find_file('views', $name, false);
+		return strlen($filename)>0;
+    }
+	
 	/**
      * Renders a view. 
 	 * Overwrite View.render

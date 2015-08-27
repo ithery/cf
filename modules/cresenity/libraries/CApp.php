@@ -1,5 +1,6 @@
 <?php
 
+
     defined('SYSPATH') OR die('No direct access allowed.');
 
     class CApp extends CObservable {
@@ -362,80 +363,37 @@
         }
 
         public function register_core_modules() {
-            if (ccfg::get('require_js')) {
-
-                $this->register_client_module('json2');
-                $this->register_client_module('excanvas');
-                $this->register_client_module('canvas-to-blob');
-                $this->register_client_module('load-image');
-
-                $this->register_client_module('jquery');
-                $this->register_client_module('bootstrap');
-                $this->register_client_module('font-awesome');
-                $this->register_client_module('jquery.ui');
-                $this->register_client_module('jquery.dialog2');
-                $this->register_client_module('slimscroll');
-                $this->register_client_module('cresenity');
-                $this->register_client_module('fileupload');
-                $this->register_client_module('wysihtml5');
-                $this->register_client_module('notify');
-                $this->register_client_module('bootbox');
-                $this->register_client_module('form');
-                $this->register_client_module('controls');
-                $this->register_client_module('event');
-                $this->register_client_module('effects');
-                $this->register_client_module('validation');
-
-                $this->register_client_module('easing');
-
-                $this->register_client_module('chosen');
-                $this->register_client_module('uniform');
-                $this->register_client_module('select2');
-                $this->register_client_module('image-gallery');
-                $this->register_client_module('modernizr');
-                $this->register_client_module('multiselect');
-                $this->register_client_module('elfinder');
-                $this->register_client_module('prettify');
-                $this->register_client_module('bootstrap-switch');
-            }
-            else {
-                $this->register_client_module('json2');
-                $this->register_client_module('excanvas');
-                $this->register_client_module('canvas-to-blob');
-                $this->register_client_module('load-image');
-
-                $this->register_client_module('jquery');
-                $this->register_client_module('bootstrap');
-                $this->register_client_module('font-awesome');
-                $this->register_client_module('jquery.ui');
-                $this->register_client_module('jquery.dialog2');
-                $this->register_client_module('cresenity');
-                $this->register_client_module('fileupload');
-                $this->register_client_module('wysihtml5');
-                $this->register_client_module('notify');
-                $this->register_client_module('bootbox');
-                $this->register_client_module('form');
-                $this->register_client_module('controls');
-                $this->register_client_module('event');
-                $this->register_client_module('slimscroll');
-                $this->register_client_module('effects');
-                $this->register_client_module('validation');
-
-                $this->register_client_module('easing');
-
-                $this->register_client_module('chosen');
-                $this->register_client_module('uniform');
-                $this->register_client_module('select2');
-                $this->register_client_module('image-gallery');
-                $this->register_client_module('modernizr');
-                $this->register_client_module('multiselect');
-                $this->register_client_module('elfinder');
-                $this->register_client_module('prettify');
-                $this->register_client_module('bootstrap-switch');
-            }
-            if (ccfg::get('have_clock')) {
-                $this->register_client_module('servertime');
-            }
+            
+			
+            
+			$theme = ccfg::get('theme');
+			if($theme==null) $theme = 'cresenity';
+			$theme_file = CF::get_file('themes',$theme);
+			if(file_exists($theme_file)) {
+				$theme_data = include $theme_file;
+				$module_arr = carr::get($theme_data,'client_modules');
+				$css_arr = carr::get($theme_data,'css');
+				$js_arr = carr::get($theme_data,'js');
+				$cs = CClientScript::instance();
+				if($module_arr!=null) {
+					foreach($module_arr as $module) {
+						$this->register_client_module($module);
+					}
+				}
+				if (ccfg::get('have_clock')) {
+					$this->register_client_module('servertime');
+				}
+				if($css_arr!=null) {
+					foreach($css_arr as $css) {
+						$cs->register_css_files($css);
+					}
+				}
+				if($js_arr!=null) {
+					foreach($js_arr as $js) {
+						$cs->register_js_files($js);
+					}
+				}
+			}
         }
 
         public function render_template() {
@@ -551,7 +509,7 @@
             }
 
             $theme_path = "";
-            $theme_path = ctheme::path();
+            
 
             if (ccfg::get("install")) {
                 $v = CView::factory($theme_path . 'cinstall/page');

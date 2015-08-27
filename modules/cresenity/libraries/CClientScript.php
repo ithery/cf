@@ -40,6 +40,8 @@ class CClientScript extends CObject {
 		
 		foreach($dirs as $dir) {
 			$path = $dir.'js'.DS.$file;
+			
+			
 			if(file_exists($path)) {
 				return $path;
 			}
@@ -54,6 +56,7 @@ class CClientScript extends CObject {
 		
 		foreach($dirs as $dir) {
 			$path = $dir.'css'.DS.$file;
+			
 			if(file_exists($path)) {
 				return $path;
 			}

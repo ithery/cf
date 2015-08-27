@@ -48,6 +48,12 @@ final class CClientModules {
 		return $data;
 	}
 	
+	public function is_registered_module($mod) {
+		
+		return in_array($mod,$this->mods);
+		
+	}
+	
 	private function add_to_tree($tree,$module) {
 		$all_modules = $this->all_modules();
 		$mod = $all_modules[$module];

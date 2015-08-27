@@ -1782,10 +1782,19 @@
                   ->appendln("'bScrollCollapse': true,")->br()
                   ;
                  */
+				 
+				 
+				$jqueryui = "'bJQueryUI': true,";
+				if(!CClientModules::instance()->is_registered_module('jquery.ui')) {
+					
+					$jqueryui = "'bJQueryUI': false,";
+				}
+				
                 $js->append("")
                         ->appendln("'oLanguage': {
 						'sLoadingRecords': '" . clang::__('Loading') . "',
 						'sZeroRecords': '" . clang::__('No records to display') . "',
+						'responsive': true,
 						'oPaginate': {
 							'sFirst': '" . clang::__('First') . "',
 							'sPrevious': '" . clang::__('Previous') . "',
@@ -1794,7 +1803,7 @@
 							
 						}
 					},")->br()
-                        ->appendln("'bJQueryUI': true,")->br()
+                        ->appendln($jqueryui)->br()
                         ->appendln("'bStateSave': false,")->br()
                         ->appendln("'iDisplayLength': " . $this->display_length . ",")->br()
                         ->appendln("'bSortCellsTop': " . $hs_val . ",")->br()

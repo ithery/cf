@@ -248,5 +248,8 @@
             "js" => array("plugins" . DS . "dropzone" . DS . "dropzone.js"),
             "css" => array("plugins" . DS . "dropzone" . DS . "dropzone.css"),
         ),
+		"metismenu" => array(
+            "js" => array("plugins" . DS . "metisMenu" . DS . "jquery.metisMenu.js"),
+        ),
     );
 ?>

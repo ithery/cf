@@ -1,0 +1,54 @@
+<?php
+
+return array(
+	"client_modules"=>array(
+		'json2',
+		'excanvas',
+		'canvas-to-blob',
+		'load-image',
+		'jquery',
+		'bootstrap',
+		'font-awesome',
+		'jquery.ui',
+		'jquery.dialog2',
+		'slimscroll',
+		'fileupload',
+		'wysihtml5',
+		'notify',
+		'bootbox',
+		'form',
+		'controls',
+		'event',
+		'effects',
+		'validation',
+		'easing',
+		'chosen',
+		'uniform',
+		'select2',
+		'image-gallery',
+		'modernizr',
+		'multiselect',
+		'elfinder',
+		'prettify',
+		'bootstrap-switch',
+		
+	),
+	
+	
+	"js" => array(
+		"cresenity.func.js",
+		"cresenity.js",
+		"cresenity.item_batch.js",
+		"cresenity.pricing_detail.js",
+	),
+	"css" => array(
+		"cresenity.colors.css",
+		"cresenity.main.css",
+		"cresenity.responsive.css",
+		"cresenity.pos.css",
+		"cresenity.retail.css",
+		"cresenity.widget.css",
+		"cresenity.table.css",
+		"cresenity.css",
+	),
+);
