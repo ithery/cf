@@ -7,13 +7,19 @@
             
             $post = $_POST;
             
-            if (isset($post)) {
-                $this->git_pull();
+            if ($post != NUlL) {
+                $res = $this->git_pull();
+                if ($res) {
+                    cmsg::add('success', 'Success');
+                }
+                else {
+                    cmsg::add('error', 'Error');
+                }
             }
             
             $form = $app->add_form();
             $form->add_field()->set_label('Domain')->add_control('domain', 'text');
-            $form->add_action();
+            $form->add_action()->set_label('Submit');
             
             echo $app->render();
         }
@@ -26,8 +32,7 @@
             $repo = Git::open("C:/xampp/htdocs_pippo/application/" .$domain ."/");
             $res = $repo->run('fetch --progress --prune origin');
             $res = $repo->run('merge --no-commit --ff origin/Test');
-            $res = $repo->test_git();
-            var_dump($res);
+            return $res;
         }
 
     }
