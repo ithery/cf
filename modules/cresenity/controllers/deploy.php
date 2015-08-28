@@ -8,7 +8,7 @@
             $post = $_POST;
             
             if ($post != NUlL) {
-                $res = $this->git_pull();
+                $res = $this->git_pull_test();
                 if ($res) {
                     cmsg::add('success', 'Success');
                 }
@@ -19,7 +19,7 @@
             
             $form = $app->add_form();
             $form->add_field()->set_label('Domain')->add_control('domain', 'text');
-            $form->add_action()->set_label('Submit');
+            $form->add_action()->set_label('Submit')->set_submit(true);
             
             echo $app->render();
         }
