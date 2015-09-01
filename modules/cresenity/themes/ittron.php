@@ -38,4 +38,7 @@ return array(
 	"css" => array(
 		"ittron/ittron.css",
 	),
+	"config" => array(
+		"datatable_dom"=>'T<"clear">lfrtip',
+	),
 );

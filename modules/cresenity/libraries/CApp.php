@@ -151,7 +151,7 @@
             $this->run = false;
 
             $theme_path = "";
-            $theme_path = ctheme::path();
+            //$theme_path = ctheme::path();
             $this->_template = array(
                 'install' => $theme_path . 'cinstall/page',
                 'sign_up' => $theme_path . 'ccore/signup',
