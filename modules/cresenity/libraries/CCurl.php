@@ -16,6 +16,7 @@
         private $engine;
         private $soap_action;
         private $http_user_agent;
+        private $post_data;
 
         private function __construct($url = null, $engine = 'curl') {
             $this->autoinit = true;
@@ -311,12 +312,14 @@
         }
 
         public function set_raw_post($string) {
+            $this->post_data = $string;
             $this->set_opt(CURLOPT_POST, TRUE);
             $this->set_opt(CURLOPT_POSTFIELDS, $string);
             return $this;
         }
 
         public function set_post($data) {
+            $this->post_data = $data;
             $post_data = curl::as_post_string($data);
             $this->set_opt(CURLOPT_POST, true);
             $this->set_opt(CURLOPT_POSTFIELDS, $post_data);
@@ -348,6 +351,10 @@
             $this->set_opt(CURLOPT_URL, $url);
             $this->url = $url;
             return $this;
+        }
+        
+        public function get_post_data() {
+            return $this->post_data;
         }
 
     }
