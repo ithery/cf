@@ -108,17 +108,15 @@
 
                     $curr_data_date = carr::get($this->data_calendar, $the_date_complete_convert);
 
-                    if (count($curr_data_date) > 0) {
                         $id = carr::get($curr_data_date, 'id', '');
                         if (strlen($id) > 0) $id = ' id = "' . $id . '"';
                         $date_content .= carr::get($curr_data_date, 'content', '<br><br><span style="font-size:12px;color:red;">-</span>');
+
                         $attributes = '';
                         $all_attributes = carr::get($curr_data_date, 'attr', array());
                         foreach ($all_attributes as $all_attributes_k => $all_attributes_v) {
                             $attributes .= $all_attributes_k . '="' . $all_attributes_v . '" ';
                         }
-                    }
-
 
                     foreach ($this->attributes as $attr_k => $attr_v) {
                         $attributes .= $attr_k . '="' . $attr_v . '" ';
@@ -157,7 +155,6 @@
                         <i class="icon icon-arrow-right"></i></a>
                     </div>';
         }
-
         public function modal($the_date_complete, $the_date_complete_convert, $date_content) {
             return '<div class="modal fade" id="modal' . $the_date_complete_convert . '">
                       <div class="modal-dialog">
@@ -324,8 +321,7 @@
                             });
                         }
                 ";
-            }
-            else {
+            } else {
                 $return .= "$(function() {
                             var res_date = '';
                             
@@ -540,4 +536,5 @@
         }
 
     }
+    
     
