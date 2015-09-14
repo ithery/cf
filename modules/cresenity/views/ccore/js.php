@@ -588,9 +588,10 @@ cresenity.func.js
 					
 					$.cresenity._handle_response(data,function() {
 						jQuery('#'+id_target).html(data.html);
-						var script = $.cresenity.base64.decode(data.js);
-						//console.log(script);
-						eval(script);
+						if(data.js && data.js.length>0) {
+							var script = $.cresenity.base64.decode(data.js);
+							eval(script);
+						}
 						
 						jQuery('#'+id_target).removeClass('loading');
 						jQuery('#'+id_target).data('xhr',false);
@@ -739,8 +740,10 @@ cresenity.func.js
 					
 					$.cresenity._handle_response(data,function() {
 						jQuery('#'+id_target).html(data.html);
-						var script = $.cresenity.base64.decode(data.js);
-						eval(script);
+						if(data.js && data.js.length>0) {
+							var script = $.cresenity.base64.decode(data.js);
+							eval(script);
+						}
 						jQuery('#'+id_target).removeClass('loading');
 						jQuery('#'+id_target).data('xhr',false);
 						if(jQuery('#'+id_target).find('.prettyprint').length>0) {

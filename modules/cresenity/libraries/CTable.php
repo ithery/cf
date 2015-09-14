@@ -1730,8 +1730,10 @@
                                                     'data': aoData,
                                                     'success': function(data) {
                                                             fnCallback(data.datatable);
-                                                            var script = $.cresenity.base64.decode(data.js);
-                                                            eval(script);
+															if(data.js && data.js.length>0) {
+																var script = $.cresenity.base64.decode(data.js);
+																eval(script);
+															}
 
                                                     },
                                                     'error': function(a,b,c) {
