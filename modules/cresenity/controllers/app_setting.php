@@ -17,6 +17,7 @@ class App_setting_Controller extends CController {
             $dir = CF::get_dir('config');
             $file = $dir . 'app_setting' . EXT;
             cphp::save_value($request, $file);
+			cmsg::add('success',clang::__('Success Edit Setting'));
             curl::redirect(curl::base() . "app_setting");
         }
 
