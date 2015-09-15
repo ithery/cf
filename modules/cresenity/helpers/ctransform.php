@@ -136,8 +136,6 @@
         }
 
         public static function unformat_datetime($x) {
-            
-            
             return date('Y-m-d H:i:s', strtotime($x));
         }
 
