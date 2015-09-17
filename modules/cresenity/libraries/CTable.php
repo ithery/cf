@@ -68,7 +68,7 @@
             $this->default_paging_list["-1"] = clang::__("ALL");
             $this->tag = "table";
             $this->responsive = false;
-            $this->db = CDatabase::instance();
+            $this->db = CDatabase::instance($this->domain);
             $this->db_config = $this->db->config();
             $this->display_length = "10";
             $this->paging_list = $this->default_paging_list;
@@ -146,6 +146,10 @@
 			return $this;
 		}
 		
+		public function set_domain($domain) {
+			parent::set_domain($domain);
+			$this->db = CDatabase::instance($domain);
+		}
 		
         public function set_database($db) {
             $this->db = $db;
@@ -1617,6 +1621,7 @@
                         ->set_data('row_action_list', $this->row_action_list)
                         ->set_data('key_field', $this->key_field)
                         ->set_data('table', serialize($this))
+                        ->set_data('domain', $this->domain)
                         ->makeurl();
             }
 			

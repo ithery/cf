@@ -203,7 +203,8 @@
 
             $table = unserialize($obj->data->table);
             //$db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
-            $db = CDatabase::instance();
+			$domain = $obj->data->domain;
+            $db = CDatabase::instance($domain);
             
             
             $request = $_GET;
