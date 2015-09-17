@@ -677,6 +677,12 @@
             return $this->_org;
         }
 
+        public function org_id() {
+            $org = $this->org();
+			if($org==null) return null;
+			return $org->org_id;
+        }
+
         public function is_user_login() {
             return $this->user() != null;
         }
@@ -698,6 +704,12 @@
                 }
             }
             return $this->_store;
+        }
+		
+		public function store_id() {
+            $store = $this->store();
+			if($store==null) return null;
+			return $store->store_id;
         }
 
         public function get_child_array($id = "", $level = 0) {
