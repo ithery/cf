@@ -4,7 +4,7 @@ return array(
 	"app_code"=>"hotel",
 	"org_id"=>'7777',
 	"org_code"=>"development",
-	"store_id"=>null,
-	"store_code"=>null,
+	"store_id"=>'72',
+	"store_code"=>'hotel01',
 	"domain"=>"hotel.local",
 );
