@@ -2,7 +2,7 @@
 return array(
 	'app_id'=>'404',
 	'app_code'=>'torsb2c',
-	'org_id'=>15,
+	'org_id'=>16,
 	'org_code'=>'tiketpasti',
 	'store_id'=>NULL,
 	'store_code'=>NULL,
