@@ -9,8 +9,7 @@ class cstore {
 		);
 		
 		
-		
-		$data = cdata::get($store_code,$org_code.'/'.$store_code);
+		$data = cdata::get($store_code,'store/'.$org_code);
 		
 		if($data==null) return null;
 		foreach($default_data as $k=>$v) {
