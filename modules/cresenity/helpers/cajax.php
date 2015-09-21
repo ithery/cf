@@ -267,7 +267,10 @@
                 $sWhere = substr_replace($sWhere, "", -3);
             }
             // Quick Search
-            $qs_cond = json_decode($request['dttable_quick_search'], TRUE);
+			$qs_cond = array();
+			if(isset($request['dttable_quick_search'])) {
+				$qs_cond = json_decode($request['dttable_quick_search'], TRUE);
+			}
             if (isset($qs_cond) && count($qs_cond) > 0) {
                 
                
