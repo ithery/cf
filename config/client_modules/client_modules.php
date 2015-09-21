@@ -244,12 +244,13 @@
             "js" => array("plugins" . DS . "jstree" . DS . "jstree.min.js"),
             "css" => array("plugins" . DS . "jstree" . DS . "style.min.css"),
         ),
-		"dropzone" => array(
+        "dropzone" => array(
             "js" => array("plugins" . DS . "dropzone" . DS . "dropzone.js"),
             "css" => array("plugins" . DS . "dropzone" . DS . "dropzone.css"),
         ),
-		"metismenu" => array(
-            "js" => array("plugins" . DS . "metisMenu" . DS . "jquery.metisMenu.js"),
+        "dhtmlxgantt" => array(
+            "js" => array("plugins" . DS . "dhtmlxgantt" . DS . "dhtmlxgantt.js"),
+            "css" => array("plugins" . DS . "dhtmlxgantt" . DS . "dhtmlxgantt.css"),
         ),
     );
 ?>

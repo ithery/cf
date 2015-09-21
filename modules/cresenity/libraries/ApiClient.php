@@ -37,7 +37,7 @@
                 
                 if ($this->api_client_engine instanceof ApiEngine) {
                     try {
-                        $server_response = $this->api_client_engine->exec($this);
+                        $server_response = $this->api_client_engine->exec();
                         $this->response = $server_response;
                     }
                     catch (Exception $exc) {
@@ -49,8 +49,21 @@
         }
         
         final public function __after(){
-            $this->session_id = $this->session->get('session_id');
+            $this->session_id = $this->session->get_session_id();
+            
             $this->after();
+
+            $response = array();
+            $response['err_code'] = $this->error()->code();
+            $response['err_message'] = $this->error()->get_err_message();
+            if ($this->error()->code() == 0) {
+                $response['data'] = carr::get($this->response, 'data');
+            }
+            else {
+                $response['data'] = array();
+            }
+            
+            $this->response = $response;
         }
         
         
