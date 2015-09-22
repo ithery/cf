@@ -7,7 +7,7 @@
      * @license http://piposystem.com Piposystem
      */
     class ApiSession {
-        
+
         protected $reserved_key = array();
         protected $validate_expired = true;
         protected $last_activity = null;
@@ -16,16 +16,16 @@
         protected $data;
         protected $session_path = null;
         protected $cookies_path = null;
-        
+        protected $using_fopen = false;
         protected static $instance;
-        
+
         public function __construct($session_id = null, $have_cookies = false) {
-            $this->session_path = CAPPPATH .'sessions' .DS;
-            $this->cookies_path = CAPPPATH .'cookies' .DS;
+            $this->session_path = CAPPPATH . 'sessions' . DS;
+            $this->cookies_path = CAPPPATH . 'cookies' . DS;
             $this->session_id = $session_id;
             $this->have_cookies = $have_cookies;
             $this->data = array();
-            
+
             if ($session_id == null || strlen($session_id) == 0) {
                 $this->init();
             }
@@ -33,110 +33,130 @@
                 $this->load();
             }
         }
-        
-        public static function instance($session_id = null, $have_cookies = false){
+
+        public static function instance($session_id = null, $have_cookies = false) {
             if (self::$instance == null) {
                 self::$instance = new ApiSession($session_id, $have_cookies);
             }
             return self::$instance;
         }
-        
-        public function save($data = null){
+
+        public function save($data = null) {
             if ($data != null) {
                 $this->data = $data;
             }
-            $filename = $this->session_path .$this->session_id .EXT;
-            cphp::save_value($this->data, $filename);
+            $filename = $this->session_path . $this->session_id . EXT;
+            if ($this->using_fopen == true) {
+                $data_val = cphp::save_value($this->data, null);
+                $this->save_file($filename, $data_val);
+            }
+            else {
+                cphp::save_value($this->data, $filename);
+            }
             return $this;
         }
-        
-        public function load(){
+
+        public function save_file($filepath, $message) {
+            if (!$fp = @fopen($filepath, 'w+')) {
+                return FALSE;
+            }
+
+            flock($fp, LOCK_EX);
+            fwrite($fp, $message);
+            flock($fp, LOCK_UN);
+            fclose($fp);
+
+            @chmod($filepath, FILE_WRITE_MODE);
+        }
+
+        public function load() {
             $this->callback_load();
-            $filename = $this->session_path .$this->session_id .EXT;
-            
+            $filename = $this->session_path . $this->session_id . EXT;
+
             if (!file_exists($filename)) {
                 throw new Exception('Session file doesnt exists');
             }
             $this->data = cphp::load_value($filename);
             return $this;
         }
-        
+
         public function set($key, $val) {
             if (!isset($this->data[$key]) || $this->data[$key] != $val) {
+                $this->load();
                 $this->data[$key] = $val;
                 $this->save();
             }
             return $this;
         }
-        
+
         public function get($key, $default = null) {
             if (isset($this->data[$key])) {
                 return $this->data[$key];
             }
             return $default;
         }
-        
-        public function init(){
+
+        public function init() {
             $prefix = date("YmdHis");
             $this->session_id = uniqid($prefix);
-            
+
             $this->callback_init();
             $this->make_dir($this->session_path);
-            
+
             if ($this->have_cookies == true) {
-                $this->data['cookies_file'] = $this->cookies_path .$this->session_id;
+                $this->data['cookies_file'] = $this->cookies_path . $this->session_id;
             }
-            
+
             $this->data['session_id'] = $this->session_id;
-            $this->save();
+            $this->save(null, true);
             return $this;
         }
-        
-        public function callback_init(){
+
+        public function callback_init() {
             // override this method
         }
-        public function callback_load(){
+
+        public function callback_load() {
             // override this method
         }
-        
-        
+
         private function make_dir($path) {
             $tmp_path = explode(DS, $path);
-            
+
             $directory = '';
             foreach ($tmp_path as $tmp_path_k => $tmp_path_v) {
-                $directory .= $tmp_path_v .DS;
+                $directory .= $tmp_path_v . DS;
                 if (!is_dir($directory) && !file_exists($directory)) {
                     mkdir($directory);
                 }
             }
         }
 
-
-        public function get_session_id(){
+        public function get_session_id() {
             return $this->session_id;
         }
-        
-        public function error(){
+
+        public function error() {
             return ApiError::instance();
         }
-        
+
         public function set_validate_expired($validate_expired) {
             $this->validate_expired = $validate_expired;
             return $this;
         }
-        
+
         public function get_validate_expired() {
             return $this->validate_expired;
         }
-        
+
         public function set_last_activity($last_activity) {
             $this->last_activity = $last_activity;
             return $this;
         }
-        
+
         public function is_expired() {
             
         }
+
     }
     
