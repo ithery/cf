@@ -1,6 +1,5 @@
 <?php
 
-
     defined('SYSPATH') OR die('No direct access allowed.');
 
     class CApp extends CObservable {
@@ -17,7 +16,7 @@
         private $signup = false;
         private $activation = false;
         private $resend = false;
-		private $login_required = true;
+        private $login_required = true;
         private $_store = null;
         private $_role = null;
         private $_org = null;
@@ -168,12 +167,11 @@
         public function set_template($k, $v) {
             $this->_template[$k] = $v;
         }
-		
-		public function set_login_required($bool) {
-            return $this->login_required=$bool;
+
+        public function set_login_required($bool) {
+            return $this->login_required = $bool;
         }
-		
-		
+
         public function app_id() {
             return $this->_app_id;
         }
@@ -363,37 +361,37 @@
         }
 
         public function register_core_modules() {
-            
-			
-            
-			$theme = ccfg::get('theme');
-			if($theme==null) $theme = 'cresenity';
-			$theme_file = CF::get_file('themes',$theme);
-			if(file_exists($theme_file)) {
-				$theme_data = include $theme_file;
-				$module_arr = carr::get($theme_data,'client_modules');
-				$css_arr = carr::get($theme_data,'css');
-				$js_arr = carr::get($theme_data,'js');
-				$cs = CClientScript::instance();
-				if($module_arr!=null) {
-					foreach($module_arr as $module) {
-						$this->register_client_module($module);
-					}
-				}
-				if (ccfg::get('have_clock')) {
-					$this->register_client_module('servertime');
-				}
-				if($css_arr!=null) {
-					foreach($css_arr as $css) {
-						$cs->register_css_files($css);
-					}
-				}
-				if($js_arr!=null) {
-					foreach($js_arr as $js) {
-						$cs->register_js_files($js);
-					}
-				}
-			}
+
+
+
+            $theme = ccfg::get('theme');
+            if ($theme == null) $theme = 'cresenity';
+            $theme_file = CF::get_file('themes', $theme);
+            if (file_exists($theme_file)) {
+                $theme_data = include $theme_file;
+                $module_arr = carr::get($theme_data, 'client_modules');
+                $css_arr = carr::get($theme_data, 'css');
+                $js_arr = carr::get($theme_data, 'js');
+                $cs = CClientScript::instance();
+                if ($module_arr != null) {
+                    foreach ($module_arr as $module) {
+                        $this->register_client_module($module);
+                    }
+                }
+                if (ccfg::get('have_clock')) {
+                    $this->register_client_module('servertime');
+                }
+                if ($css_arr != null) {
+                    foreach ($css_arr as $css) {
+                        $cs->register_css_files($css);
+                    }
+                }
+                if ($js_arr != null) {
+                    foreach ($js_arr as $js) {
+                        $cs->register_js_files($js);
+                    }
+                }
+            }
         }
 
         public function render_template() {
@@ -509,7 +507,7 @@
             }
 
             $theme_path = "";
-            
+
 
             if (ccfg::get("install")) {
                 $v = CView::factory($theme_path . 'cinstall/page');
@@ -679,8 +677,8 @@
 
         public function org_id() {
             $org = $this->org();
-			if($org==null) return null;
-			return $org->org_id;
+            if ($org == null) return null;
+            return $org->org_id;
         }
 
         public function is_user_login() {
@@ -705,18 +703,27 @@
             }
             return $this->_store;
         }
-		
-		public function store_id() {
+
+        public function store_id() {
             $store = $this->store();
-			if($store==null) return null;
-			return $store->store_id;
+            if ($store == null) return null;
+            return $store->store_id;
         }
 
         public function get_child_array($id = "", $level = 0) {
+            $app = CApp::instance();
             $db = CDatabase::instance();
+            $org = $app->org();
+
+            $org_id = "";
+            if ($org != null) $org_id = $org->org_id;
+
             $q = "select role_id,name from roles where status>0 ";
             if (strlen($id) > 0) {
                 $q.=" and parent_id=" . $db->escape($id);
+            }
+            if (strlen($org_id) > 0) {
+                $q.=" and org_id=" . $db->escape($org_id);
             }
             $result = array();
             $r = $db->query($q);
