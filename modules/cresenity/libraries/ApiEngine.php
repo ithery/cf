@@ -75,7 +75,7 @@
             if ($exec == true) {
                 // log request to server
                 // WRITE LOG REQUEST
-                $this->__write_log($service_name, 'request');
+                $this->__write_log($service_name, 'request', $data);
 
                 // execute curl
                 $curl->exec();
@@ -90,7 +90,7 @@
 //            var_dump($this->response);
                 // log response from server
                 // WRITE LOG RESPONSE
-                $this->__write_log($service_name, 'response');
+                $this->__write_log($service_name, 'response', $response);
 
                 // get http response code
                 $http_response_code = $curl->get_http_code();
