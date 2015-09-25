@@ -63,8 +63,9 @@ class cnav {
 			$role_id = null;
 		}
 		$role = cdbutils::get_row('select * from roles where role_id='.$db->escape($role_id));
-		if($role->parent_id==null) return true;
-		
+		if($role!=null) {
+			if($role->parent_id==null) return true;
+		}
 		
 		$q = "select * from role_nav where nav=".$db->escape($nav["name"])." and role_id=".$db->escape($role_id)." and app_id=".$db->escape($app_id);
 		if($role_id==null) {
