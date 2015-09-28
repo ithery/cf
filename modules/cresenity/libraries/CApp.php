@@ -31,12 +31,17 @@
         private $run;
         protected $_template = array();
         protected $rendered = false;
+        private $mobile = false;
 
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
 
                 gc_collect_cycles();
             }
+        }
+
+        public function set_mobile($bool) {
+            $this->mobile = $bool;
         }
 
         public function setup($install = false) {
@@ -504,7 +509,7 @@
                 trigger_error('CApp already rendered');
             }
             $this->rendered = true;
-            if (crequest::is_ajax()) {
+            if (crequest::is_ajax()||$this->mobile==true) {
                 return $this->json();
             }
 
@@ -851,6 +856,8 @@
             $data["css_require"] = CClientScript::instance()->url_css_file();
             return cjson::encode($data);
         }
-
+        public function is_mobile() {
+            return $this->mobile;
+        }
     }
     

@@ -79,7 +79,12 @@ class CClientScript extends CObject {
 		//$path = curl::base()."media/js/";
 		$docroot=str_replace(DS,"/",DOCROOT);
 		$file=str_replace(DS,"/",$file);
-		$file=str_replace($docroot,curl::base(),$file);
+		$base_url = curl::base();
+		if(CApp::instance()->is_mobile()) {
+
+			$base_url = curl::base(false, 'http');
+		}
+		$file=str_replace($docroot,$base_url,$file);
 		return $file;
 	}
 	public function url_css_file($file=null) {
@@ -188,7 +193,9 @@ class CClientScript extends CObject {
 		$js_close = "";
 		$i=0;
 		foreach($js_files as $f) {
-			$js_open.=str_repeat("\t",$i)."require(['".$this->url_js_file($f)."'],function(){".PHP_EOL;
+			$url_js_file = $this->url_js_file($f);
+
+			$js_open.=str_repeat("\t",$i)."require(['".$url_js_file."'],function(){".PHP_EOL;
 			
 			$js_close.="})";
 			$i++;
