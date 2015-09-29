@@ -42,7 +42,7 @@ class CFormInputImage extends CFormInput {
 			$custom_css = ' style="'.$custom_css.'"';
 		}
 		$html->appendln('<div class="fileupload fileupload-new" data-provides="fileupload">');
-		$html->appendln('	<div class="fileupload-new thumbnail" ><img src="'.$this->imgsrc.'" /></div>');
+		$html->appendln('	<div class="fileupload-new thumbnail" ><img id="cimg_'.$this->id.'" src="'.$this->imgsrc.'" /></div>');
 		$html->appendln('	<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: '.$this->maxwidth.'px; max-height: '.$this->maxheight.'px; line-height: 20px;"></div>');
 		$html->appendln('	<div>');
 		$html->appendln('		<span class="btn btn-file">');

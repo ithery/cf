@@ -100,7 +100,12 @@ class CClientScript extends CObject {
 		//return CResource::instance('css')->url($file);
 		$docroot=str_replace(DS,"/",DOCROOT);
 		$file=str_replace(DS,"/",$file);
-		$file=str_replace($docroot,curl::base(),$file);
+		$base_url = curl::base();
+		if(CApp::instance()->is_mobile()) {
+
+			$base_url = curl::base(false, 'http');
+		}
+		$file=str_replace($docroot,$base_url,$file);
 		return $file;
 	}
 	

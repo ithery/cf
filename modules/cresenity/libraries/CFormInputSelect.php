@@ -135,6 +135,7 @@ class CFormInputSelect extends CFormInput {
         $js->set_indent($indent);
         $js->append(parent::js($indent))->br();
         if ($this->applyjs == "select2") {
+            CManager::instance()->register_module('select2');
             $js->append("$('#" . $this->id . "').select2();")->br();
         }
         if ($this->applyjs == "chosen") {
