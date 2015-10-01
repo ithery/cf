@@ -20,8 +20,16 @@
         protected static $instance;
 
         public function __construct($session_id = null, $have_cookies = false) {
-            $this->session_path = CAPPPATH . 'sessions' . DS;
-            $this->cookies_path = CAPPPATH . 'cookies' . DS;
+            $include_paths = CF::include_paths();
+            $this->session_path = $include_paths[0] .'sessions' .DS;
+            $this->cookies_path = $include_paths[0] .'cookies' .DS;
+            foreach ($include_paths as $path) {
+                if (is_dir($path)) {
+                    $this->session_path = $path . 'sessions' . DS;
+                    $this->cookies_path = $path . 'cookies' . DS;
+                    break;
+                }
+            }
             $this->session_id = $session_id;
             $this->have_cookies = $have_cookies;
             $this->data = array();

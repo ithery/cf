@@ -69,7 +69,11 @@ class CFormInputText extends CFormInput {
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . '>')->br();
+        $addition_attribute = "";
+        foreach ($this->attr as $k => $v) {
+            $addition_attribute.=" " . $k . '="' . $v . '"';
+        }
+        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css .$addition_attribute  .'>')->br();
         return $html->text();
     }
 

@@ -30,6 +30,7 @@
         protected $session;
         protected $related_curl_log_path = "";
         protected $prefix_log_file_name = null;
+        protected $using_log = true;
 
         protected function __construct() {
             
@@ -69,13 +70,16 @@
                 $obj_callback->request_callback($curl, $service_name, $data);
             }
 
-            $session_id = $this->session->get('session_id');
+            if ($this->session instanceof ApiSession) {
+                $session_id = $this->session->get_session_id();
+            }
 
             $curl->set_url($this->url_request);
             if ($exec == true) {
-                // log request to server
-                // WRITE LOG REQUEST
-                $this->__write_log($service_name, 'request', $data);
+                if ($this->using_log) {
+                    // WRITE LOG REQUEST
+                    $this->__write_log($service_name, 'request', $data);
+                }
 
                 // execute curl
                 $curl->exec();
@@ -87,10 +91,10 @@
                 $response = $curl->response();
                 $this->response = $response;
 
-//            var_dump($this->response);
-                // log response from server
-                // WRITE LOG RESPONSE
-                $this->__write_log($service_name, 'response', $response);
+                if ($this->using_log) {
+                    // WRITE LOG RESPONSE
+                    $this->__write_log($service_name, 'response', $response);
+                }
 
                 // get http response code
                 $http_response_code = $curl->get_http_code();
@@ -133,16 +137,18 @@
                 $req[$curl_k]['post_data'] = $arr_req;
             }
             $request_data[$service_name_multi] = $req;
-            $this->__write_log($service_name_multi, 'request', json_encode($request_data));
-//            $a = $this->session->get('product_category_code');
-//            $b = $this->session->get('session_id');
-//        $this->__write_log($service_name_multi, 'request');
+            if ($this->using_log == true) {
+                $this->__write_log($service_name_multi, 'request', json_encode($request_data));
+            }
+            
             // execute all curl
             $this->curl_multi->exec();
 
             // get response from curl multi
             $response = $this->curl_multi->last_response();
-            $this->__write_log($service_name_multi, 'response', json_encode($response));
+            if ($this->using_log == true) {
+                $this->__write_log($service_name_multi, 'response', json_encode($response));
+            }
             return $response;
         }
 
@@ -157,6 +163,11 @@
 
         public function get_curl() {
             return $this->curl;
+        }
+
+        public function set_using_log($using_log) {
+            $this->using_log = $using_log;
+            return $this;
         }
 
         private function __write_log($service_name, $status, $log_data = null) {
@@ -188,17 +199,25 @@
                 }
             }
 //        cdbg::var_dump($data_log);
-            $log_path = 'logs' . DS;
-            $log_path .= $this->related_curl_log_path;
+//            $log_path = 'logs' . DS;
+            $log_path = $this->related_curl_log_path;
 
 
-            $full_log_path = CAPPPATH;
-
+            $include_paths = CF::include_paths();
+            $full_log_path = $include_paths[0];
+            foreach ($include_paths as $path) {
+                if (is_dir($path)) {
+                    $full_log_path = $path . 'logs' . DS;
+                    break;
+                }
+            }
+            
             $full_log_path = str_replace('//', DS, $full_log_path);
             $temp_log_path = explode(DS, $log_path);
 
             foreach ($temp_log_path as $k => $v) {
                 $full_log_path .= $v . DS;
+                echo $full_log_path;
                 if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
                     mkdir($full_log_path);
                 }

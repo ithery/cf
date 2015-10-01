@@ -15,6 +15,7 @@
         protected $api_client_engine = null;
         protected $session_id = null;
         protected $session = null;
+        protected $cache = false;
         protected static $instance = null;
 
         protected function __construct($args) {
@@ -48,14 +49,16 @@
         }
 
         final public function __after() {
-            $this->session_id = $this->session->get_session_id();
+            if ($this->session instanceof ApiSession) {
+                $this->session_id = $this->session->get_session_id();
+            }
 
             $this->after();
 
             $response = array();
             $response['err_code'] = $this->error()->code();
             $response['err_message'] = $this->error()->get_err_message();
-            $response['session_id'] = $this->session->get_session_id();
+            $response['session_id'] = $this->session_id;
             if ($this->error()->code() == 0) {
                 $response['data'] = carr::get($this->response, 'data');
             }
