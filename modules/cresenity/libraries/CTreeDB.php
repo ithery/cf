@@ -9,6 +9,7 @@ class CTreeDB {
     private $table_name = '';
     private $org_id = null;
     protected $filters = array();
+    private $have_priority = false;
 
     public function __construct($table_name, $domain = null, $db = null,$prefix='') {
         if ($domain == null)
@@ -49,7 +50,12 @@ class CTreeDB {
         $this->filters[$k] = $v;
         return $this;
     }
-
+    
+    public function set_have_priority($boolean) {
+        $this->have_priority = $boolean;
+        return $this;
+    }
+    
     private function filter_where() {
         $where = "";
         $db = $this->db;
@@ -221,7 +227,7 @@ class CTreeDB {
 			FROM " . $db->escape_table($this->table_name) . " AS node
 			WHERE status>0
 
-		";
+		". $this->filter_where() ;
 
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
@@ -332,8 +338,9 @@ class CTreeDB {
             }
             $q.=" order by lft asc";
         }
+//        echo $q;
         $r = $db->query($q)->result(false);
-
+        
         return $r;
     }
 
@@ -372,6 +379,10 @@ class CTreeDB {
             $q.= " and parent_id = " . $db->escape($id);
         } else {
             $q.= " and parent_id is null";
+        }
+        
+        if ($this->have_priority) {
+            $q .= " ORDER BY priority";
         }
         $r = $db->query($q)->result(false);
         foreach ($r as $row) {

@@ -249,6 +249,10 @@
             var mouse    = this.mouse,
                 target   = $(e.target),
                 dragItem = target.closest(this.options.itemNodeName);
+        
+            if (target.closest('.btn-group').length > 0) {
+                return false;
+            }
 
             this.placeEl.css('height', dragItem.height());
 
