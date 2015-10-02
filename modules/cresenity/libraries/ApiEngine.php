@@ -208,6 +208,9 @@
             foreach ($include_paths as $path) {
                 if (is_dir($path)) {
                     $full_log_path = $path . 'logs' . DS;
+                    if (!is_dir($full_log_path)) {
+                        mkdir($full_log_path);
+                    }
                     break;
                 }
             }
@@ -217,7 +220,6 @@
 
             foreach ($temp_log_path as $k => $v) {
                 $full_log_path .= $v . DS;
-                echo $full_log_path;
                 if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
                     mkdir($full_log_path);
                 }

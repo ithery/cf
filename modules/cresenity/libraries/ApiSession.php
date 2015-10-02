@@ -18,15 +18,27 @@
         protected $cookies_path = null;
         protected $using_fopen = false;
         protected static $instance;
+        protected $default_session_path = null;
+        protected $default_cookies_path = null;
 
         public function __construct($session_id = null, $have_cookies = false) {
             $include_paths = CF::include_paths();
             $this->session_path = $include_paths[0] .'sessions' .DS;
+            $this->default_session_path = $include_paths[0] .'sessions' .DS;
             $this->cookies_path = $include_paths[0] .'cookies' .DS;
+            $this->default_cookies_path = $include_paths[0] .'cookies' .DS;
             foreach ($include_paths as $path) {
                 if (is_dir($path)) {
                     $this->session_path = $path . 'sessions' . DS;
+                    $this->default_session_path = $path . 'sessions' . DS;
                     $this->cookies_path = $path . 'cookies' . DS;
+                    $this->default_cookies_path = $path . 'cookies' . DS;
+                    if (!is_dir($this->default_session_path)) {
+                        mkdir($this->default_session_path);
+                    }
+                    if (!is_dir($this->default_cookies_path)) {
+                        mkdir($this->default_cookies_path);
+                    }
                     break;
                 }
             }
