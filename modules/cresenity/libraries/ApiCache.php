@@ -13,11 +13,13 @@
         protected $is_exists = false;
         protected $cache_data;
         protected $expired;
+        protected $save_as_string = false;
 
         protected function __construct($full_path = '') {
             $this->is_exists = false;
             $this->cache_data = null;
             $this->full_path = $full_path;
+            $this->save_as_string = false;
         }
 
         public static function instance($full_path = '') {
@@ -31,7 +33,12 @@
             $this->build_path();
             $is_exists = $this->is_exists();
             if ($is_exists === true) {
-                return include $this->full_path;
+                if ($this->save_as_string == false) {
+                    return include $this->full_path;
+                }
+                else {
+                    return file_get_contents($this->full_path);
+                }
             }
             return $this->is_exists;
         }
@@ -39,7 +46,12 @@
         public function save($cache_data) {
             $this->build_path();
             $this->cache_data = $cache_data;
-            cphp::save_value($this->cache_data, $this->full_path);
+            if ($this->save_as_string == false) {
+                cphp::save_value($this->cache_data, $this->full_path);
+            }
+            else {
+                file_put_contents($this->full_path, $this->cache_data);
+            }
             return $this;
         }
 
