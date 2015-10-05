@@ -452,5 +452,14 @@ $sales = array(
 			"have_sales"=>true,
 		),
 	),
+	array(
+		"name"=>"have_sales_warehouse_text",
+		"label"=>"Have Sales Warehouse Text",
+		"default"=>false,
+		"type"=>"checkbox",
+		"requirement"=>array(
+			"have_sales"=>true,
+		),
+	),
 	
 );
