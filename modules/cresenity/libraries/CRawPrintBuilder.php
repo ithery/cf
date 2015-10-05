@@ -19,7 +19,7 @@ class CRawPrintBuilder {
     public function __construct($driver_name = null) {
         if ($driver_name == null)
             $driver_name = 'LX300';
-        $driver_location = dirname(__FILE__) . DIRECTORY_SEPARATOR . "driver" . DIRECTORY_SEPARATOR . "CRawPrint" . DIRECTORY_SEPARATOR . $driver_name . EXT;
+        $driver_location = dirname(__FILE__) . DIRECTORY_SEPARATOR . "drivers" . DIRECTORY_SEPARATOR . "CRawPrint" . DIRECTORY_SEPARATOR . $driver_name . EXT;
 
         require_once $driver_location;
 
@@ -73,7 +73,13 @@ class CRawPrintBuilder {
         }
         return $this;
     }
-
+    
+    public function text($text, $width = null, $align = "L", $spacing = " "){
+        if ($align == "C") return $this->text_center($text, $width, $spacing);
+        elseif ($align == "R") return $this->text_right($text, $width, $spacing);
+        else return $this->text_left($text, $width, $spacing);
+    }
+    
     public function text_left($text, $width = null, $spacing = " ") {
         if ($width == null) {
             $this->data.=$text;
