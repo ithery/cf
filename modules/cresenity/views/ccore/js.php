@@ -652,8 +652,6 @@ cresenity.func.js
 			);
 		},
 		show_tooltip : function(id_target,url,method,text,toggle,position,title,data_addition) {
-
-			console.log(position);
 			if(typeof title == 'undefined') title='';
 			if(typeof position == 'undefined') position='auto';
 			if(typeof data_addition == 'undefined') data_addition={};
