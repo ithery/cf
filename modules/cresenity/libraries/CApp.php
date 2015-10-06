@@ -32,6 +32,7 @@
         protected $_template = array();
         protected $rendered = false;
         private $mobile = false;
+        private $header_body = '';
 
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
@@ -203,6 +204,10 @@
             return CF::instance();
         }
 
+        public function set_header_body($header_body){
+            $this->header_body = $header_body;
+            return $this;
+        }
         public function app_list() {
             if ($this->app_list == null) {
                 //we will get all available app for this org
@@ -439,6 +444,8 @@
                 $cs = CClientScript::instance();
                 $css_urls = $cs->url_css_file();
 
+                $v->header_body = $this->header_body;
+                
                 $js_urls = $cs->url_js_file();
                 $additional_js = "";
 
@@ -486,6 +493,7 @@
                 $v->load_client_script = $cs->render('load');
                 $v->ready_client_script = $cs->render('ready');
 
+                
                 $v->custom_js = $this->custom_js;
                 $v->custom_header = $this->custom_header;
                 $v->custom_footer = $this->custom_footer;
@@ -494,6 +502,7 @@
                 $v->breadcrumb = $this->breadcrumb;
                 $v->cheader = $this->_template['cheader'];
                 $v->cfooter = $this->_template['cfooter'];
+                
             }
 
             return $v->render();
@@ -565,6 +574,7 @@
                 $this->content = parent::html();
                 $this->js = parent::js();
                 $v->content = $this->content;
+                $v->header_body = $this->header_body;
                 
                 $v->title = $this->title;
                 $cs = CClientScript::instance();
