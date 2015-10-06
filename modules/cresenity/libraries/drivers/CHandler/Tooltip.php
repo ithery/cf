@@ -123,9 +123,15 @@ class CHandler_Tooltip_Driver extends CHandler_Driver {
                 ";
         }
         else {
-            $js.= "
+            if(strlen($this->url) == 0) {
+                $js.= "
+                    $.cresenity.show_tooltip('" .$this->owner ."', '', '','" .$this->text ."');
+                ";
+            } else {
+                $js.= "
                     $.cresenity.show_tooltip('" . $this->owner . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
                 ";
+            }
         }
         return $js;
     }

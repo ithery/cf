@@ -655,47 +655,51 @@ cresenity.func.js
 			if(typeof data_addition == 'undefined') data_addition={};
 			if(typeof text == 'undefined') text = ' ';
 			var _tooltip_html = '<div class="tooltip bottom" id="tooltip_' + id_target + '" role="tooltip">' +
-								  '<div class="tooltip-arrow" style="border-bottom: 5px solid #FFF !important;"></div>' +
-								  '<div class="tooltip-inner"  style="background:#FFF !important;">' +
-								  '<div class="header_tooltip"><span class="tooltip_close remove" style="color:#F00;cursor:pointer;">x close</span></div>' +
-								  '<div class="content_tooltip">' +
+								  '<div class="tooltip-arrow" style="border-bottom: 5px solid #F9F9F9 !important;"></div>' +
+								  '<div class="tooltip-inner"  style="background:#F9F9F9 !important;">' +
+								  '<div class="header_tooltip"><span class="tooltip_close" style="color:#F00;cursor:pointer;">x</span></div>' +
+								  '<div class="content_tooltip" style="color:#000 !important;">' +
 								  text +
 								  '</div></div>' +
 								'</div>';
 			var selection = jQuery('#'+id_target);
 			var handle;
 			var parent = $(_tooltip_html);
-			jQuery('#'+id_target).parent().append(parent);
-			jQuery('.tooltip_close').on( "click", function() {
-				jQuery('#tooltip_'+id_target).remove();
-			});
-			handle = $('.tooltip-inner', parent);
-			var xhr = handle.data('xhr');
-			if(xhr) xhr.abort();
-			url = $.cresenity.url.add_query_string(url,'capp_current_container_id','#tooltip_'+id_target);
-			handle.data('xhr',jQuery.ajax({
-					type: method,
-					url: url,
-					dataType: 'json',
-					data: data_addition,
-					
-				}).done(function( data ) {
-					$.cresenity._handle_response(data,function() {
-						jQuery('.content_tooltip').html(data.html);
-						if(data.js && data.js.length>0) {
-							var script = $.cresenity.base64.decode(data.js);
-							eval(script);
-						}
-					
-					});
-				}).error(function(obj,t,msg) {
-					if(msg!='abort') {
-						$.cresenity.message('error','Error, please call administrator... (' + msg + ')');
-					}
-				})
-			);
-			jQuery('#tooltip_'+id_target).addClass('has-popover').popover().css('opacity', '1');
-			// $("#tooltip_" + id_target).tooltip();
+			if(typeof jQuery('#tooltip_'+id_target).html() == 'undefined') {
+				jQuery('#'+id_target).parent().append(parent);
+				jQuery('.tooltip_close').on( "click", function() {
+					jQuery('#tooltip_'+id_target).remove();
+				});
+				handle = $('.tooltip-inner', parent);
+				if(url.length > 0) {
+					var xhr = handle.data('xhr');
+					if(xhr) xhr.abort();
+					url = $.cresenity.url.add_query_string(url,'capp_current_container_id','#tooltip_'+id_target);
+					handle.data('xhr',jQuery.ajax({
+							type: method,
+							url: url,
+							dataType: 'json',
+							data: data_addition,
+							
+						}).done(function( data ) {
+							$.cresenity._handle_response(data,function() {
+								jQuery('.content_tooltip').html(data.html);
+								if(data.js && data.js.length>0) {
+									var script = $.cresenity.base64.decode(data.js);
+									eval(script);
+								}
+							
+							});
+						}).error(function(obj,t,msg) {
+							if(msg!='abort') {
+								$.cresenity.message('error','Error, please call administrator... (' + msg + ')');
+							}
+						})
+					);
+				}
+				jQuery('#tooltip_'+id_target).addClass('has-popover').popover().css('opacity', '1');
+				// $("#tooltip_" + id_target).tooltip();
+			}
 		},
 		show_dialog : function(id_target,url,method,title,data_addition) {
 			if(!title) title = 'Dialog';
