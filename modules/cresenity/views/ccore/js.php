@@ -652,12 +652,13 @@ cresenity.func.js
 			);
 		},
 		show_tooltip : function(id_target,url,method,text,data_addition) {
+			console.log(text);
 			if(typeof data_addition == 'undefined') data_addition={};
 			if(typeof text == 'undefined') text = ' ';
-			var _tooltip_html = '<div class="tooltip bottom" id="tooltip_' + id_target + '" role="tooltip">' +
-								  '<div class="tooltip-arrow" style="border-bottom: 5px solid #F9F9F9 !important;"></div>' +
-								  '<div class="tooltip-inner"  style="background:#F9F9F9 !important;">' +
-								  '<div class="header_tooltip"><span class="tooltip_close" style="color:#F00;cursor:pointer;">x</span></div>' +
+			var _tooltip_html = '<div class="tooltip bottom" id="tooltip_' + id_target + '" role="tooltip" style="width:300px;border: 1px solid rgba(0,0,0,0.2);background-color: #FFF;border-radius: 4px;">' +
+								  '<div class="tooltip-arrow" style="border-bottom: 5px solid #FFF !important;"></div>' +
+								  '<div class="tooltip-inner"  style="background:#FFF !important; max-width: inherit !important;">' +
+								  '<div class="header_tooltip" style="text-align:right;"><span class="tooltip_close" style="color:#F00;cursor:pointer;">x</span></div>' +
 								  '<div class="content_tooltip" style="color:#000 !important;">' +
 								  text +
 								  '</div></div>' +
@@ -683,7 +684,7 @@ cresenity.func.js
 							
 						}).done(function( data ) {
 							$.cresenity._handle_response(data,function() {
-								jQuery('.content_tooltip').html(data.html);
+								jQuery('.content_tooltip').append(data.html);
 								if(data.js && data.js.length>0) {
 									var script = $.cresenity.base64.decode(data.js);
 									eval(script);

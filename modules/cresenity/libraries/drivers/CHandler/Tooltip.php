@@ -129,7 +129,7 @@ class CHandler_Tooltip_Driver extends CHandler_Driver {
                 ";
             } else {
                 $js.= "
-                    $.cresenity.show_tooltip('" . $this->owner . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
+                    $.cresenity.show_tooltip('" . $this->owner . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->text . "'," . $data_addition . ");
                 ";
             }
         }
