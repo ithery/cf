@@ -651,26 +651,20 @@ cresenity.func.js
 				})
 			);
 		},
-		show_tooltip : function(id_target,url,method,text,data_addition) {
-			console.log(text);
+		show_tooltip : function(id_target,url,method,text,toggle,position,title,data_addition) {
+
+			console.log(position);
+			if(typeof title == 'undefined') title='';
+			if(typeof position == 'undefined') position='auto';
 			if(typeof data_addition == 'undefined') data_addition={};
 			if(typeof text == 'undefined') text = ' ';
-			var _tooltip_html = '<div class="tooltip bottom" id="tooltip_' + id_target + '" role="tooltip" style="width:300px;border: 1px solid rgba(0,0,0,0.2);background-color: #FFF;border-radius: 4px;">' +
-								  '<div class="tooltip-arrow" style="border-bottom: 5px solid #FFF !important;"></div>' +
-								  '<div class="tooltip-inner"  style="background:#FFF !important; max-width: inherit !important;">' +
-								  '<div class="header_tooltip" style="text-align:right;"><span class="tooltip_close" style="color:#F00;cursor:pointer;">x</span></div>' +
-								  '<div class="content_tooltip" style="color:#000 !important;">' +
-								  text +
-								  '</div></div>' +
-								'</div>';
+			var _tooltip_html = '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>';
 			var selection = jQuery('#'+id_target);
 			var handle;
-			var parent = $(_tooltip_html);
-			if(typeof jQuery('#tooltip_'+id_target).html() == 'undefined') {
-				jQuery('#'+id_target).parent().append(parent);
-				jQuery('.tooltip_close').on( "click", function() {
-					jQuery('#tooltip_'+id_target).remove();
-				});
+			var html_content = text;
+			var parent = $(jQuery('#'+id_target).html());
+			var close_button = "<a id='closetooltip"+id_target+"' class='close' style='margin-left:10px;'>X</a>";
+			if(typeof jQuery('.popover').html() == 'undefined') {
 				handle = $('.tooltip-inner', parent);
 				if(url.length > 0) {
 					var xhr = handle.data('xhr');
@@ -684,12 +678,36 @@ cresenity.func.js
 							
 						}).done(function( data ) {
 							$.cresenity._handle_response(data,function() {
-								jQuery('.content_tooltip').append(data.html);
+								html_content += data.html;
+								if(position == 'auto' || position == '') {
+									$('#'+id_target).popover({
+											title: close_button + title,
+								            html : true,
+								            trigger:"manual",
+								            content: html_content,
+								            selector:true,
+								            template:_tooltip_html,
+							        });	
+								} else {
+							        $('#'+id_target).popover({
+											title: close_button + title,
+								            html : true,
+								            trigger:"manual",
+								            content: html_content,
+								            placement: position,
+								            selector:true,
+								            template:_tooltip_html,
+							        });								
+								}
 								if(data.js && data.js.length>0) {
 									var script = $.cresenity.base64.decode(data.js);
 									eval(script);
 								}
-							
+		        				$('#'+id_target).popover('show');
+								$( "#closetooltip"+id_target ).on( "click", function() {
+								  	$('#'+id_target).popover('destroy');
+								});
+								
 							});
 						}).error(function(obj,t,msg) {
 							if(msg!='abort') {
@@ -697,10 +715,38 @@ cresenity.func.js
 							}
 						})
 					);
+				} else {
+					if(position == 'auto' || position == '') {
+						$('#'+id_target).popover({
+								title: close_button + title,
+					            html : true,
+					            trigger:"manual",
+					            content: html_content,
+					            selector:true,
+					            template:_tooltip_html,
+				        });	
+					} else {
+				        $('#'+id_target).popover({
+								title: close_button + title,
+					            html : true,
+					            trigger:"manual",
+					            content: html_content,
+					            placement: position,
+					            selector:true,
+					            template:_tooltip_html,
+				        });								
+					}
+    				$('#'+id_target).popover('show');
+    				$( "#closetooltip"+id_target ).on( "click", function() {
+					  	$('#'+id_target).popover('destroy');
+					});
 				}
-				jQuery('#tooltip_'+id_target).addClass('has-popover').popover().css('opacity', '1');
-				// $("#tooltip_" + id_target).tooltip();
+			} else {
+				if(toggle == "1") {
+					$('#'+id_target).popover('destroy');
+				}
 			}
+
 		},
 		show_dialog : function(id_target,url,method,title,data_addition) {
 			if(!title) title = 'Dialog';

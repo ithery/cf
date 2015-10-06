@@ -15,6 +15,8 @@ class CHandler_Tooltip_Driver extends CHandler_Driver {
     protected $callback;
     protected $js_class;
     protected $text;
+    protected $toggle;
+    protected $position;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
@@ -23,7 +25,10 @@ class CHandler_Tooltip_Driver extends CHandler_Driver {
         $this->content = CHandlerElement::factory();
         $this->actions = CActionList::factory();
         $this->param_inputs = array();
+        $this->title = '';
         $this->text = '';
+        $this->toggle = false;
+        $this->position = "auto";
     }
    
     
@@ -49,7 +54,16 @@ class CHandler_Tooltip_Driver extends CHandler_Driver {
         $this->text = $text;
         return $this;
     }
+    public function set_position($position) {
+        $this->position = $position;
+        return $this;
+    }
     
+    public function set_toggle() {
+        $this->toggle = TRUE;
+        return $this;
+    }
+
     public function set_js_class($js_class) {
         $this->js_class = $js_class;
         return $this;
@@ -119,17 +133,17 @@ class CHandler_Tooltip_Driver extends CHandler_Driver {
             $content = addslashes($content);
             $content = str_replace("\r\n", "", $content);
             $js .= "
-                $." .$this->js_class .".show_tooltip('" .$this->owner ."','" .$this->text ."','" .$content ."');
+                $.cresenity.show_tooltip('" .$this->owner ."', '', '','" .$this->text ."', '" . $this->toggle . "', '" . $this->position . "', '" . $this->title . "');
                 ";
         }
         else {
             if(strlen($this->url) == 0) {
                 $js.= "
-                    $.cresenity.show_tooltip('" .$this->owner ."', '', '','" .$this->text ."');
+                    $.cresenity.show_tooltip('" .$this->owner ."', '', '','" .$this->text ."', '" . $this->toggle . "', '" . $this->position . "', '" . $this->title . "');
                 ";
             } else {
                 $js.= "
-                    $.cresenity.show_tooltip('" . $this->owner . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->text . "'," . $data_addition . ");
+                    $.cresenity.show_tooltip('" . $this->owner . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->text . "', '" . $this->toggle . "', '" . $this->position . "' , '" . $this->title ."'," . $data_addition . ");
                 ";
             }
         }
