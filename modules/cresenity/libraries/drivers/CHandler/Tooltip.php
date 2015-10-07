@@ -100,25 +100,6 @@ class CHandler_Tooltip_Driver extends CHandler_Driver {
             $data_addition.="'" . $inp . "':$.cresenity.value('#" . $inp . "')";
         }
         $data_addition = '{' . $data_addition . '}';
-        /*
-          $js.= "
-          var modal_opt_".$this->event."_".$this->owner." = {
-          id: 'modal_opt_".$this->event."_".$this->owner."_dialog', // id which (if specified) will be added to the dialog to make it accessible later
-          autoOpen: true , // Should the dialog be automatically opened?
-          title: '".$this->title."',
-          content: '".$this->generated_url()."',
-          buttons: {
-
-          },
-          closeOnOverlayClick: true , // Should the dialog be closed on overlay click?
-          closeOnEscape: true , // Should the dialog be closed if [ESCAPE] key is pressed?
-          removeOnClose: true , // Should the dialog be removed from the document when it is closed?
-          showCloseHandle: true , // Should a close handle be shown?
-          initialLoadText: '' // Text to be displayed when the dialogs contents are loaded
-          }
-          jQuery('<div/>').dialog2(modal_opt_".$this->event."_".$this->owner.");
-          ";
-         */
         $js_class = ccfg::get('js_class');
         if (strlen($js_class) > 0) {
             $this->js_class = $js_class;
