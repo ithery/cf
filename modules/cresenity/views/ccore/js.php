@@ -656,17 +656,45 @@ cresenity.func.js
 			if(typeof position == 'undefined') position='auto';
 			if(typeof data_addition == 'undefined') data_addition={};
 			if(typeof text == 'undefined') text = ' ';
-			var _tooltip_html = '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>';
+			var _tooltip_html = '<div class="popover" id="popover'+id_target+'" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content" id="popover-content'+id_target+'"></div></div>';
 			var selection = jQuery('#'+id_target);
 			var handle;
 			var html_content = text;
 			var parent = $(jQuery('#'+id_target).html());
 			var close_button = "<a id='closetooltip"+id_target+"' class='close' style='margin-left:10px;'>X</a>";
-			if(typeof jQuery('.popover').html() == 'undefined') {
+			if(typeof jQuery('#popover'+id_target).html() == 'undefined') {
+				if(url.length > 0) {
+					text = jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x'));
+				}
+				if(position == 'auto' || position == '') {
+					$('#'+id_target).popover({
+							container: 'body',
+							title: close_button + title,
+				            html : true,
+				            trigger:"manual",
+				            content: text,
+				            selector:true,
+				            template:_tooltip_html,
+			        });	
+				} else {
+			        $('#'+id_target).popover({
+			        		container: 'body',
+							title: close_button + title,
+				            html : true,
+				            trigger:"manual",
+				            content: text,
+				            placement: position,
+				            selector:true,
+				            template:_tooltip_html,
+			        });								
+				}
+				$('#'+id_target).popover('show');
+				
 				handle = $('.tooltip-inner', parent);
 				if(url.length > 0) {
 					var xhr = handle.data('xhr');
 					if(xhr) xhr.abort();
+
 					url = $.cresenity.url.add_query_string(url,'capp_current_container_id','#tooltip_'+id_target);
 					handle.data('xhr',jQuery.ajax({
 							type: method,
@@ -676,69 +704,51 @@ cresenity.func.js
 							
 						}).done(function( data ) {
 							$.cresenity._handle_response(data,function() {
-								html_content += data.html;
+								$('#'+id_target).popover('destroy');
 								if(position == 'auto' || position == '') {
 									$('#'+id_target).popover({
+											animation: false,
 											title: close_button + title,
 								            html : true,
 								            trigger:"manual",
-								            content: html_content,
+								            content: html_content + data.html,
 								            selector:true,
 								            template:_tooltip_html,
 							        });	
 								} else {
 							        $('#'+id_target).popover({
+							        		animation: false,
 											title: close_button + title,
 								            html : true,
 								            trigger:"manual",
-								            content: html_content,
+								            content: html_content + data.html,
 								            placement: position,
 								            selector:true,
 								            template:_tooltip_html,
 							        });								
 								}
+								$('#'+id_target).popover('show');
 								if(data.js && data.js.length>0) {
 									var script = $.cresenity.base64.decode(data.js);
 									eval(script);
 								}
-		        				$('#'+id_target).popover('show');
 								$( "#closetooltip"+id_target ).on( "click", function() {
 								  	$('#'+id_target).popover('destroy');
 								});
-								
 							});
 						}).error(function(obj,t,msg) {
 							if(msg!='abort') {
 								$.cresenity.message('error','Error, please call administrator... (' + msg + ')');
 							}
+							$('#'+id_target+'-loading').remove();
 						})
 					);
 				} else {
-					if(position == 'auto' || position == '') {
-						$('#'+id_target).popover({
-								title: close_button + title,
-					            html : true,
-					            trigger:"manual",
-					            content: html_content,
-					            selector:true,
-					            template:_tooltip_html,
-				        });	
-					} else {
-				        $('#'+id_target).popover({
-								title: close_button + title,
-					            html : true,
-					            trigger:"manual",
-					            content: html_content,
-					            placement: position,
-					            selector:true,
-					            template:_tooltip_html,
-				        });								
-					}
-    				$('#'+id_target).popover('show');
-    				$( "#closetooltip"+id_target ).on( "click", function() {
+					$( "#closetooltip"+id_target ).on( "click", function() {
 					  	$('#'+id_target).popover('destroy');
 					});
 				}
+				
 			} else {
 				if(toggle == "1") {
 					$('#'+id_target).popover('destroy');
