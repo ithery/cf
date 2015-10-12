@@ -573,6 +573,7 @@
                 
                 $this->content = parent::html();
                 $this->js = parent::js();
+                
                 $v->content = $this->content;
                 $v->header_body = $this->header_body;
                 
@@ -636,6 +637,26 @@
             }
             
             return $v->render();
+        }
+        
+        
+        public function get_all_js() {
+            $cs = CClientScript::instance();
+            $this->js = parent::js();
+            $additional_js = '';
+            $js = "";
+                $vjs = CView::factory('ccore/js');
+                $js.=PHP_EOL . $vjs->render();
+
+                $js .= PHP_EOL . $this->js . $additional_js;
+
+                $js = $cs->render_js_require($js);
+
+                if (ccfg::get("minify_js")) {
+                    $js = CJSMin::minify($js);
+                }
+
+                return $js;
         }
 
         public function admin() {

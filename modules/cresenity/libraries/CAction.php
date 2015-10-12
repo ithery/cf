@@ -16,6 +16,7 @@ class CAction extends CElement {
     protected $confirm;
     protected $style;
     protected $confirm_message;
+    protected $button;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -34,6 +35,7 @@ class CAction extends CElement {
         $this->disabled = false;
         $this->confirm = false;
         $this->confirm_message = "";
+        $this->button = false;
     }
 
     public static function factory($id = '') {
@@ -103,9 +105,14 @@ class CAction extends CElement {
         }
         return $this;
     }
-
+    
     public function set_disabled($bool) {
         $this->disabled = $bool;
+        return $this;
+    }
+    
+    public function set_button($bool) {
+        $this->button = $bool;
         return $this;
     }
 
@@ -213,7 +220,12 @@ class CAction extends CElement {
 
             if ($this->submit)
                 $input_type = "submit";
-            $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '/>');
+            if ($this->button) {
+                $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '>'.$this->label.'</button>');
+            }
+            else {
+                $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr .$addition_attribute. $custom_css . '/>');
+            }
         } else {
             if ($this->type == "jsfunc") {
                 $link = 'javascript:;';

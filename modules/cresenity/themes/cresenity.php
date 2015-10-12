@@ -31,7 +31,6 @@ return array(
 		'elfinder',
 		'prettify',
 		'bootstrap-switch',
-		
 	),
 	
 	

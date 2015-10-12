@@ -22,6 +22,7 @@
         protected $ajax_process_id;
         protected $ajax_submit_handlers;
         protected $ajax_submit_target;
+        protected $ajax_submit_target_class;
         protected $auto_set_focus;
 
         public function __construct($form_id = "") {
@@ -48,6 +49,7 @@
             $this->ajax_redirect_url = "";
             $this->ajax_submit_handlers = array();
             $this->ajax_submit_target = false;
+            $this->ajax_submit_target_class = false;
             $this->auto_set_focus = true;
             CManager::instance()->register_module('validation');
         }
@@ -113,6 +115,11 @@
 
         public function set_ajax_submit_target($target) {
             $this->ajax_submit_target = $target;
+            return $this;
+        }
+        
+        public function set_ajax_submit_target_class($target) {
+            $this->ajax_submit_target_class = $target;
             return $this;
         }
 
@@ -456,13 +463,45 @@
 				}
 				";
                 }
+                
+                if (strlen($this->ajax_submit_target_class) > 0) {
+                    $on_before_submit = "
+					jQuery('." . $this->ajax_submit_target_class . "').children().hide();
+					jQuery('." . $this->ajax_submit_target_class . "').append(jQuery('<div>').attr('class','." . $this->ajax_submit_target_class . "-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+
+				";
+
+                    $this->ajax_datatype = "json";
+                    //the response is json
+                    $on_success_script = "
+				jQuery('." . $this->ajax_submit_target_class . "').html(data.html);
+				var script = $.cresenity.base64.decode(data.js);
+
+				eval(script);
+				jQuery('." . $this->ajax_submit_target_class . "').removeClass('loading');
+				jQuery('." . $this->ajax_submit_target_class . "').data('xhr',false);
+				if(jQuery('." . $this->ajax_submit_target_class . "').find('.prettyprint').length>0) {
+					window.prettyPrint && prettyPrint();
+				}
+				";
+                }
+                
+                $validation_if_open = '';
+                $validation_if_close = '';
+                if($this->validation) {
+                    $validation_if_open = "if ($('#" . $this->id . "').validationEngine('validate') ) {";
+                    $validation_if_close = "					} else {
+						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
+					}
+";
+                }
                 $js->appendln("
 				$('#" . $this->id . " input[type=submit]').click(function() {
 					$('input[type=submit]', $(this).parents('form')).removeAttr('clicked');
 					$(this).attr('clicked', 'true');
 				});
 				$('#" . $this->id . "').submit(function(event) {
-					if ($('#" . $this->id . "').validationEngine('validate') ) {
+					".$validation_if_open."
 						if($('#" . $this->id . "').hasClass('loading')) return false;
 						//don't do it again if still loading
 						$('#" . $this->id . "').addClass('loading');
@@ -507,10 +546,7 @@
 						}
 						" . $on_before_submit . "
 						$('#" . $this->id . "').ajaxSubmit(options); 
-						
-					} else {
-						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
-					}
+					".$validation_if_close."	
 					//never submit form
 					return false;
 				});
