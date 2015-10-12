@@ -342,10 +342,11 @@ class Cresenity_Controller extends CController {
 
                         $q = "select * from users where status>0 and username=" . $db->escape($email) . " and password=md5(" . $db->escape($password) . ")";
                         $org = CApp::instance()->org();
+                        
                         if ($org != null) {
                             $q.=" and org_id=" . $db->escape($org->org_id);
                         }
-						
+                        
                         $row = $db->query($q);
                         if ($row->count() > 0) {
                             //check activation
