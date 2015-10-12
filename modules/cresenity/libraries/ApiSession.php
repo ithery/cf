@@ -123,12 +123,13 @@
             $this->callback_init();
             $this->make_dir($this->session_path);
 
+            
             if ($this->have_cookies == true) {
                 $this->data['cookies_file'] = $this->cookies_path . $this->session_id;
             }
 
             $this->data['session_id'] = $this->session_id;
-            $this->save(null, true);
+            $this->save(null);
             return $this;
         }
 
