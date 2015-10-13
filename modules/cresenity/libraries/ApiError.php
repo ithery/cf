@@ -35,9 +35,15 @@
 //            return $this;
 //        }
         
-        public function add_default($err_code){
+        public function add_default($err_code, $additional_message = '', $replace = array()){
             $err_message = carr::get($this->error_list, $err_code);
-            $this->add($err_message, $err_code);
+            
+            foreach ($replace as $replace_k => $replace_v) {
+                $err_message = str_replace(':' .$replace_k, $replace_v, $err_message);
+            }
+            
+            $this->add($err_message .' ' .$additional_message, $err_code);
+            return $this;
         }
         
         public function add($err_message, $err_code = "9999"){
