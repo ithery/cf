@@ -56,12 +56,12 @@
         public $report_header = array();
         public $footer_action_list = array();
         public $footer_action_style;
-		public $export_filename='';
-		public $export_sheetname='';
-		
+        public $export_filename = '';
+        public $export_sheetname = '';
         protected $quick_search = FALSE;
         protected $tbody_id;
         protected $js_cell;
+        protected $dom = null;
 
         public function __construct($id = "") {
             parent::__construct($id);
@@ -121,63 +121,64 @@
             $this->tbody_id = '';
 
             $this->report_header = array();
-			$this->footer_action_list = CActionList::factory();
-			$this->footer_action_style = 'btn-list';
-			$this->footer_action_list->set_style('btn-list');
-			
-			//$this->add_footer_action($this->id.'_export_excel');
-			
-			$this->export_filename = $this->id;
-			$this->export_sheetname = $this->id;
-			
+            $this->footer_action_list = CActionList::factory();
+            $this->footer_action_style = 'btn-list';
+            $this->footer_action_list->set_style('btn-list');
+
+            //$this->add_footer_action($this->id.'_export_excel');
+
+            $this->export_filename = $this->id;
+            $this->export_sheetname = $this->id;
+
             CClientModules::instance()->register_module('jquery.datatable');
         }
 
         public static function factory($id = "") {
             return new CTable($id);
         }
-		
-		public function set_export_filename($filename) {
-			$this->export_filename = $filename;
-			return $this;
-		}
-		public function set_export_sheetname($sheetname) {
-			$this->export_sheetname = $sheetname;
-			return $this;
-		}
-		
-		public function set_domain($domain) {
-			parent::set_domain($domain);
-			$this->db = CDatabase::instance($domain);
-		}
-		
+
+        public function set_export_filename($filename) {
+            $this->export_filename = $filename;
+            return $this;
+        }
+
+        public function set_export_sheetname($sheetname) {
+            $this->export_sheetname = $sheetname;
+            return $this;
+        }
+
+        public function set_domain($domain) {
+            parent::set_domain($domain);
+            $this->db = CDatabase::instance($domain);
+        }
+
         public function set_database($db) {
             $this->db = $db;
             $this->db_config = $db->config();
 
             return $this;
         }
-		
-		public static function action_download_excel($data) {
-			$table = $data->table;
-			$table = unserialize($table);
-			$export_filename = $table->export_filename;
-			if(substr($table->export_filename,3)!='xls') {
-				$export_filename.='.xls';
-			}
-			self::export_excelxml_static($export_filename,$table->export_sheetname,$table);
-		}
-		
+
+        public static function action_download_excel($data) {
+            $table = $data->table;
+            $table = unserialize($table);
+            $export_filename = $table->export_filename;
+            if (substr($table->export_filename, 3) != 'xls') {
+                $export_filename.='.xls';
+            }
+            self::export_excelxml_static($export_filename, $table->export_sheetname, $table);
+        }
+
         public function add_footer_action($id = "") {
             $row_act = CAction::factory($id);
             $this->footer_action_list->add($row_act);
-            
+
             return $row_act;
         }
-		
-		private static function export_excelxml_static($filename, $sheet_name=null, $table) {
-			
-			
+
+        private static function export_excelxml_static($filename, $sheet_name = null, $table) {
+
+
             header("Cache-Control: no-cache, no-store, must-revalidate");
             header("Content-Type: application/vnd.ms-excel");
             header("Content-Disposition: attachment; filename=" . $filename);
@@ -294,12 +295,12 @@
             echo '<tbody>';
             $no = 0;
             $data = $table->data;
-			if(!is_resource($data)) {
-				$data = CDatabase::instance()->query($table->query);
-			}
-			if(!is_resource($data)) {
-				if (is_object($data)) $data = $data->result_array(false);
-			}
+            if (!is_resource($data)) {
+                $data = CDatabase::instance()->query($table->query);
+            }
+            if (!is_resource($data)) {
+                if (is_object($data)) $data = $data->result_array(false);
+            }
             foreach ($data as $row) {
                 $no++;
                 $key = "";
@@ -457,7 +458,7 @@
             echo '</body>';
             echo '</html>';
             exit;
-		}
+        }
 
         public function have_footer_action() {
             //return $this->can_edit||$this->can_delete||$this->can_view;
@@ -471,6 +472,11 @@
         public function set_title($title, $lang = true) {
             if ($lang) $title = clang::__($title);
             $this->title = $title;
+            return $this;
+        }
+        
+        public function set_dom($dom){
+            $this->dom = $dom;
             return $this;
         }
 
@@ -532,7 +538,7 @@
 
         public function set_action_style($style) {
             $this->action_style = $style;
-            $this->row_action_list->set_style($style);
+            return $this->row_action_list->set_style($style);
         }
 
         public function set_header_action_style($style) {
@@ -816,9 +822,7 @@
             }
             exit;
         }
-		
-		
-		
+
         public function export_excelxml($filename, $sheet_name = null) {
             $this->export_excelxml = true;
             header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -938,7 +942,7 @@
             $no = 0;
             $data = $this->data;
             if (is_object($data)) $data = $data->result_array(false);
-			
+
             foreach ($data as $row) {
                 $no++;
                 $key = "";
@@ -1366,7 +1370,7 @@
             $html->appendln("<tbody " . $tbody_id . " >" . $data_responsive_close)->inc_indent()->br();
             //render body;
             $html->appendln(parent::html($indent));
-			$no = 0;
+            $no = 0;
             if (!$this->ajax) {
                 foreach ($this->data as $row) {
                     if ($row instanceof CRenderable) {
@@ -1603,7 +1607,7 @@
              */
 
 
-
+//            echo '<textarea>' . $html->text() . '</textarea>';
 
             return $html->text();
         }
@@ -1624,26 +1628,26 @@
                         ->set_data('domain', $this->domain)
                         ->makeurl();
             }
-			
-			foreach($this->footer_action_list->childs() as $row_act) {
-				$id = $row_act->id();
-				if ((strpos($id,'export_excel')!==false)) {
-					$row_act->set_label('Download Excel')->set_icon('file');
-					
-				
-					$action_url = CAjaxMethod::factory()->set_type('callback')
-							->set_data('callable', array('CTable','action_download_excel'))
-							->set_data('query', $this->query)
-							->set_data('row_action_list', $this->row_action_list)
-							->set_data('key_field', $this->key_field)
-							->set_data('table', serialize($this))
-							->makeurl();
-					$row_act->add_listener('click')->add_handler('custom')->set_js("window.location.href='".$action_url."';");
-				}
-			}
+
+            foreach ($this->footer_action_list->childs() as $row_act) {
+                $id = $row_act->id();
+                if ((strpos($id, 'export_excel') !== false)) {
+                    $row_act->set_label('Download Excel')->set_icon('file');
+
+
+                    $action_url = CAjaxMethod::factory()->set_type('callback')
+                            ->set_data('callable', array('CTable', 'action_download_excel'))
+                            ->set_data('query', $this->query)
+                            ->set_data('row_action_list', $this->row_action_list)
+                            ->set_data('key_field', $this->key_field)
+                            ->set_data('table', serialize($this))
+                            ->makeurl();
+                    $row_act->add_listener('click')->add_handler('custom')->set_js("window.location.href='" . $action_url . "';");
+                }
+            }
             $js = new CStringBuilder();
-			
-			
+
+
             $js->set_indent($indent);
 
 
@@ -1789,14 +1793,14 @@
                   ->appendln("'bScrollCollapse': true,")->br()
                   ;
                  */
-				 
-				 
-				$jqueryui = "'bJQueryUI': true,";
-				if(!CClientModules::instance()->is_registered_module('jquery.ui')) {
-					
-					$jqueryui = "'bJQueryUI': false,";
-				}
-				
+
+
+                $jqueryui = "'bJQueryUI': true,";
+                if (!CClientModules::instance()->is_registered_module('jquery.ui')) {
+
+                    $jqueryui = "'bJQueryUI': false,";
+                }
+
                 $js->append("")
                         ->appendln("'oLanguage': {
 						'sLoadingRecords': '" . clang::__('Loading') . "',
@@ -1848,10 +1852,16 @@
                  */
 
 
+                if ($this->dom == null) {
+                    $this->dom = '<\"\"l>t<\"F\"<\"#footer_action_"' . $this->id .'"\">frp>';
+                }
+                else {
+                    $this->dom = str_replace("'", "\'", $this->dom);
+                }
                 $js->append("")
                         ->appendln("'sPaginationType': 'full_numbers',")->br()
-                        ->appendln("'sDom': '<\"\"l>t<\"F\"<\"#footer_action_" . $this->id . "\">frp>',")->br()
-                ;
+                        ->appendln("'sDom': '" .$this->dom ."',")->br();
+                
                 /*
                   $js->append("
                   'fnDrawCallback': function ( oSettings ) {");
@@ -1972,7 +1982,7 @@
             }
             $js->appendln($this->js_cell);
             if (!$this->ajax) {
-		$js->append(parent::js($indent))->br();
+                $js->append(parent::js($indent))->br();
                 foreach ($this->data as $row) {
                     if ($row instanceof CRenderable) {
                         $js->appendln($row->js())->br();
@@ -1996,6 +2006,7 @@
                 }
             }
 
+//            echo '<textarea>' . $js->text() . '</textarea>';
 
 //            clog::write($js->text());
             return $js->text();

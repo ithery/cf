@@ -5,12 +5,14 @@ class CActionList extends CElement {
     public $actions = array();
     protected $style;
     protected $label;
+    protected $btn_dropdown_classes;
 
     public function __construct($list_id) {
         parent::__construct($list_id);
 
         $this->style = "btn-list";
         $this->label = clang::__("Action");
+        $this->btn_dropdown_classes = array();
     }
 
     public static function factory($list_id = "") {
@@ -19,6 +21,11 @@ class CActionList extends CElement {
 
     public function set_label($label) {
         $this->label = $label;
+        return $this;
+    }
+    
+    public function add_btn_dropdown_class($class){
+        $this->btn_dropdown_classes[] = $class;
         return $this;
     }
 
@@ -46,8 +53,14 @@ class CActionList extends CElement {
         $html->set_indent($indent);
         $classes = $this->classes;
         $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
+        if (strlen($classes) > 0) {
             $classes = " " . $classes;
+        }
+        $btn_dropdown_classes = $this->btn_dropdown_classes;
+        $btn_dropdown_classes = implode(" ", $btn_dropdown_classes);
+        if (strlen($btn_dropdown_classes) > 0) {
+            $btn_dropdown_classes = " " . $btn_dropdown_classes;
+        }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
@@ -76,7 +89,7 @@ class CActionList extends CElement {
         if ($this->style == "btn-dropdown") {
 
             $html->appendln('
-                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn ' .$btn_dropdown_classes .' dropdown-toggle" data-toggle="dropdown" href="#">
                             ' . $this->label . '
                             <span class="caret"></span>
                     </a>
