@@ -178,6 +178,21 @@
         public function is_expired() {
             
         }
+        
+        public function get_session_file($include = false){
+            $filename = $this->session_path . $this->session_id . EXT;
+//            echo $filename;
+            if (!file_exists($filename)) {
+                throw new Exception('Session file doesnt exists');
+            }
+            if ($include == true) {
+                $file = include $filename;
+            }
+            else {
+                $file = file_get_contents($filename);
+            }
+            return $file;
+        }
 
     }
     

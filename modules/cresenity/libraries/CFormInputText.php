@@ -5,6 +5,7 @@ class CFormInputText extends CFormInput {
     protected $vk;
     protected $vk_opt;
     protected $placeholder;
+    protected $bootstrap;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -18,6 +19,10 @@ class CFormInputText extends CFormInput {
             'preventPaste' => 'true',
             'autoAccept' => 'true',
         );
+        $this->bootstrap = ccfg::get('bootstrap');
+        if (strlen($this->bootstrap) == 0) {
+            $this->bootstrap = '2';
+        }
 
         $this->vk_opt = $default_option;
     }
@@ -64,6 +69,10 @@ class CFormInputText extends CFormInput {
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
             $classes = " " . $classes;
+        
+        if ($this->bootstrap == '3') {
+            $classes = $classes ." form-control ";
+        }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
