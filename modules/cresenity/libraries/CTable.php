@@ -1853,7 +1853,7 @@
 
 
                 if ($this->dom == null) {
-                    $this->dom = '<\"\"l>t<\"F\"<\"#footer_action_"' . $this->id .'"\">frp>';
+                    $this->dom = "<\"\"l>t<\"F\"<\"#footer_action_" . $this->id ."\">frp>";
                 }
                 else {
                     $this->dom = str_replace("'", "\'", $this->dom);

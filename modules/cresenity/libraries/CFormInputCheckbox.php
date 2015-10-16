@@ -82,7 +82,7 @@ class CFormInputCheckbox extends CFormInput {
         $html->append('<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . '' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $checked . '>');
         if (strlen($this->label) > 0) {
             if ($this->label_wrap) {
-                $html->appendln('<label for="'.$this->id.'">');
+                $html->appendln('<label for="'.$this->id.'" class="checkbox-label"><span></span>');
             }
             $html->appendln('&nbsp;' . $this->label);
             if ($this->label_wrap) {
