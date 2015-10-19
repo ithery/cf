@@ -14,12 +14,14 @@
         protected $cache_data;
         protected $expired;
         protected $save_as_string = false;
+        protected $filename;
 
         protected function __construct($full_path = '') {
             $this->is_exists = false;
             $this->cache_data = null;
             $this->full_path = $full_path;
             $this->save_as_string = false;
+            $this->filename = null;
         }
 
         public static function instance($full_path = '') {
@@ -46,6 +48,12 @@
         public function save($cache_data) {
             $this->build_path();
             $this->cache_data = $cache_data;
+//            if (file_exists($this->full_path)) {
+//                $suffix = '';
+//                $new_path = str_replace('.cache', '.cache', $this->full_path);
+//                file_put_contents($new_path ,file_get_contents($this->full_path));
+//            }
+            
             if ($this->save_as_string == false) {
                 cphp::save_value($this->cache_data, $this->full_path);
             }

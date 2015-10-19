@@ -169,7 +169,6 @@
             if ($this->error()->code() == 0) {
                 $service_found = false;
                 foreach ($this->service as $service_k => $service_v) {
-                    $service_k = strtolower($service_k);
                     if ($service_k == $this->current_service_name) {
                         $service_found = true;
                         $this->current_service = $service_v;

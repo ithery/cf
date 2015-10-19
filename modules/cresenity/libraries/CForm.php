@@ -24,6 +24,7 @@
         protected $ajax_submit_target;
         protected $ajax_submit_target_class;
         protected $auto_set_focus;
+        protected $action_before_submit;
 
         public function __construct($form_id = "") {
             parent::__construct($form_id);
@@ -51,6 +52,7 @@
             $this->ajax_submit_target = false;
             $this->ajax_submit_target_class = false;
             $this->auto_set_focus = true;
+            $this->action_before_submit = '';
             CManager::instance()->register_module('validation');
         }
 
@@ -155,6 +157,11 @@
 
         public function trigger_submit($elem, $evt) {
             $this->trigger_submit[] = CJSTrigger::factory($elem, $evt);
+            return $this;
+        }
+        
+        public function set_action_before_submit($action_before_submit){
+            $this->action_before_submit = $action_before_submit;
             return $this;
         }
 
@@ -544,7 +551,8 @@
 								$('#" . $this->id . "').find('*').removeClass('disabled');
 							}
 						}
-						" . $on_before_submit . "
+						" . $on_before_submit . " 
+						" . $this->action_before_submit . "
 						$('#" . $this->id . "').ajaxSubmit(options); 
 					".$validation_if_close."	
 					//never submit form
