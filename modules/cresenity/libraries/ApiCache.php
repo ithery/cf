@@ -33,7 +33,7 @@
 
         public function get_content() {
             $this->build_path();
-            $is_exists = $this->is_exists();
+            $is_exists = $this->file_exists();
             if ($is_exists === true) {
                 if ($this->save_as_string == false) {
                     return include $this->full_path;
@@ -42,7 +42,7 @@
                     return file_get_contents($this->full_path);
                 }
             }
-            return $this->is_exists;
+            return $is_exists;
         }
 
         public function save($cache_data) {
@@ -81,6 +81,13 @@
         public function set_path($path) {
             $this->path = $path;
             return $this;
+        }
+        
+        public function file_exists(){
+            if (!file_exists($this->full_path)) {
+                return false;
+            }
+            return true;
         }
 
         public function is_exists() {
