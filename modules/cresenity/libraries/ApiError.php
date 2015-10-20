@@ -8,6 +8,7 @@
      */
     class ApiError implements ArrayAccess, Iterator, Countable {
         
+        protected $prefix_code;
         protected $errors;
         protected $error_list;
         protected $err_code;
@@ -17,6 +18,7 @@
         private function __construct() {
             $this->err_code = 0;
             $this->err_message = "";
+            $this->prefix_code = "";
         }
         
         public static function instance(){
@@ -64,8 +66,12 @@
             return $this->errors;
         }
         
+        public function set_prefix_code($prefix_code){
+            $this->prefix_code = $prefix_code;
+            return $this;
+        }
         public function code(){
-            return $this->err_code;
+            return $this->prefix_code .$this->err_code;
         }
         
         public function get_err_message(){
