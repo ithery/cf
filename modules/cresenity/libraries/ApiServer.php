@@ -394,7 +394,10 @@
             return $this->req_headers['ip_address'];
         }
 
-        
+        public function set_has_return($bool) {
+            self::$has_return = $bool;
+            return $this;
+        }
 
         public function set_session($session_class) {
             if ($session_class instanceof ApiSession) {
