@@ -121,8 +121,8 @@
             $class_form_field = 'control-group';
             $label_class = '';
             if ($this->bootstrap == '3') {
+                $class_form_field = 'form-group';
                 if ($this->style_form_group == 'inline') {
-                    $class_form_field = 'form-group';
                     $label_class = 'col-md-3';
                     $control_class = 'col-md-9';
                     if ($this->label_size == 'large') {

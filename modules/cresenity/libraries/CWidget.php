@@ -154,7 +154,12 @@
             $html->appendln('<div class="widget-box ' . $classes . '" ' . $custom_css . '>');
             $html->appendln('	<div class="widget-title">');
             $html->appendln('		<span class="icon">');
-            $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
+            if ($this->bootstrap == '3') {
+                $html->appendln('		<i class="glyphicon glyphicon-' . $this->icon . '"></i>');
+            }
+            else {
+                $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
+            }
             $html->appendln('		</span>');
             $html->appendln('		<h5>' . $this->title . '</h5>');
             $html->appendln('		' . $custom_html . '');
