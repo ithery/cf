@@ -211,7 +211,11 @@
             if (strlen($this->enctype) > 0) {
                 $addition_str .= ' enctype="' . $this->enctype . '"';
             }
-            $html->appendln('<form id="' . $this->id . '" class="form-' . $this->layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
+            $form_style_layout = '';
+            if (strlen($this->layout) > 0) {
+                $form_style_layout = 'form-' . $this->layout;
+            }
+            $html->appendln('<form id="' . $this->id . '" class="' .$form_style_layout .' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
                     ->inc_indent()
                     ->br();
 
