@@ -108,9 +108,30 @@
 
             $html->appendln("
                 <style>
+                    .tree {
+                        overflow-x: scroll;
+                        background-color: rgba(204, 204, 204, 0.20);
+                        box-shadow: inset 7px -5px 10px 0 #000;
+                        -moz-box-shadow: inset 7px -5px 10px 0 #000;
+                        -webkit-box-shadow: inset 7px -5px 10px 0 #000;
+                    }
+                    .jstree-default .jstree-anchor {
+                        height: 18px !important;
+                        line-height: 18px !important;
+                    }
+                    .jstree-default .jstree-themeicon-custom {
+                        background-color: yellow;
+                        height: 18px !important;
+                        text-align: center !important;
+                        width: 18px !important;
+                    }
 //                    #" . $this->id . " .tree { float:left; min-width:319px; border-right:1px solid silver; overflow:auto; padding:0px 0; }
-                    #" . $this->id . " .tree .folder { background:url('../media/img/file_sprite.png') right bottom no-repeat; }
-                    #" . $this->id . " .tree .file { background:url('../media/img/file_sprite.png') 0 0 no-repeat; }
+                    #" . $this->id . " .tree .folder { 
+                            background:url('../media/img/file_sprite.png') right bottom no-repeat; 
+                        }
+                    #" . $this->id . " .tree .file { 
+                            background:url('../media/img/file_sprite.png') 0 0 no-repeat; 
+                        }
                     #" . $this->id . " .tree .file-pdf { background-position: -32px 0 }
                     #" . $this->id . " .tree .file-as { background-position: -36px 0 }
                     #" . $this->id . " .tree .file-c { background-position: -72px -0px }
