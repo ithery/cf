@@ -10,6 +10,7 @@
         protected $label_size = array();
         protected $fullwidth = array();
         protected $info_text = array();
+        protected $label_class = array();
         protected $style_form_group;
 
         public function __construct($id = "") {
@@ -73,8 +74,9 @@
             return $this;
         }
 
-        public function set_label_class() {
-            
+        public function add_label_class($label_class) {
+            $this->label_class[] = $label_class;
+            return $this;
         }
 
         public function toarray() {
@@ -136,6 +138,7 @@
                     }
                 }
             }
+            $label_class .= ' ' .implode(' ', $this->label_class);
             $html->appendln('<div class="' . $class_form_field . ' ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
             if ($this->show_label) {
                 $html->appendln('<label id="' . $this->id . '" class="' . $label_class . ' control-label">' . $this->label . '</label>')->br();
