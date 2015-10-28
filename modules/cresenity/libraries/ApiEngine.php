@@ -235,7 +235,7 @@
                 $prefix_file_name = $this->prefix_log_file_name . 'DEF';
             }
 
-            $filename = $prefix_file_name . '_' . $service_name . "_" . mt_rand(10000, 99999) . "_" . date("His") . '_' . $status_log . '.log';
+            $filename = $prefix_file_name  . "_" . date("His") . '_' . $service_name . "_" . mt_rand(10000, 99999) . '_' . $status_log . '.log';
 
             if (is_array($data_log)) {
                 $data_log = json_encode($data_log);

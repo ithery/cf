@@ -119,7 +119,7 @@
             $this->ajax_submit_target = $target;
             return $this;
         }
-        
+
         public function set_ajax_submit_target_class($target) {
             $this->ajax_submit_target_class = $target;
             return $this;
@@ -159,8 +159,8 @@
             $this->trigger_submit[] = CJSTrigger::factory($elem, $evt);
             return $this;
         }
-        
-        public function set_action_before_submit($action_before_submit){
+
+        public function set_action_before_submit($action_before_submit) {
             $this->action_before_submit = $action_before_submit;
             return $this;
         }
@@ -215,7 +215,7 @@
             if (strlen($this->layout) > 0) {
                 $form_style_layout = 'form-' . $this->layout;
             }
-            $html->appendln('<form id="' . $this->id . '" class="' .$form_style_layout .' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
+            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
                     ->inc_indent()
                     ->br();
 
@@ -474,7 +474,7 @@
 				}
 				";
                 }
-                
+
                 if (strlen($this->ajax_submit_target_class) > 0) {
                     $on_before_submit = "
 					jQuery('." . $this->ajax_submit_target_class . "').children().hide();
@@ -496,10 +496,10 @@
 				}
 				";
                 }
-                
+
                 $validation_if_open = '';
                 $validation_if_close = '';
-                if($this->validation) {
+                if ($this->validation) {
                     $validation_if_open = "if ($('#" . $this->id . "').validationEngine('validate') ) {";
                     $validation_if_close = "					} else {
 						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
@@ -512,7 +512,7 @@
 					$(this).attr('clicked', 'true');
 				});
 				$('#" . $this->id . "').submit(function(event) {
-					".$validation_if_open."
+					" . $validation_if_open . "
 						if($('#" . $this->id . "').hasClass('loading')) return false;
 						//don't do it again if still loading
 						$('#" . $this->id . "').addClass('loading');
@@ -558,7 +558,7 @@
 						" . $on_before_submit . " 
 						" . $this->action_before_submit . "
 						$('#" . $this->id . "').ajaxSubmit(options); 
-					".$validation_if_close."	
+					" . $validation_if_close . "	
 					//never submit form
 					return false;
 				});
@@ -568,13 +568,18 @@
                 $js->appendln("//Form validation")->br();
                 $js->appendln("
                 $('#" . $this->id . "').validationEngine();
-				$('#" . $this->id . "').bind('jqv.form.result', function(event , errorFound){
-					if(errorFound) {
-						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
-					}
-				});
-
-            ")->br();
+                $('#" . $this->id . "').bind('jqv.form.result', function(event , errorFound){
+                    if(errorFound) {
+                            $('#" . $this->id . " .confirm').removeAttr('data-submitted');
+                    }
+                    else {")->br();
+                if (strlen($this->action_before_submit) > 0) {
+                    $js->appendln($this->action_before_submit);
+                }
+                $js->appendln("
+                        }
+                    });
+                ")->br();
             }
             if (count($this->trigger_submit) > 0) {
                 foreach ($this->trigger_submit as $t) {
