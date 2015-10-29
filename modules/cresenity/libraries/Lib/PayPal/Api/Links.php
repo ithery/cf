@@ -1,8 +1,8 @@
 <?php
 
-namespace PayPal\Api;
-
-use PayPal\Common\PayPalModel;
+//namespace PayPal\Api;
+//
+//use PayPal\Common\PayPalModel;
 
 /**
  * Class Links
@@ -18,7 +18,7 @@ use PayPal\Common\PayPalModel;
  * @property string enctype
  * @property \PayPal\Api\HyperSchema schema
  */
-class Links extends PayPalModel
+class PayPal_Api_Links extends PayPal_Common_PayPalModel
 {
     /**
      * Sets Href

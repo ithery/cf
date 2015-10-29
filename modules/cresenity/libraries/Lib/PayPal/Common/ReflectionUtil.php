@@ -54,7 +54,10 @@ class PayPal_Common_ReflectionUtil
 
         if (isset($param)) {
             $anno = preg_split("/[\s\[\]]+/", $param);
-            return $anno[0];
+//            die(json_encode($anno));
+            $class = str_replace("\\", '_', $anno[0]);
+            $class = substr($class, 1, strlen($class));
+            return $class;
         } else {
             throw new PayPal_Exception_PayPalConfigurationException("Getter function for '$propertyName' in '$class' class should have a proper return type.");
         }
