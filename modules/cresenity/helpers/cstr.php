@@ -38,6 +38,7 @@ class cstr {
 		$val_new = str_replace("Agu","Aug",$val_new);
 		$val_new = str_replace("Okt","Oct",$val_new);
 		$val_new = str_replace("Des","Dec",$val_new);
+		$val_new = str_replace("Nop","Nov",$val_new);
 		
 		return $val_new;
 	}
