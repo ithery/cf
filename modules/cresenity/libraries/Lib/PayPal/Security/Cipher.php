@@ -30,7 +30,7 @@ class PayPal_Security_Cipher
     function encrypt($input)
     {
         // Create a random IV. Not using mcrypt to generate one, as to not have a dependency on it.
-        $iv = substr(uniqid("", true), 0, Cipher::IV_SIZE);
+        $iv = substr(uniqid("", true), 0, PayPal_Security_Cipher::IV_SIZE);
         // Encrypt the data
         $encrypted = openssl_encrypt($input, "AES-256-CBC", $this->secretKey, 0, $iv);
         // Encode the data with IV as prefix
@@ -48,8 +48,8 @@ class PayPal_Security_Cipher
         // Decode the IV + data
         $input = base64_decode($input);
         // Remove the IV
-        $iv = substr($input, 0, Cipher::IV_SIZE);
+        $iv = substr($input, 0, PayPal_Security_Cipher::IV_SIZE);
         // Return Decrypted Data
-        return openssl_decrypt(substr($input, Cipher::IV_SIZE), "AES-256-CBC", $this->secretKey, 0, $iv);
+        return openssl_decrypt(substr($input, PayPal_Security_Cipher::IV_SIZE), "AES-256-CBC", $this->secretKey, 0, $iv);
     }
 }

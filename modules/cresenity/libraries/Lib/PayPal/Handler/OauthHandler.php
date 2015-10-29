@@ -3,19 +3,19 @@
  * API handler for OAuth Token Request REST API calls
  */
 
-namespace PayPal\Handler;
-
-use PayPal\Common\PayPalUserAgent;
-use PayPal\Core\PayPalConstants;
-use PayPal\Core\PayPalHttpConfig;
-use PayPal\Exception\PayPalConfigurationException;
-use PayPal\Exception\PayPalInvalidCredentialException;
-use PayPal\Exception\PayPalMissingCredentialException;
+//namespace PayPal\Handler;
+//
+//use PayPal\Common\PayPalUserAgent;
+//use PayPal\Core\PayPalConstants;
+//use PayPal\Core\PayPalHttpConfig;
+//use PayPal\Exception\PayPalConfigurationException;
+//use PayPal\Exception\PayPalInvalidCredentialException;
+//use PayPal\Exception\PayPalMissingCredentialException;
 
 /**
  * Class OauthHandler
  */
-class OauthHandler implements IPayPalHandler
+class PayPal_Handler_OauthHandler implements PayPal_Handler_IPayPalHandler
 {
     /**
      * Private Variable
@@ -53,7 +53,7 @@ class OauthHandler implements IPayPalHandler
         );
 
         $headers = array(
-            "User-Agent"    => PayPalUserAgent::getValue(PayPalConstants::SDK_NAME, PayPalConstants::SDK_VERSION),
+            "User-Agent"    => PayPal_Common_PayPalUserAgent::getValue(PayPal_Core_PayPalConstants::SDK_NAME, PayPal_Core_PayPalConstants::SDK_VERSION),
             "Authorization" => "Basic " . base64_encode($options['clientId'] . ":" . $options['clientSecret']),
             "Accept"        => "*/*"
         );
@@ -93,7 +93,7 @@ class OauthHandler implements IPayPalHandler
             }
         } else {
             // Defaulting to Sandbox
-            $baseEndpoint = PayPalConstants::REST_SANDBOX_ENDPOINT;
+            $baseEndpoint = PayPal_Core_PayPalConstants::REST_SANDBOX_ENDPOINT;
         }
 
         $baseEndpoint = rtrim(trim($baseEndpoint), '/') . "/v1/oauth2/token";

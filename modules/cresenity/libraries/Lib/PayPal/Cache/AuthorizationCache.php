@@ -1,11 +1,11 @@
 <?php
 
-namespace PayPal\Cache;
+//namespace PayPal\Cache;
+//
+//use PayPal\Core\PayPalConfigManager;
+//use PayPal\Validation\JsonValidator;
 
-use PayPal\Core\PayPalConfigManager;
-use PayPal\Validation\JsonValidator;
-
-abstract class AuthorizationCache
+abstract class PayPal_Cache_AuthorizationCache
 {
     public static $CACHE_PATH = '/../../../var/auth.cache';
 
@@ -113,7 +113,7 @@ abstract class AuthorizationCache
      */
     private static function getConfigValue($key, $config)
     {
-        $config = ($config && is_array($config)) ? $config : PayPalConfigManager::getInstance()->getConfigHashmap();
+        $config = ($config && is_array($config)) ? $config : PayPal_Core_PayPalConfigManager::getInstance()->getConfigHashmap();
         return (array_key_exists($key, $config)) ? trim($config[$key]) : null;
     }
 

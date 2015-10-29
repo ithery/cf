@@ -3,21 +3,21 @@
  * API handler for all REST API calls
  */
 
-namespace PayPal\Handler;
-
-use PayPal\Auth\OAuthTokenCredential;
-use PayPal\Common\PayPalUserAgent;
-use PayPal\Core\PayPalConstants;
-use PayPal\Core\PayPalCredentialManager;
-use PayPal\Core\PayPalHttpConfig;
-use PayPal\Exception\PayPalConfigurationException;
-use PayPal\Exception\PayPalInvalidCredentialException;
-use PayPal\Exception\PayPalMissingCredentialException;
+//namespace PayPal\Handler;
+//
+//use PayPal\Auth\OAuthTokenCredential;
+//use PayPal\Common\PayPalUserAgent;
+//use PayPal\Core\PayPalConstants;
+//use PayPal\Core\PayPalCredentialManager;
+//use PayPal\Core\PayPalHttpConfig;
+//use PayPal\Exception\PayPalConfigurationException;
+//use PayPal\Exception\PayPalInvalidCredentialException;
+//use PayPal\Exception\PayPalMissingCredentialException;
 
 /**
  * Class RestHandler
  */
-class RestHandler implements IPayPalHandler
+class PayPal_Handler_RestHandler implements PayPal_Handler_IPayPalHandler
 {
     /**
      * Private Variable
@@ -60,11 +60,11 @@ class RestHandler implements IPayPalHandler
                 throw new PayPalMissingCredentialException("Empty or invalid credentials passed");
             }
 
-            $credential = new OAuthTokenCredential($credValues['clientId'], $credValues['clientSecret']);
+            $credential = new PayPal_Auth_OAuthTokenCredential($credValues['clientId'], $credValues['clientSecret']);
         }
 
-        if ($credential == null || !($credential instanceof OAuthTokenCredential)) {
-            throw new PayPalInvalidCredentialException("Invalid credentials passed");
+        if ($credential == null || !($credential instanceof PayPal_Auth_OAuthTokenCredential)) {
+            throw new PayPal_Exception_PayPalInvalidCredentialException("Invalid credentials passed");
         }
 
         $httpConfig->setUrl(
@@ -73,10 +73,10 @@ class RestHandler implements IPayPalHandler
         );
 
         if (!array_key_exists("User-Agent", $httpConfig->getHeaders())) {
-            $httpConfig->addHeader("User-Agent", PayPalUserAgent::getValue(PayPalConstants::SDK_NAME, PayPalConstants::SDK_VERSION));
+            $httpConfig->addHeader("User-Agent", PayPal_Common_PayPalUserAgent::getValue(PayPal_Core_PayPalConstants::SDK_NAME, PayPal_Core_PayPalConstants::SDK_VERSION));
         }
 
-        if (!is_null($credential) && $credential instanceof OAuthTokenCredential && is_null($httpConfig->getHeader('Authorization'))) {
+        if (!is_null($credential) && $credential instanceof PayPal_Auth_OAuthTokenCredential && is_null($httpConfig->getHeader('Authorization'))) {
             $httpConfig->addHeader('Authorization', "Bearer " . $credential->getAccessToken($config), false);
         }
 
@@ -105,18 +105,18 @@ class RestHandler implements IPayPalHandler
         } else if (isset($config['mode'])) {
             switch (strtoupper($config['mode'])) {
                 case 'SANDBOX':
-                    return PayPalConstants::REST_SANDBOX_ENDPOINT;
+                    return PayPal_Core_PayPalConstants::REST_SANDBOX_ENDPOINT;
                     break;
                 case 'LIVE':
-                    return PayPalConstants::REST_LIVE_ENDPOINT;
+                    return PayPal_Core_PayPalConstants::REST_LIVE_ENDPOINT;
                     break;
                 default:
-                    throw new PayPalConfigurationException('The mode config parameter must be set to either sandbox/live');
+                    throw new PayPal_Exception_PayPalConfigurationException('The mode config parameter must be set to either sandbox/live');
                     break;
             }
         } else {
             // Defaulting to Sandbox
-            return PayPalConstants::REST_SANDBOX_ENDPOINT;
+            return PayPal_Core_PayPalConstants::REST_SANDBOX_ENDPOINT;
         }
     }
 }

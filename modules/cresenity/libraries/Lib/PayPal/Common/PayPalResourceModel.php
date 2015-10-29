@@ -87,7 +87,7 @@ class PayPal_Common_PayPalResourceModel extends PayPal_Common_PayPalModel implem
      * @param array $handlers
      * @return string json response of the object
      */
-    protected static function executeCall($url, $method, $payLoad, $headers = array(), $apiContext = null, $restCall = null, $handlers = array('PayPal\Handler\RestHandler'))
+    protected static function executeCall($url, $method, $payLoad, $headers = array(), $apiContext = null, $restCall = null, $handlers = array('PayPal_Handler_RestHandler'))
     {
         //Initialize the context and rest call object if not provided explicitly
         $apiContext = $apiContext ? $apiContext : new PayPal_Rest_ApiContext(self::$credential);

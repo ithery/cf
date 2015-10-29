@@ -1,13 +1,13 @@
 <?php
 
-namespace PayPal\Handler;
+//namespace PayPal\Handler;
 
 /**
  * Interface IPayPalHandler
  *
  * @package PayPal\Handler
  */
-interface IPayPalHandler
+interface PayPal_Handler_IPayPalHandler
 {
     /**
      *

@@ -5,7 +5,7 @@
  *
  * @package PayPal\Exception
  */
-class PayPal_ExceptionPayPalConnectionException extends Exception
+class PayPal_Exception_PayPalConnectionException extends Exception
 {
     /**
      * The url that was being connected to when the exception occured

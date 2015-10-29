@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPal\Common;
+//namespace PayPal\Common;
 
 /**
  * Class PayPalUserAgent
@@ -8,7 +8,7 @@ namespace PayPal\Common;
  *
  * @package PayPal\Common
  */
-class PayPalUserAgent
+class PayPal_Common_PayPalUserAgent
 {
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPal\Common;
+//namespace PayPal\Common;
 
 /**
  * Class ArrayUtil
@@ -8,7 +8,7 @@ namespace PayPal\Common;
  *
  * @package PayPal\Common
  */
-class ArrayUtil
+class PayPal_Common_ArrayUtil
 {
     /**
      *

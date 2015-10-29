@@ -181,7 +181,7 @@ class PayPal_Common_PayPalModel
         // we need to convert array to StdClass object to properly
         // represent JSON String
         if (sizeof($ret) <= 0) {
-            $ret = new PayPalModel();
+            $ret = new PayPal_Common_PayPalModel();
         }
         return $ret;
     }

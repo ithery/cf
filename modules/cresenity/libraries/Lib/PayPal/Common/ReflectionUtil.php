@@ -1,14 +1,14 @@
 <?php
 
-namespace PayPal\Common;
-use PayPal\Exception\PayPalConfigurationException;
+//namespace PayPal\Common;
+//use PayPal\Exception\PayPalConfigurationException;
 
 /**
  * Class ReflectionUtil
  *
  * @package PayPal\Common
  */
-class ReflectionUtil
+class PayPal_Common_ReflectionUtil
 {
 
     /**
@@ -38,9 +38,9 @@ class ReflectionUtil
      */
     public static function getPropertyClass($class, $propertyName)
     {
-        if ($class == get_class(new PayPalModel())) {
+        if ($class == get_class(new PayPal_Common_PayPalModel())) {
             // Make it generic if PayPalModel is used for generating this
-            return get_class(new PayPalModel());
+            return get_class(new PayPal_Common_PayPalModel());
         }
 
         // If the class doesn't exist, or the method doesn't exist, return null.
@@ -56,7 +56,7 @@ class ReflectionUtil
             $anno = preg_split("/[\s\[\]]+/", $param);
             return $anno[0];
         } else {
-            throw new PayPalConfigurationException("Getter function for '$propertyName' in '$class' class should have a proper return type.");
+            throw new PayPal_Exception_PayPalConfigurationException("Getter function for '$propertyName' in '$class' class should have a proper return type.");
         }
     }
 
@@ -82,7 +82,7 @@ class ReflectionUtil
         if (isset($param)) {
             return substr($param, -strlen('[]'))==='[]';
         } else {
-            throw new PayPalConfigurationException("Getter function for '$propertyName' in '$class' class should have a proper return type.");
+            throw new PayPal_Exception_PayPalConfigurationException("Getter function for '$propertyName' in '$class' class should have a proper return type.");
         }
     }
 

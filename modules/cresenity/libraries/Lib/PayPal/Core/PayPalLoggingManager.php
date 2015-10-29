@@ -78,7 +78,7 @@ class PayPal_Core_PayPalLoggingManager
             $this->loggingLevel =
                 (isset($loggingLevel) && defined(__NAMESPACE__ . "\\PayPalLoggingLevel::$loggingLevel")) ?
                 constant(__NAMESPACE__ . "\\PayPalLoggingLevel::$loggingLevel") :
-                PayPalLoggingManager::DEFAULT_LOGGING_LEVEL;
+                PayPal_Core_PayPalLoggingManager::DEFAULT_LOGGING_LEVEL;
         }
     }
 
@@ -88,20 +88,20 @@ class PayPal_Core_PayPalLoggingManager
      * @param string $message
      * @param int $level
      */
-    private function log($message, $level = PayPalLoggingLevel::INFO)
+    private function log($message, $level = PayPal_Core_PayPalLoggingLevel::INFO)
     {
         if ($this->isLoggingEnabled) {
-            $config = PayPalConfigManager::getInstance()->getConfigHashmap();
+            $config = PayPal_Core_PayPalConfigManager::getInstance()->getConfigHashmap();
             // Check if logging in live
             if (array_key_exists('mode', $config) && $config['mode'] == 'live') {
                 // Live should not have logging level above INFO.
-                if ($this->loggingLevel >= PayPalLoggingLevel::INFO) {
+                if ($this->loggingLevel >= PayPal_Core_PayPalLoggingLevel::INFO) {
                     // If it is at Debug Level, throw an warning in the log.
-                    if ($this->loggingLevel == PayPalLoggingLevel::DEBUG) {
+                    if ($this->loggingLevel == PayPal_Core_PayPalLoggingLevel::DEBUG) {
                         error_log("[" . date('d-m-Y h:i:s') . "] " . $this->loggerName . ": ERROR\t: Not allowed to keep 'Debug' level for Live Environments. Reduced to 'INFO'\n", 3, $this->loggerFile);
                     }
                     // Reducing it to info level
-                    $this->loggingLevel = PayPalLoggingLevel::INFO;
+                    $this->loggingLevel = PayPal_Core_PayPalLoggingLevel::INFO;
                 }
             }
 
@@ -118,7 +118,7 @@ class PayPal_Core_PayPalLoggingManager
      */
     public function error($message)
     {
-        $this->log("ERROR\t: " . $message, PayPalLoggingLevel::ERROR);
+        $this->log("ERROR\t: " . $message, PayPal_Core_PayPalLoggingLevel::ERROR);
     }
 
     /**
@@ -128,7 +128,7 @@ class PayPal_Core_PayPalLoggingManager
      */
     public function warning($message)
     {
-        $this->log("WARNING\t: " . $message, PayPalLoggingLevel::WARN);
+        $this->log("WARNING\t: " . $message, PayPal_Core_PayPalLoggingLevel::WARN);
     }
 
     /**
@@ -138,7 +138,7 @@ class PayPal_Core_PayPalLoggingManager
      */
     public function info($message)
     {
-        $this->log("INFO\t: " . $message, PayPalLoggingLevel::INFO);
+        $this->log("INFO\t: " . $message, PayPal_Core_PayPalLoggingLevel::INFO);
     }
 
     /**
@@ -148,7 +148,7 @@ class PayPal_Core_PayPalLoggingManager
      */
     public function fine($message)
     {
-        $this->log("FINE\t: " . $message, PayPalLoggingLevel::FINE);
+        $this->log("FINE\t: " . $message, PayPal_Core_PayPalLoggingLevel::FINE);
     }
 
     /**
@@ -158,7 +158,7 @@ class PayPal_Core_PayPalLoggingManager
      */
     public function debug($message)
     {
-        $this->log("DEBUG\t: " . $message, PayPalLoggingLevel::DEBUG);
+        $this->log("DEBUG\t: " . $message, PayPal_Core_PayPalLoggingLevel::DEBUG);
     }
 
 }

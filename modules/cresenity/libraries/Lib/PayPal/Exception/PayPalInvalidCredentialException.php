@@ -5,7 +5,7 @@
  *
  * @package PayPal\Exception
  */
-class PayPal_ExceptionPayPalInvalidCredentialException extends Exception
+class PayPal_Exception_PayPalInvalidCredentialException extends Exception
 {
 
     /**
