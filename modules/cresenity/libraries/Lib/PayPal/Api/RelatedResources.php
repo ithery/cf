@@ -1,8 +1,8 @@
 <?php
 
-namespace PayPal\Api;
-
-use PayPal\Common\PayPalModel;
+//namespace PayPal\Api;
+//
+//use PayPal\Common\PayPalModel;
 
 /**
  * Class RelatedResources
@@ -17,7 +17,7 @@ use PayPal\Common\PayPalModel;
  * @property \PayPal\Api\Capture       capture
  * @property \PayPal\Api\Refund        refund
  */
-class RelatedResources extends PayPalModel
+class PayPal_Api_RelatedResources extends PayPal_Common_PayPalModel
 {
     /**
      * Sale transaction

@@ -1,8 +1,8 @@
 <?php
 
-namespace PayPal\Api;
-
-use PayPal\Common\PayPalModel;
+//namespace PayPal\Api;
+//
+//use PayPal\Common\PayPalModel;
 
 /**
  * Class PayerInfo
@@ -28,7 +28,7 @@ use PayPal\Common\PayPalModel;
  * @property \PayPal\Api\Address         billing_address
  * @property \PayPal\Api\ShippingAddress shipping_address
  */
-class PayerInfo extends PayPalModel
+class PayPal_Api_PayerInfo extends PayPal_Common_PayPalModel
 {
     /**
      * Email address representing the payer. 127 characters max.

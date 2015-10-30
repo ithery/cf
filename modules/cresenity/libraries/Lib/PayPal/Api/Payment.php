@@ -593,7 +593,7 @@ class PayPal_Api_Payment extends PayPal_Common_PayPalResourceModel
             $apiContext,
             $restCall
         );
-        $ret = new Payment();
+        $ret = new PayPal_Api_Payment();
         $ret->fromJson($json);
         return $ret;
     }

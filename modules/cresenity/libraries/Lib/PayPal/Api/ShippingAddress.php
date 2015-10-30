@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPal\Api;
+//namespace PayPal\Api;
 
 /**
  * Class ShippingAddress
@@ -14,7 +14,7 @@ namespace PayPal\Api;
  * @property bool default_address
  * @property bool preferred_address
  */
-class ShippingAddress extends Address
+class PayPal_Api_ShippingAddress extends PayPal_Api_Address
 {
     /**
      * Address ID assigned in PayPal system.

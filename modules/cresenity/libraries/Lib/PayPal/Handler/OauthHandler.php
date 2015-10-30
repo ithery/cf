@@ -83,13 +83,13 @@ class PayPal_Handler_OauthHandler implements PayPal_Handler_IPayPalHandler
         } else if (isset($config['mode'])) {
             switch (strtoupper($config['mode'])) {
                 case 'SANDBOX':
-                    $baseEndpoint = PayPalConstants::REST_SANDBOX_ENDPOINT;
+                    $baseEndpoint = PayPal_Core_PayPalConstants::REST_SANDBOX_ENDPOINT;
                     break;
                 case 'LIVE':
-                    $baseEndpoint = PayPalConstants::REST_LIVE_ENDPOINT;
+                    $baseEndpoint = PayPal_Core_PayPalConstants::REST_LIVE_ENDPOINT;
                     break;
                 default:
-                    throw new PayPalConfigurationException('The mode config parameter must be set to either sandbox/live');
+                    throw new PayPal_Exception_PayPalConfigurationException('The mode config parameter must be set to either sandbox/live');
             }
         } else {
             // Defaulting to Sandbox

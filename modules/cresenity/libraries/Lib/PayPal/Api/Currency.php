@@ -1,10 +1,10 @@
 <?php
 
-namespace PayPal\Api;
-
-use PayPal\Common\PayPalModel;
-use PayPal\Converter\FormatConverter;
-use PayPal\Validation\NumericValidator;
+//namespace PayPal\Api;
+//
+//use PayPal\Common\PayPalModel;
+//use PayPal\Converter\FormatConverter;
+//use PayPal\Validation\NumericValidator;
 
 /**
  * Class Currency
@@ -16,7 +16,7 @@ use PayPal\Validation\NumericValidator;
  * @property string currency
  * @property string value
  */
-class Currency extends PayPalModel
+class PayPal_Api_Currency extends PayPal_Common_PayPalModel
 {
     /**
      * 3 letter currency code as defined by ISO 4217.
@@ -50,8 +50,8 @@ class Currency extends PayPalModel
      */
     public function setValue($value)
     {
-        NumericValidator::validate($value, "Value");
-        $value = FormatConverter::formatToPrice($value, $this->getCurrency());
+        PayPal_Validation_NumericValidator::validate($value, "Value");
+        $value = PayPal_Converter_FormatConverter::formatToPrice($value, $this->getCurrency());
         $this->value = $value;
         return $this;
     }

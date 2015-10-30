@@ -1,8 +1,8 @@
 <?php
 
-namespace PayPal\Api;
-
-use PayPal\Common\PayPalModel;
+//namespace PayPal\Api;
+//
+//use PayPal\Common\PayPalModel;
 
 /**
  * Class PaymentExecution
@@ -15,7 +15,7 @@ use PayPal\Common\PayPalModel;
  * @property string                    carrier_account_id
  * @property \PayPal\Api\Transaction[] transactions
  */
-class PaymentExecution extends PayPalModel
+class PayPal_Api_PaymentExecution extends PayPal_Common_PayPalModel
 {
     /**
      * The ID of the Payer, passed in the `return_url` by PayPal.

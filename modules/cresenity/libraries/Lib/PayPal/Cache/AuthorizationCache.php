@@ -27,7 +27,7 @@ abstract class PayPal_Cache_AuthorizationCache
         if (file_exists($cachePath)) {
             // Read from the file
             $cachedToken = file_get_contents($cachePath);
-            if ($cachedToken && JsonValidator::validate($cachedToken, true)) {
+            if ($cachedToken && PayPal_Validation_JsonValidator::validate($cachedToken, true)) {
                 $tokens = json_decode($cachedToken, true);
                 if ($clientId && is_array($tokens) && array_key_exists($clientId, $tokens)) {
                     // If client Id is found, just send in that data only

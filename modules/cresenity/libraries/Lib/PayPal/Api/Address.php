@@ -10,7 +10,7 @@
  *
  * @property string phone
  */
-class Paypal_Api_Address extends Paypal_Api_BaseAddress
+class Paypal_Api_Address extends PayPal_Api_BaseAddress
 {
     /**
      * Phone number in E.123 format.

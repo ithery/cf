@@ -1,10 +1,10 @@
 <?php
 
-namespace PayPal\Api;
-
-use PayPal\Common\PayPalResourceModel;
-use PayPal\Rest\ApiContext;
-use PayPal\Validation\ArgumentValidator;
+//namespace PayPal\Api;
+//
+//use PayPal\Common\PayPalResourceModel;
+//use PayPal\Rest\ApiContext;
+//use PayPal\Validation\ArgumentValidator;
 
 /**
  * Class Sale
@@ -36,7 +36,7 @@ use PayPal\Validation\ArgumentValidator;
  * @property string                        update_time
  * @property \PayPal\Api\Links[]           links
  */
-class Sale extends PayPalResourceModel
+class PayPal_Api_Sale extends PayPal_Common_PayPalResourceModel
 {
     /**
      * ID of the sale transaction.
@@ -567,7 +567,7 @@ class Sale extends PayPalResourceModel
      */
     public static function get($saleId, $apiContext = null, $restCall = null)
     {
-        ArgumentValidator::validate($saleId, 'saleId');
+        PayPal_Validation_ArgumentValidator::validate($saleId, 'saleId');
         $payLoad = "";
         $json = self::executeCall(
             "/v1/payments/sale/$saleId",
@@ -592,8 +592,8 @@ class Sale extends PayPalResourceModel
      */
     public function refund($refund, $apiContext = null, $restCall = null)
     {
-        ArgumentValidator::validate($this->getId(), "Id");
-        ArgumentValidator::validate($refund, 'refund');
+        PayPal_Validation_ArgumentValidator::validate($this->getId(), "Id");
+        PayPal_Validation_ArgumentValidator::validate($refund, 'refund');
         $payLoad = $refund->toJSON();
         $json = self::executeCall(
             "/v1/payments/sale/{$this->getId()}/refund",

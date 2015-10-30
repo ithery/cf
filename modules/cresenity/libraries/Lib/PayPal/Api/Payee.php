@@ -1,8 +1,8 @@
 <?php
 
-namespace PayPal\Api;
-
-use PayPal\Common\PayPalModel;
+//namespace PayPal\Api;
+//
+//use PayPal\Common\PayPalModel;
 
 /**
  * Class Payee
@@ -14,7 +14,7 @@ use PayPal\Common\PayPalModel;
  * @property string email
  * @property string merchant_id
  */
-class Payee extends PayPalModel
+class PayPal_Api_Payee extends PayPal_Common_PayPalModel
 {
     /**
      * Email Address associated with the Payee's PayPal Account. If the provided email address is not associated with any PayPal Account, the payee can only receiver PayPal Wallet Payments. Direct Credit Card Payments will be denied due to card compliance requirements.

@@ -43,6 +43,18 @@ class CPayPal {
                 $this->client_id, $this->client_secret
                 )
         );
+
+        $this->api_context->setConfig(
+                array(
+                    'mode' => 'live',
+                    'log.LogEnabled' => true,
+                    'log.FileName' => '../PayPal.log',
+                    'log.LogLevel' => 'DEBUG', // PLEASE USE `FINE` LEVEL FOR LOGGING IN LIVE ENVIRONMENTS
+                    'cache.enabled' => true,
+                // 'http.CURLOPT_CONNECTTIMEOUT' => 30
+                // 'http.headers.PayPal-Partner-Attribution-Id' => '123123123'
+                )
+        );
         $this->items = array();
     }
 
@@ -149,11 +161,52 @@ class CPayPal {
 
         try {
             $payment->create($this->api_context);
+        } catch (PayPal_Exception_PayPalConnectionException $ex) {
+            throw new Exception($ex->getMessage(), $ex->getCode());
         } catch (Exception $ex) {
-            throw $ex;
+            throw new Exception($ex->getMessage());
         }
         $approval_url = $payment->getApprovalLink();
         return $approval_url;
+    }
+
+    public function execute_payment($data) {
+        $result = array();
+        $error_code = 0;
+        $error_message = "";
+
+        $paymentId = $data['paymentId'];
+        $payment = PayPal_Api_Payment::get($paymentId, $this->api_context);
+
+        $execution = new PayPal_Api_PaymentExecution();
+        $execution->setPayerId($data['PayerID']);
+
+        try {
+            $result = $payment->execute($execution, $this->api_context);
+
+            try {
+                $payment = PayPal_Api_Payment::get($paymentId, $this->api_context);
+            } catch (PayPal_Exception_PayPalConnectionException $ex) {
+                throw new Exception("Error Get Payment: " . $ex->getMessage(), $ex->getCode());
+            } catch (Exception $ex) {
+                throw new Exception("Error Get Payment: " . $ex->getMessage());
+            }
+        } catch (PayPal_Exception_PayPalConnectionException $ex) {
+            throw new Exception("Error Execute Payment: " . $ex->getMessage(), $ex->getCode());
+        } catch (Exception $ex) {
+            throw new Exception("Error Get Payment: " . $ex->getMessage());
+        }
+
+        if ($error_code == 0) {
+            if ($payment->getState() == "approved") {
+                $result = array("err_code" => $error_code, "err_message" => "", "payment_id" => $payment->getId());
+            } else {
+                $result = array("err_code" => "003", "err_message" => "Status from Paypal: " . strtoupper($payment->getState()));
+            }
+        } else {
+            $result = array("err_code" => $error_code, "err_message" => $error_message);
+        }
+        return $result;
     }
 
     public static function factory($options = array()) {
