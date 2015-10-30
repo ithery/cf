@@ -199,8 +199,8 @@
             if ($session_id == null) {
                 $file_name = 'CLIENT_' .'DEF';
             }
-            $file_name .= '_' .$this->current_service_name ."_" 
-                    .mt_rand(10000, 99999) ."_" .date("His") .'_rq.log';
+            $file_name .=  "_" .date("His") .'_' .$this->current_service_name ."_" 
+                    .mt_rand(10000, 99999) .'_rq.log';
             $log_path = 'logs' .DS .'api_multi' .DS .'server' .DS .$this->related_log_path;
             $full_log_path = CAPPPATH;
             
@@ -315,8 +315,8 @@
             if ($session_id == null) {
                 $file_name = 'CLIENT_' .'DEF';
             }
-            $file_name .= '_' .$this->current_service_name ."_" 
-                    .mt_rand(10000, 99999) ."_" .date("His") .'_rs.log';
+            $file_name .= "_" .date("His") .'_' .$this->current_service_name ."_" 
+                    .mt_rand(10000, 99999) .'_rs.log';
             $this->full_log_path .= $file_name;
             $data_log_file = array(
                 'service_name' => $this->current_service_name,
