@@ -48,6 +48,7 @@
             $js = new CStringBuilder();
             
             $js->append("jQuery('#" .$this->id ."').slider({");
+            $js->append("   'range': true,");
             $js->append("   'min': " .$this->min_value .",");
             $js->append("   'max': " .$this->max_value .",");
             $js->append("   'value': " .$this->value .",");

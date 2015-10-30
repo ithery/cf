@@ -115,6 +115,10 @@
             $this->expired = $expired;
             return $this;
         }
+        
+        public function clear_all(){
+            
+        }
 
     }
     
