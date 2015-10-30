@@ -87,6 +87,12 @@
             $this->add($field);
             return $field;
         }
+		
+		public function add_fieldset($fieldset_id = "") {
+            $fieldset = CFormFieldset::factory($fieldset_id);
+            $this->add($fieldset);
+            return $field;
+        }
 
         public function add_table($table_id = "") {
             $table = CTable::factory($table_id);

@@ -19,6 +19,11 @@ class CFormFieldSet extends CRenderable {
         $this->add($formfield);
         return $formfield;
     }
+	
+	public function set_legend($legend) {
+        $this->legend = $legend;
+		return $this;
+	}
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
