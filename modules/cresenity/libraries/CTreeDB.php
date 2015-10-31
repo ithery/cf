@@ -10,6 +10,7 @@ class CTreeDB {
     private $org_id = null;
     protected $filters = array();
     private $have_priority = false;
+    protected $delete_child;
 
     public function __construct($table_name, $domain = null, $db = null,$prefix='') {
         if ($domain == null)
@@ -35,6 +36,7 @@ class CTreeDB {
         $this->table_name = $table_name;
         $this->db = $db;
         $this->filters = array();
+        $this->delete_child = false;
     }
 
     public static function factory($table_name, $domain = null, $db = null,$prefix='') {
@@ -48,6 +50,11 @@ class CTreeDB {
 
     public function add_filter($k, $v) {
         $this->filters[$k] = $v;
+        return $this;
+    }
+    
+    public function set_delete_child($bool) {
+        $this->delete_child = $bool;
         return $this;
     }
     
@@ -77,7 +84,7 @@ class CTreeDB {
 		if(strlen($this->org_id)>0){
 			$q.=" and org_id=" . $db->escape($this->org_id) . "";
 		}
-        $q.="
+                $q.="
 			" . $this->filter_where() . "
 			ORDER BY node.lft
 		";
@@ -171,16 +178,30 @@ class CTreeDB {
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
+        $q.=" " . $this->filter_where() . " ";
         $db->query($q);
+        
+        if ($this->delete_child == true) {
+            $child_list = $this->get_children_list($id);
+            if (is_array($child_list) && count($child_list) > 0) {
+                foreach ($child_list as $child_list_k => $child_list_v) {
+                    $q="update " . $db->escape_table($this->table_name) . " set status=0, updated=" . $db->escape(date('Y-m-d H:i:s')) . ",updatedby=" . $db->escape($user->username) . " where " .  $this->pk_column."=".$db->escape($child_list_k);
+                    $db->query($q);
+                }
+            }
+        }
+        
         $q="update " . $db->escape_table($this->table_name) . " set rgt=rgt-" . $db->escape($width) . " where status>0 and rgt>" . $db->escape($rgt);
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
+                
         $db->query($q);
         $q="update " . $db->escape_table($this->table_name) . " set lft=lft-" . $db->escape($width) . " where status>0 and  lft>" . $db->escape($rgt);
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
+        
         $db->query($q);
     }
 
@@ -194,7 +215,7 @@ class CTreeDB {
         $this->rebuild_tree_all();
     }
 
-    public function get_parents($id) {
+    public function get_parents($parent_id) {
         $db = $this->db;
 
         $qrgt="select rgt from " . $db->escape_table($this->table_name) . " where " . $db->escape_column($this->pk_column) . " = " . $db->escape($parent_id)."";
