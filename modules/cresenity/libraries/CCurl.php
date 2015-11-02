@@ -67,7 +67,7 @@
             return $this;
         }
 
-        public function get_info() {
+        public function get_info($opt = 0) {
             return curl_getinfo($this->handle);
         }
 
