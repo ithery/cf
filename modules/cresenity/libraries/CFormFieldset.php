@@ -14,7 +14,7 @@ class CFormFieldSet extends CRenderable {
         return new CFormFieldSet($id);
     }
 
-    public function add_field($id) {
+    public function add_field($id = '') {
         $formfield = CFormField::factory($id);
         $this->add($formfield);
         return $formfield;
