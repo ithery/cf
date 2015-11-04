@@ -178,15 +178,19 @@
                 "plugins" . DS . "validation-engine" . DS . "languages" . DS . "jquery.validationEngine-en.js",
             ),
             "css" => array("plugins" . DS . "validation-engine" . DS . "jquery.validationEngine.css"),
+            "requirements" => array("jquery"),
         ),
         "ckeditor" => array(
             "js" => array("plugins" . DS . "ckeditor" . DS . "ckeditor.js"),
+            "requirements" => array("jquery"),
         ),
         "isotope" => array(
             "js" => array("plugins" . DS . "isotope" . DS . "jquery.isotope.min.js"),
+            "requirements" => array("jquery"),
         ),
         "easing" => array(
             "js" => array("plugins" . DS . "easing" . DS . "jquery-easing-1.3.js"),
+            "requirements" => array("jquery"),
         ),
         "plupload" => array(
             "js" => array(
@@ -194,9 +198,11 @@
                 "plugins" . DS . "plupload" . DS . "jquery.plupload.queue.js",
             ),
             "css" => array("plugins" . DS . "plupload" . DS . "jquery.plupload.queue.css"),
+            "requirements" => array("jquery"),
         ),
         "servertime" => array(
             "js" => array("plugins" . DS . "servertime" . DS . "jquery.servertime.js"),
+            "requirements" => array("jquery"),
         ),
         "uniform" => array(
             "js" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.js"),
@@ -211,13 +217,16 @@
         "datepicker" => array(
             "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap-datepicker.js"),
             "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
+            "requirements" => array("jquery"),
         ),
         "timepicker" => array(
             "js" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.js"),
             "css" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.css"),
+            "requirements" => array("jquery"),
         ),
         "image-gallery" => array(
             "css" => array("plugins" . DS . "image-gallery" . DS . "bootstrap-image-gallery.min.css"),
+            "requirements" => array("jquery"),
         ),
         "modernizr" => array(
             "js" => array("libs" . DS . "modernizr.custom.js"),

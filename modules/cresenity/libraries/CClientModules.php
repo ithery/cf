@@ -110,18 +110,18 @@ final class CClientModules {
 		$cs = CClientScript::instance();
 		
 		$all_modules = $this->all_modules();
-		
 		if(!in_array($module,$this->mods)) {
 			
 			if(isset($all_modules[$module])) {
 				//array
+                                $mod = $all_modules[$module];
 				if(isset($mod["requirements"])) {
 					foreach($mod["requirements"] as $req) {
 						$this->register_module($req);
 					}
 				}
 				if(!in_array($module,$this->mods)) {
-					$mod = $all_modules[$module];
+					
 					if(isset($mod["js"])) $cs->register_js_files($mod["js"]);
 					if(isset($mod["css"])) $cs->register_css_files($mod["css"]);
 					$this->mods[]=$module;
