@@ -25,6 +25,7 @@
         protected $ajax_submit_target_class;
         protected $auto_set_focus;
         protected $action_before_submit;
+        protected $disable_js;
 
         public function __construct($form_id = "") {
             parent::__construct($form_id);
@@ -53,6 +54,7 @@
             $this->ajax_submit_target_class = false;
             $this->auto_set_focus = true;
             $this->action_before_submit = '';
+            $this->disable_js = false;
             CManager::instance()->register_module('validation');
         }
 
@@ -117,6 +119,11 @@
 
         public function set_ajax_submit_target($target) {
             $this->ajax_submit_target = $target;
+            return $this;
+        }
+        
+        public function set_disable_js($bool) {
+            $this->disable_js = $bool;
             return $this;
         }
 
@@ -231,7 +238,7 @@
         }
 
         public function js($indent = 0) {
-
+            if($this->disable_js) return parent::js($indent);
             $js = new CStringBuilder();
             $js->set_indent($indent);
             if ($this->ajax_submit) {
