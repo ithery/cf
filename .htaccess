@@ -6,6 +6,9 @@ RewriteEngine On
 # Installation directory
 RewriteBase /
 
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
 # Protect application and system files from being viewed
 # RewriteCond %{REQUEST_URI} !^/?(wp)/
 RewriteCond %{REQUEST_URI} !^/?(modules/.+?/media)/ [NC] 
