@@ -216,7 +216,7 @@ class CFRouter {
 		{
 			self::$current_uri = $_SERVER['PATH_INFO'];
 		}
-		elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'])
+		elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'] AND $_SERVER['ORIG_PATH_INFO'] != '/403.shtml')
 		{
 			self::$current_uri = $_SERVER['ORIG_PATH_INFO'];
 		}
