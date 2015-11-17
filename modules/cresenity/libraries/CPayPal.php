@@ -9,6 +9,7 @@ class CPayPal {
     private $client_id;
     private $client_secret;
     private $api_context;
+    private $mode;
     private $items;
     private $details;
 
@@ -36,6 +37,7 @@ class CPayPal {
     protected function __construct($options = array()) {
         $this->client_id = carr::get($options, 'client_id');
         $this->client_secret = carr::get($options, 'client_secret');
+        $this->mode = carr::get($options, 'mode', 'live');
 
 
         $this->api_context = new PayPal_Rest_ApiContext(
@@ -46,7 +48,7 @@ class CPayPal {
 
         $this->api_context->setConfig(
                 array(
-                    'mode' => 'live',
+                    'mode' => $this->mode,
                     'log.LogEnabled' => true,
                     'log.FileName' => '../PayPal.log',
                     'log.LogLevel' => 'DEBUG', // PLEASE USE `FINE` LEVEL FOR LOGGING IN LIVE ENVIRONMENTS
@@ -176,8 +178,14 @@ class CPayPal {
         $error_message = "";
 
         $paymentId = $data['paymentId'];
-        $payment = PayPal_Api_Payment::get($paymentId, $this->api_context);
-
+        try {
+            $payment = PayPal_Api_Payment::get($paymentId, $this->api_context);
+        } catch (PayPal_Exception_PayPalConnectionException $ex) {
+            throw new Exception("Error(1) Get Payment: " . $ex->getMessage(), $ex->getCode());
+        } catch (Exception $ex) {
+            throw new Exception("Error(1) Get Payment: " . $ex->getMessage());
+        }
+        
         $execution = new PayPal_Api_PaymentExecution();
         $execution->setPayerId($data['PayerID']);
 
@@ -187,21 +195,21 @@ class CPayPal {
             try {
                 $payment = PayPal_Api_Payment::get($paymentId, $this->api_context);
             } catch (PayPal_Exception_PayPalConnectionException $ex) {
-                throw new Exception("Error Get Payment: " . $ex->getMessage(), $ex->getCode());
+                throw new Exception("Error(2) Get Payment: " . $ex->getMessage(), $ex->getCode());
             } catch (Exception $ex) {
-                throw new Exception("Error Get Payment: " . $ex->getMessage());
+                throw new Exception("Error(2) Get Payment: " . $ex->getMessage());
             }
         } catch (PayPal_Exception_PayPalConnectionException $ex) {
             throw new Exception("Error Execute Payment: " . $ex->getMessage(), $ex->getCode());
         } catch (Exception $ex) {
-            throw new Exception("Error Get Payment: " . $ex->getMessage());
+            throw new Exception("Error Execute Payment: " . $ex->getMessage());
         }
 
         if ($error_code == 0) {
             if ($payment->getState() == "approved") {
-                $result = array("err_code" => $error_code, "err_message" => "", "payment_id" => $payment->getId());
+                $result = array("err_code" => $error_code, "err_message" => "", "payment_id" => $payment->getId(), "payment_data" => $payment);
             } else {
-                $result = array("err_code" => "003", "err_message" => "Status from Paypal: " . strtoupper($payment->getState()));
+                $result = array("err_code" => "003", "err_message" => "Status from Paypal: " . strtoupper($payment->getState()), "payment_id" => $payment->getId(), "payment_data" => $payment);
             }
         } else {
             $result = array("err_code" => $error_code, "err_message" => $error_message);
