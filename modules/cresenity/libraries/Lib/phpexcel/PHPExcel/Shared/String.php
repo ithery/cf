@@ -492,6 +492,10 @@ class PHPExcel_Shared_String
 	 */
 	public static function ConvertEncoding($value, $to, $from)
 	{
+                if ($to == 'UTF-8') {
+                    $to .= '//IGNORE';
+                }
+            
 		if (self::getIsIconvEnabled()) {
 			$value = iconv($from, $to, $value);
 			return $value;
