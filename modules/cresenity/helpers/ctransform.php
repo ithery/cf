@@ -66,6 +66,10 @@
                     }
                 }
             }
+            // remove char .
+            if ($decimal === 0) {
+                $float = '';
+            }
             /*
               if(strlen($float)>3) {
               $float = substr($float,0,3);

@@ -90,7 +90,7 @@
                 // get response
                 $response = $curl->response();
                 $this->response = $response;
-
+                
                 if ($this->using_log) {
                     // WRITE LOG RESPONSE
                     $this->__write_log($service_name, 'response', $response);
