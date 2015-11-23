@@ -189,12 +189,16 @@
                     $file = file_get_contents($resolved_url);
                     $raw_ext = substr($file, 0, 4);
                     $ext = 'jpg';
-                    if ($raw_ext == '‰PNG') {
+                    
+//                    if (strpos($raw_ext, 'png') != null $raw_ext == '‰PNG' || $raw_ext == '�PNG') {
+                    if (strpos(strtolower($raw_ext), 'png') !== false) {
                         $ext = 'png';
                     }
                     else if ($raw_ext == 'ÿØÿà') {
                         $ext = 'jpg';
                     }
+//                    echo '<textarea>' .$raw_ext .'</textarea>';
+//                    die($ext);
                 }
 
                 //debugpng
