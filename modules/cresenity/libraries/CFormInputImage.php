@@ -4,6 +4,7 @@ class CFormInputImage extends CFormInput {
 	protected $imgsrc;
 	protected $maxwidth;
 	protected $maxheight;
+	protected $disabled_upload;
 	
 	public function __construct($id) {
 		parent::__construct($id);		
@@ -11,6 +12,7 @@ class CFormInputImage extends CFormInput {
 		$this->imgsrc="";
 		$this->maxwidth="200";
 		$this->maxheight="150";
+		$this->disabled_upload=false;
 		
 	}
 	public function set_imgsrc($imgsrc) {
@@ -25,6 +27,10 @@ class CFormInputImage extends CFormInput {
 		$this->maxheight = $maxheight;
 		return $this;
 	}
+        public function set_disabled_upload($bool) {
+            $this->disabled_upload = $bool;
+            return $this;
+        }
 	public static function factory($id) {
 		return new CFormInputImage($id);
 	}	
@@ -45,12 +51,14 @@ class CFormInputImage extends CFormInput {
 		$html->appendln('	<div class="fileupload-new thumbnail" ><img id="cimg_'.$this->id.'" src="'.$this->imgsrc.'" /></div>');
 		$html->appendln('	<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: '.$this->maxwidth.'px; max-height: '.$this->maxheight.'px; line-height: 20px;"></div>');
 		$html->appendln('	<div>');
-		$html->appendln('		<span class="btn btn-file">');
-		$html->appendln('			<span class="fileupload-new">Select image</span>');
-		$html->appendln('			<span class="fileupload-exists">Change</span>');
-		$html->appendln('				<input type="file" name="'.$this->name.'" id="'.$this->id.'"/>');
-		$html->appendln('		</span/>');
-		$html->appendln('		<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>');
+                if ($this->disabled_upload == false){
+                    $html->appendln('		<span class="btn btn-file">');
+                    $html->appendln('			<span class="fileupload-new">Select image</span>');
+                    $html->appendln('			<span class="fileupload-exists">Change</span>');
+                    $html->appendln('				<input type="file" name="'.$this->name.'" id="'.$this->id.'"/>');
+                    $html->appendln('		</span/>');
+                    $html->appendln('		<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>');
+                }
 		$html->appendln('	</div>');
 		$html->appendln('</div>');
 	
