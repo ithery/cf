@@ -188,11 +188,7 @@
 
 
             $qfilter .= " " . $temp_order_by . ' ' . $sLimit;
-
-            if (isset($_GET['debug'])) {
-                echo $qfilter;
-            }
-
+            
             $r = $db->query($qfilter);
 
             $result = $r->result(false);
