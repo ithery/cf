@@ -100,6 +100,14 @@
             if (isset($input["page"])) {
                 $page = $input["page"];
             }
+            $base_q = $q;
+            $pos_order_by = strpos(strtolower($base_q), "order by", strpos(strtolower($base_q), 'from'));
+            $temp_order_by = '';
+            if ($pos_order_by !== false) {
+                $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
+                $base_q = substr($base_q, 0, $pos_order_by);
+            }
+
 
             $total = cdbutils::get_row_count_from_base_query($q);
 
@@ -160,10 +168,30 @@
 
             if (strlen($sOrder) > 0) {
                 $sOrder = " ORDER BY " . $sOrder;
+                $temp_order_by = '';
             }
-            $qfilter = "select * from (" . $q . ") as a " . $sWhere . ' ' . $sOrder . ' ' . $sLimit;
+
+            if (strlen($temp_order_by) > 0) {
+                $sub = explode(",", substr($temp_order_by, 9));
+                $temp_order_by = "";
+                foreach ($sub as $val) {
+                    $kata = explode(".", $val);
+                    if (isset($kata[1])) $temp_order_by.=", " . $kata[1];
+                    else $temp_order_by.=", " . $kata[0];
+                }
+                $temp_order_by = substr($temp_order_by, 2);
+                $temp_order_by = "ORDER BY " . $temp_order_by;
+            }
+
+            $qfilter = "select * from (" . $base_q . ") as a " . $sWhere . ' ' . $sOrder;
 
 
+
+            $qfilter .= " " . $temp_order_by . ' ' . $sLimit;
+
+            if (isset($_GET['debug'])) {
+                echo $qfilter;
+            }
 
             $r = $db->query($qfilter);
 
@@ -172,7 +200,7 @@
             foreach ($r as $row) {
                 $p = array();
                 foreach ($row as $k => $v) {
-                    $p[$k] = ($v==null)?"":$v;
+                    $p[$k] = ($v == null) ? "" : $v;
                 }
                 $p["id"] = $row[$key_field];
                 //$p["id"]=$row["item_id"];
