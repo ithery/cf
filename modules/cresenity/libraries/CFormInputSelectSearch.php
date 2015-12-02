@@ -73,8 +73,13 @@
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
+            
+            $classes = $this->classes;
+            $classes = implode(" ", $classes);
+            if (strlen($classes) > 0)
+                $classes = " " . $classes;
             $html->set_indent($indent);
-            $html->appendln('<input type="hidden" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '" ' . $custom_css . $multiple . '>')->br();
+            $html->appendln('<input type="hidden" class="'.$classes.'" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '" ' . $custom_css . $multiple . '>')->br();
             return $html->text();
         }
 
@@ -187,7 +192,11 @@
             $js->set_indent($indent);
             //echo $str;
             $js->append($str)->br();
-
+            
+            
+            
+            
+            
             return $js->text();
         }
 
