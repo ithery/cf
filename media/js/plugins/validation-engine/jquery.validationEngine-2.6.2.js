@@ -356,15 +356,17 @@
 			form.trigger("jqv.form.validating");
 			// first, evaluate status of non ajax fields
 			var first_err=null;
+			var names = [];
 			form.find('['+options.validateAttribute+'*=validate]').not(":disabled").each( function() {
 				var field = $(this);
-				var names = [];
+				
 				if ($.inArray(field.attr('name'), names) < 0) {
 					errorFound |= methods._validateField(field, options);
-					if (errorFound && first_err==null)
-						if (field.is(":hidden") && options.prettySelect)
+					if (errorFound && first_err==null) {
+						if (field.is(":hidden") && options.prettySelect) {
+							
 							first_err = field = form.find("#" + options.usePrefix + methods._jqSelector(field.attr('id')) + options.useSuffix);
-						else {
+						} else {
 
 							//Check if we need to adjust what element to show the prompt on
 							//and and such scroll to instead
@@ -373,27 +375,47 @@
 							} else if(field.data('jqv-prompt-at')) {
 								field = $(field.data('jqv-prompt-at'));
 							}
+							
 							first_err=field;
 						}
-					if (options.doNotShowAllErrosOnSubmit)
+					}
+					if (options.doNotShowAllErrosOnSubmit) {
 						return false;
+					}
 					names.push(field.attr('name'));
-
+					
 					//if option set, stop checking validation rules after one error is found
 					if(options.showOneMessage == true && errorFound){
 						return false;
 					}
 				}
 			});
-
+			
 			// second, check to see if all ajax calls completed ok
 			// errorFound |= !methods._checkAjaxStatus(options);
-
+			
 			// third, check status and scroll the container accordingly
 			form.trigger("jqv.form.result", [errorFound]);
-
+			
 			if (errorFound) {
 				if (options.scroll) {
+					var tab = first_err.parents('.tab-pane');
+					if(tab.length>0) {
+						if(!tab.hasClass('active')) {
+							//make it active and show the tab
+							var tab_id = tab.attr('id');
+							jQuery('#'+tab_id).parent().children().hide();
+							jQuery('#'+tab_id).show();
+							//make the navigation show correct tab
+							console.log(tab.parents('.row-fluid'));
+							console.log(tab_id);
+							var tab_nav = tab.parents('.row-fluid').find('.side-nav-container li > a[data-tab="'+tab_id+'"]');
+							var pare = tab_nav.parents('li');
+							pare.parent().children().removeClass('active');
+							pare.addClass('active');
+							
+						}
+					}
 					var destination=first_err.offset().top;
 					var fixleft = first_err.offset().left;
 
@@ -545,11 +567,31 @@
 				++$.validationEngine.fieldIdCounter;
 			}
 
-			if(field.hasClass(options.ignoreFieldsWithClass))
+			if(field.hasClass(options.ignoreFieldsWithClass)) {
 				return false;
+			}
 
-           if (!options.validateNonVisibleFields && (field.is(":hidden") && !options.prettySelect || field.parent().is(":hidden")))
-				return false;
+			if(!field.parents('.tab-pane')) {
+				if (!options.validateNonVisibleFields && (field.is(":hidden") && !options.prettySelect || field.parent().is(":hidden"))) {
+					return false;
+				}
+			} else {
+				var tab = field.parents('.tab-pane');
+				if(tab.length>0) {
+					if(!tab.hasClass('active')) {
+						//make it active and show the tab
+						var tab_id = tab.attr('id');
+						jQuery('#'+tab_id).parent().children().hide();
+						jQuery('#'+tab_id).show();
+						//make the navigation show correct tab
+						var tab_nav = tab.parents('.row-fluid').find('.side-nav-container li[data-tab="'+tab_id+'"]');
+						
+						tab_nav.parent().children().removeClass('active');
+						tab_nav.addClass('active');
+						
+					}
+				}
+			}
 
 			var rulesParsing = field.attr(options.validateAttribute);
 			var getRules = /validate\[(.*)\]/.exec(rulesParsing);

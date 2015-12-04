@@ -378,7 +378,8 @@ class CTreeDB {
         foreach ($r as $row) {
             $pk = $this->pk_column;
             $this->rebuild_tree($row[$pk], $left);
-            $qleft="select rgt from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
+            //$qleft="select rgt from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
+            $qleft="select rgt from " . $db->escape_table($this->table_name) . " where status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
             if(strlen($this->org_id)>0){
                 $qleft.=" and org_id=" . $db->escape($this->org_id) . "";
             }
