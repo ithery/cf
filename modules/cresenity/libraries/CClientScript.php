@@ -202,7 +202,18 @@
                 $js_close.="})";
                 $i++;
             }
-
+            
+            $js.= "
+                
+                if(jQuery) {
+                                        
+                    var evt = document.createEvent('Events');
+                    evt.initEvent( 'capp-start', true, true, window, 1);
+                    document.dispatchEvent(evt);
+                    
+                }
+            ";
+            
             return $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
         }
 
