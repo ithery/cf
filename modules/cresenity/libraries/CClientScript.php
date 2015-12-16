@@ -203,17 +203,17 @@
                 $i++;
             }
             
-            $js.= "
+           $js.= "
                 
-                if(jQuery) {
-                                        
+                if(!capp_started_event_initialized) {
                     var evt = document.createEvent('Events');
-                    evt.initEvent( 'capp-start', true, true, window, 1);
+                    evt.initEvent( 'capp-started', false, true, window, 0);
+                    capp_started_event_initialized=true;
                     document.dispatchEvent(evt);
-                    
                 }
+
+
             ";
-            
             return $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
         }
 
