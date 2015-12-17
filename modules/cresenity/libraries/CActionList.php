@@ -28,7 +28,7 @@ class CActionList extends CElement {
         $this->btn_dropdown_classes[] = $class;
         return $this;
     }
-
+	
     public function set_style($style) {
 
         if (in_array($style, array("form-action", "btn-group", "btn-icon-group", "btn-list", "icon-segment", "btn-dropdown", "widget-action", "table-header-action"))) {
@@ -97,7 +97,10 @@ class CActionList extends CElement {
 
             ');
         }
+		
         $html->appendln(parent::html($html->get_indent()));
+		
+		
         if ($this->style == "btn-dropdown") {
             $html->appendln('</ul>');
         }

@@ -461,7 +461,27 @@
                     $row_action_list->apply("jsparam", $jsparam);
 
                     $row_action_list->apply("set_handler_url_param", $jsparam);
+					
+					if (($table->filter_action_callback_func) != null) {
+						$actions = $row_action_list->childs();
+						
+						foreach($actions as $action) {
+							$visibility = CDynFunction::factory($table->filter_action_callback_func)
+									->add_param($table)
+									->add_param($col->get_fieldname())
+									->add_param($row)
+									->add_param($action)
+									->set_require($table->requires)
+									->execute();
+									
+							$action->set_visibility($visibility);
+							
+						}
 
+
+						//call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+					}
+					
                     $html->appendln($row_action_list->html($html->get_indent()));
                     $js.=$row_action_list->js();
                     $html->dec_indent()->appendln('</td>')->br();

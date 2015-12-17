@@ -27,6 +27,7 @@
         public $custom_column_header;
         public $header_sortable;
         public $cell_callback_func;
+        public $filter_action_callback_func;
         public $display_length;
         public $paging_list;
         public $storage;
@@ -91,6 +92,7 @@
             $this->footer = false;
             $this->footer_field = array();
             $this->cell_callback_func = "";
+            $this->filter_action_callback_func = "";
             $this->display_length = "10";
             $this->ajax = false;
             $this->ajax_method = "get";
@@ -585,6 +587,13 @@
 
         public function cell_callback_func($func, $require = "") {
             $this->cell_callback_func = $func;
+            if (strlen($require) > 0) {
+                $this->requires[] = $require;
+            }
+            return $this;
+        }
+        public function filter_action_callback_func($func, $require = "") {
+            $this->filter_action_callback_func = $func;
             if (strlen($require) > 0) {
                 $this->requires[] = $require;
             }
@@ -1489,7 +1498,28 @@
                         $this->row_action_list->regenerate_id(true);
                         $this->row_action_list->apply("jsparam", $jsparam);
                         $this->row_action_list->apply("set_handler_url_param", $jsparam);
-                        $this->js_cell.=$this->row_action_list->js();
+						
+                        if (($this->filter_action_callback_func) != null) {
+                            $actions = $this->row_action_list->childs();
+							
+							foreach($actions as $action) {
+								$visibility = CDynFunction::factory($this->filter_action_callback_func)
+										->add_param($this)
+										->add_param($col->get_fieldname())
+										->add_param($row)
+										->add_param($action)
+										->set_require($this->requires)
+										->execute();
+										
+								$action->set_visibility($visibility);
+							}
+
+
+                            //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                        }
+						
+						
+						$this->js_cell.=$this->row_action_list->js();
 
                         $html->appendln($this->row_action_list->html($html->get_indent()));
                         $html->dec_indent()->appendln('</td>')->br();

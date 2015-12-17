@@ -6,6 +6,7 @@ class CRenderable extends CObject implements IRenderable {
 
     protected $renderable;
     protected $additional_js;
+	protected $visibility;
 
     protected function __construct($id = "") {
         parent::__construct($id);
@@ -13,6 +14,7 @@ class CRenderable extends CObject implements IRenderable {
         $this->renderable = array();
 
         $this->additional_js = "";
+		$this->visibility = true;
     }
 
     public function child_count() {
@@ -22,6 +24,10 @@ class CRenderable extends CObject implements IRenderable {
 	public function childs() {
 		return $this->renderable;
 	}
+	
+	public function set_visibility($bool) {
+		$this->visibility=$bool;
+	}	
 	
     public function apply($key, $value, $class_name = '') {
         foreach ($this->renderable as $r) {
@@ -59,12 +65,17 @@ class CRenderable extends CObject implements IRenderable {
     }
 
     public function html($indent = 0) {
-        $html = new CStringBuilder();
+        if(!$this->visibility) {
+			return '';
+		}
+		$html = new CStringBuilder();
         $html->set_indent($indent);
         $html->inc_indent();
         foreach ($this->renderable as $r) {
             if (CRenderable::is_instanceof($r)) {
-                $html->append($r->html($html->get_indent()));
+				if($r->visibility) {
+					$html->append($r->html($html->get_indent()));
+				}
             } else {
                 if (is_object($r) || is_array($r)) {
                     $html->append(cdbg::var_dump($r, true));
@@ -78,7 +89,10 @@ class CRenderable extends CObject implements IRenderable {
     }
 
     public function js($indent = 0) {
-        $js = new CStringBuilder();
+        if(!$this->visibility) {
+			return '';
+		}
+		$js = new CStringBuilder();
         $js->set_indent($indent);
         foreach ($this->renderable as $r) {
             if (CRenderable::is_instanceof($r)) {

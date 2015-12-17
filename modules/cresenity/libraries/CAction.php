@@ -9,6 +9,7 @@ class CAction extends CElement {
     protected $link_target;
     protected $link;
     protected $label;
+    protected $orig_label;
     protected $submit;
     protected $submit_to;
     protected $submit_to_target;
@@ -31,6 +32,7 @@ class CAction extends CElement {
         $this->submit_to = false;
         $this->submit_to_target = false;
         $this->label = "";
+        $this->orig_label = "";
         $this->style = "";
         $this->disabled = false;
         $this->confirm = false;
@@ -64,12 +66,19 @@ class CAction extends CElement {
     }
 
     public function set_label($label, $lang = true) {
-        if ($lang)
+        $this->orig_label = $label;
+		if ($lang)
             $label = clang::__($label);
         $this->label = $label;
         return $this;
     }
-
+	
+	public function get_label() {
+        
+		return $this->orig_label;
+        
+    }
+	
     public function set_jsfunc($jsfunc) {
         $this->jsfunc = $jsfunc;
         return $this;

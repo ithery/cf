@@ -101,15 +101,19 @@
             $str_result = str_replace("'", "\'", $str_result);
             preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
             foreach ($matches as $val) {
+				$thousand_separator_pre='';
+				$thousand_separator_post='';
                 $str = $val[1]; //matches str without bracket {}
                 $b_str = $val[0]; //matches str with bracket {}
-                $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
+                $str_selection = str_replace($b_str, "'+item." . $str."+'", $str_selection);
             }
             preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
             foreach ($matches as $val) {
+				$thousand_separator_pre='';
+				$thousand_separator_post='';
                 $str = $val[1]; //matches str without bracket {}
                 $b_str = $val[0]; //matches str with bracket {}
-                $str_result = str_replace($b_str, "'+item." . $str . "+'", $str_result);
+                $str_result = str_replace($b_str, "'+item." . $str."+'", $str_result);
             }
             if (strlen($str_result) == 0) {
                 $str_result = "'+item." . $this->search_field . "+'";
