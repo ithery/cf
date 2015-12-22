@@ -113,6 +113,9 @@
                 }
                 $content = addslashes($content);
                 $content = str_replace("\r\n", "", $content);
+                if(strlen(trim($content))==0) {
+                    $content = $this->generated_url();
+                }
                 $js .= "
                     $." .$this->js_class .".show_dialog('" .$this->target ."','" .$this->title ."','" .$content ."');
                     ";
