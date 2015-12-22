@@ -177,81 +177,78 @@
                 }
             }
 
-            //Validasi Input
-            $service = array();
-            $fields = array();
-//            cdbg::var_dump($this->service);exit;
-            try {
-                Helpers_Validation_Api::validate($this->service[$this->current_service_name], $this->request, 2);
-            }
-            catch (Helpers_Validation_Api_Exception $e) {
-//                cdbg::var_dump(array($e->getCode() => $e->getMessage()));
-//                cdbg::var_dump($e->getArrayMessage());                
-                $this->error()->add_default(2999, $e->getMessage());
-            }
+            if ($this->generate_doc == false) {
+                //Validasi Input
+                try {
+                    Helpers_Validation_Api::validate($this->service[$this->current_service_name], $this->request, 2);
+                }
+                catch (Helpers_Validation_Api_Exception $e) {
+                    $this->error()->add_default(12999, $e->getMessage());
+                }
 
-            if ($this->error()->code() == 0) {
+                if ($this->error()->code() == 0) {
+                    if ($this->session instanceof ApiSession) {
+                        $this->session->set('request_' . $this->current_service_name, $this->request);
+                    }
+                }
+
+                // validation request with current service config
+                $service_input = carr::get($this->current_service, 'input');
+
+                $session_id = null;
                 if ($this->session instanceof ApiSession) {
-                    $this->session->set('request_' . $this->current_service_name, $this->request);
+                    $session_id = $this->session->get_session_id();
                 }
-            }
 
-            // validation request with current service config
-            $service_input = carr::get($this->current_service, 'input');
-
-            $session_id = null;
-            if ($this->session instanceof ApiSession) {
-                $session_id = $this->session->get_session_id();
-            }
-
-            // do log request from client - create file log request at related folders
-            $file_name = 'CLIENT_' . $session_id;
-            if ($session_id == null) {
-                $file_name = 'CLIENT_' . 'DEF';
-            }
-            $file_name .= "_" . date("His") . '_' . $this->current_service_name . "_"
-                    . mt_rand(10000, 99999) . '_rq.log';
-            $log_path = 'logs' . DS . 'api_multi' . DS . 'server' . DS . $this->related_log_path;
-            $full_log_path = CAPPPATH;
-
-            $full_log_path = str_replace('//', DS, $full_log_path);
-            $temp_log_path = explode(DS, $log_path);
-            foreach ($temp_log_path as $k => $v) {
-                $full_log_path .= $v . DS;
-                if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
-                    mkdir($full_log_path);
+                // do log request from client - create file log request at related folders
+                $file_name = 'CLIENT_' . $session_id;
+                if ($session_id == null) {
+                    $file_name = 'CLIENT_' . 'DEF';
                 }
-            }
-            $this->full_log_path = $full_log_path;
-            $full_log_path .= $file_name;
-            $data_log_file = array(
-                'service_name' => $this->current_service_name,
-                'request' => $this->request,
-                'get_data' => $get_data,
-                'post_data' => $post_data,
-            );
-            file_put_contents($full_log_path, json_encode($data_log_file));
+                $file_name .= "_" . date("His") . '_' . $this->current_service_name . "_"
+                        . mt_rand(10000, 99999) . '_rq.log';
+                $log_path = 'logs' . DS . 'api_multi' . DS . 'server' . DS . $this->related_log_path;
+                $full_log_path = CAPPPATH;
 
-            // do log request from client - insert into client_log_request
-            $data = array(
-                'org_id' => null,
-                'product_category_code' => null,
-                'product_code' => null,
-                'request_date' => date("Y-m-d H:i:s"),
-                'url' => curl::httpbase(),
-                'auth' => NULL,
-                'session_id' => $session_id,
-                'service_name' => $this->current_service_name,
-                'request' => $full_log_path,
-                'request_path' => CAPPPATH,
-                'response' => '',
-                'response_path' => CAPPPATH,
-                'http_response_code' => null,
-                'execution_time' => null,
-                'ip_address' => $this->get_req_ip_address()
-            );
-//            $db->insert( $this->table_prefix .'_client_log_request', $data);
-//            $this->client_log_id = $db->insert_id();
+                $full_log_path = str_replace('//', DS, $full_log_path);
+                $temp_log_path = explode(DS, $log_path);
+                foreach ($temp_log_path as $k => $v) {
+                    $full_log_path .= $v . DS;
+                    if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
+                        mkdir($full_log_path);
+                    }
+                }
+                $this->full_log_path = $full_log_path;
+                $full_log_path .= $file_name;
+                $data_log_file = array(
+                    'service_name' => $this->current_service_name,
+                    'request' => $this->request,
+                    'get_data' => $get_data,
+                    'post_data' => $post_data,
+                );
+                file_put_contents($full_log_path, json_encode($data_log_file));
+
+                // do log request from client - insert into client_log_request
+                $data = array(
+                    'org_id' => null,
+                    'product_category_code' => null,
+                    'product_code' => null,
+                    'request_date' => date("Y-m-d H:i:s"),
+                    'url' => curl::httpbase(),
+                    'auth' => NULL,
+                    'session_id' => $session_id,
+                    'service_name' => $this->current_service_name,
+                    'request' => $full_log_path,
+                    'request_path' => CAPPPATH,
+                    'response' => '',
+                    'response_path' => CAPPPATH,
+                    'http_response_code' => null,
+                    'execution_time' => null,
+                    'ip_address' => $this->get_req_ip_address()
+                );
+    //            $db->insert( $this->table_prefix .'_client_log_request', $data);
+    //            $this->client_log_id = $db->insert_id();
+            }
         }
 
         protected function log_request() {
@@ -348,17 +345,21 @@
         public function exec($other_request = array()) {
             $this->__before($other_request);
 
-            if ($this->error()->code() == 0) {
-                try {
-                    $this->__process();
-                }
-                catch (Exception $exc) {
-                    throw $exc;
+            if ($this->generate_doc == false) {
+                if ($this->error()->code() == 0) {
+                    try {
+                        $this->__process();
+                    }
+                    catch (Exception $exc) {
+                        throw $exc;
+                    }
                 }
             }
 
-            $this->__after();
-            if (self::$has_return == true) {
+            if ($this->generate_doc == false) {
+                $this->__after();
+            }
+            if ($this->generate_doc == true || self::$has_return == true) {
                 return $this;
             }
         }
