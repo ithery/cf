@@ -9,7 +9,6 @@
     class ApiServer extends Api {
 
         public static $has_return = false;
-        
         protected static $instance = null;
 
         /**
@@ -65,8 +64,6 @@
 
             return $this;
         }
-        
-        
 
         /**
          * @final
@@ -89,7 +86,7 @@
                 $request += $other_request;
                 $direct_access = true;
             }
-            
+
             switch ($this->method) {
                 case self::__GET:
                     if ($direct_access == true) {
@@ -133,11 +130,11 @@
                         }
                     }
 
-                    if ($data_type_valid == false)  {
+                    if ($data_type_valid == false) {
                         // error data type invalid
                     }
-                    
-                    if ($data_type_valid == true)  {
+
+                    if ($data_type_valid == true) {
                         switch ($data_type_request) {
                             case 'array':
                                 $request += $_POST;
@@ -164,7 +161,7 @@
             $this->request = $request;
 
             $this->before();
-            
+
             // validation service called is registered.
             if ($this->error()->code() == 0) {
                 $service_found = false;
@@ -180,6 +177,19 @@
                 }
             }
 
+            //Validasi Input
+            $service = array();
+            $fields = array();
+//            cdbg::var_dump($this->service);exit;
+            try {
+                Helpers_Validation_Api::validate($this->service[$this->current_service_name], $this->request, 2);
+            }
+            catch (Helpers_Validation_Api_Exception $e) {
+//                cdbg::var_dump(array($e->getCode() => $e->getMessage()));
+//                cdbg::var_dump($e->getArrayMessage());                
+                $this->error()->add_default(2999, $e->getMessage());
+            }
+
             if ($this->error()->code() == 0) {
                 if ($this->session instanceof ApiSession) {
                     $this->session->set('request_' . $this->current_service_name, $this->request);
@@ -193,21 +203,21 @@
             if ($this->session instanceof ApiSession) {
                 $session_id = $this->session->get_session_id();
             }
-            
+
             // do log request from client - create file log request at related folders
-            $file_name = 'CLIENT_' .$session_id;
+            $file_name = 'CLIENT_' . $session_id;
             if ($session_id == null) {
-                $file_name = 'CLIENT_' .'DEF';
+                $file_name = 'CLIENT_' . 'DEF';
             }
-            $file_name .=  "_" .date("His") .'_' .$this->current_service_name ."_" 
-                    .mt_rand(10000, 99999) .'_rq.log';
-            $log_path = 'logs' .DS .'api_multi' .DS .'server' .DS .$this->related_log_path;
+            $file_name .= "_" . date("His") . '_' . $this->current_service_name . "_"
+                    . mt_rand(10000, 99999) . '_rq.log';
+            $log_path = 'logs' . DS . 'api_multi' . DS . 'server' . DS . $this->related_log_path;
             $full_log_path = CAPPPATH;
-            
+
             $full_log_path = str_replace('//', DS, $full_log_path);
             $temp_log_path = explode(DS, $log_path);
             foreach ($temp_log_path as $k => $v) {
-                $full_log_path .= $v .DS;
+                $full_log_path .= $v . DS;
                 if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
                     mkdir($full_log_path);
                 }
@@ -243,8 +253,8 @@
 //            $db->insert( $this->table_prefix .'_client_log_request', $data);
 //            $this->client_log_id = $db->insert_id();
         }
-        
-        protected function log_request(){
+
+        protected function log_request() {
             
         }
 
@@ -310,26 +320,26 @@
             if ($this->session instanceof ApiSession) {
                 $session_id = $this->session->get_session_id();
             }
-            
-            $file_name = 'CLIENT_' .$session_id;
+
+            $file_name = 'CLIENT_' . $session_id;
             if ($session_id == null) {
-                $file_name = 'CLIENT_' .'DEF';
+                $file_name = 'CLIENT_' . 'DEF';
             }
-            $file_name .= "_" .date("His") .'_' .$this->current_service_name ."_" 
-                    .mt_rand(10000, 99999) .'_rs.log';
+            $file_name .= "_" . date("His") . '_' . $this->current_service_name . "_"
+                    . mt_rand(10000, 99999) . '_rs.log';
             $this->full_log_path .= $file_name;
             $data_log_file = array(
                 'service_name' => $this->current_service_name,
                 'response' => $response,
             );
             file_put_contents($this->full_log_path, json_encode($data_log_file));
-            
+
             $this->response = $response;
             if (self::$has_return == false) {
                 echo cjson::encode($response);
             }
         }
-        
+
         /**
          * 
          * @final
