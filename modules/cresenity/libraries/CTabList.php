@@ -240,6 +240,10 @@
 					var tab_id = jQuery(this).attr('data-tab');
 					jQuery('#'+tab_id).parent().children().hide();
 					jQuery('#'+tab_id).show();
+                                        //console.log(jQuery('#'+tab_id).find('li.active a.tab-ajax-load').attr('style'));
+                                        //console.log('AA');
+                                        //console.log(tab_id);
+                                        
 					
 				}
 				
@@ -249,7 +253,16 @@
 
 
             $js->appendln("
+                        //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
 			jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
+                        if(!jQuery('#" . $this->id . "').hasClass('ajax')) {
+                            setTimeout(function() {
+                                //console.log('BB');
+                                //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
+
+                                jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
+                            },500);
+                        }
 			
 		");
 
