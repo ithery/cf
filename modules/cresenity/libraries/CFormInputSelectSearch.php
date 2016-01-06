@@ -153,7 +153,10 @@
             }
             $str_multiple = "";
             if ($this->multiple) $str_multiple = " multiple:'true',";
-
+			$classes = $this->classes;
+            $classes = implode(" ", $classes);
+            if (strlen($classes) > 0)
+                $classes = " " . $classes;
             $str = "
 			$('#" . $this->id . "').select2({
 				placeholder: '" . $placeholder . "',
@@ -184,7 +187,8 @@
 				formatSelection: function(item) {
 					return '" . $str_selection . "';
 				},  // omitted for brevity, see the source of this page
-				dropdownCssClass: 'bigdrop' // apply css that makes the dropdown taller
+				dropdownCssClass: '', // apply css that makes the dropdown taller
+				containerCssClass : 'tpx-select2-container " . $classes . "'
 			}).change(function() {
 				" . $str_js_change . "
 			});
