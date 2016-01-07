@@ -1,6 +1,5 @@
 <?php
 
-
     defined('SYSPATH') OR die('No direct access allowed.');
 
     class CApp extends CObservable {
@@ -17,7 +16,7 @@
         private $signup = false;
         private $activation = false;
         private $resend = false;
-		private $login_required = true;
+        private $login_required = true;
         private $_store = null;
         private $_role = null;
         private $_org = null;
@@ -174,12 +173,11 @@
         public function set_template($k, $v) {
             $this->_template[$k] = $v;
         }
-		
-		public function set_login_required($bool) {
-            return $this->login_required=$bool;
+
+        public function set_login_required($bool) {
+            return $this->login_required = $bool;
         }
-		
-		
+
         public function app_id() {
             return $this->_app_id;
         }
@@ -204,10 +202,11 @@
             return CF::instance();
         }
 
-        public function set_header_body($header_body){
+        public function set_header_body($header_body) {
             $this->header_body = $header_body;
             return $this;
         }
+
         public function app_list() {
             if ($this->app_list == null) {
                 //we will get all available app for this org
@@ -373,37 +372,37 @@
         }
 
         public function register_core_modules() {
-            
-			
-            
-			$theme = ccfg::get('theme');
-			if($theme==null) $theme = 'cresenity';
-			$theme_file = CF::get_file('themes',$theme);
-			if(file_exists($theme_file)) {
-				$theme_data = include $theme_file;
-				$module_arr = carr::get($theme_data,'client_modules');
-				$css_arr = carr::get($theme_data,'css');
-				$js_arr = carr::get($theme_data,'js');
-				$cs = CClientScript::instance();
-				if($module_arr!=null) {
-					foreach($module_arr as $module) {
-						$this->register_client_module($module);
-					}
-				}
-				if (ccfg::get('have_clock')) {
-					$this->register_client_module('servertime');
-				}
-				if($css_arr!=null) {
-					foreach($css_arr as $css) {
-						$cs->register_css_files($css);
-					}
-				}
-				if($js_arr!=null) {
-					foreach($js_arr as $js) {
-						$cs->register_js_files($js);
-					}
-				}
-			}
+
+
+
+            $theme = ccfg::get('theme');
+            if ($theme == null) $theme = 'cresenity';
+            $theme_file = CF::get_file('themes', $theme);
+            if (file_exists($theme_file)) {
+                $theme_data = include $theme_file;
+                $module_arr = carr::get($theme_data, 'client_modules');
+                $css_arr = carr::get($theme_data, 'css');
+                $js_arr = carr::get($theme_data, 'js');
+                $cs = CClientScript::instance();
+                if ($module_arr != null) {
+                    foreach ($module_arr as $module) {
+                        $this->register_client_module($module);
+                    }
+                }
+                if (ccfg::get('have_clock')) {
+                    $this->register_client_module('servertime');
+                }
+                if ($css_arr != null) {
+                    foreach ($css_arr as $css) {
+                        $cs->register_css_files($css);
+                    }
+                }
+                if ($js_arr != null) {
+                    foreach ($js_arr as $js) {
+                        $cs->register_js_files($js);
+                    }
+                }
+            }
         }
 
         public function render_template() {
@@ -445,7 +444,7 @@
                 $css_urls = $cs->url_css_file();
 
                 $v->header_body = $this->header_body;
-                
+
                 $js_urls = $cs->url_js_file();
                 $additional_js = "";
 
@@ -493,7 +492,7 @@
                 $v->load_client_script = $cs->render('load');
                 $v->ready_client_script = $cs->render('ready');
 
-                
+
                 $v->custom_js = $this->custom_js;
                 $v->custom_header = $this->custom_header;
                 $v->custom_footer = $this->custom_footer;
@@ -502,7 +501,6 @@
                 $v->breadcrumb = $this->breadcrumb;
                 $v->cheader = $this->_template['cheader'];
                 $v->cfooter = $this->_template['cfooter'];
-                
             }
 
             return $v->render();
@@ -518,12 +516,23 @@
                 trigger_error('CApp already rendered');
             }
             $this->rendered = true;
-            if (crequest::is_ajax()||$this->mobile==true) {
+            if (crequest::is_ajax() || $this->mobile == true) {
                 return $this->json();
             }
 
-            $theme_path = "";
-            
+            $theme_path = '';
+            $theme = ccfg::get('theme');
+            if ($theme == null) $theme = 'cresenity';
+            $theme_file = CF::get_file('themes', $theme);
+            if (file_exists($theme_file)) {
+                $theme_data = include $theme_file;
+                $theme_path = carr::get($theme_data, 'theme_path');
+                if ($theme_path == null) {
+                    $theme_path = '';
+                }
+            }
+
+
             if (ccfg::get("install")) {
                 $v = CView::factory($theme_path . 'cinstall/page');
                 /*
@@ -570,13 +579,13 @@
             }
             else {
                 $v = CView::factory($theme_path . 'cpage');
-                
+
                 $this->content = parent::html();
                 $this->js = parent::js();
-                
+
                 $v->content = $this->content;
                 $v->header_body = $this->header_body;
-                
+
                 $v->title = $this->title;
                 $cs = CClientScript::instance();
                 $css_urls = $cs->url_css_file();
@@ -635,28 +644,27 @@
                 $v->show_title = $this->show_title;
                 $v->breadcrumb = $this->breadcrumb;
             }
-            
+
             return $v->render();
         }
-        
-        
+
         public function get_all_js() {
             $cs = CClientScript::instance();
             $this->js = parent::js();
             $additional_js = '';
             $js = "";
-                $vjs = CView::factory('ccore/js');
-                $js.=PHP_EOL . $vjs->render();
+            $vjs = CView::factory('ccore/js');
+            $js.=PHP_EOL . $vjs->render();
 
-                $js .= PHP_EOL . $this->js . $additional_js;
+            $js .= PHP_EOL . $this->js . $additional_js;
 
-                $js = $cs->render_js_require($js);
+            $js = $cs->render_js_require($js);
 
-                if (ccfg::get("minify_js")) {
-                    $js = CJSMin::minify($js);
-                }
+            if (ccfg::get("minify_js")) {
+                $js = CJSMin::minify($js);
+            }
 
-                return $js;
+            return $js;
         }
 
         public function admin() {
@@ -715,8 +723,8 @@
 
         public function org_id() {
             $org = $this->org();
-			if($org==null) return null;
-			return $org->org_id;
+            if ($org == null) return null;
+            return $org->org_id;
         }
 
         public function is_user_login() {
@@ -741,11 +749,11 @@
             }
             return $this->_store;
         }
-		
-		public function store_id() {
+
+        public function store_id() {
             $store = $this->store();
-			if($store==null) return null;
-			return $store->store_id;
+            if ($store == null) return null;
+            return $store->store_id;
         }
 
         public function get_child_array($id = "", $level = 0) {
@@ -887,8 +895,10 @@
             $data["css_require"] = CClientScript::instance()->url_css_file();
             return cjson::encode($data);
         }
+
         public function is_mobile() {
             return $this->mobile;
         }
+
     }
     

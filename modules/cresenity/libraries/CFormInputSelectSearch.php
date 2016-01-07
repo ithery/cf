@@ -61,7 +61,7 @@
             $this->placeholder = $placeholder;
             return $this;
         }
-        
+
         public function html($indent = 0) {
             $html = new CStringBuilder();
             $custom_css = $this->custom_css;
@@ -73,13 +73,12 @@
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
-            
+
             $classes = $this->classes;
             $classes = implode(" ", $classes);
-            if (strlen($classes) > 0)
-                $classes = " " . $classes;
+            if (strlen($classes) > 0) $classes = " " . $classes;
             $html->set_indent($indent);
-            $html->appendln('<input type="hidden" class="'.$classes.'" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '" ' . $custom_css . $multiple . '>')->br();
+            $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '" ' . $custom_css . $multiple . '>')->br();
             return $html->text();
         }
 
@@ -160,7 +159,7 @@
             $str = "
 			$('#" . $this->id . "').select2({
 				placeholder: '" . $placeholder . "',
-				minimumInputLength: 0,
+				minimumInputLength: 1,
 				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 					url: '" . $ajax_url . "',
 					dataType: 'jsonp',
@@ -177,7 +176,8 @@
 
 						// notice we return the value of more so Select2 knows if more results can be loaded
 						return {results: data.data, more: more};
-					}
+					},
+                                        cache:true
 				},
 				" . $str_js_init . "
 				formatResult: function(item) {
@@ -200,11 +200,11 @@
             $js->set_indent($indent);
             //echo $str;
             $js->append($str)->br();
-            
-            
-            
-            
-            
+
+
+
+
+
             return $js->text();
         }
 

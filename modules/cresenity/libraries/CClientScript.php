@@ -132,12 +132,18 @@
                 $dir_file = substr($file, 0, strpos($file, '?'));
                 $js_version = substr($file, strpos($file, '?'), strlen($file) - 1);
             }
-            $js_file = $this->fullpath_js_file($dir_file);
-            if (!file_exists($js_file)) {
-                trigger_error('JS File not exists, ' . $file);
+            if (strpos($dir_file, 'http') !== false) {
+                $js_file = $dir_file;
+                // do nothing
             }
-            if (strlen($js_version) > 0) {
-                $js_file .= $js_version;
+            else {
+                $js_file = $this->fullpath_js_file($dir_file);
+                if (!file_exists($js_file)) {
+                    trigger_error('JS File not exists, ' . $file);
+                }
+                if (strlen($js_version) > 0) {
+                    $js_file .= $js_version;
+                }
             }
             $this->scripts[$pos]['js_file'][] = $js_file;
         }

@@ -19,6 +19,9 @@
         "jquery" => array(
             "js" => array("libs" . DS . "jquery.min.js"),
         ),
+        "jquery-2.1.1" => array(
+            "js" => array("libs/jquery-2.1.1.min.js"),
+        ),
         "bootstrap" => array(
             "js" => array("libs" . DS . "bootstrap.min.js"),
             "css" => array("bootstrap.css", "bootstrap-responsive.css"),
@@ -258,8 +261,47 @@
             "css" => array("plugins" . DS . "dropzone" . DS . "dropzone.css"),
         ),
         "dhtmlxgantt" => array(
-            "js" => array("plugins" . DS . "dhtmlxgantt" . DS . "dhtmlxgantt.js"),
+            "js" => array("plugins" . DS . "dhtmlxgantt" . DS . "dhtmlxgantt.js?v=1"),
+//            "js" => array("http://docs.dhtmlx.com/gantt/codebase/dhtmlxgantt.js"),
             "css" => array("plugins" . DS . "dhtmlxgantt" . DS . "dhtmlxgantt.css"),
+        ),
+        "bootstrap-3.3.5" => array(
+            "css" => array(
+                "plugins/bootstrap-3.3.5/bootstrap.css",
+            ),
+            "js" => array(
+                "bootstrap-3.3.5/bootstrap.js",
+                "bootstrap-3.3.5/js/popover.js",
+            ),
+            "requirements" => array("jquery-2.1.1"),
+        ),
+        "bootstrap-dropdown" => array(
+            "css" => array(
+                "bootstrap-dropdown.css",
+            ),
+            "js" => array(
+                "libs" .DS ."bootstrap" .DS ."bootstrap-dropdown.js"
+            ),
+            "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
+        ),
+        "jquery.datatable-bootstrap3" => array(
+            "css" => array(
+                "dataTables.bootstrap.min.css",
+            ),
+            "js" => array(
+                "plugins" .DS ."datatable" .DS ."jquery.dataTables.js",
+                "plugins" .DS ."datatable" .DS ."dataTables.bootstrap.js",
+            ),
+            "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
+        ),
+        "bootstrap-slider" => array(
+            "css" => array(
+                "bootstrap-slider.css",
+            ),
+            "js" => array(
+                "libs/bootstrap/bootstrap-slider.js",
+            ),
+            "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
         ),
     );
 ?>
