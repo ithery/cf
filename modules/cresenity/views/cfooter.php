@@ -14,7 +14,7 @@
             <div class="row">
 
                 <div class="span12">
-                    &copy; 2013 <a href="http://cresenity.com">Cresenity</a>.
+                    &copy; 2016 <a href="http://ittron.co.id">Ittron Global Technology</a>.
                 </div> <!-- /span12 -->
 
             </div> <!-- /row -->
