@@ -49,4 +49,25 @@ class c {
 			return htmlentities( $string, ENT_QUOTES, mb_internal_encoding() );
 		}
 	}
+	
+	public static function deprecated() {
+		$backtrace = debug_backtrace();
+		if(count($backtrace)>1) {
+			$state = $backtrace[1];
+			$function = carr::get($state,'function','');
+			$class = carr::get($state,'class','');
+			$type = carr::get($state,'type','');
+			$line = carr::get($state,'line','');
+			$line_str = '';
+			if(strlen($line)>0) {
+				$line_str = ' on line '.$line;
+			}
+			$full_function = $class.$type.$function.$line_str;
+			$subject = 'CApp Deprecated on calling function '.$full_function;
+			$body = cdbg::var_dump($backtrace,true);
+			
+			cmail::send_smtp('hery@ittron.co.id',$subject,$body);
+			
+		}
+	}
 } // End valid
