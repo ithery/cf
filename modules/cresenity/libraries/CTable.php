@@ -2001,10 +2001,11 @@
 				jQuery('#" . $this->id . "-check-all').click(function() {
 					
 					if(jQuery(this).is(':checked')) {
-						
 						jQuery('.checkbox-" . $this->id . "').attr('checked','checked');
+						jQuery('.checkbox-" . $this->id . "').prop('checked',true);
 					} else {
 						jQuery('.checkbox-" . $this->id . "').removeAttr('checked');
+						jQuery('.checkbox-" . $this->id . "').prop('checked',false);
 					}
 				});
 				
