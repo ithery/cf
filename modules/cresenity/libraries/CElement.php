@@ -10,6 +10,7 @@
         protected $text;
         protected $bootstrap;
 
+
         public static function valid_tag() {
             $available_tag = array('div', 'a', 'p', 'span');
         }

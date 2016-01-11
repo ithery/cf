@@ -47,7 +47,10 @@ class CTreeDB {
 
         return $this;
     }
-
+	public function set_org_id($id){
+		$this->org_id=$id;
+        return $this;
+	}
     public function add_filter($k, $v) {
         $this->filters[$k] = $v;
         return $this;
@@ -371,7 +374,7 @@ class CTreeDB {
         if(strlen($this->org_id)>0){
             $q.=" and org_id=" . $db->escape($this->org_id) . "";
         }
-        $q.= " and parent_id is null";
+        $q.= " and parent_id is null order by lft asc";
         $r = $db->query($q)->result(false);
         $left = 1;
 
@@ -405,7 +408,9 @@ class CTreeDB {
         
         if ($this->have_priority) {
             $q .= " ORDER BY priority";
-        }
+        }else{
+            $q .= " ORDER BY lft asc";
+		}
         $r = $db->query($q)->result(false);
         foreach ($r as $row) {
             // recursive execution of this function for each   
