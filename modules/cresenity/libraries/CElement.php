@@ -9,6 +9,7 @@
         protected $custom_css;
         protected $text;
         protected $bootstrap;
+        protected $theme;
 
 
         public static function valid_tag() {
@@ -27,6 +28,7 @@
             if (strlen($this->bootstrap) == 0) {
                 $this->bootstrap = '2';
             }
+            $this->theme = ccfg::get('theme');
         }
 
         public static function factory($id = "", $tag = "div") {
@@ -47,6 +49,12 @@
         }
 
         public function add_class($c) {
+            if ($this->bootstrap == '3') {
+                if ($this->theme == 'ittron-app') {
+                    $c = str_replace('span', 'col-md-', $c);
+                }
+            }
+            
             if (is_array($c)) {
                 $this->classes = array_merge($c, $this->classes);
             }

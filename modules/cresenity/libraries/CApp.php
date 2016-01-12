@@ -534,6 +534,9 @@
                 if ($theme_path == null) {
                     $theme_path = '';
                 }
+                else {
+                    $theme_path .= '/';
+                }
             }
 
 
@@ -626,6 +629,8 @@
                     $v->js_hash = $cs->create_js_hash();
                 }
 
+                $v->theme = $theme;
+                $v->theme_path = $theme_path;
                 $v->head_client_script = "";
                 $v->begin_client_script = "";
                 $v->end_client_script = "";

@@ -1,0 +1,263 @@
+
+<html>
+    <head>
+        <style>
+            html{
+                margin-top:30mm;
+                margin-bottom:20mm;
+				margin-left:30mm;
+                margin-right:20mm;
+            }
+            body{
+                font-family: Times New Roman;
+                font-size: 12px;	
+            }
+			table, td, th {
+				border: 1px solid black;
+				border-collapse: collapse;
+			}
+            .space {
+                height: 20px;
+            }
+			.title{
+                font-family: Times New Roman;
+                font-size: 16px;
+				font-weight: bold;
+				color: blue;
+			}
+			.subtitle{
+                font-family: Times New Roman;
+                font-size: 12px;
+				font-weight: bold;
+			}
+        </style>
+    </head>
+	<body>	
+	<div class="title" align="center">PROJECT ASSIGNMENT</div>
+	<div class="subtitle" align="center">PA15/PRD/XII/00012</div>
+	<center>23 December 2015</center>
+	<div class="header-table">
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="100px" style="border: 1px solid transparent;">Project Order</td>
+					<td width="10px" style="border: 1px solid transparent;">:</td>
+					<td colspan="4" style="border: 1px solid transparent;"></td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">Project Name</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td width="220px" style="border: 1px solid transparent;">
+						ffff					</td>
+					<td style="border: 1px solid transparent;">Date of Created</td>
+					<td width="10px" style="border: 1px solid transparent;">:</td>
+					<td style="border: 1px solid transparent;">
+						23 December 2015					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">Org Code</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td style="border: 1px solid transparent;"></td>
+					<td style="border: 1px solid transparent;">Date of Assignment</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td style="border: 1px solid transparent;">
+						23 December 2015					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">Application Code</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td colspan="4" style="border: 1px solid transparent;">Application Code</td>
+				</tr>
+				<tr>
+					<td colspan="6" style="border: 1px solid transparent;">&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="middle-table">
+		<table width="80%" align="center">
+			<tr>
+				<td style="border: 1px solid;" width="10px"><b>No.</b></td>
+				<td style="border: 1px solid;" align="center"><b>&nbsp;Position</b></td>
+				<td style="border: 1px solid;" align="center"><b>PIC</b></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">1</td>
+				<td style="border: 1px solid ;">&nbsp;Project Order</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">2</td>
+				<td style="border: 1px solid ;">&nbsp;Senior Programmer / Middle Programmer</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">3</td>
+				<td style="border: 1px solid ;">&nbsp;Database Analyst</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">4</td>
+				<td style="border: 1px solid ;">&nbsp;System Analyst</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">5</td>
+				<td style="border: 1px solid ;">&nbsp;Designer</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">6</td>
+				<td style="border: 1px solid ;">&nbsp;Research Programmer</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">7</td>
+				<td style="border: 1px solid ;">&nbsp;Leader QC</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">8</td>
+				<td style="border: 1px solid ;">&nbsp;Implementator</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">9</td>
+				<td style="border: 1px solid ;">&nbsp;Network</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">10</td>
+				<td style="border: 1px solid ;">&nbsp;Junior Programmer</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">11</td>
+				<td style="border: 1px solid ;">&nbsp;QC</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid ;" align="right">12</td>
+				<td style="border: 1px solid ;">&nbsp;Documentator</td>
+				<td style="border: 1px solid ;">
+									</td>
+			</tr>
+		</table>
+	</div>
+	<div class="bottom-table">
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="60px" style="border: 1px solid transparent;">Start date</td>
+					<td width="10px" style="border: 1px solid transparent;">:</td>
+					<td colspan="4" style="border: 1px solid transparent;">
+						01 December 2015					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">Pralive</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td colspan="4" style="border: 1px solid transparent;">
+						24 December 2015					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">Live</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td colspan="4" style="border: 1px solid transparent;">
+						25 December 2015					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">Close</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td colspan="4" style="border: 1px solid transparent;">
+						26 December 2015					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="signature-table">
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;" align="center">Operational Manager</td>
+					<td style="border: 1px solid transparent;"></td>
+					<td style="border: 1px solid transparent;" align="center">Project Manager</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;" align="center">
+						<img align="middle" src="application/intern/default/upload/signature/1/small/logo-small.png";>
+					</td>
+					<td style="border: 1px solid transparent;"></td>
+					<td style="border: 1px solid transparent;" align="center">
+						<img src="application/intern/default/upload/signature/1/small/logo-small.png";>
+					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;" align="center">(
+					Harun)
+					</td>
+					<td style="border: 1px solid transparent;"></td>
+					<td style="border: 1px solid transparent;" align="center">(
+					Harun)
+					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;"></td>
+					<td style="border: 1px solid transparent;" align="center">Development Manager</td>
+					<td style="border: 1px solid transparent;"></td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;"></td>
+					<td style="border: 1px solid transparent;" align="center">
+						<img src="application/intern/default/upload/signature/1/small/logo-small.png";>
+					</td>
+					<td style="border: 1px solid transparent;"></td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;"></td>
+					<td style="border: 1px solid transparent;" align="center">(Raymond Sugiarto)</td>
+					<td style="border: 1px solid transparent;"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+    </body>
+</html>

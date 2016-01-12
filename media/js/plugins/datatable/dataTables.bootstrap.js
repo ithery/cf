@@ -194,7 +194,7 @@ factory(jQuery, jQuery.fn.dataTable);
 }
 else if ( typeof exports === 'object' ) {
     // Node/CommonJS
-    factory( require('jquery'), require('../js/jquery.dataTables.js') );
+    factory( require('jquery'), require('../js/jquery.dataTables.min 1-10.js') );
 }
 else if ( jQuery ) {
 	// Otherwise simply initialise as normal, stopping multiple evaluation

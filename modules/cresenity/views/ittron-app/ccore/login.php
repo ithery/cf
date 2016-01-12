@@ -14,168 +14,64 @@
         <meta charset="utf-8">
         <title>Login</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity.reset.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/bootstrap.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/bootstrap-responsive.css" rel="stylesheet">
+        <!--<link href="<?php echo curl::base(); ?>media/css/cresenity.reset.css" rel="stylesheet">-->
+        <link href="<?php echo curl::base(); ?>media/css/plugins/bootstrap-3.3.5/bootstrap.min.css" rel="stylesheet">
+        <link href="<?php echo curl::base(); ?>media/css/plugins/font-awesome/font-awesome 4.5.0.min.css" rel="stylesheet">
 
-        <link href="<?php echo curl::base(); ?>media/css/font-awesome.css" rel="stylesheet">
-
-        <link href="<?php echo curl::base(); ?>media/css/cresenity.colors.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity/cresenity.form.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity/cresenity.message.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity/cresenity.utilities.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity/cresenity.generic-element.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity/cresenity.block-arrow.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity.main.css" rel="stylesheet">
-        <link href="<?php echo curl::base(); ?>media/css/cresenity.login.css" rel="stylesheet">
+        <link href="<?php echo curl::base(); ?>media/css/iapp.min.css" rel="stylesheet">
         <!-- JavaScript at bottom except for Modernizr -->
         <script src="<?php echo curl::base(); ?>media/js/libs/modernizr.custom.js"></script>
-
+        <style>
+            .loading {
+                padding: 7px !important;
+                margin-top: -13px;
+            }
+        </style>
     </head>
-    <body>
+    <body class="hold-transition login-page">
 
-        <div class="navbar navbar-fixed-top">
-
-            <div class="navbar-inner">
-
-                <div class="container">
-
-                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </a>
-
-                    <a class="brand" href="<?php echo curl::base(); ?>">
-                        <?php echo ccfg::get('title'); ?>				
-                    </a>		
-
-                    <div class="nav-collapse">
-                        <ul class="nav pull-right">
-                            <?php if (ccfg::get("multilang")): ?>
-                                    <li class="dropdown">
-
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img style="padding-right:5px;display:inline-block;margin-top:-3px;" src="<?php echo curl::base(); ?>media/img/flags/<?php echo clang::getlang(); ?>.gif" />
-                                            <?php echo clang::current_lang_name(); ?>
-                                            <b class="caret"></b>
-                                        </a>
-
-                                        <ul class="dropdown-menu">
-                                            <?php
-                                            $list = clang::get_lang_list();
-                                            foreach ($list as $k => $v) {
-                                                $active = "";
-                                                if ($k == clang::getlang())
-                                                        $active = "active";
-                                                $img = '<img style="padding-right:10px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
-                                                echo '<li class="' . $active . '"><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '" hreflang="' . $k . '">' . $img . ' ' . $v . '</a></li>';
-                                            }
-                                            ?>
-
-                                        </ul>
-
-                                    </li>
-                                <?php endif; ?>
-                            <?php if (ccfg::get("signup")): ?>
-                                    <li class="">						
-                                        <a href="<?php echo curl::base(); ?>cresenity/signup" class="">
-                                            Create an Account
-                                        </a>
-
-                                    </li>
-                                <?php endif; ?>
-
-                        </ul>
-
-                    </div><!--/.nav-collapse -->	
-
-                </div> <!-- /container -->
-
-            </div> <!-- /navbar-inner -->
-
-        </div> <!-- /navbar -->
-
-
-
-        <div class="account-container">
-            <div class="logo">
-                <img src="<?php echo curl::base(); ?>media/img/cresenity-logo.png" />
-            </div>
-            <div class="content clearfix" id="container">
-
-                <form method="post" action="" id="form-login">
-
-                    <h1 class="align-center"><?php echo clang::__('Sign In'); ?></h1>		
-
-                    <div class="login-fields">
-                        <h4 class="align-center"><?php echo CApp::instance()->name() ?></h4>
-                        <p>&nbsp;</p>
-                        <!-- <p><?php echo clang::__('Sign in using your registered account'); ?>:</p> -->
-
-                        <div class="field">
-                            <label for="email"><?php echo clang::__('ID'); ?>:</label>
-                            <input type="text" id="email" name="email" value="<?php echo $username; ?>" placeholder="Email/Username" class="login username-field" autocomplete="off"/>
-                        </div> <!-- /field -->
-
-                        <div class="field">
-                            <label for="password"><?php echo clang::__('Password'); ?>:</label>
-                            <input type="password" id="password" name="password" value="<?php echo $password; ?>" placeholder="Password" class="login password-field" autocomplete="off"/>
-                        </div> <!-- /password -->
-
-                    </div> <!-- /login-fields -->
-                    <div class="login-actions">
-
-                        <span class="login-checkbox">
-                            <!--
-                            <input id="Field" name="Field" type="checkbox" class="field login-checkbox" value="First Choice" tabindex="4" />
-                            <label class="choice" for="Field"><?php echo clang::__('Keep me signed in'); ?></label>
-                            -->
-                        </span>
-
-                        <button class="button btn btn-warning btn-large"><?php echo clang::__('Sign In'); ?></button>
-
-                    </div> <!-- .actions -->
-
-
-
+        <div class="login-box">
+            <div class="login-logo">
+                <img src="<?php echo curl::base(); ?>media/img/logo-ittron.png" height="60px" /> <br/>
+                
+            </div><!-- /.login-logo -->
+            <div class="login-box-body">
+                <p class="login-box-msg"><a href="<?php echo curl::base(); ?>"><b><?php echo ccfg::get('title'); ?></b></a></p>
+                <form action="" method="post" id="form-login">
+                    <div class="form-group has-feedback">
+                        <input type="text" id="email" name="email" class="form-control" placeholder="Email/Username" value="<?php echo $username; ?>" class="login username-field" autocomplete="off">
+                        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" value="<?php echo $password; ?>" class="login password-field" autocomplete="off">
+                        <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-8">
+<!--                            <div class="checkbox icheck">
+                                <label>
+                                    <input type="checkbox"> Remember Me
+                                </label>
+                            </div>-->
+                        </div><!-- /.col -->
+                        <div class="col-xs-4">
+                            <button type="submit" class="btn btn-primary btn-block btn-flat"><?php echo clang::__('Sign In'); ?></button>
+                        </div><!-- /.col -->
+                    </div>
                 </form>
 
-            </div> <!-- /content -->
+<!--                <div class="social-auth-links text-center">
+                    <p>- OR -</p>
+                    <a href="#" class="btn btn-block btn-social btn-facebook btn-flat"><i class="fa fa-facebook"></i> Sign in using Facebook</a>
+                    <a href="#" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i> Sign in using Google+</a>
+                </div> /.social-auth-links 
 
-        </div> <!-- /account-container -->
+                <a href="#">I forgot my password</a><br>
+                <a href="register.html" class="text-center">Register a new membership</a>-->
 
-        <?php if (ccfg::get("signup")): ?>
+            </div><!-- /.login-box-body -->
+        </div><!-- /.login-box -->
 
-                <!-- Text Under Box -->
-                <div class="login-extra">
-                    Don't have an account? <a href="<?php echo curl::base(); ?>cresenity/signup"><?php echo clang::__('Sign Up'); ?></a><br/>
-                    <!--
-                    <?php echo clang::__('Remind'); ?> <a href="<?php echo curl::base(); ?>/cresenity/forget_password"><?php echo clang::__('Password'); ?></a>
-                    -->
-                </div> <!-- /login-extra -->
-            <?php endif; ?>
-        <!--
-        <div id="container">
-        
-                        <hgroup id="login-title" class="large-margin-bottom">
-                                <h1 class="login-title-image">192.168.0.4</h1>
-                                <h5>&copy; Cresenity</h5>
-                        </hgroup>
-        
-                        <form method="post" action="" id="form-login">
-                                <ul class="inputs black-input large">
-                                        <li><span class="icon-user mid-margin-right"></span><input type="text" name="username" id="username" value="" class="input-unstyled" placeholder="Login" autocomplete="off"></li>
-                                        <li><span class="icon-lock mid-margin-right"></span><input type="password" name="password" id="password" value="" class="input-unstyled" placeholder="Password" autocomplete="off"></li>
-                                        <li><span class="mid-margin-right"><img id="img_captcha" src="<?php echo curl::base() . "index.php/cresenity/captcha/" ?>" alt=", type it in the box" width="50" height="24" align="absbottom"></span><input type="text" name="captcha" id="captcha" value="" class="captcha input-unstyled" placeholder="Verification code" autocomplete="off"></li>
-                                        
-                                </ul>
-        
-                                <button type="submit" class="btn full-width">Login</button>
-                        </form>
-        
-                </div>
-        -->
         <!-- Load javascript here -->
         <script src="<?php echo curl::base(); ?>media/js/libs/jquery.js"></script>
         <script src="<?php echo curl::base(); ?>media/js/libs/jquery.ui.custom.js"></script>
@@ -247,6 +143,7 @@
 
                         // Show progress
                         displayLoading('Checking credentials...');
+
 
                         event.preventDefault();
 
@@ -377,7 +274,7 @@
                 function displayLoading(message)
                 {
                     // Show message
-                    var message = formLogin.message('<strong>' + message + '</strong>', {
+                    var message = formLogin.message('<div class="alert alert-warning alert-dismissable loading">' + message + '</div>', {
                         append: false,
                         arrow: 'none',
                         classes: ['blue-gradient', 'align-center'],

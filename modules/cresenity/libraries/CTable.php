@@ -132,7 +132,12 @@
             $this->export_filename = $this->id;
             $this->export_sheetname = $this->id;
 
-            CClientModules::instance()->register_module('jquery.datatable');
+            if ($this->bootstrap == '3') {
+                CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
+            }
+            else {
+                CClientModules::instance()->register_module('jquery.datatable');
+            }
         }
 
         public static function factory($id = "") {
@@ -476,8 +481,8 @@
             $this->title = $title;
             return $this;
         }
-        
-        public function set_dom($dom){
+
+        public function set_dom($dom) {
             $this->dom = $dom;
             return $this;
         }
@@ -592,6 +597,7 @@
             }
             return $this;
         }
+
         public function filter_action_callback_func($func, $require = "") {
             $this->filter_action_callback_func = $func;
             if (strlen($require) > 0) {
@@ -1321,8 +1327,20 @@
             $html->set_indent($indent);
             $wrapped = ($this->apply_data_table > 0) || $this->have_header_action();
             if ($wrapped) {
-                $html->appendln('<div class="widget-box widget-table">')->inc_indent();
-                $html->appendln('<div class="widget-title">')->inc_indent();
+
+                $main_class = ' widget-box ';
+                $main_class_title = ' widget-title ';
+                $main_class_content = ' widget-content ';
+                if ($this->bootstrap == '3') {
+                    if ($this->theme == 'ittron-app') {
+                        $main_class = ' box ';
+                        $main_class_title = ' box-header with-border ';
+                        $main_class_content = ' box-body ';
+                    }
+                }
+
+                $html->appendln('<div class="' .$main_class .' widget-table">')->inc_indent();
+                $html->appendln('<div class="'.$main_class_title.'">')->inc_indent();
                 if (strlen($this->icon > 0)) {
                     $html->appendln('<span class="icon">')->inc_indent();
                     $html->appendln('<i class="icon-' . $this->icon . '"></i>');
@@ -1333,7 +1351,7 @@
                     $html->appendln($this->header_action_list->html($html->get_indent()));
                 }
                 $html->dec_indent()->appendln('</div>');
-                $html->appendln('<div class="widget-content nopadding">')->inc_indent();
+                $html->appendln('<div class="' .$main_class_content .' nopadding">')->inc_indent();
             }
             $data_responsive_open = '';
             $data_responsive_close = '';
@@ -1498,28 +1516,28 @@
                         $this->row_action_list->regenerate_id(true);
                         $this->row_action_list->apply("jsparam", $jsparam);
                         $this->row_action_list->apply("set_handler_url_param", $jsparam);
-						
+
                         if (($this->filter_action_callback_func) != null) {
                             $actions = $this->row_action_list->childs();
-							
-							foreach($actions as $action) {
-								$visibility = CDynFunction::factory($this->filter_action_callback_func)
-										->add_param($this)
-										->add_param($col->get_fieldname())
-										->add_param($row)
-										->add_param($action)
-										->set_require($this->requires)
-										->execute();
-										
-								$action->set_visibility($visibility);
-							}
+
+                            foreach ($actions as $action) {
+                                $visibility = CDynFunction::factory($this->filter_action_callback_func)
+                                        ->add_param($this)
+                                        ->add_param($col->get_fieldname())
+                                        ->add_param($row)
+                                        ->add_param($action)
+                                        ->set_require($this->requires)
+                                        ->execute();
+
+                                $action->set_visibility($visibility);
+                            }
 
 
                             //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                         }
-						
-						
-						$this->js_cell.=$this->row_action_list->js();
+
+
+                        $this->js_cell.=$this->row_action_list->js();
 
                         $html->appendln($this->row_action_list->html($html->get_indent()));
                         $html->dec_indent()->appendln('</td>')->br();
@@ -1881,17 +1899,20 @@
                   ;
                  */
 
+                if ($this->bootstrap == '3') {
+                    $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
+                }
 
                 if ($this->dom == null) {
-                    $this->dom = "<\"\"l>t<\"F\"<\"#footer_action_" . $this->id ."\">frp>";
+                    $this->dom = "<\"\"l>t<\"F\"<\"#footer_action_" . $this->id . "\">frp>";
                 }
                 else {
                     $this->dom = str_replace("'", "\'", $this->dom);
                 }
                 $js->append("")
                         ->appendln("'sPaginationType': 'full_numbers',")->br()
-                        ->appendln("'sDom': '" .$this->dom ."',")->br();
-                
+                        ->appendln("'sDom': '" . $this->dom . "',")->br();
+
                 /*
                   $js->append("
                   'fnDrawCallback': function ( oSettings ) {");
@@ -2038,7 +2059,6 @@
             }
 
 //            echo '<textarea>' . $js->text() . '</textarea>';
-
 //            clog::write($js->text());
             return $js->text();
         }

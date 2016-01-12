@@ -13,6 +13,10 @@ class CActionList extends CElement {
         $this->style = "btn-list";
         $this->label = clang::__("Action");
         $this->btn_dropdown_classes = array();
+        if ($this->bootstrap == '3') {
+            $this->btn_dropdown_classes[] = 'btn-primary';
+            $this->btn_dropdown_classes[] = 'btn-sm';
+        }
     }
 
     public static function factory($list_id = "") {
@@ -25,7 +29,12 @@ class CActionList extends CElement {
     }
     
     public function add_btn_dropdown_class($class){
-        $this->btn_dropdown_classes[] = $class;
+        if ($this->bootstrap == '3' && ($class == 'btn-primary' || $class == 'btn-sm')) {
+            // do nothing
+        }
+        else {
+            $this->btn_dropdown_classes[] = $class;
+        }
         return $this;
     }
 	

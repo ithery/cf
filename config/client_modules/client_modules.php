@@ -33,6 +33,9 @@
         "font-awesome" => array(
             "css" => array("font-awesome.css"),
         ),
+        "font-awesome-4.5.0" => array(
+            "css" => array("plugins/font-awesome/font-awesome 4.5.0.min.css"),
+        ),
         "jquery.ui" => array(
             "js" => array("libs" . DS . "jquery.ui.custom.js"),
             "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery.ui.theme.css"),
@@ -267,11 +270,11 @@
         ),
         "bootstrap-3.3.5" => array(
             "css" => array(
-                "plugins/bootstrap-3.3.5/bootstrap.css",
+                "plugins/bootstrap-3.3.5/bootstrap.min.css",
             ),
             "js" => array(
-                "bootstrap-3.3.5/bootstrap.js",
-                "bootstrap-3.3.5/js/popover.js",
+                "libs/bootstrap-3.3.5/bootstrap.js",
+                "libs/bootstrap-3.3.5/js/popover.js",
             ),
             "requirements" => array("jquery-2.1.1"),
         ),
@@ -280,7 +283,7 @@
                 "bootstrap-dropdown.css",
             ),
             "js" => array(
-                "libs" .DS ."bootstrap" .DS ."bootstrap-dropdown.js"
+                "libs" . DS . "bootstrap" . DS . "bootstrap-dropdown.js"
             ),
             "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
         ),
@@ -289,8 +292,13 @@
                 "dataTables.bootstrap.min.css",
             ),
             "js" => array(
-                "plugins" .DS ."datatable" .DS ."jquery.dataTables.js",
-                "plugins" .DS ."datatable" .DS ."dataTables.bootstrap.js",
+                "plugins" . DS . "datatable" . DS . "jquery.dataTables.js",
+                "plugins" . DS . "datatable" . DS . "dataTables.bootstrap.js",
+//                "plugins" . DS . "datatable" . DS . "dataTables.responsive.min.js",
+//                "plugins" . DS . "datatable" . DS . "TableTools.min.js",
+//                "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
+//                "plugins" . DS . "datatable" . DS . "ColVis.min.js",
+//                "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
             ),
             "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
         ),
@@ -303,5 +311,14 @@
             ),
             "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
         ),
+        "iapp" => array(
+            "css" => array(
+                "sidebar.less",
+//            "skins/skin-blue.min.css",
+//            "skins/skin-blue-light.min.css",
+                "skins/_all-skins.min.css",
+                "iapp.min.css",
+            )
+        )
     );
 ?>

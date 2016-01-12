@@ -1,18 +1,10 @@
-<?php
-    defined('SYSPATH') OR die('No direct access allowed.');
-
-    $username = "";
-    $password = "";
-    if (isset($_GET["demo"])) {
-        $username = "demo";
-        $password = "demo";
-    }
+<?php defined('SYSPATH') OR die('No direct access allowed.');
 ?>
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Login</title>
+        <title>Admin Login</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="<?php echo curl::base(); ?>media/css/cresenity.reset.css" rel="stylesheet">
         <link href="<?php echo curl::base(); ?>media/css/bootstrap.css" rel="stylesheet">
@@ -47,44 +39,33 @@
                     </a>
 
                     <a class="brand" href="<?php echo curl::base(); ?>">
-                        <?php echo ccfg::get('title'); ?>				
+                        <?php echo ccfg::get("title"); ?>				
                     </a>		
 
                     <div class="nav-collapse">
                         <ul class="nav pull-right">
                             <?php if (ccfg::get("multilang")): ?>
-                                    <li class="dropdown">
+                                <li class="dropdown">
 
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img style="padding-right:5px;display:inline-block;margin-top:-3px;" src="<?php echo curl::base(); ?>media/img/flags/<?php echo clang::getlang(); ?>.gif" />
-                                            <?php echo clang::current_lang_name(); ?>
-                                            <b class="caret"></b>
-                                        </a>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        <i class="icon-flag"></i> 
+                                        <?php echo clang::current_lang_name(); ?>
+                                        <b class="caret"></b>
+                                    </a>
 
-                                        <ul class="dropdown-menu">
-                                            <?php
-                                            $list = clang::get_lang_list();
-                                            foreach ($list as $k => $v) {
-                                                $active = "";
-                                                if ($k == clang::getlang())
-                                                        $active = "active";
-                                                $img = '<img style="padding-right:10px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
-                                                echo '<li class="' . $active . '"><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '" hreflang="' . $k . '">' . $img . ' ' . $v . '</a></li>';
-                                            }
-                                            ?>
+                                    <ul class="dropdown-menu">
+                                        <?php
+                                        $list = clang::get_lang_list();
+                                        foreach ($list as $k => $v) {
+                                            echo '<li><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '">' . $v . '</a></li>';
+                                        }
+                                        ?>
 
-                                        </ul>
+                                    </ul>
 
-                                    </li>
-                                <?php endif; ?>
-                            <?php if (ccfg::get("signup")): ?>
-                                    <li class="">						
-                                        <a href="<?php echo curl::base(); ?>cresenity/signup" class="">
-                                            Create an Account
-                                        </a>
+                                </li>
+                            <?php endif; ?>
 
-                                    </li>
-                                <?php endif; ?>
 
                         </ul>
 
@@ -106,31 +87,22 @@
 
                 <form method="post" action="" id="form-login">
 
-                    <h1 class="align-center"><?php echo clang::__('Sign In'); ?></h1>		
+                    <h1 class="align-center"><?php echo clang::__('Administrator Page'); ?></h1>		
 
                     <div class="login-fields">
-                        <h4 class="align-center"><?php echo CApp::instance()->name() ?></h4>
-                        <p>&nbsp;</p>
-                        <!-- <p><?php echo clang::__('Sign in using your registered account'); ?>:</p> -->
 
-                        <div class="field">
-                            <label for="email"><?php echo clang::__('ID'); ?>:</label>
-                            <input type="text" id="email" name="email" value="<?php echo $username; ?>" placeholder="Email/Username" class="login username-field" autocomplete="off"/>
-                        </div> <!-- /field -->
 
                         <div class="field">
                             <label for="password"><?php echo clang::__('Password'); ?>:</label>
-                            <input type="password" id="password" name="password" value="<?php echo $password; ?>" placeholder="Password" class="login password-field" autocomplete="off"/>
+                            <input type="password" id="password" name="password" value="" placeholder="Password" class="login password-field" autocomplete="off"/>
                         </div> <!-- /password -->
 
                     </div> <!-- /login-fields -->
                     <div class="login-actions">
 
                         <span class="login-checkbox">
-                            <!--
                             <input id="Field" name="Field" type="checkbox" class="field login-checkbox" value="First Choice" tabindex="4" />
-                            <label class="choice" for="Field"><?php echo clang::__('Keep me signed in'); ?></label>
-                            -->
+
                         </span>
 
                         <button class="button btn btn-warning btn-large"><?php echo clang::__('Sign In'); ?></button>
@@ -147,14 +119,14 @@
 
         <?php if (ccfg::get("signup")): ?>
 
-                <!-- Text Under Box -->
-                <div class="login-extra">
-                    Don't have an account? <a href="<?php echo curl::base(); ?>cresenity/signup"><?php echo clang::__('Sign Up'); ?></a><br/>
-                    <!--
-                    <?php echo clang::__('Remind'); ?> <a href="<?php echo curl::base(); ?>/cresenity/forget_password"><?php echo clang::__('Password'); ?></a>
-                    -->
-                </div> <!-- /login-extra -->
-            <?php endif; ?>
+            <!-- Text Under Box -->
+            <div class="login-extra">
+                Don't have an account? <a href="<?php echo curl::base(); ?>cresenity/signup"><?php echo clang::__('Sign Up'); ?></a><br/>
+                <!--
+                <?php echo clang::__('Remind'); ?> <a href="<?php echo curl::base(); ?>/cresenity/forget_password"><?php echo clang::__('Password'); ?></a>
+                -->
+            </div> <!-- /login-extra -->
+        <?php endif; ?>
         <!--
         <div id="container">
         
@@ -202,7 +174,7 @@
              * Or if you don't trust AJAX calls, just remove the event.preventDefault() part and let the form be submitted.
              */
 
-            jQuery(document).ready(function ()
+            jQuery(document).ready(function()
             {
                 /*
                  * JS login effect
@@ -215,13 +187,13 @@
                         // If layout is centered
                         centered;
 
-
+                /******* EDIT THIS SECTION *******/
 
                 /*
                  * AJAX login
                  * This function will handle the login process through AJAX
                  */
-                formLogin.submit(function (event)
+                formLogin.submit(function(event)
                 {
                     // Values
                     var login = jQuery.trim(jQuery('#email').val()),
@@ -229,19 +201,15 @@
                             captcha = jQuery.trim(jQuery('#captcha').val());
 
                     // Check inputs
-                    if (login.length === 0) {
-                        // Remove previous messages
-                        formLogin.clearMessages();
-                        // Display message
-                        displayError('Please fill in your username');
-                        return false;
-                    } else if (pass.length === 0) {
+                    if (pass.length === 0) {
                         // Remove previous messages
                         formLogin.clearMessages();
                         // Display message
                         displayError('Please fill in your password');
                         return false;
-                    } else {
+                    }
+
+                    else {
                         // Remove previous messages
                         formLogin.clearMessages();
 
@@ -256,34 +224,38 @@
                         /*
                          * This is where you may do your AJAX call, for instance:
                          */
-                        var url = '<?php echo curl::base(); ?>index.php/cresenity/login';
+                        var url = '<?php echo curl::base(); ?>index.php/admin/core/login';
 
                         jQuery.ajax(url, {
                             dataType: 'json',
                             type: 'POST',
                             data: $("#form-login").serialize(),
-                            success: function (data) {
+                            success: function(data) {
                                 var result = data.result;
                                 var message = data.message;
                                 if (result == "OK") {
-                                    document.location.href = '<?php echo curl::base() . curl::current() . CFRouter::$query_string; ?>';
+                                    document.location.href = '<?php echo curl::base(); ?>admin/home';
                                 } else {
                                     formLogin.clearMessages();
                                     displayError(message);
                                 }
 
                             },
-                            error: function () {
+                            error: function() {
                                 formLogin.clearMessages();
                                 displayError('Error while contacting server, please try again');
                             }
                         });
 
 
+                        // Simulate server-side check
+                        //setTimeout(function() {
+                        //	document.location.href = './'
+                        //}, 2000);
                     }
                 });
 
-
+                /******* END OF EDIT SECTION *******/
 
                 // Handle resizing (mostly for debugging)
                 function handleLoginResize()
@@ -295,7 +267,8 @@
                     if (!centered)
                     {
                         container.css('margin-top', '');
-                    } else
+                    }
+                    else
                     {
                         if (parseInt(container.css('margin-top'), 10) === 0)
                         {
@@ -330,7 +303,7 @@
                         }
 
                         // Get other elements height
-                        siblings.each(function (i)
+                        siblings.each(function(i)
                         {
                             finalSize += $(this).outerHeight(true);
                         });
@@ -362,7 +335,7 @@
                     centerForm(true, 'fast');
 
                     // Watch for closing and show with effect
-                    message.bind('endfade', function (event)
+                    message.bind('endfade', function(event)
                     {
                         // This will be called once the message has faded away and is removed
                         centerForm(true, message.get(0));
@@ -391,7 +364,7 @@
                     centerForm(true, 'fast');
 
                     // Watch for closing and show with effect
-                    message.bind('endfade', function (event)
+                    message.bind('endfade', function(event)
                     {
                         // This will be called once the message has faded away and is removed
                         centerForm(true, message.get(0));
@@ -408,6 +381,5 @@
             //});
 
         </script>
-
     </body>
 </html>
