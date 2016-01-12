@@ -25,7 +25,7 @@ $org = $app->org();
         <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
 
         <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
-		
+		<?php echo $additional_head;?>
     </head>
     <body>
         <?php echo $custom_header; ?>

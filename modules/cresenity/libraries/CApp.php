@@ -32,6 +32,7 @@
         protected $rendered = false;
         private $mobile = false;
         private $header_body = '';
+		private $additional_head='';
 
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
@@ -505,7 +506,10 @@
 
             return $v->render();
         }
-
+		public function set_additional_head($str){
+			$this->additional_head=$str;
+		}
+		
         public function rendered() {
             return $this->rendered;
         }
@@ -643,6 +647,7 @@
                 $v->show_breadcrumb = $this->show_breadcrumb;
                 $v->show_title = $this->show_title;
                 $v->breadcrumb = $this->breadcrumb;
+				$v->additional_head=$this->additional_head;
             }
 
             return $v->render();
