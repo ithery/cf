@@ -15,6 +15,7 @@
         protected $requires;
         protected $custom_field_data = array();
 
+
         public function __construct($id = "") {
             parent::__construct($id);
 
@@ -171,7 +172,11 @@
                     require_once $req;
                 }
             }
-            call_user_func($data->tree_callback, array($operation, $custom_field_data));
+            $args = array(
+                'operation' => $operation,
+                'custom_field_data' => $custom_field_data
+            );
+            call_user_func($data->tree_callback, $args);
         }
 
         public function js($indent = 0) {
@@ -193,7 +198,7 @@
                     ->set_data('operation', 'get_content')
                     ->set_data('custom_field_data', $this->custom_field_data)
                     ->makeurl();
-
+//die($callback_node_url);
             $js->appendln("jQuery('#" . $this->id . " .tree').jstree({
                         'core' : {
                             'data' : {

@@ -203,7 +203,7 @@
             // return $elm;
         // }
 		
-		public function add_element($type,$id="") {
+		public function add_element($type, $id="") {
             $element = null;
             if ($this->manager->is_registered_element($type)) {
                 $element = $this->manager->create_element($id, $type);

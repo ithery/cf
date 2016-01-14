@@ -125,11 +125,13 @@
             $main_class = ' widget-box ';
             $main_class_title = ' widget-title ';
             $main_class_content = ' widget-content ';
+            $class_title = '';
             if ($this->bootstrap == '3') {
                 if ($this->theme == 'ittron-app') {
                     $main_class = ' box ';
                     $main_class_title = ' box-header with-border ';
                     $main_class_content = ' box-body ';
+                    $class_title = ' box-title ';
                 }
             }
             
@@ -173,7 +175,7 @@
                 $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
             }
             $html->appendln('		</span>');
-            $html->appendln('		<h5>' . $this->title . '</h5>');
+            $html->appendln('		<h5 class="'  .$class_title .'">' . $this->title . '</h5>');
             $html->appendln('		' . $custom_html . '');
             $html->appendln('		' . $info . '');
             if ($this->have_header_action()) {

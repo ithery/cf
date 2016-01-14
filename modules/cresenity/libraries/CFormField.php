@@ -102,7 +102,9 @@
             return $data;
         }
 
+
         public function html($indent = 0) {
+
             $html = new CStringBuilder();
             $html->set_indent($indent);
 
@@ -124,10 +126,14 @@
             $label_class = '';
             if ($this->bootstrap == '3') {
                 $class_form_field = 'form-group';
-                if ($this->style_form_group == 'inline') {
+                if ($this->theme == 'ittron-app' || $this->style_form_group == 'inline') {
                     $class_form_field .= ' row';
                     $label_class = 'col-md-3';
                     $control_class = 'col-md-9';
+                    if ($this->theme == 'ittron-app') {
+                        $label_class = 'col-md-4';
+                        $control_class = 'col-md-8';
+                    }
                     if ($this->label_size == 'large') {
                         $label_class = 'col-md-5';
                         $control_class = 'col-md-7';

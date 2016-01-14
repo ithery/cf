@@ -20,6 +20,11 @@
     $user_img = curl::base() .'media/img/'.$user_img;
     $user_img_top_small = $user_img;
     $user_img_left_medium = $user_img;
+    
+    $color = ccfg::get("default-color");
+    if (!isset($color)) {
+        $color = 'blue-light';
+    }
 ?>
 
 <html>
@@ -32,7 +37,7 @@
 
         <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
     </head>
-    <body class="skin-blue-light sidebar-mini">
+    <body class="skin-<?php echo $color; ?>" sidebar-mini">
         <div class="wrapper">
             <header class="main-header">
                 <!-- Logo -->

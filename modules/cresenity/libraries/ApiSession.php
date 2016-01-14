@@ -15,11 +15,13 @@
         protected $session_id;
         protected $data;
         protected $session_path = null;
+        protected $log_path = null;
         protected $cookies_path = null;
         protected $using_fopen = false;
         protected static $instance;
         protected $default_session_path = null;
         protected $default_cookies_path = null;
+        protected $default_log_path = null;
 
         public function __construct($session_id = null, $have_cookies = false) {
             $include_paths = CF::include_paths();
@@ -27,17 +29,24 @@
             $this->default_session_path = $include_paths[0] .'sessions' .DS;
             $this->cookies_path = $include_paths[0] .'cookies' .DS;
             $this->default_cookies_path = $include_paths[0] .'cookies' .DS;
+            $this->log_path = $include_paths[0] .'logs' .DS;
+            $this->default_log_path = $include_paths[0] .'logs' .DS;
             foreach ($include_paths as $path) {
                 if (is_dir($path)) {
                     $this->session_path = $path . 'sessions' . DS;
                     $this->default_session_path = $path . 'sessions' . DS;
                     $this->cookies_path = $path . 'cookies' . DS;
                     $this->default_cookies_path = $path . 'cookies' . DS;
+                    $this->log_path = $path . 'logs' . DS;
+                    $this->default_log_path = $path . 'logs' . DS;
                     if (!is_dir($this->default_session_path)) {
-                        mkdir($this->default_session_path);
+                        @mkdir($this->default_session_path);
                     }
                     if (!is_dir($this->default_cookies_path)) {
-                        mkdir($this->default_cookies_path);
+                        @mkdir($this->default_cookies_path);
+                    }
+                    if (!is_dir($this->default_log_path)) {
+                        @mkdir($this->default_log_path);
                     }
                     break;
                 }
@@ -148,7 +157,7 @@
             foreach ($tmp_path as $tmp_path_k => $tmp_path_v) {
                 $directory .= $tmp_path_v . DS;
                 if (!is_dir($directory) && !file_exists($directory)) {
-                    mkdir($directory);
+                    @mkdir($directory);
                 }
             }
         }
@@ -192,6 +201,14 @@
                 $file = file_get_contents($filename);
             }
             return $file;
+        }
+
+        public function get_session_path(){
+            return $this->session_path;
+        }
+
+        public function get_log_path(){
+            return $this->log_path;
         }
 
     }

@@ -68,7 +68,7 @@
         }
 
         public function get_info($opt = 0) {
-            return curl_getinfo($this->handle);
+            return curl_getinfo($this->handle, $opt);
         }
 
         public function set_engine($engine) {

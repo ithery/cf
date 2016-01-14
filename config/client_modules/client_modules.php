@@ -220,6 +220,11 @@
             "css" => array("plugins" . DS . "select2" . DS . "select2.css"),
             "requirements" => array("jquery"),
         ),
+        "select2-4.0" => array(
+            "js" => array("plugins" . DS . "select2" . DS . "select2.full.js"),
+            "css" => array("plugins" . DS . "select2" . DS . "select2-4.0.0.min.css"),
+            "requirements" => array("jquery"),
+        ),
         "datepicker" => array(
             "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap-datepicker.js"),
             "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
