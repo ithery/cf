@@ -999,15 +999,20 @@
 
                 // This is useful for hooks to determine if a page has an error
                 self::$has_error = TRUE;
+				
+				if(!is_object($exception)) {
+					$PHP_ERROR = true;
+				}
 
                 // Error handling will use exactly 5 args, every time
                 if ($PHP_ERROR) {
+					
                     $code = $exception;
                     $type = 'PHP Error';
                     $template = 'kohana_error_page';
                 }
                 else {
-                    $code = $exception->getCode();
+					$code = $exception->getCode();
                     $type = get_class($exception);
                     $message = $exception->getMessage();
                     $file = $exception->getFile();

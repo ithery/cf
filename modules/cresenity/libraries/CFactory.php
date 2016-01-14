@@ -143,7 +143,7 @@ class CFactory {
 		
 		
 		
-		$this->add($element);
+		//$this->add($element);
 
 		return $element;
 	}
