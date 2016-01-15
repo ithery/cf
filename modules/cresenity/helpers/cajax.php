@@ -6,8 +6,7 @@
         public static function callback($obj, $input) {
             
             $callable = $obj->data->callable;
-            call_user_func($callable,$obj->data);
-            
+            return call_user_func($callable,$obj->data);
         }
         public static function form_process($obj, $input) {
             $db = CDatabase::instance();

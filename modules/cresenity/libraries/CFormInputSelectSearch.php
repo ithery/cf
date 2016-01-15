@@ -9,6 +9,7 @@
         protected $search_field;
         protected $multiple;
         protected $placeholder;
+        protected $min_input_length;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -21,6 +22,7 @@
             $this->search_field = "";
             $this->placeholder = "Search for a item";
             $this->multiple = false;
+            $this->min_input_length = 1;
         }
 
         public static function factory($id) {
@@ -29,6 +31,11 @@
 
         public function set_multiple($bool) {
             $this->multiple = $bool;
+            return $this;
+        }
+
+        public function set_min_input_length($min_input_length) {
+            $this->min_input_length = $min_input_length;
             return $this;
         }
 
@@ -99,6 +106,7 @@
             $str_selection = str_replace("'", "\'", $str_selection);
             $str_result = str_replace("'", "\'", $str_result);
             preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+            var_dump($str_selection);
             foreach ($matches as $val) {
 				$thousand_separator_pre='';
 				$thousand_separator_post='';
@@ -120,6 +128,7 @@
             if (strlen($str_selection) == 0) {
                 $str_selection = "'+item." . $this->search_field . "+'";
             }
+            var_dump($str_selection);
             $placeholder = "Search for a item";
             if (strlen($this->placeholder) > 0) {
                 $placeholder = $this->placeholder;
@@ -159,7 +168,7 @@
             $str = "
 			$('#" . $this->id . "').select2({
 				placeholder: '" . $placeholder . "',
-				minimumInputLength: 1,
+				minimumInputLength: '" .$this->min_input_length ."',
 				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 					url: '" . $ajax_url . "',
 					dataType: 'jsonp',
@@ -177,12 +186,12 @@
 						// notice we return the value of more so Select2 knows if more results can be loaded
 						return {results: data.data, more: more};
 					},
-                                        cache:true
+                    cache:true,
+
 				},
 				" . $str_js_init . "
 				formatResult: function(item) {
 					return '" . $str_result . "';
-				
 				}, // omitted for brevity, see the source of this page
 				formatSelection: function(item) {
 					return '" . $str_selection . "';
