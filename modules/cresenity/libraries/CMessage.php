@@ -45,7 +45,7 @@
                     $header = clang::__("Error") . "!";
                     break;
             }
-            $html->appendln('<div class="alert ' . $class . '">')->inc_indent()->br();
+            $html->appendln('<div class="alert alert-dismissible ' . $class . '" role="alert">')->inc_indent()->br();
             $html->appendln('<a class="close" data-dismiss="alert">&times;</a>')->br();
             $html->appendln('<strong>' . $header . '</strong> ' . $this->message)->br();
 

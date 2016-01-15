@@ -64,6 +64,9 @@ class CFormInputDate extends CFormInput {
         if (strlen($classes) > 0)
             $classes = " " . $classes;
         $custom_css = $this->custom_css;
+        if ($this->bootstrap == '3') {
+            $classes = $classes ." form-control ";
+        }
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';

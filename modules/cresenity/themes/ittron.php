@@ -14,7 +14,6 @@ return array(
 		'fileupload',
 		'wysihtml5',
 		'notify',
-		'bootbox',
 		'form',
 		'controls',
 		'event',
@@ -30,13 +29,14 @@ return array(
 		'elfinder',
 		'prettify',
 		'bootstrap-switch',
+		'bootbox',
 		
 	),
 	"js" => array(
 		"ittron/ittron.js",
 	),
 	"css" => array(
-		"ittron/ittron.css",
+		
 	),
 	"config" => array(
 		"datatable_dom"=>'T<"clear">lfrtip',

@@ -1333,7 +1333,7 @@
                 $main_class_content = ' widget-content ';
                 if ($this->bootstrap == '3') {
                     if ($this->theme == 'ittron-app') {
-                        $main_class = ' box ';
+                        $main_class = ' box box-primary';
                         $main_class_title = ' box-header with-border ';
                         $main_class_content = ' box-body ';
                     }

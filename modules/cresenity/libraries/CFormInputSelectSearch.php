@@ -84,6 +84,9 @@
             $classes = $this->classes;
             $classes = implode(" ", $classes);
             if (strlen($classes) > 0) $classes = " " . $classes;
+            if ($this->bootstrap == '3') {
+                $classes = $classes ." form-control ";
+            }
             $html->set_indent($indent);
             $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '" ' . $custom_css . $multiple . '>')->br();
             return $html->text();

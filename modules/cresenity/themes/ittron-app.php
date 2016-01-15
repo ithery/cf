@@ -5,6 +5,9 @@
         "client_modules" => array(
             'jquery',
             'bootstrap-3.3.5',
+            // 'bootbox',
+            'select2',
+            'bootbox4.4.0',
             'font-awesome-4.5.0',
             'iapp',
             
@@ -45,7 +48,7 @@
 //            "cresenity.pricing_detail.js",
 	),
         "css" => array(
-            
+            "ittron/ittron.css",
         ),
         "config" => array(
             "datatable_dom" => 'T<"clear">lfrtip',

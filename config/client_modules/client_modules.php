@@ -152,6 +152,9 @@
         "bootbox" => array(
             "js" => array("plugins" . DS . "bootbox" . DS . "jquery.bootbox.js"),
         ),
+        "bootbox4.4.0" => array(
+            "js" => array("plugins" . DS . "bootbox" . DS . "bootboxbootstrap3.min.js"),
+        ),
         "form" => array(
             "js" => array("plugins" . DS . "form" . DS . "jquery.form.js"),
             "requirements" => array("jquery"),
@@ -213,6 +216,11 @@
         "uniform" => array(
             "js" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.js"),
             "css" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.css"),
+            "requirements" => array("jquery"),
+        ),
+        "select2_v4" => array(
+            "js" => array("plugins" . DS . "select2" . DS . "select2_v4.js"),
+            "css" => array("plugins" . DS . "select2" . DS . "select2_v4.css"),
             "requirements" => array("jquery"),
         ),
         "select2" => array(

@@ -116,14 +116,25 @@
             if (strlen($widget_classes) > 0) {
                 $widget_classes = " " . $widget_classes;
             }
+            if ($this->bootstrap == '3') {
+                $html->appendln('<div class="row ' . $classes . '" id="' . $this->id . '">');
+                $html->appendln('   <div class="col-md-12">');
 
-            $html->appendln('<div class="row-fluid ' . $classes . '" id="' . $this->id . '">');
-            $html->appendln('	<div class="span12">');
+                $html->appendln('       <div class="row">');
+                $html->appendln('           <div class="col-md-2">');
+            } else {
+                $html->appendln('<div class="row-fluid ' . $classes . '" id="' . $this->id . '">');
+                $html->appendln('	<div class="span12">');
 
-            $html->appendln('		<div class="row-fluid">');
-            $html->appendln('			<div class="span2">');
+                $html->appendln('		<div class="row-fluid">');
+                $html->appendln('			<div class="span2">');
+            }
             $html->appendln('				<div class="side-nav-container affix-top">');
-            $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
+            if($this->bootstrap == '3') {
+                $html->appendln('                   <ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
+            } else {
+                $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
+            }
 
             $active_tab = null;
             foreach ($this->tabs as $tab) {
@@ -161,9 +172,18 @@
             $html->appendln('					</ul>');
             $html->appendln('				</div>');
             $html->appendln('			</div>');
-            $html->appendln('			<div class="span10">');
-            $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' .$widget_classes .'">');
-            $html->appendln('					<div class="widget-title">');
+            if ($this->bootstrap == '3') {
+                $html->appendln('			<div class="col-md-10">');
+            } else {
+                $html->appendln('           <div class="span10">');
+            }
+            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
+                    $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' .$widget_classes .'">');
+                    $html->appendln('                   <div class="box-header with-border">');
+            } else {
+                $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' .$widget_classes .'">');
+                $html->appendln('					<div class="widget-title">');
+            }
             if ($this->have_icon) {
                 $html->appendln('						<span class="icon">');
                 $html->appendln('							<i class="icon-' . $active_tab_icon . '"></i>');
@@ -171,8 +191,11 @@
             }
             $html->appendln('						<h5>' . $active_tab_label . '</h5>');
             $html->appendln('					</div>');
-
-            $html->appendln('					<div class="widget-content">');
+            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
+                $html->appendln('                   <div class="box-body">');
+            } else {
+                $html->appendln('					<div class="widget-content">');
+            }
 
             if ($this->ajax) {
                 $html->appendln('						<div id="' . $this->id . '-ajax-tab-content">');

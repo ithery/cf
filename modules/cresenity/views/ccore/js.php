@@ -761,16 +761,27 @@ cresenity.func.js
 			
 			if(typeof data_addition == 'undefined') data_addition={};
 			
-			var _dialog_html = "<div class='modal' style=\"display: none;\">" + 
-				"<div class='modal-header loading'>" +
+			<?php $bootstrap = ccfg::get('bootstrap');
+			$role = '';
+			$dialog_div_open = '';
+			$dialog_div_close = '';
+			if (strlen($bootstrap) > 0) {
+				if($bootstrap == '3') {
+					$role = 'role=\"dialog\"';
+					$dialog_div_open = '<div class=\"modal-dialog modal-open modal-lg\" role=\"document\"><div class=\"modal-content\">';
+					$dialog_div_close = '</div></div>';
+				}
+			}?>
+			var _dialog_html = "<div class='modal' style=\"display: none;\" >" + 
+				"<?php echo $dialog_div_open;?><div class='modal-header loading'>" +
 				"<a href='#' class='close'></a>" + 
-				"<span class='loader'></span><h3></h3>" + 
+				"<span class='loader'></span><h4></h4>" + 
 				"</div>" + 
 				"<div class='modal-body'>" + 
 				"</div>" + 
 				"<div class='modal-footer'>" + 
 				"</div>" + 
-				"</div>";
+				"<?php echo $dialog_div_close;?></div>";
 			
 			
 			var selection = jQuery('#'+id_target);
@@ -783,7 +794,6 @@ cresenity.func.js
 			
 			
 			
-			
 			url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
 			if (!selection.is(".modal-body")) {
 				var overlay = $('<div class="modal-backdrop"></div>').hide();
@@ -791,6 +801,13 @@ cresenity.func.js
 				
 				jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function(event) {
 					event.preventDefault();
+					<?php
+	                if (strlen($bootstrap) > 0) {
+						if($bootstrap == '3') {
+					?>
+					console.log(jQuery('#'+id_target+'').parents().eq(2));
+						jQuery('#'+id_target+'').parents().eq(2).remove();
+					<?php }} ?>
 					if(dialog_is_remove) {
 						handle.parent().prev(".modal-backdrop").remove();
 						jQuery(this).parents(".modal").find(".modal-body").parent().remove();
@@ -800,7 +817,6 @@ cresenity.func.js
 
 					}
 				});
-				
 				jQuery("body").append(overlay).append(parent);
 				jQuery(".modal-header h3", parent).html(title);
 				handle = $(".modal-body", parent);
@@ -831,7 +847,13 @@ cresenity.func.js
                 overlay.show();
                 
                 handle.addClass("opened").parent().show();
-				
+                <?php
+                if (strlen($bootstrap) > 0) {
+					if($bootstrap == '3') {
+				?>
+					jQuery('.modal-backdrop').remove();
+					jQuery('#'+id_target+'').parents().eq(2).show();
+				<?php }} ?>
                     
                
             }
@@ -856,7 +878,7 @@ cresenity.func.js
 
 						}
 						if(data.title) {
-							jQuery('#'+id_target+'').parent().find('.modal-header h3').html(data.title);
+							jQuery('#'+id_target+'').parent().find('.modal-header h4').html(data.title);
 						}
 					
 					});

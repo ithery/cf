@@ -83,6 +83,9 @@ class CFormInputSelect extends CFormInput {
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
             $classes = " " . $classes;
+        if ($this->bootstrap == '3') {
+            $classes = $classes ." form-control ";
+        }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {

@@ -128,7 +128,7 @@
             $class_title = '';
             if ($this->bootstrap == '3') {
                 if ($this->theme == 'ittron-app') {
-                    $main_class = ' box ';
+                    $main_class = ' box box-info ';
                     $main_class_title = ' box-header with-border ';
                     $main_class_content = ' box-body ';
                     $class_title = ' box-title ';
@@ -167,15 +167,23 @@
             $custom_css = crenderer::render_style($custom_css);
             $html->appendln('<div class="' .$main_class . $classes . '" ' . $custom_css . '>');
             $html->appendln('	<div class="' .$main_class_title .'">');
-            $html->appendln('		<span class="icon">');
+            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
+                $html->appendln('       <span class="icon pull-left">');
+            } else {
+                $html->appendln('       <span class="icon">');
+            }
             if ($this->bootstrap == '3') {
-                $html->appendln('		<i class="glyphicon glyphicon-' . $this->icon . '"></i>');
+                $html->appendln('		<i class="glyphicon glyphicon-' . $this->icon . '" style="font-size: 36px;"></i>');
             }
             else {
                 $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
             }
             $html->appendln('		</span>');
-            $html->appendln('		<h5 class="'  .$class_title .'">' . $this->title . '</h5>');
+            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
+                $html->appendln('		<h5 style="  margin-left: 50px;font-weight: bold;font-size: 16px;">' . $this->title . '</h5>');
+            } else {
+                $html->appendln('       <h5>' . $this->title . '</h5>');
+            }
             $html->appendln('		' . $custom_html . '');
             $html->appendln('		' . $info . '');
             if ($this->have_header_action()) {

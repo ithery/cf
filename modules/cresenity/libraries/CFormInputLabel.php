@@ -30,6 +30,10 @@
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
+            $bootstrap_class = '';
+            if($this->bootstrap == '3') {
+                $bootstrap_class = ' label-default ';
+            }
             if (is_array($this->value)) {
                 $i = 0;
                 foreach ($this->value as $val) {
@@ -37,7 +41,7 @@
                     foreach ($this->transforms as $trans) {
                         $new_val = $trans->execute($new_val);
                     }
-                    $html->appendln('<span class="label" id="' . $this->id . '_' . $i . '">' . $new_val . '</span>')->br();
+                    $html->appendln('<span class="label ' . $bootstrap_class . '" id="' . $this->id . '_' . $i . '">' . $new_val . '</span>')->br();
                     $i++;
                 }
             }
@@ -46,7 +50,7 @@
                 foreach ($this->transforms as $trans) {
                     $new_val = $trans->execute($new_val);
                 }
-                $html->appendln('<span class="label' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . '>' . $new_val . '</span>')->br();
+                $html->appendln('<span class="label ' . $bootstrap_class . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . '>' . $new_val . '</span>')->br();
             }
             return $html->text();
         }

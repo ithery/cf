@@ -46,10 +46,17 @@
             return $this;
         }
 
+        // public function set_label_size($size) {
+        //     if (in_array($size, array("small", "medium", "large"))) {
+        //         $this->label_size = $size;
+        //     }
+        //     return $this;
+        // }
+
         public function set_label_size($size) {
-            if (in_array($size, array("small", "medium", "large"))) {
+            // if (in_array($size, array("small", "medium", "large"))) {
                 $this->label_size = $size;
-            }
+            // }
             return $this;
         }
 
@@ -71,6 +78,10 @@
 
         public function hide_label() {
             $this->show_label = false;
+            return $this;
+        }
+        public function style_form_inline() {
+            $this->style_form_group = "inline";
             return $this;
         }
 
@@ -111,7 +122,7 @@
             $group_classes = $this->group_classes;
             $group_classes = implode(" ", $group_classes);
             if (strlen($group_classes) > 0)
-                    $group_classes = " " . $group_classes;
+            $group_classes = " " . $group_classes;
             $group_custom_css = $this->group_custom_css;
             $group_custom_css = crenderer::render_style($group_custom_css);
             if (strlen($group_custom_css) > 0) {
@@ -126,22 +137,27 @@
             $label_class = '';
             if ($this->bootstrap == '3') {
                 $class_form_field = 'form-group';
-                if ($this->theme == 'ittron-app' || $this->style_form_group == 'inline') {
+                if ($this->style_form_group == 'inline') {
                     $class_form_field .= ' row';
-                    $label_class = 'col-md-3';
-                    $control_class = 'col-md-9';
-                    if ($this->theme == 'ittron-app') {
-                        $label_class = 'col-md-4';
-                        $control_class = 'col-md-8';
+                    $label_class = 'col-md-' . $this->label_size;
+                    $control_size = 12 - $this->label_size;
+                    $control_class = 'col-md-' . $control_size;
+                    if($this->label_size > 11) {
+                        $control_class = 'col-md-' . 10;
+                        $label_class = 'col-md-' . 2;
                     }
-                    if ($this->label_size == 'large') {
-                        $label_class = 'col-md-5';
-                        $control_class = 'col-md-7';
-                    }
-                    else if ($this->label_size == 'small') {
-                        $label_class = 'col-md-1';
-                        $control_class = 'col-md-11';
-                    }
+                    // $label_class = 'col-md-3';
+                    // $control_class = 'col-md-9';
+                    // if ($this->label_size == 'large') {
+                    //     $label_class = 'col-md-5';
+                    //     $control_class = 'col-md-7';
+                    // } else if ($this->label_size == 'small') {
+                    //     $label_class = 'col-md-1';
+                    //     $control_class = 'col-md-11';
+                    // } else {
+                    //     $label_class = 'col-md-3';
+                    //     $control_class = 'col-md-9';
+                    // }
                 }
             }
             $label_class .= ' ' .implode(' ', $this->label_class);
