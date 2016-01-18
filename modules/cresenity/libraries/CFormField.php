@@ -54,9 +54,10 @@
         // }
 
         public function set_label_size($size) {
-            // if (in_array($size, array("small", "medium", "large"))) {
+            if (in_array($size, array("small", "medium", "large"))) {
                 $this->label_size = $size;
-            // }
+            }
+            
             return $this;
         }
 
@@ -139,25 +140,25 @@
                 $class_form_field = 'form-group';
                 if ($this->style_form_group == 'inline') {
                     $class_form_field .= ' row';
-                    $label_class = 'col-md-' . $this->label_size;
-                    $control_size = 12 - $this->label_size;
-                    $control_class = 'col-md-' . $control_size;
-                    if($this->label_size > 11) {
-                        $control_class = 'col-md-' . 10;
-                        $label_class = 'col-md-' . 2;
+//                    $label_class = 'col-md-' . $this->label_size;
+//                    $control_size = 12 - $this->label_size;
+//                    $control_class = 'col-md-' . $control_size;
+//                    if($this->label_size > 11) {
+//                        $control_class = 'col-md-' . 10;
+//                        $label_class = 'col-md-' . 2;
+//                    }
+                    $label_class = 'col-md-3';
+                    $control_class = 'col-md-9';
+                    if ($this->label_size == 'large') {
+                        $label_class = 'col-md-5';
+                        $control_class = 'col-md-7';
+                    } else if ($this->label_size == 'small') {
+                        $label_class = 'col-md-1';
+                        $control_class = 'col-md-11';
+                    } else {
+                        $label_class = 'col-md-3';
+                        $control_class = 'col-md-9';
                     }
-                    // $label_class = 'col-md-3';
-                    // $control_class = 'col-md-9';
-                    // if ($this->label_size == 'large') {
-                    //     $label_class = 'col-md-5';
-                    //     $control_class = 'col-md-7';
-                    // } else if ($this->label_size == 'small') {
-                    //     $label_class = 'col-md-1';
-                    //     $control_class = 'col-md-11';
-                    // } else {
-                    //     $label_class = 'col-md-3';
-                    //     $control_class = 'col-md-9';
-                    // }
                 }
             }
             $label_class .= ' ' .implode(' ', $this->label_class);

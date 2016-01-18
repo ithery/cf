@@ -173,7 +173,7 @@
                 $html->appendln('       <span class="icon">');
             }
             if ($this->bootstrap == '3') {
-                $html->appendln('		<i class="glyphicon glyphicon-' . $this->icon . '" style="font-size: 36px;"></i>');
+                $html->appendln('		<i class="glyphicon glyphicon-' . $this->icon . '"></i>');
             }
             else {
                 $html->appendln('		<i class="icon-' . $this->icon . '"></i>');

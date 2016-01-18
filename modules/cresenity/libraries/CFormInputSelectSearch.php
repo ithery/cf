@@ -109,7 +109,7 @@
             $str_selection = str_replace("'", "\'", $str_selection);
             $str_result = str_replace("'", "\'", $str_result);
             preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
-            var_dump($str_selection);
+
             foreach ($matches as $val) {
 				$thousand_separator_pre='';
 				$thousand_separator_post='';
@@ -131,7 +131,7 @@
             if (strlen($str_selection) == 0) {
                 $str_selection = "'+item." . $this->search_field . "+'";
             }
-            var_dump($str_selection);
+
             $placeholder = "Search for a item";
             if (strlen($this->placeholder) > 0) {
                 $placeholder = $this->placeholder;
