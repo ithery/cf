@@ -140,11 +140,6 @@ class CFactory {
 		else {
 			trigger_error('Unknown element type ' . $type);
 		}
-		
-		
-		
-		//$this->add($element);
-
 		return $element;
 	}
 
