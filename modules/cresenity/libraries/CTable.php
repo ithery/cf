@@ -132,8 +132,13 @@
             $this->export_filename = $this->id;
             $this->export_sheetname = $this->id;
 
-            if ($this->bootstrap == '3') {
-                CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
+            if (isset($this->theme)) {
+                if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
+                    CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
+                }
+                else {
+                    CClientModules::instance()->register_module('jquery.datatable');
+                }
             }
             else {
                 CClientModules::instance()->register_module('jquery.datatable');
@@ -1332,7 +1337,7 @@
                 $main_class_title = ' widget-title ';
                 $main_class_content = ' widget-content ';
                 if ($this->bootstrap == '3') {
-                    if ($this->theme == 'ittron-app') {
+                    if (isset($this->theme) && $this->theme == 'ittron-app') {
                         $main_class = ' box box-primary';
                         $main_class_title = ' box-header with-border ';
                         $main_class_content = ' box-body ';
