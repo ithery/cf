@@ -9,7 +9,7 @@
         protected $search_field;
         protected $multiple;
         protected $placeholder;
-        protected $min_input_length;
+        protected $auto_select;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -22,7 +22,7 @@
             $this->search_field = "";
             $this->placeholder = "Search for a item";
             $this->multiple = false;
-            $this->min_input_length = 1;
+            $this->auto_select = false;
         }
 
         public static function factory($id) {
@@ -31,6 +31,10 @@
 
         public function set_multiple($bool) {
             $this->multiple = $bool;
+            return $this;
+        }
+        public function set_auto_select($bool) {
+            $this->auto_select = $bool;
             return $this;
         }
 
@@ -88,7 +92,21 @@
                 $classes = $classes ." form-control ";
             }
             $html->set_indent($indent);
-            $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '" ' . $custom_css . $multiple . '>')->br();
+            $value = $this->value;
+            if ($this->auto_select) {
+                $db = CDatabase::instance();
+                $rjson = 'false';
+
+                $q = "select `".$this->key_field."` from (" . $this->query . ") as a limit 1";
+                $value = cdbutils::get_value($q);
+               
+                 
+            }
+            if(strlen($this->value)>0) {
+                $value = $this->value;
+            }
+            
+            $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '>')->br();
             return $html->text();
         }
 
@@ -142,6 +160,29 @@
             }
 
             $str_js_init = "";
+            if ($this->auto_select) {
+                $db = CDatabase::instance();
+                $rjson = 'false';
+
+                $q = "select * from (" . $this->query . ") as a limit 1";
+                $r = $db->query($q)->result_array(false);
+                if (count($r) > 0) $r = $r[0];
+                $rjson = json_encode($r);
+
+
+                $str_js_init = "
+				initSelection : function (element, callback) {
+					
+				var data = " . $rjson . ";
+				
+				callback(data);
+			},
+			";
+                
+                
+               
+                 
+            }
             if (strlen($this->value) > 0) {
 
                 $db = CDatabase::instance();
@@ -156,12 +197,14 @@
                 $str_js_init = "
 				initSelection : function (element, callback) {
 					
-				var data = " . $rjson . "
+				var data = " . $rjson . ";
 				
 				callback(data);
 			},
 			";
+                
             }
+          
             $str_multiple = "";
             if ($this->multiple) $str_multiple = " multiple:'true',";
 			$classes = $this->classes;
@@ -206,7 +249,7 @@
 			});
 	
 	";
-
+            
             $js = new CStringBuilder();
             $js->append(parent::js($indent))->br();
             $js->set_indent($indent);
