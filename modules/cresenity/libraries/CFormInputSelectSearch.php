@@ -10,6 +10,7 @@
         protected $multiple;
         protected $placeholder;
         protected $auto_select;
+        protected $min_input_length;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -23,6 +24,7 @@
             $this->placeholder = "Search for a item";
             $this->multiple = false;
             $this->auto_select = false;
+            $this->min_input_length = 1;
         }
 
         public static function factory($id) {
