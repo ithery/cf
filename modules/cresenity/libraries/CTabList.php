@@ -53,6 +53,11 @@
             return $this;
         }
 
+        public function set_tab_position($tab_position){
+            $this->tab_position = $tab_position;
+            return $this;
+        }
+
         public function add_widget_class($class) {
             if (is_array($class)) {
                 $this->widget_class = array_merge($class, $this->widget_class);
@@ -121,15 +126,31 @@
                 $html->appendln('   <div class="col-md-12">');
 
                 $html->appendln('       <div class="row">');
-                $html->appendln('           <div class="col-md-2">');
+                if($this->tab_position == 'top'){
+                    $html->appendln('           <div class="row-tab-menu">');
+                }
+                else {
+                    $html->appendln('           <div class="col-md-2">');
+                }
             } else {
                 $html->appendln('<div class="row-fluid ' . $classes . '" id="' . $this->id . '">');
                 $html->appendln('	<div class="span12">');
 
                 $html->appendln('		<div class="row-fluid">');
-                $html->appendln('			<div class="span2">');
+                if($this->tab_position == 'top'){
+                    $html->appendln('           <div class="row-tab-menu">');
+                }
+                else {
+                    $html->appendln('			<div class="span2">');
+                }
             }
-            $html->appendln('				<div class="side-nav-container affix-top">');
+            if($this->tab_position == 'top'){
+                $html->appendln('               <div class="top-nav-container">');
+            }
+            else {
+                $html->appendln('				<div class="side-nav-container affix-top">');
+            }
+
             if($this->bootstrap == '3') {
                 $html->appendln('                   <ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
             } else {
@@ -173,24 +194,40 @@
             $html->appendln('				</div>');
             $html->appendln('			</div>');
             if ($this->bootstrap == '3') {
-                $html->appendln('			<div class="col-md-10">');
+                if($this->tab_position == 'top'){
+                    $html->appendln('           <div class="row-tab-content">');
+                }
+                else {
+                    $html->appendln('			<div class="col-md-10">');
+                }
             } else {
-                $html->appendln('           <div class="span10">');
+                if($this->tab_position == 'top'){
+                    $html->appendln('           <div class="row-tab-content">');
+                }
+                else {
+                    $html->appendln('           <div class="span10">');
+                }
             }
             if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
                     $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' .$widget_classes .'">');
                     $html->appendln('                   <div class="box-header with-border">');
             } else {
                 $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' .$widget_classes .'">');
-                $html->appendln('					<div class="widget-title">');
+                if($this->tab_position != 'top'){
+                    $html->appendln('					<div class="widget-title">');
+                }
             }
-            if ($this->have_icon) {
-                $html->appendln('						<span class="icon">');
-                $html->appendln('							<i class="icon-' . $active_tab_icon . '"></i>');
-                $html->appendln('						</span>');
+
+            if($this->tab_position != 'top'){
+                if ($this->have_icon) {
+                    $html->appendln('						<span class="icon">');
+                    $html->appendln('							<i class="icon-' . $active_tab_icon . '"></i>');
+                    $html->appendln('						</span>');
+                }
+                $html->appendln('						<h5>' . $active_tab_label . '</h5>');
+                $html->appendln('					</div>');
             }
-            $html->appendln('						<h5>' . $active_tab_label . '</h5>');
-            $html->appendln('					</div>');
+          
             if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
                 $html->appendln('                   <div class="box-body">');
             } else {
@@ -213,6 +250,60 @@
             $html->appendln('		</div>');
             $html->appendln('	</div>');
             $html->appendln('</div>');
+
+            if($this->tab_position == 'top'){
+                $html->appendln('
+                    <style>
+                        .top-nav-container ul {
+                            margin-bottom: 0px;
+                        }
+
+                        .top-nav-container .nav-stacked > li {
+                            display: inline-block
+                        }
+
+                        .top-nav-container .nav-stacked li  a {
+                            border-radius: 0px;
+                            background-color: #fff;
+                            color: #333;
+                            
+                            border-bottom: 1px solid #d4d4d6;
+                        }
+
+                        .top-nav-container .nav-stacked li.active a {
+                            color: #2095f2;
+                            background-color: #fff;
+                            border-top: 1px solid #d4d4d6;
+                            border-left: 1px solid #d4d4d6;
+                            border-right: 1px solid #d4d4d6;
+                            border-bottom: 1px solid #fff;
+                            font-weight: bold;
+                        }
+
+                        .row-tab-content .widget-box .widget-content {
+                            background-color: #fff;
+                        }
+
+                        .row-tab-menu {
+                            z-index: 2;
+                            position: relative;
+                        }
+                        .row-tab-content {
+                            z-index: 1;
+                            position: relative;');
+                
+                if($this->bootstrap == 3){
+                    $html->appendln('margin-top: -1px;');
+                }
+                else {
+                    $html->appendln('margin-top: 0px;');   
+                }
+
+                $html->appendln('
+                        }                        
+                    </style>');
+            }
+
 
             return $html->text();
         }

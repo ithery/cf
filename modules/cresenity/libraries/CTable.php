@@ -63,6 +63,7 @@
         protected $tbody_id;
         protected $js_cell;
         protected $dom = null;
+        protected $widget_title;
 
         public function __construct($id = "") {
             parent::__construct($id);
@@ -127,6 +128,8 @@
             $this->footer_action_style = 'btn-list';
             $this->footer_action_list->set_style('btn-list');
 
+            $this->widget_title = true;
+
             //$this->add_footer_action($this->id.'_export_excel');
 
             $this->export_filename = $this->id;
@@ -168,6 +171,11 @@
             $this->db = $db;
             $this->db_config = $db->config();
 
+            return $this;
+        }
+
+        public function set_widget_title($bool){
+            $this->widget_title = $bool;
             return $this;
         }
 
@@ -1343,6 +1351,9 @@
                         $main_class_content = ' box-body ';
                     }
                 }
+                if($this->widget_title == false){
+                    $main_class_title = ' ';
+                }
 
                 $html->appendln('<div class="' .$main_class .' widget-table">')->inc_indent();
                 $html->appendln('<div class="'.$main_class_title.'">')->inc_indent();
@@ -1904,8 +1915,11 @@
                   ;
                  */
 
+                // if ($this->bootstrap == '3') {
                 if ($this->bootstrap == '3') {
-                    $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
+                    if($this->dom == null){
+                        $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
+                    }
                 }
 
                 if ($this->dom == null) {
