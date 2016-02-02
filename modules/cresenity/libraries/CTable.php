@@ -467,7 +467,7 @@
                     }
                     else {
                         echo '<td class="tfoot ' . $class . '">';
-                        echo '$fval';
+                        echo $fval;
                         echo '</td>';
                     }
                     echo '</tr>';
@@ -1117,7 +1117,7 @@
                     }
                     else {
                         echo '<td class="tfoot ' . $class . '">';
-                        echo '$fval';
+                        echo $fval;
                         echo '</td>';
                     }
                     echo '</tr>';
