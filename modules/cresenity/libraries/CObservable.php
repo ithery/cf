@@ -240,7 +240,13 @@
             $this->add($pie_chart);
             return $pie_chart;
         }
-
+		
+		public function add_dashboard(){
+			$dashboard=CDashboard::factory();
+			$this->add($dashboard);
+			return $dashboard;
+		}
+		
         public function clear_both() {
             $this->add('<div class="clear-both"></div>');
         }
