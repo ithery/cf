@@ -1,76 +1,75 @@
 <?php
 
-    defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') OR die('No direct access allowed.');
 
-    class cmail {
+class cmail {
 
-        public static function error_mail($html) {
+    public static function error_mail($html) {
 
 
-            $app = CApp::instance();
-            $org = $app->org();
-            $org_name = 'CAPP';
-            $org_email = $org_name;
-            if ( $org != null ) {
-                $org_email = $org->name;
-                $org_name = $org->name;
-            }
-            $subject = "Error Cresenity APP - " . $org_name . " on " . crouter::complete_uri();
-
-            $headers = "From: " . strip_tags($org_email) . "\r\n";
-            $headers .= "Reply-To: " . strip_tags($org_email) . "\r\n";
-            //$headers .= "CC: susan@example.com\r\n";
-            $headers .= "MIME-Version: 1.0\r\n";
-            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-
-            $message = $html;
-            $admin_email = ccfg::get("admin_email");
-
-            if ( ccfg::get("mail_error_smtp") ) {
-                $ret = cmail::send_smtp($admin_email, $subject . " [FOR ADMINISTRATOR]", $message);
-            }
-            else {
-
-                $ret = cmail::send($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, $headers);
-            }
-
-            //echo $message;
+        $app = CApp::instance();
+        $org = $app->org();
+        $org_name = 'CAPP';
+        $org_email = $org_name;
+        if ($org != null) {
+            $org_email = $org->name;
+            $org_name = $org->name;
         }
+        $subject = "Error Cresenity APP - " . $org_name . " on " . crouter::complete_uri();
 
-        public static function register($org_id) {
-            $db = CDatabase::instance();
-            $q = "select * from org where org_id=" . $db->escape($org_id);
-            $r = $db->query($q);
-            $email = "";
-            if ( $r->count() > 0 ) {
-                $email = $r[0]->email;
-            }
+        $headers = "From: " . strip_tags($org_email) . "\r\n";
+        $headers .= "Reply-To: " . strip_tags($org_email) . "\r\n";
+        //$headers .= "CC: susan@example.com\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
-            $to = $email;
+        $message = $html;
+        $admin_email = ccfg::get("admin_email");
 
-            $subject = "Welcome to Cresenity APP";
+        if (ccfg::get("mail_error_smtp")) {
+            $ret = cmail::send_smtp($admin_email, $subject . " [FOR ADMINISTRATOR]", $message);
+        } else {
 
-            $headers = "From: " . strip_tags("no-reply@cresenity.com") . "\r\n";
-            $headers .= "Reply-To: " . strip_tags("no-reply@cresenity.com") . "\r\n";
-            //$headers .= "CC: susan@example.com\r\n";
-            $headers .= "MIME-Version: 1.0\r\n";
-            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-
-            $message = cmail::register_content($org_id);
-            $ret = cmail::send($to, $subject, $message, $headers);
-            $admin_email = ccfg::get("admin_email");
             $ret = cmail::send($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, $headers);
-
-            //echo $message;
         }
 
-        public static function header_html() {
-            $html = '
+        //echo $message;
+    }
+
+    public static function register($org_id) {
+        $db = CDatabase::instance();
+        $q = "select * from org where org_id=" . $db->escape($org_id);
+        $r = $db->query($q);
+        $email = "";
+        if ($r->count() > 0) {
+            $email = $r[0]->email;
+        }
+
+        $to = $email;
+
+        $subject = "Welcome to Cresenity APP";
+
+        $headers = "From: " . strip_tags("no-reply@cresenity.com") . "\r\n";
+        $headers .= "Reply-To: " . strip_tags("no-reply@cresenity.com") . "\r\n";
+        //$headers .= "CC: susan@example.com\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+
+        $message = cmail::register_content($org_id);
+        $ret = cmail::send($to, $subject, $message, $headers);
+        $admin_email = ccfg::get("admin_email");
+        $ret = cmail::send($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, $headers);
+
+        //echo $message;
+    }
+
+    public static function header_html() {
+        $html = '
 		<style type="text/css">
 		body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; }
 		</style>
 		';
-            $html .= '
+        $html .= '
 			<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">
 			<div style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">
 			<table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -84,11 +83,11 @@
 						<!-- [ middle starts here] -->
 			';
 
-            return $html;
-        }
+        return $html;
+    }
 
-        public static function footer_html() {
-            $html = '
+    public static function footer_html() {
+        $html = '
 		<tr>
 						<td bgcolor="#EAEAEA" align="center" style="background:#EAEAEA; text-align:center;"><center><p style="font-size:12px; margin:0;">Thank you, <strong>' . 'Cresenity APP' . '</strong></p></center></td>
 					</tr>
@@ -99,25 +98,25 @@
 		</div>
 		</body>
 		';
-            return $html;
+        return $html;
+    }
+
+    public static function register_content($org_id) {
+        $db = CDatabase::instance();
+        $q = "select * from org where org_id=" . $db->escape($org_id);
+        $r = $db->query($q);
+        if ($r->count() > 0) {
+            $name = $r[0]->name;
         }
+        $q = "select * from users where org_id=" . $db->escape($org_id) . " order by user_id asc";
 
-        public static function register_content($org_id) {
-            $db = CDatabase::instance();
-            $q = "select * from org where org_id=" . $db->escape($org_id);
-            $r = $db->query($q);
-            if ( $r->count() > 0 ) {
-                $name = $r[0]->name;
-            }
-            $q = "select * from users where org_id=" . $db->escape($org_id) . " order by user_id asc";
+        $r = $db->query($q);
+        if ($r->count() > 0) {
+            $username = $r[0]->username;
+        }
+        $activation_link = capplication::activation_link($org_id);
 
-            $r = $db->query($q);
-            if ( $r->count() > 0 ) {
-                $username = $r[0]->username;
-            }
-            $activation_link = capplication::activation_link($org_id);
-
-            $html = '		<tr>
+        $html = '		<tr>
 							<td valign="top">
 								<h1 style="font-size:22px; font-weight:normal; line-height:22px; margin:0 0 11px 0;"">Welcome ' . $name . ',</h1>
 								<p style="font-size:12px; line-height:16px; margin:0 0 16px 0;">Welcome to Cresenity APP. To log in when visiting our site just click <a href="' . curl::base() . '" style="color:#1E7EC8;">Login</a>, and then enter your username and password.</p>
@@ -136,60 +135,66 @@
 							</td>
 						</tr>
 						';
-            $html = cmail::header_html() . $html . cmail::footer_html();
-            return $html;
-        }
-
-        public static function send_smtp($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array()) {
-            $mail = CSMTP::factory();
-            $mail->set_username(ccfg::get('smtp_username'));
-            $mail->set_password(ccfg::get('smtp_password'));
-            $mail->set_host(ccfg::get('smtp_host'));
-            $mail->set_port(ccfg::get('smtp_port'));
-
-            $secure = ccfg::get('smtp_secure');
-            if ( $secure == "ssl" ) $mail->set_ssl();
-            if ( $secure == "tls" ) $mail->set_tls();
-
-            $mail->set_from(ccfg::get('smtp_from'));
-
-            $mail->set_message_html($message);
-            $mail->set_subject($subject);
-            if ( !is_array($to) ) {
-                $to = array($to);
-            }
-            foreach ( $to as $em ) {
-                $mail->add_to($em);
-            }
-            
-            if (!is_array($cc)) $cc = array($cc);
-            foreach ($cc as $cc_k => $cc_v) {
-                $mail->add_cc($cc_v);
-            }
-            if (!is_array($bcc)) $bcc = array($bcc);
-            foreach ($bcc as $bcc_k => $bcc_v) {
-                $mail->add_bcc($bcc_v);
-            }
-            
-            foreach ( $attachments as $attachment ) {
-                $data = carr::get($attachment,'data');
-                $name = carr::get($attachment,'name');
-                $encoding = carr::get($attachment,'encoding','base64');
-                $type = carr::get($attachment,'type','application/octet-stream');
-                $mail->add_attachment_string($data,$name,$encoding,$type);
-            }
-            try {
-                $mail->send();
-            }
-            catch ( Exception $ex ) {
-//                die($ex->getMessage());
-                throw $ex;
-            }
-        }
-
-        public static function send($to, $subject, $message, $headers) {
-            return @mail($to, $subject, $message, $headers);
-        }
-
+        $html = cmail::header_html() . $html . cmail::footer_html();
+        return $html;
     }
-    
+
+    public static function send_smtp($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+        $mail = CSMTP::factory();
+        $mail->set_username(ccfg::get('smtp_username'));
+        $mail->set_password(ccfg::get('smtp_password'));
+        $mail->set_host(ccfg::get('smtp_host'));
+        $mail->set_port(ccfg::get('smtp_port'));
+
+        $secure = ccfg::get('smtp_secure');
+        if ($secure == "ssl")
+            $mail->set_ssl();
+        if ($secure == "tls")
+            $mail->set_tls();
+
+        $smtp_from = carr::get($options, 'smtp_from');
+        if ($smtp_from == null) {
+            $smtp_from = ccfg::get('smtp_from');
+        }
+        $mail->set_from($smtp_from);
+
+        $mail->set_message_html($message);
+        $mail->set_subject($subject);
+        if (!is_array($to)) {
+            $to = array($to);
+        }
+        foreach ($to as $em) {
+            $mail->add_to($em);
+        }
+
+        if (!is_array($cc))
+            $cc = array($cc);
+        foreach ($cc as $cc_k => $cc_v) {
+            $mail->add_cc($cc_v);
+        }
+        if (!is_array($bcc))
+            $bcc = array($bcc);
+        foreach ($bcc as $bcc_k => $bcc_v) {
+            $mail->add_bcc($bcc_v);
+        }
+
+        foreach ($attachments as $attachment) {
+            $data = carr::get($attachment, 'data');
+            $name = carr::get($attachment, 'name');
+            $encoding = carr::get($attachment, 'encoding', 'base64');
+            $type = carr::get($attachment, 'type', 'application/octet-stream');
+            $mail->add_attachment_string($data, $name, $encoding, $type);
+        }
+        try {
+            $mail->send();
+        } catch (Exception $ex) {
+//                die($ex->getMessage());
+            throw $ex;
+        }
+    }
+
+    public static function send($to, $subject, $message, $headers) {
+        return @mail($to, $subject, $message, $headers);
+    }
+
+}
