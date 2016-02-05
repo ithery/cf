@@ -218,8 +218,10 @@
                             'default' : { 'icon' : 'folder' },
                             'file' : { 'valid_children' : [], 'icon' : 'file' }
                         },
-
-//                        'plugins' : ['state','dnd','contextmenu','wholerow']
+//'checkbox' : {
+//    'keep_selected_style' : false
+//  },
+//                        'plugins' : ['state','dnd','contextmenu','wholerow', 'checkbox']
                     })
                 .on('changed.jstree', function (e, data) {
                     if(data && data.selected && data.selected.length) {
