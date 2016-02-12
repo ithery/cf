@@ -1022,7 +1022,7 @@ textarea {
 	z-index: 999 !important;
 }
 .modal-header {
-	height: auto;
+	/* height: auto; */
 	padding: 8px 15px 5px;
 }
 .modal-header h3 {
