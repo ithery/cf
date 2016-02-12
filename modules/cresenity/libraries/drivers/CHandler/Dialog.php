@@ -14,6 +14,7 @@
         protected $reload_page;
         protected $callback;
         protected $js_class;
+        protected $js_class_manual;
 
         public function __construct($owner, $event, $name) {
             parent::__construct($owner, $event, $name);
@@ -23,6 +24,8 @@
             $this->actions = CActionList::factory();
             $this->param_inputs = array();
             $this->title = '';
+            $this->js_class = null;
+            $this->js_class_manual = null;
         }
        
         
@@ -46,7 +49,8 @@
         }
         
         public function set_js_class($js_class) {
-            $this->js_class = $js_class;
+            //set js class manual
+            $this->js_class_manual = $js_class;
             return $this;
         }
 
@@ -104,7 +108,10 @@
             if (strlen($js_class) > 0) {
                 $this->js_class = $js_class;
             }
-            if (strlen($this->js_class) > 0) {
+            if($this->js_class_manual != null) {
+                $this->js_class = $this->js_class_manual;
+            }
+            if (strlen($this->js_class) > 0 && $this->js_class != 'cresenity') {
                 if ($this->content instanceof CHandlerElement) {
                     $content = $this->content->html();
                 }
