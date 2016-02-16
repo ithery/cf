@@ -530,8 +530,8 @@
                 trigger_error('CApp already rendered');
             }
             $this->rendered = true;
-            if (crequest::is_ajax() || $this->mobile == true) {
-                // return $this->json();
+            if (crequest::is_ajax() ) {
+                return $this->json();
             }
 
             $theme_path = '';
