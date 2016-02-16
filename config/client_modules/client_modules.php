@@ -324,6 +324,21 @@
             ),
             "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
         ),
+        "materialize" => array(
+            "css" => array(
+                "materialize/bootstrap-material-design.min.css",
+                "materialize/material-icons.css",
+                "materialize/ripples.min.css",
+                "materialize/materialize.css",
+            ),
+            "js" => array(
+                "materialize/material.min.js",
+                // "materialize/materialize.amd.js",
+                "materialize/ripples.min.js",
+                "materialize/material_main.js",
+            ),
+            "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
+        ),
         "iapp" => array(
             "css" => array(
                 "sidebar.less",
