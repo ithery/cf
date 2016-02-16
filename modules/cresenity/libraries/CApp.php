@@ -33,6 +33,7 @@
         private $mobile = false;
         private $header_body = '';
 		private $additional_head='';
+        private $mobile_path = '';
 
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
@@ -43,6 +44,15 @@
 
         public function set_mobile($bool) {
             $this->mobile = $bool;
+        }
+
+        public function set_mobile_path($path) {
+            $this->mobile_path = $path;
+            return $this;
+        }
+
+        public function get_mobile_path() {
+            return $this->mobile_path;
         }
 
         public function setup($install = false) {
@@ -521,7 +531,7 @@
             }
             $this->rendered = true;
             if (crequest::is_ajax() || $this->mobile == true) {
-                return $this->json();
+                // return $this->json();
             }
 
             $theme_path = '';

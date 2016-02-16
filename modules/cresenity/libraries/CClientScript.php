@@ -132,18 +132,12 @@
                 $dir_file = substr($file, 0, strpos($file, '?'));
                 $js_version = substr($file, strpos($file, '?'), strlen($file) - 1);
             }
-            if (strpos($dir_file, 'http') !== false) {
-                $js_file = $dir_file;
-                // do nothing
+            $js_file = $this->fullpath_js_file($dir_file);
+            if (!file_exists($js_file)) {
+                trigger_error('JS File not exists, ' . $file);
             }
-            else {
-                $js_file = $this->fullpath_js_file($dir_file);
-                if (!file_exists($js_file)) {
-                    trigger_error('JS File not exists, ' . $file);
-                }
-                if (strlen($js_version) > 0) {
-                    $js_file .= $js_version;
-                }
+            if (strlen($js_version) > 0) {
+                $js_file .= $js_version;
             }
             $this->scripts[$pos]['js_file'][] = $js_file;
         }
@@ -194,14 +188,59 @@
             return CResource::instance('css')->load($hash);
         }
 
+        public function manifest() {
+            $js_files = $this->js_files();
+            $css_files = $this->css_files();
+            $manifest = array();
+            $manifest["files"]=array();
+            $last_filemtime = 0;
+            foreach ($js_files as $f) {
+                $url_js_file = $this->url_js_file($f);
+                $fullpath_js_file = $f;
+                $arr = array();
+                $arr["type"]="js";
+                $arr["url"]=$url_js_file;
+                $arr["file"]=$f;
+                $filemtime = filemtime($fullpath_js_file);
+                $arr["version"]= $filemtime;
+                if($last_filemtime<$filemtime) $last_filemtime = $filemtime;
+                $manifest["files"][]=$arr;
+
+              
+            }
+            foreach ($css_files as $f) {
+                $url_css_file = $this->url_css_file($f);
+                $fullpath_css_file = $f;
+                $arr = array();
+                $arr["type"]="css";
+                $arr["url"]=$url_css_file;
+                $arr["file"]=$f;
+                $filemtime = filemtime($fullpath_css_file);
+                $arr["version"]= $filemtime;
+                if($last_filemtime<$filemtime) $last_filemtime = $filemtime;
+                $manifest["files"][]=$arr;
+
+              
+            }
+            $manifest["version"]=$last_filemtime;
+            return $manifest;
+        }
+
         public function render_js_require($js) {
             //return CClientModules::instance()->require_js($js);
+            $app = CApp::instance();
             $js_files = $this->js_files();
             $js_open = "";
             $js_close = "";
             $i = 0;
+            $app = CApp::instance();
             foreach ($js_files as $f) {
                 $url_js_file = $this->url_js_file($f);
+                if($app->is_mobile()) {
+                    $mobile_path = $app->get_mobile_path();
+                    $url_js_file = $mobile_path.$f;
+                }
+
 
                 $js_open.=str_repeat("\t", $i) . "require(['" . $url_js_file . "'],function(){" . PHP_EOL;
 
@@ -220,12 +259,15 @@
 
 
             ";
+
+
+
             return $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
         }
 
         public function render($pos, $type = array("js_file", "css_file", "js", "css", "meta", "link")) {
             $script = "";
-
+            $app = CApp::instance();
             if (!is_array($type)) $type = array($type);
             foreach ($this->scripts[$pos] as $k => $v) {
                 if (in_array($k, $type)) {
@@ -233,14 +275,26 @@
                         switch ($k) {
                             case "js_file":
                                 if (!ccfg::get('merge_js')) {
-                                    $script.='<script src="' . $this->url_js_file($s) . '"></script>' . PHP_EOL;
+                                    $url_js_file = $this->url_js_file($s);
+                                    if($app->is_mobile()) {
+                                        $mobile_path = $app->get_mobile_path();
+                                        $url_js_file = $mobile_path.$s;
+                                    }
+
+                                    $script.='<script src="' . $url_js_file . '"></script>' . PHP_EOL;
                                 }
                                 break;
                         }
                         switch ($k) {
                             case "css_file":
                                 if (!ccfg::get('merge_css')) {
-                                    $script.='<link href="' . $this->url_css_file($s) . '" rel="stylesheet" />' . PHP_EOL;
+                                    $url_css_file = $this->url_css_file($s);
+                                    if($app->is_mobile()) {
+                                        $mobile_path = $app->get_mobile_path();
+                                        $url_css_file = $mobile_path.$s;
+                                    }
+
+                                    $script.='<link href="' . $url_css_file . '" rel="stylesheet" />' . PHP_EOL;
                                 }
                                 break;
                         }
