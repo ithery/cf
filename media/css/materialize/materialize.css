@@ -284,5 +284,6 @@ form {
 	border: 0;
 }
 
-
-
+#page-content-wrapper > .overlay {
+  position: fixed !important;
+}
