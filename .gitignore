@@ -1,6 +1,8 @@
 .DS_Store
 
 /nbproject/private/
+/nbproject/*
+
 composer.json
 application/*
 logs/*
