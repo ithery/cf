@@ -262,7 +262,7 @@ html {
 /*-------------------------------*/
 
 .overlay {
-    position: absolute;
+    position: fixed;
     display: none;
     width: 100%;
     height: 100%;
@@ -282,8 +282,4 @@ form {
 	box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 	border-radius: 2px;
 	border: 0;
-}
-
-#page-content-wrapper > .overlay {
-  position: fixed !important;
 }
