@@ -1,0 +1,81 @@
+
+<html>
+    <head>
+        <style>
+            html{
+                margin-top:30mm;
+                margin-bottom:20mm;
+				margin-left:30mm;
+                margin-right:20mm;
+            }
+            body{
+                font-family: Times New Roman;
+                font-size: 12px;	
+            }
+			table, td, th {
+				border: 1px solid black;
+				border-collapse: collapse;
+			}
+            .space {
+                height: 20px;
+            }
+			.title{
+                font-family: Times New Roman;
+                font-size: 16px;
+				font-weight: bold;
+				color: blue;
+			}
+			.subtitle{
+                font-family: Times New Roman;
+                font-size: 12px;
+				font-weight: bold;
+			}
+        </style>
+    </head>
+	<body>	
+	<div class="title" align="center">WORK ORDER INTERN PROJECT ITTRON</div>
+	<div class="subtitle" align="center">WO16/II/00033</div>
+	<center>Tanggal WO : 02 February 2016</center>
+	<div class="header-table">
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent;">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="80px" style="border: 1px solid transparent; font-weight: bold;">Customer</td>
+					<td width="1px" style="border: 1px solid transparent;">:</td>
+					<td style="border: 1px solid transparent;">
+						yyy					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent; font-weight: bold;">Project</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td style="border: 1px solid transparent;">
+						intern					</td>
+				</tr>
+				<tr>
+					<td style="border: 1px solid transparent; font-weight: bold;">Keterangan</td>
+					<td style="border: 1px solid transparent;">:</td>
+					<td style="border: 1px solid transparent;">
+						afdsfdfddsdfsfdsf					</td>
+				</tr>
+				<tr>
+					<td colspan="6" style="border: 1px solid transparent;">&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="bottom-table">
+		<table>
+			 <tr style="border: 1px solid transparent;"><td style="border: 1px solid transparent;">1.</td><td style="border: 1px solid transparent;"><p>sdfdsfsdffsfdsfsadffsd</p>
+</td></tr><tr style="border: 1px solid transparent;"><td style="border: 1px solid transparent;">2.</td><td style="border: 1px solid transparent;"><p>sdfdsfsdffsfdsfsadffsd</p>
+</td></tr>	
+		</table>
+	</div>
+	</body>
+</html>
