@@ -50,7 +50,9 @@ class c {
 		}
 	}
 	
-	public static function deprecated() {
+	public static function deprecated($message = '') {
+		$have_email_deprecated = ccfg::get('have_email_deprecated');
+		if(!$have_email_deprecated) return false;
 		$backtrace = debug_backtrace();
 		if(count($backtrace)>1) {
 			$state = $backtrace[1];
@@ -64,10 +66,19 @@ class c {
 			}
 			$full_function = $class.$type.$function.$line_str;
 			$subject = 'CApp Deprecated on calling function '.$full_function;
-			$body = cdbg::var_dump($backtrace,true);
 			
-			cmail::send_smtp('hery@ittron.co.id',$subject,$body);
-			
+			$body = '<h1>CApp Deprecated on calling function '.$full_function.'<h1>';
+			if(strlen($message)>0) {
+				$body = '<p>'.$message.'</p>';
+			}
+			$body .= '<br/><br/>';
+			$body .= cdbg::var_dump($backtrace,true);
+			try {
+				cmail::send_smtp('hery@ittron.co.id',$subject,$body);
+			} catch(Exception $exception) {
+				
+			}
+			return true;
 		}
 	}
 } // End valid
