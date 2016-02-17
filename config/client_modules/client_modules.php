@@ -287,7 +287,6 @@
             ),
             "js" => array(
                 "libs/bootstrap-3.3.5/bootstrap.js",
-                "libs/bootstrap-3.3.5/js/popover.js",
             ),
             "requirements" => array("jquery-2.1.1"),
         ),
