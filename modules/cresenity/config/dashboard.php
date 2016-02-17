@@ -22,4 +22,16 @@ return array(
             ),
         ),
     ),
+    "last_user_online" => array(
+        "type" => 'last_user_online',
+        "class" => 'CDashboard_LastUserOnline',
+        "options" => array(
+            "total_user" => array(
+                "name" => "total_user",
+                "label" => "Total User",
+                "type" => "select",
+                "list" => array("3"=>"3","5"=>"5","8"=>"8","10"=>"10")
+            ),
+        ),
+    ),
 );
