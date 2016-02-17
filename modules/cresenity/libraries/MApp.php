@@ -3,7 +3,7 @@
 
     defined('SYSPATH') OR die('No direct access allowed.');
 
-    class MApp extends CObservable {
+    class MApp extends CMobile_Observable {
 
         private $title = "";
         private $content = "";
