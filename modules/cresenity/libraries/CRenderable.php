@@ -103,6 +103,30 @@ class CRenderable extends CObject implements IRenderable {
         $js->append($this->additional_js);
         return $js->text();
     }
+	
+	public function css($indent = 0) {
+        if(!$this->visibility) {
+			return '';
+		}
+		$css = new CStringBuilder();
+        $css->set_indent($indent);
+        $css->inc_indent();
+        foreach ($this->renderable as $r) {
+            if (CRenderable::is_instanceof($r)) {
+				if($r->visibility) {
+					$html->append($r->css($html->get_indent()));
+				}
+            } else {
+                if (is_object($r) || is_array($r)) {
+                    $html->append(cdbg::var_dump($r, true));
+                } else {
+                    $html->append($r);
+                }
+            }
+        }
+        $html->dec_indent();
+        return $html->text();
+    }
 
     public function json() {
         $data = array();
