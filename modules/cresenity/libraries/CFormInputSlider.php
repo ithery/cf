@@ -8,14 +8,13 @@
         protected $step;
         protected $orientation;
         protected $tooltip;
-        
         protected $on_slide;
         protected $on_slide_start;
         protected $on_slide_stop;
 
         public function __construct($id = "") {
             parent::__construct($id);
-            
+
             $this->min_value = 0;
             $this->max_value = 10;
             $this->value = 0;
@@ -38,7 +37,7 @@
             }
 
             $html->append('<input type="text" id="' . $this->id . '" name="' . $this->name . '" '
-                    . ' class="' .$classes .'" />');
+                    . ' class="' . $classes . '" />');
 
             $html->appendln(parent::html($indent));
             return $html->text();
@@ -46,17 +45,17 @@
 
         public function js($indent = 0) {
             $js = new CStringBuilder();
-            
-            $js->append("jQuery('#" .$this->id ."').slider({");
+
+            $js->append("jQuery('#" . $this->id . "').slider({");
             $js->append("   'range': true,");
-            $js->append("   'min': " .$this->min_value .",");
-            $js->append("   'max': " .$this->max_value .",");
-            $js->append("   'value': " .$this->value .",");
-            $js->append("   'step': " .$this->step .",");
-            $js->append("   'orientation': '" .$this->orientation ."',");
-            $js->append("   'tooltip': '" .$this->tooltip ."',");
+            $js->append("   'min': " . $this->min_value . ",");
+            $js->append("   'max': " . $this->max_value . ",");
+            $js->append("   'value': " . $this->value . ",");
+            $js->append("   'step': " . $this->step . ",");
+            $js->append("   'orientation': '" . $this->orientation . "',");
+            $js->append("   'tooltip': '" . $this->tooltip . "',");
             $js->append("})");
-            
+
             if (strlen($this->on_slide) > 0) {
                 $js->append(".on('slide', function(e) {");
                 $js->append($this->on_slide);
@@ -68,23 +67,35 @@
                 $js->append("})");
             }
             $js->append(";");
-            
+
             $js->appendln(parent::js($indent));
             return $js->text();
         }
 
-        public function set_min_value($min_value){
+        public function set_min_value($min_value) {
             $this->min_value = $min_value;
             return $this;
         }
-        public function set_max_value($max_value){
+
+        public function set_max_value($max_value) {
             $this->max_value = $max_value;
             return $this;
         }
-        public function set_value($value){
+
+        public function set_value($value) {
             $this->value = $value;
             return $this;
         }
+
+        function set_tooltip($tooltip) {
+            $this->tooltip = $tooltip;
+            return $this;
+        }
+        function set_step($step) {
+            $this->step = $step;
+            return $this;
+        }
+
     }
 
 ?>
