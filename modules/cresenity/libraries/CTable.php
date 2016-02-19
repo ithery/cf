@@ -383,7 +383,10 @@
                                 ->set_require($table->requires)
                                 ->execute();
 
-
+                        if(is_array($new_v)&&isset($new_v['html'])&&isset($new_v['js'])) {
+                            $new_v = carr::get($new_v,'html');
+                            $js .= carr::get($new_v,'js');
+                        }
                         //call_user_func($table->cell_callback_func,$table,$col->get_fieldname(),$row,$v);
                     }
                     $class = "";

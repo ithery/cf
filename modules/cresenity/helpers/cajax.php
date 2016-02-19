@@ -217,6 +217,7 @@
             $q = $obj->data->query;
             $param = $obj->param;
             $js = "";
+            
 
             foreach ($param as $p) {
 
@@ -430,7 +431,12 @@
                                 ->add_param($new_v)
                                 ->set_require($table->requires)
                                 ->execute();
-
+                       
+                        if(is_array($new_v)&&isset($new_v['html'])&&isset($new_v['js'])) {
+                            $js .= $new_v['js'];
+                            $new_v = $new_v['html'];
+                        }
+                         
 
                         //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                     }
