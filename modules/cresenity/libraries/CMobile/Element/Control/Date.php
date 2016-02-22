@@ -1,6 +1,6 @@
 <?php
 
-class CMobile_Element_FormInput_Date extends CMobile_Element_AbstractFormInput {
+class CMobile_Element_FormInput_Date extends CMobile_Element_Control_AbstractInput {
 
     protected $date_format;
     protected $have_button;

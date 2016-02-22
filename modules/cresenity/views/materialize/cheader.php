@@ -31,8 +31,13 @@ $org = $app->org();
         <?php echo $custom_header; ?>
         <?php echo $begin_client_script; ?>
 		<nav class="nav-header" role="navigation">
-			<div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">62Hall</a>
+			<div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo"><?php
+                        $web_title = ccfg::get("title");
+                        //if($org!=null) $web_title = strtoupper($org->name);
+                        echo $web_title;
+                        ?></a>
 				<ul class="right ">
+					<li><a href="#"><i class="material-icons">search</i></a></li>
 					<li><a href="#"><i class="material-icons">shopping_cart</i></a></li>
 				</ul>
 

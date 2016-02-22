@@ -27,6 +27,7 @@ abstract class CMobile_Observable extends CRenderable {
         $this->manager->register_control('date', 'CMobile_Element_Control_Date');
         $this->manager->register_control('time', 'CMobile_Element_Control_Time');
         $this->manager->register_control('textarea', 'CMobile_Element_Control_Textarea');
+        $this->manager->register_control('select', 'CMobile_Element_Control_Select');
     }
 
     /**

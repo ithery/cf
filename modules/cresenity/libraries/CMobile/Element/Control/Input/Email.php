@@ -12,7 +12,7 @@ class CMobile_Element_Control_Input_Email extends CMobile_Element_Control_Abstra
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->type = "text";
+        $this->type = "email";
 
         $this->placeholder = "";
 
@@ -51,15 +51,6 @@ class CMobile_Element_Control_Input_Email extends CMobile_Element_Control_Abstra
 
     public function set_prefix_icon($prefix_icon){
         $this->prefix_icon = $prefix_icon; 
-        return $this;
-    }
-    public function set_data_error($data_error){
-        $this->data_error = $data_error; 
-        return $this;
-    }
-
-    public function set_data_success($data_success){
-        $this->data_success = $data_success; 
         return $this;
     }
 	

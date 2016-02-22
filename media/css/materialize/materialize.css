@@ -1,7 +1,9 @@
 .container {
   padding-left: 240px;
 }
-
+nav ul a {
+  padding: 0 5px;
+}
 .fixed-action-btn {
   bottom: 45px; 
   padding-top: 0px;
