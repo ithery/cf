@@ -240,14 +240,15 @@ class CClientScript extends CObject {
         $js_open = "";
         $js_close = "";
         $i = 0;
-        $app = CApp::instance();
+        $man = CManager::instance();
         foreach ($js_files as $f) {
             $url_js_file = $this->url_js_file($f);
-            if ($app->is_mobile()) {
-                $mobile_path = $app->get_mobile_path();
+            if ($man->is_mobile()) {
+                $mobile_path = $man->get_mobile_path();
                 if (strlen($mobile_path) > 0) {
                     $url_js_file = $mobile_path . $f;
                 }
+
             }
 
 
@@ -277,6 +278,7 @@ class CClientScript extends CObject {
     public function render($pos, $type = array("js_file", "css_file", "js", "css", "meta", "link")) {
         $script = "";
         $app = CApp::instance();
+		$man = CManager::instance();
         if (!is_array($type))
             $type = array($type);
         foreach ($this->scripts[$pos] as $k => $v) {
@@ -286,8 +288,8 @@ class CClientScript extends CObject {
                         case "js_file":
                             if (!ccfg::get('merge_js')) {
                                 $url_js_file = $this->url_js_file($s);
-                                if ($app->is_mobile()) {
-                                    $mobile_path = $app->get_mobile_path();
+                                if ($man->is_mobile()) {
+                                    $mobile_path = $man->get_mobile_path();
                                     if(strlen($mobile_path)>0) {
                                         $url_js_file = $mobile_path . $s;
                                     }
@@ -301,8 +303,8 @@ class CClientScript extends CObject {
                         case "css_file":
                             if (!ccfg::get('merge_css')) {
                                 $url_css_file = $this->url_css_file($s);
-                                if ($app->is_mobile()) {
-                                    $mobile_path = $app->get_mobile_path();
+                                if ($man->is_mobile()) {
+                                    $mobile_path = $man->get_mobile_path();
                                     if(strlen($mobile_path)>0) {
                                         $url_css_file = $mobile_path . $s;
                                     }

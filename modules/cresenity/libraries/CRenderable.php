@@ -7,6 +7,7 @@ class CRenderable extends CObject implements IRenderable {
     protected $renderable;
     protected $additional_js;
 	protected $visibility;
+	protected $parent;
 
     protected function __construct($id = "") {
         parent::__construct($id);
@@ -15,6 +16,7 @@ class CRenderable extends CObject implements IRenderable {
 
         $this->additional_js = "";
 		$this->visibility = true;
+		$this->parent = null;
     }
 
     public function child_count() {
@@ -23,6 +25,11 @@ class CRenderable extends CObject implements IRenderable {
 	
 	public function childs() {
 		return $this->renderable;
+	}
+	
+	public function set_parent($parent) {
+		$this->parent = $parent;
+		return $this;
 	}
 	
 	public function set_visibility($bool) {
@@ -44,6 +51,9 @@ class CRenderable extends CObject implements IRenderable {
     }
 
     public function add($renderable) {
+		if (CRenderable::is_instanceof($renderable)) {
+			$renderable->set_parent($this);
+		}
         $this->renderable[] = $renderable;
         return $this;
     }

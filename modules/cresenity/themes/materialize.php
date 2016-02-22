@@ -3,7 +3,7 @@
     return array(
         "theme_path" => "materialize",
         "client_modules" => array(
-            'jquery',
+            // 'jquery-2.1.1',
             // 'bootstrap-3.3.5',
             // 'bootbox',
             // 'select2',
@@ -39,8 +39,9 @@
 //            'bootstrap-dropdown',
 //            'bootstrap-slider',
 //            'form',
-//            'intern'
             'materialize',
+         //   'moment',
+         //   'datepicker_material',
         ),
        "js" => array(
            // "iapp-nav.min.js"
@@ -55,5 +56,10 @@
         "config" => array(
             "datatable_dom" => 'T<"clear">lfrtip',
         ),
+		"custom_js"=> "
+			
+			// jQuery('.button-collapse').sideNav();
+			
+		",
     );
     

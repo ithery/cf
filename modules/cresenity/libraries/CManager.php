@@ -10,6 +10,9 @@ final class CManager {
 
 	protected $elements = array();
 	protected $elements_code = array();
+	
+	protected $is_mobile = false;
+	protected $mobile_path = '';
 
     /**
      *
@@ -21,6 +24,11 @@ final class CManager {
         }
         return self::$_instance;
     }
+	
+	public function __construct() {
+		$this->is_mobile = ccfg::get('is_mobile');
+		$this->mobile_path = '';
+	}
 
     public function register_module($module) {
         return CClientModules::instance()->register_module($module);
@@ -84,5 +92,19 @@ final class CManager {
         //return $obj;
         //return $class::factory($id);
     }
+	
+	
+	public function set_mobile_path($path) {
+		$this->mobile_path = $path;
+		return $this;
+	}
+	
+	public function get_mobile_path() {
+		return $this->mobile_path;
+	}
+	
+	public function is_mobile() {
+		return $this->is_mobile;
+	}
 
 }

@@ -506,6 +506,7 @@
 
                 $validation_if_open = '';
                 $validation_if_close = '';
+				
                 if ($this->validation) {
                     $validation_if_open = "if ($('#" . $this->id . "').validationEngine('validate') ) {";
                     $validation_if_close = "					} else {

@@ -43,7 +43,7 @@
 			return self::$instance;
 		}
 		
-		public function title($title) {
+		public function set_title($title) {
             $this->title = clang::__($title);
 			if(strlen($this->page_title)==0) {
 				$this->set_page_title(clang::__($title));
@@ -59,13 +59,13 @@
             return $this;
         }
 		
-		public function render() {
+		public function render($app) {
 			if ($this->rendered) {
                 echo 'a';
 				//trigger_error('CPage already rendered');
             }
 			$this->rendered = true;
-            if (crequest::is_ajax() || $this->mobile == true) {
+            if (crequest::is_ajax()) {
                 return $this->json();
             }
 			
@@ -73,20 +73,23 @@
             $theme = ccfg::get('theme');
             if ($theme == null) $theme = 'cresenity';
             $theme_file = CF::get_file('themes', $theme);
-			$page_var = array();
+            $page_var = array();
+			$theme_custom_js = '';
             if (file_exists($theme_file)) {
                 $theme_data = include $theme_file;
-				$theme_path = carr::get($theme_data, 'theme_path');
-				$page_var = carr::get($theme_data, 'page_var');
+                $theme_path = carr::get($theme_data, 'theme_path');
+                $page_var = carr::get($theme_data, 'page_var');
+                $theme_custom_js = carr::get($theme_data, 'custom_js');
                 if ($theme_path == null) {
                     $theme_path = '';
                 }
                 else {
                     $theme_path .= '/';
                 }
+				
             }
 
-			$app = CApp::instance();
+            
             if (!$app->is_user_login() && ccfg::get("have_user_login") && $this->login_required) {
                 $v = CView::factory($theme_path . 'ccore/login');
             }
@@ -94,8 +97,8 @@
                 $v = CView::factory($theme_path . 'ccore/static_login');
             }
             else {
-				
-				$v = CView::factory($theme_path . 'cpage');
+                
+                $v = CView::factory($theme_path . 'cpage');
 
                 $this->content = $app->html();
                 $this->js = $app->js();
@@ -105,6 +108,7 @@
 
                 $v->title = $this->title;
                 $cs = CClientScript::instance();
+				$cm = CClientModules::instance();
                 $css_urls = $cs->url_css_file();
 
                 $js_urls = $cs->url_js_file();
@@ -117,12 +121,21 @@
 				";
                 }
                 $js = "";
+				
                 $vjs = CView::factory('ccore/js');
+				if(CView::exists($theme.'/ccore/js')) {
+					
+					$vjs= CView::factory($theme.'/ccore/js');
+				}
                 $js.=PHP_EOL . $vjs->render();
 
+				
+				if(strlen($theme_custom_js)>0) {
+					$this->js.=$theme_custom_js;
+				}
                 $js .= PHP_EOL . $this->js . $additional_js;
 
-                $js = $cs->render_js_require($js);
+                //$js = $cs->render_js_require($js);
 
                 if (ccfg::get("minify_js")) {
                     $js = CJSMin::minify($js);

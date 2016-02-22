@@ -5,34 +5,31 @@
 
     class MApp extends CMobile_Observable {
 
-        private $title = "";
-        private $content = "";
-        private $js = "";
-        private $custom_js = "";
-        private $custom_header = "";
-        private $custom_footer = "";
-        private $show_breadcrumb = true;
-        private $show_title = true;
-        private $breadcrumb = array();
-        private $signup = false;
-        private $activation = false;
-        private $resend = false;
+        private $run;
+		public static $_instance = null;
+		private $rendered = false;
 		private $login_required = true;
-        private $_store = null;
-        private $_role = null;
+		private $_role = null;
         private $_org = null;
         private $_user = null;
-        private $_admin = null;
-        private $_member = null;
         private $_app_id = null;
-        private $_clientmodules;
-        public static $_instance = null;
-        private $app_list = null;
-        private $run;
-        protected $_template = array();
-        protected $rendered = false;
-        private $mobile = false;
-
+		private $_mobile_path;
+		
+		public function title($title) {
+			$this->page()->set_title($title);
+		}
+		
+		public function page() {
+			return CPage::instance();
+		}
+		
+		public function set_mobile_path($path) {
+			CManager::instance()->set_mobile_path($path);
+			return $this;
+		}
+		
+		
+		
         public function __destruct() {
             if (function_exists('gc_collect_cycles')) {
 
@@ -40,10 +37,7 @@
             }
         }
 
-        public function set_mobile($bool) {
-            $this->mobile = $bool;
-        }
-
+        
         public function setup($install = false) {
 
             if ($this->run) return;
@@ -96,7 +90,7 @@
                 date_default_timezone_set($timezone);
             }
 
-            $this->id = "capp";
+            $this->id = "mapp";
             //check login
             $post = $_POST;
             if (!$install) {
@@ -131,7 +125,7 @@
 
             $this->run = true;
         }
-
+		
         public function __construct($install = false) {
 
             parent::__construct();
@@ -156,24 +150,10 @@
             $this->run = false;
 
             $theme_path = "";
-            //$theme_path = ctheme::path();
-            $this->_template = array(
-                'install' => $theme_path . 'cinstall/page',
-                'sign_up' => $theme_path . 'ccore/signup',
-                'resend_activation' => $theme_path . 'ccore/resend_activation',
-                'activation' => $theme_path . 'ccore/activation',
-                'login' => $theme_path . 'ccore/login',
-                'static_login' => $theme_path . 'ccore/static_login',
-                'cpage' => $theme_path . 'cpage',
-                'cheader' => $theme_path . 'cheader',
-                'cfooter' => $theme_path . 'cfooter',
-            );
+            
         }
 
-        public function set_template($k, $v) {
-            $this->_template[$k] = $v;
-        }
-		
+      
 		public function set_login_required($bool) {
             return $this->login_required=$bool;
         }
@@ -187,15 +167,7 @@
             return CManager::instance();
         }
 
-        public function name() {
-            //$app = CJDB::instance()->get("app", array("app_id" => $this->app_id()));
-            //return $app[0]->name;
-//		return CF::app_name();
-        }
-
         public function code() {
-            //$app = CJDB::instance()->get("app", array("app_id" => $this->app_id()));
-            //return $app[0]->code;
             return CF::app_code();
         }
 
@@ -203,114 +175,10 @@
             return CF::instance();
         }
 
-        public function app_list() {
-            if ($this->app_list == null) {
-                //we will get all available app for this org
-                $cdb = CJDB::instance();
-                $data = $cdb->get('domain', array("org_id" => $this->org()->org_id))->result_array();
-                $this->app_list = array();
-                foreach ($data as $domain) {
-                    $app_id = $domain["app_id"];
-                    $app = $cdb->get('app', array('app_id' => $app_id));
-                    $app_name = $app[0]->name;
-                    $this->app_list[$app_id] = $app_name;
-                }
-                //if array is empty, we make default is app with id 1
-                if (empty($this->app_list)) {
-                    $app_id = 1;
-                    $app = $cdb->get('app', array('app_id' => $app_id));
-                    $app_name = $app[0]->name;
-                    $this->app_list[$app_id] = $app_name;
-                }
-            }
-
-            return $this->app_list;
-        }
-
-        public function store_list() {
-            $cdb = CJDB::instance();
-            $stores = $cdb->get("store", array("org_id" => $this->org()->org_id));
-            $result = array();
-            foreach ($stores as $store) {
-                $result[$store->store_id] = $store->name;
-            }
-            return $result;
-        }
-
-        public function have_store() {
-
-            $cdb = CJDB::instance();
-            $stores = $cdb->get("store", array("org_id" => $this->org()->org_id));
-            return $stores->count() > 0;
-        }
-
-        public function is_store() {
-            /*
-              if (ccfg::get("store_id"))
-              return true;
-              return false;
-             */
-            return strlen(CF::$store_code) > 0;
-        }
-
-        public function have_store_access($store_id) {
-            $db = CDatabase::instance();
-            $org_id = $this->org()->org_id;
-            $user_id = $this->user()->user_id;
-            $q = "select count(*) as cnt from users_store where store_id=" . $db->escape($store_id) . " and org_id=" . $db->escape($org_id) . " and user_id=" . $db->escape($user_id);
-            $val = cdbutils::get_value($q);
-            return $val > 0;
-        }
-
-        public function user_store_list() {
-            $cdb = CJDB::instance();
-            $org_id = $this->org()->org_id;
-            $all_store_list = $cdb->get_list('store', 'store_id', 'name', array("org_id" => $org_id));
-            $store_list = array();
-            foreach ($all_store_list as $k => $v) {
-                if ($this->have_store_access($k)) {
-                    $store_list[$k] = $v;
-                }
-            }
-            return $store_list;
-        }
-
-        public function menu_list() {
-            $cdb = CJDB::instance();
-            $org_id = $this->org()->org_id;
-            $all_menu_list = $cdb->get_list('resto_menu', 'resto_menu_id', 'name', array("org_id" => $org_id));
-            $menu_list = array();
-            foreach ($all_menu_list as $k => $v) {
-                if ($this->have_store_access($k)) {
-                    $menu_list[$k] = $v;
-                }
-            }
-            return $menu_list;
-        }
-
         public function db() {
             return CDatabase::instance();
         }
 
-        public function is_admin() {
-            return $this->app_id() == 0;
-        }
-
-        /**
-         * 
-         * @param boolean $install
-         * @return MApp
-         */
-        public static function factory($install = false) {
-            //return new CApp($install);
-            return self::instance($install);
-        }
-
-        /**
-         * 
-         * @param boolean $install
-         * @return CApp
-         */
         public static function instance($install = false) {
             if (self::$_instance == null) {
                 self::$_instance = new MApp($install);
@@ -318,8 +186,8 @@
             }
             return self::$_instance;
         }
-
-        public function signup($bool = true) {
+		
+		public function signup($bool = true) {
             $this->signup = $bool;
             return $this;
         }
@@ -334,10 +202,7 @@
             return $this;
         }
 
-        public function title($title) {
-            $this->title = clang::__($title);
-            return $this;
-        }
+       
 
         public function show_breadcrumb($bool) {
             $this->show_breadcrumb = $bool;
@@ -401,252 +266,20 @@
 			}
         }
 
-        public function render_template() {
-
-            if (crequest::is_ajax()) {
-                return $this->json();
-            }
-            $theme_path = "";
-            $theme_path = ctheme::path();
-
-//            var_dump($this->_template);
-            if (ccfg::get("install")) {
-                $v = CView::factory($this->_template['install']);
-            }
-            else if ($this->signup) {
-                $v = CView::factory($this->_template['sign_up']);
-            }
-            else if ($this->resend) {
-                $v = CView::factory($this->_template['resend_activation']);
-            }
-            else if ($this->activation) {
-                $v = CView::factory($this->_template['activation']);
-            }
-            else if (!$this->is_user_login() && ccfg::get("have_user_login")) {
-                $v = CView::factory($this->_template['login']);
-            }
-            else if (!$this->is_user_login() && ccfg::get("have_static_login")) {
-                $v = CView::factory($this->_template['static_login']);
-            }
-            else {
-
-                $v = CView::factory($this->_template['cpage']);
-
-                $this->content = parent::html();
-                $this->js = parent::js();
-                $v->content = $this->content;
-                $v->title = $this->title;
-                $cs = CClientScript::instance();
-                $css_urls = $cs->url_css_file();
-
-                $js_urls = $cs->url_js_file();
-                $additional_js = "";
-
-                foreach ($css_urls as $url) {
-
-                    $additional_js .= "
-					$.cresenity._filesadded+='['+'" . $url . "'+']'
-				";
-                }
-                $js = "";
-                $vjs = CView::factory('ccore/js');
-                $js .= PHP_EOL . $vjs->render();
-
-                $js .= PHP_EOL . $this->js . $additional_js;
-
-                $js = $cs->render_js_require($js);
-
-                if (ccfg::get("minify_js")) {
-                    $js = CJSMin::minify($js);
-                }
-
-                $v->js = $js;
-
-                $v->css_hash = "";
-                $v->js_hash = "";
-                if (ccfg::get("merge_css")) {
-                    $v->css_hash = $cs->create_css_hash();
-                }
-                if (ccfg::get("merge_js")) {
-                    $v->js_hash = $cs->create_js_hash();
-                }
-
-                $v->head_client_script = "";
-                $v->begin_client_script = "";
-                $v->end_client_script = "";
-
-                $v->load_client_script = "";
-                $v->ready_client_script = "";
-
-
-                $v->head_client_script = $cs->render('head');
-                $v->begin_client_script = $cs->render('begin');
-                // $v->end_client_script = $cs->render('end');
-
-                $v->load_client_script = $cs->render('load');
-                $v->ready_client_script = $cs->render('ready');
-
-                $v->custom_js = $this->custom_js;
-                $v->custom_header = $this->custom_header;
-                $v->custom_footer = $this->custom_footer;
-                $v->show_breadcrumb = $this->show_breadcrumb;
-                $v->show_title = $this->show_title;
-                $v->breadcrumb = $this->breadcrumb;
-                $v->cheader = $this->_template['cheader'];
-                $v->cfooter = $this->_template['cfooter'];
-            }
-
-            return $v->render();
-        }
+        
 
         public function rendered() {
             return $this->rendered;
         }
+		
+		public function render() {
+			$page = CPage::instance();
+			echo $page->render($this);
+		}
 
-        public function render() {
+        
 
-            if ($this->rendered) {
-                trigger_error('MApp already rendered');
-            }
-            $this->rendered = true;
-            if (crequest::is_ajax()||$this->mobile==true) {
-                return $this->json();
-            }
-
-            $theme_path = "";
-            
-            if (ccfg::get("install")) {
-                $v = CView::factory($theme_path . 'cinstall/page');
-                /*
-                  } else if ($this->is_admin()) {
-                  if (!$this->is_admin_login()) {
-                  $v = CView::factory('admin/login');
-                  } else {
-                  $v = CView::factory('admin/cpage');
-                  $this->content = parent::html();
-                  $this->js = parent::js();
-                  $v->content = $this->content;
-                  $v->title = $this->title;
-                  $v->js = $this->js;
-                  $cs = CClientScript::instance();
-                  $v->head_client_script = $cs->render('head');
-                  $v->begin_client_script = $cs->render('begin');
-                  $v->end_client_script = $cs->render('end');
-                  $v->load_client_script = $cs->render('load');
-                  $v->ready_client_script = $cs->render('ready');
-
-                  $v->custom_js = $this->custom_js;
-                  $v->custom_header = $this->custom_header;
-                  $v->custom_footer = $this->custom_footer;
-                  $v->show_breadcrumb = $this->show_breadcrumb;
-                  $v->show_title = $this->show_title;
-                  $v->breadcrumb = $this->breadcrumb;
-                  }
-                 */
-            }
-            else if ($this->signup) {
-                $v = CView::factory($theme_path . 'ccore/signup');
-            }
-            else if ($this->resend) {
-                $v = CView::factory($theme_path . 'ccore/resend_activation');
-            }
-            else if ($this->activation) {
-                $v = CView::factory($theme_path . 'ccore/activation');
-            }
-            else if (!$this->is_user_login() && ccfg::get("have_user_login") && $this->login_required) {
-                $v = CView::factory($theme_path . 'ccore/login');
-            }
-            else if (!$this->is_user_login() && ccfg::get("have_static_login") && $this->login_required) {
-                $v = CView::factory($theme_path . 'ccore/static_login');
-            }
-            else {
-                $v = CView::factory($theme_path . 'cpage');
-                
-                $this->content = parent::html();
-                $this->js = parent::js();
-                $v->content = $this->content;
-                
-                $v->title = $this->title;
-                $cs = CClientScript::instance();
-                $css_urls = $cs->url_css_file();
-
-                $js_urls = $cs->url_js_file();
-                $additional_js = "";
-
-                foreach ($css_urls as $url) {
-
-                    $additional_js .= "
-					$.cresenity._filesadded+='['+'" . $url . "'+']'
-				";
-                }
-                $js = "";
-                $vjs = CView::factory('ccore/js');
-                $js.=PHP_EOL . $vjs->render();
-
-                $js .= PHP_EOL . $this->js . $additional_js;
-
-                $js = $cs->render_js_require($js);
-
-                if (ccfg::get("minify_js")) {
-                    $js = CJSMin::minify($js);
-                }
-
-                $v->js = $js;
-
-                $v->css_hash = "";
-                $v->js_hash = "";
-                if (ccfg::get("merge_css")) {
-                    $v->css_hash = $cs->create_css_hash();
-                }
-                if (ccfg::get("merge_js")) {
-                    $v->js_hash = $cs->create_js_hash();
-                }
-
-                $v->head_client_script = "";
-                $v->begin_client_script = "";
-                $v->end_client_script = "";
-
-                $v->load_client_script = "";
-                $v->ready_client_script = "";
-
-
-                $v->head_client_script = $cs->render('head');
-                $v->begin_client_script = $cs->render('begin');
-                // $v->end_client_script = $cs->render('end');
-
-                $v->load_client_script = $cs->render('load');
-                $v->ready_client_script = $cs->render('ready');
-
-                $v->custom_js = $this->custom_js;
-                $v->custom_header = $this->custom_header;
-                $v->custom_footer = $this->custom_footer;
-                $v->show_breadcrumb = $this->show_breadcrumb;
-                $v->show_title = $this->show_title;
-                $v->breadcrumb = $this->breadcrumb;
-            }
-            
-            return $v->render();
-        }
-
-        public function admin() {
-            if ($this->_admin == null) {
-                $session = Session::instance();
-                $admin = $session->get("admin");
-                if (!$admin) $admin = null;
-                $this->_admin = $admin;
-            }
-            return $this->_admin;
-        }
-
-        public function member() {
-            if ($this->_member = null) {
-                $session = Session::instance();
-                $member = $session->get("member");
-                if (!$member) $member = null;
-                $this->_member = $member;
-            }
-            return $this->_admin;
-        }
+       
 
         public function user() {
             if ($this->_user == null) {

@@ -325,18 +325,39 @@
         ),
         "materialize" => array(
             "css" => array(
-                "materialize/bootstrap-material-design.min.css",
+                "materialize/materialize.min.css",
+                // "materialize/bootstrap-material-design.min.css",
                 "materialize/material-icons.css",
-                "materialize/ripples.min.css",
+                "materialize/swiper/swiper.min.css",
+                // "materialize/ripples.min.css",
                 "materialize/materialize.css",
             ),
             "js" => array(
-                "materialize/material.min.js",
+                // "materialize/hammer.min.js",
+                // "materialize/materialize.js",
+                // "materialize/material.min.js",
                 // "materialize/materialize.amd.js",
-                "materialize/ripples.min.js",
+                // "materialize/ripples.min.js",
+                "materialize/swiper/swiper.jquery.js",
                 "materialize/material_main.js",
             ),
-            "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
+            "requirements" => array("jquery-2.1.1"),
+        ),
+        "moment" => array(
+            "js" => array(
+                "plugins/momentjs/moment.js",
+                "plugins/momentjs/moment-with-locales.min.js",
+            ),
+            "requirements" => array("jquery-2.1.1"),
+        ),
+        "datepicker_material" => array(
+            "css" => array(
+                "plugins/datepicker_material/bootstrap-material-datetimepicker.css",
+            ),
+            "js" => array(
+                "plugins/datepicker_material/bootstrap-material-datetimepicker.js",
+            ),
+            "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5", "materialize"),
         ),
         "iapp" => array(
             "css" => array(
