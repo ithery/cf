@@ -24,10 +24,12 @@ abstract class CMobile_Observable extends CRenderable {
         $this->manager->register_control('text', 'CMobile_Element_Control_Input_Text');
         $this->manager->register_control('email', 'CMobile_Element_Control_Input_Email');
         $this->manager->register_control('password', 'CMobile_Element_Control_Input_Password');
+        $this->manager->register_control('radio', 'CMobile_Element_Control_Input_Radio');
         $this->manager->register_control('date', 'CMobile_Element_Control_Date');
         $this->manager->register_control('time', 'CMobile_Element_Control_Time');
         $this->manager->register_control('textarea', 'CMobile_Element_Control_Textarea');
         $this->manager->register_control('select', 'CMobile_Element_Control_Select');
+        $this->manager->register_control('switch', 'CMobile_Element_Control_Switch');
     }
 
     /**
@@ -67,6 +69,24 @@ abstract class CMobile_Observable extends CRenderable {
 	
 	public function add_swiper($field_id = "") {
         $field = CMobile_Element_Component_Swiper::factory($field_id);
+        $this->add($field);
+        return $field;
+    }
+
+    public function add_chip($field_id = "") {
+        $field = CMobile_Element_Component_Chip::factory($field_id);
+        $this->add($field);
+        return $field;
+    }
+
+    public function add_collection($field_id = "") {
+        $field = CMobile_Element_Component_Collection::factory($field_id);
+        $this->add($field);
+        return $field;
+    }
+
+    public function add_progress($field_id = "") {
+        $field = CMobile_Element_Component_Progress::factory($field_id);
         $this->add($field);
         return $field;
     }

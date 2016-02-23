@@ -7,6 +7,7 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
     protected $placeholder;
     protected $label_float;
     protected $prefix_icon;
+    protected $length;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -17,6 +18,7 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
         $this->label_float = true;
         $this->col = 60;
         $this->row = 10;
+        $this->length = '';
     }
 
     public static function factory($id) {
@@ -33,6 +35,11 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
         return $this;
     }
 
+    public function set_length($length) {
+        $this->length = $length;
+        return $this;
+    }
+
     public function set_prefix_icon($prefix_icon){
         $this->prefix_icon = $prefix_icon; 
         return $this;
@@ -43,19 +50,24 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
         $placeholder = "";
         $cols = "";
         $rows = "";
+        $length = "";
         
         if ($this->placeholder)
             $placeholder = ' placeholder="'.$this->placeholder.'"';
         if ($this->col)
             $cols = ' cols="'.$this->col.'"';
         if ($this->row)
-            $rows = ' cols="'.$this->row.'"';
-                
+            $rows = ' cols="'.$this->row.'"';            
+        if (strlen($this->length) > 0)
+            $length = ' length="'.$this->length.'"';
+                    
+        $html_attr .= $length;
         $html_attr .= $cols;
         $html_attr .= $rows;
         return $html_attr;
     }
     public function build($indent = 0) {
+        $this->add_class('input-field');
         $this->add_class('materialize-textarea');
         $this->add_class( $this->validation->validation_class());
         $html_attr = $this->html_attr();
@@ -69,6 +81,8 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
           $('#" . $this->id . "').val('" . $this->value . "');
           $('#" . $this->id . "').trigger('autoresize');
         ";
+        // if (strlen($this->length) > 0)
+        //     $js .= "$('#" . $this->id . "').characterCounter();";
         return $js;
     }
 

@@ -6,6 +6,7 @@ class CMobile_Element_Label extends CMobile_Element {
     protected $label = "";
     protected $data_error;
     protected $data_success;
+    protected $for_id;
     public function __construct($id = "") {
 
         parent::__construct($id);
@@ -24,6 +25,11 @@ class CMobile_Element_Label extends CMobile_Element {
         return $this;
     } 
 
+    public function set_for_id($for_id) {
+        $this->for_id = $for_id;
+        return $this;
+    } 
+
     public function set_data_error($data_error){
         $this->data_error = $data_error; 
         return $this;
@@ -38,6 +44,7 @@ class CMobile_Element_Label extends CMobile_Element {
         $html_attr = parent::html_attr();
         $data_error = "";
         $data_success = "";
+        $for_id = "";
         
         if(strlen($this->data_error) > 0) {
             $data_error = ' data-error="'.$this->data_error.'"';
@@ -45,6 +52,10 @@ class CMobile_Element_Label extends CMobile_Element {
         if(strlen($this->data_success) > 0) {
             $data_success = ' data-success="'.$this->data_success.'"';
         }
+        if(strlen($this->for_id) > 0) {
+            $for_id = ' for="'.$this->for_id.'"';
+        }
+        $html_attr .= $for_id;
         $html_attr .= $data_error;
         $html_attr .= $data_success;
         return $html_attr;
