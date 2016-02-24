@@ -2,8 +2,10 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class User_permission_panel_dashboard_Controller extends CController {
+class User_permission_dashboard_Controller extends CController {
 
+    
+    
     public static function cell_callback($table, $col, $row, $text) {
         $db = CDatabase::instance();
         $level = $row["level"];
@@ -18,7 +20,7 @@ class User_permission_panel_dashboard_Controller extends CController {
                 $checked = "";
                 $role_id = $row["role_id"];
 
-                if (cnav_panel_dashboard::have_access($row, $role_id, $row["app_id"])) {
+                if (CDashboard::have_access($row['name'], $role_id, $row["app_id"])) {
                     $checked = ' checked="checked"';
                 }
 
@@ -31,15 +33,18 @@ class User_permission_panel_dashboard_Controller extends CController {
 
             case "permission":
                 $html = '';
-                    $html .= '<div class="btn-group" data-toggle="buttons-checkbox">';
-					$active = "";
-					if (cnav_panel_dashboard::have_permission('static_position', $row, $row["role_id"], $row["app_id"])) {
-						$active = ' active';
-					}
-					$html.='<button class="btn btn-success btn-permission btn-' . $row['name'] . '' . $active . '" name="static_position" type="button">';
-					$html.='Static Position';
-					$html.='</button>';
-                    $html .='</div>';
+                /*
+                $html .= '<div class="btn-group" data-toggle="buttons-checkbox">';
+                $active = "";
+                if (cnav_panel_dashboard::have_permission('static_position', $row, $row["role_id"], $row["app_id"])) {
+                    $active = ' active';
+                }
+                $html.='<button class="btn btn-success btn-permission btn-' . $row['name'] . '' . $active . '" name="static_position" type="button">';
+                $html.='Static Position';
+                $html.='</button>';
+                $html .='</div>';
+                 * 
+                 */
                 return $html;
                 break;
         }
@@ -49,12 +54,13 @@ class User_permission_panel_dashboard_Controller extends CController {
     public function save() {
         $app = CApp::instance();
         $org = $app->org();
-        $org_id = "";
+        $org_id = null;
         $user = $app->user();
 
         if ($org != null) {
             $org_id = $org->org_id;
         }
+        
         $error = 0;
         $error_message = "";
         $result = array();
@@ -78,25 +84,29 @@ class User_permission_panel_dashboard_Controller extends CController {
                 }
                 if ($error == 0) {
                     if ($role_id == null) {
-                        $db->query("delete from role_permission_panel_dashboard where role_id is null and app_id=" . $db->escape($app_id));
-                        $db->query("delete from role_nav_panel_dashboard where role_id is null and app_id=" . $db->escape($app_id));
+                       // $db->query("delete from role_permission_panel_dashboard where role_id is null and app_id=" . $db->escape($app_id));
+                        $db->query("delete from role_dashboard where role_id is null and app_id=" . $db->escape($app_id));
                     } else {
-                        $db->delete("role_permission_panel_dashboard", array("role_id" => $role_id, "app_id" => $app_id));
-                        $db->delete("role_nav_panel_dashboard", array("role_id" => $role_id, "app_id" => $app_id));
+                       // $db->delete("role_permission_panel_dashboard", array("role_id" => $role_id, "app_id" => $app_id));
+                        $db->delete("role_dashboard", array("role_id" => $role_id, "app_id" => $app_id));
                     }
                     $access = $post["access"];
 
                     foreach ($access as $a) {
                         $nav = $a["name"];
+                        if(strlen($org_id)==0) {
+                            $org_id = null;
+                        }
                         $data = array(
                             'role_id' => $role_id,
                             'app_id' => $app_id,
                             'org_id' => $org_id,
-                            'nav' => $nav,
+                            'dashboard' => $nav,
                             'created' => date('Y-m-d H:i:s'),
                             'createdby' => $user->username,
                         );
-                        $r = $db->insert('role_nav_panel_dashboard', $data);
+                        $r = $db->insert('role_dashboard', $data);
+                        /*
                         if (isset($a['action'])) {
                             $action = $a["action"];
                             foreach ($action as $act) {
@@ -112,6 +122,8 @@ class User_permission_panel_dashboard_Controller extends CController {
                                 $r = $db->insert('role_permission_panel_dashboard', $data);
                             }
                         }
+                         */
+                         
                     }
                 }
             } catch (Exception $e) {
@@ -153,7 +165,7 @@ class User_permission_panel_dashboard_Controller extends CController {
         $user = $app->user();
 
         $html = '';
-        $app_list = array('901'=>'TORSNETT');
+        $app_list = array(CF::app_id() => CF::app_code());
         $app_id = "";
         if (isset($_GET["app_id"])) {
             $app_id = $_GET["app_id"];
@@ -200,17 +212,31 @@ class User_permission_panel_dashboard_Controller extends CController {
         $form->add_field('check-all-field')->set_label('Check All')->add_control('check_all', 'checkbox')->set_value("1");
         $domain = CF::domain();
 
-        $org_id="";
-        if($app->org()!=null){
-            $org_id= $app->org()->org_id;
+        $org_id = "";
+        if ($app->org() != null) {
+            $org_id = $app->org()->org_id;
         }
 
-
-        $data = cnav_panel_dashboard::app_user_rights_array($app_id, $role_id, $app->role()->role_id, $domain);
-
-		// print_r($data);
-		// die();
-        $form = $app->add_form('user_rights_panel_dashboard_form');
+        $file = CF::get_file('data', 'dashboard');
+        $data_dashboard = array();
+        if (file_exists($file)) {
+            $data_dashboard= include $file;
+        }
+        $data = array();
+        foreach($data_dashboard as $k=>$v) {
+            $d = $v;
+            $d['level']=0;
+            $d['role_id']=$role_id;
+            $d['app_id']=CF::app_id();
+            $type = carr::get($v,'type');
+            $d['name']=$type;
+            $d['label']=carr::get($v,'type');
+            $data[] = $d;
+        }
+        //cdbg::var_dump($data);
+        // print_r($data);
+        // die();
+        $form = $app->add_form('user_rights_form');
 
         $table = $form->add_div()->add_class("row-fluid")->add_div()->add_class("span12")->add_widget()->set_nopadding(true)->set_title(clang::__('Permission'))->set_icon('table')->add_table('permission_table');
 
@@ -220,7 +246,7 @@ class User_permission_panel_dashboard_Controller extends CController {
         $table->add_column('access')->set_label('Access')->set_align('center');
         $table->add_column('permission')->set_label('Rules')->set_align('left');
 
-        $table->cell_callback_func(array("User_permission_panel_dashboard_Controller", "cell_callback"), __FILE__);
+        $table->cell_callback_func(array("User_permission_dashboard_Controller", "cell_callback"), __FILE__);
         $table->set_apply_data_table(false);
 
         $additional_js = "";
@@ -304,7 +330,7 @@ class User_permission_panel_dashboard_Controller extends CController {
 					e.preventDefault();
 					if($('#cmd-save').hasClass('loading')) return;
 					
-					bootbox.confirm('".clang::__('Are you sure')." ?', function(confirmed) {
+					bootbox.confirm('" . clang::__('Are you sure') . " ?', function(confirmed) {
 						if(confirmed) {
 							
 							
@@ -341,7 +367,7 @@ class User_permission_panel_dashboard_Controller extends CController {
 							
 							jQuery.ajax({
 								type: 'post',
-								url: '" . curl::base() . "user_permission/save',
+								url: '" . curl::base() . "user_permission_dashboard/save',
 								dataType: 'json',
 								data: {'access':data,'role_id':$('#role_id').val(),'app_id':$('#app_id').val()}
 							}).done(function( data ) {
@@ -355,7 +381,7 @@ class User_permission_panel_dashboard_Controller extends CController {
 								$('#cmd-save').removeClass('loading');
 								icon = $('#cmd-save').find('i');
 								icon.addClass('icon-ok').removeClass('icon-repeat').removeClass('icon-spin');
-								window.location.href='" . curl::base() . "user_permission?app_id='+$('#app_id').val()+'&role_id='+$('#role_id').val();
+								window.location.href='" . curl::base() . "user_permission_dashboard?app_id='+$('#app_id').val()+'&role_id='+$('#role_id').val();
 							}).error(function(XMLHttpRequest, textStatus, errorThrown) {
 								$.cresenity.message('error',textStatus);
 								$('#cmd-save').removeClass('loading');

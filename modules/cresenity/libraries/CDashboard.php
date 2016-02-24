@@ -24,6 +24,18 @@ class CDashboard extends CElement {
         
     }
     
+    public static function have_access($name, $role_id, $app_id) {
+        $db = CDatabase::instance();
+        $q = 'select * from role_dashboard where dashboard='.$db->escape($name).' and role_id='.$db->escape($role_id);
+        if(strlen($app_id)>0) {
+            $q.=" and app_id=".$app_id;
+        }
+        $row = cdbutils::get_row($q);
+        
+        return $row!==null;
+        
+    }
+    
     protected function execute() {
         $files = CF::get_files('config', 'dashboard');
         $files = array_reverse($files);
@@ -39,7 +51,19 @@ class CDashboard extends CElement {
             $options = carr::get($v_dashboard,'options');
             if(isset($this->_config[$type])) {
                 $class = carr::get($this->_config[$type],'class');
-                $this->_dashboard[$k_dashboard]['element'] = $class::factory('capp_dashboard_'.$name,$options);
+                $role_id = null;
+                $app = CApp::instance();
+                $role = $app->role();
+                $role_name = '';
+                if($role!=null) {
+                    $role_id=$role->role_id;
+                    $role_name=$role->name;
+                }
+                $app_id = CF::app_id();
+               
+                if(self::have_access($name, $role_id, $app_id)||strtolower($role_name)=='superadmin') {
+                    $this->_dashboard[$k_dashboard]['element'] = $class::factory('capp_dashboard_'.$name,$options);
+                }
                 
             } else {
                 trigger_error('Dashboard '.$type.' undefined');
