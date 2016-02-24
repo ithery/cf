@@ -33,6 +33,10 @@ nav ul a {
   align-items: center;
 }
 
+.collapsible > li {
+  list-style: none;
+}
+
 @media only screen and (max-width : 992px) {
   .container {
     padding-left: 0;

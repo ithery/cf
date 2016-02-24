@@ -7,6 +7,7 @@
 <script src="<?php echo curl::base(); ?>media/js/libs/jquery-2.1.1.min.js"></script>
 <script src="<?php echo curl::base(); ?>media/js/materialize/materialize.min.js"></script>
 <script src="<?php echo curl::base(); ?>media/js/materialize/swiper/swiper.jquery.js"></script>
+<script src="<?php echo curl::base(); ?>media/js/materialize/materialize.clockpicker.js"></script>
 <script src="<?php echo curl::base(); ?>media/js/require.js"></script>
 <script language="javascript">
 $(".button-collapse").sideNav();

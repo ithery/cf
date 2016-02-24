@@ -1,15 +1,15 @@
 <?php
-class CMobile_Element_Control_Switch extends CMobile_Element_AbstractControl {
+class CMobile_Element_Component_Switch_Label extends CMobile_Element_AbstractControl {
 
     protected $group_list = array();
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->tag = "div";
+        $this->tag = "label";
     }
 
     public static function factory($id) {
-        return new CMobile_Element_Control_Switch($id);
+        return new CMobile_Element_Component_Switch_Label($id);
     }
 
     protected function html_attr() {
@@ -19,10 +19,9 @@ class CMobile_Element_Control_Switch extends CMobile_Element_AbstractControl {
 
     public function build($indent = 0) {
         // $this->add_class( $this->validation->validation_class());
-        $this->add_class('switch');
         $html_attr = $this->html_attr();
-        $element = CMobile_Element_Control_Switch_label::factory('');
-        $this->add($element);
+        $this->add('OFF<input type="checkbox">
+      <span class="lever"></span>ON');
     }
 
     // public function js($indent = 0) {

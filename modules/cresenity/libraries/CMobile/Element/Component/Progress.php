@@ -51,15 +51,15 @@ class CMobile_Element_Component_Progress extends CMobile_Element_AbstractCompone
 	public function build() {
 		if($this->circle) {
 			$this->add_class('preloader-wrapper');
-			if($this->active) {
-				$this->add_class('active');
-			}
 			if(strlen($this->size) > 0) {
 				$this->add_class($this->size);
 			} else {
 				$this->add_class('small');
 			}
-			$this->add('<div class="spinner-layer spinner-blue-only">
+			if($this->active) {
+				$this->add_class('active');
+			}
+			$this->add('<div class="spinner-layer spinner-red-only">
 					      <div class="circle-clipper left">
 					        <div class="circle"></div>
 					      </div><div class="gap-patch">

@@ -11,7 +11,9 @@ class CMobile_Element_Component_Collection_Item extends CMobile_Element_Abstract
 	protected $left_image;
 	protected $right_icon;
 	protected $right_image;
-	protected $dismissable;
+    protected $dismissable;
+    protected $badge;
+	protected $badge_as_new;
 
     public function __construct($id = "") {
 
@@ -24,7 +26,9 @@ class CMobile_Element_Component_Collection_Item extends CMobile_Element_Abstract
         $this->right_icon = '';
         $this->right_image = '';
 		$this->active = false;
-		$this->dismissable = false;
+        $this->dismissable = false;
+        $this->badge_as_new = false;
+		$this->badge = '';
     }
 
     public static function factory($id = "") {
@@ -67,7 +71,16 @@ class CMobile_Element_Component_Collection_Item extends CMobile_Element_Abstract
 	}
 	
 	public function set_right_image($right_image) {
-		$this->right_image = $right_image;
+        $this->right_image = $right_image;
+        return $this;
+    }
+
+    public function set_badge($badge) {
+        $this->badge = $badge;
+        return $this;
+    }
+    public function set_badge_as_new($badge_as_new) {
+		$this->badge_as_new = $badge_as_new;
 		return $this;
 	}
 
@@ -88,11 +101,18 @@ class CMobile_Element_Component_Collection_Item extends CMobile_Element_Abstract
 	public function build() {
 		$html_attr = $this->html_attr();
 		$this->add_class('collection-item');
+        $badge_as_new = '';
 		if($this->active) {
         	$this->add_class(' active');
         }
         if($this->dismissable) {
-        	$this->add_class('dismissable');
+            $this->add_class('dismissable');
+        }
+        if($this->badge_as_new) {
+            $badge_as_new = 'new ';
+        }
+        if(strlen($this->badge) > 0) {
+        	$this->add('<span class="' . $this->badge_as_new . ' badge">' . $this->badge . '</span>');
         }
         if(strlen($this->left_icon) > 0) {
         	$this->add('<i class="material-icons circle">' . $this->left_icon . '</i>');

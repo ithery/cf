@@ -1,5 +1,5 @@
 <?php
-class CMobile_Element_Control_Input_Radio extends CMobile_Element_Control_AbstractInput {
+class CMobile_Element_Control_Input_Checkbox extends CMobile_Element_Control_AbstractInput {
 	protected $checked;
 	protected $label;
 	protected $applyjs;
@@ -7,13 +7,13 @@ class CMobile_Element_Control_Input_Radio extends CMobile_Element_Control_Abstra
 	public function __construct($id) {
 		parent::__construct($id);
 		
-		$this->type="radio";
+		$this->type="checkbox";
 		$this->applyjs="uniform";
 		$this->label="";
 		$this->checked=false;
 	}
 	public static function factory($id) {
-		return new CMobile_Element_Control_Input_Radio($id);
+		return new CMobile_Element_Control_Input_Checkbox($id);
 	}
 
 	public function set_label($text, $lang = true) {

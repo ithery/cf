@@ -329,6 +329,7 @@
                 // "materialize/bootstrap-material-design.min.css",
                 "materialize/material-icons.css",
                 "materialize/swiper/swiper.min.css",
+                "materialize/materialize.clockpicker.css",
                 // "materialize/ripples.min.css",
                 "materialize/materialize.css",
             ),

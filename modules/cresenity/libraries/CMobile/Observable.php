@@ -25,11 +25,11 @@ abstract class CMobile_Observable extends CRenderable {
         $this->manager->register_control('email', 'CMobile_Element_Control_Input_Email');
         $this->manager->register_control('password', 'CMobile_Element_Control_Input_Password');
         $this->manager->register_control('radio', 'CMobile_Element_Control_Input_Radio');
-        $this->manager->register_control('date', 'CMobile_Element_Control_Date');
-        $this->manager->register_control('time', 'CMobile_Element_Control_Time');
+        $this->manager->register_control('checkbox', 'CMobile_Element_Control_Input_Checkbox');
+        $this->manager->register_control('date', 'CMobile_Element_Control_Input_Date');
+        $this->manager->register_control('time', 'CMobile_Element_Control_Input_Time');
         $this->manager->register_control('textarea', 'CMobile_Element_Control_Textarea');
         $this->manager->register_control('select', 'CMobile_Element_Control_Select');
-        $this->manager->register_control('switch', 'CMobile_Element_Control_Switch');
     }
 
     /**
@@ -91,12 +91,30 @@ abstract class CMobile_Observable extends CRenderable {
         return $field;
     }
 
+    public function add_switch($field_id = "") {
+        $field = CMobile_Element_Component_Switch::factory($field_id);
+        $this->add($field);
+        return $field;
+    }
+
     public function add_carousel($field_id = "") {
         $field = CMobile_Element_Component_Carousel::factory($field_id);
         $this->add($field);
         return $field;
     }
+
+    public function add_file($field_id = "") {
+        $field = CMobile_Element_Component_File::factory($field_id);
+        $this->add($field);
+        return $field;
+    }
 	
+    public function add_collapsible($field_id = "") {
+        $field = CMobile_Element_Component_Collapsible::factory($field_id);
+        $this->add($field);
+        return $field;
+    }
+
     public function add_field($field_id = "") {
         $field = CMobile_Element_FormField::factory($field_id);
         $this->add($field);
