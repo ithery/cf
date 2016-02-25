@@ -94,11 +94,11 @@
             $db->insert("log_print", $data);
         }
 
-        public static function request($user_id) {
+        public static function request($user_id=null) {
             $app = CApp::instance();
             $db = CDatabase::instance();
-            $app_id = $app->app_id();
-            $org_id = null;
+            $app_id = CF::app_id();
+            $org_id = CF::org_id();
             $org = $app->org();
             if ($org != null) {
                 $org_id = $org->org_id;
