@@ -11,7 +11,7 @@ abstract class CMobile_Observable extends CRenderable {
     }
 
     public function add_listener($event) {
-        $listener = CListener::factory($this->id, $event);
+        $listener = CMobile_Listener::factory($this->id, $event);
         $this->listeners[] = $listener;
         return $listener;
     }
