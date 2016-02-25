@@ -44,6 +44,7 @@
         private static $org_code;
         private static $store_id;
         private static $store_code;
+        private static $shared_app_code = array();
 
         public static function domain_data($domain) {
             $data = CFData::get($domain, 'domain');
@@ -120,10 +121,11 @@
 
             //get domain data
             $data = CFData::get($domain, 'domain');
-
+            
             if ($data != null) {
                 self::$app_id = isset($data['app_id']) ? $data['app_id'] : null;
                 self::$app_code = isset($data['app_code']) ? $data['app_code'] : null;
+                self::$shared_app_code = isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
                 self::$org_id = isset($data['org_id']) ? $data['org_id'] : null;
                 self::$org_code = isset($data['org_code']) ? $data['org_code'] : null;
                 self::$store_id = isset($data['store_id']) ? $data['store_id'] : null;
@@ -132,7 +134,8 @@
             $capp_path = APPPATH;
             if (strlen(self::$app_code) > 0) $capp_path.=self::$app_code . DS;
             if (strlen(self::$org_code) > 0) $capp_path.=self::$org_code . DS;
-            if (strlen(self::$store_code) > 0) $capp_path.=self::$store_code . DS;
+            if (strlen(self::$store_code) > 0)
+                    $capp_path.=self::$store_code . DS;
             $capp_path.="default" . DS;
 
             define('CAPPPATH', $capp_path);
@@ -272,9 +275,9 @@
 
             if (self::$instance === NULL) {
                 CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
-				if(empty(CFRouter::$controller_path)) {
-					exit;
-				}
+                if (empty(CFRouter::$controller_path)) {
+                    exit;
+                }
                 // Include the Controller file
                 require CFRouter::$controller_path;
 
@@ -286,7 +289,7 @@
                     try {
                         $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
                         // Start validation of the controller
-                        $class = new ReflectionClass('Controller_' .$class_name .ucfirst(CFRouter::$controller));
+                        $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
                     }
                     catch (ReflectionException $e) {
                         // Controller does not exist
@@ -294,7 +297,7 @@
                     }
                 }
 
-                if ($class->isAbstract() OR (IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE)) {
+                if ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE)) {
                     // Controller is not allowed to run in production
                     CFEvent::run('system.404');
                 }
@@ -353,13 +356,13 @@
             return self::$instance;
         }
 
-        public static function get_dir($directory='', $domain = null) {
+        public static function get_dir($directory = '', $domain = null) {
             $include_paths = CF::include_paths();
             foreach ($include_paths as $p) {
-				$path = $p;
-				if(strlen($directory)>0) {
-					$path = $p . $directory . DS;
-				}
+                $path = $p;
+                if (strlen($directory) > 0) {
+                    $path = $p . $directory . DS;
+                }
                 if (is_dir($path)) {
                     return $path;
                 }
@@ -476,6 +479,17 @@
                     self::$include_paths[] = APPPATH . self::$app_code . DS;
                 }
 
+                foreach (self::$shared_app_code as $key => $value) {
+                    if (self::$org_code != null) {
+                        self::$include_paths[] = APPPATH . $value. DS . self::$org_code . DS . "default" . DS;
+                        self::$include_paths[] = APPPATH . $value . DS . self::$org_code . DS;
+                    }
+
+                    self::$include_paths[] = APPPATH . $value . DS . "default" . DS;
+                    self::$include_paths[] = APPPATH . $value . DS;
+
+                }
+
                 self::$include_paths[] = APPPATH . "default" . DS;
 
                 if (isset(self::$configuration['core']['modules'])) {
@@ -508,10 +522,10 @@
             if (self::$configuration === NULL) {
                 // Re-parse the include paths
                 self::include_paths(TRUE);
-                
+
                 // Load core configuration
                 self::$configuration['core'] = self::config_load('core');
-                
+
                 // Re-parse the include paths
                 self::include_paths(TRUE);
             }
@@ -587,7 +601,7 @@
         public static function config_load($name, $required = TRUE) {
             if ($name === 'core') {
                 $found = FALSE;
-                
+
                 // find config file at all available paths
                 if ($files = self::find_file('config', 'config', $required)) {
                     foreach ($files as $file) {
@@ -597,7 +611,7 @@
                         }
                     }
                 }
-                
+
                 if ($found == FALSE) {
                     // Load the application configuration file
                     if (file_exists(DOCROOT . 'config/config' . EXT)) {
@@ -717,14 +731,14 @@
          */
         public static function log_directory($dir = NULL) {
             static $directory;
-			
-			$dir = CF::get_dir('logs');
-			
-			
+
+            $dir = CF::get_dir('logs');
+
+
             if (!empty($dir)) {
                 // Get the directory path
                 $dir = realpath($dir);
-                
+
                 if (!is_dir($dir)) {
                     mkdir($dir);
                 }
@@ -969,12 +983,13 @@
          * @return  void
          */
         public static function show_404($page = FALSE, $template = FALSE) {
-            if(CView::exists('ccore/404')) {
-				echo CView::factory('ccore/404')->render();
-			} else {
-			
-				throw new CF_404_Exception($page, $template);
-			}
+            if (CView::exists('ccore/404')) {
+                echo CView::factory('ccore/404')->render();
+            }
+            else {
+
+                throw new CF_404_Exception($page, $template);
+            }
         }
 
         /**
@@ -994,25 +1009,25 @@
                 $PHP_ERROR = (func_num_args() === 5);
 
                 // Test to see if errors should be displayed
-                if ($PHP_ERROR AND (error_reporting() & $exception) === 0)
+                if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
                         return;
 
                 // This is useful for hooks to determine if a page has an error
                 self::$has_error = TRUE;
-				
-				if(!is_object($exception)) {
-					$PHP_ERROR = true;
-				}
+
+                if (!is_object($exception)) {
+                    $PHP_ERROR = true;
+                }
 
                 // Error handling will use exactly 5 args, every time
                 if ($PHP_ERROR) {
-					
+
                     $code = $exception;
                     $type = 'PHP Error';
                     $template = 'kohana_error_page';
                 }
                 else {
-					$code = $exception->getCode();
+                    $code = $exception->getCode();
                     $type = get_class($exception);
                     $message = $exception->getMessage();
                     $file = $exception->getFile();
@@ -1058,7 +1073,7 @@
                     }
                 }
                 else {
-                    if (method_exists($exception, 'send_headers') AND !headers_sent()) {
+                    if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
                         // Send the headers if they have not already been sent
                         $exception->send_headers();
                     }
@@ -1078,17 +1093,14 @@
                         // Beautify backtrace
                         $trace = self::backtrace($trace);
                     }
-					if (IN_PRODUCTION) {
-						$data = array(
-							'description'=>$description,
-							'error'=>$error,
-							
-							
-						);
-						$view = CView::factory('kohana_error_page',$data);
-						cmail::error_mail($view->render());
-				
-					}
+                    if (IN_PRODUCTION) {
+                        $data = array(
+                            'description' => $description,
+                            'error' => $error,
+                        );
+                        $view = CView::factory('kohana_error_page', $data);
+                        cmail::error_mail($view->render());
+                    }
                     // Load the error
                     require self::find_file('views', empty($template) ? 'kohana_error_page' : $template);
                 }
@@ -1129,7 +1141,7 @@
          */
         public static function auto_load($class, $directory = 'libraries') {
             if (class_exists($class, FALSE)) return TRUE;
-            
+
             if (($suffix = strrpos($class, '_')) > 0) {
                 // Find the class suffix
                 $suffix = substr($class, $suffix + 1);
@@ -1169,15 +1181,15 @@
                 $type = ($class[0] < 'a') ? 'libraries' : 'helpers';
                 $file = $class;
             }
-            
+
             $class_not_found = FALSE;
-            
+
             if ($filename = self::find_file($type, $file)) {
                 require $filename;
                 $class_not_found = TRUE;
                 return TRUE;
             }
-            
+
             if (!$class_not_found) {
                 // Transform the class name according to PSR-0
                 $routing_class = ltrim($class, '\\');
@@ -1200,10 +1212,10 @@
                 }
                 // check route file at helpers
                 if (!$class_not_found) {
-				    $temp_routing_file = explode(DS, $routing_file);
-					if (strtolower($temp_routing_file[0]) == 'helpers') {
+                    $temp_routing_file = explode(DS, $routing_file);
+                    if (strtolower($temp_routing_file[0]) == 'helpers') {
                         $temp_routing_file[0] = 'helpers';
-                        $routing_file = str_replace('Helpers' .DS, '', $routing_file);
+                        $routing_file = str_replace('Helpers' . DS, '', $routing_file);
                         $directory = 'helpers';
                         if ($path = self::find_file($directory, $routing_file)) {
                             // Load the class file
@@ -1214,14 +1226,14 @@
                     }
                 }
             }
-            
-            
-            
-            if (!$class_not_found) { 
+
+
+
+            if (!$class_not_found) {
                 // The class could not be found
                 return FALSE;
             }
-            
+
             if ($filename = self::find_file($type, self::$configuration['core']['extension_prefix'] . $class)) {
                 // Load the class extension
                 require $filename;
@@ -1284,14 +1296,14 @@
 
             // Load include paths
             $paths = self::$include_paths;
-            
+
             // Nothing found, yet
             $found = NULL;
 
             if ($directory === 'config' OR $directory === 'i18n') {
                 // Search in reverse, for merging
                 $paths = array_reverse($paths);
-                
+
                 foreach ($paths as $path) {
                     if (is_file($path . $search)) {
                         // A matching file has been found
@@ -1457,7 +1469,7 @@
                 $key = array_shift($keys);
 
                 if (isset($array[$key])) {
-                    if (is_array($array[$key]) AND !empty($keys)) {
+                    if (is_array($array[$key]) AND ! empty($keys)) {
                         // Dig down to prepare the next loop
                         $array = $array[$key];
                     }
@@ -1485,7 +1497,7 @@
          * @return  void
          */
         public static function key_string_set(& $array, $keys, $fill = NULL) {
-            if (is_object($array) AND ($array instanceof ArrayObject)) {
+            if (is_object($array) AND ( $array instanceof ArrayObject)) {
                 // Copy the array
                 $array_copy = $array->getArrayCopy();
 

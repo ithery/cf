@@ -732,6 +732,7 @@
         }
 
         public function org() {
+            
             if ($this->_org == null) {
                 $role = $this->role();
                 if ($role != null) {
