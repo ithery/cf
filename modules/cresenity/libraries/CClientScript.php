@@ -151,12 +151,27 @@ class CClientScript extends CObject {
         $this->scripts[$pos]['js_file'][] = $js_file;
     }
 
-    public function register_css_file($file, $pos = "head") {
-        $css_file = $this->fullpath_css_file($file);
-        if (!file_exists($css_file)) {
-            trigger_error('CSS File not exists, ' . $file);
-        }
-        $this->scripts[$pos]['css_file'][] = $css_file;
+        public function register_css_file($file, $pos = "head") {
+            $dir_file = $file;
+            $css_version = '';
+            if (strpos($file, '?') !== false) {
+                $dir_file = substr($file, 0, strpos($file, '?'));
+                $css_version = substr($file, strpos($file, '?'), strlen($file) - 1);
+            }
+            if (strpos($dir_file, 'http') !== false) {
+                $css_file = $dir_file;
+                // do nothing
+            }
+            else {
+                $css_file = $this->fullpath_css_file($dir_file);
+                if (!file_exists($css_file)) {
+                    trigger_error('CSS File not exists, ' . $file);
+                }
+                if (strlen($css_version) > 0) {
+                    $css_file .= $css_version;
+                }
+            }
+            $this->scripts[$pos]['css_file'][] = $css_file;
     }
 
     public function js_files() {
