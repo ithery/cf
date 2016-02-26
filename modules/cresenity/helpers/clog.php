@@ -145,7 +145,7 @@
             $browser_version = crequest::browser_version();
             $platform = crequest::platform();
             $platform_version = crequest::platform_version();
-            $description = "";
+            $description = CF::domain();
 
             $data = array(
                 "request_date" => date("Y-m-d H:i:s"),
