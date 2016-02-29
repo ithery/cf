@@ -2,14 +2,12 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CMobile_Element_Component_Swiper extends CMobile_Element_AbstractComponent {
+class CMobile_Element_Component_SideNav extends CMobile_Element_AbstractComponent {
 
-	protected $wrapper;
     public function __construct($id = "") {
 
         parent::__construct($id);
         $this->tag = "div";
-		$this->wrapper = $this->add_div($this->id."_wrapper")->add_class('swiper-wrapper');
     }
 
     public static function factory($id = "") {
@@ -18,16 +16,25 @@ class CMobile_Element_Component_Swiper extends CMobile_Element_AbstractComponent
 
     public function add_item($id="") {
 		$element = CMobile_Element_Component_Swiper_Item::factory($id);
-		$this->wrapper->add($element);
+		$this->add($element);
 		return $element;
 	}
 
+	// public function build() {
+	// 	$this->add('<div class="swiper-scrollbar"></div>');
+		
+	// }
 
-	public function build() {
-		$this->add_class('swiper-container');
-		$this->add_div($this->id."_pagination")->add_class('swiper-pagination');
+	public function html($indent=0) {
+		$this->add_class('swiper-wrapper');
+		$html = new CStringBuilder();
+        $html->set_indent($indent);
+        $html->appendln('<div class="swiper-container">');
+        $html->appendln(parent::html() . '');
+        $html->appendln('<div class="swiper-pagination"></div>');
+        $html->appendln('</div>');
+        return $html->text();
 	}
-
 
 	public function js($indent=0) {
 		

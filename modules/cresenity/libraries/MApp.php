@@ -13,10 +13,15 @@
         private $_org = null;
         private $_user = null;
         private $_app_id = null;
-		private $_mobile_path;
+        private $_mobile_path;
+		private $title;
 		
 		public function title($title) {
-			$this->page()->set_title($title);
+            $this->title = $title;
+            $this->page()->set_title($title);
+        }
+        public function get_title() {
+            return $this->title;
 		}
 		
 		public function page() {

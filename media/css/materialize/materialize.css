@@ -1,4 +1,4 @@
-.container {
+.content, .nav-wrapper {
   padding-left: 240px;
 }
 nav ul a {
@@ -38,7 +38,8 @@ nav ul a {
 }
 
 @media only screen and (max-width : 992px) {
-  .container {
+  .content, .nav-wrapper {
     padding-left: 0;
   }
 }
+

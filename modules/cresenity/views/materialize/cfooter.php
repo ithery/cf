@@ -11,6 +11,34 @@
 <script src="<?php echo curl::base(); ?>media/js/require.js"></script>
 <script language="javascript">
 $(".button-collapse").sideNav();
+$(".sidenav-header").on('click', function(env) {
+    $(this).next().addClass('show-submenu');
+    $(this).parents('.menu-list').addClass('hidden-menu');
+    // if ( $(this).parents('.menu-list').is( ".top-menu" ) ) {
+        // $('.menu-container').css('top', '0');
+        // $('.sidenav-top').css('display', 'none');
+    // }
+    $(this).parents('.menu-list').animate({
+      left: -300
+    }, {
+      queue: false,
+      duration: 3
+    });
+});
+$(".sidenav-back-button").on('click', function(env) {
+    // if ( $(this).closest('.hidden-menu').is( ".top-menu" ) ) {
+    //     console.log('DIE 2');
+        // $('.menu-container').css('top', '+=130');
+        // $('.sidenav-top').css('display', 'block');
+    // }
+    $(this).closest('.hidden-menu').animate({
+      left: 0
+    }, {
+      queue: false,
+      duration: 3
+    }).removeClass('hidden-menu');
+    $(this).closest('.show-submenu').removeClass('show-submenu');
+});
 </script>
 
 

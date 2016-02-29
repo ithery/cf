@@ -66,7 +66,7 @@
             }
 			$this->rendered = true;
             if (crequest::is_ajax()) {
-                return $this->json();
+                return $app->json();
             }
 			
 			$theme_path = '';

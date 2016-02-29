@@ -343,16 +343,7 @@ cresenity.func.js
 			}
 			
 			if(alert_type=='notify') {
-				obj = $('<div>');
-				container.prepend(obj);
-				obj.addClass('notifications');
-				obj.addClass('top-right');
-				
-				
-				obj.notify({
-					'message': { text: message },
-					'type': type
-				}).show();	
+				Materialize.toast(message, 10000);
 			}
 			
 		},

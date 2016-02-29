@@ -120,6 +120,12 @@ abstract class CMobile_Observable extends CRenderable {
         $this->add($field);
         return $field;
     }
+
+    public function add_a($field_id = "") {
+        $field = CMobile_Element_A::factory($field_id);
+        $this->add($field);
+        return $field;
+    }
 	
 	public function add_action_list($id = "") {
         $actlist = CMobile_Element_ActionList::factory($id);
