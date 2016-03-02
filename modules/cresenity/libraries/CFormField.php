@@ -11,6 +11,7 @@
         protected $fullwidth = array();
         protected $info_text = array();
         protected $label_class = array();
+        protected $control_class = array();
         protected $style_form_group;
 
         public function __construct($id = "") {
@@ -54,10 +55,9 @@
         // }
 
         public function set_label_size($size) {
-            if (in_array($size, array("small", "medium", "large"))) {
+            if (in_array($size, array("small", "medium", "large", "none"))) {
                 $this->label_size = $size;
             }
-            
             return $this;
         }
 
@@ -81,6 +81,7 @@
             $this->show_label = false;
             return $this;
         }
+
         public function style_form_inline() {
             $this->style_form_group = "inline";
             return $this;
@@ -88,6 +89,10 @@
 
         public function add_label_class($label_class) {
             $this->label_class[] = $label_class;
+            return $this;
+        }
+        public function add_control_class($control_class) {
+            $this->control_class[] = $control_class;
             return $this;
         }
 
@@ -114,7 +119,6 @@
             return $data;
         }
 
-
         public function html($indent = 0) {
 
             $html = new CStringBuilder();
@@ -123,7 +127,7 @@
             $group_classes = $this->group_classes;
             $group_classes = implode(" ", $group_classes);
             if (strlen($group_classes) > 0)
-            $group_classes = " " . $group_classes;
+                    $group_classes = " " . $group_classes;
             $group_custom_css = $this->group_custom_css;
             $group_custom_css = crenderer::render_style($group_custom_css);
             if (strlen($group_custom_css) > 0) {
@@ -136,6 +140,7 @@
 
             $class_form_field = 'control-group';
             $label_class = '';
+            $control_class = '';
             if ($this->bootstrap == '3') {
                 $class_form_field = 'form-group';
                 if ($this->style_form_group == 'inline') {
@@ -147,21 +152,26 @@
 //                        $control_class = 'col-md-' . 10;
 //                        $label_class = 'col-md-' . 2;
 //                    }
-                    $label_class = 'col-md-3';
-                    $control_class = 'col-md-9';
-                    if ($this->label_size == 'large') {
-                        $label_class = 'col-md-5';
-                        $control_class = 'col-md-7';
-                    } else if ($this->label_size == 'small') {
-                        $label_class = 'col-md-1';
-                        $control_class = 'col-md-11';
-                    } else {
+                    if ($this->label_size != 'none') {
                         $label_class = 'col-md-3';
                         $control_class = 'col-md-9';
+                        if ($this->label_size == 'large') {
+                            $label_class = 'col-md-5';
+                            $control_class = 'col-md-7';
+                        }
+                        else if ($this->label_size == 'small') {
+                            $label_class = 'col-md-1';
+                            $control_class = 'col-md-11';
+                        }
+                        else {
+                            $label_class = 'col-md-3';
+                            $control_class = 'col-md-9';
+                        }
                     }
                 }
             }
-            $label_class .= ' ' .implode(' ', $this->label_class);
+            $label_class .= ' ' . implode(' ', $this->label_class);
+            $control_class .= ' ' . implode(' ', $this->control_class);
             $html->appendln('<div class="' . $class_form_field . ' ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
             if ($this->show_label) {
                 $html->appendln('<label id="' . $this->id . '" class="' . $label_class . ' control-label">' . $this->label . '</label>')->br();
