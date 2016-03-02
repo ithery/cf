@@ -71,6 +71,61 @@ class cupload {
 
 		return FALSE;
 	}
+        
+        public static function save_array($file, $filename = NULL, $directory = NULL, $chmod = 0644)
+	{
+		// Load file data from FILES if not passed as array
+		$file = is_array($file) ? $file : $_FILES[$file];
+                $file_rotate = carr::rotate($file);
+
+                foreach ($file_rotate as $file) {
+                    
+                    if ($filename === NULL)
+                    {
+                            // Use the default filename, with a timestamp pre-pended
+                            $filename = time().$file['name'];
+                    }
+
+                    if (CF::config('upload.remove_spaces') === TRUE)
+                    {
+                            // Remove spaces from the filename
+                            $filename = preg_replace('/\s+/', '_', $filename);
+                    }
+
+                    if ($directory === NULL)
+                    {
+                            // Use the pre-configured upload directory
+                            $directory = CF::config('upload.directory', TRUE);
+                    }
+
+                    // Make sure the directory ends with a slash
+                    $directory = rtrim($directory, '/').'/';
+
+                    if ( ! is_dir($directory) AND CF::config('upload.create_directories') === TRUE)
+                    {
+                            // Create the upload directory
+                            mkdir($directory, 0777, TRUE);
+                    }
+
+                    if ( ! is_writable($directory))
+                            // throw new Kohana_Exception('upload.not_writable', $directory);
+                            throw new Exception(CF::lang('upload.not_writable'));
+
+                    if (is_uploaded_file($file['tmp_name']) AND move_uploaded_file($file['tmp_name'], $filename = $directory.$filename))
+                    {
+                            if ($chmod !== FALSE)
+                            {
+                                    // Set permissions on filename
+                                    chmod($filename, $chmod);
+                            }
+
+                            // Return new file path
+                            return $filename;
+                    }
+                }
+
+		return FALSE;
+	}
 
 	/* Validation Rules */
 
