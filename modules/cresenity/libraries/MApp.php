@@ -486,7 +486,11 @@
             $data["title"] = $this->title;
             $data["html"] = cmsg::flash_all() . $this->html();
             $js = $this->js();
-            $js = CClientScript::instance()->render_js_require($js);
+            $require_js = ccfg::get('require_js');
+            
+            if($require_js) {
+                $js = ClientScript::instance()->render_js_require($js);
+            }
             if (ccfg::get("minify_js")) {
                 $js = CJSMin::minify($js);
             }

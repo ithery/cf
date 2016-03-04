@@ -242,7 +242,7 @@ class CMobile_Element_Action extends CMobile_CompositeElement {
 		if (strlen($this->icon) > 0) {
 			$this->add_icon()->set_icon($this->icon);
 		}
-		$this->add($this->label);
+		// $this->add($this->label);
 	}
 	
 	

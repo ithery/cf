@@ -19,6 +19,8 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
     protected $select_month;
     protected $select_year;
     protected $first_day;
+    protected $prefix_icon;
+    protected $placeholder;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -46,6 +48,8 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
         $this->current_date = "";
         $this->clear_button = "true";
         $this->now_button = "true";
+        $this->prefix_icon = '';
+        $this->placeholder = "";
         $this->disable_day = array();
         $this->disable_week = array();
     }
@@ -59,6 +63,11 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
         return $this;
     }
 
+    public function set_placeholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
+
     public function set_min_date($str) {
         $this->min_date = $str;
         return $this;
@@ -66,6 +75,11 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
 
     public function set_max_date($str) {
         $this->max_date = $str;
+        return $this;
+    }
+    
+    public function set_prefix_icon($prefix_icon){
+        $this->prefix_icon = $prefix_icon; 
         return $this;
     }
 
@@ -155,6 +169,13 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
         }
         if(strlen($this->value) > 0) {
             $value = $this->value;
+        }
+        if (strlen($this->placeholder)>0) {
+            $this->set_attr('placeholder',$this->placeholder);
+        }
+        if (strlen($this->prefix_icon) > 0) {
+            $this->before()->add_icon()->set_icon($this->prefix_icon)->set_type('prefix');
+            
         }
         $this->set_attr('data-value', $value);
         $this->add_class('datepicker');
