@@ -1,10 +1,10 @@
 <?php
 
-
 abstract class CMobile_Observable extends CRenderable {
 
     protected $listeners;
     protected $manager;
+    protected $wrapper;
 
     public function get_listeners() {
         return $this->listeners;
@@ -13,12 +13,14 @@ abstract class CMobile_Observable extends CRenderable {
     public function add_listener($event) {
         $listener = CMobile_Listener::factory($this->id, $event);
         $this->listeners[] = $listener;
+        
         return $listener;
     }
 
     protected function __construct($id = "") {
 
         parent::__construct($id);
+        $this->wrapper = $this;
         $this->listeners = array();
         $this->manager = CManager::instance();
         $this->manager->register_control('text', 'CMobile_Element_Control_Input_Text');
@@ -61,140 +63,151 @@ abstract class CMobile_Observable extends CRenderable {
         }
 
 
-        $this->add($control);
+        $this->wrapper->add($control);
 
         return $control;
     }
 
-	
-	public function add_swiper($field_id = "") {
+    public function add_swiper($field_id = "") {
         $field = CMobile_Element_Component_Swiper::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
+        return $field;
+    }
+    
+    public function add_nav($field_id = "") {
+        $field = CMobile_Element_Component_Nav::factory($field_id);
+        $this->wrapper->add($field);
+        return $field;
+    }
+    
+    public function add_side_nav($field_id = "") {
+        $field = CMobile_Element_Component_SideNav::factory($field_id);
+        $this->wrapper->add($field);
         return $field;
     }
 
+
     public function add_chip($field_id = "") {
         $field = CMobile_Element_Component_Chip::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
 
     public function add_collection($field_id = "") {
         $field = CMobile_Element_Component_Collection::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
 
     public function add_progress($field_id = "") {
         $field = CMobile_Element_Component_Progress::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
 
     public function add_switch($field_id = "") {
         $field = CMobile_Element_Component_Switch::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
 
     public function add_carousel($field_id = "") {
         $field = CMobile_Element_Component_Carousel::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
 
     public function add_file($field_id = "") {
         $field = CMobile_Element_Component_File::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
-	
+
     public function add_collapsible($field_id = "") {
         $field = CMobile_Element_Component_Collapsible::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
 
     public function add_field($field_id = "") {
         $field = CMobile_Element_FormField::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
 
     public function add_a($field_id = "") {
         $field = CMobile_Element_A::factory($field_id);
-        $this->add($field);
+        $this->wrapper->add($field);
         return $field;
     }
-	
-	public function add_action_list($id = "") {
+
+    public function add_action_list($id = "") {
         $actlist = CMobile_Element_ActionList::factory($id);
-        $this->add($actlist);
-        if ($this instanceof CForm) {
+        $this->wrapper->add($actlist);
+        if ($this instanceof CMobile_Form) {
             $actlist->set_style('form-action');
         }
         return $actlist;
     }
 
-	public function add_floating_action($id = "") {
+    public function add_floating_action($id = "") {
         $element = CMobile_Element_FloatingAction::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	public function add_icon($id = "") {
+
+    public function add_icon($id = "") {
         $element = CMobile_Element_Icon::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
+
     public function add_action($id = "") {
         $element = CMobile_Element_Action::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	public function add_card($id = "") {
+
+    public function add_card($id = "") {
         $element = CMobile_Element_Component_Card::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	
-	/* BASIC ELEMENT */
-	
-	/**
+
+    /* BASIC ELEMENT */
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Div
      */
     public function add_div($id = "") {
         $div = CMobile_Element_Div::factory($id);
-        $this->add($div);
+        $this->wrapper->add($div);
         return $div;
     }
 
-	/**
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Span
      */
     public function add_span($id = "") {
         $element = CMobile_Element_Span::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
 
-	/**
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Img
      */
     public function add_img($id = "") {
         $element = CMobile_Element_Img::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-
 
     /**
      * 
@@ -203,166 +216,163 @@ abstract class CMobile_Observable extends CRenderable {
      */
     public function add_form($id = "") {
         $element = CMobile_Element_Form::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Label
      */
     public function add_label($field_id = "") {
         $elm = CMobile_Element_Label::factory($field_id);
-        $this->add($elm);
+        $this->wrapper->add($elm);
         return $elm;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Ul
      */
     public function add_ul($id = "") {
         $element = CMobile_Element_Ul::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Ul
      */
     public function add_ol($id = "") {
         $element = CMobile_Element_Ol::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Li
      */
     public function add_li($id = "") {
         $element = CMobile_Element_Li::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_H1
      */
     public function add_h1($id = "") {
         $element = CMobile_Element_H1::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_H2
      */
     public function add_h2($id = "") {
         $element = CMobile_Element_H2::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_H3
      */
     public function add_h3($id = "") {
         $element = CMobile_Element_H3::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_H4
      */
     public function add_h4($id = "") {
         $element = CMobile_Element_H4::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_H5
      */
     public function add_h5($id = "") {
         $element = CMobile_Element_H5::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_H6
      */
     public function add_h6($id = "") {
         $element = CMobile_Element_H6::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_P
      */
     public function add_p($id = "") {
         $element = CMobile_Element_P::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Blockquote
      */
     public function add_blockquote($id = "") {
         $element = CMobile_Element_Blockquote::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	
 
-	/**
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Hr
      */
     public function add_hr($id = "") {
         $element = CMobile_Element_Hr::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-	
-	/**
+
+    /**
      * 
      * @param string $id
      * @return CMobile_Element_Br
      */
-	public function add_br($id = "") {
+    public function add_br($id = "") {
         $element = CMobile_Element_Br::factory($id);
-        $this->add($element);
+        $this->wrapper->add($element);
         return $element;
     }
-
 
     public function add_element($type, $id = "") {
         $element = null;
@@ -374,13 +384,10 @@ abstract class CMobile_Observable extends CRenderable {
 
 
 
-        $this->add($element);
+        $this->wrapper->add($element);
 
         return $element;
     }
-
-    
-
 
     public function set_handler_url_param($param) {
 

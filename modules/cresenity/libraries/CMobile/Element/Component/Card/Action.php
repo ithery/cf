@@ -4,7 +4,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CMobile_Element_Component_Card_Action extends CMobile_Element_Component_AbstractCard {
 
-	protected $img;
+    protected $img;
 
     public function __construct($id = "") {
 
@@ -15,18 +15,11 @@ class CMobile_Element_Component_Card_Action extends CMobile_Element_Component_Ab
     public static function factory($id = "") {
         return new CMobile_Element_Component_Card_Action($id);
     }
-	
-	
-	public function build() {
-		
-		  
-		$this->add_class('card-action');
-		
-	
-	}
-	
-	
 
-   
+    public function build() {
+
+
+        $this->add_class('card-action');
+    }
 
 }

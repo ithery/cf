@@ -1,7 +1,6 @@
 <?php
 defined('SYSPATH') OR die('No direct access allowed.');
 
-
 $session = Session::instance();
 $user = $session->get("user");
 $role_id = "";

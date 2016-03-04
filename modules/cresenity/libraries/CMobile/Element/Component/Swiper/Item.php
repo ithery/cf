@@ -19,7 +19,9 @@ class CMobile_Element_Component_Swiper_Item extends CMobile_Element_AbstractComp
         return new CMobile_Element_Component_Swiper_Item($id);
     }
 	
-   
+   public function aaaaa(){
+       
+   }
 	
 	public function build() {
 		$this->add_class('swiper-slide');

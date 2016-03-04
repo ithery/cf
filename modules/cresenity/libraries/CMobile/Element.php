@@ -39,10 +39,7 @@
 			$this->is_empty = false;
         }
 
-        public static function factory($id = "", $tag = "div") {
-            return new CMobile_Element($id, $tag);
-        }
-
+        
         public function custom_css($key, $val) {
             $this->custom_css[$key] = $val;
             return $this;
