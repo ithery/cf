@@ -141,10 +141,21 @@
                 
             if ($this->bootstrap == '3.3') {
                 $html->appendln('<div class="form-group ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
+                $label_class = '';
+                $control_class = '';
+                
+                $label_class .= ' ' . implode(' ', $this->label_class);
+                $control_class .= ' ' . implode(' ', $this->control_class);
                 if ($this->show_label) {
-                    $html->appendln('<label id="' . $this->id . '">' . $this->label . '</label>')->br();
+                    $html->appendln('<label class="' .$label_class .'" id="' . $this->id . '">' . $this->label . '</label>')->br();
+                }
+                if ($this->style_form_group == 'inline') {
+                    $html->appendln('<div class="' .$control_class .'">');
                 }
                 $html->appendln(parent::html($html->get_indent()))->br();
+                if ($this->style_form_group == 'inline') {
+                    $html->appendln('</div>');
+                }
                 $html->appendln('</div>');
             }
             else {

@@ -312,7 +312,7 @@
 //                "plugins" . DS . "datatable" . DS . "ColVis.min.js",
 //                "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
             ),
-            "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5"),
+            "requirements" => array("jquery-2.1.1" ,"bootstrap-3.3.5"),
         ),
         "bootstrap-slider" => array(
             "css" => array(

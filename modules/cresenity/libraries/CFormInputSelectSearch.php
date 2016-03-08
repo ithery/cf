@@ -109,7 +109,7 @@
 
             if ($this->select2 >= '4') {
                 $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '">');
-                $html->appendln('</select');
+                $html->appendln('</select>');
                 $html->br();
             }
             else {
@@ -215,7 +215,7 @@
             if (strlen($classes) > 0) {
                 $classes = " " . $classes;
             }
-            if ($this->bootstrap >= '3') {
+            if ($this->bootstrap == '3.3') {
                 $classes = $classes . " form-control ";
             }
             if ($this->select2 >= '4') {
