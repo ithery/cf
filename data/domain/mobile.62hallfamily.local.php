@@ -7,4 +7,7 @@ return array(
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'mobile.62hallfamily.local',
+	'shared_app_code'=>array(
+            "62hallfamily"
+        ),
 );
