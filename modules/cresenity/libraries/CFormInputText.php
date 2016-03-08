@@ -19,11 +19,6 @@ class CFormInputText extends CFormInput {
             'preventPaste' => 'true',
             'autoAccept' => 'true',
         );
-        $this->bootstrap = ccfg::get('bootstrap');
-        if (strlen($this->bootstrap) == 0) {
-            $this->bootstrap = '2';
-        }
-
         $this->vk_opt = $default_option;
     }
 
@@ -70,7 +65,7 @@ class CFormInputText extends CFormInput {
         if (strlen($classes) > 0)
             $classes = " " . $classes;
         
-        if ($this->bootstrap == '3') {
+        if ($this->bootstrap >= '3') {
             $classes = $classes ." form-control ";
         }
         $custom_css = $this->custom_css;
@@ -82,7 +77,7 @@ class CFormInputText extends CFormInput {
         foreach ($this->attr as $k => $v) {
             $addition_attribute.=" " . $k . '="' . $v . '"';
         }
-        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css .$addition_attribute  .'>')->br();
+        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css .$addition_attribute  .'/>')->br();
         return $html->text();
     }
 

@@ -20,9 +20,20 @@
                 $nav_method = carr::get($nav, 'method', '');
                 $nav_controller = carr::get($nav, 'controller', '');
 
+//                var_dump($path .$controller);
+//                cdbg::var_dump($nav);
 
-                if ($nav_controller != '' && $nav_method != '' && $nav_controller == $controller && $nav_method == $method && $nav_path == $path) {
-                    return $nav;
+                if ($nav_path != '') {
+                    if ($nav_controller != '' && $nav_method != '' 
+                            && $nav_controller == $controller && $nav_method == $method) {
+                        return $nav;
+                    }
+                }
+                else {
+                    if ($nav_controller != '' && $nav_method != '' 
+                            && $nav_controller == $path .$controller && $nav_method == $method) {
+                        return $nav;
+                    }
                 }
                 if (isset($nav["action"])) {
                     foreach ($nav["action"] as $act) {
@@ -206,7 +217,7 @@
             $child_count = 0;
             $nav_active = false;
             foreach ($navs as $d) {
-                if ($level == 0) {
+                if ($level <= 1) {
                     $activated = false;
                 }
                 $child = 0;

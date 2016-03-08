@@ -136,7 +136,7 @@
             $this->export_sheetname = $this->id;
 
             if (isset($this->theme)) {
-                if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
+                if ($this->bootstrap >= '3') {
                     CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
                 }
                 else {
@@ -1919,7 +1919,7 @@
                  */
 
                 // if ($this->bootstrap == '3') {
-                if ($this->bootstrap == '3') {
+                if ($this->bootstrap >= '3') {
                     if($this->dom == null){
                         $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
                     }

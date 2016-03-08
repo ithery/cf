@@ -34,7 +34,7 @@ class CFormInputPassword extends CFormInput {
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
             $classes = " " . $classes;
-        if ($this->bootstrap == '3') {
+        if ($this->bootstrap >= '3') {
             $classes = $classes ." form-control ";
         }
         $additional_attr = ' autocomplete="off"';

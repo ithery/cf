@@ -35,6 +35,7 @@
             $this->multiple = $bool;
             return $this;
         }
+
         public function set_auto_select($bool) {
             $this->auto_select = $bool;
             return $this;
@@ -90,8 +91,8 @@
             $classes = $this->classes;
             $classes = implode(" ", $classes);
             if (strlen($classes) > 0) $classes = " " . $classes;
-            if ($this->bootstrap == '3') {
-                $classes = $classes ." form-control ";
+            if ($this->bootstrap >= '3') {
+                $classes = $classes . " form-control ";
             }
             $html->set_indent($indent);
             $value = $this->value;
@@ -99,16 +100,21 @@
                 $db = CDatabase::instance();
                 $rjson = 'false';
 
-                $q = "select `".$this->key_field."` from (" . $this->query . ") as a limit 1";
+                $q = "select `" . $this->key_field . "` from (" . $this->query . ") as a limit 1";
                 $value = cdbutils::get_value($q);
-               
-                 
             }
-            if(strlen($this->value)>0) {
+            if (strlen($this->value) > 0) {
                 $value = $this->value;
             }
-            
-            $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '>')->br();
+
+            if ($this->select2 >= '4') {
+                $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '">');
+                $html->appendln('</select');
+                $html->br();
+            }
+            else {
+                $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '>')->br();
+            }
             return $html->text();
         }
 
@@ -131,19 +137,19 @@
             preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
 
             foreach ($matches as $val) {
-				$thousand_separator_pre='';
-				$thousand_separator_post='';
+                $thousand_separator_pre = '';
+                $thousand_separator_post = '';
                 $str = $val[1]; //matches str without bracket {}
                 $b_str = $val[0]; //matches str with bracket {}
-                $str_selection = str_replace($b_str, "'+item." . $str."+'", $str_selection);
+                $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
             }
             preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
             foreach ($matches as $val) {
-				$thousand_separator_pre='';
-				$thousand_separator_post='';
+                $thousand_separator_pre = '';
+                $thousand_separator_post = '';
                 $str = $val[1]; //matches str without bracket {}
                 $b_str = $val[0]; //matches str with bracket {}
-                $str_result = str_replace($b_str, "'+item." . $str."+'", $str_result);
+                $str_result = str_replace($b_str, "'+item." . $str . "+'", $str_result);
             }
             if (strlen($str_result) == 0) {
                 $str_result = "'+item." . $this->search_field . "+'";
@@ -180,10 +186,6 @@
 				callback(data);
 			},
 			";
-                
-                
-               
-                 
             }
             if (strlen($this->value) > 0) {
 
@@ -204,19 +206,75 @@
 				callback(data);
 			},
 			";
-                
             }
-          
+
             $str_multiple = "";
             if ($this->multiple) $str_multiple = " multiple:'true',";
-			$classes = $this->classes;
+            $classes = $this->classes;
             $classes = implode(" ", $classes);
-            if (strlen($classes) > 0)
+            if (strlen($classes) > 0) {
                 $classes = " " . $classes;
-            $str = "
+            }
+            if ($this->bootstrap >= '3') {
+                $classes = $classes . " form-control ";
+            }
+            if ($this->select2 >= '4') {
+                $str = "
+                    $('#" . $this->id . "').select2({
+                        placeholder: '" . $placeholder . "',
+                        minimumInputLength: '" . $this->min_input_length . "',
+                        ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
+                                url: '" . $ajax_url . "',
+                                dataType: 'jsonp',
+                                " . $str_multiple . "
+                                data: function (params) {
+                                    return {
+                                      q: params.term, // search term
+                                      page: params.page
+                                    };
+                                },
+                                processResults: function (data, params) { 
+                                    // parse the results into the format expected by Select2
+                                    // since we are using custom formatting functions we do not need to
+                                    // alter the remote JSON data, except to indicate that infinite
+                                    // scrolling can be used
+                                    params.page = params.page || 1;
+                                    
+                                    return {
+                                            results: data.data,
+                                            pagination: {
+                                              more: (params.page * 10) < data.total
+                                            }
+                                          };
+                                },
+                                cache:true,
+                            },
+                        " . $str_js_init . "
+                        templateResult: function(item) {
+                            if (item.id === '') {
+                                return item.text;
+                            }
+                            return '" . $str_result . "';
+                        }, // omitted for brevity, see the source of this page
+                        templateSelection: function(item) {
+                        
+                            if (item.id === '') {
+                                return item.text;
+                            }
+                            return '" . $str_selection . "';
+                        },  // omitted for brevity, see the source of this page
+                        dropdownCssClass: '', // apply css that makes the dropdown taller
+                        containerCssClass : 'tpx-select2-container " . $classes . "'
+                    }).change(function() {
+				" . $str_js_change . "
+                    });
+                    ";
+            }
+            else {
+                $str = "
 			$('#" . $this->id . "').select2({
 				placeholder: '" . $placeholder . "',
-				minimumInputLength: '" .$this->min_input_length ."',
+				minimumInputLength: '" . $this->min_input_length . "',
 				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 					url: '" . $ajax_url . "',
 					dataType: 'jsonp',
@@ -250,8 +308,9 @@
 				" . $str_js_change . "
 			});
 	
-	";
-            
+                ";
+            }
+
             $js = new CStringBuilder();
             $js->append(parent::js($indent))->br();
             $js->set_indent($indent);

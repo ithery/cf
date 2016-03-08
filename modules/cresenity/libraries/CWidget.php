@@ -126,20 +126,20 @@
             $main_class_title = ' widget-title ';
             $main_class_content = ' widget-content ';
             $class_title = '';
-            if ($this->bootstrap == '3') {
-                if ($this->theme == 'ittron-app') {
-                    $main_class = ' box box-info ';
-                    $main_class_title = ' box-header with-border ';
-                    $main_class_content = ' box-body ';
-                    $class_title = ' box-title ';
-                }
+            
+            // keep in mind with project biota, use this and bootstrap = 3
+            if ($this->bootstrap >= '3') {
+                $main_class = ' box box-info ';
+                $main_class_title = ' box-header with-border ';
+                $main_class_content = ' box-body ';
+                $class_title = ' box-title ';
             }
             
             if ($this->header_action_style == "btn-dropdown") {
                 $this->header_action_list->add_class("pull-right");
             }
             if ($this->wrapped) {
-                if ($this->bootstrap == '3') {
+                if ($this->bootstrap >= '3') {
                     $html->appendln('<div class="row">
 				<div class="col-md-' . $this->span . '">');
                 }
@@ -167,20 +167,20 @@
             $custom_css = crenderer::render_style($custom_css);
             $html->appendln('<div class="' .$main_class . $classes . '" ' . $custom_css . '>');
             $html->appendln('	<div class="' .$main_class_title .'">');
-            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
+            if ($this->bootstrap >= '3') {
                 $html->appendln('       <span class="icon pull-left">');
             } else {
                 $html->appendln('       <span class="icon">');
             }
-            if ($this->bootstrap == '3') {
+            if ($this->bootstrap >= '3') {
                 $html->appendln('		<i class="glyphicon glyphicon-' . $this->icon . '"></i>');
             }
             else {
                 $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
             }
             $html->appendln('		</span>');
-            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
-                $html->appendln('		<h5 style="  margin-left: 50px;font-weight: bold;font-size: 16px;">' . $this->title . '</h5>');
+            if ($this->bootstrap >= '3') {
+                $html->appendln('		<h3 class="box-title">' . $this->title . '</h3>');
             } else {
                 $html->appendln('       <h5>' . $this->title . '</h5>');
             }

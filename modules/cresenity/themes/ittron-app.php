@@ -2,11 +2,13 @@
 
     return array(
         "theme_path" => "ittron-app",
+        "bootstrap" => "3.3",
+        "select2" => "4.0",
         "client_modules" => array(
             'jquery',
             'bootstrap-3.3.5',
+            'select2-4.0',
             // 'bootbox',
-            'select2',
             'bootbox4.4.0',
             'font-awesome-4.5.0',
             'iapp',
@@ -28,7 +30,8 @@
             'easing',
             'chosen',
             'uniform',
-            'select2',
+//            'select2',
+            
             'image-gallery',
             'modernizr',
             'multiselect',
