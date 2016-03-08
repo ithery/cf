@@ -29,20 +29,20 @@ $org = $app->org();
     <body>
         <?php echo $custom_header; ?>
         <?php echo $begin_client_script; ?>
-		<nav class="nav-header" role="navigation">
+		<!-- <nav class="nav-header" role="navigation">
 			<div class="nav-wrapper">
-        <a id="logo-container" href="#" class="brand-logo">
+        <a id="logo-container" href="#" class="brand-logo"> -->
           <?php
           $web_title = ccfg::get("title");
           $app = MApp::instance();
           if(strlen($app->get_title()) > 0) {
           	$web_title = $app->get_title();
           }
-          echo $web_title;
+          // echo $web_title;
           //if($org!=null) $web_title = strtoupper($org->name);
           ?>
-        </a>
-        <form id="navbar-search" style="display: none;">
+        <!-- </a> -->
+        <!-- <form id="navbar-search" style="display: none;">
           <div class="input-field">
             <input id="search" type="search" required>
             <label for="search"><i class="material-icons">search</i></label>
@@ -69,7 +69,6 @@ $org = $app->org();
                     <div class="sidenav-account-setting">
                       <i class="material-icons">settings</i>
                     </div> 
-                    <!-- <img src="https://www.google.co.id/logos/doodles/2016/leap-year-2016-5690429188079616-res.png" alt=""> -->
                   </a>
                 </li>
                 <li><a href="/demo/typography" class="sidenav-menu"><div class="material-icons nav-icons">person</div><div>DAFTAR / MASUK</div></a></li>
@@ -77,7 +76,6 @@ $org = $app->org();
                 <li><a href="/demo/form" class="sidenav-menu"><div class="material-icons nav-icons">shopping_cart</div><div>GOLD</div></a></li>
                 <li><a href="/demo/media" class="sidenav-menu" ><div class="material-icons nav-icons">shopping_cart</div><div>JASA</div></a></li>
                 <li>
-                  <!-- <a class="sidenav-back-button">Back</a> -->
                   <a class="sidenav-header" id="4565657"><div class="material-icons nav-icons">list</div>KATEGORI</a>
                   <div class="sidenav-body">
                       <ul class="menu-list">
@@ -132,7 +130,7 @@ $org = $app->org();
         </div>
         <a href="javascript:;" id="nav-mobile-button" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
         <a id="other-nav-mobile-button" style="display: none;"><i id="other-nav-icon" class="material-icons">arrow_back</i></a>
-      </div>
+      </div> -->
             <?php CMobile_Navigation::instance()->render();?>
     </nav>
 		<div class="content">

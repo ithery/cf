@@ -15,6 +15,7 @@
         protected $label_float;
         protected $data_error;
         protected $data_success;
+        protected $label_for;
 
 
         public function __construct($id = "") {
@@ -30,6 +31,7 @@
             $this->group_custom_css = array();
             $this->style_form_group = null;
             $this->label_float = true;
+            $this->label_for = '';
         }
 
         public static function factory($id = "") {
@@ -58,6 +60,11 @@
 
         public function set_data_success($data_success){
             $this->data_success = $data_success; 
+            return $this;
+        }
+
+        public function set_label_for($label_for){
+            $this->label_for = $label_for; 
             return $this;
         }
 
@@ -140,7 +147,7 @@
             $this->add_class('input-field');
             
             if ($this->show_label) {
-                $this->add_label()->set_label($this->label)->set_for_id($this->id)->set_data_error($this->data_error)->set_data_success($this->data_success);
+                $this->add_label()->set_label($this->label)->set_for_id($this->label_for)->set_data_error($this->data_error)->set_data_success($this->data_success);
                 //$html->appendln('<label id="' . $this->id . '" class="' . $label_class . '">' . $this->label . '</label>')->br();
             }
             

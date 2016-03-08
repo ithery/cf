@@ -28,6 +28,7 @@ abstract class CMobile_Observable extends CRenderable {
         $this->manager->register_control('password', 'CMobile_Element_Control_Input_Password');
         $this->manager->register_control('radio', 'CMobile_Element_Control_Input_Radio');
         $this->manager->register_control('checkbox', 'CMobile_Element_Control_Input_Checkbox');
+        $this->manager->register_control('search', 'CMobile_Element_Control_Input_Search');
         $this->manager->register_control('date', 'CMobile_Element_Control_Input_Date');
         $this->manager->register_control('time', 'CMobile_Element_Control_Input_Time');
         $this->manager->register_control('textarea', 'CMobile_Element_Control_Textarea');
