@@ -93,6 +93,9 @@
             if (isset($input["term"])) {
                 $term = $input["term"];
             }
+            if (isset($input["q"])) {
+                $term = $input["q"];
+            }
             if (isset($input["limit"])) {
                 $limit = $input["limit"];
             }
@@ -106,7 +109,6 @@
                 $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
                 $base_q = substr($base_q, 0, $pos_order_by);
             }
-
 
             $total = cdbutils::get_row_count_from_base_query($q);
 
@@ -183,7 +185,7 @@
             }
 
             $qfilter = "select * from (" . $base_q . ") as a " . $sWhere . ' ' . $sOrder;
-
+            $total = cdbutils::get_row_count_from_base_query($qfilter);
 
 
             $qfilter .= " " . $temp_order_by . ' ' . $sLimit;

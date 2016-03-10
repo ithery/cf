@@ -239,11 +239,12 @@
                                     // alter the remote JSON data, except to indicate that infinite
                                     // scrolling can be used
                                     params.page = params.page || 1;
+                                    var more = (params.page * 10) < data.total;
                                     
                                     return {
                                             results: data.data,
                                             pagination: {
-                                              more: (params.page * 10) < data.total
+                                              more: more
                                             }
                                           };
                                 },
@@ -251,16 +252,9 @@
                             },
                         " . $str_js_init . "
                         templateResult: function(item) {
-                            if (item.id === '') {
-                                return item.text;
-                            }
                             return '" . $str_result . "';
                         }, // omitted for brevity, see the source of this page
                         templateSelection: function(item) {
-                        
-                            if (item.id === '') {
-                                return item.text;
-                            }
                             return '" . $str_selection . "';
                         },  // omitted for brevity, see the source of this page
                         dropdownCssClass: '', // apply css that makes the dropdown taller
@@ -269,6 +263,8 @@
 				" . $str_js_change . "
                     });
                     ";
+//                var_dump($str);
+//                die();
             }
             else {
                 $str = "
@@ -297,6 +293,7 @@
 				},
 				" . $str_js_init . "
 				formatResult: function(item) {
+                                console.log(item);
 					return '" . $str_result . "';
 				}, // omitted for brevity, see the source of this page
 				formatSelection: function(item) {

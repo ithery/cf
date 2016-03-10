@@ -136,7 +136,7 @@
             $this->export_sheetname = $this->id;
 
             if (isset($this->theme)) {
-                if ($this->bootstrap >= '3') {
+                if ($this->bootstrap >= '3.3') {
                     CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
                 }
                 else {
