@@ -344,9 +344,8 @@ class Cresenity_Controller extends CController {
                         $org = CApp::instance()->org();
                         
                         if ($org != null) {
-                            $q.=" and org_id=" . $db->escape($org->org_id);
+                            $q.=" and (org_id=" . $db->escape($org->org_id). ' or org_id is null)';
                         }
-                        
                         $row = $db->query($q);
                         if ($row->count() > 0) {
                             //check activation
