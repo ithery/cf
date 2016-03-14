@@ -84,6 +84,7 @@ class CMobile_Element_Component_Carousel extends CMobile_Element_AbstractCompone
 		})();
 			
 		";
+		$js.=parent::js();
 		return $js;
 	}
 

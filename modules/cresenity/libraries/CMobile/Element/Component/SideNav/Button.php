@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Description of Button
- *
- * @author Ecko Santoso
- * @since 04 Mar 16
- */
 class CMobile_Element_Component_SideNav_Button extends CMobile_Element_AbstractComponent {
 
     //put your code here
@@ -22,7 +16,6 @@ class CMobile_Element_Component_SideNav_Button extends CMobile_Element_AbstractC
         $this->sidenav_id = $id;
         return $this;
     }
-    
     
 
     public static function factory($id = "") {

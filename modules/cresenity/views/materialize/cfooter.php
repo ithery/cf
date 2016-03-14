@@ -10,7 +10,7 @@
 <script src="<?php echo curl::base(); ?>media/js/materialize/materialize.clockpicker.js"></script>
 <script src="<?php echo curl::base(); ?>media/js/require.js"></script>
 <script language="javascript">
-$(".button-collapse").sideNav();
+// $(".button-collapse").sideNav();
 $(".sidenav-header").on('click', function(env) {
     $(this).next().addClass('show-submenu');
     $(this).parents('.menu-list').addClass('hidden-menu').animate({

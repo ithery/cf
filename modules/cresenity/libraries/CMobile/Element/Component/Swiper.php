@@ -44,6 +44,7 @@ class CMobile_Element_Component_Swiper extends CMobile_Element_AbstractComponent
     	});
 			
 		";
+		$js.=parent::js();
 		return $js;
 	}
 }

@@ -40,6 +40,7 @@ class CMobile_Element_Component_Collection extends CMobile_Element_AbstractCompo
 
 	public function js($indent=0) {
 		$js = "";
+		$js.=parent::js();
 		return $js;
 	}
 }

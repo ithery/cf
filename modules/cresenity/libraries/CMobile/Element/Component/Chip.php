@@ -57,6 +57,7 @@ class CMobile_Element_Component_Chip extends CMobile_Element_AbstractComponent {
 
 	public function js($indent=0) {
 		$js = "";
+		$js.=parent::js();
 		return $js;
 	}
 }

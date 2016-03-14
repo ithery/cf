@@ -35,6 +35,7 @@ class CMobile_Element_Component_File extends CMobile_Element_AbstractComponent {
 		
 		$js = "
 		";
+		$js.=parent::js();
 		return $js;
 	}
 }

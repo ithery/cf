@@ -30,6 +30,7 @@ class CMobile_Element_Component_Card extends CMobile_Element_Component_AbstractC
 			//$('#".$this->id."').carousel();
 			
 		";
+		$js.=parent::js();
 		return $js;
 	}
 

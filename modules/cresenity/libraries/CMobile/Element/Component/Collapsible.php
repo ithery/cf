@@ -45,6 +45,7 @@ class CMobile_Element_Component_Collapsible extends CMobile_Element_AbstractComp
 
 	public function js($indent=0) {
 		$js = "";
+		$js.=parent::js();
 		return $js;
 	}
 }
