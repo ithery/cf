@@ -13,9 +13,9 @@ class CMobile_Element_Component_SideNav extends CMobile_Element_AbstractComponen
         parent::__construct($id);
         $this->tag = "div";
         $this->is_fixed = true;
-        $this->button = CMobile_Element_Component_SideNav_Button::factory();
-        $this->button->set_sidenav_id($this->id);
-        $this->button = $this->before()->add($this->button);
+        // $this->button = CMobile_Element_Component_SideNav_Button::factory();
+        // $this->button->set_sidenav_id($this->id);
+        // $this->button = $this->before()->add($this->button);
         $this->container = $this->add_div()->add_class('menu-container');
         $this->menu_list = $this->container->add_ul()->add_class('menu-list top-menu');
     }
@@ -29,6 +29,13 @@ class CMobile_Element_Component_SideNav extends CMobile_Element_AbstractComponen
         return $this;
     }
     
+    public function add_button($id = "") {
+        $this->button = CMobile_Element_Component_SideNav_Button::factory();
+        $this->button->set_sidenav_id($this->id);
+        $this->before()->add($this->button);
+        return $this->button;
+    }
+
     public function add_item($id = "") {
         $element = CMobile_Element_Component_SideNav_Item::factory($id);
         $this->menu_list->add($element);
