@@ -44,7 +44,7 @@ class CMobile_Element_Component_SideNav extends CMobile_Element_AbstractComponen
     public function build() {
         $this->add_class('side-nav');
         if($this->is_fixed) {
-            $this->add_class('fixed');
+            // $this->add_class('fixed');
         }
     }
 

@@ -23,7 +23,7 @@ class CMobile_Element_Component_SideNav_Button extends CMobile_Element_AbstractC
     }
 
     public function build() {
-        $this->add_class('button-collapse');
+        $this->add_class('button-collapse show-on-large');
         $this->id = 'nav-mobile-button';
         $this->set_attr('data-activates',$this->sidenav_id);
         $this->add_icon()->add('menu');
