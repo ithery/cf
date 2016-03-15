@@ -386,8 +386,9 @@
 
 
 
-            $theme = ccfg::get('theme');
-            if ($theme == null) $theme = 'cresenity';
+//            $theme = ccfg::get('theme');
+//            if ($theme == null) $theme = 'cresenity';
+            $theme = ctheme::get_current_theme();
             $theme_file = CF::get_file('themes', $theme);
             if (file_exists($theme_file)) {
                 $theme_data = include $theme_file;
@@ -535,8 +536,9 @@
             }
 
             $theme_path = '';
-            $theme = ccfg::get('theme');
-            if ($theme == null) $theme = 'cresenity';
+//            $theme = ccfg::get('theme');
+//            if ($theme == null) $theme = 'cresenity';
+            $theme = ctheme::get_current_theme();
             $theme_file = CF::get_file('themes', $theme);
             if (file_exists($theme_file)) {
                 $theme_data = include $theme_file;

@@ -77,7 +77,9 @@
                 
             if ($this->bootstrap == '3.3') {
                 // read default style from each theme
-                $this->style_form_group = carr::get($this->theme_style, 'form_field_style');
+                if (strlen($this->style_form_group) == 0) {
+                    $this->style_form_group = carr::get($this->theme_style, 'form_field_style');
+                }
                 $html->appendln('<div class="form-group ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
                 $label_class = '';
                 $control_class = '';

@@ -73,6 +73,11 @@ class Cresenity_Controller extends CController {
         clang::setlang($lang);
         curl::redirect(request::referrer());
     }
+    
+    public function change_theme($theme) {
+        ctheme::set_theme($theme);
+        curl::redirect(request::referrer());
+    }
 
     public function server_time() {
         $app = CApp::instance();

@@ -63,7 +63,6 @@
         }
 
         public function add_class($c) {
-            
             if (is_array($c)) {
                 $this->classes = array_merge($c, $this->classes);
             }

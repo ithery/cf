@@ -178,16 +178,16 @@
                 }
             }
 
-            if ($this->validate == false) {
-                //Validasi Input
-                try {
-                    Helpers_Validation_Api::validate($this->service[$this->current_service_name], $this->request, 2);
-                }
-                catch (Helpers_Validation_Api_Exception $e) {
-                    $this->error()->add_default(12999, $e->getMessage());
-                }
+            if ($this->generate_doc == false) {
+                if ($this->validate == false) {
+                    //Validasi Input
+                    try {
+                        Helpers_Validation_Api::validate($this->service[$this->current_service_name], $this->request, 2);
+                    }
+                    catch (Helpers_Validation_Api_Exception $e) {
+                        $this->error()->add_default(12999, $e->getMessage());
+                    }
 
-                if ($this->error()->code() == 0) {
                     if ($this->session instanceof ApiSession) {
                         $this->session->set('request_' . $this->current_service_name, $this->request);
                     }
@@ -301,6 +301,10 @@
          */
         final public function __after() {
             $this->after();
+            
+            if ($this->session instanceof ApiSession) {
+                $this->session->set('response_' . $this->current_service_name, $this->request);
+            }
 
             $response = array();
             $response['err_code'] = $this->error()->code();

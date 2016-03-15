@@ -85,7 +85,6 @@
 
                                     </li>
                                 <?php endif; ?>
-
                         </ul>
 
                     </div><!--/.nav-collapse -->	

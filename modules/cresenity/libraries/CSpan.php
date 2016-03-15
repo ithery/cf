@@ -1,46 +1,55 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.'); 
+<?php
 
-class CSpan extends CObservable {
-	
-	
-	protected $col;
-	public function __construct($id="") {
-		
-		parent::__construct($id);
-		
-		
-		$this->col = 12;
-		
-	}
-	
-	public static function factory($id="") {
-		return new CSpan($id);
-	}
-	
-	public function set_col($col) {
-	
-		$this->col = $col;
-		return $this;
-	}
-	
+    defined('SYSPATH') OR die('No direct access allowed.');
 
-	public function html($indent=0) {
-		$html = new CStringBuilder();
-			$html->set_indent($indent);
-			$disabled = "";
-			$html->appendln('<div class="span'.$this->col.'">');
-			
-			
-			$html->appendln(parent::html($html->get_indent()))->br();
-			$html->appendln('</div>');
-			
-			return $html->text();	
-	
-		
-	}
-	public function js($indent=0) {
-		return parent::js($indent);
-	}
-	
-}
+    class CSpan extends CElement {
 
+        protected $col;
+        protected $size;
+
+        public function __construct($id = "") {
+
+            parent::__construct($id);
+
+            $this->size = 'md';
+            $this->col = 12;
+        }
+
+        public static function factory($id = "") {
+            return new CSpan($id);
+        }
+
+        public function set_col($col) {
+            $this->col = $col;
+            return $this;
+        }
+        
+        public function set_size($size){
+            $this->size = $size;
+            return $this;
+        }
+
+        public function html($indent = 0) {
+            $html = new CStringBuilder();
+            $html->set_indent($indent);
+            $disabled = "";
+            if ($this->bootstrap == '3.3') {
+                $html->appendln('<div class="col-'.$this->size . '-' . $this->col . '">');
+                $html->appendln(parent::html($html->get_indent()))->br();
+                $html->appendln('</div>');
+            }
+            else {
+                $html->appendln('<div class="span' . $this->col . '">');
+                $html->appendln(parent::html($html->get_indent()))->br();
+                $html->appendln('</div>');
+            }
+
+            return $html->text();
+        }
+
+        public function js($indent = 0) {
+            return parent::js($indent);
+        }
+
+    }
+    

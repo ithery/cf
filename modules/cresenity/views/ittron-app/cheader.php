@@ -61,6 +61,23 @@
                                     &nbsp;
                                 </a>
                             </li>
+                            <?php if (ccfg::get("change_theme")): ?>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <?php echo clang::__('Theme'); ?> <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <?php 
+                                        $theme_list = ctheme::get_theme_list();
+                                        foreach ($theme_list as $k => $v) {
+                                            if ($k != ctheme::get_current_theme()) {
+                                                echo '<li><a href="' .curl::base() .'cresenity/change_theme/' .$k .'">' .$v .'</a></li>';
+                                            }
+                                        }
+                                    ?>
+                                </ul>
+                            </li>
+                            <?php endif; ?>
                             <?php
                                 if (ccfg::get("multilang")):
                                     $list = clang::get_lang_list();
@@ -114,9 +131,9 @@
                                 </ul>
                             </li>
                             <!-- Control Sidebar Toggle Button -->
-                            <li>
+<!--                            <li>
                                 <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
-                            </li>
+                            </li>-->
                         </ul>
                     </div>
                 </nav>

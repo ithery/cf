@@ -54,6 +54,9 @@
 
         public function add_header_action($id = "") {
             $row_act = CAction::factory($id);
+            if ($this->bootstrap == '3.3') {
+                $row_act->add_class('btn-xs');
+            }
             $this->header_action_list->add($row_act);
             return $row_act;
         }
@@ -125,12 +128,12 @@
             $html = new CStringBuilder();
             $html->set_indent($indent);
             $disabled = "";
-            
+
             $main_class = ' widget-box ';
             $main_class_title = ' widget-title ';
             $main_class_content = ' widget-content ';
             $class_title = '';
-            
+
             // keep in mind with project biota, use this and bootstrap = 3
             if ($this->bootstrap >= '3') {
                 $main_class = ' box box-info ';
@@ -138,7 +141,7 @@
                 $main_class_content = ' box-body ';
                 $class_title = ' box-title ';
             }
-            
+
             if ($this->header_action_style == "btn-dropdown") {
                 $this->header_action_list->add_class("pull-right");
             }
@@ -169,11 +172,12 @@
             if (strlen($classes) > 0) $classes = " " . $classes;
             $custom_css = $this->custom_css;
             $custom_css = crenderer::render_style($custom_css);
-            $html->appendln('<div class="' .$main_class . $classes . '" ' . $custom_css . '>');
-            $html->appendln('	<div class="' .$main_class_title .'">');
+            $html->appendln('<div class="' . $main_class . $classes . '" ' . $custom_css . '>');
+            $html->appendln('	<div class="' . $main_class_title . '">');
             if ($this->bootstrap >= '3') {
                 $html->appendln('       <span class="icon pull-left">');
-            } else {
+            }
+            else {
                 $html->appendln('       <span class="icon">');
             }
             if ($this->bootstrap >= '3') {
@@ -189,7 +193,7 @@
                 if ($this->minimize || $this->close) {
                     $box_tools = true;
                 }
-                
+
                 if ($box_tools == true) {
                     $html->appendln('<div class="box-tools pull-right">');
                     if ($this->minimize) {
@@ -204,14 +208,22 @@
                     }
                     $html->appendln('</div>');
                 }
-                
-            } else {
+            }
+            else {
                 $html->appendln('       <h5>' . $this->title . '</h5>');
             }
             $html->appendln('		' . $custom_html . '');
             $html->appendln('		' . $info . '');
             if ($this->have_header_action()) {
-                $html->appendln($this->header_action_list->html($html->get_indent()));
+                if ($this->bootstrap >= '3') {
+                    $html->appendln('<div class="box-tools pull-right">');
+                    $html->appendln($this->header_action_list->html($html->get_indent()));
+                    $html->appendln('</div>');
+                }
+                else {
+                    $html->appendln($this->header_action_list->html($html->get_indent()));
+                    
+                }
             }
 
             $scroll_class = "";
@@ -232,7 +244,7 @@
             }
 
             $html->appendln('	</div>');
-            $html->appendln('	<div class="' .$main_class_content . $nopadding . $scroll_class . '"' . $str_height . $content_attr . '>');
+            $html->appendln('	<div class="' . $main_class_content . $nopadding . $scroll_class . '"' . $str_height . $content_attr . '>');
             $html->appendln('		' . parent::html() . '');
             $html->appendln('	</div>');
             $html->appendln('</div>');

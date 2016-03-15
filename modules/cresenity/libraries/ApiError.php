@@ -13,12 +13,23 @@
         protected $error_list;
         protected $err_code;
         protected $err_message;
-        public static $instance;
+        protected $default_error_list = array();
+        
+        public static $instance = null;
         
         private function __construct() {
             $this->err_code = 0;
             $this->err_message = "";
             $this->prefix_code = "";
+            
+            $error_files = CF::get_files('data/api', 'error_list');
+            if (count($error_files) > 0) {
+                $error_files = array_reverse($error_files);
+                foreach ($error_files as $k => $v) {
+                    $list = include $v;
+                    $this->default_error_list = $this->default_error_list + $list;
+                }
+            }
         }
         
         public static function instance(){
@@ -70,6 +81,7 @@
             $this->prefix_code = $prefix_code;
             return $this;
         }
+        
         public function code(){
             return $this->prefix_code .$this->err_code;
         }
@@ -83,7 +95,8 @@
         }
         
         public function set_error_list($error_list){
-            $this->error_list = $error_list;
+            $this->error_list = $this->default_error_list + $error_list;
+            cdbg::var_dump($this->error_list);
             return $this;
         }
         
