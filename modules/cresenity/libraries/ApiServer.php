@@ -197,10 +197,10 @@
             // validation request with current service config
             $service_input = carr::get($this->current_service, 'input');
 
-            $this->log_request();
+            $this->log_request($get_data, $post_data);
         }
 
-        protected function log_request() {
+        protected function log_request($get_data, $post_data) {
             $session_id = null;
             if ($this->session instanceof ApiSession) {
                 $session_id = $this->session->get_session_id();
