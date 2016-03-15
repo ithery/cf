@@ -39,9 +39,12 @@
  *      2.1 
  *  3. ELEMENT
  *      3.1 BOX
+ *  	3.2 FILEUPLOAD
+ *  	3.3 FORM
  *  4. SECTION
  *  	4.1 MAIN HEADER
  *  	4.2 CONTENT HEADER
+ *  	4.3 MODAL
  * 
  **/
 
@@ -73,6 +76,31 @@ a:focus {
         margin-top: 1px;
         margin-right: 8px;
     }
+    
+    
+/* 3.2 FileUpload */
+.fileupload .thumbnail {
+    display: inline-block;
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-align: center;
+    vertical-align: middle;
+}
+.fileupload-exists .fileupload-new, .fileupload-new .fileupload-exists {
+    display: none;
+}
+
+/* 3.3 FORM */
+.form-control {
+    border-radius: 0;
+    box-shadow: none;
+    border-color: #d2d6de;
+}
+.form-control:focus {
+    border-color: #3c8dbc;
+    box-shadow: none;
+}
+
 
 /* 4.2 CONTENT HEADER */
 #breadcrumb {
@@ -159,7 +187,7 @@ div.dataTables_length select {
     width: 75px;
 }
 
-
+/* 4.3 MODAL */
 .modal {
     overflow-x: hidden !important;
     overflow-y: visible !important;
@@ -180,17 +208,6 @@ div.dataTables_length select {
 }
 .modal .form-group label {
     margin-left: 20px;
-}
-
-
-.form-control {
-    border-radius: 0;
-    box-shadow: none;
-    border-color: #d2d6de;
-}
-.form-control:focus {
-    border-color: #3c8dbc;
-    box-shadow: none;
 }
 
 
