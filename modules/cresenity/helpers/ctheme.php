@@ -23,7 +23,8 @@
         public static function get_current_theme(){
             $theme = Session::instance()->get('theme');
             if ($theme == null) {
-                $theme = 'cresenity';
+                $theme = ccfg::get('theme');
+                if ($theme == null) $theme = 'cresenity';
             }
             return $theme;
         }
