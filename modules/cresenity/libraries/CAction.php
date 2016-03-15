@@ -213,6 +213,9 @@
             if ($this->confirm) {
                 $add_class .= " confirm";
             }
+            if ($this->bootstrap == '3.3') { 
+                $add_class .= ' btn-default ';
+            }
             if ($this->style == "btn-icon-group" && strlen($this->label) > 0) {
                 $add_class .= " tip-top";
                 $add_attr .= ' data-original-title="' . $this->label . '"';
@@ -245,7 +248,7 @@
                     $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
                 }
                 else {
-                    $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn btn-default' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
+                    $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
                 }
                 if (strlen($this->icon) > 0) {
                     if ($this->bootstrap == '3.3') {
