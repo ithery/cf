@@ -179,7 +179,7 @@
             }
 
             if ($this->generate_doc == false) {
-                if ($this->validate == false) {
+                if ($this->validate == true) {
                     //Validasi Input
                     try {
                         Helpers_Validation_Api::validate($this->service[$this->current_service_name], $this->request, 2);

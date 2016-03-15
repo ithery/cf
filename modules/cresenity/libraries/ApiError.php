@@ -55,7 +55,7 @@
                 $err_message = str_replace(':' .$replace_k, $replace_v, $err_message);
             }
             
-            $this->add($err_message .' ' .$additional_message, $err_code);
+            $this->add(clang::__($err_message .' ' .$additional_message), $err_code);
             return $this;
         }
         
@@ -64,11 +64,11 @@
             $this->err_message = $err_message;
             if (is_array($err_message)){
                 foreach ($err_message as $key => $value) {
-                    $this->errors[] = $value;
+                    $this->errors[] = clang::__($value);
                 }
             }
             else {
-                $this->errors[] = $err_message;
+                $this->errors[] = clang::__($err_message);
             }
             return $this;
         }
@@ -96,7 +96,6 @@
         
         public function set_error_list($error_list){
             $this->error_list = $this->default_error_list + $error_list;
-            cdbg::var_dump($this->error_list);
             return $this;
         }
         
