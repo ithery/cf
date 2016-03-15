@@ -301,12 +301,13 @@
         ),
         "jquery.datatable-bootstrap3" => array(
             "css" => array(
-                "dataTables.bootstrap.min.css",
+                "plugins" .DS ."datatable" .DS ."dataTables.bootstrap.min.css",
+                "plugins" .DS ."datatable" .DS ."responsive.bootstrap.min.css",
             ),
             "js" => array(
                 "plugins" . DS . "datatable" . DS . "jquery.dataTables.js",
                 "plugins" . DS . "datatable" . DS . "dataTables.bootstrap.js",
-//                "plugins" . DS . "datatable" . DS . "dataTables.responsive.min.js",
+                "plugins" . DS . "datatable" . DS . "dataTables.responsive.2.0.2.min.js",
 //                "plugins" . DS . "datatable" . DS . "TableTools.min.js",
 //                "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
 //                "plugins" . DS . "datatable" . DS . "ColVis.min.js",
@@ -348,6 +349,15 @@
             "js" => array(
                 "plugins/momentjs/moment.js",
                 "plugins/momentjs/moment-with-locales.min.js",
+            ),
+            "requirements" => array("jquery-2.1.1"),
+        ),
+        "icheck" => array(
+            "js" => array(
+                "plugins/icheck/icheck.min.js",
+            ),
+            "css" => array(
+                "plugins/iCheck1.0.1/all.css",
             ),
             "requirements" => array("jquery-2.1.1"),
         ),

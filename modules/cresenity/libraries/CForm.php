@@ -223,10 +223,14 @@
             
             if ($this->bootstrap == '3.3') {
                 $form_style_layout = '';
+                $this->layout = carr::get($this->theme_style, 'form_layout');
+                if (strlen($this->layout) > 0) {
+                    $form_style_layout = 'form-' . $this->layout;
+                }
                 $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
                     ->inc_indent()
                     ->br();
-                $html->appendln("<div class='box-body'>");
+//                $html->appendln("<div class='box-body'>");
             }
             else {
                 $form_style_layout = '';
@@ -243,7 +247,7 @@
             }
             $html->appendln(parent::html($html->get_indent()));
             if ($this->bootstrap == '3.3') {
-                $html->appendln("</div>");
+//                $html->appendln("</div>");
             }
 
             $html->dec_indent()

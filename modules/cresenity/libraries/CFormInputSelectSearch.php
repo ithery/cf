@@ -108,7 +108,10 @@
             }
 
             if ($this->select2 >= '4') {
-                $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '">');
+                $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . $multiple . '">');
+                if (strlen($this->value) > 0) {
+                    $html->appendln('<option value="' .$this->value .'"></option>');
+                }
                 $html->appendln('</select>');
                 $html->br();
             }
@@ -221,6 +224,7 @@
             if ($this->select2 >= '4') {
                 $str = "
                     $('#" . $this->id . "').select2({
+                        width: '100%',
                         placeholder: '" . $placeholder . "',
                         minimumInputLength: '" . $this->min_input_length . "',
                         ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
@@ -255,7 +259,12 @@
                             return '" . $str_result . "';
                         }, // omitted for brevity, see the source of this page
                         templateSelection: function(item) {
-                            return '" . $str_selection . "';
+                            if (item.id === '') {
+                                return item.text;
+                            }
+                            else {
+                                return '" . $str_selection . "';
+                            }
                         },  // omitted for brevity, see the source of this page
                         dropdownCssClass: '', // apply css that makes the dropdown taller
                         containerCssClass : 'tpx-select2-container " . $classes . "'

@@ -1347,29 +1347,33 @@
                 $main_class = ' widget-box ';
                 $main_class_title = ' widget-title ';
                 $main_class_content = ' widget-content ';
-                if ($this->bootstrap == '3') {
-                    if (isset($this->theme) && $this->theme == 'ittron-app') {
-                        $main_class = ' box box-primary';
-                        $main_class_title = ' box-header with-border ';
-                        $main_class_content = ' box-body ';
-                    }
+                if ($this->bootstrap == '3.3') {
+                    $main_class = ' box box-info';
+                    $main_class_title = ' box-header with-border ';
+                    $main_class_content = ' box-body ';
                 }
                 if($this->widget_title == false){
                     $main_class_title = ' ';
                 }
 
                 $html->appendln('<div class="' .$main_class .' widget-table">')->inc_indent();
-                $html->appendln('<div class="'.$main_class_title.'">')->inc_indent();
-                if (strlen($this->icon > 0)) {
-                    $html->appendln('<span class="icon">')->inc_indent();
-                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
-                    $html->dec_indent()->appendln('</span');
+                $show_title = true;
+                if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
+                    $show_title = false;
                 }
-                $html->appendln('<h5>' . $this->title . '</h5>');
-                if ($this->have_header_action()) {
-                    $html->appendln($this->header_action_list->html($html->get_indent()));
+                if ($show_title) {
+                    $html->appendln('<div class="'.$main_class_title.'">')->inc_indent();
+                    if (strlen($this->icon > 0)) {
+                        $html->appendln('<span class="icon">')->inc_indent();
+                        $html->appendln('<i class="icon-' . $this->icon . '"></i>');
+                        $html->dec_indent()->appendln('</span');
+                    }
+                    $html->appendln('<h5>' . $this->title . '</h5>');
+                    if ($this->have_header_action()) {
+                        $html->appendln($this->header_action_list->html($html->get_indent()));
+                    }
+                    $html->dec_indent()->appendln('</div>');
                 }
-                $html->dec_indent()->appendln('</div>');
                 $html->appendln('<div class="' .$main_class_content .' nopadding">')->inc_indent();
             }
             $data_responsive_open = '';
@@ -1904,6 +1908,7 @@
                         ->appendln("'bPaginate': " . ($this->get_option("pagination") ? "true" : "false") . ",")->br()
                         ->appendln("'bLengthChange': " . ($this->get_option("length_change") ? "true" : "false") . ",")->br()
                         ->appendln("'aoColumns': vaoColumns,")->br()
+                        ->appendln("'autoWidth': false,")->br()
                         ->appendln("'aLengthMenu': [
 					[" . $km . "],
 					[" . $vm . "]

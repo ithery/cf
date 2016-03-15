@@ -37,7 +37,7 @@
 
         <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
     </head>
-    <body class="skin-<?php echo $color; ?>" sidebar-mini">
+    <body class="skin-<?php echo $color; ?> sidebar-mini">
         <div class="wrapper">
             <header class="main-header">
                 <!-- Logo -->
@@ -156,11 +156,12 @@
             <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">
                 <section class="content-header">
+                    <h1>
                     <?php if ($show_title): ?>
-                            <h1>
                                 <?php echo $title ?>
-                            </h1>
-                        <?php endif; ?>
+                    <?php endif; ?>
+                        &nbsp;
+                    </h1>
                     <?php if ($show_breadcrumb): ?>
                             <?php
                             if ($breadcrumb == "") $breadcrumb = $title;
@@ -179,10 +180,16 @@
                             ?>
                         <?php endif; ?>
                 </section>
+                
                 <!-- Main content -->
                 <section class="content">
                     <div class="row">
                         <section class="col-md-12">
-                            
+                <?php
+                $msg = cmsg::flash_all();
+                if (strlen($msg) > 0) {
+                    echo '<div class="row"><div class="col-md-12">' . $msg . '</div></div>';
+                }
+                ?>
                         
 

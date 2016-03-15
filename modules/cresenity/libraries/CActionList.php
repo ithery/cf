@@ -13,10 +13,7 @@ class CActionList extends CElement {
         $this->style = "btn-list";
         $this->label = clang::__("Action");
         $this->btn_dropdown_classes = array();
-        if ($this->bootstrap == '3') {
-            $this->btn_dropdown_classes[] = 'btn-primary';
-            $this->btn_dropdown_classes[] = 'btn-sm';
-        }
+        
     }
 
     public static function factory($list_id = "") {
@@ -29,12 +26,7 @@ class CActionList extends CElement {
     }
     
     public function add_btn_dropdown_class($class){
-        if ($this->bootstrap == '3' && ($class == 'btn-primary' || $class == 'btn-sm')) {
-            // do nothing
-        }
-        else {
-            $this->btn_dropdown_classes[] = $class;
-        }
+        $this->btn_dropdown_classes[] = $class;
         return $this;
     }
 	
@@ -57,6 +49,13 @@ class CActionList extends CElement {
         }
         //apply render style to child before render
 
+        if (count($this->btn_dropdown_classes) == 0) {
+            if ($this->bootstrap >= '3') {
+                $this->btn_dropdown_classes[] = 'btn-primary';
+                $this->btn_dropdown_classes[] = 'btn-sm';
+            }
+        }
+        
         $this->apply('style', $this->style, 'CAction');
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -78,7 +77,16 @@ class CActionList extends CElement {
         $pretag = '<div class="button-list ' . $classes . '">';
         switch ($this->style) {
             case "form-action":
-                $pretag = '<div class="form-actions clear-both ' . $classes . '">';
+                if ($this->bootstrap == '3.3') {
+                    $pretag = '
+                        <div class="form-group clear-both ' . $classes . '">
+                            <label class="col-md-2 control-label"></label>
+                                <div class="col-md-10">
+                            ';
+                }
+                else {
+                    $pretag = '<div class="form-actions clear-both ' . $classes . '">';
+                }
                 break;
             case "btn-group":
             case "btn-icon-group":
@@ -119,9 +127,16 @@ class CActionList extends CElement {
             case "btn-dropdown":
                 $posttag = "</div>";
                 break;
+            case "form-action":
+                if ($this->bootstrap == '3.3') {
+                    $posttag = "</div></div>";
+                }
+                else {
+                    $posttag = "</div>";
+                }
+                break;
             default:
                 $posttag = "</div>";
-
                 break;
         }
         $html->dec_indent()->appendln($posttag)->br();

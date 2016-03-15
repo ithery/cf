@@ -1,6 +1,6 @@
 <?php
 
-class CNestable extends CObservable {
+class CNestable extends CElement {
 
     protected $data;
     protected $id_key;
@@ -132,6 +132,9 @@ class CNestable extends CObservable {
                     $this->row_action_list->add_class("pull-right");
                     if ($this->action_style == "btn-dropdown") {
                         $this->row_action_list->add_class("pull-right");
+                        if ($this->bootstrap == '3') {
+                            $this->row_action_list->add_btn_dropdown_class("btn-xs btn-primary");
+                        }
                     }
                     $this->row_action_list->apply("jsparam", $jsparam);
                     $html->appendln($this->row_action_list->html($html->get_indent()));

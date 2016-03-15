@@ -32,6 +32,7 @@
         protected $client_log_id = null;
         protected $related_log_path = '';
         protected $full_log_path = '';
+        protected $validate = false;
 
         /**
          *
@@ -177,7 +178,7 @@
                 }
             }
 
-            if ($this->generate_doc == false) {
+            if ($this->validate == false) {
                 //Validasi Input
                 try {
                     Helpers_Validation_Api::validate($this->service[$this->current_service_name], $this->request, 2);
@@ -191,43 +192,59 @@
                         $this->session->set('request_' . $this->current_service_name, $this->request);
                     }
                 }
+            }
 
-                // validation request with current service config
-                $service_input = carr::get($this->current_service, 'input');
+            // validation request with current service config
+            $service_input = carr::get($this->current_service, 'input');
 
-                $session_id = null;
-                if ($this->session instanceof ApiSession) {
-                    $session_id = $this->session->get_session_id();
+            $this->log_request();
+        }
+
+        protected function log_request() {
+            $session_id = null;
+            if ($this->session instanceof ApiSession) {
+                $session_id = $this->session->get_session_id();
+            }
+
+            // do log request from client - create file log request at related folders
+            $file_name = 'CLIENT_' . $session_id;
+            if ($session_id == null) {
+                $file_name = 'CLIENT_' . 'DEF';
+            }
+            $file_name .= "_" . date("His") . '_' . $this->current_service_name . "_"
+                    . mt_rand(10000, 99999) . '_rq.log';
+
+            $api_name = 'api_multi';
+            if (property_exists($this, 'api_name')) {
+                $api_name = $this->api_name;
+            }
+            $log_path = 'logs' . DS . $api_name . DS . 'server' . DS . $this->related_log_path;
+            $full_log_path = CAPPPATH;
+
+            $full_log_path = str_replace('//', DS, $full_log_path);
+            $temp_log_path = explode(DS, $log_path);
+            foreach ($temp_log_path as $k => $v) {
+                $full_log_path .= $v . DS;
+                if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
+                    @mkdir($full_log_path);
                 }
+            }
+            $this->full_log_path = $full_log_path;
+            
+            if ($this->session instanceof ApiSession) {
+                $this->session->set('client_full_log_path', $this->full_log_path);
+            }
+            
+            $full_log_path .= $file_name;
+            $data_log_file = array(
+                'service_name' => $this->current_service_name,
+                'request' => $this->request,
+                'get_data' => $get_data,
+                'post_data' => $post_data,
+            );
+            @file_put_contents($full_log_path, json_encode($data_log_file));
 
-                // do log request from client - create file log request at related folders
-                $file_name = 'CLIENT_' . $session_id;
-                if ($session_id == null) {
-                    $file_name = 'CLIENT_' . 'DEF';
-                }
-                $file_name .= "_" . date("His") . '_' . $this->current_service_name . "_"
-                        . mt_rand(10000, 99999) . '_rq.log';
-                $log_path = 'logs' . DS . 'api_multi' . DS . 'server' . DS . $this->related_log_path;
-                $full_log_path = CAPPPATH;
-
-                $full_log_path = str_replace('//', DS, $full_log_path);
-                $temp_log_path = explode(DS, $log_path);
-                foreach ($temp_log_path as $k => $v) {
-                    $full_log_path .= $v . DS;
-                    if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
-                        mkdir($full_log_path);
-                    }
-                }
-                $this->full_log_path = $full_log_path;
-                $full_log_path .= $file_name;
-                $data_log_file = array(
-                    'service_name' => $this->current_service_name,
-                    'request' => $this->request,
-                    'get_data' => $get_data,
-                    'post_data' => $post_data,
-                );
-                file_put_contents($full_log_path, json_encode($data_log_file));
-
+            if (strlen($this->table_prefix) > 0) {
                 // do log request from client - insert into client_log_request
                 $data = array(
                     'org_id' => null,
@@ -246,13 +263,9 @@
                     'execution_time' => null,
                     'ip_address' => $this->get_req_ip_address()
                 );
-    //            $db->insert( $this->table_prefix .'_client_log_request', $data);
-    //            $this->client_log_id = $db->insert_id();
+                $db->insert($this->table_prefix . '_client_log_request', $data);
+                $this->client_log_id = $db->insert_id();
             }
-        }
-
-        protected function log_request() {
-            
         }
 
         /**

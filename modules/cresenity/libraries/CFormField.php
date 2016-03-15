@@ -33,70 +33,6 @@
             return new CFormField($id);
         }
 
-        public function set_group_id($id) {
-            $this->group_id = $id;
-            return $this;
-        }
-
-        public function add_group_class($class) {
-            $this->group_classes[] = $class;
-            return $this;
-        }
-
-        public function group_custom_css($key, $val) {
-            $this->group_custom_css[$key] = $val;
-            return $this;
-        }
-
-        // public function set_label_size($size) {
-        //     if (in_array($size, array("small", "medium", "large"))) {
-        //         $this->label_size = $size;
-        //     }
-        //     return $this;
-        // }
-
-        public function set_label_size($size) {
-            if (in_array($size, array("small", "medium", "large", "none"))) {
-                $this->label_size = $size;
-            }
-            return $this;
-        }
-
-        public function set_info_text($info_text) {
-            $this->info_text = $info_text;
-            return $this;
-        }
-
-        public function set_label($text, $lang = true) {
-            if ($lang) $text = clang::__($text);
-            $this->label = $text;
-            return $this;
-        }
-
-        public function show_label() {
-            $this->show_label = true;
-            return $this;
-        }
-
-        public function hide_label() {
-            $this->show_label = false;
-            return $this;
-        }
-
-        public function style_form_inline() {
-            $this->style_form_group = "inline";
-            return $this;
-        }
-
-        public function add_label_class($label_class) {
-            $this->label_class[] = $label_class;
-            return $this;
-        }
-
-        public function add_control_class($control_class) {
-            $this->control_class[] = $control_class;
-            return $this;
-        }
 
         public function toarray() {
             $data = array();
@@ -140,10 +76,22 @@
             }
                 
             if ($this->bootstrap == '3.3') {
+                // read default style from each theme
+                $this->style_form_group = carr::get($this->theme_style, 'form_field_style');
                 $html->appendln('<div class="form-group ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
                 $label_class = '';
                 $control_class = '';
                 
+                
+                if ($this->style_form_group == 'inline') {
+                    if (count($this->label_class) == 0) {
+                        $this->label_class = array('col-md-2');
+                    }
+                    if (count($this->control_class) == 0) {
+                        $this->control_class = array('col-md-10');
+                    }
+                    $this->label_class[] = 'control-label';
+                }
                 $label_class .= ' ' . implode(' ', $this->label_class);
                 $control_class .= ' ' . implode(' ', $this->control_class);
                 if ($this->show_label) {
@@ -239,11 +187,6 @@
             return $html->text();
         }
 
-        public function set_style_form_group($style_form_group) {
-            $this->style_form_group = $style_form_group;
-            return $this;
-        }
-
         public function js($indent = 0) {
             $js = CStringBuilder::factory()->set_indent($indent);
 
@@ -252,6 +195,76 @@
             $js->appendln(parent::js($js->get_indent()))->br();
 
             return $js->text();
+        }
+        
+        public function set_style_form_group($style_form_group) {
+            $this->style_form_group = $style_form_group;
+            return $this;
+        }
+        
+        public function set_group_id($id) {
+            $this->group_id = $id;
+            return $this;
+        }
+
+        public function add_group_class($class) {
+            $this->group_classes[] = $class;
+            return $this;
+        }
+
+        public function group_custom_css($key, $val) {
+            $this->group_custom_css[$key] = $val;
+            return $this;
+        }
+
+        // public function set_label_size($size) {
+        //     if (in_array($size, array("small", "medium", "large"))) {
+        //         $this->label_size = $size;
+        //     }
+        //     return $this;
+        // }
+
+        public function set_label_size($size) {
+            if (in_array($size, array("small", "medium", "large", "none"))) {
+                $this->label_size = $size;
+            }
+            return $this;
+        }
+
+        public function set_info_text($info_text) {
+            $this->info_text = $info_text;
+            return $this;
+        }
+
+        public function set_label($text, $lang = true) {
+            if ($lang) $text = clang::__($text);
+            $this->label = $text;
+            return $this;
+        }
+
+        public function show_label() {
+            $this->show_label = true;
+            return $this;
+        }
+
+        public function hide_label() {
+            $this->show_label = false;
+            return $this;
+        }
+
+        public function style_form_inline() {
+            $this->style_form_group = "inline";
+            return $this;
+        }
+
+        public function add_label_class($label_class) {
+            $this->label_class[] = $label_class;
+            return $this;
+        }
+
+        public function add_control_class($control_class) {
+            $this->control_class[] = $control_class;
+            return $this;
         }
 
     }

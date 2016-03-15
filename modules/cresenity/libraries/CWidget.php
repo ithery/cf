@@ -18,6 +18,8 @@
         public $header_action_style;
         public $height;
         public $attr;
+        public $minimize;
+        public $close;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -37,6 +39,8 @@
             $this->header_action_style = 'widget-action';
             $this->header_action_list->set_style('widget-action');
             $this->attr = array();
+            $this->minimize = false;
+            $this->close = false;
         }
 
         public static function factory($id = "") {
@@ -181,6 +185,26 @@
             $html->appendln('		</span>');
             if ($this->bootstrap >= '3') {
                 $html->appendln('		<h3 class="box-title">' . $this->title . '</h3>');
+                $box_tools = false;
+                if ($this->minimize || $this->close) {
+                    $box_tools = true;
+                }
+                
+                if ($box_tools == true) {
+                    $html->appendln('<div class="box-tools pull-right">');
+                    if ($this->minimize) {
+                        $html->appendln('<button class="btn btn-info btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse">');
+                        $html->appendln('<i class="fa fa-minus"></i>');
+                        $html->appendln('</button>');
+                    }
+                    if ($this->close) {
+                        $html->appendln('<button class="btn btn-info btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove">');
+                        $html->appendln('<i class="fa fa-times"></i>');
+                        $html->appendln('</button>');
+                    }
+                    $html->appendln('</div>');
+                }
+                
             } else {
                 $html->appendln('       <h5>' . $this->title . '</h5>');
             }

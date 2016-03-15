@@ -7,11 +7,13 @@ class CFormInputCheckbox extends CFormInput {
     protected $applyjs = "";
     protected $display_inline = "";
     protected $label_wrap;
+    protected $style = '';
 
     public function __construct($id) {
         parent::__construct($id);
 
 
+        $this->style = 'minimal';
         $this->type = "checkbox";
         $this->label = "";
         $this->applyjs = "uniform";
@@ -66,7 +68,13 @@ class CFormInputCheckbox extends CFormInput {
         if ($this->display_inline) {
             $label_addition_attr = 'style="display:inline-block;padding-right:5px"';
         }
-        $html->append('<label class="checkbox" ' . $label_addition_attr . '>');
+        $label_class = "checkbox";
+        if ($this->bootstrap == '3.3') {
+            if ($this->checkbox >= '1.0') {
+                $label_class = 'control-label';
+            }
+        }
+        $html->append('<label class="' .$label_class .'" ' . $label_addition_attr . '>');
         if ($this->applyjs == "switch") {
             $html->append('<div class="switch">');
         }
@@ -76,6 +84,11 @@ class CFormInputCheckbox extends CFormInput {
             $classes = " " . $classes;
         if ($this->bootstrap == '3') {
             $classes = $classes ." form-control ";
+        }
+        if ($this->bootstrap == '3.3') {
+            if ($this->checkbox >= '1.0') {
+                $classes = $classes .' ' .$this->style .' ';
+            }
         }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);

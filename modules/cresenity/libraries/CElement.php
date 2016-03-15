@@ -8,10 +8,12 @@
         protected $attr;
         protected $custom_css;
         protected $text;
+        
+        protected $checkbox;
         protected $bootstrap;
         protected $select2;
         protected $theme;
-
+        protected $theme_style = array();
 
         public static function valid_tag() {
             $available_tag = array('div', 'a', 'p', 'span');
@@ -34,6 +36,8 @@
             if (isset($theme_data)) {
                 $this->select2 = carr::get($theme_data, 'select2');
                 $this->bootstrap = carr::get($theme_data, 'bootstrap');
+                $this->checkbox = carr::get($theme_data, 'checkbox', '0');
+                $this->theme_style = carr::get($theme_data, 'theme_style');
             }
             if (strlen($this->bootstrap) == 0) {
                 $bootstrap = ccfg::get('bootstrap');
@@ -59,14 +63,15 @@
         }
 
         public function add_class($c) {
-            if ($this->bootstrap == '3.3') {
-                $c = str_replace('span', 'col-md-', $c);
-            }
             
             if (is_array($c)) {
                 $this->classes = array_merge($c, $this->classes);
             }
             else {
+                if ($this->bootstrap == '3.3') {
+                    $c = str_replace('span', 'col-md-', $c);
+                    $c = str_replace('row-fluid', 'row', $c);
+                }
                 $this->classes[] = $c;
             }
             return $this;
