@@ -28,7 +28,9 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
         $this->input_div = $this->search->add_div()->add_class('input-field');
         $this->input_field = $this->input_div->add_control('navbar-search-input', 'search');
         $this->search_label = $this->input_div->add_label()->set_for_id('navbar-search-input');
-        $this->search_label->add_icon()->set_icon('search')->set_type(''); 
+        $search_icon = $this->search_label->add_icon()->set_icon('search')->set_type(''); 
+        $search_icon->custom_css('position', 'absolute');
+        $search_icon->custom_css('left', '1rem');
         $this->input_div->add_icon('navbar-search-close')->set_icon('close')->set_type(''); 
     }
     
