@@ -171,7 +171,10 @@
         }
 
         private function __write_log($service_name, $status, $log_data = null) {
-            $session_id = $this->session->get('session_id');
+            $session_id = null;
+            if ($this->session instanceof ApiSession) {
+                $session_id = $this->session->get('session_id');
+            }
 
             $status_log = 'rq';
             if (strlen($status) > 0) {
