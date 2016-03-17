@@ -31,6 +31,7 @@
         protected $related_curl_log_path = "";
         protected $prefix_log_file_name = null;
         protected $using_log = true;
+        protected $debug = false;
 
         protected function __construct() {
             
@@ -81,15 +82,27 @@
                     $this->__write_log($service_name, 'request', $data);
                 }
 
+                if ($this->session instanceof ApiSession) {
+                    $this->session->set("REQUEST_" .$service_name, $data);
+                }
+
                 // execute curl
                 $curl->exec();
-
+                
                 // get error
                 $has_error = $curl->has_error();
 
                 // get response
                 $response = $curl->response();
                 $this->response = $response;
+                
+                if ($this->session instanceof ApiSession) {
+                    $data_response = array(
+                        'response' => $response,
+                        'has_error' => $has_error
+                    );
+                    $this->session->set("RESPONSE_" .$service_name, $data_response);
+                }
                 
                 if ($this->using_log) {
                     // WRITE LOG RESPONSE

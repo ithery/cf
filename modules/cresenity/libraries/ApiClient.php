@@ -104,6 +104,10 @@
             return $this;
         }
 
+        /**
+         * 
+         * @return ApiError
+         */
         protected function error() {
             return ApiError::instance();
         }
@@ -118,6 +122,11 @@
 
         public function get_session_id() {
             return $this->session_id;
+        }
+        
+        public function set_session($session) {
+            $this->session = $session;
+            return $this;
         }
 
     }

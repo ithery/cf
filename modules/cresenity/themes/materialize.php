@@ -40,6 +40,7 @@
 //            'bootstrap-slider',
 //            'form',
             'materialize',
+            'android-62hall',
          //   'moment',
          //   'datepicker_material',
         ),

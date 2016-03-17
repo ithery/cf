@@ -8,6 +8,7 @@
      */
     class ApiSession {
 
+        const _digit = 4;
         protected $reserved_key = array();
         protected $validate_expired = true;
         protected $last_activity = null;
@@ -209,6 +210,45 @@
 
         public function get_log_path(){
             return $this->log_path;
+        }
+        
+        public function encrypt($session_id) {
+            $session_key = ccfg::get('session_key');
+            if (strlen($session_key) == 0) {
+                $session_key = 'ITTRONSESSION';
+            }
+            $str = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+            shuffle($str);
+            $salt = '';
+            foreach (array_rand($str, self::_digit) as $key) {
+                $salt .= $str[$key];
+            }
+
+            $count_session_key = count($session_key);
+            $chiper_text = '';
+            for ($i = 0; $i < strlen($session_id); $i++) {
+                $chiper_text .= $session_id[$i] ^ $session_key[$i % $count_session_key];
+            }
+
+            $chiper_text = base64_encode($chiper_text);
+            $chiper_text = str_replace("/", "_", $chiper_text);
+            return $chiper_text;
+        }
+
+        public function decrypt($chiper_text) {
+            $session_key = ccfg::get('session_key');
+            if (strlen($session_key) == 0) {
+                $session_key = 'ITTRONSESSION';
+            }
+            $chiper_text = str_replace('_', '/', $chiper_text);
+            $chiper_text = base64_decode($chiper_text);
+            $count_session_key = count($session_key);
+
+            $decrypt_text = '';
+            for ($i = 0; $i < strlen($chiper_text); $i++) {
+                $decrypt_text .= $chiper_text[$i] ^ $session_key[$i % $count_session_key];
+            }
+            return $decrypt_text;
         }
 
     }

@@ -87,7 +87,8 @@
                 $request += $other_request;
                 $direct_access = true;
             }
-
+            $get_data=null;
+            $post_data=null;
             switch ($this->method) {
                 case self::__GET:
                     if ($direct_access == true) {
