@@ -53,6 +53,16 @@ class CMobile_Element_Control_Input_Email extends CMobile_Element_Control_Abstra
         $this->prefix_icon = $prefix_icon; 
         return $this;
     }
+
+    public function set_data_error($data_error){
+        $this->data_error = $data_error; 
+        return $this;
+    }
+
+    public function set_data_success($data_success){
+        $this->data_success = $data_success; 
+        return $this;
+    }
 	
 	protected function build() {
 		if (strlen($this->placeholder)>0) {

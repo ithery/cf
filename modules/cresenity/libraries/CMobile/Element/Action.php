@@ -155,9 +155,9 @@ class CMobile_Element_Action extends CMobile_CompositeElement {
 
     public function render_as_input() {
         $render_as_input = false;
-        if ($this->submit) {
-            $render_as_input = true;
-        }
+        // if ($this->submit) {
+        //     $render_as_input = true;
+        // }
         return $render_as_input;
     }
 
@@ -175,6 +175,13 @@ class CMobile_Element_Action extends CMobile_CompositeElement {
 
     
 	public function build() {
+        if($this->submit) {
+            $this->tag = 'input';
+            $this->add_attr('type', 'submit');
+            $this->add_attr('value', $this->label);
+        } else {
+            $this->add($this->label);
+        }
 		$this->reassign_confirm();
 		if ($this->disabled) {
 			$this->set_attr('disabled','disabled');
@@ -242,7 +249,7 @@ class CMobile_Element_Action extends CMobile_CompositeElement {
 		if (strlen($this->icon) > 0) {
 			$this->add_icon()->set_icon($this->icon);
 		}
-		$this->add($this->label);
+		// $this->add($this->label);
 	}
 	
 	
@@ -263,21 +270,25 @@ class CMobile_Element_Action extends CMobile_CompositeElement {
                     } else {
                         $js->appendln("jQuery('#" . $this->id . "').click(function() { window.location.href='" . $this->link . "'; });");
                     }
+                } else {
+                    // $js->appendln("jQuery('#" . $this->id . "').click(function() { jQuery(this).closest('form').attr('action','" . $this->link . "'); });");
                 }
             } else {
-                if (strlen($this->submit_to) > 0) {
-                    $str_submit_to_target = "";
-                    if (strlen($this->submit_to_target) > 0) {
-                        $str_submit_to_target = "jQuery(this).closest('form').attr('target','" . $this->submit_to_target . "');";
-                    }
-                    $js->appendln("
-						jQuery('#" . $this->id . "').click(function() {
-							jQuery(this).closest('form').attr('action','" . $this->submit_to . "');
-							" . $str_submit_to_target . "
-							jQuery(this).closest('form').submit();
-						}
-					);");
-                }
+                //     print_r('xxxxx' . $this->submit_to);
+                // die();
+                // if (strlen($this->submit_to) > 0) {
+     //                $str_submit_to_target = "";
+     //                if (strlen($this->submit_to_target) > 0) {
+     //                    $str_submit_to_target = "jQuery(this).closest('form').attr('target','" . $this->submit_to_target . "');";
+     //                }
+     //                $js->appendln("
+					// 	jQuery('#" . $this->id . "').click(function() {
+					// 		jQuery(this).closest('form').attr('action','" . $this->submit_to . "');
+					// 		" . $str_submit_to_target . "
+					// 		jQuery(this).closest('form').submit();
+					// 	}
+					// );");
+                // }
             }
         }
 
