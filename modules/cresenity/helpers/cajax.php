@@ -373,12 +373,12 @@
             $rarr = $r->result(false);
             $data = $rarr;
             $output = array(
-                "sEcho" => intval($request['sEcho']),
+                "sEcho" => intval(carr::get($request,'sEcho')),
                 "iTotalRecords" => $total_record,
                 "iTotalDisplayRecords" => $filtered_record,
                 "aaData" => array(),
             );
-            $no = $request['iDisplayStart'];
+            $no = carr::get($request,'iDisplayStart',0);
             foreach ($data as $row) {
                 $arr = array();
                 $no++;
