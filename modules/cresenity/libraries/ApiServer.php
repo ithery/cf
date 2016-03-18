@@ -247,6 +247,7 @@
 
             if (strlen($this->table_prefix) > 0) {
                 // do log request from client - insert into client_log_request
+                $db = CDatabase::instance();
                 $data = array(
                     'org_id' => null,
                     'product_category_code' => null,
@@ -264,8 +265,8 @@
                     'execution_time' => null,
                     'ip_address' => $this->get_req_ip_address()
                 );
-                $db->insert($this->table_prefix . '_client_log_request', $data);
-                $this->client_log_id = $db->insert_id();
+//                $db->insert($this->table_prefix . '_client_log_request', $data);
+//                $this->client_log_id = $db->insert_id();
             }
         }
 

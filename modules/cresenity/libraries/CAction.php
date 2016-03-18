@@ -18,6 +18,7 @@
         protected $style;
         protected $confirm_message;
         protected $button;
+        protected $btn_style;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -38,6 +39,7 @@
             $this->confirm = false;
             $this->confirm_message = "";
             $this->button = false;
+            $this->btn_style = 'default';
         }
 
         public static function factory($id = '') {
@@ -214,7 +216,9 @@
                 $add_class .= " confirm";
             }
             if ($this->bootstrap == '3.3') { 
-                $add_class .= ' btn-default ';
+                if (strlen($this->btn_style) == 0) {
+                    $add_class .= ' btn-' .$this->btn_style;
+                }
             }
             if ($this->style == "btn-icon-group" && strlen($this->label) > 0) {
                 $add_class .= " tip-top";

@@ -76,6 +76,9 @@
             }
                 
             if ($this->bootstrap == '3.3') {
+                $inline_without_default = '0';
+                $inline_without_default = carr::get($this->theme_style, 'inline_without_default');
+                
                 // read default style from each theme
                 if (strlen($this->style_form_group) == 0) {
                     $this->style_form_group = carr::get($this->theme_style, 'form_field_style');
@@ -86,13 +89,15 @@
                 
                 
                 if ($this->style_form_group == 'inline') {
-                    if (count($this->label_class) == 0) {
-                        $this->label_class = array('col-md-2');
+                    if ($inline_without_default == '0') {
+                        if (count($this->label_class) == 0) {
+                            $this->label_class = array('col-md-2');
+                        }
+                        if (count($this->control_class) == 0) {
+                            $this->control_class = array('col-md-10');
+                        }
+                        $this->label_class[] = 'control-label';
                     }
-                    if (count($this->control_class) == 0) {
-                        $this->control_class = array('col-md-10');
-                    }
-                    $this->label_class[] = 'control-label';
                 }
                 $label_class .= ' ' . implode(' ', $this->label_class);
                 $control_class .= ' ' . implode(' ', $this->control_class);
