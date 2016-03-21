@@ -7,7 +7,9 @@ class cajax {
     public static function callback($obj, $input) {
 
         $callable = $obj->data->callable;
-        return call_user_func($callable, $obj->data);
+        if(is_callable($callable)) {
+            return call_user_func($callable, $obj->data);
+        }
     }
 
     public static function form_process($obj, $input) {
