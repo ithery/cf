@@ -3,7 +3,7 @@
 /**
  * Description of Nav
  *
- * @author Ecko Santoso
+ * @author Hery
  * @since 04 Mar 16
  */
 class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
