@@ -13,6 +13,7 @@ abstract class CMobile_Element extends CMobile_Observable {
     protected $after;
     protected $is_builded = false;
     protected $is_empty = false;
+    private $is_build = false;
 
     public static function valid_tag() {
         $available_tag = array('div', 'a', 'p', 'span');
@@ -180,7 +181,6 @@ abstract class CMobile_Element extends CMobile_Observable {
         
     }
 
-    private $is_build = false;
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -228,6 +228,8 @@ abstract class CMobile_Element extends CMobile_Observable {
                 . "</pre>";
         return $return;
     }
+    
+
 
 }
 
