@@ -2016,16 +2016,23 @@
                             
                                 var all_column = " . json_encode($this->columns) . ";
                                 var column = all_column[jQuery(this).index()];
-                                var transforms = JSON.stringify(column.transforms);
-                                if(column.searchable) {
-                                    input = jQuery('<input>');
-                                    input.attr('type', 'text');
-                                    input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
-                                    input.attr('class', 'data_table-quick_search');
+                                var transforms = {};
+                                if(column) {
+                                    if(hasOwnProperty.call(column, 'transforms')) {
+                                        
+                                        transforms = JSON.stringify(column.transforms);
+                                    }
+                               
+                                    if(column.searchable) {
+                                        input = jQuery('<input>');
+                                        input.attr('type', 'text');
+                                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
+                                        input.attr('class', 'data_table-quick_search');
 
-                                    input.attr('transforms', transforms);
-                                    input.attr('placeholder', 'Search ' + title );
-                                    input.css('width','90%');
+                                        input.attr('transforms', transforms);
+                                        input.attr('placeholder', 'Search ' + title );
+                                        input.css('width','90%');
+                                    }
                                 }
                                 
                             }
