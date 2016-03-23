@@ -34,7 +34,9 @@ class CMobile_Element_Control_Input_Radio extends CMobile_Element_Control_Abstra
 
 	protected function build() {
 		$this->set_attr('type',$this->type);
-		
+		if($this->checked) {
+			$this->add_attr('checked', '');
+		}
 		$this->add_class('validate');
 
 		// if ($this->show_label) {
