@@ -355,6 +355,16 @@
             ),
             "requirements" => array("jquery-2.1.1"),
         ),
+        "slick" => array(
+            "js" => array(
+                "plugins/slick/slick.min.js",
+            ),
+            "css" => array(
+                "plugins/slick/slick.css",
+                "plugins/slick/slick-theme.css",
+            ),
+            "requirements" => array("jquery-2.1.1"),
+        ),
         "icheck" => array(
             "js" => array(
                 "plugins/icheck/icheck.min.js",

@@ -232,7 +232,13 @@
 
                 if ($this->submit) $input_type = "submit";
                 if ($this->button) {
-                    $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
+                    $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
+                    if (strlen($this->icon) > 0) {
+                        if ($this->bootstrap == '3.3') {
+                            $html->append('<i class="fa fa-' . $this->icon . '"></i> ');
+                        }
+                    }
+                    $html->appendln($this->label . '</button>');
                 }
                 else {
                     $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '/>');

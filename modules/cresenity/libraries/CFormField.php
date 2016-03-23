@@ -99,6 +99,7 @@
                         $this->label_class[] = 'control-label';
                     }
                 }
+                $this->label_class[] = 'lbl-form-group';
                 $label_class .= ' ' . implode(' ', $this->label_class);
                 $control_class .= ' ' . implode(' ', $this->control_class);
                 if ($this->show_label) {
