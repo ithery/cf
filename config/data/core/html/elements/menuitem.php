@@ -7,7 +7,7 @@ return array (
 		"checked"=>array(
 			"html5"=>true,
 			"html5_support"=>true,
-			"description"=>"Specifies that the command/menu item should be checked when the page loads. Only for type="radio" or type="checkbox""
+			"description"=>"Specifies that the command/menu item should be checked when the page loads. Only for type=\"radio\" or type=\"checkbox\""
 		),
 		"command"=>array(
 			"html5"=>true,
@@ -38,12 +38,12 @@ return array (
 		"radiogroup"=>array(
 			"html5"=>true,
 			"html5_support"=>true,
-			"description"=>"Specifies the name of the group of commands that will be toggled when the command/menu item itself is toggled. Only for type="radio""
+			"description"=>"Specifies the name of the group of commands that will be toggled when the command/menu item itself is toggled. Only for type=\"radio\""
 		),
 		"type"=>array(
 			"html5"=>true,
 			"html5_support"=>true,
-			"description"=>"Specifies the type of command/menu item. Default is "command""	
+			"description"=>"Specifies the type of command/menu item. Default is \"command\""	
 
 
 		),

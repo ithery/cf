@@ -27,7 +27,7 @@ return array (
 		"srclang"=>array(
 			"html5"=>true,
 			"html5_support"=>true,
-			"description"=>"Specifies the language of the track text data (required if kind="subtitles")"
+			"description"=>"Specifies the language of the track text data (required if kind=\"subtitles\")"
 			
 		),
 	),

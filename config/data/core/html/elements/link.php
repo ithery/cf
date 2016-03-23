@@ -38,7 +38,7 @@ return array (
 		"sizes"=>array(
 			"html5"=>true,
 			"html5_support"=>true,
-			"description"=>"Specifies the size of the linked resource. Only for rel="icon""
+			"description"=>"Specifies the size of the linked resource. Only for rel=\"icon\""
 		),
 		"target"=>array(
 			"html5"=>false,
