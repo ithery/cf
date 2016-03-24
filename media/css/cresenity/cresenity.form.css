@@ -152,7 +152,7 @@ label {
 		line-height: 16px;
 		border-width: 0;
 		color: inherit;
-		//color:expression(this.parentNode.currentStyle['color']);
+		/*color:expression(this.parentNode.currentStyle['color']);*/
 		-webkit-appearance: none;
 		-webkit-border-radius: 0;
 		-moz-border-radius: 0;
