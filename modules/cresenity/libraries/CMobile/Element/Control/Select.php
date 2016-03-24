@@ -96,9 +96,11 @@ class CMobile_Element_Control_Select extends CMobile_Element_AbstractControl {
     }
 
     public function js($indent = 0) {
-        $js = "$('#" . $this->id . "').material_select();";
-
-        return $js;
+        $js = new CStringBuilder();
+        $js->set_indent($indent);
+        $js->append(parent::js($indent))->br();
+        $js->append("$('#" . $this->id . "').material_select();");
+        return $js->text();
     }
 
 }

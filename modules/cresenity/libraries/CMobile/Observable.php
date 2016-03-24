@@ -74,6 +74,11 @@ abstract class CMobile_Observable extends CRenderable {
         $this->wrapper->add($field);
         return $field;
     }
+    public function add_message($field_id = "") {
+        $field = CMobile_Element_Message::factory($field_id);
+        $this->wrapper->add($field);
+        return $field;
+    }
     
     public function add_nav($field_id = "") {
         $field = CMobile_Element_Component_Nav::factory($field_id);
