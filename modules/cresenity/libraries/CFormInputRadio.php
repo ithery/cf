@@ -5,6 +5,7 @@
         protected $checked;
         protected $label;
         protected $applyjs;
+		protected $label_wrap;
         protected $inline;
 
         public function __construct($id) {
@@ -15,6 +16,7 @@
             $this->applyjs = "uniform";
             $this->checked = false;
             $this->inline = false;
+			$this->label_wrap=false;
         }
 
         public static function factory($id) {
@@ -35,6 +37,11 @@
             $this->label = $label;
             return $this;
         }
+		
+		public function set_label_wrap($bool) {
+			$this->label_wrap = $bool;
+			return $this;
+		}
         
         function get_inline() {
             return $this->inline;
@@ -63,6 +70,13 @@
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
+			$label_class='radio-inline';
+			if ($this->bootstrap == '3.3') {
+				if ($this->radio >= '1.0') {
+					$label_class = 'control-label';
+				}
+			}
+
 
             if ($this->bootstrap >= '3') {
                 if ($this->inline == false) {
@@ -70,11 +84,17 @@
                     $html->append(' <label>');
                 }
                 else {
-                    $html->append('<label class="radio-inline ' . $classes . '" >');
+                    $html->append('<label class="'.$label_class.' '. $classes . '" >');
                 }
                 $html->append('     <input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $checked . '>');
                 if (strlen($this->label) > 0) {
-                    $html->appendln($this->label);
+					if ($this->label_wrap) {
+						$html->appendln('<label for="'.$this->id.'" class="radio-label"><span></span>');
+					}
+					$html->appendln('&nbsp;' . $this->label);
+					if ($this->label_wrap) {
+						$html->appendln('</label>');
+					}
                 }
                 if ($this->inline == false) {
                     $html->append(' </label>');

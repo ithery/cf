@@ -10,6 +10,7 @@
         protected $text;
         
         protected $checkbox;
+        protected $radio;
         protected $bootstrap;
         protected $select2;
         protected $theme;
@@ -37,6 +38,7 @@
                 $this->select2 = carr::get($theme_data, 'select2');
                 $this->bootstrap = carr::get($theme_data, 'bootstrap');
                 $this->checkbox = carr::get($theme_data, 'checkbox', '0');
+                $this->radio = carr::get($theme_data, 'radio', '0');
                 $this->theme_style = carr::get($theme_data, 'theme_style');
             }
             if (strlen($this->bootstrap) == 0) {
