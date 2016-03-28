@@ -11,6 +11,7 @@
         protected $title;
         protected $actions;
         protected $param_inputs;
+        protected $param_request;
         protected $reload_page;
         protected $callback;
         protected $js_class;
@@ -23,6 +24,7 @@
             $this->content = CHandlerElement::factory();
             $this->actions = CActionList::factory();
             $this->param_inputs = array();
+            $this->param_request=array();
             $this->title = '';
             $this->js_class = null;
             $this->js_class_manual = null;
@@ -63,6 +65,16 @@
             }
             return $this;
         }
+        
+        public function add_param_request($param_request) {
+		if(!is_array($param_request)) {
+			$param_request = array($param_request);
+		}
+		foreach($param_request as $req_k => $req_v) {
+			$this->param_request[$req_k] = $req_v;
+		}
+		return $this;
+	}
 
         public function set_method($method) {
             $this->method = $method;
@@ -84,6 +96,10 @@
                 if (strlen($data_addition) > 0) $data_addition.=',';
                 $data_addition.="'" . $inp . "':$.cresenity.value('#" . $inp . "')";
             }
+            foreach($this->param_request as $req_k => $req_v) {
+			if(strlen($data_addition)>0) $data_addition.=',';
+			$data_addition.= "'".$req_k."':'".$req_v."'";
+		}
             $data_addition = '{' . $data_addition . '}';
             /*
               $js.= "
