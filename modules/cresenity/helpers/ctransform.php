@@ -60,14 +60,14 @@
             $digit = ccfg::get('decimal_digit');
             if ($decimal === null) {
                 if ($digit != null) {
-                    $float = substr($float, 0, $digit + 1);
+                    $float = substr($float, 0, $digit + 1)."";
                     if ($float == "") {
                         $float = $ds . str_repeat("0", $digit);
                     }
                 }
             }
             // remove char .
-            if ($decimal === 0) {
+            if ($decimal === 0||$digit==0) {
                 $float = '';
             }
             /*
