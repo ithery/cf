@@ -136,7 +136,10 @@
             if (strlen(self::$org_code) > 0) $capp_path.=self::$org_code . DS;
             if (strlen(self::$store_code) > 0)
                     $capp_path.=self::$store_code . DS;
-            $capp_path.="default" . DS;
+            
+            if(is_dir($capp_path."default" . DS)) {
+                $capp_path.="default" . DS;
+            }
 
             define('CAPPPATH', $capp_path);
             // Define CF error constant
