@@ -19,6 +19,7 @@
         protected $confirm_message;
         protected $button;
         protected $btn_style;
+        protected $value;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -40,6 +41,7 @@
             $this->confirm_message = "";
             $this->button = false;
             $this->btn_style = 'default';
+            $this->value = '';
         }
 
         public static function factory($id = '') {
@@ -76,6 +78,11 @@
         public function get_label() {
 
             return $this->orig_label;
+        }
+        
+        public function set_value($value) {
+            $this->value = $value;
+            return $this;
         }
 
         public function set_jsfunc($jsfunc) {
@@ -232,7 +239,7 @@
 
                 if ($this->submit) $input_type = "submit";
                 if ($this->button) {
-                    $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
+                    $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" value="' .$this->value .'" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
                     if (strlen($this->icon) > 0) {
                         if ($this->bootstrap == '3.3') {
                             $html->append('<i class="fa fa-' . $this->icon . '"></i> ');

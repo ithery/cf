@@ -274,7 +274,9 @@ class CClientScript extends CObject {
         }
 
         $js.= "
-                
+                if (typeof capp_started_event_initialized === 'undefined') {
+                    capp_started_event_initialized=false;
+                 }
                 if(!capp_started_event_initialized) {
                     var evt = document.createEvent('Events');
                     evt.initEvent( 'capp-started', false, true, window, 0);

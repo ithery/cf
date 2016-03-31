@@ -17,6 +17,9 @@ RewriteRule ^(modules|system) - [F,L]
 RewriteRule ^(wp)($|/) - [L]
 RewriteCond %{REQUEST_URI} !^/?(wp)/
 
+
+
+
 RewriteRule ^coba.php$ coba.php [QSA,L]
 
 # Allow any files or directories that exist to be displayed directly

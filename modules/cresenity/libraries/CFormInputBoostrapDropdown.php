@@ -47,11 +47,18 @@
                 $classes = " " . $classes;
             }
 
-            $html->appendln('<div class="btn-group b2c-select input-group ' . $classes . '" id="' . $this->id . '-select">');
+            $addition_attribute = "";
+            foreach ($this->attr as $k => $v) {
+                $addition_attribute.=" " . $k . '="' . $v . '"';
+            }
+            $html->appendln('<div class="btn-group bs-dropdown input-group ' . $classes . '" id="' . $this->id . '-select" ' .$addition_attribute .'>');
             $html->appendln('<input type="hidden" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '"/>');
             $default_value = carr::get($this->list, $this->value);
+            if ($default_value instanceof CRenderable) {
+                $default_value = $default_value->html();
+            }
             if (is_array($default_value)) {
-                $default_value = carr::get($default_value, 'value');
+                $default_value = carr::get($default_value, 'mask');
             }
             if ($default_value == null) {
                 $default_value = $this->placeholder;
@@ -78,6 +85,10 @@
                     $hover_class = 'hover';
                 }
                 $link = 'javascript:void(0);';
+                if ($list_v instanceof CRenderable) {
+                    $list_v = $list_v->html();
+                }
+                
                 if ($this->masking == false) {
                     $html->appendln('
                         <li class="dropdown-menu-list" val="' . $list_k . '">
@@ -132,6 +143,12 @@
                         });  
                     ');
             }
+            
+            foreach ($this->list as $list_k => $list_v) {
+                if ($list_v instanceof CRenderable) {
+                    $js->appendln($list_v->js());
+                }
+            }
             $js->appendln(parent::js());
             return $js->text();
         }
@@ -153,6 +170,17 @@
         public function set_list($list) {
             $this->list = $list;
             return $this;
+        }
+        
+        public function add_list_control($id = '', $type){
+            $control = null;
+            if ($this->manager->is_registered_control($type)) {
+                $control = $this->manager->create_control($id, $type);
+            } else {
+                trigger_error('Unknown control type ' . $type);
+            }
+            $this->list[] = $control;
+            return $control;
         }
 
         public function get_opt_is_hover() {

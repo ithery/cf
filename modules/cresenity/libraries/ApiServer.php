@@ -32,7 +32,6 @@
         protected $client_log_id = null;
         protected $related_log_path = '';
         protected $full_log_path = '';
-        protected $validate = false;
 
         /**
          *

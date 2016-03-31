@@ -53,7 +53,7 @@
             return $this;
         }
 
-        public function set_tab_position($tab_position){
+        public function set_tab_position($tab_position) {
             $this->tab_position = $tab_position;
             return $this;
         }
@@ -121,39 +121,41 @@
             if (strlen($widget_classes) > 0) {
                 $widget_classes = " " . $widget_classes;
             }
-            if ($this->bootstrap == '3') {
-                $html->appendln('<div class="row ' . $classes . '" id="' . $this->id . '">');
+            if ($this->bootstrap >= '3') {
+                $html->appendln('<div class="row tab-list' . $classes . '" id="' . $this->id . '">');
                 $html->appendln('   <div class="col-md-12">');
 
                 $html->appendln('       <div class="row">');
-                if($this->tab_position == 'top'){
+                if ($this->tab_position == 'top') {
                     $html->appendln('           <div class="row-tab-menu">');
                 }
                 else {
                     $html->appendln('           <div class="col-md-2">');
                 }
-            } else {
-                $html->appendln('<div class="row-fluid ' . $classes . '" id="' . $this->id . '">');
+            }
+            else {
+                $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
                 $html->appendln('	<div class="span12">');
 
                 $html->appendln('		<div class="row-fluid">');
-                if($this->tab_position == 'top'){
+                if ($this->tab_position == 'top') {
                     $html->appendln('           <div class="row-tab-menu">');
                 }
                 else {
                     $html->appendln('			<div class="span2">');
                 }
             }
-            if($this->tab_position == 'top'){
+            if ($this->tab_position == 'top') {
                 $html->appendln('               <div class="top-nav-container">');
             }
             else {
                 $html->appendln('				<div class="side-nav-container affix-top">');
             }
 
-            if($this->bootstrap == '3') {
-                $html->appendln('                   <ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
-            } else {
+            if ($this->bootstrap >= '3') {
+                $html->appendln('                                       <ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
+            }
+            else {
                 $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
             }
 
@@ -193,32 +195,34 @@
             $html->appendln('					</ul>');
             $html->appendln('				</div>');
             $html->appendln('			</div>');
-            if ($this->bootstrap == '3') {
-                if($this->tab_position == 'top'){
+            if ($this->bootstrap >= '3') {
+                if ($this->tab_position == 'top') {
                     $html->appendln('           <div class="row-tab-content">');
                 }
                 else {
                     $html->appendln('			<div class="col-md-10">');
                 }
-            } else {
-                if($this->tab_position == 'top'){
+            }
+            else {
+                if ($this->tab_position == 'top') {
                     $html->appendln('           <div class="row-tab-content">');
                 }
                 else {
                     $html->appendln('           <div class="span10">');
                 }
             }
-            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
-                    $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' .$widget_classes .'">');
-                    $html->appendln('                   <div class="box-header with-border">');
-            } else {
-                $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' .$widget_classes .'">');
-                if($this->tab_position != 'top'){
+            if ($this->bootstrap >= '3') {
+                $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' . $widget_classes . '">');
+                $html->appendln('                   <div class="box-header with-border">');
+            }
+            else {
+                $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widget_classes . '">');
+                if ($this->tab_position != 'top') {
                     $html->appendln('					<div class="widget-title">');
                 }
             }
 
-            if($this->tab_position != 'top'){
+            if ($this->tab_position != 'top') {
                 if ($this->have_icon) {
                     $html->appendln('						<span class="icon">');
                     $html->appendln('							<i class="icon-' . $active_tab_icon . '"></i>');
@@ -227,10 +231,11 @@
                 $html->appendln('						<h5>' . $active_tab_label . '</h5>');
                 $html->appendln('					</div>');
             }
-          
-            if ($this->bootstrap == '3' && $this->theme == 'ittron-app') {
-                $html->appendln('                   <div class="box-body">');
-            } else {
+
+            if ($this->bootstrap >= '3') {
+                $html->appendln('                                       <div class="box-body">');
+            }
+            else {
                 $html->appendln('					<div class="widget-content">');
             }
 
@@ -251,7 +256,7 @@
             $html->appendln('	</div>');
             $html->appendln('</div>');
 
-            if($this->tab_position == 'top'){
+            if ($this->tab_position == 'top') {
                 $html->appendln('
                     <style>
                         .top-nav-container ul {
@@ -291,12 +296,12 @@
                         .row-tab-content {
                             z-index: 1;
                             position: relative;');
-                
-                if($this->bootstrap == 3){
+
+                if ($this->bootstrap >= 3) {
                     $html->appendln('margin-top: -1px;');
                 }
                 else {
-                    $html->appendln('margin-top: 0px;');   
+                    $html->appendln('margin-top: 0px;');
                 }
 
                 $html->appendln('
@@ -350,15 +355,11 @@
 				
 				if(jQuery('#" . $this->id . "').hasClass('ajax')) {
 					$.cresenity.reload(target,url,method);
-				} else {
+				} 
+                                else {
 					var tab_id = jQuery(this).attr('data-tab');
 					jQuery('#'+tab_id).parent().children().hide();
 					jQuery('#'+tab_id).show();
-                                        //console.log(jQuery('#'+tab_id).find('li.active a.tab-ajax-load').attr('style'));
-                                        //console.log('AA');
-                                        //console.log(tab_id);
-                                        
-					
 				}
 				
 			});

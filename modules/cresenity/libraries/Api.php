@@ -19,6 +19,7 @@
         protected $class;
         protected $debug = false;
         protected $generate_doc = false;
+        protected $validate = false;
         
         protected function __construct(){
             $this->service = array();
@@ -74,8 +75,10 @@
             return $this->generate_doc;
         }
 
-        final public function set_generate_doc($generate_doc) {
-            $this->generate_doc = $generate_doc;
+        final public function set_generate_doc() {
+            $this->generate_doc = false;
+            $this->validate = false;
+            return $this;
         }
 
     

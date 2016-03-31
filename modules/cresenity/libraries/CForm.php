@@ -538,6 +538,7 @@
 					$(this).attr('clicked', 'true');
 				});
 				$('#" . $this->id . "').submit(function(event) {
+                                    
 					" . $validation_if_open . "
 						if($('#" . $this->id . "').hasClass('loading')) return false;
 						//don't do it again if still loading
@@ -561,7 +562,7 @@
 								//console.log(percentVal, position, total);
 							},
 							success: function(data) {
-								$.cresenity._handle_response(data,function() {
+                                                            $.cresenity._handle_response(data,function() {
                                                                     $('#" . $this->id . "').find('*').removeClass('disabled');
                                                                     $('#" . $this->id . "').removeClass('loading');
                                                                     " . $upload_progress_success . "

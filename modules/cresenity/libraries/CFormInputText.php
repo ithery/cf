@@ -79,8 +79,8 @@
             return $this;
         }
         
-        function add_action(){
-            $this->action = CAction::factory();
+        function add_action($id = ''){
+            $this->action = CAction::factory($id);
             return $this->action;
         }
         

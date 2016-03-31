@@ -31,7 +31,7 @@
                 $custom_css = ' style="' . $custom_css . '"';
             }
             $bootstrap_class = '';
-            if($this->bootstrap == '3') {
+            if($this->bootstrap >= '3') {
                 $bootstrap_class = ' label-default ';
             }
             if (is_array($this->value)) {

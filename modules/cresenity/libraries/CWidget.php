@@ -18,8 +18,9 @@
         public $header_action_style;
         public $height;
         public $attr;
-        public $minimize;
-        public $close;
+        private $collapse;
+        private $close;
+        private $js_collapse;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -39,8 +40,9 @@
             $this->header_action_style = 'widget-action';
             $this->header_action_list->set_style('widget-action');
             $this->attr = array();
-            $this->minimize = false;
+            $this->collapse = false;
             $this->close = false;
+            $this->js_collapse = true;
         }
 
         public static function factory($id = "") {
@@ -123,7 +125,26 @@
             $this->attr[$k] = $v;
             return $this;
         }
+        
+        function get_collapse() {
+            return $this->collapse;
+        }
 
+        function get_close() {
+            return $this->close;
+        }
+
+        function set_collapse($collapse) {
+            $this->collapse = $collapse;
+            return $this;
+        }
+
+        function set_close($close) {
+            $this->close = $close;
+            return $this;
+        }
+
+        
         public function html($indent = 0) {
             $html = new CStringBuilder();
             $html->set_indent($indent);
@@ -188,15 +209,14 @@
             }
             $html->appendln('		</span>');
             if ($this->bootstrap >= '3') {
-                $html->appendln('		<h3 class="box-title">' . $this->title . '</h3>');
                 $box_tools = false;
-                if ($this->minimize || $this->close) {
+                if ($this->collapse || $this->close) {
                     $box_tools = true;
                 }
 
                 if ($box_tools == true) {
                     $html->appendln('<div class="box-tools pull-right">');
-                    if ($this->minimize) {
+                    if ($this->collapse) {
                         $html->appendln('<button class="btn btn-info btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse">');
                         $html->appendln('<i class="fa fa-minus"></i>');
                         $html->appendln('</button>');
@@ -208,6 +228,7 @@
                     }
                     $html->appendln('</div>');
                 }
+                $html->appendln('		<h3 class="box-title">' . $this->title . '</h3>');
             }
             else {
                 $html->appendln('       <h5>' . $this->title . '</h5>');
@@ -262,6 +283,28 @@
             $js->set_indent($indent);
             if ($this->have_header_action()) {
                 $js->appendln($this->header_action_list->js($js->get_indent()));
+            }
+            
+            if ($this->bootstrap >= '3') {
+                if ($this->js_collapse == true) {
+                    if ($this->collapse) {
+                        $js->appendln('jQuery("#' .$this->id .' button[data-widget=\"collapse\"]").on("click", function(){
+                                var box = jQuery(this).parents(".box").first();
+                                if (box.hasClass("collapsed-box")){
+                                    box.find("> .box-body, > .box-footer").slideDown();
+                                    box.removeClass("collapsed-box");
+                                    jQuery(this).children(".fa").removeClass("fa-plus");
+                                    jQuery(this).children(".fa").addClass("fa-minus");
+                                }
+                                else {
+                                    box.find("> .box-body, > .box-footer").slideUp();
+                                    box.addClass("collapsed-box");
+                                    jQuery(this).children(".fa").addClass("fa-plus");
+                                    jQuery(this).children(".fa").removeClass("fa-minus");
+                                }
+                            });');
+                    }
+                }
             }
             $js->append(parent::js($js->get_indent()));
             return $js->text();

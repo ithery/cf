@@ -634,7 +634,7 @@ cresenity.func.js
 						jQuery('#'+id_target).append(data.html);
 						jQuery('#'+id_target).find('#'+id_target+'-loading').remove();
 						var script = $.cresenity.base64.decode(data.js);
-						//console.log(script);
+						console.log(script);
 						eval(script);
 						
 						jQuery('#'+id_target).removeClass('loading');
