@@ -593,8 +593,13 @@
             }
             else {
                 $js->appendln("//Form validation")->br();
+                $strvalidation = "";
+                if ($this->validation) {
+                    $strvalidation = "$('#" . $this->id . "').validationEngine();";
+                }
+                
                 $js->appendln("
-                $('#" . $this->id . "').validationEngine();
+                ".$strvalidation."
                 $('#" . $this->id . "').bind('jqv.form.result', function(event , errorFound){
                     if(errorFound) {
                             $('#" . $this->id . " .confirm').removeAttr('data-submitted');
