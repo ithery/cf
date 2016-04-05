@@ -126,6 +126,45 @@
             return $html;
         }
 
+        public function responsive_header_html($indent = 0) {
+
+            if (strlen($this->ajax_url) == 0) {
+                if ($this->ajax) {
+                    $ajax_url = CAjaxMethod::factory()->set_type('reload')
+                            ->set_data('json', $this->json())
+                            ->makeurl();
+                    $this->set_ajax_url($ajax_url);
+                }
+            }
+
+            $class_active = "";
+            if ($this->active) {
+                $class_active = "active";
+            }
+            
+            $tab_class = "";
+            
+            $tab_url = "";
+            if (strlen($this->ajax_url) > 0) {
+                $tab_url = ' data-url="' . $this->ajax_url . '"';
+            }
+            $tab_label = "";
+            if (strlen($this->label) > 0) {
+                $tab_label = $this->label;
+            }
+
+            $tab_target = "";
+            if (strlen($this->target) > 0) {
+                $tab_target = ' data-target="' . $this->target . '"';
+            }
+
+            $html = '<li class="' . $class_active . '"><a href="#" ' . $tab_class . $tab_target . $tab_url . ' data-toggle="tab">';
+            $html .= $tab_label;
+            $html .= '</a><div id="'.$this->id.'" class="resp-tab-target"></div></li>';
+
+            return $html;
+        }
+
         public function html($indent = 0) {
 
             $html = new CStringBuilder();
