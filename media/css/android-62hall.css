@@ -1,10 +1,10 @@
 @font-face {
     font-family: 'Android-62Hall';
-    src:    url('/media/font/android62hall/Android-62Hall.eot?xwdhlg');
-    src:    url('/media/font/android62hall/Android-62Hall.eot?xwdhlg#iefix') format('embedded-opentype'),
-        url('/media/font/android62hall/Android-62Hall.ttf?xwdhlg') format('truetype'),
-        url('/media/font/android62hall/Android-62Hall.woff?xwdhlg') format('woff'),
-        url('/media/font/android62hall/Android-62Hall.svg?xwdhlg#Android-62Hall') format('svg');
+    src:    url('../../media/font/android62hall/Android-62Hall.eot?xwdhlg');
+    src:    url('../../media/font/android62hall/Android-62Hall.eot?xwdhlg#iefix') format('embedded-opentype'),
+        url('../../media/font/android62hall/Android-62Hall.ttf?xwdhlg') format('truetype'),
+        url('../../media/font/android62hall/Android-62Hall.woff?xwdhlg') format('woff'),
+        url('../../media/font/android62hall/Android-62Hall.svg?xwdhlg#Android-62Hall') format('svg');
     font-weight: normal;
     font-style: normal;
 }

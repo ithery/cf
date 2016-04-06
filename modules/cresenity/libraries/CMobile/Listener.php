@@ -65,7 +65,7 @@
         }
 
         public function add_handler($handler_name) {
-            $handler = CHandler::factory($this->owner, $this->event, $handler_name);
+            $handler = CMobile_Handler::factory($this->owner, $this->event, $handler_name);
             $this->handlers[] = $handler;
             return $handler;
         }

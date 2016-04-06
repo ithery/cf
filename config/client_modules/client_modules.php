@@ -39,12 +39,12 @@
         "jquery.ui" => array(
             "js" => array("libs" . DS . "jquery.ui.custom.js"),
             "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery.ui.theme.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "jquery.dialog2" => array(
             "js" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.js", "plugins" . DS . "dialog2" . DS . "jquery.dialog2.helpers.js"),
             "css" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.css"),
-            "requirements" => array("jquery", "bootstrap"),
+            "requirements" => array("jquery-2.1.1", "bootstrap"),
         ),
         "jquery.datatable" => array(
             "js" => array(
@@ -54,7 +54,7 @@
                 "plugins" . DS . "datatable" . DS . "ColVis.min.js",
                 "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
             ),
-            "requirements" => array("jquery", "bootstrap"),
+            "requirements" => array("jquery-2.1.1", "bootstrap"),
         ),
         "jquery.datatable.tabletools" => array(
             "js" => array(
@@ -83,12 +83,12 @@
         "chosen" => array(
             "js" => array("plugins" . DS . "chosen" . DS . "chosen.jquery.min.js"),
             "css" => array("plugins" . DS . "chosen" . DS . "chosen.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "jquery.nestable" => array(
             "js" => array("plugins" . DS . "nestable" . DS . "jquery.nestable.js"),
             "css" => array("plugins" . DS . "nestable" . DS . "jquery.nestable.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "cresenity" => array(
             "js" => array(
@@ -140,7 +140,7 @@
                 "plugins" . DS . "wysihtml5" . DS . "bootstrap-wysihtml5.js",
             ),
             "css" => array("plugins" . DS . "wysihtml5" . DS . "bootstrap-wysihtml5.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "notify" => array(
             "js" => array("plugins" . DS . "notify" . DS . "bootstrap-notify.js"),
@@ -157,11 +157,11 @@
         ),
         "form" => array(
             "js" => array("plugins" . DS . "form" . DS . "jquery.form.js"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "controls" => array(
             "js" => array("plugins" . DS . "controls" . DS . "jquery.controls.js"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "event" => array(
             "js" => array(
@@ -187,19 +187,19 @@
                 "plugins" . DS . "validation-engine" . DS . "languages" . DS . "jquery.validationEngine-en.js",
             ),
             "css" => array("plugins" . DS . "validation-engine" . DS . "jquery.validationEngine.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "ckeditor" => array(
             "js" => array("plugins" . DS . "ckeditor" . DS . "ckeditor.js"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "isotope" => array(
             "js" => array("plugins" . DS . "isotope" . DS . "jquery.isotope.min.js"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "easing" => array(
             "js" => array("plugins" . DS . "easing" . DS . "jquery-easing-1.3.js"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "plupload" => array(
             "js" => array(
@@ -207,45 +207,45 @@
                 "plugins" . DS . "plupload" . DS . "jquery.plupload.queue.js",
             ),
             "css" => array("plugins" . DS . "plupload" . DS . "jquery.plupload.queue.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "servertime" => array(
             "js" => array("plugins" . DS . "servertime" . DS . "jquery.servertime.js"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "uniform" => array(
             "js" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.js"),
             "css" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "select2_v4" => array(
             "js" => array("plugins" . DS . "select2" . DS . "select2_v4.js"),
             "css" => array("plugins" . DS . "select2" . DS . "select2_v4.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "select2" => array(
             "js" => array("plugins" . DS . "select2" . DS . "select2.js"),
             "css" => array("plugins" . DS . "select2" . DS . "select2.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "select2-4.0" => array(
             "js" => array("plugins" . DS . "select2" . DS . "select2.full.js"),
             "css" => array("plugins" . DS . "select2" . DS . "select2-4.0.0.min.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "datepicker" => array(
             "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap-datepicker.js"),
             "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "timepicker" => array(
             "js" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.js"),
             "css" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "image-gallery" => array(
             "css" => array("plugins" . DS . "image-gallery" . DS . "bootstrap-image-gallery.min.css"),
-            "requirements" => array("jquery"),
+            "requirements" => array("jquery-2.1.1"),
         ),
         "modernizr" => array(
             "js" => array("libs" . DS . "modernizr.custom.js"),
