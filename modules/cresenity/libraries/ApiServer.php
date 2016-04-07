@@ -304,7 +304,7 @@
             $this->after();
             
             if ($this->session instanceof ApiSession) {
-                $this->session->set('response_' . $this->current_service_name, $this->request);
+                $this->session->set('response_' . $this->current_service_name, $this->response);
             }
 
             $response = array();
@@ -373,9 +373,9 @@
                     }
                 }
             }
-
             if ($this->generate_doc == false) {
                 $this->__after();
+                
             }
             if ($this->generate_doc == true || self::$has_return == true) {
                 return $this;
