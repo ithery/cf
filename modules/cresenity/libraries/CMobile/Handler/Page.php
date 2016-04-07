@@ -4,7 +4,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CMobile_Handler_Page extends CMobile_HandlerDriver {
 
-    protected $target;
+        protected $id;
         protected $method;
         protected $content;
         protected $param;
@@ -46,7 +46,7 @@ class CMobile_Handler_Page extends CMobile_HandlerDriver {
         }
 
         public function set_target($target) {
-            $this->target = $target;
+            $this->id = $target;
             return $this;
         }
         
@@ -86,8 +86,8 @@ class CMobile_Handler_Page extends CMobile_HandlerDriver {
 
         public function script() {
             $js = parent::script();
-            if (strlen($this->target) == 0) {
-                $this->target = "modal_opt_" . $this->event . "_" . $this->owner . "_dialog";
+            if (strlen($this->id) == 0) {
+                $this->id = "modal_opt_" . $this->event . "_" . $this->owner . "_dialog";
             }
 
             $data_addition = '';
@@ -140,12 +140,12 @@ class CMobile_Handler_Page extends CMobile_HandlerDriver {
                     $content = $this->generated_url();
                 }
                 $js .= "
-                    $." .$this->js_class .".show_page('" .$this->target ."','" .$this->title ."','" .$content ."');
+                    $." .$this->js_class .".show_page('" .$this->id ."','" .$this->title ."','" .$content ."');
                     ";
             }
             else {
                 $js.= "
-                        $.cresenity.show_page('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
+                        $.cresenity.show_page('" . $this->id . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
                     ";
             }
             return $js;

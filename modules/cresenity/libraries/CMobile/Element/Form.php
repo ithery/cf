@@ -564,7 +564,7 @@
 						}
 						" . $on_before_submit . " 
 						" . $this->action_before_submit . "
-						$('#" . $this->id . "').ajaxSubmit(options); 
+						
 					" . $validation_if_close . "	
 					//never submit form
 					return false;
