@@ -1,6 +1,7 @@
 <?php
+
 date_default_timezone_set('Asia/Jakarta');
-define('DS',DIRECTORY_SEPARATOR);
+define('DS', DIRECTORY_SEPARATOR);
 
 /**
  * This file acts as the "front controller" to your application. You can
@@ -9,7 +10,6 @@ define('DS',DIRECTORY_SEPARATOR);
  *
  * @see http://kohanaphp.com
  */
-
 /**
  * Define the website environment status. When this flag is set to TRUE, some
  * module demonstration controllers will result in 404 errors. For more information
@@ -79,48 +79,45 @@ define('EXT', '.php');
 
 $kohana_pathinfo = pathinfo(__FILE__);
 // Define the front controller name and docroot
-define('DOCROOT', $kohana_pathinfo['dirname'].DIRECTORY_SEPARATOR);
-define('KOHANA',  $kohana_pathinfo['basename']);
+define('DOCROOT', $kohana_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
+define('KOHANA', $kohana_pathinfo['basename']);
 
 // If the front controller is a symlink, change to the real docroot
 is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
 
 //we get app code from here
-$file = DOCROOT.'data'.DIRECTORY_SEPARATOR.'domain'.DIRECTORY_SEPARATOR;
+$file = DOCROOT . 'data' . DIRECTORY_SEPARATOR . 'domain' . DIRECTORY_SEPARATOR;
 $domain = $_SERVER["SERVER_NAME"];
 $file.=$domain;
 
 
-if(file_exists($file)) {
-	$content = file_get_contents($file);
-	$data = json_decode($content,true);
-	$app_code = $data['app_code'];
-	
-	$kohana_application = 'application'.DIRECTORY_SEPARATOR.$app_code;
+if (file_exists($file)) {
+    $content = file_get_contents($file);
+    $data = json_decode($content, true);
+    $app_code = $data['app_code'];
+
+    $kohana_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
 }
 
 
 
 // If kohana folders are relative paths, make them absolute.
-$kohana_application = file_exists($kohana_application) ? $kohana_application : DOCROOT.$kohana_application;
-$kohana_modules = file_exists($kohana_modules) ? $kohana_modules : DOCROOT.$kohana_modules;
-$kohana_system = file_exists($kohana_system) ? $kohana_system : DOCROOT.$kohana_system;
+$kohana_application = file_exists($kohana_application) ? $kohana_application : DOCROOT . $kohana_application;
+$kohana_modules = file_exists($kohana_modules) ? $kohana_modules : DOCROOT . $kohana_modules;
+$kohana_system = file_exists($kohana_system) ? $kohana_system : DOCROOT . $kohana_system;
 
 // Define application and system paths
-define('APPPATH', str_replace('\\', '/', realpath($kohana_application)).'/');
-define('MODPATH', str_replace('\\', '/', realpath($kohana_modules)).'/');
-define('SYSPATH', str_replace('\\', '/', realpath($kohana_system)).'/');
+define('APPPATH', str_replace('\\', '/', realpath($kohana_application)) . '/');
+define('MODPATH', str_replace('\\', '/', realpath($kohana_modules)) . '/');
+define('SYSPATH', str_replace('\\', '/', realpath($kohana_system)) . '/');
 
 // Clean up
 unset($kohana_application, $kohana_modules, $kohana_system);
 
-if (file_exists(DOCROOT.'install'.EXT))
-{
-	// Load the installation tests
-	include DOCROOT.'install'.EXT;
-}
-else
-{
-	// Initialize Kohana
-	require SYSPATH.'core/Bootstrap'.EXT;
+if (file_exists(DOCROOT . 'install' . EXT)) {
+    // Load the installation tests
+    include DOCROOT . 'install' . EXT;
+} else {
+    // Initialize Kohana
+    require SYSPATH . 'core/Bootstrap' . EXT;
 }
