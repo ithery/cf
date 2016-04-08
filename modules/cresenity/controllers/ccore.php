@@ -102,8 +102,10 @@
         }
 
         public function ajax($method) {
-
             $file = ctemp::makepath("ajax", $method . ".tmp");
+            if(!file_exists($file)) {
+                return;
+            }
             $text = file_get_contents($file);
             $obj = json_decode($text);
             $response = "";
