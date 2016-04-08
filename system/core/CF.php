@@ -1650,6 +1650,18 @@ final class CF {
     }
 
     /**
+     * Checks if given data is file, handles mixed input
+     *
+     * @param  mixed $value
+     * @return boolean
+     */
+    private static function is_file($value) {
+        $value = strval(str_replace("\0", "", $value));
+
+        return is_file($value);
+    }
+
+    /**
      * Displays nice backtrace information.
      * @see http://php.net/debug_backtrace
      *
@@ -1684,9 +1696,9 @@ final class CF {
             if (isset($entry['args']) AND is_array($entry['args'])) {
                 // Separator starts as nothing
                 $sep = '';
-
+                
                 while ($arg = array_shift($entry['args'])) {
-                    if (is_string($arg) AND is_file($arg)) {
+                    if (is_string($arg) AND self::is_file($arg)) {
                         // Remove docroot from filename
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
