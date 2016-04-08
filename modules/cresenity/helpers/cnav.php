@@ -435,16 +435,7 @@
             if ($nav === false) return false;
             $navname = $nav["name"];
             $app = CApp::instance();
-            if (isset($nav["requirements"])) {
-                $requirements = $nav["requirements"];
-                foreach ($requirements as $k => $v) {
-
-                    $config_value = ccfg::get($k, $domain);
-                    if ($config_value != $v) {
-                        return false;
-                    }
-                }
-            }
+            
             if (strlen($app_role_id) == 0) {
                 if ($app->user() != null) {
                     $app_role_id = cobj::get($app->user(), 'role_id');
@@ -453,7 +444,7 @@
 
             if (strlen($app_role_id) > 0) {
                 $app_role = crole::get($app_role_id);
-
+                if($app_role->parent_id==null) return true;
                 if ($app_role != null && (!isset($nav["subnav"]) || count($nav["subnav"]) == 0)) {
 
                     $parent_role_id = $app_role->parent_id;
@@ -462,6 +453,17 @@
 
                             return false;
                         }
+                    }
+                }
+            }
+            
+            if (isset($nav["requirements"])) {
+                $requirements = $nav["requirements"];
+                foreach ($requirements as $k => $v) {
+
+                    $config_value = ccfg::get($k, $domain);
+                    if ($config_value != $v) {
+                        return false;
                     }
                 }
             }
