@@ -32,6 +32,8 @@
             $this->style_form_group = null;
             $this->label_float = true;
             $this->label_for = '';
+            $this->wrapper = $this->add_div()->add_class('row')->add_div()->add_class('input-field col s12');
+
         }
 
         public static function factory($id = "") {
@@ -142,17 +144,16 @@
         }
 
 
-
-        public function html($indent = 0) {
-            $this->add_class('input-field');
+        public function build() {
+            parent::build();
             
             if ($this->show_label) {
-                $this->add_label()->set_label($this->label)->set_for_id($this->label_for)->set_data_error($this->data_error)->set_data_success($this->data_success);
+                $this->wrapper->add_label()->set_label($this->label)->set_for_id($this->label_for)->set_data_error($this->data_error)->set_data_success($this->data_success);
                 //$html->appendln('<label id="' . $this->id . '" class="' . $label_class . '">' . $this->label . '</label>')->br();
             }
-            
-            return parent::html($indent);
         }
+
+      
 
         public function set_style_form_group($style_form_group) {
             $this->style_form_group = $style_form_group;

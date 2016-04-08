@@ -40,9 +40,7 @@ input[type="submit"] {
   width: inherit;
   height: inherit;
 }
-.input-field label {
-  top: -1.2rem;
-}
+
 @media only screen and (max-width : 992px) {
   .content, .nav-wrapper {
     padding-left: 0;
