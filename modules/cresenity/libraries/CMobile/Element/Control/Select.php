@@ -70,7 +70,13 @@ class CMobile_Element_Control_Select extends CMobile_Element_AbstractControl {
                     $data_icon = $v['icon'];
                     $class_option .= ' circle';
                 }
-                $this->add('<option value="' . $k . '" data-icon="' . $data_icon . '" class="' . $class_option . '">' . $v['text'] . '</option>');
+                $selected = "";
+                if (strlen($this->value) > 0) {
+                    if ($this->value == $k) {
+                        $selected = "selected";
+                    }
+                }
+                $this->add('<option value="' . $k . '" data-icon="' . $data_icon . '" class="' . $class_option . '" '.$selected.'>' . $v['text'] . '</option>');
             }
         }
         if ($this->group_list != null) {

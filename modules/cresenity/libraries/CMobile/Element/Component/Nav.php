@@ -17,6 +17,7 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
     protected $search_label = null;
     protected $url;
     protected $method;
+    protected $search_value;
     
     public function __construct($id = "") {
 
@@ -26,6 +27,7 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
         $this->container = $this->wrapper->add_div();
         $this->right_menu = $this->container->add_ul('navbar-right-menu')->add_class('right');
         $this->method = 'POST';
+        $this->search_value = '';
     }
     
     public static function factory($id="") {
@@ -53,6 +55,11 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
         return $this;
     }
     
+    public function set_search_value($search_value) {
+        $this->search_value = $search_value;
+        return $this;
+    }
+    
     public function build() {
         $this->add_class('nav-header');
         $form = $this->wrapper->add_form('navbar-search')->custom_css('display', 'none');
@@ -65,6 +72,9 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
         $this->search = $form;
         $this->input_div = $this->search->add_div()->add_class('input-field');
         $this->input_field = $this->input_div->add_control('keyword', 'search');
+        if (strlen($this->search_value) > 0) {
+            $this->input_field->set_value($this->search_value);
+        }
         $this->search_label = $this->input_div->add_label()->set_for_id('navbar-search-input');
         $search_icon = $this->search_label->add_icon()->set_icon('search')->set_type(''); 
         $search_icon->custom_css('position', 'absolute');
