@@ -102,6 +102,10 @@
         public function load() {
             $this->callback_load();
             $filename = $this->session_path . $this->session_id . EXT;
+            if (!file_exists($filename)) {
+                $this->init();
+            }
+            
 
             if (!file_exists($filename)) {
                 throw new Exception('Session file doesnt exists');
