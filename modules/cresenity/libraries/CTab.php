@@ -164,7 +164,7 @@
                 $tab_target = ' data-target="' . $this->target . '"';
             }
 
-            $html = '<li class="' . $class_active . '"><a href="'.$tab_href.'" ' . $tab_class . $tab_target . $tab_url . ' data-toggle="tab">';
+            $html = '<li class="' . $class_active . '"><a href="'.$tab_href.'" ' . ' class="'.$tab_class. '"' . $tab_target . $tab_url . ' data-toggle="tab">';
             $html .= $tab_label;
             if (strlen($this->ajax_url) > 0) {
                 $html .= '</a><div id="'.$this->id.'" class="resp-tab-target"></div></li>';
