@@ -1,0 +1,135 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+class CMobile_Handler_Driver extends CMobile_HandlerDriver {
+
+    protected $target;
+    protected $method;
+    protected $content;
+    protected $param;
+    protected $title;
+    protected $actions;
+    protected $param_inputs;
+    protected $reload_page;
+    protected $callback;
+    protected $js_class;
+    protected $text;
+    protected $toggle;
+    protected $position;
+
+    public function __construct($owner, $event, $name) {
+        parent::__construct($owner, $event, $name);
+        $this->method = "get";
+        $this->target = "";
+        $this->content = CHandlerElement::factory();
+        $this->actions = CActionList::factory();
+        $this->param_inputs = array();
+        $this->title = '';
+        $this->text = '';
+        $this->toggle = false;
+        $this->position = "auto";
+    }
+   
+    
+    public function set_reload_page($reload_page){
+        $this->reload_page = $reload_page;
+        return $this;
+    }
+    
+    public function set_callback(callable $callback){
+        $this->callback = $callback;
+        return $this;
+    }
+
+    public function set_title($title) {
+        $this->title = $title;
+    }
+
+    public function set_target($target) {
+        $this->target = $target;
+        return $this;
+    }
+    public function set_text($text) {
+        $this->text = $text;
+        return $this;
+    }
+    public function set_position($position) {
+        $this->position = $position;
+        return $this;
+    }
+    
+    public function set_toggle() {
+        $this->toggle = TRUE;
+        return $this;
+    }
+
+    public function set_js_class($js_class) {
+        $this->js_class = $js_class;
+        return $this;
+    }
+
+    public function add_param_input($inputs) {
+        if (!is_array($inputs)) {
+            $inputs = array($inputs);
+        }
+        foreach ($inputs as $inp) {
+            $this->param_inputs[] = $inp;
+        }
+        return $this;
+    }
+
+    public function set_method($method) {
+        $this->method = $method;
+    }
+
+    public function content() {
+        return $this->content;
+    }
+
+    public function script() {
+        $js = parent::script();
+        if (strlen($this->target) == 0) {
+            $this->target = "modal_opt_" . $this->event . "_" . $this->owner . "_dialog";
+        }
+
+        $data_addition = '';
+
+        foreach ($this->param_inputs as $inp) {
+            if (strlen($data_addition) > 0) $data_addition.=',';
+            $data_addition.="'" . $inp . "':$.cresenity.value('#" . $inp . "')";
+        }
+        $data_addition = '{' . $data_addition . '}';
+        $js_class = ccfg::get('js_class');
+        if (strlen($js_class) > 0) {
+            $this->js_class = $js_class;
+        }
+        if (strlen($this->js_class) > 0) {
+            if ($this->content instanceof CHandlerElement) {
+                $content = $this->content->html();
+            }
+            else {
+                $content = $this->content;
+            }
+            $content = addslashes($content);
+            $content = str_replace("\r\n", "", $content);
+            $js .= "
+                $.cresenity.show_tooltip('" .$this->owner ."', '', '','" .$this->text ."', '" . $this->toggle . "', '" . $this->position . "', '" . $this->title . "');
+                ";
+        }
+        else {
+            if(strlen($this->url) == 0) {
+                $js.= "
+                    $.cresenity.show_tooltip('" .$this->owner ."', '', '','" .$this->text ."', '" . $this->toggle . "', '" . $this->position . "', '" . $this->title . "');
+                ";
+            } else {
+                $js.= "
+                    $.cresenity.show_tooltip('" . $this->owner . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->text . "', '" . $this->toggle . "', '" . $this->position . "' , '" . $this->title ."'," . $data_addition . ");
+                ";
+            }
+        }
+        return $js;
+    }
+
+}
+    
