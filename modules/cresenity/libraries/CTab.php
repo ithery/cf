@@ -128,14 +128,14 @@
 
         public function responsive_header_html($indent = 0) {
 
-            if (strlen($this->ajax_url) == 0) {
-                if ($this->ajax) {
-                    $ajax_url = CAjaxMethod::factory()->set_type('reload')
-                            ->set_data('json', $this->json())
-                            ->makeurl();
-                    $this->set_ajax_url($ajax_url);
-                }
-            }
+            // if (strlen($this->ajax_url) == 0) {
+            //     if ($this->ajax) {
+            //         $ajax_url = CAjaxMethod::factory()->set_type('reload')
+            //                 ->set_data('json', $this->json())
+            //                 ->makeurl();
+            //         $this->set_ajax_url($ajax_url);
+            //     }
+            // }
 
             $class_active = "";
             if ($this->active) {
@@ -147,7 +147,13 @@
             $tab_url = "";
             if (strlen($this->ajax_url) > 0) {
                 $tab_url = ' data-url="' . $this->ajax_url . '"';
+                $tab_href = "#";
             }
+            else {
+                $tab_href = "#".$this->id;
+                $tab_class .= "static-tab";
+            }
+
             $tab_label = "";
             if (strlen($this->label) > 0) {
                 $tab_label = $this->label;
@@ -158,9 +164,18 @@
                 $tab_target = ' data-target="' . $this->target . '"';
             }
 
-            $html = '<li class="' . $class_active . '"><a href="#" ' . $tab_class . $tab_target . $tab_url . ' data-toggle="tab">';
+            $html = '<li class="' . $class_active . '"><a href="'.$tab_href.'" ' . $tab_class . $tab_target . $tab_url . ' data-toggle="tab">';
             $html .= $tab_label;
-            $html .= '</a><div id="'.$this->id.'" class="resp-tab-target"></div></li>';
+            if (strlen($this->ajax_url) > 0) {
+                $html .= '</a><div id="'.$this->id.'" class="resp-tab-target"></div></li>';
+            }
+            else {
+                $html .= '</a>
+                    <div class="resp-tab-target-static">
+
+                    </div>
+                </li>';
+            }
 
             return $html;
         }
