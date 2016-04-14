@@ -84,7 +84,7 @@
             $method_segment = NULL;
 
             // Paths to search
-            $paths = CF::include_paths();
+            $paths = CF::include_paths_theme(TRUE);
 
             foreach (self::$rsegments as $key => $segment) {
                 // Add the segment to the search path
