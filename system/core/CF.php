@@ -20,6 +20,8 @@ final class CF {
     private static $configuration;
     // Include paths
     private static $include_paths;
+    // Theme Include paths
+    private static $include_paths_theme;
     // Logged messages
     private static $log;
     // Cache lifetime
@@ -42,6 +44,7 @@ final class CF {
     private static $app_code;
     private static $org_id;
     private static $org_code;
+    private static $theme;
     private static $store_id;
     private static $store_code;
     private static $shared_app_code = array();
@@ -55,6 +58,8 @@ final class CF {
         $result['org_code'] = '';
         $result['store_id'] = '';
         $result['store_code'] = '';
+        $result['shared_app_code'] = array();
+        $result['theme'] = '';
 
         if ($data != null) {
             $result['app_id'] = isset($data['app_id']) ? $data['app_id'] : null;
@@ -63,10 +68,12 @@ final class CF {
             $result['org_code'] = isset($data['org_code']) ? $data['org_code'] : null;
             $result['store_id'] = isset($data['store_id']) ? $data['store_id'] : null;
             $result['store_code'] = isset($data['store_code']) ? $data['store_code'] : null;
+            $result['shared_app_code'] = isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
+            $result['theme'] = isset($data['theme']) ? $data['theme'] : null;
         }
         return $result;
     }
-
+    
     public static function app_id() {
 
         return self::$app_id;
@@ -92,6 +99,13 @@ final class CF {
         return self::$store_code;
     }
 
+    public static function shared_app_code() {
+        return self::$shared_app_code;
+    }
+
+    public static function theme() {
+        return self::$theme;
+    }
     /**
      * Sets up the PHP environment. Adds error/exception handling, output
      * buffering, and adds an auto-loading method for loading classes.
@@ -131,6 +145,7 @@ final class CF {
             self::$org_code = isset($data['org_code']) ? $data['org_code'] : null;
             self::$store_id = isset($data['store_id']) ? $data['store_id'] : null;
             self::$store_code = isset($data['store_code']) ? $data['store_code'] : null;
+            self::$theme = isset($data['theme']) ? $data['theme'] : null;
         }
         $capp_path = APPPATH;
         if (strlen(self::$app_code) > 0) {
@@ -400,46 +415,11 @@ final class CF {
     }
 
     public static function get_files($directory, $filename, $domain = null) {
-        if ($domain == null)
+        if ($domain == null) {
             $domain = crouter::domain();
-
-        $data = cdata::get($domain, "domain");
-        $app_id = carr::get($data, 'app_id');
-        $app_code = carr::get($data, 'app_code');
-        $org_id = carr::get($data, 'org_id');
-        $org_code = carr::get($data, 'org_code');
-        $store_id = carr::get($data, 'store_id');
-        $store_code = carr::get($data, 'store_code');
-        // Add APPPATH as the first path
-        $include_paths = array();
-        //self::$include_paths[] = APPPATH;
-
-
-
-        if ($store_code != null) {
-            $include_paths[] = APPPATH . $app_code . DS . $org_code . DS . $store_code . DS;
-            $include_paths[] = APPPATH . $app_code . DS . $org_code . DS . $store_code . DS . "default" . DS;
         }
-        if ($org_code != null) {
-            $include_paths[] = APPPATH . $app_code . DS . $org_code . DS;
-            $include_paths[] = APPPATH . $app_code . DS . $org_code . DS . "default" . DS;
-        }
-        if ($app_code != null) {
-            $include_paths[] = APPPATH . $app_code . DS;
-            $include_paths[] = APPPATH . $app_code . DS . "default" . DS;
-        }
+        $include_paths = CF::include_paths();
 
-        $include_paths[] = APPPATH . "default" . DS;
-
-
-        foreach (self::$configuration['core']['modules'] as $path) {
-            if ($path = str_replace('\\', '/', realpath($path))) {
-                // Add a valid path
-                $include_paths[] = $path . '/';
-            }
-        }
-
-        $include_paths[] = DOCROOT;
 
         $result = array();
         foreach ($include_paths as $path) {
@@ -459,6 +439,74 @@ final class CF {
         return null;
     }
 
+    
+    public static function include_paths_theme($process = FALSE) {
+        
+        $theme = self::$theme;
+        
+        if ($process === TRUE) {
+
+            // Add APPPATH as the first path
+            self::$include_paths_theme = array();
+            //self::$include_paths[] = APPPATH;
+
+            if (self::$store_code != null) {
+                if ($theme != null) {
+                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS . "themes" . DS . $theme . DS;
+                }
+                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS;
+                if ($theme != null) {
+                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "themes" . DS . $theme . DS;
+                }
+                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
+            }
+            if (self::$org_code != null) {
+                if ($theme != null) {
+                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themse" . DS . $theme . DS;
+                }
+                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
+                if ($theme != null) {
+                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "themes" . DS . $theme . DS;
+                }
+                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
+            }
+            if (self::$app_code != null) {
+                if ($theme != null) {
+                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . "default" . DS . "themes" . DS . $theme . DS;
+                }
+                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . "default" . DS;
+                self::$include_paths_theme[] = APPPATH . self::$app_code . DS;
+            }
+
+            foreach (self::$shared_app_code as $key => $value) {
+                if (self::$org_code != null) {
+                    self::$include_paths_theme[] = APPPATH . $value . DS . self::$org_code . DS . "default" . DS;
+                    self::$include_paths_theme[] = APPPATH . $value . DS . self::$org_code . DS;
+                }
+
+                self::$include_paths_theme[] = APPPATH . $value . DS . "default" . DS;
+                self::$include_paths_theme[] = APPPATH . $value . DS;
+            }
+
+            self::$include_paths_theme[] = APPPATH . "default" . DS;
+
+            if (isset(self::$configuration['core']['modules'])) {
+                foreach (self::$configuration['core']['modules'] as $path) {
+                    if ($path = str_replace('\\', '/', realpath($path))) {
+                        // Add a valid path
+                        self::$include_paths_theme[] = $path . '/';
+                    }
+                }
+            }
+
+            // Add SYSPATH as the last path
+            self::$include_paths_theme[] = SYSPATH;
+
+            self::$include_paths_theme[] = DOCROOT;
+        }
+
+        return self::$include_paths_theme;
+    }
     /**
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
@@ -466,22 +514,41 @@ final class CF {
      * @param   boolean  re-process the include paths
      * @return  array
      */
-    public static function include_paths($process = FALSE) {
-
+    public static function include_paths($process = FALSE, $with_theme=false) {
+        $theme = '';
+        if($with_theme) {
+            $theme = self::$theme;
+        }
         if ($process === TRUE) {
+
             // Add APPPATH as the first path
             self::$include_paths = array();
             //self::$include_paths[] = APPPATH;
 
             if (self::$store_code != null) {
+                if ($theme != null) {
+                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS . "themes" . DS . $theme . DS;
+                }
                 self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS;
+                if ($theme != null) {
+                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "themes" . DS . $theme . DS;
+                }
                 self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
             }
             if (self::$org_code != null) {
+                if ($theme != null) {
+                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themse" . DS . $theme . DS;
+                }
                 self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
+                if ($theme != null) {
+                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "themes" . DS . $theme . DS;
+                }
                 self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
             }
             if (self::$app_code != null) {
+                if ($theme != null) {
+                    self::$include_paths[] = APPPATH . self::$app_code . DS . "default" . DS . "themes" . DS . $theme . DS;
+                }
                 self::$include_paths[] = APPPATH . self::$app_code . DS . "default" . DS;
                 self::$include_paths[] = APPPATH . self::$app_code . DS;
             }
@@ -1696,7 +1763,7 @@ final class CF {
             if (isset($entry['args']) AND is_array($entry['args'])) {
                 // Separator starts as nothing
                 $sep = '';
-                
+
                 while ($arg = array_shift($entry['args'])) {
                     if (is_string($arg) AND self::is_file($arg)) {
                         // Remove docroot from filename
