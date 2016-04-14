@@ -1382,7 +1382,13 @@
                 $data_responsive_open = '<div class="span12" style="overflow: auto;margin-left: 0;">';
                 $data_responsive_close = '</div>';
             }
-            $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered table-striped responsive" id="' . $this->id . '">')
+            
+            $classes = $this->classes;
+            $classes = implode(" ", $classes);
+            if (strlen($classes) > 0) {
+                $classes = " " . $classes;
+            }
+            $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered table-striped responsive ' .$classes .'" id="' . $this->id . '">')
                     ->inc_indent()->br();
             if ($this->show_header) {
                 $html->appendln('<thead>')
