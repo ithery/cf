@@ -23,6 +23,7 @@
         protected $default_session_path = null;
         protected $default_cookies_path = null;
         protected $default_log_path = null;
+        protected $encrypt = false;
 
         public function __construct($session_id = null, $have_cookies = false) {
             $include_paths = CF::include_paths();
@@ -51,6 +52,10 @@
                     }
                     break;
                 }
+            }
+            if ($this->encrypt == true) {
+                $this->session_id_encrypt = $session_id;
+                $session_id = $this->decrypt($this->session_id_encrypt);
             }
             $this->session_id = $session_id;
             $this->have_cookies = $have_cookies;
@@ -167,8 +172,22 @@
             }
         }
 
-        public function get_session_id() {
-            return $this->session_id;
+//        public function get_session_id() {
+//            return $this->session_id;
+//        }
+        
+        public function get_session_id($encrypt = true) {
+            if ($this->encrypt == false) {
+                return $this->session_id;
+            }
+            else {
+                if ($encrypt == true) {
+                    return $this->encrypt($this->session_id);
+                }
+                else {
+                    return $this->session_id;
+                }
+            }
         }
 
         public function error() {

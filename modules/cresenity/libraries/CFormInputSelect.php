@@ -5,9 +5,12 @@
         protected $group_list = array();
         protected $multiple;
         protected $applyjs;
+        protected $dropdown_classes;
 
         public function __construct($id) {
             parent::__construct($id);
+            
+            $this->dropdown_classes = array();
             $this->tag = "select";
             $this->multiple = false;
             $this->type = "select";
@@ -34,6 +37,20 @@
 
         public function add_group_list($group, $list) {
             $this->group_list[$group] = $list;
+            return $this;
+        }
+        
+        public function add_dropdown_class($c) {
+            if (is_array($c)) {
+                $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
+            }
+            else {
+                if ($this->bootstrap == '3.3') {
+                    $c = str_replace('span', 'col-md-', $c);
+                    $c = str_replace('row-fluid', 'row', $c);
+                }
+                $this->dropdown_classes[] = $c;
+            }
             return $this;
         }
 
@@ -154,7 +171,23 @@
                 else {
                     CManager::instance()->register_module('select2');
                 }
-                $js->append("$('#" . $this->id . "').select2();")->br();
+                $classes = $this->classes;
+                $classes = implode(" ", $classes);
+                if (strlen($classes) > 0) {
+                    $classes = " " . $classes;
+                }
+                if ($this->bootstrap == '3.3') {
+                    $classes = $classes . " form-control ";
+                }
+                $dropdown_classes = $this->dropdown_classes;
+                $dropdown_classes = implode(" ", $dropdown_classes);
+                if (strlen($dropdown_classes) > 0) {
+                    $dropdown_classes = " " . $dropdown_classes;
+                }
+                $js->append("$('#" . $this->id . "').select2({
+                        dropdownCssClass: '" .$dropdown_classes ."', // apply css that makes the dropdown taller
+                        containerCssClass : 'tpx-select2-container " . $classes . "'
+                    });")->br();
             }
             if ($this->applyjs == "chosen") {
                 $js->append("$('#" . $this->id . "').chosen();")->br();

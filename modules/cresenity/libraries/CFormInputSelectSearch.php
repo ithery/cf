@@ -11,10 +11,12 @@
         protected $placeholder;
         protected $auto_select;
         protected $min_input_length;
+        protected $dropdown_classes;
 
         public function __construct($id) {
             parent::__construct($id);
 
+            $this->dropdown_classes = array();
             $this->type = "selectsearch";
             $this->query = "";
             $this->format_selection = "";
@@ -73,6 +75,20 @@
 
         public function set_placeholder($placeholder) {
             $this->placeholder = $placeholder;
+            return $this;
+        }
+        
+        public function add_dropdown_class($c) {
+            if (is_array($c)) {
+                $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
+            }
+            else {
+                if ($this->bootstrap == '3.3') {
+                    $c = str_replace('span', 'col-md-', $c);
+                    $c = str_replace('row-fluid', 'row', $c);
+                }
+                $this->dropdown_classes[] = $c;
+            }
             return $this;
         }
 
@@ -221,6 +237,11 @@
             if ($this->bootstrap == '3.3') {
                 $classes = $classes . " form-control ";
             }
+            $dropdown_classes = $this->dropdown_classes;
+            $dropdown_classes = implode(" ", $dropdown_classes);
+            if (strlen($dropdown_classes) > 0) {
+                $dropdown_classes = " " . $dropdown_classes;
+            }
             if ($this->select2 >= '4') {
                 $str = "
                     $('#" . $this->id . "').select2({
@@ -266,7 +287,7 @@
                                 return '" . $str_selection . "';
                             }
                         },  // omitted for brevity, see the source of this page
-                        dropdownCssClass: '', // apply css that makes the dropdown taller
+                        dropdownCssClass: '" .$dropdown_classes ."', // apply css that makes the dropdown taller
                         containerCssClass : 'tpx-select2-container " . $classes . "'
                     }).change(function() {
 				" . $str_js_change . "
@@ -302,13 +323,12 @@
 				},
 				" . $str_js_init . "
 				formatResult: function(item) {
-                                console.log(item);
 					return '" . $str_result . "';
 				}, // omitted for brevity, see the source of this page
 				formatSelection: function(item) {
 					return '" . $str_selection . "';
 				},  // omitted for brevity, see the source of this page
-				dropdownCssClass: '', // apply css that makes the dropdown taller
+				dropdownCssClass: '" .$dropdown_classes ."', // apply css that makes the dropdown taller
 				containerCssClass : 'tpx-select2-container " . $classes . "'
 			}).change(function() {
 				" . $str_js_change . "
