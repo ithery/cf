@@ -6,5 +6,6 @@ return array(
 	'org_code'=>NULL,
 	'store_id'=>NULL,
 	'store_code'=>NULL,
-	'domain'=>'62hallfamily.local',
+	'domain'=>'floor.62hallfamily.local',
+	'theme'=>'62hallfloor',
 );
