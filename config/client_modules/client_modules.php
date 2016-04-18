@@ -345,6 +345,8 @@
                 "materialize/jscroll/jquery.jscroll.js",
                 "require.js",
                 "materialize/material_main.js",
+                "materialize/dlmenu/jquery.dlmenu.js",
+                "materialize/dlmenu/modernizr.custom.js",
             ),
             "requirements" => array("jquery-2.1.1"),
         ),
