@@ -571,9 +571,9 @@
 				return false;
 			}
 
-			if(!field.parents('.tab-pane')) {
+			if(field.parents('.tab-pane').length == 0) {
 				if (!options.validateNonVisibleFields && (field.is(":hidden") && !options.prettySelect || field.parent().is(":hidden"))) {
-					return false;
+                                    return false;
 				}
 			} else {
 				var tab = field.parents('.tab-pane');

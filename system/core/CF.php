@@ -462,7 +462,7 @@ final class CF {
             }
             if (self::$org_code != null) {
                 if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themse" . DS . $theme . DS;
+                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themes" . DS . $theme . DS;
                 }
                 self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
                 if ($theme != null) {

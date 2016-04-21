@@ -73,7 +73,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
         $js.= "
                 $.cresenity.reload('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
              ";
-
+       
         return $js;
     }
 

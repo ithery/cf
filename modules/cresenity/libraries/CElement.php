@@ -50,6 +50,11 @@
         public static function factory($id = "", $tag = "div") {
             return new CElement($id, $tag);
         }
+        
+        public function set_radio($radio) {
+            $this->radio = $radio;
+            return $this;
+        }
 
         public function set_text($text) {
             $this->text = $text;
@@ -108,6 +113,15 @@
 
         public function posttag() {
             return '</' . $this->tag . '>';
+        }
+        
+        public function generate_class(){
+            $classes = $this->classes;
+            $classes = implode(" ", $classes);
+            if (strlen($classes) > 0) {
+                $classes = " " . $classes;
+            }
+            return $classes;
         }
 
         public static function is_instanceof($val) {

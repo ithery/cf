@@ -134,7 +134,16 @@
             }
             return $default;
         }
-
+        
+        public function get_data() {
+            return $this->data;
+        }
+        
+        public function set_data($data) {
+            $this->data = $data;
+            return $this;
+        }
+        
         public function init() {
             $prefix = date("YmdHis");
             $this->session_id = uniqid($prefix);

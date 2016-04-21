@@ -125,14 +125,14 @@
 
             if ($this->opt_on_close == false) {
                 $js->appendln('
-                    jQuery("#' . $this->id . '-select .dropdown-menu").click(function(e){
+                    jQuery("body").on("click", "#' . $this->id . '-select .dropdown-menu", function(e){
                         e.stopPropagation();
                     });
                 ');
             }
             else {
                 $js->appendln('
-                        jQuery("#' . $this->id . '-select .dropdown-menu-list").on("click", function(){
+                        jQuery("body").on("click", "#' . $this->id . '-select .dropdown-menu-list", function(){
                             var value = jQuery(this).attr("val");
                             var show_value = jQuery(this).find(".dropdown-show-value").html();
                             if (typeof show_value === "undefined") {

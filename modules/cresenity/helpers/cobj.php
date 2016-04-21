@@ -9,8 +9,8 @@
 
     class cobj {
         
-        public static function get($object, $key){
-            return isset($object->$key) ? $object->$key : NULL;
+        public static function get($object, $key, $default = NULL){
+            return isset($object->$key) ? $object->$key : $default;
         }
         
         public static function xml_to_string($object){
