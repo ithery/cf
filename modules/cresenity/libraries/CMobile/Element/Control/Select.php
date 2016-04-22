@@ -6,6 +6,7 @@ class CMobile_Element_Control_Select extends CMobile_Element_AbstractControl {
     protected $applyjs;
     protected $prefix_icon;
     protected $list;
+    protected $placeholder;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -40,6 +41,11 @@ class CMobile_Element_Control_Select extends CMobile_Element_AbstractControl {
         return $this;
     }
 
+    public function set_placeholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
+
     protected function html_attr() {
         $html_attr = parent::html_attr();
         $multiple = "";
@@ -54,6 +60,9 @@ class CMobile_Element_Control_Select extends CMobile_Element_AbstractControl {
     public function build($indent = 0) {
         $this->add_class( $this->validation->validation_class());
         $html_attr = $this->html_attr();
+        if (strlen($this->placeholder)>0) {
+            $this->set_attr('placeholder',$this->placeholder);
+        }
         if (strlen($this->prefix_icon) > 0) {
             $this->before()->add_icon()->set_icon($this->prefix_icon)->set_type('prefix'); 
         }

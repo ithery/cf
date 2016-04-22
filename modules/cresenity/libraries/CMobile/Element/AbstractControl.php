@@ -124,6 +124,14 @@
 				
 				";
             }
+            $js .= "$( document ).ready(function() {
+                        if($('#" . $this->id . "').attr('type') == 'text') {
+                            var value_field = $('#" . $this->id . "').val();
+                            if(value_field.length > 0) {
+                                $('label[for=\'" . $this->id . "\']').addClass('active');
+                            }
+                        }
+                    });";
             $js.= parent::js($indent);
             return $js;
         }
