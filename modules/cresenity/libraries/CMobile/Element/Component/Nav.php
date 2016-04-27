@@ -71,7 +71,7 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
         }
         $this->search = $form;
         $this->input_div = $this->search->add_div()->add_class('input-field');
-        $this->input_field = $this->input_div->add_control('keyword', 'search');
+        $this->input_field = $this->input_div->add_control('keyword', 'search')->add_class('keyword-search');
         if (strlen($this->search_value) > 0) {
             $this->input_field->set_value($this->search_value);
         }
