@@ -3,12 +3,14 @@
     class CTable extends CElement {
 
         public $default_paging_list = array(
+            "1" => "1",
             "10" => "10",
             "25" => "25",
             "50" => "50",
             "100" => "100",
             "-1" => "ALL",
         );
+        public $current_row = 1;
         public $db;
         public $db_config;
         public $columns;

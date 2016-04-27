@@ -67,7 +67,7 @@
                 $js->append("})");
             }
             $js->append(";");
-
+            
             $js->appendln(parent::js($indent));
             return $js->text();
         }

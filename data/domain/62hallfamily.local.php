@@ -7,4 +7,5 @@ return array(
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'62hallfamily.local',
+        'theme' => 'ittron-62hall'
 );

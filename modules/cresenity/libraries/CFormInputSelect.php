@@ -6,6 +6,7 @@
         protected $multiple;
         protected $applyjs;
         protected $dropdown_classes;
+        protected $hide_search;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -15,6 +16,7 @@
             $this->multiple = false;
             $this->type = "select";
             $this->applyjs = "false";
+            $this->hide_search = false;
         }
 
         public static function factory($id) {
@@ -186,8 +188,12 @@
                 }
                 $js->append("$('#" . $this->id . "').select2({
                         dropdownCssClass: '" .$dropdown_classes ."', // apply css that makes the dropdown taller
-                        containerCssClass : 'tpx-select2-container " . $classes . "'
-                    });")->br();
+                        containerCssClass : 'tpx-select2-container " . $classes . "',
+                        ");
+                if ($this->hide_search) {
+                    $js->append("minimumResultsForSearch: Infinity,");
+                }
+                $js->append("});")->br();
             }
             if ($this->applyjs == "chosen") {
                 $js->append("$('#" . $this->id . "').chosen();")->br();
@@ -198,6 +204,15 @@
 
             return $js->text();
         }
+        
+        public function get_hide_search() {
+            return $this->hide_search;
+        }
 
+        public function set_hide_search($hide_search) {
+            $this->hide_search = $hide_search;
+            return $this;
+        }
+    
     }
     

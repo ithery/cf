@@ -9,6 +9,7 @@
             "100" => "100",
             "-1" => "ALL",
         );
+       
         public $db;
         public $db_config;
         public $columns;

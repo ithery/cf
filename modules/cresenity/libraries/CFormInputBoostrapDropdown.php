@@ -87,30 +87,39 @@
                 $link = 'javascript:void(0);';
                 if ($list_v instanceof CRenderable) {
                     $list_v = $list_v->html();
-                }
-                
-                if ($this->masking == false) {
+                    $link = 'javascript:void(0);';
                     $html->appendln('
-                        <li class="dropdown-menu-list" val="' . $list_k . '">
-                            <a class="dropdown-menu-list-link ' . $hover_class . '" href="' .$link .'">' . $list_v . '</a>
-                        </li>
-                            ');
+                            <li class="dropdown-menu-list" val="' . $list_k . '">
+                                <a class="dropdown-menu-list-link ' . $hover_class . '" href="' .$link .'">' . $list_v . '</a>
+                            </li>
+                                ');
                 }
                 else {
-                    $mask = $list_v;
-                    $value = $list_v;
-                    $link = 'javascript:void(0);';
-                    if (is_array($list_v)) {
-                        $mask = carr::get($list_v, 'mask');
-                        $value = carr::get($list_v, 'value');
-                        $link = carr::get($list_v, 'link', 'javascript:void(0);');
+                    if ($this->masking == false) {
+                        $html->appendln('
+                            <li class="dropdown-menu-list" val="' . $list_k . '">
+                                <a class="dropdown-menu-list-link ' . $hover_class . '" href="' .$link .'">' . $list_v . '</a>
+                            </li>
+                                ');
                     }
-                    $html->appendln('
-                        <li class="dropdown-menu-list" val="' . $list_k . '">
-                            <span class="dropdown-show-value hide">' .$value .'</span>
-                            <a class="dropdown-menu-list-link ' . $hover_class . '" href="' .$link .'">' . $mask . '</a>
-                        </li>
-                            ');
+                    else {
+                        $mask = $list_v;
+                        $value = $list_v;
+                        $link = 'javascript:void(0);';
+                        $class = '';
+                        if (is_array($list_v)) {
+                            $mask = carr::get($list_v, 'mask');
+                            $value = carr::get($list_v, 'value');
+                            $link = carr::get($list_v, 'link', 'javascript:void(0);');
+                            $class = carr::get($list_v, 'class', '');
+                        }
+                        $html->appendln('
+                            <li class="dropdown-menu-list ' .$class .'" val="' . $list_k . '">
+                                <span class="dropdown-show-value hide">' .$value .'</span>
+                                <a class="dropdown-menu-list-link ' . $hover_class . '" href="' .$link .'">' . $mask . '</a>
+                            </li>
+                                ');
+                    }
                 }
             }
             $html->appendln('   </ul>');

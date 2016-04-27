@@ -551,7 +551,6 @@
                 }
             }
 
-
             if (ccfg::get("install")) {
                 $v = CView::factory($theme_path . 'cinstall/page');
                 /*

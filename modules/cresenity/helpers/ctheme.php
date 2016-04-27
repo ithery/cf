@@ -32,5 +32,22 @@
         public static function set_theme($theme){
             Session::instance()->set( 'theme',$theme);
         }
+        
+        public static function get_theme_path(){
+            $theme_path = '';
+            $theme = ctheme::get_current_theme();
+            $theme_file = CF::get_file('themes', $theme);
+            if (file_exists($theme_file)) {
+                $theme_data = include $theme_file;
+                $theme_path = carr::get($theme_data, 'theme_path');
+                if ($theme_path == null) {
+                    $theme_path = '';
+                }
+                else {
+                    $theme_path .= '/';
+                }
+            }
+            return $theme_path;
+        }
     }
     
