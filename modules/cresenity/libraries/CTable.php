@@ -61,6 +61,7 @@
         public $footer_action_style;
         public $export_filename = '';
         public $export_sheetname = '';
+        protected $table_striped;
         protected $quick_search = FALSE;
         protected $tbody_id;
         protected $js_cell;
@@ -136,6 +137,7 @@
 
             $this->export_filename = $this->id;
             $this->export_sheetname = $this->id;
+            $this->table_striped = true;
 
             if (isset($this->theme)) {
                 if ($this->bootstrap >= '3.3') {
@@ -175,7 +177,12 @@
 
             return $this;
         }
-
+        
+        function set_table_striped($table_striped) {
+            $this->table_striped = $table_striped;
+            return $this;
+        }
+        
         public function set_widget_title($bool){
             $this->widget_title = $bool;
             return $this;
@@ -1390,7 +1397,10 @@
             if (strlen($classes) > 0) {
                 $classes = " " . $classes;
             }
-            $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered table-striped responsive ' .$classes .'" id="' . $this->id . '">')
+            if ($this->table_striped) {
+                $classes .= " table-striped ";
+            }
+            $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered  responsive ' .$classes .'" id="' . $this->id . '">')
                     ->inc_indent()->br();
             if ($this->show_header) {
                 $html->appendln('<thead>')
