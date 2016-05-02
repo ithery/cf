@@ -75,6 +75,11 @@ abstract class CMobile_Observable extends CRenderable {
         $this->wrapper->add($field);
         return $field;
     }
+    public function add_slick($field_id = "") {
+        $field = CMobile_Element_Component_Slick::factory($field_id);
+        $this->wrapper->add($field);
+        return $field;
+    }
     public function add_message($field_id = "") {
         $field = CMobile_Element_Message::factory($field_id);
         $this->wrapper->add($field);

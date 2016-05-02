@@ -350,9 +350,7 @@
             ),
             "requirements" => array("jquery-2.1.1"),
         ),
-        "android-62hall" => array(
-            "css" => array("android-62hall.css"),
-        ),
+        
         "moment" => array(
             "js" => array(
                 "plugins/momentjs/moment.js",

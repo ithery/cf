@@ -62,12 +62,12 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
     
     public function build() {
         $this->add_class('nav-header');
-        $form = $this->wrapper->add_form('navbar-search')->custom_css('display', 'none');
+        $form = $this->wrapper->add_div('navbar-search')->custom_css('display', 'none');
         if (strlen($this->url) > 0) {
-            $form->set_action($this->url);
+            // $form->set_action($this->url);
         }
         if (strlen($this->method) > 0) {
-            $form->set_method($this->method);
+            // $form->set_method($this->method);
         }
         $this->search = $form;
         $this->input_div = $this->search->add_div()->add_class('input-field');
