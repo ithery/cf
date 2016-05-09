@@ -41,6 +41,7 @@
             'materialize',
             'android-62hall',
             'validation',
+            'slick',
          //   'moment',
          //   'datepicker_material',
         ),

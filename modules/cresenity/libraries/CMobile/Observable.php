@@ -98,6 +98,12 @@ abstract class CMobile_Observable extends CRenderable {
         return $field;
     }
 
+    public function add_menu($field_id = "") {
+        $field = CMobile_Element_Component_SideNav_Menu::factory($field_id);
+        $this->wrapper->add($field);
+        return $field;
+    }
+
 
     public function add_chip($field_id = "") {
         $field = CMobile_Element_Component_Chip::factory($field_id);
