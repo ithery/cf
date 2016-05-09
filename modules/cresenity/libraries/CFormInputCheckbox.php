@@ -83,7 +83,7 @@ class CFormInputCheckbox extends CFormInput {
         if (strlen($classes) > 0)
             $classes = " " . $classes;
         if ($this->bootstrap == '3') {
-            $classes = $classes ." form-control ";
+            //$classes = $classes ." form-control ";
         }
         if ($this->bootstrap == '3.3') {
             if ($this->checkbox >= '1.0') {
