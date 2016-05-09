@@ -41,8 +41,9 @@
             'materialize',
             'android-62hall',
             'validation',
+            'touchspin',
             'slick',
-         //   'moment',
+//            'moment',
          //   'datepicker_material',
         ),
        "js" => array(
