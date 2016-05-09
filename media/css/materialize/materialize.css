@@ -1,6 +1,11 @@
 /*.content, .nav-wrapper {
   padding-left: 240px;
 }*/
+body {
+  -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+  -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+  -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+}
 nav ul a {
   padding: 0 5px;
 }
