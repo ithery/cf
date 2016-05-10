@@ -120,6 +120,7 @@ class CMobile_Handler_Page extends CMobile_HandlerDriver {
               jQuery('<div/>').dialog2(modal_opt_".$this->event."_".$this->owner.");
               ";
              */
+            $this->title = utilities::excerpt_paragraph($this->title, 25, '..', false);
             $js_class = ccfg::get('js_class');
             if (strlen($js_class) > 0) {
                 $this->js_class = $js_class;
