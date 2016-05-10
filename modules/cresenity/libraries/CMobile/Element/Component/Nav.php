@@ -25,7 +25,7 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
         $this->tag = "nav";
         $this->wrapper = $this->add_div()->add_class('nav-wrapper');
         $this->container = $this->wrapper->add_div();
-        $this->right_menu = $this->container->add_ul('navbar-right-menu')->add_class('right');
+        $this->right_menu = $this->container->add_ul('navbar-right-menu')->add_class('right ul-top-menu');
         $this->method = 'POST';
         $this->search_value = '';
     }
@@ -62,7 +62,7 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
     
     public function build() {
         $this->add_class('nav-header');
-        $form = $this->wrapper->add_div('navbar-search')->custom_css('display', 'none');
+        $form = $this->wrapper->add_div('navbar-search')->custom_css('display', 'none')->add_class('searchform');
         if (strlen($this->url) > 0) {
             // $form->set_action($this->url);
         }
@@ -79,6 +79,6 @@ class CMobile_Element_Component_Nav  extends CMobile_Element_AbstractComponent {
         $search_icon = $this->search_label->add_icon()->set_icon('search')->set_type(''); 
         $search_icon->custom_css('position', 'absolute');
         $search_icon->custom_css('left', '1rem');
-        $this->input_div->add_icon('navbar-search-close')->set_icon('close')->set_type(''); 
+        $this->input_div->add_icon('navbar-search-close')->set_icon('close')->set_type('')->add_class('searchbar-close'); 
     }
 }
