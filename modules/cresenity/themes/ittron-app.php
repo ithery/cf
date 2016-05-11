@@ -8,6 +8,7 @@
         "theme_style" => array(
             "form_layout" => "horizontal",
             "form_field_style" => "inline",
+            "inline_without_default" => "0",
         ),
         "client_modules" => array(
             'jquery',

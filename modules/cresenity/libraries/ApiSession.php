@@ -141,6 +141,7 @@
         
         public function set_data($data) {
             $this->data = $data;
+            $this->save();
             return $this;
         }
         
