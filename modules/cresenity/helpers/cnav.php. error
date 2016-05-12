@@ -20,20 +20,9 @@
                 $nav_method = carr::get($nav, 'method', '');
                 $nav_controller = carr::get($nav, 'controller', '');
 
-//                var_dump($path .$controller);
-//                cdbg::var_dump($nav);
 
-                if ($nav_path != '') {
-                    if ($nav_controller != '' && $nav_method != '' 
-                            && $nav_controller == $controller && $nav_method == $method) {
-                        return $nav;
-                    }
-                }
-                else {
-                    if ($nav_controller != '' && $nav_method != '' 
-                            && $nav_controller == $path .$controller && $nav_method == $method) {
-                        return $nav;
-                    }
+                if ($nav_controller != '' && $nav_method != '' && $nav_controller == $controller && $nav_method == $method && $nav_path == $path) {
+                    return $nav;
                 }
                 if (isset($nav["action"])) {
                     foreach ($nav["action"] as $act) {
@@ -208,112 +197,6 @@
             return $url;
         }
 
-        public function render_theme($theme, $navs = null, $level = 0, &$child = 0, &$activated = false) {
-            $is_admin = CApp::instance()->is_admin();
-            if ($navs == null) $navs = CNavigation::instance()->navs();
-
-            if ($navs == null) return false;
-            $html = "";
-            $child_count = 0;
-            $nav_active = false;
-            foreach ($navs as $d) {
-                if ($level <= 1) {
-                    $activated = false;
-                }
-                $child = 0;
-                $active_class = "";
-                $controller = "";
-                $method = "";
-                $label = "";
-                $icon = "";
-                if (isset($d["controller"])) $controller = $d["controller"];
-                if (isset($d["method"])) $method = $d["method"];
-                if (isset($d["label"])) $label = $d["label"];
-                if (isset($d["icon"])) $icon = $d["icon"];
-
-                $child_html = "";
-
-                if (isset($d["subnav"])) {
-                    $child_html .= cnav::render_theme($theme, $d["subnav"], $level + 1, $child, $activated);
-                }
-
-                $url = cnav::url($d);
-                if (!isset($url) || $url == null) {
-                    $url = "";
-                }
-
-                if (strlen($child_html) > 0 || strlen($url) > 0) {
-                    if (!cnav::access_available($d, CF::app_id(), CF::domain())) {
-                        continue;
-                    }
-                    if (isset($d["controller"]) && $d["controller"] != "") {
-                        if (!$is_admin && ccfg::get("have_user_access")) {
-                            if (!cnav::have_access($d)) {
-                                continue;
-                            }
-                        }
-                    }
-
-                    $child_count++;
-
-                    $li_class = "";
-                    if ($child > 0) {
-//                        $li_class.=" with-right-arrow";
-                        if ($level == 0) {
-                            $li_class.=" treeview";
-                        }
-                    }
-
-                    // selected navigator
-                    $find_nav = cnav::nav($d);
-                    if ($find_nav !== false || $activated == true) {
-                        $nav_active = true;
-                        $active_class = " active";
-                    }
-
-                    // icon
-                    $icon_html = "";
-                    if (isset($d["icon"]) && strlen($d["icon"]) > 0) {
-                        $icon_html = '<i class="fa fa-' . $d["icon"] . '"></i>';
-                    }
-
-                    $html .= "<li class='" . $active_class . " " . $li_class . "'>";
-
-                    if ($url == "") {
-                        $elem = "<a href='#'>
-                                    " . $icon_html . "</i><span>" . clang::__($label) . "</span> 
-                                    <i class='fa fa-angle-left pull-right'></i>
-                                  </a>";
-                    }
-                    else {
-                        $elem = "<a href='" . $url . "'>" . $icon_html . "<span>" . clang::__($label) . "</span></a>";
-                    }
-                    $html .= $elem;
-                    $html .= $child_html;
-                    $html .= '</li>';
-                }
-            }
-            
-            if ($nav_active == true) {
-                $activated = true;
-            }
-
-            if (strlen($html) > 0) {
-                if ($level == 0) {
-                    $html = "<ul class='sidebar-menu'>" . $html . "</ul>";
-                }
-                else {
-                    $html = "<ul class=\"treeview-menu\">\r\n" . $html . "  </ul>\r\n";
-                }
-            }
-           
-            if ($child_count == 0) {
-                $html = "";
-            }
-            $child = $child_count;
-            return $html;
-        }
-
         public function render($navs = null, $level = 0, &$child = 0) {
 
             $is_admin = CApp::instance()->is_admin();
@@ -435,7 +318,16 @@
             if ($nav === false) return false;
             $navname = $nav["name"];
             $app = CApp::instance();
-            
+            if (isset($nav["requirements"])) {
+                $requirements = $nav["requirements"];
+                foreach ($requirements as $k => $v) {
+
+                    $config_value = ccfg::get($k, $domain);
+                    if ($config_value != $v) {
+                        return false;
+                    }
+                }
+            }
             if (strlen($app_role_id) == 0) {
                 if ($app->user() != null) {
                     $app_role_id = cobj::get($app->user(), 'role_id');
@@ -444,7 +336,7 @@
 
             if (strlen($app_role_id) > 0) {
                 $app_role = crole::get($app_role_id);
-                if($app_role->parent_id==null) return true;
+
                 if ($app_role != null && (!isset($nav["subnav"]) || count($nav["subnav"]) == 0)) {
 
                     $parent_role_id = $app_role->parent_id;
@@ -453,17 +345,6 @@
 
                             return false;
                         }
-                    }
-                }
-            }
-            
-            if (isset($nav["requirements"])) {
-                $requirements = $nav["requirements"];
-                foreach ($requirements as $k => $v) {
-
-                    $config_value = ccfg::get($k, $domain);
-                    if ($config_value != $v) {
-                        return false;
                     }
                 }
             }
