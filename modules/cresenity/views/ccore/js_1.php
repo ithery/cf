@@ -1,4 +1,4 @@
-
+<script>
 //** jQuery Scroll to Top Control script- (c) Dynamic Drive DHTML code library: http://www.dynamicdrive.com.
 //** Available/ usage terms at http://www.dynamicdrive.com (March 30th, 09')
 //** v1.1 (April 7th, 09'):
@@ -669,218 +669,154 @@ cresenity.func.js
 
 		},
 		show_dialog : function(id_target,url,method,title,data_addition) {
-                    <?php
-                        $bootstrap = ccfg::get('bootstrap');
-                        $theme_data = CManager::instance()->get_theme_data();
-                        if (isset($theme_data)) {
-                            $bootstrap = carr::get($theme_data, 'bootstrap');
-                        }
-                        if (strlen($bootstrap) == 0) {
-                            $bootstrap = ccfg::get('bootstrap');
-                        }
-                        
-                        if ($bootstrap >= '3.3') {
-                    ?>
-                        if(!title) title = 'Dialog';
-                        if(typeof data_addition == 'undefined') data_addition={};
-                    
-                        var _dialog_html = "<div class='modal fade'>" 
-                            + "<div class='modal-dialog'>"
-                                + "<div class='modal-content'>"
-                                    + "<div class='modal-header'>"
-                                    + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>×</span></button>"
-                                    + "<h4 class='modal-title'></h4>"
-                                    + "</div>"
-                                    + "<div class='modal-body loading'>"
-                                    + "</div>"
-
-                                + "</div>"
-                            + "</div>"
-                        + "</div>";
-                        var selection = jQuery('#'+id_target);
+			if(!title) title = 'Dialog';
+			
+			if(typeof data_addition == 'undefined') data_addition={};
+			
+			<?php 
+//			$bootstrap = ccfg::get('bootstrap');
+			$role = '';
+			$modal_class = '';
+			$dialog_div_open = '';
+			$dialog_div_close = '';
+//			if (strlen($bootstrap) > 0) {
+//				if($bootstrap == '3') {
+//					$modal_class = "modal-bs-3";
+//					$role = 'role=\"dialog\"';
+//					$dialog_div_open = '<div class=\"modal-dialog modal-open modal-lg\" role=\"document\"><div class=\"modal-content\">';
+//					$dialog_div_close = '</div></div>';
+//				}
+//			}
+			?>
+			var _dialog_html = "<div class='modal <?php echo $modal_class;?>' style=\"display: none;\" >" + 
+				"<?php echo $dialog_div_open;?><div class='modal-header loading'>" +
+				"<a href='#' class='close'></a>" + 
+				"<span class='loader'></span><h3></h3>" + 
+				"</div>" + 
+				"<div class='modal-body'>" + 
+				"</div>" + 
+				"<div class='modal-footer'>" + 
+				"</div>" + 
+				"<?php echo $dialog_div_close;?></div>";
+			
+			
+			var selection = jQuery('#'+id_target);
                         var handle;
-                        var dialog_is_remove = false;
-                        if(selection.length == 0) {
-                            selection = jQuery('<div/>').attr('id',id_target);
-                            dialog_is_remove = true;
-                        }
-                        url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
-                        if (!selection.is(".modal-body")) {
-                            var parent = $(_dialog_html);
-                            
-                            jQuery(".modal-header .close[data-dismiss='modal']", parent).click(function(event) {
-                                event.preventDefault();
-                                if(dialog_is_remove) {
-                                    jQuery(this).parents(".modal").remove();
-                                }
-                                else {
-                                    jQuery(this).parents(".modal").removeClass('in').hide();
-                                }
-                            });
-                           
-                            jQuery("body").append(parent);
-                            jQuery(".modal-header .modal-title", parent).html(title);
-                            handle = $(".modal-body", parent);
-                            if (selection.is("div") && selection.length == 1) {
-                                handle.replaceWith(selection);
-                                selection.addClass("modal-body").show();
-                                handle = selection;
-                            }
-                            // If not, append current selection to dialog body
-                            else {
-                                handle.append(selection);
-                            }
-                        }
-                        else {
-                            handle = selection;
-                        }
-                        if(!method) method="get";
-                        var xhr = handle.data('xhr');
-                        if (xhr) xhr.abort();
-                        
-                        url = $.cresenity.url.replace_param(url);
-                        jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
-                        if (!handle.is(".opened")) {
-                            handle.parents('.modal').addClass("in").show();
-                        }
-                        handle.data('xhr',jQuery.ajax({
-                                type: method,
-                                url: url,
-                                dataType: 'json',
-                                data: data_addition,
-                            }).done(function( data ) {
-                                $.cresenity._handle_response(data,function() {
-                                    jQuery('#'+id_target).html(data.html);
-                                    if (data.js && data.js.length>0) {
-                                        var script = $.cresenity.base64.decode(data.js);
-                                        eval(script);
-                                    }
-                                    jQuery('#'+id_target).removeClass('loading');
-                                    jQuery('#'+id_target).data('xhr',false);
-                                    if (jQuery('#'+id_target).find('.prettyprint').length>0) {
-                                        window.prettyPrint && prettyPrint();
-                                    }
-                                    if (data.title) {
-                                        jQuery('#'+id_target+'').parent().find('.modal-header .modal-title').html(data.title);
-                                    }
-                                });
-                            }).error(function(obj,t,msg) {
-                                if (msg!='abort') {
-                                    $.cresenity.message('error','Error, please call administrator... (' + msg + ')');
-                                }
-                            })
-                        );
-                    <?php
-                        }
-                        else {
-                            // do Old show_dialog
-                    ?>
-                    if(!title) title = 'Dialog';
+			var dialog_is_remove = false;
+			if(selection.length==0) {
+				selection = jQuery('<div/>').attr('id',id_target);
+				dialog_is_remove = true;
+			}
+			
+			
+			
+			url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
+			if (!selection.is(".modal-body")) {
+				var overlay = $('<div class="modal-backdrop"></div>').hide();
+				var parent = $(_dialog_html);
+				
+				jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function(event) {
+					event.preventDefault();
+					<?php
+//	                 if (strlen($bootstrap) > 0) {
+//						 if($bootstrap == '3') {
+					?>
+//					if(dialog_is_remove) {
+//						handle.parents(".modal-bs-3").prev(".modal-backdrop").remove();
+//						jQuery(this).parents(".modal").find(".modal-dialog").parent().remove();
+//					} else {
+//						handle.parents(".modal-bs-3").prev(".modal-backdrop").hide();
+//						jQuery(this).parents(".modal").find(".modal-dialog").parent().hide();
+//
+//					}
+					<?php
+//						}
+//					} else { ?>
+					if(dialog_is_remove) {
+						handle.parent().prev(".modal-backdrop").remove();
+						jQuery(this).parents(".modal").find(".modal-body").parent().remove();
+					} else {
+						handle.parent().prev(".modal-backdrop").hide();
+						jQuery(this).parents(".modal").find(".modal-body").parent().hide();
 
-                    if(typeof data_addition == 'undefined') data_addition={};
+					}
+					<?php // } ?>
+				});
+				jQuery("body").append(overlay).append(parent);
+				jQuery(".modal-header h3", parent).html(title);
+				handle = $(".modal-body", parent);
+				// Create dialog body from current jquery selection
+				// If specified body is a div element and only one element is 
+				// specified, make it the new modal dialog body
+				// Allows us to do something like this 
+				// $('<div id="foo"></div>').dialog2(); $("#foo").dialog2("open");
+				if (selection.is("div") && selection.length == 1) {
+					handle.replaceWith(selection);
+					selection.addClass("modal-body").show();
+					handle = selection;
+				}
+				// If not, append current selection to dialog body
+				else {
+					handle.append(selection);
+				}
+			} else {
+                handle = selection;
+            }
+			if(!method) method="get";
+			var xhr = handle.data('xhr');
+			if(xhr) xhr.abort();
+			
+			url = $.cresenity.url.replace_param(url);
+			jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+			if (!handle.is(".opened")) {
+                overlay.show();
+                
+                handle.addClass("opened").parent().show();
+                <?php
+//                if (strlen($bootstrap) > 0) {
+//					if($bootstrap == '3') {
+				?>
+					/*jQuery('.modal-backdrop').remove();*/
+					jQuery('#'+id_target+'').parents().eq(2).show();
+				<?php // }} ?>
+                    
+               
+            }
+			handle.data('xhr',jQuery.ajax({
+					type: method,
+					url: url,
+					dataType: 'json',
+					data: data_addition,
+					
+				}).done(function( data ) {
+					
+					$.cresenity._handle_response(data,function() {
+						jQuery('#'+id_target).html(data.html);
+						if(data.js && data.js.length>0) {
+							var script = $.cresenity.base64.decode(data.js);
+							eval(script);
+						}
+						jQuery('#'+id_target).removeClass('loading');
+						jQuery('#'+id_target).data('xhr',false);
+						if(jQuery('#'+id_target).find('.prettyprint').length>0) {
+							window.prettyPrint && prettyPrint();
 
-                    var _dialog_html = "<div class='modal' style=\"display: none;\" >" + 
-                            "<div class='modal-header loading'>" +
-                            "<a href='#' class='close'></a>" + 
-                            "<span class='loader'></span><h3></h3>" + 
-                            "</div>" + 
-                            "<div class='modal-body'>" + 
-                            "</div>" + 
-                            "<div class='modal-footer'>" + 
-                            "</div>" + 
-                            "</div>";
-
-
-                    var selection = jQuery('#'+id_target);
-                    var handle;
-                    var dialog_is_remove = false;
-                    if(selection.length == 0) {
-                            selection = jQuery('<div/>').attr('id',id_target);
-                            dialog_is_remove = true;
-                    }
-
-
-
-                    url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
-                    if (!selection.is(".modal-body")) {
-                            var overlay = $('<div class="modal-backdrop"></div>').hide();
-                            var parent = $(_dialog_html);
-
-                            jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function(event) {
-                                    event.preventDefault();
-                                    if(dialog_is_remove) {
-                                            handle.parent().prev(".modal-backdrop").remove();
-                                            jQuery(this).parents(".modal").find(".modal-body").parent().remove();
-                                    } else {
-                                            handle.parent().prev(".modal-backdrop").hide();
-                                            jQuery(this).parents(".modal").find(".modal-body").parent().hide();
-
-                                    }
-                            });
-                            jQuery("body").append(overlay).append(parent);
-                            jQuery(".modal-header h3", parent).html(title);
-                            handle = $(".modal-body", parent);
-                            // Create dialog body from current jquery selection
-                            // If specified body is a div element and only one element is 
-                            // specified, make it the new modal dialog body
-                            // Allows us to do something like this 
-                            // $('<div id="foo"></div>').dialog2(); $("#foo").dialog2("open");
-                            if (selection.is("div") && selection.length == 1) {
-                                    handle.replaceWith(selection);
-                                    selection.addClass("modal-body").show();
-                                    handle = selection;
-                            }
-                            // If not, append current selection to dialog body
-                            else {
-                                    handle.append(selection);
-                            }
-                    } 
-                    else {
-                        handle = selection;
-                    }
-                    if(!method) method="get";
-                    var xhr = handle.data('xhr');
-                    if(xhr) xhr.abort();
-
-                    url = $.cresenity.url.replace_param(url);
-                    jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
-                    if (!handle.is(".opened")) {
-                        overlay.show();
-
-                        handle.addClass("opened").parent().show();
-                    }
-                    handle.data('xhr',jQuery.ajax({
-                                    type: method,
-                                    url: url,
-                                    dataType: 'json',
-                                    data: data_addition,
-
-                            }).done(function( data ) {
-
-                                    $.cresenity._handle_response(data,function() {
-                                            jQuery('#'+id_target).html(data.html);
-                                            if(data.js && data.js.length>0) {
-                                                    var script = $.cresenity.base64.decode(data.js);
-                                                    eval(script);
-                                            }
-                                            jQuery('#'+id_target).removeClass('loading');
-                                            jQuery('#'+id_target).data('xhr',false);
-                                            if(jQuery('#'+id_target).find('.prettyprint').length>0) {
-                                                    window.prettyPrint && prettyPrint();
-
-                                            }
-                                            if(data.title) {
-                                                    jQuery('#'+id_target+'').parent().find('.modal-header h4').html(data.title);
-                                            }
-
-                                    });
-                            }).error(function(obj,t,msg) {
-                                    if(msg!='abort') {
-                                            $.cresenity.message('error','Error, please call administrator... (' + msg + ')');
-                                    }
-                            })
-                    );
-                    <?php } // old show dialog?>
+						}
+						if(data.title) {
+							jQuery('#'+id_target+'').parent().find('.modal-header h4').html(data.title);
+						}
+					
+					});
+				}).error(function(obj,t,msg) {
+					if(msg!='abort') {
+						$.cresenity.message('error','Error, please call administrator... (' + msg + ')');
+					}
+				})
+			);
+			
+			
+            
+           
 		},
 		value : function(elm) {
 			elm = jQuery(elm);

@@ -4,10 +4,12 @@
 
         protected $col;
         protected $row;
+        protected $placeholder;
 
         public function __construct($id) {
             parent::__construct($id);
 
+            $this->placeholder = "";
             $this->type = "textarea";
             $this->col = 60;
             $this->row = 10;
@@ -44,13 +46,22 @@
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
-            $html->appendln('<textarea cols="' . $this->col . '" rows="' . $this->row . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" ' . $disabled . $custom_css . '>' . $this->value . '</textarea>')->br();
+            $addition_attribute = "";
+            foreach ($this->attr as $k => $v) {
+                $addition_attribute.=" " . $k . '="' . $v . '"';
+            }
+            $html->appendln('<textarea cols="' . $this->col . '" rows="' . $this->row . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" ' . $disabled . $custom_css . $addition_attribute .' placeholder="' .$this->placeholder .'">' . $this->value . '</textarea>')->br();
             //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
             return $html->text();
         }
 
         public function js($indent = 0) {
             return "";
+        }
+        
+        public function set_placeholder($placeholder) {
+            $this->placeholder = $placeholder;
+            return $this;
         }
 
     }

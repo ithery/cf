@@ -41,6 +41,7 @@
  *      3.1 BOX
  *  	3.2 FILEUPLOAD
  *  	3.3 FORM
+ *  	3.4 DATATABLE
  *  4. SECTION
  *  	4.1 MAIN HEADER
  *  	4.2 CONTENT HEADER
@@ -58,17 +59,29 @@ body {
     font-weight: normal;
 }
 
-a {
-    cursor: pointer;
-}
-a:hover,
-a:focus {
-    text-decoration: none;
-}
+
 
 .container {
     width:100%;
 }
+/* 2. HELPER */
+.clear-both {
+    clear: both;
+}
+
+/* 2.1 TYPOGRAPHY */
+a {
+    cursor: pointer;
+}
+    a:hover,
+    a:focus {
+        text-decoration: none;
+    }
+span.required {
+    color: red;
+}
+
+
 
 /* 3.1 BOX HEADER */
 .box{} 
@@ -102,25 +115,7 @@ a:focus {
 }
 
 
-/* 4.2 CONTENT HEADER */
-#breadcrumb {
-    background-color: #ffffff;
-    margin-left:-15px;
-    margin-right:-15px;
-    padding: 5px 15px;
-    margin-bottom: 10px;
-}
-    #breadcrumb>a+a:before {
-        padding: 0 5px;
-        color: #ccc;
-        content: "/\00a0";
-    }
-
-
-/*
-table
-*/
-
+/* 3.4 DATATABLE */
 table.dataTable {
     font-size: 14px;
 }
@@ -178,17 +173,47 @@ table.dataTable thead .sorting_desc:after {
 }
 
 table .DataTables_sort_icon {
-
     float: right;
-
 }
-
 div.dataTables_length select {
     width: 75px;
 }
 
+
+
+/* 4.2 CONTENT HEADER */
+#breadcrumb {
+    background-color: #ffffff;
+    margin-left:-15px;
+    margin-right:-15px;
+    padding: 5px 15px;
+    margin-bottom: 10px;
+}
+    #breadcrumb>a+a:before {
+        padding: 0 5px;
+        color: #ccc;
+        content: "/\00a0";
+    }
+
+    
 /* 4.3 MODAL */
 .modal {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+    .modal .modal-dialog .modal-content{
+        border-radius: 0px;
+    }
+    .modal .modal-dialog .modal-content .modal-body {
+        overflow-y: auto;
+        max-height: 450px;
+    }
+@media (min-width: 768px) {
+    .modal .modal-dialog {
+        width: 80%;
+    }
+}
+/*.modal {
     overflow-x: hidden !important;
     overflow-y: visible !important;
 }
@@ -208,7 +233,7 @@ div.dataTables_length select {
 }
 .modal .form-group label {
     margin-left: 20px;
-}
+}*/
 
 
 

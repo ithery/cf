@@ -118,6 +118,13 @@
         "fileupload" => array(
             "js" => array("plugins" . DS . "fileupload" . DS . "bootstrap-fileupload.min.js"),
         ),
+        "jquery-fileupload" => array(
+            "js" => array(
+                "plugins" . DS . "jquery-fileupload" . DS . "jquery.ui.widget.js",
+                "plugins" . DS . "jquery-fileupload" . DS . "jquery.iframe-transport.js",
+                "plugins" . DS . "jquery-fileupload" . DS . "jquery.fileupload.js",
+            ),
+        ),
         "peity" => array(
             "js" => array("plugins" . DS . "peity" . DS . "jquery.peity.min.js"),
         ),
@@ -235,6 +242,11 @@
         ),
         "datepicker" => array(
             "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap-datepicker.js"),
+            "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
+            "requirements" => array("jquery"),
+        ),
+        "bootstrap3-datepicker" => array(
+            "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap3-datepicker.js"),
             "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
             "requirements" => array("jquery"),
         ),

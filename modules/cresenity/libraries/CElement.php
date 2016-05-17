@@ -15,6 +15,8 @@
         protected $select2;
         protected $theme;
         protected $theme_style = array();
+        protected $client_modules = array();
+        protected $theme_data = array();
 
         public static function valid_tag() {
             $available_tag = array('div', 'a', 'p', 'span');
@@ -34,12 +36,14 @@
             }
             $this->theme = ccfg::get('theme');
             $theme_data = CManager::instance()->get_theme_data();
+            $this->theme_data = $theme_data;
             if (isset($theme_data)) {
                 $this->select2 = carr::get($theme_data, 'select2');
                 $this->bootstrap = carr::get($theme_data, 'bootstrap');
                 $this->checkbox = carr::get($theme_data, 'checkbox', '0');
                 $this->radio = carr::get($theme_data, 'radio', '0');
                 $this->theme_style = carr::get($theme_data, 'theme_style');
+                $this->client_modules = carr::get($theme_data, 'client_modules');
             }
             if (strlen($this->bootstrap) == 0) {
                 $bootstrap = ccfg::get('bootstrap');

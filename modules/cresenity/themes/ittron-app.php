@@ -10,6 +10,7 @@
             "form_field_style" => "inline",
             "inline_without_default" => "0",
         ),
+        "fileupload" => 'jquery-fileupload',
         "client_modules" => array(
             'jquery',
             'bootstrap-3.3.5',
@@ -22,7 +23,7 @@
             'canvas-to-blob',
             'load-image',
             'validation',
-            'fileupload',
+//            'fileupload',
             'wysihtml5',
             'notify',
             'form',

@@ -83,9 +83,13 @@
                                     $list = clang::get_lang_list();
                                     foreach ($list as $k => $v) {
                                         $active = "";
-                                        if ($k == clang::getlang())
-                                                $active = "active";
-                                        $img = '<img style="padding-right:10px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
+                                        if ($k == clang::getlang()) {
+                                            $active = "active";
+                                        }
+                                        $img = '';
+                                        if ($k != 'default') {
+                                            $img = '<img style="padding-right:10px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
+                                        }
                                         echo '<li class="' . $active . '"><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '" hreflang="' . $k . '">' . $img . ' ' . $v . '</a></li>';
                                     }
                                 endif;

@@ -66,7 +66,6 @@ class CHandler_Append_Driver extends CHandler_Driver {
                             is_duplicate = 1;
                         }
                     }
-                    console.log(is_duplicate);
                     if (is_duplicate==0) {
 			$.cresenity.append('".$this->target."','".$this->generated_url()."','".$this->method."',".$data_addition.");
                     }

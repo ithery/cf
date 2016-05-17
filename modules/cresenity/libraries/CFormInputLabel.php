@@ -2,9 +2,6 @@
 
     class CFormInputLabel extends CFormInput {
 
-        
-
-
         public function __construct($id) {
             parent::__construct($id);
 
@@ -31,8 +28,9 @@
                 $custom_css = ' style="' . $custom_css . '"';
             }
             $bootstrap_class = '';
-            if($this->bootstrap >= '3') {
+            if ($this->bootstrap >= '3') {
                 $bootstrap_class = ' label-default ';
+                $html->appendln('<h4>');
             }
             if (is_array($this->value)) {
                 $i = 0;
@@ -51,6 +49,9 @@
                     $new_val = $trans->execute($new_val);
                 }
                 $html->appendln('<span class="label ' . $bootstrap_class . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . '>' . $new_val . '</span>')->br();
+            }
+            if ($this->bootstrap >= '3') {
+                $html->appendln('</h4>');
             }
             return $html->text();
         }

@@ -10,7 +10,13 @@
 
         public function __construct($id) {
             parent::__construct($id);
-            CManager::instance()->register_module('datepicker');
+            if ($this->bootstrap == '3.3') {
+                
+                CManager::instance()->register_module('bootstrap3-datepicker');
+            }
+            else {
+                CManager::instance()->register_module('datepicker');
+            }
 
             $this->type = "date";
             $this->date_format = "yyyy-mm-dd";

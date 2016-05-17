@@ -89,6 +89,16 @@
                 
                 if ($this->style_form_group == 'inline') {
                     if ($inline_without_default == '0') {
+                        if (strlen($this->label_size)) {
+                            $default_size = 12;
+                            if (is_numeric($this->label_size)) {
+                                $tmp_label_size = $this->label_size;
+                                $tmp_control_size = $default_size - $this->label_size;
+                                
+                                $this->label_class[] = 'col-md-' .$tmp_label_size;
+                                $this->control_class[] = 'col-md-' .$tmp_control_size;
+                            }
+                        }
                         if (count($this->label_class) == 0) {
                             $this->label_class = array('col-md-2');
                         }
@@ -233,7 +243,7 @@
         // }
 
         public function set_label_size($size) {
-            if (in_array($size, array("small", "medium", "large", "none"))) {
+            if (in_array($size, array("small", "medium", "large", "none")) || is_numeric($size)) {
                 $this->label_size = $size;
             }
             return $this;
