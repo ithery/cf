@@ -11,7 +11,7 @@ class CMobile_Element_Control_Checkbox extends CMobile_Element_AbstractControl {
     public static function factory($id) {
         return new CMobile_Element_Control_Checkbox($id);
     }
-
+    
     protected function html_attr() {
         $html_attr = parent::html_attr();
         return $html_attr;

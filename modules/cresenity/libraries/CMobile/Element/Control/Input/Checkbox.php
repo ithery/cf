@@ -36,6 +36,9 @@ class CMobile_Element_Control_Input_Checkbox extends CMobile_Element_Control_Abs
 		$this->set_attr('type',$this->type);
 		
 		$this->add_class('validate');
+                if($this->checked) {
+			$this->add_attr('checked', '');
+		}
 
 		// if ($this->show_label) {
             $this->add_label()->set_label($this->label)->set_for_id($this->id);
