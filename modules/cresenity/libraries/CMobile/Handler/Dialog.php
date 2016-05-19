@@ -16,6 +16,8 @@
         protected $callback;
         protected $js_class;
         protected $js_class_manual;
+        protected $modal_footer;
+        protected $modal_footer_content;
 
         public function __construct($owner, $event, $name) {
             parent::__construct($owner, $event, $name);
@@ -28,6 +30,8 @@
             $this->title = '';
             $this->js_class = null;
             $this->js_class_manual = null;
+            $this->modal_footer = false;
+            $this->modal_footer_content = '';
         }
        
         
@@ -79,7 +83,16 @@
         public function set_method($method) {
             $this->method = $method;
         }
-
+        public function set_footer($boolean) {
+            $this->modal_footer = $boolean;
+            return $this;
+        }
+        
+        public function add_footer_content($param) {
+            $this->modal_footer_content = $param;
+            return $this;
+        }
+        
         public function content() {
             return $this->content;
         }
@@ -100,6 +113,12 @@
 			if(strlen($data_addition)>0) $data_addition.=',';
 			$data_addition.= "'".$req_k."':'".$req_v."'";
 		}
+            if ($this->modal_footer == true) {
+                $data_addition .= ",'modal_footer':true";
+                if (strlen($this->modal_footer_content) > 0) {
+                    $data_addition .= ",'modal_footer_content':'".$this->modal_footer_content."'";
+                }
+            }
             $data_addition = '{' . $data_addition . '}';
             /*
               $js.= "
