@@ -18,6 +18,7 @@
         protected $js_class_manual;
         protected $modal_footer;
         protected $modal_footer_content;
+        protected $modal_class;
 
         public function __construct($owner, $event, $name) {
             parent::__construct($owner, $event, $name);
@@ -32,6 +33,7 @@
             $this->js_class_manual = null;
             $this->modal_footer = false;
             $this->modal_footer_content = '';
+            $this->modal_class = '';
         }
        
         
@@ -93,6 +95,11 @@
             return $this;
         }
         
+        public function set_modal_class($param) {
+            $this->modal_class = $param;
+            return $this;
+        }
+        
         public function content() {
             return $this->content;
         }
@@ -119,6 +126,10 @@
                     $data_addition .= ",'modal_footer_content':'".$this->modal_footer_content."'";
                 }
             }
+            if (strlen($this->modal_class) > 0) {
+                $data_addition .= ",'modal_class':'".$this->modal_class."'";
+            }
+            
             $data_addition = '{' . $data_addition . '}';
             /*
               $js.= "
