@@ -62,6 +62,11 @@ class CNestable extends CElement {
         $this->data = $treedb->get_children_data($parent_id);
         return $this;
     }
+    
+    public function set_data_from_array($array = array()) {
+        $this->data = $array;
+        return $this;
+    }
 
     public function set_id_key($id_key) {
         $this->id_key = $id_key;
