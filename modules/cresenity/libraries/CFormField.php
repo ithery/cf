@@ -13,6 +13,7 @@
         protected $label_class = array();
         protected $control_class = array();
         protected $style_form_group;
+        protected $inline_without_default;
 
         public function __construct($id = "") {
             parent::__construct($id);
@@ -26,13 +27,13 @@
             $this->group_classes = array();
             $this->group_custom_css = array();
             $this->style_form_group = null;
-            
+            $this->inline_without_default = '0';
+            $this->inline_without_default = carr::get($this->theme_style, 'inline_without_default');
         }
 
         public static function factory($id = "") {
             return new CFormField($id);
         }
-
 
         public function toarray() {
             $data = array();
@@ -74,11 +75,8 @@
             if (strlen($this->group_id) > 0) {
                 $group_attr.=' id="' . $this->group_id . '"';
             }
-                
+
             if ($this->bootstrap == '3.3') {
-                $inline_without_default = '0';
-                $inline_without_default = carr::get($this->theme_style, 'inline_without_default');
-                
                 // read default style from each theme
                 if (strlen($this->style_form_group) == 0) {
                     $this->style_form_group = carr::get($this->theme_style, 'form_field_style');
@@ -86,17 +84,16 @@
                 $html->appendln('<div class="form-group ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
                 $label_class = '';
                 $control_class = '';
-                
                 if ($this->style_form_group == 'inline') {
-                    if ($inline_without_default == '0') {
+                    if ($this->inline_without_default == '0') {
                         if (strlen($this->label_size)) {
                             $default_size = 12;
                             if (is_numeric($this->label_size)) {
                                 $tmp_label_size = $this->label_size;
                                 $tmp_control_size = $default_size - $this->label_size;
-                                
-                                $this->label_class[] = 'col-md-' .$tmp_label_size;
-                                $this->control_class[] = 'col-md-' .$tmp_control_size;
+
+                                $this->label_class[] = 'col-md-' . $tmp_label_size;
+                                $this->control_class[] = 'col-md-' . $tmp_control_size;
                             }
                         }
                         if (count($this->label_class) == 0) {
@@ -108,15 +105,15 @@
                         $this->label_class[] = 'control-label';
                     }
                 }
-                
+
                 $this->label_class[] = 'lbl-form-group';
                 $label_class .= ' ' . implode(' ', $this->label_class);
                 $control_class .= ' ' . implode(' ', $this->control_class);
                 if ($this->show_label) {
-                    $html->appendln('<label class="' .$label_class .'" id="' . $this->id . '">' . $this->label . '</label>')->br();
+                    $html->appendln('<label class="' . $label_class . '" id="' . $this->id . '">' . $this->label . '</label>')->br();
                 }
                 if ($this->style_form_group == 'inline') {
-                    $html->appendln('<div class="' .$control_class .'">');
+                    $html->appendln('<div class="' . $control_class . '">');
                 }
                 $html->appendln(parent::html($html->get_indent()))->br();
                 if ($this->style_form_group == 'inline') {
@@ -132,13 +129,13 @@
                     $class_form_field = 'form-group';
                     if ($this->style_form_group == 'inline') {
                         $class_form_field .= ' row';
-    //                    $label_class = 'col-md-' . $this->label_size;
-    //                    $control_size = 12 - $this->label_size;
-    //                    $control_class = 'col-md-' . $control_size;
-    //                    if($this->label_size > 11) {
-    //                        $control_class = 'col-md-' . 10;
-    //                        $label_class = 'col-md-' . 2;
-    //                    }
+                        //                    $label_class = 'col-md-' . $this->label_size;
+                        //                    $control_size = 12 - $this->label_size;
+                        //                    $control_class = 'col-md-' . $control_size;
+                        //                    if($this->label_size > 11) {
+                        //                        $control_class = 'col-md-' . 10;
+                        //                        $label_class = 'col-md-' . 2;
+                        //                    }
                         if ($this->label_size != 'none') {
                             $label_class = 'col-md-3';
                             $control_class = 'col-md-9';
@@ -214,12 +211,12 @@
 
             return $js->text();
         }
-        
+
         public function set_style_form_group($style_form_group) {
             $this->style_form_group = $style_form_group;
             return $this;
         }
-        
+
         public function set_group_id($id) {
             $this->group_id = $id;
             return $this;
@@ -282,6 +279,15 @@
 
         public function add_control_class($control_class) {
             $this->control_class[] = $control_class;
+            return $this;
+        }
+
+        function get_inline_without_default() {
+            return $this->inline_without_default;
+        }
+
+        function set_inline_without_default($inline_without_default) {
+            $this->inline_without_default = $inline_without_default;
             return $this;
         }
 

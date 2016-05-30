@@ -668,6 +668,38 @@ cresenity.func.js
 			}
 
 		},
+                show_real_notification: function(id_target, url){
+                    var selection = jQuery('#'+id_target);
+                    url = $.cresenity.url.replace_param(url);
+                    var handle;
+                    if(selection.length == 0) {
+                        selection = jQuery('<div/>').attr('id',id_target);
+                    }
+                    handle = selection;
+                    handle.data('xhr',jQuery.ajax({
+                        type: 'post',
+                        url: url,
+                        dataType: 'json',
+                    }).done(function( data ) {
+                        $.cresenity._handle_response(data,function() {
+                            jQuery('#'+id_target).html(data.html);
+                            if (data.js && data.js.length>0) {
+                                var script = $.cresenity.base64.decode(data.js);
+                                eval(script);
+                            }
+                            jQuery('#'+id_target).removeClass('loading');
+                            jQuery('#'+id_target).data('xhr',false);
+                            if (jQuery('#'+id_target).find('.prettyprint').length>0) {
+                                window.prettyPrint && prettyPrint();
+                            }
+                        });
+                    }).error(function(obj,t,msg) {
+                        if (msg!='abort') {
+                            $.cresenity.message('error','Error, please call administrator... (' + msg + ')');
+                        }
+                    })
+                    );
+                },
 		show_dialog : function(id_target,url,method,title,data_addition) {
                     <?php
                         $bootstrap = ccfg::get('bootstrap');
@@ -707,6 +739,7 @@ cresenity.func.js
                         url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
                         if (!selection.is(".modal-body")) {
                             var parent = $(_dialog_html);
+                            parent.attr('id', id_target + '_modal');
                             
                             jQuery(".modal-header .close[data-dismiss='modal']", parent).click(function(event) {
                                 event.preventDefault();

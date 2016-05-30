@@ -6,6 +6,7 @@ class CActionList extends CElement {
     protected $style;
     protected $label;
     protected $btn_dropdown_classes;
+    protected $label_size;
 
     public function __construct($list_id) {
         parent::__construct($list_id);
@@ -13,7 +14,7 @@ class CActionList extends CElement {
         $this->style = "btn-list";
         $this->label = clang::__("Action");
         $this->btn_dropdown_classes = array();
-        
+        $this->label_size = 2;
     }
 
     public static function factory($list_id = "") {
@@ -22,6 +23,10 @@ class CActionList extends CElement {
 
     public function set_label($label) {
         $this->label = $label;
+        return $this;
+    }
+    public function set_label_size($label_size) {
+        $this->label_size = $label_size;
         return $this;
     }
     
@@ -78,10 +83,11 @@ class CActionList extends CElement {
         switch ($this->style) {
             case "form-action":
                 if ($this->bootstrap == '3.3') {
+                    $control_size = 12 - $this->label_size;
                     $pretag = '
                         <div class="form-group clear-both ' . $classes . '">
-                            <label class="col-md-2 control-label"></label>
-                                <div class="col-md-10">
+                            <label class="col-md-' .$this->label_size . ' control-label"></label>
+                                <div class="col-md-' .$control_size .'">
                             ';
                 }
                 else {

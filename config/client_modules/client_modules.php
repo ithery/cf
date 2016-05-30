@@ -200,6 +200,10 @@
             "js" => array("plugins" . DS . "ckeditor" . DS . "ckeditor.js"),
             "requirements" => array("jquery"),
         ),
+        "ckeditor-4" => array(
+            "js" => array("plugins" . DS . "ckeditor" .DS ."4.5.9" . DS . "ckeditor.js"),
+            "requirements" => array("jquery"),
+        ),
         "isotope" => array(
             "js" => array("plugins" . DS . "isotope" . DS . "jquery.isotope.min.js"),
             "requirements" => array("jquery"),

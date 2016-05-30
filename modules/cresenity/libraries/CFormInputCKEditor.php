@@ -14,7 +14,8 @@ class CFormInputCKEditor extends CFormInputTextarea {
 		$this->row = 10;
 		$this->toolbar_item = array();
 		
-		CManager::instance()->register_module('ckeditor');
+//		CManager::instance()->register_module('ckeditor');
+		CManager::instance()->register_module('ckeditor-4');
 		
 		
 	}
@@ -56,10 +57,13 @@ class CFormInputCKEditor extends CFormInputTextarea {
 		
 		$js = new CStringBuilder();
 		$js->set_indent($indent);
-		$js->append("
-			CKEDITOR.replace('".$this->name."',{
-				toolbar: '".$this->toolbar."'
-			});")->br();
+		$js->appendln("
+                    CKEDITOR.replace('".$this->id."');
+                ");
+//		$js->append("
+//			CKEDITOR.replace('".$this->name."',{
+//				toolbar: '".$this->toolbar."'
+//			});")->br();
 		
 		
 		return $js->text();

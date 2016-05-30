@@ -84,7 +84,7 @@ class cfs {
     }
     
     public static function file_exists($value) {
-        if(!is_file($value)) return false;
+        if(!cfs::is_file($value)) return false;
         return file_exists($value);
     }
 

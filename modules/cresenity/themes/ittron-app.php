@@ -5,6 +5,9 @@
         "bootstrap" => "3.3",
         "select2" => "4.0",
         "checkbox" => "1.0", // icheck
+        "radio" => "1.0", // icheck
+        "js_checkbox" => "icheck", // icheck
+        "js_radio" => "icheck", // icheck
         "theme_style" => array(
             "form_layout" => "horizontal",
             "form_field_style" => "inline",

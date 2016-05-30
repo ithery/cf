@@ -42,6 +42,8 @@
  *  	3.2 FILEUPLOAD
  *  	3.3 FORM
  *  	3.4 DATATABLE
+ *  	3.5 CHECKBOX
+ *  	3.6 RADIO
  *  4. SECTION
  *  	4.1 MAIN HEADER
  *  	4.2 CONTENT HEADER
@@ -67,6 +69,12 @@ body {
 /* 2. HELPER */
 .clear-both {
     clear: both;
+}
+.mt-15 {
+    margin-top: 15px;
+}
+.mb-15 {
+    margin-top: 15px;
 }
 
 /* 2.1 TYPOGRAPHY */
@@ -179,8 +187,24 @@ div.dataTables_length select {
     width: 75px;
 }
 
+/* 3.5 CHECKBOX */
+.icheck{} 
+    .control-label > .icheckbox input[type="checkbox"]{
+        left: 0;
+    } 
 
+/* 3.5 RADIO */
+.icheck{} 
+    .control-label > .iradio input[type="radio"]{
+        left: 0;
+    } 
 
+/* 4. SECTION */
+/* 4.1 MAIN HEADER*/
+.notifications-menu .fa.fa-bell-o {
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
 /* 4.2 CONTENT HEADER */
 #breadcrumb {
     background-color: #ffffff;

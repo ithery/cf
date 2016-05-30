@@ -61,6 +61,20 @@
                                     &nbsp;
                                 </a>
                             </li>
+                            <?php if (ccfg::get("have_real_notification")): ?>
+                            <li class="dropdown notifications-menu">
+                                <?php 
+                                    $total_notification = notification::get_count();
+                                ?>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" state="default">
+                                    <i class="fa fa-bell-o"></i>
+                                    <span class="label label-warning lbl-total-notification"><?php $total_notification; ?></span>
+                                </a>
+                                <ul id="dropdown-menu-notification" class="dropdown-menu">
+                                   
+                                </ul>
+                            </li>
+                            <?php endif; ?>
                             <?php if (ccfg::get("change_theme")): ?>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -78,22 +92,36 @@
                                 </ul>
                             </li>
                             <?php endif; ?>
-                            <?php
-                                if (ccfg::get("multilang")):
+                            <?php if (ccfg::get("multilang")): ?>
+                            <li class="dropdown">
+                                <?php 
+                                    $active_lang = '';
+                                    $dropdown_menu = '';
                                     $list = clang::get_lang_list();
                                     foreach ($list as $k => $v) {
                                         $active = "";
-                                        if ($k == clang::getlang()) {
-                                            $active = "active";
-                                        }
                                         $img = '';
                                         if ($k != 'default') {
-                                            $img = '<img style="padding-right:10px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
+                                            $img = '<img style="padding-right:2px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
                                         }
-                                        echo '<li class="' . $active . '"><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '" hreflang="' . $k . '">' . $img . ' ' . $v . '</a></li>';
+                                        if ($k == clang::getlang()) {
+                                            $active = "active";
+                                            $active_lang = $img .' ' .$v;
+                                        }
+                                        else {
+                                            $dropdown_menu .= '<li class="' . $active . '"><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '" hreflang="' . $k . '">' . $img . ' ' . $v . '</a></li>';
+                                        }
+                                        
                                     }
-                                endif;
-                            ?>
+                                ?>
+                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <?php echo $active_lang; ?>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <?php echo $dropdown_menu; ?>
+                                </ul>
+                            </li>
+                            <?php endif; ?>
                             <!-- User Account: style can be found in dropdown.less -->
                             <li class="dropdown user user-menu">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">

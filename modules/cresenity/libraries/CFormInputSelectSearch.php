@@ -255,7 +255,8 @@
                                 data: function (params) {
                                     return {
                                       q: params.term, // search term
-                                      page: params.page
+                                      page: params.page,
+                                      limit: 10
                                     };
                                 },
                                 processResults: function (data, params) { 
@@ -265,7 +266,8 @@
                                     // scrolling can be used
                                     params.page = params.page || 1;
                                     var more = (params.page * 10) < data.total;
-                                    
+                                    console.log(params);
+                                    console.log(data);
                                     return {
                                             results: data.data,
                                             pagination: {
@@ -277,14 +279,14 @@
                             },
                         " . $str_js_init . "
                         templateResult: function(item) {
-                            return '" . $str_result . "';
+                            return $('<div>" . $str_result . "</div>');
                         }, // omitted for brevity, see the source of this page
                         templateSelection: function(item) {
                             if (item.id === '') {
                                 return item.text;
                             }
                             else {
-                                return '" . $str_selection . "';
+                                return $('<div>" . $str_selection . "</div>');
                             }
                         },  // omitted for brevity, see the source of this page
                         dropdownCssClass: '" .$dropdown_classes ."', // apply css that makes the dropdown taller

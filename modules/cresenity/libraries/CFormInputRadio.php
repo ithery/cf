@@ -17,6 +17,10 @@
             $this->checked = false;
             $this->inline = false;
             $this->label_wrap = false;
+            $js_radio = carr::get($this->theme_data, 'js_radio');
+            if (strlen($js_radio) > 0) {
+                $this->applyjs = $js_radio;
+            }
         }
 
         public static function factory($id) {
@@ -129,10 +133,16 @@
             if ($this->applyjs == "uniform") {
                 //$js->append("$('#".$this->id."').uniform();")->br();
             }
-            if ($this->applyjs == "switch") {
+            else if ($this->applyjs == "switch") {
                 //$js->append("$('#".$this->id."').parent().bootstrapSwitch();")->br();
             }
-
+            else if ($this->applyjs == 'icheck') {
+                $js->append("
+                    $('#" . $this->id . "').iCheck({
+                        radioClass: 'iradio iradio_minimal-blue'
+                    });
+                ");
+            }
 
             return $js->text();
         }
