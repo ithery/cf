@@ -229,8 +229,9 @@ class User_permission_dashboard_Controller extends CController {
             $d['role_id']=$role_id;
             $d['app_id']=CF::app_id();
             $type = carr::get($v,'type');
-            $d['name']=$type;
-            $d['label']=carr::get($v,'type');
+            $d['name']=$k;
+            $d['type']=$type;
+            $d['label']=$k;
             $data[] = $d;
         }
         //cdbg::var_dump($data);
