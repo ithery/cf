@@ -3,7 +3,7 @@
 class crouter {
 	
 	public static function domain() {
-		return $_SERVER["SERVER_NAME"];
+		return CF::domain();
 	}
 	
 	public static function controller() {
