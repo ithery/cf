@@ -87,7 +87,15 @@ is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
 
 //we get app code from here
 $file = DOCROOT . 'data' . DIRECTORY_SEPARATOR . 'domain' . DIRECTORY_SEPARATOR;
-$domain = $_SERVER["SERVER_NAME"];
+if (PHP_SAPI === 'cli') {
+    // Command line requires a bit of hacking
+    if (isset($_SERVER['argv'][2])) {
+        $domain = $_SERVER['argv'][2];
+    }
+} else {
+    $domain = $_SERVER["SERVER_NAME"];
+
+}
 $file.=$domain;
 
 
@@ -98,8 +106,6 @@ if (file_exists($file)) {
 
     $kohana_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
 }
-
-
 
 // If kohana folders are relative paths, make them absolute.
 $kohana_application = file_exists($kohana_application) ? $kohana_application : DOCROOT . $kohana_application;
