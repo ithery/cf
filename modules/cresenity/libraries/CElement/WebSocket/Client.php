@@ -39,7 +39,7 @@
         }
 
         public static function factory($id = "", $tag = "div") {
-            return new Client($id, $tag);
+            return new CElement_WebSocket_Client($id, $tag);
         }
 
         public function html($indent = 0) {
@@ -79,7 +79,7 @@
             );
             if (strlen($this->on_open) > 0) {
                 $js->appendln('
-                        websocket.onopen = function(ev){
+                        websocket.onopen = function(res){
                             websocket.send(JSON.stringify(' . json_encode($data_login) . '));
                                 last_error' . $this->func_name . ' = "";
                         ' . $this->on_open . '
@@ -88,14 +88,14 @@
             }
             if (strlen($this->on_message) > 0) {
                 $js->appendln('
-                        websocket.onmessage = function(ev){
+                        websocket.onmessage = function(res){
                         ' . $this->on_message . '
                         };'
                 );
             }
             if (strlen($this->on_error) > 0) {
                 $js->appendln('
-                        websocket.onerror = function(ev){
+                        websocket.onerror = function(res){
                             $.cresenity.message("error","Socket error connection.");
                         ' . $this->on_error . '
                         };'
@@ -103,7 +103,7 @@
             }
             if (strlen($this->on_close) > 0) {
                 $js->appendln('
-                        websocket.onclose = function(ev){
+                        websocket.onclose = function(res){
                             ' . $this->on_close . '
                             var time = generateInterval(attempts);
     
