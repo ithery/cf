@@ -1312,7 +1312,17 @@ final class CF {
     }
 
     public static function domain() {
-        return $_SERVER["SERVER_NAME"];
+        $domain = '';
+        if (PHP_SAPI === 'cli') {
+            // Command line requires a bit of hacking
+            if (isset($_SERVER['argv'][2])) {
+                $domain = $_SERVER['argv'][2];
+            }
+        } else {
+            $domain = $_SERVER["SERVER_NAME"];
+
+        }
+        return $domain;
     }
 
     /**
