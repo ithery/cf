@@ -80,6 +80,7 @@ class CDashboard extends CElement {
         $html = new CStringBuilder();
         $curr_col = 13;
         foreach ($this->_dashboard as $key => $val) {
+            $name = $key;
             $element = carr::get($val,'element');
             $col = carr::get($val,'col');
             $height = carr::get($val,'height');
@@ -91,7 +92,7 @@ class CDashboard extends CElement {
                     
                 }
                 $div_col = $div->add_div()->add_class('span'.$col);
-                $div_container = $div_col->add_div();
+                $div_container = $div_col->add_div()->add_class('board-item ' .$name);
                 //$div_container->add_class('slimscroll');
                 if($height==null) {
                     $height = '400px';

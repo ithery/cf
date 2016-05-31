@@ -402,6 +402,16 @@
             ),
             "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5", "materialize"),
         ),
+        "fullcalendar" => array(
+            "css" => array(
+                "plugins/fullcalendar/fullcalendar.min.css",
+//                "plugins/fullcalendar/fullcalendar.print.css",
+            ),
+            "js" => array(
+                "plugins/fullcalendar/fullcalendar.min.js",
+            ),
+            "requirements" => array("jquery-2.1.1", "moment"),
+        ),
         "iapp" => array(
             "css" => array(
                 "sidebar.less",

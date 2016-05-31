@@ -5,7 +5,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class cajax {
 
     public static function callback($obj, $input) {
-
         $callable = $obj->data->callable;
         if(is_callable($callable)) {
             return call_user_func($callable, $obj->data);

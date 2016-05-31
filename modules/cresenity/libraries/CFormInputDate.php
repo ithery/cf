@@ -11,7 +11,6 @@
         public function __construct($id) {
             parent::__construct($id);
             if ($this->bootstrap == '3.3') {
-                
                 CManager::instance()->register_module('bootstrap3-datepicker');
             }
             else {

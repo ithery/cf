@@ -134,8 +134,9 @@
             return $this->close;
         }
 
-        function set_collapse($collapse) {
+        function set_collapse($collapse, $js_collapse = false) {
             $this->collapse = $collapse;
+            $this->js_collapse = $js_collapse;
             return $this;
         }
 
@@ -156,7 +157,7 @@
             $class_title = '';
 
             // keep in mind with project biota, use this and bootstrap = 3
-            if ($this->bootstrap >= '3') {
+            if ($this->bootstrap > '3') {
                 $main_class = ' box box-info ';
                 $main_class_title = ' box-header with-border ';
                 $main_class_content = ' box-body ';
@@ -167,7 +168,7 @@
                 $this->header_action_list->add_class("pull-right");
             }
             if ($this->wrapped) {
-                if ($this->bootstrap >= '3') {
+                if ($this->bootstrap > '3') {
                     $html->appendln('<div class="row">
 				<div class="col-md-' . $this->span . '">');
                 }
@@ -288,21 +289,21 @@
             if ($this->bootstrap >= '3') {
                 if ($this->js_collapse == true) {
                     if ($this->collapse) {
-                        $js->appendln('jQuery("#' .$this->id .' button[data-widget=\"collapse\"]").on("click", function(){
-                                var box = jQuery(this).parents(".box").first();
-                                if (box.hasClass("collapsed-box")){
-                                    box.find("> .box-body, > .box-footer").slideDown();
-                                    box.removeClass("collapsed-box");
-                                    jQuery(this).children(".fa").removeClass("fa-plus");
-                                    jQuery(this).children(".fa").addClass("fa-minus");
-                                }
-                                else {
-                                    box.find("> .box-body, > .box-footer").slideUp();
-                                    box.addClass("collapsed-box");
-                                    jQuery(this).children(".fa").addClass("fa-plus");
-                                    jQuery(this).children(".fa").removeClass("fa-minus");
-                                }
-                            });');
+//                        $js->appendln('jQuery("#' .$this->id .' button[data-widget=\"collapse\"]").on("click", function(){
+//                                var box = jQuery(this).parents(".box").first();
+//                                if (box.hasClass("collapsed-box")){
+//                                    box.find("> .box-body, > .box-footer").slideDown();
+//                                    box.removeClass("collapsed-box");
+//                                    jQuery(this).children(".fa").removeClass("fa-plus");
+//                                    jQuery(this).children(".fa").addClass("fa-minus");
+//                                }
+//                                else {
+//                                    box.find("> .box-body, > .box-footer").slideUp();
+//                                    box.addClass("collapsed-box");
+//                                    jQuery(this).children(".fa").addClass("fa-plus");
+//                                    jQuery(this).children(".fa").removeClass("fa-minus");
+//                                }
+//                            });');
                     }
                 }
             }

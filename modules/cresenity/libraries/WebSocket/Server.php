@@ -57,32 +57,38 @@
                     $header = socket_read($socket_new, 1024); //read data sent by the socket
                     $this->perform_handshaking($header, $socket_new, $host, $port); //perform websocket handshake
 
-                    socket_getpeername($socket_new, $ip); //get ip address of connected socket
-                    $data_response = array(
-                        'act' => 'info',
-                        'type' => 'system',
-                        'data' => array(
-                            'status' => 'connected',
-                            'message' => $ip . ' connected'
-                        )
-                    );
-                    
-                    $client_notify = array($socket_new);
-                    if ($this->send_all_when_connect) {
-                        $client_notify = $this->clients;
+                    try {
+                        @socket_getpeername($socket_new, $ip); //get ip address of connected socket
+                        $data_response = array(
+                            'act' => 'info',
+                            'type' => 'system',
+                            'data' => array(
+                                'status' => 'connected',
+                                'message' => $ip . ' connected'
+                            )
+                        );
+
+                        $client_notify = array($socket_new);
+                        if ($this->send_all_when_connect) {
+                            $client_notify = $this->clients;
+                        }
+                        $response = $this->mask(json_encode($data_response)); //prepare json data
+                        $this->send_message($client_notify, $response); //notify all users about new connection
+
+                        //make room for new socket
+                        $found_socket = array_search($this->socket, $changed);
+                        unset($changed[$found_socket]);
                     }
-                    $response = $this->mask(json_encode($data_response)); //prepare json data
-                    $this->send_message($client_notify, $response); //notify all users about new connection
-                    
-                    //make room for new socket
-                    $found_socket = array_search($this->socket, $changed);
-                    unset($changed[$found_socket]);
+                    catch (Exception $exc) {
+                        // do nothing
+                        // this catch for handle 
+                        //   - socket_getpeername(): unable to retrieve peer name [107]: Transport endpoint is not connected
+                    }
                 }
                 
                 //loop through all connected sockets
                 foreach ($changed as $changed_index => $changed_socket) {
 
-                    
                     //check for any incomming data
                     while (@socket_recv($changed_socket, $buf, 1024, 0) >= 1) {
                         $received_text = $this->unmask($buf); //unmask data
@@ -125,7 +131,9 @@
 
                         //notify all users about disconnected connection
                         $response = $this->mask(json_encode($data_response));
-                        $this->send_message($this->clients, $response);
+                        if ($this->send_all_when_connect) {
+                            $this->send_message($this->clients, $response);
+                        }
                     }
                 }
             }

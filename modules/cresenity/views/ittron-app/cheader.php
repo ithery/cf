@@ -34,8 +34,10 @@
         <?php echo $head_client_script; ?>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
-
         <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
+        <script type="text/javascript">
+            var baseUrl = '<?php echo curl::base();?>';
+        </script>
     </head>
     <body class="skin-<?php echo $color; ?> sidebar-mini">
         <div class="wrapper">
@@ -68,7 +70,7 @@
                                 ?>
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" state="default">
                                     <i class="fa fa-bell-o"></i>
-                                    <span class="label label-warning lbl-total-notification"><?php $total_notification; ?></span>
+                                    <span class="label label-warning lbl-total-notification"><?php echo $total_notification; ?></span>
                                 </a>
                                 <ul id="dropdown-menu-notification" class="dropdown-menu">
                                    
