@@ -23,10 +23,19 @@
 
             $query = $this->opt('query');
             $key_field = $this->opt('key_field');
+            $title = $this->opt('title');
+            if (strlen($title) == 0) {
+                $title = 'Calendar Title';
+            }
+            
+            $calendar_element_name = $this->opt('calendar_element_name');
+            if (strlen($calendar_element_name) == 0) {
+                $calendar_element_name = 'full-calendar';
+            }
             
             $widget = $this->add_div()->add_class('content')->add_widget()->add_class('dboard-widget-calendar');
-            $widget->set_collapse(true);
-            $full_calendar = $widget->add_element('full-calendar');
+            $widget->set_collapse(true)->set_title($title);
+            $full_calendar = $widget->add_element($calendar_element_name);
             $full_calendar->set_query($query);
             $full_calendar->set_key_field($key_field);
 

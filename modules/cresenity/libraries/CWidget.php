@@ -289,21 +289,21 @@
             if ($this->bootstrap >= '3') {
                 if ($this->js_collapse == true) {
                     if ($this->collapse) {
-//                        $js->appendln('jQuery("#' .$this->id .' button[data-widget=\"collapse\"]").on("click", function(){
-//                                var box = jQuery(this).parents(".box").first();
-//                                if (box.hasClass("collapsed-box")){
-//                                    box.find("> .box-body, > .box-footer").slideDown();
-//                                    box.removeClass("collapsed-box");
-//                                    jQuery(this).children(".fa").removeClass("fa-plus");
-//                                    jQuery(this).children(".fa").addClass("fa-minus");
-//                                }
-//                                else {
-//                                    box.find("> .box-body, > .box-footer").slideUp();
-//                                    box.addClass("collapsed-box");
-//                                    jQuery(this).children(".fa").addClass("fa-plus");
-//                                    jQuery(this).children(".fa").removeClass("fa-minus");
-//                                }
-//                            });');
+                        $js->appendln('jQuery("#' .$this->id .' button[data-widget=\"collapse\"]").on("click", function(){
+                                var box = jQuery(this).parents(".box").first();
+                                if (box.hasClass("collapsed-box")){
+                                    box.find("> .box-body, > .box-footer").slideDown();
+                                    box.removeClass("collapsed-box");
+                                    jQuery(this).children(".fa").removeClass("fa-plus");
+                                    jQuery(this).children(".fa").addClass("fa-minus");
+                                }
+                                else {
+                                    box.find("> .box-body, > .box-footer").slideUp();
+                                    box.addClass("collapsed-box");
+                                    jQuery(this).children(".fa").addClass("fa-plus");
+                                    jQuery(this).children(".fa").removeClass("fa-minus");
+                                }
+                            });');
                     }
                 }
             }

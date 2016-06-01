@@ -25,6 +25,17 @@
     if (!isset($color)) {
         $color = 'blue-light';
     }
+    
+    $app_code = CF::app_code();
+    $org_code = CF::org_code();
+    if (strlen($org_code) == 0) {
+        $org_code = 'default';
+    }
+    $favico = curl::base() .'media/img/favico.png';
+    $favico_path = 'application/'.$app_code .'/' .$org_code .'/media/img/favico.png';
+    if (file_exists($favico_path)) {
+        $favico = curl::base() .$favico_path;
+    }
 ?>
 
 <html>
@@ -33,7 +44,7 @@
         <title><?php echo $title; ?></title>
         <?php echo $head_client_script; ?>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
+        <link rel="shortcut icon" href="<?php echo $favico; ?>">
         <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
         <script type="text/javascript">
             var baseUrl = '<?php echo curl::base();?>';
@@ -44,10 +55,50 @@
             <header class="main-header">
                 <!-- Logo -->
                 <a href="<?php echo curl::base(); ?>" class="logo">
+                    <?php 
+                        
+                        
+                        $is_mini_image = false;
+                        $mini_logo = '<b>I</b>APP';
+                        
+                        $cf_mini_logo = curl::base() .'application/' .$app_code .'/' .$org_code .'/media/img/mini-logo.png';
+                        $cf_mini_logo_path = 'application/'.$app_code .'/' .$org_code .'/media/img/mini-logo.png';
+                        if (!file_exists($cf_mini_logo_path)) {
+                            $cf_mini_logo_path = 'media/img/mini-logo.png';
+                            if (file_exists($cf_large_logo_path)) {
+                                $cf_mini_logo = curl::base() .'media/img/mini-logo.png';
+                                $is_mini_image = true;
+                            }
+                        }
+                        else {
+                            $is_mini_image = true;
+                        }
+                        if ($is_mini_image) {
+                            $mini_logo = '<img src="' .$cf_mini_logo .'"/>';
+                        }
+                        
+                        $large_logo = '<b>ITtron</b>APP';
+                        $is_image = false;
+                        $cf_large_logo = curl::base() .'application/' .$app_code .'/' .$org_code .'/media/img/logo.png';
+                        $cf_large_logo_path = 'application/'.$app_code .'/' .$org_code .'/media/img/logo.png';
+                        if (!file_exists($cf_large_logo_path)) {
+                            $cf_large_logo_path = 'media/img/logo.png';
+                            if (file_exists($cf_large_logo_path)) {
+                                $cf_large_logo = curl::base() .'media/img/logo.png';
+                                $is_image = true;
+                            }
+                        }
+                        else {
+                            $is_image = true;
+                        }
+                        if ($is_image) {
+                            $large_logo = '<img src="' .$cf_large_logo .'" width="200px" height="100%"/>';
+                        }
+                    ?>
                     <!-- mini logo for sidebar mini 50x50 pixels -->
-                    <span class="logo-mini"><b>I</b>APP</span>
+                    <span class="logo-mini"><?php echo $mini_logo; ?></span>
                     <!-- logo for regular state and mobile devices -->
-                    <span class="logo-lg"><b>ITtron</b>APP</span>
+                    <span class="logo-lg"><?php echo $large_logo; ?></span>
                 </a>
                 <!-- Header Navbar: style can be found in header.less -->
                 <nav class="navbar navbar-static-top" role="navigation">
