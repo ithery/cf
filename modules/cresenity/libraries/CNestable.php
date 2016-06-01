@@ -11,6 +11,7 @@ class CNestable extends CElement {
     protected $action_style;
     protected $display_callback;
     protected $requires;
+    protected $js_cell;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -24,6 +25,7 @@ class CNestable extends CElement {
         $this->row_action_list->set_style('btn-icon-group');
         $this->display_callback = false;
         $this->requires = array();
+        $this->js_cell = '';
     }
 
     public static function factory($id) {
@@ -141,7 +143,10 @@ class CNestable extends CElement {
                             $this->row_action_list->add_btn_dropdown_class("btn-xs btn-primary");
                         }
                     }
+                    $this->row_action_list->regenerate_id(true);
                     $this->row_action_list->apply("jsparam", $jsparam);
+                    $this->row_action_list->apply("set_handler_url_param", $jsparam);
+                    $this->js_cell.=$this->row_action_list->js();
                     $html->appendln($this->row_action_list->html($html->get_indent()));
                 }
                 $html->dec_indent()->appendln('</div>');
@@ -210,6 +215,10 @@ class CNestable extends CElement {
 				}
 			");
         }
+
+        $js->appendln($this->js_cell);
+        $js->appendln(parent::js($indent));   
+        
         return $js->text();
     }
 
