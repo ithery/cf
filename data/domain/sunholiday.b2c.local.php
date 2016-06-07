@@ -7,4 +7,5 @@ return array(
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'sunholiday.b2c.local',
+	'shared_app_code'=> array('cmstorsb2c'),
 );
