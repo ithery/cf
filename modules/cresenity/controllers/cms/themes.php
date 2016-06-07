@@ -6,9 +6,9 @@
      * @since  Dec 7, 2015
      * @license http://piposystem.com Piposystem
      */
-    class Template_Controller extends CController {
+    class Themes_Controller extends CController {
         
-        protected $_controller='cms/template/';
+        protected $_controller='cms/themes/';
         
         public function __construct() {
             parent::__construct();
@@ -32,12 +32,16 @@
             $header_name='';
             $header_file='';
             $header_label='';
-            $custom_fields_count=0;
+            //$custom_fields_count=0;
             
+           
             //submit
             $post=$_POST;
+            
+          
+            
             if(!$post==null){
-                $file = CF::get_file('data', 'template_setting');
+                $file = CF::get_file('data', 'themes_setting');
 
                 $file_template_setting = array();
                 if (file_exists($file)) {
@@ -46,8 +50,9 @@
 
                 $key = carr::get($post, 'header_name');
                 $file_template_setting[$key] = $post;
-                $path = CF::get_dir('data') . 'template_setting.php';
+                $path = CF::get_dir('data') . 'themes_setting.php';
                 cphp::save_value($file_template_setting, $path);
+                cmsg::add('success', clang::__("Theme Setting") . " [" . $key . "] " . clang::__("Successfully Added") . " !");
                 
                 
             }
@@ -56,34 +61,90 @@
             $content=$form->add_div('content');
             //header
             $widget_header=$content->add_widget()->set_title('Header');
-            $widget_header->add_field()->set_label('Name')->add_control('header_name','text')->set_value($header_name);
-            $widget_header->add_field()->set_label('File')->add_control('header_file','text')->set_value($header_file);
-            $widget_header->add_field()->set_label('Label')->add_control('header_label','text')->set_value($header_label);
+            $widget_header->add_field()->set_label('Themes Name')->add_control('header_name','text')->set_value($header_name);
+            $widget_header->add_field()->set_label('Themes File')->add_control('header_file','text')->set_value($header_file);
+            $widget_header->add_field()->set_label('Themes Label')->add_control('header_label','text')->set_value($header_label);
             
-            //custom field
-            $widget_custom_field=$content->add_widget()->set_title('Custom Field');
-            $widget_custom_field->add_div('custom_field_content');
-            $header_action_custom_field_add=$widget_custom_field->add_header_action('add_custom_field')->set_label('ADD')->set_icon('plus')->add_class('btn-success')->set_attr('count',0)->set_attr('rel','');
-            $listener_header_action_custom_field_add = $header_action_custom_field_add->add_listener('click');
-            $listener_header_action_custom_field_add
-                    ->add_handler('custom')
-                    ->set_js("add_custom_field()");
+            $detail_widget = $content->add_widget()->set_title(clang::__('Add Templates'));
+            //prepare detail table 
+            $control_button = $detail_widget->add_header_action()->set_label(clang::__('Add'))->add_class('btn-success')->set_icon('plus');
+            $tbl_detail = $detail_widget->add_table()->set_apply_data_table(FALSE)->set_tbody_id('tbl_detail');
+            $tbl_detail->add_column('themes')->set_label('Themes');
+            $tbl_detail->add_column('action')->set_label('Act');
             
+            
+            $add_button = $control_button->add_listener('click');
+            $add_button
+                    ->add_handler('append')
+                    ->set_target('tbl_detail')->set_url(curl::base() . $this->_controller . 'add_item_detail_themes');
+
+
+//            //custom field
+//            $widget_custom_field=$content->add_widget()->set_title('Custom Field');
+//            $widget_custom_field->add_div('custom_field_content');
+//            $header_action_custom_field_add=$widget_custom_field->add_header_action('add_custom_field')->set_label('ADD')->set_icon('plus')->add_class('btn-success')->set_attr('count',0)->set_attr('rel','');
+//            $listener_header_action_custom_field_add = $header_action_custom_field_add->add_listener('click');
+//            $listener_header_action_custom_field_add
+//                    ->add_handler('custom')
+//                    ->set_js("add_custom_field()");
+//            
             $div_action=$form->add_div();
             $div_action->add_action_list()->add_action()->set_label(clang::__('Submit'))->set_submit(true)->set_confirm(true);
-            $js="
-                function add_custom_field(){
-                    var obj_count=$('#add_custom_field');
-                    var count=obj_count.attr('count');
-                    var rel=obj_count.attr('rel');
-                    count++;
-                    $('#add_custom_field').attr('count',count);    
-                    $.cresenity.append('custom_field_content','" . curl::base() . $this->_controller."add_custom_field','get',{'count':count,'rel':rel});                }
-                    
-            ";
-            $app->add_js($js);        
+//            $js="
+//                function add_custom_field(){
+//                    var obj_count=$('#add_custom_field');
+//                    var count=obj_count.attr('count');
+//                    var rel=obj_count.attr('rel');
+//                    count++;
+//                    $('#add_custom_field').attr('count',count);    
+//                    $.cresenity.append('custom_field_content','" . curl::base() . $this->_controller."add_custom_field','get',{'count':count,'rel':rel});                }
+//                    
+//            ";
+//            $app->add_js($js);        
             echo $app->render();
         }
+        
+        public function add_item_detail_themes($row_data=array()){
+            $app = CApp::instance();           
+            $get = $_GET;
+            $themes = '';
+           
+            if (count($row_data) > 0) {                     
+                $themes = carr::get($row_data, 'themes');
+                $row = CTableRow::factory();
+            }else{
+                $row = $app->add_row();
+            }
+            
+         
+            $file_themes_setting = CF::get_file('data', 'template_setting');
+            $list_themes_setting = include $file_themes_setting; 
+            $arr_data=array();
+            foreach($list_themes_setting as $key=>$val){    
+                    $arr_key=$val['header_label'];
+                    $arr_data[$key]= $arr_key;
+                }
+            
+            $select_control = CFactory::create_control('', 'select')
+                            ->set_name('themes[]')
+                            ->set_value($themes)
+                            ->set_list($arr_data)
+                            ->custom_css('width', '600px');
+           
+            $del_button = CFactory::create_action()->set_label(clang::__('Delete'))->add_class('btn-danger')->set_icon('trash');
+            $del_button_listener=$del_button->add_listener('click');
+            $del_button_listener->add_handler('remove')->set_parent('tr');
+            $del_button_listener->add_handler('custom')->set_js('refresh_total()');
+           
+            $row->add_column($select_control);           
+            $row->add_column($del_button); 
+
+            if (count($row_data) > 0) {
+                return $row;
+            }
+            echo $app->render();
+        }        
+      
 
         public function add_custom_field(){
             $app=CApp::instance();
