@@ -175,36 +175,40 @@
                 $error = carr::get($response, 'error');
                 $message = carr::get($response, 'message');
                 $data = carr::get($response, 'data');
-                if ($error == false) {
-                    if ($act == 'login') {
-                        return $data;
-                    }
-                    else {
-                        throw new Exception('ERROR[Login-2]. Wrong ACT response. Please contact server administrator');
-                    }
-                }
-                else {
-                    throw new Exception('ERROR[Login-1]. ' . $message);
-                }
+//                if ($error == false) {
+//                    if ($act == 'login') {
+//                        return $data;
+//                    }
+//                    else {
+//                        throw new Exception('ERROR[Login-2]. Wrong ACT response. Please contact server administrator');
+//                    }
+//                }
+//                else {
+//                    throw new Exception('ERROR[Login-1]. ' . $message);
+//                }
             }
             catch (Exception $exc) {
                 throw new Exception('ERROR[Login]. ' . $exc->getMessage());
             }
         }
 
-        public function send_message($msg) {
+        public function send_message($msg, $msg_wait = false) {
             // encode message
             $msg = $this->encode($msg);
 
             if (!@socket_write($this->socket, $msg, strlen($msg))) {
                 throw new Exception('[WRITE] ' . $this->last_error() . '. Message: ' . $msg);
             }
-            if (@socket_recv($this->socket, $buf, 1024, 0) === FALSE) {
-                throw new Exception('[RECV-3] ' . $this->last_error());
+            if (!$msg_wait) {
+                return true;
             }
-            
-            $received_text = $this->read_response($buf); //unmask data
-            return $received_text;
+            else {
+                if (@socket_recv($this->socket, $buf, 1024, MSG_DONTWAIT) === FALSE) {
+                    throw new Exception('[RECV-3] ' . $this->last_error());
+                }
+                $received_text = $this->read_response($buf); //unmask data
+                return $received_text;
+            }
         }
 
         public function close() {

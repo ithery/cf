@@ -678,6 +678,9 @@ cresenity.func.js
                     handle = selection;
                     handle.data('xhr',jQuery.ajax({
                         type: 'post',
+                        data: {
+                            'title': document.title,
+                        },
                         url: url,
                         dataType: 'json',
                     }).done(function( data ) {
@@ -730,6 +733,7 @@ cresenity.func.js
                             + "</div>"
                         + "</div>";
                         var selection = jQuery('#'+id_target);
+                        console.log(selection);
                         var handle;
                         var dialog_is_remove = false;
                         if(selection.length == 0) {

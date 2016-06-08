@@ -171,7 +171,7 @@
                 $this->last_status = curl_getinfo($this->handle);
                 $this->last_status['errno'] = curl_errno($this->handle);
                 $this->last_status['error'] = curl_error($this->handle);
-
+                
                 // If there has been a curl error, just return this object.
                 if ($this->last_status['errno']) {
                     return $this;

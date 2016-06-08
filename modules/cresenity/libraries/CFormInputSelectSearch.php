@@ -162,6 +162,7 @@
                 $b_str = $val[0]; //matches str with bracket {}
                 $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
             }
+            
             preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
             foreach ($matches as $val) {
                 $thousand_separator_pre = '';
@@ -266,8 +267,6 @@
                                     // scrolling can be used
                                     params.page = params.page || 1;
                                     var more = (params.page * 10) < data.total;
-                                    console.log(params);
-                                    console.log(data);
                                     return {
                                             results: data.data,
                                             pagination: {
@@ -279,6 +278,9 @@
                             },
                         " . $str_js_init . "
                         templateResult: function(item) {
+                            if (typeof item.loading !== 'undefined') {
+                                return item.text;
+                            }
                             return $('<div>" . $str_result . "</div>');
                         }, // omitted for brevity, see the source of this page
                         templateSelection: function(item) {

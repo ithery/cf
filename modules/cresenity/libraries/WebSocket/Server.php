@@ -74,7 +74,6 @@
                         }
                         $response = $this->mask(json_encode($data_response)); //prepare json data
                         $this->send_message($client_notify, $response); //notify all users about new connection
-
                         //make room for new socket
                         $found_socket = array_search($this->socket, $changed);
                         unset($changed[$found_socket]);
@@ -85,7 +84,7 @@
                         //   - socket_getpeername(): unable to retrieve peer name [107]: Transport endpoint is not connected
                     }
                 }
-                
+
                 //loop through all connected sockets
                 foreach ($changed as $changed_index => $changed_socket) {
 
@@ -93,10 +92,9 @@
                     while (@socket_recv($changed_socket, $buf, 1024, 0) >= 1) {
                         $received_text = $this->unmask($buf); //unmask data
                         $message = json_decode($received_text, true); //json decode 
-                        
+
                         $message['ipaddress'] = $ip;
                         $this->receive_message($changed_index, $message, $clients_receiver); // do something receive message
-                        
                         //prepare data to be sent to client
                         $response_text = $this->mask(json_encode($message));
                         $this->send_message($clients_receiver, $response_text); //send data
@@ -107,32 +105,39 @@
                     if ($buf === false) { // check disconnected client
                         // remove client for $clients array
                         $found_socket = array_search($changed_socket, $this->clients);
-                        socket_getpeername($changed_socket, $ip);
-                        $data_response = array(
-                            'act' => 'info',
-                            'type' => 'system',
-                            'data' => array(
-                                'status' => 'disconnected',
-                                'message' => $ip . ' disconnected'
-                            )
-                        );
-                        unset($this->clients[$found_socket]);
-                        if (isset($this->clients_data[$found_socket])) {
-                            $app_id = carr::get($this->clients_data[$found_socket], 'app_id');
-                            $valid_clients = carr::get($this->valid_clients, $app_id, array());
-                            foreach ($valid_clients as $k => $v) {
-                                if (carr::get($v, 'client_idx') == $found_socket) {
-                                    unset($this->valid_clients[$app_id][$k]);
-                                    break;
+                        try {
+                            @socket_getpeername($changed_socket, $ip);
+                            $data_response = array(
+                                'act' => 'info',
+                                'type' => 'system',
+                                'data' => array(
+                                    'status' => 'disconnected',
+                                    'message' => $ip . ' disconnected'
+                                )
+                            );
+                            unset($this->clients[$found_socket]);
+                            if (isset($this->clients_data[$found_socket])) {
+                                $app_id = carr::get($this->clients_data[$found_socket], 'app_id');
+                                $valid_clients = carr::get($this->valid_clients, $app_id, array());
+                                foreach ($valid_clients as $k => $v) {
+                                    if (carr::get($v, 'client_idx') == $found_socket) {
+                                        unset($this->valid_clients[$app_id][$k]);
+                                        break;
+                                    }
                                 }
+                                unset($this->clients_data[$found_socket]);
                             }
-                            unset($this->clients_data[$found_socket]);
-                        }
 
-                        //notify all users about disconnected connection
-                        $response = $this->mask(json_encode($data_response));
-                        if ($this->send_all_when_connect) {
-                            $this->send_message($this->clients, $response);
+                            //notify all users about disconnected connection
+                            $response = $this->mask(json_encode($data_response));
+                            if ($this->send_all_when_connect) {
+                                $this->send_message($this->clients, $response);
+                            }
+                        }
+                        catch (Exception $ex) {
+                            // do nothing
+                            // this catch for handle 
+                            //   - socket_getpeername(): unable to retrieve peer name [107]: Transport endpoint is not connected
                         }
                     }
                 }

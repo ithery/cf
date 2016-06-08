@@ -58,7 +58,9 @@ class CFormInputCKEditor extends CFormInputTextarea {
 		$js = new CStringBuilder();
 		$js->set_indent($indent);
 		$js->appendln("
-                    CKEDITOR.replace('".$this->id."');
+                    CKEDITOR.replace('".$this->id."',{
+                        extraPlugins: 'markline'
+                        });
                 ");
 //		$js->append("
 //			CKEDITOR.replace('".$this->name."',{
