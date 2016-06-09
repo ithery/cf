@@ -65,7 +65,7 @@
                         $cf_mini_logo_path = 'application/'.$app_code .'/' .$org_code .'/media/img/mini-logo.png';
                         if (!file_exists($cf_mini_logo_path)) {
                             $cf_mini_logo_path = 'media/img/mini-logo.png';
-                            if (file_exists($cf_large_logo_path)) {
+                            if (file_exists($cf_mini_logo_path)) {
                                 $cf_mini_logo = curl::base() .'media/img/mini-logo.png';
                                 $is_mini_image = true;
                             }
