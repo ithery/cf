@@ -77,16 +77,13 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
     }
 
     public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->set_indent($indent);
-        $js->append(parent::js($indent))->br();
-        $js->append($js = "
+        
+        $js =  "
           $('#" . $this->id . "').val('" . $this->value . "');
           $('#" . $this->id . "').trigger('autoresize');
-        ");
-        // if (strlen($this->length) > 0)
-        //     $js .= "$('#" . $this->id . "').characterCounter();";
-        return $js->text();
+        ";
+        $js.=parent::js();
+        return $js;
     }
 
 }
