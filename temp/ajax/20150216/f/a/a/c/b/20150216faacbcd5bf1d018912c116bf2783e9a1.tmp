@@ -1,1 +1,0 @@
-{"name":"","method":"GET","data":{"query":"select * from airports","key_field":"code","search_field":["code","name"]},"type":"searchselect","target":"","param":[]}

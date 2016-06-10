@@ -1,1 +1,0 @@
-{"name":"","method":"GET","data":{"query":"select tp.topup_id, tp.code,tm.org_id ,tm.code as org_code from topup tp inner join org tm on tm.org_id = tp.org_id where tp.status_confirm = \"Confirmed\" and tp.status > 0","key_field":"topup_id","search_field":["code","org_code"]},"type":"searchselect","target":"","param":[]}
