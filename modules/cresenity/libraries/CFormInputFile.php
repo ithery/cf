@@ -5,6 +5,7 @@
         protected $multiple;
         protected $applyjs;
         protected $paste_zone;
+        protected $drop_zone;
         protected $url;
         protected $max_file_size;
         protected $resize;
@@ -21,6 +22,7 @@
             $this->type = "file";
             $this->applyjs = "file-upload";
             $this->paste_zone = "jQuery('body')";
+            $this->drop_zone = "jQuery('body')";
             $this->resize = true;
             $this->max_file_size = 99999;
             $this->accept_file_type = "/(\.|\/)(gif|jpe?g|png)$/i";
@@ -31,9 +33,6 @@
 
             $fileupload = carr::get($this->theme_data, 'fileupload');
             if (strlen($fileupload) > 0) {
-                if ($fileupload == 'jquery-fileupload') {
-                    CClientModules::instance()->register_module('jquery-fileupload');
-                }
                 $this->applyjs = $fileupload;
             }
         }
@@ -43,6 +42,9 @@
         }
 
         public function html($indent = 0) {
+            if ($this->applyjs == 'jquery-fileupload') {
+                CClientModules::instance()->register_module('jquery-fileupload');
+            }
             $html = new CStringBuilder();
             $html->set_indent($indent);
             $disabled = "";
@@ -114,6 +116,7 @@
                                 " . $this->callback_success . "
                                 })
                                 .error(function (jqXHR, status, thrown) {
+                                    console.log(jqXHR);
                                     if (status == 'error') {
                                         $.cresenity.message('error','Error, please call administrator... (' + thrown + ')');
                                     }
@@ -135,6 +138,9 @@
                 }
                 if (strlen($this->paste_zone) > 0) {
                     $js->append("pasteZone: " . $this->paste_zone . ",");
+                }
+                if (strlen($this->drop_zone) > 0) {
+                    $js->append("dropZone: " . $this->drop_zone . ",");
                 }
                 if ($this->resize == true) {
                     $js->appendln("

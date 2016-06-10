@@ -32,8 +32,32 @@
 
         <div class="login-box">
             <div class="login-logo">
-                <img src="<?php echo curl::base(); ?>media/img/logo-ittron.png" height="60px" /> <br/>
-                
+                <?php 
+                    $app_code = CF::app_code();
+                    $org_code = CF::org_code();
+                    if (strlen($org_code) == 0) {
+                        $org_code = 'default';
+                    }
+                    $large_logo = '<img src="' .curl::base() .'media/img/logo-ittron.png" height="80px" />';
+                    $is_image = false;
+                    $cf_large_logo = curl::base() .'application/' .$app_code .'/' .$org_code .'/media/img/logo.png';
+                    $cf_large_logo_path = 'application/'.$app_code .'/' .$org_code .'/media/img/logo.png';
+                    if (!file_exists($cf_large_logo_path)) {
+                        $cf_large_logo_path = 'media/img/logo.png';
+                        if (file_exists($cf_large_logo_path)) {
+                            $cf_large_logo = curl::base() .'media/img/logo.png';
+                            $is_image = true;
+                        }
+                    }
+                    else {
+                        $is_image = true;
+                    }
+                    if ($is_image) {
+                        $large_logo = '<img src="' .$cf_large_logo .'"  height="80px" />';
+                    }
+                    echo $large_logo;
+                ?>
+                <br/>
             </div><!-- /.login-logo -->
             <div class="login-box-body">
                 <p class="login-box-msg"><a href="<?php echo curl::base(); ?>"><b><?php echo ccfg::get('title'); ?></b></a></p>

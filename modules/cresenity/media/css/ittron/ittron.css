@@ -44,6 +44,8 @@
  *  	3.4 DATATABLE
  *  	3.5 CHECKBOX
  *  	3.6 RADIO
+ *  	3.7 DASHBOARD
+ *          3.7.1 LISTVIEW
  *  4. SECTION
  *  	4.1 MAIN HEADER
  *  	4.2 CONTENT HEADER
@@ -76,6 +78,12 @@ body {
 .mb-15 {
     margin-top: 15px;
 }
+.no-padding {
+    padding: 0px;
+}
+.no-margin {
+    margin: 0px;
+}
 
 /* 2.1 TYPOGRAPHY */
 a {
@@ -87,6 +95,15 @@ a {
     }
 span.required {
     color: red;
+}
+.txt-center {
+    text-align: center;
+}
+.txt-left {
+    text-align: left;
+}
+.txt-right {
+    text-align: right;
 }
 
 
@@ -193,11 +210,40 @@ div.dataTables_length select {
         left: 0;
     } 
 
-/* 3.5 RADIO */
+/* 3.6 RADIO */
 .icheck{} 
     .control-label > .iradio input[type="radio"]{
         left: 0;
     } 
+
+/* 3.7 DASHBOARD */
+/* 3.7.1 LISTVIEW */
+.dboard-widget-listview {}
+    .dboard-widget-listview .box-body {
+        padding: 0px;
+    }
+    .dboard-widget-listview.default .listview-items {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    .dboard-widget-listview.default .listview-items .listview-item {
+        padding: 15px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #f4f4f4;
+        font-size: 14px;
+    }
+    .dboard-widget-listview.default .listview-items .listview-item .date {
+        font-size: 12px;
+        font-style: italic;
+        color: #0D47A1;
+    }
+    .dboard-widget-listview.default .listview-items .listview-item.link {
+        cursor: pointer;
+    }
+    .dboard-widget-listview.default .listview-items .listview-item.link:hover {
+        background-color: #FFE0B2;
+    }
 
 /* 4. SECTION */
 /* 4.1 MAIN HEADER*/

@@ -55,6 +55,10 @@
             $this->auto_set_focus = true;
             $this->action_before_submit = '';
             $this->disable_js = false;
+
+            if ($this->bootstrap == '3.3') {
+                $this->layout = carr::get($this->theme_style, 'form_layout');
+            }
             CManager::instance()->register_module('validation');
         }
 
@@ -121,7 +125,7 @@
             $this->ajax_submit_target = $target;
             return $this;
         }
-        
+
         public function set_disable_js($bool) {
             $this->disable_js = $bool;
             return $this;
@@ -218,18 +222,17 @@
             if (strlen($this->enctype) > 0) {
                 $addition_str .= ' enctype="' . $this->enctype . '"';
             }
-            
-            
-            
+
+
+
             if ($this->bootstrap == '3.3') {
                 $form_style_layout = '';
-                $this->layout = carr::get($this->theme_style, 'form_layout');
                 if (strlen($this->layout) > 0) {
                     $form_style_layout = 'form-' . $this->layout;
                 }
                 $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->inc_indent()
-                    ->br();
+                        ->inc_indent()
+                        ->br();
 //                $html->appendln("<div class='box-body'>");
             }
             else {
@@ -238,8 +241,8 @@
                     $form_style_layout = 'form-' . $this->layout;
                 }
                 $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->inc_indent()
-                    ->br();
+                        ->inc_indent()
+                        ->br();
             }
 
             if ($this->ajax_process_progress) {
@@ -256,7 +259,7 @@
         }
 
         public function js($indent = 0) {
-            if($this->disable_js) return parent::js($indent);
+            if ($this->disable_js) return parent::js($indent);
             $js = new CStringBuilder();
             $js->set_indent($indent);
             if ($this->ajax_submit) {
@@ -524,7 +527,7 @@
 
                 $validation_if_open = '';
                 $validation_if_close = '';
-				
+
                 if ($this->validation) {
                     $validation_if_open = "if ($('#" . $this->id . "').validationEngine('validate') ) {";
                     $validation_if_close = "					} else {
@@ -597,9 +600,9 @@
                 if ($this->validation) {
                     $strvalidation = "$('#" . $this->id . "').validationEngine();";
                 }
-                
+
                 $js->appendln("
-                ".$strvalidation."
+                " . $strvalidation . "
                 $('#" . $this->id . "').bind('jqv.form.result', function(event , errorFound){
                     if(errorFound) {
                             $('#" . $this->id . " .confirm').removeAttr('data-submitted');

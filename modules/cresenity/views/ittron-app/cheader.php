@@ -92,7 +92,7 @@
                             $is_image = true;
                         }
                         if ($is_image) {
-                            $large_logo = '<img src="' .$cf_large_logo .'" width="200px" height="100%"/>';
+                            $large_logo = '<img src="' .$cf_large_logo .'" width="200px" height="50px"/>';
                         }
                     ?>
                     <!-- mini logo for sidebar mini 50x50 pixels -->
