@@ -14,6 +14,8 @@
         protected $before_submit;
         protected $callback_success;
         protected $callback_progress;
+        protected $auto_upload;
+        protected $max_number_of_files;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -30,6 +32,8 @@
             $this->before_submit = null;
             $this->callback_success = null;
             $this->callback_progress = null;
+            $this->auto_upload = true;
+            $this->max_number_of_files = null;
 
             $fileupload = carr::get($this->theme_data, 'fileupload');
             if (strlen($fileupload) > 0) {
@@ -99,6 +103,13 @@
                         //xhrFields: {withCredentials: true},
                         url: '" . $this->url . "',
                 ");
+                if (!$this->auto_upload) {
+                    $js->appendln("autoUpload: false,");
+                }
+                if (strlen($this->max_number_of_files) > 0) {
+                    $js->appendln('maxNumberOfFiles: ' .$this->max_number_of_files .',');
+                }
+                
                 if (strlen($this->callback_progress) > 0) {
                     $js->appendln("progress: function(e, data){
                                 " . $this->callback_progress . "
@@ -107,26 +118,29 @@
                 $js->appendln(" add: function (e, data) {
                             // this code below for create preview image using blob system
                             // URL.createObjectURL(data.files[0]);
-                            
+
                             " . $this->before_submit . "
-                            data.url = '" . $this->url . "';
-                            data.dataType = 'json';
-                            var jqXHR = data.submit()
-                                .success(function (result, textStatus, jqXHR) {
-                                " . $this->callback_success . "
-                                })
-                                .error(function (jqXHR, status, thrown) {
-                                    console.log(jqXHR);
-                                    if (status == 'error') {
-                                        $.cresenity.message('error','Error, please call administrator... (' + thrown + ')');
-                                    }
-                                })
-//                                .complete(function (result, textStatus, jqXHR) {
-//                                console.log('complete');
-//                                console.log(jqXHR);
-//                                console.log(textStatus);
-//                                })
-                                ;
+                            if (data.autoUpload || (data.autoUpload !== false &&
+                                        $(this).fileupload('option', 'autoUpload'))) {
+                                    data.url = '" . $this->url . "';
+                                    data.dataType = 'json';
+                                    var jqXHR = data.submit()
+                                        .success(function (result, textStatus, jqXHR) {
+                                        " . $this->callback_success . "
+                                        })
+                                        .error(function (jqXHR, status, thrown) {
+                                            console.log(jqXHR);
+                                            if (status == 'error') {
+                                                $.cresenity.message('error','Error, please call administrator... (' + thrown + ')');
+                                            }
+                                        })
+//                                        .complete(function (result, textStatus, jqXHR) {
+//                                        console.log('complete');
+//                                        console.log(jqXHR);
+//                                        console.log(textStatus);
+//                                        })
+                                        ;
+                            }
                         },
                 ");
                 if (strlen($this->callback_drop) > 0) {
@@ -255,6 +269,33 @@
             $this->callback_progress = $callback_progress;
             return $this;
         }
+        public function get_drop_zone() {
+            return $this->drop_zone;
+        }
 
+        public function get_auto_upload() {
+            return $this->auto_upload;
+        }
+
+        public function set_drop_zone($drop_zone) {
+            $this->drop_zone = $drop_zone;
+            return $this;
+        }
+
+        public function set_auto_upload($auto_upload) {
+            $this->auto_upload = $auto_upload;
+            return $this;
+        }
+
+        public function get_max_number_of_files() {
+            return $this->max_number_of_files;
+        }
+
+        public function set_max_number_of_files($max_number_of_files) {
+            $this->max_number_of_files = $max_number_of_files;
+            return $this;
+        }
+
+        
     }
     
