@@ -64,7 +64,7 @@ class CNestable extends CElement {
         $this->data = $treedb->get_children_data($parent_id);
         return $this;
     }
-    
+
     public function set_data_from_array($array = array()) {
         $this->data = $array;
         return $this;
@@ -186,27 +186,27 @@ class CNestable extends CElement {
     }
 
     public function js($indent = 0) {
-        if (!$this->applyjs)
-            return false;
+
         $js = new CStringBuilder();
         $js->set_indent($indent);
-        $js->appendln("
+        if (!$this->applyjs) {
+            $js->appendln("
 			jQuery('#" . $this->id . "').nestable({
 				/* config options */
 				maxDepth:100
 			});
 		")->inc_indent();
-        if (strlen($this->input) > 0) {
-            $js->appendln("
+            if (strlen($this->input) > 0) {
+                $js->appendln("
 				jQuery('#" . $this->id . "').on('change', function() {
 					/* on change event */
-					
+
 					if (window.JSON) {
 						jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
 					} else {
 						jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
 					}
-					
+
 				});
 				if (window.JSON) {
 					jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
@@ -214,11 +214,12 @@ class CNestable extends CElement {
 					jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
 				}
 			");
+            }
         }
-
         $js->appendln($this->js_cell);
-        $js->appendln(parent::js($indent));   
-        
+        $js->appendln(parent::js($indent));
+
+
         return $js->text();
     }
 
