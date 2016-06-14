@@ -29,25 +29,141 @@ class ccms {
         return $list;
     }
 
-    public static function generate_custom_field_input($options) {
-        $container = carr::get($options, 'container');
-        $fields = carr::get($options, 'fields');
-        $custom_fields = carr::get($options, 'custom_fields');
-        $post_id = carr::get($options, 'post_id');
+    public static function update_custom_field($options, $field_name = null, $field_value = null) {
+        $db = CDatabase::instance();
+        //check custom_field
+        $field_type = null;
+       
+        if (is_array($options)) {
+            $post_id = carr::get($options, 'post_id');
+            $field_name = carr::get($options, 'field_name');
+            $field_value = carr::get($options, 'field_value');
+            $field_type = carr::get($options, 'field_type');
+        } else {
+            $post_id = $options;
+        }
+        
+        if (strlen($field_name) == 0) {
+            throw new Exception('Field name is empty');
+        }
+        $data = array(
+            'field_name' => $field_name,
+            'field_value' => $field_value,
+        );
+        if (($field_type != null) && strlen($field_type) > 0) {
+            $data['field_type'] = $field_type;
+        }
+        $r = null;
+        $row = cdbutils::get_row('select * from cms_custom_field where cms_post_id=' . $db->escape($post_id) . " and field_name=" . $db->escape($field_name));
+        if($row!==null&&strlen($field_type)==0) {
+            $field_type = $row->field_type;
+        }
+        switch($field_type) {
+            case 'image':
+                $field_value = json_encode($field_value);
+            break;
+        }
+        if ($row === null) {
+            $data['cms_post_id'] = $post_id;
+            $r = $db->insert('cms_custom_field', $data);
+        } else {
+            $r = $db->update('cms_custom_field', $data, array('cms_post_id' => $post_id, 'field_name'=>$field_name));
+        }
+        return $r;
+    }
 
-        $custom_field_data = ccms::get_custom_field_data($custom_fields);
-        $fields = carr::get($custom_field_data, 'fields');
+    public static function get_custom_field($post_id, $field_name) {
+        $db = CDatabase::instance();
+        $row = cdbutils::get_row('select * from cms_custom_field where cms_post_id=' . $db->escape($post_id) . " and field_name=" . $db->escape($field_name));
+        if($row===null) {
+            return null;
+        }
+        $field_value = $row->field_value;
+        $field_type = $row->field_type;
+        $value = $field_value;
+        switch ($field_type) {
+            case 'image':
+                $value = json_decode($field_value);
+                break;
+            default:
+                $value = $field_value;
+                break;
+        }
+        return $value;
+    }
+
+    public static function get_custom_fields($options) {
+        $db = CDatabase::instance();
+        $fields = array();
+        $custom_fields = array();
+        $post_id = carr::get($options, 'post_id');
+        if ($post_id != null && strlen($post_id > 0)) {
+            $post_type = cdbutils::get_value('select post_type from cms_post where cms_post_id=' . $db->escape($post_id));
+            $data = ccms::get_post_type_data($post_type);
+            $custom_fields = carr::get($data, 'custom_fields');
+            if($custom_fields==null) {
+                $custom_fields=array();
+            }
+        }
+        if (isset($options['custom_fields'])) {
+            $custom_fields = carr::get($options, 'custom_fields');
+        }
+        if (count($custom_fields) > 0) {
+            $custom_field_data = ccms::get_custom_field_data($custom_fields);
+            $fields = carr::get($custom_field_data, 'fields');
+        }
+        if (isset($options['fields'])) {
+            $fields = carr::get($options, 'fields');
+        }
+        
+        
+        return $fields;
+    }
+
+    public static function generate_custom_field_input($options) {
+        
+        $post_id = carr::get($options, 'post_id');
+        $prefix = carr::get($options, 'prefix');
+        $container = carr::get($options, 'container');
+        if ($container === null) {
+            $container = CApp::instance();
+        }
+        if ($prefix === null) {
+            $prefix = '';
+        }
+        $fields = self::get_custom_fields($options);
+        
         if (is_array($fields)) {
             foreach ($fields as $k => $field) {
                 $label = carr::get($field, 'label');
                 $type = carr::get($field, 'type');
+                $default_value = carr::get($field, 'default_value');
                 $field = $container->add_field()->set_label($label);
+                //create control
+                $control = null;
                 switch ($type) {
-                    case 'text':
-                        $field->add_control('custom_field_' . $k, $type);
-                        break;
                     case 'image':
-                        $field->add_control('custom_field_' . $k, $type);
+                        $control = $field->add_control($prefix . $k, $type);
+                        break;
+                    default:
+                        $control = $field->add_control($prefix . $k, $type);
+                        break;
+                }
+                if($control==null) {
+                    throw new Exception('Unknown control for '.$k);
+                }
+                //set value
+                switch ($type) {
+                    case 'image':
+                        
+                        break;
+                    default:
+                        $control = $control->set_value($default_value);
+                        if(strlen($post_id)>0) {
+                            $field_value = self::get_custom_field($post_id, $k);
+                            $control = $control->set_value($field_value);
+                            
+                        }
                         break;
                 }
             }
@@ -73,6 +189,7 @@ class ccms {
     public static function get_post_type_data($post_type) {
         $all_post_type = self::get_all_post_type();
         return carr::get($all_post_type, $post_type);
+        
     }
 
     private static function get_all_post_type() {
@@ -95,7 +212,7 @@ class ccms {
 
     public static function get_post_type_list() {
         $all_post_type = self::get_all_post_type();
-
+        
 
         $result = array('post' => 'Post');
 
