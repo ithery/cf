@@ -43,13 +43,13 @@ class Read_Controller extends CController {
 //        cdbg::var_dump($the_post);
 //        echo $app->render();
     }
-    
+
     // Reading page
     public function page($post = '') {
         $app = CApp::instance();
         $post_title = '';
         $post_content = '';
-        
+        $post_id = $post;
         $post = ccms::get_post($post);
         $template = $post->template;
         if(strlen($template)>0) {
@@ -58,21 +58,24 @@ class Read_Controller extends CController {
             $template = 'cms/post';
 
         }
-        if(!CView::exists($template)) {
+        $file = CF::get_file('template',$template);
+        if($file===null) {
             $template = 'cms/index';
         }
         
-        if(!CView::exists($template)) {
+        $file = CF::get_file('template',$template);
+        if($file===null) {
             $template = 'cms/404';
         }
-        if(!CView::exists($template)) {
+        $file = CF::get_file('template',$template);
+        if($file===null) {
             CF::show_404();
             return;
         } else {
-            $view = CView::factory($template);
+            
             $app->show_breadcrumb(false);
             $app->show_title(false);
-            $app->add($view->render());
+            include $file;
         }
         echo $app->render();
     }

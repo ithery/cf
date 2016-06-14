@@ -22,9 +22,7 @@ class ccms {
     public static function get_template_list($options=null) {
         $data = self::get_template_data($options);
         $list = array();
-        if($options==null) {
-            $list[''] = 'Default';
-        }
+        $list[''] = 'Default';
         $post_type = carr::get($options,'post_type');
         $templates = array();
         if(strlen($post_type)!=null) {

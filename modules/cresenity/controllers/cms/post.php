@@ -88,6 +88,7 @@ class Post_Controller extends CController {
         $post_title = "";
         $post_name = "";
         $post_content = "";
+        $post_type = "";
         $post_status = "";
         $cms_terms_id = "";
         $item_image = "";
@@ -485,7 +486,7 @@ class Post_Controller extends CController {
         $db = CDatabase::instance();
         $current_value = '';
         if(strlen($id)>0) {
-            $row = cdbutils::get_value('select template from cms_post where cms_post_id='.$db->escape($id));
+            $row = cdbutils::get_row('select template from cms_post where cms_post_id='.$db->escape($id));
             if($row!=null) {
                 $current_value = $row->template;
             }
