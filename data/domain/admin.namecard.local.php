@@ -7,7 +7,5 @@ return array(
 	"store_id"=>null,
 	"store_code"=>null,
 	"domain"=>"admin.namecard.local",
-        'shared_app_code'=>array(
-            "namecard"
-        ),
+        
 );
