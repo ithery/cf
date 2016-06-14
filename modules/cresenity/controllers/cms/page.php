@@ -178,6 +178,7 @@ class Page_Controller extends CController {
             $post_name = carr::get($page, 'post_name');
             $post_content = carr::get($page, 'post_content');
             $post_status = carr::get($page, 'post_status');
+            $template = carr::get($page, 'template');
             $cannot_delete = carr::get($page, 'cannot_delete');
             
             $template = carr::get($page, 'template');

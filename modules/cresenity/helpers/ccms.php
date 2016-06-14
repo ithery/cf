@@ -10,7 +10,7 @@ class ccms {
 
     static $all_post_type = null;
 
-    public static function get_template_data() {
+    public static function get_template_data($options=null) {
         $return = array();
         $file = CF::get_file('data', 'cms/template');
         if ($file != null) {
@@ -19,10 +19,29 @@ class ccms {
         return $return;
     }
 
-    public static function get_template_list() {
-        $data = self::get_template_data();
-        $list = array('' => 'Default');
+    public static function get_template_list($options=null) {
+        $data = self::get_template_data($options);
+        $list = array();
+        if($options==null) {
+            $list[''] = 'Default';
+        }
+        $post_type = carr::get($options,'post_type');
+        $templates = array();
+        if(strlen($post_type)!=null) {
+            $post_type_data = self::get_post_type_data($post_type);
+            $templates = carr::get($post_type_data,'templates');
+            if(!is_array($templates)) {
+                $templates = array();
+            }
+        }
         foreach ($data as $k => $v) {
+            if(count($templates)>0) {
+                
+                
+                if(!in_array($k, $templates)) {
+                    continue;
+                }
+            }
             $list[$k] = carr::get($v, 'name');
         }
 
@@ -46,13 +65,8 @@ class ccms {
         if (strlen($field_name) == 0) {
             throw new Exception('Field name is empty');
         }
-        $data = array(
-            'field_name' => $field_name,
-            'field_value' => $field_value,
-        );
-        if (($field_type != null) && strlen($field_type) > 0) {
-            $data['field_type'] = $field_type;
-        }
+        
+        
         $r = null;
         $row = cdbutils::get_row('select * from cms_custom_field where cms_post_id=' . $db->escape($post_id) . " and field_name=" . $db->escape($field_name));
         if($row!==null&&strlen($field_type)==0) {
@@ -62,6 +76,13 @@ class ccms {
             case 'image':
                 $field_value = json_encode($field_value);
             break;
+        }
+        $data = array(
+            'field_name' => $field_name,
+            'field_value' => $field_value,
+        );
+        if (($field_type != null) && strlen($field_type) > 0) {
+            $data['field_type'] = $field_type;
         }
         if ($row === null) {
             $data['cms_post_id'] = $post_id;
@@ -83,7 +104,7 @@ class ccms {
         $value = $field_value;
         switch ($field_type) {
             case 'image':
-                $value = json_decode($field_value);
+                $value = json_decode($field_value,true);
                 break;
             default:
                 $value = $field_value;
@@ -155,7 +176,17 @@ class ccms {
                 //set value
                 switch ($type) {
                     case 'image':
+                        $control->set_imgsrc(curl::base().'cresenity/noimage/100/100');
+                        $control->set_maxwidth(100);
+                        $control->set_maxheight(100);
                         
+                        if(strlen($post_id)>0) {
+                            $field_value = self::get_custom_field($post_id, $k);
+                            $control->set_imgsrc(carr::get($field_value,'image_url'));
+                            
+                           
+                            
+                        }
                         break;
                     default:
                         $control = $control->set_value($default_value);
@@ -287,6 +318,19 @@ class ccms {
         }
         return $return;
     }
+    
+    public static function get_post($id = '') {
+       
+        $result = self::__get_post_single( $id);
+        
+        return $result;
+    }
+    
+    public static function get_posts($options) {
+        
+        $result = self::__get_post($options);
+        
+    }
 
     public static function post($id = '') {
         $result = self::__get_post('post');
@@ -319,10 +363,14 @@ class ccms {
         return $result;
     }
 
-    private static function __get_post($post_type = 'post', $org_id = null) {
+    private static function __get_post($options, $org_id = null) {
         $db = CDatabase::instance();
         $result = array();
-
+        if($org_id==null) {
+            $org_id = CF::org_id();
+        }
+        $post_type = carr::get($options,'post_type');
+        
         $q = "SELECT
                 tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
                 p.*
@@ -330,10 +378,12 @@ class ccms {
                LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
                LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
                LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
-               WHERE p.status > 0
-               AND p.post_type = " . $db->escape($post_type);
+               WHERE p.status > 0";
+        if($post_type!=null&&strlen($post_type)>0) {
+               $q.=" AND p.post_type = " . $db->escape($post_type);
+        }
         if ($org_id != null) {
-            $q.= " and p.org_id=" . $db->escape($org_id);
+            $q.= " AND p.org_id=" . $db->escape($org_id);
         }
         $r = $db->query($q);
         if (count($r) > 0) {
@@ -362,42 +412,17 @@ class ccms {
         return $result;
     }
 
-    private static function __get_post_single($post_type = "post", $id) {
+    private static function __get_post_single( $id) {
         $db = CDatabase::instance();
         $result = array();
 
-        $q = "SELECT
-                tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
-                p.*
+        $q = "SELECT *
                FROM cms_post p
-               LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
-               LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
-               LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
                WHERE p.status > 0
-               AND p.post_type = " . $db->escape($post_type) . " AND p.cms_post_id=" . $db->escape($id);
+               AND  p.cms_post_id=" . $db->escape($id);
         $r = cdbutils::get_row($q);
-        if ($r != NULL) {
-            $result['cms_term_taxonomy_id'] = $r->cms_term_taxonomy_id;
-            $result['cms_terms_id'] = $r->cms_terms_id;
-            $result['term_name'] = $r->term_name;
-            $result['term_slug'] = $r->term_slug;
-            $result['cms_post_id'] = $r->cms_post_id;
-            $result['post_content'] = $r->post_content;
-            $result['post_title'] = $r->post_title;
-            $result['post_excerpt'] = $r->post_excerpt;
-            $result['post_status'] = $r->post_status;
-            $result['post_name'] = $r->post_name;
-            $result['post_type'] = $r->post_type;
-            $result['post_parent'] = $r->post_parent;
-            $result['guid'] = $r->guid;
-            $result['menu_order'] = $r->menu_order;
-            $result['post_type'] = $r->post_type;
-            $result['post_mime_type'] = $r->post_mime_type;
-            $result['template'] = $r->template;
-            $result['cannot_delete'] = $r->cannot_delete;
-        }
-
-        return $result;
+        return $r;
+       
     }
 
     public static function add_slash_domain($domain) {

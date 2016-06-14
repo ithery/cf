@@ -352,13 +352,13 @@ class Post_Controller extends CController {
                     switch($field_type) {
                         case 'image':
                             
-                            $resource = CResources::factory('image', 'custom_field_image_'.$k,$org_code);
+                            $resource = CResources::factory('image', 'custom-field-image-'.$k,$org_code);
                             $image_url = null;
                             $filename = null;
                             $file_name_generated = '';
                             if(isset($_FILES['custom_field_'.$k])&&$_FILES['custom_field_'.$k]!=null&&isset($_FILES['custom_field_'.$k]['tmp_name'])&&$_FILES['custom_field_'.$k]['tmp_name']!=null) {
-                                $filename = $_FILES['image_name']['name'];
-                                $content = file_get_contents($_FILES['image_name']['tmp_name']);
+                                $filename = $_FILES['custom_field_'.$k]['name'];
+                                $content = file_get_contents($_FILES['custom_field_'.$k]['tmp_name']);
                                 $file_name_generated = $resource->save($filename, $content);
                                 $image_url = $resource->get_url($file_name_generated);
                             }
@@ -426,6 +426,10 @@ class Post_Controller extends CController {
                 ->set_url(curl::base() . 'cms/post/load_custom_field/' . $id)->add_param_input(array('post_type'));
         $post_type_control->add_listener('change')->add_handler('reload')->set_target('custom-field-container')
                 ->set_url(curl::base() . 'cms/post/load_custom_field/' . $id)->add_param_input(array('post_type'));
+        $post_type_control->add_listener('ready')->add_handler('reload')->set_target('template-container')
+                ->set_url(curl::base() . 'cms/post/load_template/' . $id)->add_param_input(array('post_type'));
+        $post_type_control->add_listener('change')->add_handler('reload')->set_target('template-container')
+                ->set_url(curl::base() . 'cms/post/load_template/' . $id)->add_param_input(array('post_type'));
 
         $widget_left->add_field()->set_label(clang::__("Post Title"))->add_control('post_title', 'text')->set_value($post_title);
         //$widget_left->add_field()->set_label(clang::__("Url"))->add_control('post_name', 'text')->set_value($post_name)->set_placeholder("Auto");
@@ -444,6 +448,7 @@ class Post_Controller extends CController {
         $widget_left->add_field()->set_label(clang::__("Post Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
         $widget_left->add_div('custom-field-container');
         // DIV RIGHT
+        $widget_right->add_div('template-container');
         $widget_right->add_field()->set_label(clang::__("Post Status"))->add_control('post_status', 'select')->set_value($post_status)->set_list($status_list)->add_class('large');
         $widget_right->add_field()->set_label(clang::__("Category"))->add_control('cms_terms_id', 'select')->set_value($cms_terms_id)->set_list($category_list)->add_class('large');
         $widget_right->add_field()
@@ -474,6 +479,28 @@ class Post_Controller extends CController {
         echo $app->render();
     }
 
+    
+    public function load_template($id = "") {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $current_value = '';
+        if(strlen($id)>0) {
+            $row = cdbutils::get_value('select template from cms_post where cms_post_id='.$db->escape($id));
+            if($row!=null) {
+                $current_value = $row->template;
+            }
+        }
+        $request = array_merge($_GET, $_POST);
+        $post_type = carr::get($request, 'post_type');
+        
+        $options = array(
+            'post_type'=>$post_type,
+        );
+        $template_list = ccms::get_template_list($options);
+        $app->add_field()->set_label(clang::__("Template"))->add_control('template', 'select')->set_value($current_value)->set_list($template_list)->add_class('large');
+        echo $app->render();
+        
+    }
     public function load_custom_field($id = "") {
         $app = CApp::instance();
         $request = array_merge($_GET, $_POST);
