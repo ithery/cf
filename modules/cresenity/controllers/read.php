@@ -47,10 +47,14 @@ class Read_Controller extends CController {
     // Reading page
     public function page($post = '') {
         $app = CApp::instance();
+        $db = CDatabase::instance();
         $post_title = '';
         $post_content = '';
         $post_id = $post;
-        $post = ccms::get_post($post);
+        if (!is_numeric($post_id)) {
+            $post_id = cdbutils::get_value("SELECT cms_post_id FROM cms_post WHERE post_name = ".$db->escape($post_id));
+        }
+        $post = ccms::get_post($post_id);
         $template = $post->template;
         if(strlen($template)>0) {
             $template = 'cms/'.$template;
