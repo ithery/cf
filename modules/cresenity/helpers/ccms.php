@@ -18,7 +18,29 @@ class ccms {
         }
         return $return;
     }
+    
+    public static function get_category_type_data($options=null) {
+        $return = array();
+        $file = CF::get_file('data', 'cms/category_type');
+        if ($file != null) {
+            $return = include $file;
+        }
+        return $return;
+    }
+    
+    public static function get_category_type_list($options=null) {
+        $data = self::get_category_type_data($options);
+        $list = array();
+        $list[''] = 'Default';
+        
+        foreach ($data as $k => $v) {
+            
+            $list[$k] = carr::get($v, 'name');
+        }
 
+        return $list;
+    }
+    
     public static function get_template_list($options=null) {
         $data = self::get_template_data($options);
         $list = array();

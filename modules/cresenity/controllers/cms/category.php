@@ -1,0 +1,551 @@
+<?php
+
+/**
+ *
+ * @author Hery
+ * @since  Nov 16, 2015
+ * @license http://piposystem.com Piposystem
+ */
+class Category_Controller extends CController {
+
+    public function __construct() {
+        parent::__construct();
+    }
+
+    public function index() {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $user = $app->user();
+        $app->add_breadcrumb(clang::__("Category"), curl::base() . "cms/category");
+
+        $category_list = ccms::get_category_type_list();
+        
+        $widget = $app->add_widget();
+        $widget->set_title(clang::__('Product Category List'))->set_icon('filter');
+        $form = $widget->add_form();
+        $span = $form->add_div()
+                ->add_class("row-fluid")
+                ->add_div()
+                ->add_class("span5");
+
+        $span->add_field()->set_label(clang::__("Category Type"))->add_control('category_type', 'select')->set_list($category_list)->add_class('large');
+        
+        $actions = $form->add_action_list()->set_style('form-action');
+        $actions->add_class('submit-form');
+        $actions->add_action()->set_label(clang::__("Show"))->set_submit(true)->set_confirm(false);
+
+        $form->set_ajax_submit(true)->set_ajax_submit_target('table-container')
+                ->set_action(curl::base() . "cms/category/table");
+        $form->add_listener('ready')->add_handler('submit');
+
+        $app->add_div('table-container');
+
+        echo $app->render();
+    }
+
+    public function table() {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $org = $app->org();
+        $user = $app->user();
+
+        $request = array_merge($_GET, $_POST);
+        $category_type = carr::get($request, 'category_type');
+
+        $app->title(clang::__("Category Type List"));
+        $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
+
+        $widget = $app->add_widget()->set_title(clang::__("Category Type"));
+        $nestable = $widget->add_nestable();
+        $widget->clear_both();
+        $nestable->set_data_from_treedb($tree)->set_id_key('cms_category_id')->set_value_key('name')->set_input('data_order');
+        $nestable->set_applyjs(false);
+        $nestable->set_action_style('btn-dropdown');
+
+        if (cnav::have_permission('edit_product_category')) {
+            $actedit = $nestable->add_row_action('edit');
+            $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . "cms/category/edit/{param1}")->set_label(" " . clang::__("Edit") . " " . clang::__("Product Category"));
+        }
+        if (cnav::have_permission('delete_product_category')) {
+            $actedit = $nestable->add_row_action('delete');
+            $actedit->set_label("")->set_icon("trash")->set_link(curl::base() . "cms/category/delete/{param1}")->set_confirm(true)->set_label(" " . clang::__("Delete") . " " . clang::__("Product Category"));
+        }
+
+        echo $app->render();
+    }
+
+    public function add() {
+        $this->edit();
+    }
+
+    public function edit($id = "") {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $user = $app->user();
+        $err_code = 0;
+        $err_message = '';
+        $is_insert = true;
+
+        $title = clang::__("Add Category");
+
+        if (strlen($id) > 0) {
+            $title = clang::__("Edit Category");
+            $is_insert = false;
+        }
+        $app->title($title);
+
+        $org = $app->org();
+        $org_code = null;
+        if ($org) {
+            $org_code = $org->org_code;
+        }
+
+        
+        $category_type = "";
+        $code = "";
+        $parent_id = "";
+        $name = "";
+        $url_key = '';
+        $description = "";
+
+        $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
+
+        $app->add_breadcrumb(clang::__("Category"), curl::base() . "cms/category");
+        $imgsrc = curl::base() . 'cresenity/noimage/120/120';
+        $widget = $app->add_widget()->set_title($title);
+        $form = $widget->add_form()->set_enctype('multipart/form-data');
+        $post = $this->input->post();
+
+        if ($post != null) {
+            $category_type = carr::get($post, 'category_type');
+            $code = carr::get($post, 'code');
+            $name = carr::get($post, 'name');
+            $description = carr::get($post, 'description');
+            $parent_id = carr::get($post, 'parent_id');
+            $url_key = carr::get($post, 'url_key');
+            //$url_key = cstr::sanitize($name);
+
+
+            $image = carr::get($_FILES, 'image_name');
+            $filename = '';
+            $tmp_name = '';
+            if (strlen($id) == 0) {
+                if (isset($image['name'])) {
+                    $filename = $image['name'];
+                }
+                if (isset($image['tmp_name'])) {
+                    $tmp_name = $image['tmp_name'];
+                }
+                if (strlen($filename) == 0) {
+                    $error++;
+                    $error_message = 'Please Insert Image';
+                }
+                if (strlen($tmp_name) == 0) {
+                    $error++;
+                    $error_message = 'Please Insert Image';
+                }
+            }
+
+//                if ($parent_id == 0) $parent_id = NULL;
+
+            if ($err_code == 0) {
+                if (strlen($product_type_id) == 0) {
+                    $err_code++;
+                    $err_message = 'Product Type is required.';
+                }
+            }
+            if ($err_code == 0) {
+                if (strlen($product_category_code) == 0) {
+                    $err_code++;
+                    $err_message = 'Product Code is required.';
+                }
+            }
+
+            if ($err_code == 0) {
+                if (strlen($product_category_code) > 100) {
+                    $err_code++;
+                    $err_message = 'Too long Product Category Code.';
+                }
+            }
+
+//                if ($err_code == 0) {
+//                    if (strlen($product_category_code) > 1) {
+//                        $err_code++;
+//                        $err_message = 'Too long Product Category Code.';
+//                    }
+//                }
+//                if ($err_code == 0) {
+//                    if (strlen($name) == 0) {
+//                        $err_code++;
+//                        $err_message = 'Name is required.';
+//                    }
+//                }
+
+            if ($err_code == 0) {
+                $qcheck = " select * from cms_category
+                                where code=" . $db->escape($code) . " and status > 0
+                                and category_type=" . $db->escape($category_type);
+                if (strlen($id) > 0)
+                    $qcheck .= " and cms_category_id <>" . $db->escape($id) . "";
+                $rcheck = $db->query($qcheck);
+                if ($rcheck->count() > 0) {
+                    $err_message = 'Error,' . ' ' . clang::__('Code') . ' ' . clang::__('is already exist, please try another') . ' ' . clang::__('Code');
+                    $err_code++;
+                }
+            }
+
+            if ($err_code == 0) {
+
+                $resource = CResources::factory("image", "product_category", $org_code);
+                $filename = $_FILES['image_name']['name'];
+                $path = file_get_contents($_FILES['image_name']['tmp_name']);
+                $file_name_generated = $resource->save($filename, $path);
+                $image_url = $resource->get_url($file_name_generated);
+
+                $data = array(
+                    "category_type" => $category_type,
+                    //"parent_id" => $parent_id,
+                    "code" => $product_category_code,
+                    "name" => $name,
+                    "image_name" => $file_name_generated,
+                    "image_url" => $image_url,
+                    "url_key" => $url_key,
+                    "description" => $description
+                );
+                if (strlen($parent_id) > 0)
+                    $data['parent_id'] = $parent_id;
+
+                try {
+                    if (strlen($id) == 0) {
+                        $data = array_merge($data, array(
+                            "created" => date("Y-m-d H:i:s"),
+                            "createdby" => $user->username,
+                            "updated" => date("Y-m-d H:i:s"),
+                            "updatedby" => $user->username,
+                        ));
+                        $tree->insert($data, $parent_id);
+                        $last_query = $db->last_query();
+
+                        $param = array(
+                            'user_id' => $user->user_id,
+                            'before' => '',
+                            'after' => $data,
+                        );
+                    } else {
+                        if (isset($image['name'])) {
+                            $filename = $image['name'];
+                        }
+                        if (isset($image['tmp_name'])) {
+                            $tmp_name = $image['tmp_name'];
+                        }
+                        $dataa = array(
+                            "cms_category_id" => $cms_category_id,
+                            "code" => $code,
+                            "name" => $name,
+                            "url_key" => $url_key,
+                            "description" => $description
+                        );
+
+                        if (strlen($tmp_name) > 0) {
+                            $resource = CResources::factory("image", "productcategory", $org_code);
+                            $filename = $_FILES['image_name']['name'];
+
+                            $path = file_get_contents($_FILES['image_name']['tmp_name']);
+                            $file_name_generated = $resource->save($filename, $path);
+                            $image_url = $resource->get_url($file_name_generated);
+                            $dataa = array_merge($dataa, array(
+                                "image_name" => $file_name_generated,
+                                "image_url" => $image_url,
+                            ));
+                        }
+                        $data = array_merge($dataa, array(
+                            "updated" => date("Y-m-d H:i:s"),
+                            "updatedby" => $user->username,
+                        ));
+
+                        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id));
+                        $param = array(
+                            'user_id' => $user->user_id,
+                            'before' => $before,
+                            'after' => $data,
+                        );
+
+                        $tree->update($id, $data, $parent_id);
+                        $last_query = $db->last_query();
+                    }
+                } catch (Exception $e) {
+                    $err_code++;
+                    $err_message = "Error, call administrator..." . $e->getMessage();
+                }
+            }
+
+            if ($err_code == 0) {
+                if ($id > 0) {
+//                    clog::activity($param, 'Edit_Product_Category', clang::__("Product Category") . " [" . $name . "] " . clang::__("Successfully Modified") . " !");
+                    cmsg::add('success', clang::__("Category") . " [" . $name . "] " . clang::__("Successfully Modified") . " !");
+                    curl::redirect("cms/category");
+                } else {
+//                    clog::activity($param, 'Add_Product_Category', clang::__("Product Category") . " [" . $name . "] " . clang::__("Successfully Added") . " !");
+                    cmsg::add('success', clang::__("Category") . " [" . $name . "] " . clang::__("Successfully Added") . " !");
+                    curl::redirect("cms/category/add");
+                }
+            } else {
+//                    cmsg::add('error', clang::__("Product Category") . " [" . $name . "] " . $err_message . " !");
+                cmsg::add("error", $error_message);
+            }
+        } else if (strlen($id) > 0) {
+            $q = " SELECT * FROM cms_category WHERE cms_category_id = " . $db->escape($id);
+            $row = cdbutils::get_row($q);
+            if ($row != NULL) {
+//                $product_type_name = $row->product_type_name;
+                $category_type = $row->category_type;
+                $code = $row->code;
+                $name = $row->name;
+                $file_name_generated = $row->image_name;
+                $image_url = $row->image_url;
+                $url_key = $row->url_key;
+                $description = $row->description;
+                $parent_id = $row->parent_id;
+            }
+        }
+
+
+        $div_row = $form->add_div()->add_class("row-fluid");
+        $span = $div_row->add_div()->add_class("span6");
+
+        $image_div_right = $div_row->add_div()->add_class('span6');
+        $info = $image_div_right->add_div()->add_class('alert alert-info');
+        $info->add('<h4>' . clang::__('Information') . '</h4>');
+        $info->add('<ul>');
+        $info->add('<li>Ukuran Gambar <br>width : <b>386px &nbsp</b>height: <b>469px</b></li>');
+        $info->add('</ul>');
+        if (strlen($id) > 0) {
+            if ($err_code > 0)
+                $product_type_name = cdbutils::get_value('select name from product_type where product_type_id = ' . $db->escape($product_type_id) . ' and status > 0 ');
+            $span->add_field()->set_label(clang::__("Product Type"))
+                    ->add_control('product_type_name', 'label')->add_validation(null)
+                    ->set_value($product_type_name)->add_transform('uppercase');
+            $span->add_control('product_type_id', 'hidden')->set_value($product_type_id);
+
+            $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $product_type_id);
+            $product_category[''] = '';
+            $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
+            unset($product_category[$id]);
+            $product_category = array('' => 'NONE') + $product_category;
+
+
+            $parent_name = cdbutils::get_value('select name from product_category where status > 0 and product_category_id = ' . $db->escape($parent_id) . ' ');
+            $span->add_control('parent_id', 'hidden')->set_value($parent_id);
+            $span
+                    ->add_field()
+                    ->set_label(clang::__('Parent'))
+                    ->add_control('parent_name', 'text')
+                    ->add_validation(null)
+                    ->set_value($parent_name)
+                    ->set_disabled(true)
+            ;
+        }
+//        else {
+//            $product_type_control = $span->add_field()
+//                    ->set_label("<span style='color:red;'>*</span> " . clang::__("Product Type"))
+//                    ->add_control("product_type_id", "product-type-select")
+//                    ->set_value($product_type_id);
+//
+//            $tree = CTreeDB::factory('product_category')->add_filter('product_type_id', $product_type_id);
+//            $product_category[''] = '';
+//            $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
+//            $product_category = array('' => 'NONE') + $product_category;
+//
+//            $product_category_control = $span->add_div('div_product_category_control');
+//
+//            $product_category_control->add_field()
+//                    ->set_label(clang::__("Parent"))
+//                    ->add_control("parent_id", "select")
+//                    ->add_validation(null)
+//                    ->set_value($parent_id)
+//                    ->set_list($product_category)
+//                    ->set_applyjs('select2');
+//
+//            $product_type_control->add_listener('change')->add_handler('reload')
+//                    ->set_target('div_product_category_control')
+//                    ->set_url(curl::base() . 'master/product_category/reload_product_category_parent')
+//                    ->add_param_input(array('product_type_id'));
+//
+//            if (strlen($parent_id) == 0) {
+//                $product_type_control->add_listener('ready')->add_handler('reload')
+//                        ->set_target('div_product_category_control')
+//                        ->set_url(curl::base() . 'master/product_category/reload_product_category_parent')
+//                        ->add_param_input(array('product_type_id', 'parent_id'));
+//            }
+//        }
+
+        $span->add_field()
+                ->set_label("<span style='color:red;'>*</span> " . clang::__("Product Category Code"))
+                ->add_control("code", "text")
+                ->add_validation('required')
+                ->set_value($code);
+        $span->add_field()
+                ->set_label("<span style='color:red;'>*</span> " . clang::__("Product Category Name"))
+                ->add_control("name", "text")
+                ->add_validation('required')
+                ->set_value($name);
+
+
+
+
+
+        if ($is_insert) {
+            $field = $span
+                    ->add_field()
+                    ->set_label('<span style="color: red;">*</span> ' . clang::__("Image"));
+
+            $field
+                    ->add_control('image_name', 'image')
+                    ->set_imgsrc($imgsrc)
+                    ->set_maxwidth(386)
+                    ->set_maxheight(469);
+
+
+            $span
+                    ->add_field()
+                    ->set_label(clang::__("Url Key"))
+                    ->add_control('url_key', 'text')
+                    ->set_value($url_key)
+                    ->set_placeholder("Auto");
+        } else {
+            $span
+                    ->add_field()
+                    ->set_label('<span style="color: red;">*</span> ' . clang::__("Image"))
+                    ->add_control('image_name', 'image')
+                    ->set_imgsrc($image_url)
+                    ->set_maxwidth(386)
+                    ->set_maxheight(469);
+
+            $span
+                    ->add_field()
+                    ->set_label(clang::__("Url Key"))
+                    ->add_control('url_key_show', 'text')
+                    ->set_value($url_key)
+                    ->set_placeholder("Auto")
+                    ->set_disabled(true);
+
+            $span->add_control('url_key', 'hidden')->set_value($url_key);
+        }
+
+        $span->add_field()
+                ->set_label(clang::__("Description"))
+                ->add_control("description", "textarea")
+                ->set_value($description);
+
+        $action = $form->add_action_list()->add_action()
+                        ->set_label(clang::__("Submit"))->set_submit(true)->set_confirm(true);
+
+        if ($is_insert) {
+            $js = "jQuery('#name').keyup(function(){
+                        var Title = jQuery(this).val();
+                        jQuery('#url_key').val(convertToSlug(Title));
+                    });
+                    function convertToSlug(Text)
+                    {
+                        return Text
+                            .toLowerCase()
+                            .replace(/[^\w ]+/g,'')
+                            .replace(/ +/g,'-')
+                            ;
+                    }";
+            $app->add_js($js);
+        }
+
+        echo $app->render();
+    }
+
+    public function reload_product_category_parent() {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+
+        $product_type_id = $_GET['product_type_id'];
+        $parent_id = '';
+
+        $tree = CTreeDB::factory('product_category')->add_filter('product_type_id', $product_type_id);
+        $product_category[''] = '';
+        $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
+        $product_category = array('' => 'NONE') + $product_category;
+
+        $app->add_field()
+                ->set_label(clang::__("Parent"))
+                ->add_control("parent_id", "select")
+                ->add_validation(null)
+                ->set_value($parent_id)
+                ->set_list($product_category)
+                ->set_applyjs('select2');
+
+        echo $app->render();
+    }
+
+    public function delete($id = "") {
+        if (!cnav::have_permission('delete_product_category')) {
+            cmsg::add('error', clang::__('You do not have access to this module') . ', ' . clang::__("call administrator"));
+            curl::redirect('home');
+        }
+        if (strlen($id) == 0) {
+            curl::redirect("master/product_category");
+        }
+        $app = CApp::instance();
+        $user = $app->user();
+        $db = CDatabase::instance();
+        $error = 0;
+
+        $before = cdbutils::get_row('select * from product_category where product_category_id = ' . $db->escape($id));
+        $param = array('user_id' => $user->user_id, 'before' => (array) $before, 'after' => '',);
+
+        if ($error == 0) {
+            $q = "SELECT * FROM product_category
+                      WHERE status>0 AND parent_id = " . $db->escape($id);
+            $r = $db->query($q);
+
+            if (count($r) > 0) {
+                $error++;
+                $error_message = "Product Category is already as Parent";
+            }
+        }
+
+        if ($error == 0) {
+            $q = "SELECT * FROM product
+                      WHERE status>0 AND product_category_id = " . $db->escape($id);
+            $r = $db->query($q);
+
+            if (count($r) > 0) {
+                $error++;
+                $error_message = "Product Category is already exist in Product";
+            }
+        }
+
+        if ($error == 0) {
+            try {
+                $db->update("product_category", array("status" => 0, "updated" => date("Y-m-d H:i:s"),
+                    "updatedby" => $user->username), array("product_category_id" => $id));
+            } catch (Exception $e) {
+                $error++;
+                $error_message = clang::__("system_delete_fail") . $e->getMessage();
+            }
+        }
+
+        if ($error == 0) {
+            clog::activity($param, 'Delete_Product_Category', clang::__("Product Category") . " [" . $before->name . "] " . clang::__("Successfully Deleted") . " !");
+            cmsg::add('success', clang::__("Product Category") . " " . clang::__("Successfully Deleted") . " !");
+        } else {
+//                cmsg::add('error', clang::__("Product Category") . " [" . $before->name . "] " . $err_message . " !");
+            cmsg::add("error", $error_message);
+        }
+        curl::redirect("master/product_category");
+    }
+
+    public function rebuild() {
+        $app = CApp::instance();
+        $user = $app->user();
+
+        $tree = CTreeDB::factory('product_category')->add_filter('product_type_id', 1);
+        $tree->rebuild_tree_all();
+    }
+
+}
