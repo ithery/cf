@@ -84,7 +84,8 @@ class Post_Controller extends CController {
 
         // DECLARE
         $status_list = ccms::post_status();
-        $category_list = ccms::category();
+        $options = array();
+        
         $post_title = "";
         $post_name = "";
         $post_content = "";
@@ -151,12 +152,13 @@ class Post_Controller extends CController {
             
             $post_content = carr::get($post, 'post_content');
             $post_excerpt = ccms::excerpt_paragraph($post_content, 50);
-            $cms_terms_id = carr::get($post, 'cms_terms_id');
+            $cms_category_id = carr::get($post, 'cms_category_id');
             $post_title = carr::get($post, 'post_title');
             $post_name_ori = cstr::sanitize($post_title);
             $template = carr::get($post, 'template');
             $post_type = carr::get($post, 'post_type');
             $post_status = carr::get($post, 'post_status');
+            $cms_terms_id = null;
             //check for exists urlkey
             $is_duplicate = true;
             $i = 0;
@@ -188,7 +190,7 @@ class Post_Controller extends CController {
             }
             //process
             if($err_code==0) {
-            
+                if(strlen($cms_category_id)==0) $cms_category_id=null;
                 $data_post = array(
                     "org_id" => $org_id,
                     "post_title" => $post_title,
@@ -198,6 +200,7 @@ class Post_Controller extends CController {
                     "post_content" => $post_content,
                     "post_status" => $post_status,
                     "post_excerpt" => $post_excerpt,
+                    "cms_category_id" => $cms_category_id,
                 );
                 if (strlen($id) > 0) {
                     $query = "select " .
@@ -431,6 +434,10 @@ class Post_Controller extends CController {
                 ->set_url(curl::base() . 'cms/post/load_template/' . $id)->add_param_input(array('post_type'));
         $post_type_control->add_listener('change')->add_handler('reload')->set_target('template-container')
                 ->set_url(curl::base() . 'cms/post/load_template/' . $id)->add_param_input(array('post_type'));
+        $post_type_control->add_listener('ready')->add_handler('reload')->set_target('category-container')
+                ->set_url(curl::base() . 'cms/post/load_category/' . $id)->add_param_input(array('post_type'));
+        $post_type_control->add_listener('change')->add_handler('reload')->set_target('category-container')
+                ->set_url(curl::base() . 'cms/post/load_category/' . $id)->add_param_input(array('post_type'));
 
         $widget_left->add_field()->set_label(clang::__("Post Title"))->add_control('post_title', 'text')->set_value($post_title);
         //$widget_left->add_field()->set_label(clang::__("Url"))->add_control('post_name', 'text')->set_value($post_name)->set_placeholder("Auto");
@@ -451,7 +458,7 @@ class Post_Controller extends CController {
         // DIV RIGHT
         $widget_right->add_div('template-container');
         $widget_right->add_field()->set_label(clang::__("Post Status"))->add_control('post_status', 'select')->set_value($post_status)->set_list($status_list)->add_class('large');
-        $widget_right->add_field()->set_label(clang::__("Category"))->add_control('cms_terms_id', 'select')->set_value($cms_terms_id)->set_list($category_list)->add_class('large');
+        $widget_right->add_div('category-container');
         $widget_right->add_field()
                 ->set_label(clang::__("Featured Image"))
                 ->add_control('item_image', 'image')
@@ -502,6 +509,35 @@ class Post_Controller extends CController {
         echo $app->render();
         
     }
+    
+    public function load_category($id = "") {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $current_value = '';
+        if(strlen($id)>0) {
+            $row = cdbutils::get_row('select cms_category_id from cms_post where cms_post_id='.$db->escape($id));
+            if($row!=null) {
+                $current_value = $row->cms_category_id;
+            }
+        }
+        
+        $request = array_merge($_GET, $_POST);
+        $post_type = carr::get($request, 'post_type');
+        $post_type_data = ccms::get_post_type_data($post_type);
+        $category_type = carr::get($post_type_data,'category_type');
+        
+        
+        
+        $options = array(
+            'category_type'=>$category_type,
+        );
+        $category_list = ccms::get_category_list($options);
+        $app->add_field()->set_label(clang::__("Category"))->add_control('cms_category_id', 'select')->set_value($current_value)->set_list($category_list)->add_class('large');
+        echo $app->render();
+        
+    }
+            
+
     public function load_custom_field($id = "") {
         $app = CApp::instance();
         $request = array_merge($_GET, $_POST);

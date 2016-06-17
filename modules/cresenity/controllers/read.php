@@ -22,7 +22,7 @@ class Read_Controller extends CController {
 //    }
     
     // Reading category
-    public function category($category = '', $post='') {
+    public function category2($category = '', $post='') {
 //        $app = CApp::instance();
         $title = '';
         $request = $_GET;
@@ -42,6 +42,82 @@ class Read_Controller extends CController {
         $this->view_category($category, $the_post);
 //        cdbg::var_dump($the_post);
 //        echo $app->render();
+    }
+    
+    public function category($category = '') {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $post_title = '';
+        $post_content = '';
+        $category_id = $category;
+        if (!is_numeric($category_id)) {
+            $category_id = cdbutils::get_value("SELECT cms_category_id FROM cms_category WHERE url_key = ".$db->escape($category_id));
+        }
+        $category = ccms::get_category($category_id);
+        $category_type = $category->category_type;
+        $template = 'cms/category';
+        if(strlen($category_type)>0&&$category_type!='default') {
+            $template = 'cms/category-'.$category_type;
+        }
+        $file = CF::get_file('template',$template);
+        if($file===null) {
+            $template = 'cms/index';
+        }
+        
+        $file = CF::get_file('template',$template);
+        if($file===null) {
+            $template = 'cms/404';
+        }
+        $file = CF::get_file('template',$template);
+        if($file===null) {
+            CF::show_404();
+            return;
+        } else {
+            
+            $app->show_breadcrumb(false);
+            $app->show_title(false);
+            include $file;
+        }
+        echo $app->render();
+    }
+    
+    public function post($post = '') {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $post_title = '';
+        $post_content = '';
+        $post_id = $post;
+        if (!is_numeric($post_id)) {
+            $post_id = cdbutils::get_value("SELECT cms_post_id FROM cms_post WHERE post_name = ".$db->escape($post_id));
+        }
+        $post = ccms::get_post($post_id);
+        $template = $post->template;
+        if(strlen($template)>0) {
+            $template = 'cms/'.$template;
+        } else {
+            $template = 'cms/post';
+
+        }
+        $file = CF::get_file('template',$template);
+        if($file===null) {
+            $template = 'cms/index';
+        }
+        
+        $file = CF::get_file('template',$template);
+        if($file===null) {
+            $template = 'cms/404';
+        }
+        $file = CF::get_file('template',$template);
+        if($file===null) {
+            CF::show_404();
+            return;
+        } else {
+            
+            $app->show_breadcrumb(false);
+            $app->show_title(false);
+            include $file;
+        }
+        echo $app->render();
     }
 
     // Reading page

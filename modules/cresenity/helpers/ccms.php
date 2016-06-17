@@ -31,7 +31,7 @@ class ccms {
     public static function get_category_type_list($options=null) {
         $data = self::get_category_type_data($options);
         $list = array();
-        $list[''] = 'Default';
+        $list['default'] = 'Default';
         
         foreach ($data as $k => $v) {
             
@@ -285,6 +285,33 @@ class ccms {
     public static function category_list() {
         return self::__get_taxonomy('category');
     }
+    
+    public static function get_category_list($options) {
+        $db = CDatabase::instance();
+
+        $category_type=carr::get($options,'category_type');
+        if($category_type===null) $category_type = array();
+        if(!is_array($category_type)) $category_type = array($category_type);
+        $parent_id=carr::get($options,'parent_id');
+        
+        $result=array();
+        if(count($category_type)==0) {
+            $category_type[0]='default';
+        }
+        foreach($category_type as $cat_type) {
+            $treedb = CTreeDB::factory('cms_category');
+            if(strlen($cat_type)>0) {
+                $treedb->add_filter('category_type', $cat_type);
+            }
+            
+            $list = $treedb->get_list("&nbsp;&nbsp;&nbsp;&nbsp;");
+            $result = $result + $list;
+        }
+        
+        $result = array(''=>'NONE') + $result;
+        
+        return $result;
+    }
 
     public static function category() {
         $db = CDatabase::instance();
@@ -349,7 +376,7 @@ class ccms {
     public static function get_posts($options) {
         
         $result = self::__get_post($options);
-        
+        return $result;
     }
 
     public static function post($id = '') {
@@ -390,6 +417,7 @@ class ccms {
             $org_id = CF::org_id();
         }
         $post_type = carr::get($options,'post_type');
+        $category_id = carr::get($options,'category_id');
         
         $q = "SELECT
                 tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
@@ -402,9 +430,13 @@ class ccms {
         if($post_type!=null&&strlen($post_type)>0) {
                $q.=" AND p.post_type = " . $db->escape($post_type);
         }
+        if($category_id!=null&&strlen($category_id)>0) {
+               $q.=" AND p.cms_category_id = " . $db->escape($category_id);
+        }
         if ($org_id != null) {
             $q.= " AND p.org_id=" . $db->escape($org_id);
         }
+        
         $r = $db->query($q);
         if (count($r) > 0) {
             foreach ($r as $r_k => $r_v) {
@@ -670,6 +702,34 @@ class ccms {
         $return = self::__parseTree($all_menu);
         return $return;
     }
+    
+    public static function get_permalink($post_id) {
+        $db = CDatabase::instance();
+        $post_name = cdbutils::get_value('select post_name from cms_post where cms_post_id='.$db->escape($post_id));
+        if($post_name!==null) {
+            $menu_url = curl::base() . 'read/post/' . $post_name;
+            return $menu_url;
+        }
+        return null;
+        
+    }
+    public static function get_category_link($category_id) {
+        $db = CDatabase::instance();
+        $url_key = cdbutils::get_value('select url_key from cms_category where cms_category_id='.$db->escape($category_id));
+        if($url_key!==null) {
+            $menu_url = curl::base() . 'read/category/' . $url_key;
+            return $menu_url;
+        }
+        return null;
+        
+    }
+    
+    public static function get_category($category_id) {
+        $db = CDatabase::instance();
+        $row = cdbutils::get_row('select * from cms_category where cms_category_id='.$db->escape($category_id));
+        return $row;
+        
+    }
 
     private static function __parseTree($tree, $root = null) {
         $return = array();
@@ -803,5 +863,7 @@ class ccms {
 
         return $result;
     }
+    
+    
 
 }

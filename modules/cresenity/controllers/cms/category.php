@@ -82,6 +82,8 @@ class Category_Controller extends CController {
         $app = CApp::instance();
         $db = CDatabase::instance();
         $user = $app->user();
+        $org_id = CF::org_id();
+        
         $err_code = 0;
         $err_message = '';
         $is_insert = true;
@@ -100,9 +102,8 @@ class Category_Controller extends CController {
             $org_code = $org->org_code;
         }
 
-        
+        $category_type_list = ccms::get_category_type_list();
         $category_type = "";
-        $code = "";
         $parent_id = "";
         $name = "";
         $url_key = '';
@@ -118,17 +119,15 @@ class Category_Controller extends CController {
 
         if ($post != null) {
             $category_type = carr::get($post, 'category_type');
-            $code = carr::get($post, 'code');
             $name = carr::get($post, 'name');
             $description = carr::get($post, 'description');
             $parent_id = carr::get($post, 'parent_id');
-            $url_key = carr::get($post, 'url_key');
-            //$url_key = cstr::sanitize($name);
-
-
+            $url_key = trim(carr::get($post, 'url_key'));
+            
             $image = carr::get($_FILES, 'image_name');
             $filename = '';
             $tmp_name = '';
+            
             if (strlen($id) == 0) {
                 if (isset($image['name'])) {
                     $filename = $image['name'];
@@ -137,65 +136,31 @@ class Category_Controller extends CController {
                     $tmp_name = $image['tmp_name'];
                 }
                 if (strlen($filename) == 0) {
-                    $error++;
-                    $error_message = 'Please Insert Image';
+                    $err_code++;
+                    $err_message = 'Please Insert Image';
                 }
                 if (strlen($tmp_name) == 0) {
-                    $error++;
-                    $error_message = 'Please Insert Image';
+                    $err_code++;
+                    $err_message = 'Please Insert Image';
                 }
             }
 
 //                if ($parent_id == 0) $parent_id = NULL;
 
             if ($err_code == 0) {
-                if (strlen($product_type_id) == 0) {
-                    $err_code++;
-                    $err_message = 'Product Type is required.';
-                }
-            }
-            if ($err_code == 0) {
-                if (strlen($product_category_code) == 0) {
-                    $err_code++;
-                    $err_message = 'Product Code is required.';
-                }
-            }
-
-            if ($err_code == 0) {
-                if (strlen($product_category_code) > 100) {
-                    $err_code++;
-                    $err_message = 'Too long Product Category Code.';
-                }
-            }
-
-//                if ($err_code == 0) {
-//                    if (strlen($product_category_code) > 1) {
-//                        $err_code++;
-//                        $err_message = 'Too long Product Category Code.';
-//                    }
-//                }
-//                if ($err_code == 0) {
-//                    if (strlen($name) == 0) {
-//                        $err_code++;
-//                        $err_message = 'Name is required.';
-//                    }
-//                }
-
-            if ($err_code == 0) {
                 $qcheck = " select * from cms_category
-                                where code=" . $db->escape($code) . " and status > 0
+                                where url_key=" . $db->escape($url_key) . " and status > 0
                                 and category_type=" . $db->escape($category_type);
                 if (strlen($id) > 0)
                     $qcheck .= " and cms_category_id <>" . $db->escape($id) . "";
                 $rcheck = $db->query($qcheck);
                 if ($rcheck->count() > 0) {
-                    $err_message = 'Error,' . ' ' . clang::__('Code') . ' ' . clang::__('is already exist, please try another') . ' ' . clang::__('Code');
+                    $err_message = 'Error,' . ' ' . clang::__('Category') . ' ' . clang::__('is already exist, please try another') . ' ' . clang::__('Category');
                     $err_code++;
                 }
             }
 
             if ($err_code == 0) {
-
                 $resource = CResources::factory("image", "product_category", $org_code);
                 $filename = $_FILES['image_name']['name'];
                 $path = file_get_contents($_FILES['image_name']['tmp_name']);
@@ -205,12 +170,12 @@ class Category_Controller extends CController {
                 $data = array(
                     "category_type" => $category_type,
                     //"parent_id" => $parent_id,
-                    "code" => $product_category_code,
                     "name" => $name,
                     "image_name" => $file_name_generated,
                     "image_url" => $image_url,
                     "url_key" => $url_key,
-                    "description" => $description
+                    "description" => $description,
+                    "org_id" => $org_id,
                 );
                 if (strlen($parent_id) > 0)
                     $data['parent_id'] = $parent_id;
@@ -240,14 +205,13 @@ class Category_Controller extends CController {
                         }
                         $dataa = array(
                             "cms_category_id" => $cms_category_id,
-                            "code" => $code,
                             "name" => $name,
                             "url_key" => $url_key,
                             "description" => $description
                         );
 
                         if (strlen($tmp_name) > 0) {
-                            $resource = CResources::factory("image", "productcategory", $org_code);
+                            $resource = CResources::factory("image", "product_category", $org_code);
                             $filename = $_FILES['image_name']['name'];
 
                             $path = file_get_contents($_FILES['image_name']['tmp_name']);
@@ -291,15 +255,13 @@ class Category_Controller extends CController {
                 }
             } else {
 //                    cmsg::add('error', clang::__("Product Category") . " [" . $name . "] " . $err_message . " !");
-                cmsg::add("error", $error_message);
+                cmsg::add("error", $err_message);
             }
         } else if (strlen($id) > 0) {
             $q = " SELECT * FROM cms_category WHERE cms_category_id = " . $db->escape($id);
             $row = cdbutils::get_row($q);
             if ($row != NULL) {
-//                $product_type_name = $row->product_type_name;
                 $category_type = $row->category_type;
-                $code = $row->code;
                 $name = $row->name;
                 $file_name_generated = $row->image_name;
                 $image_url = $row->image_url;
@@ -311,30 +273,28 @@ class Category_Controller extends CController {
 
 
         $div_row = $form->add_div()->add_class("row-fluid");
-        $span = $div_row->add_div()->add_class("span6");
+        $span = $div_row->add_div()->add_class("span7");
 
-        $image_div_right = $div_row->add_div()->add_class('span6');
+        $image_div_right = $div_row->add_div()->add_class('span5');
         $info = $image_div_right->add_div()->add_class('alert alert-info');
         $info->add('<h4>' . clang::__('Information') . '</h4>');
-        $info->add('<ul>');
-        $info->add('<li>Ukuran Gambar <br>width : <b>386px &nbsp</b>height: <b>469px</b></li>');
-        $info->add('</ul>');
+        $info->add('<ul><li>Ukuran Gambar <br>width : <b>386px &nbsp</b>height: <b>469px</b></li></ul>');
+        
         if (strlen($id) > 0) {
             if ($err_code > 0)
-                $product_type_name = cdbutils::get_value('select name from product_type where product_type_id = ' . $db->escape($product_type_id) . ' and status > 0 ');
-            $span->add_field()->set_label(clang::__("Product Type"))
-                    ->add_control('product_type_name', 'label')->add_validation(null)
-                    ->set_value($product_type_name)->add_transform('uppercase');
-            $span->add_control('product_type_id', 'hidden')->set_value($product_type_id);
+//                $product_type_name = cdbutils::get_value('select name from product_type where product_type_id = ' . $db->escape($product_type_id) . ' and status > 0 ');
+//            $span->add_field()->set_label(clang::__("Category Type"))
+//                    ->add_control('category_type', 'label')->add_validation(null)
+//                    ->set_value($product_type_name)->add_transform('uppercase');
 
-            $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $product_type_id);
+            $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
             $product_category[''] = '';
             $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
             unset($product_category[$id]);
             $product_category = array('' => 'NONE') + $product_category;
 
 
-            $parent_name = cdbutils::get_value('select name from product_category where status > 0 and product_category_id = ' . $db->escape($parent_id) . ' ');
+            $parent_name = cdbutils::get_value('select name from cms_category where status > 0 and cms_category_id = ' . $db->escape($parent_id) . ' ');
             $span->add_control('parent_id', 'hidden')->set_value($parent_id);
             $span
                     ->add_field()
@@ -345,73 +305,62 @@ class Category_Controller extends CController {
                     ->set_disabled(true)
             ;
         }
-//        else {
-//            $product_type_control = $span->add_field()
-//                    ->set_label("<span style='color:red;'>*</span> " . clang::__("Product Type"))
-//                    ->add_control("product_type_id", "product-type-select")
-//                    ->set_value($product_type_id);
-//
-//            $tree = CTreeDB::factory('product_category')->add_filter('product_type_id', $product_type_id);
-//            $product_category[''] = '';
-//            $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
-//            $product_category = array('' => 'NONE') + $product_category;
-//
-//            $product_category_control = $span->add_div('div_product_category_control');
-//
-//            $product_category_control->add_field()
-//                    ->set_label(clang::__("Parent"))
-//                    ->add_control("parent_id", "select")
-//                    ->add_validation(null)
-//                    ->set_value($parent_id)
-//                    ->set_list($product_category)
-//                    ->set_applyjs('select2');
-//
-//            $product_type_control->add_listener('change')->add_handler('reload')
-//                    ->set_target('div_product_category_control')
-//                    ->set_url(curl::base() . 'master/product_category/reload_product_category_parent')
-//                    ->add_param_input(array('product_type_id'));
-//
-//            if (strlen($parent_id) == 0) {
-//                $product_type_control->add_listener('ready')->add_handler('reload')
-//                        ->set_target('div_product_category_control')
-//                        ->set_url(curl::base() . 'master/product_category/reload_product_category_parent')
-//                        ->add_param_input(array('product_type_id', 'parent_id'));
-//            }
-//        }
+        else {
+            $product_type_control = $span->add_field()
+                    ->set_label("<span style='color:red;'>*</span> " . clang::__("Category Type"))
+                    ->add_control("category_type", "select")
+                    ->set_list($category_type_list)
+                    ->set_value($category_type);
 
+            $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
+            $product_category[''] = '';
+            $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
+            $product_category = array('' => 'NONE') + $product_category;
+
+            $product_category_control = $span->add_div('div_product_category_control');
+
+            $product_category_control->add_field()
+                    ->set_label(clang::__("Parent"))
+                    ->add_control("parent_id", "select")
+                    ->add_validation(null)
+                    ->set_value($parent_id)
+                    ->set_list($product_category)
+                    ->set_applyjs('select2');
+
+            $product_type_control->add_listener('change')->add_handler('reload')
+                    ->set_target('div_product_category_control')
+                    ->set_url(curl::base() . 'cms/category/reload_category_parent')
+                    ->add_param_input(array('category_type'));
+
+            if (strlen($parent_id) == 0) {
+                $product_type_control->add_listener('ready')->add_handler('reload')
+                        ->set_target('div_product_category_control')
+                        ->set_url(curl::base() . 'cms/category/reload_category_parent')
+                        ->add_param_input(array('category_type', 'parent_id'));
+            }
+        }
         $span->add_field()
-                ->set_label("<span style='color:red;'>*</span> " . clang::__("Product Category Code"))
-                ->add_control("code", "text")
-                ->add_validation('required')
-                ->set_value($code);
-        $span->add_field()
-                ->set_label("<span style='color:red;'>*</span> " . clang::__("Product Category Name"))
+                ->set_label("<span style='color:red;'>*</span> " . clang::__("Category Name"))
                 ->add_control("name", "text")
                 ->add_validation('required')
                 ->set_value($name);
 
-
-
-
-
         if ($is_insert) {
-            $field = $span
-                    ->add_field()
-                    ->set_label('<span style="color: red;">*</span> ' . clang::__("Image"));
-
-            $field
-                    ->add_control('image_name', 'image')
-                    ->set_imgsrc($imgsrc)
-                    ->set_maxwidth(386)
-                    ->set_maxheight(469);
-
-
             $span
                     ->add_field()
                     ->set_label(clang::__("Url Key"))
                     ->add_control('url_key', 'text')
                     ->set_value($url_key)
                     ->set_placeholder("Auto");
+            $span
+                    ->add_field()
+                    ->set_label('<span style="color: red;">*</span> ' . clang::__("Image"))
+                    ->add_control('image_name', 'image')
+                    ->set_imgsrc($imgsrc)
+                    ->set_maxwidth(386)
+                    ->set_maxheight(469);
+
+
         } else {
             $span
                     ->add_field()
@@ -459,14 +408,15 @@ class Category_Controller extends CController {
         echo $app->render();
     }
 
-    public function reload_product_category_parent() {
+    public function reload_category_parent() {
         $app = CApp::instance();
         $db = CDatabase::instance();
 
-        $product_type_id = $_GET['product_type_id'];
+        $category_type = $_GET['category_type'];
         $parent_id = '';
 
-        $tree = CTreeDB::factory('product_category')->add_filter('product_type_id', $product_type_id);
+        $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
+        
         $product_category[''] = '';
         $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
         $product_category = array('' => 'NONE') + $product_category;
@@ -483,47 +433,48 @@ class Category_Controller extends CController {
     }
 
     public function delete($id = "") {
-        if (!cnav::have_permission('delete_product_category')) {
+        if (!cnav::have_permission('delete_category')) {
             cmsg::add('error', clang::__('You do not have access to this module') . ', ' . clang::__("call administrator"));
             curl::redirect('home');
         }
         if (strlen($id) == 0) {
-            curl::redirect("master/product_category");
+            curl::redirect("cms/category");
         }
         $app = CApp::instance();
         $user = $app->user();
         $db = CDatabase::instance();
         $error = 0;
+        $error_message = 0;
 
-        $before = cdbutils::get_row('select * from product_category where product_category_id = ' . $db->escape($id));
+        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id));
         $param = array('user_id' => $user->user_id, 'before' => (array) $before, 'after' => '',);
 
         if ($error == 0) {
-            $q = "SELECT * FROM product_category
+            $q = "SELECT * FROM cms_category
                       WHERE status>0 AND parent_id = " . $db->escape($id);
             $r = $db->query($q);
 
             if (count($r) > 0) {
                 $error++;
-                $error_message = "Product Category is already as Parent";
+                $error_message = "Category is already as Parent";
             }
         }
 
-        if ($error == 0) {
-            $q = "SELECT * FROM product
-                      WHERE status>0 AND product_category_id = " . $db->escape($id);
-            $r = $db->query($q);
-
-            if (count($r) > 0) {
-                $error++;
-                $error_message = "Product Category is already exist in Product";
-            }
-        }
+//        if ($error == 0) {
+//            $q = "SELECT * FROM product
+//                      WHERE status>0 AND product_category_id = " . $db->escape($id);
+//            $r = $db->query($q);
+//
+//            if (count($r) > 0) {
+//                $error++;
+//                $error_message = "Product Category is already exist in Product";
+//            }
+//        }
 
         if ($error == 0) {
             try {
-                $db->update("product_category", array("status" => 0, "updated" => date("Y-m-d H:i:s"),
-                    "updatedby" => $user->username), array("product_category_id" => $id));
+                $db->update("cms_category", array("status" => 0, "updated" => date("Y-m-d H:i:s"),
+                    "updatedby" => $user->username), array("cms_category_id" => $id));
             } catch (Exception $e) {
                 $error++;
                 $error_message = clang::__("system_delete_fail") . $e->getMessage();
@@ -531,20 +482,20 @@ class Category_Controller extends CController {
         }
 
         if ($error == 0) {
-            clog::activity($param, 'Delete_Product_Category', clang::__("Product Category") . " [" . $before->name . "] " . clang::__("Successfully Deleted") . " !");
-            cmsg::add('success', clang::__("Product Category") . " " . clang::__("Successfully Deleted") . " !");
+//            clog::activity($param, 'Delete_Product_Category', clang::__("Product Category") . " [" . $before->name . "] " . clang::__("Successfully Deleted") . " !");
+            cmsg::add('success', clang::__("Category") . " " . clang::__("Successfully Deleted") . " !");
         } else {
 //                cmsg::add('error', clang::__("Product Category") . " [" . $before->name . "] " . $err_message . " !");
             cmsg::add("error", $error_message);
         }
-        curl::redirect("master/product_category");
+        curl::redirect("cms/category");
     }
 
     public function rebuild() {
         $app = CApp::instance();
         $user = $app->user();
 
-        $tree = CTreeDB::factory('product_category')->add_filter('product_type_id', 1);
+        $tree = CTreeDB::factory('cms_category')->add_filter('category_type', 'default');
         $tree->rebuild_tree_all();
     }
 
