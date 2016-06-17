@@ -286,7 +286,7 @@ class ccms {
         return self::__get_taxonomy('category');
     }
     
-    public static function get_category_list($options) {
+    public static function get_category_list($options=null) {
         $db = CDatabase::instance();
 
         $category_type=carr::get($options,'category_type');
@@ -300,7 +300,7 @@ class ccms {
         }
         foreach($category_type as $cat_type) {
             $treedb = CTreeDB::factory('cms_category');
-            if(strlen($cat_type)>0) {
+            if(strlen($cat_type)>0&&$cat_type!="ALL") {
                 $treedb->add_filter('category_type', $cat_type);
             }
             
@@ -665,9 +665,9 @@ class ccms {
                         if ($menu_object == 'category') {
                             // GET TERMS
                             if (strlen($menu_object_id) > 0) {
-                                $get_term = cdbutils::get_row("SELECT * FROM cms_terms WHERE cms_terms_id = " . $db->escape($menu_object_id));
+                                $get_term = cdbutils::get_row("SELECT * FROM cms_category WHERE cms_category_id = " . $db->escape($menu_object_id));
                                 if ($get_term != NULL) {
-                                    $menu_tail = $get_term->slug;
+                                    $menu_tail = $get_term->url_key;
                                 }
                             }
                         }
