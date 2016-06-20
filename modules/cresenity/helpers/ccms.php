@@ -10,7 +10,7 @@ class ccms {
 
     static $all_post_type = null;
 
-    public static function get_template_data($options=null) {
+    public static function get_template_data($options = null) {
         $return = array();
         $file = CF::get_file('data', 'cms/template');
         if ($file != null) {
@@ -37,6 +37,7 @@ class ccms {
             
             $list[$k] = carr::get($v, 'name');
         }
+
 
         return $list;
     }
@@ -72,7 +73,7 @@ class ccms {
         $db = CDatabase::instance();
         //check custom_field
         $field_type = null;
-       
+
         if (is_array($options)) {
             $post_id = carr::get($options, 'post_id');
             $field_name = carr::get($options, 'field_name');
@@ -81,21 +82,21 @@ class ccms {
         } else {
             $post_id = $options;
         }
-        
+
         if (strlen($field_name) == 0) {
             throw new Exception('Field name is empty');
         }
-        
-        
+
+
         $r = null;
         $row = cdbutils::get_row('select * from cms_custom_field where cms_post_id=' . $db->escape($post_id) . " and field_name=" . $db->escape($field_name));
-        if($row!==null&&strlen($field_type)==0) {
+        if ($row !== null && strlen($field_type) == 0) {
             $field_type = $row->field_type;
         }
-        switch($field_type) {
+        switch ($field_type) {
             case 'image':
                 $field_value = json_encode($field_value);
-            break;
+                break;
         }
         $data = array(
             'field_name' => $field_name,
@@ -108,7 +109,7 @@ class ccms {
             $data['cms_post_id'] = $post_id;
             $r = $db->insert('cms_custom_field', $data);
         } else {
-            $r = $db->update('cms_custom_field', $data, array('cms_post_id' => $post_id, 'field_name'=>$field_name));
+            $r = $db->update('cms_custom_field', $data, array('cms_post_id' => $post_id, 'field_name' => $field_name));
         }
         return $r;
     }
@@ -116,7 +117,7 @@ class ccms {
     public static function get_custom_field($post_id, $field_name) {
         $db = CDatabase::instance();
         $row = cdbutils::get_row('select * from cms_custom_field where cms_post_id=' . $db->escape($post_id) . " and field_name=" . $db->escape($field_name));
-        if($row===null) {
+        if ($row === null) {
             return null;
         }
         $field_value = $row->field_value;
@@ -124,7 +125,7 @@ class ccms {
         $value = $field_value;
         switch ($field_type) {
             case 'image':
-                $value = json_decode($field_value,true);
+                $value = json_decode($field_value, true);
                 break;
             default:
                 $value = $field_value;
@@ -142,8 +143,8 @@ class ccms {
             $post_type = cdbutils::get_value('select post_type from cms_post where cms_post_id=' . $db->escape($post_id));
             $data = ccms::get_post_type_data($post_type);
             $custom_fields = carr::get($data, 'custom_fields');
-            if($custom_fields==null) {
-                $custom_fields=array();
+            if ($custom_fields == null) {
+                $custom_fields = array();
             }
         }
         if (isset($options['custom_fields'])) {
@@ -156,13 +157,13 @@ class ccms {
         if (isset($options['fields'])) {
             $fields = carr::get($options, 'fields');
         }
-        
-        
+
+
         return $fields;
     }
 
     public static function generate_custom_field_input($options) {
-        
+
         $post_id = carr::get($options, 'post_id');
         $prefix = carr::get($options, 'prefix');
         $container = carr::get($options, 'container');
@@ -173,7 +174,7 @@ class ccms {
             $prefix = '';
         }
         $fields = self::get_custom_fields($options);
-        
+
         if (is_array($fields)) {
             foreach ($fields as $k => $field) {
                 $label = carr::get($field, 'label');
@@ -190,30 +191,26 @@ class ccms {
                         $control = $field->add_control($prefix . $k, $type);
                         break;
                 }
-                if($control==null) {
-                    throw new Exception('Unknown control for '.$k);
+                if ($control == null) {
+                    throw new Exception('Unknown control for ' . $k);
                 }
                 //set value
                 switch ($type) {
                     case 'image':
-                        $control->set_imgsrc(curl::base().'cresenity/noimage/100/100');
+                        $control->set_imgsrc(curl::base() . 'cresenity/noimage/100/100');
                         $control->set_maxwidth(100);
                         $control->set_maxheight(100);
-                        
-                        if(strlen($post_id)>0) {
+
+                        if (strlen($post_id) > 0) {
                             $field_value = self::get_custom_field($post_id, $k);
-                            $control->set_imgsrc(carr::get($field_value,'image_url'));
-                            
-                           
-                            
+                            $control->set_imgsrc(carr::get($field_value, 'image_url'));
                         }
                         break;
                     default:
                         $control = $control->set_value($default_value);
-                        if(strlen($post_id)>0) {
+                        if (strlen($post_id) > 0) {
                             $field_value = self::get_custom_field($post_id, $k);
                             $control = $control->set_value($field_value);
-                            
                         }
                         break;
                 }
@@ -240,7 +237,6 @@ class ccms {
     public static function get_post_type_data($post_type) {
         $all_post_type = self::get_all_post_type();
         return carr::get($all_post_type, $post_type);
-        
     }
 
     private static function get_all_post_type() {
@@ -263,7 +259,7 @@ class ccms {
 
     public static function get_post_type_list() {
         $all_post_type = self::get_all_post_type();
-        
+
 
         $result = array('post' => 'Post');
 
@@ -365,16 +361,16 @@ class ccms {
         }
         return $return;
     }
-    
+
     public static function get_post($id = '') {
-       
-        $result = self::__get_post_single( $id);
-        
+
+        $result = self::__get_post_single($id);
+
         return $result;
     }
-    
+
     public static function get_posts($options) {
-        
+
         $result = self::__get_post($options);
         return $result;
     }
@@ -388,10 +384,7 @@ class ccms {
     }
 
     public static function page($id = '') {
-        $result = self::__get_post('page');
-        if (strlen($id) > 0 && is_numeric($id)) {
-            $result = self::__get_post_single($id);
-        }
+        $result = self::__get_post_single($id);
         return $result;
     }
 
@@ -413,7 +406,7 @@ class ccms {
     private static function __get_post($options, $org_id = null) {
         $db = CDatabase::instance();
         $result = array();
-        if($org_id==null) {
+        if ($org_id == null) {
             $org_id = CF::org_id();
         }
         $post_type = carr::get($options,'post_type');
@@ -427,8 +420,8 @@ class ccms {
                LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
                LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
                WHERE p.status > 0";
-        if($post_type!=null&&strlen($post_type)>0) {
-               $q.=" AND p.post_type = " . $db->escape($post_type);
+        if ($post_type != null && strlen($post_type) > 0) {
+            $q.=" AND p.post_type = " . $db->escape($post_type);
         }
         if($category_id!=null&&strlen($category_id)>0) {
                $q.=" AND p.cms_category_id = " . $db->escape($category_id);
@@ -464,7 +457,7 @@ class ccms {
         return $result;
     }
 
-    private static function __get_post_single( $id) {
+    private static function __get_post_single($id) {
         $db = CDatabase::instance();
         $result = array();
 
@@ -474,7 +467,6 @@ class ccms {
                AND  p.cms_post_id=" . $db->escape($id);
         $r = cdbutils::get_row($q);
         return $r;
-       
     }
 
     public static function add_slash_domain($domain) {

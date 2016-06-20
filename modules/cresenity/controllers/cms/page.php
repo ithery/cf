@@ -91,6 +91,19 @@ class Page_Controller extends CController {
         $template = "";
         $cannot_delete = 0;
 
+		if (strlen($id) > 0) {
+            $page = ccms::page($id);
+			
+            $post_title = cobj::get($page, 'post_title');
+            $post_name = cobj::get($page, 'post_name');
+            $post_content = cobj::get($page, 'post_content');
+            $post_status = cobj::get($page, 'post_status');
+            $template = cobj::get($page, 'template');
+            $cannot_delete = cobj::get($page, 'cannot_delete');
+            
+            $template = cobj::get($page, 'template');
+        }
+		
         // PROCESS
         if (count($post) > 0 || $post != NULL) {
             $db->begin();
@@ -232,26 +245,7 @@ class Page_Controller extends CController {
             }
         }
         
-        if (strlen($id) > 0) {
-            $page = ccms::page($id);
-            $post_title = cobj::get($page, 'post_title');
-            $post_name = cobj::get($page, 'post_name');
-            $post_content = cobj::get($page, 'post_content');
-            $post_status = cobj::get($page, 'post_status');
-            $template = cobj::get($page, 'template');
-            $cannot_delete = cobj::get($page, 'cannot_delete');
-            
-            $template = cobj::get($page, 'template');
-            
-//            if (strlen(cobj::get($page, 'file_location')) > 0) {
-//                $item_image = curl::base() . 'upload/cmsb2c_image/' . $type . '/' . $id . '/small/' . cobj::get($page, 'filename');
-//            }
-        }
         
-        $imgsrc = curl::base() . 'cresenity/noimage/120/120';
-//        if (strlen($item_image) > 0) {
-//            $imgsrc = $item_image;
-//        }
 
         // BUILD UI
         $form = $app->add_form()->set_enctype('multipart/form-data');
