@@ -86,12 +86,24 @@ class Page_Controller extends CController {
         $post_name = "";
         $post_content = "";
         $post_status = "";
+//        $item_image = "";
+        $type = 'page';
         $template = "";
         $cannot_delete = 0;
 
         // PROCESS
         if (count($post) > 0 || $post != NULL) {
             $db->begin();
+            
+//                $filename = "";
+//                if (isset($_FILES["item_image"])) {
+//                    $filename = $_FILES["item_image"]["name"];
+//                }
+//                $filename = cutils::sanitize($filename, true);
+//                $filename_product = $filename;
+//                $item_image = basename(stripslashes($filename));
+                
+                
                 if (isset($post['cannot_delete'])) {
                     $cannot_delete = 1;
                 }
@@ -123,6 +135,16 @@ class Page_Controller extends CController {
                     "cannot_delete" => $cannot_delete,
                 );
             if (strlen($id) > 0) {
+//                $query = "select " .
+//                        " file_location, filename" .
+//                        " " .
+//                        " from cms_post where cms_post_id = " . $db->escape($id);
+//                $get_file_image = $db->query($query);
+//                if ($get_file_image->count() > 0) {
+//                    $row = $get_file_image[0];
+//                    $older_image = $row->filename;
+//                }
+
                 // EDIT
                 $default = array(
                     'updated' => date('Y-m-d H:i:s'),
@@ -131,6 +153,20 @@ class Page_Controller extends CController {
                 try {
                     $data = array_merge($data_post, $default);
                     $db->update("cms_post", $data, array("cms_post_id" => $id));
+//                    if (strlen($filename) > 0) {
+//                        $path = cimage::get_image_path('cmsb2c_image'.DS . $type, $id, 'original');
+//                        $path = preg_replace('#\\\#ims', '/', $path);
+//                        cimage::create_image_folder("cmsb2c_image/" . $type, $id);
+//                        cimage::delete_all_image("cmsb2c_image/" . $type, $id, $older_image);
+//                        $filename = cupload::save("item_image", $filename, $path);
+//                        cimage::resize_image("cmsb2c_image/" . $type, $id, $filename);
+//                        $path_url = cimage::get_upload_url('cmsb2c_image/' . $type, $id, 'original', $filename_product);
+//
+//                        $before_gallery = cdbutils::get_row('select * from cms_post where cms_post_id = ' . $db->escape($id) . ' and status > 0');
+//                        $path = substr($path, 0, -1);
+//                        $data = array('file_location' => $path, 'filename' => $filename_product, 'url_location' => $path_url);
+//                        $db->update("cms_post", $data, array("cms_post_id" => $id));
+//                    }
                 }
                 catch (Exception $e){
                     $err_code++;
@@ -147,6 +183,30 @@ class Page_Controller extends CController {
                     $data = array_merge($data_post, $default);
                     $insert_post = $db->insert("cms_post", $data);
                     $cms_post_id = $insert_post->insert_id();
+                    
+                     // Added image on page
+//                    if (strlen($filename) > 0) {
+//                        $path = cimage::get_image_path('cmsb2c_image/' . $type, $cms_post_id, 'original');
+//                        $path = preg_replace('#\\\#ims', '/', $path);
+//                        cimage::create_image_folder("cmsb2c_image/" . $type, $cms_post_id);
+//                        cimage::delete_all_image("cmsb2c_image/" . $type, $cms_post_id, $item_image);
+//                        $filename = cupload::save("item_image", $filename, $path);
+//                        cimage::resize_image("cmsb2c_image/" . $type, $cms_post_id, $filename);
+//                        $path_url = cimage::get_upload_url('cmsb2c_image/' . $type, $cms_post_id, 'original', $filename_product);
+//                    }
+//
+//                    if ($err_code == 0) {
+//                        if (strlen($filename) > 0) {
+//                            $before_gallery = cdbutils::get_row('select * from cms_post where cms_post_id = ' . $db->escape($cms_post_id));
+//                            $path = substr($path, 0, -1);
+//                            $data = array(
+//                                'file_location' => $path,
+//                                'filename' => $filename_product,
+//                                'url_location' => $path_url
+//                            );
+//                            $db->update("cms_post", $data, array("cms_post_id" => $cms_post_id));
+//                        }
+//                    }
                     
                 } catch (Exception $e) {
                     $err_code++;
@@ -174,18 +234,27 @@ class Page_Controller extends CController {
         
         if (strlen($id) > 0) {
             $page = ccms::page($id);
-            $post_title = carr::get($page, 'post_title');
-            $post_name = carr::get($page, 'post_name');
-            $post_content = carr::get($page, 'post_content');
-            $post_status = carr::get($page, 'post_status');
-            $template = carr::get($page, 'template');
-            $cannot_delete = carr::get($page, 'cannot_delete');
+            $post_title = cobj::get($page, 'post_title');
+            $post_name = cobj::get($page, 'post_name');
+            $post_content = cobj::get($page, 'post_content');
+            $post_status = cobj::get($page, 'post_status');
+            $template = cobj::get($page, 'template');
+            $cannot_delete = cobj::get($page, 'cannot_delete');
             
-            $template = carr::get($page, 'template');
+            $template = cobj::get($page, 'template');
+            
+//            if (strlen(cobj::get($page, 'file_location')) > 0) {
+//                $item_image = curl::base() . 'upload/cmsb2c_image/' . $type . '/' . $id . '/small/' . cobj::get($page, 'filename');
+//            }
         }
+        
+        $imgsrc = curl::base() . 'cresenity/noimage/120/120';
+//        if (strlen($item_image) > 0) {
+//            $imgsrc = $item_image;
+//        }
 
         // BUILD UI
-        $form = $app->add_form();
+        $form = $app->add_form()->set_enctype('multipart/form-data');
         $div = $form->add_div()->add_class('row');
         $div_left = $div->add_div()->add_class('span8');
         $widget_left = $div_left->add_widget();
@@ -200,6 +269,12 @@ class Page_Controller extends CController {
         $template_list = ccms::get_template_list();
         $widget_right->add_field()->set_label(clang::__("Template"))->add_control('template', 'select')->set_value($template)->set_list($template_list)->add_class('large');
         $widget_right->add_field()->set_label(clang::__("Page Status"))->add_control('post_status', 'select')->set_value($post_status)->set_list($status_list)->add_class('large');
+//        $widget_right->add_field()
+//                ->set_label(clang::__("Featured Image"))
+//                ->add_control('item_image', 'image')
+//                ->set_imgsrc($imgsrc)
+//                ->set_maxwidth(150)
+//                ->set_maxheight(100);
         if ($role != NULL) {
             if ($role->parent_id == NULL) {
                 $field_cannot_delete = $widget_right->add_field()->set_label(clang::__("Cannot delete"))->add_control('cannot_delete', 'checkbox');
