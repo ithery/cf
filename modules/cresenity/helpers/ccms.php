@@ -308,6 +308,44 @@ class ccms {
         
         return $result;
     }
+    
+    public static function get_category_list_child($options=null) {
+        $db = CDatabase::instance();
+
+        $category_type=carr::get($options,'category_type');
+        if($category_type===null) $category_type = array();
+        if(!is_array($category_type)) $category_type = array($category_type);
+        $parent_id=carr::get($options,'parent_id');
+        
+        $result=array();
+        if(count($category_type)==0) {
+            $category_type[0]='default';
+        }
+        foreach($category_type as $cat_type) {
+            $treedb = CTreeDB::factory('cms_category');
+            if(strlen($cat_type)>0&&$cat_type!="ALL") {
+                $treedb->add_filter('category_type', $cat_type);
+            }
+            
+            $result = $treedb->get_children_data($parent_id);
+            $cat_data = array();
+            foreach ($result as $result_k => $result_v) {
+                $arr_cat['category_id'] = carr::get($result_v, 'cms_category_id');
+                $arr_cat['name'] = carr::get($result_v, 'name');
+                $arr_cat['image_url'] = carr::get($result_v, 'image_url');
+                $arr_cat['url_key'] = carr::get($result_v, 'url_key');
+                $arr_cat['description'] = carr::get($result_v, 'description');
+                $arr_cat['created'] = carr::get($result_v, 'created');
+                $arr_cat['createdby'] = carr::get($result_v, 'createdby');
+                $arr_cat['updated'] = carr::get($result_v, 'updated');
+                $arr_cat['updatedby'] = carr::get($result_v, 'updatedby');
+                $cat_data[] = $arr_cat;
+            }
+            $result = $cat_data;
+        }
+        return $result;
+    }
+    
 
     public static function category() {
         $db = CDatabase::instance();
@@ -453,7 +491,7 @@ class ccms {
                 $result[] = $arr_result;
             }
         }
-
+        
         return $result;
     }
 
