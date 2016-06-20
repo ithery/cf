@@ -436,7 +436,6 @@ class ccms {
         if ($org_id != null) {
             $q.= " AND p.org_id=" . $db->escape($org_id);
         }
-        
         $r = $db->query($q);
         if (count($r) > 0) {
             foreach ($r as $r_k => $r_v) {
@@ -451,6 +450,7 @@ class ccms {
                 $arr_result['post_status'] = $r_v->post_status;
                 $arr_result['post_name'] = $r_v->post_name;
                 $arr_result['post_parent'] = $r_v->post_parent;
+                $arr_result['post_feature_image'] = curl::httpbase().$r_v->url_location;
                 $arr_result['guid'] = $r_v->guid;
                 $arr_result['menu_order'] = $r_v->menu_order;
                 $arr_result['post_type'] = $r_v->post_type;
