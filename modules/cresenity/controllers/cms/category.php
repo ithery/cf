@@ -161,7 +161,7 @@ class Category_Controller extends CController {
             }
 
             if ($err_code == 0) {
-                $resource = CResources::factory("image", "product_category", $org_code);
+                $resource = CResources::factory("image", "productcategory", $org_code);
                 $filename = $_FILES['image_name']['name'];
                 $path = file_get_contents($_FILES['image_name']['tmp_name']);
                 $file_name_generated = $resource->save($filename, $path);
@@ -204,14 +204,14 @@ class Category_Controller extends CController {
                             $tmp_name = $image['tmp_name'];
                         }
                         $dataa = array(
-                            "cms_category_id" => $cms_category_id,
+//                            "cms_category_id" => $cms_category_id,
                             "name" => $name,
                             "url_key" => $url_key,
                             "description" => $description
                         );
 
                         if (strlen($tmp_name) > 0) {
-                            $resource = CResources::factory("image", "product_category", $org_code);
+                            $resource = CResources::factory("image", "productcategory", $org_code);
                             $filename = $_FILES['image_name']['name'];
 
                             $path = file_get_contents($_FILES['image_name']['tmp_name']);
@@ -233,7 +233,6 @@ class Category_Controller extends CController {
                             'before' => $before,
                             'after' => $data,
                         );
-
                         $tree->update($id, $data, $parent_id);
                         $last_query = $db->last_query();
                     }
@@ -270,7 +269,6 @@ class Category_Controller extends CController {
                 $parent_id = $row->parent_id;
             }
         }
-
 
         $div_row = $form->add_div()->add_class("row-fluid");
         $span = $div_row->add_div()->add_class("span7");
