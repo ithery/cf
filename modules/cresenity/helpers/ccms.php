@@ -665,6 +665,7 @@ class ccms {
      */
     public static function nav_menu($menu_name = '') {
         $db = CDatabase::instance();
+        $org_id = CF::org_id();
 
         $all_menu = array();
 
@@ -674,14 +675,16 @@ class ccms {
                 $cms_terms_id = $menu_name;
             } else {
                 // Get cms_terms_id from cms_terms (slug)
-                $get_cms_term_id = cdbutils::get_row("SELECT * FROM cms_terms WHERE slug = " . $db->escape($menu_name) . " AND STATUS > 0");
+//                $get_cms_term_id = cdbutils::get_row("SELECT * FROM cms_terms WHERE slug = " . $db->escape($menu_name) . " AND STATUS > 0");
+                $get_cms_term_id = cdbutils::get_row("SELECT * FROM cms_terms WHERE slug = " . $db->escape($menu_name) . " AND STATUS > 0 AND org_id = ".$db->escape($org_id));
                 if ($get_cms_term_id != NULL) {
                     $cms_terms_id = $get_cms_term_id->cms_terms_id;
                 }
             }
 
             if ($cms_terms_id != NULL) {
-                $q_menu = "SELECT * FROM `cms_menu` WHERE STATUS>0 AND `cms_terms_id` = " . $db->escape($cms_terms_id) . " ORDER BY lft ASC";
+//                $q_menu = "SELECT * FROM `cms_menu` WHERE STATUS>0 AND `cms_terms_id` = " . $db->escape($cms_terms_id) . " ORDER BY lft ASC";
+                $q_menu = "SELECT * FROM `cms_menu` WHERE STATUS>0 AND `cms_terms_id` = " . $db->escape($cms_terms_id) . " AND org_id = ".$db->escape($org_id)." ORDER BY lft ASC";
                 $menu_res = $db->query($q_menu);
                 if (count($menu_res) > 0) {
                     foreach ($menu_res as $menu_res_k => $menu_res_v) {
@@ -695,7 +698,7 @@ class ccms {
                         if ($menu_object == 'category') {
                             // GET TERMS
                             if (strlen($menu_object_id) > 0) {
-                                $get_term = cdbutils::get_row("SELECT * FROM cms_category WHERE cms_category_id = " . $db->escape($menu_object_id));
+                                $get_term = cdbutils::get_row("SELECT * FROM cms_category WHERE cms_category_id = " . $db->escape($menu_object_id) ." AND org_id=".$db->escape($org_id));
                                 if ($get_term != NULL) {
                                     $menu_tail = $get_term->url_key;
                                 }
@@ -704,7 +707,8 @@ class ccms {
 
                         if ($menu_object == 'page') {
                             if (strlen($menu_object_id) > 0) {
-                                $get_page = cdbutils::get_row("SELECT * FROM cms_post WHERE cms_post_id = " . $db->escape($menu_object_id));
+//                                $get_page = cdbutils::get_row("SELECT * FROM cms_post WHERE cms_post_id = " . $db->escape($menu_object_id));
+                                $get_page = cdbutils::get_row("SELECT * FROM cms_post WHERE cms_post_id = " . $db->escape($menu_object_id) . " AND org_id = ".$db->escape($org_id));
                                 if ($get_page != NULL) {
                                     $menu_tail = $get_page->post_name;
                                 }
@@ -735,7 +739,9 @@ class ccms {
     
     public static function get_permalink($post_id) {
         $db = CDatabase::instance();
-        $post_name = cdbutils::get_value('select post_name from cms_post where cms_post_id='.$db->escape($post_id));
+        $org_id = CF::org_id();
+//        $post_name = cdbutils::get_value('select post_name from cms_post where cms_post_id='.$db->escape($post_id));
+        $post_name = cdbutils::get_value('select post_name from cms_post where cms_post_id='.$db->escape($post_id) ." AND org_id = ".$db->escape($org_id));
         if($post_name!==null) {
             $menu_url = curl::base() . 'read/post/' . $post_name;
             return $menu_url;
@@ -745,7 +751,8 @@ class ccms {
     }
     public static function get_category_link($category_id) {
         $db = CDatabase::instance();
-        $url_key = cdbutils::get_value('select url_key from cms_category where cms_category_id='.$db->escape($category_id));
+        $org_id = CF::org_id();
+        $url_key = cdbutils::get_value('select url_key from cms_category where cms_category_id='.$db->escape($category_id) ." AND org_id = ".$db->escape($org_id));
         if($url_key!==null) {
             $menu_url = curl::base() . 'read/category/' . $url_key;
             return $menu_url;
