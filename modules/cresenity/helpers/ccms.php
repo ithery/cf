@@ -31,7 +31,7 @@ class ccms {
     public static function get_category_type_list($options=null) {
         $data = self::get_category_type_data($options);
         $list = array();
-        $list['default'] = 'Default';
+        //$list['default'] = 'Default';
         
         foreach ($data as $k => $v) {
             
@@ -45,7 +45,7 @@ class ccms {
     public static function get_template_list($options=null) {
         $data = self::get_template_data($options);
         $list = array();
-        $list[''] = 'Default';
+        //$list[''] = 'Default';
         $post_type = carr::get($options,'post_type');
         $templates = array();
         if(strlen($post_type)!=null) {
@@ -57,8 +57,6 @@ class ccms {
         }
         foreach ($data as $k => $v) {
             if(count($templates)>0) {
-                
-                
                 if(!in_array($k, $templates)) {
                     continue;
                 }
@@ -261,8 +259,8 @@ class ccms {
         $all_post_type = self::get_all_post_type();
 
 
-        $result = array('post' => 'Post');
-
+        //$result = array('post' => 'Post');
+        $result = array();
         foreach ($all_post_type as $k => $data) {
             $value = carr::get($data, 'label');
             $result[$k] = $value;
@@ -304,7 +302,7 @@ class ccms {
             $result = $result + $list;
         }
         
-        $result = array(''=>'NONE') + $result;
+        //$result = array(''=>'NONE') + $result;
         
         return $result;
     }

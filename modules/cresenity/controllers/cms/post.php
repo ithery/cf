@@ -18,7 +18,7 @@ class Post_Controller extends CController {
         $app = CApp::instance();
         $org_id = CF::org_id();
         $app->title(clang::__("Post List"));
-
+        $db = CDatabase::instance();
         $post = ccms::post();
 
         $q = "SELECT
@@ -28,10 +28,14 @@ class Post_Controller extends CController {
                LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
                LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
                LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
-               WHERE p.status > 0 and p.org_id = " . $org_id . "
-               AND p.post_type <> 'page'";
+               WHERE p.status > 0 
+               AND p.post_type <> 'page' and p.post_type <> 'nav_menu_item'";
 
+        if(strlen($org_id)>0&&$org_id!=0) {
+            $q.= "and p.org_id = " . $db->escape($org_id) ;
+        }
         $table = $app->add_table('post')->set_quick_search(true);
+        $table->add_column('post_type')->set_label(clang::__("Type"))->add_transform('uppercase');
         $table->add_column('post_title')->set_label(clang::__("Title"));
         $table->add_column('post_excerpt')->set_label(clang::__("Content"));
         $table->add_column('term_name')->set_label(clang::__("Category"));
@@ -450,8 +454,8 @@ class Post_Controller extends CController {
         $list_tag = cdbutils::get_array($q_list_tag);
 
 
-        $tag_control = $widget_left->add_field()->set_label(clang::__("Tag"))->add_control('post_tag', 'select-tag');
-        $tag_control->set_value($cms_tag_value)->set_list($list_tag);
+        //$tag_control = $widget_left->add_field()->set_label(clang::__("Tag"))->add_control('post_tag', 'select-tag');
+        //$tag_control->set_value($cms_tag_value)->set_list($list_tag);
 
         $widget_left->add_field()->set_label(clang::__("Post Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
         $widget_left->add_div('custom-field-container');
@@ -459,13 +463,15 @@ class Post_Controller extends CController {
         $widget_right->add_div('template-container');
         $widget_right->add_field()->set_label(clang::__("Post Status"))->add_control('post_status', 'select')->set_value($post_status)->set_list($status_list)->add_class('large');
         $widget_right->add_div('category-container');
+        
+        /*
         $widget_right->add_field()
                 ->set_label(clang::__("Featured Image"))
                 ->add_control('item_image', 'image')
                 ->set_imgsrc($imgsrc)
                 ->set_maxwidth(150)
                 ->set_maxheight(100);
-
+        */
         $form->add_action_list()->add_action()->set_label(clang::__("Submit"))->set_confirm(true)->set_submit(true);
         $form->set_validation(false);
         /*

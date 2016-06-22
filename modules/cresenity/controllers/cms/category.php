@@ -16,7 +16,8 @@ class Category_Controller extends CController {
         $app = CApp::instance();
         $db = CDatabase::instance();
         $user = $app->user();
-        $app->add_breadcrumb(clang::__("Category"), curl::base() . "cms/category");
+        //$app->add_breadcrumb(clang::__("Category"), curl::base() . "cms/category");
+        $app->title('Category');
 
         $category_list = ccms::get_category_type_list();
         
@@ -62,14 +63,10 @@ class Category_Controller extends CController {
         $nestable->set_applyjs(false);
         $nestable->set_action_style('btn-dropdown');
 
-        if (cnav::have_permission('edit_product_category')) {
-            $actedit = $nestable->add_row_action('edit');
-            $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . "cms/category/edit/{param1}")->set_label(" " . clang::__("Edit") . " " . clang::__("Product Category"));
-        }
-        if (cnav::have_permission('delete_product_category')) {
-            $actedit = $nestable->add_row_action('delete');
-            $actedit->set_label("")->set_icon("trash")->set_link(curl::base() . "cms/category/delete/{param1}")->set_confirm(true)->set_label(" " . clang::__("Delete") . " " . clang::__("Product Category"));
-        }
+        $actedit = $nestable->add_row_action('edit');
+        $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . "cms/category/edit/{param1}")->set_label(" " . clang::__("Edit") . " " . clang::__("Product Category"));
+        $actedit = $nestable->add_row_action('delete');
+        $actedit->set_label("")->set_icon("trash")->set_link(curl::base() . "cms/category/delete/{param1}")->set_confirm(true)->set_label(" " . clang::__("Delete") . " " . clang::__("Product Category"));
 
         echo $app->render();
     }
@@ -162,21 +159,29 @@ class Category_Controller extends CController {
 
             if ($err_code == 0) {
                 $resource = CResources::factory("image", "productcategory", $org_code);
-                $filename = $_FILES['image_name']['name'];
-                $path = file_get_contents($_FILES['image_name']['tmp_name']);
-                $file_name_generated = $resource->save($filename, $path);
-                $image_url = $resource->get_url($file_name_generated);
+                $file_name_generated=null;
+                $image_url=null;
+                if(isset($_FILES['image_name'])&&isset($_FILES['image_name']['name']) && strlen($_FILES['image_name']['name'])>0) {
+                    
+                    $filename = $_FILES['image_name']['name'];
+                    $path = file_get_contents($_FILES['image_name']['tmp_name']);
+                    $file_name_generated = $resource->save($filename, $path);
+                    $image_url = $resource->get_url($file_name_generated);
+                }
 
                 $data = array(
                     "category_type" => $category_type,
                     //"parent_id" => $parent_id,
                     "name" => $name,
-                    "image_name" => $file_name_generated,
-                    "image_url" => $image_url,
                     "url_key" => $url_key,
                     "description" => $description,
                     "org_id" => $org_id,
                 );
+                if(strlen($image_url)>0) {
+                    $data["image_name"]=$file_name_generated;
+                    $data["image_url"]=$image_url;
+                    
+                }
                 if (strlen($parent_id) > 0)
                     $data['parent_id'] = $parent_id;
 
@@ -277,6 +282,7 @@ class Category_Controller extends CController {
         $info = $image_div_right->add_div()->add_class('alert alert-info');
         $info->add('<h4>' . clang::__('Information') . '</h4>');
         $info->add('<ul><li>Ukuran Gambar <br>width : <b>386px &nbsp</b>height: <b>469px</b></li></ul>');
+        $product_category = array();
         
         if (strlen($id) > 0) {
             if ($err_code > 0)
@@ -286,10 +292,11 @@ class Category_Controller extends CController {
 //                    ->set_value($product_type_name)->add_transform('uppercase');
 
             $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
-            $product_category[''] = '';
             $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
-            unset($product_category[$id]);
-            $product_category = array('' => 'NONE') + $product_category;
+            if($id!=null&&isset($product_category[$id])) {
+                unset($product_category[$id]);
+            }
+            //$product_category = array('' => 'NONE') + $product_category;
 
 
             $parent_name = cdbutils::get_value('select name from cms_category where status > 0 and cms_category_id = ' . $db->escape($parent_id) . ' ');
@@ -311,9 +318,8 @@ class Category_Controller extends CController {
                     ->set_value($category_type);
 
             $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
-            $product_category[''] = '';
             $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
-            $product_category = array('' => 'NONE') + $product_category;
+            //$product_category = array('' => 'NONE') + $product_category;
 
             $product_category_control = $span->add_div('div_product_category_control');
 
@@ -322,8 +328,9 @@ class Category_Controller extends CController {
                     ->add_control("parent_id", "select")
                     ->add_validation(null)
                     ->set_value($parent_id)
-                    ->set_list($product_category)
-                    ->set_applyjs('select2');
+                    ->set_list($product_category);
+                    
+                    
 
             $product_type_control->add_listener('change')->add_handler('reload')
                     ->set_target('div_product_category_control')
@@ -415,26 +422,22 @@ class Category_Controller extends CController {
 
         $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
         
-        $product_category[''] = '';
+        $product_category = array();
         $product_category = $product_category + $tree->get_list('&nbsp;&nbsp;&nbsp;&nbsp;');
-        $product_category = array('' => 'NONE') + $product_category;
+        //$product_category = array('' => 'NONE') + $product_category;
 
         $app->add_field()
                 ->set_label(clang::__("Parent"))
                 ->add_control("parent_id", "select")
                 ->add_validation(null)
                 ->set_value($parent_id)
-                ->set_list($product_category)
-                ->set_applyjs('select2');
+                ->set_list($product_category);
+                
 
         echo $app->render();
     }
 
     public function delete($id = "") {
-        if (!cnav::have_permission('delete_category')) {
-            cmsg::add('error', clang::__('You do not have access to this module') . ', ' . clang::__("call administrator"));
-            curl::redirect('home');
-        }
         if (strlen($id) == 0) {
             curl::redirect("cms/category");
         }
@@ -445,7 +448,7 @@ class Category_Controller extends CController {
         $error = 0;
         $error_message = 0;
 
-        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id))." and org_id = ".$db->escape($org_id);
+        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id)." and org_id = ".$db->escape($org_id));
         $param = array('user_id' => $user->user_id, 'before' => (array) $before, 'after' => '',);
 
         if ($error == 0) {
