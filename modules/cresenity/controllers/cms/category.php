@@ -150,7 +150,7 @@ class Category_Controller extends CController {
             if ($err_code == 0) {
                 $qcheck = " select * from cms_category
                                 where url_key=" . $db->escape($url_key) . " and status > 0
-                                and category_type=" . $db->escape($category_type);
+                                and category_type=" . $db->escape($category_type)." AND org_id = ".$db->escape($org_id);
                 if (strlen($id) > 0)
                     $qcheck .= " and cms_category_id <>" . $db->escape($id) . "";
                 $rcheck = $db->query($qcheck);
@@ -440,11 +440,12 @@ class Category_Controller extends CController {
         }
         $app = CApp::instance();
         $user = $app->user();
+        $org_id = CF::org_id();
         $db = CDatabase::instance();
         $error = 0;
         $error_message = 0;
 
-        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id));
+        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id))." and org_id = ".$db->escape($org_id);
         $param = array('user_id' => $user->user_id, 'before' => (array) $before, 'after' => '',);
 
         if ($error == 0) {
@@ -472,7 +473,7 @@ class Category_Controller extends CController {
         if ($error == 0) {
             try {
                 $db->update("cms_category", array("status" => 0, "updated" => date("Y-m-d H:i:s"),
-                    "updatedby" => $user->username), array("cms_category_id" => $id));
+                    "updatedby" => $user->username), array("cms_category_id" => $id, "org_id"=>$org_id));
             } catch (Exception $e) {
                 $error++;
                 $error_message = clang::__("system_delete_fail") . $e->getMessage();
