@@ -432,7 +432,7 @@ class ccms {
         }
 
         $result = array();
-        $cat = self::__get_post('page', $org_id);
+        $cat = self::__get_post(array('post_type'=>'page'), $org_id);
         if (count($cat) > 0) {
             foreach ($cat as $cat_k => $cat_v) {
                 $result[$cat_v['cms_post_id']] = ucfirst($cat_v['post_title']);
