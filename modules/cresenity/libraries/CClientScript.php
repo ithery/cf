@@ -238,6 +238,11 @@ class CClientScript extends CObject {
             $arr["type"] = "css";
             $arr["url"] = $url_css_file;
             $arr["file"] = $f;
+
+            $file = explode('?',$fullpath_css_file);
+            $fullpath_css_file = $file[0];
+
+
             $filemtime = filemtime($fullpath_css_file);
             $arr["version"] = $filemtime;
             if ($last_filemtime < $filemtime)
