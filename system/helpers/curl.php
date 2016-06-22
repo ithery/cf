@@ -53,7 +53,7 @@
                     $base_url = $protocol . '://' . $site_domain;
                 }
             }
-
+            
             if ($index === TRUE AND $index = CF::config('core.index_page')) {
                 // Append the index page
                 $base_url = $base_url . $index;

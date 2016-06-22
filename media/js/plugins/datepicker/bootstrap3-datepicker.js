@@ -276,7 +276,7 @@
 		},
 
 		setStartDate: function(startDate){
-			this.startDate = startDate||-Infinity;
+                        this.startDate = startDate||-Infinity;
 			if (this.startDate !== -Infinity) {
 				this.startDate = DPGlobal.parseDate(this.startDate, this.format, this.language);
 			}
