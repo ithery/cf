@@ -448,8 +448,8 @@ class Category_Controller extends CController {
         $error = 0;
         $error_message = 0;
 
-        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id)." and org_id = ".$db->escape($org_id));
-        $param = array('user_id' => $user->user_id, 'before' => (array) $before, 'after' => '',);
+//        $before = cdbutils::get_row('select * from cms_category where cms_category_id = ' . $db->escape($id)." and org_id = ".$db->escape($org_id));
+//        $param = array('user_id' => $user->user_id, 'before' => (array) $before, 'after' => '',);
 
         if ($error == 0) {
             $q = "SELECT * FROM cms_category
