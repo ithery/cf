@@ -88,8 +88,16 @@ class Read_Controller extends CController {
         $post_title = '';
         $post_content = '';
         $post_id = $post;
+		
+		$org_id = CF::org_id();
+		
         if (!is_numeric($post_id)) {
-            $post_id = cdbutils::get_value("SELECT cms_post_id FROM cms_post WHERE post_name = ".$db->escape($post_id));
+            $q = "SELECT cms_post_id FROM cms_post WHERE post_name = ".$db->escape($post_id);
+			if(strlen($org_id)>0) {
+				$q.= " and org_id=".$db->escape($org_id);
+			}
+			
+			$post_id = cdbutils::get_value($q);
         }
         $post = ccms::get_post($post_id);
         $template = $post->template;
@@ -128,8 +136,15 @@ class Read_Controller extends CController {
         $post_title = '';
         $post_content = '';
         $post_id = $post;
+		
+		$org_id = CF::org_id();
         if (!is_numeric($post_id)) {
-            $post_id = cdbutils::get_value("SELECT cms_post_id FROM cms_post WHERE post_name = ".$db->escape($post_id));
+            $q = "SELECT cms_post_id FROM cms_post WHERE post_name = ".$db->escape($post_id);
+			if(strlen($org_id)>0) {
+				$q.= " and org_id=".$db->escape($org_id);
+			}
+			
+			$post_id = cdbutils::get_value($q);
         }
         $post = ccms::get_post($post_id);
         $template = $post->template;
