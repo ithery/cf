@@ -7,6 +7,7 @@
         protected $applyjs;
         protected $dropdown_classes;
         protected $hide_search;
+        protected $readonly;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -17,6 +18,7 @@
             $this->type = "select";
             $this->applyjs = "false";
             $this->hide_search = false;
+            $this->readonly = false;
         }
 
         public static function factory($id) {
@@ -55,6 +57,11 @@
             }
             return $this;
         }
+        
+        public function set_readonly($bool) {
+            $this->readonly = $bool;
+            return $this;
+        }
 
         public function toarray() {
             $data = array();
@@ -88,8 +95,11 @@
         }
 
         public function html($indent = 0) {
+            
             $html = new CStringBuilder();
             $html->set_indent($indent);
+            $readonly = "";
+            if ($this->readonly) $readonly = ' readonly="readonly"';
             $disabled = "";
             if ($this->disabled) $disabled = ' disabled="disabled"';
             $multiple = "";
@@ -111,7 +121,7 @@
             foreach ($this->attr as $k => $v) {
                 $addition_attribute.=" " . $k . '="' . $v . '"';
             }
-            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $multiple . $addition_attribute. '>')->inc_indent()->br();
+            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly .$multiple . $addition_attribute. '>')->inc_indent()->br();
             if (count($this->group_list) > 0) {
                 foreach ($this->group_list as $g => $list) {
                     if (strlen($g) > 0) {
@@ -152,7 +162,14 @@
                             $addition_attribute.=" " . $attribute_k . '="' . $attribute_v . '"';
                         }
                     }
-                    $html->appendln('<option value="' . $k . '" ' . $selected . $addition_attribute . '>' . $value . '</option>')->br();
+                    if ($this->readonly) {
+                        if ($k == $this->value) {
+                            $html->appendln('<option value="' . $k . '" ' . $selected . $addition_attribute . '>' . $value . '</option>')->br();
+                        }
+                    }
+                    else {
+                        $html->appendln('<option value="' . $k . '" ' . $selected . $addition_attribute . '>' . $value . '</option>')->br();
+                    }
                 }
             }
             $html->dec_indent()->appendln('</select>')->br();

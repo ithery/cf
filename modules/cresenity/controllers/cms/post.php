@@ -100,7 +100,7 @@ class Post_Controller extends CController {
         $type = 'post';
         $template = "";
         $cms_tag_value = array();
-
+        
         
         if (strlen($id) > 0) {
             $q_post = "SELECT * FROM cms_post WHERE status > 0 AND cms_post_id = " . $db->escape($id);
@@ -259,7 +259,8 @@ class Post_Controller extends CController {
                         $err_code++;
                         $err_message = $e->getMessage();
                     }
-                } else {
+                } 
+                else {
                     // INSERT NEW
                     $default = array(
                         'created' => date('Y-m-d H:i:s'),
@@ -353,9 +354,11 @@ class Post_Controller extends CController {
                     "post_id"=>$cms_post_id
                 );
                 $fields = ccms::get_custom_fields($options);
+                
                 foreach($fields as $k=>$v) {
                     $field_type = carr::get($v,'type');
                     $field_name = carr::get($v,'name');
+                    $field_rules = carr::get($v,'rules');
                     $field_value = carr::get($post,'custom_field_'.$k);
                     switch($field_type) {
                         case 'image':
@@ -374,6 +377,16 @@ class Post_Controller extends CController {
                                 'filename'=>$filename,
                                 'image_url'=>$image_url,
                             );
+                            
+                            if ($field_rules != null) {
+                                $image_required = carr::get($field_rules, 'required');
+                                if ($image_required) {
+                                    if (strlen($filename) == 0) {
+                                        $err_code++;
+                                        $err_message = clang::__($field_name).' '.clang::__('is required');
+                                    }
+                                }
+                            }
                         break;
                         default:
                             $field_value = carr::get($post,'custom_field_'.$k);
@@ -408,6 +421,7 @@ class Post_Controller extends CController {
                 }
             }
         }
+        
 
         
 
@@ -550,6 +564,7 @@ class Post_Controller extends CController {
         $post_type = carr::get($request, 'post_type');
         $data = ccms::get_post_type_data($post_type);
         $custom_fields = carr::get($data, 'custom_fields');
+        
         if($custom_fields==null) {
             $custom_fields = array();
         }
