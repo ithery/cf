@@ -91,8 +91,12 @@ class ccms {
         if ($row !== null && strlen($field_type) == 0) {
             $field_type = $row->field_type;
         }
+        $need_update = true;
         switch ($field_type) {
             case 'image':
+                if(strlen(carr::get($field_value,'filename'))==0) {
+                    $need_update = false;
+                }
                 $field_value = json_encode($field_value);
                 break;
         }
@@ -107,7 +111,9 @@ class ccms {
             $data['cms_post_id'] = $post_id;
             $r = $db->insert('cms_custom_field', $data);
         } else {
-            $r = $db->update('cms_custom_field', $data, array('cms_post_id' => $post_id, 'field_name' => $field_name));
+            if ($need_update) {
+                $r = $db->update('cms_custom_field', $data, array('cms_post_id' => $post_id, 'field_name' => $field_name));
+            }
         }
         return $r;
     }

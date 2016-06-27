@@ -378,15 +378,18 @@ class Post_Controller extends CController {
                                 'image_url'=>$image_url,
                             );
                             
-                            if ($field_rules != null) {
-                                $image_required = carr::get($field_rules, 'required');
-                                if ($image_required) {
-                                    if (strlen($filename) == 0) {
-                                        $err_code++;
-                                        $err_message = clang::__($field_name).' '.clang::__('is required');
+                            if (strlen($id) == 0) {
+                                if ($field_rules != null) {
+                                    $image_required = carr::get($field_rules, 'required');
+                                    if ($image_required) {
+                                        if (strlen($filename) == 0) {
+                                            $err_code++;
+                                            $err_message = clang::__($field_name).' '.clang::__('is required');
+                                        }
                                     }
                                 }
                             }
+                            
                         break;
                         default:
                             $field_value = carr::get($post,'custom_field_'.$k);
