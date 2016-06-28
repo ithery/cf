@@ -23,11 +23,13 @@ class Post_Controller extends CController {
 
         $q = "SELECT
                 tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
+                tc.name as category_name,
                 p.*
                FROM cms_post p
                LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
                LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
                LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
+               LEFT JOIN cms_category tc ON tc.cms_category_id=p.cms_category_id
                WHERE p.status > 0 
                AND p.post_type <> 'page' and p.post_type <> 'nav_menu_item'";
 
@@ -37,7 +39,7 @@ class Post_Controller extends CController {
         $table = $app->add_table('post')->set_quick_search(true);
         $table->add_column('post_type')->set_label(clang::__("Type"))->add_transform('uppercase');
         $table->add_column('post_title')->set_label(clang::__("Title"));
-        $table->add_column('term_name')->set_label(clang::__("Category"));
+        $table->add_column('category_name')->set_label(clang::__("Category"));
         $table->add_column('post_status')->set_label(clang::__("Status"));
         $table->add_column('post_name')->set_label(clang::__("Url"));
         $table->add_column('created')->set_label(clang::__("Created"))->add_transform('format_datetime');
