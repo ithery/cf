@@ -37,7 +37,6 @@ class Post_Controller extends CController {
         $table = $app->add_table('post')->set_quick_search(true);
         $table->add_column('post_type')->set_label(clang::__("Type"))->add_transform('uppercase');
         $table->add_column('post_title')->set_label(clang::__("Title"));
-        $table->add_column('post_excerpt')->set_label(clang::__("Content"));
         $table->add_column('term_name')->set_label(clang::__("Category"));
         $table->add_column('post_status')->set_label(clang::__("Status"));
         $table->add_column('post_name')->set_label(clang::__("Url"));

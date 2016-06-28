@@ -33,7 +33,7 @@ class Page_Controller extends CController {
         
         $table = $app->add_table('page')->set_quick_search(true);
         $table->add_column('post_title')->set_label(clang::__("Title"));
-        $table->add_column('post_excerpt')->set_label(clang::__("Content"));
+        //$table->add_column('post_excerpt')->set_label(clang::__("Content"));
         $table->add_column('post_status')->set_label(clang::__("Status"));
         $table->add_column('post_name')->set_label(clang::__("Url"));
         $table->add_column('created')->set_label(clang::__("Created"))->add_transform("format_datetime");
