@@ -36,8 +36,8 @@ class Page_Controller extends CController {
         //$table->add_column('post_excerpt')->set_label(clang::__("Content"));
         $table->add_column('post_status')->set_label(clang::__("Status"));
         $table->add_column('post_name')->set_label(clang::__("Url"));
-        $table->add_column('created')->set_label(clang::__("Created"))->add_transform("format_datetime");
-        $table->add_column('createdby')->set_label(clang::__("Created By"));
+        $table->add_column('updated')->set_label(clang::__("Updated"))->add_transform("format_datetime");
+        $table->add_column('updatedby')->set_label(clang::__("Updated By"));
         //$table->set_data_from_array($post)->set_key('cms_post_id');
         $table->set_data_from_query($q)->set_key('cms_post_id');;
         $table->set_title(clang::__("Page"));
