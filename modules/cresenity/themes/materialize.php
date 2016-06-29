@@ -43,6 +43,7 @@
             'validation',
             'touchspin',
             'slick',
+            'font-awesome-4.5.0',
 //            'moment',
          //   'datepicker_material',
         ),
