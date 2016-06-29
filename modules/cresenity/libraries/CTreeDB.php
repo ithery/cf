@@ -309,7 +309,7 @@
 					status>0
 					and lft>" . $db->escape($lft) . " and rgt<" . $db->escape($rgt) . "
 
-			";
+			". $this->filter_where();
                 if (strlen($this->org_id) > 0) {
                     $q.=" and org_id=" . $db->escape($this->org_id) . "";
                 }
