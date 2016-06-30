@@ -164,6 +164,19 @@ class Post_Controller extends CController {
             $post_type = carr::get($post, 'post_type');
             $post_status = carr::get($post, 'post_status');
             $cms_terms_id = null;
+            
+            // condition if user login org_id = null
+            $org_post = carr::get($post, 'org_id');
+            if ($org_id == null) {
+                if (strlen($org_post) > 0) {
+                    $org_id = $org_post;
+                }
+                else {
+                    $err_code++;
+                    $err_message = clang::__('Org').' is required';
+                }
+            }
+                
             //check for exists urlkey
             $is_duplicate = true;
             $i = 0;
@@ -447,6 +460,10 @@ class Post_Controller extends CController {
         $widget_right = $div_right->add_widget();
 
         // DIV LEFT
+        if ($org_id == null) {
+            $widget_left->add_field()->set_label(clang::__("Org").' <red>*</red>')->add_control('org_id', 'org-merchant-select')->set_value($org_id)->add_validation('required');
+        }
+        
         $post_type_control = $widget_left->add_field()->set_label(clang::__("Post Type"))->add_control('post_type', 'select')->set_list($post_type_list)->set_value($post_type);
         $post_type_control->add_listener('ready')->add_handler('reload')->set_target('custom-field-container')
                 ->set_url(curl::base() . 'cms/post/load_custom_field/' . $id)->add_param_input(array('post_type'));

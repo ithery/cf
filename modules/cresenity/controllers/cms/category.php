@@ -121,6 +121,18 @@ class Category_Controller extends CController {
             $parent_id = carr::get($post, 'parent_id');
             $url_key = trim(carr::get($post, 'url_key'));
             
+            // condition if user login org_id = null
+            $org_post = carr::get($post, 'org_id');
+            if ($org_id == null) {
+                if (strlen($org_post) > 0) {
+                    $org_id = $org_post;
+                }
+                else {
+                    $err_code++;
+                    $err_message = clang::__('Org').' is required';
+                }
+            }
+            
             $image = carr::get($_FILES, 'image_name');
             $filename = '';
             $tmp_name = '';
@@ -343,6 +355,10 @@ class Category_Controller extends CController {
                         ->set_url(curl::base() . 'cms/category/reload_category_parent')
                         ->add_param_input(array('category_type', 'parent_id'));
             }
+        }
+        $org_id = null;
+        if ($org_id == null) {
+            $span->add_field()->set_label("<span style='color:red;'>*</span> ". clang::__("Org"))->add_control('org_id', 'org-merchant-select')->set_value($org_id)->add_validation('required');
         }
         $span->add_field()
                 ->set_label("<span style='color:red;'>*</span> " . clang::__("Category Name"))

@@ -126,6 +126,18 @@ class Page_Controller extends CController {
                 $template = carr::get($post, 'template');
                 $post_excerpt = ccms::excerpt_paragraph($post_content, 50);
                 
+                // condition if user login org_id = null
+                $org_post = carr::get($post, 'org_id');
+                if ($org_id == null) {
+                    if (strlen($org_post) > 0) {
+                        $org_id = $org_post;
+                    }
+                    else {
+                        $err_code++;
+                        $err_message = clang::__('Org').' is required';
+                    }
+                }
+                
                 if (strlen($post_title) == 0) {
                     $err_code++;
                     $err_message = "Title is required.";
@@ -254,8 +266,11 @@ class Page_Controller extends CController {
         $widget_left = $div_left->add_widget();
         $div_right = $div->add_div()->add_class('span4');
         $widget_right = $div_right->add_widget();
-
+        
         // DIV LEFT
+        if ($org_id == null) {
+            $widget_left->add_field()->set_label(clang::__("Org").' <red>*</red>')->add_control('org_id', 'org-merchant-select')->set_value($org_id)->add_validation('required');
+        }
         $widget_left->add_field()->set_label(clang::__("Page Title").' <red>*</red>')->add_control('post_title', 'text')->set_value($post_title)->add_validation('required');
         $widget_left->add_field()->set_label(clang::__("Url").' <red>*</red>')->add_control('post_name', 'text')->set_value($post_name)->set_placeholder("Auto")->add_validation('required');
         $widget_left->add_field()->set_label(clang::__("Page Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
