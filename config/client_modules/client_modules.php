@@ -115,6 +115,9 @@
         "mockjax" => array(
             "js" => array("plugins" . DS . "mockjax" . DS . "jquery.mockjax.js"),
         ),
+        "jquery-autocomplete" => array(
+            "js" => array("plugins" . DS . "jquery-autocomplete" . DS . "jquery-autocomplete.js"),
+        ),
         "fileupload" => array(
             "js" => array("plugins" . DS . "fileupload" . DS . "bootstrap-fileupload.min.js"),
         ),

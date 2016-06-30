@@ -3,7 +3,6 @@
     class CTable extends CElement {
 
         public $default_paging_list = array(
-            "1" => "1",
             "10" => "10",
             "25" => "25",
             "50" => "50",
