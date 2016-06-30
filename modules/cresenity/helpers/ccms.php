@@ -184,7 +184,25 @@ class ccms {
                 $label = carr::get($field, 'label');
                 $type = carr::get($field, 'type');
                 $default_value = carr::get($field, 'default_value');
-                $field = $container->add_field()->set_label($label);
+                $info = carr::get($field, 'info');
+                if (count($info) > 0) {
+                    $row_container = $container->add_div()->add_class('row-fluid');
+                    $left = $row_container->add_div()->add_class('span6');
+                    $right = $row_container->add_div()->add_class('span6');
+                    
+                    $field = $left->add_field()->set_label($label);
+                    $information = $right->add_div()->add_class('alert alert-info');
+                    $information->add('<h4>'.clang::__('Information').'</h4>');
+                    $ul = '<ul>';
+                    foreach ($info as $info_k => $info_v) {
+                        $ul .= '<li>'.$info_v.'</li>';
+                    }
+                    $ul .= '</ul>';
+                    $information->add($ul);
+                }
+                else {
+                    $field = $container->add_field()->set_label($label);
+                }
                 //create control
                 $control = null;
                 switch ($type) {
