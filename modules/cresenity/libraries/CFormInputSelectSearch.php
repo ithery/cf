@@ -77,7 +77,7 @@
             $this->placeholder = $placeholder;
             return $this;
         }
-        
+
         public function add_dropdown_class($c) {
             if (is_array($c)) {
                 $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
@@ -125,9 +125,6 @@
 
             if ($this->select2 >= '4') {
                 $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . $multiple . '">');
-                if (strlen($this->value) > 0) {
-                    $html->appendln('<option value="' .$this->value .'"></option>');
-                }
                 $html->appendln('</select>');
                 $html->br();
             }
@@ -162,7 +159,7 @@
                 $b_str = $val[0]; //matches str with bracket {}
                 $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
             }
-            
+
             preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
             foreach ($matches as $val) {
                 $thousand_separator_pre = '';
@@ -207,6 +204,7 @@
 			},
 			";
             }
+            
             if (strlen($this->value) > 0) {
 
                 $db = CDatabase::instance();
@@ -219,14 +217,15 @@
 
 
                 $str_js_init = "
-				initSelection : function (element, callback) {
-					
-				var data = " . $rjson . ";
-				
-				callback(data);
-			},
-			";
+                            initSelection : function (element, callback) {
+
+                            var data = " . $rjson . ";
+
+                            callback(data);
+                    },
+                    ";
             }
+            
 
             $str_multiple = "";
             if ($this->multiple) $str_multiple = " multiple:'true',";
@@ -291,7 +290,7 @@
                                 return $('<div>" . $str_selection . "</div>');
                             }
                         },  // omitted for brevity, see the source of this page
-                        dropdownCssClass: '" .$dropdown_classes ."', // apply css that makes the dropdown taller
+                        dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
                         containerCssClass : 'tpx-select2-container " . $classes . "'
                     }).change(function() {
 				" . $str_js_change . "
@@ -332,7 +331,7 @@
 				formatSelection: function(item) {
 					return '" . $str_selection . "';
 				},  // omitted for brevity, see the source of this page
-				dropdownCssClass: '" .$dropdown_classes ."', // apply css that makes the dropdown taller
+				dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
 				containerCssClass : 'tpx-select2-container " . $classes . "'
 			}).change(function() {
 				" . $str_js_change . "
