@@ -254,6 +254,11 @@
                 $this->config['connection']['pass'] = NULL;
             }
         }
+        
+        public function close(){
+            $this->driver->close();
+            $this->driver = null;
+        }
 
         /**
          * Runs a query into the driver and returns the result.

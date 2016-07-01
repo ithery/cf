@@ -31,6 +31,11 @@ class CDatabase_Mysql_Driver extends CDatabase_Driver {
 	{
 		is_resource($this->link) and mysql_close($this->link);
 	}
+        
+        public function close(){
+            is_resource($this->link) and mysql_close($this->link);
+            $this->link = null;
+        }
 
 	public function connect()
 	{

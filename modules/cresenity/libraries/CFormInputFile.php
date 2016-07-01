@@ -129,7 +129,6 @@
                                         " . $this->callback_success . "
                                         })
                                         .error(function (jqXHR, status, thrown) {
-                                            console.log(jqXHR);
                                             if (status == 'error') {
                                                 $.cresenity.message('error','Error, please call administrator... (' + thrown + ')');
                                             }
