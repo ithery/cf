@@ -147,12 +147,15 @@ class Read_Controller extends CController {
 			$post_id = cdbutils::get_value($q);
         }
         $post = ccms::get_post($post_id);
+        $theme = ccms::get_option('theme_scheme');
+        if (strlen($theme) > 0) {
+            $theme = $theme.'/';
+        }
         $template = $post->template;
         if(strlen($template)>0) {
-            $template = 'cms/'.$template;
+            $template = 'cms/'.$theme.$template;
         } else {
             $template = 'cms/post';
-
         }
         $file = CF::get_file('template',$template);
         if($file===null) {
