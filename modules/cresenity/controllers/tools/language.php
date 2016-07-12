@@ -218,6 +218,8 @@
                                     $def_lang = substr($def_lang, 0, strlen($def_lang) - 1);
                                 }
                                 
+                                $prefix = substr($def_lang, 0, 1);
+                                $suffix = substr($def_lang, strlen($def_lang) - 1, 1);
                                 $messages = array();
                                 if ($prefix == ' ' || $suffix == ' ') {
                                     $messages[] = '<span class="label label-danger">WHITESPACE</span>';
