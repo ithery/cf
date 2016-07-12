@@ -153,7 +153,7 @@
             
             $form = $app->add_form();
             $form->add_field()->set_label('Set Application')
-                    ->add_control('application', 'select')->set_list($dirs)->set_value('lastmenit');
+                    ->add_control('application', 'select')->set_list($dirs);
             $form->add_action_list()->add_action()
                     ->set_label('Show')->add_class('btn-primary')->add_listener('click')->add_handler('reload')
                     ->set_url(curl::base() .'tools/language/load_lang_list')
@@ -228,8 +228,11 @@
                                     $messages[] = '<span class="label label-danger">PHPVAR</span>';
                                 }
                                 
-//                                $widget->add(htmlspecialchars($def_lang));
-//                                $widget->add_br();
+                                preg_match('#<.+?>?#ims', $def_lang, $html_tag);
+                                if (count($html_tag) > 0) {
+                                    $messages[] = '<span class="label label-danger">HTMLTAG</span>';
+                                }
+                                
                                 $row = CTableRow::factory();
                                 
                                 $div = CFactory::create_div()->add(htmlspecialchars($def_lang));
