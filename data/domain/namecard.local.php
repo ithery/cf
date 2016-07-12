@@ -10,4 +10,5 @@ return array(
         'shared_app_code'=>array(
             "adminnamecard"
         ),
+        'theme' => 'materialize',
 );
