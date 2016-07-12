@@ -223,7 +223,7 @@
                                     $messages[] = '<span class="label label-danger">WHITESPACE</span>';
                                 }
                                 
-                                preg_match('#^\$.*\s?#ims', $def_lang, $php_var);
+                                preg_match('#\$.*\s?#ims', $def_lang, $php_var);
                                 if (count($php_var) > 0) {
                                     $messages[] = '<span class="label label-danger">PHPVAR</span>';
                                 }
