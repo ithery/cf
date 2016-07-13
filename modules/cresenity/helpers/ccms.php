@@ -9,6 +9,7 @@
 class ccms {
 
     static $all_post_type = null;
+    static $all_theme = null;
 
     public static function get_template_data($options = null) {
         $return = array();
@@ -291,6 +292,39 @@ class ccms {
         }
 
         return $result;
+    }
+    
+    private static function get_all_theme_list() {
+        if (self::$all_theme === null) {
+            $theme_file = CF::get_file('data','cms/theme');
+            if (file_exists($theme_file)) {
+                $theme_data = include $theme_file;
+                $result = array();
+                if (is_array($theme_data)) {
+                    foreach ($theme_data as $theme_data_k => $theme_data_v) {
+                        $result[$theme_data_k] = $theme_data_v;
+                    }
+                }
+                self::$all_theme = $result;
+            }
+        }
+        return self::$all_theme;
+    }
+    
+    public static function get_theme_list() {
+        $all_theme = self::get_all_theme_list();
+        $result = array();
+        foreach ($all_theme as $all_theme_k => $all_theme_v) {
+            $value = carr::get($all_theme_v, 'label');
+            $result[$all_theme_k] = $value;
+        }
+
+        return $result;
+    }
+    
+    public static function get_theme_color($theme) {
+        $all_theme_color = self::get_all_theme_list();
+        return carr::get($all_theme_color, $theme);
     }
 
     public static function post_status() {
