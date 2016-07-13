@@ -72,14 +72,32 @@ body {
 .clear-both {
     clear: both;
 }
+.mt-5 {
+    margin-top: 5px;
+}
 .mt-15 {
     margin-top: 15px;
+}
+.mb-5 {
+    margin-bottom: 5px;
 }
 .mb-15 {
     margin-top: 15px;
 }
+.pt-15 {
+    padding-top: 15px;
+}
+.pb-15 {
+    padding-bottom: 15px;
+}
 .no-padding {
     padding: 0px;
+}
+.no-padding-left {
+    padding-left: 0px;
+}
+.no-padding-right {
+    padding-right: 0px;
 }
 .no-margin {
     margin: 0px;
