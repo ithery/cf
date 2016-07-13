@@ -125,6 +125,34 @@
 
             if ($this->select2 >= '4') {
                 $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . $multiple . '">');
+                
+                // select2 4.0 using option to set default value
+                if (strlen($this->value) > 0 || $this->auto_select) {
+                    $db = CDatabase::instance();
+                    $rjson = 'false';
+
+                    if ($this->auto_select) {
+                        $q = "select * from (" . $this->query . ") as a limit 1";
+                    }
+                    else {
+                        $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
+                    }
+                    $r = $db->query($q)->result_array(false);
+                    if (count($r) > 0) {
+                        $r = $r[0];
+                        $str_selection = $this->format_selection;
+                        $str_selection = str_replace("'", "\'", $str_selection);
+                        preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+
+                        foreach ($matches as $val) {
+                            $str = $val[1]; //matches str without bracket {}
+                            $b_str = $val[0]; //matches str with bracket {}
+                            $str_selection = str_replace($b_str, $r[$str], $str_selection);
+                        }
+                        
+                        $html->appendln('<option value="' .$this->value .'">' .$str_selection .'</option>');
+                    }
+                }
                 $html->appendln('</select>');
                 $html->br();
             }
@@ -191,7 +219,9 @@
 
                 $q = "select * from (" . $this->query . ") as a limit 1";
                 $r = $db->query($q)->result_array(false);
-                if (count($r) > 0) $r = $r[0];
+                if (count($r) > 0) {
+                    $r = $r[0];
+                }
                 $rjson = json_encode($r);
 
 
@@ -205,25 +235,29 @@
 			";
             }
             
-            if (strlen($this->value) > 0) {
+            if ($this->select2 >= '4') {
+                // change concept, using select at function html()
+            }
+            else {
+                if (strlen($this->value) > 0) {
 
-                $db = CDatabase::instance();
-                $rjson = 'false';
+                    $db = CDatabase::instance();
+                    $rjson = 'false';
 
-                $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
-                $r = $db->query($q)->result_array(false);
-                if (count($r) > 0) $r = $r[0];
-                $rjson = json_encode($r);
+                    $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
+                    $r = $db->query($q)->result_array(false);
+                    if (count($r) > 0) $r = $r[0];
+                    $rjson = json_encode($r);
 
+                    $str_js_init = "
+                                initSelection : function (element, callback) {
 
-                $str_js_init = "
-                            initSelection : function (element, callback) {
+                                var data = " . $rjson . ";
 
-                            var data = " . $rjson . ";
-
-                            callback(data);
-                    },
-                    ";
+                                callback(data);
+                        },
+                        ";
+                }
             }
             
 
@@ -283,7 +317,7 @@
                             return $('<div>" . $str_result . "</div>');
                         }, // omitted for brevity, see the source of this page
                         templateSelection: function(item) {
-                            if (item.id === '') {
+                            if (item.id === '' || item.selected) {
                                 return item.text;
                             }
                             else {
