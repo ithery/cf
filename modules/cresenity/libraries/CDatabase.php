@@ -65,7 +65,7 @@
                 // Create a new instance
                 CDatabase::$instances[$domain][$name] = new CDatabase($config === NULL ? $name : $config, $domain);
             }
-
+            
             return CDatabase::$instances[$domain][$name];
         }
 
@@ -257,7 +257,7 @@
         
         public function close(){
             $this->driver->close();
-            $this->driver = null;
+            $this->link = null;
         }
 
         /**

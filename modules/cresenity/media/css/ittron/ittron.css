@@ -46,6 +46,7 @@
  *  	3.6 RADIO
  *  	3.7 DASHBOARD
  *          3.7.1 LISTVIEW
+ *  	3.8 LOADING
  *  4. SECTION
  *  	4.1 MAIN HEADER
  *  	4.2 CONTENT HEADER
@@ -263,6 +264,15 @@ div.dataTables_length select {
         background-color: #FFE0B2;
     }
 
+/* 3.8 LOADING */
+div.loading {
+    background: url('../../img/ittron/loading.gif');
+    background-repeat: no-repeat;
+    min-height: 90px;
+    width: 90px;
+    margin: auto;
+}
+    
 /* 4. SECTION */
 /* 4.1 MAIN HEADER*/
 .notifications-menu .fa.fa-bell-o {

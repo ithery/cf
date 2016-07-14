@@ -486,10 +486,31 @@ cresenity.func.js
 			
 			if(typeof data_addition == 'undefined') data_addition={};
 			url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
+                        <?php
+                            $bootstrap = ccfg::get('bootstrap');
+                            $theme_data = CManager::instance()->get_theme_data();
+                            if (isset($theme_data)) {
+                                $bootstrap = carr::get($theme_data, 'bootstrap');
+                            }
+                            if (strlen($bootstrap) == 0) {
+                                $bootstrap = ccfg::get('bootstrap');
+                            }
+                            if ($bootstrap >= '3.3') {
+                        ?>
+                        jQuery('#'+id_target).empty();
+                        jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').addClass('loading'));
+                        <?php 
+                            }
+                            else {
+                        ?>
 			jQuery('#'+id_target).addClass('loading');
 			jQuery('#'+id_target).empty();
 			jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+                        <?php 
+                            } 
+                        ?>
 			
+                                        
 			jQuery('#'+id_target).data('xhr',jQuery.ajax({
 					type: method,
 					url: url,
@@ -530,9 +551,28 @@ cresenity.func.js
 			
 			if(typeof data_addition == 'undefined') data_addition={};
 			url = $.cresenity.url.add_query_string(url,'capp_current_container_id',id_target);
+                        <?php
+                            $bootstrap = ccfg::get('bootstrap');
+                            $theme_data = CManager::instance()->get_theme_data();
+                            if (isset($theme_data)) {
+                                $bootstrap = carr::get($theme_data, 'bootstrap');
+                            }
+                            if (strlen($bootstrap) == 0) {
+                                $bootstrap = ccfg::get('bootstrap');
+                            }
+                            if ($bootstrap >= '3.3') {
+                        ?>
+                        jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').addClass('loading'));
+                        <?php 
+                            }
+                            else {
+                        ?>
 			jQuery('#'+id_target).addClass('loading');
-			
 			jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+                        <?php 
+                            } 
+                        ?>
+                                
 			
 			jQuery('#'+id_target).data('xhr',jQuery.ajax({
 					type: method,
@@ -776,7 +816,8 @@ cresenity.func.js
                         if (xhr) xhr.abort();
                         
                         url = $.cresenity.url.replace_param(url);
-                        jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+                        jQuery('#'+id_target).empty();
+                        jQuery('#'+id_target).append(jQuery('<div>').attr('id',id_target+'-loading').addClass('loading'));
                         if (!handle.is(".opened")) {
                             handle.parents('.modal').addClass("in").show();
                         }
