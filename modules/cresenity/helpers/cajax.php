@@ -463,7 +463,7 @@ class cajax {
             if (count($row_action_list) > 0) {
                 $html = new CStringBuilder();
                 ;
-                $html->appendln('<td class="low-padding align-center">')->inc_indent()->br();
+                $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
                 }
@@ -498,6 +498,7 @@ class cajax {
                 $html->appendln($row_action_list->html($html->get_indent()));
                 $js.=$row_action_list->js();
                 $html->dec_indent()->appendln('</td>')->br();
+                //$arr[] = '';
                 $arr[] = $html->text();
                 $arr["DT_RowId"] = $key;
             }

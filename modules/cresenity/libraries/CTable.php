@@ -1425,7 +1425,7 @@
                         if ($this->action_style == "btn-dropdown") {
                             $action_width = 70;
                         }
-                        $html->appendln('<th data-align="align-center" scope="col" width="' . $action_width . '" class="align-center' . $th_class . '">' . clang::__('Actions') . '</th>')->br();
+                        $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $th_class . '">' . clang::__('Actions') . '</th>')->br();
                     }
                     $html->dec_indent()->appendln("</tr>")->br();
                 }
@@ -1544,7 +1544,7 @@
                     }
 
                     if ($this->have_action()) {
-                        $html->appendln('<td class="low-padding align-center">')->inc_indent()->br();
+                        $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
                         foreach ($row as $k => $v) {
                             $jsparam[$k] = $v;
                         }
@@ -1857,7 +1857,11 @@
 							
 							//get head data align
 							var data_align = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
+							var data_action = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
 							var data_no_line_break = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
+							if(data_action) {
+								$('td:eq('+i+')', nRow).addClass(data_action);
+							}
 							if(data_align) {
 								$('td:eq('+i+')', nRow).addClass(data_align);
 							}
