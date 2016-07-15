@@ -147,13 +147,16 @@ class Read_Controller extends CController {
 			$post_id = cdbutils::get_value($q);
         }
         $post = ccms::get_post($post_id);
-        $theme = ccms::get_option('theme_scheme');
-        if (strlen($theme) > 0) {
-            $theme = $theme.'/';
+        $theme = cms::get_option('theme');
+        $theme_name = carr::get($theme, 'name');
+        $theme_color = carr::get($theme, 'color');
+        
+        if (strlen($theme_name) > 0) {
+            $theme_name = $theme_name.'/';
         }
         $template = $post->template;
         if(strlen($template)>0) {
-            $template = 'cms/'.$theme.$template;
+            $template = 'cms/'.$theme_name.$template;
         } else {
             $template = 'cms/post';
         }
