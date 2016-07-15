@@ -45,6 +45,11 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
         return $this;
     }
 
+    public function set_placeholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
+
     protected function html_attr() {
         $html_attr = parent::html_attr();
         $placeholder = "";
@@ -64,6 +69,7 @@ class CMobile_Element_Control_Textarea extends CMobile_Element_AbstractControl {
         $html_attr .= $length;
         $html_attr .= $cols;
         $html_attr .= $rows;
+        $html_attr .= $placeholder;
         return $html_attr;
     }
     public function build($indent = 0) {
