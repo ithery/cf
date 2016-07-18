@@ -7,7 +7,7 @@
  * @since 08 Sep 15
  */
 class Page_Controller extends CController {
-    
+
     CONST __CONTROLLER = "cms/page/";
 
     public function __construct() {
@@ -18,20 +18,26 @@ class Page_Controller extends CController {
         $app = CApp::instance();
         $org_id = CF::org_id();
         $app->title(clang::__("Page List"));
-        
+        $db = CDatabase::instance();
+
         $post = ccms::page();
-        
-         $q = "SELECT
+
+        $q = "SELECT
                 tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
-                p.*
+                p.*, o.code org_code
                FROM cms_post p
                LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
                LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
                LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
-               WHERE p.status > 0 and p.org_id = " . $org_id . "
-               AND p.post_type = 'page'";
-        
+               LEFT JOIN org o ON o.org_id = p.org_id
+               WHERE p.status > 0 AND p.post_type = 'page'";
+        if (strlen($org_id) > 0) {
+            $q .= " AND p.org_id = " . $db->escape($org_id);
+        }
         $table = $app->add_table('page')->set_quick_search(true);
+        if ($org_id == null) {
+            $table->add_column('org_code')->set_label(clang::__("Org"));
+        }
         $table->add_column('post_title')->set_label(clang::__("Title"));
         //$table->add_column('post_excerpt')->set_label(clang::__("Content"));
         $table->add_column('post_status')->set_label(clang::__("Status"));
@@ -39,22 +45,23 @@ class Page_Controller extends CController {
         $table->add_column('updated')->set_label(clang::__("Updated"))->add_transform("format_datetime");
         $table->add_column('updatedby')->set_label(clang::__("Updated By"));
         //$table->set_data_from_array($post)->set_key('cms_post_id');
-        $table->set_data_from_query($q)->set_key('cms_post_id');;
+        $table->set_data_from_query($q)->set_key('cms_post_id');
+        ;
         $table->set_title(clang::__("Page"));
         $table->set_apply_data_table(true);
         $table->set_ajax(true);
         $table->set_quick_search(true);
-        
+
         if (cnav::have_permission('edit_page')) {
             $actedit = $table->add_row_action('edit');
-            $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . self::__CONTROLLER."edit/{cms_post_id}")->set_label(clang::__('Edit'));
+            $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . self::__CONTROLLER . "edit/{cms_post_id}")->set_label(clang::__('Edit'));
         }
         if (cnav::have_permission('delete_page')) {
             $actdelete = $table->add_row_action('delete');
-            $actdelete->set_label("")->set_icon("trash")->set_link(curl::base() . self::__CONTROLLER ."delete/{cms_post_id}")->set_confirm(true)->set_label(clang::__('Delete'));
+            $actdelete->set_label("")->set_icon("trash")->set_link(curl::base() . self::__CONTROLLER . "delete/{cms_post_id}")->set_confirm(true)->set_label(clang::__('Delete'));
         }
         $table->set_action_style("btn-dropdown");
-        
+
         echo $app->render();
     }
 
@@ -91,23 +98,23 @@ class Page_Controller extends CController {
         $template = "";
         $cannot_delete = 0;
 
-		if (strlen($id) > 0) {
+        if (strlen($id) > 0) {
             $page = ccms::page($id);
-			
+
             $post_title = cobj::get($page, 'post_title');
             $post_name = cobj::get($page, 'post_name');
             $post_content = cobj::get($page, 'post_content');
             $post_status = cobj::get($page, 'post_status');
             $template = cobj::get($page, 'template');
             $cannot_delete = cobj::get($page, 'cannot_delete');
-            
+
             $template = cobj::get($page, 'template');
         }
-		
+
         // PROCESS
         if (count($post) > 0 || $post != NULL) {
             $db->begin();
-            
+
 //                $filename = "";
 //                if (isset($_FILES["item_image"])) {
 //                    $filename = $_FILES["item_image"]["name"];
@@ -115,50 +122,49 @@ class Page_Controller extends CController {
 //                $filename = cutils::sanitize($filename, true);
 //                $filename_product = $filename;
 //                $item_image = basename(stripslashes($filename));
-                
-                
-                if (isset($post['cannot_delete'])) {
-                    $cannot_delete = 1;
-                }
-                $post_title = carr::get($post, 'post_title');
-                $post_name = carr::get($post, 'post_name');
-                $post_content = carr::get($post, 'post_content');
-                $template = carr::get($post, 'template');
-                $post_excerpt = ccms::excerpt_paragraph($post_content, 50);
-                
-                // condition if user login org_id = null
-                $org_post = carr::get($post, 'org_id');
-                if ($org_id == null) {
-                    if (strlen($org_post) > 0) {
-                        $org_id = $org_post;
-                    }
-                    else {
-                        $err_code++;
-                        $err_message = clang::__('Org').' is required';
-                    }
-                }
-                
-                if (strlen($post_title) == 0) {
+
+
+            if (isset($post['cannot_delete'])) {
+                $cannot_delete = 1;
+            }
+            $post_title = carr::get($post, 'post_title');
+            $post_name = carr::get($post, 'post_name');
+            $post_content = carr::get($post, 'post_content');
+            $template = carr::get($post, 'template');
+            $post_excerpt = ccms::excerpt_paragraph($post_content, 50);
+
+            // condition if user login org_id = null
+            $org_post = carr::get($post, 'org_id');
+            if ($org_id == null) {
+                if (strlen($org_post) > 0) {
+                    $org_id = $org_post;
+                } else {
                     $err_code++;
-                    $err_message = "Title is required.";
+                    $err_message = clang::__('Org') . ' is required';
                 }
-                
-                if (strlen($post_name) == 0) {
-                    $err_code++;
-                    $err_message = "Url is required.";
-                }
-                
-                $data_post = array(                    
-                    "org_id" => $org_id,
-                    "post_title" => carr::get($post, 'post_title'),
-                    "post_name" => carr::get($post, 'post_name'),
-                    "post_type" => "page",
-                    "post_content" => $post_content,
-                    "post_status" => carr::get($post, 'post_status'),
-                    "post_excerpt" => $post_excerpt,
-                    "template" => $template,
-                    "cannot_delete" => $cannot_delete,
-                );
+            }
+
+            if (strlen($post_title) == 0) {
+                $err_code++;
+                $err_message = "Title is required.";
+            }
+
+            if (strlen($post_name) == 0) {
+                $err_code++;
+                $err_message = "Url is required.";
+            }
+
+            $data_post = array(
+                "org_id" => $org_id,
+                "post_title" => carr::get($post, 'post_title'),
+                "post_name" => carr::get($post, 'post_name'),
+                "post_type" => "page",
+                "post_content" => $post_content,
+                "post_status" => carr::get($post, 'post_status'),
+                "post_excerpt" => $post_excerpt,
+                "template" => $template,
+                "cannot_delete" => $cannot_delete,
+            );
             if (strlen($id) > 0) {
 //                $query = "select " .
 //                        " file_location, filename" .
@@ -169,7 +175,6 @@ class Page_Controller extends CController {
 //                    $row = $get_file_image[0];
 //                    $older_image = $row->filename;
 //                }
-
                 // EDIT
                 $default = array(
                     'updated' => date('Y-m-d H:i:s'),
@@ -192,8 +197,7 @@ class Page_Controller extends CController {
 //                        $data = array('file_location' => $path, 'filename' => $filename_product, 'url_location' => $path_url);
 //                        $db->update("cms_post", $data, array("cms_post_id" => $id));
 //                    }
-                }
-                catch (Exception $e){
+                } catch (Exception $e) {
                     $err_code++;
                     $err_message = $e->getMessage();
                 }
@@ -208,8 +212,8 @@ class Page_Controller extends CController {
                     $data = array_merge($data_post, $default);
                     $insert_post = $db->insert("cms_post", $data);
                     $cms_post_id = $insert_post->insert_id();
-                    
-                     // Added image on page
+
+                    // Added image on page
 //                    if (strlen($filename) > 0) {
 //                        $path = cimage::get_image_path('cmsb2c_image/' . $type, $cms_post_id, 'original');
 //                        $path = preg_replace('#\\\#ims', '/', $path);
@@ -232,32 +236,30 @@ class Page_Controller extends CController {
 //                            $db->update("cms_post", $data, array("cms_post_id" => $cms_post_id));
 //                        }
 //                    }
-                    
                 } catch (Exception $e) {
                     $err_code++;
                     $err_message = $e->getMessage();
                 }
             }
-            
+
             if ($err_code > 0) {
                 $db->rollback();
                 cmsg::add("error", $err_message);
             }
-            
+
             if ($err_code == 0) {
                 $db->commit();
                 if (strlen($id) > 0) {
                     cmsg::add("success", "Update Success");
                     curl::redirect(self::__CONTROLLER);
-                }
-                else {
+                } else {
                     cmsg::add("success", "Save Success");
-                    curl::redirect(self::__CONTROLLER."add");
+                    curl::redirect(self::__CONTROLLER . "add");
                 }
             }
         }
-        
-        
+
+
 
         // BUILD UI
         $form = $app->add_form()->set_enctype('multipart/form-data');
@@ -266,13 +268,20 @@ class Page_Controller extends CController {
         $widget_left = $div_left->add_widget();
         $div_right = $div->add_div()->add_class('span4');
         $widget_right = $div_right->add_widget();
-        
+
         // DIV LEFT
         if ($org_id == null) {
-            $widget_left->add_field()->set_label(clang::__("Org").' <red>*</red>')->add_control('org_id', 'org-merchant-select')->set_value($org_id)->add_validation('required');
+            $org_control = $widget_left->add_field()->set_label(clang::__("Org") . ' <red>*</red>')->add_control('org_id', 'org-merchant-select')
+                    ->add_validation('required');
+            if (strlen($id) > 0) {
+                $page = ccms::page($id);
+                $org_id = cobj::get($page, 'org_id');
+//                $org_control->set_readonly(true);
+            }
+            $org_control->set_value($org_id);
         }
-        $widget_left->add_field()->set_label(clang::__("Page Title").' <red>*</red>')->add_control('post_title', 'text')->set_value($post_title)->add_validation('required');
-        $widget_left->add_field()->set_label(clang::__("Url").' <red>*</red>')->add_control('post_name', 'text')->set_value($post_name)->set_placeholder("Auto")->add_validation('required');
+        $widget_left->add_field()->set_label(clang::__("Page Title") . ' <red>*</red>')->add_control('post_title', 'text')->set_value($post_title)->add_validation('required');
+        $widget_left->add_field()->set_label(clang::__("Url") . ' <red>*</red>')->add_control('post_name', 'text')->set_value($post_name)->set_placeholder("Auto")->add_validation('required');
         $widget_left->add_field()->set_label(clang::__("Page Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
         // DIV RIGHT
         $template_list = ccms::get_template_list();
@@ -310,7 +319,7 @@ class Page_Controller extends CController {
         $app->add_js($js);
         echo $app->render();
     }
-    
+
     public function delete($id = "") {
         if (strlen($id) == 0) {
             cmsg::add("error", "Not Found!");
@@ -320,28 +329,28 @@ class Page_Controller extends CController {
         $user = $app->user();
         $db = CDatabase::instance();
         $post = cdbutils::get_row('SELECT * FROM cms_post WHERE cms_post_id=' . $db->escape($id) . ' AND status > 0');
-        
+
         $err_code = 0;
         $err_message = "";
-        
+
         if ($post == NULL) {
             $err_code++;
             $err_message = 'Not found';
         }
-        
+
         // Check if cannot delete
         if ($err_code == 0) {
             if ($post->cannot_delete == 1) {
                 $err_code++;
-                $err_message = "Cannot delete, Page [".$post->post_name."] is required!";
+                $err_message = "Cannot delete, Page [" . $post->post_name . "] is required!";
             }
         }
-        
+
         if ($err_code == 0) {
-            $q = cdbutils::get_row("SELECT * FROM cms_menu WHERE status > 0 AND menu_item_object = 'page' AND menu_item_object_id = ".$db->escape($id));
+            $q = cdbutils::get_row("SELECT * FROM cms_menu WHERE status > 0 AND menu_item_object = 'page' AND menu_item_object_id = " . $db->escape($id));
             if ($q != NULL) {
                 $err_code++;
-                $err_message = "Cannot delete, Page [".$post->post_name."] is in use on menu!";
+                $err_message = "Cannot delete, Page [" . $post->post_name . "] is in use on menu!";
             }
         }
 
@@ -349,19 +358,15 @@ class Page_Controller extends CController {
             try {
                 $db->begin();
                 $db->update(
-                        "cms_post", 
-                        array("status" => 0, "updated" => date("Y-m-d H:i:s"),"updatedby" => $user->username), 
-                        array("cms_post_id" => $id)
-                        );
-                $q_relationships = "SELECT * FROM cms_term_relationships WHERE cms_post_id = ".$db->escape($id);
+                        "cms_post", array("status" => 0, "updated" => date("Y-m-d H:i:s"), "updatedby" => $user->username), array("cms_post_id" => $id)
+                );
+                $q_relationships = "SELECT * FROM cms_term_relationships WHERE cms_post_id = " . $db->escape($id);
                 $r_relationships = cdbutils::get_row($q_relationships);
                 if ($r_relationships != NULL) {
                     $rel_id = $r_relationships->cms_term_relationships_id;
                     $db->update(
-                            "cms_term_relationships",
-                            array("status" => 0, "updated" => date("Y-m-d H:i:s"),"updatedby" => $user->username), 
-                            array("cms_term_relationships_id"=>$rel_id)
-                            );
+                            "cms_term_relationships", array("status" => 0, "updated" => date("Y-m-d H:i:s"), "updatedby" => $user->username), array("cms_term_relationships_id" => $rel_id)
+                    );
                 }
             } catch (Exception $e) {
                 $err_code++;

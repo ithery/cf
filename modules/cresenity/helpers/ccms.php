@@ -879,8 +879,8 @@ class ccms {
             "info_title",
             "info_subtitle",
             "utilities_retrieve",
-            "color_scheme",
-            "theme_scheme",
+//            "color_scheme",
+//            "theme_scheme",
         );
         if (in_array($param, $param_allowed) == TRUE) {
             if ($view == "single") {
