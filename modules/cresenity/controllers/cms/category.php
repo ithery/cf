@@ -16,6 +16,8 @@ class Category_Controller extends CController {
         $app = CApp::instance();
         $db = CDatabase::instance();
         $user = $app->user();
+        $org_id = CF::org_id();
+//        $org_id = null;
         //$app->add_breadcrumb(clang::__("Category"), curl::base() . "cms/category");
         $app->title('Category');
 
@@ -30,6 +32,13 @@ class Category_Controller extends CController {
                 ->add_class("span5");
 
         $span->add_field()->set_label(clang::__("Category Type"))->add_control('category_type', 'select')->set_list($category_list)->add_class('large');
+        if ($org_id == null) {
+            $org_control = $span->add_field()
+                    ->set_label(clang::__("Org"))
+                    ->add_control('org_id', 'org-merchant-select')
+                    ->set_none(false)
+                    ->add_validation('required');
+        }
         
         $actions = $form->add_action_list()->set_style('form-action');
         $actions->add_class('submit-form');
@@ -37,7 +46,9 @@ class Category_Controller extends CController {
 
         $form->set_ajax_submit(true)->set_ajax_submit_target('table-container')
                 ->set_action(curl::base() . "cms/category/table");
-        $form->add_listener('ready')->add_handler('submit');
+        if ($org_id != null) {
+            $form->add_listener('ready')->add_handler('submit');
+        }
 
         $app->add_div('table-container');
 
@@ -49,25 +60,51 @@ class Category_Controller extends CController {
         $db = CDatabase::instance();
         $org = $app->org();
         $user = $app->user();
+        $org_id = CF::org_id();
+//        $org_id  = null;
+        
+        $err_code = 0;
+        $err_message = "";
 
         $request = array_merge($_GET, $_POST);
         $category_type = carr::get($request, 'category_type');
+        $org_id_post = '';
+        $org_code = '';
+        if ($org_id == null) {
+            $org_id_post = carr::get($request, 'org_id');
+            if (strlen($org_id_post) == 0) {
+                $err_code++;
+                $err_message = clang::__('org') . ' is required!';
+            }
+            if ($err_code == 0) {
+                $org_code = cdbutils::get_value("SELECT code FROM org WHERE org_id=".$db->escape($org_id_post) . " AND status > 0");
+                $org_code = ' of '.$org_code;
+            }
+        }
 
         $app->title(clang::__("Category Type List"));
         $tree = CTreeDB::factory('cms_category')->add_filter('category_type', $category_type);
+        if (strlen($org_id_post) > 0) {
+            $tree->set_org_id($org_id_post);
+        }
+        $widget = $app->add_widget()->set_title(clang::__("Category Type") . $org_code);
+        
+        if ($err_code == 0) {
+            $nestable = $widget->add_nestable();
+            $widget->clear_both();
+            $nestable->set_data_from_treedb($tree)->set_id_key('cms_category_id')->set_value_key('name')->set_input('data_order');
+            $nestable->set_applyjs(false);
+            $nestable->set_action_style('btn-dropdown');
 
-        $widget = $app->add_widget()->set_title(clang::__("Category Type"));
-        $nestable = $widget->add_nestable();
-        $widget->clear_both();
-        $nestable->set_data_from_treedb($tree)->set_id_key('cms_category_id')->set_value_key('name')->set_input('data_order');
-        $nestable->set_applyjs(false);
-        $nestable->set_action_style('btn-dropdown');
-
-        $actedit = $nestable->add_row_action('edit');
-        $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . "cms/category/edit/{param1}")->set_label(" " . clang::__("Edit") . " " . clang::__("Product Category"));
-        $actedit = $nestable->add_row_action('delete');
-        $actedit->set_label("")->set_icon("trash")->set_link(curl::base() . "cms/category/delete/{param1}")->set_confirm(true)->set_label(" " . clang::__("Delete") . " " . clang::__("Product Category"));
-
+            $actedit = $nestable->add_row_action('edit');
+            $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . "cms/category/edit/{param1}")->set_label(" " . clang::__("Edit") . " " . clang::__("Product Category"));
+            $actedit = $nestable->add_row_action('delete');
+            $actedit->set_label("")->set_icon("trash")->set_link(curl::base() . "cms/category/delete/{param1}")->set_confirm(true)->set_label(" " . clang::__("Delete") . " " . clang::__("Product Category"));
+        }
+        else {
+            cmsg::add('error', $err_message);
+        }
+        
         echo $app->render();
     }
 
@@ -80,6 +117,7 @@ class Category_Controller extends CController {
         $db = CDatabase::instance();
         $user = $app->user();
         $org_id = CF::org_id();
+//        $org_id = null;
         
         $err_code = 0;
         $err_message = '';
@@ -310,7 +348,6 @@ class Category_Controller extends CController {
             }
             //$product_category = array('' => 'NONE') + $product_category;
 
-
             $parent_name = cdbutils::get_value('select name from cms_category where status > 0 and cms_category_id = ' . $db->escape($parent_id) . ' ');
             $span->add_control('parent_id', 'hidden')->set_value($parent_id);
             $span
@@ -356,10 +393,7 @@ class Category_Controller extends CController {
                         ->add_param_input(array('category_type', 'parent_id'));
             }
         }
-        $org_id = null;
-        if ($org_id == null) {
-            $span->add_field()->set_label("<span style='color:red;'>*</span> ". clang::__("Org"))->add_control('org_id', 'org-merchant-select')->set_value($org_id)->add_validation('required');
-        }
+        
         $span->add_field()
                 ->set_label("<span style='color:red;'>*</span> " . clang::__("Category Name"))
                 ->add_control("name", "text")
@@ -367,6 +401,10 @@ class Category_Controller extends CController {
                 ->set_value($name);
 
         if ($is_insert) {
+            if ($org_id == null) {
+                $org_control = $span->add_field()->set_label("<span style='color:red;'>*</span> ". clang::__("Org"))->add_control('org_id', 'org-merchant-select')->add_validation('required');
+            }
+            
             $span
                     ->add_field()
                     ->set_label(clang::__("Url Key"))
@@ -383,6 +421,23 @@ class Category_Controller extends CController {
 
 
         } else {
+            if ($org_id == null) {
+                $org_control_display = $span->add_field()->set_label("<span style='color:red;'>*</span> ". clang::__("Org"))->add_control('org_name', 'text');
+                $org_control = $span->add_control('org_id', 'hidden');
+                $org_name = '';
+                if (strlen($id) > 0) {
+                    $q = "SELECT  o.code org_code, o.name org_name, c.* FROM cms_category c LEFT JOIN org o ON o.org_id = c.org_id WHERE c.cms_category_id =" . $db->escape($id);
+                    $row = cdbutils::get_row($q);
+                    if ($row != NULL) {
+                        $org_id = cobj::get($row, 'org_id');
+                        $org_name = cobj::get($row, 'org_name');
+                        $org_control_display->set_readonly(true);
+                    }
+                }
+                $org_control->set_value($org_id);
+                $org_control_display->set_value($org_name);
+            }
+            
             $span
                     ->add_field()
                     ->set_label('<span style="color: red;">*</span> ' . clang::__("Image"))

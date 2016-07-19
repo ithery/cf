@@ -22,6 +22,7 @@ class Post_Controller extends CController {
         $post = ccms::post();
 
         $q = "SELECT
+                o.code org_code,
                 tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
                 tc.name as category_name,
                 p.*
@@ -30,6 +31,7 @@ class Post_Controller extends CController {
                LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
                LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
                LEFT JOIN cms_category tc ON tc.cms_category_id=p.cms_category_id
+               LEFT JOIN org o ON o.org_id = p.org_id
                WHERE p.status > 0 
                AND p.post_type <> 'page' and p.post_type <> 'nav_menu_item'";
 
@@ -37,6 +39,9 @@ class Post_Controller extends CController {
             $q.= "and p.org_id = " . $db->escape($org_id) ;
         }
         $table = $app->add_table('post')->set_quick_search(true);
+        if ($org_id == null) {
+            $table->add_column('org_code')->set_label(clang::__("Org"));
+        }
         $table->add_column('post_type')->set_label(clang::__("Type"))->add_transform('uppercase');
         $table->add_column('post_title')->set_label(clang::__("Title"));
         $table->add_column('category_name')->set_label(clang::__("Category"));
@@ -164,6 +169,7 @@ class Post_Controller extends CController {
             $post_type = carr::get($post, 'post_type');
             $post_status = carr::get($post, 'post_status');
             $cms_terms_id = null;
+            
             
             // condition if user login org_id = null
             $org_post = carr::get($post, 'org_id');
@@ -461,7 +467,13 @@ class Post_Controller extends CController {
 
         // DIV LEFT
         if ($org_id == null) {
-            $widget_left->add_field()->set_label(clang::__("Org").' <red>*</red>')->add_control('org_id', 'org-merchant-select')->set_value($org_id)->add_validation('required');
+            $org_control = $widget_left->add_field()->set_label(clang::__("Org").' <red>*</red>')->add_control('org_id', 'org-merchant-select')
+                    ->add_validation('required');
+            if (strlen($id) > 0) {
+                $page = ccms::page($id);
+                $org_id = cobj::get($page, 'org_id');
+            }
+            $org_control->set_value($org_id);
         }
         
         $post_type_control = $widget_left->add_field()->set_label(clang::__("Post Type"))->add_control('post_type', 'select')->set_list($post_type_list)->set_value($post_type);
