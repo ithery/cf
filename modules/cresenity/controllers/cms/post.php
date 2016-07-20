@@ -380,6 +380,7 @@ class Post_Controller extends CController {
                     $field_name = carr::get($v,'name');
                     $field_rules = carr::get($v,'rules');
                     $field_value = carr::get($post,'custom_field_'.$k);
+                    
                     switch($field_type) {
                         case 'image':
                             
@@ -410,7 +411,35 @@ class Post_Controller extends CController {
                                 }
                             }
                             
-                        break;
+                            break;
+                        case 'file':
+                            $resource = CResources::factory('pdf', 'custom-field-pdf-'.$k,$org_code);
+                            $fileurl = null;
+                            $filename = null;
+                            $file_name_generated = '';
+                            if(isset($_FILES['custom_field_'.$k])&&$_FILES['custom_field_'.$k]!=null&&isset($_FILES['custom_field_'.$k]['tmp_name'])&&$_FILES['custom_field_'.$k]['tmp_name']!=null) {
+                                $filename = $_FILES['custom_field_'.$k]['name'];
+                                $content = file_get_contents($_FILES['custom_field_'.$k]['tmp_name']);
+                                $file_name_generated = $resource->save($filename, $content);
+                                $fileurl = $resource->get_url($file_name_generated);
+                            }
+                            $field_value = array(
+                                'filename'=>$filename,
+                                'download_url'=>$fileurl,
+                            );
+                            
+//                            if (strlen($id) == 0) {
+//                                if ($field_rules != null) {
+//                                    $image_required = carr::get($field_rules, 'required');
+//                                    if ($image_required) {
+//                                        if (strlen($filename) == 0) {
+//                                            $err_code++;
+//                                            $err_message = clang::__($field_name).' '.clang::__('is required');
+//                                        }
+//                                    }
+//                                }
+//                            }
+                            break;
                         default:
                             $field_value = carr::get($post,'custom_field_'.$k);
                         break;

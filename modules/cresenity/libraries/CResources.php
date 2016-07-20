@@ -69,7 +69,7 @@
             }
             $temp.=$filename;
             $dir = CF::get_dir('resources');
-
+            
             $temp_path = str_replace(DS, "/", $dir) . "" . $temp;
             return $temp_path;
         }

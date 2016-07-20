@@ -100,6 +100,12 @@ class ccms {
                 }
                 $field_value = json_encode($field_value);
                 break;
+            case 'file':
+                if(strlen(carr::get($field_value,'filename'))==0) {
+                    $need_update = false;
+                }
+                $field_value = json_encode($field_value);
+                break;
         }
         $data = array(
             'field_name' => $field_name,
@@ -130,6 +136,9 @@ class ccms {
         $value = $field_value;
         switch ($field_type) {
             case 'image':
+                $value = json_decode($field_value, true);
+                break;
+            case 'file':
                 $value = json_decode($field_value, true);
                 break;
             default:
