@@ -81,6 +81,7 @@ class Post_Controller extends CController {
         $app = CApp::instance();
         $db = CDatabase::instance();
         $org_id = CF::org_id();
+//        $org_id = null;
         $user = $app->user();
         
 
@@ -498,11 +499,12 @@ class Post_Controller extends CController {
         if ($org_id == null) {
             $org_control = $widget_left->add_field()->set_label(clang::__("Org").' <red>*</red>')->add_control('org_id', 'org-merchant-select')
                     ->add_validation('required');
+            $org_id_selected = $org_id;		
             if (strlen($id) > 0) {
                 $page = ccms::page($id);
-                $org_id = cobj::get($page, 'org_id');
+                $org_id_selected = cobj::get($page, 'org_id');
             }
-            $org_control->set_value($org_id);
+            $org_control->set_value($org_id_selected);
         }
         
         $post_type_control = $widget_left->add_field()->set_label(clang::__("Post Type"))->add_control('post_type', 'select')->set_list($post_type_list)->set_value($post_type);
@@ -516,8 +518,19 @@ class Post_Controller extends CController {
                 ->set_url(curl::base() . 'cms/post/load_template/' . $id)->add_param_input(array('post_type'));
         $post_type_control->add_listener('ready')->add_handler('reload')->set_target('category-container')
                 ->set_url(curl::base() . 'cms/post/load_category/' . $id)->add_param_input(array('post_type'));
-        $post_type_control->add_listener('change')->add_handler('reload')->set_target('category-container')
-                ->set_url(curl::base() . 'cms/post/load_category/' . $id)->add_param_input(array('post_type'));
+        $change_post_type_control = $post_type_control->add_listener('change')->add_handler('reload')->set_target('category-container')
+                ->set_url(curl::base() . 'cms/post/load_category/' . $id);
+        $post_type_param = array('post_type');
+        if ($org_id == null) {
+            $post_type_param[] = 'org_id';
+            $org_control->add_listener('change')->add_handler('reload')->set_target('category-container')
+                ->set_url(curl::base() . 'cms/post/load_category/' . $id)->add_param_input(array('post_type', 'org_id'));
+            if (strlen($id) > 0) {
+                $org_control->add_listener('ready')->add_handler('reload')->set_target('category-container')
+                    ->set_url(curl::base() . 'cms/post/load_category/' . $id)->add_param_input(array('post_type', 'org_id'));
+            }
+        }
+        $change_post_type_control->add_param_input($post_type_param);
 
         $widget_left->add_field()->set_label(clang::__("Post Title"))->add_control('post_title', 'text')->set_value($post_title);
         //$widget_left->add_field()->set_label(clang::__("Url"))->add_control('post_name', 'text')->set_value($post_name)->set_placeholder("Auto");
@@ -595,6 +608,9 @@ class Post_Controller extends CController {
     public function load_category($id = "") {
         $app = CApp::instance();
         $db = CDatabase::instance();
+        $org_id = CF::org_id();
+//        $org_id = null;
+        
         $current_value = '';
         if(strlen($id)>0) {
             $row = cdbutils::get_row('select cms_category_id from cms_post where cms_post_id='.$db->escape($id));
@@ -608,10 +624,14 @@ class Post_Controller extends CController {
         $post_type_data = ccms::get_post_type_data($post_type);
         $category_type = carr::get($post_type_data,'category_type');
         
+        if ($org_id == null) {
+            $org_id = carr::get($request, 'org_id');
+        }
         
         
         $options = array(
             'category_type'=>$category_type,
+            'org_id'=>$org_id,
         );
         $category_list = ccms::get_category_list($options);
         $app->add_field()->set_label(clang::__("Category"))->add_control('cms_category_id', 'select')->set_value($current_value)->set_list($category_list)->add_class('large');

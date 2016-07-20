@@ -351,6 +351,7 @@ class ccms {
         $db = CDatabase::instance();
 
         $category_type=carr::get($options,'category_type');
+        $org_id=carr::get($options,'org_id');
         if($category_type===null) $category_type = array();
         if(!is_array($category_type)) $category_type = array($category_type);
         $parent_id=carr::get($options,'parent_id');
@@ -363,6 +364,9 @@ class ccms {
             $treedb = CTreeDB::factory('cms_category');
             if(strlen($cat_type)>0&&$cat_type!="ALL") {
                 $treedb->add_filter('category_type', $cat_type);
+            }
+            if (strlen($org_id) > 0) {
+                $treedb->set_org_id($org_id);
             }
             
             $list = $treedb->get_list("&nbsp;&nbsp;&nbsp;&nbsp;");

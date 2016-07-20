@@ -17,7 +17,6 @@ class Category_Controller extends CController {
         $db = CDatabase::instance();
         $user = $app->user();
         $org_id = CF::org_id();
-//        $org_id = null;
         //$app->add_breadcrumb(clang::__("Category"), curl::base() . "cms/category");
         $app->title('Category');
 
