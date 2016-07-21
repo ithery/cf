@@ -139,7 +139,7 @@ class CNestable extends CElement {
                     $this->row_action_list->add_class("pull-right");
                     if ($this->action_style == "btn-dropdown") {
                         $this->row_action_list->add_class("pull-right");
-                        if ($this->bootstrap == '3') {
+                        if ($this->bootstrap >= '3.3') {
                             $this->row_action_list->add_btn_dropdown_class("btn-xs btn-primary");
                         }
                     }

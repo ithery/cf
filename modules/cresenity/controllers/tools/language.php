@@ -137,62 +137,147 @@
             echo $app->render();
         }
 
+        public function manual() {
+            $app = CApp::instance();
+
+            $container = $app->add_div();
+            $form = $container->add_form();
+
+            $language = 'en';
+            $list = clang::get_lang_list();
+
+            $select = $form->add_field()->set_label('Language')->add_control('language', 'select')
+                            ->set_list($list)->set_value($language);
+            $select->add_listener('change')->add_handler('reload')->set_target('lang-wrapper')
+                    ->add_param_input(array('language'))
+                    ->set_url(curl::base() . 'tools/language/load_language');
+            $select->add_listener('ready')->add_handler('reload')->set_target('lang-wrapper')
+                    ->add_param_input(array('language'))
+                    ->set_url(curl::base() . 'tools/language/load_language');
+
+
+            $this->process_manual(false, $form);
+
+
+            echo $app->render();
+        }
+
+        public function process_manual($render = true, $container = null) {
+            $app = CApp::instance();
+
+            if ($container != null) {
+                if ($render == false) {
+                    $app = $container;
+                }
+            }
+
+            $key = '';
+            $value = '';
+            $language = 'en';
+            $err_code = 0;
+            $err_message = '';
+            $request = $_GET;
+            if (isset($request['key'])) {
+                $key = carr::get($request, 'key');
+                $language = carr::get($request, 'language');
+                $value = carr::get($request, 'value');
+                if ($err_code == 0) {
+                    if (strlen($key) == 0) {
+                        $err_code++;
+                        $err_message = 'Key is required';
+                    }
+                }
+                if ($err_code == 0) {
+                    if (strlen($value) == 0) {
+                        $err_code++;
+                        $err_message = 'Value is required';
+                    }
+                }
+                if ($err_code == 0) {
+                    $file = clang::get_file($language);
+                    if ($file == null) {
+                        $file = clang::get_dir($language) . $language . '.php';
+                    }
+
+                    $languages = include $file;
+                    $languages[$key] = $value;
+                    cphp::save_value($languages, $file);
+                    
+                    $key = '';
+                    $value = '';
+                }
+            }
+
+
+            $reload_form = $app->add_div('reload-form-lang');
+            $reload_form->add_field()->set_label('Key')->add_control('key', 'text')->set_value($key);
+            $reload_form->add_field()->set_label('Value')->add_control('value', 'text')->set_value($value);
+            $btn_save = $reload_form->add_field()->add_action()->set_label('Save')->add_class('btn-primary');
+            $btn_save->add_listener('click')->add_handler('reload')
+                    ->set_target('reload-form-lang')->add_param_input(array('key', 'value', 'language'))
+                    ->set_url(curl::base() . 'tools/language/process_manual');
+
+            if ($render) {
+                echo $app->render();
+            }
+        }
+
         public function grab_lang() {
             $app = CApp::instance();
 
             $app_path = APPPATH;
 
             $dirs = array();
-            $files = glob($app_path .'*');
-            foreach($files as $file) {
+            $files = glob($app_path . '*');
+            foreach ($files as $file) {
                 if (is_dir($file)) {
                     $name = str_replace($app_path, '', $file);
                     $dirs[$name] = $name;
                 }
             }
-            
+
             $form = $app->add_form();
             $form->add_field()->set_label('Set Application')
                     ->add_control('application', 'select')->set_list($dirs);
             $form->add_action_list()->add_action()
                     ->set_label('Show')->add_class('btn-primary')->add_listener('click')->add_handler('reload')
-                    ->set_url(curl::base() .'tools/language/load_lang_list')
+                    ->set_url(curl::base() . 'tools/language/load_lang_list')
                     ->set_target('lang-container')->add_param_input(array('application'));
-            
+
             $app->add_div('lang-container');
             echo $app->render();
         }
-        
-        public function load_lang_list(){
+
+        public function load_lang_list() {
             $app = CApp::instance();
-            
+
             $request = $_GET;
             $err_code = 0;
             $err_message = '';
-            
+
             $application = carr::get($request, 'application');
             if (strlen($application) == 0) {
                 $err_code++;
                 $err_message = clang::__('Application invalid');
             }
-            $app_path = APPPATH .$application;
+            $app_path = APPPATH . $application;
             if (!is_dir($app_path)) {
                 $err_code++;
                 $err_message = clang::__('Application not found');
             }
-            
+
             if ($err_code == 0) {
                 $widget = $app->add_widget()->set_title(clang::__('List of Language'));
                 $files = array();
                 $ignore_dirs = array('.git', '.gitignore', 'logs', 'resources', 'media', 'nbproject');
                 cfs::list_files_in_dir($app_path, $files, $ignore_dirs);
-                
+
                 foreach ($files as $key => $file) {
                     $content = @file_get_contents($file);
                     if ($content != false) {
                         $langs = array();
                         preg_match_all('#clang::__\((.+?)\)#ims', $content, $langs, PREG_SET_ORDER);
-                        
+
                         $have_lang = false;
                         if (count($langs) > 0) {
                             $have_lang = true;
@@ -217,26 +302,26 @@
                                 if ($suffix == '"' || $suffix == "'") {
                                     $def_lang = substr($def_lang, 0, strlen($def_lang) - 1);
                                 }
-                                
+
                                 $prefix = substr($def_lang, 0, 1);
                                 $suffix = substr($def_lang, strlen($def_lang) - 1, 1);
                                 $messages = array();
                                 if ($prefix == ' ' || $suffix == ' ') {
                                     $messages[] = '<span class="label label-danger">WHITESPACE</span>';
                                 }
-                                
+
                                 preg_match('#\$.*\s?#ims', $def_lang, $php_var);
                                 if (count($php_var) > 0) {
                                     $messages[] = '<span class="label label-danger">PHPVAR</span>';
                                 }
-                                
+
                                 preg_match('#<.+?>?#ims', $def_lang, $html_tag);
                                 if (count($html_tag) > 0) {
                                     $messages[] = '<span class="label label-danger">HTMLTAG</span>';
                                 }
-                                
+
                                 $row = CTableRow::factory();
-                                
+
                                 $div = CFactory::create_div()->add(htmlspecialchars($def_lang));
                                 $row->add_column($div);
                                 $div = CFactory::create_div()->add(implode(' ', $messages));
@@ -250,8 +335,8 @@
                     }
                 }
             }
-            
-            
+
+
             echo $app->render();
         }
 
