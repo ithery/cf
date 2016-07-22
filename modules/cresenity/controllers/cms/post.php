@@ -14,7 +14,157 @@ class Post_Controller extends CController {
         parent::__construct();
     }
 
-    public function index() {
+    public function index(){
+        $app = CApp::instance();
+        $app->title(clang::__('Post List'));
+        $org_id = CF::org_id();
+        $org_id = null;
+        
+        $post_type_list = ccms::get_post_type_list();
+        
+        $widget = $app->add_widget();
+        $widget->set_title(clang::__('Post List'))->set_icon('filter');
+        $form = $widget->add_form();
+        $span = $form->add_div()
+                ->add_class("row-fluid")
+                ->add_div()
+                ->add_class("span5");
+
+        $span->add_field()->set_label(clang::__("Post Type"))->add_control('post_type', 'select')->set_list($post_type_list)->add_class('large');
+        if ($org_id == null) {
+            $org_control = $span->add_field()
+                    ->set_label(clang::__("Org"))
+                    ->add_control('org_id', 'org-merchant-select')
+                    ->set_none(false)
+                    ->add_validation('required');
+        }
+        
+        $actions = $form->add_action_list()->set_style('form-action');
+        $actions->add_class('submit-form');
+        $actions->add_action()->set_label(clang::__("Show"))->set_submit(true)->set_confirm(false);
+
+        $form->set_ajax_submit(true)->set_ajax_submit_target('table-container')
+                ->set_action(curl::base() . self::__CONTROLLER. "table");
+        if ($org_id != null) {
+            $form->add_listener('ready')->add_handler('submit');
+        }
+
+        $app->add_div('table-container');
+        
+        echo $app->render();
+    }
+    
+    public function table() {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $org = $app->org();
+        $user = $app->user();
+        $org_id = CF::org_id();
+        $org_id = null;
+        
+        $err_code = 0;
+        $err_message = "";
+
+        $request = array_merge($_GET, $_POST);
+        $post_type = carr::get($request, 'post_type');
+//        $org_id_post = '';
+        $org_code = '';
+        if ($org_id == null) {
+            $org_id = carr::get($request, 'org_id');
+            if (strlen($org_id) == 0) {
+                $err_code++;
+                $err_message = clang::__('org') . ' is required!';
+            }
+            if ($err_code == 0) {
+                $org_code = cdbutils::get_value("SELECT code FROM org WHERE org_id=".$db->escape($org_id) . " AND status > 0");
+                $org_code = ' of '.$org_code;
+            }
+        }
+        
+        if (strlen($post_type) == 0) {
+            $err_code++;
+            $err_message = 'post type is required!';
+        }
+        
+        if ($err_code == 0) {
+            $q = "SELECT
+                    o.code org_code,
+                    tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
+                    tc.name as category_name,
+                    p.*
+                   FROM cms_post p
+                   LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
+                   LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
+                   LEFT JOIN cms_terms t ON t.cms_terms_id=tt.cms_terms_id
+                   LEFT JOIN cms_category tc ON tc.cms_category_id=p.cms_category_id
+                   LEFT JOIN org o ON o.org_id = p.org_id
+                   WHERE p.status > 0 
+                   AND p.post_type <> 'page' and p.post_type <> 'nav_menu_item'";
+
+            if(strlen($org_id)>0&&$org_id!=0) {
+                $q.= "and p.org_id = " . $db->escape($org_id) ;
+            }
+            
+            if (strlen($post_type) > 0) {
+                $q.= "and p.post_type = " . $db->escape($post_type) ;
+            }
+            
+            $table_grid = array();
+            $post_type_detail = ccms::get_post_type_data($post_type);
+            $post_type_option = carr::get($post_type_detail, 'option');
+            if (count($post_type_option) > 0) {
+                $table_grid = carr::get($post_type_option, 'table_grid');
+            }
+            
+            $table = $app->add_table('post')
+                    ->set_title(clang::__("Post List") . $org_code)
+                    ->set_quick_search(true);
+//            if ($org_id == null) {
+//                $table->add_column('org_code')->set_label(clang::__("Org"));
+//            }
+            if (count($table_grid) > 0 ){
+                foreach ($table_grid as $table_grid_k => $table_grid_v) {
+                    $grid_label = carr::get($table_grid_v, 'label');
+                    $grid_transform = carr::get($table_grid_v, 'transform');
+                    $grid = $table->add_column($table_grid_k)->set_label(clang::__($grid_label));
+                    if (strlen($grid_transform) > 0) {
+                        $grid->add_transform($grid_transform);
+                    }
+                    
+                }
+            }
+//            $table->add_column('post_type')->set_label(clang::__("Type"))->add_transform('uppercase');
+//            $table->add_column('post_title')->set_label(clang::__("Title"));
+//            $table->add_column('category_name')->set_label(clang::__("Category"));
+//            $table->add_column('post_status')->set_label(clang::__("Status"));
+//            $table->add_column('post_name')->set_label(clang::__("Url"));
+//            $table->add_column('updated')->set_label(clang::__("Updated"))->add_transform('format_datetime');
+//            $table->add_column('updatedby')->set_label(clang::__("Updated By"));
+            $table->set_data_from_query($q)->set_key('cms_post_id');
+//            $table->set_title(clang::__("Post"));
+            $table->set_ajax(true);
+
+            if (cnav::have_permission('edit_post')) {
+                $actedit = $table->add_row_action('edit');
+                $actedit->set_label("")->set_icon("pencil")->set_link(curl::base() . self::__CONTROLLER . "edit/{cms_post_id}")->set_label(clang::__('Edit'));
+            }
+
+            if (cnav::have_permission('delete_post')) {
+                $actdelete = $table->add_row_action('delete');
+                $actdelete->set_label("")->set_icon("trash")->set_link(curl::base() . self::__CONTROLLER . "delete/{cms_post_id}")->set_confirm(true)->set_label(clang::__('Delete'));
+            }
+            $table->set_action_style("btn-dropdown");
+            
+            
+        }
+        else {
+            cmsg::add('error', $err_message);
+        }
+        
+        echo $app->render();
+    }
+    
+    public function indexa() {
         $app = CApp::instance();
         $org_id = CF::org_id();
         $app->title(clang::__("Post List"));
@@ -38,6 +188,7 @@ class Post_Controller extends CController {
         if(strlen($org_id)>0&&$org_id!=0) {
             $q.= "and p.org_id = " . $db->escape($org_id) ;
         }
+        
         $table = $app->add_table('post')->set_quick_search(true);
         if ($org_id == null) {
             $table->add_column('org_code')->set_label(clang::__("Org"));
