@@ -238,6 +238,12 @@ class ccms {
                             $control->set_imgsrc(carr::get($field_value, 'image_url'));
                         }
                         break;
+                    case 'file':
+                        if (strlen($post_id) > 0) {
+                            $field_value = self::get_custom_field($post_id, $k);
+                            $control->set_value(carr::get($field_value, 'filename'));
+                        }
+                        break;    
                     default:
                         $control = $control->set_value($default_value);
                         if (strlen($post_id) > 0) {
