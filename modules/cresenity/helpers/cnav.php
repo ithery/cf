@@ -192,15 +192,23 @@
             $controller = "";
             $method = "";
             $path = "";
+            $link = "";
 
             if (isset($nav["path"])) $path = $nav["path"];
             if (isset($nav["controller"])) $controller = $nav["controller"];
             if (isset($nav["method"])) $method = $nav["method"];
+            if (isset($nav["link"])) $link = $nav["link"];
 
-            if (strlen($path) > 0) $path.='/';
-            if (strlen($controller) == 0) return "";
-            if (strlen($method) == 0) return "";
-            $url = curl::base() . $path . $controller . "/" . $method;
+            if(strlen($link)>0) {
+                $url = $link;
+            } else {
+                if (strlen($path) > 0) $path.='/';
+                if (strlen($controller) == 0) return "";
+                if (strlen($method) == 0) return "";
+                $url = curl::base() . $path . $controller . "/" . $method;
+                
+            }
+            
 
             if (CApp::instance()->is_admin()) {
                 //$url =curl::base().'admin/'.$controller."/".$method; 
@@ -406,6 +414,10 @@
                         $elem.= "</a>\r\n";
                     }
                     else {
+                        $target = "";
+                        if (isset($d["target"]) && strlen($d["target"]) > 0) {
+                            $target = ' target="'.$target.'"';
+                        }
                         $elem = '<a class="' . $active_class . '" href="' . $url . '">' . $icon_html . '<span>' . clang::__($label) . "</span></a>\r\n";
                     }
                     $html.=$elem;
