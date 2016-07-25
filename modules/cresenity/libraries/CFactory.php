@@ -147,9 +147,7 @@ class CFactory {
 	public static function create_action_list($id = "") {
 		$actlist = CActionList::factory($id);
 		
-		if ($this instanceof CForm) {
-			$actlist->set_style('form-action');
-		}
+		
 		return $actlist;
 	}
 
