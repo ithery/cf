@@ -408,8 +408,13 @@ cresenity.func.js
 			var ds='<?php echo (ccfg::get('decimal_separator')==null?'.':ccfg::get('decimal_separator')); ?>';
 			var ts='<?php echo (ccfg::get('thousand_separator')==null?',':ccfg::get('thousand_separator')); ?>';
 			
+			var last3 = rp.substr(rp.length - 3);
+			var char_last3 = last3.charAt(0);
 			
-			rp = this.replace_all(rp,ts,'');
+			if(char_last3!=ts) {
+                            rp = this.replace_all(rp,ts,'');
+			}
+			
 			
 			
 			rp = rp.replace(ds, ".");

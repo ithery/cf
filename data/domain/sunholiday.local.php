@@ -7,5 +7,5 @@ return array(
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'sunholiday.local',
-	'shared_app_code'=> array('cmssunholiday'),
+	'shared_app_code'=>array('sunholidayshare'),
 );
