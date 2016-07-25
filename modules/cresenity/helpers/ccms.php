@@ -9,6 +9,7 @@
 class ccms {
 
     static $all_post_type = null;
+    static $all_options = null;
     static $all_theme = null;
 
     public static function get_template_data($options = null) {
@@ -302,6 +303,41 @@ class ccms {
         //$result = array('post' => 'Post');
         $result = array();
         foreach ($all_post_type as $k => $data) {
+            $value = carr::get($data, 'label');
+            $result[$k] = $value;
+        }
+
+        return $result;
+    }
+    
+    public static function get_options_data($option) {
+        $all_options = self::get_all_options();
+        return carr::get($all_options, $option);
+    }
+    
+    private static function get_all_options() {
+        if (self::$all_options === null) {
+            $dir = CF::get_dir('data/cms/options');
+            $files = cfs::list_files($dir);
+
+            if (is_array($files)) {
+                foreach ($files as $f) {
+                    $data = include $f;
+                    $key = carr::get($data, 'name');
+                    $value = carr::get($data, 'label');
+                    $result[$key] = $data;
+                }
+            }
+            self::$all_options = $result;
+        }
+        return self::$all_options;
+    }
+    
+    public static function get_options_list() {
+        $all_options = self::get_all_options();
+        
+        $result = array();
+        foreach ($all_options as $k => $data) {
             $value = carr::get($data, 'label');
             $result[$k] = $value;
         }

@@ -18,7 +18,7 @@ class Post_Controller extends CController {
         $app = CApp::instance();
         $app->title(clang::__('Post List'));
         $org_id = CF::org_id();
-        $org_id = null;
+//        $org_id = null;
         
         $post_type_list = ccms::get_post_type_list();
         
@@ -60,7 +60,7 @@ class Post_Controller extends CController {
         $org = $app->org();
         $user = $app->user();
         $org_id = CF::org_id();
-        $org_id = null;
+//        $org_id = null;
         
         $err_code = 0;
         $err_message = "";
@@ -164,7 +164,7 @@ class Post_Controller extends CController {
         echo $app->render();
     }
     
-    public function indexa() {
+    public function index_old() {
         $app = CApp::instance();
         $org_id = CF::org_id();
         $app->title(clang::__("Post List"));
@@ -659,6 +659,12 @@ class Post_Controller extends CController {
         }
         
         $post_type_control = $widget_left->add_field()->set_label(clang::__("Post Type"))->add_control('post_type', 'select')->set_list($post_type_list)->set_value($post_type);
+        
+        $post_type_control->add_listener('ready')->add_handler('reload')->set_target('post-field-container')
+                ->set_url(curl::base() . 'cms/post/load_post_field/' . $id)->add_param_input(array('post_type'));
+        $post_type_control->add_listener('change')->add_handler('reload')->set_target('post-field-container')
+                ->set_url(curl::base() . 'cms/post/load_post_field/' . $id)->add_param_input(array('post_type'));
+        
         $post_type_control->add_listener('ready')->add_handler('reload')->set_target('custom-field-container')
                 ->set_url(curl::base() . 'cms/post/load_custom_field/' . $id)->add_param_input(array('post_type'));
         $post_type_control->add_listener('change')->add_handler('reload')->set_target('custom-field-container')
@@ -694,10 +700,11 @@ class Post_Controller extends CController {
         $list_tag = cdbutils::get_array($q_list_tag);
 
 
-        //$tag_control = $widget_left->add_field()->set_label(clang::__("Tag"))->add_control('post_tag', 'select-tag');
+//        $tag_control = $widget_left->add_field()->set_label(clang::__("Tag"))->add_control('post_tag', 'select-tag');
         //$tag_control->set_value($cms_tag_value)->set_list($list_tag);
 
-        $widget_left->add_field()->set_label(clang::__("Post Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
+//        $widget_left->add_field()->set_label(clang::__("Post Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
+        $widget_left->add_div('post-field-container');
         $widget_left->add_div('custom-field-container');
         // DIV RIGHT
         $widget_right->add_div('template-container');
@@ -812,6 +819,37 @@ class Post_Controller extends CController {
 
 
 
+        echo $app->render();
+    }
+    
+    public function load_post_field($id = '') {
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $request = array_merge($_GET, $_POST);
+        $post_type = carr::get($request, 'post_type');
+        $data = ccms::get_post_type_data($post_type);
+        $post_option = carr::get($data, 'option');
+        $show_content = carr::get($post_option, 'show_content', false);
+//        $show_tag = carr::get($post_option, 'show_tag', false);
+        
+        $post_content = "";
+        
+        if (strlen($id) > 0) {
+            $q_post = "SELECT * FROM cms_post WHERE status > 0 AND cms_post_id = " . $db->escape($id);
+            $r_post = cdbutils::get_row($q_post);
+            if ($r_post != NULL) {
+                $post_content = $r_post->post_content;
+            }
+        }
+        
+//        if ($show_tag) {
+//            $app->add_field()->set_label(clang::__("Tag"))->add_control('post_tag', 'select-tag');
+//        }
+        
+        if ($show_content) {
+            $app->add_field()->set_label(clang::__("Post Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
+        }
+        
         echo $app->render();
     }
 
