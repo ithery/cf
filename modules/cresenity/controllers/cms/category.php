@@ -353,7 +353,6 @@ class Category_Controller extends CController {
                     ->add_field()
                     ->set_label(clang::__('Parent'))
                     ->add_control('parent_name', 'text')
-                    ->add_validation(null)
                     ->set_value($parent_name)
                     ->set_disabled(true)
             ;
@@ -374,11 +373,8 @@ class Category_Controller extends CController {
             $product_category_control->add_field()
                     ->set_label(clang::__("Parent"))
                     ->add_control("parent_id", "select")
-                    ->add_validation(null)
                     ->set_value($parent_id)
                     ->set_list($product_category);
-                    
-                    
 
             $product_type_control->add_listener('change')->add_handler('reload')
                     ->set_target('div_product_category_control')

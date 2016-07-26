@@ -781,7 +781,6 @@ class Post_Controller extends CController {
         $post_type = carr::get($request, 'post_type');
         $post_type_data = ccms::get_post_type_data($post_type);
         $category_type = carr::get($post_type_data,'category_type');
-        
         if ($org_id == null) {
             $org_id = carr::get($request, 'org_id');
         }
@@ -792,6 +791,7 @@ class Post_Controller extends CController {
             'org_id'=>$org_id,
         );
         $category_list = ccms::get_category_list($options);
+        
         $app->add_field()->set_label(clang::__("Category"))->add_control('cms_category_id', 'select')->set_value($current_value)->set_list($category_list)->add_class('large');
         echo $app->render();
         
