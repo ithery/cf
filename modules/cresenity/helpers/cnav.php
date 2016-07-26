@@ -156,8 +156,11 @@
                 if (isset($d["subnav"]) && is_array($d["subnav"])) {
                     $subnav = cnav::as_user_rights_array($app_id, $role_id, $d["subnav"], $app_role_id, $domain, $level + 1);
                 }
-                if (count($subnav) == 0 && (!isset($d["controller"]) || strlen($d["controller"]) == 0))
+                if (count($subnav) == 0 && (!isset($d["controller"]) || strlen($d["controller"]) == 0 )) {
+                    if(!isset($d["link"]) || strlen($d["link"]) == 0 ) {
                         continue;
+                    }
+                }
                 $result[] = $res;
                 $result = array_merge($result, $subnav);
             }
@@ -416,9 +419,9 @@
                     else {
                         $target = "";
                         if (isset($d["target"]) && strlen($d["target"]) > 0) {
-                            $target = ' target="'.$target.'"';
+                            $target = ' target="'.$d["target"].'"';
                         }
-                        $elem = '<a class="' . $active_class . '" href="' . $url . '">' . $icon_html . '<span>' . clang::__($label) . "</span></a>\r\n";
+                        $elem = '<a class="' . $active_class . '" href="' . $url . '"'.$target.'>' . $icon_html . '<span>' . clang::__($label) . "</span></a>\r\n";
                     }
                     $html.=$elem;
                     $html.=$child_html;
