@@ -86,12 +86,31 @@ class Post_Controller extends CController {
             $err_message = 'post type is required!';
         }
         
+        
         if ($err_code == 0) {
+            $custom_field_q = "";
+            
+            $table_grid = array();
+            $post_type_detail = ccms::get_post_type_data($post_type);
+            $post_type_option = carr::get($post_type_detail, 'option');
+            if (count($post_type_option) > 0) {
+                $table_grid = carr::get($post_type_option, 'table_grid');
+            }
+            if (count($table_grid) > 0 ){
+                foreach ($table_grid as $table_grid_k => $table_grid_v) {
+                    $grid_type = carr::get($table_grid_v, 'type');
+                    if (strlen($grid_type) > 0 && $grid_type == 'custom_field') {
+                        $custom_field_q .= ", (SELECT field_value FROM cms_custom_field WHERE cms_post_id=p.cms_post_id AND field_name=".$db->escape($table_grid_k)." LIMIT 1) ".$table_grid_k;
+                    }
+                }
+            }
+            
             $q = "SELECT
                     o.code org_code,
                     tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
                     tc.name as category_name,
                     p.*
+                    ".$custom_field_q."
                    FROM cms_post p
                    LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
                    LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
@@ -109,13 +128,6 @@ class Post_Controller extends CController {
                 $q.= "and p.post_type = " . $db->escape($post_type) ;
             }
             
-            $table_grid = array();
-            $post_type_detail = ccms::get_post_type_data($post_type);
-            $post_type_option = carr::get($post_type_detail, 'option');
-            if (count($post_type_option) > 0) {
-                $table_grid = carr::get($post_type_option, 'table_grid');
-            }
-            
             $table = $app->add_table('post')
                     ->set_title(clang::__("Post List") . $org_code)
                     ->set_quick_search(true);
@@ -126,22 +138,26 @@ class Post_Controller extends CController {
                 foreach ($table_grid as $table_grid_k => $table_grid_v) {
                     $grid_label = carr::get($table_grid_v, 'label');
                     $grid_transform = carr::get($table_grid_v, 'transform');
+                    $grid_type = carr::get($table_grid_v, 'type');
+                    
                     $grid = $table->add_column($table_grid_k)->set_label(clang::__($grid_label));
                     if (strlen($grid_transform) > 0) {
                         $grid->add_transform($grid_transform);
                     }
-                    
                 }
+                
             }
-//            $table->add_column('post_type')->set_label(clang::__("Type"))->add_transform('uppercase');
-//            $table->add_column('post_title')->set_label(clang::__("Title"));
-//            $table->add_column('category_name')->set_label(clang::__("Category"));
-//            $table->add_column('post_status')->set_label(clang::__("Status"));
-//            $table->add_column('post_name')->set_label(clang::__("Url"));
-//            $table->add_column('updated')->set_label(clang::__("Updated"))->add_transform('format_datetime');
-//            $table->add_column('updatedby')->set_label(clang::__("Updated By"));
+            else {
+                $table->add_column('post_type')->set_label(clang::__("Type"))->add_transform('uppercase');
+                $table->add_column('post_title')->set_label(clang::__("Title"));
+                $table->add_column('category_name')->set_label(clang::__("Category"));
+                $table->add_column('post_status')->set_label(clang::__("Status"));
+                $table->add_column('post_name')->set_label(clang::__("Url"));
+                $table->add_column('updated')->set_label(clang::__("Updated"))->add_transform('format_datetime');
+                $table->add_column('updatedby')->set_label(clang::__("Updated By"));
+            }
+            
             $table->set_data_from_query($q)->set_key('cms_post_id');
-//            $table->set_title(clang::__("Post"));
             $table->set_ajax(true);
 
             if (cnav::have_permission('edit_post')) {
