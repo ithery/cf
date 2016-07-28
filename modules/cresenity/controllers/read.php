@@ -56,9 +56,12 @@ class Read_Controller extends CController {
         }
         $category = ccms::get_category($category_id);
         $category_type = $category->category_type;
-        $template = 'cms/category';
+        $theme = cms::get_option('theme');
+        $theme_name = carr::get($theme, 'name');
+        $theme_color = carr::get($theme, 'color');
+        $template = 'cms/' . $theme_name . '/category';
         if(strlen($category_type)>0&&$category_type!='default') {
-            $template = 'cms/category-'.$category_type;
+            $template = 'cms/' . $theme_name . '/category-'.$category_type;
         }
         $file = CF::get_file('template',$template);
         if($file===null) {
@@ -101,10 +104,13 @@ class Read_Controller extends CController {
         }
         $post = ccms::get_post($post_id);
         $template = $post->template;
+        $theme = cms::get_option('theme');
+        $theme_name = carr::get($theme, 'name');
+        $theme_color = carr::get($theme, 'color');
         if(strlen($template)>0) {
-            $template = 'cms/'.$template;
+            $template = 'cms/' . $theme_name . '/' . $template;
         } else {
-            $template = 'cms/post';
+            $template = 'cms/' . $theme_name . '/post';
 
         }
         $file = CF::get_file('template',$template);

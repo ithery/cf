@@ -2023,8 +2023,8 @@ $(document).ready(function(){
         closeOnClick: false
       };
       options = $.extend(defaults, options);
-      console.log('SIDENAV');
-      console.log(options);
+      // console.log('SIDENAV');
+      // console.log(options);
       $(this).each(function(){
         var $this = $(this);
         var menu_id = $("#"+ $this.attr('data-activates'));

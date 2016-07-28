@@ -15,7 +15,9 @@ nav ul a {
   position: fixed;
   right: 24px;
 }
-
+ul.ul-top-menu li {
+  list-style: none;
+}
 .swiper-container {
   width: 100%;
   height: 100%;
