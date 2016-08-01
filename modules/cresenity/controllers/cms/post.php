@@ -121,11 +121,11 @@ class Post_Controller extends CController {
                    AND p.post_type <> 'page' and p.post_type <> 'nav_menu_item'";
 
             if(strlen($org_id)>0&&$org_id!=0) {
-                $q.= "and p.org_id = " . $db->escape($org_id) ;
+                $q.= " and p.org_id = " . $db->escape($org_id) ;
             }
             
             if (strlen($post_type) > 0) {
-                $q.= "and p.post_type = " . $db->escape($post_type) ;
+                $q.= " and p.post_type = " . $db->escape($post_type) ;
             }
             
             $table = $app->add_table('post')
