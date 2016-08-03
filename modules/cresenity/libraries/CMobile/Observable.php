@@ -80,6 +80,21 @@ abstract class CMobile_Observable extends CRenderable {
         $this->wrapper->add($field);
         return $field;
     }
+    public function add_iframe($field_id = "") {
+        $field = CMobile_Element_Iframe::factory($field_id);
+        $this->wrapper->add($field);
+        return $field;
+    }
+    public function add_video($field_id = "") {
+        $field = CMobile_Element_Video::factory($field_id);
+        $this->wrapper->add($field);
+        return $field;
+    }
+    public function add_source($field_id = "") {
+        $field = CMobile_Element_Source::factory($field_id);
+        $this->wrapper->add($field);
+        return $field;
+    }
     public function add_message($field_id = "") {
         $field = CMobile_Element_Message::factory($field_id);
         $this->wrapper->add($field);
