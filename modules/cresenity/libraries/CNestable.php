@@ -189,7 +189,7 @@ class CNestable extends CElement {
 
         $js = new CStringBuilder();
         $js->set_indent($indent);
-        if (!$this->applyjs) {
+        if ($this->applyjs) {
             $js->appendln("
 			jQuery('#" . $this->id . "').nestable({
 				/* config options */
