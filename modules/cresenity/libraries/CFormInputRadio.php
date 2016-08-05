@@ -79,6 +79,10 @@
                     $label_class = 'control-label';
                 }
             }
+            $addition_attribute = "";
+            foreach ($this->attr as $k => $v) {
+                $addition_attribute.=" " . $k . '="' . $v . '"';
+            }
 
 
             if ($this->bootstrap >= '3') {
@@ -89,7 +93,7 @@
                 else {
                     $html->append('<label class="' . $label_class . ' ' . $classes . '" >');
                 }
-                $html->append('     <input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $checked . '>');
+                $html->append('     <input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" '.$addition_attribute.' value="' . $this->value . '"' . $disabled . $checked . '>');
                 if (strlen($this->label) > 0) {
                     if ($this->label_wrap) {
                         $html->appendln('<label for="' . $this->id . '" class="radio-label"><span></span>');
@@ -113,7 +117,7 @@
                     $html->append('<div class="switch">');
                 }
 
-                $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $checked . '>');
+                $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" '.$addition_attribute.' value="' . $this->value . '"' . $disabled . $checked . '>');
                 if (strlen($this->label) > 0) {
                     $html->appendln('&nbsp;' . $this->label);
                 }
