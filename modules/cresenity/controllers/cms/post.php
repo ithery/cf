@@ -274,6 +274,7 @@ class Post_Controller extends CController {
         $type = 'post';
         $template = "";
         $cms_tag_value = array();
+        $post_status_old = '';
         
         
         if (strlen($id) > 0) {
@@ -288,6 +289,8 @@ class Post_Controller extends CController {
                 $post_status = $r_post->post_status;
                 $post_type = $r_post->post_type;
                 $template = $r_post->template;
+                
+                $post_status_old = $post_status;
 
                 $q_val_tag = "select distinct tag from cms_post_tag where cms_post_id=" . $db->escape($id) . "  ";
                 if (strlen($org_id) > 0) {
@@ -459,6 +462,7 @@ class Post_Controller extends CController {
                         $data = array_merge($data_post, $default);
                         $insert_post = $db->insert("cms_post", $data);
                         $cms_post_id = $insert_post->insert_id();
+                        
 
                         // Jika ada cms_terms_id maka input juga ke cms_term_relationship sebagai penghubung antara post dan term melalui term_taxonomy
                         if (strlen($cms_terms_id) > 0 && is_numeric($cms_terms_id)) {
@@ -633,9 +637,25 @@ class Post_Controller extends CController {
             if ($err_code == 0) {
                 $db->commit();
                 if (strlen($id) > 0) {
+                    // After update post status
+                    if (strlen($post_status_old) > 0 && $post_status_old == 'draft') {
+                        $param = array(
+                                    'cms_post_id' => $id,
+                                    'post_type' => $post_type
+                                );
+                        CFEvent::run('cms_post_publish', $param);
+                    }
                     cmsg::add("success", "Update Success");
                     curl::redirect(self::__CONTROLLER);
                 } else {
+                    // After insert event
+                    if ($post_status == 'publish') {
+                        $param = array(
+                                    'cms_post_id' => $cms_post_id,
+                                    'post_type' => $post_type
+                                );
+                        CFEvent::run('cms_post_publish', $param);
+                    }
                     cmsg::add("success", "Save Success");
                     curl::redirect(self::__CONTROLLER . "add");
                 }
