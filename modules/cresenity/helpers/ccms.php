@@ -13,8 +13,20 @@ class ccms {
     static $all_theme = null;
 
     public static function get_template_data($options = null) {
+        $theme = CF::theme();
+        $theme_folder = '';
+        if (strlen($theme) > 0 && $theme != 'default') {
+            $theme_folder = $theme.'/';
+        }
+        
         $return = array();
-        $file = CF::get_file('data', 'cms/template');
+        $file = CF::get_file('data', 'cms/'.$theme_folder.'template');
+        if ($file == NULL) {
+            $file = CF::get_file('data', 'cms/default/template');
+            if ($file == NULL) {
+                $file = CF::get_file('data', 'cms/template');
+            }
+        }
         if ($file != null) {
             $return = include $file;
         }
@@ -22,8 +34,20 @@ class ccms {
     }
     
     public static function get_category_type_data($options=null) {
+        $theme = CF::theme();
+        $theme_folder = '';
+        if (strlen($theme) > 0 && $theme != 'default') {
+            $theme_folder = $theme.'/';
+        }
+        
         $return = array();
-        $file = CF::get_file('data', 'cms/category_type');
+        $file = CF::get_file('data', 'cms/'.$theme_folder.'category_type');
+        if ($file == NULL) {
+            $file = CF::get_file('data', 'cms/default/category_type');
+            if ($file == NULL) {
+                $file = CF::get_file('data', 'cms/category_type');
+            }
+        }
         if ($file != null) {
             $return = include $file;
         }
@@ -173,7 +197,6 @@ class ccms {
             $fields = carr::get($options, 'fields');
         }
 
-
         return $fields;
     }
 
@@ -258,12 +281,24 @@ class ccms {
     }
 
     public static function get_custom_field_data($custom_fields) {
+        $theme = CF::theme();
+        $theme_folder = '';
+        if (strlen($theme) > 0 && $theme != 'default') {
+            $theme_folder = $theme.'/';
+        }
+        
         if (!is_array($custom_fields)) {
             $custom_fields = array($custom_fields);
         }
         $data = array();
         foreach ($custom_fields as $val) {
-            $file = CF::get_file('data', 'cms/custom_field/' . $val);
+            $file = CF::get_file('data', 'cms/'.$theme_folder.'custom_field/' . $val);
+            if ($file == NULL) {
+                $file = CF::get_file('data', 'cms/default/custom_field/' . $val);
+                if ($file == NULL) {
+                    $file = CF::get_file('data', 'cms/custom_field/' . $val);
+                }
+            }
             $file_data = array();
             if (file_exists($file)) {
                 $file_data = include $file;
@@ -279,10 +314,21 @@ class ccms {
     }
 
     private static function get_all_post_type() {
+        $theme = CF::theme();
+        $theme_folder = '';
+        if (strlen($theme) > 0 && $theme != 'default') {
+            $theme_folder = $theme.'/';
+        }
+        
         if (self::$all_post_type === null) {
-            $dir = CF::get_dir('data/cms/post_type');
+            $dir = CF::get_dir('data/cms/'.$theme_folder.'post_type');
+            if ($dir == NULL) {
+                $dir = CF::get_dir('data/cms/default/post_type');
+                if ($dir == NULL) {
+                    $dir = CF::get_dir('data/cms/post_type');
+                }
+            }
             $files = cfs::list_files($dir);
-
             if (is_array($files)) {
                 foreach ($files as $f) {
                     $data = include $f;
@@ -316,8 +362,20 @@ class ccms {
     }
     
     private static function get_all_options() {
+        $theme = CF::theme();
+        $theme_folder = '';
+        if (strlen($theme) > 0 && $theme != 'default') {
+            $theme_folder = $theme.'/';
+        }
+        
         if (self::$all_options === null) {
-            $dir = CF::get_dir('data/cms/options');
+            $dir = CF::get_dir('data/cms/'.$theme_folder.'options');
+            if ($dir == NULL) {
+                $dir = CF::get_dir('data/cms/default/options');
+                if ($dir == NULL) {
+                    $dir = CF::get_dir('data/cms/options');
+                }
+            }
             $files = cfs::list_files($dir);
 
             if (is_array($files)) {

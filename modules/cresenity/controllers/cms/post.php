@@ -826,6 +826,7 @@ class Post_Controller extends CController {
             'category_type'=>$category_type,
             'org_id'=>$org_id,
         );
+        
         $category_list = ccms::get_category_list($options);
         
         $app->add_field()->set_label(clang::__("Category"))->add_control('cms_category_id', 'select')->set_value($current_value)->set_list($category_list)->add_class('large');
@@ -840,7 +841,6 @@ class Post_Controller extends CController {
         $post_type = carr::get($request, 'post_type');
         $data = ccms::get_post_type_data($post_type);
         $custom_fields = carr::get($data, 'custom_fields');
-        
         if($custom_fields==null) {
             $custom_fields = array();
         }
@@ -852,8 +852,6 @@ class Post_Controller extends CController {
             'prefix' => 'custom_field_',
         );
         ccms::generate_custom_field_input($options);
-
-
 
         echo $app->render();
     }
