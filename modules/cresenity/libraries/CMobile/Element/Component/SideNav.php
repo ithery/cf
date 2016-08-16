@@ -8,11 +8,13 @@ class CMobile_Element_Component_SideNav extends CMobile_Element_AbstractComponen
     protected $button = null;
     protected $container = null;
     protected $menu_list = null;
+    protected $manual;
     public function __construct($id = "") {
 
         parent::__construct($id);
         $this->tag = "div";
         $this->is_fixed = true;
+        $this->manual = false;
         // $this->button = CMobile_Element_Component_SideNav_Button::factory();
         // $this->button->set_sidenav_id($this->id);
         // $this->button = $this->before()->add($this->button);
@@ -26,6 +28,11 @@ class CMobile_Element_Component_SideNav extends CMobile_Element_AbstractComponen
     
     public function set_fixed($bool) {
         $this->is_fixed  = $bool;
+        return $this;
+    }
+
+    public function set_manual($manual) {
+        $this->manual  = $manual;
         return $this;
     }
     
@@ -56,7 +63,11 @@ class CMobile_Element_Component_SideNav extends CMobile_Element_AbstractComponen
     }
 
     public function js($indent = 0) {
-        $js = '$(".button-collapse").sideNav();';
+        $js = '';
+        if(!$this->manual) {
+            $js = '$(".button-collapse").sideNav();';
+
+        }
         $js.=parent::js();
         return $js;
     }
