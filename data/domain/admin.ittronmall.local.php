@@ -8,7 +8,7 @@ return array(
 	'store_code'=>NULL,
 	'domain'=>'admin.ittronmall.local',
         'theme' => 'minimalis',
-//        'shared_app_code'=>array(
-//            "lastmenitshare"
-//        ),
+        'shared_app_code'=>array(
+            "ittronmallshare"
+        ),
 );
