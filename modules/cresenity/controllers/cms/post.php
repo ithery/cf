@@ -341,6 +341,20 @@ class Post_Controller extends CController {
             $post_status = carr::get($post, 'post_status');
             $cms_terms_id = null;
             
+            // check if any max_post of post_type, condition if new post
+            if (strlen($id) == 0) {
+                $post_type_data = ccms::get_post_type_data($post_type);
+                $post_option = carr::get($post_type_data, 'option');
+                $max_post = carr::get($post_option, 'max_post');
+                if (strlen($max_post) > 0) {
+                    // check in db, count post
+                    $total = cdbutils::get_value("SELECT COUNT(*) as total FROM cms_post WHERE status > 0 AND post_type = " . $db->escape($post_type));
+                    if ($total >= $max_post) {
+                        $err_code++;
+                        $err_message = "Maximum post of ".$post_type. " is ".$max_post;
+                    }
+                }
+            }
             
             // condition if user login org_id = null
             $org_post = carr::get($post, 'org_id');
