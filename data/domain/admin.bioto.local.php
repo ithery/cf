@@ -1,6 +1,6 @@
 <?php 
 return array(
-	'app_id'=>'900',
+	'app_id'=>'600',
 	'app_code'=>'adminbioto',
 	'org_id'=>900002,
 	'org_code'=>'bioto',

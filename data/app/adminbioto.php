@@ -1,6 +1,6 @@
 <?php 
 return array(
-	'app_id'=>'900',
+	'app_id'=>'600',
 	'code'=>'adminbioto',
 	'name'=>'Admin Bioto',
 );

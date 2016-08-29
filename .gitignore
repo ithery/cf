@@ -13,3 +13,4 @@ temp/*
 export/
 upload/*
 Thumbs.db
+/data/*
