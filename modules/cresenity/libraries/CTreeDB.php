@@ -371,9 +371,13 @@
         public function get_children_data($id = null) {
             $db = $this->db;
             $q = "select * from " . $db->escape_table($this->table_name) . " where status>0 " . $this->filter_where();
-            if (strlen($this->org_id) > 0) {
+            if (strlen($this->org_id) > 0 && $this->org_id != 'ALL' && $this->org_id != 'NONE') {
                 $q.=" and org_id=" . $db->escape($this->org_id) . "";
             }
+            else if(strlen($this->org_id) > 0 && $this->org_id == 'NONE'){
+                $q.=" and org_id is null ";
+            }
+            
             $q.= " order by lft asc";
             if ($id != null) {
                 $qrgt = "select rgt from " . $db->escape_table($this->table_name) . " where " . $db->escape_column($this->pk_column) . " = " . $db->escape($id) . "";
