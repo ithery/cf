@@ -6,6 +6,9 @@ body {
   -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
   -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
 }
+.ios .nav-header {
+  margin-top: 20px;
+}
 nav ul a {
   padding: 0 5px;
 }
