@@ -423,6 +423,15 @@
                 "skins/_all-skins.min.css",
                 "iapp.min.css",
             )
-        )
+        ),
+        "swiper" => array(
+            "css" => array(
+                "materialize/swiper/swiper.min.css",
+            ),
+            "js" => array(
+                "materialize/swiper/swiper.jquery.js",
+            ),
+//            "requirements" => array("jquery-2.1.1"),
+        ),
     );
 ?>
