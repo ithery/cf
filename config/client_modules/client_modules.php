@@ -385,7 +385,7 @@
                 "plugins/slick/slick.css",
                 "plugins/slick/slick-theme.css",
             ),
-            "requirements" => array("jquery-2.1.1"),
+            "requirements" => array("jquery"),
         ),
         "icheck" => array(
             "js" => array(
@@ -424,14 +424,14 @@
                 "iapp.min.css",
             )
         ),
-        "swiper" => array(
-            "css" => array(
-                "materialize/swiper/swiper.min.css",
-            ),
-            "js" => array(
-                "materialize/swiper/swiper.jquery.js",
-            ),
-//            "requirements" => array("jquery-2.1.1"),
-        ),
+//        "swiper" => array(
+//            "css" => array(
+//                "materialize/swiper/swiper.min.css",
+//            ),
+//            "js" => array(
+//                "materialize/swiper/swiper.jquery.js",
+//            ),
+////            "requirements" => array("jquery-2.1.1"),
+//        ),
     );
 ?>
