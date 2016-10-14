@@ -368,7 +368,7 @@
             }
         }
 
-        protected function css() {
+        public function css() {
             return '<style>
                         @import url(http://fonts.googleapis.com/css?family=Oxygen:400,300);
                         
@@ -390,7 +390,7 @@
                             /*border: 1px solid #CCCCCC;*/
                             margin: 0px;
                             float: left; 
-                            min-height: 110px;
+                            height: 100px;
                             /*height: 80px; */
                             /*font-size: 4em;*/
                             font-size: 1.2em; 
@@ -407,6 +407,7 @@
                         #selectable li:hover {
                             cursor: pointer;
                             background-color: #f0f0f0;
+                            overflow: auto;
                         }
                         
                         #selectable li.left-over { border-left: none; }
