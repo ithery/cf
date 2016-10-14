@@ -16,7 +16,8 @@
             if ($domain == null) $domain = crouter::domain();
             if ($db == null) $db = CDatabase::instance($domain);
             $data = cdata::get($domain, "domain");
-            $this->org_id = CF::org_id();
+            //$this->org_id = CF::org_id();
+            $this->org_id = null;
 
             $pk_column = $table_name . "_id";
             if (strlen($prefix) > 0) {
