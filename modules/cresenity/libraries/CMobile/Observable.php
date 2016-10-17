@@ -32,6 +32,7 @@ abstract class CMobile_Observable extends CRenderable {
         $this->manager->register_control('search', 'CMobile_Element_Control_Input_Search');
         $this->manager->register_control('date', 'CMobile_Element_Control_Input_Date');
         $this->manager->register_control('time', 'CMobile_Element_Control_Input_Time');
+        $this->manager->register_control('file', 'CMobile_Element_Control_Input_File');
         $this->manager->register_control('textarea', 'CMobile_Element_Control_Textarea');
         $this->manager->register_control('select', 'CMobile_Element_Control_Select');
     }
@@ -151,7 +152,7 @@ abstract class CMobile_Observable extends CRenderable {
     }
 
     public function add_file($field_id = "") {
-        $field = CMobile_Element_Component_File::factory($field_id);
+        $field = CMobile_Element_Control_File::factory($field_id);
         $this->wrapper->add($field);
         return $field;
     }
