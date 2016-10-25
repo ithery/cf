@@ -82,7 +82,13 @@ abstract class CObservable extends CRenderable {
 
         return $control;
     }
-
+    
+    /**
+     * Add Form Field
+     *
+     * @param   string  field id
+     * @return  CFormField  Form Field
+     */
     public function add_field($field_id = "") {
         $field = CFormField::factory($field_id);
         $this->add($field);
