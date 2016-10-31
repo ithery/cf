@@ -1,13 +1,10 @@
 <?php 
 return array(
-	'app_id'=>'810',
-	'app_code'=>'ittronmall',
-	'org_id'=>'1',
+	'app_id'=>'800',
+	'app_code'=>'62hallfamily',
+	'org_id'=>'620028',
 	'org_code'=>'ittronmall',
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'ittronmall.local',
-        'shared_app_code'=>array(
-            "ittronmallshare"
-        ),
 );

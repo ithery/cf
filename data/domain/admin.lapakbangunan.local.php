@@ -1,8 +1,8 @@
 <?php 
 return array(
-	'app_id'=>'890',
-	'app_code'=>'admin62hallfamily',
-	'org_id'=>'620019',
+	'app_id'=>'710',
+	'app_code'=>'adminlapakbangunan',
+	'org_id'=>'710001',
 	'org_code'=>'lapakbangunan',
 	'store_id'=>NULL,
 	'store_code'=>NULL,
