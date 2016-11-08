@@ -175,7 +175,12 @@
             $this->action_before_submit = $action_before_submit;
             return $this;
         }
-
+        
+        public function set_auto_set_focus($bol){
+            $this->auto_set_focus=$bol;
+            return $this;
+        }
+        
         /**
          *
          * @param string $handler_name

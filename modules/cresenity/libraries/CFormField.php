@@ -186,7 +186,9 @@
                 }
                 else {
                     $html->dec_indent()->appendln('</div>')->inc_indent()->br();
+
                 }
+                $html->appendln('<div style="clear:both"></div>')->inc_indent()->br();
                 $html->dec_indent()->appendln('</div>');
             }
             /*

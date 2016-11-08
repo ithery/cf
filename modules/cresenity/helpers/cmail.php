@@ -141,12 +141,34 @@ class cmail {
 
     public static function send_smtp($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         $mail = CSMTP::factory();
-        $mail->set_username(ccfg::get('smtp_username'));
-        $mail->set_password(ccfg::get('smtp_password'));
-        $mail->set_host(ccfg::get('smtp_host'));
-        $mail->set_port(ccfg::get('smtp_port'));
+        $smtp_username=carr::get($options,'smtp_username');
+        $smtp_password=carr::get($options,'smtp_password');
+        $smtp_host=carr::get($options,'smtp_host');
+        $smtp_port=carr::get($options,'smtp_port');
+        $secure=carr::get($options,'smtp_secure');
+        if(!$smtp_username){
+            $smtp_username=ccfg::get('smtp_username');
+        }
+        if(!$smtp_password){
+            $smtp_password=ccfg::get('smtp_password');
+        }
+        if(!$smtp_host){
+            $smtp_host=ccfg::get('smtp_host');
+        }
+        if(!$smtp_port){
+            $smtp_port=ccfg::get('smtp_port');
+        }
+        if(!$secure){
+            $secure=ccfg::get('smtp_secure');
+        }
+        
+        
+        
+        $mail->set_username($smtp_username);
+        $mail->set_password($smtp_password);
+        $mail->set_host($smtp_host);
+        $mail->set_port($smtp_port);
 
-        $secure = ccfg::get('smtp_secure');
         if ($secure == "ssl")
             $mail->set_ssl();
         if ($secure == "tls")
