@@ -89,7 +89,11 @@ class CMobile_Element_Control_Input_Text extends CMobile_Element_Control_Abstrac
 		$this->add_class('validate');
 		
 		if (strlen($this->prefix_icon) > 0) {
-            $this->before()->add_icon()->set_icon($this->prefix_icon)->set_type('prefix'); 
+            if(substr($this->prefix_icon, 0, 1) == '#') {
+                $this->before()->add_icon()->set_icon($this->prefix_icon)->set_type('prefix'); 
+            } else {
+                $this->before()->add_icon()->add_class($this->prefix_icon)->set_type('prefix'); 
+            }
         }
 	}
     

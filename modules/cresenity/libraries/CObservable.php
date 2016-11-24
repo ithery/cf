@@ -95,6 +95,18 @@ abstract class CObservable extends CRenderable {
         return $field;
     }
 
+    public function add_ul($id = "") {
+        $ul = CUlElement::factory($id);
+        $this->add($ul);
+        return $ul;
+    }
+
+    public function add_li($id = "") {
+        $li = CLiElement::factory($id);
+        $this->add($li);
+        return $li;
+    }
+
     public function add_fieldset($fieldset_id = "") {
         $fieldset = CFormFieldset::factory($fieldset_id);
         $this->add($fieldset);
