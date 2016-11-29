@@ -12,7 +12,6 @@ class CMobile_Element_Component_Collapsible extends CMobile_Element_AbstractComp
         parent::__construct($id);
         $this->tag = "div";
         $this->type = "accordion";
-        $this->type = "";
     }
 
     public static function factory($id = "") {

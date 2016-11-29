@@ -21,6 +21,7 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
     protected $first_day;
     protected $prefix_icon;
     protected $placeholder;
+    protected $manual;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -35,7 +36,7 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
 			$date_format = str_replace('d','dd',$date_format);
 			$this->date_format = $date_format;
 		}
-		
+		$this->manual = false;
         $this->have_button = false;
         $this->month_short = false;
         $this->select_month = true;
@@ -60,6 +61,11 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
 
     public function set_have_button($boolean) {
         $this->have_button = $boolean;
+        return $this;
+    }
+
+    public function set_manual($boolean) {
+        $this->manual = $boolean;
         return $this;
     }
 
@@ -231,12 +237,15 @@ class CMobile_Element_Control_Input_Date extends CMobile_Element_Control_Abstrac
         } else {
             $option .= 'selectYears:false,';
         }
-        $js->append("$('#" . $this->id . "').pickadate({
-                        selectMonths: true, // Creates a dropdown to control month
-                        selectYears: 15, // Creates a dropdown of 15 years to control year
-                        format: '" . $this->date_format . "',
-                        " . $option . "
-                      });");
+        if(!$this->manual) {
+            $js->append("$('#" . $this->id . "').pickadate({
+                            selectMonths: true, // Creates a dropdown to control month
+                            yearSelector: 100,
+                            format: '" . $this->date_format . "',
+                            " . $option . "
+                          });");
+
+        }
         
         return $js->text();
     }

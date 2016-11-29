@@ -10,7 +10,7 @@ class CMobile_Element_Component_Collapsible_Li extends CMobile_Element_AbstractC
     }
 
     public function add_header($id="") {
-        $element = CMobile_Element_Component_Collapsible_li_Header::factory($id);
+        $element = CMobile_Element_Component_Collapsible_Li_Header::factory($id);
         $this->add($element);
         return $element;
     }
