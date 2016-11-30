@@ -27,7 +27,30 @@ class cmail {
         $admin_email = ccfg::get("admin_email");
 
         if (ccfg::get("mail_error_smtp")) {
-            $ret = cmail::send_smtp($admin_email, $subject . " [FOR ADMINISTRATOR]", $message);
+            $smtp_username=ccfg::get('smtp_username_error');
+            $smtp_password=  ccfg::get('smtp_password_error');
+            $smtp_host=ccfg::get('smtp_host_error');
+            $smtp_port=ccfg::get('smtp_port_error');
+            $secure=ccfg::get('smtp_secure_error');
+            $arr_options = array();
+            if(strlen($smtp_username)>0){
+                $arr_options['smtp_username']=$smtp_username;
+            } 
+            if(strlen($smtp_password)>0){
+                $arr_options['smtp_password']=$smtp_password;
+            } 
+            if(strlen($smtp_host)>0){
+                $arr_options['smtp_host']=$smtp_host;
+            } 
+            if(strlen($smtp_port)>0){
+                $arr_options['smtp_port']=$smtp_port;
+            } 
+            if(strlen($secure)>0){
+                $arr_options['smtp_secure']=$secure;
+            } 
+
+            $ret = cmail::send_smtp($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, array(), array(), array(), $arr_options);
+            
         } else {
 
             $ret = cmail::send($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, $headers);

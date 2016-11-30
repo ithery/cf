@@ -319,7 +319,7 @@ final class CF {
                 }
             }
 
-            if ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE)) {
+            if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
                 // Controller is not allowed to run in production
                 CFEvent::run('system.404');
             }
@@ -328,7 +328,9 @@ final class CF {
             CFEvent::run('system.pre_controller');
 
             // Create a new controller instance
-            $controller = $class->newInstance();
+            if (isset($class)) {
+                $controller = $class->newInstance();
+            }
 
             // Controller constructor has been executed
             CFEvent::run('system.post_controller_constructor');
@@ -1161,6 +1163,7 @@ final class CF {
                         'error' => $error,
                     );
                     $view = CView::factory('kohana_error_page', $data);
+
                     cmail::error_mail($view->render());
                 }
                 // Load the error
