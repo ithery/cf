@@ -1163,8 +1163,11 @@ final class CF {
                         'error' => $error,
                     );
                     $view = CView::factory('kohana_error_page', $data);
-
-                    cmail::error_mail($view->render());
+                    try {
+                        cmail::error_mail($view->render());
+                    } catch(Exception $ex) {
+                        
+                    }
                 }
                 // Load the error
                 require self::find_file('views', empty($template) ? 'kohana_error_page' : $template);
@@ -1187,7 +1190,11 @@ final class CF {
             exit;
         } catch (Exception $e) {
             if (IN_PRODUCTION) {
-                die('Fatal Error');
+                if(isset($_GET['debug'])) {
+                    die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
+                } else {
+                    die('Fatal Error');
+                }
             } else {
                 die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
             }
