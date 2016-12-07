@@ -1,9 +1,9 @@
 <?php 
 return array(
-	'app_id'=>'890',
-	'app_code'=>'admin62hallfamily',
-	'org_id'=>'620028',
-	'org_code'=>'ittronmall',
+	'app_id'=>'891',
+	'app_code'=>'adminittronmall',
+	'org_id'=>NULL,
+	'org_code'=>NULL,
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'admin.ittronmall.local',
