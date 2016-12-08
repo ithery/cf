@@ -280,12 +280,30 @@ class Page_Controller extends CController {
             }
             $org_control->set_value($org_id);
         }
+        $widget_left->add_control('post_type', 'hidden')->set_value('page');
         $widget_left->add_field()->set_label(clang::__("Page Title") . ' <red>*</red>')->add_control('post_title', 'text')->set_value($post_title)->add_validation('required');
-        $widget_left->add_field()->set_label(clang::__("Url") . ' <red>*</red>')->add_control('post_name', 'text')->set_value($post_name)->set_placeholder("Auto")->add_validation('required');
-        $widget_left->add_field()->set_label(clang::__("Page Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
+        //$field_url = $widget_left->add_field()->set_label(clang::__("Url") . ' <red>*</red>');
+        $widget_left->add_control('post_name', 'hidden')->set_value($post_name);//->set_placeholder("Auto")->add_validation('required');
+//        $widget_left->add_field()->set_label(clang::__("Page Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
+        
+        $app->add_listener('ready')->add_handler('reload')->set_target('post-field-container')
+                ->set_url(curl::base() . 'cms/page/load_post_field/' . $id)->add_param_input(array('post_type', 'post_title'));
+        
+        $widget_left->add_div('post-field-container');
         // DIV RIGHT
+        /*
+         * If edit and not have permission to change template
+         * show only template selected
+         */
         $template_list = ccms::get_template_list();
-        $widget_right->add_field()->set_label(clang::__("Template"))->add_control('template', 'select')->set_value($template)->set_list($template_list)->add_class('large');
+        if ($id > 0){
+            if (cnav::have_permission('change_template') == false) {
+                 $template_list_name = carr::get($template_list, $template);
+                 $template_list = array($template=>$template_list_name);
+            }
+        }
+        $template_control = $widget_right->add_field()->set_label(clang::__("Template"))->add_control('template', 'select')->set_value($template)->set_list($template_list)->add_class('large');
+        
         $widget_right->add_field()->set_label(clang::__("Page Status"))->add_control('post_status', 'select')->set_value($post_status)->set_list($status_list)->add_class('large');
 //        $widget_right->add_field()
 //                ->set_label(clang::__("Featured Image"))
@@ -317,6 +335,36 @@ class Page_Controller extends CController {
                         ;
                 }";
         $app->add_js($js);
+        echo $app->render();
+    }
+    
+    public function load_post_field($id = ''){
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+        $request = array_merge($_GET, $_POST);
+        $post_type = carr::get($request, 'post_type');
+        $post_title = carr::get($request, 'post_title');
+        
+        $show_content = true;
+        if (strlen($post_title) > 0 && strtolower($post_title) == 'home') {
+            $show_content = false;
+        }
+        
+        $page = ccms::page($id);
+        $post_content = cobj::get($page, 'post_content');
+        
+//        if (strlen($id) > 0) {
+//            $q_post = "SELECT * FROM cms_post WHERE status > 0 AND cms_post_id = " . $db->escape($id);
+//            $r_post = cdbutils::get_row($q_post);
+//            if ($r_post != NULL) {
+//                $post_content = $r_post->post_content;
+//            }
+//        }
+        
+        if ($show_content) {
+            $app->add_field()->set_label(clang::__("Post Content"))->add_control('post_content', 'ckeditor')->set_value($post_content);
+        }
+        
         echo $app->render();
     }
 
