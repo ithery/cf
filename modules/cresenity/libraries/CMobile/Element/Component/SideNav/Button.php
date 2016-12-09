@@ -8,6 +8,7 @@ class CMobile_Element_Component_SideNav_Button extends CMobile_Element_AbstractC
     protected $type;
     protected $href;
     protected $icon;
+    protected $show_on_large;
 
     public function __construct($id = "") {
 
@@ -16,10 +17,16 @@ class CMobile_Element_Component_SideNav_Button extends CMobile_Element_AbstractC
         $this->type = "menu";
         $this->href = "";
         $this->icon = "menu";
+        $this->show_on_large = true;
     }
     
     public function set_sidenav_id($id) {
         $this->sidenav_id = $id;
+        return $this;
+    }
+
+    public function show_on_large($param) {
+        $this->show_on_large = $param;
         return $this;
     }
 
@@ -46,7 +53,10 @@ class CMobile_Element_Component_SideNav_Button extends CMobile_Element_AbstractC
         // echo $this->type;
         // die();
         if($this->type == 'menu') {
-            $this->add_class('button-collapse show-on-large');
+            $this->add_class('button-collapse');
+            if($this->show_on_large) {
+                $this->add_class('show-on-large');
+            }
             $this->id = 'nav-mobile-button';
             $this->set_attr('data-activates',$this->sidenav_id);
             $this->add_icon()->add('menu');
