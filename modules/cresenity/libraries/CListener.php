@@ -115,17 +115,48 @@
 			";
             }
 
-            $js->append("
-			jQuery('#" . $this->owner . "')." . $this->event . "(function() {				
-				
-				" . $start_script . "
-				" . $confirm_start_script . "
-				" . $handlers_script . "
-				" . $confirm_end_script . "
-				
-			});
-		");
+            if ($this->event == 'lazyload') {
+                $js->append("
+                    jQuery(window).ready(function() {
+                        if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
+                                " . $start_script . "
+                                " . $confirm_start_script . "
+                                " . $handlers_script . "
+                                " . $confirm_end_script . "
+                            }
+                    });
+                    jQuery(window).scroll(function() {
+                        if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
+                                " . $start_script . "
+                                " . $confirm_start_script . "
+                                " . $handlers_script . "
+                                " . $confirm_end_script . "
+                            }
+                    });
+                ");
+            } else {
+                $js->append('
+                    jQuery("#' . $this->owner . '").' . $this->event . '(function() {
 
+                        ' . $start_script . '
+                        ' . $confirm_start_script . '
+                        ' . $handlers_script . '
+                        ' . $confirm_end_script . '
+
+                    });
+                ');
+            }
+
+  //           $js->append("
+		// 	jQuery('#" . $this->owner . "')." . $this->event . "(function() {				
+				
+		// 		" . $start_script . "
+		// 		" . $confirm_start_script . "
+		// 		" . $handlers_script . "
+		// 		" . $confirm_end_script . "
+				
+		// 	});
+		// ");
 
             return $js->text();
         }
