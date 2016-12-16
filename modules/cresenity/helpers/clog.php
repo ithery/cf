@@ -304,7 +304,11 @@
         public static function log($filename, $type, $message) {
             $date = date("Y-m-d H:i:s");
             $str = $date . " " . $type . " " . $message . "\r\n";
-            $filename = DOCROOT . "/log/" . date("Ymd") . "_" . $filename;
+            $dir = DOCROOT . "logs/";
+            if(!is_dir($dir)){
+                @mkdir($dir);
+            }
+            $filename = $dir . date("Ymd") . "_" . $filename;
             $fh = @fopen($filename, 'a+');
             fwrite($fh, $str);
             @fclose($fh);
