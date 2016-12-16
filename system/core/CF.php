@@ -1161,12 +1161,15 @@ final class CF {
                     $data = array(
                         'description' => $description,
                         'error' => $error,
+                        'message' => $message,
+                        'show_debug_error' => '1',
                     );
                     $view = CView::factory('kohana_error_page', $data);
                     try {
                         cmail::error_mail($view->render());
                     } catch(Exception $ex) {
-                        
+                       
+                        clog::log('error_mail.log', 'error', CF::domain()." - ".$ex->getMessage());
                     }
                 }
                 // Load the error
