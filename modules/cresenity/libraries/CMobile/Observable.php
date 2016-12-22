@@ -301,6 +301,50 @@ abstract class CMobile_Observable extends CRenderable {
     /**
      * 
      * @param string $id
+     * @return CMobile_Element_Table
+     */
+    public function add_table($id = "") {
+        $element = CMobile_Element_Table::factory($id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CMobile_Element_Tr
+     */
+    public function add_tr($id = "") {
+        $element = CMobile_Element_Tr::factory($id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CMobile_Element_Td
+     */
+    public function add_td($id = "") {
+        $element = CMobile_Element_Td::factory($id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CMobile_Element_Th
+     */
+    public function add_th($id = "") {
+        $element = CMobile_Element_Th::factory($id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * 
+     * @param string $id
      * @return CMobile_Element_H1
      */
     public function add_h1($id = "") {
