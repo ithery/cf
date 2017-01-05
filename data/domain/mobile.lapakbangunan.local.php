@@ -7,5 +7,5 @@ return array(
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'mobile.lapakbangunan.local',
-	'theme' => 'imbuilding'
+	//'theme' => 'imbuilding'
 );

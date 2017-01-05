@@ -2,10 +2,10 @@
 return array(
 	'app_id'=>'892',
 	'app_code'=>'ittronmall',
-	'org_id'=>'620029',
-	'org_code'=>'lasvegas',
+	'org_id'=>'620441',
+	'org_code'=>'paroparo',
 	'store_id'=>NULL,
 	'store_code'=>NULL,
-	'domain'=>'lasvegas.local',
-	'theme' => 'Imlasvegas'
+	'domain'=>'paroparo.local',
+	'theme' => 'imparoparo'
 );
