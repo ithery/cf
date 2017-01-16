@@ -8,4 +8,5 @@ return array(
 	'store_code'=>NULL,
 	'domain'=>'admin.bioto.local',
 	'shared_app_code'=>array('biotoshare'),
+
 );
