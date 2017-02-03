@@ -247,14 +247,22 @@ class cajax {
         $key = $obj->data->key_field;
         $base_q = $q;
 
-
-        $pos_order_by = strpos(strtolower($base_q), "order by", strpos(strtolower($base_q), 'from'));
+        $max_where = strrpos(strtolower($base_q), 'where');
+        $max_from = strrpos(strtolower($base_q), 'from');
+        $max_offset = 0;
+        if($max_where!==false&&$max_where>$max_offset) {
+            $max_offset = $max_where;
+        }
+        if($max_from!==false&&$max_from>$max_offset) {
+            $max_offset = $max_from;
+        }
+        
+        $pos_order_by = strrpos(strtolower($base_q), "order by", $max_offset);
         $temp_order_by = '';
         if ($pos_order_by !== false) {
             $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
             $base_q = substr($base_q, 0, $pos_order_by);
         }
-
 
         $qtotal = "select count(*) as cnt from (" . $q . ") as a";
         $rtotal = $db->query($qtotal);
