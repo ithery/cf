@@ -336,7 +336,8 @@
             // Stop the benchmark
             $stop = microtime(TRUE);
 
-            if ($this->config['benchmark'] == TRUE) {
+            $is_benchmark = carr::get($this->config, 'benchmark', FALSE);
+            if ($is_benchmark) {
                 // Benchmark the query
                 CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $stop - $start, 'rows' => count($result));
             }
