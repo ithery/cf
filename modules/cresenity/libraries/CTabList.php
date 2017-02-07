@@ -228,7 +228,7 @@
                     $html->appendln('							<i class="icon-' . $active_tab_icon . '"></i>');
                     $html->appendln('						</span>');
                 }
-                $html->appendln('						<h5>' . $active_tab_label . '</h5>');
+                //$html->appendln('						<h5>' . $active_tab_label . '</h5>');
                 $html->appendln('					</div>');
             }
 
@@ -249,6 +249,10 @@
                 }
             }
 
+            if ($this->bootstrap >= '3') {
+                $html->appendln('					</div>');
+                
+            }
             $html->appendln('					</div>');
             $html->appendln('				</div>');
             $html->appendln('			</div>');
