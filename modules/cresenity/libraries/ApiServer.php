@@ -218,7 +218,8 @@
             if (property_exists($this, 'api_name')) {
                 $api_name = $this->api_name;
             }
-            $log_path = 'logs' . DS . $api_name . DS . 'server' . DS . $this->related_log_path;
+            $log_path = 'logs' . DS . $api_name . DS . 'server' . DS .date('Ymd').DS.date('H').DS. $this->related_log_path;
+            
             $full_log_path = CAPPPATH;
 
             $full_log_path = str_replace('//', DS, $full_log_path);
@@ -230,7 +231,6 @@
                 }
             }
             $this->full_log_path = $full_log_path;
-            
             if ($this->session instanceof ApiSession) {
                 $this->session->set('client_full_log_path', $this->full_log_path);
             }
