@@ -7,5 +7,5 @@ return array(
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'admin.paroparo.local',
-	'theme' => 'imparoparo'
+	'theme' => 'Imparoparo'
 );
