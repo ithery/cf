@@ -317,11 +317,11 @@
                 if ($response_error > 0) {
                     $response['err_code'] = $response_error;
                     $response['err_message'] = $response_error_message;
-                    $response['data'] = array();
+                    //$response['data'] = array();
                 }
             }
             else {
-                $response['data'] = array();
+                //$response['data'] = array();
             }
 
             $benchmark = CFBenchmark::get('client_activity');
