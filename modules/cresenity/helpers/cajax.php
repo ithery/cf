@@ -282,8 +282,12 @@ class cajax {
         if (isset($request['iSortCol_0'])) {
             $sOrder = "ORDER BY  ";
             for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
+                $i2 = 0;
+                if($table->checkbox) {
+                        $i2=-1;
+                }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
-                    $sOrder .= "`" . $columns[intval($request['iSortCol_' . $i])]->fieldname . "` " . mysql_real_escape_string($request['sSortDir_' . $i]) . ", ";
+                    $sOrder .= "`" . $columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname . "` " . mysql_real_escape_string($request['sSortDir_' . $i]) . ", ";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -2);
@@ -299,8 +303,12 @@ class cajax {
         $qs_condition_str = "";
         if (isset($request['sSearch']) && $request['sSearch'] != "") {
             for ($i = 0; $i < count($columns); $i++) {
+                $i2 = 0;
+                if($table->checkbox) {
+                        $i2=-1;
+                }
                 if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
-                    $sWhere .= "`" . $columns[$i]->fieldname . "` LIKE '%" . mysql_real_escape_string($request['sSearch']) . "%' OR ";
+                    $sWhere .= "`" . $columns[$i+$i2]->fieldname . "` LIKE '%" . mysql_real_escape_string($request['sSearch']) . "%' OR ";
                 }
             }
             $sWhere = substr_replace($sWhere, "", -3);

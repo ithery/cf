@@ -2033,11 +2033,16 @@
                            
                             var total_th = jQuery('#" . $this->id . " thead th').length;
                             var input = '';
-                            if(!(have_action==1&&(total_th-1==jQuery(this).index()))) {
+                            var have_checkbox = ".($this->checkbox?"1":"0").";
                                 
+                            if((!(have_action==1&&(total_th-1==jQuery(this).index())))&& (!(have_checkbox==1&&(0==jQuery(this).index()))) ) {
+                                var i2 = 0;
+                                if(have_checkbox) {
+                                        i2 = -1;
+                                }
                             
                                 var all_column = " . json_encode($this->columns) . ";
-                                var column = all_column[jQuery(this).index()];
+                                var column = all_column[jQuery(this).index()+i2];
                                 var transforms = {};
                                 if(column) {
                                     if(hasOwnProperty.call(column, 'transforms')) {
