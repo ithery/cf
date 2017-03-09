@@ -37,6 +37,8 @@ class CFormInputCKEditor extends CFormInputTextarea {
 	public function html($indent=0) {
 		$html = new CStringBuilder();
 		$html->set_indent($indent);
+                $readonly="";
+                if($this->readonly) $readonly=' readonly="readonly"';
 		$disabled = "";
 		if($this->disabled) $disabled = ' disabled="disabled"';
 		$classes = $this->classes;
@@ -49,7 +51,7 @@ class CFormInputCKEditor extends CFormInputTextarea {
 		}
 		$disabled = "";
 		if($this->disabled) $disabled = ' disabled="disabled"';
-		$html->appendln('<textarea cols="'.$this->col.'" rows="'.$this->row.'" name="'.$this->name.'" id="'.$this->id.'" class="wysiwyg'.$this->validation->validation_class().$classes.'" '.$disabled.$custom_css.'>'.$this->value.'</textarea>')->br();
+		$html->appendln('<textarea cols="'.$this->col.'" rows="'.$this->row.'" name="'.$this->name.'" id="'.$this->id.'" class="wysiwyg'.$this->validation->validation_class().$classes.'" '.$disabled.$readonly.$custom_css.'>'.$this->value.'</textarea>')->br();
 		//$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
 		return $html->text();	
 	}

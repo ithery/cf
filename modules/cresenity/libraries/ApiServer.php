@@ -207,7 +207,7 @@
             }
 
             // do log request from client - create file log request at related folders
-            $file_name = 'CLIENT_' . $session_id;
+            $file_name = 'CLIENT_';
             if ($session_id == null) {
                 $file_name = 'CLIENT_' . 'DEF';
             }

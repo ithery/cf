@@ -96,6 +96,10 @@
             $html = new CStringBuilder();
             $custom_css = $this->custom_css;
             $custom_css = crenderer::render_style($custom_css);
+            $disabled = "";
+            if ($this->disabled) {
+                $disabled = ' disabled="disabled"';
+            }
             $multiple = "";
             if ($this->multiple) {
                 $multiple = ' multiple="multiple"';
@@ -124,7 +128,7 @@
             }
 
             if ($this->select2 >= '4') {
-                $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . $multiple . '">');
+                $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' .$disabled .$custom_css . $multiple . '">');
                 
                 // select2 4.0 using option to set default value
                 if (strlen($this->value) > 0 || $this->auto_select) {

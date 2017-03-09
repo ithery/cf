@@ -75,7 +75,11 @@
             $where = "";
             $db = $this->db;
             foreach ($this->filters as $k => $v) {
-                $where.=" AND " . $db->escape_column($k) . " = " . $db->escape($v);
+                if($v===null){
+                    $where.=" AND " . $db->escape_column($k) . " is null";
+                }else{
+                    $where.=" AND " . $db->escape_column($k) . " = " . $db->escape($v);
+                }
             }
             //if(strlen($where)>0) $where = substr($where,5);
             return $where;
