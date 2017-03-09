@@ -72,7 +72,7 @@ class cfs {
                 }
             }
             closedir($handle);
-            rmdir($dir);
+            @rmdir($dir);
             return true;
         } else {
             return false;
