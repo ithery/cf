@@ -9,7 +9,7 @@ return array(
 		'jquery',
 		'bootstrap',
 		'font-awesome',
-		'jquery.ui',
+		'jquery-ui-1.12.1.custom',
 		'jquery.dialog2',
 		'slimscroll',
 		'fileupload',
@@ -31,7 +31,6 @@ return array(
 		'elfinder',
 		'prettify',
 		'bootstrap-switch',
-		'dropzone',
 	),
 	
 	

@@ -41,6 +41,16 @@
             "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery.ui.theme.css"),
             "requirements" => array("jquery"),
         ),
+        "jquery-ui-1.12.1" => array(
+            "js" => array("libs" . DS . "jquery-ui-1.12.1.min.js"),
+            "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.min.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.theme.min.css"),
+            "requirements" => array("jquery"),
+        ),
+        "jquery-ui-1.12.1.custom" => array(
+            "js" => array("libs" . DS . "jquery-ui-1.12.1.custom" . DS . "jquery-ui.min.js"),
+            "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.min.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.theme.min.css"),
+            "requirements" => array("jquery"),
+        ),
         "jquery.dialog2" => array(
             "js" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.js", "plugins" . DS . "dialog2" . DS . "jquery.dialog2.helpers.js"),
             "css" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.css"),

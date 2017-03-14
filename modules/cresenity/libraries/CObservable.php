@@ -47,7 +47,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->register_control('filedrop', 'CFormInputFileDrop');
         $this->manager->register_control('slider', 'CFormInputSlider');
         $this->manager->register_control('tooltip', 'CFormInputTooltip');
-        $this->manager->register_control('dropzone', 'CFormInputDropZone');
+        $this->manager->register_control('fileupload', 'CFormInputFileUpload');
     }
 
     /**
