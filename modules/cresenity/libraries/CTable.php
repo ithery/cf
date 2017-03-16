@@ -1887,10 +1887,10 @@
                  */
 
 
-                $jqueryui = "'bJQueryUI': true,";
-                if (!CClientModules::instance()->is_registered_module('jquery.ui')) {
+                $jqueryui = "'bJQueryUI': false,";
+                if (CClientModules::instance()->is_registered_module('jquery.ui') || CClientModules::instance()->is_registered_module('jquery-ui-1.12.1.custom')) {
+                    $jqueryui = "'bJQueryUI': true,";
 
-                    $jqueryui = "'bJQueryUI': false,";
                 }
 
                 $js->append("")
