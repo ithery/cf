@@ -73,7 +73,7 @@
                 $html->appendln('			<span class="fileupload-new">Select image</span>');
                 $html->appendln('			<span class="fileupload-exists">Change</span>');
                 $html->appendln('				<input type="file" name="' . $this->name . '" id="' . $this->id . '"/>');
-                $html->appendln('		</span/>');
+                $html->appendln('		</span>');
                 if ($this->bootstrap == '3.3') {
                     $html->appendln('		<a href="#" class="btn fileupload-exists btn-danger" data-dismiss="fileupload">Remove</a>');
                 }
