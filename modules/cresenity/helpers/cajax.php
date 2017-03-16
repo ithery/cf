@@ -6,7 +6,7 @@ class cajax {
 
     public static function callback($obj, $input) {
         $callable = $obj->data->callable;
-        if(is_callable($callable)) {
+        if (is_callable($callable)) {
             return call_user_func($callable, $obj->data);
         }
     }
@@ -250,13 +250,13 @@ class cajax {
         $max_where = strrpos(strtolower($base_q), 'where');
         $max_from = strrpos(strtolower($base_q), 'from');
         $max_offset = 0;
-        if($max_where!==false&&$max_where>$max_offset) {
+        if ($max_where !== false && $max_where > $max_offset) {
             $max_offset = $max_where;
         }
-        if($max_from!==false&&$max_from>$max_offset) {
+        if ($max_from !== false && $max_from > $max_offset) {
             $max_offset = $max_from;
         }
-        
+
         $pos_order_by = strrpos(strtolower($base_q), "order by", $max_offset);
         $temp_order_by = '';
         if ($pos_order_by !== false) {
@@ -283,8 +283,8 @@ class cajax {
             $sOrder = "ORDER BY  ";
             for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
                 $i2 = 0;
-                if($table->checkbox) {
-                        $i2=-1;
+                if ($table->checkbox) {
+                    $i2 = -1;
                 }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
                     $sOrder .= "`" . $columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname . "` " . mysql_real_escape_string($request['sSortDir_' . $i]) . ", ";
@@ -304,11 +304,11 @@ class cajax {
         if (isset($request['sSearch']) && $request['sSearch'] != "") {
             for ($i = 0; $i < count($columns); $i++) {
                 $i2 = 0;
-                if($table->checkbox) {
-                        $i2=-1;
+                if ($table->checkbox) {
+                    $i2 = -1;
                 }
                 if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
-                    $sWhere .= "`" . $columns[$i+$i2]->fieldname . "` LIKE '%" . mysql_real_escape_string($request['sSearch']) . "%' OR ";
+                    $sWhere .= "`" . $columns[$i + $i2]->fieldname . "` LIKE '%" . mysql_real_escape_string($request['sSearch']) . "%' OR ";
                 }
             }
             $sWhere = substr_replace($sWhere, "", -3);
@@ -535,6 +535,26 @@ class cajax {
         $data = $obj->data->json;
 
         return $data;
+    }
+
+    public static function fileupload($obj, $input) {
+        $return = array();
+        $data = $obj->data;
+        $input_name = $data->input_name;
+        if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
+            for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
+                $extension = ".".pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
+                $file_id = date('Ymd') . cutils::randmd5().$extension;
+                $fullfilename = ctemp::makepath("fileupload", $file_id . ".tmp");
+                
+                
+                move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename);
+                $return[] = $file_id;
+            }
+        }
+        return $file_id;
+        //$response = json_encode($return);
+        //return $response;
     }
 
 }

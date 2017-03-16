@@ -104,6 +104,7 @@
         public function ajax($method) {
             $file = ctemp::makepath("ajax", $method . ".tmp");
             if(!file_exists($file)) {
+            
                 return;
             }
             $text = file_get_contents($file);
@@ -114,7 +115,7 @@
             if ($obj->method == "GET") {
                 $input = $_GET;
             }
-
+            
             switch ($obj->type) {
                 case "form_process":
                     $response = cajax::form_process($obj, $input);
@@ -133,6 +134,9 @@
                     break;
                 case "callback":
                     $response = cajax::callback($obj, $input);
+                    break;
+                case "fileupload":
+                    $response = cajax::fileupload($obj, $input);
                     break;
                 case "reload":
                 case "handler_reload":

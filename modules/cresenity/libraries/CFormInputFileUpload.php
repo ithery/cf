@@ -34,7 +34,7 @@ class CFormInputFileUpload extends CFormInput {
         return $this;
     }
 
-    public function add_file($input_name,$file_url) {
+    public function add_file($file_url,$input_name="") {
         $arr = array();
         $arr['input_name'] = $input_name;
         $arr['file_url'] = $file_url;
@@ -124,6 +124,7 @@ class CFormInputFileUpload extends CFormInput {
                 <div>
                     <img data="'.$ii.'" src="'.$file_url.'" />
                     <a class="' . $div_id . '_remove" data="'.$ii.'">Remove</a>
+                    <input type="hidden" name="'. $this->name .'['.$input_name.']" value="">
                 </div>
                     
             ');
@@ -142,10 +143,14 @@ class CFormInputFileUpload extends CFormInput {
     }
 
     public function js($indent = 0) {
+        $ajax_url = CAjaxMethod::factory()->set_type('fileupload')
+                        ->set_data('input_name', $this->name)
+                        ->makeurl();
+        
         $div_id = 'div_fileupload_' . $this->id;
         $js = new CStringBuilder();
         $js->set_indent($indent);
-        if (empty($this->link)) {
+        if (empty($ajax_url)) {
             throw new Exception('Link is empty', 1);
         }
         if ($this->applyjs == "fileupload") {
@@ -198,7 +203,7 @@ class CFormInputFileUpload extends CFormInput {
                         })
                 }
                 file_upload_remove();
-
+                $( "#' . $div_id . '" ).sortable();
                 // Add Image by Drag & Drop
                 $( "#' . $div_id . '" ).on({
                         "drop": function(e) {
@@ -241,7 +246,7 @@ class CFormInputFileUpload extends CFormInput {
                 ');
             }
             $js->appendln('
-                                                    xhr.open("post", "'.$this->link.'");
+                                                    xhr.open("post", "'.$ajax_url.'");
                                                     xhr.send(data);
                                                             }, this, file, $("#' . $div_id . '"));
                                                             reader.readAsDataURL(file);
@@ -289,7 +294,7 @@ class CFormInputFileUpload extends CFormInput {
 					');
             }
             $js->appendln('
-                                            xhr.open("post", "'.$this->link.'");
+                                            xhr.open("post", "'.$ajax_url.'");
                                             xhr.send(data);
                                             }, this, file, $("#' . $div_id . '"));
                                             reader.readAsDataURL(file);
