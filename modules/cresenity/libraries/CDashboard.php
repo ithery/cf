@@ -8,7 +8,7 @@ class CDashboard extends CElement {
     
     public function __construct($id = '') {
         parent::__construct($id);
-        $file = CF::get_file('data', 'dashboard');
+        $file = CF::get_file('data', $id);
         $dashboard = array();
         if (file_exists($file)) {
             $dashboard = include $file;
@@ -37,7 +37,7 @@ class CDashboard extends CElement {
     }
     
     protected function execute() {
-        $files = CF::get_files('config', 'dashboard');
+        $files = CF::get_files('config', $this->id());
         $files = array_reverse($files);
         foreach($files as $file) {
             if(file_exists($file)) {

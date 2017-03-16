@@ -259,8 +259,8 @@ abstract class CObservable extends CRenderable {
         return $pie_chart;
     }
 
-    public function add_dashboard() {
-        $dashboard = CDashboard::factory();
+    public function add_dashboard($id= "") {
+        $dashboard = CDashboard::factory($id);
         $this->add($dashboard);
         return $dashboard;
     }
