@@ -66,69 +66,70 @@ class CFormInputFileUpload extends CFormInput {
         $div_id = 'div_fileupload_' . $this->id;
         $html->appendln('
                 <style>
-                        #' . $div_id . ' {
-                                margin-left: 0px;
-                                padding: 10px 10px;
-                                border: 1px dashed #CDCDCD;
-                        }
-                        #' . $div_id . ' div {
-                                border: 1px solid #ddd;
-                                margin: 10px 10px;
-                                width: 100px;
-                                height: 100px;
-                                float: left;
-                                text-align: center;
-                                position: relative;
-                                border-radius: 4px;
-                                padding:4px;
-                        }
-                        #' . $div_id . ' div img {
-                                width: 100%;
-                                height: 100%;
-                        }
-                        #' . $div_id . ' div span {
-                                position: absolute;
-                                left: 0;
-                                right: 0;
-                                top: 50%;
-                                color: white;
-                                font-size: 100%;
-                                background-color: rgba(0, 0, 0, 0.5);
-                        }
-                        #' . $div_id . '_description {
-                                text-align: center;
-                                display: block;
-                                font-size: 20px;
-                        }
-                        #' . $div_id . '_message {
-                                margin-left: 0px;
-                                display: none;
-                                font-size: 20px;
-                        }
-                        .' . $div_id . '_remove {
-                                cursor: pointer;
-                        }
+                    #' . $div_id . ' {
+                        margin-left: 0px;
+                        padding: 10px 10px;
+                        border: 1px dashed #CDCDCD;
+                    }
+                    #' . $div_id . ' div {
+                        border: 1px solid #ddd;
+                        margin: 10px 10px;
+                        width: 100px;
+                        height: 100px;
+                        float: left;
+                        text-align: center;
+                        position: relative;
+                        border-radius: 4px;
+                        padding:4px;
+                    }
+                    #' . $div_id . ' div img {
+                        width: 100%;
+                        height: 100%;
+                    }
+                    #' . $div_id . '_description {
+                        text-align: center;
+                        display: block;
+                        font-size: 20px;
+                    }
+                    #' . $div_id . '_message {
+                        margin-left: 0px;
+                        display: none;
+                        font-size: 20px;
+                    }
+                    .' . $div_id . '_file.loading .' . $div_id . '_loading {
+                        display: block;
+                    }
+                    .' . $div_id . '_file .' . $div_id . '_loading {
+                        display: none;
+                    }
+                    .' . $div_id . '_loading {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        z-index: 1000;
+                        background-color: rgba(0, 0, 0, 0.5);
+                    }
+                    .' . $div_id . '_remove {
+                        cursor: pointer;
+                    }
                 </style>
-                <input id="' . $div_id . '_input" type="file" name="'.$div_id.'_input_temp[]" multiple style="display:none;">
+                <input id="' . $div_id . '_input_temp" type="file" name="'.$div_id.'_input_temp[]" multiple style="display:none;">
                 <div id="' . $div_id . '_message" class="row alert alert-danger fade in">
                 </div>
                 <div id="' . $div_id . '" class="row">
                 ');
         
-        $ii=0;
         foreach($this->files as $f) {
             $input_name = carr::get($f,'input_name');
             $file_url = carr::get($f,'file_url');
                     //<input id="' . $div_id . '_input_'.$ii.'" class="'.$div_id.'_i" type="file" name="'.$this->name.'['.$input_name.']" style="display:none;">    
             $html->appendln('
-                <div>
-                    <img data="'.$ii.'" src="'.$file_url.'" />
-                    <a class="' . $div_id . '_remove" data="'.$ii.'">Remove</a>
+                <div class="' . $div_id . '_file">
+                    <img src="'.$file_url.'" />
+                    <a class="' . $div_id . '_remove">Remove</a>
                     <input type="hidden" name="'. $this->name .'['.$input_name.']" value="">
                 </div>
-                    
             ');
-            $ii++;
         }
         
         $html_description = '';
@@ -155,126 +156,124 @@ class CFormInputFileUpload extends CFormInput {
         }
         if ($this->applyjs == "fileupload") {
             
-            
-            
             $js->appendln('
 
                 var description = $("#' . $div_id . '_description");
 
                 $(this).on({
-                        "dragover dragenter": function(e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                        },
-                        "drop": function(e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                        }
+                    "dragover dragenter": function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                    },
+                    "drop": function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                    }
                 })
 
                 // Remove File
                 function file_upload_remove(e) {
-                        $( ".' . $div_id . '_remove" ).click(function(e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                
-                                
-                                $(this).parent().remove();
-                               
-                                if ($("#' . $div_id . '").children().length==0) {
-                                        $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">Click Here or Drop Files Here</span>");
-                                }
-                        })
+                    $( ".' . $div_id . '_remove" ).click(function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            
+                            $(this).parent().remove();
+                           
+                            if ($("#' . $div_id . '").children().length==0) {
+                                    $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">Click Here or Drop Files Here</span>");
+                            }
+                    })
                 }
+
                 file_upload_remove();
                 $( "#' . $div_id . '" ).sortable();
+
                 // Add Image by Drag & Drop
                 $( "#' . $div_id . '" ).on({
-                        "drop": function(e) {
-                                $( "#' . $div_id . '" ).sortable();
-                                var dataTransfer = e.originalEvent.dataTransfer;
-                                if( dataTransfer && dataTransfer.files.length) {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        $("#' . $div_id . '_description").remove();
-                                        $.each( dataTransfer.files, function(i, file) {
-                                                var reader = new FileReader();
-                                                reader.onload = $.proxy(function(file, fileList, event) {
-                                                    
-                                                    var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
-
-                                                    var data = new FormData();
-                                                    data.append("' . $this->name . '[]", file);
-                                                    var xhr = new XMLHttpRequest();
+                    "drop": function(e) {
+                        $( "#' . $div_id . '" ).sortable();
+                        var dataTransfer = e.originalEvent.dataTransfer;
+                        if( dataTransfer && dataTransfer.files.length) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $("#' . $div_id . '_description").remove();
+                            $.each( dataTransfer.files, function(i, file) {
+                                var reader = new FileReader();
+                                reader.onload = $.proxy(function(file, fileList, event) {
+                                    
+                                    var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
+                                    var div = $("<div>").addClass("' . $div_id . '_file");
+                                    div.append(img);
             ');
-
             if ($this->removeLink) {
                 $js->appendln('
-                                                    xhr.onreadystatechange = function() {
-                                                        if (this.readyState == 4 && this.status == 200) {
-
-                                                            fileList.append($("<div>").append(img + "").append("<a class=\"' . $div_id . '_remove\" >Remove</a>").append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
-                                                            file_upload_remove();
-                                                        }
-                                                    };
-                ');
-            } else {
-                $js->appendln('
-                                                    fileList.append($("<div>").append(img).append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
+                                    div.append("<a class=\"' . $div_id . '_remove\">Remove</a>");
+                                    file_upload_remove();
                 ');
             }
             $js->appendln('
-                                                    xhr.open("post", "'.$ajax_url.'");
-                                                    xhr.send(data);
-                                                            }, this, file, $("#' . $div_id . '"));
-                                                            reader.readAsDataURL(file);
-                                                    });
-                                            }
-                                    }
-                            })
+                                    div.append("<img class=\"' . $div_id . '_loading\" src=\"http://admin.62hallfamily.local/res/show/NjI2MlJXUFNDXkJtX19XVVNtQkBTRFlFU1BpAAYDAAMEAg9tRFtYVRhVX1Q=\" />");
+                                    fileList.append(div.addClass("loading"));
 
-                            // Add Image by Click
-                            $( "#' . $div_id . '" ).click(function() {
-                                    $( "#' . $div_id . '_input" ).trigger("click");
-                            })
-                            $( "#' . $div_id . '_input" ).change(function(e) {
-                                    $("#' . $div_id . '_description").remove();
-                                    $.each(e.target.files, function(i, file) {
-                                            var reader = new FileReader();
-                                            reader.onload = $.proxy(function(file, fileList, event) {
-                                            
-                                            var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
+                                    var data = new FormData();
+                                    data.append("' . $this->name . '[]", file);
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.onreadystatechange = function() {
+                                        if (this.readyState == 4 && this.status == 200) {
+                                            div.removeClass("loading");
+                                            div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
+                                        }
+                                    };
+                                    xhr.open("post", "'.$ajax_url.'");
+                                    xhr.send(data);
+                                }, this, file, $("#' . $div_id . '"));
+                                reader.readAsDataURL(file);
+                            });
+                        }
+                    }
+                })
 
-                                            var data = new FormData();
-                                            data.append("' . $this->name . '[]", file);
-                                            var xhr = new XMLHttpRequest();
-            ');
-
-            if ($this->removeLink) {
-                $js->appendln('
-                                            xhr.onreadystatechange = function() {
-                                                if (this.readyState == 4 && this.status == 200) {
-                                                    
-                                                    fileList.append($("<div>").append(img + "").append("<a class=\"' . $div_id . '_remove\" >Remove</a>").append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
-                                                    file_upload_remove();
-                                                }
-                                            };
-					');
-            } else {
-                $js->appendln('
-                                            fileList.append($("<div>").append(img).append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
-					');
-            }
-            $js->appendln('
-                                            xhr.open("post", "'.$ajax_url.'");
-                                            xhr.send(data);
-                                            }, this, file, $("#' . $div_id . '"));
-                                            reader.readAsDataURL(file);
-                                        })
-                                        $(this).val("");
-                                })
-
+                // Add Image by Click
+                $( "#' . $div_id . '" ).click(function() {
+                    $( "#' . $div_id . '_input_temp" ).trigger("click");
+                })
+                $( "#' . $div_id . '_input_temp" ).change(function(e) {
+                    $("#' . $div_id . '_description").remove();
+                    $.each(e.target.files, function(i, file) {
+                        var reader = new FileReader();
+                        reader.onload = $.proxy(function(file, fileList, event) {
                                 
+                            var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
+                            var div = $("<div>").addClass("' . $div_id . '_file");
+                            div.append(img);
+            ');
+            if ($this->removeLink) {
+                $js->appendln('
+                            div.append("<a class=\"' . $div_id . '_remove\">Remove</a>");
+                            file_upload_remove();
+                ');
+            }
+            $js->appendln('
+                            div.append("<img class=\"' . $div_id . '_loading\" src=\"http://admin.62hallfamily.local/res/show/NjI2MlJXUFNDXkJtX19XVVNtQkBTRFlFU1BpAAYDAAMEAg9tRFtYVRhVX1Q=\" />");
+                            fileList.append(div.addClass("loading"));
+
+                            var data = new FormData();
+                            data.append("' . $this->name . '[]", file);
+                            var xhr = new XMLHttpRequest();
+                            xhr.onreadystatechange = function() {
+                                if (this.readyState == 4 && this.status == 200) {
+                                    div.removeClass("loading");
+                                    div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
+                                }
+                            };
+                            xhr.open("post", "'.$ajax_url.'");
+                            xhr.send(data);
+                        }, this, file, $("#' . $div_id . '"));
+                        reader.readAsDataURL(file);
+                    })
+                    $(this).val("");
+                })        
             ');
         }
         return $js->text();
