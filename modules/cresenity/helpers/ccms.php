@@ -618,6 +618,7 @@ class ccms {
         }
         $post_type = carr::get($options,'post_type');
         $category_id = carr::get($options,'category_id');
+        $sortby = carr::get($options,'sortby');
         
         $q = "SELECT
                 tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
@@ -636,6 +637,16 @@ class ccms {
         if ($org_id != null) {
             $q.= " AND p.org_id=" . $db->escape($org_id);
         }
+        
+        if(strlen($sortby)>0) {
+            if($sortby=='created_asc') {
+                $q.=" order by p.created asc, updated asc";
+            }
+            if($sortby=='created_desc') {
+                $q.=" order by p.created desc, updated desc";
+            }
+        }
+        
         $r = $db->query($q);
         if (count($r) > 0) {
             foreach ($r as $r_k => $r_v) {
