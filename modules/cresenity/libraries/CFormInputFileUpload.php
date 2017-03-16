@@ -154,22 +154,11 @@ class CFormInputFileUpload extends CFormInput {
             throw new Exception('Link is empty', 1);
         }
         if ($this->applyjs == "fileupload") {
-            $arr_files = array();
-            $ii=0;
-            foreach($this->files as $f) {
-                $input_name = carr::get($f,'input_name');
-                $file_url = carr::get($f,'file_url');
-                $arr=[];
-                $arr['file']='';
-                $arr['data']=$input_name;
-                $arr['id']=$ii;
-                $arr_files[] = $arr;
-                $ii++;
-            }
             
-            $file_json = json_encode($arr_files);
+            
+            
             $js->appendln('
-                window.files = '.$file_json.';
+
                 var description = $("#' . $div_id . '_description");
 
                 $(this).on({
@@ -189,15 +178,10 @@ class CFormInputFileUpload extends CFormInput {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 
-                                var index = files.findIndex(function(value) {
-                                        return (value.id == this);
-                                }, $(this).attr("data"))
                                 
-                                if (index > -1) {
-                                        files.splice(index, 1);
-                                        $(this).parent().remove();
-                                }
-                                if (files.length == 0) {
+                                $(this).parent().remove();
+                               
+                                if ($("#' . $div_id . '").children().length==0) {
                                         $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">Click Here or Drop Files Here</span>");
                                 }
                         })
@@ -216,12 +200,8 @@ class CFormInputFileUpload extends CFormInput {
                                         $.each( dataTransfer.files, function(i, file) {
                                                 var reader = new FileReader();
                                                 reader.onload = $.proxy(function(file, fileList, event) {
-                                                    files.push({
-                                                            "file" : file,
-                                                            "data" : event.target.result,
-                                                            "id" : files.length
-                                                    });
-                                                    var img = file.type.match("image.*") ? "<img data="+ (files.length-1) +" src=" + event.target.result + " /> " : "";
+                                                    
+                                                    var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
 
                                                     var data = new FormData();
                                                     data.append("' . $this->name . '[]", file);
@@ -232,10 +212,8 @@ class CFormInputFileUpload extends CFormInput {
                 $js->appendln('
                                                     xhr.onreadystatechange = function() {
                                                         if (this.readyState == 4 && this.status == 200) {
-                                                            var index = files.findIndex(function(value) {
-                                                                    return (value.file == this);
-                                                            }, file)
-                                                            fileList.append($("<div>").append(img + "").append("<a class=\"' . $div_id . '_remove\" data=" + index + ">Remove</a>").append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
+
+                                                            fileList.append($("<div>").append(img + "").append("<a class=\"' . $div_id . '_remove\" >Remove</a>").append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
                                                             file_upload_remove();
                                                         }
                                                     };
@@ -264,12 +242,8 @@ class CFormInputFileUpload extends CFormInput {
                                     $.each(e.target.files, function(i, file) {
                                             var reader = new FileReader();
                                             reader.onload = $.proxy(function(file, fileList, event) {
-                                            files.push({
-                                                    "file" : file,
-                                                    "data" : event.target.result,
-                                                    "id" : files.length
-                                            });
-                                            var img = file.type.match("image.*") ? "<img data="+ (files.length-1) +" src=" + event.target.result + " /> " : "";
+                                            
+                                            var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
 
                                             var data = new FormData();
                                             data.append("' . $this->name . '[]", file);
@@ -280,10 +254,8 @@ class CFormInputFileUpload extends CFormInput {
                 $js->appendln('
                                             xhr.onreadystatechange = function() {
                                                 if (this.readyState == 4 && this.status == 200) {
-                                                    var index = files.findIndex(function(value) {
-                                                            return (value.file == this);
-                                                    }, file)
-                                                    fileList.append($("<div>").append(img + "").append("<a class=\"' . $div_id . '_remove\" data=" + (files.length-1) + ">Remove</a>").append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
+                                                    
+                                                    fileList.append($("<div>").append(img + "").append("<a class=\"' . $div_id . '_remove\" >Remove</a>").append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">"));
                                                     file_upload_remove();
                                                 }
                                             };
@@ -302,34 +274,7 @@ class CFormInputFileUpload extends CFormInput {
                                         $(this).val("");
                                 })
 
-                                // Handler Submit Data
-                                // $( "#' . $div_id . '" ).parents("form").submit(function(e) {
-                                //         e.preventDefault();
-                                //         e.stopPropagation();
-                                //         var data = new FormData(this);
-                                //         $.each($("#' . $div_id . '").children(), function(i, file) {
-                                //                 var index = files.findIndex(function(value) {
-                                                        
-                                //                         return (value.id == this);
-                                //                 }, $(file).children().first().attr("data"))
-                                //                 if(files[index].file=="") {
-                                //                     data.append("' . $this->name . '[]", new File([""], files[index].data));
-                                //                 } else {
-                                //                     data.append("' . $this->name . '[]", files[index].file);
-                                //                 }
-                                //         })
-                                        
-                                //         var xhr = new XMLHttpRequest();
-                                //         xhr.onreadystatechange = function() {
-                                //                 if (this.readyState == 4 && this.status == 200) {
-                                //                         document.open("text/html", "replace");
-                                //                         document.write(xhr.responseText);
-                                //                         document.close();
-                                //                 }
-                                //         }
-                                //         xhr.open("post", e.target.action);
-                                //         xhr.send(data);
-                                // });
+                                
             ');
         }
         return $js->text();
