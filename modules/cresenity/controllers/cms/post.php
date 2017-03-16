@@ -128,6 +128,8 @@ class Post_Controller extends CController {
                 $q.= " and p.post_type = " . $db->escape($post_type) ;
             }
             
+            $q.=" order by p.updated desc";
+            
             $table = $app->add_table('post')
                     ->set_title(clang::__("Post List") . $org_code)
                     ->set_quick_search(true);
