@@ -88,6 +88,10 @@
         public function is_registered_control($type) {
             return isset($this->controls[$type]);
         }
+        
+        public function get_registered_controls() {
+            return $this->controls;
+        }
 
         public function is_registered_element($type) {
             return isset($this->elements[$type]);
