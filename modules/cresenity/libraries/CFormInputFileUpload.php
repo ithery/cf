@@ -116,7 +116,7 @@ class CFormInputFileUpload extends CFormInput {
                 <input id="' . $div_id . '_input_temp" type="file" name="'.$div_id.'_input_temp[]" multiple style="display:none;">
                 <div id="' . $div_id . '_message" class="row alert alert-danger fade in">
                 </div>
-                <div id="' . $div_id . '" class="row">
+                <div id="' . $div_id . '" class="row control-fileupload">
                 ');
         
         foreach($this->files as $f) {
@@ -173,10 +173,11 @@ class CFormInputFileUpload extends CFormInput {
 
                 // Remove File
                 function file_upload_remove(e) {
+                    
                     $( ".' . $div_id . '_remove" ).click(function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        
+                       
                         
                         $(this).parent().remove();
                        
@@ -210,12 +211,12 @@ class CFormInputFileUpload extends CFormInput {
                 $js->appendln('
                                     var remove = $("<a>").addClass("' . $div_id . '_remove").html("Remove");
                                     div.append(remove);
-                                    file_upload_remove();
                 ');
             }
             $js->appendln('
-                                    div.append("<img class=\"' . $div_id . '_loading\" src=\"http://admin.62hallfamily.local/res/show/NjI2MlJXUFNDXkJtX19XVVNtQkBTRFlFU1BpAAYDAAMEAg9tRFtYVRhVX1Q=\" />");
+                                    div.append("<img class=\"' . $div_id . '_loading\" src=\"'.curl::base().'media/img/ring.gif\" />");
                                     fileList.append(div.addClass("loading"));
+                                    file_upload_remove();
 
                                     var data = new FormData();
                                     data.append("' . $this->name . '[]", file);
@@ -225,7 +226,7 @@ class CFormInputFileUpload extends CFormInput {
                                             div.removeClass("loading");
                                             div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
                                         } else if (this.readyState == 4 && this.status != 200) {
-                                            div.remove();
+                                            //div.remove();
                                         }
                                     };
                                     xhr.open("post", "'.$ajax_url.'");
@@ -258,8 +259,9 @@ class CFormInputFileUpload extends CFormInput {
                 ');
             }
             $js->appendln('
-                            div.append("<img class=\"' . $div_id . '_loading\" src=\"http://admin.62hallfamily.local/res/show/NjI2MlJXUFNDXkJtX19XVVNtQkBTRFlFU1BpAAYDAAMEAg9tRFtYVRhVX1Q=\" />");
+                            div.append("<img class=\"' . $div_id . '_loading\" src=\"'.curl::base().'media/img/ring.gif\" />");
                             fileList.append(div.addClass("loading"));
+                            file_upload_remove();
 
                             var data = new FormData();
                             data.append("' . $this->name . '[]", file);
@@ -269,7 +271,7 @@ class CFormInputFileUpload extends CFormInput {
                                     div.removeClass("loading");
                                     div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
                                 } else if (this.readyState == 4 && this.status != 200) {
-                                    div.remove();
+                                    //div.remove();
                                 }
                             };
                             xhr.open("post", "'.$ajax_url.'");

@@ -554,16 +554,17 @@
 				});
 				$('#" . $this->id . "').submit(function(event) {
 
-                    var fileupload = $('[id*=fileupload]');
+                    var fileupload = $('.control-fileupload');
                     var error = 0;
-                    if (fileupload.length > 0) {
-                        fileupload.last().children().each(function() {
+                    fileupload.each(function() {
+                        $(this).children().each(function() {
                             if($(this).hasClass('loading')) {
                                 alert('There\'s any file still uploading');
                                 error++;
                             }
                         })
-                    }
+                    });
+
                     if (error > 0) {
                         $('#" . $this->id . " .confirm').removeAttr('data-submitted');
                         return false;
@@ -631,16 +632,17 @@
                 $js->appendln("
                     $('#" . $this->id . "').submit(function(event) {
 
-                        var fileupload = $('[id*=fileupload]');
+                        var fileupload = $('.control-fileupload');
                         var error = 0;
-                        if (fileupload.length > 0) {
-                            fileupload.last().children().each(function() {
+                        fileupload.each(function() {
+                            $(this).children().each(function() {
                                 if($(this).hasClass('loading')) {
                                     alert('There\'s any file still uploading');
                                     error++;
                                 }
                             })
-                        }
+                        });
+                        
                         if (error > 0) {
                             $('#" . $this->id . " .confirm').removeAttr('data-submitted');
                             return false;
