@@ -69,7 +69,11 @@ class CFormInputFileUpload extends CFormInput {
                     #' . $div_id . ' {
                         margin-left: 0px;
                         padding: 10px 10px;
-                        border: 1px dashed #CDCDCD;
+                        border: 2px dashed #CDCDCD;
+                    }
+                    #' . $div_id . '.ondrag {
+                        border: 5px dashed #CDCDCD;
+                        background-color: rgba(0, 0, 0, 0.05);
                     }
                     #' . $div_id . ' div {
                         border: 1px solid #ddd;
@@ -157,17 +161,16 @@ class CFormInputFileUpload extends CFormInput {
         if ($this->applyjs == "fileupload") {
             
             $js->appendln('
-
                 var description = $("#' . $div_id . '_description");
 
                 $(this).on({
                     "dragover dragenter": function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        e.preventDefault();
+                        e.stopPropagation();
                     },
                     "drop": function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        e.preventDefault();
+                        e.stopPropagation();
                     }
                 })
 
@@ -192,7 +195,14 @@ class CFormInputFileUpload extends CFormInput {
 
                 // Add Image by Drag & Drop
                 $( "#' . $div_id . '" ).on({
+                    "dragover dragenter": function(e) {
+                        $(this).addClass("ondrag");
+                    },
+                    "dragleave dragend": function(e) {
+                        $(this).removeClass("ondrag");
+                    },
                     "drop": function(e) {
+                        $(this).removeClass("ondrag");
                         $( "#' . $div_id . '" ).sortable();
                         var dataTransfer = e.originalEvent.dataTransfer;
                         if( dataTransfer && dataTransfer.files.length) {
