@@ -12,6 +12,7 @@ class CNestable extends CElement {
     protected $display_callback;
     protected $requires;
     protected $js_cell;
+    protected $collapse_all;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -26,6 +27,7 @@ class CNestable extends CElement {
         $this->display_callback = false;
         $this->requires = array();
         $this->js_cell = '';
+        $this->collapse_all = false;
     }
 
     public static function factory($id) {
@@ -40,6 +42,10 @@ class CNestable extends CElement {
         return $this;
     }
 
+    public function set_collapse_all($bool) {
+        $this->collapse_all = $bool;
+        return $this;
+    }
     public function have_action() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->row_action_list->child_count() > 0;
@@ -139,7 +145,7 @@ class CNestable extends CElement {
                     $this->row_action_list->add_class("pull-right");
                     if ($this->action_style == "btn-dropdown") {
                         $this->row_action_list->add_class("pull-right");
-                        if (cobj::get($this,'bootstrap') == '3') {
+                        if (cobj::get($this, 'bootstrap') == '3') {
                             $this->row_action_list->add_btn_dropdown_class("btn-xs btn-primary");
                         }
                     }
@@ -216,6 +222,14 @@ class CNestable extends CElement {
 			");
             }
         }
+        
+        if ($this->collapse_all) {
+            $js->appendln("
+                $('#" . $this->id . "').nestable('collapseAll');
+            ");
+        }
+        
+        
         $js->appendln($this->js_cell);
         $js->appendln(parent::js($indent));
 
