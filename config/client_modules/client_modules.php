@@ -56,6 +56,10 @@ return array(
         ),
         "requirements" => array("jquery"),
     ),
+    "jquery.lazyload" => array(
+        "js" => array("plugins" . DS . "lazyload" . DS . "jquery.lazyload.min.js" ),
+        "requirements" => array("jquery"),
+    ),
     "jquery.dialog2" => array(
         "js" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.js", "plugins" . DS . "dialog2" . DS . "jquery.dialog2.helpers.js"),
         "css" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.css"),
