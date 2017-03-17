@@ -553,7 +553,22 @@
 					$(this).attr('clicked', 'true');
 				});
 				$('#" . $this->id . "').submit(function(event) {
-                                    
+
+                    var fileupload = $('[id*=fileupload]');
+                    var error = 0;
+                    if (fileupload.length > 0) {
+                        fileupload.last().children().each(function() {
+                            if($(this).hasClass('loading')) {
+                                alert('There\'s any file still uploading');
+                                error++;
+                            }
+                        })
+                    }
+                    if (error > 0) {
+                        $('#" . $this->id . " .confirm').removeAttr('data-submitted');
+                        return false;
+                    }     
+
 					" . $validation_if_open . "
 						if($('#" . $this->id . "').hasClass('loading')) return false;
 						//don't do it again if still loading
@@ -614,6 +629,27 @@
                 }
 
                 $js->appendln("
+                    $('#" . $this->id . "').submit(function(event) {
+
+                        var fileupload = $('[id*=fileupload]');
+                        var error = 0;
+                        if (fileupload.length > 0) {
+                            fileupload.last().children().each(function() {
+                                if($(this).hasClass('loading')) {
+                                    alert('There\'s any file still uploading');
+                                    error++;
+                                }
+                            })
+                        }
+                        if (error > 0) {
+                            $('#" . $this->id . " .confirm').removeAttr('data-submitted');
+                            return false;
+                        }
+
+                    });
+                ");
+
+                $js->appendln("
                 " . $strvalidation . "
                 $('#" . $this->id . "').bind('jqv.form.result', function(event , errorFound){
                     if(errorFound) {
@@ -664,15 +700,3 @@
     }
 
 ?>
-<!-- // var fileupload = $('[id*=fileupload]');
-// if (fileupload.length > 0) {
-//     fileupload.last().children().each(function() {
-//         if($(this).hasClass('loading')) {
-//             alert('There\'s any file still uploading');
-//             event.preventDefault();
-//             event.stopPropagation();
-//             throw 'There\'s any file still uploading';
-//             return;
-//         }
-//     })
-// } -->
