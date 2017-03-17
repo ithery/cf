@@ -664,3 +664,15 @@
     }
 
 ?>
+<!-- // var fileupload = $('[id*=fileupload]');
+// if (fileupload.length > 0) {
+//     fileupload.last().children().each(function() {
+//         if($(this).hasClass('loading')) {
+//             alert('There\'s any file still uploading');
+//             event.preventDefault();
+//             event.stopPropagation();
+//             throw 'There\'s any file still uploading';
+//             return;
+//         }
+//     })
+// } -->

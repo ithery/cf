@@ -174,15 +174,15 @@ class CFormInputFileUpload extends CFormInput {
                 // Remove File
                 function file_upload_remove(e) {
                     $( ".' . $div_id . '_remove" ).click(function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            
-                            $(this).parent().remove();
-                           
-                            if ($("#' . $div_id . '").children().length==0) {
-                                    $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">Click Here or Drop Files Here</span>");
-                            }
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        
+                        $(this).parent().remove();
+                       
+                        if ($("#' . $div_id . '").children().length==0) {
+                                $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">Click Here or Drop Files Here</span>");
+                        }
                     })
                 }
 
@@ -208,7 +208,8 @@ class CFormInputFileUpload extends CFormInput {
             ');
             if ($this->removeLink) {
                 $js->appendln('
-                                    div.append("<a class=\"' . $div_id . '_remove\">Remove</a>");
+                                    var remove = $("<a>").addClass("' . $div_id . '_remove").html("Remove");
+                                    div.append(remove);
                                     file_upload_remove();
                 ');
             }
@@ -223,6 +224,8 @@ class CFormInputFileUpload extends CFormInput {
                                         if (this.readyState == 4 && this.status == 200) {
                                             div.removeClass("loading");
                                             div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
+                                        } else if (this.readyState == 4 && this.status != 200) {
+                                            div.remove();
                                         }
                                     };
                                     xhr.open("post", "'.$ajax_url.'");
@@ -250,8 +253,8 @@ class CFormInputFileUpload extends CFormInput {
             ');
             if ($this->removeLink) {
                 $js->appendln('
-                            div.append("<a class=\"' . $div_id . '_remove\">Remove</a>");
-                            file_upload_remove();
+                            var remove = $("<a>").addClass("' . $div_id . '_remove").html("Remove");
+                            div.append(remove);
                 ');
             }
             $js->appendln('
@@ -265,6 +268,8 @@ class CFormInputFileUpload extends CFormInput {
                                 if (this.readyState == 4 && this.status == 200) {
                                     div.removeClass("loading");
                                     div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
+                                } else if (this.readyState == 4 && this.status != 200) {
+                                    div.remove();
                                 }
                             };
                             xhr.open("post", "'.$ajax_url.'");
