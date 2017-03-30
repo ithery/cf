@@ -16,7 +16,6 @@
         protected $callback;
         protected $js_class;
         protected $js_class_manual;
-        protected $custom_id;
 
         public function __construct($owner, $event, $name) {
             parent::__construct($owner, $event, $name);
@@ -29,7 +28,6 @@
             $this->title = '';
             $this->js_class = null;
             $this->js_class_manual = null;
-            $this->custom_id = "";
         }
        
         
@@ -67,12 +65,7 @@
             }
             return $this;
         }
-        
-        public function set_custom_id($param) {
-            $this->custom_id = $param;
-            return $this;
-        }
-        
+                
         public function add_param_request($param_request) {
 		if(!is_array($param_request)) {
 			$param_request = array($param_request);
@@ -147,7 +140,7 @@
                     $content = $this->generated_url();
                 }
                 $js .= "
-                    $." .$this->js_class .".show_dialog('" .$this->target ."','" .$this->title ."','" .$content ."', '".$this->custom_id."');
+                    $." .$this->js_class .".show_dialog('" .$this->target ."','" .$this->title ."','" .$content ."');
                     ";
             }
             else {
