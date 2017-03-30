@@ -124,8 +124,8 @@
          * @param String $file_name Filename included extensions
          * @return type
          */
-        public function get_url($file_name) {
-            return $this->_engine->get_url($file_name);
+        public function get_url($file_name,$size='') {
+            return $this->_engine->get_url($file_name,$size);
         }
 
         public static function decode($filename) {

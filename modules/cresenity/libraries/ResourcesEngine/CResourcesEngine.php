@@ -84,10 +84,13 @@
             return $temp_file_name;
         }
 
-        public function get_url($filename = null) {
+        public function get_url($filename = null,$size='') {
             if ($filename == null) $filename = $this->_filename;
-
-            $path = curl::base(false, 'http') . 'assets/image/' . CResourcesEncode::encode($filename);
+            $size_add = $size;
+            if(strlen($size_add)>0) {
+                $size_add .= '/';
+            }
+            $path = curl::base(false, 'http') . 'assets/image/' . $size_add . CResourcesEncode::encode($filename);
 //            $file_name_encode = $this->encode($file_name,self::_digit);
             return $path;
         }
