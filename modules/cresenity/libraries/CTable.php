@@ -1016,7 +1016,10 @@
                             $col_v = $v;
                             $ori_v = $col_v;
                             foreach ($col->transforms as $trans) {
-                                $col_v = $trans->execute($col_v);
+                                if($trans->get_function()!='format_currency') {
+                                    $col_v = $trans->execute($col_v);
+                                }
+//                                $col_v = $trans->execute($col_v);
                             }
                         }
                     }

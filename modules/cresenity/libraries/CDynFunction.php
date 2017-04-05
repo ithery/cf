@@ -17,6 +17,10 @@
 			return $this;
 		}
 		
+		public function get_function() {
+			return $this->func;
+		}
+		
 		public function add_param($p) {
 			$this->params[] = $p;
 			return $this;
