@@ -70,15 +70,15 @@
                 else {
                     $html->appendln('		<span class="btn btn-file">');
                 }
-                $html->appendln('			<span class="fileupload-new">Select image</span>');
-                $html->appendln('			<span class="fileupload-exists">Change</span>');
+                $html->appendln('			<span class="fileupload-new">' . clang::__('Select Image') . '</span>');
+                $html->appendln('			<span class="fileupload-exists">' . clang::__('Change') . '</span>');
                 $html->appendln('				<input type="file" name="' . $this->name . '" id="' . $this->id . '"/>');
                 $html->appendln('		</span>');
                 if ($this->bootstrap == '3.3') {
-                    $html->appendln('		<a href="#" class="btn fileupload-exists btn-danger" data-dismiss="fileupload">Remove</a>');
+                    $html->appendln('		<a href="#" class="btn fileupload-exists btn-danger" data-dismiss="fileupload">' . clang::__('Remove') . '</a>');
                 }
                 else {
-                    $html->appendln('		<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>');
+                    $html->appendln('		<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">' . clang::__('Remove') . '</a>');
                 }
             }
             $html->appendln('	</div>');
