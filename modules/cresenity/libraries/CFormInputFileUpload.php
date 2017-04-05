@@ -138,7 +138,7 @@ class CFormInputFileUpload extends CFormInput {
         
         $html_description = '';
         if(count($this->files)==0) {
-            $html_description = '<span id="' . $div_id . '_description">Click Here or Drop Files Here</span>';
+            $html_description = '<span id="' . $div_id . '_description">'.clang::__("Click Here or Drop Files Here").'</span>';
         }
         $html->appendln(        '
                         '.$html_description.'
@@ -185,7 +185,7 @@ class CFormInputFileUpload extends CFormInput {
                         $(this).parent().remove();
                        
                         if ($("#' . $div_id . '").children().length==0) {
-                                $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">Click Here or Drop Files Here</span>");
+                                $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">'.clang::__("Click Here or Drop Files Here").'</span>");
                         }
                     })
                 }
