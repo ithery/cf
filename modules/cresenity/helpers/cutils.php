@@ -61,10 +61,10 @@ class cutils {
         $m1 = Date('m');
         $y1 = Date('Y');
         $date1 = $y1 . "-" . $m1 . "-" . $d1;
-		$date_format = ccfg::get('date_formatted');
-		if($date_format!=null) {
-			$date1 = date($date_format,strtotime($date1));
-		}
+        $date_format = ccfg::get('date_formatted');
+        if ($date_format != null) {
+            $date1 = date($date_format, strtotime($date1));
+        }
         return $date1;
     }
 
@@ -73,10 +73,10 @@ class cutils {
         $m2 = Date('m');
         $y2 = Date('Y');
         $date2 = $y2 . "-" . $m2 . "-" . $d2;
-		$date_format = ccfg::get('date_formatted');
-		if($date_format!=null) {
-			$date2 = date($date_format,strtotime($date2));
-		}
+        $date_format = ccfg::get('date_formatted');
+        if ($date_format != null) {
+            $date2 = date($date_format, strtotime($date2));
+        }
         return $date2;
     }
 
@@ -96,61 +96,63 @@ class cutils {
         return ctransform::thousand_separator($rp);
     }
 
-    public static function indonesian_currency_string($val) {
-
-        function get_under_1000($val) {
-            $C_NUMBER = Array('', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan');
-            $res = '';
-            if ($val >= 1000)
-                return $res;
-            //process hundred
-            $tempv = $val;
-            if ($tempv >= 100) {
-                if (floor($tempv / 100) == 1) {
-                    $res = $res . ' Seratus';
-                } else {
-                    $res .= ' ' . $C_NUMBER[floor($tempv / 100)] . ' Ratus';
-                }
+    public static function get_under_1000($val) {
+        $C_NUMBER = Array('', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan');
+        $res = '';
+        if ($val >= 1000)
+            return $res;
+        //process hundred
+        $tempv = $val;
+        if ($tempv >= 100) {
+            if (floor($tempv / 100) == 1) {
+                $res = $res . ' Seratus';
+            } else {
+                $res .= ' ' . $C_NUMBER[floor($tempv / 100)] . ' Ratus';
             }
-            //process ten
-            $tempv = $val % 100;
-            if ($tempv >= 10) {
-                if (floor($tempv / 10) == 1) {
-                    if ($tempv % 10 == 0) {
-                        $res .= ' Sepuluh';
-                    } else if ($tempv % 10 == 1) {
-                        $res .= ' Sebelas';
-                    } else {
-                        $res .= ' ' . $C_NUMBER[$tempv % 10] . ' Belas';
-                    }
+        }
+        //process ten
+        $tempv = $val % 100;
+        if ($tempv >= 10) {
+            if (floor($tempv / 10) == 1) {
+                if ($tempv % 10 == 0) {
+                    $res .= ' Sepuluh';
+                } else if ($tempv % 10 == 1) {
+                    $res .= ' Sebelas';
                 } else {
-                    $res .= ' ' . $C_NUMBER[floor($tempv / 10)] . ' Puluh';
-                    if ($tempv % 10 > 0)
-                        $res .= ' ' . $C_NUMBER[$tempv % 10];
+                    $res .= ' ' . $C_NUMBER[$tempv % 10] . ' Belas';
                 }
             } else {
+                $res .= ' ' . $C_NUMBER[floor($tempv / 10)] . ' Puluh';
                 if ($tempv % 10 > 0)
                     $res .= ' ' . $C_NUMBER[$tempv % 10];
             }
-            $res = trim($res);
-            return $res;
+        } else {
+            if ($tempv % 10 > 0)
+                $res .= ' ' . $C_NUMBER[$tempv % 10];
         }
+        $res = trim($res);
+        return $res;
+    }
+
+    public static function indonesian_currency_string($val) {
+
+
 
         $res = '';
         $tempval = $val;
         if ($tempval >= 1000000000000) {
             $temp_under_1000 = floor($tempval / 1000000000000);
-            $res = $res . ' ' . get_under_1000($temp_under_1000) . ' Triliun';
+            $res = $res . ' ' . self::get_under_1000($temp_under_1000) . ' Triliun';
         }
         $tempval = $val % 1000000000000;
         if ($tempval >= 1000000000) {
             $temp_under_1000 = floor($tempval / 1000000000);
-            $res = $res . ' ' . get_under_1000($temp_under_1000) . ' Miliar';
+            $res = $res . ' ' . self::get_under_1000($temp_under_1000) . ' Miliar';
         }
         $tempval = $val % 1000000000;
         if (floor($val / 1000000) > 0) {
             $temp_under_1000 = floor($tempval / 1000000);
-            $res = $res . ' ' . get_under_1000($temp_under_1000) . ' Juta';
+            $res = $res . ' ' . self::get_under_1000($temp_under_1000) . ' Juta';
         }
         $tempval = $val % 1000000;
 //		if (floor($val / 1000) > 0)  {
@@ -159,11 +161,11 @@ class cutils {
             if ($temp_under_1000 == 1) {
                 $res = $res . ' Seribu';
             } else {
-                $res = $res . ' ' . get_under_1000($temp_under_1000) . ' Ribu';
+                $res = $res . ' ' . self::get_under_1000($temp_under_1000) . ' Ribu';
             }
         }
         $tempval = $val % 1000;
-        $res = $res . ' ' . get_under_1000($tempval);
+        $res = $res . ' ' . self::get_under_1000($tempval);
         $result = trim($res);
         return $result;
     }
@@ -387,8 +389,8 @@ class cutils {
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
         return $second;
     }
-    
-        /**
+
+    /**
      * Converts a unix timestamp to a relative time string, such as "3 days ago"
      * or "2 weeks ago".
      *
@@ -397,18 +399,19 @@ class cutils {
      * @param  string $suffix The string to add to the end, defaults to " ago"
      * @return string
      */
-    public static function human_time_diff($from, $to = '', $as_text = false, $suffix = ' ago')
-    {
+    public static function human_time_diff($from, $to = '', $as_text = false, $suffix = ' ago') {
         if ($to == '') {
             $to = time();
         }
-        
-        if(is_string($from)) $from =strtotime($from);
-        if(is_string($to)) $to =strtotime($to);
-        
+
+        if (is_string($from))
+            $from = strtotime($from);
+        if (is_string($to))
+            $to = strtotime($to);
+
 
         $from = new \DateTime(date('Y-m-d H:i:s', $from));
-        $to   = new \DateTime(date('Y-m-d H:i:s', $to));
+        $to = new \DateTime(date('Y-m-d H:i:s', $to));
         $diff = $from->diff($to);
 
         if ($diff->y > 1) {
@@ -448,7 +451,7 @@ class cutils {
 
         return trim($text) . $suffix;
     }
-    
+
     /**
      * Converts a number into the text equivalent. For example, 456 becomes four
      * hundred and fifty-six.
@@ -458,8 +461,7 @@ class cutils {
      * @param  int|float $number The number to convert into text
      * @return string
      */
-    public static function number_to_word($number)
-    {
+    public static function number_to_word($number) {
         $number = (string) $number;
 
         if (strpos($number, '.') !== false) {
@@ -483,7 +485,7 @@ class cutils {
         } else {
             $length = 19;
             $number = str_pad($number, 60, '0', STR_PAD_LEFT);
-            $group  = rtrim(chunk_split($number, 3, ' '), ' ');
+            $group = rtrim(chunk_split($number, 3, ' '), ' ');
             $groups = explode(' ', $group);
             $groups2 = array();
 
@@ -496,7 +498,7 @@ class cutils {
             for ($z = 0; $z < count($groups2); $z++) {
                 if ($groups2[$z] != '') {
                     $output .= $groups2[$z] . self::numberToWordConvertGroup($length - $z);
-                    $output .= ($z < $length && ! array_search('', array_slice($groups2, $z + 1, -1)) && $groups2[$length] != '' && $groups[$length][0] == '0' ? ' and ' : ', ');
+                    $output .= ($z < $length && !array_search('', array_slice($groups2, $z + 1, -1)) && $groups2[$length] != '' && $groups[$length][0] == '0' ? ' and ' : ', ');
                 }
             }
 
@@ -514,9 +516,8 @@ class cutils {
         return $output;
     }
 
-    protected static function numberToWordConvertGroup($index)
-    {
-        switch($index) {
+    protected static function numberToWordConvertGroup($index) {
+        switch ($index) {
             case 11:
                 return ' decillion';
             case 10:
@@ -546,8 +547,7 @@ class cutils {
         return '';
     }
 
-    protected static function numberToWordThreeDigits($digit1, $digit2, $digit3)
-    {
+    protected static function numberToWordThreeDigits($digit1, $digit2, $digit3) {
         $output = '';
 
         if ($digit1 == '0' && $digit2 == '0' && $digit3 == '0') {
@@ -570,8 +570,7 @@ class cutils {
         return $output;
     }
 
-    protected static function numberToWordTwoDigits($digit1, $digit2)
-    {
+    protected static function numberToWordTwoDigits($digit1, $digit2) {
         if ($digit2 == '0') {
             switch ($digit1) {
                 case '1':
@@ -643,8 +642,7 @@ class cutils {
      * @return string
      * @throws \LogicException
      */
-    protected static function numberToWordConvertDigit($digit)
-    {
+    protected static function numberToWordConvertDigit($digit) {
         switch ($digit) {
             case '0':
                 return 'zero';
@@ -670,6 +668,5 @@ class cutils {
                 throw new \LogicException('Not a number');
         }
     }
-
 
 }
