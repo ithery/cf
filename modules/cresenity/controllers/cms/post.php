@@ -277,6 +277,7 @@ class Post_Controller extends CController {
         $template = "";
         $cms_tag_value = array();
         $post_status_old = '';
+        $push_notification = 1;
         
         
         if (strlen($id) > 0) {
@@ -291,6 +292,7 @@ class Post_Controller extends CController {
                 $post_status = $r_post->post_status;
                 $post_type = $r_post->post_type;
                 $template = $r_post->template;
+                $push_notification = cobj::get($r_post, 'push_notification');
                 
                 $post_status_old = $post_status;
 
@@ -341,6 +343,7 @@ class Post_Controller extends CController {
             $template = carr::get($post, 'template');
             $post_type = carr::get($post, 'post_type');
             $post_status = carr::get($post, 'post_status');
+            $push_notification = carr::get($post, 'push_notification', 0);
             $cms_terms_id = null;
             
             // check if any max_post of post_type, condition if new post
@@ -412,7 +415,9 @@ class Post_Controller extends CController {
                     "post_status" => $post_status,
                     "post_excerpt" => $post_excerpt,
                     "cms_category_id" => $cms_category_id,
+                    "push_notification" => $push_notification,
                 );
+                
                 if (strlen($id) > 0) {
                     $query = "select " .
                             " file_location, filename" .
@@ -762,6 +767,10 @@ class Post_Controller extends CController {
         $widget_right->add_div('template-container');
         $widget_right->add_field()->set_label(clang::__("Post Status"))->add_control('post_status', 'select')->set_value($post_status)->set_list($status_list)->add_class('large');
         $widget_right->add_div('category-container');
+        $push_notification_checkbox = $widget_right->add_field()->set_label(clang::__("Push Notification"))->add_control('push_notification', 'checkbox')->set_value($push_notification);
+        if ($push_notification) {
+            $push_notification_checkbox->set_checked(TRUE);
+        }
         
         /*
         $widget_right->add_field()
