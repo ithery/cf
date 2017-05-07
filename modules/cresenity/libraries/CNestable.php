@@ -96,6 +96,23 @@ class CNestable extends CElement {
         return $this;
     }
 
+    private function get_total_row($lft, $rgt) {
+        $db = CDatabase::instance();
+        $q = "select count(*) 
+            from product 
+            where status > 0 
+            and is_active > 0
+            and status_confirm = 'CONFIRMED'
+            and product_category_id in (
+                select product_category_id 
+                from product_category 
+                where status > 0 
+                and lft >= ".$db->escape($lft)."
+                and rgt <= ".$db->escape($rgt)."
+        )";
+        return cdbutils::get_value($q);
+    }
+    
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -123,8 +140,8 @@ class CNestable extends CElement {
                 }
                 $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->inc_indent();
 
-                $html->appendln('<div class="dd-handle">')->inc_indent();
-                $val = $d[$this->value_key];
+                $html->appendln('<div class="dd-handle">')->inc_indent();                
+                $val = $d[$this->value_key] . ' ('.$this->get_total_row($d['lft'], $d['rgt']) . ')';
                 $new_v = $val;
                 if ($this->display_callback !== false && is_callable($this->display_callback)) {
                     $new_v = CDynFunction::factory($this->display_callback)
