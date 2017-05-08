@@ -205,13 +205,29 @@ class ccms {
         $post_id = carr::get($options, 'post_id');
         $prefix = carr::get($options, 'prefix');
         $container = carr::get($options, 'container');
+        $custom_fields = carr::get($options, 'custom_fields', array());
+        
         if ($container === null) {
             $container = CApp::instance();
         }
         if ($prefix === null) {
             $prefix = '';
         }
-        $fields = self::get_custom_fields($options);
+        
+        $static_fields = array();
+        if (is_array($custom_fields) && count($custom_fields) > 0) {
+            $get_fields = carr::get($custom_fields, 'fields', array());
+            if (is_array($get_fields) && count($get_fields) > 0) {
+                $static_fields = $get_fields;
+            }
+        }
+        
+        if (count($static_fields) > 0) {
+            $fields = $static_fields;
+        }
+        else {
+            $fields = self::get_custom_fields($options);
+        }
 
         if (is_array($fields)) {
             foreach ($fields as $k => $field) {

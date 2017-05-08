@@ -16,6 +16,7 @@
         protected $callback_progress;
         protected $auto_upload;
         protected $max_number_of_files;
+        protected $input_help;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -34,6 +35,7 @@
             $this->callback_progress = null;
             $this->auto_upload = true;
             $this->max_number_of_files = null;
+            $this->input_help = '';
 
             $fileupload = carr::get($this->theme_data, 'fileupload');
             if (strlen($fileupload) > 0) {
@@ -84,6 +86,10 @@
                 $html->appendln('		</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">' . clang::__('Remove') . '</a>');
                 $html->appendln('	</div>');
                 $html->appendln('</div>');
+            }
+            
+            if (strlen($this->input_help) > 0) {
+                $html->appendln('<span class="help-block">'.$this->input_help.'</span>');
             }
 
             //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
@@ -292,6 +298,11 @@
 
         public function set_max_number_of_files($max_number_of_files) {
             $this->max_number_of_files = $max_number_of_files;
+            return $this;
+        }
+        
+        public function set_input_help($param) {
+            $this->input_help = $param;
             return $this;
         }
 

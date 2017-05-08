@@ -52,7 +52,7 @@ class Read_Controller extends CController {
         $post_content = '';
         $category_id = $category;
         if (!is_numeric($category_id)) {
-            $category_id = cdbutils::get_value("SELECT cms_category_id FROM cms_category WHERE url_key = ".$db->escape($category_id) . ' and org_id = ' . $db->escape($org_id));
+            $category_id = cdbutils::get_value("SELECT cms_category_id FROM cms_category WHERE status > 0 AND url_key = ".$db->escape($category_id) . ' and org_id = ' . $db->escape($org_id));
         }
         $category = ccms::get_category($category_id);
         $category_type = $category->category_type;
