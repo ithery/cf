@@ -79,7 +79,7 @@ class CActionList extends CElement {
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $pretag = '<div class="button-list ' . $classes . '">';
+        $pretag = '<div id="'.$this->id.'" class="button-list ' . $classes . '">';
         switch ($this->style) {
             case "form-action":
                 if ($this->bootstrap == '3.3') {
