@@ -84,8 +84,13 @@ class CClientScript extends CObject {
 
             $base_url = curl::base(false, 'http');
         }
+        
+//        if(CF::domain()=='livemall.co.id') {
+//            $base_url = 'http://livemall-70ae.kxcdn.com/';
+//        }
+        
         $file = str_replace($docroot, $base_url, $file);
-
+        
         return $file;
     }
 
@@ -106,6 +111,9 @@ class CClientScript extends CObject {
         if (CApp::instance()->is_mobile()) {
 
             $base_url = curl::base(false, 'http');
+        }
+        if(CF::domain()=='livemall.co.id') {
+            $base_url = 'http://livemall-70ae.kxcdn.com/';
         }
         $file = str_replace($docroot, $base_url, $file);
         return $file;
