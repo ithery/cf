@@ -1,28 +1,19 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
-<!--	
-</div>
--->
+
+
 </div>
 </div>
 </div>
 <div class="footer">
-
     <div class="footer-inner">
-
         <div class="container">
-
             <div class="row">
-
                 <div class="span12">
-                    &copy; 2016 <a href="http://ittron.co.id">Ittron Global Technology</a>.
+                    &copy; 2017 <a href="http://ittron.co.id">Ittron Global Technology</a>.
                 </div> <!-- /span12 -->
-
             </div> <!-- /row -->
-
         </div> <!-- /container -->
-
     </div> <!-- /footer-inner -->
-
 </div> <!-- /footer -->
 
 <script src="<?php echo curl::base(); ?>media/js/require.js"></script>
@@ -30,9 +21,6 @@
 
 <?php echo $end_client_script; ?>
 
-<script language="javascript">
-   
-</script>
 <script language="javascript">
 	
 <?php
