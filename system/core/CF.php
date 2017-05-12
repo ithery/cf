@@ -1172,16 +1172,20 @@ final class CF {
                         clog::log('error_mail.log', 'error', CF::domain()." - ".$ex->getMessage());
                     }
                 }
-                if (!IN_PRODUCTION && !isset($_GET['show_error'])) {
+                
+                // Load the error
+                $custom_error = false;
+                if(!isset($_GET['show_error'])) {
                     if (CView::exists('ccore/error_page')) {
+                        $custom_error=true;
                         echo CView::factory('ccore/error_page')->render();
-                    } else {
-                        CFEvent::run('system.404');
-                    }
-                } else {
-                    // Load the error
+                    } 
+                }
+                if(!$custom_error) {
                     require self::find_file('views', empty($template) ? 'kohana_error_page' : $template);
                 }
+
+                
             } else {
                 // Get the i18n messages
                 $error = self::lang('core.generic_error');
