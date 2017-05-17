@@ -1,14 +1,11 @@
 <?php 
 return array(
-	'app_id'=>'900',
-	'app_code'=>'lastmenit',
-	'org_id'=>'1',
+	'app_id'=>'892',
+	'app_code'=>'ittronmall',
+	'org_id'=>'620585',
 	'org_code'=>'lastmenit',
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'lastmenit.local',
-	'shared_app_code'=>array(
-            "lastmenitshare"
-        ),
-    
+	'theme'=>'Imlasvegas',
 );
