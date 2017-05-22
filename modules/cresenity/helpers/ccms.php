@@ -635,10 +635,19 @@ class ccms {
         $post_type = carr::get($options,'post_type');
         $category_id = carr::get($options,'category_id');
         $sortby = carr::get($options,'sortby');
+        $custom_field = carr::get($options,'custom_field', array());
+        
+        $q_custom_field = "";
+        if (count($custom_field) > 0) {
+            foreach ($custom_field as $custom_field_k => $custom_field_v) {
+                $q_custom_field .= ", (SELECT field_value FROM cms_custom_field WHERE cms_post_id=p.cms_post_id AND field_name=".$db->escape($custom_field_v)." LIMIT 1) ".$custom_field_v;
+            }
+        }
         
         $q = "SELECT
                 tr.cms_term_taxonomy_id, tt.cms_terms_id, t.name term_name, t.slug term_slug,
                 p.*
+                ".$q_custom_field."
                FROM cms_post p
                LEFT JOIN cms_term_relationships tr ON tr.cms_post_id=p.cms_post_id
                LEFT JOIN cms_term_taxonomy tt ON tt.cms_term_taxonomy_id = tr.cms_term_taxonomy_id
@@ -684,6 +693,11 @@ class ccms {
                 $arr_result['post_mime_type'] = $r_v->post_mime_type;
                 $arr_result['created'] = $r_v->created;
                 $arr_result['createdby'] = $r_v->createdby;
+                if (count($custom_field) > 0) {
+                    foreach ($custom_field as $custom_field_k => $custom_field_v) {
+                        $arr_result[$custom_field_v] = cobj::get($r_v, $custom_field_v);
+                    }
+                }
                 $result[] = $arr_result;
             }
         }
