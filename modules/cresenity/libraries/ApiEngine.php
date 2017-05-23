@@ -237,7 +237,7 @@
             foreach ($temp_log_path as $k => $v) {
                 $full_log_path .= $v . DS;
                 if (!is_dir($full_log_path) && !file_exists($full_log_path)) {
-                    mkdir($full_log_path);
+                    @mkdir($full_log_path);
                 }
             }
 
