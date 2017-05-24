@@ -14,6 +14,7 @@ class CMobile_Handler extends CObject  {
 	protected $driver;
 	
 	protected function __construct($owner,$event,$name) {
+            
 		parent::__construct();
 		
 		

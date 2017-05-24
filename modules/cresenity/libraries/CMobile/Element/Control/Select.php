@@ -92,6 +92,11 @@ class CMobile_Element_Control_Select extends CMobile_Element_AbstractControl {
             foreach ($this->group_list as $k_group => $list) {
                 $this->add('<optgroup label="' . $k_group . '">');
                 foreach ($list as $k_list => $v) {
+                    $data_id = carr::get($v, 'id', NULL);
+                    $option_value = $k_list;
+                    if ($data_id != NULL) {
+                        $option_value = $data_id;
+                    }
                     $data_icon = '';
                     $class_option = '';
                     if(isset($v['icon_position'])) {
@@ -103,7 +108,7 @@ class CMobile_Element_Control_Select extends CMobile_Element_AbstractControl {
                         $data_icon = $v['icon'];
                         $class_option .= ' circle';
                     }
-                    $this->add('<option value="' . $k_list . '" data-icon="' . $data_icon . '" class="' . $class_option . '">' . $v['text'] . '</option>');
+                    $this->add('<option value="' . $option_value . '" data-icon="' . $data_icon . '" class="' . $class_option . '">' . $v['text'] . '</option>');
                 }
                 $this->add('</optgroup>');
             }
