@@ -60,7 +60,7 @@
                 $attr.=$k . '="' . $v . '" ';
             }
             $html->appendln('<div class="fileupload fileupload-new" data-provides="fileupload">');
-            $html->appendln('	<div class="fileupload-new thumbnail" ><img ' . $attr . ' id="cimg_' . $this->id . '" src="' . $this->imgsrc . '"  /></div>');
+            $html->appendln('	<div class="fileupload-new thumbnail" ><img ' . $attr . ' id="cimg_' . $this->id . '" src="' . $this->imgsrc . '" style="max-width: ' . $this->maxwidth . 'px; max-height: ' . $this->maxheight . 'px;"  /></div>');
             $html->appendln('	<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: ' . $this->maxwidth . 'px; max-height: ' . $this->maxheight . 'px; line-height: 20px;"></div>');
             $html->appendln('	<div>');
             if ($this->disabled_upload == false) {
