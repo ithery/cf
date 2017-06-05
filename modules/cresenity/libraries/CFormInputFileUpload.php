@@ -8,6 +8,8 @@ class CFormInputFileUpload extends CFormInput {
     protected $disabled;
     protected $files;
     protected $link;
+    protected $custom_control;
+    protected $custom_control_value;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -17,6 +19,8 @@ class CFormInputFileUpload extends CFormInput {
         $this->applyjs = "fileupload";
         $this->uniqid = uniqid();
         $this->files = array();
+        $this->custom_control = array();
+        $this->custom_control_value = array();
         $this->link = '';
     }
 
@@ -42,7 +46,20 @@ class CFormInputFileUpload extends CFormInput {
         $this->files[] = $arr;
         return $this;
     }
+    public function add_custom_control($control,$input_name,$input_label) {
+        $arr = array();
+        $arr['control'] = $control;
+        $arr['input_name'] = $input_name;
+        $arr['input_label'] = $input_label;
+        $this->custom_control[] = $arr;
+        return $this;
+    }
 
+    public function add_custom_control_value($input_name,$control_name,$input_value) {
+        $this->custom_control_value[$input_name][$control_name] = $input_value;
+        return $this;
+    }
+        
     public function set_link($value) {
         $this->link = $value;
         return $this;
@@ -75,16 +92,22 @@ class CFormInputFileUpload extends CFormInput {
                         border: 5px dashed #CDCDCD;
                         background-color: rgba(0, 0, 0, 0.05);
                     }
-                    #' . $div_id . ' div {
+                    #' . $div_id . ' div.container-file-upload {
                         border: 1px solid #ddd;
                         margin: 10px 10px;
-                        width: 100px;
-                        height: 100px;
+                        width: 200px;
+                        height: auto;
                         float: left;
                         text-align: center;
                         position: relative;
                         border-radius: 4px;
                         padding:4px;
+                    }
+                    #'.$div_id.' .div-img{
+                        border: 0px;
+                        width: auto;
+                        height: 100px;
+                        margin: 10px 0px;
                     }
                     #' . $div_id . ' div img {
                         width: 100%;
@@ -116,22 +139,49 @@ class CFormInputFileUpload extends CFormInput {
                     .' . $div_id . '_remove {
                         cursor: pointer;
                     }
+                    .div-custom-control{
+                        margin-top:10px;
+                    }
+                    
+                    .div-custom-control label{
+                        display:inline-block;
+                    }
+                    .div-custom-control input[type="text"]{
+                        display:inline-block;
+                        width:auto;
+                    }
                 </style>
                 <input id="' . $div_id . '_input_temp" type="file" name="'.$div_id.'_input_temp[]" multiple style="display:none;">
                 <div id="' . $div_id . '_message" class="row alert alert-danger fade in">
                 </div>
                 <div id="' . $div_id . '" class="row control-fileupload">
                 ');
-        
         foreach($this->files as $f) {
             $input_name = carr::get($f,'input_name');
             $file_url = carr::get($f,'file_url');
                     //<input id="' . $div_id . '_input_'.$ii.'" class="'.$div_id.'_i" type="file" name="'.$this->name.'['.$input_name.']" style="display:none;">    
             $html->appendln('
-                <div class="' . $div_id . '_file">
-                    <img src="'.$file_url.'" />
-                    <a class="' . $div_id . '_remove">Remove</a>
-                    <input type="hidden" name="'. $this->name .'['.$input_name.']" value="">
+                <div class="' . $div_id . '_file container-file-upload">
+                    <div class="div-img">
+                        <img src="'.$file_url.'" />
+                        <input type="hidden" name="'. $this->name .'['.$input_name.']" value="">
+                    </div>
+            ');
+            foreach($this->custom_control as $cc){
+                    $control=carr::get($cc,'control');
+                    $control_name=carr::get($cc,'input_name');
+                    $control_label=carr::get($cc,'input_label');
+                    //get value
+                    $control_value=carr::get($this->custom_control_value,$input_name,array());
+                    $value=carr::get($control_value,$control_name);
+                    $html->appendln('
+                        <div class="div-custom-control">
+                            <label>'.$control_label.' :</label><input type="'.$control.'" name="'. $this->name .'_custom_control['.$input_name.']['.$control_name.']" value="'.$value.'"  >
+                        </div>
+                    ');
+            }
+            $html->appendln('
+                        <a class="' . $div_id . '_remove">Remove</a>
                 </div>
             ');
         }
@@ -161,6 +211,7 @@ class CFormInputFileUpload extends CFormInput {
         if ($this->applyjs == "fileupload") {
             
             $js->appendln('
+                var index=0;
                 var description = $("#' . $div_id . '_description");
 
                 $(this).on({
@@ -171,9 +222,12 @@ class CFormInputFileUpload extends CFormInput {
                     "drop": function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                    }
+                    },
                 })
-
+                $(".container-file-upload").click(function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                });
                 // Remove File
                 function file_upload_remove(e) {
                     
@@ -214,9 +268,28 @@ class CFormInputFileUpload extends CFormInput {
                                 reader.onload = $.proxy(function(file, fileList, event) {
                                     
                                     var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
-                                    var div = $("<div>").addClass("' . $div_id . '_file");
-                                    div.append(img);
+                                    var div = $("<div>").addClass("' . $div_id . '_file container-file-upload");
+                                    div.click(function(e){
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    });
+                                    var div_img=$("<div>").addClass("div-img");
+                                    div_img.append(img);
+                                    div.append(div_img);
             ');
+            foreach($this->custom_control as $cc){
+                $control=carr::get($cc,'control');
+                $control_name=carr::get($cc,'input_name');
+                $control_label=carr::get($cc,'input_label');
+                $js->appendln('
+                    var div_cc=$("<div>").addClass("div-custom-control");
+                    var cc_label=$("<label>").html("'.$control_label.' :");
+                    var cc=$("<input type=\"'.$control.'\" name=\"'.$this->name.'_custom_control["+index+"]['.$control_name.']\">");
+                    div_cc.append(cc_label);
+                    div_cc.append(cc);
+                    div.append(div_cc);
+                ');
+            }
             if ($this->removeLink) {
                 $js->appendln('
                                     var remove = $("<a>").addClass("' . $div_id . '_remove").html("Remove");
@@ -234,7 +307,8 @@ class CFormInputFileUpload extends CFormInput {
                                     xhr.onreadystatechange = function() {
                                         if (this.readyState == 4 && this.status == 200) {
                                             div.removeClass("loading");
-                                            div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
+                                            div.append("<input type=\"hidden\" name=\"'. $this->name .'["+index+"]\" value="+ this.responseText +">");
+                                            index++;
                                         } else if (this.readyState == 4 && this.status != 200) {
                                             //div.remove();
                                         }
@@ -259,9 +333,28 @@ class CFormInputFileUpload extends CFormInput {
                         reader.onload = $.proxy(function(file, fileList, event) {
                                 
                             var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
-                            var div = $("<div>").addClass("' . $div_id . '_file");
-                            div.append(img);
+                            var div = $("<div>").addClass("' . $div_id . '_file container-file-upload");
+                            div.click(function(e){
+                                e.preventDefault();
+                                e.stopPropagation();
+                            });
+                            var div_img=$("<div>").addClass("div-img");
+                            div_img.append(img);
+                            div.append(div_img);
             ');
+            foreach($this->custom_control as $cc){
+                $control=carr::get($cc,'control');
+                $control_name=carr::get($cc,'input_name');
+                $control_label=carr::get($cc,'input_label');
+                $js->appendln('
+                    var div_cc=$("<div>").addClass("div-custom-control");
+                    var cc_label=$("<label>").html("'.$control_label.' :");
+                    var cc=$("<input type=\"'.$control.'\" name=\"'.$this->name.'_custom_control["+index+"]['.$control_name.']\">");
+                    div_cc.append(cc_label);
+                    div_cc.append(cc);
+                    div.append(div_cc);
+                ');
+            }
             if ($this->removeLink) {
                 $js->appendln('
                             var remove = $("<a>").addClass("' . $div_id . '_remove").html("Remove");
@@ -279,7 +372,8 @@ class CFormInputFileUpload extends CFormInput {
                             xhr.onreadystatechange = function() {
                                 if (this.readyState == 4 && this.status == 200) {
                                     div.removeClass("loading");
-                                    div.append("<input type=\"hidden\" name=\"'. $this->name .'[]\" value="+ this.responseText +">");
+                                    div.append("<input type=\"hidden\" name=\"'. $this->name .'["+index+"]\" value="+ this.responseText +">");
+                                    index++;
                                 } else if (this.readyState == 4 && this.status != 200) {
                                     //div.remove();
                                 }
