@@ -1,9 +1,9 @@
 <?php 
 return array(
-	'app_id'=>'800',
+	'app_id'=>'928',
 	'app_code'=>'spread',
-	'org_id'=>'620028',
-	'org_code'=>'ittronmall',
+	'org_id'=>NULL,
+	'org_code'=>NULL,
 	'store_id'=>NULL,
 	'store_code'=>NULL,
 	'domain'=>'spread.local',
