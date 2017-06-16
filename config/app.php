@@ -23,7 +23,7 @@ $config["code_test"] = false;
 
 $config["require_js"] = true;
 $config["merge_js"] = false;
-$config["minify_js"] = true;
+$config["minify_js"] = false;
 
 $config["merge_css"] = false;
 $config["minify_css"] = true;

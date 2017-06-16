@@ -428,6 +428,28 @@
                 $left = cdbutils::get_value($qleft) + 1;
             }
         }
+        
+        function rebuild_tree_all_ignore_status() {
+            $db = $this->db;
+            $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where 1=1 ";
+            if (strlen($this->org_id) > 0) {
+                $q.=" and org_id=" . $db->escape($this->org_id) . "";
+            }
+            $q.= " and parent_id is null order by lft asc";
+            $r = $db->query($q)->result(false);
+            $left = 1;
+
+            foreach ($r as $row) {
+                $pk = $this->pk_column;
+                $this->rebuild_tree_ignore_status($row[$pk], $left);
+                //$qleft="select rgt from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
+                $qleft = "select rgt from " . $db->escape_table($this->table_name) . " where 1=1 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
+                if (strlen($this->org_id) > 0) {
+                    $qleft.=" and org_id=" . $db->escape($this->org_id) . "";
+                }
+                $left = cdbutils::get_value($qleft) + 1;
+            }
+        }
 
         function rebuild_tree($id = null, $left = 1, $depth = 0) {
             // the right value of this node is the left value + 1   
@@ -435,6 +457,52 @@
             $right = $left + 1;
             // get all children of this node   
             $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where  status>0";
+            if (strlen($this->org_id) > 0) {
+                $q.=" and org_id=" . $db->escape($this->org_id) . "";
+            }
+
+            if ($id != null) {
+                $q.= " and parent_id = " . $db->escape($id);
+            }
+            else {
+                $q.= " and parent_id is null";
+            }
+
+            if ($this->have_priority) {
+                $q .= " ORDER BY priority";
+            }
+            else {
+                $q .= " ORDER BY lft asc";
+            }
+            $r = $db->query($q)->result(false);
+            foreach ($r as $row) {
+                // recursive execution of this function for each   
+                // child of this node   
+                // $right is the current right value, which is   
+                // incremented by the rebuild_tree function   
+                $pk = $this->pk_column;
+                $right = $this->rebuild_tree($row[$pk], $right, $depth + 1);
+            }
+
+            // we've got the left value, and now that we've processed   
+            // the children of this node we also know the right value   
+
+            $data = array(
+                'lft' => $left,
+                'rgt' => $right,
+                'depth' => $depth,
+            );
+            $db->update($this->table_name, $data, array($this->pk_column => $id));
+            // return the right value of this node + 1   
+            return $right + 1;
+        }
+        
+        function rebuild_tree_ignore_status($id = null, $left = 1, $depth = 0) {
+            // the right value of this node is the left value + 1   
+            $db = $this->db;
+            $right = $left + 1;
+            // get all children of this node   
+            $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where 1=1 ";
             if (strlen($this->org_id) > 0) {
                 $q.=" and org_id=" . $db->escape($this->org_id) . "";
             }

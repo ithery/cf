@@ -146,7 +146,7 @@ class CMobile_Handler_Page extends CMobile_HandlerDriver {
             }
             else {
                 $js.= "
-                        $.cresenity.show_page('" . $this->id . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
+                        $.cresenity.show_page('" . $this->id . "','" . $this->generated_url() . "','" . $this->method . "','" . addslashes($this->title ). "'," . $data_addition . ");
                     ";
             }
             return $js;

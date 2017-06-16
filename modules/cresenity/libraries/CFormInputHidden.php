@@ -23,7 +23,13 @@ class CFormInputHidden extends CFormInput {
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
             $classes = " " . $classes;
-		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" class="'.$classes.'" value="'.$this->value.'">')->br();
+        
+            $attr = '';
+            foreach ($this->attr as $k => $v) {
+                $attr.=$k . '="' . $v . '" ';
+            }
+        
+		$html->appendln('<input type="hidden" name="'.$this->name.'" id="'.$this->id.'" class="'.$classes.'" '.$attr.' value="'.$this->value.'">')->br();
 		return $html->text();
 	}		
 	public function js($indent=0) {			
