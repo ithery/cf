@@ -83,7 +83,7 @@
             }
             $html->appendln('			<input type="file" name="' . $name . '" id="' . $this->id . '" class="file' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $multiple . ' />')->inc_indent()->br();
             if ($this->applyjs == "file-upload") {
-                $html->appendln('		</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">' . clang::__('Remove') . '</a>');
+                $html->appendln('		</span><a href="#" class="btn remove fileupload-exists" data-dismiss="fileupload">' . clang::__('Remove') . '</a>');
                 $html->appendln('	</div>');
                 $html->appendln('</div>');
             }

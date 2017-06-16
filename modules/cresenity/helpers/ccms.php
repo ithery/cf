@@ -95,6 +95,7 @@ class ccms {
 
     public static function update_custom_field($options, $field_name = null, $field_value = null) {
         $db = CDatabase::instance();
+        $set_null = false;
         //check custom_field
         $field_type = null;
 
@@ -111,7 +112,7 @@ class ccms {
             throw new Exception('Field name is empty');
         }
 
-
+        
         $r = null;
         $row = cdbutils::get_row('select * from cms_custom_field where cms_post_id=' . $db->escape($post_id) . " and field_name=" . $db->escape($field_name));
         if ($row !== null && strlen($field_type) == 0) {
@@ -128,6 +129,9 @@ class ccms {
             case 'file':
                 if(strlen(carr::get($field_value,'filename'))==0) {
                     $need_update = false;
+                } else if (carr::get($field_value,'filename') === "clear_data"){
+                    $need_update = true;
+                    $set_null = true;
                 }
                 $field_value = json_encode($field_value);
                 break;
@@ -144,6 +148,12 @@ class ccms {
             $r = $db->insert('cms_custom_field', $data);
         } else {
             if ($need_update) {
+                if ($set_null) {
+                    $data = array(
+                        'field_name' => $field_name,
+                        'field_value' => NULL,
+                    );
+                }
                 $r = $db->update('cms_custom_field', $data, array('cms_post_id' => $post_id, 'field_name' => $field_name));
             }
         }
