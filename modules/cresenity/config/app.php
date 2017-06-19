@@ -7,4 +7,6 @@ return array (
 	"have_user_permission"=>true,
 	"have_clock"=>false,
 	"theme"=>'cresenity',
+	"change_theme"=>false,
+    
 );

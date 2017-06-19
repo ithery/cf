@@ -53,6 +53,7 @@
         
         public function set_org_id($id) {
             $this->org_id = $id;
+            
             return $this;
         }
 
@@ -386,13 +387,9 @@
             $q.= " order by lft asc";
             if ($id != null) {
                 $qrgt = "select rgt from " . $db->escape_table($this->table_name) . " where " . $db->escape_column($this->pk_column) . " = " . $db->escape($id) . "";
-                if (strlen($this->org_id) > 0) {
-                    $qrgt.=" and org_id=" . $db->escape($this->org_id) . "";
-                }
+                
                 $qlft = "select lft from " . $db->escape_table($this->table_name) . " where  " . $db->escape_column($this->pk_column) . " = " . $db->escape($id) . "";
-                if (strlen($this->org_id) > 0) {
-                    $qlft.=" and org_id=" . $db->escape($this->org_id) . "";
-                }
+                
                 $rgt = cdbutils::get_value($qrgt);
                 $lft = cdbutils::get_value($qlft);
                 $q = "select * from " . $db->escape_table($this->table_name) . " where status>0 and lft>" . $db->escape($lft) . " and rgt<" . $db->escape($rgt) . " " . $this->filter_where() . " ";
@@ -400,6 +397,11 @@
                     $q.=" and org_id=" . $db->escape($this->org_id) . "";
                 }
                 $q.=" order by lft asc";
+                if(isset($_GET['mydebug'])) {
+                    cdbg::var_dump($this->org_id);
+                    cdbg::var_dump($q);
+                    die();
+                }
             }
 
             $r = $db->query($q)->result(false);

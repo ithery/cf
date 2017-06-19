@@ -784,6 +784,17 @@
             if (strlen($id) > 0) {
                 $q.=" and parent_id=" . $db->escape($id);
             }
+            $org_id = CF::org_id();
+            $user = $this->user();
+            if($user!=null) {
+                if(strlen($org_id)==0) {
+                    $org_id = $user->org_id;
+                }
+            }
+            if($org_id==0) $org_id = null;
+            if(strlen($org_id)>0) {
+                $q.=" and org_id=".$db->escape($org_id);
+            }
             $result = array();
             $r = $db->query($q);
             foreach ($r as $row) {
