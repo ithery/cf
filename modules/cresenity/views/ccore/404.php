@@ -1,5 +1,23 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.'); 
 
+// $db = CDatabase::instance();
+// if (strpos(CF::domain(), 'compromall.id') !== false) {
+//     $q = '
+//         SELECT
+//             COUNT(*)
+//         FROM
+//             org
+//         WHERE
+//             status > 0
+//             AND domain like "%' . $db->escape_like(CF::domain()) . '%"
+//     ';
+
+//     $res = cdbutils::get_value($q);
+//     if ($res == 0) {
+//         header('Location: //compromall.id');
+//     }
+// }
+
 	$username = "";
 	$password = "";
 	if(isset($_GET["demo"])) {
