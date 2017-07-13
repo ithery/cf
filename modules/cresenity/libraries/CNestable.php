@@ -13,6 +13,7 @@ class CNestable extends CElement {
     protected $requires;
     protected $js_cell;
     protected $collapse_all;
+    protected $display_total_row;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -28,6 +29,7 @@ class CNestable extends CElement {
         $this->requires = array();
         $this->js_cell = '';
         $this->collapse_all = false;
+        $this->display_total_row = true;
     }
 
     public static function factory($id) {
@@ -46,6 +48,12 @@ class CNestable extends CElement {
         $this->collapse_all = $bool;
         return $this;
     }
+    
+    public function show_total_row($bool) {
+        $this->display_total_row = $bool;
+        return $this;
+    }
+    
     public function have_action() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->row_action_list->child_count() > 0;
@@ -95,6 +103,8 @@ class CNestable extends CElement {
         $this->applyjs = $boolean;
         return $this;
     }
+    
+    
 
     private function get_total_row($lft, $rgt) {
         $db = CDatabase::instance();
@@ -140,8 +150,11 @@ class CNestable extends CElement {
                 }
                 $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->inc_indent();
 
-                $html->appendln('<div class="dd-handle">')->inc_indent();                
-                $val = $d[$this->value_key] . ' ('.$this->get_total_row($d['lft'], $d['rgt']) . ')';
+                $html->appendln('<div class="dd-handle">')->inc_indent();
+                $val = $d[$this->value_key];
+                if ($this->display_total_row) {
+                    $val .= ' ('.$this->get_total_row($d['lft'], $d['rgt']) . ')';
+                }
                 $new_v = $val;
                 if ($this->display_callback !== false && is_callable($this->display_callback)) {
                     $new_v = CDynFunction::factory($this->display_callback)
