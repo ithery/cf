@@ -143,7 +143,9 @@
                             case 'xml':
                                 // get all xml request
                                 $xml_obj = simplexml_load_string($post_data);
-                                $request = $this->xml2array($xml_obj);
+                                if ($xml_obj) {
+                                    $request = $this->xml2array($xml_obj);
+                                }
                                 break;
                             default:
                                 $request += $post_data;
