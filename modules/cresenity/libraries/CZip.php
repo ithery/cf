@@ -24,15 +24,17 @@ class CZip {
         $result = 1;
         if (!file_exists($dest)) {
             $cont = false;
-            $result = 'file / directory does not exist';
+            //$result = 'file / directory does not exist';
+            throw new Exception ('file / directory does not exist');
         }
-
 
         if ($cont) {
             $pclzip = $this->pclzip;
             $res = $pclzip->create($dest, PCLZIP_OPT_REMOVE_PATH, $dest, PCLZIP_OPT_ADD_PATH, $zip_path);
             if ($res == 0) {
-                $result = $pclzip->errorInfo(true);
+                //die("Error : ".$pclzip->errorInfo(true));
+                //$result = $pclzip->errorInfo(true);
+                throw new Exception ($pclzip->errorInfo(true));
             }
         }
         return $result;
