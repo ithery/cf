@@ -383,7 +383,12 @@ class Cresenity_Controller extends CController {
                     }
                     if (!$success_login) {
                         $error++;
-                        $error_message = "Email/password invalid";
+                        if (ccfg::get('compromall_system')) {
+                            $error_message = "Username/Password Invalid";
+                        } else {
+                            $error_message = "Email/Password Invalid";
+                        }
+                        
                     }
                 } catch (Exception $ex) {
                     $error++;
