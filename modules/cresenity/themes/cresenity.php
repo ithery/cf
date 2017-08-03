@@ -25,20 +25,13 @@ return array(
 		'chosen',
 		'uniform',
 		'select2',
-		'image-gallery',
 		'modernizr',
-		'multiselect',
-		'elfinder',
-		'prettify',
-		'bootstrap-switch',
 	),
 	
 	
 	"js" => array(
 		"cresenity.func.js",
 		"cresenity.js",
-		"cresenity.item_batch.js",
-		"cresenity.pricing_detail.js",
 	),
 	"css" => array(
 		"cresenity.colors.css",

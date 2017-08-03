@@ -12,6 +12,7 @@
         protected $auto_select;
         protected $min_input_length;
         protected $dropdown_classes;
+        protected $delay;
 
         public function __construct($id) {
             parent::__construct($id);
@@ -27,6 +28,7 @@
             $this->multiple = false;
             $this->auto_select = false;
             $this->min_input_length = 0;
+            $this->delay = 100;
         }
 
         public static function factory($id) {
@@ -35,6 +37,11 @@
 
         public function set_multiple($bool) {
             $this->multiple = $bool;
+            return $this;
+        }
+        
+        public function set_delay($val) {
+            $this->delay = $val;
             return $this;
         }
 
@@ -289,6 +296,8 @@
                         ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
                                 url: '" . $ajax_url . "',
                                 dataType: 'jsonp',
+                                quietMillis: ".$this->delay.", 
+                                delay: ".$this->delay.", 
                                 " . $str_multiple . "
                                 data: function (params) {
                                     return {
@@ -344,6 +353,8 @@
 				minimumInputLength: '" . $this->min_input_length . "',
 				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 					url: '" . $ajax_url . "',
+                                        quietMillis: ".$this->delay.", 
+                                        delay: ".$this->delay.", 
 					dataType: 'jsonp',
 					" . $str_multiple . "
 					data: function (term, page) {

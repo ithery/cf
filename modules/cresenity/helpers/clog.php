@@ -221,8 +221,13 @@
                     }
                 }
             }
-            $user = cuser::get($user_id);
-            $org_id = $user->org_id;
+            $org_id = CF::org_id();
+            if($org_id==null) {
+                $user = cuser::get($user_id);
+                if($user!=null) {
+                    $org_id = $user->org_id;
+                }
+            }
             $data = array(
                 "activity_date" => date("Y-m-d H:i:s"),
                 "org_id" => $org_id,

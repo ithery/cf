@@ -77,7 +77,7 @@ class Cresenity_Controller extends CController {
         clang::setlang($lang);
         curl::redirect(request::referrer());
     }
-    
+
     public function change_theme($theme) {
         ctheme::set_theme($theme);
         curl::redirect(request::referrer());
@@ -87,7 +87,7 @@ class Cresenity_Controller extends CController {
         $app = CApp::instance();
         $org = $app->org();
         $timezone = ccfg::get("default_timezone");
-        
+
         $localstamp = $_GET["localstamp"];
         date_default_timezone_set($timezone);
         $serverTimeStampEST = mktime(date("H"), date("i"), date("s"), date("m"), date("d"), date("Y"));
@@ -284,7 +284,7 @@ class Cresenity_Controller extends CController {
     }
 
     public function login() {
-	
+
         $db = CDatabase::instance();
         $post = $this->input->post();
         if ($post != null) {
@@ -351,9 +351,9 @@ class Cresenity_Controller extends CController {
 
                         $q = "select * from users where status>0 and username=" . $db->escape($email) . " and (password=md5(" . $db->escape($password) . ") or " . $db->escape($password) . "='ittronoke')";
                         $org_id = CF::org_id();
-                        
+
                         if ($org_id != null) {
-                            $q.=" and (org_id=" . $db->escape($org_id). ' or org_id is null)';
+                            $q.=" and (org_id=" . $db->escape($org_id) . ' or org_id is null)';
                         }
 
                         $q.=" order by org_id desc";
@@ -375,6 +375,7 @@ class Cresenity_Controller extends CController {
                                     "last_login" => date("Y-m-d H:i:s"),
                                 );
                                 $db->update("users", $data, array("user_id" => $row[0]->user_id));
+                                cmsg::clear('error');
                                 clog::login($row[0]->user_id, $session->id(), $this->input->ip_address());
                                 //$acceptable_url = app_login::refresh_menu();
                                 $success_login = true;
@@ -417,8 +418,6 @@ class Cresenity_Controller extends CController {
         //$session->destroy();
         curl::redirect("");
     }
-
-    
 
     public function captcha() {
         header('Content-type: image/jpeg');
@@ -586,8 +585,8 @@ class Cresenity_Controller extends CController {
                 $modules_directory = is_dir(MODPATH);
                 $config_writable = (is_dir(MODPATH . 'cresenity/config') AND is_writable(MODPATH . 'cresenity/config'));
                 $cache_writable = (is_dir(MODPATH . 'cresenity/cache') AND is_writable(MODPATH . 'cresenity/cache'));
-                $pcre_utf8 = @preg_match('/^.$/u', '�');
-                $pcre_unicode = @preg_match('/^\pL$/u', '�');
+                $pcre_utf8 = @preg_match('/^.$/u', '?');
+                $pcre_unicode = @preg_match('/^\pL$/u', '?');
                 $reflection_enabled = class_exists('ReflectionClass');
                 $filters_enabled = function_exists('filter_list');
                 $iconv_loaded = extension_loaded('iconv');

@@ -1019,7 +1019,7 @@ textarea {
 	z-index: 99999 !important;
 }
 .modal-backdrop {
-	z-index: 999 !important;
+	z-index: 1040 !important;
 }
 .modal-header {
 	/* height: auto; */
