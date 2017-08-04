@@ -77,6 +77,17 @@ define('EXT', '.php');
 // $Id: index.php 3915 2009-01-20 20:52:20Z zombor $
 //
 
+if(isset($_FILES) && is_array($_FILES)) {
+    foreach($_FILES as $k=>$v) {
+        if(isset($v['name'])) {
+            $ext = pathinfo($v['name'], PATHINFO_EXTENSION);
+            if($ext == 'php' || $ext == 'sh') {
+                die('Not Allowed X_X');
+            }
+        }
+    }
+}
+
 $kohana_pathinfo = pathinfo(__FILE__);
 // Define the front controller name and docroot
 define('DOCROOT', $kohana_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
