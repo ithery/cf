@@ -80,9 +80,18 @@ define('EXT', '.php');
 if(isset($_FILES) && is_array($_FILES)) {
     foreach($_FILES as $k=>$v) {
         if(isset($v['name'])) {
-            $ext = pathinfo($v['name'], PATHINFO_EXTENSION);
-            if($ext == 'php' || $ext == 'sh') {
-                die('Not Allowed X_X');
+            $t = $v['name'];
+
+            if(!is_array($t)) {
+                $t = array($t);
+            }
+            foreach($t as $g) {
+                if (!is_array($g)) {
+                    $ext = pathinfo($g, PATHINFO_EXTENSION);
+                    if($ext == 'php' || $ext == 'sh') {
+                        die('Not Allowed X_X');
+                    }
+                }
             }
         }
     }
