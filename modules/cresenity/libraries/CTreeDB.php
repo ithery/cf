@@ -415,7 +415,7 @@
             if (strlen($this->org_id) > 0) {
                 $q.=" and org_id=" . $db->escape($this->org_id) . "";
             }
-            $q.= " and parent_id is null order by lft asc";
+            $q.= " and parent_id is null order by lft,".$db->escape_column($this->pk_column)." asc";
             $r = $db->query($q)->result(false);
             $left = 1;
 
@@ -474,7 +474,7 @@
                 $q .= " ORDER BY priority";
             }
             else {
-                $q .= " ORDER BY lft asc";
+                $q .= " ORDER BY lft,".$db->escape_column($this->pk_column)." asc";
             }
             $r = $db->query($q)->result(false);
             foreach ($r as $row) {

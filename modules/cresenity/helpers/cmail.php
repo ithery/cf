@@ -201,7 +201,11 @@ class cmail {
         if ($smtp_from == null) {
             $smtp_from = ccfg::get('smtp_from');
         }
-        $mail->set_from($smtp_from);
+        $smtp_from_name=carr::get($options,'smtp_from_name');
+        if ($smtp_from_name == null) {
+            $smtp_from_name = ccfg::get('smtp_from_name');
+        }
+        $mail->set_from($smtp_from,$smtp_from_name);
 
         $mail->set_message_html($message);
         $mail->set_subject($subject);

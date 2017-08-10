@@ -37,11 +37,16 @@ class CFormInputPassword extends CFormInput {
         if ($this->bootstrap >= '3') {
             $classes = $classes . " form-control ";
         }
+        $custom_css = $this->custom_css;
+        $custom_css = crenderer::render_style($custom_css);
+        if (strlen($custom_css) > 0) {
+            $custom_css = ' style="' . $custom_css . '"';
+        }
         $additional_attr = ' autocomplete="off"';
         if ($this->autocomplete) {
             $additional_attr = ' autocomplete="on"';
         }
-        $html->appendln('<input type="password" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '" ' . $additional_attr . '>')->br();
+        $html->appendln('<input type="password" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" '.$custom_css.' class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '" ' . $additional_attr . '>')->br();
         return $html->text();
     }
 
