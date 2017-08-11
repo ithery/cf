@@ -1,46 +1,46 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
 
 class CView extends View {
-	public static function factory($name = NULL, $data = NULL, $type = NULL) {
-        
-		return new CView($name, $data, $type);
+
+    public static function factory($name = NULL, $data = NULL, $type = NULL) {
+
+        return new CView($name, $data, $type);
     }
-	
-	public static function load_view($view_filename, $input_data) {
-		if ($view_filename == '')
-			return;
 
-		// Buffering on
-		ob_start();
+    public static function load_view($view_filename, $input_data) {
+        if ($view_filename == '')
+            return;
 
-		// Import the view variables to local namespace
-		extract($input_data, EXTR_SKIP);
+        // Buffering on
+        ob_start();
 
-		// Views are straight HTML pages with embedded PHP, so importing them
-		// this way insures that $this can be accessed as if the user was in
-		// the controller, which gives the easiest access to libraries in views
-		try
-		{
-			include $view_filename;
-		}
-		catch (Exception $e)
-		{
-			ob_end_clean();
-			throw $e;
-		}
+        // Import the view variables to local namespace
+        extract($input_data, EXTR_SKIP);
 
-		// Fetch the output and close the buffer
-		return ob_get_clean();
-	}
-	
-	public static function exists($name) {
+        // Views are straight HTML pages with embedded PHP, so importing them
+        // this way insures that $this can be accessed as if the user was in
+        // the controller, which gives the easiest access to libraries in views
+        try {
+            include $view_filename;
+        } catch (Exception $e) {
+            ob_end_clean();
+            throw $e;
+        }
+
+        // Fetch the output and close the buffer
+        return ob_get_clean();
+    }
+
+    public static function exists($name) {
         $filename = CF::find_file('views', $name, false);
-		return strlen($filename)>0;
+        return strlen($filename) > 0;
     }
-	
-	/**
+
+    /**
      * Renders a view. 
-	 * Overwrite View.render
+     * Overwrite View.render
      *
      * @param   boolean   set to TRUE to echo the output instead of returning it
      * @param   callback  special renderer to pass the output through
@@ -87,4 +87,5 @@ class CView extends View {
 
         return $output;
     }
+
 }

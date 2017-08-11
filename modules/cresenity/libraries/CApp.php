@@ -534,7 +534,7 @@
             if (crequest::is_ajax() ) {
                 return $this->json();
             }
-
+            $v = null;
             $theme_path = '';
 //            $theme = ccfg::get('theme');
 //            if ($theme == null) $theme = 'cresenity';
@@ -596,7 +596,12 @@
                 $v = CView::factory($theme_path . 'ccore/static_login');
             }
             else {
-                $v = CView::factory($theme_path . 'cpage');
+                if(CView::exists($theme_path . 'cpage')) {
+                    $v = CView::factory($theme_path . 'cpage');
+                }
+                if($v==null) {
+                    $v = CView::factory('cpage');
+                }
 
                 $this->content = parent::html();
                 $this->js = parent::js();
