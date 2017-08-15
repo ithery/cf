@@ -35,7 +35,9 @@ class csendgrid {
           'filters' => array('templates' => array('settings' => array('enable' => 1, 'template_id' => $template_id)))
           );
          */
-
+        
+        
+        
         $params = array(
             'to' => $to,
             'cc' => $cc,
