@@ -163,7 +163,6 @@
             if ($exec == TRUE) {
                 //exec curl
                 $result = curl_exec($this->handle);
-
                 $this->last_response = $result;
                 $this->last_response_header = null;
                 $this->last_response_body = $result;
@@ -226,11 +225,11 @@
         }
 
         public function get_status($key = null) {
-            if (empty($this->last_headers)) {
+            if (empty($this->last_status)) {
                 return false;
             }
             if (empty($key)) {
-                return $this->last_headers;
+                return $this->last_status;
             }
             else {
                 if (isset($this->last_status[$key])) {

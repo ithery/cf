@@ -65,7 +65,7 @@ abstract class CDatabase_Driver {
 	 */
 	public function set_charset($charset)
 	{
-		throw new Kohana_Database_Exception('database.not_implemented', __FUNCTION__);
+		throw new CDatabase_Exception('database.not_implemented', __FUNCTION__);
 	}
 
 	/**
@@ -204,7 +204,7 @@ abstract class CDatabase_Driver {
 	 */
 	public function regex($field, $match, $type, $num_regexs)
 	{
-		throw new Kohana_Database_Exception('database.not_implemented', __FUNCTION__);
+		throw new CDatabase_Exception('database.not_implemented', __FUNCTION__);
 	}
 
 	/**
@@ -218,7 +218,7 @@ abstract class CDatabase_Driver {
 	 */
 	public function notregex($field, $match, $type, $num_regexs)
 	{
-		throw new Kohana_Database_Exception('database.not_implemented', __FUNCTION__);
+		throw new CDatabase_Exception('database.not_implemented', __FUNCTION__);
 	}
 
 	/**
@@ -249,7 +249,7 @@ abstract class CDatabase_Driver {
 	 */
 	public function merge($table, $keys, $values)
 	{
-		throw new Kohana_Database_Exception('database.not_implemented', __FUNCTION__);
+		throw new CDatabase_Exception('database.not_implemented', __FUNCTION__);
 	}
 
 	/**
@@ -269,7 +269,7 @@ abstract class CDatabase_Driver {
 	 */
 	public function stmt_prepare($sql = '')
 	{
-		throw new Kohana_Database_Exception('database.not_implemented', __FUNCTION__);
+		throw new CDatabase_Exception('database.not_implemented', __FUNCTION__);
 	}
 
 	/**
@@ -565,21 +565,21 @@ abstract class CDatabase_Result implements ArrayAccess, Iterator, Countable {
 	/**
 	 * ArrayAccess: offsetSet
 	 *
-	 * @throws  Kohana_Database_Exception
+	 * @throws  CDatabase_Exception
 	 */
 	public function offsetSet($offset, $value)
 	{
-		throw new Kohana_Database_Exception('database.result_read_only');
+		throw new CDatabase_Exception('database.result_read_only');
 	}
 
 	/**
 	 * ArrayAccess: offsetUnset
 	 *
-	 * @throws  Kohana_Database_Exception
+	 * @throws  CDatabase_Exception
 	 */
 	public function offsetUnset($offset)
 	{
-		throw new Kohana_Database_Exception('database.result_read_only');
+		throw new CDatabase_Exception('database.result_read_only');
 	}
 
 	/**
