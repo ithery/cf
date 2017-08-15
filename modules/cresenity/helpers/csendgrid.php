@@ -7,14 +7,14 @@ class csendgrid {
 
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
-        if ($smtp_host != 'smtp.sendgrid.com') {
-            throw new Exception('Fail to send mail API, SMTP Host is not valid');
-        }
         if (!$smtp_password) {
             $smtp_password = ccfg::get('smtp_password');
         }
         if (!$smtp_host) {
             $smtp_host = ccfg::get('smtp_host');
+        }
+        if ($smtp_host != 'smtp.sendgrid.net') {
+            throw new Exception('Fail to send mail API, SMTP Host is not valid');
         }
         $sendgrid_apikey = $smtp_password;
         $smtp_from = carr::get($options, 'smtp_from');
@@ -44,7 +44,7 @@ class csendgrid {
             'bcc' => $bcc,
             'from' => $smtp_from,
             'fromname' => $smtp_from_name,
-            'subject' => $subject,
+            'subject' => $subject . '.',
             'html' => $message,
         );
 

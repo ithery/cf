@@ -185,7 +185,7 @@ class cmail {
             $secure=ccfg::get('smtp_secure');
         }
         
-        if($smtp_host=='smtp.sendgrid.com'&&count($attachments)==0) {
+        if($smtp_host=='smtp.sendgrid.net'&&count($attachments)==0) {
             return csendgrid::send($to,$subject, $message,$attachments,$cc,$bcc,$options);
         }
         
