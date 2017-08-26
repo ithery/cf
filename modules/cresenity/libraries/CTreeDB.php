@@ -4,12 +4,12 @@
 
     class CTreeDB {
 
-        private $db = null;
-        private $pk_column = '';
-        private $table_name = '';
-        private $org_id = null;
+        protected $db = null;
+        protected $pk_column = '';
+        protected $table_name = '';
+        protected $org_id = null;
         protected $filters = array();
-        private $have_priority = false;
+        protected $have_priority = false;
         protected $delete_child;
 
         public function __construct($table_name, $domain = null, $db = null, $prefix = '') {
@@ -72,7 +72,7 @@
             return $this;
         }
 
-        private function filter_where() {
+        protected function filter_where() {
             $where = "";
             $db = $this->db;
             foreach ($this->filters as $k => $v) {

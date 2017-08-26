@@ -13,7 +13,6 @@ class CNestable extends CElement {
     protected $requires;
     protected $js_cell;
     protected $collapse_all;
-    
 
     public function __construct($id) {
         parent::__construct($id);
@@ -29,7 +28,6 @@ class CNestable extends CElement {
         $this->requires = array();
         $this->js_cell = '';
         $this->collapse_all = false;
-        
     }
 
     public static function factory($id) {
@@ -48,9 +46,7 @@ class CNestable extends CElement {
         $this->collapse_all = $bool;
         return $this;
     }
-    
-    
-    
+
     public function have_action() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->row_action_list->child_count() > 0;
@@ -100,8 +96,7 @@ class CNestable extends CElement {
         $this->applyjs = $boolean;
         return $this;
     }
-    
-    
+
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -111,6 +106,15 @@ class CNestable extends CElement {
 
             $depth_before = -1;
             $in = 0;
+            if ($this->have_action()) {
+                $this->row_action_list->add_class("pull-right");
+                if ($this->action_style == "btn-dropdown") {
+                    $this->row_action_list->add_class("pull-right");
+                    if (cobj::get($this, 'bootstrap') == '3') {
+                        $this->row_action_list->add_btn_dropdown_class("btn-xs btn-primary");
+                    }
+                }
+            }
             foreach ($this->data as $d) {
                 $depth = $d['depth'];
                 if ($depth_before >= $depth) {
@@ -149,13 +153,7 @@ class CNestable extends CElement {
                         $jsparam[$k] = $v;
                     }
                     $jsparam["param1"] = $d[$this->id_key];
-                    $this->row_action_list->add_class("pull-right");
-                    if ($this->action_style == "btn-dropdown") {
-                        $this->row_action_list->add_class("pull-right");
-                        if (cobj::get($this, 'bootstrap') == '3') {
-                            $this->row_action_list->add_btn_dropdown_class("btn-xs btn-primary");
-                        }
-                    }
+
                     $this->row_action_list->regenerate_id(true);
                     $this->row_action_list->apply("jsparam", $jsparam);
                     $this->row_action_list->apply("set_handler_url_param", $jsparam);
@@ -173,7 +171,6 @@ class CNestable extends CElement {
         }
         $html->dec_indent()->appendln('</div>');
         return $html->text();
-        
     }
 
     public function js($indent = 0) {
@@ -207,14 +204,14 @@ class CNestable extends CElement {
 			");
             }
         }
-        
+
         if ($this->collapse_all) {
             $js->appendln("
                 $('#" . $this->id . "').nestable('collapseAll');
             ");
         }
-        
-        
+
+
         $js->appendln($this->js_cell);
         $js->appendln(parent::js($indent));
 
