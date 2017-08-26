@@ -13,7 +13,7 @@ class CNestable extends CElement {
     protected $requires;
     protected $js_cell;
     protected $collapse_all;
-    protected $display_total_row;
+    
 
     public function __construct($id) {
         parent::__construct($id);
@@ -29,7 +29,7 @@ class CNestable extends CElement {
         $this->requires = array();
         $this->js_cell = '';
         $this->collapse_all = false;
-        $this->display_total_row = true;
+        
     }
 
     public static function factory($id) {
@@ -49,10 +49,7 @@ class CNestable extends CElement {
         return $this;
     }
     
-    public function show_total_row($bool) {
-        $this->display_total_row = $bool;
-        return $this;
-    }
+    
     
     public function have_action() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
@@ -105,24 +102,6 @@ class CNestable extends CElement {
     }
     
     
-
-    private function get_total_row($lft, $rgt) {
-        $db = CDatabase::instance();
-        $q = "select count(*) 
-            from product 
-            where status > 0 
-            and is_active > 0
-            and status_confirm = 'CONFIRMED'
-            and product_category_id in (
-                select product_category_id 
-                from product_category 
-                where status > 0 
-                and lft >= ".$db->escape($lft)."
-                and rgt <= ".$db->escape($rgt)."
-        )";
-        return cdbutils::get_value($q);
-    }
-    
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -152,9 +131,7 @@ class CNestable extends CElement {
 
                 $html->appendln('<div class="dd-handle">')->inc_indent();
                 $val = $d[$this->value_key];
-                if ($this->display_total_row) {
-                    $val .= ' ('.$this->get_total_row($d['lft'], $d['rgt']) . ')';
-                }
+
                 $new_v = $val;
                 if ($this->display_callback !== false && is_callable($this->display_callback)) {
                     $new_v = CDynFunction::factory($this->display_callback)
@@ -196,29 +173,7 @@ class CNestable extends CElement {
         }
         $html->dec_indent()->appendln('</div>');
         return $html->text();
-        /*
-          <div class="dd">
-          <ol class="dd-list">
-          <li class="dd-item" data-id="1">
-          <div class="dd-handle">Item 1</div>
-          </li>
-          <li class="dd-item" data-id="2">
-          <div class="dd-handle">Item 2</div>
-          </li>
-          <li class="dd-item" data-id="3">
-          <div class="dd-handle">Item 3</div>
-          <ol class="dd-list">
-          <li class="dd-item" data-id="4">
-          <div class="dd-handle">Item 4</div>
-          </li>
-          <li class="dd-item" data-id="5">
-          <div class="dd-handle">Item 5</div>
-          </li>
-          </ol>
-          </li>
-          </ol>
-          </div>
-         */
+        
     }
 
     public function js($indent = 0) {

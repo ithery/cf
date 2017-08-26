@@ -44,7 +44,7 @@ class csendgrid {
             'bcc' => $bcc,
             'from' => $smtp_from,
             'fromname' => $smtp_from_name,
-            'subject' => $subject . '.',
+            'subject' => $subject . '',
             'html' => $message,
         );
 

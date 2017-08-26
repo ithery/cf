@@ -107,10 +107,20 @@ class cajax {
         }
         $base_q = $q;
         $pos_order_by = strpos(strtolower($base_q), "order by", strpos(strtolower($base_q), 'from'));
+        
+        $pos_last_kurung = strrpos(strtolower($base_q), ")");
+        if(isset($_GET['bdebug'])) {
+            cdbg::var_dump($pos_order_by);
+            cdbg::var_dump($pos_last_kurung);
+            die();
+            
+        }
         $temp_order_by = '';
-        if ($pos_order_by !== false) {
-            $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
-            $base_q = substr($base_q, 0, $pos_order_by);
+        if($pos_order_by>$pos_last_kurung) {
+            if ($pos_order_by !== false) {
+                $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
+                $base_q = substr($base_q, 0, $pos_order_by);
+            }
         }
 
         $total = cdbutils::get_row_count_from_base_query($q);
@@ -258,10 +268,15 @@ class cajax {
         }
 
         $pos_order_by = strrpos(strtolower($base_q), "order by", $max_offset);
+        
+        $pos_last_kurung = strrpos(strtolower($base_q), ")");
+
         $temp_order_by = '';
-        if ($pos_order_by !== false) {
-            $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
-            $base_q = substr($base_q, 0, $pos_order_by);
+        if($pos_order_by>$pos_last_kurung) {
+            if ($pos_order_by !== false) {
+                $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
+                $base_q = substr($base_q, 0, $pos_order_by);
+            }
         }
 
         $qtotal = "select count(*) as cnt from (" . $q . ") as a";

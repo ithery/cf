@@ -10,6 +10,7 @@ class CApp extends CObservable {
     private $custom_js = "";
     private $custom_header = "";
     private $custom_footer = "";
+    private $custom_data = array();
     private $show_breadcrumb = true;
     private $show_title = true;
     private $breadcrumb = array();
@@ -506,6 +507,7 @@ class CApp extends CObservable {
             $v->show_breadcrumb = $this->show_breadcrumb;
             $v->show_title = $this->show_title;
             $v->breadcrumb = $this->breadcrumb;
+            $v->custom_data = $this->custom_data;
             $v->cheader = $this->_template['cheader'];
             $v->cfooter = $this->_template['cfooter'];
         }
@@ -659,9 +661,15 @@ class CApp extends CObservable {
             $v->show_title = $this->show_title;
             $v->breadcrumb = $this->breadcrumb;
             $v->additional_head = $this->additional_head;
+            $v->custom_data = $this->custom_data;
         }
 
         return $v->render();
+    }
+    
+    public function set_custom_data($data) {
+        $this->custom_data = $data;
+        return $this;
     }
 
     public function get_all_js() {
