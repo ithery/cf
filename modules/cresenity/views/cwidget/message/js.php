@@ -17,14 +17,10 @@ function add_message(user_msg_id,name,img,msg,time,clear,append) {
 	var id = 'msg-'+i;
 	var idname = name.replace(' ','-').toLowerCase();
 	if(append) {
-		inner.append('<p id="'+id+'" class="user-'+idname+' user-msg" user-msg-id="'+user_msg_id+'"><img src="'+img+'" alt="" />'
-										+'<span class="msg-block"><strong>'+name+'</strong> <span class="time">- '+time+'</span>'
-										+'<span class="msg">'+msg+'</span></span></p>');
+		inner.append('<p id="'+id+'" class="user-'+idname+' user-msg" user-msg-id="'+user_msg_id+'"><img src="'+img+'" alt="" />'+'<span class="msg-block"><strong>'+name+'</strong> <span class="time">- '+time+'</span>'+'<span class="msg">'+msg+'</span></span></p>');
 		
 	} else {
-		inner.prepend('<p id="'+id+'" class="user-'+idname+' user-msg" user-msg-id="'+user_msg_id+'"><img src="'+img+'" alt="" />'
-										+'<span class="msg-block"><strong>'+name+'</strong> <span class="time">- '+time+'</span>'
-										+'<span class="msg">'+msg+'</span></span></p>');
+		inner.prepend('<p id="'+id+'" class="user-'+idname+' user-msg" user-msg-id="'+user_msg_id+'"><img src="'+img+'" alt="" />'+'<span class="msg-block"><strong>'+name+'</strong> <span class="time">- '+time+'</span>'+'<span class="msg">'+msg+'</span></span></p>');
 		
 	}
 	$('#'+id).hide().fadeIn(800);
