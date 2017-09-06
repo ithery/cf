@@ -193,10 +193,10 @@ class Account_Controller extends CController {
         $db = CDatabase::instance();
 
         $user = $app->user();
-        if($user==null) {
+        if ($user == null) {
             curl::redirect(curl::base());
         }
-        if($user!=null) {
+        if ($user != null) {
             $user_id = $user->user_id;
 
 
