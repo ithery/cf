@@ -31,7 +31,11 @@ class CDashboard_LastUserOnline extends CElement_Dashboard {
         $table->add_column('last_request')->set_label("Last Online")->set_align('center');
         
      
-        $q = "select * from users order by last_request desc limit ".$total_user;
+        $q = "select * from users where status>0 ";
+        if(CF::org_id()>0) {
+            $q.=" and org_id=".$db->escape(CF::org_id());
+        }
+        $q.=" order by last_request desc limit ".$total_user;
         
         $table->set_data_from_query($q);
         
@@ -71,6 +75,9 @@ class CDashboard_LastUserOnline extends CElement_Dashboard {
     
     public static function cell_callback($table,$col,$row,$val) {
         if($col=="last_request"){
+            if($val==null||$val=="1970-01-01 00:00:00") {
+                return "-";
+            }
             return cutils::human_time_diff($val,date('Y-m-d H:i:s'));
         }
         return $val;
