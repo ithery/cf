@@ -195,6 +195,11 @@
             }
             elseif (isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO']) {
                 self::$current_uri = $_SERVER['PATH_INFO'];
+                if(self::$current_uri=='/403.shtml') {
+                    self::$current_uri = $_SERVER['REQUEST_URI'];
+                }
+                
+                       
             }
             elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'] AND $_SERVER['ORIG_PATH_INFO'] != '/403.shtml') {
                 self::$current_uri = $_SERVER['ORIG_PATH_INFO'];
