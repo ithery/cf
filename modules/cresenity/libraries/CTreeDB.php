@@ -31,6 +31,7 @@
 
             $this->pk_column = $pk_column;
             if ($table_name == "roles") $this->pk_column = 'role_id';
+            if ($table_name == "users") $this->pk_column = 'user_id';
             $this->table_name = $table_name;
             $this->db = $db;
             $this->filters = array();
