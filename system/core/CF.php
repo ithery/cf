@@ -1099,7 +1099,7 @@ final class CF {
                 $message = $exception->getMessage();
                 $file = $exception->getFile();
                 $line = $exception->getLine();
-                $template = ($exception instanceof C_Exception) ? $exception->getTemplate() : 'kohana_error_page';
+                $template = ($exception instanceof CF_Exception) ? $exception->getTemplate() : 'kohana_error_page';
             }
 
             if (is_numeric($code)) {
@@ -1219,7 +1219,7 @@ final class CF {
     /**
      * Provides class auto-loading.
      *
-     * @throws  C_Exception
+     * @throws  CF_Exception
      * @param   string  name of class
      * @return  bool
      */
@@ -1355,7 +1355,7 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @throws  C_Exception  if file is required and not found
+     * @throws  CF_Exception  if file is required and not found
      * @param   string   directory to search in
      * @param   string   filename to look for (without extension)
      * @param   boolean  file required

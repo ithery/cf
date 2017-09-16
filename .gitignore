@@ -1,7 +1,6 @@
 .DS_Store
-*/nbproject/
-/nbproject/private/
-/nbproject/*
+/nbproject/
+*/nbproject/*
 
 composer.json
 application/*
