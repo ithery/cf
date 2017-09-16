@@ -9,13 +9,13 @@ class corg {
             "org_name" => "",
             "abbr" => "",
         );
-		
+
         $data = cdata::get($id, 'org');
         if ($data == null)
             return null;
         foreach ($default_data as $k => $v) {
-            
-			if (!isset($data[$k])) {
+
+            if (!isset($data[$k])) {
                 $data[$k] = $v;
             }
         }
@@ -24,9 +24,11 @@ class corg {
         if ($data != null) {
             $data = carr::to_object($data);
         }
-		if(isset($data->org_code)) $data->code = $data->org_code;
-		if(isset($data->org_code)) $data->name = $data->org_name;
-		
+        if (isset($data->org_code))
+            $data->code = $data->org_code;
+        if (isset($data->org_code))
+            $data->name = $data->org_name;
+
         return $data;
 
         /*

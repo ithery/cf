@@ -1,4 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
 /**
  * Number helper class.
  *
@@ -11,16 +14,17 @@
  */
 class num {
 
-	/**
-	 * Round a number to the nearest nth
-	 *
-	 * @param   integer  number to round
-	 * @param   integer  number to round to
-	 * @return  integer
-	 */
-	public static function round($number, $nearest = 5)
-	{
-		return round($number / $nearest) * $nearest;
-	}
+    /**
+     * Round a number to the nearest nth
+     *
+     * @param   integer  number to round
+     * @param   integer  number to round to
+     * @return  integer
+     */
+    public static function round($number, $nearest = 5) {
+        return round($number / $nearest) * $nearest;
+    }
 
-} // End num
+}
+
+// End num

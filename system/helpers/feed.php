@@ -1,4 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
 /**
  * Feed helper class.
  *
@@ -11,112 +14,102 @@
  */
 class feed {
 
-	/**
-	 * Parses a remote feed into an array.
-	 *
-	 * @param   string   remote feed URL
-	 * @param   integer  item limit to fetch
-	 * @return  array
-	 */
-	public static function parse($feed, $limit = 0)
-	{
-		// Check if SimpleXML is installed
-		if( ! function_exists('simplexml_load_file'))
-			throw new Kohana_User_Exception('Feed Error', 'SimpleXML must be installed!');
-		
-		// Make limit an integer
-		$limit = (int) $limit;
+    /**
+     * Parses a remote feed into an array.
+     *
+     * @param   string   remote feed URL
+     * @param   integer  item limit to fetch
+     * @return  array
+     */
+    public static function parse($feed, $limit = 0) {
+        // Check if SimpleXML is installed
+        if (!function_exists('simplexml_load_file'))
+            throw new Kohana_User_Exception('Feed Error', 'SimpleXML must be installed!');
 
-		// Disable error reporting while opening the feed
-		$ER = error_reporting(0);
+        // Make limit an integer
+        $limit = (int) $limit;
 
-		// Allow loading by filename or raw XML string
-		$load = (is_file($feed) OR valid::url($feed)) ? 'simplexml_load_file' : 'simplexml_load_string';
+        // Disable error reporting while opening the feed
+        $ER = error_reporting(0);
 
-		// Load the feed
-		$feed = $load($feed, 'SimpleXMLElement', LIBXML_NOCDATA);
+        // Allow loading by filename or raw XML string
+        $load = (is_file($feed) OR valid::url($feed)) ? 'simplexml_load_file' : 'simplexml_load_string';
 
-		// Restore error reporting
-		error_reporting($ER);
+        // Load the feed
+        $feed = $load($feed, 'SimpleXMLElement', LIBXML_NOCDATA);
 
-		// Feed could not be loaded
-		if ($feed === FALSE)
-			return array();
+        // Restore error reporting
+        error_reporting($ER);
 
-		// Detect the feed type. RSS 1.0/2.0 and Atom 1.0 are supported.
-		$feed = isset($feed->channel) ? $feed->xpath('//item') : $feed->entry;
+        // Feed could not be loaded
+        if ($feed === FALSE)
+            return array();
 
-		$i = 0;
-		$items = array();
+        // Detect the feed type. RSS 1.0/2.0 and Atom 1.0 are supported.
+        $feed = isset($feed->channel) ? $feed->xpath('//item') : $feed->entry;
 
-		foreach ($feed as $item)
-		{
-			if ($limit > 0 AND $i++ === $limit)
-				break;
+        $i = 0;
+        $items = array();
 
-			$items[] = (array) $item;
-		}
+        foreach ($feed as $item) {
+            if ($limit > 0 AND $i++ === $limit)
+                break;
 
-		return $items;
-	}
+            $items[] = (array) $item;
+        }
 
-	/**
-	 * Creates a feed from the given parameters.
-	 *
-	 * @param   array   feed information
-	 * @param   array   items to add to the feed
-	 * @param   string  define which format to use
-	 * @param   string  define which encoding to use
-	 * @return  string
-	 */
-	public static function create($info, $items, $format = 'rss2', $encoding = 'UTF-8')
-	{
-		$info += array('title' => 'Generated Feed', 'link' => '', 'generator' => 'KohanaPHP');
+        return $items;
+    }
 
-		$feed = '<?xml version="1.0" encoding="'.$encoding.'"?><rss version="2.0"><channel></channel></rss>';
-		$feed = simplexml_load_string($feed);
+    /**
+     * Creates a feed from the given parameters.
+     *
+     * @param   array   feed information
+     * @param   array   items to add to the feed
+     * @param   string  define which format to use
+     * @param   string  define which encoding to use
+     * @return  string
+     */
+    public static function create($info, $items, $format = 'rss2', $encoding = 'UTF-8') {
+        $info += array('title' => 'Generated Feed', 'link' => '', 'generator' => 'KohanaPHP');
 
-		foreach ($info as $name => $value)
-		{
-			if (($name === 'pubDate' OR $name === 'lastBuildDate') AND (is_int($value) OR ctype_digit($value)))
-			{
-				// Convert timestamps to RFC 822 formatted dates
-				$value = date(DATE_RFC822, $value);
-			}
-			elseif (($name === 'link' OR $name === 'docs') AND strpos($value, '://') === FALSE)
-			{
-				// Convert URIs to URLs
-				$value = curl::site($value, 'http');
-			}
+        $feed = '<?xml version="1.0" encoding="' . $encoding . '"?><rss version="2.0"><channel></channel></rss>';
+        $feed = simplexml_load_string($feed);
 
-			// Add the info to the channel
-			$feed->channel->addChild($name, $value);
-		}
+        foreach ($info as $name => $value) {
+            if (($name === 'pubDate' OR $name === 'lastBuildDate') AND ( is_int($value) OR ctype_digit($value))) {
+                // Convert timestamps to RFC 822 formatted dates
+                $value = date(DATE_RFC822, $value);
+            } elseif (($name === 'link' OR $name === 'docs') AND strpos($value, '://') === FALSE) {
+                // Convert URIs to URLs
+                $value = curl::site($value, 'http');
+            }
 
-		foreach ($items as $item)
-		{
-			// Add the item to the channel
-			$row = $feed->channel->addChild('item');
+            // Add the info to the channel
+            $feed->channel->addChild($name, $value);
+        }
 
-			foreach ($item as $name => $value)
-			{
-				if ($name === 'pubDate' AND (is_int($value) OR ctype_digit($value)))
-				{
-					// Convert timestamps to RFC 822 formatted dates
-					$value = date(DATE_RFC822, $value);
-				}
-				elseif (($name === 'link' OR $name === 'guid') AND strpos($value, '://') === FALSE)
-				{
-					// Convert URIs to URLs
-					$value = curl::site($value, 'http');
-				}
+        foreach ($items as $item) {
+            // Add the item to the channel
+            $row = $feed->channel->addChild('item');
 
-				// Add the info to the row
-				$row->addChild($name, $value);
-			}
-		}
+            foreach ($item as $name => $value) {
+                if ($name === 'pubDate' AND ( is_int($value) OR ctype_digit($value))) {
+                    // Convert timestamps to RFC 822 formatted dates
+                    $value = date(DATE_RFC822, $value);
+                } elseif (($name === 'link' OR $name === 'guid') AND strpos($value, '://') === FALSE) {
+                    // Convert URIs to URLs
+                    $value = curl::site($value, 'http');
+                }
 
-		return $feed->asXML();
-	}
+                // Add the info to the row
+                $row->addChild($name, $value);
+            }
+        }
 
-} // End feed
+        return $feed->asXML();
+    }
+
+}
+
+// End feed

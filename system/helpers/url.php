@@ -1,245 +1,215 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
 
 trigger_error('url is deprecated please use curl');
 
 class url {
 
-	/**
-	 * Fetches the current URI.
-	 *
-	 * @param   boolean  include the query string
-	 * @return  string
-	 */
-	public static function current($qs = FALSE)
-	{
-		return ($qs === TRUE) ? Router::$complete_uri : Router::$current_uri;
-	}
+    /**
+     * Fetches the current URI.
+     *
+     * @param   boolean  include the query string
+     * @return  string
+     */
+    public static function current($qs = FALSE) {
+        return ($qs === TRUE) ? Router::$complete_uri : Router::$current_uri;
+    }
 
-	/**
-	 * Base URL, with or without the index page.
-	 *
-	 * If protocol (and core.site_protocol) and core.site_domain are both empty,
-	 * then
-	 *
-	 * @param   boolean  include the index page
-	 * @param   boolean  non-default protocol
-	 * @return  string
-	 */
-	public static function base($index = FALSE, $protocol = FALSE)
-	{
-		if ($protocol == FALSE)
-		{
-			// Use the default configured protocol
-			$protocol = CF::config('core.site_protocol');
-		}
+    /**
+     * Base URL, with or without the index page.
+     *
+     * If protocol (and core.site_protocol) and core.site_domain are both empty,
+     * then
+     *
+     * @param   boolean  include the index page
+     * @param   boolean  non-default protocol
+     * @return  string
+     */
+    public static function base($index = FALSE, $protocol = FALSE) {
+        if ($protocol == FALSE) {
+            // Use the default configured protocol
+            $protocol = CF::config('core.site_protocol');
+        }
 
-		// Load the site domain
-		$site_domain = (string) CF::config('core.site_domain', TRUE);
+        // Load the site domain
+        $site_domain = (string) CF::config('core.site_domain', TRUE);
 
-		if ($protocol == FALSE)
-		{
-			if ($site_domain === '' OR $site_domain[0] === '/')
-			{
-				// Use the configured site domain
-				$base_url = $site_domain;
-			}
-			else
-			{
-				// Guess the protocol to provide full http://domain/path URL
-				$base_url = ((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] === 'off') ? 'http' : 'https').'://'.$site_domain;
-			}
-		}
-		else
-		{
-			if ($site_domain === '' OR $site_domain[0] === '/')
-			{
-				// Guess the server name if the domain starts with slash
-				$base_url = $protocol.'://'.$_SERVER['HTTP_HOST'].$site_domain;
-			}
-			else
-			{
-				// Use the configured site domain
-				$base_url = $protocol.'://'.$site_domain;
-			}
-		}
+        if ($protocol == FALSE) {
+            if ($site_domain === '' OR $site_domain[0] === '/') {
+                // Use the configured site domain
+                $base_url = $site_domain;
+            } else {
+                // Guess the protocol to provide full http://domain/path URL
+                $base_url = ((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] === 'off') ? 'http' : 'https') . '://' . $site_domain;
+            }
+        } else {
+            if ($site_domain === '' OR $site_domain[0] === '/') {
+                // Guess the server name if the domain starts with slash
+                $base_url = $protocol . '://' . $_SERVER['HTTP_HOST'] . $site_domain;
+            } else {
+                // Use the configured site domain
+                $base_url = $protocol . '://' . $site_domain;
+            }
+        }
 
-		if ($index === TRUE AND $index = CF::config('core.index_page'))
-		{
-			// Append the index page
-			$base_url = $base_url.$index;
-		}
+        if ($index === TRUE AND $index = CF::config('core.index_page')) {
+            // Append the index page
+            $base_url = $base_url . $index;
+        }
 
-		// Force a slash on the end of the URL
-		return rtrim($base_url, '/').'/';
-	}
+        // Force a slash on the end of the URL
+        return rtrim($base_url, '/') . '/';
+    }
 
-	/**
-	 * Fetches an absolute site URL based on a URI segment.
-	 *
-	 * @param   string  site URI to convert
-	 * @param   string  non-default protocol
-	 * @return  string
-	 */
-	public static function site($uri = '', $protocol = FALSE)
-	{
-		if ($path = trim(parse_url($uri, PHP_URL_PATH), '/'))
-		{
-			// Add path suffix
-			$path .= CF::config('core.url_suffix');
-		}
+    /**
+     * Fetches an absolute site URL based on a URI segment.
+     *
+     * @param   string  site URI to convert
+     * @param   string  non-default protocol
+     * @return  string
+     */
+    public static function site($uri = '', $protocol = FALSE) {
+        if ($path = trim(parse_url($uri, PHP_URL_PATH), '/')) {
+            // Add path suffix
+            $path .= CF::config('core.url_suffix');
+        }
 
-		if ($query = parse_url($uri, PHP_URL_QUERY))
-		{
-			// ?query=string
-			$query = '?'.$query;
-		}
+        if ($query = parse_url($uri, PHP_URL_QUERY)) {
+            // ?query=string
+            $query = '?' . $query;
+        }
 
-		if ($fragment = parse_url($uri, PHP_URL_FRAGMENT))
-		{
-			// #fragment
-			$fragment =  '#'.$fragment;
-		}
+        if ($fragment = parse_url($uri, PHP_URL_FRAGMENT)) {
+            // #fragment
+            $fragment = '#' . $fragment;
+        }
 
-		// Concat the URL
-		return curl::base(TRUE, $protocol).$path.$query.$fragment;
-	}
+        // Concat the URL
+        return curl::base(TRUE, $protocol) . $path . $query . $fragment;
+    }
 
-	/**
-	 * Return the URL to a file. Absolute filenames and relative filenames
-	 * are allowed.
-	 *
-	 * @param   string   filename
-	 * @param   boolean  include the index page
-	 * @return  string
-	 */
-	public static function file($file, $index = FALSE)
-	{
-		if (strpos($file, '://') === FALSE)
-		{
-			// Add the base URL to the filename
-			$file = curl::base($index).$file;
-		}
+    /**
+     * Return the URL to a file. Absolute filenames and relative filenames
+     * are allowed.
+     *
+     * @param   string   filename
+     * @param   boolean  include the index page
+     * @return  string
+     */
+    public static function file($file, $index = FALSE) {
+        if (strpos($file, '://') === FALSE) {
+            // Add the base URL to the filename
+            $file = curl::base($index) . $file;
+        }
 
-		return $file;
-	}
+        return $file;
+    }
 
-	/**
-	 * Merges an array of arguments with the current URI and query string to
-	 * overload, instead of replace, the current query string.
-	 *
-	 * @param   array   associative array of arguments
-	 * @return  string
-	 */
-	public static function merge(array $arguments)
-	{
-		if ($_GET === $arguments)
-		{
-			$query = Router::$query_string;
-		}
-		elseif ($query = http_build_query(array_merge($_GET, $arguments)))
-		{
-			$query = '?'.$query;
-		}
+    /**
+     * Merges an array of arguments with the current URI and query string to
+     * overload, instead of replace, the current query string.
+     *
+     * @param   array   associative array of arguments
+     * @return  string
+     */
+    public static function merge(array $arguments) {
+        if ($_GET === $arguments) {
+            $query = Router::$query_string;
+        } elseif ($query = http_build_query(array_merge($_GET, $arguments))) {
+            $query = '?' . $query;
+        }
 
-		// Return the current URI with the arguments merged into the query string
-		return Router::$current_uri.$query;
-	}
+        // Return the current URI with the arguments merged into the query string
+        return Router::$current_uri . $query;
+    }
 
-	/**
-	 * Convert a phrase to a URL-safe title.
-	 *
-	 * @param   string  phrase to convert
-	 * @param   string  word separator (- or _)
-	 * @return  string
-	 */
-	public static function title($title, $separator = '-')
-	{
-		$separator = ($separator === '-') ? '-' : '_';
+    /**
+     * Convert a phrase to a URL-safe title.
+     *
+     * @param   string  phrase to convert
+     * @param   string  word separator (- or _)
+     * @return  string
+     */
+    public static function title($title, $separator = '-') {
+        $separator = ($separator === '-') ? '-' : '_';
 
-		// Replace accented characters by their unaccented equivalents
-		$title = utf8::transliterate_to_ascii($title);
+        // Replace accented characters by their unaccented equivalents
+        $title = utf8::transliterate_to_ascii($title);
 
-		// Remove all characters that are not the separator, a-z, 0-9, or whitespace
-		$title = preg_replace('/[^'.$separator.'a-z0-9\s]+/', '', strtolower($title));
+        // Remove all characters that are not the separator, a-z, 0-9, or whitespace
+        $title = preg_replace('/[^' . $separator . 'a-z0-9\s]+/', '', strtolower($title));
 
-		// Replace all separator characters and whitespace by a single separator
-		$title = preg_replace('/['.$separator.'\s]+/', $separator, $title);
+        // Replace all separator characters and whitespace by a single separator
+        $title = preg_replace('/[' . $separator . '\s]+/', $separator, $title);
 
-		// Trim separators from the beginning and end
-		return trim($title, $separator);
-	}
+        // Trim separators from the beginning and end
+        return trim($title, $separator);
+    }
 
-	/**
-	 * Sends a page redirect header and runs the system.redirect Event.
-	 *
-	 * @param  mixed   string site URI or URL to redirect to, or array of strings if method is 300
-	 * @param  string  HTTP method of redirect
-	 * @return void
-	 */
-	public static function redirect($uri = '', $method = '302')
-	{
-		if (CFEvent::has_run('system.send_headers'))
-		{
-			return FALSE;
-		}
+    /**
+     * Sends a page redirect header and runs the system.redirect Event.
+     *
+     * @param  mixed   string site URI or URL to redirect to, or array of strings if method is 300
+     * @param  string  HTTP method of redirect
+     * @return void
+     */
+    public static function redirect($uri = '', $method = '302') {
+        if (CFEvent::has_run('system.send_headers')) {
+            return FALSE;
+        }
 
-		$codes = array
-		(
-			'refresh' => 'Refresh',
-			'300' => 'Multiple Choices',
-			'301' => 'Moved Permanently',
-			'302' => 'Found',
-			'303' => 'See Other',
-			'304' => 'Not Modified',
-			'305' => 'Use Proxy',
-			'307' => 'Temporary Redirect'
-		);
+        $codes = array
+            (
+            'refresh' => 'Refresh',
+            '300' => 'Multiple Choices',
+            '301' => 'Moved Permanently',
+            '302' => 'Found',
+            '303' => 'See Other',
+            '304' => 'Not Modified',
+            '305' => 'Use Proxy',
+            '307' => 'Temporary Redirect'
+        );
 
-		// Validate the method and default to 302
-		$method = isset($codes[$method]) ? (string) $method : '302';
+        // Validate the method and default to 302
+        $method = isset($codes[$method]) ? (string) $method : '302';
 
-		if ($method === '300')
-		{
-			$uri = (array) $uri;
+        if ($method === '300') {
+            $uri = (array) $uri;
 
-			$output = '<ul>';
-			foreach ($uri as $link)
-			{
-				$output .= '<li>'.chtml::anchor($link).'</li>';
-			}
-			$output .= '</ul>';
+            $output = '<ul>';
+            foreach ($uri as $link) {
+                $output .= '<li>' . chtml::anchor($link) . '</li>';
+            }
+            $output .= '</ul>';
 
-			// The first URI will be used for the Location header
-			$uri = $uri[0];
-		}
-		else
-		{
-			$output = '<p>'.chtml::anchor($uri).'</p>';
-		}
+            // The first URI will be used for the Location header
+            $uri = $uri[0];
+        } else {
+            $output = '<p>' . chtml::anchor($uri) . '</p>';
+        }
 
-		// Run the redirect event
-		CFEvent::run('system.redirect', $uri);
+        // Run the redirect event
+        CFEvent::run('system.redirect', $uri);
 
-		if (strpos($uri, '://') === FALSE)
-		{
-			// HTTP headers expect absolute URLs
-			$uri = curl::site($uri, request::protocol());
-		}
+        if (strpos($uri, '://') === FALSE) {
+            // HTTP headers expect absolute URLs
+            $uri = curl::site($uri, request::protocol());
+        }
 
-		if ($method === 'refresh')
-		{
-			header('Refresh: 0; url='.$uri);
-		}
-		else
-		{
-			header('HTTP/1.1 '.$method.' '.$codes[$method]);
-			header('Location: '.$uri);
-		}
+        if ($method === 'refresh') {
+            header('Refresh: 0; url=' . $uri);
+        } else {
+            header('HTTP/1.1 ' . $method . ' ' . $codes[$method]);
+            header('Location: ' . $uri);
+        }
 
-		// We are about to exit, so run the send_headers event
-		CFEvent::run('system.send_headers');
+        // We are about to exit, so run the send_headers event
+        CFEvent::run('system.send_headers');
 
-		exit('<h1>'.$method.' - '.$codes[$method].'</h1>'.$output);
-	}
+        exit('<h1>' . $method . ' - ' . $codes[$method] . '</h1>' . $output);
+    }
 
-} // End url
+}
+
+// End url
