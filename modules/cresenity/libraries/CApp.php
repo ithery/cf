@@ -693,7 +693,7 @@ class CApp extends CObservable {
 
     public function admin() {
         if ($this->_admin == null) {
-            $session = Session::instance();
+            $session = CSession::instance();
             $admin = $session->get("admin");
             if (!$admin)
                 $admin = null;
@@ -704,7 +704,7 @@ class CApp extends CObservable {
 
     public function member() {
         if ($this->_member = null) {
-            $session = Session::instance();
+            $session = CSession::instance();
             $member = $session->get("member");
             if (!$member)
                 $member = null;
@@ -715,7 +715,7 @@ class CApp extends CObservable {
 
     public function user() {
         if ($this->_user == null) {
-            $session = Session::instance();
+            $session = CSession::instance();
             $user = $session->get("user");
             if (!$user)
                 $user = null;

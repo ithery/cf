@@ -142,7 +142,7 @@ class Cresenity_Controller extends CController {
         $post = $this->input->post();
 
         if ($post != null) {
-            $session = Session::instance();
+            $session = CSession::instance();
             $email = isset($post["email"]) ? $post["email"] : "";
             $agree = isset($post["agree"]) ? $post["agree"] : "";
             $org_name = isset($post["org_name"]) ? $post["org_name"] : "";
@@ -288,7 +288,7 @@ class Cresenity_Controller extends CController {
         $db = CDatabase::instance();
         $post = $this->input->post();
         if ($post != null) {
-            $session = Session::instance();
+            $session = CSession::instance();
             $email = isset($post["email"]) ? $post["email"] : "";
             $password = isset($post["password"]) ? $post["password"] : "";
             $captcha = isset($post["captcha"]) ? $post["captcha"] : "";
@@ -413,7 +413,7 @@ class Cresenity_Controller extends CController {
     }
 
     public function logout() {
-        $session = Session::instance();
+        $session = CSession::instance();
         $session->delete("user");
         //$session->destroy();
         curl::redirect("");
@@ -443,7 +443,7 @@ class Cresenity_Controller extends CController {
         imagestring($my_image, 5, $x, $y, $rand_string, 0x000000);
 
         //setcookie('ncaptca',(md5($rand_string).'a4xn'));
-        $session = Session::instance();
+        $session = CSession::instance();
         $session->set("captcha", md5($rand_string) . 'a4xn');
 
 
@@ -456,7 +456,7 @@ class Cresenity_Controller extends CController {
         $app = CApp::instance(true)
                 ->title('Installation')
         ;
-        $session = Session::instance();
+        $session = CSession::instance();
         $post = $this->input->post();
         $error = 0;
         $error_message = "";
@@ -535,7 +535,7 @@ class Cresenity_Controller extends CController {
                         $db = mysql_select_db($dbname, $link);
                         cinstaller::load_sql($sql, $link);
                         cinstaller::create_database_config($dbuser, $dbpass, $dbhost, $dbname, "");
-                        Session::instance()->destroy();
+                        CSession::instance()->destroy();
                         curl::redirect('cresenity/install/5');
                     } catch (Exception $ex) {
                         $error++;

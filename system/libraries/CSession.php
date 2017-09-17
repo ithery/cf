@@ -40,22 +40,22 @@ class CSession {
             CSession::$config = CF::config('session');
 
             // Makes a mirrored array, eg: foo=foo
-            CSession::$protect = array_combine(Session::$protect, Session::$protect);
+            CSession::$protect = array_combine(CSession::$protect, CSession::$protect);
 
             // Configure garbage collection
-            ini_set('session.gc_probability', (int) Session::$config['gc_probability']);
+            ini_set('session.gc_probability', (int) CSession::$config['gc_probability']);
             ini_set('session.gc_divisor', 100);
-            ini_set('session.gc_maxlifetime', (Session::$config['expiration'] == 0) ? 86400 : Session::$config['expiration']);
+            ini_set('session.gc_maxlifetime', (CSession::$config['expiration'] == 0) ? 86400 : CSession::$config['expiration']);
 
             // Create a new session
             $this->create();
 
-            if (CSession::$config['regenerate'] > 0 AND ( $_SESSION['total_hits'] % Session::$config['regenerate']) === 0) {
+            if (CSession::$config['regenerate'] > 0 AND ( $_SESSION['total_hits'] % CSession::$config['regenerate']) === 0) {
                 // Regenerate session id and update session cookie
                 $this->regenerate();
             } else {
                 // Always update session cookie to keep the session alive
-                cookie::set(Session::$config['name'], $_SESSION['session_id'], Session::$config['expiration']);
+                cookie::set(CSession::$config['name'], $_SESSION['session_id'], CSession::$config['expiration']);
             }
 
             // Close the session just before sending the headers, so that
@@ -93,38 +93,34 @@ class CSession {
 
         if (CSession::$config['driver'] !== 'native') {
             // Set driver name
-            $driver = 'Session_' . ucfirst(Session::$config['driver']) . '_Driver';
+            $driver = 'CSession_' . ucfirst(CSession::$config['driver']) . '_Driver';
 
             // Load the driver
             if (!CF::auto_load($driver))
-                throw new CF_Exception('core.driver_not_found', Session::$config['driver'], get_class($this));
+                throw new CF_Exception('core.driver_not_found', CSession::$config['driver'], get_class($this));
 
             // Initialize the driver
             CSession::$driver = new $driver();
 
             // Validate the driver
-            if (!(CSession::$driver instanceof CSession_Driver))
-                throw new CF_Exception('core.driver_implements', Session::$config['driver'], get_class($this), 'Session_Driver');
+            if (!(CSession::$driver instanceof CSession_Driver)) {
+                throw new CF_Exception('core.driver_implements', CSession::$config['driver'], get_class($this), 'Session_Driver');
+            }
 
             // Register non-native driver as the session handler
-            session_set_save_handler
-                    (
-                    array(CSession::$driver, 'open'), array(CSession::$driver, 'close'), array(CSession::$driver, 'read'), array(CSession::$driver, 'write'), array(CSession::$driver, 'destroy'), array(CSession::$driver, 'gc')
-            );
+            session_set_save_handler(array(CSession::$driver, 'open'), array(CSession::$driver, 'close'), array(CSession::$driver, 'read'), array(CSession::$driver, 'write'), array(CSession::$driver, 'destroy'), array(CSession::$driver, 'gc'));
         }
 
         // Validate the session name
-        if (!preg_match('~^(?=.*[a-z])[a-z0-9_]++$~iD', Session::$config['name']))
-            throw new CF_Exception('session.invalid_session_name', Session::$config['name']);
+        if (!preg_match('~^(?=.*[a-z])[a-z0-9_]++$~iD', CSession::$config['name'])) {
+            throw new CF_Exception('session.invalid_session_name', CSession::$config['name']);
+        }
 
         // Name the session, this will also be the name of the cookie
         session_name(CSession::$config['name']);
 
         // Set the session cookie parameters
-        session_set_cookie_params
-                (
-                CSession::$config['expiration'], CF::config('cookie.path'), CF::config('cookie.domain'), CF::config('cookie.secure'), CF::config('cookie.httponly')
-        );
+        session_set_cookie_params(CSession::$config['expiration'], CF::config('cookie.path'), CF::config('cookie.domain'), CF::config('cookie.secure'), CF::config('cookie.httponly'));
 
         // Start the session!
         session_start();
@@ -150,7 +146,7 @@ class CSession {
         // Validate data only on hits after one
         if ($_SESSION['total_hits'] > 1) {
             // Validate the session
-            foreach (Session::$config['validate'] as $valid) {
+            foreach (CSession::$config['validate'] as $valid) {
                 switch ($valid) {
                     // Check user agent for consistency
                     case 'user_agent':

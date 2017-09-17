@@ -9,7 +9,7 @@
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
-interface Session_Driver {
+interface CSession_Driver {
 
 	/**
 	 * Opens a session.

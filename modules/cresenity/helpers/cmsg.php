@@ -5,7 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class cmsg {
 
     public static function add($type, $message) {
-        $session = Session::instance();
+        $session = CSession::instance();
         $msgs = $session->get('cmsg_' . $type);
         if (!is_array($msgs)) {
             $msgs = array();
@@ -15,12 +15,12 @@ class cmsg {
     }
 
     public static function get($type) {
-        $session = Session::instance();
+        $session = CSession::instance();
         return $session->get('cmsg_' . $type);
     }
 
     public static function clear($type) {
-        $session = Session::instance();
+        $session = CSession::instance();
         $session->set('cmsg_' . $type, null);
     }
 
@@ -36,7 +36,7 @@ class cmsg {
         $message = "";
         if (is_array($msgs)) {
             foreach ($msgs as $msg) {
-                $message.= "<p>" . $msg . "</p>";
+                $message .= "<p>" . $msg . "</p>";
             }
         } else if (is_string($msgs)) {
             if (strlen($msgs) > 0)

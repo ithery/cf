@@ -17,7 +17,7 @@
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
-class Session_Cache_Driver implements Session_Driver {
+class CSession_Cache_Driver implements Session_Driver {
 
 	protected $cache;
 	protected $encrypt;
@@ -25,30 +25,30 @@ class Session_Cache_Driver implements Session_Driver {
 	public function __construct()
 	{
 		// Load Encrypt library
-		if (Kohana::config('session.encryption'))
+		if (CF::config('session.encryption'))
 		{
 			$this->encrypt = new Encrypt;
 		}
 
-		Kohana::log('debug', 'Session Cache Driver Initialized');
+		CF::log('debug', 'Session Cache Driver Initialized');
 	}
 
 	public function open($path, $name)
 	{
-		$config = Kohana::config('session.storage');
+		$config = CF::config('session.storage');
 
 		if (empty($config))
 		{
 			// Load the default group
-			$config = Kohana::config('cache.default');
+			$config = CF::config('cache.default');
 		}
 		elseif (is_string($config))
 		{
 			$name = $config;
 
 			// Test the config group name
-			if (($config = Kohana::config('cache.'.$config)) === NULL)
-				throw new Kohana_Exception('cache.undefined_group', $name);
+			if (($config = CF::config('cache.'.$config)) === NULL)
+				throw new CF_Exception('cache.undefined_group', $name);
 		}
 
 		$config['lifetime'] = (Kohana::config('session.expiration') == 0) ? 86400 : Kohana::config('session.expiration');

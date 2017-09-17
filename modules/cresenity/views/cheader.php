@@ -2,7 +2,7 @@
 defined('SYSPATH') OR die('No direct access allowed.');
 
 
-$session = Session::instance();
+$session = CSession::instance();
 $user = $session->get("user");
 $role_id = "";
 $username = "";

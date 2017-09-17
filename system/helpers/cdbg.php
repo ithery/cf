@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class cdbg {
 
+    protected static $deprecated_has_run = false;
+    
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
      * an array or object
@@ -231,8 +233,19 @@ class cdbg {
     }
 
     public static function deprecated($message = '') {
+        //run just once to make this performance good
+        
+        
+        if(self::$deprecated_has_run){
+            return true;
+        }
+        if(!self::$deprecated_has_run) {
+            self::$deprecated_has_run=true;
+        }
         
         $backtrace = debug_backtrace();
+        $full_function_1 = '';
+        $full_function_2 = '';
         if (count($backtrace) > 1) {
             $state = $backtrace[1];
             $function = carr::get($state, 'function', '');
@@ -243,22 +256,45 @@ class cdbg {
             if (strlen($line) > 0) {
                 $line_str = ' on line ' . $line;
             }
-            $full_function = $class . $type . $function . $line_str;
-            $subject = 'CApp Deprecated on calling function ' . $full_function;
-
-            $body = '<h1>CApp Deprecated on calling function ' . $full_function . '<h1>';
-            if (strlen($message) > 0) {
-                $body = '<p>' . $message . '</p>';
-            }
-            $body .= '<br/><br/>';
-            $body .= cdbg::var_dump($backtrace, true);
-            try {
-                cmail::send_smtp('hery@ittron.co.id', $subject, $body);
-            } catch (Exception $exception) {
-                
-            }
-            return true;
+            $full_function_1 = $class . $type . $function . $line_str;
         }
+        if (count($backtrace) > 2) {
+            $state = $backtrace[2];
+            $function = carr::get($state, 'function', '');
+            $class = carr::get($state, 'class', '');
+            $type = carr::get($state, 'type', '');
+            $line = carr::get($state, 'line', '');
+            $line_str = '';
+            if (strlen($line) > 0) {
+                $line_str = ' on line ' . $line;
+            }
+            $full_function_2 = $class . $type . $function . $line_str;
+        }
+        $subject = 'CApp Deprecated '.CF::domain().' ' . strlen($full_function_2)>0?$full_function_2:$full_function_1;
+
+        if (strlen($message) > 0) {
+            $body = '<p>' . $message . '</p>';
+        }
+        $body .= '<br/><br/>';
+        $body .= '<h4>CApp Deprecated on calling function ' . $full_function_1 . '<h4>';
+        if(strlen($full_function_2)) {
+            $body .= '<h4>before calling function ' . $full_function_2 . '<h4>';
+        }
+        $body .= '<br/><br/>';
+        $body .= 'Domain:'.CF::domain().'<br/>';
+        $body .= 'App Code:'.CF::app_code().'<br/>';
+        $body .= 'Org Code:'.CF::org_code().'<br/>';
+        $body .= '<br/><br/>';
+        
+        $backtrace = array_slice($backtrace, 0, 5, true);
+        $body .= cdbg::var_dump($backtrace, true);
+        try {
+            cmail::send_smtp('hery@ittron.co.id', $subject, $body);
+        } catch (Exception $ex) {
+            echo "Error Email Deprecated".$ex->getMessage();
+        }
+        return true;
+       
     }
 
 }
