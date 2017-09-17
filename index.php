@@ -3,20 +3,6 @@
 date_default_timezone_set('Asia/Jakarta');
 define('DS', DIRECTORY_SEPARATOR);
 
-/**
- * This file acts as the "front controller" to your application. You can
- * configure your application, modules, and system directories here.
- * PHP error_reporting level may also be changed.
- *
- * @see http://kohanaphp.com
- */
-/**
- * Define the website environment status. When this flag is set to TRUE, some
- * module demonstration controllers will result in 404 errors. For more information
- * about this option, read the documentation about deploying Kohana.
- *
- * @see http://docs.kohanaphp.com/installation/deployment
- */
 define('IN_PRODUCTION', FALSE);
 
 /**
@@ -25,32 +11,32 @@ define('IN_PRODUCTION', FALSE);
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_application = 'application';
+$cf_application = 'application';
 
 /**
- * Kohana modules directory. This directory should contain all the modules used
+ * CF modules directory. This directory should contain all the modules used
  * by your application. Modules are enabled and disabled by the application
  * configuration file.
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_modules = 'modules';
+$cf_modules = 'modules';
 
 /**
- * Kohana system directory. This directory should contain the core/ directory,
- * and the resources you included in your download of Kohana.
+ * CF system directory. This directory should contain the core/ directory,
+ * and the resources you included in your download of CF.
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_system = 'system';
+$cf_system = 'system';
 
 /**
- * Test to make sure that Kohana is running on PHP 5.2 or newer. Once you are
- * sure that your environment is compatible with Kohana, you can comment this
+ * Test to make sure that CF is running on PHP 5.2 or newer. Once you are
+ * sure that your environment is compatible with CF, you can comment this
  * line out. When running an application on a new server, uncomment this line
  * to check the PHP version quickly.
  */
-version_compare(PHP_VERSION, '5.2', '<') and exit('Kohana requires PHP 5.2 or newer.');
+version_compare(PHP_VERSION, '5.2', '<') and exit('CF requires PHP 5.2 or newer.');
 
 /**
  * Set the error reporting level. Unless you have a special need, E_ALL is a
@@ -59,8 +45,8 @@ version_compare(PHP_VERSION, '5.2', '<') and exit('Kohana requires PHP 5.2 or ne
 error_reporting(E_ALL & ~E_STRICT ^ E_DEPRECATED);
 
 /**
- * Turning off display_errors will effectively disable Kohana error display
- * and logging. You can turn off Kohana errors in application/config/config.php
+ * Turning off display_errors will effectively disable CF error display
+ * and logging. You can turn off CF errors in application/config/config.php
  */
 ini_set('display_errors', TRUE);
 
@@ -97,10 +83,10 @@ if(isset($_FILES) && is_array($_FILES)) {
     }
 }
 
-$kohana_pathinfo = pathinfo(__FILE__);
+$cf_pathinfo = pathinfo(__FILE__);
 // Define the front controller name and docroot
-define('DOCROOT', $kohana_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
-define('KOHANA', $kohana_pathinfo['basename']);
+define('DOCROOT', $cf_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
+define('KOHANA', $cf_pathinfo['basename']);
 
 // If the front controller is a symlink, change to the real docroot
 is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
@@ -124,26 +110,21 @@ if (file_exists($file)) {
     $data = json_decode($content, true);
     $app_code = $data['app_code'];
 
-    $kohana_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
+    $cf_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
 }
 
 // If kohana folders are relative paths, make them absolute.
-$kohana_application = file_exists($kohana_application) ? $kohana_application : DOCROOT . $kohana_application;
-$kohana_modules = file_exists($kohana_modules) ? $kohana_modules : DOCROOT . $kohana_modules;
-$kohana_system = file_exists($kohana_system) ? $kohana_system : DOCROOT . $kohana_system;
+$cf_application = file_exists($cf_application) ? $cf_application : DOCROOT . $cf_application;
+$cf_modules = file_exists($cf_modules) ? $cf_modules : DOCROOT . $cf_modules;
+$cf_system = file_exists($cf_system) ? $cf_system : DOCROOT . $cf_system;
 
 // Define application and system paths
-define('APPPATH', str_replace('\\', '/', realpath($kohana_application)) . '/');
-define('MODPATH', str_replace('\\', '/', realpath($kohana_modules)) . '/');
-define('SYSPATH', str_replace('\\', '/', realpath($kohana_system)) . '/');
+define('APPPATH', str_replace('\\', '/', realpath($cf_application)) . '/');
+define('MODPATH', str_replace('\\', '/', realpath($cf_modules)) . '/');
+define('SYSPATH', str_replace('\\', '/', realpath($cf_system)) . '/');
 
 // Clean up
-unset($kohana_application, $kohana_modules, $kohana_system);
+unset($cf_application, $cf_modules, $cf_system);
 
-if (file_exists(DOCROOT . 'install' . EXT)) {
-    // Load the installation tests
-    include DOCROOT . 'install' . EXT;
-} else {
-    // Initialize Kohana
-    require SYSPATH . 'core/Bootstrap' . EXT;
-}
+
+require SYSPATH . 'core/Bootstrap' . EXT;
