@@ -316,6 +316,105 @@ class carr {
     }
 
     /**
+     * Recursively merge two or more arrays. Values in an associative array
+     * overwrite previous values with the same key. Values in an indexed array
+     * are appended, but only when they do not already exist in the result.
+     *
+     * Note that this does not work the same as [array_merge_recursive](http://php.net/array_merge_recursive)!
+     *
+     *     $john = array('name' => 'john', 'children' => array('fred', 'paul', 'sally', 'jane'));
+     *     $mary = array('name' => 'mary', 'children' => array('jane'));
+     *
+     *     // John and Mary are married, merge them together
+     *     $john = Arr::merge($john, $mary);
+     *
+     *     // The output of $john will now be:
+     *     array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'))
+     *
+     * @param   array  $array1      initial array
+     * @param   array  $array2,...  array to merge
+     * @return  array
+     */
+    public static function merge($array1, $array2) {
+        if (Arr::is_assoc($array2)) {
+            foreach ($array2 as $key => $value) {
+                if (is_array($value)
+                        AND isset($array1[$key])
+                        AND is_array($array1[$key])
+                ) {
+                    $array1[$key] = Arr::merge($array1[$key], $value);
+                } else {
+                    $array1[$key] = $value;
+                }
+            }
+        } else {
+            foreach ($array2 as $value) {
+                if (!in_array($value, $array1, TRUE)) {
+                    $array1[] = $value;
+                }
+            }
+        }
+
+        if (func_num_args() > 2) {
+            foreach (array_slice(func_get_args(), 2) as $array2) {
+                if (Arr::is_assoc($array2)) {
+                    foreach ($array2 as $key => $value) {
+                        if (is_array($value)
+                                AND isset($array1[$key])
+                                AND is_array($array1[$key])
+                        ) {
+                            $array1[$key] = Arr::merge($array1[$key], $value);
+                        } else {
+                            $array1[$key] = $value;
+                        }
+                    }
+                } else {
+                    foreach ($array2 as $value) {
+                        if (!in_array($value, $array1, TRUE)) {
+                            $array1[] = $value;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $array1;
+    }
+
+    /**
+     * Overwrites an array with values from input arrays.
+     * Keys that do not exist in the first array will not be added!
+     *
+     *     $a1 = array('name' => 'john', 'mood' => 'happy', 'food' => 'bacon');
+     *     $a2 = array('name' => 'jack', 'food' => 'tacos', 'drink' => 'beer');
+     *
+     *     // Overwrite the values of $a1 with $a2
+     *     $array = Arr::overwrite($a1, $a2);
+     *
+     *     // The output of $array will now be:
+     *     array('name' => 'jack', 'mood' => 'happy', 'food' => 'tacos')
+     *
+     * @param   array   $array1 master array
+     * @param   array   $array2 input arrays that will overwrite existing values
+     * @return  array
+     */
+    public static function overwrite($array1, $array2) {
+        foreach (array_intersect_key($array2, $array1) as $key => $value) {
+            $array1[$key] = $value;
+        }
+
+        if (func_num_args() > 2) {
+            foreach (array_slice(func_get_args(), 2) as $array2) {
+                foreach (array_intersect_key($array2, $array1) as $key => $value) {
+                    $array1[$key] = $value;
+                }
+            }
+        }
+
+        return $array1;
+    }
+
+    /**
      * Because PHP does not have this function.
      *
      * @param   array   array to unshift
