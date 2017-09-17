@@ -13,3 +13,6 @@ export/
 upload/*
 Thumbs.db
 /data/*
+
+#for aptana
+.project
