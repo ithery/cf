@@ -230,4 +230,35 @@ class cdbg {
         return $html;
     }
 
+    public static function deprecated($message = '') {
+        
+        $backtrace = debug_backtrace();
+        if (count($backtrace) > 1) {
+            $state = $backtrace[1];
+            $function = carr::get($state, 'function', '');
+            $class = carr::get($state, 'class', '');
+            $type = carr::get($state, 'type', '');
+            $line = carr::get($state, 'line', '');
+            $line_str = '';
+            if (strlen($line) > 0) {
+                $line_str = ' on line ' . $line;
+            }
+            $full_function = $class . $type . $function . $line_str;
+            $subject = 'CApp Deprecated on calling function ' . $full_function;
+
+            $body = '<h1>CApp Deprecated on calling function ' . $full_function . '<h1>';
+            if (strlen($message) > 0) {
+                $body = '<p>' . $message . '</p>';
+            }
+            $body .= '<br/><br/>';
+            $body .= cdbg::var_dump($backtrace, true);
+            try {
+                cmail::send_smtp('hery@ittron.co.id', $subject, $body);
+            } catch (Exception $exception) {
+                
+            }
+            return true;
+        }
+    }
+
 }
