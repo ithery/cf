@@ -336,13 +336,13 @@ class carr {
      * @return  array
      */
     public static function merge($array1, $array2) {
-        if (Arr::is_assoc($array2)) {
+        if (carr::is_assoc($array2)) {
             foreach ($array2 as $key => $value) {
                 if (is_array($value)
                         AND isset($array1[$key])
                         AND is_array($array1[$key])
                 ) {
-                    $array1[$key] = Arr::merge($array1[$key], $value);
+                    $array1[$key] = carr::merge($array1[$key], $value);
                 } else {
                     $array1[$key] = $value;
                 }
@@ -474,64 +474,6 @@ class carr {
         }
 
         return FALSE;
-    }
-
-    /**
-     * Emulates array_merge_recursive, but appends numeric keys and replaces
-     * associative keys, instead of appending all keys.
-     *
-     * @param   array  any number of arrays
-     * @return  array
-     */
-    public static function merge() {
-        $total = func_num_args();
-
-        $result = array();
-        for ($i = 0; $i < $total; $i++) {
-            foreach (func_get_arg($i) as $key => $val) {
-                if (isset($result[$key])) {
-                    if (is_array($val)) {
-                        // Arrays are merged recursively
-                        $result[$key] = carr::merge($result[$key], $val);
-                    } elseif (is_int($key)) {
-                        // Indexed arrays are appended
-                        array_push($result, $val);
-                    } else {
-                        // Associative arrays are replaced
-                        $result[$key] = $val;
-                    }
-                } else {
-                    // New values are added
-                    $result[$key] = $val;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Overwrites an array with values from input array(s).
-     * Non-existing keys will not be appended!
-     *
-     * @param   array   key array
-     * @param   array   input array(s) that will overwrite key array values
-     * @return  array
-     */
-    public static function overwrite($array1, $array2) {
-        foreach (array_intersect_key($array2, $array1) as $key => $value) {
-            $array1[$key] = $value;
-        }
-
-        if (func_num_args() > 2) {
-            foreach (array_slice(func_get_args(), 2) as $array2) {
-                foreach (array_intersect_key($array2, $array1) as $key => $value) {
-                    $array1[$key] = $value;
-                }
-            }
-        }
-
-        return $array1;
     }
 
     /**
