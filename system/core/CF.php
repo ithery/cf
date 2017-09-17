@@ -73,7 +73,7 @@ final class CF {
         }
         return $result;
     }
-    
+
     public static function app_id() {
 
         return self::$app_id;
@@ -106,6 +106,7 @@ final class CF {
     public static function theme() {
         return self::$theme;
     }
+
     /**
      * Sets up the PHP environment. Adds error/exception handling, output
      * buffering, and adds an auto-loading method for loading classes.
@@ -149,17 +150,17 @@ final class CF {
         }
         $capp_path = APPPATH;
         if (strlen(self::$app_code) > 0) {
-            $capp_path.=self::$app_code . DS;
+            $capp_path .= self::$app_code . DS;
         }
         if (strlen(self::$org_code) > 0) {
-            $capp_path.=self::$org_code . DS;
+            $capp_path .= self::$org_code . DS;
         }
         if (strlen(self::$store_code) > 0) {
-            $capp_path.=self::$store_code . DS;
+            $capp_path .= self::$store_code . DS;
         }
 
         if (is_dir($capp_path . "default" . DS)) {
-            $capp_path.="default" . DS;
+            $capp_path .= "default" . DS;
         }
 
         define('CAPPPATH', $capp_path);
@@ -276,8 +277,6 @@ final class CF {
                 include $file;
             }
         }
-
-
 
         // Setup is complete, prevent it from being run again
         $run = TRUE;
@@ -441,11 +440,10 @@ final class CF {
         return null;
     }
 
-    
     public static function include_paths_theme($process = FALSE) {
-        
+
         $theme = self::$theme;
-        
+
         if ($process === TRUE) {
 
             // Add APPPATH as the first path
@@ -509,6 +507,7 @@ final class CF {
 
         return self::$include_paths_theme;
     }
+
     /**
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
@@ -516,9 +515,9 @@ final class CF {
      * @param   boolean  re-process the include paths
      * @return  array
      */
-    public static function include_paths($process = FALSE, $with_theme=false) {
+    public static function include_paths($process = FALSE, $with_theme = false) {
         $theme = '';
-        if($with_theme) {
+        if ($with_theme) {
             $theme = self::$theme;
         }
         if ($process === TRUE) {
@@ -1052,12 +1051,8 @@ final class CF {
      * @return  void
      */
     public static function show_404($page = FALSE, $template = FALSE) {
-        if (CView::exists('ccore/404')) {
-            echo CView::factory('ccore/404')->render();
-        } else {
-
-            throw new CF_404_Exception($page, $template);
-        }
+        
+        throw new CF_404_Exception($page, $template);
     }
 
     /**
@@ -1099,7 +1094,7 @@ final class CF {
                 $message = $exception->getMessage();
                 $file = $exception->getFile();
                 $line = $exception->getLine();
-                $template = ($exception instanceof CF_Exception) ? $exception->getTemplate() : 'kohana_error_page';
+                $template = ($exception instanceof CF_Exception) ? $exception->get_template() : 'kohana_error_page';
             }
 
             if (is_numeric($code)) {
@@ -1167,25 +1162,23 @@ final class CF {
                     $view = CView::factory('kohana_error_page', $data);
                     try {
                         cmail::error_mail($view->render());
-                    } catch(Exception $ex) {
-                       
-                        clog::log('error_mail.log', 'error', CF::domain()." - ".$ex->getMessage());
+                    } catch (Exception $ex) {
+
+                        clog::log('error_mail.log', 'error', CF::domain() . " - " . $ex->getMessage());
                     }
                 }
-                
+
                 // Load the error
                 $custom_error = false;
-                if(!isset($_GET['show_error'])) {
+                if (!isset($_GET['show_error'])) {
                     if (CView::exists('ccore/error_page')) {
-                        $custom_error=true;
+                        $custom_error = true;
                         echo CView::factory('ccore/error_page')->render();
-                    } 
+                    }
                 }
-                if(!$custom_error) {
+                if (!$custom_error) {
                     require self::find_file('views', empty($template) ? 'kohana_error_page' : $template);
                 }
-
-                
             } else {
                 // Get the i18n messages
                 $error = self::lang('core.generic_error');
@@ -1205,7 +1198,7 @@ final class CF {
             exit;
         } catch (Exception $e) {
             if (IN_PRODUCTION) {
-                if(isset($_GET['debug'])) {
+                if (isset($_GET['debug'])) {
                     die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
                 } else {
                     die('Fatal Error');
@@ -1345,7 +1338,6 @@ final class CF {
             }
         } else {
             $domain = $_SERVER["SERVER_NAME"];
-
         }
         return $domain;
     }
@@ -1963,7 +1955,12 @@ class CF_404_Exception extends CF_Exception {
             // Construct the page URI using Router properties
             $page = CFRouter::$current_uri . CFRouter::$url_suffix . CFRouter::$query_string;
         }
-
+        
+        if ($template == false) {
+            if (CView::exists('ccore/404')) {
+                $template = 'ccore/404';
+            }
+        }
 
         Exception::__construct(CF::lang('core.page_not_found', $page));
 
