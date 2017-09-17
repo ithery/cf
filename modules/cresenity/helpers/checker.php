@@ -17,7 +17,7 @@ class checker {
                 if ($qwhere == "")
                     $qwhere = $k . " = " . $db->escape($v);
                 else
-                    $qwhere.=" and " . $k . " = " . $db->escape($v);
+                    $qwhere .= " and " . $k . " = " . $db->escape($v);
             }
             $q = "select 1 from " . ($tbl) . " where " . $qwhere;
             $rs = $db->query($q);
@@ -40,7 +40,7 @@ class checker {
                     $result = true;
                 }
             }
-        } catch (Kohana_Exception $e) {
+        } catch (CF_Exception $e) {
             $result = true;
         }
         return $result;
