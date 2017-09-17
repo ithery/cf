@@ -270,7 +270,7 @@ class cdbg {
             }
             $full_function_2 = $class . $type . $function . $line_str;
         }
-        $subject = 'CApp Deprecated '.CF::domain().' ' . strlen($full_function_2)>0?$full_function_2:$full_function_1;
+        $subject = 'CApp Deprecated on '.CF::domain().' '.date('Y-m-d H:i:s');
 
         if (strlen($message) > 0) {
             $body = '<p>' . $message . '</p>';
@@ -284,6 +284,9 @@ class cdbg {
         $body .= 'Domain:'.CF::domain().'<br/>';
         $body .= 'App Code:'.CF::app_code().'<br/>';
         $body .= 'Org Code:'.CF::org_code().'<br/>';
+        $body .= 'User Agent:'.crequest::user_agent().'<br/>';
+        $body .= 'Remote Address:'.crequest::remote_address().'<br/>';
+        $body .= 'Browser:'.crequest::browser().'<br/>';
         $body .= '<br/><br/>';
         
         $backtrace = array_slice($backtrace, 0, 5, true);
