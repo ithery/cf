@@ -2,17 +2,17 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class View {
+class CView {
 
     // The view file name and type
     protected $kohana_filename = FALSE;
     protected $kohana_filetype = FALSE;
-    // View variable storage
+    // CView variable storage
     protected $kohana_local_data = array();
     protected static $kohana_global_data = array();
 
     /**
-     * Creates a new View using the given parameters.
+     * Creates a new CView using the given parameters.
      *
      * @param   string  view name
      * @param   array   pre-load data
@@ -20,20 +20,20 @@ class View {
      * @return  object
      */
     public static function factory($name = NULL, $data = NULL, $type = NULL) {
-        return new View($name, $data, $type);
+        return new CView($name, $data, $type);
     }
-	
-	/**
-     * Check a View is exists.
+
+    /**
+     * Check a CView is exists.
      *
      * @param   string  view name
      * @return  boolean
      */
     public static function exists($name) {
         $filename = CF::find_file('views', $name, false);
-		return strlen($filename)>0;
+        return strlen($filename) > 0;
     }
-	
+
     /**
      * Attempts to load a view and pre-load view data.
      *
@@ -49,7 +49,7 @@ class View {
             $this->set_filename($name, $type);
         }
 
-        if (is_array($data) AND !empty($data)) {
+        if (is_array($data) AND ! empty($data)) {
             // Preload data using array_merge, to allow user extensions
             $this->kohana_local_data = array_merge($this->kohana_local_data, $data);
         }
@@ -58,7 +58,7 @@ class View {
     /**
      * Magic method access to test for view property
      *
-     * @param   string   View property to test for
+     * @param   string   CView property to test for
      * @return  boolean
      */
     public function __isset($key = NULL) {
@@ -137,11 +137,11 @@ class View {
             // Foreach key
             foreach ($key as $property) {
                 // Set the result to an associative array
-                $result[$property] = (array_key_exists($property, $this->kohana_local_data) OR array_key_exists($property, View::$kohana_global_data)) ? TRUE : FALSE;
+                $result[$property] = (array_key_exists($property, $this->kohana_local_data) OR array_key_exists($property, CView::$kohana_global_data)) ? TRUE : FALSE;
             }
         } else {
             // Otherwise just check one property
-            $result = (array_key_exists($key, $this->kohana_local_data) OR array_key_exists($key, View::$kohana_global_data)) ? TRUE : FALSE;
+            $result = (array_key_exists($key, $this->kohana_local_data) OR array_key_exists($key, CView::$kohana_global_data)) ? TRUE : FALSE;
         }
 
         // Return the result
@@ -171,10 +171,10 @@ class View {
     public static function set_global($name, $value = NULL) {
         if (is_array($name)) {
             foreach ($name as $key => $value) {
-                View::$kohana_global_data[$key] = $value;
+                CView::$kohana_global_data[$key] = $value;
             }
         } else {
-            View::$kohana_global_data[$name] = $value;
+            CView::$kohana_global_data[$name] = $value;
         }
     }
 
@@ -200,8 +200,8 @@ class View {
         if (isset($this->kohana_local_data[$key]))
             return $this->kohana_local_data[$key];
 
-        if (isset(View::$kohana_global_data[$key]))
-            return View::$kohana_global_data[$key];
+        if (isset(CView::$kohana_global_data[$key]))
+            return CView::$kohana_global_data[$key];
 
         if (isset($this->$key))
             return $this->$key;
@@ -222,6 +222,37 @@ class View {
     }
 
     /**
+     * Load a view.
+     *
+     * @param   view_filename   filename of view
+     * @param   input_data  data to pass to view
+     * @return  string    
+     */
+    public static function load_view($view_filename, $input_data) {
+        if ($view_filename == '')
+            return;
+
+        // Buffering on
+        ob_start();
+
+        // Import the view variables to local namespace
+        extract($input_data, EXTR_SKIP);
+
+        // Views are straight HTML pages with embedded PHP, so importing them
+        // this way insures that $this can be accessed as if the user was in
+        // the controller, which gives the easiest access to libraries in views
+        try {
+            include $view_filename;
+        } catch (Exception $e) {
+            ob_end_clean();
+            throw $e;
+        }
+
+        // Fetch the output and close the buffer
+        return ob_get_clean();
+    }
+
+    /**
      * Renders a view.
      *
      * @param   boolean   set to TRUE to echo the output instead of returning it
@@ -234,16 +265,11 @@ class View {
             throw new CF_Exception('core.view_set_filename');
         if (is_string($this->kohana_filetype)) {
             // Merge global and local data, local overrides global with the same name
-            $data = array_merge(View::$kohana_global_data, $this->kohana_local_data);
-			
-			if(CF::$instance==null) {
-				var_dump(debug_backtrace());
-				
-			}
-			
+            $data = array_merge(CView::$kohana_global_data, $this->kohana_local_data);
+
 //            var_dump(CF::$instance);
             // Load the view in the controller for access to $this
-            $output = CF::$instance->_kohana_load_view($this->kohana_filename, $data);
+            $output = self::load_view($this->kohana_filename, $data);
 
             if ($renderer !== FALSE AND is_callable($renderer, TRUE)) {
                 // Pass the output through the user defined renderer
@@ -277,4 +303,4 @@ class View {
 
 }
 
-// End View
+// End CView

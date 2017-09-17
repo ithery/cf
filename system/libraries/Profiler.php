@@ -101,7 +101,7 @@ class Profiler {
 			'styles'   => $styles,
 			'execution_time' => microtime(TRUE) - $start
 		);
-		$view = new View('kohana_profiler', $data);
+		$view = new CView('kohana_profiler', $data);
 
 		// Return rendered view if $return is TRUE
 		if ($return === TRUE)

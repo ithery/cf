@@ -64,6 +64,6 @@ class Profiler_Table {
 	{
 		$data['rows'] = $this->rows;
 		$data['columns'] = $this->columns;
-		return View::factory('kohana_profiler_table', $data)->render();
+		return CView::factory('kohana_profiler_table', $data)->render();
 	}
 }

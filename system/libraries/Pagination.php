@@ -195,7 +195,7 @@ class Pagination {
 		}
 
 		// Return rendered pagination view
-		return View::factory($this->directory.$style, get_object_vars($this))->render();
+		return CView::factory($this->directory.$style, get_object_vars($this))->render();
 	}
 
 	/**
