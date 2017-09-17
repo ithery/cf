@@ -76,9 +76,6 @@ class carr {
      * @return  mixed
      */
     public static function get($array, $key, $default = NULL) {
-        if (is_object($array)) {
-            trigger_error('Parameter is object');
-        }
         if ($array instanceof ArrayObject) {
             // This is a workaround for inconsistent implementation of isset between PHP and HHVM
             // See https://github.com/facebook/hhvm/issues/3437
@@ -86,7 +83,146 @@ class carr {
         } else {
             return isset($array[$key]) ? $array[$key] : $default;
         }
-        
+    }
+
+    /**
+     * Gets a value from an array using a dot separated path.
+     *
+     *     // Get the value of $array['foo']['bar']
+     *     $value = carr::path($array, 'foo.bar');
+     *
+     * Using a wildcard "*" will search intermediate arrays and return an array.
+     *
+     *     // Get the values of "color" in theme
+     *     $colors = carr::path($array, 'theme.*.color');
+     *
+     *     // Using an array of keys
+     *     $colors = carr::path($array, array('theme', '*', 'color'));
+     *
+     * @param   array   $array      array to search
+     * @param   mixed   $path       key path string (delimiter separated) or array of keys
+     * @param   mixed   $default    default value if the path is not set
+     * @param   string  $delimiter  key path delimiter
+     * @return  mixed
+     */
+    public static function path($array, $path, $default = NULL, $delimiter = NULL) {
+        if (!carr::is_array($array)) {
+            // This is not an array!
+            return $default;
+        }
+
+        if (is_array($path)) {
+            // The path has already been separated into keys
+            $keys = $path;
+        } else {
+            if (array_key_exists($path, $array)) {
+                // No need to do extra processing
+                return $array[$path];
+            }
+
+            if ($delimiter === NULL) {
+                // Use the default delimiter .
+                $delimiter = '.';
+            }
+
+            // Remove starting delimiters and spaces
+            $path = ltrim($path, "{$delimiter} ");
+
+            // Remove ending delimiters, spaces, and wildcards
+            $path = rtrim($path, "{$delimiter} *");
+
+            // Split the keys by delimiter
+            $keys = explode($delimiter, $path);
+        }
+
+        do {
+            $key = array_shift($keys);
+
+            if (ctype_digit($key)) {
+                // Make the key an integer
+                $key = (int) $key;
+            }
+
+            if (isset($array[$key])) {
+                if ($keys) {
+                    if (carr::is_array($array[$key])) {
+                        // Dig down into the next part of the path
+                        $array = $array[$key];
+                    } else {
+                        // Unable to dig deeper
+                        break;
+                    }
+                } else {
+                    // Found the path requested
+                    return $array[$key];
+                }
+            } elseif ($key === '*') {
+                // Handle wildcards
+
+                $values = array();
+                foreach ($array as $arr) {
+                    if ($value = carr::path($arr, implode('.', $keys))) {
+                        $values[] = $value;
+                    }
+                }
+
+                if ($values) {
+                    // Found the values requested
+                    return $values;
+                } else {
+                    // Unable to dig deeper
+                    break;
+                }
+            } else {
+                // Unable to dig deeper
+                break;
+            }
+        } while ($keys);
+
+        // Unable to find the value requested
+        return $default;
+    }
+
+    /**
+     * Set a value on an array by path.
+     *
+     * @see carr::path()
+     * @param array   $array     Array to update
+     * @param string  $path      Path
+     * @param mixed   $value     Value to set
+     * @param string  $delimiter Path delimiter
+     */
+    public static function set_path(& $array, $path, $value, $delimiter = NULL) {
+        if (!$delimiter) {
+            // Use the default delimiter
+            $delimiter = '.';
+        }
+
+        // The path has already been separated into keys
+        $keys = $path;
+        if (!carr::is_array($path)) {
+            // Split the keys by delimiter
+            $keys = explode($delimiter, $path);
+        }
+
+        // Set current $array to inner-most array path
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+
+            if (ctype_digit($key)) {
+                // Make the key an integer
+                $key = (int) $key;
+            }
+
+            if (!isset($array[$key])) {
+                $array[$key] = array();
+            }
+
+            $array = & $array[$key];
+        }
+
+        // Set key on inner-most array
+        $array[array_shift($keys)] = $value;
     }
 
     /**
@@ -155,25 +291,25 @@ class carr {
     }
 
     /**
-     * Extract one or more keys from an array. Each key given after the first
-     * argument (the array) will be extracted. Keys that do not exist in the
-     * search array will be NULL in the extracted data.
+     * Retrieves multiple paths from an array. If the path does not exist in the
+     * array, the default value will be added instead.
      *
-     * @param   array   array to search
-     * @param   string  key name
+     *     // Get the values "username", "password" from $_POST
+     *     $auth = Arr::extract($_POST, array('username', 'password'));
+     *
+     *     // Get the value "level1.level2a" from $data
+     *     $data = array('level1' => array('level2a' => 'value 1', 'level2b' => 'value 2'));
+     *     Arr::extract($data, array('level1.level2a', 'password'));
+     *
+     * @param   array  $array    array to extract paths from
+     * @param   array  $paths    list of path
+     * @param   mixed  $default  default value
      * @return  array
      */
-    public static function extract(array $search, $keys) {
-        // Get the keys, removing the $search array
-        $keys = array_slice(func_get_args(), 1);
-
+    public static function extract($array, array $paths, $default = NULL) {
         $found = array();
-        foreach ($keys as $key) {
-            if (isset($search[$key])) {
-                $found[$key] = $search[$key];
-            } else {
-                $found[$key] = NULL;
-            }
+        foreach ($paths as $path) {
+            carr::set_path($found, $path, carr::path($array, $path, $default));
         }
 
         return $found;
