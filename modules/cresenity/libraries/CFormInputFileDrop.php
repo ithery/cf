@@ -60,7 +60,7 @@ class CFormInputFileDrop extends CFormInput {
 		return $html->text();
 	}
 	public static function handle_file_drop($data) {
-		$session = Session::instance();
+		$session = CSession::instance();
 		$id = $data->element_id;
 		$uniqid = $data->uniqid;
 		$files = array();
@@ -89,7 +89,7 @@ class CFormInputFileDrop extends CFormInput {
 	}
 
 	public static function get_files($id) {
-		$session = Session::instance();
+		$session = CSession::instance();
 		$files = array();
 		if($session->get($id.'_filedrop')) {
 			$files = $session->get($id.'_filedrop');

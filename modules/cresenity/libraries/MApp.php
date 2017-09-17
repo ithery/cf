@@ -288,7 +288,7 @@ class MApp extends CMobile_Observable {
 
     public function user() {
         if ($this->_user == null) {
-            $session = Session::instance();
+            $session = CSession::instance();
             $user = $session->get("user");
             if (!$user)
                 $user = null;
