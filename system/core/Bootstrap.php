@@ -10,8 +10,8 @@
  * @license    http://kohanaphp.com/license.html
  */
 
-define('CF_VERSION',  '2.3.4');
-define('CF_CODENAME', 'buteo regalis');
+define('CF_VERSION',  '1.0');
+define('CF_CODENAME', 'CF1.0');
 
 // Test of CF is running in Windows
 define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');
@@ -26,7 +26,7 @@ require SYSPATH.'core/CFBenchmark'.EXT;
 CFBenchmark::start(SYSTEM_BENCHMARK.'_total_execution');
 
 // Start kohana_loading
-CFBenchmark::start(SYSTEM_BENCHMARK.'_kohana_loading');
+CFBenchmark::start(SYSTEM_BENCHMARK.'_cf_loading');
 
 // Load core files
 require SYSPATH.'core/utf8'.EXT;
@@ -39,7 +39,7 @@ require SYSPATH.'core/CF'.EXT;
 CF::setup();
 
 // End kohana_loading
-CFBenchmark::stop(SYSTEM_BENCHMARK.'_kohana_loading');
+CFBenchmark::stop(SYSTEM_BENCHMARK.'_cf_loading');
 
 // Start system_initialization
 CFBenchmark::start(SYSTEM_BENCHMARK.'_system_initialization');

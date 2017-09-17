@@ -14,11 +14,79 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class carr {
 
-    public static function get($array, $key, $default = null) {
+    /**
+     * Tests if an array is associative or not.
+     *
+     *     // Returns TRUE
+     *     carr::is_assoc(array('username' => 'john.doe'));
+     *
+     *     // Returns FALSE
+     *     carr::is_assoc('foo', 'bar');
+     *
+     * @param   array   $array  array to check
+     * @return  boolean
+     */
+    public static function is_assoc(array $array) {
+        // Keys of the array
+        $keys = array_keys($array);
+
+        // If the array keys of the keys match the keys, then the array must
+        // not be associative (e.g. the keys array looked like {0:0, 1:1...}).
+        return array_keys($keys) !== $keys;
+    }
+
+    /**
+     * Test if a value is an array with an additional check for array-like objects.
+     *
+     *     // Returns TRUE
+     *     carr::is_array(array());
+     *     carr::is_array(new ArrayObject);
+     *
+     *     // Returns FALSE
+     *     carr::is_array(FALSE);
+     *     carr::is_array('not an array!');
+     *     carr::is_array(Database::instance());
+     *
+     * @param   mixed   $value  value to check
+     * @return  boolean
+     */
+    public static function is_array($value) {
+        if (is_array($value)) {
+            // Definitely an array
+            return TRUE;
+        } else {
+            // Possibly a Traversable object, functionally the same as an array
+            return (is_object($value) AND $value instanceof Traversable);
+        }
+    }
+
+    /**
+     * Retrieve a single key from an array. If the key does not exist in the
+     * array, the default value will be returned instead.
+     *
+     *     // Get the value "username" from $_POST, if it exists
+     *     $username = carr::get($_POST, 'username');
+     *
+     *     // Get the value "sorting" from $_GET, if it exists
+     *     $sorting = carr::get($_GET, 'sorting');
+     *
+     * @param   array   $array      array to extract from
+     * @param   string  $key        key name
+     * @param   mixed   $default    default value
+     * @return  mixed
+     */
+    public static function get($array, $key, $default = NULL) {
         if (is_object($array)) {
             trigger_error('Parameter is object');
         }
-        return isset($array[$key]) ? $array[$key] : $default;
+        if ($array instanceof ArrayObject) {
+            // This is a workaround for inconsistent implementation of isset between PHP and HHVM
+            // See https://github.com/facebook/hhvm/issues/3437
+            return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
+        } else {
+            return isset($array[$key]) ? $array[$key] : $default;
+        }
+        
     }
 
     /**
@@ -288,16 +356,7 @@ class carr {
         }
         return $res;
     }
-    
-    /**
-     * @param $arr
-     * @return bool
-     */
-    public static function is_assoc($arr) {
-        $arrKeys = array_keys($arr);
-        sort($arrKeys, SORT_NUMERIC);
-        return $arrKeys !== range(0, count($arr) - 1);
-    }
+
 }
 
 // End arr
