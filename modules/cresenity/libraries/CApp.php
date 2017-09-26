@@ -367,7 +367,7 @@ class CApp extends CObservable {
     }
 
     public function add_custom_js($js) {
-        $this->custom_js.= $js;
+        $this->custom_js .= $js;
         return $this;
     }
 
@@ -588,7 +588,7 @@ class CApp extends CObservable {
             $v = CView::factory($theme_path . 'ccore/static_login');
         } else {
             if (CView::exists($theme_path . 'cpage')) {
-                        
+
                 $v = CView::factory($theme_path . 'cpage');
             }
             if ($v == null) {
@@ -616,7 +616,7 @@ class CApp extends CObservable {
             }
             $js = "";
             $vjs = CView::factory('ccore/js');
-            $js.=PHP_EOL . $vjs->render();
+            $js .= PHP_EOL . $vjs->render();
 
             $js .= PHP_EOL . $this->js . $additional_js;
 
@@ -663,10 +663,13 @@ class CApp extends CObservable {
             $v->additional_head = $this->additional_head;
             $v->custom_data = $this->custom_data;
         }
+        if (isset($_GET['profiler'])) {
+            new Profiler();
+        }
 
         return $v->render();
     }
-    
+
     public function set_custom_data($data) {
         $this->custom_data = $data;
         return $this;
@@ -678,7 +681,7 @@ class CApp extends CObservable {
         $additional_js = '';
         $js = "";
         $vjs = CView::factory('ccore/js');
-        $js.=PHP_EOL . $vjs->render();
+        $js .= PHP_EOL . $vjs->render();
 
         $js .= PHP_EOL . $this->js . $additional_js;
 
@@ -788,9 +791,9 @@ class CApp extends CObservable {
 
     public function get_child_array($id = "", $level = 0) {
         $db = CDatabase::instance();
-        $q = "select role_id,name from roles where status>0 ";
+        $q = "select role_id,name,lft,rgt from roles where status>0 ";
         if (strlen($id) > 0) {
-            $q.=" and parent_id=" . $db->escape($id);
+            $q .= " and parent_id=" . $db->escape($id);
         }
         $org_id = CF::org_id();
         $user = $this->user();
@@ -802,7 +805,7 @@ class CApp extends CObservable {
         if ($org_id == 0)
             $org_id = null;
         if (strlen($org_id) > 0) {
-            $q.=" and (org_id is null or org_id = 0 or org_id=" . $db->escape($org_id).")";
+            $q .= " and (org_id is null or org_id = 0 or org_id=" . $db->escape($org_id) . ")";
         }
         $result = array();
         $r = $db->query($q);
@@ -812,7 +815,10 @@ class CApp extends CObservable {
             $role["name"] = $row->name;
             $role["level"] = $level;
             $result[] = $role;
-            $childs = $this->get_child_array($row->role_id, $level + 1);
+            $childs = array();
+            if ($row->rgt != $row->lft + 1) {
+                $childs = $this->get_child_array($row->role_id, $level + 1);
+            }
             if (count($childs) > 0)
                 $result = array_merge($result, $childs);
         }
