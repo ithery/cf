@@ -2,6 +2,9 @@
 
 class cnav {
 
+    protected static $roles = array();
+    protected static $role_navs = array();
+
     public function nav($nav = null, $controller = null, $method = null, $path = null) {
         if ($controller == null)
             $controller = crouter::controller();
@@ -78,19 +81,31 @@ class cnav {
         if ($role_id == "PUBLIC") {
             $role_id = null;
         }
-        $role = cdbutils::get_row('select * from roles where role_id=' . $db->escape($role_id));
-        if ($role != null) {
-            if ($role->parent_id == null)
-                return true;
+        if (!isset(self::$roles[$role_id])) {
+            $role = cdbutils::get_row('select * from roles where role_id=' . $db->escape($role_id));
+            if ($role != null) {
+                if ($role->parent_id == null)
+                    return true;
+            }
+            self::$roles[$role_id] = $role;
+        }
+        $role = self::$roles[$role_id];
+
+        if (!isset(self::$role_navs[$app_id])) {
+            self::$role_navs[$app_id] = array();
+
+            if (!isset(self::$role_navs[$app_id][$role_id])) {
+                $q = "select nav from role_nav where nav=" . $db->escape($nav["name"]) . " and role_id=" . $db->escape($role_id) . " and app_id=" . $db->escape($app_id);
+                if ($role_id == null) {
+                    $q = "select nav from role_nav where nav=" . $db->escape($nav["name"]) . " and role_id is null and app_id=" . $db->escape($app_id);
+                }
+                $role_navs[$app_id][$role_id] = cdbutils::get_array($q);
+            }
         }
 
-        $q = "select * from role_nav where nav=" . $db->escape($nav["name"]) . " and role_id=" . $db->escape($role_id) . " and app_id=" . $db->escape($app_id);
-        if ($role_id == null) {
-            $q = "select * from role_nav where nav=" . $db->escape($nav["name"]) . " and role_id is null and app_id=" . $db->escape($app_id);
-        }
-
-        $r = $db->query($q);
-        return $r->count() > 0;
+        
+        return in_array($nav["name"], $role_navs[$app_id][$role_id]);
+       
     }
 
     public static function have_permission($action, $nav = null, $role_id = null, $app_id = null, $domain = null) {
@@ -220,7 +235,7 @@ class cnav {
             $url = $link;
         } else {
             if (strlen($path) > 0)
-                $path.='/';
+                $path .= '/';
             if (strlen($controller) == 0)
                 return "";
             if (strlen($method) == 0)
@@ -293,7 +308,7 @@ class cnav {
                 if ($child > 0) {
 //                        $li_class.=" with-right-arrow";
                     if ($level == 0) {
-                        $li_class.=" treeview";
+                        $li_class .= " treeview";
                     }
                 }
 
@@ -410,11 +425,11 @@ class cnav {
 
                 $li_class = "";
                 if ($child > 0) {
-                    $li_class.=" with-right-arrow";
+                    $li_class .= " with-right-arrow";
                     if ($level == 0) {
-                        $li_class.=" dropdown";
+                        $li_class .= " dropdown";
                     } else {
-                        $li_class.=" dropdown-submenu ";
+                        $li_class .= " dropdown-submenu ";
                     }
                 }
 
@@ -426,7 +441,7 @@ class cnav {
                     $addition_style = ' style="border-bottom:1px solid #bbb"';
                 }
 
-                $html.='<li class="' . $li_class . $active_class . '" ' . $addition_style . '>';
+                $html .= '<li class="' . $li_class . $active_class . '" ' . $addition_style . '>';
                 $icon_html = "";
                 if (isset($d["icon"]) && strlen($d["icon"]) > 0) {
                     $icon_html = '<i class="icon-' . $d["icon"] . '"></i>';
@@ -440,7 +455,7 @@ class cnav {
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
-                    $elem.= "</a>\r\n";
+                    $elem .= "</a>\r\n";
                 } else {
                     $target = "";
                     if (isset($d["target"]) && strlen($d["target"]) > 0) {
@@ -448,9 +463,9 @@ class cnav {
                     }
                     $elem = '<a class="' . $active_class . '" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span></a>\r\n";
                 }
-                $html.=$elem;
-                $html.=$child_html;
-                $html.='</li>';
+                $html .= $elem;
+                $html .= $child_html;
+                $html .= '</li>';
             }
         }
         if (strlen($html) > 0) {
