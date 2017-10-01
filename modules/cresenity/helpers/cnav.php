@@ -87,20 +87,22 @@ class cnav {
                 return true;
         }
 
-
-        if (!isset(self::$role_navs[$app_id])) {
-            self::$role_navs[$app_id] = array();
-
+        
+        if (!isset(self::$role_navs[$app_id]) || !isset(self::$role_navs[$app_id][$role_id]) ) {
+            if (!isset(self::$role_navs[$app_id])) {
+                self::$role_navs[$app_id] = array();
+            }
             if (!isset(self::$role_navs[$app_id][$role_id])) {
+              
                 $q = "select nav from role_nav where role_id=" . $db->escape($role_id) . " and app_id=" . $db->escape($app_id);
                 if ($role_id == null) {
                     $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($app_id);
                 }
                 self::$role_navs[$app_id][$role_id] = cdbutils::get_array($q);
+                
             }
         }
-
-
+        
         return in_array($nav["name"], self::$role_navs[$app_id][$role_id]);
     }
 
