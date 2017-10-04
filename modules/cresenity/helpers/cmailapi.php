@@ -75,7 +75,7 @@ class cmailapi {
     }
 
     public function elasticemail($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
-        
+
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
         if (!$smtp_password) {
@@ -103,12 +103,23 @@ class cmailapi {
             if (!is_array($to)) {
                 $to = array($to);
             }
+            if (!is_array($cc)) {
+                $cc = array($cc);
+            }
+            if (!is_array($bcc)) {
+                $bcc = array($bcc);
+            }
+            
             $to_implode = implode(";", $to);
+            $cc_implode = implode(";", $cc);
+            $bcc_implode = implode(";", $bcc);
             $post = array('from' => $smtp_from,
                 'fromName' => $smtp_from_name,
                 'apikey' => $smtp_password,
-                'subject' => $subject.'[API]',
-                'to' => $to_implode,
+                'subject' => $subject . '[API]',
+                'msgTo' => $to_implode,
+                'msgCC' => $cc_implode,
+                'msgBcc' => $bcc_implode,
                 'bodyHtml' => $message,
                 'isTransactional' => false
             );
@@ -123,10 +134,13 @@ class cmailapi {
                 CURLOPT_SSL_VERIFYPEER => false
             ));
 
-            $result = curl_exec($ch);
+            $response = curl_exec($ch);
             curl_close($ch);
 
-            echo $result;
+            $response_array = json_decode($response, true);
+            if (!carr::get($response_array, 'success')) {
+                throw new Exception('Fail to send mail, API Response:' . $response);
+            }
         } catch (Exception $ex) {
             return $ex;
         }
