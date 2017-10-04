@@ -27,30 +27,29 @@ class cmail {
         $admin_email = ccfg::get("admin_email");
 
         if (ccfg::get("mail_error_smtp")) {
-            $smtp_username=ccfg::get('smtp_username_error');
-            $smtp_password=  ccfg::get('smtp_password_error');
-            $smtp_host=ccfg::get('smtp_host_error');
-            $smtp_port=ccfg::get('smtp_port_error');
-            $secure=ccfg::get('smtp_secure_error');
+            $smtp_username = ccfg::get('smtp_username_error');
+            $smtp_password = ccfg::get('smtp_password_error');
+            $smtp_host = ccfg::get('smtp_host_error');
+            $smtp_port = ccfg::get('smtp_port_error');
+            $secure = ccfg::get('smtp_secure_error');
             $arr_options = array();
-            if(strlen($smtp_username)>0){
-                $arr_options['smtp_username']=$smtp_username;
-            } 
-            if(strlen($smtp_password)>0){
-                $arr_options['smtp_password']=$smtp_password;
-            } 
-            if(strlen($smtp_host)>0){
-                $arr_options['smtp_host']=$smtp_host;
-            } 
-            if(strlen($smtp_port)>0){
-                $arr_options['smtp_port']=$smtp_port;
-            } 
-            if(strlen($secure)>0){
-                $arr_options['smtp_secure']=$secure;
-            } 
+            if (strlen($smtp_username) > 0) {
+                $arr_options['smtp_username'] = $smtp_username;
+            }
+            if (strlen($smtp_password) > 0) {
+                $arr_options['smtp_password'] = $smtp_password;
+            }
+            if (strlen($smtp_host) > 0) {
+                $arr_options['smtp_host'] = $smtp_host;
+            }
+            if (strlen($smtp_port) > 0) {
+                $arr_options['smtp_port'] = $smtp_port;
+            }
+            if (strlen($secure) > 0) {
+                $arr_options['smtp_secure'] = $secure;
+            }
 
             $ret = cmail::send_smtp($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, array(), array(), array(), $arr_options);
-            
         } else {
 
             $ret = cmail::send($admin_email, $subject . " [FOR ADMINISTRATOR]", $message, $headers);
@@ -164,32 +163,41 @@ class cmail {
 
     public static function send_smtp($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         $mail = CSMTP::factory();
-        $smtp_username=carr::get($options,'smtp_username');
-        $smtp_password=carr::get($options,'smtp_password');
-        $smtp_host=carr::get($options,'smtp_host');
-        $smtp_port=carr::get($options,'smtp_port');
-        $secure=carr::get($options,'smtp_secure');
-        if(!$smtp_username){
-            $smtp_username=ccfg::get('smtp_username');
+        $smtp_username = carr::get($options, 'smtp_username');
+        $smtp_password = carr::get($options, 'smtp_password');
+        $smtp_host = carr::get($options, 'smtp_host');
+        $smtp_port = carr::get($options, 'smtp_port');
+        $secure = carr::get($options, 'smtp_secure');
+        if (!$smtp_username) {
+            $smtp_username = ccfg::get('smtp_username');
         }
-        if(!$smtp_password){
-            $smtp_password=ccfg::get('smtp_password');
+        if (!$smtp_password) {
+            $smtp_password = ccfg::get('smtp_password');
         }
-        if(!$smtp_host){
-            $smtp_host=ccfg::get('smtp_host');
+        if (!$smtp_host) {
+            $smtp_host = ccfg::get('smtp_host');
         }
-        if(!$smtp_port){
-            $smtp_port=ccfg::get('smtp_port');
+        if (!$smtp_port) {
+            $smtp_port = ccfg::get('smtp_port');
         }
-        if(!$secure){
-            $secure=ccfg::get('smtp_secure');
+        if (!$secure) {
+            $secure = ccfg::get('smtp_secure');
         }
-        
-        if($smtp_host=='smtp.sendgrid.net'&&count($attachments)==0) {
-            return csendgrid::send($to,$subject, $message,$attachments,$cc,$bcc,$options);
+
+        if (count($attachments) == 0) {
+            switch ($smtp_host) {
+                case 'smtp.sendgrid.net':
+                    return cmailapi::sendgrid($to, $subject, $message, $attachments, $cc, $bcc, $options);
+                    break;
+                case 'smtp.elasticemail.com':
+                case 'smtp25.elasticemail.com':
+                    return cmailapi::elasticemail($to, $subject, $message, $attachments, $cc, $bcc, $options);
+                    break;
+            }
         }
-        
-        
+
+
+
         $mail->set_username($smtp_username);
         $mail->set_password($smtp_password);
         $mail->set_host($smtp_host);
@@ -204,11 +212,11 @@ class cmail {
         if ($smtp_from == null) {
             $smtp_from = ccfg::get('smtp_from');
         }
-        $smtp_from_name=carr::get($options,'smtp_from_name');
+        $smtp_from_name = carr::get($options, 'smtp_from_name');
         if ($smtp_from_name == null) {
             $smtp_from_name = ccfg::get('smtp_from_name');
         }
-        $mail->set_from($smtp_from,$smtp_from_name);
+        $mail->set_from($smtp_from, $smtp_from_name);
 
         $mail->set_message_html($message);
         $mail->set_subject($subject);
