@@ -1,9 +1,8 @@
 <?php
 
-class csendgrid {
+class celasticmail {
 
     public function send($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
-        //$sendgrid_apikey = "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";
 
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
@@ -26,50 +25,38 @@ class csendgrid {
             $smtp_from_name = ccfg::get('smtp_from_name');
         }
 
-        $url = 'https://api.sendgrid.com/';
-        $pass = $sendgrid_apikey;
-        /*
-          $template_id = '<your_template_id>';
-          $js = array(
-          'sub' => array(':name' => array('Elmer')),
-          'filters' => array('templates' => array('settings' => array('enable' => 1, 'template_id' => $template_id)))
-          );
-         */
-        
-        
-        
-        $params = array(
-            'to' => $to,
-            'cc' => $cc,
-            'bcc' => $bcc,
-            'from' => $smtp_from,
-            'fromname' => $smtp_from_name,
-            'subject' => $subject . '',
-            'html' => $message,
-        );
+        $url = 'https://api.elasticemail.com/v2/email/send';
 
-        $request = $url . 'api/mail.send.json';
+        try {
+            if (!is_array($to)) {
+                $to = array($to);
+            }
+            $to_implode = implode(";", $to);
+            $post = array('from' => $smtp_from,
+                'fromName' => $smtp_from_name,
+                'apikey' => $smtp_password,
+                'subject' => $subject,
+                'to' => $to_implode,
+                'bodyHtml' => $message,
+                'isTransactional' => false
+            );
 
-        // Generate curl request
-        $session = curl_init($request);
-        // Tell PHP not to use SSLv3 (instead opting for TLS)
-        curl_setopt($session, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-        curl_setopt($session, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $sendgrid_apikey));
-        // Tell curl to use HTTP POST
-        curl_setopt($session, CURLOPT_POST, true);
-        // Tell curl that this is the body of the POST
-        curl_setopt($session, CURLOPT_POSTFIELDS, curl::as_post_string($params));
-        // Tell curl not to return headers, but do return the response
-        curl_setopt($session, CURLOPT_HEADER, false);
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => $url,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $post,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => false,
+                CURLOPT_SSL_VERIFYPEER => false
+            ));
 
-        // obtain response
-        $response = curl_exec($session);
-        curl_close($session);
+            $result = curl_exec($ch);
+            curl_close($ch);
 
-        $response_array = json_decode($response,true);
-        if(carr::get($response_array,'message')!='success') {
-            throw new Exception('Fail to send mail, API Response:'.$response);
+            echo $result;
+        } catch (Exception $ex) {
+            return $ex;
         }
         return true;
     }
