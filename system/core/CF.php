@@ -268,15 +268,25 @@ final class CF {
         // Enable C output handling
         CFEvent::add('system.shutdown', array('CF', 'shutdown'));
 
-        if (self::config('core.enable_hooks') === TRUE) {
-            // Find all the hook files
-            $hooks = self::list_files('hooks', TRUE);
-
-            foreach ($hooks as $file) {
-                // Load the hook
-                include $file;
-            }
+        CFBenchmark::start('system.cf.bootstrap');
+        //try to locate bootstrap files for modules 
+//        foreach (CF::modules() as $module) {
+//            $bootstrap_path = DOCROOT . 'modules' . DS . $module;
+//            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+//                include $bootstrap_path . 'bootstrap' . EXT;
+//            }
+//        }
+        //try to locate bootstrap files for application 
+        $bootstrap_path = DOCROOT . 'application' . DS . CF::app_code() . DS;
+        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+            include $bootstrap_path . 'bootstrap' . EXT;
         }
+        //try to locate bootstrap files for org
+        $bootstrap_path .= CF::org_code() . DS;
+        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+            include $bootstrap_path . 'bootstrap' . EXT;
+        }
+        CFBenchmark::stop('system.cf.bootstrap');
 
         // Setup is complete, prevent it from being run again
         $run = TRUE;
