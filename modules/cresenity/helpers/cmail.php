@@ -193,6 +193,9 @@ class cmail {
                 case 'smtp25.elasticemail.com':
                     return cmailapi::elasticemail($to, $subject, $message, $attachments, $cc, $bcc, $options);
                     break;
+                case 'smtp.postmarkapp.com':
+                    return cmailapi::postmark($to, $subject, $message, $attachments, $cc, $bcc, $options);
+                    break;
             }
         }
 

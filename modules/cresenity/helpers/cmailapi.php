@@ -87,7 +87,7 @@ class cmailapi {
         if ($smtp_host != 'smtp.elasticemail.com' && $smtp_host != 'smtp25.elasticemail.com') {
             throw new Exception('Fail to send mail API, SMTP Host is not valid');
         }
-        $sendgrid_apikey = $smtp_password;
+
         $smtp_from = carr::get($options, 'smtp_from');
         if ($smtp_from == null) {
             $smtp_from = ccfg::get('smtp_from');
@@ -109,7 +109,7 @@ class cmailapi {
             if (!is_array($bcc)) {
                 $bcc = array($bcc);
             }
-            
+
             $to_implode = implode(";", $to);
             $cc_implode = implode(";", $cc);
             $bcc_implode = implode(";", $bcc);
@@ -121,7 +121,7 @@ class cmailapi {
                 'msgCC' => $cc_implode,
                 'msgBcc' => $bcc_implode,
                 'bodyHtml' => $message,
-                'isTransactional' => false
+                'isTransactional' => true
             );
 
             $ch = curl_init();
@@ -143,6 +143,91 @@ class cmailapi {
             }
         } catch (Exception $ex) {
             return $ex;
+        }
+        return true;
+    }
+
+    public function postmark($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+
+
+        $smtp_password = carr::get($options, 'smtp_password');
+        $smtp_host = carr::get($options, 'smtp_host');
+        if (!$smtp_password) {
+            $smtp_password = ccfg::get('smtp_password');
+        }
+        if (!$smtp_host) {
+            $smtp_host = ccfg::get('smtp_host');
+        }
+        if ($smtp_host != 'smtp.postmarkapp.com') {
+            throw new Exception('Fail to send mail API, SMTP Host is not valid');
+        }
+
+        $smtp_from = carr::get($options, 'smtp_from');
+        if ($smtp_from == null) {
+            $smtp_from = ccfg::get('smtp_from');
+        }
+        $smtp_from_name = carr::get($options, 'smtp_from_name');
+        if ($smtp_from_name == null) {
+            $smtp_from_name = ccfg::get('smtp_from_name');
+        }
+
+        $url = 'https://api.postmarkapp.com/email';
+
+        try {
+            if (!is_array($to)) {
+                $to = array($to);
+            }
+            if (!is_array($cc)) {
+                $cc = array($cc);
+            }
+            if (!is_array($bcc)) {
+                $bcc = array($bcc);
+            }
+
+            $to_implode = implode(",", $to);
+            $cc_implode = implode(",", $cc);
+            $bcc_implode = implode(",", $bcc);
+            $post = array();
+            $post['From'] = $smtp_from;
+            $post['To'] = $to_implode;
+            $post['Cc'] = $cc_implode;
+            $post['Bcc'] = $bcc_implode;
+            $post['Subject'] = $subject;
+            $post['HtmlBody'] = $message;
+
+            $version = phpversion();
+            $os = PHP_OS;
+
+            $json = json_encode($post);
+            cdbg::var_dump($json);
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => $url,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $json,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_HTTPHEADER => array(
+                    'User-Agent: Postmark-PHP (PHP Version:' . $version . ', OS:' . $os . ')',
+                    'Accept: application/json',
+                    'Content-Type: application/json',
+                    'X-Postmark-Server-Token:' . $smtp_password
+                ),
+            ));
+
+
+
+            $response = curl_exec($ch);
+            curl_close($ch);
+            cdbg::var_dump($response);
+            die;
+            $response_array = json_decode($response, true);
+            if (!carr::get($response_array, 'success')) {
+                throw new Exception('Fail to send mail, API Response:' . $response);
+            }
+        } catch (Exception $ex) {
+            throw $ex;
         }
         return true;
     }
