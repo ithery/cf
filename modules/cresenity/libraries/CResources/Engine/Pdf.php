@@ -1,11 +1,9 @@
 <?php
 
-require_once dirname(__FILE__) . DS . CResources::_prefix . EXT;
+class CResources_Engine_Pdf extends CResources_Engine {
 
-class CResourcesEnginePdf extends CResourcesEngine {
-
-    protected function __construct($resource_type, $type, $org_code) {
-        parent::__construct($resource_type, $type, $org_code);
+    public function __construct($type, $org_code) {
+        parent::__construct('Pdf', $type, $org_code);
     }
 
     public static function factory($resource_type, $type, $org_code = null) {

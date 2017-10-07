@@ -1,6 +1,6 @@
 <?php
 
-class CResourcesEncode {
+class CResources_Encode {
 
     const _digit = 4;
 

@@ -1,6 +1,6 @@
 <?php
 
-    class CResourcesDecode{
+    class CResources_Decode{
         const _digit=4;
 
         public static function decode($file_name){

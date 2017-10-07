@@ -1,15 +1,13 @@
 <?php
 
-require_once dirname(__FILE__) . DS . CResources::_prefix . EXT;
+class CResources_Engine_Image extends CResources_Engine {
 
-class CResourcesEngineImage extends CResourcesEngine {
-
-    protected function __construct($resource_type, $type, $org_code) {
-        parent::__construct($resource_type, $type, $org_code);
+    public function __construct($type, $org_code) {
+        parent::__construct('Image', $type, $org_code);
     }
 
-    public static function factory($resource_type, $type, $org_code = null) {
-        return new CResourcesEngineImage($resource_type, $type, $org_code);
+    public function add_size($size_name, $options) {
+        $this->_sizes[$size_name] = $options;
     }
 
     public function save($file_name, $file_request) {
@@ -44,10 +42,9 @@ class CResourcesEngineImage extends CResourcesEngine {
                     ///////////////////// jja ///////////////////// 
 
                     if ($file_path !== $new_file_path) {
-                        //return copy($file_path, $new_file_path);
+
                         copy($file_path, $new_file_path);
                     }
-                    //return true;
                 }
                 $new_width = $img_width * $scale;
                 $new_height = $img_height * $scale;
@@ -73,7 +70,7 @@ class CResourcesEngineImage extends CResourcesEngine {
                     $white = $wideimage->allocateColor(255, 255, 255);
                     //throw new Exception("Width:".$width.", Height:".$height.", Img Width:".$img_width.", Img Height:".$img_height.", Width New:".$width_new.", Height New:".$height_new);
                     $wideimage = $wideimage->resizeCanvas($width_new, $height_new, 'center', 'center', $white);
-                } 
+                }
                 $wideimage = $wideimage->resize($new_width, $new_height);
                 if ($crop) {
                     $wideimage = $wideimage->crop('center', 'center', $width, $height);
@@ -81,7 +78,7 @@ class CResourcesEngineImage extends CResourcesEngine {
 
 
                 $wideimage->saveToFile($full_size_path);
-            } catch (Exception $ex) {
+            } catch (SMResources_Exception $ex) {
                 throw $ex;
             }
         }
