@@ -19,15 +19,17 @@ class Assets_controller extends CController {
             $filename = $size;
             $size = null;
         }
-        $filename = CResources::decode($filename);
+        $filename = CResources_Decode::decode($filename);
         $file_path = CResources::get_path($filename, $size);
-        
+
+
+
         if (!cfs::file_exists($file_path)) {
             $file_path = DOCROOT . 'application/admin62hallfamily/default/media/img/product/no-image.png';
         }
-        
-        
-        
+
+
+
         $info = CResources::get_file_info($filename);
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
 
@@ -58,7 +60,7 @@ class Assets_controller extends CController {
             }
         }
 
-        
+
         if ($if_modified_since) {
 
             header('HTTP/1.1 304 Not Modified');
@@ -81,12 +83,12 @@ class Assets_controller extends CController {
 
         header($content_type);
         $file = '';
-        if(cfs::file_exists($file_path)) {
+        if (cfs::file_exists($file_path)) {
             $file = file_get_contents($file_path);
-        } 
+        }
         echo $file;
     }
-    
+
     public function pdf($param_size, $param_filename = null) {
         $app = CApp::instance();
         $org = $app->org();
@@ -102,12 +104,12 @@ class Assets_controller extends CController {
         }
         $filename = CResources::decode($filename);
         $file_path = CResources::get_path($filename, $size);
-        
+
         if (!cfs::file_exists($file_path)) {
             $file_path = DOCROOT . 'application/admin62hallfamily/default/media/img/product/no-image.png';
         }
-        
-        
+
+
         $info = CResources::get_file_info($filename);
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $cache_length = 2592000;
@@ -134,8 +136,8 @@ class Assets_controller extends CController {
             }
         }
 
-        
-        if ($if_modified_since) {
+
+        if ($not_modified) {
 
             header('HTTP/1.1 304 Not Modified');
         } else {
@@ -145,18 +147,17 @@ class Assets_controller extends CController {
 
         header("Expires: $cache_expire_date");
         header("Pragma: cache");
-        header("Cache-Control: must-revalidate");
+        header("Cache-Control: max-age:120");
         header("Access-Control-Allow-Methods:GET,HEAD");
         header("Access-Control-Allow-Origin:*");
         header("Accept-Ranges:bytes");
-        
-        if(cfs::file_exists($file_path)) {
+
+        if (cfs::file_exists($file_path)) {
             header("Content-type:application/pdf");
-            header("Content-Disposition:attachment;filename='".$filename."'");
+            header("Content-Disposition:attachment;filename='" . $filename . "'");
             readfile($file_path);
-        } 
-        else {
-            echo 'file ['.$filename.'] not found!';
+        } else {
+            echo 'file [' . $filename . '] not found!';
         }
     }
 

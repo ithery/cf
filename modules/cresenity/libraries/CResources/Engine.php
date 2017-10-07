@@ -42,7 +42,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             $temp .= $size . DS;
         }
         $temp .= $filename;
-        $dir = CF::get_dir($this->_root_directory);
+        $dir = $this->_root_directory . DS;
         $temp_path = str_replace(DS, "/", $dir) . "" . $temp;
 
         return $temp_path;
@@ -58,35 +58,32 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
     public function save($file_name, $file_request) {
         $date_now = date("Y-m-d H:i:s");
-        $dir = CF::get_dir($this->_root_directory);
+
+        $dir = $this->_root_directory . DS;
 
         $org_code = $this->_org_code;
         if ($org_code == null)
             $org_code = 'default';
         $dir .= $org_code . DS;
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
+
 
         $dir .= $this->_resource_type . DS;
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
+
 
         $dir .= $this->_type . DS;
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
+
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
 
+        cfs::mkdir($dir);
 
         $temp_file_name = $org_code . '_' . $this->_resource_type . "_" . $this->_type . "_" . date('YmdHis', strtotime($date_now)) . "_" . $file_name;
         $path = $dir . $temp_file_name;
-        file_put_contents($path, $file_request);
+        $written = cfs::atomic_write($path, $file_request);
+
+        if ($written === false) {
+            throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
+        }
         $this->_filename = $temp_file_name;
         return $temp_file_name;
     }
