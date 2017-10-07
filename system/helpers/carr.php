@@ -81,6 +81,9 @@ class carr {
             // See https://github.com/facebook/hhvm/issues/3437
             return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
         } else {
+            if (is_object($array)) {
+                throw new CException('error passing variable object as array');
+            }
             return isset($array[$key]) ? $array[$key] : $default;
         }
     }
