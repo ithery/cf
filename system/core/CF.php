@@ -40,14 +40,7 @@ final class CF {
     private static $internal_cache_path;
     private static $internal_cache_key;
     private static $internal_cache_encrypt;
-    private static $app_id;
-    private static $app_code;
-    private static $org_id;
-    private static $org_code;
-    private static $theme;
-    private static $store_id;
-    private static $store_code;
-    private static $shared_app_code = array();
+    private static $data;
 
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
@@ -72,39 +65,6 @@ final class CF {
             $result['theme'] = isset($data['theme']) ? $data['theme'] : null;
         }
         return $result;
-    }
-
-    public static function app_id() {
-
-        return self::$app_id;
-    }
-
-    public static function app_code() {
-        return self::$app_code;
-    }
-
-    public static function org_id() {
-        return self::$org_id;
-    }
-
-    public static function org_code() {
-        return self::$org_code;
-    }
-
-    public static function store_id() {
-        return self::$store_id;
-    }
-
-    public static function store_code() {
-        return self::$store_code;
-    }
-
-    public static function shared_app_code() {
-        return self::$shared_app_code;
-    }
-
-    public static function theme() {
-        return self::$theme;
     }
 
     /**
@@ -132,38 +92,27 @@ final class CF {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
 
-        //we load the app, org and store from domain
-        $domain = self::domain();
-
-        //get domain data
-        $data = CFData::get($domain, 'domain');
-
-        if ($data != null) {
-            self::$app_id = isset($data['app_id']) ? $data['app_id'] : null;
-            self::$app_code = isset($data['app_code']) ? $data['app_code'] : null;
-            self::$shared_app_code = isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
-            self::$org_id = isset($data['org_id']) ? $data['org_id'] : null;
-            self::$org_code = isset($data['org_code']) ? $data['org_code'] : null;
-            self::$store_id = isset($data['store_id']) ? $data['store_id'] : null;
-            self::$store_code = isset($data['store_code']) ? $data['store_code'] : null;
-            self::$theme = isset($data['theme']) ? $data['theme'] : null;
+        $capppath = APPPATH;
+        $defaultpath = APPPATH;
+        if (strlen(self::app_code()) > 0) {
+            $capppath .= self::app_code() . DS;
+            $defaultpath .= self::app_code() . DS;
         }
-        $capp_path = APPPATH;
-        if (strlen(self::$app_code) > 0) {
-            $capp_path .= self::$app_code . DS;
-        }
-        if (strlen(self::$org_code) > 0) {
-            $capp_path .= self::$org_code . DS;
-        }
-        if (strlen(self::$store_code) > 0) {
-            $capp_path .= self::$store_code . DS;
+        if (strlen(self::org_code()) > 0) {
+            $capppath .= self::org_code() . DS;
         }
 
-        if (is_dir($capp_path . "default" . DS)) {
-            $capp_path .= "default" . DS;
+
+        if (is_dir($defaultpath . "default" . DS)) {
+            $defaultpath .= "default" . DS;
+        }
+        if (is_dir($capppath . "default" . DS)) {
+            $defaultpath .= "default" . DS;
         }
 
-        define('CAPPPATH', $capp_path);
+        define('CAPPPATH', $capppath);
+        define('DEFAULTPATH', $defaultpath);
+
         // Define CF error constant
         define('E_CF', 42);
 
@@ -452,70 +401,7 @@ final class CF {
 
     public static function include_paths_theme($process = FALSE) {
 
-        $theme = self::$theme;
-
-        if ($process === TRUE) {
-
-            // Add APPPATH as the first path
-            self::$include_paths_theme = array();
-            //self::$include_paths[] = APPPATH;
-
-            if (self::$store_code != null) {
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
-            }
-            if (self::$org_code != null) {
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
-            }
-            if (self::$app_code != null) {
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . "default" . DS;
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS;
-            }
-
-            foreach (self::$shared_app_code as $key => $value) {
-                if (self::$org_code != null) {
-                    self::$include_paths_theme[] = APPPATH . $value . DS . self::$org_code . DS . "default" . DS;
-                    self::$include_paths_theme[] = APPPATH . $value . DS . self::$org_code . DS;
-                }
-
-                self::$include_paths_theme[] = APPPATH . $value . DS . "default" . DS;
-                self::$include_paths_theme[] = APPPATH . $value . DS;
-            }
-
-            self::$include_paths_theme[] = APPPATH . "default" . DS;
-
-            if (isset(self::$configuration['core']['modules'])) {
-                foreach (self::$configuration['core']['modules'] as $path) {
-                    if ($path = str_replace('\\', '/', realpath($path))) {
-                        // Add a valid path
-                        self::$include_paths_theme[] = $path . '/';
-                    }
-                }
-            }
-
-            // Add SYSPATH as the last path
-            self::$include_paths_theme[] = SYSPATH;
-
-            self::$include_paths_theme[] = DOCROOT;
-        }
-
-        return self::$include_paths_theme;
+        return self::include_paths($process, true);
     }
 
     /**
@@ -526,9 +412,9 @@ final class CF {
      * @return  array
      */
     public static function include_paths($process = FALSE, $with_theme = false) {
-        $theme = '';
+        $theme = null;
         if ($with_theme) {
-            $theme = self::$theme;
+            $theme = self::theme();
         }
         if ($process === TRUE) {
 
@@ -536,38 +422,29 @@ final class CF {
             self::$include_paths = array();
             //self::$include_paths[] = APPPATH;
 
-            if (self::$store_code != null) {
+
+            if (self::org_code() != null) {
                 if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS . "themes" . DS . $theme . DS;
+                    self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS . "default" . DS . "themse" . DS . $theme . DS;
                 }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS;
+                self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS . "default" . DS;
                 if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "themes" . DS . $theme . DS;
+                    self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS . "themes" . DS . $theme . DS;
                 }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
+                self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS;
             }
-            if (self::$org_code != null) {
+            if (self::app_code() != null) {
                 if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themse" . DS . $theme . DS;
+                    self::$include_paths[] = APPPATH . self::app_code() . DS . "default" . DS . "themes" . DS . $theme . DS;
                 }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
-            }
-            if (self::$app_code != null) {
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . "default" . DS;
-                self::$include_paths[] = APPPATH . self::$app_code . DS;
+                self::$include_paths[] = APPPATH . self::app_code() . DS . "default" . DS;
+                self::$include_paths[] = APPPATH . self::app_code() . DS;
             }
 
-            foreach (self::$shared_app_code as $key => $value) {
-                if (self::$org_code != null) {
-                    self::$include_paths[] = APPPATH . $value . DS . self::$org_code . DS . "default" . DS;
-                    self::$include_paths[] = APPPATH . $value . DS . self::$org_code . DS;
+            foreach (self::shared_app_code() as $key => $value) {
+                if (self::org_code() != null) {
+                    self::$include_paths[] = APPPATH . $value . DS . self::org_code() . DS . "default" . DS;
+                    self::$include_paths[] = APPPATH . $value . DS . self::org_code() . DS;
                 }
 
                 self::$include_paths[] = APPPATH . $value . DS . "default" . DS;
@@ -576,14 +453,13 @@ final class CF {
 
             self::$include_paths[] = APPPATH . "default" . DS;
 
-            if (isset(self::$configuration['core']['modules'])) {
-                foreach (self::$configuration['core']['modules'] as $path) {
-                    if ($path = str_replace('\\', '/', realpath($path))) {
-                        // Add a valid path
-                        self::$include_paths[] = $path . '/';
-                    }
-                }
+
+            foreach (self::modules() as $path) {
+
+                // Add a valid path
+                self::$include_paths[] = MODPATH . $path . DS;
             }
+
 
             // Add SYSPATH as the last path
             self::$include_paths[] = SYSPATH;
@@ -1061,7 +937,7 @@ final class CF {
      * @return  void
      */
     public static function show_404($page = FALSE, $template = FALSE) {
-        
+
         throw new CF_404_Exception($page, $template);
     }
 
@@ -1850,6 +1726,87 @@ final class CF {
         return $written;
     }
 
+    /**
+     * Get data domain
+     */
+    public static function data($domain = null) {
+        $domain = $domain == null ? self::domain() : $domain;
+        if (!isset(self::$data[$domain])) {
+            self::$data[$domain] = CFData::domain($domain);
+        }
+        return self::$data[$domain];
+    }
+
+    /**
+     * Get application id for domain
+     *
+     * @return  string
+     */
+    public static function app_id($domain = null) {
+        $data = self::data($domain);
+        return isset($data['app_id']) ? $data['app_id'] : null;
+    }
+
+    /**
+     * Get application code for domain
+     *
+     * @return  string
+     */
+    public static function app_code($domain = null) {
+        $data = self::data($domain);
+        return isset($data['app_code']) ? $data['app_code'] : null;
+    }
+
+    /**
+     * Get org id for this domain
+     *
+     * @return  string
+     */
+    public static function org_id($domain = null) {
+        $data = self::data($domain);
+        return isset($data['org_id']) ? $data['org_id'] : null;
+    }
+
+    /**
+     * Get org code for this domain
+     *
+     * @return  string
+     */
+    public static function org_code($domain = null) {
+        $data = self::data($domain);
+        return isset($data['org_code']) ? $data['org_code'] : null;
+    }
+
+    /**
+     * Get shared application code for this domain
+     *
+     * @return  array
+     */
+    public static function shared_app_code($domain = null) {
+        $data = self::data($domain);
+        return isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
+    }
+
+    /**
+     * Get theme for this domain
+     *
+     * @return  array
+     */
+    public static function theme($domain = null) {
+        $data = self::data($domain);
+        return isset($data['theme']) ? $data['theme'] : null;
+    }
+
+    /**
+     * Get modules for this domain
+     *
+     * @return  array
+     */
+    public static function modules($domain = null) {
+        $data = self::data($domain);
+        return isset($data['modules']) ? $data['modules'] : array('cresenity');
+    }
+
 }
 
 // End C
@@ -1965,7 +1922,7 @@ class CF_404_Exception extends CF_Exception {
             // Construct the page URI using Router properties
             $page = CFRouter::$current_uri . CFRouter::$url_suffix . CFRouter::$query_string;
         }
-        
+
         if ($template == false) {
             if (CView::exists('ccore/404')) {
                 $template = 'ccore/404';
