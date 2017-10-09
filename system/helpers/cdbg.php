@@ -8,7 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class cdbg {
 
     protected static $deprecated_has_run = false;
-    
+
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
      * an array or object
@@ -234,15 +234,15 @@ class cdbg {
 
     public static function deprecated($message = '') {
         //run just once to make this performance good
-        
-        
-        if(self::$deprecated_has_run){
+
+
+        if (self::$deprecated_has_run) {
             return true;
         }
-        if(!self::$deprecated_has_run) {
-            self::$deprecated_has_run=true;
+        if (!self::$deprecated_has_run) {
+            self::$deprecated_has_run = true;
         }
-        
+
         $backtrace = debug_backtrace();
         $full_function_1 = '';
         $full_function_2 = '';
@@ -270,34 +270,79 @@ class cdbg {
             }
             $full_function_2 = $class . $type . $function . $line_str;
         }
-        $subject = 'CApp Deprecated on '.CF::domain().' '.date('Y-m-d H:i:s');
+        $subject = 'CApp Deprecated on ' . CF::domain() . ' ' . date('Y-m-d H:i:s');
 
         if (strlen($message) > 0) {
             $body = '<p>' . $message . '</p>';
         }
         $body .= '<br/><br/>';
         $body .= '<h4>CApp Deprecated on calling function ' . $full_function_1 . '<h4>';
-        if(strlen($full_function_2)) {
+        if (strlen($full_function_2)) {
             $body .= '<h4>before calling function ' . $full_function_2 . '<h4>';
         }
         $body .= '<br/><br/>';
-        $body .= 'Domain:'.CF::domain().'<br/>';
-        $body .= 'App Code:'.CF::app_code().'<br/>';
-        $body .= 'Org Code:'.CF::org_code().'<br/>';
-        $body .= 'User Agent:'.crequest::user_agent().'<br/>';
-        $body .= 'Remote Address:'.crequest::remote_address().'<br/>';
-        $body .= 'Browser:'.crequest::browser().'<br/>';
+        $body .= 'Domain:' . CF::domain() . '<br/>';
+        $body .= 'App Code:' . CF::app_code() . '<br/>';
+        $body .= 'Org Code:' . CF::org_code() . '<br/>';
+        $body .= 'User Agent:' . crequest::user_agent() . '<br/>';
+        $body .= 'Remote Address:' . crequest::remote_address() . '<br/>';
+        $body .= 'Browser:' . crequest::browser() . '<br/>';
         $body .= '<br/><br/>';
-        
+
         $backtrace = array_slice($backtrace, 0, 5, true);
         $body .= cdbg::var_dump($backtrace, true);
         try {
             cmail::send_smtp('hery@ittron.co.id', $subject, $body);
         } catch (Exception $ex) {
-            echo "Error Email Deprecated".$ex->getMessage();
+            echo "Error Email Deprecated" . $ex->getMessage();
         }
         return true;
-       
+    }
+
+    public static function caller_info() {
+        $c = '';
+        $file = '';
+        $func = '';
+        $class = '';
+        // Older php version don't have 'DEBUG_BACKTRACE_IGNORE_ARGS', so manually remove the args from the backtrace
+        if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+            $trace = array_map(function ($item) {
+                unset($item['args']);
+                return $item;
+            }, debug_backtrace(FALSE));
+        } else {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        }
+
+
+        if (isset($trace[2])) {
+            $file = carr::path($trace, '1.file');
+            $line = carr::path($trace, '1.line');
+            $func = carr::path($trace, '2.function');
+            if ((substr($func, 0, 7) == 'include') || (substr($func, 0, 7) == 'require')) {
+                $func = '';
+            }
+        } else if (isset($trace[1])) {
+            $file = carr::path($trace, '1.file');
+            $line = carr::path($trace, '1.line');
+            $func = '';
+        }
+        if (isset($trace[3]['class'])) {
+            $class = carr::path($trace, '3.class');
+            $func = carr::path($trace, '3.function');
+            $file = carr::path($trace, '2.file');
+            $line = carr::path($trace, '2.line');
+        } else if (isset($trace[2]['class'])) {
+            $class = carr::path($trace, '2.class');
+            $func = carr::path($trace, '2.function');
+            $file = carr::path($trace, '1.file');
+            $line = carr::path($trace, '1.line');
+        }
+
+        $c = $file . ":" . $line . " ";
+        $c .= ($class != '') ? ":" . $class . "->" : "";
+        $c .= ($func != '') ? $func . "(): " : "";
+        return $c;
     }
 
 }

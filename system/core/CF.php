@@ -4,6 +4,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CF {
 
+    // Security check that is added to all generated PHP files
+    const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
+    
     // The singleton instance of the controller
     public static $instance;
     // Output buffering level
@@ -34,6 +37,10 @@ final class CF {
         'info' => 3,
         'debug' => 4,
     );
+
+    /* log threshold default , CLogger::LOG_WARNING (4) */
+    public static $log_threshold = 4;
+
     // Internal caches and write status
     private static $internal_cache = array();
     private static $write_cache;
@@ -41,6 +48,7 @@ final class CF {
     private static $internal_cache_key;
     private static $internal_cache_encrypt;
     private static $data;
+    
 
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
@@ -634,14 +642,15 @@ final class CF {
      * @param   string  message text
      * @return  void
      */
-    public static function log($type, $message) {
-        if (self::$log_levels[$type] <= self::$configuration['core']['log_threshold']) {
-            $message = array(date('Y-m-d H:i:s P'), $type, $message);
-
-            // Run the system.log event
-            CFEvent::run('system.log', $message);
-
-            self::$log[] = $message;
+    public static function log($level, $message) {
+        if (!is_numeric($level)) {
+            $level = carr::get(self::$log_levels, $level);
+        }
+        if (!is_numeric($level)) {
+            $level = CLogger::EMERGENCY;
+        }
+        if ($level <= CF::$log_threshold) {
+            CLogger::instance()->add($level, $message);
         }
     }
 
