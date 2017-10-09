@@ -85,10 +85,10 @@ class CResources {
 
         //validate resource_type and type
         if (strpos($resource_type, '_') !== false) {
-            throw new SMResources_Exception('Resource type cannot have underscore character');
+            throw new CResources_Exception('Resource type cannot have underscore character');
         }
         if (strpos($type, '_') !== false) {
-            throw new SMResources_Exception('Resource type cannot have underscore character');
+            throw new CResources_Exception('Resource type cannot have underscore character');
         }
 
         $chr = mb_substr($resource_type, 0, 1, "UTF-8");
