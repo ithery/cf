@@ -2,12 +2,14 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CSession_Cookie_Driver implements Session_Driver {
+class CSession_Driver_Cookie implements CSession_Driver {
 
     protected $cookie_name;
     protected $encrypt; // Library
 
     public function __construct() {
+        cdbg::var_dump('die');
+        die;
         $this->cookie_name = CF::config('session.name') . '_data';
 
         if (CF::config('session.encryption')) {

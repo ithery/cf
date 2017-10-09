@@ -69,7 +69,7 @@ class CSession {
             CSession::$instance = $this;
         }
 
-        CF::log('debug', 'Session Library initialized');
+        CF::log(CLogger::DEBUG, 'Session Library initialized');
     }
 
     /**
@@ -93,18 +93,21 @@ class CSession {
 
         if (CSession::$config['driver'] !== 'native') {
             // Set driver name
-            $driver = 'CSession_' . ucfirst(CSession::$config['driver']) . '_Driver';
+            $driver = 'CSession_Driver_' . ucfirst(CSession::$config['driver']);
 
             // Load the driver
-            if (!CF::auto_load($driver))
-                throw new CF_Exception('core.driver_not_found', CSession::$config['driver'], get_class($this));
-
-            // Initialize the driver
-            CSession::$driver = new $driver();
+            try {
+                // Validation of the driver
+                $class = new ReflectionClass($driver);
+                // Initialize the driver
+                CSession::$driver = $class->newInstance();
+            } catch (ReflectionException $ex) {
+                throw new CException('The :driver driver for the :class library could not be found', array(':driver' => CSession::$config['driver'],':class' => get_class($this)));
+            }
 
             // Validate the driver
             if (!(CSession::$driver instanceof CSession_Driver)) {
-                throw new CF_Exception('core.driver_implements', CSession::$config['driver'], get_class($this), 'Session_Driver');
+                throw new CFException('The :driver driver for the :class library must implement the :interface interface', array(':driver' => CSession::$config['driver'],':class' => get_class($this), ':interface'=> 'Session_Driver'));
             }
 
             // Register non-native driver as the session handler
@@ -113,7 +116,7 @@ class CSession {
 
         // Validate the session name
         if (!preg_match('~^(?=.*[a-z])[a-z0-9_]++$~iD', CSession::$config['name'])) {
-            throw new CF_Exception('session.invalid_session_name', CSession::$config['name']);
+            throw new CFException('The session_name, :name, is invalid. It must contain only alphanumeric characters and underscores. Also at least one letter must be present.', array(':name',CSession::$config['name']));
         }
 
         // Name the session, this will also be the name of the cookie

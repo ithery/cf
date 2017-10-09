@@ -40,7 +40,7 @@ final class CF {
 
     /* log threshold default , CLogger::LOG_WARNING (4) */
     public static $log_threshold = 4;
-
+    public static $global_xss_filtering = TRUE;
     // Internal caches and write status
     private static $internal_cache = array();
     private static $write_cache;
@@ -1015,7 +1015,7 @@ final class CF {
 
             if ($level <= self::$configuration['core']['log_threshold']) {
                 // Log the error
-                self::log('error', self::lang('core.uncaught_exception', $type, $message, $file, $line));
+                self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line));
             }
 
             if ($PHP_ERROR) {
