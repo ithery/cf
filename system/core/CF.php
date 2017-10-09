@@ -1733,6 +1733,11 @@ final class CF {
         $domain = $domain == null ? self::domain() : $domain;
         if (!isset(self::$data[$domain])) {
             self::$data[$domain] = CFData::domain($domain);
+            if (self::$data[$domain] == null) {
+                //try to locate wildcard subdomain
+                $wildcard_domain = implode('.', array('_') + array_slice(explode('.', $domain), 0));
+                self::$data[$domain] = CFData::domain($wildcard_domain);
+            }
         }
         return self::$data[$domain];
     }
