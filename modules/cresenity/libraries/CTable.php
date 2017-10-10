@@ -1555,6 +1555,10 @@ class CTable extends CElement {
                                 break;
                         }
                     }
+                    if (is_array($new_v)) {
+                        $this->js_cell .= carr::get($new_v, 'js', '');
+                        $new_v = carr::get($new_v, 'html', '');
+                    }
                     $html->appendln('<td' . $pdf_tbody_td_current_attr . ' class="' . $class . '" data-column="' . $col->get_fieldname() . '">' . $new_v . '</td>')->br();
                     $col_found = true;
                 }
