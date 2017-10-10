@@ -1,9 +1,30 @@
 <?php
 
+
+if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])) {
+    //bot detected
+//    if (isset($_SERVER['HTTP_HOST'])) {
+//        preg_match('/^(?:(.+)\.)?([^.]+\.[^.]+)$/', $_SERVER['HTTP_HOST'], $matches);
+//        if (isset($matches[1]) && $matches[1] != 'www') {
+            //subdomain detected
+            header('HTTP/1.0 503 Service Unavailable');
+            header('Content-Type: text/html');
+            header("Retry-After: 3600");
+            header('Content-Type: text/html');
+            echo "<html><body><p><b>Server under undue load</b><br />";
+            echo "Please wait 1 hours before retrying.</p></body></html>";
+            exit;
+//        }
+//    }
+}
+
+
+
 date_default_timezone_set('Asia/Jakarta');
 define('DS', DIRECTORY_SEPARATOR);
 
-define('IN_PRODUCTION', FALSE);
+
+define('IN_PRODUCTION', TRUE);
 
 /**
  * Website application directory. This directory should contain your application
@@ -63,18 +84,18 @@ define('EXT', '.php');
 // $Id: index.php 3915 2009-01-20 20:52:20Z zombor $
 //
 
-if(isset($_FILES) && is_array($_FILES)) {
-    foreach($_FILES as $k=>$v) {
-        if(isset($v['name'])) {
+if (isset($_FILES) && is_array($_FILES)) {
+    foreach ($_FILES as $k => $v) {
+        if (isset($v['name'])) {
             $t = $v['name'];
 
-            if(!is_array($t)) {
+            if (!is_array($t)) {
                 $t = array($t);
             }
-            foreach($t as $g) {
+            foreach ($t as $g) {
                 if (!is_array($g)) {
                     $ext = pathinfo($g, PATHINFO_EXTENSION);
-                    if($ext == 'php' || $ext == 'sh') {
+                    if ($ext == 'php' || $ext == 'sh') {
                         die('Not Allowed X_X');
                     }
                 }
@@ -100,7 +121,6 @@ if (PHP_SAPI === 'cli') {
     }
 } else {
     $domain = $_SERVER["SERVER_NAME"];
-
 }
 $file.=$domain;
 
