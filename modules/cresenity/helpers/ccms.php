@@ -264,6 +264,17 @@ class ccms {
                     $field = $container->add_field()->set_label($label);
                 }
                 //create control
+
+                if ($type == 'file') {
+                    $field
+                        ->add_div()
+                        ->add_class('alert alert-info')
+                        ->add('<h4>' . clang::__('Information') . '</h4>')
+                        ->add('<ul>')
+                        ->add('Maximum file size 2 MB')
+                        ->add('</ul>');
+                }
+
                 $control = null;
                 switch ($type) {
                     case 'image':
