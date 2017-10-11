@@ -279,6 +279,8 @@ final class CF {
                     $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
                     // Start validation of the controller
                     $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
+                    
+                
                 } catch (ReflectionException $e) {
                     // Controller does not exist
                     CFEvent::run('system.404');
