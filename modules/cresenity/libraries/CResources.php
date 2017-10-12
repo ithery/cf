@@ -97,9 +97,16 @@ class CResources {
         }
 
         $class = 'CResources_Engine_' . $resource_type;
-        $object = new $class($resource_type, $type, $org_code);
+        $object = new $class($type, $org_code);
         $object->set_root_directory($root_directory);
         return $object;
     }
 
+    
+    public static function encode($str){
+        return CResources_Encode::encode($str);
+    }
+    public static function decode($str){
+        return CResources_Decode::decode($str);
+    }
 }
