@@ -6,7 +6,7 @@ final class CF {
 
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
-    
+
     // The singleton instance of the controller
     public static $instance;
     // Output buffering level
@@ -48,7 +48,6 @@ final class CF {
     private static $internal_cache_key;
     private static $internal_cache_encrypt;
     private static $data;
-    
 
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
@@ -279,8 +278,6 @@ final class CF {
                     $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
                     // Start validation of the controller
                     $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
-                    
-                
                 } catch (ReflectionException $e) {
                     // Controller does not exist
                     CFEvent::run('system.404');
@@ -948,7 +945,9 @@ final class CF {
      * @return  void
      */
     public static function show_404($page = FALSE, $template = FALSE) {
-
+        if(CFRouter::$current_uri=='favicon.ico') {
+            return false;
+        } 
         throw new CF_404_Exception($page, $template);
     }
 
@@ -980,6 +979,9 @@ final class CF {
             }
 
             // Error handling will use exactly 5 args, every time
+            $trace = '';
+            $uri = '';
+
             if ($PHP_ERROR) {
 
                 $code = $exception;
@@ -991,6 +993,8 @@ final class CF {
                 $message = $exception->getMessage();
                 $file = $exception->getFile();
                 $line = $exception->getLine();
+                $trace = $exception->getTraceAsString();
+                $uri = CFRouter::$current_uri;
                 $template = ($exception instanceof CF_Exception) ? $exception->get_template() : 'kohana_error_page';
             }
 
@@ -1017,7 +1021,7 @@ final class CF {
 
             if ($level <= self::$configuration['core']['log_threshold']) {
                 // Log the error
-                self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line));
+                self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
             }
 
             if ($PHP_ERROR) {
