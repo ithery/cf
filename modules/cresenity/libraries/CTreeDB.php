@@ -391,11 +391,6 @@ class CTreeDB {
                 $q .= " and org_id=" . $db->escape($this->org_id) . "";
             }
             $q .= " order by lft asc";
-            if (isset($_GET['mydebug'])) {
-                cdbg::var_dump($this->org_id);
-                cdbg::var_dump($q);
-                die();
-            }
         }
 
         $r = $db->query($q)->result(false);
