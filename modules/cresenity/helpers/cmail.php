@@ -161,6 +161,19 @@ class cmail {
         return $html;
     }
 
+    /**
+     * 
+     * @param string|array $to to email
+     * @param string $subject subject of email
+     * @param string $message body message of email
+     * @param array $attachments
+     * @param array $cc
+     * @param array $bcc
+     * @param array $options Options available smtp_username,smtp_password,dll
+     * @return type
+     * @throws Exception
+     */
+    
     public static function send_smtp($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         $mail = CSMTP::factory();
         $smtp_username = carr::get($options, 'smtp_username');
