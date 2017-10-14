@@ -1359,6 +1359,10 @@ class CDatabase {
         self::rollback();
     }
 
+    public function in_transaction() {
+        return $this->in_trans;
+    }
+
     public function begin() {
         if (!$this->in_trans)
             $this->query('START TRANSACTION;');
