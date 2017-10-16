@@ -25,3 +25,4 @@ application/*
 .idea/*
 *.iml
 composer.json
+sftp-config*.json
