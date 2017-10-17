@@ -965,8 +965,24 @@ final class CF {
     public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
 
         try {
+
             // PHP errors have 5 args, always
             $PHP_ERROR = (func_num_args() === 5);
+            if (isset($_GET['debug'])) {
+                if ($PHP_ERROR) {
+                    cdbg::var_dump($message);
+                    try {
+                        throw new Exception('testing');
+                    } catch (Exception $ex) {
+                        cdbg::var_dump($ex->getTraceAsString());
+                    }
+                    die;
+                } else {
+                    cdbg::var_dump($exception->getMessage());
+                    cdbg::var_dump($exception->getTraceAsString());
+                    die;
+                }
+            }
 
             // Test to see if errors should be displayed
             if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
@@ -1107,7 +1123,7 @@ final class CF {
             error_reporting(0);
             exit;
         } catch (Exception $e) {
-            
+
             if (IN_PRODUCTION) {
                 if (isset($_GET['debug'])) {
                     die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
