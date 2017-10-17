@@ -1,8 +1,8 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-interface AdapterInterface extends ReadInterface
+interface League_Flysystem_AdapterInterface extends League_Flysystem_ReadInterface
 {
     /**
      * @const  VISIBILITY_PUBLIC  public visibility

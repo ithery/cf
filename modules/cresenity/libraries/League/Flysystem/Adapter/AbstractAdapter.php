@@ -1,10 +1,10 @@
 <?php
 
-namespace League\Flysystem\Adapter;
+// namespace League\Flysystem\Adapter;
 
-use League\Flysystem\AdapterInterface;
+// use League\Flysystem\AdapterInterface;
 
-abstract class AbstractAdapter implements AdapterInterface
+abstract class League_Flysystem_Adapter_AbstractAdapter implements League_Flysystem_AdapterInterface
 {
     /**
      * @var string path prefix

@@ -1,13 +1,13 @@
 <?php
 
-namespace League\Flysystem\Plugin;
+// namespace League\Flysystem\Plugin;
 
-use BadMethodCallException;
-use League\Flysystem\FilesystemInterface;
-use League\Flysystem\PluginInterface;
-use LogicException;
+// use BadMethodCallException;
+// use League\Flysystem\FilesystemInterface;
+// use League\Flysystem\PluginInterface;
+// use LogicException;
 
-trait PluggableTrait
+trait League_Flysystem_Plugin_PluggableTrait
 {
     /**
      * @var array

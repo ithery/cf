@@ -1,8 +1,8 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-interface ReadInterface
+interface League_Flysystem_ReadInterface
 {
     /**
      * Check whether a file exists.

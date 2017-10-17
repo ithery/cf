@@ -1,11 +1,11 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-use InvalidArgumentException;
-use League\Flysystem\Adapter\CanOverwriteFiles;
-use League\Flysystem\Plugin\PluggableTrait;
-use League\Flysystem\Util\ContentListingFormatter;
+// use InvalidArgumentException;
+// use League\Flysystem\Adapter\CanOverwriteFiles;
+// use League\Flysystem\Plugin\PluggableTrait;
+// use League\Flysystem\Util\ContentListingFormatter;
 
 /**
  * @method array getWithMetadata(string $path, array $metadata)
@@ -15,10 +15,10 @@ use League\Flysystem\Util\ContentListingFormatter;
  * @method array listPaths(string $path = '', boolean $recursive = false)
  * @method array listWith(array $keys = [], $directory = '', $recursive = false)
  */
-class Filesystem implements FilesystemInterface
+class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterface
 {
-    use PluggableTrait;
-    use ConfigAwareTrait;
+    use League_Flysystem_Plugin_PluggableTrait;
+    use League_Flysystem_ConfigAwareTrait;
 
     /**
      * @var AdapterInterface

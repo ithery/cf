@@ -1,11 +1,11 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
 /**
  * @internal
  */
-trait ConfigAwareTrait
+trait League_Flysystem_ConfigAwareTrait
 {
     /**
      * @var Config
