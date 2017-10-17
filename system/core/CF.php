@@ -945,9 +945,9 @@ final class CF {
      * @return  void
      */
     public static function show_404($page = FALSE, $template = FALSE) {
-        if(CFRouter::$current_uri=='favicon.ico') {
+        if (CFRouter::$current_uri == 'favicon.ico') {
             return false;
-        } 
+        }
         throw new CF_404_Exception($page, $template);
     }
 
@@ -1021,7 +1021,15 @@ final class CF {
 
             if ($level <= self::$configuration['core']['log_threshold']) {
                 // Log the error
-                self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
+                $need_to_log = true;
+                if (!$PHP_ERROR) {
+                    if ($exception instanceof CF_404_Exception) {
+                        $need_to_log = false;
+                    }
+                }
+                if ($need_to_log) {
+                    self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
+                }
             }
 
             if ($PHP_ERROR) {
