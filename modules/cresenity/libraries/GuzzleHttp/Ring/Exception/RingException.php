@@ -1,4 +1,5 @@
 <?php
+/*
 namespace GuzzleHttp\Ring\Exception;
-
-class RingException extends \RuntimeException {};
+*/
+class GuzzleHttp_Ring_Exception_RingException extends \RuntimeException {};

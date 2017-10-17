@@ -80,7 +80,7 @@ class GuzzleHttp_Ring_Client_CurlHandler {
         $h = $result[0];
         $hd = & $result[1];
         $bd = $result[2];
-        Core::doSleep($request);
+        GuzzleHttp_Ring_Core::doSleep($request);
         curl_exec($h);
         $response = ['transfer_stats' => curl_getinfo($h)];
         $response['curl']['error'] = curl_error($h);

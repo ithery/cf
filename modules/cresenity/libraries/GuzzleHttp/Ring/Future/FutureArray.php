@@ -1,12 +1,11 @@
 <?php
-namespace GuzzleHttp\Ring\Future;
 
 /**
  * Represents a future array value that when dereferenced returns an array.
  */
-class FutureArray implements FutureArrayInterface
+class GuzzleHttp_Ring_Future_FutureArray implements GuzzleHttp_Ring_Future_FutureArrayInterface
 {
-    use MagicFutureTrait;
+    use GuzzleHttp_Ring_Future_MagicFutureTrait;
 
     public function offsetExists($offset)
     {
@@ -37,4 +36,6 @@ class FutureArray implements FutureArrayInterface
     {
         return new \ArrayIterator($this->_value);
     }
+
+    
 }

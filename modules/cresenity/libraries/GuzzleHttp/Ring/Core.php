@@ -333,12 +333,12 @@ class GuzzleHttp_Ring_Core
      * @return FutureArray
      */
     public static function proxy(
-        FutureArrayInterface $future,
+        GuzzleHttp_Ring_Future_CompletedFutureArray $future,
         callable $onFulfilled = null,
         callable $onRejected = null,
         callable $onProgress = null
     ) {
-        return new FutureArray(
+        return new GuzzleHttp_Ring_Future_FutureArray(
             $future->then($onFulfilled, $onRejected, $onProgress),
             [$future, 'wait'],
             [$future, 'cancel']

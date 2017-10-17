@@ -165,7 +165,7 @@ class Elasticsearch_Connections_Connection implements Elasticsearch_Connections_
         if (empty($request['client'])) {
             unset($request['client']);
         }
-
+        
         $handler = $this->handler;
         $future = $handler($request, $this, $transport, $options);
 

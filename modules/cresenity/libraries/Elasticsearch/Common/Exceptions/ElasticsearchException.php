@@ -1,7 +1,7 @@
 <?php
-
+/*
 namespace Elasticsearch\Common\Exceptions;
-
+*/
 /**
  * Generic Exception interface
  *
@@ -11,6 +11,6 @@ namespace Elasticsearch\Common\Exceptions;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-interface ElasticsearchException
+interface Elasticsearch_Common_Exceptions_ElasticsearchException
 {
 }

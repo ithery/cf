@@ -1,9 +1,11 @@
 <?php
 
-namespace Elasticsearch\Endpoints;
+/*
+  namespace Elasticsearch\Endpoints;
 
-use Elasticsearch\Common\Exceptions\InvalidArgumentException;
-use Elasticsearch\Common\Exceptions;
+  use Elasticsearch\Common\Exceptions\InvalidArgumentException;
+  use Elasticsearch\Common\Exceptions;
+ */
 
 /**
  * Class Search
@@ -14,16 +16,15 @@ use Elasticsearch\Common\Exceptions;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class Search extends AbstractEndpoint
-{
+class Elasticsearch_Endpoints_Search extends Elasticsearch_Endpoints_AbstractEndpoint {
+
     /**
      * @param array $body
      *
      * @throws \Elasticsearch\Common\Exceptions\InvalidArgumentException
      * @return $this
      */
-    public function setBody($body)
-    {
+    public function setBody($body) {
         if (isset($body) !== true) {
             return $this;
         }
@@ -36,11 +37,10 @@ class Search extends AbstractEndpoint
     /**
      * @return string
      */
-    public function getURI()
-    {
+    public function getURI() {
         $index = $this->index;
         $type = $this->type;
-        $uri   = "/_search";
+        $uri = "/_search";
 
         if (isset($index) === true && isset($type) === true) {
             $uri = "/$index/$type/_search";
@@ -56,8 +56,7 @@ class Search extends AbstractEndpoint
     /**
      * @return string[]
      */
-    public function getParamWhitelist()
-    {
+    public function getParamWhitelist() {
         return array(
             'analyzer',
             'analyze_wildcard',
@@ -106,8 +105,8 @@ class Search extends AbstractEndpoint
     /**
      * @return string
      */
-    public function getMethod()
-    {
+    public function getMethod() {
         return 'GET';
     }
+
 }

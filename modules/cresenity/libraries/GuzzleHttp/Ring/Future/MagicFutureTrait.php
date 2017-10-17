@@ -1,6 +1,7 @@
 <?php
+/*
 namespace GuzzleHttp\Ring\Future;
-
+*/
 /**
  * Implements common future functionality that is triggered when the result
  * property is accessed via a magic __get method.
@@ -8,9 +9,9 @@ namespace GuzzleHttp\Ring\Future;
  * @property mixed $_value Actual data used by the future. Accessing this
  *     property will cause the future to block if needed.
  */
-trait MagicFutureTrait
+trait GuzzleHttp_Ring_Future_MagicFutureTrait
 {
-    use BaseFutureTrait;
+    use GuzzleHttp_Ring_Future_BaseFutureTrait;
 
     /**
      * This function handles retrieving the dereferenced result when requested.

@@ -402,7 +402,7 @@ class Elasticsearch_ClientBuilder {
     }
 
     /**
-     * @return Client
+     * @return Elasticsearch_Client
      */
     public function build() {
         $this->buildLoggers();

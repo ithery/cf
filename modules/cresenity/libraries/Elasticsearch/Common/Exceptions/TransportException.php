@@ -1,7 +1,7 @@
 <?php
-
+/*
 namespace Elasticsearch\Common\Exceptions;
-
+*/
 /**
  * TransportException
  *
@@ -11,6 +11,6 @@ namespace Elasticsearch\Common\Exceptions;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class TransportException extends \Exception implements ElasticsearchException
+class Elasticsearch_Common_Exceptions_TransportException extends \Exception implements Elasticsearch_Common_Exceptions_ElasticsearchException
 {
 }
