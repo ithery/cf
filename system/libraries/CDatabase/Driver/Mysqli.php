@@ -22,6 +22,10 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver {
 
         CF::log(CLogger::DEBUG, 'MySQLi Database Driver Initialized');
     }
+    
+    public function close() {
+        is_object($this->link) and $this->link->close();
+    }
 
     /**
      * Closes the database connection.
