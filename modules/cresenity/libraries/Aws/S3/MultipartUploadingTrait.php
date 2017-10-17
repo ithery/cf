@@ -1,11 +1,6 @@
 <?php
-namespace Aws\S3;
 
-use Aws\CommandInterface;
-use Aws\Multipart\UploadState;
-use Aws\ResultInterface;
-
-trait MultipartUploadingTrait
+trait Aws_S3_MultipartUploadingTrait
 {
     /**
      * Creates an UploadState object for a multipart upload by querying the

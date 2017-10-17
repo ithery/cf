@@ -30,8 +30,8 @@ class Aws_S3_SSECMiddleware
     }
 
     public function __invoke(
-        CommandInterface $command,
-        RequestInterface $request = null
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request = null
     ) {
         // Allows only HTTPS connections when using SSE-C
         if (($command['SSECustomerKey'] || $command['CopySourceSSECustomerKey'])

@@ -34,7 +34,7 @@ abstract class Aws_Api_Serializer_RestSerializer
         $opts = $this->serialize($operation, $args);
         $uri = $this->buildEndpoint($operation, $args, $opts);
 
-        return new Psr7\Request(
+        return new GuzzleHttp_Psr7_Request(
             $operation['http']['method'],
             $uri,
             isset($opts['headers']) ? $opts['headers'] : [],
@@ -184,12 +184,12 @@ abstract class Aws_Api_Serializer_RestSerializer
 
         // Add the query string variables or appending to one if needed.
         if (!empty($opts['query'])) {
-            $append = Psr7\build_query($opts['query']);
+            $append = guzzlehttp_psr7_build_query($opts['query']);
             $relative .= strpos($relative, '?') ? "&{$append}" : "?$append";
         }
 
         // Expand path place holders using Amazon's slightly different URI
         // template syntax.
-        return UriResolver::resolve($this->endpoint, new Uri($relative));
+        return GuzzleHttp_Psr7_UriResolver::resolve($this->endpoint, new GuzzleHttp_Psr7_Uri($relative));
     }
 }

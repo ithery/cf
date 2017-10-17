@@ -1,15 +1,10 @@
 <?php
-namespace Aws\S3;
-
-use GuzzleHttp\Promise\PromisorInterface;
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Uploads an object to S3, using a PutObject command or a multipart upload as
  * appropriate.
  */
-class ObjectUploader implements PromisorInterface
+class Aws_S3_ObjectUploader implements GuzzleHttp_Promise_PromisorInterface
 {
     const DEFAULT_MULTIPART_THRESHOLD = 16777216;
 
@@ -44,7 +39,7 @@ class ObjectUploader implements PromisorInterface
      *                                          the sub command(s).
      */
     public function __construct(
-        S3ClientInterface $client,
+        Aws_S3_S3ClientInterface $client,
         $bucket,
         $key,
         $body,
@@ -54,7 +49,7 @@ class ObjectUploader implements PromisorInterface
         $this->client = $client;
         $this->bucket = $bucket;
         $this->key = $key;
-        $this->body = Psr7\stream_for($body);
+        $this->body = guzzlehttp_psr7_stream_for($body);
         $this->acl = $acl;
         $this->options = $options + self::$defaults;
     }
@@ -100,7 +95,7 @@ class ObjectUploader implements PromisorInterface
      *
      * @return bool
      */
-    private function requiresMultipart(StreamInterface &$body, $threshold)
+    private function requiresMultipart(Psr_Http_Message_StreamInterface &$body, $threshold)
     {
         // If body size known, compare to threshold to determine if Multipart.
         if ($body->getSize() !== null) {
@@ -113,7 +108,7 @@ class ObjectUploader implements PromisorInterface
          * @var StreamInterface $buffer
          */
         $buffer = Psr7\stream_for();
-        Psr7\copy_to_stream($body, $buffer, MultipartUploader::PART_MIN_SIZE);
+        guzzlehttp_psr7_copy_to_stream($body, $buffer, Aws_S3_MultipartUploader::PART_MIN_SIZE);
 
         // If body < 5MB, use PutObject with the buffer.
         if ($buffer->getSize() < MultipartUploader::PART_MIN_SIZE) {

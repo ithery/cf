@@ -1,14 +1,10 @@
 <?php
-namespace Aws\Signature;
-
-use Aws\Credentials\CredentialsInterface;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Interface used to provide interchangeable strategies for signing requests
  * using the various AWS signature protocols.
  */
-interface SignatureInterface
+interface Aws_Signature_SignatureInterface
 {
     /**
      * Signs the specified request with an AWS signing protocol by using the
@@ -21,8 +17,8 @@ interface SignatureInterface
      * @return RequestInterface Returns the modified request.
      */
     public function signRequest(
-        RequestInterface $request,
-        CredentialsInterface $credentials
+        Psr_Http_Message_RequestInterface $request,
+        Aws_Credentials_CredentialsInterface $credentials
     );
 
     /**
@@ -37,8 +33,8 @@ interface SignatureInterface
      * @return RequestInterface
      */
     public function presign(
-        RequestInterface $request,
-        CredentialsInterface $credentials,
+        Psr_Http_Message_RequestInterface $request,
+        Aws_Credentials_CredentialsInterface $credentials,
         $expires
     );
 }

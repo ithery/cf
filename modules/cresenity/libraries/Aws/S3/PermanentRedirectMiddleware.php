@@ -31,11 +31,11 @@ class Aws_S3_PermanentRedirectMiddleware
         $this->nextHandler = $nextHandler;
     }
 
-    public function __invoke(CommandInterface $command, RequestInterface $request = null)
+    public function __invoke(Aws_CommandInterface $command, Psr_Http_Message_RequestInterface $request = null)
     {
         $next = $this->nextHandler;
         return $next($command, $request)->then(
-            function (ResultInterface $result) use ($command) {
+            function (Aws_ResultInterface $result) use ($command) {
                 $status = isset($result['@metadata']['statusCode'])
                     ? $result['@metadata']['statusCode']
                     : null;

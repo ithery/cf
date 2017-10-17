@@ -1,12 +1,6 @@
 <?php
-namespace Aws\Multipart;
 
-use Aws\AwsClientInterface as Client;
-use GuzzleHttp\Psr7;
-use InvalidArgumentException as IAE;
-use Psr\Http\Message\StreamInterface as Stream;
-
-abstract class AbstractUploader extends AbstractUploadManager
+abstract class Aws_Multipart_AbstractUploader extends Aws_Multipart_AbstractUploadManager
 {
     /** @var Stream Source of the data to be uploaded. */
     protected $source;

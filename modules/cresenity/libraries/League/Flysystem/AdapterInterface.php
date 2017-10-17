@@ -23,7 +23,7 @@ interface League_Flysystem_AdapterInterface extends League_Flysystem_ReadInterfa
      *
      * @return array|false false on failure file meta data on success
      */
-    public function write($path, $contents, Config $config);
+    public function write($path, $contents, League_Flysystem_Config $config);
 
     /**
      * Write a new file using a stream.
@@ -34,7 +34,7 @@ interface League_Flysystem_AdapterInterface extends League_Flysystem_ReadInterfa
      *
      * @return array|false false on failure file meta data on success
      */
-    public function writeStream($path, $resource, Config $config);
+    public function writeStream($path, $resource, League_Flysystem_Config $config);
 
     /**
      * Update a file.
@@ -45,7 +45,7 @@ interface League_Flysystem_AdapterInterface extends League_Flysystem_ReadInterfa
      *
      * @return array|false false on failure file meta data on success
      */
-    public function update($path, $contents, Config $config);
+    public function update($path, $contents, League_Flysystem_Config $config);
 
     /**
      * Update a file using a stream.
@@ -56,7 +56,7 @@ interface League_Flysystem_AdapterInterface extends League_Flysystem_ReadInterfa
      *
      * @return array|false false on failure file meta data on success
      */
-    public function updateStream($path, $resource, Config $config);
+    public function updateStream($path, $resource, League_Flysystem_Config $config);
 
     /**
      * Rename a file.
@@ -104,7 +104,7 @@ interface League_Flysystem_AdapterInterface extends League_Flysystem_ReadInterfa
      *
      * @return array|false
      */
-    public function createDir($dirname, Config $config);
+    public function createDir($dirname, League_Flysystem_Config $config);
 
     /**
      * Set the visibility for a file.

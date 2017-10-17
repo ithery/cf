@@ -58,7 +58,7 @@ class GuzzleHttp_Handler_CurlMultiHandler
         $easy = $this->factory->create($request, $options);
         $id = (int) $easy->handle;
 
-        $promise = new Promise(
+        $promise = new GuzzleHttp_Promise_Promise(
             [$this, 'execute'],
             function () use ($id) { return $this->cancel($id); }
         );
@@ -88,7 +88,7 @@ class GuzzleHttp_Handler_CurlMultiHandler
         }
 
         // Step through the task queue which may add additional requests.
-        P\queue()->run();
+        guzzlehttp_promise_queue()->run();
 
         if ($this->active &&
             curl_multi_select($this->_mh, $this->selectTimeout) === -1
@@ -108,7 +108,7 @@ class GuzzleHttp_Handler_CurlMultiHandler
      */
     public function execute()
     {
-        $queue = P\queue();
+        $queue = guzzlehttp_promise_queue();
 
         while ($this->handles || !$queue->isEmpty()) {
             // If there are no transfers, then sleep for the next delay
@@ -168,7 +168,7 @@ class GuzzleHttp_Handler_CurlMultiHandler
             unset($this->handles[$id], $this->delays[$id]);
             $entry['easy']->errno = $done['result'];
             $entry['deferred']->resolve(
-                CurlFactory::finish(
+                GuzzleHttp_Handler_CurlFactory::finish(
                     $this,
                     $entry['easy'],
                     $this->factory

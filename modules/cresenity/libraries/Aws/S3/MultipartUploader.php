@@ -1,20 +1,11 @@
 <?php
-namespace Aws\S3;
-
-use Aws\HashingStream;
-use Aws\Multipart\AbstractUploader;
-use Aws\PhpHash;
-use Aws\ResultInterface;
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\StreamInterface as Stream;
-use Aws\S3\Exception\S3MultipartUploadException;
 
 /**
  * Encapsulates the execution of a multipart upload to S3 or Glacier.
  */
-class MultipartUploader extends AbstractUploader
+class Aws_S3_MultipartUploader extends Aws_Multipart_AbstractUploader
 {
-    use MultipartUploadingTrait;
+    use Aws_S3_MultipartUploadingTrait;
 
     const PART_MIN_SIZE = 5242880;
     const PART_MAX_SIZE = 5368709120;

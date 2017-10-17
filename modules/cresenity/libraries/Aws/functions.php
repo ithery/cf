@@ -1,6 +1,5 @@
 <?php
 require_once(dirname(__FILE__) . DS . '../GuzzleHttp/ClientInterface.php');
-require_once(dirname(__FILE__) . DS . 'Handler/GuzzleV6/GuzzleHandler.php');
 
 //-----------------------------------------------------------------------------
 // Functional functions

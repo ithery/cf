@@ -44,10 +44,10 @@ class Aws_Api_Validator
      *
      * @throws \InvalidArgumentException if the input is invalid.
      */
-    public function validate($name, Shape $shape, array $input)
+    public function validate($name, Aws_Api_Shape $shape, array $input)
     {
         $this->dispatch($shape, $input);
-
+        
         if ($this->errors) {
             $message = sprintf(
                 "Found %d error%s while validating the input provided for the "
@@ -63,7 +63,7 @@ class Aws_Api_Validator
         }
     }
 
-    private function dispatch(Shape $shape, $value)
+    private function dispatch(Aws_Api_Shape $shape, $value)
     {
         static $methods = [
             'structure' => 'check_structure',
@@ -78,14 +78,13 @@ class Aws_Api_Validator
             'byte'      => 'check_string',
             'char'      => 'check_string'
         ];
-
         $type = $shape->getType();
         if (isset($methods[$type])) {
             $this->{$methods[$type]}($shape, $value);
         }
     }
 
-    private function check_structure(StructureShape $shape, $value)
+    private function check_structure(Aws_Api_StructureShape $shape, $value)
     {
         if (!$this->checkAssociativeArray($value)) {
             return;
@@ -113,7 +112,7 @@ class Aws_Api_Validator
         }
     }
 
-    private function check_list(ListShape $shape, $value)
+    private function check_list(Aws_Api_ListShape $shape, $value)
     {
         if (!is_array($value)) {
             $this->addError('must be an array. Found '
@@ -131,7 +130,7 @@ class Aws_Api_Validator
         }
     }
 
-    private function check_map(MapShape $shape, $value)
+    private function check_map(Aws_Api_MapShape $shape, $value)
     {
         if (!$this->checkAssociativeArray($value)) {
             return;
@@ -145,7 +144,7 @@ class Aws_Api_Validator
         }
     }
 
-    private function check_blob(Shape $shape, $value)
+    private function check_blob(Aws_Api_Shape $shape, $value)
     {
         static $valid = [
             'string' => true,
@@ -165,7 +164,7 @@ class Aws_Api_Validator
         }
     }
 
-    private function check_numeric(Shape $shape, $value)
+    private function check_numeric(Aws_Api_Shape $shape, $value)
     {
         if (!is_numeric($value)) {
             $this->addError('must be numeric. Found '
@@ -176,7 +175,7 @@ class Aws_Api_Validator
         $this->validateRange($shape, $value, "numeric value");
     }
 
-    private function check_boolean(Shape $shape, $value)
+    private function check_boolean(Aws_Api_Shape $shape, $value)
     {
         if (!is_bool($value)) {
             $this->addError('must be a boolean. Found '
@@ -184,7 +183,7 @@ class Aws_Api_Validator
         }
     }
 
-    private function check_string(Shape $shape, $value)
+    private function check_string(Aws_Api_Shape $shape, $value)
     {
         if ($shape['jsonvalue']) {
             if (!self::canJsonEncode($value)) {
@@ -210,7 +209,7 @@ class Aws_Api_Validator
         }
     }
 
-    private function validateRange(Shape $shape, $length, $descriptor)
+    private function validateRange(Aws_Api_Shape $shape, $length, $descriptor)
     {
         if ($this->constraints['min']) {
             $min = $shape['min'];

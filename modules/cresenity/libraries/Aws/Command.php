@@ -1,12 +1,11 @@
 <?php
-namespace Aws;
 
 /**
  * AWS command object.
  */
-class Command implements CommandInterface
+class Aws_Command implements Aws_CommandInterface
 {
-    use HasDataTrait;
+    use Aws_HasDataTrait;
 
     /** @var string */
     private $name;
@@ -23,11 +22,11 @@ class Command implements CommandInterface
      * @param array       $args           Arguments to pass to the command
      * @param HandlerList $list           Handler list
      */
-    public function __construct($name, array $args = [], HandlerList $list = null)
+    public function __construct($name, array $args = [], Aws_HandlerList $list = null)
     {
         $this->name = $name;
         $this->data = $args;
-        $this->handlerList = $list ?: new HandlerList();
+        $this->handlerList = $list ?: new Aws_HandlerList();
 
         if (!isset($this->data['@http'])) {
             $this->data['@http'] = [];

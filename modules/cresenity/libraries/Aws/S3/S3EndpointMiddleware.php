@@ -66,7 +66,7 @@ class Aws_S3_S3EndpointMiddleware
         $this->nextHandler = $nextHandler;
     }
 
-    public function __invoke(CommandInterface $command, RequestInterface $request)
+    public function __invoke(Aws_CommandInterface $command, Psr_Http_Message_RequestInterface $request)
     {
         switch ($this->endpointPatternDecider($command, $request)) {
             case self::HOST_STYLE:
@@ -99,10 +99,10 @@ class Aws_S3_S3EndpointMiddleware
     }
 
     private static function isRequestHostStyleCompatible(
-        CommandInterface $command,
-        RequestInterface $request
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request
     ) {
-        return S3Client::isBucketDnsCompatible($command['Bucket'])
+        return Aws_S3_S3Client::isBucketDnsCompatible($command['Bucket'])
             && (
                 $request->getUri()->getScheme() === 'http'
                 || strpos($command['Bucket'], '.') === false
@@ -110,8 +110,8 @@ class Aws_S3_S3EndpointMiddleware
     }
 
     private function endpointPatternDecider(
-        CommandInterface $command,
-        RequestInterface $request
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request
     ) {
         $accelerate = isset($command['@use_accelerate_endpoint'])
             ? $command['@use_accelerate_endpoint'] : $this->accelerateByDefault;
@@ -139,13 +139,13 @@ class Aws_S3_S3EndpointMiddleware
         }
     }
 
-    private function canAccelerate(CommandInterface $command)
+    private function canAccelerate(Aws_CommandInterface $command)
     {
         return empty(self::$exclusions[$command->getName()])
             && S3Client::isBucketDnsCompatible($command['Bucket']);
     }
 
-    private function getBucketStyleHost(CommandInterface $command, $host)
+    private function getBucketStyleHost(Aws_CommandInterface $command, $host)
     {
         // For operations on the base host (e.g. ListBuckets)
         if (!isset($command['Bucket'])) {
@@ -156,8 +156,8 @@ class Aws_S3_S3EndpointMiddleware
     }
 
     private function applyHostStyleEndpoint(
-        CommandInterface $command,
-        RequestInterface $request
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request
     ) {
         $uri = $request->getUri();
         $request = $request->withUri(
@@ -174,8 +174,8 @@ class Aws_S3_S3EndpointMiddleware
     }
 
     private function applyDualStackEndpoint(
-        CommandInterface $command,
-        RequestInterface $request
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request
     ) {
         $request = $request->withUri(
             $request->getUri()
@@ -196,8 +196,8 @@ class Aws_S3_S3EndpointMiddleware
     }
 
     private function applyAccelerateEndpoint(
-        CommandInterface $command,
-        RequestInterface $request,
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request,
         $pattern
     ) {
         $request = $request->withUri(
@@ -211,12 +211,12 @@ class Aws_S3_S3EndpointMiddleware
         return $request;
     }
 
-    private function getAccelerateHost(CommandInterface $command, $pattern)
+    private function getAccelerateHost(Aws_CommandInterface $command, $pattern)
     {
         return "{$command['Bucket']}.{$pattern}.amazonaws.com";
     }
 
-    private function getBucketlessPath($path, CommandInterface $command)
+    private function getBucketlessPath($path, Aws_CommandInterface $command)
     {
         $pattern = '/^\\/' . preg_quote($command['Bucket'], '/') . '/';
         return preg_replace($pattern, '', $path) ?: '/';

@@ -1,25 +1,11 @@
 <?php
-namespace Aws\Multipart;
-
-use Aws\AwsClientInterface as Client;
-use Aws\CommandInterface;
-use Aws\CommandPool;
-use Aws\Exception\AwsException;
-use Aws\Exception\MultipartUploadException;
-use Aws\Result;
-use Aws\ResultInterface;
-use GuzzleHttp\Promise;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7;
-use InvalidArgumentException as IAE;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Encapsulates the execution of a multipart upload to S3 or Glacier.
  *
  * @internal
  */
-abstract class AbstractUploadManager implements Promise\PromisorInterface
+abstract class Aws_Multipart_AbstractUploadManager implements GuzzleHttp_Promise_PromisorInterface
 {
     const DEFAULT_CONCURRENCY = 5;
 

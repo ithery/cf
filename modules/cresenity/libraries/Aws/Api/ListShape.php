@@ -1,10 +1,9 @@
 <?php
-namespace Aws\Api;
 
 /**
  * Represents a list shape.
  */
-class ListShape extends Shape
+class Aws_Api_ListShape extends Aws_Api_Shape
 {
     private $member;
 

@@ -41,7 +41,7 @@ trait League_Flysystem_ConfigAwareTrait
      */
     protected function prepareConfig(array $config)
     {
-        $config = new Config($config);
+        $config = new League_Flysystem_Config($config);
         $config->setFallback($this->getConfig());
 
         return $config;

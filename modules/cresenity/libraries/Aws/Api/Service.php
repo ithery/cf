@@ -239,7 +239,7 @@ class Aws_Api_Service extends Aws_Api_AbstractModel {
             if (!isset($this->definition['operations'][$name])) {
                 throw new \InvalidArgumentException("Unknown operation: $name");
             }
-            $this->operations[$name] = new Operation(
+            $this->operations[$name] = new Aws_Api_Operation(
                     $this->definition['operations'][$name], $this->shapeMap
             );
         }

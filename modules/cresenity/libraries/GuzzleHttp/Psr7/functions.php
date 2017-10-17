@@ -334,7 +334,7 @@ function guzzlehttp_psr7_copy_to_string(StreamInterface $stream, $maxLen = -1) {
  * @throws \RuntimeException on error.
  */
 function guzzlehttp_psr7_copy_to_stream(
-StreamInterface $source, StreamInterface $dest, $maxLen = -1
+Psr_Http_Message_StreamInterface $source, Psr_Http_Message_StreamInterface $dest, $maxLen = -1
 ) {
     $bufferSize = 8192;
 
@@ -369,7 +369,7 @@ StreamInterface $source, StreamInterface $dest, $maxLen = -1
  * @throws \RuntimeException on error.
  */
 function guzzlehttp_psr7_hash(
-StreamInterface $stream, $algo, $rawOutput = false
+Psr_Http_Message_StreamInterface $stream, $algo, $rawOutput = false
 ) {
     $pos = $stream->tell();
 

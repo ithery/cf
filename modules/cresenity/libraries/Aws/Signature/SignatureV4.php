@@ -1,18 +1,12 @@
 <?php
-namespace Aws\Signature;
-
-use Aws\Credentials\CredentialsInterface;
-use Aws\Exception\CouldNotCreateChecksumException;
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\RequestInterface;
-
+require_once(dirname(__FILE__) . DS . '../../GuzzleHttp/Psr7/functions.php');
 /**
  * Signature Version 4
  * @link http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
  */
-class SignatureV4 implements SignatureInterface
+class Aws_Signature_SignatureV4 implements Aws_Signature_SignatureInterface
 {
-    use SignatureTrait;
+    use Aws_Signature_SignatureTrait;
     const ISO8601_BASIC = 'Ymd\THis\Z';
     const UNSIGNED_PAYLOAD = 'UNSIGNED-PAYLOAD';
 
@@ -40,8 +34,8 @@ class SignatureV4 implements SignatureInterface
     }
 
     public function signRequest(
-        RequestInterface $request,
-        CredentialsInterface $credentials
+        Psr_Http_Message_RequestInterface $request,
+        Aws_Credentials_CredentialsInterface $credentials
     ) {
         $ldt = gmdate(self::ISO8601_BASIC);
         $sdt = substr($ldt, 0, 8);
@@ -77,8 +71,8 @@ class SignatureV4 implements SignatureInterface
     }
 
     public function presign(
-        RequestInterface $request,
-        CredentialsInterface $credentials,
+        Psr_Http_Message_RequestInterface $request,
+        Aws_Credentials_CredentialsInterface $credentials,
         $expires,
         array $options = []
     ) {
@@ -124,7 +118,7 @@ class SignatureV4 implements SignatureInterface
      * @return RequestInterface
      * @throws \InvalidArgumentException if the method is not POST
      */
-    public static function convertPostToGet(RequestInterface $request)
+    public static function convertPostToGet(Psr_Http_Message_RequestInterface $request)
     {
         if ($request->getMethod() !== 'POST') {
             throw new \InvalidArgumentException('Expected a POST request but '
@@ -145,7 +139,7 @@ class SignatureV4 implements SignatureInterface
         return $sr;
     }
 
-    protected function getPayload(RequestInterface $request)
+    protected function getPayload(Psr_Http_Message_RequestInterface $request)
     {
         if ($this->unsigned && $request->getUri()->getScheme() == 'https') {
             return self::UNSIGNED_PAYLOAD;
@@ -161,13 +155,13 @@ class SignatureV4 implements SignatureInterface
         }
 
         try {
-            return Psr7\hash($request->getBody(), 'sha256');
+            return guzzlehttp_psr7_hash($request->getBody(), 'sha256');
         } catch (\Exception $e) {
             throw new CouldNotCreateChecksumException('sha256', $e);
         }
     }
 
-    protected function getPresignedPayload(RequestInterface $request)
+    protected function getPresignedPayload(Psr_Http_Message_RequestInterface $request)
     {
         return $this->getPayload($request);
     }
@@ -187,8 +181,8 @@ class SignatureV4 implements SignatureInterface
     }
 
     private function createPresignedRequest(
-        RequestInterface $request,
-        CredentialsInterface $credentials
+        Psr_Http_Message_RequestInterface $request,
+        Aws_Credentials_CredentialsInterface $credentials
     ) {
         $parsedRequest = $this->parseRequest($request);
 
@@ -334,7 +328,7 @@ class SignatureV4 implements SignatureInterface
         return $parsedRequest;
     }
 
-    private function parseRequest(RequestInterface $request)
+    private function parseRequest(Psr_Http_Message_RequestInterface $request)
     {
         // Clean up any previously set headers.
         /** @var RequestInterface $request */
@@ -347,7 +341,7 @@ class SignatureV4 implements SignatureInterface
         return [
             'method'  => $request->getMethod(),
             'path'    => $uri->getPath(),
-            'query'   => Psr7\parse_query($uri->getQuery()),
+            'query'   => guzzlehttp_psr7_parse_query($uri->getQuery()),
             'uri'     => $uri,
             'headers' => $request->getHeaders(),
             'body'    => $request->getBody(),
@@ -358,10 +352,10 @@ class SignatureV4 implements SignatureInterface
     private function buildRequest(array $req)
     {
         if ($req['query']) {
-            $req['uri'] = $req['uri']->withQuery(Psr7\build_query($req['query']));
+            $req['uri'] = $req['uri']->withQuery(guzzlehttp_psr7_build_query($req['query']));
         }
 
-        return new Psr7\Request(
+        return new GuzzleHttp_Psr7_Request(
             $req['method'],
             $req['uri'],
             $req['headers'],

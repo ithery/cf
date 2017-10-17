@@ -61,8 +61,8 @@ class Aws_WrappedHttpHandler
      * @return Promise\PromiseInterface
      */
     public function __invoke(
-        CommandInterface $command,
-        RequestInterface $request
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request
     ) {
         $fn = $this->httpHandler;
         $options = $command['@http'] ?: [];
@@ -78,7 +78,7 @@ class Aws_WrappedHttpHandler
                 . ' receiver to Aws\WrappedHttpHandler is not supported.');
         }
 
-        return Promise\promise_for($fn($request, $options))
+        return guzzlehttp_promise_promise_for($fn($request, $options))
             ->then(
                 function (
                     ResponseInterface $res
@@ -94,7 +94,7 @@ class Aws_WrappedHttpHandler
                             $stats
                         );
                     }
-                    return new Promise\RejectedPromise($err);
+                    return new GuzzleHttp_Promise_RejectedPromise($err);
                 }
             );
     }
@@ -151,8 +151,8 @@ class Aws_WrappedHttpHandler
      */
     private function parseError(
         array $err,
-        RequestInterface $request,
-        CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request,
+        Aws_CommandInterface $command,
         array $stats
     ) {
         if (!isset($err['exception'])) {

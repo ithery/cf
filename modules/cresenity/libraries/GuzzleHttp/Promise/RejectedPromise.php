@@ -27,7 +27,7 @@ class GuzzleHttp_Promise_RejectedPromise implements GuzzleHttp_Promise_PromiseIn
             return $this;
         }
 
-        $queue = queue();
+        $queue = guzzlehttp_promise_queue();
         $reason = $this->reason;
         $p = new GuzzleHttp_Promise_Promise([$queue, 'run']);
         $queue->add(static function () use ($p, $reason, $onRejected) {

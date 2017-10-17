@@ -1,16 +1,15 @@
 <?php
-namespace Aws\Api;
 
 /**
  * Represents an API operation.
  */
-class Operation extends AbstractModel
+class Aws_Api_Operation extends Aws_Api_AbstractModel
 {
     private $input;
     private $output;
     private $errors;
 
-    public function __construct(array $definition, ShapeMap $shapeMap)
+    public function __construct(array $definition, Aws_Api_ShapeMap $shapeMap)
     {
         $definition['type'] = 'structure';
 

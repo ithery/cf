@@ -98,7 +98,7 @@ class League_Flysystem_Config
      *
      * @return $this
      */
-    public function setFallback(Config $fallback)
+    public function setFallback(League_Flysystem_Config $fallback)
     {
         $this->fallback = $fallback;
 

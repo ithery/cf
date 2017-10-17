@@ -44,8 +44,8 @@ class Aws_S3_ApplyChecksumMiddleware
     }
 
     public function __invoke(
-        CommandInterface $command,
-        RequestInterface $request
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request
     ) {
         $next = $this->nextHandler;
         $name = $command->getName();

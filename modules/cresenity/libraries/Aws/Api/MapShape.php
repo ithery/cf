@@ -1,10 +1,9 @@
 <?php
-namespace Aws\Api;
 
 /**
  * Represents a map shape.
  */
-class MapShape extends Shape
+class Aws_Api_MapShape extends Aws_Api_Shape
 {
     /** @var Shape */
     private $value;
@@ -12,7 +11,7 @@ class MapShape extends Shape
     /** @var Shape */
     private $key;
 
-    public function __construct(array $definition, ShapeMap $shapeMap)
+    public function __construct(array $definition, Aws_Api_ShapeMap $shapeMap)
     {
         $definition['type'] = 'map';
         parent::__construct($definition, $shapeMap);
@@ -45,8 +44,8 @@ class MapShape extends Shape
     {
         if (!$this->key) {
             $this->key = isset($this->definition['key'])
-                ? Shape::create($this->definition['key'], $this->shapeMap)
-                : new Shape(['type' => 'string'], $this->shapeMap);
+                ? Aws_Api_Shape::create($this->definition['key'], $this->shapeMap)
+                : new Aws_Api_Shape(['type' => 'string'], $this->shapeMap);
         }
 
         return $this->key;

@@ -52,7 +52,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function has($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
 
         return strlen($path) === 0 ? false : (bool) $this->getAdapter()->has($path);
     }
@@ -92,7 +92,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function put($path, $contents, array $config = [])
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $config = $this->prepareConfig($config);
 
         if ( ! $this->adapter instanceof CanOverwriteFiles && $this->has($path)) {
@@ -267,7 +267,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function listContents($directory = '', $recursive = false)
     {
-        $directory = Util::normalizePath($directory);
+        $directory = League_Flysystem_Util::normalizePath($directory);
         $contents = $this->getAdapter()->listContents($directory, $recursive);
 
         return (new ContentListingFormatter($directory, $recursive))->formatListing($contents);

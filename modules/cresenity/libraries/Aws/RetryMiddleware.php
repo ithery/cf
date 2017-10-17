@@ -51,9 +51,9 @@ class Aws_RetryMiddleware
     {
         return function (
             $retries,
-            CommandInterface $command,
-            RequestInterface $request,
-            ResultInterface $result = null,
+            Aws_CommandInterface $command,
+            Psr_Http_Message_RequestInterface $request,
+            Aws_ResultInterface $result = null,
             $error = null
         ) use ($maxRetries) {
             // Allow command-level options to override this value
@@ -100,8 +100,8 @@ class Aws_RetryMiddleware
      * @return PromiseInterface
      */
     public function __invoke(
-        CommandInterface $command,
-        RequestInterface $request = null
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request = null
     ) {
         $retries = 0;
         $requestStats = [];
@@ -125,11 +125,11 @@ class Aws_RetryMiddleware
 
             if ($value instanceof \Exception || $value instanceof \Throwable) {
                 if (!$decider($retries, $command, $request, null, $value)) {
-                    return \GuzzleHttp\Promise\rejection_for(
+                    return guzzlehttp_promise_rejection_for(
                         $this->bindStatsToReturn($value, $requestStats)
                     );
                 }
-            } elseif ($value instanceof ResultInterface
+            } elseif ($value instanceof Aws_ResultInterface
                 && !$decider($retries, $command, $request, $value, null)
             ) {
                 return $this->bindStatsToReturn($value, $requestStats);

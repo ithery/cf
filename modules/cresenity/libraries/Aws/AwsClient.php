@@ -205,7 +205,7 @@ class Aws_AwsClient implements Aws_AwsClientInterface {
             $args['@http'] += $this->defaultRequestOptions;
         }
 
-        return new Command($name, $args, clone $this->getHandlerList());
+        return new Aws_Command($name, $args, clone $this->getHandlerList());
     }
 
     public function __sleep() {
@@ -252,7 +252,7 @@ class Aws_AwsClient implements Aws_AwsClientInterface {
         $region = $this->config['signing_region'];
 
         $resolver = static function (
-                CommandInterface $c
+                Aws_CommandInterface $c
                 ) use ($api, $provider, $name, $region, $version) {
             $authType = $api->getOperation($c->getName())['authtype'];
             switch ($authType) {
@@ -263,7 +263,7 @@ class Aws_AwsClient implements Aws_AwsClientInterface {
                     $version = 'v4-unsigned-body';
                     break;
             }
-            return SignatureProvider::resolve($provider, $version, $name, $region);
+            return Aws_Signature_SignatureProvider::resolve($provider, $version, $name, $region);
         };
         $this->handlerList->appendSign(
                 Aws_Middleware::signer($this->credentialProvider, $resolver), 'signer'

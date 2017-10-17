@@ -504,8 +504,8 @@ class Aws_ClientResolver {
 
         $list->appendBuild(static function (callable $handler) use ($value) {
             return function (
-                    CommandInterface $command,
-                    RequestInterface $request
+                    Aws_CommandInterface $command,
+                    Psr_Http_Message_RequestInterface $request
                     ) use ($handler, $value) {
                 return $handler($command, $request->withHeader(
                                 'User-Agent', implode(' ', array_merge(

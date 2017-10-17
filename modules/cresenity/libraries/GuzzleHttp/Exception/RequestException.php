@@ -1,15 +1,9 @@
 <?php
-namespace GuzzleHttp\Exception;
-
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Promise\PromiseInterface;
-use Psr\Http\Message\UriInterface;
 
 /**
  * HTTP Request exception
  */
-class RequestException extends TransferException
+class GuzzleHttp_Exception_RequestException extends GuzzleHttp_Exception_TransferException
 {
     /** @var RequestInterface */
     private $request;
@@ -22,8 +16,8 @@ class RequestException extends TransferException
 
     public function __construct(
         $message,
-        RequestInterface $request,
-        ResponseInterface $response = null,
+        Psr_Http_Message_RequestInterface $request,
+        Psr_Http_Message_ResponseInterface $response = null,
         \Exception $previous = null,
         array $handlerContext = []
     ) {
@@ -45,11 +39,11 @@ class RequestException extends TransferException
      *
      * @return RequestException
      */
-    public static function wrapException(RequestInterface $request, \Exception $e)
+    public static function wrapException(Psr_Http_Message_RequestInterface $request, \Exception $e)
     {
-        return $e instanceof RequestException
+        return $e instanceof GuzzleHttp_Exception_RequestException
             ? $e
-            : new RequestException($e->getMessage(), $request, null, $e);
+            : new GuzzleHttp_Exception_RequestException($e->getMessage(), $request, null, $e);
     }
 
     /**
@@ -63,8 +57,8 @@ class RequestException extends TransferException
      * @return self
      */
     public static function create(
-        RequestInterface $request,
-        ResponseInterface $response = null,
+        Psr_Http_Message_RequestInterface $request,
+        Psr_Http_Message_ResponseInterface $response = null,
         \Exception $previous = null,
         array $ctx = []
     ) {
@@ -81,10 +75,10 @@ class RequestException extends TransferException
         $level = (int) floor($response->getStatusCode() / 100);
         if ($level === 4) {
             $label = 'Client error';
-            $className = ClientException::class;
+            $className = GuzzleHttp_Exception_ClientException::class;
         } elseif ($level === 5) {
             $label = 'Server error';
-            $className = ServerException::class;
+            $className = GuzzleHttp_Exception_ServerException::class;
         } else {
             $label = 'Unsuccessful request';
             $className = __CLASS__;
@@ -122,7 +116,7 @@ class RequestException extends TransferException
      *
      * @return string|null
      */
-    public static function getResponseBodySummary(ResponseInterface $response)
+    public static function getResponseBodySummary(Psr_Http_Message_ResponseInterface $response)
     {
         $body = $response->getBody();
 

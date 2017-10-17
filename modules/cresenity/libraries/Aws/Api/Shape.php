@@ -1,10 +1,9 @@
 <?php
-namespace Aws\Api;
 
 /**
  * Base class representing a modeled shape.
  */
-class Shape extends AbstractModel
+class Aws_Api_Shape extends Aws_Api_AbstractModel
 {
     /**
      * Get a concrete shape for the given definition.
@@ -15,22 +14,22 @@ class Shape extends AbstractModel
      * @return mixed
      * @throws \RuntimeException if the type is invalid
      */
-    public static function create(array $definition, ShapeMap $shapeMap)
+    public static function create(array $definition, Aws_Api_ShapeMap $shapeMap)
     {
         static $map = [
-            'structure' => 'Aws\Api\StructureShape',
-            'map'       => 'Aws\Api\MapShape',
-            'list'      => 'Aws\Api\ListShape',
-            'timestamp' => 'Aws\Api\TimestampShape',
-            'integer'   => 'Aws\Api\Shape',
-            'double'    => 'Aws\Api\Shape',
-            'float'     => 'Aws\Api\Shape',
-            'long'      => 'Aws\Api\Shape',
-            'string'    => 'Aws\Api\Shape',
-            'byte'      => 'Aws\Api\Shape',
-            'character' => 'Aws\Api\Shape',
-            'blob'      => 'Aws\Api\Shape',
-            'boolean'   => 'Aws\Api\Shape'
+            'structure' => 'Aws_Api_StructureShape',
+            'map'       => 'Aws_Api_MapShape',
+            'list'      => 'Aws_Api_ListShape',
+            'timestamp' => 'Aws_Api_TimestampShape',
+            'integer'   => 'Aws_Api_Shape',
+            'double'    => 'Aws_Api_Shape',
+            'float'     => 'Aws_Api_Shape',
+            'long'      => 'Aws_Api_Shape',
+            'string'    => 'Aws_Api_Shape',
+            'byte'      => 'Aws_Api_Shape',
+            'character' => 'Aws_Api_Shape',
+            'blob'      => 'Aws_Api_Shape',
+            'boolean'   => 'Aws_Api_Shape'
         ];
 
         if (isset($definition['shape'])) {

@@ -1,20 +1,16 @@
 <?php
-namespace Aws\Signature;
-
-use Aws\Credentials\CredentialsInterface;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Amazon S3 signature version 4 support.
  */
-class S3SignatureV4 extends SignatureV4
+class Aws_Signature_S3SignatureV4 extends Aws_Signature_SignatureV4
 {
     /**
      * Always add a x-amz-content-sha-256 for data integrity.
      */
     public function signRequest(
-        RequestInterface $request,
-        CredentialsInterface $credentials
+        Psr_Http_Message_RequestInterface $request,
+        Aws_Credentials_CredentialsInterface $credentials
     ) {
         if (!$request->hasHeader('x-amz-content-sha256')) {
             $request = $request->withHeader(
@@ -30,8 +26,8 @@ class S3SignatureV4 extends SignatureV4
      * Always add a x-amz-content-sha-256 for data integrity.
      */
     public function presign(
-        RequestInterface $request,
-        CredentialsInterface $credentials,
+        Psr_Http_Message_RequestInterface $request,
+        Aws_Credentials_CredentialsInterface $credentials,
         $expires,
         array $options = []
     ) {
@@ -49,9 +45,9 @@ class S3SignatureV4 extends SignatureV4
      * Override used to allow pre-signed URLs to be created for an
      * in-determinate request payload.
      */
-    protected function getPresignedPayload(RequestInterface $request)
+    protected function getPresignedPayload(Psr_Http_Message_RequestInterface $request)
     {
-        return SignatureV4::UNSIGNED_PAYLOAD;
+        return Aws_Signature_SignatureV4::UNSIGNED_PAYLOAD;
     }
 
     /**

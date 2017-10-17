@@ -22,12 +22,12 @@ class Aws_Handler_GuzzleV6_GuzzleHandler
      *
      * @return Promise\Promise
      */
-    public function __invoke(Psr7Request $request, array $options = [])
+    public function __invoke(GuzzleHttp_Psr7_Request $request, array $options = [])
     {
         $request = $request->withHeader(
             'User-Agent',
             $request->getHeaderLine('User-Agent')
-                . ' ' . \GuzzleHttp\default_user_agent()
+                . ' ' . guzzlehttp_default_user_agent()
         );
 
         return $this->client->sendAsync($request, $this->parseOptions($options))
@@ -43,7 +43,7 @@ class Aws_Handler_GuzzleV6_GuzzleHandler
                         $error['response'] = $e->getResponse();
                     }
 
-                    return new Promise\RejectedPromise($error);
+                    return new GuzzleHttp_Promise_RejectedPromise($error);
                 }
             );
     }

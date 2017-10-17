@@ -1,7 +1,4 @@
 <?php
-namespace GuzzleHttp\Psr7;
-
-use Psr\Http\Message\UriInterface;
 
 /**
  * Resolves a URI reference in the context of a base URI and the opposite way.
@@ -10,7 +7,7 @@ use Psr\Http\Message\UriInterface;
  *
  * @link https://tools.ietf.org/html/rfc3986#section-5
  */
-final class UriResolver
+final class GuzzleHttp_Psr7_UriResolver
 {
     /**
      * Removes dot segments from a path and returns the new path.
@@ -59,7 +56,7 @@ final class UriResolver
      * @return UriInterface
      * @link http://tools.ietf.org/html/rfc3986#section-5.2
      */
-    public static function resolve(UriInterface $base, UriInterface $rel)
+    public static function resolve(Psr_Http_Message_UriInterface $base, Psr_Http_Message_UriInterface $rel)
     {
         if ((string) $rel === '') {
             // we can simply return the same base URI instance for this same-document reference
@@ -99,7 +96,7 @@ final class UriResolver
             }
         }
 
-        return new Uri(Uri::composeComponents(
+        return new GuzzleHttp_Psr7_Uri(GuzzleHttp_Psr7_Uri::composeComponents(
             $base->getScheme(),
             $targetAuthority,
             $targetPath,

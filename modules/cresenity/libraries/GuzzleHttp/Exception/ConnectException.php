@@ -1,14 +1,11 @@
 <?php
-namespace GuzzleHttp\Exception;
-
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Exception thrown when a connection cannot be established.
  *
  * Note that no response is present for a ConnectException
  */
-class ConnectException extends RequestException
+class GuzzleHttp_Exception_ConnectException extends GuzzleHttp_Exception_RequestException
 {
     public function __construct(
         $message,

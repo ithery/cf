@@ -329,7 +329,7 @@ class Aws_S3_S3Client extends Aws_AwsClient implements Aws_S3_S3ClientInterface 
     private function getLocationConstraintMiddleware() {
         $region = $this->getRegion();
         return static function (callable $handler) use ($region) {
-            return function (Command $command, $request = null) use ($handler, $region) {
+            return function (Aws_Command $command, $request = null) use ($handler, $region) {
                 if ($command->getName() === 'CreateBucket') {
                     $locationConstraint = isset($command['CreateBucketConfiguration']['LocationConstraint']) ? $command['CreateBucketConfiguration']['LocationConstraint'] : null;
 
@@ -352,7 +352,7 @@ class Aws_S3_S3Client extends Aws_AwsClient implements Aws_S3_S3ClientInterface 
      */
     private function getSaveAsParameter() {
         return static function (callable $handler) {
-            return function (Command $command, $request = null) use ($handler) {
+            return function (Aws_Command $command, $request = null) use ($handler) {
                 if ($command->getName() === 'GetObject' && isset($command['SaveAs'])) {
                     $command['@http']['sink'] = $command['SaveAs'];
                     unset($command['SaveAs']);
@@ -372,8 +372,8 @@ class Aws_S3_S3Client extends Aws_AwsClient implements Aws_S3_S3ClientInterface 
     private function getHeadObjectMiddleware() {
         return static function (callable $handler) {
             return function (
-                    CommandInterface $command,
-                    RequestInterface $request = null
+                    Aws_CommandInterface $command,
+                    Psr_Http_Message_RequestInterface $request = null
                     ) use ($handler) {
                 if ($command->getName() === 'HeadObject' && !isset($command['@http']['decode_content'])
                 ) {
@@ -393,7 +393,7 @@ class Aws_S3_S3Client extends Aws_AwsClient implements Aws_S3_S3ClientInterface 
      */
     private function getEncodingTypeMiddleware() {
         return static function (callable $handler) {
-            return function (Command $command, $request = null) use ($handler) {
+            return function (Aws_Command $command, $request = null) use ($handler) {
                 $autoSet = false;
                 if ($command->getName() === 'ListObjects' && empty($command['EncodingType'])
                 ) {

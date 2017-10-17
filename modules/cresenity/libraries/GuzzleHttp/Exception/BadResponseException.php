@@ -1,18 +1,14 @@
 <?php
-namespace GuzzleHttp\Exception;
-
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Exception when an HTTP error occurs (4xx or 5xx error)
  */
-class BadResponseException extends RequestException
+class GuzzleHttp_Exception_BadResponseException extends GuzzleHttp_Exception_RequestException
 {
     public function __construct(
         $message,
-        RequestInterface $request,
-        ResponseInterface $response = null,
+        Psr_Http_Message_RequestInterface $request,
+        Psr_Http_Message_ResponseInterface $response = null,
         \Exception $previous = null,
         array $handlerContext = []
     ) {

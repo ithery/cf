@@ -52,11 +52,11 @@ class Aws_Signature_SignatureProvider
     public static function resolve(callable $provider, $version, $service, $region)
     {
         $result = $provider($version, $service, $region);
-        if ($result instanceof SignatureInterface) {
+        if ($result instanceof Aws_Signature_SignatureInterface) {
             return $result;
         }
 
-        throw new UnresolvedSignatureException(
+        throw new Aws_Exception_UnresolvedSignatureException(
             "Unable to resolve a signature for $version/$service/$region.\n"
             . "Valid signature versions include v4 and anonymous."
         );

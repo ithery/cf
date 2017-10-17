@@ -1,10 +1,9 @@
 <?php
-namespace Aws\Signature;
 
 /**
  * Provides signature calculation for SignatureV4.
  */
-trait SignatureTrait
+trait Aws_Signature_SignatureTrait
 {
     /** @var array Cache of previously signed values */
     private $cache = [];

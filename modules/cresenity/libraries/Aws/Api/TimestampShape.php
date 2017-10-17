@@ -1,12 +1,11 @@
 <?php
-namespace Aws\Api;
 
 /**
  * Represents a timestamp shape.
  */
-class TimestampShape extends Shape
+class Aws_Api_TimestampShape extends Aws_Api_Shape
 {
-    public function __construct(array $definition, ShapeMap $shapeMap)
+    public function __construct(array $definition, Aws_Api_ShapeMap $shapeMap)
     {
         $definition['type'] = 'timestamp';
         parent::__construct($definition, $shapeMap);

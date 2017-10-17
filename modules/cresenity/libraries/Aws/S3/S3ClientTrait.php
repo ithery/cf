@@ -25,7 +25,7 @@ trait Aws_S3_S3ClientTrait {
     public function uploadAsync(
     $bucket, $key, $body, $acl = 'private', array $options = []
     ) {
-        return (new ObjectUploader($this, $bucket, $key, $body, $acl, $options))
+        return (new Aws_S3_ObjectUploader($this, $bucket, $key, $body, $acl, $options))
                         ->promise();
     }
 

@@ -1,17 +1,16 @@
 <?php
-namespace Aws\Api;
 
 /**
  * Represents a structure shape and resolve member shape references.
  */
-class StructureShape extends Shape
+class Aws_Api_StructureShape extends Aws_Api_Shape
 {
     /**
      * @var Shape[]
      */
     private $members;
 
-    public function __construct(array $definition, ShapeMap $shapeMap)
+    public function __construct(array $definition, Aws_Api_ShapeMap $shapeMap)
     {
         $definition['type'] = 'structure';
 

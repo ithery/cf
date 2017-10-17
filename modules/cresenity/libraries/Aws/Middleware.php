@@ -23,8 +23,8 @@ final class Aws_Middleware
             $sourceParameter
         ) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null)
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null)
             use (
                 $handler,
                 $api,
@@ -55,11 +55,11 @@ final class Aws_Middleware
      */
     public static function validation(Aws_Api_Service $api, Aws_Api_Validator $validator = null)
     {
-        $validator = $validator ?: new Validator();
+        $validator = $validator ?: new Aws_Api_Validator();
         return function (callable $handler) use ($api, $validator) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($api, $validator, $handler) {
                 $operation = $api->getOperation($command->getName());
                 $validator->validate(
@@ -82,7 +82,7 @@ final class Aws_Middleware
     public static function requestBuilder(callable $serializer)
     {
         return function (callable $handler) use ($serializer) {
-            return function (CommandInterface $command) use ($serializer, $handler) {
+            return function (Aws_CommandInterface $command) use ($serializer, $handler) {
                 return $handler($command, $serializer($command));
             };
         };
@@ -104,12 +104,12 @@ final class Aws_Middleware
     {
         return function (callable $handler) use ($signatureFunction, $credProvider) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request
             ) use ($handler, $signatureFunction, $credProvider) {
                 $signer = $signatureFunction($command);
                 return $credProvider()->then(
-                    function (CredentialsInterface $creds)
+                    function (Aws_Credentials_Credentials $creds)
                     use ($handler, $command, $signer, $request) {
                         return $handler(
                             $command,
@@ -137,8 +137,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) use ($fn) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($handler, $fn) {
                 $fn($command, $request);
                 return $handler($command, $request);
@@ -168,11 +168,11 @@ final class Aws_Middleware
         callable $delay = null,
         $stats = false
     ) {
-        $decider = $decider ?: RetryMiddleware::createDefaultDecider();
-        $delay = $delay ?: [RetryMiddleware::class, 'exponentialDelay'];
+        $decider = $decider ?: Aws_RetryMiddleware::createDefaultDecider();
+        $delay = $delay ?: [Aws_RetryMiddleware::class, 'exponentialDelay'];
 
         return function (callable $handler) use ($decider, $delay, $stats) {
-            return new RetryMiddleware($decider, $delay, $handler, $stats);
+            return new Aws_RetryMiddleware($decider, $delay, $handler, $stats);
         };
     }
     /**
@@ -188,8 +188,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request
             ) use ($handler){
                 return $handler($command, $request->withHeader(
                     'aws-sdk-invocation-id',
@@ -212,8 +212,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) use ($operations) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($handler, $operations) {
                 if (!$request->hasHeader('Content-Type')
                     && in_array($command->getName(), $operations, true)
@@ -243,8 +243,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) use ($history) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($handler, $history) {
                 $ticket = $history->start($command, $request);
                 return $handler($command, $request)
@@ -275,8 +275,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) use ($f) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($handler, $f) {
                 return $handler($command, $f($request));
             };
@@ -296,8 +296,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) use ($f) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($handler, $f) {
                 return $handler($f($command), $request);
             };
@@ -316,8 +316,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) use ($f) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($handler, $f) {
                 return $handler($command, $request)->then($f);
             };
@@ -328,8 +328,8 @@ final class Aws_Middleware
     {
         return function (callable $handler) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($handler) {
                 $start = microtime(true);
                 return $handler($command, $request)

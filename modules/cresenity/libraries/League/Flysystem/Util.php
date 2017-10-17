@@ -1,11 +1,11 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-use League\Flysystem\Util\MimeType;
-use LogicException;
+// use League\Flysystem\Util\MimeType;
+// use LogicException;
 
-class Util
+class League_Flysystem_Util
 {
     /**
      * Get normalized pathinfo.
@@ -176,13 +176,13 @@ class Util
      */
     public static function guessMimeType($path, $content)
     {
-        $mimeType = MimeType::detectByContent($content);
+        $mimeType = League_Flysystem_Util_MimeType::detectByContent($content);
 
         if ( ! (empty($mimeType) || in_array($mimeType, ['application/x-empty', 'text/plain', 'text/x-asm']))) {
             return $mimeType;
         }
 
-        return MimeType::detectByFilename($path);
+        return League_Flysystem_Util_MimeType::detectByFilename($path);
     }
 
     /**

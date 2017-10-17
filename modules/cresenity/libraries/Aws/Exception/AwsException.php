@@ -1,15 +1,9 @@
 <?php
-namespace Aws\Exception;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\RequestInterface;
-use Aws\CommandInterface;
-use Aws\ResultInterface;
 
 /**
  * Represents an AWS exception that is thrown when a command fails.
  */
-class AwsException extends \RuntimeException
+class Aws_Exception_AwsException extends \RuntimeException
 {
     /** @var ResponseInterface */
     private $response;
@@ -31,7 +25,7 @@ class AwsException extends \RuntimeException
      */
     public function __construct(
         $message,
-        CommandInterface $command,
+        Aws_CommandInterface $command,
         array $context = [],
         \Exception $previous = null
     ) {

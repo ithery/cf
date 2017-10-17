@@ -1,14 +1,14 @@
 <?php
 
-namespace League\Flysystem\Util;
+// namespace League\Flysystem\Util;
 
-use Finfo;
-use ErrorException;
+// use Finfo;
+// use ErrorException;
 
 /**
  * @internal
  */
-class MimeType
+class League_Flysystem_Util_MimeType
 {
     /**
      * Detects MIME Type based on given content.

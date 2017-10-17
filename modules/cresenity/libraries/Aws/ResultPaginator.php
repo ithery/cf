@@ -1,12 +1,9 @@
 <?php
-namespace Aws;
-
-use GuzzleHttp\Promise;
 
 /**
  * Iterator that yields each page of results of a pageable operation.
  */
-class ResultPaginator implements \Iterator
+class Aws_ResultPaginator implements \Iterator
 {
     /** @var AwsClientInterface Client performing operations. */
     private $client;
@@ -36,7 +33,7 @@ class ResultPaginator implements \Iterator
      * @param array              $config
      */
     public function __construct(
-        AwsClientInterface $client,
+        Aws_S3_S3Client $client,
         $operation,
         array $args,
         array $config

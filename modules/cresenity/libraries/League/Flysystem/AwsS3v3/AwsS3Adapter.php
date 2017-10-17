@@ -124,7 +124,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
      *
      * @return false|array false on failure file meta data on success
      */
-    public function write($path, $contents, Config $config)
+    public function write($path, $contents, League_Flysystem_Config $config)
     {
         return $this->upload($path, $contents, $config);
     }
@@ -138,7 +138,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
      *
      * @return false|array false on failure file meta data on success
      */
-    public function update($path, $contents, Config $config)
+    public function update($path, $contents, League_Flysystem_Config $config)
     {
         return $this->upload($path, $contents, $config);
     }
@@ -211,7 +211,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
      *
      * @return bool|array
      */
-    public function createDir($dirname, Config $config)
+    public function createDir($dirname, League_Flysystem_Config $config)
     {
         return $this->upload($dirname . '/', '', $config);
     }
@@ -371,7 +371,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
      *
      * @return array|false false on failure file meta data on success
      */
-    public function writeStream($path, $resource, Config $config)
+    public function writeStream($path, $resource, League_Flysystem_Config $config)
     {
         return $this->upload($path, $resource, $config);
     }
@@ -385,7 +385,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
      *
      * @return array|false false on failure file meta data on success
      */
-    public function updateStream($path, $resource, Config $config)
+    public function updateStream($path, $resource, League_Flysystem_Config $config)
     {
         return $this->upload($path, $resource, $config);
     }
@@ -570,18 +570,18 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
      *
      * @return array
      */
-    protected function upload($path, $body, Config $config)
+    protected function upload($path, $body, League_Flysystem_Config $config)
     {
         $key = $this->applyPathPrefix($path);
         $options = $this->getOptionsFromConfig($config);
         $acl = array_key_exists('ACL', $options) ? $options['ACL'] : 'private';
 
         if ( ! isset($options['ContentType'])) {
-            $options['ContentType'] = Util::guessMimeType($path, $body);
+            $options['ContentType'] = League_Flysystem_Util::guessMimeType($path, $body);
         }
 
         if ( ! isset($options['ContentLength'])) {
-            $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : Util::getStreamSize($body);
+            $options['ContentLength'] = is_string($body) ? League_Flysystem_Util::contentSize($body) : League_Flysystem_Util::getStreamSize($body);
         }
 
         if ($options['ContentLength'] === null) {
@@ -600,7 +600,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
      *
      * @return array
      */
-    protected function getOptionsFromConfig(Config $config)
+    protected function getOptionsFromConfig(League_Flysystem_Config $config)
     {
         $options = $this->options;
 

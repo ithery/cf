@@ -42,7 +42,7 @@ class Aws_IdempotencyTokenMiddleware
 
     public function __construct(
         callable $nextHandler,
-        Service $service,
+        Aws_Api_Service $service,
         callable $bytesGenerator = null
     ) {
         $this->bytesGenerator = $bytesGenerator
@@ -52,8 +52,8 @@ class Aws_IdempotencyTokenMiddleware
     }
 
     public function __invoke(
-        CommandInterface $command,
-        RequestInterface $request = null
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request = null
     ) {
         $handler = $this->nextHandler;
         if ($this->bytesGenerator) {

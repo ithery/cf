@@ -54,7 +54,7 @@ class Aws_Api_ShapeMap
         $definition['name'] = $definition['shape'];
         unset($definition['shape']);
 
-        $result = Shape::create($definition, $this);
+        $result = Aws_Api_Shape::create($definition, $this);
 
         if ($isSimple) {
             $this->simple[$shape] = $result;

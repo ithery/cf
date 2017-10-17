@@ -134,7 +134,7 @@ class GuzzleHttp_Handler_CurlFactory implements GuzzleHttp_Handler_CurlFactoryIn
         // return a rejected promise that wraps that exception.
         if ($easy->onHeadersException) {
             return guzzlehttp_promise_rejection_for(
-                    new RequestException(
+                    new GuzzleHttp_Exception_RequestException(
                     'An error was encountered during the on_headers event', $easy->request, $easy->response, $easy->onHeadersException, $ctx
                     )
             );
@@ -145,9 +145,9 @@ class GuzzleHttp_Handler_CurlFactory implements GuzzleHttp_Handler_CurlFactoryIn
         );
 
         // Create a connection exception if it was a specific error code.
-        $error = isset($connectionErrors[$easy->errno]) ? new ConnectException($message, $easy->request, null, $ctx) : new RequestException($message, $easy->request, $easy->response, null, $ctx);
+        $error = isset($connectionErrors[$easy->errno]) ? new GuzzleHttp_Exception_ConnectException($message, $easy->request, null, $ctx) : new GuzzleHttp_Exception_RequestException($message, $easy->request, $easy->response, null, $ctx);
 
-        return \GuzzleHttp\Promise\rejection_for($error);
+        return guzzlehttp_promise_rejection_for($error);
     }
 
     private function getDefaultConf(GuzzleHttp_Handler_EasyHandle $easy) {
