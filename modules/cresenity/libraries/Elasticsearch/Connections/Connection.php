@@ -165,7 +165,7 @@ class Elasticsearch_Connections_Connection implements Elasticsearch_Connections_
         if (empty($request['client'])) {
             unset($request['client']);
         }
-        
+
         $handler = $this->handler;
         $future = $handler($request, $this, $transport, $options);
 
@@ -546,19 +546,19 @@ class Elasticsearch_Connections_Connection implements Elasticsearch_Connections_
         }
 
         if ($statusCode === 400 && strpos($responseBody, "AlreadyExpiredException") !== false) {
-            $exception = new AlreadyExpiredException($responseBody, $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_AlreadyExpiredException($responseBody, $statusCode);
         } elseif ($statusCode === 403) {
-            $exception = new Forbidden403Exception($responseBody, $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_Forbidden403Exception($responseBody, $statusCode);
         } elseif ($statusCode === 404) {
-            $exception = new Missing404Exception($responseBody, $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_Missing404Exception($responseBody, $statusCode);
         } elseif ($statusCode === 409) {
-            $exception = new Conflict409Exception($responseBody, $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_Conflict409Exception($responseBody, $statusCode);
         } elseif ($statusCode === 400 && strpos($responseBody, 'script_lang not supported') !== false) {
-            $exception = new ScriptLangNotSupportedException($responseBody . $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_ScriptLangNotSupportedException($responseBody . $statusCode);
         } elseif ($statusCode === 408) {
-            $exception = new RequestTimeout408Exception($responseBody, $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_RequestTimeout408Exception($responseBody, $statusCode);
         } else {
-            $exception = new BadRequest400Exception($responseBody, $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_BadRequest400Exception($responseBody, $statusCode);
         }
 
         $this->logRequestFail(
@@ -589,14 +589,14 @@ class Elasticsearch_Connections_Connection implements Elasticsearch_Connections_
             return;
         }
 
-        if ($statusCode === 500 && strpos($responseBody, "RoutingMissingException") !== false) {
-            $exception = new RoutingMissingException($exception->getMessage(), $statusCode, $exception);
+        if ($statusCode === 500 && strpos($responseBody, "Elasticsearch_Common_Exceptions_RoutingMissingException") !== false) {
+            $exception = new Elasticsearch_Common_Exceptions_RoutingMissingException($exception->getMessage(), $statusCode, $exception);
         } elseif ($statusCode === 500 && preg_match('/ActionRequestValidationException.+ no documents to get/', $responseBody) === 1) {
-            $exception = new NoDocumentsToGetException($exception->getMessage(), $statusCode, $exception);
-        } elseif ($statusCode === 500 && strpos($responseBody, 'NoShardAvailableActionException') !== false) {
-            $exception = new NoShardAvailableException($exception->getMessage(), $statusCode, $exception);
+            $exception = new Elasticsearch_Common_Exceptions_NoDocumentsToGetException($exception->getMessage(), $statusCode, $exception);
+        } elseif ($statusCode === 500 && strpos($responseBody, 'Elasticsearch_Common_Exceptions_NoShardAvailableActionException') !== false) {
+            $exception = new Elasticsearch_Common_Exceptions_NoShardAvailableException($exception->getMessage(), $statusCode, $exception);
         } else {
-            $exception = new ServerErrorResponseException($responseBody, $statusCode);
+            $exception = new Elasticsearch_Common_Exceptions_ServerErrorResponseException($responseBody, $statusCode);
         }
 
         $this->logRequestFail(
@@ -607,11 +607,11 @@ class Elasticsearch_Connections_Connection implements Elasticsearch_Connections_
     }
 
     private function tryDeserialize400Error($response) {
-        return $this->tryDeserializeError($response, 'Elasticsearch\Common\Exceptions\BadRequest400Exception');
+        return $this->tryDeserializeError($response, 'Elasticsearch_Common_Exceptions_BadRequest400Exception');
     }
 
     private function tryDeserialize500Error($response) {
-        return $this->tryDeserializeError($response, 'Elasticsearch\Common\Exceptions\ServerErrorResponseException');
+        return $this->tryDeserializeError($response, 'Elasticsearch_Common_Exceptions_ServerErrorResponseException');
     }
 
     private function tryDeserializeError($response, $errorClass) {

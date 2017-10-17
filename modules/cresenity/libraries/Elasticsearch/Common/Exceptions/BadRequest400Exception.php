@@ -1,6 +1,8 @@
 <?php
 
-namespace Elasticsearch\Common\Exceptions;
+/*
+  namespace Elasticsearch\Common\Exceptions;
+ */
 
 /**
  * BadRequest400Exception, thrown on 400 conflict http error
@@ -11,6 +13,6 @@ namespace Elasticsearch\Common\Exceptions;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class BadRequest400Exception extends \Exception implements ElasticsearchException
-{
+class Elasticsearch_Common_Exceptions_BadRequest400Exception extends \Exception implements Elasticsearch_Common_Exceptions_ElasticsearchException {
+    
 }

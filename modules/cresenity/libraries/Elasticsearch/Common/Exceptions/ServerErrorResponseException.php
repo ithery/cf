@@ -1,6 +1,8 @@
 <?php
 
-namespace Elasticsearch\Common\Exceptions;
+/*
+  namespace Elasticsearch\Common\Exceptions;
+ */
 
 /**
  * ServerErrorResponseException
@@ -11,6 +13,6 @@ namespace Elasticsearch\Common\Exceptions;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class ServerErrorResponseException extends TransportException implements ElasticsearchException
-{
+class Elasticsearch_Common_Exceptions_ServerErrorResponseException extends Elasticsearch_Common_Exceptions_TransportException implements Elasticsearch_Common_Exceptions_ElasticsearchException {
+    
 }
