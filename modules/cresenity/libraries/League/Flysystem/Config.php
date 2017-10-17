@@ -1,8 +1,8 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-class Config
+class League_Flysystem_Config
 {
     /**
      * @var array

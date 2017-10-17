@@ -31,7 +31,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      * @param AdapterInterface $adapter
      * @param Config|array     $config
      */
-    public function __construct(AdapterInterface $adapter, $config = null)
+    public function __construct(League_Flysystem_AwsS3v3_AwsS3Adapter $adapter, $config = null)
     {
         $this->adapter = $adapter;
         $this->setConfig($config);
