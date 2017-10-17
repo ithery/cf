@@ -1,13 +1,14 @@
 <?php
-
+/*
 namespace Elasticsearch\ConnectionPool;
 
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use Elasticsearch\ConnectionPool\Selectors\SelectorInterface;
 use Elasticsearch\Connections\Connection;
 use Elasticsearch\Connections\ConnectionFactoryInterface;
+*/
 
-class StaticNoPingConnectionPool extends AbstractConnectionPool implements ConnectionPoolInterface
+class Elasticsearch_ConnectionPool_StaticNoPingConnectionPool extends Elasticsearch_ConnectionPool_AbstractConnectionPool implements Elasticsearch_ConnectionPool_ConnectionPoolInterface
 {
     /**
      * @var int
@@ -22,7 +23,7 @@ class StaticNoPingConnectionPool extends AbstractConnectionPool implements Conne
     /**
      * {@inheritdoc}
      */
-    public function __construct($connections, SelectorInterface $selector, ConnectionFactoryInterface $factory, $connectionPoolParams)
+    public function __construct($connections, Elasticsearch_ConnectionPool_Selectors_SelectorInterface $selector, Elasticsearch_Connections_ConnectionFactoryInterface $factory, $connectionPoolParams)
     {
         parent::__construct($connections, $selector, $factory, $connectionPoolParams);
     }
@@ -60,7 +61,7 @@ class StaticNoPingConnectionPool extends AbstractConnectionPool implements Conne
      *
      * @return bool
      */
-    private function readyToRevive(Connection $connection)
+    private function readyToRevive(Elasticsearch_Connections_Connection $connection)
     {
         $timeout = min(
             $this->pingTimeout * pow(2, $connection->getPingFailures()),

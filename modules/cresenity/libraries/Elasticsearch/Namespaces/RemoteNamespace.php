@@ -1,9 +1,9 @@
 <?php
-
+/*
 namespace Elasticsearch\Namespaces;
 
 use Elasticsearch\Endpoints\Remote\Info;
-
+*/
 /**
  * Class RemoteNamespace
  *
@@ -13,7 +13,7 @@ use Elasticsearch\Endpoints\Remote\Info;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class RemoteNamespace extends AbstractNamespace
+class Elasticsearch_Namespaces_RemoteNamespace extends Elasticsearch_Namespaces_AbstractNamespace
 {
     /**
      * @param $params array Associative array of parameters

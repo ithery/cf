@@ -8,14 +8,14 @@
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-
+/*
 namespace Elasticsearch\Namespaces;
 
 
 use Elasticsearch\Serializers\SerializerInterface;
 use Elasticsearch\Transport;
-
-interface NamespaceBuilderInterface
+*/
+interface Elasticsearch_Namespaces_NamespaceBuilderInterface
 {
     /**
      * Returns the name of the namespace.  This is what users will call, e.g. the name
@@ -33,5 +33,5 @@ interface NamespaceBuilderInterface
      * @param SerializerInterface $serializer
      * @return Object
      */
-    public function getObject(Transport $transport, SerializerInterface $serializer);
+    public function getObject(Elasticsearch_Transport $transport, Elasticsearch_Serializers_SerializerInterface $serializer);
 }

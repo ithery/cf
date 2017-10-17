@@ -1,5 +1,5 @@
 <?php
-
+/*
 namespace Elasticsearch\Endpoints;
 
 use Elasticsearch\Common\Exceptions\UnexpectedValueException;
@@ -7,7 +7,7 @@ use Elasticsearch\Serializers\SerializerInterface;
 use Elasticsearch\Transport;
 use Exception;
 use GuzzleHttp\Ring\Future\FutureArrayInterface;
-
+*/
 /**
  * Class AbstractEndpoint
  *
@@ -17,7 +17,7 @@ use GuzzleHttp\Ring\Future\FutureArrayInterface;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-abstract class AbstractEndpoint
+abstract class Elasticsearch_Endpoints_AbstractEndpoint
 {
     /** @var array  */
     protected $params = array();

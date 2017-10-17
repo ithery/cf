@@ -1,12 +1,12 @@
 <?php
-
+/*
 namespace Elasticsearch\Namespaces;
 
 use Elasticsearch\Endpoints\Ingest\Pipeline\Delete;
 use Elasticsearch\Endpoints\Ingest\Pipeline\Get;
 use Elasticsearch\Endpoints\Ingest\Pipeline\Put;
 use Elasticsearch\Endpoints\Ingest\Simulate;
-
+*/
 /**
  * Class IngestNamespace
  *
@@ -16,7 +16,7 @@ use Elasticsearch\Endpoints\Ingest\Simulate;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class IngestNamespace extends AbstractNamespace
+class Elasticsearch_Namespaces_IngestNamespace extends Elasticsearch_Namespaces_AbstractNamespace
 {
     /**
      * $params['master_timeout']             = (time) Explicit operation timeout for connection to master node

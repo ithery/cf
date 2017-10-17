@@ -1,9 +1,11 @@
 <?php
 
-namespace Elasticsearch\Namespaces;
+/*
+  namespace Elasticsearch\Namespaces;
 
-use Elasticsearch\Endpoints\AbstractEndpoint;
-use Elasticsearch\Transport;
+  use Elasticsearch\Endpoints\AbstractEndpoint;
+  use Elasticsearch\Transport;
+ */
 
 /**
  * Class AbstractNamespace
@@ -14,8 +16,8 @@ use Elasticsearch\Transport;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-abstract class AbstractNamespace
-{
+abstract class Elasticsearch_Namespaces_AbstractNamespace {
+
     /** @var \Elasticsearch\Transport  */
     protected $transport;
 
@@ -25,11 +27,10 @@ abstract class AbstractNamespace
     /**
      * Abstract constructor
      *
-     * @param Transport $transport Transport object
+     * @param Elasticsearch_Transport $transport Transport object
      * @param $endpoints
      */
-    public function __construct($transport, $endpoints)
-    {
+    public function __construct($transport, $endpoints) {
         $this->transport = $transport;
         $this->endpoints = $endpoints;
     }
@@ -40,8 +41,7 @@ abstract class AbstractNamespace
      *
      * @return null|mixed
      */
-    public function extractArgument(&$params, $arg)
-    {
+    public function extractArgument(&$params, $arg) {
         if (is_object($params) === true) {
             $params = (array) $params;
         }
@@ -62,16 +62,12 @@ abstract class AbstractNamespace
      * @throws \Exception
      * @return array
      */
-    protected function performRequest(AbstractEndpoint $endpoint)
-    {
+    protected function performRequest(Elasticsearch_Endpoints_AbstractEndpoint $endpoint) {
         $response = $this->transport->performRequest(
-            $endpoint->getMethod(),
-            $endpoint->getURI(),
-            $endpoint->getParams(),
-            $endpoint->getBody(),
-            $endpoint->getOptions()
+                $endpoint->getMethod(), $endpoint->getURI(), $endpoint->getParams(), $endpoint->getBody(), $endpoint->getOptions()
         );
 
         return $this->transport->resultOrFuture($response, $endpoint->getOptions());
     }
+
 }

@@ -1,7 +1,7 @@
 <?php
-
+/*
 namespace Elasticsearch\Namespaces;
-
+*/
 /**
  * Class SnapshotNamespace
  *
@@ -11,7 +11,7 @@ namespace Elasticsearch\Namespaces;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class SnapshotNamespace extends AbstractNamespace
+class Elasticsearch_Namespaces_SnapshotNamespace extends Elasticsearch_Namespaces_AbstractNamespace
 {
     /**
      * $params['master_timeout'] = (time) Explicit operation timeout for connection to master node

@@ -1,7 +1,7 @@
 <?php
-
+/*
 namespace Elasticsearch\Namespaces;
-
+*/
 /**
  * Class IndicesNamespace
  *
@@ -11,7 +11,7 @@ namespace Elasticsearch\Namespaces;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class IndicesNamespace extends AbstractNamespace
+class Elasticsearch_Namespaces_IndicesNamespace extends Elasticsearch_Namespaces_AbstractNamespace
 {
     /**
      * $params['index'] = (list) A comma-separated list of indices to check (Required)

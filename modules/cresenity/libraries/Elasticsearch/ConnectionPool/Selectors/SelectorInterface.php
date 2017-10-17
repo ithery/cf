@@ -1,6 +1,8 @@
 <?php
 
-namespace Elasticsearch\ConnectionPool\Selectors;
+/*
+  namespace Elasticsearch\ConnectionPool\Selectors;
+ */
 
 /**
  * Class RandomSelector
@@ -11,8 +13,8 @@ namespace Elasticsearch\ConnectionPool\Selectors;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-interface SelectorInterface
-{
+interface Elasticsearch_ConnectionPool_Selectors_SelectorInterface {
+
     /**
      * Perform logic to select a single ConnectionInterface instance from the array provided
      *

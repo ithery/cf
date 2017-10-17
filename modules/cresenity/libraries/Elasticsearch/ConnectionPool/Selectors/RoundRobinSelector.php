@@ -1,9 +1,9 @@
 <?php
-
+/*
 namespace Elasticsearch\ConnectionPool\Selectors;
 
 use Elasticsearch\Connections\ConnectionInterface;
-
+*/
 /**
  * Class RoundRobinSelector
  *
@@ -13,7 +13,7 @@ use Elasticsearch\Connections\ConnectionInterface;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class RoundRobinSelector implements SelectorInterface
+class Elasticsearch_ConnectionPool_Selectors_RoundRobinSelector implements Elasticsearch_ConnectionPool_Selectors_SelectorInterface
 {
     /**
      * @var int

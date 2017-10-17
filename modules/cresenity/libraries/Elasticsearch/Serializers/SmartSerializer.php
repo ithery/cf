@@ -1,8 +1,14 @@
 <?php
 
-namespace Elasticsearch\Serializers;
+if (!defined('JSON_PRESERVE_ZERO_FRACTION')) {
+    define('JSON_PRESERVE_ZERO_FRACTION', 1024);
+}
 
-use Elasticsearch\Common\Exceptions\Serializer\JsonErrorException;
+/*
+  namespace Elasticsearch\Serializers;
+
+  use Elasticsearch\Common\Exceptions\Serializer\JsonErrorException;
+ */
 
 /**
  * Class SmartSerializer
@@ -13,8 +19,8 @@ use Elasticsearch\Common\Exceptions\Serializer\JsonErrorException;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class SmartSerializer implements SerializerInterface
-{
+class Elasticsearch_Serializers_SmartSerializer implements Elasticsearch_Serializers_SerializerInterface {
+
     /**
      * Serialize assoc array into JSON string
      *
@@ -22,14 +28,13 @@ class SmartSerializer implements SerializerInterface
      *
      * @return string
      */
-    public function serialize($data)
-    {
+    public function serialize($data) {
         if (is_string($data) === true) {
             return $data;
         } else {
             $data = json_encode($data, JSON_PRESERVE_ZERO_FRACTION);
             if ($data === false) {
-                throw new RuntimeException("Failed to JSON encode: ".json_last_error());
+                throw new RuntimeException("Failed to JSON encode: " . json_last_error());
             }
             if ($data === '[]') {
                 return '{}';
@@ -49,8 +54,7 @@ class SmartSerializer implements SerializerInterface
      * @throws JsonErrorException
      * @return array
      */
-    public function deserialize($data, $headers)
-    {
+    public function deserialize($data, $headers) {
         if (isset($headers['content_type']) === true) {
             if (strpos($headers['content_type'], 'json') !== false) {
                 return $this->decode($data);
@@ -72,8 +76,7 @@ class SmartSerializer implements SerializerInterface
      * @return array
      * @throws JsonErrorException
      */
-    private function decode($data)
-    {
+    private function decode($data) {
         if ($data === null || strlen($data) === 0) {
             return "";
         }
@@ -88,4 +91,5 @@ class SmartSerializer implements SerializerInterface
 
         return $result;
     }
+
 }

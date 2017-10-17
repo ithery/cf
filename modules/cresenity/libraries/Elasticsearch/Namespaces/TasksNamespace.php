@@ -1,10 +1,10 @@
 <?php
-
+/*
 namespace Elasticsearch\Namespaces;
 
 use Elasticsearch\Endpoints\Tasks\Cancel;
 use Elasticsearch\Endpoints\Tasks\Get;
-
+*/
 /**
  * Class TasksNamespace
  *
@@ -14,7 +14,7 @@ use Elasticsearch\Endpoints\Tasks\Get;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class TasksNamespace extends AbstractNamespace
+class Elasticsearch_Namespaces_TasksNamespace extends Elasticsearch_Namespaces_AbstractNamespace
 {
     /**
      * $params['wait_for_completion'] = (bool) Wait for the matching tasks to complete (default: false)

@@ -1,7 +1,7 @@
 <?php
-
+/*
 namespace Elasticsearch\Namespaces;
-
+*/
 /**
  * Class NodesNamespace
  *
@@ -11,7 +11,7 @@ namespace Elasticsearch\Namespaces;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class NodesNamespace extends AbstractNamespace
+class Elasticsearch_Namespaces_NodesNamespace extends Elasticsearch_Namespaces_AbstractNamespace
 {
     /**
      * $params['fields']        = (list) A comma-separated list of fields for `fielddata` metric (supports wildcards)

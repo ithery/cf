@@ -1,5 +1,5 @@
 <?php
-
+/*
 namespace Elasticsearch\ConnectionPool;
 
 use Elasticsearch\Common\Exceptions\InvalidArgumentException;
@@ -7,7 +7,7 @@ use Elasticsearch\ConnectionPool\Selectors\SelectorInterface;
 use Elasticsearch\Connections\Connection;
 use Elasticsearch\Connections\ConnectionFactoryInterface;
 use Elasticsearch\Connections\ConnectionInterface;
-
+*/
 /**
  * Class AbstractConnectionPool
  *
@@ -17,7 +17,7 @@ use Elasticsearch\Connections\ConnectionInterface;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-abstract class AbstractConnectionPool implements ConnectionPoolInterface
+abstract class Elasticsearch_ConnectionPool_AbstractConnectionPool implements Elasticsearch_ConnectionPool_ConnectionPoolInterface
 {
     /**
      * Array of connections
@@ -54,7 +54,7 @@ abstract class AbstractConnectionPool implements ConnectionPoolInterface
      * @param ConnectionFactoryInterface     $factory              ConnectionFactory instance
      * @param array                          $connectionPoolParams
      */
-    public function __construct($connections, SelectorInterface $selector, ConnectionFactoryInterface $factory, $connectionPoolParams)
+    public function __construct($connections, Elasticsearch_ConnectionPool_Selectors_SelectorInterface $selector, Elasticsearch_Connections_ConnectionFactoryInterface $factory, $connectionPoolParams)
     {
         $paramList = array('connections', 'selector', 'connectionPoolParams');
         foreach ($paramList as $param) {

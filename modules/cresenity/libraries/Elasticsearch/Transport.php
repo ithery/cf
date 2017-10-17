@@ -1,13 +1,15 @@
 <?php
 
-namespace Elasticsearch;
+/*
+  namespace Elasticsearch;
 
-use Elasticsearch\Common\Exceptions;
-use Elasticsearch\ConnectionPool\AbstractConnectionPool;
-use Elasticsearch\Connections\Connection;
-use Elasticsearch\Connections\ConnectionInterface;
-use GuzzleHttp\Ring\Future\FutureArrayInterface;
-use Psr\Log\LoggerInterface;
+  use Elasticsearch\Common\Exceptions;
+  use Elasticsearch\ConnectionPool\AbstractConnectionPool;
+  use Elasticsearch\Connections\Connection;
+  use Elasticsearch\Connections\ConnectionInterface;
+  use GuzzleHttp\Ring\Future\FutureArrayInterface;
+  use Psr\Log\LoggerInterface;
+ */
 
 /**
  * Class Transport
@@ -18,8 +20,8 @@ use Psr\Log\LoggerInterface;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class Transport
-{
+class Elasticsearch_Transport {
+
     /**
      * @var AbstractConnectionPool
      */
@@ -48,11 +50,10 @@ class Transport
      * @param ConnectionPool\AbstractConnectionPool $connectionPool
      * @param \Psr\Log\LoggerInterface $log    Monolog logger object
      */
-    public function __construct($retries, $sniffOnStart = false, AbstractConnectionPool $connectionPool, LoggerInterface $log)
-    {
-        $this->log            = $log;
+    public function __construct($retries, $sniffOnStart = false, Elasticsearch_ConnectionPool_AbstractConnectionPool $connectionPool, Psr_Log_LoggerInterface $log) {
+        $this->log = $log;
         $this->connectionPool = $connectionPool;
-        $this->retries        = $retries;
+        $this->retries = $retries;
 
         if ($sniffOnStart === true) {
             $this->log->notice('Sniff on Start.');
@@ -66,9 +67,7 @@ class Transport
      *
      * @return ConnectionInterface Connection
      */
-
-    public function getConnection()
-    {
+    public function getConnection() {
         return $this->connectionPool->nextConnection();
     }
 
@@ -84,42 +83,36 @@ class Transport
      * @throws Common\Exceptions\NoNodesAvailableException|\Exception
      * @return FutureArrayInterface
      */
-    public function performRequest($method, $uri, $params = null, $body = null, $options = [])
-    {
+    public function performRequest($method, $uri, $params = null, $body = null, $options = []) {
         try {
-            $connection  = $this->getConnection();
+            $connection = $this->getConnection();
         } catch (Exceptions\NoNodesAvailableException $exception) {
             $this->log->critical('No alive nodes found in cluster');
             throw $exception;
         }
 
-        $response             = array();
-        $caughtException      = null;
+        $response = array();
+        $caughtException = null;
         $this->lastConnection = $connection;
 
         $future = $connection->performRequest(
-            $method,
-            $uri,
-            $params,
-            $body,
-            $options,
-            $this
+                $method, $uri, $params, $body, $options, $this
         );
 
         $future->promise()->then(
-            //onSuccess
-            function ($response) {
-                $this->retryAttempts = 0;
-                // Note, this could be a 4xx or 5xx error
-            },
-            //onFailure
-            function ($response) {
-                // Ignore 400 level errors, as that means the server responded just fine
-                if (!(isset($response['code']) && $response['code'] >=400 && $response['code'] < 500)) {
-                    // Otherwise schedule a check
-                    $this->connectionPool->scheduleCheck();
-                }
-            });
+                //onSuccess
+                function ($response) {
+            $this->retryAttempts = 0;
+            // Note, this could be a 4xx or 5xx error
+        },
+                //onFailure
+                function ($response) {
+            // Ignore 400 level errors, as that means the server responded just fine
+            if (!(isset($response['code']) && $response['code'] >= 400 && $response['code'] < 500)) {
+                // Otherwise schedule a check
+                $this->connectionPool->scheduleCheck();
+            }
+        });
 
         return $future;
     }
@@ -130,8 +123,7 @@ class Transport
      *
      * @return callable|array
      */
-    public function resultOrFuture($result, $options = [])
-    {
+    public function resultOrFuture($result, $options = []) {
         $response = null;
         $async = isset($options['client']['future']) ? $options['client']['future'] : null;
         if (is_null($async) || $async === false) {
@@ -150,8 +142,7 @@ class Transport
      *
      * @return bool
      */
-    public function shouldRetry($request)
-    {
+    public function shouldRetry($request) {
         if ($this->retryAttempts < $this->retries) {
             $this->retryAttempts += 1;
 
@@ -167,8 +158,8 @@ class Transport
      *
      * @return Connection
      */
-    public function getLastConnection()
-    {
+    public function getLastConnection() {
         return $this->lastConnection;
     }
+
 }

@@ -1,9 +1,9 @@
 <?php
-
+/*
 namespace Elasticsearch\Endpoints;
 
 use Elasticsearch\Common\Exceptions;
-
+*/
 /**
  * Class Index
  *
@@ -13,7 +13,7 @@ use Elasticsearch\Common\Exceptions;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-class Index extends AbstractEndpoint
+class Elasticsearch_Endpoints_Index extends Elasticsearch_Endpoints_AbstractEndpoint
 {
     /** @var bool  */
     private $createIfAbsent = false;

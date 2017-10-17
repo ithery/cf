@@ -1,11 +1,11 @@
 <?php
-
+/*
 namespace Elasticsearch\Connections;
 
 use Elasticsearch\Serializers\SerializerInterface;
 use Elasticsearch\Transport;
 use Psr\Log\LoggerInterface;
-
+*/
 /**
  * Interface ConnectionInterface
  *
@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-interface ConnectionInterface
+interface Elasticsearch_Connections_ConnectionInterface
 {
     /**
      * Constructor
@@ -28,7 +28,7 @@ interface ConnectionInterface
      * @param \Psr\Log\LoggerInterface $trace        Logger object
      */
     public function __construct($handler, $hostDetails, $connectionParams,
-                                SerializerInterface $serializer, LoggerInterface $log, LoggerInterface $trace);
+                                Elasticsearch_Serializers_SerializerInterface $serializer, Psr_Log_LoggerInterface $log, Psr_Log_LoggerInterface $trace);
 
     /**
      * Get the transport schema for this connection
@@ -95,5 +95,5 @@ interface ConnectionInterface
      * @param \Elasticsearch\Transport $transport
      * @return mixed
      */
-    public function performRequest($method, $uri, $params = null, $body = null, $options = [], Transport $transport);
+    public function performRequest($method, $uri, $params = null, $body = null, $options = [], Elasticsearch_Transport $transport);
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace Elasticsearch\Serializers;
+/*
+  namespace Elasticsearch\Serializers;
+ */
 
 /**
  * Interface SerializerInterface
@@ -11,8 +13,8 @@ namespace Elasticsearch\Serializers;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-interface SerializerInterface
-{
+interface Elasticsearch_Serializers_SerializerInterface {
+
     /**
      * Serialize a complex data-structure into a json encoded string
      *

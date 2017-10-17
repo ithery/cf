@@ -1,9 +1,11 @@
 <?php
 
-namespace Elasticsearch\Connections;
+/*
+  namespace Elasticsearch\Connections;
 
-use Elasticsearch\Serializers\SerializerInterface;
-use Psr\Log\LoggerInterface;
+  use Elasticsearch\Serializers\SerializerInterface;
+  use Psr\Log\LoggerInterface;
+ */
 
 /**
  * Class AbstractConnection
@@ -14,8 +16,8 @@ use Psr\Log\LoggerInterface;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
  * @link     http://elastic.co
  */
-interface ConnectionFactoryInterface
-{
+interface Elasticsearch_Connections_ConnectionFactoryInterface {
+
     /**
      * @param $handler
      * @param array $connectionParams
@@ -23,8 +25,7 @@ interface ConnectionFactoryInterface
      * @param LoggerInterface $logger
      * @param LoggerInterface $tracer
      */
-    public function __construct(callable $handler, array $connectionParams,
-                                SerializerInterface $serializer, LoggerInterface $logger, LoggerInterface $tracer);
+    public function __construct(callable $handler, array $connectionParams, Elasticsearch_Serializers_SerializerInterface $serializer, Psr_Log_LoggerInterface $logger, Psr_Log_LoggerInterface $tracer);
 
     /**
      * @param $hostDetails
