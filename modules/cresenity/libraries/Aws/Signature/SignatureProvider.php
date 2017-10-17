@@ -1,7 +1,5 @@
 <?php
-namespace Aws\Signature;
 
-use Aws\Exception\UnresolvedSignatureException;
 
 /**
  * Signature providers.
@@ -38,7 +36,7 @@ use Aws\Exception\UnresolvedSignatureException;
  *     $signer = $c('foo', 'abc', '123');    // $b handles this.
  *     $nullValue = $c('???', 'abc', '123'); // Neither can handle this.
  */
-class SignatureProvider
+class Aws_Signature_SignatureProvider
 {
     /**
      * Resolves and signature provider and ensures a non-null return value.
@@ -112,12 +110,12 @@ class SignatureProvider
                 case 's3v4':
                 case 'v4':
                     return $service === 's3'
-                        ? new S3SignatureV4($service, $region)
-                        : new SignatureV4($service, $region);
+                        ? new Aws_Signature_S3SignatureV4($service, $region)
+                        : new Aws_Signature_SignatureV4($service, $region);
                 case 'v4-unsigned-body':
-                    return new SignatureV4($service, $region, ['unsigned-body' => 'true']);
+                    return new Aws_Signature_SignatureV4($service, $region, ['unsigned-body' => 'true']);
                 case 'anonymous':
-                    return new AnonymousSignature();
+                    return new Aws_Signature_AnonymousSignature();
                 default:
                     return null;
             }

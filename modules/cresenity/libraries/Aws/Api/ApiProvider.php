@@ -1,7 +1,4 @@
 <?php
-namespace Aws\Api;
-
-use Aws\Exception\UnresolvedApiException;
 
 /**
  * API providers.
@@ -13,7 +10,7 @@ use Aws\Exception\UnresolvedApiException;
  * You can wrap your calls to an API provider with the
  * {@see ApiProvider::resolve} method to ensure that API data is created. If the
  * API data is not created, then the resolve() method will throw a
- * {@see Aws\Exception\UnresolvedApiException}.
+ * {@see Aws_Exception_UnresolvedApiException}.
  *
  *     use Aws\Api\ApiProvider;
  *     $provider = ApiProvider::defaultProvider();
@@ -35,14 +32,14 @@ use Aws\Exception\UnresolvedApiException;
  *     $data = $c('api', 's3', '2006-03-01');          // $b handles this.
  *     $data = $c('api', 'invalid', '2014-12-15');     // Neither handles this.
  */
-class ApiProvider
-{
+class Aws_Api_ApiProvider {
+
     /** @var array A map of public API type names to their file suffix. */
     private static $typeMap = [
-        'api'       => 'api-2',
+        'api' => 'api-2',
         'paginator' => 'paginators-1',
-        'waiter'    => 'waiters-2',
-        'docs'      => 'docs-2',
+        'waiter' => 'waiters-2',
+        'docs' => 'docs-2',
     ];
 
     /** @var array API manifest */
@@ -62,8 +59,7 @@ class ApiProvider
      * @return array
      * @throws UnresolvedApiException
      */
-    public static function resolve(callable $provider, $type, $service, $version)
-    {
+    public static function resolve(callable $provider, $type, $service, $version) {
         // Execute the provider and return the result, if there is one.
         $result = $provider($type, $service, $version);
         if (is_array($result)) {
@@ -82,7 +78,7 @@ class ApiProvider
             $msg = "You must specify a service name to retrieve its API data.";
         }
 
-        throw new UnresolvedApiException($msg);
+        throw new Aws_Exception_UnresolvedApiException($msg);
     }
 
     /**
@@ -92,9 +88,8 @@ class ApiProvider
      *
      * @return self
      */
-    public static function defaultProvider()
-    {
-        return new self(__DIR__ . '/../data', \Aws\manifest());
+    public static function defaultProvider() {
+        return new self(__DIR__ . '/../data', aws_manifest());
     }
 
     /**
@@ -123,8 +118,7 @@ class ApiProvider
      *
      * @return self
      */
-    public static function manifest($dir, array $manifest)
-    {
+    public static function manifest($dir, array $manifest) {
         return new self($dir, $manifest);
     }
 
@@ -139,8 +133,7 @@ class ApiProvider
      * @return self
      * @throws \InvalidArgumentException if the provided `$dir` is invalid.
      */
-    public static function filesystem($dir)
-    {
+    public static function filesystem($dir) {
         return new self($dir);
     }
 
@@ -151,8 +144,7 @@ class ApiProvider
      *
      * @return array
      */
-    public function getVersions($service)
-    {
+    public function getVersions($service) {
         if (!isset($this->manifest)) {
             $this->buildVersionsList($service);
         }
@@ -173,8 +165,7 @@ class ApiProvider
      *
      * @return array|null
      */
-    public function __invoke($type, $service, $version)
-    {
+    public function __invoke($type, $service, $version) {
         // Resolve the type or return null.
         if (isset(self::$typeMap[$type])) {
             $type = self::$typeMap[$type];
@@ -195,7 +186,7 @@ class ApiProvider
         $path = "{$this->modelsDir}/{$service}/{$version}/{$type}.json";
 
         try {
-            return \Aws\load_compiled_json($path);
+            return aws_load_compiled_json($path);
         } catch (\InvalidArgumentException $e) {
             return null;
         }
@@ -205,13 +196,12 @@ class ApiProvider
      * @param string $modelsDir Directory containing service models.
      * @param array  $manifest  The API version manifest data.
      */
-    private function __construct($modelsDir, array $manifest = null)
-    {
+    private function __construct($modelsDir, array $manifest = null) {
         $this->manifest = $manifest;
         $this->modelsDir = rtrim($modelsDir, '/');
         if (!is_dir($this->modelsDir)) {
             throw new \InvalidArgumentException(
-                "The specified models directory, {$modelsDir}, was not found."
+            "The specified models directory, {$modelsDir}, was not found."
             );
         }
     }
@@ -219,8 +209,7 @@ class ApiProvider
     /**
      * Build the versions list for the specified service by globbing the dir.
      */
-    private function buildVersionsList($service)
-    {
+    private function buildVersionsList($service) {
         $dir = "{$this->modelsDir}/{$service}/";
 
         if (!is_dir($dir)) {
@@ -241,4 +230,5 @@ class ApiProvider
             $this->manifest[$service]['versions'] += array_combine($results, $results);
         }
     }
+
 }

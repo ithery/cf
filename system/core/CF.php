@@ -37,6 +37,7 @@ final class CF {
         'info' => 3,
         'debug' => 4,
     );
+    public static $charset = 'utf-8';
 
     /* log threshold default , CLogger::LOG_WARNING (4) */
     public static $log_threshold = 4;
@@ -272,12 +273,12 @@ final class CF {
 
             try {
                 // Start validation of the controller
-                $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
+                $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
+                $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
             } catch (ReflectionException $e) {
                 try {
-                    $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
+                    $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
                     // Start validation of the controller
-                    $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
                 } catch (ReflectionException $e) {
                     // Controller does not exist
                     CFEvent::run('system.404');
@@ -1106,6 +1107,7 @@ final class CF {
             error_reporting(0);
             exit;
         } catch (Exception $e) {
+            
             if (IN_PRODUCTION) {
                 if (isset($_GET['debug'])) {
                     die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
@@ -1177,14 +1179,21 @@ final class CF {
             $routing_file = '';
             $namespace = '';
 
+
+
             if ($last_namespace_position = strripos($routing_class, '\\')) {
+
                 $namespace = substr($routing_class, 0, $last_namespace_position);
+
                 $routing_class = substr($routing_class, $last_namespace_position + 1);
                 $routing_file = str_replace('\\', DS, $namespace) . DS;
             }
 
+
+
             // find file at libraries
             $routing_file .= str_replace('_', DS, $routing_class);
+
             if ($path = self::find_file($directory, $routing_file)) {
                 // Load the class file
                 require $path;
@@ -1200,6 +1209,7 @@ final class CF {
                     $directory = 'helpers';
                     if ($path = self::find_file($directory, $routing_file)) {
                         // Load the class file
+
                         require $path;
                         $class_not_found = TRUE;
                         return TRUE;

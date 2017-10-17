@@ -1,14 +1,10 @@
 <?php
-namespace Aws;
-
-use Psr\Http\Message\UriInterface;
-use GuzzleHttp\Promise\PromiseInterface;
 
 /**
  * Represents an AWS client.
  */
-interface AwsClientInterface
-{
+interface Aws_AwsClientInterface {
+
     /**
      * Creates and executes a command for an operation by name.
      *
@@ -50,7 +46,7 @@ interface AwsClientInterface
      * @return ResultInterface
      * @throws \Exception
      */
-    public function execute(CommandInterface $command);
+    public function execute(Aws_CommandInterface $command);
 
     /**
      * Execute a command asynchronously.
@@ -59,7 +55,7 @@ interface AwsClientInterface
      *
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function executeAsync(CommandInterface $command);
+    public function executeAsync(Aws_CommandInterface $command);
 
     /**
      * Returns a promise that is fulfilled with an

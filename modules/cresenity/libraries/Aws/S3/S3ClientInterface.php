@@ -1,14 +1,9 @@
 <?php
-namespace Aws\S3;
 
-use Aws\AwsClientInterface;
-use Aws\CommandInterface;
-use Aws\ResultInterface;
-use GuzzleHttp\Promise\PromiseInterface;
-use Psr\Http\Message\RequestInterface;
 
-interface S3ClientInterface extends AwsClientInterface
-{
+
+interface Aws_S3_S3ClientInterface extends Aws_AwsClientInterface {
+
     /**
      * Create a pre-signed URL for the given S3 command object.
      *
@@ -22,7 +17,7 @@ interface S3ClientInterface extends AwsClientInterface
      *
      * @return RequestInterface
      */
-    public function createPresignedRequest(CommandInterface $command, $expires);
+    public function createPresignedRequest(Aws_CommandInterface $command, $expires);
 
     /**
      * Returns the URL to an object identified by its bucket and key.
@@ -79,10 +74,7 @@ interface S3ClientInterface extends AwsClientInterface
      * @throws \RuntimeException if no prefix and no regex is given
      */
     public function deleteMatchingObjects(
-        $bucket,
-        $prefix = '',
-        $regex = '',
-        array $options = []
+    $bucket, $prefix = '', $regex = '', array $options = []
     );
 
     /**
@@ -95,17 +87,12 @@ interface S3ClientInterface extends AwsClientInterface
      * @param string $regex   Delete only objects that match this regex
      * @param array  $options Aws\S3\BatchDelete options array.
      *
-     * @see Aws\S3\S3Client::listObjects
+     * @see Aws_S3_S3Client::listObjects
      *
-     * @return PromiseInterface     A promise that is settled when matching
-     *                              objects are deleted.
+     * @return GuzzleHttp_Promise_PromiseInterface     A promise that is settled when matching
+     *                                                 objects are deleted.
      */
-    public function deleteMatchingObjectsAsync(
-        $bucket,
-        $prefix = '',
-        $regex = '',
-        array $options = []
-    );
+    public function deleteMatchingObjectsAsync($bucket, $prefix = '', $regex = '', array $options = []);
 
     /**
      * Upload a file, stream, or string to a bucket.
@@ -136,15 +123,11 @@ interface S3ClientInterface extends AwsClientInterface
      * @param string $acl     ACL to apply to the object (default: private).
      * @param array  $options Options used to configure the upload process.
      *
-     * @see Aws\S3\MultipartUploader for more info about multipart uploads.
+     * @see Aws_S3_MultipartUploader for more info about multipart uploads.
      * @return ResultInterface Returns the result of the upload.
      */
     public function upload(
-        $bucket,
-        $key,
-        $body,
-        $acl = 'private',
-        array $options = []
+    $bucket, $key, $body, $acl = 'private', array $options = []
     );
 
     /**
@@ -163,11 +146,7 @@ interface S3ClientInterface extends AwsClientInterface
      *                              with the result of the upload.
      */
     public function uploadAsync(
-        $bucket,
-        $key,
-        $body,
-        $acl = 'private',
-        array $options = []
+    $bucket, $key, $body, $acl = 'private', array $options = []
     );
 
     /**
@@ -200,12 +179,7 @@ interface S3ClientInterface extends AwsClientInterface
      * @return ResultInterface Returns the result of the copy.
      */
     public function copy(
-        $fromBucket,
-        $fromKey,
-        $destBucket,
-        $destKey,
-        $acl = 'private',
-        array $options = []
+    $fromBucket, $fromKey, $destBucket, $destKey, $acl = 'private', array $options = []
     );
 
     /**
@@ -223,12 +197,7 @@ interface S3ClientInterface extends AwsClientInterface
      *                              with the result of the copy.
      */
     public function copyAsync(
-        $fromBucket,
-        $fromKey,
-        $destBucket,
-        $destKey,
-        $acl = 'private',
-        array $options = []
+    $fromBucket, $fromKey, $destBucket, $destKey, $acl = 'private', array $options = []
     );
 
     /**
@@ -242,10 +211,7 @@ interface S3ClientInterface extends AwsClientInterface
      * @see Aws\S3\Transfer for more options and customization
      */
     public function uploadDirectory(
-        $directory,
-        $bucket,
-        $keyPrefix = null,
-        array $options = []
+    $directory, $bucket, $keyPrefix = null, array $options = []
     );
 
     /**
@@ -262,10 +228,7 @@ interface S3ClientInterface extends AwsClientInterface
      *                          complete.
      */
     public function uploadDirectoryAsync(
-        $directory,
-        $bucket,
-        $keyPrefix = null,
-        array $options = []
+    $directory, $bucket, $keyPrefix = null, array $options = []
     );
 
     /**
@@ -277,10 +240,7 @@ interface S3ClientInterface extends AwsClientInterface
      * @param array  $options   Options available in Aws\S3\Transfer::__construct
      */
     public function downloadBucket(
-        $directory,
-        $bucket,
-        $keyPrefix = '',
-        array $options = []
+    $directory, $bucket, $keyPrefix = '', array $options = []
     );
 
     /**
@@ -295,10 +255,7 @@ interface S3ClientInterface extends AwsClientInterface
      *                          complete.
      */
     public function downloadBucketAsync(
-        $directory,
-        $bucket,
-        $keyPrefix = '',
-        array $options = []
+    $directory, $bucket, $keyPrefix = '', array $options = []
     );
 
     /**

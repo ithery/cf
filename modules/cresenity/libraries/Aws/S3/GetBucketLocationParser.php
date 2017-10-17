@@ -1,30 +1,23 @@
 <?php
-namespace Aws\S3;
-
-use Aws\Api\Parser\AbstractParser;
-use Aws\CommandInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * @internal Decorates a parser for the S3 service to correctly handle the
  *           GetBucketLocation operation.
  */
-class GetBucketLocationParser extends AbstractParser
-{
+class Aws_S3_GetBucketLocationParser extends Aws_Api_Parser_AbstractParser {
+
     /** @var callable */
     private $parser;
 
     /**
      * @param callable $parser Parser to wrap.
      */
-    public function __construct(callable $parser)
-    {
+    public function __construct(callable $parser) {
         $this->parser = $parser;
     }
 
     public function __invoke(
-        CommandInterface $command,
-        ResponseInterface $response
+    Aws_CommandInterface $command, Psr_Http_Message_ResponseInterface $response
     ) {
         $fn = $this->parser;
         $result = $fn($command, $response);
@@ -39,4 +32,5 @@ class GetBucketLocationParser extends AbstractParser
 
         return $result;
     }
+
 }

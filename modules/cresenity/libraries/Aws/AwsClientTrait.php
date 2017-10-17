@@ -1,36 +1,27 @@
 <?php
-namespace Aws;
-
-use Aws\Api\Service;
-use GuzzleHttp\Promise\Promise;
 
 /**
  * A trait providing generic functionality for interacting with Amazon Web
  * Services. This is meant to be used in classes implementing
  * \Aws\AwsClientInterface
  */
-trait AwsClientTrait
-{
-    public function getPaginator($name, array $args = [])
-    {
+trait Aws_AwsClientTrait {
+
+    public function getPaginator($name, array $args = []) {
         $config = $this->getApi()->getPaginatorConfig($name);
 
-        return new ResultPaginator($this, $name, $args, $config);
+        return new Aws_ResultPaginator($this, $name, $args, $config);
     }
 
-    public function getIterator($name, array $args = [])
-    {
+    public function getIterator($name, array $args = []) {
         $config = $this->getApi()->getPaginatorConfig($name);
         if (!$config['result_key']) {
             throw new \UnexpectedValueException(sprintf(
-                'There are no resources to iterate for the %s operation of %s',
-                $name, $this->getApi()['serviceFullName']
+                    'There are no resources to iterate for the %s operation of %s', $name, $this->getApi()['serviceFullName']
             ));
         }
 
-        $key = is_array($config['result_key'])
-            ? $config['result_key'][0]
-            : $config['result_key'];
+        $key = is_array($config['result_key']) ? $config['result_key'][0] : $config['result_key'];
 
         if ($config['output_token'] && $config['input_token']) {
             return $this->getPaginator($name, $args)->search($key);
@@ -41,37 +32,32 @@ trait AwsClientTrait
         return new \ArrayIterator((array) $result);
     }
 
-    public function waitUntil($name, array $args = [])
-    {
+    public function waitUntil($name, array $args = []) {
         return $this->getWaiter($name, $args)->promise()->wait();
     }
 
-    public function getWaiter($name, array $args = [])
-    {
+    public function getWaiter($name, array $args = []) {
         $config = isset($args['@waiter']) ? $args['@waiter'] : [];
         $config += $this->getApi()->getWaiterConfig($name);
 
         return new Waiter($this, $name, $args, $config);
     }
 
-    public function execute(CommandInterface $command)
-    {
+    public function execute(Aws_CommandInterface $command) {
         return $this->executeAsync($command)->wait();
     }
 
-    public function executeAsync(CommandInterface $command)
-    {
+    public function executeAsync(Aws_CommandInterface $command) {
         $handler = $command->getHandlerList()->resolve();
         return $handler($command);
     }
 
-    public function __call($name, array $args)
-    {
+    public function __call($name, array $args) {
         $params = isset($args[0]) ? $args[0] : [];
 
         if (substr($name, -5) === 'Async') {
             return $this->executeAsync(
-                $this->getCommand(substr($name, 0, -5), $params)
+                            $this->getCommand(substr($name, 0, -5), $params)
             );
         }
 

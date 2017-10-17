@@ -1,19 +1,12 @@
 <?php
-namespace Aws\Api\Parser;
-
-use Aws\Api\DateTimeResult;
-use Aws\Api\Shape;
-use Aws\Api\StructureShape;
-use Aws\Result;
-use Aws\CommandInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * @internal
  */
-abstract class AbstractRestParser extends AbstractParser
-{
-    use PayloadParserTrait;
+abstract class Aws_Api_Parser_AbstractRestParser extends Aws_Api_Parser_AbstractParser {
+
+    use Aws_Api_Parser_PayloadParserTrait;
+
     /**
      * Parses a payload from a response.
      *
@@ -24,14 +17,11 @@ abstract class AbstractRestParser extends AbstractParser
      * @return mixed
      */
     abstract protected function payload(
-        ResponseInterface $response,
-        StructureShape $member,
-        array &$result
+    Psr_Http_Message_ResponseInterface $response, Aws_Api_StructureShape $member, array &$result
     );
 
     public function __invoke(
-        CommandInterface $command,
-        ResponseInterface $response
+    Aws_CommandInterface $command, Psr_Http_Message_ResponseInterface $response
     ) {
         $output = $this->api->getOperation($command->getName())->getOutput();
         $result = [];
@@ -54,9 +44,7 @@ abstract class AbstractRestParser extends AbstractParser
             }
         }
 
-        if (!$payload
-            && $response->getBody()->getSize() > 0
-            && count($output->getMembers()) > 0
+        if (!$payload && $response->getBody()->getSize() > 0 && count($output->getMembers()) > 0
         ) {
             // if no payload was found, then parse the contents of the body
             $this->payload($response, $output, $result);
@@ -66,10 +54,7 @@ abstract class AbstractRestParser extends AbstractParser
     }
 
     private function extractPayload(
-        $payload,
-        StructureShape $output,
-        ResponseInterface $response,
-        array &$result
+    $payload, StructureShape $output, ResponseInterface $response, array &$result
     ) {
         $member = $output->getMember($payload);
 
@@ -87,12 +72,9 @@ abstract class AbstractRestParser extends AbstractParser
      * Extract a single header from the response into the result.
      */
     private function extractHeader(
-        $name,
-        Shape $shape,
-        ResponseInterface $response,
-        &$result
+    $name, Shape $shape, ResponseInterface $response, &$result
     ) {
-        $value = $response->getHeaderLine($shape['locationName'] ?: $name);
+        $value = $response->getHeaderLine($shape['locationName'] ? : $name);
 
         switch ($shape->getType()) {
             case 'float':
@@ -131,10 +113,7 @@ abstract class AbstractRestParser extends AbstractParser
      * Extract a map of headers with an optional prefix from the response.
      */
     private function extractHeaders(
-        $name,
-        Shape $shape,
-        ResponseInterface $response,
-        &$result
+    $name, Shape $shape, ResponseInterface $response, &$result
     ) {
         // Check if the headers are prefixed by a location name
         $result[$name] = [];
@@ -154,10 +133,9 @@ abstract class AbstractRestParser extends AbstractParser
      * Places the status code of the response into the result array.
      */
     private function extractStatus(
-        $name,
-        ResponseInterface $response,
-        array &$result
+    $name, ResponseInterface $response, array &$result
     ) {
         $result[$name] = (int) $response->getStatusCode();
     }
+
 }

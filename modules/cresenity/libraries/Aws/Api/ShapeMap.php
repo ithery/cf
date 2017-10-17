@@ -1,10 +1,9 @@
 <?php
-namespace Aws\Api;
 
 /**
  * Builds shape based on shape references.
  */
-class ShapeMap
+class Aws_Api_ShapeMap
 {
     /** @var array */
     private $definitions;

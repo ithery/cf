@@ -1,17 +1,14 @@
 <?php
-namespace Aws\Api\ErrorParser;
 
-use Aws\Api\Parser\PayloadParserTrait;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Parses XML errors.
  */
-class XmlErrorParser
+class Aws_Api_ErrorParser_XmlErrorParser
 {
-    use PayloadParserTrait;
+    use Aws_Api_Parser_PayloadParserTrait;
 
-    public function __invoke(ResponseInterface $response)
+    public function __invoke(\Psr_Http_Message_ResponseInterface $response)
     {
         $code = (string) $response->getStatusCode();
 
@@ -33,7 +30,7 @@ class XmlErrorParser
         return $data;
     }
 
-    private function parseHeaders(ResponseInterface $response, array &$data)
+    private function parseHeaders(Psr_Http_Message_ResponseInterface $response, array &$data)
     {
         if ($response->getStatusCode() == '404') {
             $data['code'] = 'NotFound';

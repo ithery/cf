@@ -170,6 +170,11 @@ class CValidation implements ArrayAccess {
         // Remove the rules that apply to every field
         unset($rules[TRUE]);
 
+        // Bind the validation object to :validation
+        $this->bind(':validation', $this);
+        // Bind the data to :data
+        $this->bind(':data', $this->_data);
+
         // Execute the rules
         foreach ($rules as $field => $set) {
             // Get the field value
@@ -193,7 +198,9 @@ class CValidation implements ArrayAccess {
                     }
                 }
                 
-                if (method_exists('CValidator', $rule)) {
+                if(is_callable($rule)) {
+                    $passed = call_user_func_array($rule, $params);
+                } elseif (method_exists('CValidator', $rule)) {
                     // Use a method in this object
                     $method = new ReflectionMethod('CValidator', $rule);
 
