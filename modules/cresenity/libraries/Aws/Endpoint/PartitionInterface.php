@@ -1,10 +1,9 @@
 <?php
-namespace Aws\Endpoint;
 
 /**
  * Represents a section of the AWS cloud.
  */
-interface PartitionInterface
+interface Aws_Endpoint_PartitionInterface
 {
     /**
      * Returns the partition's short name, e.g., 'aws,' 'aws-cn,' or

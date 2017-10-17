@@ -1,11 +1,4 @@
 <?php
-namespace Aws;
-
-use Aws\Api\Parser\Exception\ParserException;
-use GuzzleHttp\Promise;
-use GuzzleHttp\Promise\FulfilledPromise;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Converts an HTTP handler into a Command HTTP handler.
@@ -23,7 +16,7 @@ use Psr\Http\Message\ResponseInterface;
  * - connection_error: (bool) True if the error is the result of failing to
  *   connect.
  */
-class WrappedHttpHandler
+class Aws_WrappedHttpHandler
 {
     private $httpHandler;
     private $parser;

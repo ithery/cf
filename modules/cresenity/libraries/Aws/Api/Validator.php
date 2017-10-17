@@ -1,12 +1,9 @@
 <?php
-namespace Aws\Api;
-
-use Aws;
 
 /**
  * Validates a schema against a hash of input.
  */
-class Validator
+class Aws_Api_Validator
 {
     private $path = [];
     private $errors = [];

@@ -1,23 +1,10 @@
 <?php
-namespace Aws\Api\Serializer;
-
-use Aws\Api\MapShape;
-use Aws\Api\Service;
-use Aws\Api\Operation;
-use Aws\Api\Shape;
-use Aws\Api\StructureShape;
-use Aws\Api\TimestampShape;
-use Aws\CommandInterface;
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Psr7\UriResolver;
-use Psr\Http\Message\RequestInterface;
-
+require_once(dirname(__FILE__) . DS . '../../../GuzzleHttp/Psr7/functions.php');
 /**
  * Serializes HTTP locations like header, uri, payload, etc...
  * @internal
  */
-abstract class RestSerializer
+abstract class Aws_Api_Serializer_RestSerializer
 {
     /** @var Service */
     private $api;
@@ -29,10 +16,10 @@ abstract class RestSerializer
      * @param Service $api      Service API description
      * @param string  $endpoint Endpoint to connect to
      */
-    public function __construct(Service $api, $endpoint)
+    public function __construct(Aws_Api_Service $api, $endpoint)
     {
         $this->api = $api;
-        $this->endpoint = Psr7\uri_for($endpoint);
+        $this->endpoint = guzzlehttp_psr7_uri_for($endpoint);
     }
 
     /**
@@ -40,7 +27,7 @@ abstract class RestSerializer
      *
      * @return RequestInterface
      */
-    public function __invoke(CommandInterface $command)
+    public function __invoke(Aws_CommandInterface $command)
     {
         $operation = $this->api->getOperation($command->getName());
         $args = $command->toArray();
@@ -63,12 +50,12 @@ abstract class RestSerializer
      * @param array            $opts    Request options to modify.
      */
     abstract protected function payload(
-        StructureShape $member,
+        Aws_Api_StructureShape $member,
         array $value,
         array &$opts
     );
 
-    private function serialize(Operation $operation, array $args)
+    private function serialize(Aws_Api_Operation $operation, array $args)
     {
         $opts = [];
         $input = $operation->getInput();
@@ -121,7 +108,7 @@ abstract class RestSerializer
         $this->payload($m, $args[$name], $opts);
     }
 
-    private function applyHeader($name, Shape $member, $value, array &$opts)
+    private function applyHeader($name, Aws_Api_Shape $member, $value, array &$opts)
     {
         if ($member->getType() == 'timestamp') {
             $value = TimestampShape::format($value, 'rfc822');
@@ -142,7 +129,7 @@ abstract class RestSerializer
     /**
      * Note: This is currently only present in the Amazon S3 model.
      */
-    private function applyHeaderMap($name, Shape $member, array $value, array &$opts)
+    private function applyHeaderMap($name, Aws_Api_Shape $member, array $value, array &$opts)
     {
         $prefix = $member['locationName'];
         foreach ($value as $k => $v) {
@@ -150,9 +137,9 @@ abstract class RestSerializer
         }
     }
 
-    private function applyQuery($name, Shape $member, $value, array &$opts)
+    private function applyQuery($name, Aws_Api_Shape $member, $value, array &$opts)
     {
-        if ($member instanceof MapShape) {
+        if ($member instanceof Aws_Api_MapShape) {
             $opts['query'] = isset($opts['query']) && is_array($opts['query'])
                 ? $opts['query'] + $value
                 : $value;
@@ -165,7 +152,7 @@ abstract class RestSerializer
         }
     }
 
-    private function buildEndpoint(Operation $operation, array $args, array $opts)
+    private function buildEndpoint(Aws_Api_Operation $operation, array $args, array $opts)
     {
         $varspecs = [];
 

@@ -1,5 +1,4 @@
 <?php
-namespace Aws;
 
 /**
  * Builds AWS clients based on configuration settings.
@@ -213,7 +212,7 @@ namespace Aws;
  * @method \Aws\XRay\XRayClient createXRay(array $args = [])
  * @method \Aws\MultiRegionClient createMultiRegionXRay(array $args = [])
  */
-class Sdk
+class Aws_Sdk
 {
     const VERSION = '3.36.27';
 

@@ -55,7 +55,7 @@ class GuzzleHttp_Client implements GuzzleHttp_ClientInterface {
      */
     public function __construct(array $config = []) {
         if (!isset($config['handler'])) {
-            $config['handler'] = HandlerStack::create();
+            $config['handler'] = GuzzleHttp_HandlerStack::create();
         } elseif (!is_callable($config['handler'])) {
             throw new InvalidArgumentException('handler must be a callable');
         }

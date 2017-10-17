@@ -1,9 +1,4 @@
 <?php
-namespace Aws\S3;
-
-use Aws\CommandInterface;
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Apply required or optional MD5s to requests before sending.
@@ -12,7 +7,7 @@ use Psr\Http\Message\RequestInterface;
  *
  * @internal
  */
-class ApplyChecksumMiddleware
+class Aws_S3_ApplyChecksumMiddleware
 {
     private static $md5 = [
         'DeleteObjects',

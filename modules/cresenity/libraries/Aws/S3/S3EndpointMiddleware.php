@@ -1,9 +1,4 @@
 <?php
-namespace Aws\S3;
-
-use Aws\CommandInterface;
-use Aws\S3\Exception\S3Exception;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Used to update the URL used for S3 requests to support:
@@ -15,7 +10,7 @@ use Psr\Http\Message\RequestInterface;
  *
  * @internal
  */
-class S3EndpointMiddleware
+class Aws_S3_S3EndpointMiddleware
 {
     private static $exclusions = [
         'CreateBucket' => true,

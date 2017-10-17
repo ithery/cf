@@ -1,18 +1,13 @@
 <?php
-namespace Aws;
 
-use Aws\Api\ApiProvider;
-use Aws\Api\DocModel;
-use Aws\Api\Service;
-use Aws\Signature\SignatureProvider;
-use GuzzleHttp\Psr7\Uri;
+require_once dirname(__FILE__) . DS . 'functions' . EXT;
 
 /**
  * Default AWS client implementation
  */
-class AwsClient implements AwsClientInterface
-{
-    use AwsClientTrait;
+class Aws_AwsClient implements Aws_AwsClientInterface {
+
+    use Aws_AwsClientTrait;
 
     /** @var array */
     private $config;
@@ -35,7 +30,7 @@ class AwsClient implements AwsClientInterface
     /** @var HandlerList */
     private $handlerList;
 
-    /** @var array*/
+    /** @var array */
     private $defaultRequestOptions;
 
     /**
@@ -43,9 +38,8 @@ class AwsClient implements AwsClientInterface
      *
      * @return array
      */
-    public static function getArguments()
-    {
-        return ClientResolver::getDefaultArguments();
+    public static function getArguments() {
+        return Aws_ClientResolver::getDefaultArguments();
     }
 
     /**
@@ -143,22 +137,22 @@ class AwsClient implements AwsClientInterface
      * @throws \InvalidArgumentException if any required options are missing or
      *                                   the service is not supported.
      */
-    public function __construct(array $args)
-    {
+    public function __construct(array $args) {
         list($service, $exceptionClass) = $this->parseClass();
         if (!isset($args['service'])) {
-            $args['service'] = manifest($service)['endpoint'];
+
+            $args['service'] = aws_manifest($service)['endpoint'];
         }
         if (!isset($args['exception_class'])) {
             $args['exception_class'] = $exceptionClass;
         }
 
-        $this->handlerList = new HandlerList();
-        $resolver = new ClientResolver(static::getArguments());
+        $this->handlerList = new Aws_HandlerList();
+        $resolver = new Aws_ClientResolver(static::getArguments());
         $config = $resolver->resolve($args, $this->handlerList);
         $this->api = $config['api'];
         $this->signatureProvider = $config['signature_provider'];
-        $this->endpoint = new Uri($config['endpoint']);
+        $this->endpoint = new GuzzleHttp_Psr7_Uri($config['endpoint']);
         $this->credentialProvider = $config['credentials'];
         $this->region = isset($config['region']) ? $config['region'] : null;
         $this->config = $config['config'];
@@ -171,43 +165,32 @@ class AwsClient implements AwsClientInterface
         }
     }
 
-    public function getHandlerList()
-    {
+    public function getHandlerList() {
         return $this->handlerList;
     }
 
-    public function getConfig($option = null)
-    {
-        return $option === null
-            ? $this->config
-            : (isset($this->config[$option])
-                ? $this->config[$option]
-                : null);
+    public function getConfig($option = null) {
+        return $option === null ? $this->config : (isset($this->config[$option]) ? $this->config[$option] : null);
     }
 
-    public function getCredentials()
-    {
+    public function getCredentials() {
         $fn = $this->credentialProvider;
         return $fn();
     }
 
-    public function getEndpoint()
-    {
+    public function getEndpoint() {
         return $this->endpoint;
     }
 
-    public function getRegion()
-    {
+    public function getRegion() {
         return $this->region;
     }
 
-    public function getApi()
-    {
+    public function getApi() {
         return $this->api;
     }
 
-    public function getCommand($name, array $args = [])
-    {
+    public function getCommand($name, array $args = []) {
         // Fail fast if the command cannot be found in the description.
         if (!isset($this->getApi()['operations'][$name])) {
             $name = ucfirst($name);
@@ -225,10 +208,9 @@ class AwsClient implements AwsClientInterface
         return new Command($name, $args, clone $this->getHandlerList());
     }
 
-    public function __sleep()
-    {
+    public function __sleep() {
         throw new \RuntimeException('Instances of ' . static::class
-            . ' cannot be serialized');
+        . ' cannot be serialized');
     }
 
     /**
@@ -236,8 +218,7 @@ class AwsClient implements AwsClientInterface
      *
      * @return callable
      */
-    final protected function getSignatureProvider()
-    {
+    final protected function getSignatureProvider() {
         return $this->signatureProvider;
     }
 
@@ -247,24 +228,23 @@ class AwsClient implements AwsClientInterface
      *
      * @return array
      */
-    private function parseClass()
-    {
+    private function parseClass() {
         $klass = get_class($this);
 
         if ($klass === __CLASS__) {
-            return ['', 'Aws\Exception\AwsException'];
+            return ['', 'Aws_Exception_AwsException'];
         }
 
-        $service = substr($klass, strrpos($klass, '\\') + 1, -6);
+        $service = substr($klass, strrpos($klass, '_') + 1, -6);
+
 
         return [
             strtolower($service),
-            "Aws\\{$service}\\Exception\\{$service}Exception"
+            "Aws_{$service}_Exception_{$service}Exception"
         ];
     }
 
-    private function addSignatureMiddleware()
-    {
+    private function addSignatureMiddleware() {
         $api = $this->getApi();
         $provider = $this->signatureProvider;
         $version = $this->config['signature_version'];
@@ -272,10 +252,10 @@ class AwsClient implements AwsClientInterface
         $region = $this->config['signing_region'];
 
         $resolver = static function (
-            CommandInterface $c
-        ) use ($api, $provider, $name, $region, $version) {
+                CommandInterface $c
+                ) use ($api, $provider, $name, $region, $version) {
             $authType = $api->getOperation($c->getName())['authtype'];
-            switch ($authType){
+            switch ($authType) {
                 case 'none':
                     $version = 'anonymous';
                     break;
@@ -286,15 +266,13 @@ class AwsClient implements AwsClientInterface
             return SignatureProvider::resolve($provider, $version, $name, $region);
         };
         $this->handlerList->appendSign(
-            Middleware::signer($this->credentialProvider, $resolver),
-            'signer'
+                Aws_Middleware::signer($this->credentialProvider, $resolver), 'signer'
         );
     }
 
-    private function addInvocationId()
-    {
+    private function addInvocationId() {
         // Add invocation id to each request
-        $this->handlerList->prependSign(Middleware::invocationId(), 'invocation-id');
+        $this->handlerList->prependSign(Aws_Middleware::invocationId(), 'invocation-id');
     }
 
     /**
@@ -309,8 +287,7 @@ class AwsClient implements AwsClientInterface
      * @internal This should only used to document the service API.
      * @codeCoverageIgnore
      */
-    public static function applyDocFilters(array $api, array $docs)
-    {
+    public static function applyDocFilters(array $api, array $docs) {
         return [
             new Service($api, ApiProvider::defaultProvider()),
             new DocModel($docs)
@@ -321,8 +298,8 @@ class AwsClient implements AwsClientInterface
      * @deprecated
      * @return static
      */
-    public static function factory(array $config = [])
-    {
+    public static function factory(array $config = []) {
         return new static($config);
     }
+
 }

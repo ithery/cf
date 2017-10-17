@@ -1,7 +1,6 @@
 <?php
-namespace Aws\Endpoint;
 
-class PartitionEndpointProvider
+class Aws_Endpoint_PartitionEndpointProvider
 {
     /** @var Partition[] */
     private $partitions;
@@ -11,7 +10,7 @@ class PartitionEndpointProvider
     public function __construct(array $partitions, $defaultPartition = 'aws')
     {
         $this->partitions = array_map(function (array $definition) {
-            return new Partition($definition);
+            return new Aws_Endpoint_Partition($definition);
         }, array_values($partitions));
         $this->defaultPartition = $defaultPartition;
     }
@@ -70,7 +69,7 @@ class PartitionEndpointProvider
      */
     public static function defaultProvider()
     {
-        $data = \Aws\load_compiled_json(__DIR__ . '/../data/endpoints.json');
+        $data = aws_load_compiled_json(__DIR__ . '/../data/endpoints.json');
 
         return new self($data['partitions']);
     }

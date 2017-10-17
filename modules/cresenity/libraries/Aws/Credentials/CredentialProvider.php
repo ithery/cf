@@ -1,10 +1,5 @@
 <?php
-namespace Aws\Credentials;
-
-use Aws;
-use Aws\CacheInterface;
-use Aws\Exception\CredentialsException;
-use GuzzleHttp\Promise;
+require_once(dirname(__FILE__) . DS . '../../GuzzleHttp/Promise/functions.php');
 
 /**
  * Credential providers are functions that accept no arguments and return a
@@ -40,7 +35,7 @@ use GuzzleHttp\Promise;
  * $creds = $promise->wait();
  * </code>
  */
-class CredentialProvider
+class Aws_Credentials_CredentialProvider
 {
     const ENV_KEY = 'AWS_ACCESS_KEY_ID';
     const ENV_SECRET = 'AWS_SECRET_ACCESS_KEY';
@@ -83,9 +78,9 @@ class CredentialProvider
      *
      * @return callable
      */
-    public static function fromCredentials(CredentialsInterface $creds)
+    public static function fromCredentials(Aws_Credentials_CredentialsInterface $creds)
     {
-        $promise = Promise\promise_for($creds);
+        $promise = guzzlehttp_promise_promise_for($creds);
 
         return function () use ($promise) {
             return $promise;

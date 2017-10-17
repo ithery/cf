@@ -1,13 +1,9 @@
 <?php
-namespace Aws\Api\Serializer;
-
-use Aws\Api\StructureShape;
-use Aws\Api\Service;
 
 /**
  * @internal
  */
-class RestXmlSerializer extends RestSerializer
+class Aws_Api_Serializer_RestXmlSerializer extends Aws_Api_Serializer_RestSerializer
 {
     /** @var XmlBody */
     private $xmlBody;
@@ -18,15 +14,15 @@ class RestXmlSerializer extends RestSerializer
      * @param XmlBody $xmlBody  Optional XML formatter to use
      */
     public function __construct(
-        Service $api,
+        Aws_Api_Service $api,
         $endpoint,
-        XmlBody $xmlBody = null
+        Aws_Api_Serializer_XmlBody $xmlBody = null
     ) {
         parent::__construct($api, $endpoint);
-        $this->xmlBody = $xmlBody ?: new XmlBody($api);
+        $this->xmlBody = $xmlBody ?: new Aws_Api_Serializer_XmlBody($api);
     }
 
-    protected function payload(StructureShape $member, array $value, array &$opts)
+    protected function payload(Aws_Api_StructureShape $member, array $value, array &$opts)
     {
         $opts['headers']['Content-Type'] = 'application/xml';
         $opts['body'] = (string) $this->xmlBody->build($member, $value);

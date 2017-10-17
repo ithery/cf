@@ -1,17 +1,6 @@
 <?php
-namespace Aws;
 
-use Aws\Api\Service;
-use Aws\Api\Validator;
-use Aws\Credentials\CredentialsInterface;
-use Aws\Exception\AwsException;
-use GuzzleHttp\Promise;
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\LazyOpenStream;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-
-final class Middleware
+final class Aws_Middleware
 {
     /**
      * Middleware used to allow a command parameter (e.g., "SourceFile") to
@@ -24,7 +13,7 @@ final class Middleware
      * @return callable
      */
     public static function sourceFile(
-        Service $api,
+        Aws_Api_Service $api,
         $bodyParameter = 'Body',
         $sourceParameter = 'SourceFile'
     ) {
@@ -64,7 +53,7 @@ final class Middleware
      *
      * @return callable
      */
-    public static function validation(Service $api, Validator $validator = null)
+    public static function validation(Aws_Api_Service $api, Aws_Api_Validator $validator = null)
     {
         $validator = $validator ?: new Validator();
         return function (callable $handler) use ($api, $validator) {

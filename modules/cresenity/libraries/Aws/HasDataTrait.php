@@ -1,11 +1,10 @@
 <?php
-namespace Aws;
 
 /**
  * Trait implementing ToArrayInterface, \ArrayAccess, \Countable, and
  * \IteratorAggregate
  */
-trait HasDataTrait
+trait Aws_HasDataTrait
 {
     /** @var array */
     private $data = [];

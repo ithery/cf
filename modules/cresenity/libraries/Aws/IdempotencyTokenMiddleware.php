@@ -1,13 +1,9 @@
 <?php
-namespace Aws;
-
-use Aws\Api\Service;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * @internal Middleware that auto fills parameters with `idempotencyToken` trait
  */
-class IdempotencyTokenMiddleware
+class Aws_IdempotencyTokenMiddleware
 {
     /** @var Service */
     private $service;
@@ -36,7 +32,7 @@ class IdempotencyTokenMiddleware
      * @return callable
      */
     public static function wrap(
-        Service $service,
+        Aws_Api_Service $service,
         callable $bytesGenerator = null
     ) {
         return function (callable $handler) use ($service, $bytesGenerator) {

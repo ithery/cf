@@ -1,16 +1,11 @@
 <?php
-namespace Aws\S3;
-
-use Aws\CommandInterface;
-use Aws\ResultInterface;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Injects ObjectURL into the result of the PutObject operation.
  *
  * @internal
  */
-class PutObjectUrlMiddleware
+class Aws_S3_PutObjectUrlMiddleware
 {
     /** @var callable  */
     private $nextHandler;

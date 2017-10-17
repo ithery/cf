@@ -1,11 +1,10 @@
 <?php
-namespace Aws\Credentials;
 
 /**
  * Basic implementation of the AWS Credentials interface that allows callers to
  * pass in the AWS Access Key and AWS Secret Access Key in the constructor.
  */
-class Credentials implements CredentialsInterface, \Serializable
+class Aws_Credentials_Credentials implements Aws_Credentials_CredentialsInterface, \Serializable
 {
     private $key;
     private $secret;

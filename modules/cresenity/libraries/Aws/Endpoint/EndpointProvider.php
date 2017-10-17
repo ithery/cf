@@ -1,7 +1,4 @@
 <?php
-namespace Aws\Endpoint;
-
-use Aws\Exception\UnresolvedEndpointException;
 
 /**
  * Endpoint providers.
@@ -44,7 +41,7 @@ use Aws\Exception\UnresolvedEndpointException;
  *     $config['region'] = 'us-west-2';
  *     $res = $c($config); // $b handles this.
  */
-class EndpointProvider
+class Aws_Endpoint_EndpointProvider
 {
     /**
      * Resolves and endpoint provider and ensures a non-null return value.

@@ -1,14 +1,10 @@
 <?php
-namespace Aws\S3;
-
-use Aws\CommandInterface;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Simplifies the SSE-C process by encoding and hashing the key.
  * @internal
  */
-class SSECMiddleware
+class Aws_S3_SSECMiddleware
 {
     private $endpointScheme;
     private $nextHandler;

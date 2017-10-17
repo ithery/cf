@@ -1,20 +1,9 @@
 <?php
-namespace Aws\Handler\GuzzleV6;
-
-use Aws\Sdk;
-use Exception;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\TransferStats;
-use Psr\Http\Message\RequestInterface as Psr7Request;
 
 /**
  * A request handler that sends PSR-7-compatible requests with Guzzle 6.
  */
-class GuzzleHandler
+class Aws_Handler_GuzzleV6_GuzzleHandler
 {
     /** @var ClientInterface */
     private $client;
@@ -22,9 +11,9 @@ class GuzzleHandler
     /**
      * @param ClientInterface $client
      */
-    public function __construct(ClientInterface $client = null)
+    public function __construct(GuzzleHttp_ClientInterface $client = null)
     {
-        $this->client = $client ?: new Client();
+        $this->client = $client ?: new GuzzleHttp_Client();
     }
 
     /**

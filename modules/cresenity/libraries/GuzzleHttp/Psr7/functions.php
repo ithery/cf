@@ -46,7 +46,7 @@ function guzzlehttp_psr7_uri_for($uri) {
     if ($uri instanceof Psr_Http_Message_UriInterface) {
         return $uri;
     } elseif (is_string($uri)) {
-        return new Uri($uri);
+        return new GuzzleHttp_Psr7_Uri($uri);
     }
 
     throw new InvalidArgumentException('URI must be a string or UriInterface');

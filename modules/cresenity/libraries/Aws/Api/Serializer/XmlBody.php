@@ -1,18 +1,9 @@
 <?php
-namespace Aws\Api\Serializer;
-
-use Aws\Api\MapShape;
-use Aws\Api\Service;
-use Aws\Api\Shape;
-use Aws\Api\StructureShape;
-use Aws\Api\ListShape;
-use Aws\Api\TimestampShape;
-use XMLWriter;
 
 /**
  * @internal Formats the XML body of a REST-XML services.
  */
-class XmlBody
+class Aws_Api_Serializer_XmlBody
 {
     /** @var \Aws\Api\Service */
     private $api;
@@ -20,7 +11,7 @@ class XmlBody
     /**
      * @param Service $api API being used to create the XML body.
      */
-    public function __construct(Service $api)
+    public function __construct(Aws_Api_Service $api)
     {
         $this->api = $api;
     }
@@ -33,7 +24,7 @@ class XmlBody
      *
      * @return string
      */
-    public function build(Shape $shape, array $args)
+    public function build(Aws_Api_Shape $shape, array $args)
     {
         $xml = new XMLWriter();
         $xml->openMemory();
