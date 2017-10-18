@@ -263,7 +263,7 @@ interface League_Flysystem_FilesystemInterface
      *
      * @return Handler Either a file or directory handler.
      */
-    public function get($path, Handler $handler = null);
+    public function get($path, League_Flysystem_Handler $handler = null);
 
     /**
      * Register a plugin.
@@ -272,5 +272,5 @@ interface League_Flysystem_FilesystemInterface
      *
      * @return $this
      */
-    public function addPlugin(PluginInterface $plugin);
+    public function addPlugin(League_Flysystem_PluginInterface $plugin);
 }

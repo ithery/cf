@@ -1,11 +1,4 @@
 <?php
-namespace Aws\S3;
-
-use Aws\AwsClientInterface;
-use Aws\S3\Exception\DeleteMultipleObjectsException;
-use GuzzleHttp\Promise;
-use GuzzleHttp\Promise\PromisorInterface;
-use GuzzleHttp\Promise\PromiseInterface;
 
 /**
  * Efficiently deletes many objects from a single Amazon S3 bucket using an
@@ -34,7 +27,7 @@ use GuzzleHttp\Promise\PromiseInterface;
  *
  * @link http://docs.aws.amazon.com/AmazonS3/latest/API/multiobjectdeleteapi.html
  */
-class BatchDelete implements PromisorInterface
+class Aws_S3_BatchDelete implements GuzzleHttp_Promise_PromisorInterface
 {
     private $bucket;
     /** @var AwsClientInterface */
@@ -60,13 +53,13 @@ class BatchDelete implements PromisorInterface
      * @return BatchDelete
      */
     public static function fromListObjects(
-        AwsClientInterface $client,
+        Aws_AwsClientInterface $client,
         array $listObjectsParams,
         array $options = []
     ) {
         $iter = $client->getPaginator('ListObjects', $listObjectsParams);
         $bucket = $listObjectsParams['Bucket'];
-        $fn = function (BatchDelete $that) use ($iter) {
+        $fn = function (Aws_S3_BatchDelete $that) use ($iter) {
             return $iter->each(function ($result) use ($that) {
                 $promises = [];
                 if (is_array($result['Contents'])) {
@@ -94,13 +87,13 @@ class BatchDelete implements PromisorInterface
      * @return BatchDelete
      */
     public static function fromIterator(
-        AwsClientInterface $client,
+        Aws_AwsClientInterface $client,
         $bucket,
         \Iterator $iter,
         array $options = []
     ) {
-        $fn = function (BatchDelete $that) use ($iter) {
-            return \GuzzleHttp\Promise\coroutine(function () use ($that, $iter) {
+        $fn = function (Aws_S3_BatchDelete $that) use ($iter) {
+            return guzzlehttp_promise_coroutine(function () use ($that, $iter) {
                 foreach ($iter as $obj) {
                     if ($promise = $that->enqueue($obj)) {
                         yield $promise;
@@ -140,7 +133,7 @@ class BatchDelete implements PromisorInterface
      * @throws \InvalidArgumentException if the provided batch_size is <= 0
      */
     private function __construct(
-        AwsClientInterface $client,
+        Aws_AwsClientInterface $client,
         $bucket,
         callable $promiseFn,
         array $options = []
@@ -197,7 +190,7 @@ class BatchDelete implements PromisorInterface
         return $this->client->executeAsync($command)
             ->then(function ($result) {
                 if (!empty($result['Errors'])) {
-                    throw new DeleteMultipleObjectsException(
+                    throw new Aws_S3_Exception_DeleteMultipleObjectsException(
                         $result['Deleted'] ?: [],
                         $result['Errors']
                     );
@@ -225,12 +218,12 @@ class BatchDelete implements PromisorInterface
         // When done, ensure cleanup and that any remaining are processed.
         return $promise->then(
             function () use ($cleanup)  {
-                return Promise\promise_for($this->flushQueue())
+                return guzzlehttp_promise_promise_for($this->flushQueue())
                     ->then($cleanup);
             },
             function ($reason) use ($cleanup)  {
                 $cleanup();
-                return Promise\rejection_for($reason);
+                return guzzlehttp_promise_rejection_for($reason);
             }
         );
     }

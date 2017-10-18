@@ -35,7 +35,7 @@ class Aws_Api_Serializer_XmlBody
         return $xml->outputMemory();
     }
 
-    private function startElement(Shape $shape, $name, XMLWriter $xml)
+    private function startElement(Aws_Api_Shape $shape, $name, XMLWriter $xml)
     {
         $xml->startElement($name);
 
@@ -47,7 +47,7 @@ class Aws_Api_Serializer_XmlBody
         }
     }
 
-    private function format(Shape $shape, $name, $value, XMLWriter $xml)
+    private function format(Aws_Api_Shape $shape, $name, $value, XMLWriter $xml)
     {
         // Any method mentioned here has a custom serialization handler.
         static $methods = [
@@ -68,7 +68,7 @@ class Aws_Api_Serializer_XmlBody
         }
     }
 
-    private function defaultShape(Shape $shape, $name, $value, XMLWriter $xml)
+    private function defaultShape(Aws_Api_Shape $shape, $name, $value, XMLWriter $xml)
     {
         $this->startElement($shape, $name, $xml);
         $xml->writeRaw($value);
@@ -76,7 +76,7 @@ class Aws_Api_Serializer_XmlBody
     }
 
     private function add_structure(
-        StructureShape $shape,
+        Aws_Api_StructureShape $shape,
         $name,
         array $value,
         \XMLWriter $xml
@@ -95,7 +95,7 @@ class Aws_Api_Serializer_XmlBody
         $xml->endElement();
     }
 
-    private function getStructureMembers(StructureShape $shape, array $value)
+    private function getStructureMembers(Aws_Api_StructureShape $shape, array $value)
     {
         $members = [];
 
@@ -119,7 +119,7 @@ class Aws_Api_Serializer_XmlBody
     }
 
     private function add_list(
-        ListShape $shape,
+        Aws_Api_ListShape $shape,
         $name,
         array $value,
         XMLWriter $xml
@@ -143,7 +143,7 @@ class Aws_Api_Serializer_XmlBody
     }
 
     private function add_map(
-        MapShape $shape,
+        Aws_Api_MapShape $shape,
         $name,
         array $value,
         XMLWriter $xml
@@ -164,7 +164,7 @@ class Aws_Api_Serializer_XmlBody
         $xml->endElement();
     }
 
-    private function add_blob(Shape $shape, $name, $value, XMLWriter $xml)
+    private function add_blob(Aws_Api_Shape $shape, $name, $value, XMLWriter $xml)
     {
         $this->startElement($shape, $name, $xml);
         $xml->writeRaw(base64_encode($value));
@@ -172,7 +172,7 @@ class Aws_Api_Serializer_XmlBody
     }
 
     private function add_timestamp(
-        TimestampShape $shape,
+        Aws_Api_TimestampShape $shape,
         $name,
         $value,
         XMLWriter $xml
@@ -183,7 +183,7 @@ class Aws_Api_Serializer_XmlBody
     }
 
     private function add_boolean(
-        Shape $shape,
+        Aws_Api_Shape $shape,
         $name,
         $value,
         XMLWriter $xml
@@ -194,7 +194,7 @@ class Aws_Api_Serializer_XmlBody
     }
 
     private function add_string(
-        Shape $shape,
+        Aws_Api_Shape $shape,
         $name,
         $value,
         XMLWriter $xml

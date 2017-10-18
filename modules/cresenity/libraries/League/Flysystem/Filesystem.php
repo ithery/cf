@@ -362,7 +362,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
 
         if ( ! $handler) {
             $metadata = $this->getMetadata($path);
-            $handler = $metadata['type'] === 'file' ? new File($this, $path) : new League_Flysystem_Directory($this, $path);
+            $handler = $metadata['type'] === 'file' ? new League_Flysystem_File($this, $path) : new League_Flysystem_Directory($this, $path);
         }
 
         $handler->setPath($path);

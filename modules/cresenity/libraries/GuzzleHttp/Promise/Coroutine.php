@@ -1,9 +1,4 @@
 <?php
-namespace GuzzleHttp\Promise;
-
-use Exception;
-use Generator;
-use Throwable;
 
 /**
  * Creates a promise that is resolved using a generator that yields values or
@@ -40,7 +35,7 @@ use Throwable;
  * @return Promise
  * @link https://github.com/petkaantonov/bluebird/blob/master/API.md#generators inspiration
  */
-final class Coroutine implements PromiseInterface
+final class GuzzleHttp_Promise_Coroutine implements GuzzleHttp_Promise_PromiseInterface
 {
     /**
      * @var PromiseInterface|null
@@ -60,7 +55,7 @@ final class Coroutine implements PromiseInterface
     public function __construct(callable $generatorFn)
     {
         $this->generator = $generatorFn();
-        $this->result = new Promise(function () {
+        $this->result = new GuzzleHttp_Promise_Promise(function () {
             while (isset($this->currentPromise)) {
                 $this->currentPromise->wait();
             }
@@ -108,7 +103,7 @@ final class Coroutine implements PromiseInterface
 
     private function nextCoroutine($yielded)
     {
-        $this->currentPromise = promise_for($yielded)
+        $this->currentPromise = guzzlehttp_promise_promise_for($yielded)
             ->then([$this, '_handleSuccess'], [$this, '_handleFailure']);
     }
 

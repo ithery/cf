@@ -1,8 +1,8 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-class File extends Handler
+class League_Flysystem_File extends League_Flysystem_Handler
 {
     /**
      * Check whether the file exists.

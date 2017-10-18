@@ -1,11 +1,10 @@
 <?php
-namespace Aws\S3\Exception;
 
 /**
  * Exception thrown when errors occur while deleting objects using a
  * {@see S3\BatchDelete} object.
  */
-class DeleteMultipleObjectsException extends \Exception
+class Aws_S3_Exception_DeleteMultipleObjectsException extends \Exception
 {
     private $deleted = [];
     private $errors = [];

@@ -59,7 +59,7 @@ function aws_map($iterable, callable $f) {
  * @return \Generator
  */
 function aws_flatmap($iterable, callable $f) {
-    foreach (map($iterable, $f) as $outer) {
+    foreach (aws_map($iterable, $f) as $outer) {
         foreach ($outer as $inner) {
             yield $inner;
         }

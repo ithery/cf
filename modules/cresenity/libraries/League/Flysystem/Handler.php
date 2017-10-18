@@ -22,7 +22,7 @@ abstract class League_Flysystem_Handler
      * @param FilesystemInterface $filesystem
      * @param string              $path
      */
-    public function __construct(FilesystemInterface $filesystem = null, $path = null)
+    public function __construct(League_Flysystem_FilesystemInterface $filesystem = null, $path = null)
     {
         $this->path = $path;
         $this->filesystem = $filesystem;
@@ -67,7 +67,7 @@ abstract class League_Flysystem_Handler
      *
      * @return $this
      */
-    public function setFilesystem(FilesystemInterface $filesystem)
+    public function setFilesystem(League_Flysystem_FilesystemInterface $filesystem)
     {
         $this->filesystem = $filesystem;
 

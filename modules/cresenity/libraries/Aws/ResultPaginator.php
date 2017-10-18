@@ -90,7 +90,7 @@ class Aws_ResultPaginator implements \Iterator
     public function search($expression)
     {
         // Apply JMESPath expression on each result, but as a flat sequence.
-        return flatmap($this, function (Result $result) use ($expression) {
+        return aws_flatmap($this, function (Aws_Result $result) use ($expression) {
             return (array) $result->search($expression);
         });
     }

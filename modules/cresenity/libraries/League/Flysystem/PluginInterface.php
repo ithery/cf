@@ -1,8 +1,8 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-interface PluginInterface
+interface League_Flysystem_PluginInterface
 {
     /**
      * Get the method name.
@@ -16,5 +16,5 @@ interface PluginInterface
      *
      * @param FilesystemInterface $filesystem
      */
-    public function setFilesystem(FilesystemInterface $filesystem);
+    public function setFilesystem(League_Flysystem_FilesystemInterface $filesystem);
 }

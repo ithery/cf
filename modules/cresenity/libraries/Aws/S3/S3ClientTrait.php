@@ -85,7 +85,7 @@ trait Aws_S3_S3ClientTrait {
     $bucket, $prefix = '', $regex = '', array $options = []
     ) {
         if (!$prefix && !$regex) {
-            return new RejectedPromise(
+            return new GuzzleHttp_Promise_RejectedPromise(
                     new \RuntimeException('A prefix or regex is required.')
             );
         }
@@ -94,12 +94,12 @@ trait Aws_S3_S3ClientTrait {
         $iter = $this->getIterator('ListObjects', $params);
 
         if ($regex) {
-            $iter = \Aws\filter($iter, function ($c) use ($regex) {
+            $iter = aws_filter($iter, function ($c) use ($regex) {
                 return preg_match($regex, $c['Key']);
             });
         }
 
-        return BatchDelete::fromIterator($this, $bucket, $iter, $options)
+        return Aws_S3_BatchDelete::fromIterator($this, $bucket, $iter, $options)
                         ->promise();
     }
 

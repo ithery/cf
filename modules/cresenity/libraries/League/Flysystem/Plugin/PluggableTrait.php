@@ -23,7 +23,7 @@ trait League_Flysystem_Plugin_PluggableTrait
      *
      * @return $this
      */
-    public function addPlugin(PluginInterface $plugin)
+    public function addPlugin(League_Flysystem_PluginInterface $plugin)
     {
         if ( ! method_exists($plugin, 'handle')) {
             throw new LogicException(get_class($plugin) . ' does not have a handle method.');
@@ -86,7 +86,7 @@ trait League_Flysystem_Plugin_PluggableTrait
     {
         try {
             return $this->invokePlugin($method, $arguments, $this);
-        } catch (PluginNotFoundException $e) {
+        } catch (League_Flysystem_Plugin_PluginNotFoundException $e) {
             throw new BadMethodCallException(
                 'Call to undefined method '
                 . get_class($this)

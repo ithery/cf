@@ -406,7 +406,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($newpath),
                 'CopySource' => urlencode($this->bucket . '/' . $this->applyPathPrefix($path)),
-                'ACL' => $this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC
+                'ACL' => $this->getRawVisibility($path) === League_Flysystem_AdapterInterface::VISIBILITY_PUBLIC
                     ? 'public-read' : 'private',
             ] + $this->options
         );
@@ -545,7 +545,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
         );
 
         $result = $this->s3Client->execute($command);
-        $visibility = AdapterInterface::VISIBILITY_PRIVATE;
+        $visibility = League_Flysystem_AdapterInterface::VISIBILITY_PRIVATE;
 
         foreach ($result->get('Grants') as $grant) {
             if (
@@ -553,7 +553,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
                 && $grant['Grantee']['URI'] === self::PUBLIC_GRANT_URI
                 && $grant['Permission'] === 'READ'
             ) {
-                $visibility = AdapterInterface::VISIBILITY_PUBLIC;
+                $visibility = League_Flysystem_AdapterInterface::VISIBILITY_PUBLIC;
                 break;
             }
         }
