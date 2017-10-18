@@ -46,7 +46,7 @@ trait League_Flysystem_Plugin_PluggableTrait
     protected function findPlugin($method)
     {
         if ( ! isset($this->plugins[$method])) {
-            throw new PluginNotFoundException('Plugin not found for method: ' . $method);
+            throw new League_Flysystem_Plugin_PluginNotFoundException('Plugin not found for method: ' . $method);
         }
 
         return $this->plugins[$method];
@@ -63,7 +63,7 @@ trait League_Flysystem_Plugin_PluggableTrait
      *
      * @return mixed
      */
-    protected function invokePlugin($method, array $arguments, FilesystemInterface $filesystem)
+    protected function invokePlugin($method, array $arguments, League_Flysystem_FilesystemInterface $filesystem)
     {
         $plugin = $this->findPlugin($method);
         $plugin->setFilesystem($filesystem);

@@ -63,7 +63,7 @@ class Aws_WrappedHttpHandler
     public function __invoke(
         Aws_CommandInterface $command,
         Psr_Http_Message_RequestInterface $request
-    ) {
+    ) { 
         $fn = $this->httpHandler;
         $options = $command['@http'] ?: [];
         $stats = [];

@@ -1,13 +1,9 @@
 <?php
 
-namespace League\Flysystem\Util;
-
-use League\Flysystem\Util;
-
 /**
  * @internal
  */
-class ContentListingFormatter
+class League_Flysystem_Util_ContentListingFormatter
 {
     /**
      * @var string
@@ -97,7 +93,7 @@ class ContentListingFormatter
      */
     private function isDirectChild(array $entry)
     {
-        return Util::dirname($entry['path']) === $this->directory;
+        return League_Flysystem_Util::dirname($entry['path']) === $this->directory;
     }
 
     /**

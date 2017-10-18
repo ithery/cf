@@ -175,7 +175,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function read($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
 
         if ( ! ($object = $this->getAdapter()->read($path))) {
@@ -190,7 +190,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function readStream($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
 
         if ( ! $object = $this->getAdapter()->readStream($path)) {
@@ -205,8 +205,8 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function rename($path, $newpath)
     {
-        $path = Util::normalizePath($path);
-        $newpath = Util::normalizePath($newpath);
+        $path = League_Flysystem_Util::normalizePath($path);
+        $newpath = League_Flysystem_Util::normalizePath($newpath);
         $this->assertPresent($path);
         $this->assertAbsent($newpath);
 
@@ -218,8 +218,8 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function copy($path, $newpath)
     {
-        $path = Util::normalizePath($path);
-        $newpath = Util::normalizePath($newpath);
+        $path = League_Flysystem_Util::normalizePath($path);
+        $newpath = League_Flysystem_Util::normalizePath($newpath);
         $this->assertPresent($path);
         $this->assertAbsent($newpath);
 
@@ -231,7 +231,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function delete($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
 
         return $this->getAdapter()->delete($path);
@@ -242,7 +242,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function deleteDir($dirname)
     {
-        $dirname = Util::normalizePath($dirname);
+        $dirname = League_Flysystem_Util::normalizePath($dirname);
 
         if ($dirname === '') {
             throw new RootViolationException('Root directories can not be deleted.');
@@ -256,7 +256,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function createDir($dirname, array $config = [])
     {
-        $dirname = Util::normalizePath($dirname);
+        $dirname = League_Flysystem_Util::normalizePath($dirname);
         $config = $this->prepareConfig($config);
 
         return (bool) $this->getAdapter()->createDir($dirname, $config);
@@ -270,7 +270,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
         $directory = League_Flysystem_Util::normalizePath($directory);
         $contents = $this->getAdapter()->listContents($directory, $recursive);
 
-        return (new ContentListingFormatter($directory, $recursive))->formatListing($contents);
+        return (new League_Flysystem_Util_ContentListingFormatter($directory, $recursive))->formatListing($contents);
     }
 
     /**
@@ -278,7 +278,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function getMimetype($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
 
         if (( ! $object = $this->getAdapter()->getMimetype($path)) || ! array_key_exists('mimetype', $object)) {
@@ -293,7 +293,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function getTimestamp($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
 
         if (( ! $object = $this->getAdapter()->getTimestamp($path)) || ! array_key_exists('timestamp', $object)) {
@@ -308,7 +308,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function getVisibility($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
 
         if (( ! $object = $this->getAdapter()->getVisibility($path)) || ! array_key_exists('visibility', $object)) {
@@ -323,7 +323,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function getSize($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
 
         if (( ! $object = $this->getAdapter()->getSize($path)) || ! array_key_exists('size', $object)) {
             return false;
@@ -337,7 +337,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function setVisibility($path, $visibility)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
 
         return (bool) $this->getAdapter()->setVisibility($path, $visibility);
     }

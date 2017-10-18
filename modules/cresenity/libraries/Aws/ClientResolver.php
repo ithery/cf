@@ -441,9 +441,9 @@ class Aws_ClientResolver {
         $list->prependBuild(Aws_Middleware::requestBuilder($value), 'builder');
     }
 
-    public static function _apply_debug($value, array &$args, HandlerList $list) {
+    public static function _apply_debug($value, array &$args, Aws_HandlerList $list) {
         if ($value !== false) {
-            $list->interpose(new TraceMiddleware($value === true ? [] : $value));
+            $list->interpose(new Aws_TraceMiddleware($value === true ? [] : $value));
         }
     }
 
@@ -612,7 +612,7 @@ class Aws_ClientResolver {
 
     public static function _missing_version(array $args) {
         $service = isset($args['service']) ? $args['service'] : '';
-        $versions = ApiProvider::defaultProvider()->getVersions($service);
+        $versions = Aws_Api_ApiProvider::defaultProvider()->getVersions($service);
         $versions = implode("\n", array_map(function ($v) {
                             return "* \"$v\"";
                         }, $versions)) ? : '* (none found)';

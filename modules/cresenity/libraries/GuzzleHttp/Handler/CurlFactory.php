@@ -413,7 +413,7 @@ class GuzzleHttp_Handler_CurlFactory implements GuzzleHttp_Handler_CurlFactoryIn
         }
 
         if (!empty($options['debug'])) {
-            $conf[CURLOPT_STDERR] = \GuzzleHttp\debug_resource($options['debug']);
+            $conf[CURLOPT_STDERR] = guzzlehttp_debug_resource($options['debug']);
             $conf[CURLOPT_VERBOSE] = true;
         }
     }

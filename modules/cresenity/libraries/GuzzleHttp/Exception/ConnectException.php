@@ -9,7 +9,7 @@ class GuzzleHttp_Exception_ConnectException extends GuzzleHttp_Exception_Request
 {
     public function __construct(
         $message,
-        RequestInterface $request,
+        Psr_Http_Message_RequestInterface $request,
         \Exception $previous = null,
         array $handlerContext = []
     ) {

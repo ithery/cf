@@ -1,16 +1,9 @@
 <?php
-namespace Aws;
-
-use Aws\Exception\AwsException;
-use GuzzleHttp\Promise\RejectedPromise;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Traces state changes between middlewares.
  */
-class TraceMiddleware
+class Aws_TraceMiddleware
 {
     private $prevOutput;
     private $prevInput;
@@ -75,8 +68,8 @@ class TraceMiddleware
 
         return function (callable $next) use ($step, $name) {
             return function (
-                CommandInterface $command,
-                RequestInterface $request = null
+                Aws_CommandInterface $command,
+                Psr_Http_Message_RequestInterface $request = null
             ) use ($next, $step, $name) {
                 $this->createHttpDebug($command);
                 $start = microtime(true);
@@ -106,7 +99,7 @@ class TraceMiddleware
                             'result' => null,
                             'error'  => $this->exceptionArray($reason)
                         ]);
-                        return new RejectedPromise($reason);
+                        return new GuzzleHttp_Promise_RejectedPromise($reason);
                     }
                 );
             };
@@ -146,7 +139,7 @@ class TraceMiddleware
         $this->write($str . "\n");
     }
 
-    private function commandArray(CommandInterface $cmd)
+    private function commandArray(Aws_CommandInterface $cmd)
     {
         return [
             'instance' => spl_object_hash($cmd),
@@ -155,7 +148,7 @@ class TraceMiddleware
         ];
     }
 
-    private function requestArray(RequestInterface $request = null)
+    private function requestArray(Psr_Http_Message_RequestInterface $request = null)
     {
         return !$request ? [] : array_filter([
             'instance' => spl_object_hash($request),
@@ -169,7 +162,7 @@ class TraceMiddleware
         ]);
     }
 
-    private function responseArray(ResponseInterface $response = null)
+    private function responseArray(Psr_Http_Message_ResponseInterface $response = null)
     {
         return !$response ? [] : [
             'instance'   => spl_object_hash($response),
@@ -181,7 +174,7 @@ class TraceMiddleware
 
     private function resultArray($value)
     {
-        return $value instanceof ResultInterface
+        return $value instanceof Aws_ResultInterface
             ? [
                 'instance' => spl_object_hash($value),
                 'data'     => $value->toArray()
@@ -203,7 +196,7 @@ class TraceMiddleware
             'trace'      => $e->getTraceAsString(),
         ];
 
-        if ($e instanceof AwsException) {
+        if ($e instanceof Aws_AwsException) {
             $result += [
                 'type'       => $e->getAwsErrorType(),
                 'code'       => $e->getAwsErrorCode(),
@@ -256,21 +249,21 @@ class TraceMiddleware
         return ob_get_clean();
     }
 
-    private function streamStr(StreamInterface $body)
+    private function streamStr(Psr_Http_Message_StreamInterface $body)
     {
         return $body->getSize() < $this->config['stream_size']
             ? (string) $body
             : 'stream(size=' . $body->getSize() . ')';
     }
 
-    private function createHttpDebug(CommandInterface $command)
+    private function createHttpDebug(Aws_CommandInterface $command)
     {
         if ($this->config['http'] && !isset($command['@http']['debug'])) {
             $command['@http']['debug'] = fopen('php://temp', 'w+');
         }
     }
 
-    private function flushHttpDebug(CommandInterface $command)
+    private function flushHttpDebug(Aws_CommandInterface $command)
     {
         if ($res = $command['@http']['debug']) {
             rewind($res);
