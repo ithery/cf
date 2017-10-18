@@ -1,10 +1,10 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-use Exception as BaseException;
+// use Exception as BaseException;
 
-class FileNotFoundException extends Exception
+class League_Flysystem_FileNotFoundException extends Exception
 {
     /**
      * @var string
@@ -18,7 +18,7 @@ class FileNotFoundException extends Exception
      * @param int        $code
      * @param \Exception $previous
      */
-    public function __construct($path, $code = 0, BaseException $previous = null)
+    public function __construct($path, $code = 0, Exception $previous = null)
     {
         $this->path = $path;
 

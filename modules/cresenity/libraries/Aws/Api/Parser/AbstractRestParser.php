@@ -50,15 +50,15 @@ abstract class Aws_Api_Parser_AbstractRestParser extends Aws_Api_Parser_Abstract
             $this->payload($response, $output, $result);
         }
 
-        return new Result($result);
+        return new Aws_Result($result);
     }
 
     private function extractPayload(
-    $payload, StructureShape $output, ResponseInterface $response, array &$result
+    $payload, Aws_Api_StructureShape $output, Psr_Http_Message_ResponseInterface $response, array &$result
     ) {
         $member = $output->getMember($payload);
 
-        if ($member instanceof StructureShape) {
+        if ($member instanceof Aws_Api_StructureShape) {
             // Structure members parse top-level data into a specific key.
             $result[$payload] = [];
             $this->payload($response, $member, $result[$payload]);
@@ -72,7 +72,7 @@ abstract class Aws_Api_Parser_AbstractRestParser extends Aws_Api_Parser_Abstract
      * Extract a single header from the response into the result.
      */
     private function extractHeader(
-    $name, Shape $shape, ResponseInterface $response, &$result
+    $name, Aws_Api_Shape $shape, Psr_Http_Message_ResponseInterface $response, &$result
     ) {
         $value = $response->getHeaderLine($shape['locationName'] ? : $name);
 
@@ -92,7 +92,7 @@ abstract class Aws_Api_Parser_AbstractRestParser extends Aws_Api_Parser_Abstract
                 break;
             case 'timestamp':
                 try {
-                    $value = new DateTimeResult($value);
+                    $value = new Aws_Api_DateTimeResult($value);
                     break;
                 } catch (\Exception $e) {
                     // If the value cannot be parsed, then do not add it to the
@@ -113,7 +113,7 @@ abstract class Aws_Api_Parser_AbstractRestParser extends Aws_Api_Parser_Abstract
      * Extract a map of headers with an optional prefix from the response.
      */
     private function extractHeaders(
-    $name, Shape $shape, ResponseInterface $response, &$result
+    $name, Aws_Api_Shape $shape, Psr_Http_Message_ResponseInterface $response, &$result
     ) {
         // Check if the headers are prefixed by a location name
         $result[$name] = [];
@@ -133,7 +133,7 @@ abstract class Aws_Api_Parser_AbstractRestParser extends Aws_Api_Parser_Abstract
      * Places the status code of the response into the result array.
      */
     private function extractStatus(
-    $name, ResponseInterface $response, array &$result
+    $name, Psr_Http_Message_ResponseInterface $response, array &$result
     ) {
         $result[$name] = (int) $response->getStatusCode();
     }

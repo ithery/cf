@@ -7,7 +7,7 @@ class Aws_Api_ListShape extends Aws_Api_Shape
 {
     private $member;
 
-    public function __construct(array $definition, ShapeMap $shapeMap)
+    public function __construct(array $definition, Aws_Api_ShapeMap $shapeMap)
     {
         $definition['type'] = 'list';
         parent::__construct($definition, $shapeMap);
@@ -23,7 +23,7 @@ class Aws_Api_ListShape extends Aws_Api_Shape
             if (!isset($this->definition['member'])) {
                 throw new \RuntimeException('No member attribute specified');
             }
-            $this->member = Shape::create(
+            $this->member = Aws_Api_Shape::create(
                 $this->definition['member'],
                 $this->shapeMap
             );

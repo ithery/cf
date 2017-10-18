@@ -273,7 +273,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
         $normalizer = [$this, 'normalizeResponse'];
         $normalized = array_map($normalizer, $listing);
 
-        return Util::emulateDirectories($normalized);
+        return League_Flysystem_Util::emulateDirectories($normalized);
     }
 
     /**
@@ -643,7 +643,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
                 isset($response['Key']) ? $response['Key'] : $response['Prefix']
             ),
         ];
-        $result = array_merge($result, Util::pathinfo($result['path']));
+        $result = array_merge($result, League_Flysystem_Util::pathinfo($result['path']));
 
         if (isset($response['LastModified'])) {
             $result['timestamp'] = strtotime($response['LastModified']);
@@ -656,7 +656,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
             return $result;
         }
 
-        return array_merge($result, Util::map($response, static::$resultMap), ['type' => 'file']);
+        return array_merge($result, League_Flysystem_Util::map($response, static::$resultMap), ['type' => 'file']);
     }
 
     /**

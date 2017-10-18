@@ -62,7 +62,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function write($path, $contents, array $config = [])
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertAbsent($path);
         $config = $this->prepareConfig($config);
 
@@ -78,11 +78,11 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
             throw new InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
         }
 
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertAbsent($path);
         $config = $this->prepareConfig($config);
 
-        Util::rewindStream($resource);
+        League_Flysystem_Util::rewindStream($resource);
 
         return (bool) $this->getAdapter()->writeStream($path, $resource, $config);
     }
@@ -95,7 +95,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
         $path = League_Flysystem_Util::normalizePath($path);
         $config = $this->prepareConfig($config);
 
-        if ( ! $this->adapter instanceof CanOverwriteFiles && $this->has($path)) {
+        if ( ! $this->adapter instanceof League_Flysystem_Adapter_CanOverwriteFiles && $this->has($path)) {
             return (bool) $this->getAdapter()->update($path, $contents, $config);
         }
 
@@ -111,11 +111,11 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
             throw new InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
         }
 
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $config = $this->prepareConfig($config);
-        Util::rewindStream($resource);
+        League_Flysystem_Util::rewindStream($resource);
 
-        if ( ! $this->adapter instanceof CanOverwriteFiles &&$this->has($path)) {
+        if ( ! $this->adapter instanceof League_Flysystem_Adapter_CanOverwriteFiles &&$this->has($path)) {
             return (bool) $this->getAdapter()->updateStream($path, $resource, $config);
         }
 
@@ -127,7 +127,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function readAndDelete($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
         $contents = $this->read($path);
 
@@ -145,7 +145,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function update($path, $contents, array $config = [])
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $config = $this->prepareConfig($config);
 
         $this->assertPresent($path);
@@ -162,10 +162,10 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
             throw new InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
         }
 
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $config = $this->prepareConfig($config);
         $this->assertPresent($path);
-        Util::rewindStream($resource);
+        League_Flysystem_Util::rewindStream($resource);
 
         return (bool) $this->getAdapter()->updateStream($path, $resource, $config);
     }
@@ -245,7 +245,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
         $dirname = League_Flysystem_Util::normalizePath($dirname);
 
         if ($dirname === '') {
-            throw new RootViolationException('Root directories can not be deleted.');
+            throw new League_Flysystem_RootViolationException('Root directories can not be deleted.');
         }
 
         return (bool) $this->getAdapter()->deleteDir($dirname);
@@ -347,7 +347,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
      */
     public function getMetadata($path)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
         $this->assertPresent($path);
 
         return $this->getAdapter()->getMetadata($path);
@@ -356,13 +356,13 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
     /**
      * @inheritdoc
      */
-    public function get($path, Handler $handler = null)
+    public function get($path, League_Flysystem_Handler $handler = null)
     {
-        $path = Util::normalizePath($path);
+        $path = League_Flysystem_Util::normalizePath($path);
 
         if ( ! $handler) {
             $metadata = $this->getMetadata($path);
-            $handler = $metadata['type'] === 'file' ? new File($this, $path) : new Directory($this, $path);
+            $handler = $metadata['type'] === 'file' ? new File($this, $path) : new League_Flysystem_Directory($this, $path);
         }
 
         $handler->setPath($path);
@@ -383,7 +383,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
     public function assertPresent($path)
     {
         if ($this->config->get('disable_asserts', false) === false && ! $this->has($path)) {
-            throw new FileNotFoundException($path);
+            throw new League_Flysystem_FileNotFoundException($path);
         }
     }
 
@@ -399,7 +399,7 @@ class League_Flysystem_Filesystem implements League_Flysystem_FilesystemInterfac
     public function assertAbsent($path)
     {
         if ($this->config->get('disable_asserts', false) === false && $this->has($path)) {
-            throw new FileExistsException($path);
+            throw new League_Flysystem_FileExistsException($path);
         }
     }
 }

@@ -88,7 +88,7 @@ abstract class Aws_Api_Serializer_RestSerializer
         return $opts;
     }
 
-    private function applyPayload(StructureShape $input, $name, array $args, array &$opts)
+    private function applyPayload(Aws_Api_StructureShape $input, $name, array $args, array &$opts)
     {
         if (!isset($args[$name])) {
             return;
@@ -101,7 +101,7 @@ abstract class Aws_Api_Serializer_RestSerializer
         ) {
             // Streaming bodies or payloads that are strings are
             // always just a stream of data.
-            $opts['body'] = Psr7\stream_for($args[$name]);
+            $opts['body'] = guzzlehttp_psr7_stream_for($args[$name]);
             return;
         }
 

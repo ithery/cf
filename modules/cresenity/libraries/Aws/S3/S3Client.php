@@ -402,7 +402,7 @@ class Aws_S3_S3Client extends Aws_AwsClient implements Aws_S3_S3ClientInterface 
                 }
 
                 return $handler($command, $request)
-                                ->then(function (ResultInterface $result) use ($autoSet) {
+                                ->then(function (Aws_ResultInterface $result) use ($autoSet) {
                                     if ($result['EncodingType'] === 'url' && $autoSet) {
                                         static $topLevel = [
                                             'Delimiter',

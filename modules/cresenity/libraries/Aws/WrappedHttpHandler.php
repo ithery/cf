@@ -81,7 +81,7 @@ class Aws_WrappedHttpHandler
         return guzzlehttp_promise_promise_for($fn($request, $options))
             ->then(
                 function (
-                    ResponseInterface $res
+                    Psr_Http_Message_ResponseInterface $res
                 ) use ($command, $request, &$stats) {
                     return $this->parseResponse($command, $request, $res, $stats);
                 },
@@ -108,9 +108,9 @@ class Aws_WrappedHttpHandler
      * @return ResultInterface
      */
     private function parseResponse(
-        CommandInterface $command,
-        RequestInterface $request,
-        ResponseInterface $response,
+        Aws_CommandInterface $command,
+        Psr_Http_Message_RequestInterface $request,
+        Psr_Http_Message_ResponseInterface $response,
         array $stats
     ) {
         $parser = $this->parser;

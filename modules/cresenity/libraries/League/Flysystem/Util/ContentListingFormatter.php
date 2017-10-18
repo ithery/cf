@@ -45,7 +45,7 @@ class League_Flysystem_Util_ContentListingFormatter
 
     private function addPathInfo(array $entry)
     {
-        return $entry + Util::pathinfo($entry['path']);
+        return $entry + League_Flysystem_Util::pathinfo($entry['path']);
     }
 
     /**

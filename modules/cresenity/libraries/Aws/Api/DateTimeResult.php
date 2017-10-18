@@ -1,11 +1,10 @@
 <?php
-namespace Aws\Api;
 
 /**
  * DateTime overrides that make DateTime work more seamlessly as a string,
  * with JSON documents, and with JMESPath.
  */
-class DateTimeResult extends \DateTime implements \JsonSerializable
+class Aws_Api_DateTimeResult extends \DateTime implements \JsonSerializable
 {
     /**
      * Create a new DateTimeResult from a unix timestamp.

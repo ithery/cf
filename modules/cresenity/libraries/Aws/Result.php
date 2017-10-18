@@ -1,14 +1,11 @@
 <?php
-namespace Aws;
-
-use JmesPath\Env as JmesPath;
 
 /**
  * AWS result.
  */
-class Result implements ResultInterface
+class Aws_Result implements Aws_ResultInterface
 {
-    use HasDataTrait;
+    use Aws_HasDataTrait;
 
     public function __construct(array $data = [])
     {
@@ -27,7 +24,7 @@ class Result implements ResultInterface
 
     public function search($expression)
     {
-        return JmesPath::search($expression, $this->toArray());
+        return JmesPath_Env::search($expression, $this->toArray());
     }
 
     public function __toString()

@@ -143,7 +143,7 @@ class Aws_ResultPaginator implements \Iterator
         return $this->client->getCommand($this->operation, $args + ($nextToken ?: []));
     }
 
-    private function determineNextToken(Result $result)
+    private function determineNextToken(Aws_Result $result)
     {
         if (!$this->config['output_token']) {
             return null;

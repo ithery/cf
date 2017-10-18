@@ -1,10 +1,10 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-use BadMethodCallException;
+// use BadMethodCallException;
 
-abstract class Handler
+abstract class League_Flysystem_Handler
 {
     /**
      * @var string

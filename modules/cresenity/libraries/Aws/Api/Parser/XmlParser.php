@@ -95,23 +95,23 @@ class Aws_Api_Parser_XmlParser {
         return $target;
     }
 
-    private function parse_blob(Shape $shape, $value) {
+    private function parse_blob(Aws_Api_Shape $shape, $value) {
         return base64_decode((string) $value);
     }
 
-    private function parse_float(Shape $shape, $value) {
+    private function parse_float(Aws_Api_Shape $shape, $value) {
         return (float) (string) $value;
     }
 
-    private function parse_integer(Shape $shape, $value) {
+    private function parse_integer(Aws_Api_Shape $shape, $value) {
         return (int) (string) $value;
     }
 
-    private function parse_boolean(Shape $shape, $value) {
+    private function parse_boolean(Aws_Api_Shape $shape, $value) {
         return $value == 'true' ? true : false;
     }
 
-    private function parse_timestamp(Shape $shape, $value) {
+    private function parse_timestamp(Aws_Api_Shape $shape, $value) {
         return new Aws_Api_DateTimeResult($value);
     }
 

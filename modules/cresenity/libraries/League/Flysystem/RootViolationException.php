@@ -1,10 +1,10 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-use LogicException;
+// use LogicException;
 
-class RootViolationException extends LogicException
+class League_Flysystem_RootViolationException extends LogicException
 {
     //
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace League\Flysystem;
+// namespace League\Flysystem;
 
-class Directory extends Handler
+class League_Flysystem_Directory extends League_Flysystem_Handler
 {
     /**
      * Delete the directory.
