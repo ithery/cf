@@ -71,7 +71,7 @@ class cmailapi {
         if (carr::get($response_array, 'message') != 'success') {
             throw new Exception('Fail to send mail, API Response:' . $response);
         }
-        return true;
+        return $response_array;
     }
 
     public function elasticemail($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
