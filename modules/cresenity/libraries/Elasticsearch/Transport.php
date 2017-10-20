@@ -108,18 +108,15 @@ class Elasticsearch_Transport {
                 //onFailure
                 function ($response) {
             if ($response instanceof Exception) {
-                echo $response->getMessage();
-                echo $response->getTraceAsString();
-                die;
-                
-                die;
+                throw $response;
             }
             // Ignore 400 level errors, as that means the server responded just fine
             if (!(isset($response['code']) && $response['code'] >= 400 && $response['code'] < 500)) {
                 // Otherwise schedule a check
                 $this->connectionPool->scheduleCheck();
             }
-        });
+        }
+        );
 
         return $future;
     }
