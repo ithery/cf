@@ -134,7 +134,7 @@ final class GuzzleHttp_Promise_Coroutine implements GuzzleHttp_Promise_PromiseIn
     {
         unset($this->currentPromise);
         try {
-            $nextYield = $this->generator->throw(exception_for($reason));
+            $nextYield = $this->generator->throw(guzzlehttp_promise_exception_for($reason));
             // The throw was caught, so keep iterating on the coroutine
             $this->nextCoroutine($nextYield);
         } catch (Exception $exception) {

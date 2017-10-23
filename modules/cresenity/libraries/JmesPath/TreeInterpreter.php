@@ -59,7 +59,7 @@ class JmesPath_TreeInterpreter
                 );
 
             case 'index':
-                if (!Utils::isArray($value)) {
+                if (!JmesPath_Utils::isArray($value)) {
                     return null;
                 }
                 $idx = $node['value'] >= 0
@@ -71,12 +71,12 @@ class JmesPath_TreeInterpreter
                 $left = $this->dispatch($node['children'][0], $value);
                 switch ($node['from']) {
                     case 'object':
-                        if (!Utils::isObject($left)) {
+                        if (!JmesPath_Utils::isObject($left)) {
                             return null;
                         }
                         break;
                     case 'array':
-                        if (!Utils::isArray($left)) {
+                        if (!JmesPath_Utils::isArray($left)) {
                             return null;
                         }
                         break;
@@ -100,7 +100,7 @@ class JmesPath_TreeInterpreter
                 static $skipElement = [];
                 $value = $this->dispatch($node['children'][0], $value);
 
-                if (!Utils::isArray($value)) {
+                if (!JmesPath_Utils::isArray($value)) {
                     return null;
                 }
 
@@ -124,18 +124,18 @@ class JmesPath_TreeInterpreter
 
             case 'or':
                 $result = $this->dispatch($node['children'][0], $value);
-                return Utils::isTruthy($result)
+                return JmesPath_Utils::isTruthy($result)
                     ? $result
                     : $this->dispatch($node['children'][1], $value);
 
             case 'and':
                 $result = $this->dispatch($node['children'][0], $value);
-                return Utils::isTruthy($result)
+                return JmesPath_Utils::isTruthy($result)
                     ? $this->dispatch($node['children'][1], $value)
                     : $result;
 
             case 'not':
-                return !Utils::isTruthy(
+                return !JmesPath_Utils::isTruthy(
                     $this->dispatch($node['children'][0], $value)
                 );
 
@@ -176,15 +176,15 @@ class JmesPath_TreeInterpreter
                 $left = $this->dispatch($node['children'][0], $value);
                 $right = $this->dispatch($node['children'][1], $value);
                 if ($node['value'] == '==') {
-                    return Utils::isEqual($left, $right);
+                    return JmesPath_Utils::isEqual($left, $right);
                 } elseif ($node['value'] == '!=') {
-                    return !Utils::isEqual($left, $right);
+                    return !JmesPath_Utils::isEqual($left, $right);
                 } else {
                     return self::relativeCmp($left, $right, $node['value']);
                 }
 
             case 'condition':
-                return Utils::isTruthy($this->dispatch($node['children'][0], $value))
+                return JmesPath_Utils::isTruthy($this->dispatch($node['children'][0], $value))
                     ? $this->dispatch($node['children'][1], $value)
                     : null;
 
@@ -196,8 +196,8 @@ class JmesPath_TreeInterpreter
                 return $dispatcher($node['value'], $args);
 
             case 'slice':
-                return is_string($value) || Utils::isArray($value)
-                    ? Utils::slice(
+                return is_string($value) || JmesPath_Utils::isArray($value)
+                    ? JmesPath_Utils::slice(
                         $value,
                         $node['value'][0],
                         $node['value'][1],

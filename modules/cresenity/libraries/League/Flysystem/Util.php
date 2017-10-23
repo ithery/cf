@@ -226,15 +226,15 @@ class League_Flysystem_Util
     public static function ensureConfig($config)
     {
         if ($config === null) {
-            return new Config();
+            return new League_Flysystem_Config();
         }
 
-        if ($config instanceof Config) {
+        if ($config instanceof League_Flysystem_Config) {
             return $config;
         }
 
         if (is_array($config)) {
-            return new Config($config);
+            return new League_Flysystem_Config($config);
         }
 
         throw new LogicException('A config should either be an array or a Flysystem\Config object.');

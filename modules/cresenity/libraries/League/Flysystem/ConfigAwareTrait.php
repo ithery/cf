@@ -19,7 +19,7 @@ trait League_Flysystem_ConfigAwareTrait
      */
     protected function setConfig($config)
     {
-        $this->config = $config ? Util::ensureConfig($config) : new League_Flysystem_Config;
+        $this->config = $config ? League_Flysystem_Util::ensureConfig($config) : new League_Flysystem_Config;
     }
 
     /**

@@ -484,7 +484,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
             [
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($path),
-                'ACL' => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
+                'ACL' => $visibility === League_Flysystem_AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
             ]
         );
 
@@ -608,7 +608,7 @@ class League_Flysystem_AwsS3v3_AwsS3Adapter extends League_Flysystem_Adapter_Abs
             // For local reference
             $options['visibility'] = $visibility;
             // For external reference
-            $options['ACL'] = $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private';
+            $options['ACL'] = $visibility === League_Flysystem_AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private';
         }
 
         if ($mimetype = $config->get('mimetype')) {
