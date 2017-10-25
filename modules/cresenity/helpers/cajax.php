@@ -160,10 +160,10 @@ class cajax {
             $sWhere = "WHERE (";
             if (is_array($search_field)) {
                 foreach ($search_field as $f) {
-                    $sWhere .= "`" . $f . "` LIKE '%" . mysql_real_escape_string($term) . "%' OR ";
+                    $sWhere .= "`" . $f . "` LIKE '%" . $db->escape_like($term) . "%' OR ";
                 }
             } else {
-                $sWhere .= "`" . $search_field . "` LIKE '%" . mysql_real_escape_string($term) . "%' OR ";
+                $sWhere .= "`" . $search_field . "` LIKE '%" . $db->escape_like($term) . "%' OR ";
             }
 
             $sWhere = substr_replace($sWhere, "", -3);
@@ -174,7 +174,7 @@ class cajax {
                 foreach ($search_field as $f) {
                     if (strlen($sOrder) > 0)
                         $sOrder.=",";
-                    $sOrder.= "`" . $f . "` = '" . mysql_real_escape_string($term) . "' DESC";
+                    $sOrder.= "`" . $f . "` = " . $db->escape($term) . " DESC";
                 }
             }
         }
