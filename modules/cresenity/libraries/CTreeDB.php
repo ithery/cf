@@ -230,7 +230,7 @@ class CTreeDB {
 
         $r = $db->update($this->table_name, $data, array($this->pk_column => $id));
 
-        $this->rebuild_tree_all();
+        //$this->rebuild_tree_all();
     }
 
     public function get_parents($parent_id) {
@@ -398,7 +398,13 @@ class CTreeDB {
         return $r;
     }
 
-    function rebuild_tree_all() {
+    function rebuild_tree_all($force = false) {
+        if (!$force) {
+            if($this->org_id==null) {
+                throw new Exception('Service Unavailable on rebuild_tree_all on org_id null');
+            }
+        }
+
         $db = $this->db;
         $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where status>0";
         if (strlen($this->org_id) > 0) {
