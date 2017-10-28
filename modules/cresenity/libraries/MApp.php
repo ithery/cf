@@ -283,6 +283,9 @@ class MApp extends CMobile_Observable {
 
     public function render() {
         $page = CPage::instance();
+        if (isset($_GET['profiler'])) {
+            new Profiler();
+        }
         echo $page->render($this);
     }
 
