@@ -1,5 +1,4 @@
-<?php declare(strict_types=1);
-
+<?php
 /*
  * This file is part of the Monolog package.
  *
@@ -11,7 +10,6 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Logger;
 
@@ -27,7 +25,7 @@ class ZendMonitorHandler extends AbstractProcessingHandler
      *
      * @var array
      */
-    protected $levelMap = [
+    protected $levelMap = array(
         Logger::DEBUG     => 1,
         Logger::INFO      => 2,
         Logger::NOTICE    => 3,
@@ -36,7 +34,7 @@ class ZendMonitorHandler extends AbstractProcessingHandler
         Logger::CRITICAL  => 6,
         Logger::ALERT     => 7,
         Logger::EMERGENCY => 0,
-    ];
+    );
 
     /**
      * Construct
@@ -80,7 +78,7 @@ class ZendMonitorHandler extends AbstractProcessingHandler
     /**
      * {@inheritdoc}
      */
-    public function getDefaultFormatter(): FormatterInterface
+    public function getDefaultFormatter()
     {
         return new NormalizerFormatter();
     }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -18,10 +18,8 @@ use Monolog\Formatter\FormatterInterface;
  *
  * @author Lenar Lõhmus <lenar@city.ee>
  */
-class GroupHandler extends Handler implements ProcessableHandlerInterface
+class GroupHandler extends AbstractHandler
 {
-    use ProcessableHandlerTrait;
-
     protected $handlers;
 
     /**
@@ -43,7 +41,7 @@ class GroupHandler extends Handler implements ProcessableHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record): bool
+    public function isHandling(array $record)
     {
         foreach ($this->handlers as $handler) {
             if ($handler->isHandling($record)) {
@@ -57,10 +55,12 @@ class GroupHandler extends Handler implements ProcessableHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record): bool
+    public function handle(array $record)
     {
         if ($this->processors) {
-            $record = $this->processRecord($record);
+            foreach ($this->processors as $processor) {
+                $record = call_user_func($processor, $record);
+            }
         }
 
         foreach ($this->handlers as $handler) {
@@ -76,7 +76,7 @@ class GroupHandler extends Handler implements ProcessableHandlerInterface
     public function handleBatch(array $records)
     {
         if ($this->processors) {
-            $processed = [];
+            $processed = array();
             foreach ($records as $record) {
                 foreach ($this->processors as $processor) {
                     $processed[] = call_user_func($processor, $record);

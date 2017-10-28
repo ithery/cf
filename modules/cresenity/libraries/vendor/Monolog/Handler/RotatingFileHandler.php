@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -11,7 +11,6 @@
 
 namespace Monolog\Handler;
 
-use InvalidArgumentException;
 use Monolog\Logger;
 
 /**
@@ -48,7 +47,7 @@ class RotatingFileHandler extends StreamHandler
     {
         $this->filename = $filename;
         $this->maxFiles = (int) $maxFiles;
-        $this->nextRotation = new \DateTimeImmutable('tomorrow');
+        $this->nextRotation = new \DateTime('tomorrow');
         $this->filenameFormat = '{filename}-{date}';
         $this->dateFormat = 'Y-m-d';
 
@@ -70,16 +69,18 @@ class RotatingFileHandler extends StreamHandler
     public function setFilenameFormat($filenameFormat, $dateFormat)
     {
         if (!preg_match('{^Y(([/_.-]?m)([/_.-]?d)?)?$}', $dateFormat)) {
-            throw new InvalidArgumentException(
+            trigger_error(
                 'Invalid date format - format must be one of '.
                 'RotatingFileHandler::FILE_PER_DAY ("Y-m-d"), RotatingFileHandler::FILE_PER_MONTH ("Y-m") '.
                 'or RotatingFileHandler::FILE_PER_YEAR ("Y"), or you can set one of the '.
-                'date formats using slashes, underscores and/or dots instead of dashes.'
+                'date formats using slashes, underscores and/or dots instead of dashes.',
+                E_USER_DEPRECATED
             );
         }
         if (substr_count($filenameFormat, '{date}') === 0) {
-            throw new InvalidArgumentException(
-                'Invalid filename format - format must contain at least `{date}`, because otherwise rotating is impossible.'
+            trigger_error(
+                'Invalid filename format - format should contain at least `{date}`, because otherwise rotating is impossible.',
+                E_USER_DEPRECATED
             );
         }
         $this->filenameFormat = $filenameFormat;
@@ -113,7 +114,7 @@ class RotatingFileHandler extends StreamHandler
     {
         // update filename
         $this->url = $this->getTimedFilename();
-        $this->nextRotation = new \DateTimeImmutable('tomorrow');
+        $this->nextRotation = new \DateTime('tomorrow');
 
         // skip GC of old logs if files are unlimited
         if (0 === $this->maxFiles) {
@@ -135,8 +136,7 @@ class RotatingFileHandler extends StreamHandler
             if (is_writable($file)) {
                 // suppress errors here as unlink() might fail if two processes
                 // are cleaning up/rotating at the same time
-                set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-                });
+                set_error_handler(function ($errno, $errstr, $errfile, $errline) {});
                 unlink($file);
                 restore_error_handler();
             }
@@ -149,8 +149,8 @@ class RotatingFileHandler extends StreamHandler
     {
         $fileInfo = pathinfo($this->filename);
         $timedFilename = str_replace(
-            ['{filename}', '{date}'],
-            [$fileInfo['filename'], date($this->dateFormat)],
+            array('{filename}', '{date}'),
+            array($fileInfo['filename'], date($this->dateFormat)),
             $fileInfo['dirname'] . '/' . $this->filenameFormat
         );
 
@@ -165,8 +165,8 @@ class RotatingFileHandler extends StreamHandler
     {
         $fileInfo = pathinfo($this->filename);
         $glob = str_replace(
-            ['{filename}', '{date}'],
-            [$fileInfo['filename'], '*'],
+            array('{filename}', '{date}'),
+            array($fileInfo['filename'], '*'),
             $fileInfo['dirname'] . '/' . $this->filenameFormat
         );
         if (!empty($fileInfo['extension'])) {

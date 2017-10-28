@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -19,23 +19,18 @@ namespace Monolog\Handler;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Christophe Coevoet <stof@notk.org>
  */
-abstract class AbstractProcessingHandler extends AbstractHandler implements ProcessableHandlerInterface, FormattableHandlerInterface
+abstract class AbstractProcessingHandler extends AbstractHandler
 {
-    use ProcessableHandlerTrait;
-    use FormattableHandlerTrait;
-
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record): bool
+    public function handle(array $record)
     {
         if (!$this->isHandling($record)) {
             return false;
         }
 
-        if ($this->processors) {
-            $record = $this->processRecord($record);
-        }
+        $record = $this->processRecord($record);
 
         $record['formatted'] = $this->getFormatter()->format($record);
 
@@ -51,4 +46,21 @@ abstract class AbstractProcessingHandler extends AbstractHandler implements Proc
      * @return void
      */
     abstract protected function write(array $record);
+
+    /**
+     * Processes a record.
+     *
+     * @param  array $record
+     * @return array
+     */
+    protected function processRecord(array $record)
+    {
+        if ($this->processors) {
+            foreach ($this->processors as $processor) {
+                $record = call_user_func($processor, $record);
+            }
+        }
+
+        return $record;
+    }
 }

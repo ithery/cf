@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -12,7 +12,6 @@
 namespace Monolog\Handler;
 
 use Monolog\Logger;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\JsonFormatter;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -32,18 +31,18 @@ class AmqpHandler extends AbstractProcessingHandler
 
     /**
      * @param AMQPExchange|AMQPChannel $exchange     AMQPExchange (php AMQP ext) or PHP AMQP lib channel, ready for use
-     * @param string                   $exchangeName Optional exchange name, for AMQPChannel (PhpAmqpLib) only
+     * @param string                   $exchangeName
      * @param int                      $level
      * @param bool                     $bubble       Whether the messages that are handled can bubble up the stack or not
      */
-    public function __construct($exchange, $exchangeName = null, $level = Logger::DEBUG, $bubble = true)
+    public function __construct($exchange, $exchangeName = 'log', $level = Logger::DEBUG, $bubble = true)
     {
-        if ($exchange instanceof AMQPChannel) {
+        if ($exchange instanceof AMQPExchange) {
+            $exchange->setName($exchangeName);
+        } elseif ($exchange instanceof AMQPChannel) {
             $this->exchangeName = $exchangeName;
-        } elseif (!$exchange instanceof AMQPExchange) {
+        } else {
             throw new \InvalidArgumentException('PhpAmqpLib\Channel\AMQPChannel or AMQPExchange instance required');
-        } elseif ($exchangeName) {
-            @trigger_error('The $exchangeName parameter can only be passed when using PhpAmqpLib, if using an AMQPExchange instance configure it beforehand', E_USER_DEPRECATED);
         }
         $this->exchange = $exchange;
 
@@ -63,10 +62,10 @@ class AmqpHandler extends AbstractProcessingHandler
                 $data,
                 $routingKey,
                 0,
-                [
+                array(
                     'delivery_mode' => 2,
                     'content_type' => 'application/json',
-                ]
+                )
             );
         } else {
             $this->exchange->basic_publish(
@@ -114,7 +113,12 @@ class AmqpHandler extends AbstractProcessingHandler
      */
     protected function getRoutingKey(array $record)
     {
-        $routingKey = sprintf('%s.%s', $record['level_name'], $record['channel']);
+        $routingKey = sprintf(
+            '%s.%s',
+            // TODO 2.0 remove substr call
+            substr($record['level_name'], 0, 4),
+            $record['channel']
+        );
 
         return strtolower($routingKey);
     }
@@ -127,17 +131,17 @@ class AmqpHandler extends AbstractProcessingHandler
     {
         return new AMQPMessage(
             (string) $data,
-            [
+            array(
                 'delivery_mode' => 2,
                 'content_type' => 'application/json',
-            ]
+            )
         );
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, false);
     }

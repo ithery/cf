@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -48,11 +48,11 @@ class IFTTTHandler extends AbstractProcessingHandler
      */
     public function write(array $record)
     {
-        $postData = [
+        $postData = array(
             "value1" => $record["channel"],
             "value2" => $record["level_name"],
             "value3" => $record["message"],
-        ];
+        );
         $postString = json_encode($postData);
 
         $ch = curl_init();
@@ -60,9 +60,9 @@ class IFTTTHandler extends AbstractProcessingHandler
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             "Content-Type: application/json",
-        ]);
+        ));
 
         Curl\Util::execute($ch);
     }

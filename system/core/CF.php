@@ -1207,21 +1207,24 @@ final class CF {
 
 
 
-            // find file at libraries
             $routing_file .= str_replace('_', DS, $routing_class);
-            if ($path = self::find_file($directory, $routing_file)) {
-                // Load the class file
-                require $path;
-                $class_not_found = TRUE;
-                return TRUE;
-            }
+
             // find file at libraries/vendor
+
             if ($path = self::find_file($directory, 'vendor' . DS . $routing_file)) {
                 // Load the class file
                 require $path;
                 $class_not_found = TRUE;
                 return TRUE;
             }
+            // find file at libraries
+            if ($path = self::find_file($directory, $routing_file)) {
+                // Load the class file
+                require $path;
+                $class_not_found = TRUE;
+                return TRUE;
+            }
+
             // check route file at helpers
             if (!$class_not_found) {
                 $temp_routing_file = explode(DS, $routing_file);

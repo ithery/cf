@@ -1,5 +1,4 @@
-<?php declare(strict_types=1);
-
+<?php
 /*
  * This file is part of the Monolog package.
  *
@@ -25,7 +24,7 @@ class HtmlFormatter extends NormalizerFormatter
     /**
      * Translates Monolog log levels to html color priorities.
      */
-    protected $logLevels = [
+    protected $logLevels = array(
         Logger::DEBUG     => '#cccccc',
         Logger::INFO      => '#468847',
         Logger::NOTICE    => '#3a87ad',
@@ -34,12 +33,12 @@ class HtmlFormatter extends NormalizerFormatter
         Logger::CRITICAL  => '#FF7708',
         Logger::ALERT     => '#C12A19',
         Logger::EMERGENCY => '#000000',
-    ];
+    );
 
     /**
      * @param string $dateFormat The format of the timestamp: one supported by DateTime::format
      */
-    public function __construct(string $dateFormat = null)
+    public function __construct($dateFormat = null)
     {
         parent::__construct($dateFormat);
     }
@@ -52,7 +51,7 @@ class HtmlFormatter extends NormalizerFormatter
      * @param  bool   $escapeTd false if td content must not be html escaped
      * @return string
      */
-    protected function addRow(string $th, string $td = ' ', bool $escapeTd = true): string
+    protected function addRow($th, $td = ' ', $escapeTd = true)
     {
         $th = htmlspecialchars($th, ENT_NOQUOTES, 'UTF-8');
         if ($escapeTd) {
@@ -69,7 +68,7 @@ class HtmlFormatter extends NormalizerFormatter
      * @param  int    $level Error level
      * @return string
      */
-    protected function addTitle(string $title, int $level)
+    protected function addTitle($title, $level)
     {
         $title = htmlspecialchars($title, ENT_NOQUOTES, 'UTF-8');
 
@@ -82,13 +81,13 @@ class HtmlFormatter extends NormalizerFormatter
      * @param  array $record A record to format
      * @return mixed The formatted record
      */
-    public function format(array $record): string
+    public function format(array $record)
     {
         $output = $this->addTitle($record['level_name'], $record['level']);
         $output .= '<table cellspacing="1" width="100%" class="monolog-output">';
 
         $output .= $this->addRow('Message', (string) $record['message']);
-        $output .= $this->addRow('Time', $this->formatDate($record['datetime']));
+        $output .= $this->addRow('Time', $record['datetime']->format($this->dateFormat));
         $output .= $this->addRow('Channel', $record['channel']);
         if ($record['context']) {
             $embeddedTable = '<table cellspacing="1" width="100%">';
@@ -116,7 +115,7 @@ class HtmlFormatter extends NormalizerFormatter
      * @param  array $records A set of records to format
      * @return mixed The formatted set of records
      */
-    public function formatBatch(array $records): string
+    public function formatBatch(array $records)
     {
         $message = '';
         foreach ($records as $record) {
@@ -126,14 +125,17 @@ class HtmlFormatter extends NormalizerFormatter
         return $message;
     }
 
-    protected function convertToString($data): string
+    protected function convertToString($data)
     {
         if (null === $data || is_scalar($data)) {
             return (string) $data;
         }
 
         $data = $this->normalize($data);
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
 
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return str_replace('\\/', '/', json_encode($data));
     }
 }

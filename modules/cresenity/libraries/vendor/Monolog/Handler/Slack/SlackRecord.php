@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -89,7 +89,7 @@ class SlackRecord
     {
         $this->channel = $channel;
         $this->username = $username;
-        $this->userIcon = $userIcon !== null ? trim($userIcon, ':') : null;
+        $this->userIcon = trim($userIcon, ':');
         $this->useAttachment = $useAttachment;
         $this->useShortAttachment = $useShortAttachment;
         $this->includeContextAndExtra = $includeContextAndExtra;
@@ -127,7 +127,7 @@ class SlackRecord
                 'color'     => $this->getAttachmentColor($record['level']),
                 'fields'    => array(),
                 'mrkdwn_in' => array('fields'),
-                'ts'        => $record['datetime']->getTimestamp(),
+                'ts'        => $record['datetime']->getTimestamp()
             );
 
             if ($this->useShortAttachment) {
@@ -136,6 +136,7 @@ class SlackRecord
                 $attachment['title'] = 'Message';
                 $attachment['fields'][] = $this->generateAttachmentField('Level', $record['level_name']);
             }
+
 
             if ($this->includeContextAndExtra) {
                 foreach (array('extra', 'context') as $key) {
@@ -228,7 +229,7 @@ class SlackRecord
     /**
      * Generates attachment field
      *
-     * @param string       $title
+     * @param string $title
      * @param string|array $value\
      *
      * @return array
@@ -242,7 +243,7 @@ class SlackRecord
         return array(
             'title' => $title,
             'value' => $value,
-            'short' => false,
+            'short' => false
         );
     }
 

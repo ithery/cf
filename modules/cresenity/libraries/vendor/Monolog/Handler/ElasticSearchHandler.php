@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -43,7 +43,7 @@ class ElasticSearchHandler extends AbstractProcessingHandler
     /**
      * @var array Handler config options
      */
-    protected $options = [];
+    protected $options = array();
 
     /**
      * @param Client  $client  Elastica Client object
@@ -51,16 +51,16 @@ class ElasticSearchHandler extends AbstractProcessingHandler
      * @param int     $level   The minimum logging level at which this handler will be triggered
      * @param Boolean $bubble  Whether the messages that are handled can bubble up the stack or not
      */
-    public function __construct(Client $client, array $options = [], $level = Logger::DEBUG, $bubble = true)
+    public function __construct(Client $client, array $options = array(), $level = Logger::DEBUG, $bubble = true)
     {
         parent::__construct($level, $bubble);
         $this->client = $client;
         $this->options = array_merge(
-            [
+            array(
                 'index'          => 'monolog',      // Elastic index name
                 'type'           => 'record',       // Elastic document type
                 'ignore_error'   => false,          // Suppress Elastica exceptions
-            ],
+            ),
             $options
         );
     }
@@ -70,13 +70,13 @@ class ElasticSearchHandler extends AbstractProcessingHandler
      */
     protected function write(array $record)
     {
-        $this->bulkSend([$record['formatted']]);
+        $this->bulkSend(array($record['formatted']));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setFormatter(FormatterInterface $formatter): HandlerInterface
+    public function setFormatter(FormatterInterface $formatter)
     {
         if ($formatter instanceof ElasticaFormatter) {
             return parent::setFormatter($formatter);
@@ -96,7 +96,7 @@ class ElasticSearchHandler extends AbstractProcessingHandler
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new ElasticaFormatter($this->options['index'], $this->options['type']);
     }

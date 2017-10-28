@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -12,7 +12,6 @@
 namespace Monolog\Handler;
 
 use Monolog\Formatter\LineFormatter;
-use Monolog\Formatter\FormatterInterface;
 
 /**
  * Handler sending logs to browser's javascript console with no browser extension required
@@ -22,7 +21,7 @@ use Monolog\Formatter\FormatterInterface;
 class BrowserConsoleHandler extends AbstractProcessingHandler
 {
     protected static $initialized = false;
-    protected static $records = [];
+    protected static $records = array();
 
     /**
      * {@inheritDoc}
@@ -33,7 +32,7 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
      *
      *     You can do [[blue text]]{color: blue} or [[green background]]{background-color: green; color: white}
      */
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new LineFormatter('[[%channel%]]{macro: autolabel} [[%level_name%]]{font-weight: bold} %message%');
     }
@@ -79,7 +78,7 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
      */
     public static function reset()
     {
-        self::$records = [];
+        self::$records = array();
     }
 
     /**
@@ -88,7 +87,7 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
     protected function registerShutdownFunction()
     {
         if (PHP_SAPI !== 'cli') {
-            register_shutdown_function(['Monolog\Handler\BrowserConsoleHandler', 'send']);
+            register_shutdown_function(array('Monolog\Handler\BrowserConsoleHandler', 'send'));
         }
     }
 
@@ -133,7 +132,7 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
 
     private static function generateScript()
     {
-        $script = [];
+        $script = array();
         foreach (self::$records as $record) {
             $context = self::dump('Context', $record['context']);
             $extra = self::dump('Extra', $record['extra']);
@@ -142,10 +141,10 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
                 $script[] = self::call_array('log', self::handleStyles($record['formatted']));
             } else {
                 $script = array_merge($script,
-                    [self::call_array('groupCollapsed', self::handleStyles($record['formatted']))],
+                    array(self::call_array('groupCollapsed', self::handleStyles($record['formatted']))),
                     $context,
                     $extra,
-                    [self::call('groupEnd')]
+                    array(self::call('groupEnd'))
                 );
             }
         }
@@ -155,7 +154,7 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
 
     private static function handleStyles($formatted)
     {
-        $args = [self::quote('font-weight: normal')];
+        $args = array(self::quote('font-weight: normal'));
         $format = '%c' . $formatted;
         preg_match_all('/\[\[(.*?)\]\]\{([^}]*)\}/s', $format, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
 
@@ -174,8 +173,8 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
 
     private static function handleCustomStyles($style, $string)
     {
-        static $colors = ['blue', 'green', 'red', 'magenta', 'orange', 'black', 'grey'];
-        static $labels = [];
+        static $colors = array('blue', 'green', 'red', 'magenta', 'orange', 'black', 'grey');
+        static $labels = array();
 
         return preg_replace_callback('/macro\s*:(.*?)(?:;|$)/', function ($m) use ($string, &$colors, &$labels) {
             if (trim($m[1]) === 'autolabel') {
@@ -194,7 +193,7 @@ class BrowserConsoleHandler extends AbstractProcessingHandler
 
     private static function dump($title, array $dict)
     {
-        $script = [];
+        $script = array();
         $dict = array_filter($dict);
         if (empty($dict)) {
             return $script;

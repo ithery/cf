@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -27,15 +27,13 @@ use Monolog\Logger;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class FingersCrossedHandler extends Handler implements ProcessableHandlerInterface
+class FingersCrossedHandler extends AbstractHandler
 {
-    use ProcessableHandlerTrait;
-
     protected $handler;
     protected $activationStrategy;
     protected $buffering = true;
     protected $bufferSize;
-    protected $buffer = [];
+    protected $buffer = array();
     protected $stopBuffering;
     protected $passthruLevel;
 
@@ -76,7 +74,7 @@ class FingersCrossedHandler extends Handler implements ProcessableHandlerInterfa
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record): bool
+    public function isHandling(array $record)
     {
         return true;
     }
@@ -98,16 +96,18 @@ class FingersCrossedHandler extends Handler implements ProcessableHandlerInterfa
             }
         }
         $this->handler->handleBatch($this->buffer);
-        $this->buffer = [];
+        $this->buffer = array();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record): bool
+    public function handle(array $record)
     {
         if ($this->processors) {
-            $record = $this->processRecord($record);
+            foreach ($this->processors as $processor) {
+                $record = call_user_func($processor, $record);
+            }
         }
 
         if ($this->buffering) {
@@ -137,7 +137,7 @@ class FingersCrossedHandler extends Handler implements ProcessableHandlerInterfa
             });
             if (count($this->buffer) > 0) {
                 $this->handler->handleBatch($this->buffer);
-                $this->buffer = [];
+                $this->buffer = array();
             }
         }
     }
@@ -157,7 +157,7 @@ class FingersCrossedHandler extends Handler implements ProcessableHandlerInterfa
      */
     public function clear()
     {
-        $this->buffer = [];
+        $this->buffer = array();
         $this->reset();
     }
 }

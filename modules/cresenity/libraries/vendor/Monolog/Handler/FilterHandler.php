@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -21,10 +21,8 @@ use Monolog\Logger;
  * @author Hennadiy Verkh
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class FilterHandler extends Handler implements ProcessableHandlerInterface
+class FilterHandler extends AbstractHandler
 {
-    use ProcessableHandlerTrait;
-
     /**
      * Handler or factory callable($record, $this)
      *
@@ -66,7 +64,7 @@ class FilterHandler extends Handler implements ProcessableHandlerInterface
     /**
      * @return array
      */
-    public function getAcceptedLevels(): array
+    public function getAcceptedLevels()
     {
         return array_flip($this->acceptedLevels);
     }
@@ -92,7 +90,7 @@ class FilterHandler extends Handler implements ProcessableHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record): bool
+    public function isHandling(array $record)
     {
         return isset($this->acceptedLevels[$record['level']]);
     }
@@ -100,7 +98,7 @@ class FilterHandler extends Handler implements ProcessableHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record): bool
+    public function handle(array $record)
     {
         if (!$this->isHandling($record)) {
             return false;
@@ -115,7 +113,9 @@ class FilterHandler extends Handler implements ProcessableHandlerInterface
         }
 
         if ($this->processors) {
-            $record = $this->processRecord($record);
+            foreach ($this->processors as $processor) {
+                $record = call_user_func($processor, $record);
+            }
         }
 
         $this->handler->handle($record);
@@ -128,7 +128,7 @@ class FilterHandler extends Handler implements ProcessableHandlerInterface
      */
     public function handleBatch(array $records)
     {
-        $filtered = [];
+        $filtered = array();
         foreach ($records as $record) {
             if ($this->isHandling($record)) {
                 $filtered[] = $record;

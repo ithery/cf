@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -10,6 +10,8 @@
  */
 
 namespace Monolog\Handler;
+
+use Monolog\Formatter\FormatterInterface;
 
 /**
  * Interface that all Monolog Handlers must implement
@@ -31,7 +33,7 @@ interface HandlerInterface
      *
      * @return Boolean
      */
-    public function isHandling(array $record): bool;
+    public function isHandling(array $record);
 
     /**
      * Handles a record.
@@ -47,7 +49,7 @@ interface HandlerInterface
      * @return Boolean true means that this handler handled the record, and that bubbling is not permitted.
      *                        false means the record was either not processed or that this handler allows bubbling.
      */
-    public function handle(array $record): bool;
+    public function handle(array $record);
 
     /**
      * Handles a set of records at once.
@@ -57,12 +59,32 @@ interface HandlerInterface
     public function handleBatch(array $records);
 
     /**
-     * Closes the handler.
+     * Adds a processor in the stack.
      *
-     * This will be called automatically when the object is destroyed if you extend Monolog\Handler\Handler
-     *
-     * Implementations have to be idempotent (i.e. it should be possible to call close several times without breakage)
-     * and ideally handlers should be able to reopen themselves on handle() after they have been closed.
+     * @param  callable $callback
+     * @return self
      */
-    public function close();
+    public function pushProcessor($callback);
+
+    /**
+     * Removes the processor on top of the stack and returns it.
+     *
+     * @return callable
+     */
+    public function popProcessor();
+
+    /**
+     * Sets the formatter.
+     *
+     * @param  FormatterInterface $formatter
+     * @return self
+     */
+    public function setFormatter(FormatterInterface $formatter);
+
+    /**
+     * Gets the formatter.
+     *
+     * @return FormatterInterface
+     */
+    public function getFormatter();
 }

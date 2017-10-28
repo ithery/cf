@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -12,16 +12,24 @@
 namespace Monolog\Handler;
 
 use Monolog\Logger;
+use Monolog\Formatter\FormatterInterface;
+use Monolog\Formatter\LineFormatter;
 
 /**
- * Base Handler class providing basic level/bubble support
+ * Base Handler class providing the Handler structure
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class AbstractHandler extends Handler
+abstract class AbstractHandler implements HandlerInterface
 {
     protected $level = Logger::DEBUG;
     protected $bubble = true;
+
+    /**
+     * @var FormatterInterface
+     */
+    protected $formatter;
+    protected $processors = array();
 
     /**
      * @param int     $level  The minimum logging level at which this handler will be triggered
@@ -36,9 +44,75 @@ abstract class AbstractHandler extends Handler
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record): bool
+    public function isHandling(array $record)
     {
         return $record['level'] >= $this->level;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleBatch(array $records)
+    {
+        foreach ($records as $record) {
+            $this->handle($record);
+        }
+    }
+
+    /**
+     * Closes the handler.
+     *
+     * This will be called automatically when the object is destroyed
+     */
+    public function close()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function pushProcessor($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException('Processors must be valid callables (callback or object with an __invoke method), '.var_export($callback, true).' given');
+        }
+        array_unshift($this->processors, $callback);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function popProcessor()
+    {
+        if (!$this->processors) {
+            throw new \LogicException('You tried to pop from an empty processor stack.');
+        }
+
+        return array_shift($this->processors);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFormatter(FormatterInterface $formatter)
+    {
+        $this->formatter = $formatter;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormatter()
+    {
+        if (!$this->formatter) {
+            $this->formatter = $this->getDefaultFormatter();
+        }
+
+        return $this->formatter;
     }
 
     /**
@@ -47,7 +121,7 @@ abstract class AbstractHandler extends Handler
      * @param  int|string $level Level or level name
      * @return self
      */
-    public function setLevel($level): self
+    public function setLevel($level)
     {
         $this->level = Logger::toMonologLevel($level);
 
@@ -59,7 +133,7 @@ abstract class AbstractHandler extends Handler
      *
      * @return int
      */
-    public function getLevel(): int
+    public function getLevel()
     {
         return $this->level;
     }
@@ -71,7 +145,7 @@ abstract class AbstractHandler extends Handler
      *                         false means that bubbling is not permitted.
      * @return self
      */
-    public function setBubble(bool $bubble): self
+    public function setBubble($bubble)
     {
         $this->bubble = $bubble;
 
@@ -84,8 +158,29 @@ abstract class AbstractHandler extends Handler
      * @return Boolean true means that this handler allows bubbling.
      *                 false means that bubbling is not permitted.
      */
-    public function getBubble(): bool
+    public function getBubble()
     {
         return $this->bubble;
+    }
+
+    public function __destruct()
+    {
+        try {
+            $this->close();
+        } catch (\Exception $e) {
+            // do nothing
+        } catch (\Throwable $e) {
+            // do nothing
+        }
+    }
+
+    /**
+     * Gets the default formatter.
+     *
+     * @return FormatterInterface
+     */
+    protected function getDefaultFormatter()
+    {
+        return new LineFormatter();
     }
 }

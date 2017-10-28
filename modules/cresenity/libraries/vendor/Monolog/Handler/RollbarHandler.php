@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -12,7 +12,7 @@
 namespace Monolog\Handler;
 
 use RollbarNotifier;
-use Throwable;
+use Exception;
 use Monolog\Logger;
 
 /**
@@ -40,7 +40,7 @@ class RollbarHandler extends AbstractProcessingHandler
      */
     protected $rollbarNotifier;
 
-    protected $levelMap = [
+    protected $levelMap = array(
         Logger::DEBUG     => 'debug',
         Logger::INFO      => 'info',
         Logger::NOTICE    => 'info',
@@ -49,7 +49,7 @@ class RollbarHandler extends AbstractProcessingHandler
         Logger::CRITICAL  => 'critical',
         Logger::ALERT     => 'critical',
         Logger::EMERGENCY => 'critical',
-    ];
+    );
 
     /**
      * Records whether any log records have been added since the last flush of the rollbar notifier
@@ -84,19 +84,19 @@ class RollbarHandler extends AbstractProcessingHandler
         }
 
         $context = $record['context'];
-        $payload = [];
+        $payload = array();
         if (isset($context['payload'])) {
             $payload = $context['payload'];
             unset($context['payload']);
         }
-        $context = array_merge($context, $record['extra'], [
+        $context = array_merge($context, $record['extra'], array(
             'level' => $this->levelMap[$record['level']],
             'monolog_level' => $record['level_name'],
             'channel' => $record['channel'],
             'datetime' => $record['datetime']->format('U'),
-        ]);
+        ));
 
-        if (isset($context['exception']) && $context['exception'] instanceof Throwable) {
+        if (isset($context['exception']) && $context['exception'] instanceof Exception) {
             $payload['level'] = $context['level'];
             $exception = $context['exception'];
             unset($context['exception']);

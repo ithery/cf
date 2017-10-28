@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -12,7 +12,6 @@
 namespace Monolog\Handler;
 
 use Monolog\Formatter\ChromePHPFormatter;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
 
 /**
@@ -33,7 +32,7 @@ class ChromePHPHandler extends AbstractProcessingHandler
      * Header name
      */
     const HEADER_NAME = 'X-ChromeLogger-Data';
-
+    
     /**
      * Regular expression to detect supported browsers (matches any Chrome, or Firefox 43+)
      */
@@ -50,11 +49,11 @@ class ChromePHPHandler extends AbstractProcessingHandler
      */
     protected static $overflowed = false;
 
-    protected static $json = [
+    protected static $json = array(
         'version' => self::VERSION,
-        'columns' => ['label', 'log', 'backtrace', 'type'],
-        'rows' => [],
-    ];
+        'columns' => array('label', 'log', 'backtrace', 'type'),
+        'rows' => array(),
+    );
 
     protected static $sendHeaders = true;
 
@@ -75,7 +74,7 @@ class ChromePHPHandler extends AbstractProcessingHandler
      */
     public function handleBatch(array $records)
     {
-        $messages = [];
+        $messages = array();
 
         foreach ($records as $record) {
             if ($record['level'] < $this->level) {
@@ -94,7 +93,7 @@ class ChromePHPHandler extends AbstractProcessingHandler
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new ChromePHPFormatter();
     }
@@ -132,7 +131,7 @@ class ChromePHPHandler extends AbstractProcessingHandler
                 return;
             }
 
-            self::$json['request_uri'] = $_SERVER['REQUEST_URI'] ?? '';
+            self::$json['request_uri'] = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         }
 
         $json = @json_encode(self::$json);
@@ -140,15 +139,15 @@ class ChromePHPHandler extends AbstractProcessingHandler
         if (strlen($data) > 240 * 1024) {
             self::$overflowed = true;
 
-            $record = [
+            $record = array(
                 'message' => 'Incomplete logs, chrome header size limit reached',
-                'context' => [],
+                'context' => array(),
                 'level' => Logger::WARNING,
                 'level_name' => Logger::getLevelName(Logger::WARNING),
                 'channel' => 'monolog',
-                'datetime' => new \DateTimeImmutable(),
-                'extra' => [],
-            ];
+                'datetime' => new \DateTime(),
+                'extra' => array(),
+            );
             self::$json['rows'][count(self::$json['rows']) - 1] = $this->getFormatter()->format($record);
             $json = @json_encode(self::$json);
             $data = base64_encode(utf8_encode($json));
@@ -174,13 +173,39 @@ class ChromePHPHandler extends AbstractProcessingHandler
 
     /**
      * Verifies if the headers are accepted by the current user agent
+     *
+     * @return Boolean
      */
-    protected function headersAccepted(): bool
+    protected function headersAccepted()
     {
         if (empty($_SERVER['HTTP_USER_AGENT'])) {
             return false;
         }
 
-        return preg_match(self::USER_AGENT_REGEX, $_SERVER['HTTP_USER_AGENT']) === 1;
+        return preg_match(self::USER_AGENT_REGEX, $_SERVER['HTTP_USER_AGENT']);
+    }
+
+    /**
+     * BC getter for the sendHeaders property that has been made static
+     */
+    public function __get($property)
+    {
+        if ('sendHeaders' !== $property) {
+            throw new \InvalidArgumentException('Undefined property '.$property);
+        }
+
+        return static::$sendHeaders;
+    }
+
+    /**
+     * BC setter for the sendHeaders property that has been made static
+     */
+    public function __set($property, $value)
+    {
+        if ('sendHeaders' !== $property) {
+            throw new \InvalidArgumentException('Undefined property '.$property);
+        }
+
+        static::$sendHeaders = $value;
     }
 }

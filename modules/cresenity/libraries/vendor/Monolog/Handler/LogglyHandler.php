@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -12,7 +12,6 @@
 namespace Monolog\Handler;
 
 use Monolog\Logger;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LogglyFormatter;
 
 /**
@@ -30,7 +29,7 @@ class LogglyHandler extends AbstractProcessingHandler
 
     protected $token;
 
-    protected $tag = [];
+    protected $tag = array();
 
     public function __construct($token, $level = Logger::DEBUG, $bubble = true)
     {
@@ -45,14 +44,14 @@ class LogglyHandler extends AbstractProcessingHandler
 
     public function setTag($tag)
     {
-        $tag = !empty($tag) ? $tag : [];
-        $this->tag = is_array($tag) ? $tag : [$tag];
+        $tag = !empty($tag) ? $tag : array();
+        $this->tag = is_array($tag) ? $tag : array($tag);
     }
 
     public function addTag($tag)
     {
         if (!empty($tag)) {
-            $tag = is_array($tag) ? $tag : [$tag];
+            $tag = is_array($tag) ? $tag : array($tag);
             $this->tag = array_unique(array_merge($this->tag, $tag));
         }
     }
@@ -79,7 +78,7 @@ class LogglyHandler extends AbstractProcessingHandler
     {
         $url = sprintf("https://%s/%s/%s/", self::HOST, $endpoint, $this->token);
 
-        $headers = ['Content-Type: application/json'];
+        $headers = array('Content-Type: application/json');
 
         if (!empty($this->tag)) {
             $headers[] = 'X-LOGGLY-TAG: '.implode(',', $this->tag);
@@ -96,7 +95,7 @@ class LogglyHandler extends AbstractProcessingHandler
         Curl\Util::execute($ch);
     }
 
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new LogglyFormatter();
     }

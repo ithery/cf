@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -27,7 +27,7 @@ class RavenHandler extends AbstractProcessingHandler
     /**
      * Translates Monolog log levels to Raven log levels.
      */
-    private $logLevels = [
+    private $logLevels = array(
         Logger::DEBUG     => Raven_Client::DEBUG,
         Logger::INFO      => Raven_Client::INFO,
         Logger::NOTICE    => Raven_Client::INFO,
@@ -36,7 +36,7 @@ class RavenHandler extends AbstractProcessingHandler
         Logger::CRITICAL  => Raven_Client::FATAL,
         Logger::ALERT     => Raven_Client::FATAL,
         Logger::EMERGENCY => Raven_Client::FATAL,
-    ];
+    );
 
     /**
      * @var string should represent the current version of the calling
@@ -92,7 +92,7 @@ class RavenHandler extends AbstractProcessingHandler
         });
 
         // the other ones are added as a context item
-        $logs = [];
+        $logs = array();
         foreach ($records as $r) {
             $logs[] = $this->processRecord($r);
         }
@@ -133,11 +133,10 @@ class RavenHandler extends AbstractProcessingHandler
      */
     protected function write(array $record)
     {
-        /** @var bool|null|array This is false, unless set below to null or an array of data, when we read the current user context */
         $previousUserContext = false;
-        $options = [];
+        $options = array();
         $options['level'] = $this->logLevels[$record['level']];
-        $options['tags'] = [];
+        $options['tags'] = array();
         if (!empty($record['extra']['tags'])) {
             $options['tags'] = array_merge($options['tags'], $record['extra']['tags']);
             unset($record['extra']['tags']);
@@ -157,7 +156,7 @@ class RavenHandler extends AbstractProcessingHandler
             $options['logger'] = $record['channel'];
         }
         foreach ($this->getExtraParameters() as $key) {
-            foreach (['extra', 'context'] as $source) {
+            foreach (array('extra', 'context') as $source) {
                 if (!empty($record[$source][$key])) {
                     $options[$key] = $record[$source][$key];
                     unset($record[$source][$key]);
@@ -180,15 +179,14 @@ class RavenHandler extends AbstractProcessingHandler
             $options['release'] = $this->release;
         }
 
-        if (isset($record['context']['exception']) && $record['context']['exception'] instanceof \Throwable) {
+        if (isset($record['context']['exception']) && ($record['context']['exception'] instanceof \Exception || (PHP_VERSION_ID >= 70000 && $record['context']['exception'] instanceof \Throwable))) {
             $options['extra']['message'] = $record['formatted'];
             $this->ravenClient->captureException($record['context']['exception'], $options);
         } else {
-            $this->ravenClient->captureMessage($record['formatted'], [], $options);
+            $this->ravenClient->captureMessage($record['formatted'], array(), $options);
         }
 
-        // restore the user context if it was modified
-        if (!is_bool($previousUserContext)) {
+        if ($previousUserContext !== false) {
             $this->ravenClient->user_context($previousUserContext);
         }
     }
@@ -196,7 +194,7 @@ class RavenHandler extends AbstractProcessingHandler
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new LineFormatter('[%channel%] %message%');
     }
@@ -218,11 +216,11 @@ class RavenHandler extends AbstractProcessingHandler
      */
     protected function getExtraParameters()
     {
-        return ['checksum', 'release', 'event_id'];
+        return array('checksum', 'release', 'event_id');
     }
 
     /**
-     * @param  string $value
+     * @param string $value
      * @return self
      */
     public function setRelease($value)

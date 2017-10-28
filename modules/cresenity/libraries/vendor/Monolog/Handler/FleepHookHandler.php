@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -11,7 +11,6 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 
@@ -64,7 +63,7 @@ class FleepHookHandler extends SocketHandler
      *
      * @return LineFormatter
      */
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new LineFormatter(null, null, true, true);
     }
@@ -118,9 +117,9 @@ class FleepHookHandler extends SocketHandler
      */
     private function buildContent($record)
     {
-        $dataArray = [
+        $dataArray = array(
             'message' => $record['formatted'],
-        ];
+        );
 
         return http_build_query($dataArray);
     }
