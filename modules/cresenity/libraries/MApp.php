@@ -214,25 +214,23 @@ class MApp extends CMobile_Observable {
     }
 
     public function add_custom_js($js) {
-        $this->custom_js.= $js;
+        $this->custom_js .= $js;
         return $this;
     }
 
     public function set_view_html() {
         
     }
-    
+
     public function set_custom_var($custom_var) {
         $this->custom_var = $custom_var;
         return $this;
     }
-    
+
     public function get_custom_var() {
         return $this->custom_var;
     }
 
-    
-    
     public function add_breadcrumb($caption, $url) {
         $this->breadcrumb[$caption] = $url;
         return $this;
@@ -365,7 +363,7 @@ class MApp extends CMobile_Observable {
         $db = CDatabase::instance();
         $q = "select role_id,name from roles where status>0 ";
         if (strlen($id) > 0) {
-            $q.=" and parent_id=" . $db->escape($id);
+            $q .= " and parent_id=" . $db->escape($id);
         }
         $result = array();
         $r = $db->query($q);
