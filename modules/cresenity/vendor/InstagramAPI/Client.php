@@ -9,7 +9,9 @@ use InstagramAPI\Exception\ServerMessageThrower;
 use InstagramAPI\Exception\SettingsException;
 use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
-use function GuzzleHttp\Psr7\modify_request;
+
+
+require_once dirname(__FILE__).DS.'../GuzzleHttp/Psr7/functions_include.php';
 
 /**
  * This class handles core API network communication.
@@ -758,7 +760,7 @@ class Client
         array $guzzleOptions = [])
     {
         // Set up headers that are required for every request.
-        $request = modify_request($request, [
+        $request = \GuzzleHttp\Psr7\modify_request($request, [
             'set_headers' => [
                 'User-Agent'       => $this->_userAgent,
                 // Keep the API's HTTPS connection alive in Guzzle for future

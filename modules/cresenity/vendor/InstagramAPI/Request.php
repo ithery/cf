@@ -7,8 +7,8 @@ use GuzzleHttp\Psr7\Request as HttpRequest;
 use GuzzleHttp\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use function GuzzleHttp\Psr7\stream_for;
 
+require_once dirname(__FILE__).DS.'../GuzzleHttp/Psr7/functions_include.php';
 /**
  * Bridge between Instagram Client calls, the object mapper & response objects.
  */
@@ -476,14 +476,14 @@ class Request
         array $file)
     {
         if (isset($file['contents'])) {
-            $result = stream_for($file['contents']);
+            $result = \GuzzleHttp\Psr7\stream_for($file['contents']);
         } elseif (isset($file['filepath'])) {
             $handle = fopen($file['filepath'], 'rb');
             if ($handle === false) {
                 throw new \RuntimeException(sprintf('Could not open file "%s" for reading.', $file['filepath']));
             }
             $this->_handles[] = $handle;
-            $result = stream_for($handle);
+            $result = \GuzzleHttp\Psr7\stream_for($handle);
         } else {
             throw new \BadMethodCallException('No data for stream creation.');
         }
@@ -559,7 +559,7 @@ class Request
     {
         $this->_headers['Content-Type'] = Constants::CONTENT_TYPE;
 
-        return stream_for(http_build_query(Utils::reorderByHashCode($this->_posts)));
+        return \GuzzleHttp\Psr7\stream_for(http_build_query(Utils::reorderByHashCode($this->_posts)));
     }
 
     /**
@@ -601,7 +601,7 @@ class Request
         $endpoint = $this->_url;
         // Determine the URI to use (it's either relative to API, or a full URI).
         if (strncmp($endpoint, 'http:', 5) !== 0 && strncmp($endpoint, 'https:', 6) !== 0) {
-            $endpoint = Constants::API_URLS[$this->_apiVersion].$endpoint;
+            $endpoint = Constants::$API_URLS[$this->_apiVersion].$endpoint;
         }
         // Generate the final endpoint URL, by adding any custom query params.
         if (count($this->_params)) {

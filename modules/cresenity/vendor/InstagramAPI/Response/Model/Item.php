@@ -51,7 +51,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getITunesItem()
  * @method mixed getIcon()
  * @method string getId()
- * @method Image_Versions2 getImageVersions2()
+ * @method ImageVersions2 getImageVersions2()
  * @method mixed getImportedTakenAt()
  * @method mixed getImpressionToken()
  * @method Injected getInjected()
@@ -281,7 +281,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setITunesItem(mixed $value)
  * @method setIcon(mixed $value)
  * @method setId(string $value)
- * @method setImageVersions2(Image_Versions2 $value)
+ * @method setImageVersions2(ImageVersions2 $value)
  * @method setImportedTakenAt(mixed $value)
  * @method setImpressionToken(mixed $value)
  * @method setInjected(Injected $value)
@@ -377,7 +377,7 @@ class Item extends AutoPropertyHandler
      */
     public $attribution;
     /**
-     * @var Image_Versions2
+     * @var ImageVersions2
      */
     public $image_versions2;
     public $original_width;

@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class Constants
 {
     // Core API Constants.
-    const API_URLS = [
+    public static $API_URLS = [
         1 => 'https://i.instagram.com/api/v1/',
         2 => 'https://i.instagram.com/api/v2/',
     ];

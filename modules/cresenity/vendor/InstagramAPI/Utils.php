@@ -36,7 +36,7 @@ class Utils
      *
      * @var string
      */
-    const BOUNDARY_CHARS = '-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    public static $BOUNDARY_CHARS = '-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     /**
      * Length of generated multipart boundary.
@@ -166,9 +166,9 @@ class Utils
     public static function generateMultipartBoundary()
     {
         $result = '';
-        $max = strlen(self::BOUNDARY_CHARS) - 1;
+        $max = strlen(self::$BOUNDARY_CHARS) - 1;
         for ($i = 0; $i < self::BOUNDARY_LENGTH; ++$i) {
-            $result .= self::BOUNDARY_CHARS[mt_rand(0, $max)];
+            $result .= self::$BOUNDARY_CHARS[mt_rand(0, $max)];
         }
 
         return $result;

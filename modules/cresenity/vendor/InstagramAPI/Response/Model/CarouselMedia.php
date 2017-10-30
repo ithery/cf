@@ -15,7 +15,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method Headline getHeadline()
  * @method mixed getHideNuxText()
  * @method string getId()
- * @method Image_Versions2 getImageVersions2()
+ * @method ImageVersions2 getImageVersions2()
  * @method mixed getLink()
  * @method mixed getLinkHintText()
  * @method mixed getLinkText()
@@ -67,7 +67,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setHeadline(Headline $value)
  * @method setHideNuxText(mixed $value)
  * @method setId(string $value)
- * @method setImageVersions2(Image_Versions2 $value)
+ * @method setImageVersions2(ImageVersions2 $value)
  * @method setLink(mixed $value)
  * @method setLinkHintText(mixed $value)
  * @method setLinkText(mixed $value)
@@ -102,7 +102,7 @@ class CarouselMedia extends AutoPropertyHandler
      */
     public $carousel_parent_id;
     /**
-     * @var Image_Versions2
+     * @var ImageVersions2
      */
     public $image_versions2;
     /**

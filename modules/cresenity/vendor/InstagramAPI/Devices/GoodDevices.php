@@ -115,7 +115,7 @@ class GoodDevices
     /*
      * LAST-UPDATED: MARCH 2017.
      */
-    const DEVICES = [
+    public static $DEVICES = [
         /* OnePlus 3T. Released: November 2016.
          * https://www.amazon.com/OnePlus-A3010-64GB-Gunmetal-International/dp/B01N4H00V8
          * https://www.handsetdetection.com/properties/devices/OnePlus/A3010
@@ -160,9 +160,9 @@ class GoodDevices
      */
     public static function getRandomGoodDevice()
     {
-        $randomIdx = array_rand(self::DEVICES, 1);
+        $randomIdx = array_rand(self::$DEVICES, 1);
 
-        return self::DEVICES[$randomIdx];
+        return self::$DEVICES[$randomIdx];
     }
 
     /**
@@ -172,7 +172,7 @@ class GoodDevices
      */
     public static function getAllGoodDevices()
     {
-        return self::DEVICES;
+        return self::$DEVICES;
     }
 
     /**
@@ -185,6 +185,6 @@ class GoodDevices
     public static function isGoodDevice(
         $deviceString)
     {
-        return in_array($deviceString, self::DEVICES, true);
+        return in_array($deviceString, self::$DEVICES, true);
     }
 }

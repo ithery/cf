@@ -69,7 +69,7 @@ interface ResponseInterface
     /**
      * Sets the special API status messages.
      *
-     * @param Response\Model\_Message[]|null $_messages
+     * @param Response\Model\ZMessage[]|null $_messages
      */
     public function set_Messages(
         $_messages);
@@ -81,7 +81,7 @@ interface ResponseInterface
      * information. Known messages: "fb_needs_reauth", "vkontakte_needs_reauth",
      * "twitter_needs_reauth", "ameba_needs_reauth", "update_push_token".
      *
-     * @return Response\Model\_Message[]|null Messages if any, otherwise NULL.
+     * @return Response\Model\ZMessage[]|null Messages if any, otherwise NULL.
      */
     public function get_Messages();
 

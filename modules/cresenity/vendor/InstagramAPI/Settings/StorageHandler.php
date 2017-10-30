@@ -24,7 +24,7 @@ class StorageHandler
      *
      * @var array
      */
-    const PERSISTENT_KEYS = [
+    public static $PERSISTENT_KEYS = [
         'account_id', // The numerical UserPK ID of the account.
         'devicestring', // Which Android device they're identifying as.
         'device_id', // Hardware identifier.
@@ -47,11 +47,11 @@ class StorageHandler
      * the values of all settings EXCEPT the keys listed here. It is therefore
      * VERY important to list ALL important NON-DEVICE specific settings here!
      *
-     * @var array
+     * @var arrayKEEP_KEYS_WHEN_ERASING_DEVICE
      *
      * @see StorageHandler::eraseDeviceSettings()
      */
-    const KEEP_KEYS_WHEN_ERASING_DEVICE = [
+    public static $KEEP_KEYS_WHEN_ERASING_DEVICE = [
         'account_id', // We don't really need to keep this, but it's a good example.
     ];
 
@@ -62,7 +62,7 @@ class StorageHandler
      *
      * @var array
      */
-    const EXPERIMENT_KEYS = [
+    public static $EXPERIMENT_KEYS = [
         'ig_android_2fac',
         'ig_android_realtime_iris',
         'ig_android_skywalker_live_event_start_end',
@@ -77,7 +77,7 @@ class StorageHandler
      *   end or when switching to a different user). Can be used for bulk-saving
      *   data at the end of a user's session, to avoid constant micro-updates.
      */
-    const SUPPORTED_CALLBACKS = [
+    public static $SUPPORTED_CALLBACKS = [
         'onCloseUser',
     ];
 
@@ -261,7 +261,7 @@ class StorageHandler
             }
 
             // Only keep values for keys that are still in use. Discard others.
-            if (in_array($key, self::PERSISTENT_KEYS)) {
+            if (in_array($key, self::$PERSISTENT_KEYS)) {
                 // Cast all values to strings to ensure we only use strings!
                 // NOTE: THIS CAST IS EXTREMELY IMPORTANT AND *MUST* BE DONE!
                 $this->_userSettings[$key] = (string) $value;
@@ -301,8 +301,8 @@ class StorageHandler
      */
     public function eraseDeviceSettings()
     {
-        foreach (self::PERSISTENT_KEYS as $key) {
-            if (!in_array($key, self::KEEP_KEYS_WHEN_ERASING_DEVICE)) {
+        foreach (self::$PERSISTENT_KEYS as $key) {
+            if (!in_array($key, self::$KEEP_KEYS_WHEN_ERASING_DEVICE)) {
                 $this->set($key, '');
             }
         }
@@ -326,7 +326,7 @@ class StorageHandler
         $this->_throwIfNoActiveUser();
 
         // Reject anything that isn't in our list of VALID persistent keys.
-        if (!in_array($key, self::PERSISTENT_KEYS)) {
+        if (!in_array($key, self::$PERSISTENT_KEYS)) {
             throw new SettingsException(sprintf(
                 'The settings key "%s" is not a valid persistent key name.',
                 $key
@@ -359,7 +359,7 @@ class StorageHandler
         $this->_throwIfNoActiveUser();
 
         // Reject anything that isn't in our list of VALID persistent keys.
-        if (!in_array($key, self::PERSISTENT_KEYS)) {
+        if (!in_array($key, self::$PERSISTENT_KEYS)) {
             throw new SettingsException(sprintf(
                 'The settings key "%s" is not a valid persistent key name.',
                 $key
@@ -519,7 +519,7 @@ class StorageHandler
         $cbName)
     {
         // Reject anything that isn't in our list of VALID callbacks.
-        if (!in_array($cbName, self::SUPPORTED_CALLBACKS)) {
+        if (!in_array($cbName, self::$SUPPORTED_CALLBACKS)) {
             throw new SettingsException(sprintf(
                 'The string "%s" is not a valid callback name.',
                 $cbName
@@ -554,7 +554,7 @@ class StorageHandler
         array $experiments)
     {
         $filtered = [];
-        foreach (self::EXPERIMENT_KEYS as $key) {
+        foreach (self::$EXPERIMENT_KEYS as $key) {
             if (!isset($experiments[$key])) {
                 continue;
             }

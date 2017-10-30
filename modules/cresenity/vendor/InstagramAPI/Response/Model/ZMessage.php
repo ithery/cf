@@ -12,7 +12,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setKey(mixed $value)
  * @method setTime(mixed $value)
  */
-class _Message extends AutoPropertyHandler
+class ZMessage extends AutoPropertyHandler
 {
     public $key;
     public $time;

@@ -12,7 +12,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setCandidates(ImageCandidate[] $value)
  * @method setTraceToken(mixed $value)
  */
-class Image_Versions2 extends AutoPropertyHandler
+class ImageVersions2 extends AutoPropertyHandler
 {
     /**
      * @var ImageCandidate[]
