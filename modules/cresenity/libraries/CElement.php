@@ -56,8 +56,8 @@ class CElement extends CObservable {
         }
     }
 
-    public static function factory($id = "", $tag = "div") {
-        return new CElement($id, $tag);
+    public static function factory($id = "") {
+        return new CElement($id);
     }
 
     public function set_radio($radio) {

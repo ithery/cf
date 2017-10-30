@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp\Ring\Future;
 
 use React\Promise\PromiseInterface;
@@ -16,8 +17,8 @@ use React\Promise\PromisorInterface;
  * computation has not yet completed when wait() is called, the call to wait()
  * will block until the future has completed.
  */
-interface FutureInterface extends PromiseInterface, PromisorInterface
-{
+interface FutureInterface extends PromiseInterface, PromisorInterface {
+
     /**
      * Returns the result of the future either from cache or by blocking until
      * it is complete.
@@ -37,4 +38,10 @@ interface FutureInterface extends PromiseInterface, PromisorInterface
      * Cancels the future, if possible.
      */
     public function cancel();
+
+    public function always(callable $onFulfilledOrRejected);
+
+    public function done(callable $onFulfilled = null, callable $onRejected = null);
+
+    public function otherwise(callable $onRejected);
 }

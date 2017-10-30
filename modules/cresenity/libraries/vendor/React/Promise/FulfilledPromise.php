@@ -2,6 +2,9 @@
 
 namespace React\Promise;
 
+require_once dirname(__FILE__) . '/functions_include.php';
+
+
 final class FulfilledPromise implements PromiseInterface
 {
     private $value;

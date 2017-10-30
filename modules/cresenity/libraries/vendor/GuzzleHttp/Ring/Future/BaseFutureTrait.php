@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp\Ring\Future;
 
 use GuzzleHttp\Ring\Exception\CancelledFutureAccessException;
@@ -8,8 +9,8 @@ use React\Promise\PromiseInterface;
 /**
  * Implements common future functionality built on top of promises.
  */
-trait BaseFutureTrait
-{
+trait BaseFutureTrait {
+
     /** @var callable */
     private $waitfn;
 
@@ -24,7 +25,6 @@ trait BaseFutureTrait
 
     /** @var mixed Result of the future */
     private $result;
-
     private $isRealized = false;
 
     /**
@@ -38,17 +38,14 @@ trait BaseFutureTrait
      *                                  future from completing.
      */
     public function __construct(
-        PromiseInterface $promise,
-        callable $wait = null,
-        callable $cancel = null
+    PromiseInterface $promise, callable $wait = null, callable $cancel = null
     ) {
         $this->wrappedPromise = $promise;
         $this->waitfn = $wait;
         $this->cancelfn = $cancel;
     }
 
-    public function wait()
-    {
+    public function wait() {
         if (!$this->isRealized) {
             $this->addShadow();
             if (!$this->isRealized && $this->waitfn) {
@@ -66,21 +63,17 @@ trait BaseFutureTrait
         return $this->result;
     }
 
-    public function promise()
-    {
+    public function promise() {
         return $this->wrappedPromise;
     }
 
     public function then(
-        callable $onFulfilled = null,
-        callable $onRejected = null,
-        callable $onProgress = null
+    callable $onFulfilled = null, callable $onRejected = null, callable $onProgress = null
     ) {
         return $this->wrappedPromise->then($onFulfilled, $onRejected, $onProgress);
     }
 
-    public function cancel()
-    {
+    public function cancel() {
         if (!$this->isRealized) {
             $cancelfn = $this->cancelfn;
             $this->waitfn = $this->cancelfn = null;
@@ -92,26 +85,35 @@ trait BaseFutureTrait
         }
     }
 
-    private function addShadow()
-    {
+    public function always(callable $onFulfilledOrRejected) {
+        return $this->wrappedPromise->always($onFulfilledOrRejected);
+    }
+
+    public function done(callable $onFulfilled = null, callable $onRejected = null) {
+        return $this->wrappedPromise->done($onFulfilled, $onRejected);
+    }
+
+    public function otherwise(callable $onRejected) {
+        return $this->wrappedPromise->always($onRejected);
+    }
+
+    private function addShadow() {
         // Get the result and error when the promise is resolved. Note that
         // calling this function might trigger the resolution immediately.
         $this->wrappedPromise->then(
-            function ($value) {
-                $this->isRealized = true;
-                $this->result = $value;
-                $this->waitfn = $this->cancelfn = null;
-            },
-            function ($error) {
-                $this->isRealized = true;
-                $this->error = $error;
-                $this->waitfn = $this->cancelfn = null;
-            }
+                function ($value) {
+            $this->isRealized = true;
+            $this->result = $value;
+            $this->waitfn = $this->cancelfn = null;
+        }, function ($error) {
+            $this->isRealized = true;
+            $this->error = $error;
+            $this->waitfn = $this->cancelfn = null;
+        }
         );
     }
 
-    private function invokeWait()
-    {
+    private function invokeWait() {
         try {
             $wait = $this->waitfn;
             $this->waitfn = null;
@@ -122,4 +124,5 @@ trait BaseFutureTrait
             $this->isRealized = true;
         }
     }
+
 }

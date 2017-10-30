@@ -4,9 +4,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CDivElement extends CElement {
 
-    public function __construct($id = "") {
+    public function __construct($id = "", $tag = "div") {
 
-        parent::__construct($id);
+        parent::__construct($id,$tag);
         $this->tag = "div";
     }
 

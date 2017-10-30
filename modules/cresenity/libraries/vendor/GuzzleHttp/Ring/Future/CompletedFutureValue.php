@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp\Ring\Future;
 
 use React\Promise\FulfilledPromise;
@@ -7,11 +8,10 @@ use React\Promise\RejectedPromise;
 /**
  * Represents a future value that has been resolved or rejected.
  */
-class CompletedFutureValue implements FutureInterface
-{
+class CompletedFutureValue implements FutureInterface {
+
     protected $result;
     protected $error;
-
     private $cachedPromise;
 
     /**
@@ -19,14 +19,12 @@ class CompletedFutureValue implements FutureInterface
      * @param \Exception $e      Error. Pass a GuzzleHttp\Ring\Exception\CancelledFutureAccessException
      *                           to mark the future as cancelled.
      */
-    public function __construct($result, \Exception $e = null)
-    {
+    public function __construct($result, \Exception $e = null) {
         $this->result = $result;
         $this->error = $e;
     }
 
-    public function wait()
-    {
+    public function wait() {
         if ($this->error) {
             throw $this->error;
         }
@@ -34,24 +32,32 @@ class CompletedFutureValue implements FutureInterface
         return $this->result;
     }
 
-    public function cancel() {}
+    public function cancel() {
+        
+    }
 
-    public function promise()
-    {
+    public function promise() {
         if (!$this->cachedPromise) {
-            $this->cachedPromise = $this->error
-                ? new RejectedPromise($this->error)
-                : new FulfilledPromise($this->result);
+            $this->cachedPromise = $this->error ? new RejectedPromise($this->error) : new FulfilledPromise($this->result);
         }
 
         return $this->cachedPromise;
     }
 
-    public function then(
-        callable $onFulfilled = null,
-        callable $onRejected = null,
-        callable $onProgress = null
-    ) {
+    public function then(callable $onFulfilled = null, callable $onRejected = null, callable $onProgress = null) {
         return $this->promise()->then($onFulfilled, $onRejected, $onProgress);
     }
+
+    public function always(callable $onFulfilledOrRejected) {
+        return $this->promise()->always($onFulfilledOrRejected);
+    }
+
+    public function done(callable $onFulfilled = null, callable $onRejected = null) {
+        return $this->promise()->done($onFulfilled, $onRejected);
+    }
+
+    public function otherwise(callable $onRejected) {
+        return $this->promise()->otherwise($onRejected);
+    }
+
 }
