@@ -302,7 +302,7 @@ class cajax {
                     $i2 = -1;
                 }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
-                    $sOrder .= "`" . $columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname . "` " . mysql_real_escape_string($request['sSortDir_' . $i]) . ", ";
+                    $sOrder .= "" . $db->escape_column($columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -2);
