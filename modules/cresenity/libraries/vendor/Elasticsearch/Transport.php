@@ -106,7 +106,7 @@ class Transport {
                 //onFailure
                 function ($response) {
             // Ignore 400 level errors, as that means the server responded just fine
-            if ($response instanceof Exception) {
+            if ($response instanceof \Exception) {
                 throw $response;
             }
 
