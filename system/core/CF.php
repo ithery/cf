@@ -1209,16 +1209,18 @@ final class CF {
 
             $routing_file .= str_replace('_', DS, $routing_class);
 
-            // find file at libraries/vendor
-            if ($path = self::find_file($directory, 'vendor' . DS . $routing_file)) {
-                // Load the class file
-                require $path;
-                
-                if(class_exists($class)) {
-                    $class_not_found = TRUE;
-                    return TRUE;
+            if($directory=='libraries') {
+                // find file at vendor first
+                if ($path = self::find_file('vendor', $routing_file)) {
+                    // Load the class file
+                    require $path;
+
+                    if(class_exists($class)) {
+                        $class_not_found = TRUE;
+                        return TRUE;
+                    }
+
                 }
-                
             }
             // find file at libraries
             if ($path = self::find_file($directory, $routing_file)) {
