@@ -2,8 +2,9 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-final class CF {
 
+final class CF {
+    
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 

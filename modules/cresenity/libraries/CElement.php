@@ -1,6 +1,6 @@
 <?php
 
-class CElement extends CObservable {
+abstract class CElement extends CObservable {
 
     protected $classes;
     protected $tag;
@@ -54,10 +54,6 @@ class CElement extends CObservable {
             $bootstrap = ccfg::get('bootstrap');
             $this->bootstrap = $bootstrap;
         }
-    }
-
-    public static function factory($id = "") {
-        return new CElement($id);
     }
 
     public function set_radio($radio) {
