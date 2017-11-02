@@ -18,12 +18,7 @@ class CFRouter {
     public static $controller_path;
     public static $method = 'index';
     public static $arguments = array();
-
-    /**
-     * CFRouter setup routine. Automatically called during CF setup process.
-     *
-     * @return  void
-     */
+    public static $route_data = array();
 
     /**
      * CFRouter setup routine. Automatically called during CF setup process.
@@ -42,296 +37,217 @@ class CFRouter {
         }
     }
 
+    /**
+     * CFRouter get route data
+     *
+     * @return  array
+     */
     public static function get_route_data($uri = null) {
-        $data = array();
-        $data['routes'] = NULL;
-        $data['current_uri'] = '';
-        $data['query_string'] = '';
-        $data['complete_uri'] = '';
-        $data['routed_uri'] = '';
-        $data['url_suffix'] = '';
-        $data['segments'] = NULL;
-        $data['rsegments'] = NULL;
-        $data['controller'] = NULL;
-        $data['controller_dir'] = NULL;
-        $data['controller_dir_ucfirst'] = NULL;
-        $data['controller_path'] = NULL;
-        $data['method'] = 'index';
-        $data['arguments'] = array();
+        if (self::$route_data == null) {
+            self::$route_data = array();
+        }
 
+        $current_uri = NULL;
+        $routes = NULL;
         if ($uri !== null) {
-            $data['current_uri'] = $uri;
-        }
-        if (!empty($_SERVER['QUERY_STRING'])) {
-            // Set the query string to the current query string
-            $data['query_string'] = '?' . trim($_SERVER['QUERY_STRING'], '&/');
+            $current_uri = $uri;
         }
 
-        if ($data['routes'] === NULL) {
+        if ($current_uri === null) {
+            $current_uri = self::get_uri();
+        }
+
+        if ($routes === NULL) {
             // Load routes
-            $data['routes'] = CF::config('routes');
+            $routes = CF::config('routes');
         }
 
         // Default route status
         $default_route = FALSE;
 
-        if ($data['current_uri'] === '') {
+        if ($current_uri === '') {
             // Make sure the default route is set
-            if (!isset($data['routes']['_default']))
+            if (!isset($routes['_default']))
                 throw new CF_Exception('core.no_default_route');
 
             // Use the default route when no segments exist
-            $data['current_uri'] = $data['routes']['_default'];
+            $current_uri = $routes['_default'];
 
             // Default route is in use
             $default_route = TRUE;
         }
 
         // Make sure the URL is not tainted with HTML characters
-        $data['current_uri'] = chtml::specialchars($data['current_uri'], FALSE);
+        $current_uri = chtml::specialchars($current_uri, FALSE);
 
         // Remove all dot-paths from the URI, they are not valid
-        $data['current_uri'] = preg_replace('#\.[\s./]*/#', '', $data['current_uri']);
+        $current_uri = preg_replace('#\.[\s./]*/#', '', $current_uri);
 
-        // At this point segments, rsegments, and current URI are all the same
-        $data['segments'] = $data['rsegments'] = $data['current_uri'] = trim($data['current_uri'], '/');
 
-        // Set the complete URI
-        $data['complete_uri'] = $data['current_uri'] . $data['query_string'];
+        if (!isset(self::$route_data[$current_uri])) {
+            $data = array();
+            $data['routes'] = $routes;
+            $data['current_uri'] = $current_uri;
+            $data['query_string'] = '';
+            $data['complete_uri'] = '';
+            $data['routed_uri'] = '';
+            $data['url_suffix'] = '';
+            $data['segments'] = NULL;
+            $data['rsegments'] = NULL;
+            $data['controller'] = NULL;
+            $data['controller_dir'] = NULL;
+            $data['controller_dir_ucfirst'] = NULL;
+            $data['controller_path'] = NULL;
+            $data['method'] = 'index';
+            $data['arguments'] = array();
 
-        // Explode the segments by slashes
-        $data['segments'] = ($default_route === TRUE OR $data['segments'] === '') ? array() : explode('/', $data['segments']);
 
-        if ($default_route === FALSE AND count($data['routes']) > 1) {
-            // Custom routing
-            $data['rsegments'] = self::routed_uri($data['current_uri']);
-        }
+            if (!empty($_SERVER['QUERY_STRING'])) {
+                // Set the query string to the current query string
+                $data['query_string'] = '?' . trim($_SERVER['QUERY_STRING'], '&/');
+            }
 
-        // The routed URI is now complete
-        $data['routed_uri'] = $data['rsegments'];
+            // At this point segments, rsegments, and current URI are all the same
+            $data['segments'] = $data['rsegments'] = $data['current_uri'] = trim($data['current_uri'], '/');
 
-        // Routed segments will never be empty
-        $data['rsegments'] = explode('/', $data['rsegments']);
+            // Set the complete URI
+            $data['complete_uri'] = $data['current_uri'] . $data['query_string'];
 
-        // Prepare to find the controller
-        $controller_path = '';
-        $controller_path_ucfirst = '';
-        $c_dir = '';
-        $c_dir_ucfirst = '';
-        $method_segment = NULL;
+            // Explode the segments by slashes
+            $data['segments'] = ($default_route === TRUE OR $data['segments'] === '') ? array() : explode('/', $data['segments']);
 
-        // Paths to search
-        $paths = CF::include_paths_theme(TRUE);
+            if ($default_route === FALSE AND count($data['routes']) > 1) {
+                // Custom routing
+                $data['rsegments'] = self::routed_uri($data['current_uri'],$data['routes']);
+            }
 
-        foreach ($data['rsegments'] as $key => $segment) {
-            // Add the segment to the search path
-            $c_dir = $controller_path;
-            $c_dir_ucfirst = strtolower($controller_path_ucfirst);
-            $controller_path .= $segment;
-            $controller_path_ucfirst .= ucfirst($segment);
-            $found = FALSE;
+            // The routed URI is now complete
+            $data['routed_uri'] = $data['rsegments'];
 
-            foreach ($paths as $dir) {
-                // Search within controllers only
-                $dir .= 'controllers' . DS;
+            // Routed segments will never be empty
+            $data['rsegments'] = explode('/', $data['rsegments']);
 
-                if (is_dir($dir . $controller_path) OR is_file($dir . $controller_path . EXT)) {
+            // Prepare to find the controller
+            $controller_path = '';
+            $controller_path_ucfirst = '';
+            $c_dir = '';
+            $c_dir_ucfirst = '';
+            $method_segment = NULL;
 
-                    // Valid path
-                    $found = TRUE;
+            // Paths to search
+            $paths = CF::include_paths_theme(TRUE);
 
-                    // The controller must be a file that exists with the search path
-                    if ($c = str_replace('\\', '/', realpath($dir . $controller_path . EXT))
-                            AND is_file($c)) {
+            foreach ($data['rsegments'] as $key => $segment) {
+                // Add the segment to the search path
+                $c_dir = $controller_path;
+                $c_dir_ucfirst = strtolower($controller_path_ucfirst);
+                $controller_path .= $segment;
+                $controller_path_ucfirst .= ucfirst($segment);
+                $found = FALSE;
 
-                        // Set controller name
-                        $data['controller'] = $segment;
+                foreach ($paths as $dir) {
+                    // Search within controllers only
+                    $dir .= 'controllers' . DS;
 
-                        // Set controller dir
-                        $data['controller_dir'] = $c_dir;
-                        $data['controller_dir_ucfirst'] = $c_dir_ucfirst;
+                    if (is_dir($dir . $controller_path) OR is_file($dir . $controller_path . EXT)) {
 
-                        // Change controller path
-                        $data['controller_path'] = $c;
+                        // Valid path
+                        $found = TRUE;
 
-                        // Set the method segment
-                        $method_segment = $key + 1;
+                        // The controller must be a file that exists with the search path
+                        if ($c = str_replace('\\', '/', realpath($dir . $controller_path . EXT))
+                                AND is_file($c)) {
 
-                        // Stop searching
-                        break;
+                            // Set controller name
+                            $data['controller'] = $segment;
+
+                            // Set controller dir
+                            $data['controller_dir'] = $c_dir;
+                            $data['controller_dir_ucfirst'] = $c_dir_ucfirst;
+
+                            // Change controller path
+                            $data['controller_path'] = $c;
+
+                            // Set the method segment
+                            $method_segment = $key + 1;
+
+                            // Stop searching
+                            break;
+                        }
+                        //if(strlen($c_dir)>0) $c_dir.=DS;
                     }
-                    //if(strlen($c_dir)>0) $c_dir.=DS;
+
+                    //                                echo $c_dir .'<br/>';
                 }
 
-//                                echo $c_dir .'<br/>';
+                if ($found === FALSE) {
+                    // Maximum depth has been reached, stop searching
+                    break;
+                }
+
+                // Add another slash
+                $controller_path .= '/';
+                $controller_path_ucfirst .= '/';
             }
 
-            if ($found === FALSE) {
-                // Maximum depth has been reached, stop searching
-                break;
-            }
+            if ($method_segment !== NULL AND isset($data['rsegments'][$method_segment])) {
+                // Set method
+                $data['method'] = $data['rsegments'][$method_segment];
 
-            // Add another slash
-            $controller_path .= '/';
-            $controller_path_ucfirst .= '/';
+                if (isset($data['rsegments'][$method_segment + 1])) {
+                    // Set arguments
+                    $data['arguments'] = array_slice($data['rsegments'], $method_segment + 1);
+                }
+            }
+            self::$route_data[$current_uri] = $data;
         }
-
-        if ($method_segment !== NULL AND isset($data['rsegments'][$method_segment])) {
-            // Set method
-            $data['method'] = $data['rsegments'][$method_segment];
-
-            if (isset($data['rsegments'][$method_segment + 1])) {
-                // Set arguments
-                $data['arguments'] = array_slice($data['rsegments'], $method_segment + 1);
-            }
-        }
-        return $data;
+        return self::$route_data[$current_uri];
     }
 
+    /**
+     * 
+     * @param string $uri if null, using the current uri 
+     * 
+     * @return void
+     */
     public static function resetup($uri = null) {
         if ($uri !== null) {
             self::$current_uri = $uri;
         }
-        if (!empty($_SERVER['QUERY_STRING'])) {
-            // Set the query string to the current query string
-            self::$query_string = '?' . trim($_SERVER['QUERY_STRING'], '&/');
-        }
+        $data = self::get_route_data(self::$current_uri);
 
-        if (self::$routes === NULL) {
-            // Load routes
-            self::$routes = CF::config('routes');
-        }
-
-        // Default route status
-        $default_route = FALSE;
-
-        if (self::$current_uri === '') {
-            // Make sure the default route is set
-            if (!isset(self::$routes['_default']))
-                throw new CF_Exception('core.no_default_route');
-
-            // Use the default route when no segments exist
-            self::$current_uri = self::$routes['_default'];
-
-            // Default route is in use
-            $default_route = TRUE;
-        }
-
-        // Make sure the URL is not tainted with HTML characters
-        self::$current_uri = chtml::specialchars(self::$current_uri, FALSE);
-
-        // Remove all dot-paths from the URI, they are not valid
-        self::$current_uri = preg_replace('#\.[\s./]*/#', '', self::$current_uri);
-
-        // At this point segments, rsegments, and current URI are all the same
-        self::$segments = self::$rsegments = self::$current_uri = trim(self::$current_uri, '/');
-
-        // Set the complete URI
-        self::$complete_uri = self::$current_uri . self::$query_string;
-
-        // Explode the segments by slashes
-        self::$segments = ($default_route === TRUE OR self::$segments === '') ? array() : explode('/', self::$segments);
-
-        if ($default_route === FALSE AND count(self::$routes) > 1) {
-            // Custom routing
-            self::$rsegments = self::routed_uri(self::$current_uri);
-        }
-
-        // The routed URI is now complete
-        self::$routed_uri = self::$rsegments;
-
-        // Routed segments will never be empty
-        self::$rsegments = explode('/', self::$rsegments);
-
-        // Prepare to find the controller
-        $controller_path = '';
-        $controller_path_ucfirst = '';
-        $c_dir = '';
-        $c_dir_ucfirst = '';
-        $method_segment = NULL;
-
-        // Paths to search
-        $paths = CF::include_paths_theme(TRUE);
-
-        foreach (self::$rsegments as $key => $segment) {
-            // Add the segment to the search path
-            $c_dir = $controller_path;
-            $c_dir_ucfirst = strtolower($controller_path_ucfirst);
-            $controller_path .= $segment;
-            $controller_path_ucfirst .= ucfirst($segment);
-            $found = FALSE;
-
-            foreach ($paths as $dir) {
-                // Search within controllers only
-                $dir .= 'controllers' . DS;
-
-                if (is_dir($dir . $controller_path) OR is_file($dir . $controller_path . EXT)) {
-
-                    // Valid path
-                    $found = TRUE;
-
-                    // The controller must be a file that exists with the search path
-                    if ($c = str_replace('\\', '/', realpath($dir . $controller_path . EXT))
-                            AND is_file($c)) {
-
-                        // Set controller name
-                        self::$controller = $segment;
-
-                        // Set controller dir
-                        self::$controller_dir = $c_dir;
-                        self::$controller_dir_ucfirst = $c_dir_ucfirst;
-
-                        // Change controller path
-                        self::$controller_path = $c;
-
-                        // Set the method segment
-                        $method_segment = $key + 1;
-
-                        // Stop searching
-                        break;
-                    }
-                    //if(strlen($c_dir)>0) $c_dir.=DS;
-                }
-
-//                                echo $c_dir .'<br/>';
-            }
-
-            if ($found === FALSE) {
-                // Maximum depth has been reached, stop searching
-                break;
-            }
-
-            // Add another slash
-            $controller_path .= '/';
-            $controller_path_ucfirst .= '/';
-        }
-
-        if ($method_segment !== NULL AND isset(self::$rsegments[$method_segment])) {
-            // Set method
-            self::$method = self::$rsegments[$method_segment];
-
-            if (isset(self::$rsegments[$method_segment + 1])) {
-                // Set arguments
-                self::$arguments = array_slice(self::$rsegments, $method_segment + 1);
-            }
-        }
+        self::$routes = carr::get($data, 'routes');
+        self::$current_uri = carr::get($data, 'current_uri');
+        self::$query_string = carr::get($data, 'query_string');
+        self::$complete_uri = carr::get($data, 'complete_uri');
+        self::$routed_uri = carr::get($data, 'routed_uri');
+        self::$url_suffix = carr::get($data, 'url_suffix');
+        self::$segments = carr::get($data, 'segments');
+        self::$rsegments = carr::get($data, 'rsegments');
+        self::$controller = carr::get($data, 'controller');
+        self::$controller_dir = carr::get($data, 'controller_dir');
+        self::$controller_dir_ucfirst = carr::get($data, 'controller_dir_ucfirst');
+        self::$controller_path = carr::get($data, 'controller_path');
+        self::$method = carr::get($data, 'method');
+        self::$arguments = carr::get($data, 'arguments');
     }
 
     /**
+     * 
      * Attempts to determine the current URI using CLI, GET, PATH_INFO, ORIG_PATH_INFO, or PHP_SELF.
-     *
-     * @return  void
+     * 
+     * @return string uri
      */
-    public static function find_uri() {
-
+    public static function get_uri() {
+        $current_uri = '';
         if (PHP_SAPI === 'cli') {
             // Command line requires a bit of hacking
             if (isset($_SERVER['argv'][1])) {
-                self::$current_uri = $_SERVER['argv'][1];
+                $current_uri = $_SERVER['argv'][1];
 
                 // Remove GET string from segments
-                if (($query = strpos(self::$current_uri, '?')) !== FALSE) {
-                    list (self::$current_uri, $query) = explode('?', self::$current_uri, 2);
+                if (($query = strpos($current_uri, '?')) !== FALSE) {
+                    list ($current_uri, $query) = explode('?', $current_uri, 2);
 
                     // Parse the query string into $_GET
                     parse_str($query, $_GET);
@@ -343,7 +259,7 @@ class CFRouter {
         } elseif (isset($_GET['kohana_uri'])) {
 
             // Use the URI defined in the query string
-            self::$current_uri = $_GET['kohana_uri'];
+            $current_uri = $_GET['kohana_uri'];
 
             // Remove the URI from $_GET
             unset($_GET['kohana_uri']);
@@ -351,36 +267,46 @@ class CFRouter {
             // Remove the URI from $_SERVER['QUERY_STRING']
             $_SERVER['QUERY_STRING'] = preg_replace('~\bkohana_uri\b[^&]*+&?~', '', $_SERVER['QUERY_STRING']);
         } elseif (isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO']) {
-            self::$current_uri = $_SERVER['PATH_INFO'];
-            if (self::$current_uri == '/403.shtml') {
-                self::$current_uri = $_SERVER['REQUEST_URI'];
+            $current_uri = $_SERVER['PATH_INFO'];
+            if ($current_uri == '/403.shtml') {
+                $current_uri = $_SERVER['REQUEST_URI'];
             }
         } elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'] AND $_SERVER['ORIG_PATH_INFO'] != '/403.shtml') {
-            self::$current_uri = $_SERVER['ORIG_PATH_INFO'];
+            $current_uri = $_SERVER['ORIG_PATH_INFO'];
         } elseif (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF']) {
-            self::$current_uri = $_SERVER['PHP_SELF'];
+            $current_uri = $_SERVER['PHP_SELF'];
         }
 
-        if (($strpos_fc = strpos(self::$current_uri, KOHANA)) !== FALSE) {
+        if (($strpos_fc = strpos($current_uri, KOHANA)) !== FALSE) {
             // Remove the front controller from the current uri
-            self::$current_uri = (string) substr(self::$current_uri, $strpos_fc + strlen(KOHANA));
+            $current_uri = (string) substr($current_uri, $strpos_fc + strlen(KOHANA));
         }
 
         // Remove slashes from the start and end of the URI
-        self::$current_uri = trim(self::$current_uri, '/');
+        $current_uri = trim($current_uri, '/');
 
-        if (self::$current_uri !== '') {
-            if ($suffix = CF::config('core.url_suffix') AND strpos(self::$current_uri, $suffix) !== FALSE) {
+        if ($current_uri !== '') {
+            if ($suffix = CF::config('core.url_suffix') AND strpos($current_uri, $suffix) !== FALSE) {
                 // Remove the URL suffix
-                self::$current_uri = preg_replace('#' . preg_quote($suffix) . '$#u', '', self::$current_uri);
+                $current_uri = preg_replace('#' . preg_quote($suffix) . '$#u', '', $current_uri);
 
                 // Set the URL suffix
                 self::$url_suffix = $suffix;
             }
 
             // Reduce multiple slashes into single slashes
-            self::$current_uri = preg_replace('#//+#', '/', self::$current_uri);
+            $current_uri = preg_replace('#//+#', '/', $current_uri);
         }
+        return $current_uri;
+    }
+
+    /**
+     * Attempts to determine the current URI using CLI, GET, PATH_INFO, ORIG_PATH_INFO, or PHP_SELF.
+     *
+     * @return  void
+     */
+    public static function find_uri() {
+        self::$current_uri = self::get_uri();
     }
 
     /**
@@ -389,18 +315,18 @@ class CFRouter {
      * @param  string  URI to convert
      * @return string  Routed uri
      */
-    public static function routed_uri($uri) {
-        if (self::$routes === NULL) {
+    public static function routed_uri($uri, & $routes=null) {
+        if ($routes === NULL) {
             // Load routes
-            self::$routes = CF::config('routes');
+            $routes = CF::config('routes');
         }
 
         // Prepare variables
         $routed_uri = $uri = trim($uri, '/');
 
-        if (isset(self::$routes[$uri])) {
+        if (isset($routes[$uri])) {
             // Literal match, no need for regex
-            $routed_uri = self::$routes[$uri];
+            $routed_uri = $routes[$uri];
         } else {
             // Loop through the routes and see if anything matches
             foreach (self::$routes as $key => $val) {
@@ -426,9 +352,9 @@ class CFRouter {
             }
         }
 
-        if (isset(self::$routes[$routed_uri])) {
+        if (isset($routes[$routed_uri])) {
             // Check for double routing (without regex)
-            $routed_uri = self::$routes[$routed_uri];
+            $routed_uri = $routes[$routed_uri];
         }
 
         return trim($routed_uri, '/');

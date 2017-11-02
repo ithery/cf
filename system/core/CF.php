@@ -267,7 +267,7 @@ final class CF {
         if (self::$instance === NULL) {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
             if (empty(CFRouter::$controller_path)) {
-                exit;
+               CF::show_404();
             }
             // Include the Controller file
             require CFRouter::$controller_path;
