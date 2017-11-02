@@ -575,7 +575,7 @@ class cdbg {
         return $file;
     }
 
-    public static function deprecated($message = '') {
+    public static function deprecated($message = '', $email = '') {
         //run just once to make this performance good
 
 
@@ -585,44 +585,17 @@ class cdbg {
         if (!self::$deprecated_has_run) {
             self::$deprecated_has_run = true;
         }
-
-        $backtrace = debug_backtrace();
-        $full_function_1 = '';
-        $full_function_2 = '';
-        if (count($backtrace) > 1) {
-            $state = $backtrace[1];
-            $function = carr::get($state, 'function', '');
-            $class = carr::get($state, 'class', '');
-            $type = carr::get($state, 'type', '');
-            $line = carr::get($state, 'line', '');
-            $line_str = '';
-            if (strlen($line) > 0) {
-                $line_str = ' on line ' . $line;
-            }
-            $full_function_1 = $class . $type . $function . $line_str;
-        }
-        if (count($backtrace) > 2) {
-            $state = $backtrace[2];
-            $function = carr::get($state, 'function', '');
-            $class = carr::get($state, 'class', '');
-            $type = carr::get($state, 'type', '');
-            $line = carr::get($state, 'line', '');
-            $line_str = '';
-            if (strlen($line) > 0) {
-                $line_str = ' on line ' . $line;
-            }
-            $full_function_2 = $class . $type . $function . $line_str;
-        }
         $subject = 'CApp Deprecated on ' . CF::domain() . ' ' . date('Y-m-d H:i:s');
 
-        if (strlen($message) > 0) {
-            $body = '<p>' . $message . '</p>';
+        try {
+            throw new Exception($message);
+        } catch (Exception $ex) {
+            $body = '<p>' . $ex->getMessage() . '</p>';
+            $body .= '<br/><br/>';
+            $body .= '<h4>CApp Deprecated on trace:<h4>';
+            $body .= nl2br($ex->getTraceAsString());
         }
-        $body .= '<br/><br/>';
-        $body .= '<h4>CApp Deprecated on calling function ' . $full_function_1 . '<h4>';
-        if (strlen($full_function_2)) {
-            $body .= '<h4>before calling function ' . $full_function_2 . '<h4>';
-        }
+
         $body .= '<br/><br/>';
         $body .= 'Domain:' . CF::domain() . '<br/>';
         $body .= 'App Code:' . CF::app_code() . '<br/>';
@@ -632,10 +605,11 @@ class cdbg {
         $body .= 'Browser:' . crequest::browser() . '<br/>';
         $body .= '<br/><br/>';
 
-        $backtrace = array_slice($backtrace, 0, 5, true);
-        $body .= cdbg::var_dump($backtrace, true);
         try {
-            cmail::send_smtp('hery@ittron.co.id', $subject, $body);
+            if (strlen($email) == 0) {
+                $email = 'hery@ittron.co.id';
+            }
+            cmail::send_smtp($email, $subject, $body);
         } catch (Exception $ex) {
             echo "Error Email Deprecated" . $ex->getMessage();
         }
