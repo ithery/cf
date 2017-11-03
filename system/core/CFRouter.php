@@ -329,7 +329,7 @@ class CFRouter {
             $routed_uri = $routes[$uri];
         } else {
             // Loop through the routes and see if anything matches
-            foreach (self::$routes as $key => $val) {
+            foreach ($routes as $key => $val) {
                 if ($key === '_default')
                     continue;
 
