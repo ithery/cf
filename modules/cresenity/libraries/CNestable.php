@@ -67,7 +67,7 @@ class CNestable extends CElement {
         return $row_act;
     }
 
-    public function set_data_from_treedb($treedb, $parent_id = null) {
+    public function set_data_from_treedb(CTreeDB $treedb, $parent_id = null) {
         $this->data = $treedb->get_children_data($parent_id);
         return $this;
     }
