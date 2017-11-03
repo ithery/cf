@@ -116,7 +116,7 @@ final class CF {
             $defaultpath .= "default" . DS;
         }
         if (is_dir($capppath . "default" . DS)) {
-            $defaultpath .= "default" . DS;
+            $capppath .= "default" . DS;
         }
 
         define('CAPPPATH', $capppath);
@@ -270,7 +270,9 @@ final class CF {
                CF::show_404();
             }
             // Include the Controller file
-            require CFRouter::$controller_path;
+            if(strlen(CFRouter::$controller_path)>0) {
+                require CFRouter::$controller_path;
+            }
 
             try {
                 // Start validation of the controller

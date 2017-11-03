@@ -336,6 +336,7 @@ class clog {
         $clogger_instance = CLogger::instance();
         $level = CLogger::INFO;
         $message = $options;
+        $param=array();
         if (is_array($options)) {
             $message = carr::get($options, 'message');
             $filename = carr::get($options, 'filename');
@@ -350,6 +351,7 @@ class clog {
               $clogger_instance->set_additional_path($path);
              * 
              */
+            $param['path']=$path;
         }
         return $clogger_instance->add($level, $message);
     }
