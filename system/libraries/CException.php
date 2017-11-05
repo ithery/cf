@@ -2,7 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CException extends CF_Exception {
+class CException extends Exception {
 
     /**
      * @var  array  PHP error code => human readable name
@@ -32,8 +32,9 @@ class CException extends CF_Exception {
      * @return  void
      */
     public function __construct($message = "", array $variables = NULL, $code = 0, Exception $previous = NULL) {
-
-        $message = strtr($message, $variables);
+        if(is_array($variables)) {
+            $message = strtr($message, $variables);
+        }
         // Pass the message and integer code to the parent
         parent::__construct($message);
 
