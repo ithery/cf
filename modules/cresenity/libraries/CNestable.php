@@ -1,6 +1,6 @@
 <?php
 
-class CNestable extends CElement {
+class CNestable extends CObservable {
 
     protected $data;
     protected $id_key;
@@ -11,8 +11,8 @@ class CNestable extends CElement {
     protected $action_style;
     protected $display_callback;
     protected $requires;
-    protected $js_cell;
-    protected $collapse_all;
+    protected $checkbox;
+    protected $disable_dnd;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -25,9 +25,8 @@ class CNestable extends CElement {
         $this->action_style = 'btn-icon-group';
         $this->row_action_list->set_style('btn-icon-group');
         $this->display_callback = false;
+        $this->checkbox = false;
         $this->requires = array();
-        $this->js_cell = '';
-        $this->collapse_all = false;
     }
 
     public static function factory($id) {
@@ -39,11 +38,6 @@ class CNestable extends CElement {
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
-        return $this;
-    }
-
-    public function set_collapse_all($bool) {
-        $this->collapse_all = $bool;
         return $this;
     }
 
@@ -67,18 +61,23 @@ class CNestable extends CElement {
         return $row_act;
     }
 
-    public function set_data_from_treedb(CTreeDB $treedb, $parent_id = null) {
+    public function set_data_from_treedb($treedb, $parent_id = null) {
         $this->data = $treedb->get_children_data($parent_id);
-        return $this;
-    }
-
-    public function set_data_from_array($array = array()) {
-        $this->data = $array;
         return $this;
     }
 
     public function set_id_key($id_key) {
         $this->id_key = $id_key;
+        return $this;
+    }
+
+    public function set_disable_dnd($disable_dnd) {
+        $this->disable_dnd = $disable_dnd;
+        return $this;
+    }
+
+    public function set_have_checkbox($checkbox) {
+        $this->checkbox = $checkbox;
         return $this;
     }
 
@@ -106,15 +105,6 @@ class CNestable extends CElement {
 
             $depth_before = -1;
             $in = 0;
-            if ($this->have_action()) {
-                $this->row_action_list->add_class("pull-right");
-                if ($this->action_style == "btn-dropdown") {
-                    $this->row_action_list->add_class("pull-right");
-                    if (cobj::get($this, 'bootstrap') == '3') {
-                        $this->row_action_list->add_btn_dropdown_class("btn-xs btn-primary");
-                    }
-                }
-            }
             foreach ($this->data as $d) {
                 $depth = $d['depth'];
                 if ($depth_before >= $depth) {
@@ -134,8 +124,10 @@ class CNestable extends CElement {
                 $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->inc_indent();
 
                 $html->appendln('<div class="dd-handle">')->inc_indent();
+                if($this->checkbox) {
+                    $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d["parent_id"] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->inc_indent();
+                }
                 $val = $d[$this->value_key];
-
                 $new_v = $val;
                 if ($this->display_callback !== false && is_callable($this->display_callback)) {
                     $new_v = CDynFunction::factory($this->display_callback)
@@ -153,11 +145,11 @@ class CNestable extends CElement {
                         $jsparam[$k] = $v;
                     }
                     $jsparam["param1"] = $d[$this->id_key];
-
-                    $this->row_action_list->regenerate_id(true);
+                    $this->row_action_list->add_class("pull-right");
+                    if ($this->action_style == "btn-dropdown") {
+                        $this->row_action_list->add_class("pull-right");
+                    }
                     $this->row_action_list->apply("jsparam", $jsparam);
-                    $this->row_action_list->apply("set_handler_url_param", $jsparam);
-                    $this->js_cell.=$this->row_action_list->js();
                     $html->appendln($this->row_action_list->html($html->get_indent()));
                 }
                 $html->dec_indent()->appendln('</div>');
@@ -171,51 +163,70 @@ class CNestable extends CElement {
         }
         $html->dec_indent()->appendln('</div>');
         return $html->text();
+        /*
+          <div class="dd">
+          <ol class="dd-list">
+          <li class="dd-item" data-id="1">
+          <div class="dd-handle">Item 1</div>
+          </li>
+          <li class="dd-item" data-id="2">
+          <div class="dd-handle">Item 2</div>
+          </li>
+          <li class="dd-item" data-id="3">
+          <div class="dd-handle">Item 3</div>
+          <ol class="dd-list">
+          <li class="dd-item" data-id="4">
+          <div class="dd-handle">Item 4</div>
+          </li>
+          <li class="dd-item" data-id="5">
+          <div class="dd-handle">Item 5</div>
+          </li>
+          </ol>
+          </li>
+          </ol>
+          </div>
+         */
     }
 
     public function js($indent = 0) {
-
+        if (!$this->applyjs)
+            return false;
         $js = new CStringBuilder();
         $js->set_indent($indent);
-        if ($this->applyjs) {
+        if($this->disable_dnd) {
             $js->appendln("
-			jQuery('#" . $this->id . "').nestable({
-				/* config options */
-				maxDepth:100
-			});
-		")->inc_indent();
-            if (strlen($this->input) > 0) {
-                $js->appendln("
-				jQuery('#" . $this->id . "').on('change', function() {
-					/* on change event */
-
-					if (window.JSON) {
-						jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
-					} else {
-						jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
-					}
-
-				});
-				if (window.JSON) {
-					jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
-				} else {
-					jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
-				}
-			");
-            }
+                jQuery('#" . $this->id . "').nestable({
+                    /* config options */
+                    maxDepth:0
+                });
+            ")->inc_indent();
+        } else {
+            $js->appendln("
+                jQuery('#" . $this->id . "').nestable({
+                    /* config options */
+                    maxDepth:100
+                });
+            ")->inc_indent();
         }
-
-        if ($this->collapse_all) {
+        if (strlen($this->input) > 0) {
             $js->appendln("
-                $('#" . $this->id . "').nestable('collapseAll');
+                jQuery('#" . $this->id . "').on('change', function() {
+                    /* on change event */
+                    
+                    if (window.JSON) {
+                        jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
+                    } else {
+                        jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
+                    }
+                    
+                });
+                if (window.JSON) {
+                    jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
+                } else {
+                    jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
+                }
             ");
         }
-
-
-        $js->appendln($this->js_cell);
-        $js->appendln(parent::js($indent));
-
-
         return $js->text();
     }
 
