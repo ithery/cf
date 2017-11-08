@@ -13,7 +13,7 @@ class clog {
         $platform = crequest::platform();
         $platform_version = crequest::platform_version();
         $user = cuser::get($user_id);
-        $org_id = $user->org_id;
+        $org_id = CF::org_id();
         $data = array(
             "login_date" => date("Y-m-d H:i:s"),
             "org_id" => $org_id,
