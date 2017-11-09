@@ -17,7 +17,11 @@ class ctheme {
     }
 
     public static function get_default_theme() {
-        return ccfg::get('theme');
+        $theme = CF::theme();
+        if(strlen(ccfg::get('theme'))>0) {
+            $theme = ccfg::get('theme');
+        }
+        return $theme;
     }
 
     public static function get_current_theme() {
