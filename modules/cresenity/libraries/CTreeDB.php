@@ -229,8 +229,9 @@ class CTreeDB {
         $db = $this->db;
 
         $r = $db->update($this->table_name, $data, array($this->pk_column => $id));
-
-        //$this->rebuild_tree_all();
+        if($this->org_id!=null) {
+            $this->rebuild_tree_all();
+        }
     }
 
     public function get_parents($parent_id) {
