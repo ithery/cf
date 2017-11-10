@@ -35,9 +35,12 @@ class DigitalOcean_Client
 		]);
 
 		$adapter = new League_Flysystem_AwsS3v3_AwsS3Adapter($awsS3Client, $this->bucket);
-		$filesystem = new League_Flysystem_Filesystem($adapter, [
-		    'visibility' => $this->visibility,
-		]);
+
+		$options = [
+			'visibility' => $this->visibility,
+		];
+
+		$filesystem = new League_Flysystem_Filesystem($adapter, $options);
 
 		$this->client = $filesystem;
 	}
@@ -103,6 +106,18 @@ class DigitalOcean_Client
 	}
 
 	public function upload($path, $fileContent, $filename, $options = []) {
-		$this->client->put($path . DS . $filename, $fileContent, $options);
+		return $this->client->put($path . DS . $filename, $fileContent, $options);
+	}
+
+	public function copy($path, $newPath) {
+		return $this->client->copy($path, $newPath);
+	}
+
+	public function delete($path) {
+		return $this->client->delete($path);
+	}
+
+	public function listContent($directory) {
+		return $this->client->listContents($directory);
 	}
 }
