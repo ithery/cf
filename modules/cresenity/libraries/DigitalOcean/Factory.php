@@ -2,7 +2,7 @@
 
 class DigitalOcean_Factory
 {
-	function __construct($options = [])
+	public function __construct($options = [])
 	{
 		return new DigitalOcean_Client($options);
 	}
