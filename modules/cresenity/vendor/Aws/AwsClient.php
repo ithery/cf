@@ -7,6 +7,10 @@ use Aws\Api\Service;
 use Aws\Signature\SignatureProvider;
 use GuzzleHttp\Psr7\Uri;
 
+require_once dirname(__FILE__) . '/functions.php';
+require_once dirname(__FILE__) . '/../GuzzleHttp/Psr7/functions_include.php';
+require_once dirname(__FILE__) . '/../GuzzleHttp/Promise/functions_include.php';
+
 /**
  * Default AWS client implementation
  */

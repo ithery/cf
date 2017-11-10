@@ -1,5 +1,9 @@
 <?php
 
+use Aws\S3\S3Client;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
+
 class DigitalOcean_Client
 {
 	private $key = 'TNYA2K7WT6IU2GCCVOED';
@@ -24,7 +28,7 @@ class DigitalOcean_Client
 	}
 
 	private function build() {
-		$awsS3Client = new Aws_S3_S3Client([
+		$S3Client = new S3Client([
 		    'credentials' => [
 		        'key' => $this->key,
 		        'secret' => $this->secret,
@@ -34,13 +38,13 @@ class DigitalOcean_Client
 		    'endpoint' => $this->endpoint,
 		]);
 
-		$adapter = new League_Flysystem_AwsS3v3_AwsS3Adapter($awsS3Client, $this->bucket);
+		$adapter = new AwsS3Adapter($S3Client, $this->bucket);
 
 		$options = [
 			'visibility' => $this->visibility,
 		];
 
-		$filesystem = new League_Flysystem_Filesystem($adapter, $options);
+		$filesystem = new Filesystem($adapter, $options);
 
 		$this->client = $filesystem;
 	}
