@@ -7,6 +7,7 @@ abstract class CObservable extends CRenderable {
 
     protected $listeners;
     protected $manager;
+    protected $wrapper;
 
     public function get_listeners() {
         return $this->listeners;
@@ -21,6 +22,7 @@ abstract class CObservable extends CRenderable {
     protected function __construct($id = "") {
 
         parent::__construct($id);
+        $this->wrapper = $this;
         $this->listeners = array();
         $this->manager = CManager::instance();
 
@@ -79,11 +81,143 @@ abstract class CObservable extends CRenderable {
         }
 
 
-        $this->add($control);
+        $this->wrapper->add($control);
 
         return $control;
     }
+
+    /**
+     * Add Div &lt;div&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Div  Div Element
+     */
+    public function add_div($id = "") {
+        $element = CElement_Factory::create_element('div', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * Add Anchor Element &lt;a&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_A  Anchor Element
+     */
+    public function add_a($id = "") {
+        $element = CElement_Factory::create_element('a', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
     
+    /**
+     * Add Heading 1 Element &lt;h1&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_H1  Heading 1 Element
+     */
+    public function add_h1($id = "") {
+        $element = CElement_Factory::create_element('h1', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
+    /**
+     * Add Heading 2 Element &lt;h2&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_H2  Heading 2 Element
+     */
+    public function add_h2($id = "") {
+        $element = CElement_Factory::create_element('h2', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
+    /**
+     * Add Heading 3 Element &lt;h3&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_H3  Heading 3 Element
+     */
+    public function add_h3($id = "") {
+        $element = CElement_Factory::create_element('h3', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
+    /**
+     * Add Heading 4 Element &lt;h4&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_H4  Heading 4 Element
+     */
+    public function add_h4($id = "") {
+        $element = CElement_Factory::create_element('h4', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
+    /**
+     * Add Heading 5 Element &lt;h5&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_H5  Heading 5 Element
+     */
+    public function add_h5($id = "") {
+        $element = CElement_Factory::create_element('h5', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
+    /**
+     * Add Heading 6 Element &lt;h6&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_H6  Heading 6 Element
+     */
+    public function add_h6($id = "") {
+        $element = CElement_Factory::create_element('h6', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * Add Ordered List Element &lt;ol&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Ol  Ordered List Element
+     */
+    public function add_ol($id = "") {
+        $element = CElement_Factory::create_element('ol', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * Add Unordered List Element &lt;ul&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Ol  Unordered List Element
+     */
+    public function add_ul($id = "") {
+        $element = CElement_Factory::create_element('ol', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * Add List Item Element &lt;li&gt
+     * 
+     * @param string $id
+     * @return CElement_Element_Ol List Item Element
+     */
+    public function add_li($id = "") {
+        $element = CElement_Factory::create_element('li', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
     /**
      * Add Form Field
      *
@@ -94,18 +228,6 @@ abstract class CObservable extends CRenderable {
         $field = CFormField::factory($field_id);
         $this->add($field);
         return $field;
-    }
-
-    public function add_ul($id = "") {
-        $ul = CUlElement::factory($id);
-        $this->add($ul);
-        return $ul;
-    }
-
-    public function add_li($id = "") {
-        $li = CLiElement::factory($id);
-        $this->add($li);
-        return $li;
     }
 
     public function add_fieldset($fieldset_id = "") {
@@ -154,12 +276,6 @@ abstract class CObservable extends CRenderable {
         $tag = CCustomElement::factory($tag, $id);
         $this->add($tag);
         return $tag;
-    }
-
-    public function add_div($id = "") {
-        $div = CDivElement::factory($id);
-        $this->add($div);
-        return $div;
     }
 
     public function add_row_fluid($id = "") {
@@ -259,7 +375,7 @@ abstract class CObservable extends CRenderable {
         return $pie_chart;
     }
 
-    public function add_dashboard($id= "") {
+    public function add_dashboard($id = "") {
         $dashboard = CDashboard::factory($id);
         $this->add($dashboard);
         return $dashboard;
