@@ -2,10 +2,18 @@
 
 class CElement_Factory {
 
+    /**
+     * 
+     * @param string $tag
+     * @param string $id optional
+     * @return \CElement_Element|boolean
+     * @throws CApp_Exception
+     */
     public static function create_element($tag = "div", $id = "") {
         $class_name = 'CElement_Element_';
         switch (strtolower($tag)) {
             case 'div':
+            case 'span':
             case 'a':
             case 'h1':
             case 'h2':
@@ -15,6 +23,13 @@ class CElement_Factory {
             case 'h6':
             case 'ol':
             case 'li':
+            case 'table':
+            case 'th':
+            case 'tr':
+            case 'td':
+            case 'tbody':
+            case 'thead':
+            case 'blockquote':
                 $class_name = 'CElement_Element_' . ucfirst($tag);
                 return new $class_name($id);
                 break;
