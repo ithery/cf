@@ -173,7 +173,8 @@ class Profiler {
         text::alternate();
         $total_time = $total_rows = 0;
         foreach ($queries as $query) {
-            $data = array($query['query'], number_format($query['time'], 3), $query['rows']);
+            $data = array($query['query'].' - '.$query['caller'], number_format($query['time'], 3), $query['rows']);
+            //$data = array($query['query'], number_format($query['time'], 3), $query['rows']);
             $class = text::alternate('', 'kp-altrow');
             $table->add_row($data, $class);
             $total_time += $query['time'];
