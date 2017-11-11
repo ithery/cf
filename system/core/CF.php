@@ -2,9 +2,8 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-
 final class CF {
-    
+
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
@@ -50,6 +49,7 @@ final class CF {
     private static $internal_cache_key;
     private static $internal_cache_encrypt;
     private static $data;
+    public static $instances;
 
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
@@ -267,11 +267,11 @@ final class CF {
         if (self::$instance === NULL) {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
             if (empty(CFRouter::$controller_path)) {
-               CF::show_404();
+                CF::show_404();
             }
             // Include the Controller file
-            if(strlen(CFRouter::$controller_path)>0) {
-                require CFRouter::$controller_path;
+            if (strlen(CFRouter::$controller_path) > 0) {
+                require_once CFRouter::$controller_path;
             }
 
             try {
@@ -301,6 +301,9 @@ final class CF {
                 $controller = $class->newInstance();
             }
 
+            if (!isset(self::$instances[CFRouter::$current_uri])) {
+                self::$instances[CFRouter::$current_uri] = $controller;
+            }
             // Controller constructor has been executed
             CFEvent::run('system.post_controller_constructor');
 
@@ -347,6 +350,50 @@ final class CF {
 
         return self::$instance;
     }
+
+    /*
+      public static function & get_controller($uri) {
+
+
+
+      $data = CFRouter::get_route_data($uri);
+      if (empty(carr::get($data, 'controller_path'))) {
+      CF::show_404();
+      }
+      // Include the Controller file
+      if (strlen(carr::get($data, 'controller_path')) > 0) {
+      require_once carr::get($data, 'controller_path');
+      }
+
+      try {
+      // Start validation of the controller
+      $class_name = str_replace('/', '_', carr::get($data, 'controller_dir_ucfirst'));
+      $class = new ReflectionClass('Controller_' . $class_name . ucfirst(carr::get($data, 'controller')));
+      } catch (ReflectionException $e) {
+      try {
+      $class = new ReflectionClass(ucfirst(carr::get($data, 'controller')) . '_Controller');
+      // Start validation of the controller
+      } catch (ReflectionException $e) {
+      // Controller does not exist
+      throw new Exception('controller not exists');
+      }
+      }
+
+      if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
+      // Controller is not allowed to run in production
+      throw new Exception('controller not allowed in production');
+      }
+
+      $controller = null;
+      // Create a new controller instance
+      if (isset($class)) {
+      $controller = $class->newInstance();
+      }
+
+      return $controller;
+      }
+     * 
+     */
 
     public static function get_dir($directory = '', $domain = null) {
         $include_paths = CF::include_paths();
@@ -1212,17 +1259,16 @@ final class CF {
 
             $routing_file .= str_replace('_', DS, $routing_class);
 
-            if($directory=='libraries') {
+            if ($directory == 'libraries') {
                 // find file at vendor first
                 if ($path = self::find_file('vendor', $routing_file)) {
                     // Load the class file
                     require $path;
 
-                    if(class_exists($class)) {
+                    if (class_exists($class)) {
                         $class_not_found = TRUE;
                         return TRUE;
                     }
-
                 }
             }
             // find file at libraries

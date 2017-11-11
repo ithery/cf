@@ -103,5 +103,7 @@ abstract class CElasticResult extends CDatabase_Result {
     public function count_all() {
         return $this->count_all;
     }
+    
+    
 
 }
