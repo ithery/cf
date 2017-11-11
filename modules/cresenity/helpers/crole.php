@@ -5,6 +5,9 @@ class crole {
     protected static $roles = array();
 
     public static function get($id) {
+        if ($id === null) {
+            return null;
+        }
         $db = CDatabase::instance();
         if (!isset(self::$roles[$id])) {
             $query = "select * from roles where status>0 and role_id=" . $db->escape($id);
