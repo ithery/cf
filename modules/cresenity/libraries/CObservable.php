@@ -12,6 +12,12 @@ abstract class CObservable extends CRenderable {
     public function get_listeners() {
         return $this->listeners;
     }
+    
+    /**
+     * 
+     * @param string $event
+     * @return CListener
+     */
 
     public function add_listener($event) {
         $listener = CListener::factory($this->id, $event);
