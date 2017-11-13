@@ -1449,7 +1449,7 @@ class CTable extends CElement {
 
         $html->appendln("<tbody " . $tbody_id . " >" . $data_responsive_close)->inc_indent()->br();
         //render body;
-        $html->appendln(parent::html($indent));
+        $html->appendln($this->html_child($indent));
         $no = 0;
         if (!$this->ajax) {
             foreach ($this->data as $row) {
