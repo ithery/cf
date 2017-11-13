@@ -22,7 +22,7 @@ class DigitalOcean_Client
 		$this->version = carr::get($options, 'version', 'latest');
 		$this->endpoint = 'https://' . $this->region . '.digitaloceanspaces.com';
 		$this->bucket = carr::get($options, 'bucket', '62hall');
-		$this->visibility = carr::get($options, 'visibility', 'private');
+		$this->visibility = carr::get($options, 'visibility', 'public');
 
 		$this->build();
 	}
@@ -95,14 +95,14 @@ class DigitalOcean_Client
 		return $this;
 	}
 
-	public function bucket($bucket) {
+	public function setBucket($bucket) {
 		$this->bucket = $bucket;
 		$this->build();
 
 		return $this;
 	}
 
-	public function visibility($visibility) {
+	public function setVisibility($visibility) {
 		$this->visibility = $visibility;
 		$this->build();
 
