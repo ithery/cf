@@ -108,10 +108,20 @@ class CFormInputFileUpload extends CFormInput {
                         width: auto;
                         height: 100px;
                         margin: 10px 0px;
+                        position:relative;
                     }
                     #' . $div_id . ' div img {
-                        width: 100%;
-                        height: 100%;
+                        position: absolute;
+                        width: auto;
+                        max-width: 100%;
+                        height: auto;
+                        max-height: 100%;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        margin: auto;
+                        min-height: 1px;
                     }
                     #' . $div_id . '_description {
                         text-align: center;
