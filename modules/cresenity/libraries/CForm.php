@@ -252,7 +252,7 @@ class CForm extends CElement {
         if ($this->ajax_process_progress) {
             $html->appendln('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
         }
-        $html->appendln(parent::html($html->get_indent()));
+        $html->appendln($this->html_child($html->get_indent()));
         if ($this->bootstrap == '3.3') {
 //                $html->appendln("</div>");
         }
@@ -279,88 +279,88 @@ class CForm extends CElement {
                 $ajax_process_script_buttons = "	buttons: {}, ";
                 if ($this->ajax_process_progress_cancel) {
                     $ajax_process_script_buttons = "
-											'buttons': {
-												'Cancel': {
-													'primary': true,
-													'click': function() {
-														jQuery.ajax('" . $ajax_process_url . "', {
-															dataType: 'json',
-															type: 'POST',
-															data : {ajax_process_id:'" . $this->ajax_process_id . "',cancel:true},
-															success: function(data) {
-																$(this).dialog2('close');
-															},
-															error: function(xhr, status, error) {
-																$.cresenity.message('error','[AJAX PROCESS] ' + status + ' - Server reponse is: ' + xhr.responseText);
-															}
-														});
+                        'buttons': {
+                                'Cancel': {
+                                        'primary': true,
+                                        'click': function() {
+                                                jQuery.ajax('" . $ajax_process_url . "', {
+                                                        dataType: 'json',
+                                                        type: 'POST',
+                                                        data : {ajax_process_id:'" . $this->ajax_process_id . "',cancel:true},
+                                                        success: function(data) {
+                                                                $(this).dialog2('close');
+                                                        },
+                                                        error: function(xhr, status, error) {
+                                                                $.cresenity.message('error','[AJAX PROCESS] ' + status + ' - Server reponse is: ' + xhr.responseText);
+                                                        }
+                                                });
 
-													}
-												}
-											},
-					";
+                                        }
+                                }
+                        },
+                    ";
                 }
                 $ajax_process_script = "
-					 if(cprocess_run_once_" . $this->id . "==false) {
-						cprocess_run_once" . $this->id . "=true;
-						ctimer_" . $this->id . " = setInterval(function()  {
+                    if(cprocess_run_once_" . $this->id . "==false) {
+                           cprocess_run_once" . $this->id . "=true;
+                           ctimer_" . $this->id . " = setInterval(function()  {
 
-							jQuery.ajax('" . $ajax_process_url . "', {
-								dataType: 'json',
-								type: 'POST',
-								data : {ajax_process_id:'" . $this->ajax_process_id . "'},
-								success: function(data) {
-									var percentComplete = data.percent;
-									var info = data.info;
-									if(info=='undefined') info = '';
-									//update the progress bar
-									//do create progress
-									var progress = $('#progress_" . $this->id . "');
-									if(progress.length==0) {
-										progress = $('<div id=\"progress_" . $this->id . "\"class=\"progress progress-striped active\"><div id=\"bar_" . $this->id . "\" class=\"bar\" style=\"width: 0%;\"><p>0%</p></div></div>');
-										var span = $('<div class=\"span12\">');
-										var span_info = $('<div class=\"span12\" id=\"info_" . $this->id . "\">');
-										var div = $('<div class=\"row-fluid\" style=\"width:auto\">');
-										div.append(span);
-										div.append(span_info);
-										span.append(progress);
-										$.cresenity.dialog.show(div,{
-											" . $ajax_process_script_buttons . "
-											showCloseHandle: false,
-											closeOnEscape: false,
-											closeOnOverlayClick: false,
-											title: 'Progress',
-											autoOpen: true,
-											removeOnClose: true
-										});
+                                   jQuery.ajax('" . $ajax_process_url . "', {
+                                           dataType: 'json',
+                                           type: 'POST',
+                                           data : {ajax_process_id:'" . $this->ajax_process_id . "'},
+                                           success: function(data) {
+                                                   var percentComplete = data.percent;
+                                                   var info = data.info;
+                                                   if(info=='undefined') info = '';
+                                                   //update the progress bar
+                                                   //do create progress
+                                                   var progress = $('#progress_" . $this->id . "');
+                                                   if(progress.length==0) {
+                                                           progress = $('<div id=\"progress_" . $this->id . "\"class=\"progress progress-striped active\"><div id=\"bar_" . $this->id . "\" class=\"bar\" style=\"width: 0%;\"><p>0%</p></div></div>');
+                                                           var span = $('<div class=\"span12\">');
+                                                           var span_info = $('<div class=\"span12\" id=\"info_" . $this->id . "\">');
+                                                           var div = $('<div class=\"row-fluid\" style=\"width:auto\">');
+                                                           div.append(span);
+                                                           div.append(span_info);
+                                                           span.append(progress);
+                                                           $.cresenity.dialog.show(div,{
+                                                                   " . $ajax_process_script_buttons . "
+                                                                   showCloseHandle: false,
+                                                                   closeOnEscape: false,
+                                                                   closeOnOverlayClick: false,
+                                                                   title: 'Progress',
+                                                                   autoOpen: true,
+                                                                   removeOnClose: true
+                                                           });
 
-									};
-									var percentVal = percentComplete + '%';
-									$('#bar_" . $this->id . "').width(percentVal);
-									$('#bar_" . $this->id . "').find('p').html(percentVal);
-									$('#info_" . $this->id . "').html(info);
-									if(percentComplete==100) {
-										$('#bar_" . $this->id . "').parent().parent().parent().remove();
-									}
-								},
-								error: function(xhr, status, error) {
-									$.cresenity.message('error','[AJAX PROCESS] ' + status + ' - Server reponse is: ' + xhr.responseText);
-								}
-							});
-						},2000);
-					}
-				";
+                                                   };
+                                                   var percentVal = percentComplete + '%';
+                                                   $('#bar_" . $this->id . "').width(percentVal);
+                                                   $('#bar_" . $this->id . "').find('p').html(percentVal);
+                                                   $('#info_" . $this->id . "').html(info);
+                                                   if(percentComplete==100) {
+                                                           $('#bar_" . $this->id . "').parent().parent().parent().remove();
+                                                   }
+                                           },
+                                           error: function(xhr, status, error) {
+                                                   $.cresenity.message('error','[AJAX PROCESS] ' + status + ' - Server reponse is: ' + xhr.responseText);
+                                           }
+                                   });
+                           },2000);
+                   }
+                ";
                 $ajax_process_done_script = "
-					clearInterval(ctimer_" . $this->id . ");
-					var progress = $('#progress_" . $this->id . "');
-					if(progress.length>0) {
-						modal = progress.closest('.modal');
-						if(modal.length>0) {
-							modal.remove();
-							$('.modal-backdrop').remove();
-						}
-					}
-				";
+                    clearInterval(ctimer_" . $this->id . ");
+                    var progress = $('#progress_" . $this->id . "');
+                    if(progress.length>0) {
+                        modal = progress.closest('.modal');
+                        if(modal.length>0) {
+                            modal.remove();
+                            $('.modal-backdrop').remove();
+                        }
+                    }
+                ";
             }
             $redirect_url = $this->ajax_redirect_url;
             $ajax_url = $this->action;
@@ -691,7 +691,7 @@ class CForm extends CElement {
 				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
 			");
         }
-        $js->appendln(parent::js($js->get_indent()))->br();
+        $js->appendln($this->js_child($js->get_indent()))->br();
 
         return $js->text();
     }

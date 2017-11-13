@@ -146,10 +146,7 @@ abstract class CFormInput extends CElement {
         return $data;
     }
 
-    public function html($indent = 0) {
-        return parent::html($indent);
-    }
-
+   
     public function js($indent = 0) {
         $js = "";
         if ($this->submit_onchange) {
@@ -168,7 +165,7 @@ abstract class CFormInput extends CElement {
 				
 				";
         }
-        $js.= parent::js($indent);
+        $js.= $this->js_child($indent);
         return $js;
     }
 
