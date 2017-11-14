@@ -10,8 +10,6 @@ class CCustomElement extends CElement {
 
         parent::__construct($id);
 
-        cdbg::deprecated('CCustomElement is deprecated');
-
         $this->tag = $tag;
     }
 
