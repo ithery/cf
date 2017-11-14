@@ -41,7 +41,7 @@ class CCustomElement extends CElement {
         $html->appendln('<' . $this->tag . ' id="' . $this->id . '" class="' . $classes . '"' . $custom_css . ' '.$attr.' >');
 
 
-        $html->appendln(parent::html($html->get_indent()))->br();
+        $html->appendln($this->html_child($indent))->br();
         $html->appendln('</' . $this->tag . '>');
 
         return $html->text();
