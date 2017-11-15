@@ -11,6 +11,7 @@ class cajax {
         }
     }
 
+    
     public static function form_process($obj, $input) {
         $db = CDatabase::instance();
         $form = $obj->data->form;
@@ -323,7 +324,7 @@ class cajax {
                     $i2 = -1;
                 }
                 if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
-                    $sWhere .= "`" . $columns[$i + $i2]->fieldname . "` LIKE '%" . mysql_real_escape_string($request['sSearch']) . "%' OR ";
+                    $sWhere .= "`" . $columns[$i + $i2]->fieldname . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                 }
             }
             $sWhere = substr_replace($sWhere, "", -3);
@@ -348,7 +349,7 @@ class cajax {
                 }
 
                 $field_name = str_replace('dt_table_qs-', '', $qs_cond_v['name']);
-                $qs_condition_str .= "`" . $field_name . "` LIKE '%" . mysql_real_escape_string($value) . "%' AND ";
+                $qs_condition_str .= "`" . $field_name . "` LIKE '%" . $db->escape_like($value) . "%' AND ";
             }
             $qs_condition_str = substr_replace($qs_condition_str, "", -4);
             if (strlen(trim($sWhere)) > 0)
@@ -369,7 +370,7 @@ class cajax {
                 } else {
                     $sWhere .= " AND ";
                 }
-                $sWhere .= "`" . $columns[$i]->fieldname . "` LIKE '%" . mysql_real_escape_string($request['sSearch_' . $i]) . "%' ";
+                $sWhere .= "`" . $columns[$i]->fieldname . "` LIKE '%" . $db->escape_like($request['sSearch_' . $i]) . "%' ";
             }
         }
 

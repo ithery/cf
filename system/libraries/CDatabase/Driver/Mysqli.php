@@ -24,14 +24,18 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver {
     }
     
     public function close() {
-        is_object($this->link) and $this->link->close();
+        is_object($this->link) and @$this->link->close();
     }
 
     /**
      * Closes the database connection.
      */
     public function __destruct() {
-        is_object($this->link) and $this->link->close();
+        try {
+            is_object($this->link) and @$this->link->close();
+        } catch(Exception $ex) {
+            //do nothing
+        }
     }
 
     public function connect() {
