@@ -23,8 +23,12 @@ class DigitalOcean_Client
 		$this->endpoint = 'https://' . $this->region . '.digitaloceanspaces.com';
 		$this->bucket = carr::get($options, 'bucket', '62hall');
 		$this->visibility = carr::get($options, 'visibility', 'public');
-
 		$this->build();
+		return $this;
+	}
+
+	public static function factory($options = []) {
+		return new DigitalOcean_Client($options);
 	}
 
 	private function build() {
