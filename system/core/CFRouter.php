@@ -118,7 +118,7 @@ class CFRouter {
 
             if ($default_route === FALSE AND count($data['routes']) > 1) {
                 // Custom routing
-                $data['rsegments'] = self::routed_uri($data['current_uri'],$data['routes']);
+                $data['rsegments'] = self::routed_uri($data['current_uri'], $data['routes']);
             }
 
             // The routed URI is now complete
@@ -135,7 +135,7 @@ class CFRouter {
             $method_segment = NULL;
 
             // Paths to search
-            $paths = CF::include_paths_theme(TRUE);
+            $paths = CF::paths();
 
             foreach ($data['rsegments'] as $key => $segment) {
                 // Add the segment to the search path
@@ -315,7 +315,7 @@ class CFRouter {
      * @param  string  URI to convert
      * @return string  Routed uri
      */
-    public static function routed_uri($uri, & $routes=null) {
+    public static function routed_uri($uri, & $routes = null) {
         if ($routes === NULL) {
             // Load routes
             $routes = CF::config('routes');

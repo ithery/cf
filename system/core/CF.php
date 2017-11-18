@@ -22,9 +22,7 @@ final class CF {
     // Configuration
     private static $configuration;
     // Include paths
-    private static $include_paths;
-    // Theme Include paths
-    private static $include_paths_theme;
+    private static $paths;
     // Logged messages
     private static $log;
     // Cache lifetime
@@ -50,6 +48,16 @@ final class CF {
     private static $internal_cache_encrypt;
     private static $data;
     public static $instances;
+
+    /**
+     * @var  CLogger  logging object
+     */
+    public static $logger;
+
+    /**
+     * @var  CConfig  config object
+     */
+    public static $config;
 
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
@@ -134,32 +142,27 @@ final class CF {
         // Define Handler error constant
         define('E_HANDLER_ERROR', 45);
 
-        if (self::$cache_lifetime = self::config('core.internal_cache')) {
-            // Are we using encryption for caches?
-            self::$internal_cache_encrypt = self::config('core.internal_cache_encrypt');
+        // Start output buffering
+        ob_start(array(__CLASS__, 'output_buffer'));
 
-            if (self::$internal_cache_encrypt === TRUE) {
-                self::$internal_cache_key = self::config('core.internal_cache_key');
+        // Save buffering level
+        self::$buffer_level = ob_get_level();
 
-                // Be sure the key is of acceptable length for the mcrypt algorithm used
-                self::$internal_cache_key = substr(self::$internal_cache_key, 0, 24);
-            }
+        // Set autoloader
+        spl_autoload_register(array('CF', 'auto_load'));
 
-            // Set the directory to be used for the internal cache
-            if (!self::$internal_cache_path = self::config('core.internal_cache_path')) {
-                self::$internal_cache_path = APPPATH . 'cache/';
-            }
+        // Set error handler
+        set_error_handler(array('CF', 'exception_handler'));
 
-            // Load cached configuration and language files
-            self::$internal_cache['configuration'] = self::cache('configuration', self::$cache_lifetime);
-            self::$internal_cache['language'] = self::cache('language', self::$cache_lifetime);
+        // Set exception handler
+        set_exception_handler(array('CF', 'exception_handler'));
 
-            // Load cached file paths
-            self::$internal_cache['find_file_paths'] = self::cache('find_file_paths', self::$cache_lifetime);
+        // Set and test the logger instance, we need to know whats wrong when CF Fail
+        self::$logger = CLogger::instance();
 
-            // Enable cache saving
-            CFEvent::add('system.shutdown', array(__CLASS__, 'internal_cache_save'));
-        }
+        // Set and test the config, we need config can loaded normally to run CF
+        self::$config = CConfig::instance('app');
+
 
         // Disable notices and "strict" errors
         $ER = error_reporting(~E_NOTICE & ~E_STRICT);
@@ -177,21 +180,6 @@ final class CF {
 
         // Restore error reporting
         error_reporting($ER);
-
-        // Start output buffering
-        ob_start(array(__CLASS__, 'output_buffer'));
-
-        // Save buffering level
-        self::$buffer_level = ob_get_level();
-
-        // Set autoloader
-        spl_autoload_register(array('CF', 'auto_load'));
-
-        // Set error handler
-        set_error_handler(array('CF', 'exception_handler'));
-
-        // Set exception handler
-        set_exception_handler(array('CF', 'exception_handler'));
 
         // Send default text/html UTF-8 header
         header('Content-Type: text/html; charset=UTF-8');
@@ -396,7 +384,7 @@ final class CF {
      */
 
     public static function get_dir($directory = '', $domain = null) {
-        $include_paths = CF::include_paths();
+        $include_paths = CF::paths();
         foreach ($include_paths as $p) {
             $path = $p;
             if (strlen($directory) > 0) {
@@ -410,7 +398,7 @@ final class CF {
     }
 
     public static function get_dirs($directory, $domain = null) {
-        $include_paths = CF::include_paths();
+        $include_paths = CF::paths();
         $dirs = array();
         foreach ($include_paths as $p) {
             $path = $p . $directory . DS;
@@ -436,7 +424,7 @@ final class CF {
         if ($domain == null) {
             $domain = crouter::domain();
         }
-        $include_paths = CF::include_paths();
+        $include_paths = CF::paths();
 
 
         $result = array();
@@ -457,6 +445,66 @@ final class CF {
         return null;
     }
 
+    /**
+     * Get all include paths. APPPATH is the first path, followed by module
+     * paths in the order they are configured, follow by the SYSPATH.
+     *
+     * @param   boolean  re-process the include paths
+     * @return  array
+     */
+    public static function paths($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain($domain);
+        }
+        if (!isset(self::$paths[$domain])) {
+            //we try to search all paths for this domain
+            $paths = array();
+            $theme = CF::theme($domain);
+            $org_code = CF::org_code($domain);
+            $app_code = CF::app_code($domain);
+            $shared_app_code = CF::shared_app_code($domain);
+            $modules = CF::modules($domain);
+            //when this domain is org
+            if (strlen($org_code) > 0) {
+                //add theme path if theme exists
+                if (strlen($theme) > 0) {
+                    $paths[] = APPPATH . $app_code . DS . $org_code . DS . "themes" . DS . $theme . DS;
+                }
+                $paths[] = APPPATH . $app_code . DS . $org_code . DS;
+            }
+            if (strlen($app_code) > 0) {
+                //add theme path if theme exists
+                if (strlen($theme) > 0) {
+                    $paths[] = APPPATH . $app_code . DS . 'default' . DS . "themes" . DS . $theme . DS;
+                }
+                $paths[] = APPPATH . $app_code . DS . 'default' . DS;
+            }
+            foreach ($shared_app_code as $key => $value) {
+                if (strlen($org_code) > 0) {
+                    //add theme path if theme exists
+                    if (strlen($theme) > 0) {
+                        $paths[] = APPPATH . $value . DS . $org_code . DS . "themes" . DS . $theme . DS;
+                    }
+                    $paths[] = APPPATH . $value . DS . $org_code . DS;
+                }
+                if (strlen($theme) > 0) {
+                    $paths[] = APPPATH . $value . DS . 'default' . DS . "themes" . DS . $theme . DS;
+                }
+                $paths[] = APPPATH . $value . DS . 'default' . DS;
+            }
+
+            foreach ($modules as $module) {
+                $paths[] = MODPATH . $module . DS;
+            }
+            $paths[] = SYSPATH;
+            $paths[] = DOCROOT;
+            self::$paths[$domain] = $paths;
+        }
+
+
+        return self::$paths[$domain];
+    }
+
     public static function include_paths_theme($process = FALSE) {
 
         return self::include_paths($process, true);
@@ -470,62 +518,7 @@ final class CF {
      * @return  array
      */
     public static function include_paths($process = FALSE, $with_theme = false) {
-        $theme = null;
-        if ($with_theme) {
-            $theme = self::theme();
-        }
-        if ($process === TRUE) {
-
-            // Add APPPATH as the first path
-            self::$include_paths = array();
-            //self::$include_paths[] = APPPATH;
-
-
-            if (self::org_code() != null) {
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS . "default" . DS . "themse" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::app_code() . DS . self::org_code() . DS;
-            }
-            if (self::app_code() != null) {
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::app_code() . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::app_code() . DS . "default" . DS;
-                self::$include_paths[] = APPPATH . self::app_code() . DS;
-            }
-
-            foreach (self::shared_app_code() as $key => $value) {
-                if (self::org_code() != null) {
-                    self::$include_paths[] = APPPATH . $value . DS . self::org_code() . DS . "default" . DS;
-                    self::$include_paths[] = APPPATH . $value . DS . self::org_code() . DS;
-                }
-
-                self::$include_paths[] = APPPATH . $value . DS . "default" . DS;
-                self::$include_paths[] = APPPATH . $value . DS;
-            }
-
-            self::$include_paths[] = APPPATH . "default" . DS;
-
-
-            foreach (self::modules() as $path) {
-
-                // Add a valid path
-                self::$include_paths[] = MODPATH . $path . DS;
-            }
-
-
-            // Add SYSPATH as the last path
-            self::$include_paths[] = SYSPATH;
-
-            self::$include_paths[] = DOCROOT;
-        }
-
-        return self::$include_paths;
+        return self::paths();
     }
 
     /**
@@ -536,34 +529,17 @@ final class CF {
      * @param   boolean  is the item required?
      * @return  mixed
      */
-    public static function config($key, $slash = FALSE, $required = TRUE) {
-        if (self::$configuration === NULL) {
-            // Re-parse the include paths
-            self::include_paths(TRUE);
-
-            // Load core configuration
-            self::$configuration['core'] = self::config_load('core');
-
-            // Re-parse the include paths
-            self::include_paths(TRUE);
+    public static function config($group, $default = null, $required = TRUE) {
+        $path = null;
+        if (strpos($group, '.') !== FALSE) {
+            // Split the config group and path
+            list($group, $path) = explode('.', $group, 2);
         }
 
-        // Get the group name from the key
-        $group = explode('.', $key, 2);
-        $group = $group[0];
+        $config = CConfig::instance($group);
 
-        if (!isset(self::$configuration[$group])) {
-            // Load the configuration group
-            self::$configuration[$group] = self::config_load($group, $required);
-        }
+        $value = $config->get($path, $default);
 
-        // Get the value of the key string
-        $value = self::key_string(self::$configuration, $key);
-
-        if ($slash === TRUE AND is_string($value) AND $value !== '') {
-            // Force the value to end with "/"
-            $value = rtrim($value, '/') . '/';
-        }
 
         return $value;
     }
@@ -1372,7 +1348,7 @@ final class CF {
             return self::$internal_cache['find_file_paths'][$search];
 
         // Load include paths
-        $paths = self::$include_paths;
+        $paths = self::paths();
 
         // Nothing found, yet
         $found = NULL;
@@ -1388,6 +1364,7 @@ final class CF {
                 }
             }
         } else {
+
             foreach ($paths as $path) {
                 if (is_file($path . $search)) {
                     // A matching file has been found

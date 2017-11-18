@@ -25,13 +25,9 @@ class curl {
      * @return  string
      */
     public static function base($index = FALSE, $protocol = FALSE) {
-        if ($protocol == FALSE) {
-            // Use the default configured protocol
-            $protocol = CF::config('core.site_protocol');
-        }
-
+        
         // Load the site domain
-        $site_domain = (string) CF::config('core.site_domain', TRUE);
+        $site_domain = (string) CF::config('core.site_domain', '');
 
         if ($protocol == FALSE) {
             if ($site_domain === '' OR $site_domain[0] === '/') {
@@ -55,7 +51,7 @@ class curl {
             // Append the index page
             $base_url = $base_url . $index;
         }
-
+        
         // Force a slash on the end of the URL
         return rtrim($base_url, '/') . '/';
     }
