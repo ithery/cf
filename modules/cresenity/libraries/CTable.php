@@ -710,6 +710,10 @@ class CTable extends CElement {
         $this->query = $q;
         return $this;
     }
+    
+    public function set_data_from_elastic($el) {
+        $this->data = $el;
+    }
 
     public function set_data_from_array($a) {
         $this->data = $a;
