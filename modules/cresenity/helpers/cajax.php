@@ -589,6 +589,9 @@ class cajax {
         //$db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
         $domain = $obj->data->domain;
 
+        /*
+         * @var CElastic
+         */
         $el = CElastic::instance();
 
         $request = $_GET;
@@ -611,12 +614,28 @@ class cajax {
             $search->must_not((array) $mn);
         }
 
-        $select = (array) cobj::get($ajax_data, 'select');
-        foreach ($select as $k => $v) {
-            $search->select($k, $v);
+        $select_raw = (array) cobj::get($ajax_data, 'select');
+
+        foreach ($select_raw as $k => $v) {
+            $v = (array) $v;
+
+            $select[carr::get($v, 'field')] = carr::get($v, 'alias');
+            $select_flip[carr::get($v, 'alias')] = carr::get($v, 'field');
         }
 
-        $select_flip = array_flip($select);
+        
+        
+        foreach ($select_raw as $k => $v) {
+            $v = (array) $v;
+
+            $search->select(carr::get($v, 'field'), carr::get($v, 'alias'));
+        }
+
+        $sort = (array) cobj::get($ajax_data, 'sort', array());
+        $from = cobj::get($ajax_data, 'from', 0);
+        $size = cobj::get($ajax_data, 'size', 10);
+
+
 
         /* Paging */
         if (isset($request['iDisplayStart']) && $request['iDisplayLength'] != '-1') {
@@ -624,22 +643,31 @@ class cajax {
             $search->size(intval($request['iDisplayLength']));
         }
 
+
         /* Ordering */
-        $sOrder = "";
         if (isset($request['iSortCol_0'])) {
-            $sOrder = "ORDER BY  ";
             for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
                 $i2 = 0;
                 if ($table->checkbox) {
                     $i2 = -1;
                 }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
-                    $sOrder .= "" . $db->escape_column($columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
+
+                    $field = $columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname;
+
+                    $sort_mode = $request['sSortDir_' . $i];
+                    if (strlen($field) > 0) {
+                        if (isset($select_flip[$field])) {
+                            $field = $select_flip[$field];
+                        }
+
+                        $search->sort($field, $sort_mode);
+                    }
                 }
             }
-            $sOrder = substr_replace($sOrder, "", -2);
-            if ($sOrder == "ORDER BY") {
-                $sOrder = "";
+        } else {
+            foreach ($sort as $s) {
+                $search->sort($s);
             }
         }
 
@@ -661,7 +689,6 @@ class cajax {
                         $s = array();
                         carr::set_path($s, 'match.' . $field, $request['sSearch']);
                         $should[] = $s;
-                        
                     }
                 }
             }
@@ -674,7 +701,9 @@ class cajax {
 
 
         $total_record = $r->count_all();
-        $filtered_record = $r->count_all();
+        $filtered_record = min($r->count_all(), 10000);
+
+
         $rarr = $r->result(false);
         $data = $rarr;
         $output = array(

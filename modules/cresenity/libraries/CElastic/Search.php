@@ -21,8 +21,9 @@ class CElastic_Search {
     protected $must_not;
     protected $should;
     protected $select;
-    protected $from = null;
-    protected $size = null;
+    protected $from;
+    protected $size;
+    protected $sort;
 
     public function __construct(CElastic $elastic, $index, $document_type = '') {
         $this->elastic = $elastic;
@@ -32,6 +33,9 @@ class CElastic_Search {
         $this->must = array();
         $this->must_not = array();
         $this->select = array();
+        $this->from = null;
+        $this->size = null;
+        $this->sort = array();
     }
 
     public function must($path, $value = null) {
@@ -62,6 +66,16 @@ class CElastic_Search {
         $this->size = $size;
     }
 
+    public function sort($field, $mode = 'asc') {
+        $arr = array();
+        if (is_array($field)) {
+            $arr = $field;
+        } else {
+            $arr = array($field => array('order' => $mode));
+        }
+        $this->sort[] = $arr;
+    }
+
     public function exec() {
         $params = array();
         $params['index'] = $this->index;
@@ -79,15 +93,17 @@ class CElastic_Search {
             carr::set_path($body, 'query.bool.must_not', $this->must_not);
         }
 
-        if($this->size!=null) {
-            $body['size']=$this->size;
+        if ($this->size != null) {
+            $body['size'] = $this->size;
         }
-        if($this->from!=null) {
-            $body['from']=$this->from;
+        if ($this->from != null) {
+            $body['from'] = $this->from;
         }
-        
 
-        
+        if (count($this->sort) > 0) {
+            $body['sort'] = $this->sort;
+        }
+
         $params['body'] = $body;
         $response = $this->client->search($params);
 
@@ -99,7 +115,8 @@ class CElastic_Search {
         if ($alias == null) {
             $alias = $field;
         }
-        $this->select[$field] = $alias;
+        $arr = array('field' => $field, 'alias' => $alias);
+        $this->select[] = $arr;
     }
 
     public function ajax_data() {
