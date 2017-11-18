@@ -5,7 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CLiElement extends CElement {
 
     public function __construct($id = "") {
-
+        cdbg::deprecated('CLiElement is deprecated');
         parent::__construct($id);
         $this->tag = "li";
     }

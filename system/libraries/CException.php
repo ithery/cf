@@ -39,4 +39,28 @@ class CException extends Exception {
         parent::__construct($message, $code, $previous);
     }
 
+    /**
+     * Get a single line of text representing the exception:
+     *
+     * Error [ Code ]: Message ~ File [ Line ]
+     *
+     * @param   Exception  $e
+     * @return  string
+     */
+    public static function text(Exception $e) {
+        return sprintf('%s [ %s ]: %s ~ %s [ %d ]', get_class($e), $e->getCode(), strip_tags($e->getMessage()), cdbg::path($e->getFile()), $e->getLine());
+    }
+
+    /**
+     * Magic object-to-string method.
+     *
+     *     echo $exception;
+     *
+     * @uses    CException::text
+     * @return  string
+     */
+    public function __toString() {
+        return self::text($this);
+    }
+
 }
