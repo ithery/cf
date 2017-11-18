@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CWidget extends CElement {
+class CWidget extends CElement_Element {
 
     protected $header_action_list;
     public $title;

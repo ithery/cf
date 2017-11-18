@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CSpan extends CElement {
+class CSpan extends CElement_Element {
 
     protected $col;
     protected $size;

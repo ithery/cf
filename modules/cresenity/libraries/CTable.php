@@ -1,6 +1,6 @@
 <?php
 
-class CTable extends CElement {
+class CTable extends CElement_Element {
 
     public $default_paging_list = array(
         "10" => "10",

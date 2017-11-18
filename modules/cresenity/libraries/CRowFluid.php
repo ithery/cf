@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CRowFluid extends CElement {
+class CRowFluid extends CElement_Element {
 
     public function __construct($id) {
         parent::__construct($id);

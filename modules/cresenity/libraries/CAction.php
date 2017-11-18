@@ -1,6 +1,6 @@
 <?php
 
-class CAction extends CElement {
+class CAction extends CElement_Element {
 
     protected $jsfunc;
     protected $icon;

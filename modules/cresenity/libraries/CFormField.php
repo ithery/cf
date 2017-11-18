@@ -1,6 +1,6 @@
 <?php
 
-class CFormField extends CElement {
+class CFormField extends CElement_Element {
 
     protected $group_classes = array();
     protected $group_id = "";

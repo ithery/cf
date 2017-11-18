@@ -1,6 +1,6 @@
 <?php
 
-abstract class CFormInput extends CElement {
+abstract class CFormInput extends CElement_Element {
 
     protected $transforms = array();
     protected $name;

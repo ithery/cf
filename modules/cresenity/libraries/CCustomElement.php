@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CCustomElement extends CElement {
+class CCustomElement extends CElement_Element {
 
     protected $tag;
 

@@ -1,6 +1,6 @@
 <?php
 
-class CForm extends CElement {
+class CForm extends CElement_Element {
 
     protected $name;
     protected $method;

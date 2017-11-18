@@ -1,6 +1,6 @@
 <?php
 
-class CActionList extends CElement {
+class CActionList extends CElement_Element {
 
     public $actions = array();
     protected $style;

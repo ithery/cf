@@ -47,6 +47,7 @@ final class CF {
     private static $internal_cache_key;
     private static $internal_cache_encrypt;
     private static $data;
+    private static $shared_app_code = array();
     public static $instances;
 
     /**
@@ -1871,6 +1872,11 @@ final class CF {
         return isset($data['org_code']) ? $data['org_code'] : null;
     }
 
+    public static function add_shared_app_code($app_code) {
+
+        self::$shared_app_code[] = $app_code;
+    }
+
     /**
      * Get shared application code for this domain
      *
@@ -1878,6 +1884,11 @@ final class CF {
      */
     public static function shared_app_code($domain = null) {
         $data = self::data($domain);
+        if (!isset($data['shared_app_code'])) {
+            $data['shared_app_code'] = array();
+        }
+
+        $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$shared_app_code);
         return isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
     }
 

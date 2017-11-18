@@ -26,7 +26,7 @@ date_default_timezone_set('Asia/Jakarta');
 define('DS', DIRECTORY_SEPARATOR);
 
 
-define('IN_PRODUCTION', TRUE);
+define('IN_PRODUCTION', FALSE);
 
 /**
  * Website application directory. This directory should contain your application

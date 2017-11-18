@@ -12,13 +12,12 @@ abstract class CObservable extends CRenderable {
     public function get_listeners() {
         return $this->listeners;
     }
-    
+
     /**
      * 
      * @param string $event
      * @return CListener
      */
-
     public function add_listener($event) {
         $listener = CListener::factory($this->id, $event);
         $this->listeners[] = $listener;
@@ -115,7 +114,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Heading 1 Element &lt;h1&gt
      *
@@ -127,7 +126,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Heading 2 Element &lt;h2&gt
      *
@@ -139,7 +138,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Heading 3 Element &lt;h3&gt
      *
@@ -151,7 +150,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Heading 4 Element &lt;h4&gt
      *
@@ -163,7 +162,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Heading 5 Element &lt;h5&gt
      *
@@ -175,7 +174,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Heading 6 Element &lt;h6&gt
      *
@@ -187,7 +186,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Ordered List Element &lt;ol&gt
      *
@@ -204,10 +203,11 @@ abstract class CObservable extends CRenderable {
      * Add Unordered List Element &lt;ul&gt
      *
      * @param string $id optional
-     * @return  CElement_Element_Ol  Unordered List Element
+     * @return  CElement_Element_Ul  Unordered List Element
      */
     public function add_ul($id = "") {
-        $element = CElement_Factory::create_element('ol', $id);
+        $element = CElement_Factory::create_element('ul', $id);
+        //$element = CUlElement::factory($id);
         $this->wrapper->add($element);
         return $element;
     }
