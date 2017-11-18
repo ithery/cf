@@ -213,17 +213,17 @@ final class CF {
             register_shutdown_function(array(__CLASS__, 'log_save'));
         }
 
-        // Enable C routing
+        // Enable CF routing
         CFEvent::add('system.routing', array('CFRouter', 'find_uri'));
         CFEvent::add('system.routing', array('CFRouter', 'setup'));
 
-        // Enable C controller initialization
+        // Enable CF controller initialization
         CFEvent::add('system.execute', array('CF', 'instance'));
 
-        // Enable C 404 pages
+        // Enable CF 404 pages
         CFEvent::add('system.404', array('CF', 'show_404'));
 
-        // Enable C output handling
+        // Enable CF output handling
         CFEvent::add('system.shutdown', array('CF', 'shutdown'));
 
         CFBenchmark::start('system.cf.bootstrap');
