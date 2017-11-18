@@ -11,7 +11,6 @@ class cajax {
         }
     }
 
-    
     public static function form_process($obj, $input) {
         $db = CDatabase::instance();
         $form = $obj->data->form;
@@ -108,16 +107,15 @@ class cajax {
         }
         $base_q = $q;
         $pos_order_by = strpos(strtolower($base_q), "order by", strpos(strtolower($base_q), 'from'));
-        
+
         $pos_last_kurung = strrpos(strtolower($base_q), ")");
-        if(isset($_GET['bdebug'])) {
+        if (isset($_GET['bdebug'])) {
             cdbg::var_dump($pos_order_by);
             cdbg::var_dump($pos_last_kurung);
             die();
-            
         }
         $temp_order_by = '';
-        if($pos_order_by>$pos_last_kurung) {
+        if ($pos_order_by > $pos_last_kurung) {
             if ($pos_order_by !== false) {
                 $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
                 $base_q = substr($base_q, 0, $pos_order_by);
@@ -174,8 +172,8 @@ class cajax {
             if (is_array($search_field)) {
                 foreach ($search_field as $f) {
                     if (strlen($sOrder) > 0)
-                        $sOrder.=",";
-                    $sOrder.= "`" . $f . "` = " . $db->escape($term) . " DESC";
+                        $sOrder .= ",";
+                    $sOrder .= "`" . $f . "` = " . $db->escape($term) . " DESC";
                 }
             }
         }
@@ -191,9 +189,9 @@ class cajax {
             foreach ($sub as $val) {
                 $kata = explode(".", $val);
                 if (isset($kata[1]))
-                    $temp_order_by.=", " . $kata[1];
+                    $temp_order_by .= ", " . $kata[1];
                 else
-                    $temp_order_by.=", " . $kata[0];
+                    $temp_order_by .= ", " . $kata[0];
             }
             $temp_order_by = substr($temp_order_by, 2);
             $temp_order_by = "ORDER BY " . $temp_order_by;
@@ -223,9 +221,9 @@ class cajax {
         $result["total"] = $total;
 
         $response = "";
-        $response.= $callback . "(";
-        $response.= json_encode($result);
-        $response.= ")";
+        $response .= $callback . "(";
+        $response .= json_encode($result);
+        $response .= ")";
         return $response;
     }
 
@@ -235,6 +233,9 @@ class cajax {
         $param = $obj->param;
         $js = "";
 
+        if ($obj->data->is_elastic) {
+            return self::dataelastic($obj, $input);
+        }
 
         foreach ($param as $p) {
 
@@ -269,11 +270,11 @@ class cajax {
         }
 
         $pos_order_by = strrpos(strtolower($base_q), "order by", $max_offset);
-        
+
         $pos_last_kurung = strrpos(strtolower($base_q), ")");
 
         $temp_order_by = '';
-        if($pos_order_by>$pos_last_kurung) {
+        if ($pos_order_by > $pos_last_kurung) {
             if ($pos_order_by !== false) {
                 $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
                 $base_q = substr($base_q, 0, $pos_order_by);
@@ -392,9 +393,9 @@ class cajax {
             foreach ($sub as $val) {
                 $kata = explode(".", $val);
                 if (isset($kata[1]))
-                    $temp_order_by.=", " . $kata[1];
+                    $temp_order_by .= ", " . $kata[1];
                 else
-                    $temp_order_by.=", " . $kata[0];
+                    $temp_order_by .= ", " . $kata[0];
             }
             $temp_order_by = substr($temp_order_by, 2);
             $temp_order_by = "ORDER BY " . $temp_order_by;
@@ -483,11 +484,11 @@ class cajax {
                 }
                 $class = "";
                 switch ($col->get_align()) {
-                    case "left": $class.=" align-left";
+                    case "left": $class .= " align-left";
                         break;
-                    case "right": $class.=" align-right";
+                    case "right": $class .= " align-right";
                         break;
-                    case "center": $class.=" align-center";
+                    case "center": $class .= " align-center";
                         break;
                 }
                 $arr[] = $new_v;
@@ -528,7 +529,7 @@ class cajax {
                 }
 
                 $html->appendln($row_action_list->html($html->get_indent()));
-                $js.=$row_action_list->js();
+                $js .= $row_action_list->js();
                 $html->dec_indent()->appendln('</td>')->br();
                 //$arr[] = '';
                 $arr[] = $html->text();
@@ -559,11 +560,11 @@ class cajax {
         $input_name = $data->input_name;
         if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
             for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
-                $extension = ".".pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
-                $file_id = date('Ymd') . cutils::randmd5().$extension;
+                $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
+                $file_id = date('Ymd') . cutils::randmd5() . $extension;
                 $fullfilename = ctemp::makepath("fileupload", $file_id . ".tmp");
-                
-                
+
+
                 move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename);
                 $return[] = $file_id;
             }
@@ -571,6 +572,244 @@ class cajax {
         return $file_id;
         //$response = json_encode($return);
         //return $response;
+    }
+
+    public static function dataelastic($obj, $input) {
+        $ajax_data = $obj->data->query;
+        $param = $obj->param;
+        $js = "";
+
+        foreach ($param as $p) {
+
+            $val = $input[$p->name];
+            $q = str_replace("{" . $p->name . "}", $db->escape($val), $q);
+        }
+
+        $table = unserialize($obj->data->table);
+        //$db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
+        $domain = $obj->data->domain;
+
+        $el = CElastic::instance();
+
+        $request = $_GET;
+
+        if (strtoupper($table->ajax_method) == "POST") {
+            $request = $_POST;
+        }
+
+        $columns = $obj->data->columns;
+        $row_action_list = $table->row_action_list;
+        $key = $obj->data->key_field;
+
+        $search = $el->search(cobj::get($ajax_data, 'index'), cobj::get($ajax_data, 'document_type'));
+        $must = cobj::get($ajax_data, 'must');
+        foreach ($must as $m) {
+            $search->must((array) $m);
+        }
+        $must_not = cobj::get($ajax_data, 'must_not');
+        foreach ($must_not as $mn) {
+            $search->must_not((array) $mn);
+        }
+
+        $select = (array) cobj::get($ajax_data, 'select');
+        foreach ($select as $k => $v) {
+            $search->select($k, $v);
+        }
+
+        $select_flip = array_flip($select);
+
+        /* Paging */
+        if (isset($request['iDisplayStart']) && $request['iDisplayLength'] != '-1') {
+            $search->from(intval($request['iDisplayStart']));
+            $search->size(intval($request['iDisplayLength']));
+        }
+
+        /* Ordering */
+        $sOrder = "";
+        if (isset($request['iSortCol_0'])) {
+            $sOrder = "ORDER BY  ";
+            for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
+                $i2 = 0;
+                if ($table->checkbox) {
+                    $i2 = -1;
+                }
+                if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
+                    $sOrder .= "" . $db->escape_column($columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -2);
+            if ($sOrder == "ORDER BY") {
+                $sOrder = "";
+            }
+        }
+
+        if (isset($request['sSearch']) && $request['sSearch'] != "") {
+            $arr = array();
+            if (count($columns) > 0) {
+                carr::set_path($arr, 'bool.should', array());
+                $should = &$arr['bool']['should'];
+                for ($i = 0; $i < count($columns); $i++) {
+                    $i2 = 0;
+                    if ($table->checkbox) {
+                        $i2 = -1;
+                    }
+                    if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
+                        $field = $columns[$i + $i2]->fieldname;
+                        if (isset($select_flip[$field])) {
+                            $field = $select_flip[$field];
+                        }
+                        $s = array();
+                        carr::set_path($s, 'match.' . $field, $request['sSearch']);
+                        $should[] = $s;
+                        
+                    }
+                }
+            }
+            if (count($arr) > 0) {
+                $search->must($arr);
+            }
+        }
+
+        $r = $search->exec();
+
+
+        $total_record = $r->count_all();
+        $filtered_record = $r->count_all();
+        $rarr = $r->result(false);
+        $data = $rarr;
+        $output = array(
+            "sEcho" => intval(carr::get($request, 'sEcho')),
+            "iTotalRecords" => $total_record,
+            "iTotalDisplayRecords" => $filtered_record,
+            "aaData" => array(),
+        );
+        $no = carr::get($request, 'iDisplayStart', 0);
+        foreach ($data as $row) {
+            $arr = array();
+            $no++;
+            $key = "";
+
+            if (array_key_exists($table->key_field, $row)) {
+
+                $key = $row[$table->key_field];
+            }
+            if ($table->numbering) {
+                $arr[] = $no;
+            }
+
+            if ($table->checkbox) {
+                $arr[] = '<input type="checkbox" name="' . $table->id() . '-check[]" id="' . $table->id() . '-' . $key . '" value="' . $key . '" class="checkbox-' . $table->id() . '">';
+            }
+            foreach ($table->columns as $col) {
+                $col_found = false;
+                $new_v = "";
+                $col_v = "";
+                $ori_v = "";
+                //do print from query
+                foreach ($row as $k => $v) {
+                    if ($k == $col->get_fieldname()) {
+                        $col_v = $v;
+                        $ori_v = $col_v;
+                        foreach ($col->transforms as $trans) {
+                            $col_v = $trans->execute($col_v);
+                        }
+                    }
+                }
+                //if formatted
+                if (strlen($col->format) > 0) {
+                    $temp_v = $col->format;
+                    foreach ($row as $k2 => $v2) {
+
+                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
+
+                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        }
+                        $col_v = $temp_v;
+                    }
+                }
+
+                $new_v = $col_v;
+
+                if (($table->cell_callback_func) != null) {
+                    $new_v = CDynFunction::factory($table->cell_callback_func)
+                            ->add_param($table)
+                            ->add_param($col->get_fieldname())
+                            ->add_param($row)
+                            ->add_param($new_v)
+                            ->set_require($table->requires)
+                            ->execute();
+
+                    if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
+                        $js .= $new_v['js'];
+                        $new_v = $new_v['html'];
+                    }
+
+
+                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                }
+                $class = "";
+                switch ($col->get_align()) {
+                    case "left": $class .= " align-left";
+                        break;
+                    case "right": $class .= " align-right";
+                        break;
+                    case "center": $class .= " align-center";
+                        break;
+                }
+                $arr[] = $new_v;
+            }
+            if (count($row_action_list) > 0) {
+                $html = new CStringBuilder();
+                ;
+                $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
+                foreach ($row as $k => $v) {
+                    $jsparam[$k] = $v;
+                }
+                $jsparam["param1"] = $key;
+                if ($table->action_style == "btn-dropdown") {
+                    $table->row_action_list->add_class("pull-right");
+                }
+                $row_action_list->regenerate_id(true);
+                $row_action_list->apply("jsparam", $jsparam);
+
+                $row_action_list->apply("set_handler_url_param", $jsparam);
+
+                if (($table->filter_action_callback_func) != null) {
+                    $actions = $row_action_list->childs();
+
+                    foreach ($actions as $action) {
+                        $visibility = CDynFunction::factory($table->filter_action_callback_func)
+                                ->add_param($table)
+                                ->add_param($col->get_fieldname())
+                                ->add_param($row)
+                                ->add_param($action)
+                                ->set_require($table->requires)
+                                ->execute();
+
+                        $action->set_visibility($visibility);
+                    }
+
+
+                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                }
+
+                $html->appendln($row_action_list->html($html->get_indent()));
+                $js .= $row_action_list->js();
+                $html->dec_indent()->appendln('</td>')->br();
+                //$arr[] = '';
+                $arr[] = $html->text();
+                $arr["DT_RowId"] = $key;
+            }
+            $output["aaData"][] = $arr;
+        }
+
+
+        $data = array(
+            "datatable" => $output,
+            "js" => cbase64::encode($js),
+        );
+        $response = json_encode($data);
+        return $response;
     }
 
 }

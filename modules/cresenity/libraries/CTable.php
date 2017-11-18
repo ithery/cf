@@ -60,6 +60,7 @@ class CTable extends CElement {
     public $footer_action_style;
     public $export_filename = '';
     public $export_sheetname = '';
+    public $is_elastic = false;
     protected $table_striped;
     protected $quick_search = FALSE;
     protected $tbody_id;
@@ -710,9 +711,14 @@ class CTable extends CElement {
         $this->query = $q;
         return $this;
     }
-    
+
     public function set_data_from_elastic($el) {
-        $this->data = $el;
+        $this->query = $el;
+        $this->is_elastic = true;
+        if ($el instanceof CElastic_Search) {
+
+            $this->query = $el->ajax_data();
+        }
     }
 
     public function set_data_from_array($a) {
@@ -1739,6 +1745,7 @@ class CTable extends CElement {
                     ->set_data('key_field', $this->key_field)
                     ->set_data('table', serialize($this))
                     ->set_data('domain', $this->domain)
+                    ->set_data('is_elastic', $this->is_elastic)
                     ->makeurl();
         }
 

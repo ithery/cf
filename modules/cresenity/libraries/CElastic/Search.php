@@ -2,16 +2,6 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermsQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
-use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
-use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
-use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\BuilderInterface;
-
 /**
  * @author Hery Kurniawan
  * @since Nov 18, 2017, 9:05:59 PM
@@ -21,17 +11,27 @@ class CElastic_Search {
 
     protected $index;
     protected $document_type;
+
+    /*
+     * @var Elasticsearch\Client
+     */
+    protected $elastic;
     protected $client;
     protected $must;
     protected $must_not;
     protected $should;
+    protected $select;
+    protected $from = null;
+    protected $size = null;
 
-    public function __construct($client, $index, $document_type = '') {
-        $this->client = $client;
+    public function __construct(CElastic $elastic, $index, $document_type = '') {
+        $this->elastic = $elastic;
+        $this->client = $elastic->client();
         $this->index = $index;
         $this->document_type = $document_type;
         $this->must = array();
         $this->must_not = array();
+        $this->select = array();
     }
 
     public function must($path, $value = null) {
@@ -51,7 +51,15 @@ class CElastic_Search {
         } else {
             carr::set_path($arr, $path, $value);
         }
-        $this->must[] = $arr;
+        $this->must_not[] = $arr;
+    }
+
+    public function from($from) {
+        $this->from = $from;
+    }
+
+    public function size($size) {
+        $this->size = $size;
     }
 
     public function exec() {
@@ -68,16 +76,43 @@ class CElastic_Search {
             carr::set_path($body, 'query.bool.must', $this->must);
         }
         if (count($this->must_not) > 0) {
-            carr::set_path($body, 'query.bool.must_not', $this->must);
+            carr::set_path($body, 'query.bool.must_not', $this->must_not);
         }
 
+        if($this->size!=null) {
+            $body['size']=$this->size;
+        }
+        if($this->from!=null) {
+            $body['from']=$this->from;
+        }
+        
 
+        
         $params['body'] = $body;
-        cdbg::var_dump($params);
-        $result = $this->client->search($params);
-        cdbg::var_dump($result);
-        die();
+        $response = $this->client->search($params);
+
+        $result = new CElastic_Result($response, $this->select);
         return $result;
+    }
+
+    public function select($field, $alias = null) {
+        if ($alias == null) {
+            $alias = $field;
+        }
+        $this->select[$field] = $alias;
+    }
+
+    public function ajax_data() {
+        $data = array();
+        $data['index'] = $this->index;
+        $data['document_type'] = $this->document_type;
+        $data['config'] = $this->elastic->config();
+        $data['must'] = $this->must;
+        $data['must_not'] = $this->must_not;
+        $data['select'] = $this->select;
+        $data['from'] = $this->from;
+        $data['size'] = $this->size;
+        return $data;
     }
 
 }

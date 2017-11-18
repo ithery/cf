@@ -122,41 +122,22 @@ class CElastic {
         CF::log(CLogger::DEBUG, 'Elastic Library initialized');
     }
 
-    public function search($index,$document_type='') {
-        return new CElastic_Search($this->client,$index,$document_type);
+    /**
+     * 
+     * @param string $index
+     * @param string $document_type
+     * @return \CElastic_Search
+     */
+    public function search($index, $document_type = '') {
+        return new CElastic_Search($this, $index, $document_type);
     }
-    
-    public function get_result() {
 
-        $matchAll = new ONGR\ElasticsearchDSL\Query\MatchAllQuery();
-        $bool = new ONGR\ElasticsearchDSL\Query\Compound\BoolQuery();
-
-        $range = new ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery('stock', array(ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery::GT => 0));
-
-
-
-        $bool->add($range);
-
-
-        $this->dsl->bool_query()->add($this->dsl->range_query('status', array('gt' => 0)));
-
-        $search = new ONGR\ElasticsearchDSL\Search();
-        $search->addQuery($bool);
-
-        $params = [
-            'index' => '62hall',
-            'type' => 'searchproduct',
-            'body' => $search->toArray(),
-        ];
-
-
-        cdbg::var_dump($params);
-
-        $results = $client->search($params);
-
-        cdbg::var_dump($results);
-        die;
-        return $results;
+    /**
+     * 
+     * @return Elasticsearch\Client
+     */
+    public function &client() {
+        return $this->client;
     }
 
 }
