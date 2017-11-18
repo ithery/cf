@@ -14,13 +14,17 @@ namespace ONGR\ElasticsearchDSL\Query\Compound;
 use ONGR\ElasticsearchDSL\BuilderInterface;
 use ONGR\ElasticsearchDSL\ParametersTrait;
 
+if (!is_callable('random_bytes')) {
+    require_once \CF::get_file('vendor', 'random_compat/random');
+}
+
 /**
  * Represents Elasticsearch "bool" query.
  *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
  */
-class BoolQuery implements BuilderInterface
-{
+class BoolQuery implements BuilderInterface {
+
     use ParametersTrait;
 
     const MUST = 'must';
@@ -36,8 +40,7 @@ class BoolQuery implements BuilderInterface
     /**
      * Constructor to prepare container.
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->container = [];
     }
 
@@ -48,8 +51,7 @@ class BoolQuery implements BuilderInterface
      *
      * @return array
      */
-    public function getQueries($boolType = null)
-    {
+    public function getQueries($boolType = null) {
         if ($boolType === null) {
             $queries = [];
 
@@ -78,8 +80,7 @@ class BoolQuery implements BuilderInterface
      *
      * @throws \UnexpectedValueException
      */
-    public function add(BuilderInterface $query, $type = self::MUST, $key = null)
-    {
+    public function add(BuilderInterface $query, $type = self::MUST, $key = null) {
         if (!in_array($type, [self::MUST, self::MUST_NOT, self::SHOULD, self::FILTER])) {
             throw new \UnexpectedValueException(sprintf('The bool operator %s is not supported', $type));
         }
@@ -96,10 +97,8 @@ class BoolQuery implements BuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray()
-    {
-        if (count($this->container) === 1 && isset($this->container[self::MUST])
-                && count($this->container[self::MUST]) === 1) {
+    public function toArray() {
+        if (count($this->container) === 1 && isset($this->container[self::MUST]) && count($this->container[self::MUST]) === 1) {
             $query = reset($this->container[self::MUST]);
 
             return $query->toArray();
@@ -122,8 +121,8 @@ class BoolQuery implements BuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
+    public function getType() {
         return 'bool';
     }
+
 }

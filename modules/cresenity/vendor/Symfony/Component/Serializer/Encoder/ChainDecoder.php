@@ -22,29 +22,26 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  *
  * @final since version 3.3.
  */
-class ChainDecoder implements ContextAwareDecoderInterface
-{
+class ChainDecoder implements ContextAwareDecoderInterface {
+
     protected $decoders = array();
     protected $decoderByFormat = array();
 
-    public function __construct(array $decoders = array())
-    {
+    public function __construct(array $decoders = array()) {
         $this->decoders = $decoders;
     }
 
     /**
      * {@inheritdoc}
      */
-    final public function decode($data, $format, array $context = array())
-    {
+    final public function decode($data, $format, array $context = array()) {
         return $this->getDecoder($format, $context)->decode($data, $format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format, array $context = array())
-    {
+    public function supportsDecoding($format, array $context = array()) {
         try {
             $this->getDecoder($format, $context);
         } catch (RuntimeException $e) {
@@ -59,10 +56,8 @@ class ChainDecoder implements ContextAwareDecoderInterface
      *
      * @throws RuntimeException if no decoder is found
      */
-    private function getDecoder(string $format, array $context): DecoderInterface
-    {
-        if (isset($this->decoderByFormat[$format])
-            && isset($this->decoders[$this->decoderByFormat[$format]])
+    private function getDecoder($format, array $context) {
+        if (isset($this->decoderByFormat[$format]) && isset($this->decoders[$this->decoderByFormat[$format]])
         ) {
             return $this->decoders[$this->decoderByFormat[$format]];
         }
@@ -77,4 +72,5 @@ class ChainDecoder implements ContextAwareDecoderInterface
 
         throw new RuntimeException(sprintf('No decoder found for format "%s".', $format));
     }
+
 }
