@@ -719,6 +719,7 @@ class CTable extends CElement_Element {
 
             $this->query = $el->ajax_data();
         }
+        return $this;
     }
 
     public function set_data_from_array($a) {
