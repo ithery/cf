@@ -453,11 +453,11 @@ final class CF {
      * @param   boolean  re-process the include paths
      * @return  array
      */
-    public static function paths($domain = null) {
+    public static function paths($domain = null,$force_reload=false) {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
-        if (!isset(self::$paths[$domain])) {
+        if (!isset(self::$paths[$domain]) || $force_reload) {
             //we try to search all paths for this domain
             $paths = array();
             $theme = CF::theme($domain);
@@ -1889,6 +1889,8 @@ final class CF {
         }
 
         $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$shared_app_code);
+        
+
         return isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
     }
 
