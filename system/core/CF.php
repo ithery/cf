@@ -242,6 +242,81 @@ final class CF {
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
     }
 
+    public static function invoke($uri) {
+        $router_data = CFRouter::get_route_data($uri);
+        $routes = carr::get($router_data, 'routes');
+        $current_uri = carr::get($router_data, 'current_uri');
+        $query_string = carr::get($router_data, 'query_string');
+        $complete_uri = carr::get($router_data, 'complete_uri');
+        $routed_uri = carr::get($router_data, 'routed_uri');
+        $url_suffix = carr::get($router_data, 'url_suffix');
+        $segments = carr::get($router_data, 'segments');
+        $rsegments = carr::get($router_data, 'rsegments');
+        $controller = carr::get($router_data, 'controller');
+        $controller_dir = carr::get($router_data, 'controller_dir');
+        $controller_dir_ucfirst = carr::get($router_data, 'controller_dir_ucfirst');
+        $controller_path = carr::get($router_data, 'controller_path');
+        $method = carr::get($router_data, 'method');
+        $arguments = carr::get($router_data, 'arguments');
+
+        // Include the Controller file
+        if (strlen($controller_path) > 0) {
+            require_once $controller_path;
+        }
+        $class_name = '';
+        try {
+            // Start validation of the controller
+            $class_name = str_replace('/', '_', $controller_dir_ucfirst);
+            $class_name = 'Controller_' . $class_name . ucfirst($controller);
+            $class = new ReflectionClass($class_name);
+        } catch (ReflectionException $e) {
+            try {
+                $class_name = ucfirst($controller) . '_Controller';
+                $class = new ReflectionClass($class_name);
+                // Start validation of the controller
+            } catch (ReflectionException $e) {
+                // Controller does not exist
+                CFEvent::run('system.404');
+            }
+        }
+
+        if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
+            // Controller is not allowed to run in production
+            throw new CException('class is abstract or not allowed in production in :class_name', array(':class_name' => $class_name));
+        }
+        // Create a new controller instance
+        if (isset($class)) {
+            $controller = $class->newInstance();
+        }
+        try {
+            // Load the controller method
+            $method = $class->getMethod($method);
+
+            // Method exists
+            if (CFRouter::$method[0] === '_') {
+                // Do not allow access to hidden methods
+                throw new CException('method :method is hidden methods in :class_name', array(':method' => $method, ':class_name' => $class_name));
+            }
+
+            if ($method->isProtected() or $method->isPrivate()) {
+                // Do not attempt to invoke protected methods
+                throw new ReflectionException('protected controller method');
+            }
+
+            // Default arguments
+            $arguments = $arguments;
+        } catch (ReflectionException $e) {
+            // Use __call instead
+            $method = $class->getMethod('__call');
+
+            // Use arguments in __call format
+            $arguments = array($method, $arguments);
+        }
+
+        // Execute the controller method
+        return $method->invokeArgs($controller, $arguments);
+    }
+
     /**
      * Loads the controller and initializes it. Runs the pre_controller,
      * post_controller_constructor, and post_controller events. Triggers
@@ -336,6 +411,7 @@ final class CF {
             // Stop the controller execution benchmark
             CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
         }
+
 
         return self::$instance;
     }
@@ -453,7 +529,7 @@ final class CF {
      * @param   boolean  re-process the include paths
      * @return  array
      */
-    public static function paths($domain = null,$force_reload=false) {
+    public static function paths($domain = null, $force_reload = false) {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
@@ -1889,7 +1965,7 @@ final class CF {
         }
 
         $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$shared_app_code);
-        
+
 
         return isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
     }
