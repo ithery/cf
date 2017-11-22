@@ -68,7 +68,7 @@ class CFRouter {
         if ($current_uri === '') {
             // Make sure the default route is set
             if (!isset($routes['_default']))
-                throw new CF_Exception('core.no_default_route');
+                throw new CException('Please set a default route in config/routes.php');
 
             // Use the default route when no segments exist
             $current_uri = $routes['_default'];
