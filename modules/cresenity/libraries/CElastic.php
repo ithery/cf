@@ -134,6 +134,16 @@ class CElastic {
 
     /**
      * 
+     * @param string $index
+     * @param string $document_type
+     * @return \CElastic_CreateIndex
+     */
+    public function indices($index, $document_type = "") {
+        return new CElastic_Indices($this, $index, $document_type);
+    }
+
+    /**
+     * 
      * @return Elasticsearch\Client
      */
     public function &client() {
