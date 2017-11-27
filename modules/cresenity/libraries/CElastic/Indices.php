@@ -62,7 +62,7 @@ class CElastic_Indices {
         try {
             $this->client->indices()->create($params);
         } catch(Exception $e) {
-            throw new Exception($this->index . " Index is Exists", 1);
+            throw new Exception($this->index . " - Index is Exists", 1);
         }
     }
 
@@ -81,7 +81,26 @@ class CElastic_Indices {
         try {
             $this->client->indices()->putMapping($params);
         } catch(Exception $e) {
-            throw new Exception($this->index . " " . $this->document_type . " Failed", 1);
+            throw new Exception($this->index . " " . $this->document_type . " - Put Mapping Failed", 1);
+        }
+    }
+
+    public function put_setting() {
+        $params = array();
+        $params['index'] = $this->index;
+        
+        //build the body
+        $body = array();
+        if(count($this->settings) > 0) {
+            $body['putSettings'] = $this->settings;
+        }
+
+        $params['body'] = $body;
+
+        try {
+            $this->client->indices()->putSettings($params);
+        } catch(Exception $e) {
+            throw new Exception($this->index . " - Put Mapping Failed", 1);
         }
     }
 
@@ -96,7 +115,35 @@ class CElastic_Indices {
         try {
             $result = $this->client->indices()->getMapping($params);
         } catch(Exception $e) {
-            throw new Exception($this->index . " " . $this->document_type . " Not Found", 1);
+            throw new Exception($this->index . " " . $this->document_type . " - Get Mapping Not Found", 1);
+        }
+
+        return $result;
+    }
+
+    public function get_setting() {
+        $params = array();
+        $params['index'] = $this->index;
+
+        $result;
+        try {
+            $result = $this->client->indices()->getSettings($params);
+        } catch(Exception $e) {
+            throw new Exception($this->index . " - Get Setting Not Found", 1);
+        }
+
+        return $result;
+    }
+
+    public function delete() {
+        $params = array();
+        $params['index'] = $this->index;
+
+        $result;
+        try {
+            $result = $this->client->indices()->delete($params);
+        } catch(Exception $e) {
+            throw new Exception($this->index . " - Delete Failed", 1);
         }
 
         return $result;
