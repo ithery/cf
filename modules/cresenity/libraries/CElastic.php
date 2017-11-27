@@ -136,10 +136,20 @@ class CElastic {
      * 
      * @param string $index
      * @param string $document_type
-     * @return \CElastic_CreateIndex
+     * @return \CElastic_Indices
      */
     public function indices($index, $document_type = "") {
         return new CElastic_Indices($this, $index, $document_type);
+    }
+
+    /**
+     * 
+     * @param string $index
+     * @param string $document_type
+     * @return \CElastic_Document
+     */
+    public function document($index, $document_type) {
+        return new CElastic_Document($this, $index, $document_type);
     }
 
     /**
