@@ -92,7 +92,7 @@ class CElastic_Indices {
         //build the body
         $body = array();
         if(count($this->settings) > 0) {
-            $body['putSettings'] = $this->settings;
+            $body['settings'] = $this->settings;
         }
 
         $params['body'] = $body;
