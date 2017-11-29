@@ -17,24 +17,15 @@ class CElastic_Document {
      */
     protected $elastic;
     protected $client;
-    protected $header;
-    protected $data;
 
     public function __construct(CElastic $elastic, $index, $document_type) {
         $this->elastic = $elastic;
         $this->client = $elastic->client();
         $this->index = $index;
         $this->document_type = $document_type;
-        $this->header = array();
-        $this->data = array();
     }
 
-    public function add_data($id, $data) {
-        $this->header[] = $id;
-        $this->data[] = $data;
-    }
-
-    public function bulk() {
+    public function bulk($query, $index_field_name = "") {
         $params = ['body' => []];
 
         $i = 0;
@@ -42,16 +33,27 @@ class CElastic_Document {
         $error = 0;
         $error_message = "";
 
-        foreach ($this->header as $key => $value) {
+        $db = CDatabase::instance();
+        $results = $db->query($query);
+        $list_field = $results->list_fields();
+
+        foreach ($results as $key => $value) {
+            $row = (array) $value;
+
+            $id = $row[$list_field[0]];
+            if(strlen($index_field_name) > 0) {
+                $id = $row[$index_field_name];
+            }
+            
             $params['body'][] = [
                 'index' => [
                     '_index' => $this->index,
                     '_type' => $this->document_type,
-                    '_id' => $value
+                    '_id' => $id
                 ]
             ];
 
-            $params['body'][] = $this->data[$key];
+            $params['body'][] = $row;
 
             $i++;
 
