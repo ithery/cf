@@ -78,17 +78,51 @@ class CElastic_Search {
         $this->sort[] = $arr;
     }
 
-    public function aggs($name, $field) {
-        $aggs_temp = array();
-        if (isset($this->aggs[$name])) {
-            $aggs_temp = $this->aggs[$name];
-        }
-        $aggs_temp[$name] = array(
+    public function aggs($name, $field, $min_doc_count = 0) {
+        $this->aggs[$name] = array(
             'terms' => array(
                 "field" => $field
             )
         );
-        $this->aggs = $aggs_temp;
+        
+        if($min_doc_count > 0) {
+            $this->aggs[$name]['terms']["min_doc_count"] = $min_doc_count;
+        }
+    }
+
+    public function aggs_order($name, $order, $order_type = "", $order_mode = "") {
+        if (isset($this->aggs[$name])) {
+            if ($order != null) {
+                $this->aggs[$name]["terms"]["order"] = $order;
+            }
+
+            if (strlen($order_type) > 0 && strlen($order_mode) > 0) {
+                $this->aggs[$name]["terms"]["order"] = array(
+                    $order_type => $order_mode
+                );
+            }
+        }
+    }
+
+    public function sub_aggs($name_parent, $name, $field, $type = "avg", $filter_field = "", $filter_value = "") {
+        if (isset($this->aggs[$name_parent])) {
+            $this->aggs[$name_parent]["aggs"] = array(
+                $name => array(
+                    $type => array(
+                        "field" => $field
+                    )
+                )
+            );
+            if(strlen($filter_field) > 0 && strlen($filter_value) > 0) {
+                $this->aggs[$name_parent]["aggs"][$name] = array(
+                    "filter" => array(
+                        "term" => array(
+                            $filter_field => $filter_value
+                        )
+                    )
+                );
+            }
+        }
     }
 
     public function exec() {
