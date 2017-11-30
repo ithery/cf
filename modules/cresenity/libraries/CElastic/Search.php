@@ -24,6 +24,7 @@ class CElastic_Search {
     protected $from;
     protected $size;
     protected $sort;
+    protected $aggs;
 
     public function __construct(CElastic $elastic, $index, $document_type = '') {
         $this->elastic = $elastic;
@@ -36,6 +37,7 @@ class CElastic_Search {
         $this->from = null;
         $this->size = null;
         $this->sort = array();
+        $this->aggs = array();
     }
 
     public function must($path, $value = null) {
@@ -76,6 +78,19 @@ class CElastic_Search {
         $this->sort[] = $arr;
     }
 
+    public function aggs($name, $field) {
+        $aggs_temp = array();
+        if (isset($this->aggs[$name])) {
+            $aggs_temp = $this->aggs[$name];
+        }
+        $aggs_temp[$name] = array(
+            'terms' => array(
+                "field" => $field
+            )
+        );
+        $this->aggs = $aggs_temp;
+    }
+
     public function exec() {
         $params = array();
         $params['index'] = $this->index;
@@ -103,10 +118,12 @@ class CElastic_Search {
         if (count($this->sort) > 0) {
             $body['sort'] = $this->sort;
         }
+        if (count($this->aggs) > 0) {
+            $body['aggs'] = $this->aggs;
+        }
 
         $params['body'] = $body;
         $response = $this->client->search($params);
-
         $result = new CElastic_Result($response, $this->select);
         return $result;
     }
