@@ -78,9 +78,9 @@ class CElastic_Search {
         $this->sort[] = $arr;
     }
 
-    public function aggs($name, $field, $min_doc_count = 0) {
+    public function aggs($name, $function, $field, $min_doc_count = 0) {
         $this->aggs[$name] = array(
-            'terms' => array(
+            $function => array(
                 "field" => $field
             )
         );
