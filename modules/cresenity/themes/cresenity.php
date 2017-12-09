@@ -28,8 +28,8 @@ return array(
         'modernizr',
     ),
     "js" => array(
-        "cresenity.js",
         "capp.js",
+        "cresenity.js",
     ),
     "css" => array(
         "cresenity.colors.css",
