@@ -263,6 +263,7 @@ class CClientScript extends CObject {
         $js_files = $this->js_files();
         $js_open = "";
         $js_close = "";
+        $js_before = "";
         $i = 0;
         $man = CManager::instance();
         foreach ($js_files as $f) {
@@ -296,8 +297,11 @@ class CClientScript extends CObject {
             ";
 
 
+        $js_before .= "
+            window.capp = " . json_encode(CApp::variables()) . ";
+            ";
 
-        return $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
+        return $js_before . $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
     }
 
     public function render($pos, $type = array("js_file", "css_file", "js", "css", "meta", "link")) {

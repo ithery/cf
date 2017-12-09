@@ -35,6 +35,7 @@ class CApp extends CObservable {
     private $header_body = '';
     private $additional_head = '';
     private $mobile_path = '';
+    private $variables;
 
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
@@ -453,6 +454,8 @@ class CApp extends CObservable {
 
             $v->header_body = $this->header_body;
 
+
+
             $js_urls = $cs->url_js_file();
             $additional_js = "";
 
@@ -463,8 +466,8 @@ class CApp extends CObservable {
 				";
             }
             $js = "";
-            $vjs = CView::factory('ccore/js');
-            $js .= PHP_EOL . $vjs->render();
+            //$vjs = CView::factory('ccore/js');
+            //$js .= PHP_EOL . $vjs->render();
 
             $js .= PHP_EOL . $this->js . $additional_js;
 
@@ -550,32 +553,6 @@ class CApp extends CObservable {
 
         if (ccfg::get("install")) {
             $v = CView::factory($theme_path . 'cinstall/page');
-            /*
-              } else if ($this->is_admin()) {
-              if (!$this->is_admin_login()) {
-              $v = CView::factory('admin/login');
-              } else {
-              $v = CView::factory('admin/cpage');
-              $this->content = parent::html();
-              $this->js = parent::js();
-              $v->content = $this->content;
-              $v->title = $this->title;
-              $v->js = $this->js;
-              $cs = CClientScript::instance();
-              $v->head_client_script = $cs->render('head');
-              $v->begin_client_script = $cs->render('begin');
-              $v->end_client_script = $cs->render('end');
-              $v->load_client_script = $cs->render('load');
-              $v->ready_client_script = $cs->render('ready');
-
-              $v->custom_js = $this->custom_js;
-              $v->custom_header = $this->custom_header;
-              $v->custom_footer = $this->custom_footer;
-              $v->show_breadcrumb = $this->show_breadcrumb;
-              $v->show_title = $this->show_title;
-              $v->breadcrumb = $this->breadcrumb;
-              }
-             */
         } else if ($this->signup) {
             $v = CView::factory($theme_path . 'ccore/signup');
         } else if ($this->resend) {
@@ -615,8 +592,8 @@ class CApp extends CObservable {
 				";
             }
             $js = "";
-            $vjs = CView::factory('ccore/js');
-            $js .= PHP_EOL . $vjs->render();
+            //$vjs = CView::factory('ccore/js');
+            //$js .= PHP_EOL . $vjs->render();
 
             $js .= PHP_EOL . $this->js . $additional_js;
 
@@ -943,6 +920,26 @@ class CApp extends CObservable {
 
     public function is_mobile() {
         return $this->mobile;
+    }
+
+    public static function variables() {
+        $variables = array();
+        $variables['decimal_separator'] = ccfg::get('decimal_separator') == null ? '.' : ccfg::get('decimal_separator');
+        $variables['thousand_separator'] = ccfg::get('thousand_separator') == null ? ',' : ccfg::get('thousand_separator');
+        $variables['decimal_digit'] = ccfg::get('decimal_digit') == null ? '0' : ccfg::get('decimal_digit');
+        $variables['have_clock'] = ccfg::get('have_clock') == null ? false : ccfg::get('have_clock');
+
+        $bootstrap = ccfg::get('bootstrap');
+        $theme_data = CManager::instance()->get_theme_data();
+        if (isset($theme_data) && strlen(carr::get($theme_data, 'bootstrap')) > 0) {
+            $bootstrap = carr::get($theme_data, 'bootstrap');
+        }
+
+        if (strlen($bootstrap) == 0) {
+            $bootstrap = '2.3';
+        }
+        $variables['bootstrap'] = $bootstrap;
+        return $variables;
     }
 
 }
