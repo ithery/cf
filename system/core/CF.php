@@ -327,7 +327,7 @@ final class CF {
      * @return  object  instance of controller
      */
     public static function & instance() {
-
+        $null = NULL;
         if (self::$instance === NULL) {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
             if (empty(CFRouter::$controller_path)) {
@@ -349,12 +349,14 @@ final class CF {
                 } catch (ReflectionException $e) {
                     // Controller does not exist
                     CFEvent::run('system.404');
+                    return $null;
                 }
             }
 
             if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
                 // Controller is not allowed to run in production
                 CFEvent::run('system.404');
+                return $null;
             }
 
             // Run system.pre_controller
@@ -363,14 +365,15 @@ final class CF {
             // Create a new controller instance
             if (isset($class)) {
                 $controller = $class->newInstance();
+
+                if (!isset(self::$instances[CFRouter::$current_uri])) {
+                    self::$instances[CFRouter::$current_uri] = $controller;
+                }
             }
 
-            if (!isset(self::$instances[CFRouter::$current_uri])) {
-                self::$instances[CFRouter::$current_uri] = $controller;
-            }
             // Controller constructor has been executed
             CFEvent::run('system.post_controller_constructor');
-
+            
             try {
                 // Load the controller method
                 $method = $class->getMethod(CFRouter::$method);
@@ -1181,6 +1184,7 @@ final class CF {
                     // Beautify backtrace
                     $trace = self::backtrace($trace);
                 }
+
                 if (IN_PRODUCTION) {
                     $data = array(
                         'description' => $description,
@@ -1188,11 +1192,11 @@ final class CF {
                         'message' => $message,
                         'show_debug_error' => '1',
                     );
+
                     $view = CView::factory('kohana_error_page', $data);
                     try {
                         cmail::error_mail($view->render());
                     } catch (Exception $ex) {
-
                         clog::log('error_mail.log', 'error', CF::domain() . " - " . $ex->getMessage());
                     }
                 }

@@ -1,25 +1,26 @@
 <?php
 
-if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])) {
-    //bot detected
+if (!isset($_GET['force-nobot'])) {
+    if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])) {
+        //bot detected
 //    if (isset($_SERVER['HTTP_HOST'])) {
 //        preg_match('/^(?:(.+)\.)?([^.]+\.[^.]+)$/', $_SERVER['HTTP_HOST'], $matches);
 //        if (isset($matches[1]) && $matches[1] != 'www') {
-    //subdomain detected
-    if (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF'] AND $_SERVER['PHP_SELF'] != '/index.php/check') {
+        //subdomain detected
+        if (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF'] AND $_SERVER['PHP_SELF'] != '/index.php/check') {
 
-        header('HTTP/1.0 503 Service Unavailable');
-        header('Content-Type: text/html');
-        header("Retry-After: 3600");
-        header('Content-Type: text/html');
-        echo "<html><body><p><b>Server under undue load</b><br />";
-        echo "Please wait 1 hours before retrying.</p></body></html>";
-        exit;
-    }
+            header('HTTP/1.0 503 Service Unavailable');
+            header('Content-Type: text/html');
+            header("Retry-After: 3600");
+            header('Content-Type: text/html');
+            echo "<html><body><p><b>Server under undue load</b><br />";
+            echo "Please wait 1 hours before retrying.</p></body></html>";
+            exit;
+        }
 //        }
 //    }
+    }
 }
-
 
 
 date_default_timezone_set('Asia/Jakarta');

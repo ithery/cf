@@ -1,6 +1,6 @@
 <?php
 
-class CNestable extends CObservable {
+class CNestable extends CElement_Element {
 
     protected $data;
     protected $id_key;
@@ -13,6 +13,7 @@ class CNestable extends CObservable {
     protected $requires;
     protected $checkbox;
     protected $disable_dnd;
+    protected $js_cell;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -27,6 +28,7 @@ class CNestable extends CObservable {
         $this->display_callback = false;
         $this->checkbox = false;
         $this->requires = array();
+        $this->js_cell = '';
     }
 
     public static function factory($id) {
@@ -124,7 +126,7 @@ class CNestable extends CObservable {
                 $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->inc_indent();
 
                 $html->appendln('<div class="dd-handle">')->inc_indent();
-                if($this->checkbox) {
+                if ($this->checkbox) {
                     $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d["parent_id"] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->inc_indent();
                 }
                 $val = $d[$this->value_key];
@@ -149,7 +151,12 @@ class CNestable extends CObservable {
                     if ($this->action_style == "btn-dropdown") {
                         $this->row_action_list->add_class("pull-right");
                     }
+                    $this->row_action_list->regenerate_id(true);
                     $this->row_action_list->apply("jsparam", $jsparam);
+                    $this->row_action_list->apply("set_handler_url_param", $jsparam);
+
+                    $this->js_cell .= $this->row_action_list->js();
+
                     $html->appendln($this->row_action_list->html($html->get_indent()));
                 }
                 $html->dec_indent()->appendln('</div>');
@@ -189,44 +196,51 @@ class CNestable extends CObservable {
     }
 
     public function js($indent = 0) {
-        if (!$this->applyjs)
-            return false;
+
+
         $js = new CStringBuilder();
         $js->set_indent($indent);
-        if($this->disable_dnd) {
-            $js->appendln("
-                jQuery('#" . $this->id . "').nestable({
-                    /* config options */
-                    maxDepth:0
-                });
-            ")->inc_indent();
-        } else {
-            $js->appendln("
-                jQuery('#" . $this->id . "').nestable({
-                    /* config options */
-                    maxDepth:100
-                });
-            ")->inc_indent();
-        }
-        if (strlen($this->input) > 0) {
-            $js->appendln("
-                jQuery('#" . $this->id . "').on('change', function() {
-                    /* on change event */
-                    
+        if ($this->applyjs) {
+            if ($this->disable_dnd) {
+                $js->appendln("
+                    jQuery('#" . $this->id . "').nestable({
+                        /* config options */
+                        maxDepth:0
+                    });
+                ")->inc_indent();
+            } else {
+                $js->appendln("
+                    jQuery('#" . $this->id . "').nestable({
+                        /* config options */
+                        maxDepth:100
+                    });
+                ")->inc_indent();
+            }
+            if (strlen($this->input) > 0) {
+                $js->appendln("
+                    jQuery('#" . $this->id . "').on('change', function() {
+                        /* on change event */
+
+                        if (window.JSON) {
+                            jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
+                        } else {
+                            jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
+                        }
+
+                    });
                     if (window.JSON) {
                         jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
                     } else {
                         jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
                     }
-                    
-                });
-                if (window.JSON) {
-                    jQuery('#" . $this->input . "').val(window.JSON.stringify(jQuery('#" . $this->id . "').nestable('serialize')));//, null, 2));
-                } else {
-                    jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
-                }
-            ");
+                ");
+            }
         }
+
+
+        $js->append($this->js_cell)->br();
+
+        $js->append($this->js_child($indent))->br();
         return $js->text();
     }
 
