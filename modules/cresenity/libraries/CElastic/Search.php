@@ -78,16 +78,14 @@ class CElastic_Search {
         $this->sort[] = $arr;
     }
 
-    public function aggs($name, $function, $field, $min_doc_count = 0) {
+    public function aggs($name, $function, $field, $size = 10, $min_doc_count = 0) {
         $this->aggs[$name] = array(
             $function => array(
-                "field" => $field
+                "field" => $field,
+                "size" => $size,
             )
         );
-        
-        if($min_doc_count > 0) {
-            $this->aggs[$name]['terms']["min_doc_count"] = $min_doc_count;
-        }
+        //carr::set_path($this->aggs,'filtered.filter.bool.must_not.0.exists.field','parent_id');
     }
 
     public function aggs_order($name, $order, $order_type = "", $order_mode = "") {
@@ -113,7 +111,7 @@ class CElastic_Search {
                     )
                 )
             );
-            if(strlen($filter_field) > 0 && strlen($filter_value) > 0) {
+            if (strlen($filter_field) > 0 && strlen($filter_value) > 0) {
                 $this->aggs[$name_parent]["aggs"][$name] = array(
                     "filter" => array(
                         "term" => array(
