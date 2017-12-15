@@ -86,6 +86,9 @@ class CElastic_Search {
             )
         );
         //carr::set_path($this->aggs,'filtered.filter.bool.must_not.0.exists.field','parent_id');
+        if($min_doc_count > 0) {
+            $this->aggs[$name]['terms']["min_doc_count"] = $min_doc_count;
+        }
     }
 
     public function aggs_order($name, $order, $order_type = "", $order_mode = "") {
