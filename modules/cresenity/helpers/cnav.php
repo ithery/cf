@@ -4,7 +4,7 @@ class cnav {
 
     protected static $role_navs = array();
 
-    public function nav($nav = null, $controller = null, $method = null, $path = null) {
+    public static function nav($nav = null, $controller = null, $method = null, $path = null) {
         if ($controller == null)
             $controller = crouter::controller();
         if ($method == null)
@@ -248,7 +248,7 @@ class cnav {
         return $url;
     }
 
-    public function render_theme($theme, $navs = null, $level = 0, &$child = 0, &$activated = false) {
+    public static function render_theme($theme, $navs = null, $level = 0, &$child = 0, &$activated = false) {
         $is_admin = CApp::instance()->is_admin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
@@ -358,7 +358,7 @@ class cnav {
         return $html;
     }
 
-    public function render($navs = null, $level = 0, &$child = 0) {
+    public static function render($navs = null, $level = 0, &$child = 0) {
 
         $is_admin = CApp::instance()->is_admin();
         if ($navs == null)
@@ -498,7 +498,7 @@ class cnav {
 
         if (strlen($app_role_id) > 0) {
             $app_role = crole::get($app_role_id);
-            if ($app_role->parent_id == null)
+            if ($app_role!=null && $app_role->parent_id == null)
                 return true;
             if ($app_role != null && (!isset($nav["subnav"]) || count($nav["subnav"]) == 0)) {
 
