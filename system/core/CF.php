@@ -1203,10 +1203,12 @@ final class CF {
 
                 // Load the error
                 $custom_error = false;
-                if (!isset($_GET['show_error'])) {
-                    if (CView::exists('ccore/error_page')) {
-                        $custom_error = true;
-                        echo CView::factory('ccore/error_page')->render();
+                if (IN_PRODUCTION) {
+                    if (!isset($_GET['show_error'])) {
+                        if (CView::exists('ccore/error_page')) {
+                            $custom_error = true;
+                            echo CView::factory('ccore/error_page')->render();
+                        }
                     }
                 }
                 if (!$custom_error) {
