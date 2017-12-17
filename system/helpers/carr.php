@@ -537,6 +537,59 @@ class carr {
         return $res;
     }
 
+    /**
+     * Return the first element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function first($array, callable $callback = null, $default = null) {
+        if (is_null($callback)) {
+            if (empty($array)) {
+                return value($default);
+            }
+
+            foreach ($array as $item) {
+                return $item;
+            }
+        }
+
+        foreach ($array as $key => $value) {
+            if (call_user_func($callback, $value, $key)) {
+                return $value;
+            }
+        }
+
+        return value($default);
+    }
+
+    /**
+     * Flatten a multi-dimensional array into a single level.
+     *
+     * @param  array  $array
+     * @param  int  $depth
+     * @return array
+     */
+    public static function flatten($array, $depth = INF) {
+        $result = [];
+
+        foreach ($array as $item) {
+            $item = $item instanceof Collection ? $item->all() : $item;
+
+            if (!is_array($item)) {
+                $result[] = $item;
+            } elseif ($depth === 1) {
+                $result = array_merge($result, array_values($item));
+            } else {
+                $result = array_merge($result, static::flatten($item, $depth - 1));
+            }
+        }
+
+        return $result;
+    }
+
 }
 
 // End arr

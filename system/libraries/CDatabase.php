@@ -24,6 +24,7 @@ class CDatabase {
     );
     // Database driver object
     protected $driver;
+    protected $driver_name;
     protected $link;
     // Un-compiled parts of the SQL query
     protected $select = array();
@@ -335,6 +336,8 @@ class CDatabase {
 
         return $result;
     }
+
+    
 
     /**
      * Selects the column names for a database query.
@@ -1385,6 +1388,29 @@ class CDatabase {
         //$str = str_replace(array($e, '_', '%'), array($e.$e, $e.'_', $e.'%'), $s);
         $str = $this->escape_str($str);
         return $str;
+    }
+
+    public function driver_name() {
+        return ucfirst($this->config['connection']['type']);
+    }
+
+    public function table($table) {
+        return (new CDatabase_Query_Builder($this))->from($table);
+    }
+
+    /**
+     * Reconnect to the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function reconnect() {
+        if (is_callable($this->reconnector)) {
+            return call_user_func($this->reconnector, $this);
+        }
+
+        throw new LogicException('Lost connection and no reconnector available.');
     }
 
 }
