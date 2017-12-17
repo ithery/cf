@@ -11,7 +11,7 @@ var scrolltotop = {
 //startline: Integer. Number of pixels from top of doc scrollbar is scrolled before showing control
 //scrollto: Keyword (Integer, or "Scroll_to_Element_ID"). How far to scroll document up when control is clicked on (0=top).
     setting: {startline: 100, scrollto: 0, scrollduration: 1000, fadeduration: [500, 100]},
-    controlHTML: '<img src="<?php echo curl::base(); ?>media/img/up.png" style="width:51px; height:42px" />', //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
+    controlHTML: '<img src="' + window.capp.base_url + 'media/img/up.png" style="width:51px; height:42px" />', //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
     controlattrs: {offsetx: 5, offsety: 5}, //offset of control relative to right/ bottom of window corner
     anchorkeyword: '#top', //Enter href value of HTML anchors on the page that should also act as "Scroll Up" links
 
@@ -87,13 +87,13 @@ jQuery(document).on('click', 'a.confirm', function (e) {
     }
 
     if (!message) {
-        message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+        message = window.capp.label_confirm;
     } else {
         message = $.cresenity.base64.decode(message);
     }
 
-    str_confirm = "<?php echo clang::__('OK'); ?>";
-    str_cancel = "<?php echo clang::__('Cancel'); ?>";
+    str_confirm = window.capp.label_ok;
+    str_cancel = window.capp.label_cancel;
     e.preventDefault();
     e.stopPropagation();
     bootbox.confirm(message, function (confirmed) {
@@ -114,14 +114,14 @@ jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
     btn.attr('data-submitted', '1');
     var message = $(this).attr('data-confirm-message');
     if (!message) {
-        message = "<?php echo clang::__('Are you sure').' ?'; ?>";
+        message = window.capp.label_confirm;
     } else {
         message = $.cresenity.base64.decode(message);
     }
 
 
-    str_confirm = "<?php echo clang::__('OK'); ?>";
-    str_cancel = "<?php echo clang::__('Cancel'); ?>";
+    str_confirm = window.capp.label_ok;
+    str_cancel = window.capp.label_cancel;
     bootbox.confirm(message, str_cancel, str_confirm, function (confirmed) {
         if (confirmed) {
             jQuery(e.target).closest('form').submit();
@@ -152,7 +152,7 @@ if (window.capp.have_clock) {
 
     $(document).ready(function () {
         $('#servertime').serverTime({
-            ajaxFile: '<?php echo curl::base(); ?>cresenity/server_time',
+            ajaxFile: window.cresenity.base_url + 'cresenity/server_time',
             displayDateFormat: "yyyy-mm-dd HH:MM:ss"
         });
     });

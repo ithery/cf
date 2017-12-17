@@ -939,6 +939,11 @@ class CApp extends CObservable {
             $bootstrap = '2.3';
         }
         $variables['bootstrap'] = $bootstrap;
+
+        $variables['base_url'] = curl::base();
+        $variables['label_confirm'] = clang::__("Are you sure ?");
+        $variables['label_ok'] = clang::__("OK");
+        $variables['label_cancel'] = clang::__("Cancel");
         return $variables;
     }
 

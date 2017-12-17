@@ -35,13 +35,12 @@ class CElement_Factory {
                 return new $class_name($id);
                 break;
             default:
-                throw new CApp_Exception('element :tag not found', array(':tag' => $tag));
+                throw new CApp_Exception('element [:tag] not found', array(':tag' => $tag));
                 break;
         }
         return false;
     }
 
-  
 }
 
 ?>
