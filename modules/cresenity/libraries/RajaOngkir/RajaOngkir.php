@@ -45,9 +45,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -78,9 +78,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -111,9 +111,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -165,9 +165,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -198,9 +198,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -230,9 +230,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -278,9 +278,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -307,9 +307,9 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
 	}
 
@@ -341,9 +341,24 @@ class RajaOngkir {
 		curl_close($curl);
 
 		if ($err) {
-			return $err;
+			return $this->error($err);
 		} else {
-			return json_decode($response);
+			return $this->response($response);
 		}
+	}
+
+	private function response($res) {
+		return json_decode($res);
+	}
+
+	private function error($err) {
+		return (Object) [
+			'rajaongkir' => [
+				'status' => [
+					'code' => 'ERROR',
+					'description' => $err,
+				],
+			],
+		];
 	}
 }
