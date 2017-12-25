@@ -156,12 +156,6 @@ class CDatabase_Query_Builder {
      */
     public $lock;
 
-    /**
-     * model of this query builder.
-     *
-     * @var CModel
-     */
-    public $model;
 
     /**
      * All of the available clause operators.
@@ -495,28 +489,7 @@ class CDatabase_Query_Builder {
         return $this;
     }
 
-    /**
-     * Get the model instance being queried.
-     *
-     * @return CModel
-     */
-    public function getModel() {
-        return $this->model;
-    }
-
-    /**
-     * Set a model instance for the model being queried.
-     *
-     * @param  CModel  $model
-     * @return $this
-     */
-    public function setModel(CModel $model) {
-        $this->model = $model;
-
-        $this->from($model->getTable());
-
-        return $this;
-    }
+    
 
     /**
      * Execute a query for a single record by ID.

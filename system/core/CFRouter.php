@@ -26,6 +26,7 @@ class CFRouter {
      * @return  void
      */
     public static function setup() {
+
         self::resetup(self::$current_uri);
 
         // Last chance to set routing before a 404 is triggered
@@ -270,6 +271,18 @@ class CFRouter {
             $current_uri = $_SERVER['PATH_INFO'];
             if ($current_uri == '/403.shtml') {
                 $current_uri = $_SERVER['REQUEST_URI'];
+            }
+            if ($current_uri == '/500.shtml') {
+                if (isset($_SERVER['REDIRECT_REDIRECT_SCRIPT_URL'])) {
+                    $current_uri = $_SERVER['REDIRECT_REDIRECT_SCRIPT_URL'];
+                }
+                if (isset($_SERVER['REDIRECT_REDIRECT_REDIRECT_QUERY_STRING'])) {
+                    $_SERVER['QUERY_STRING'] = $_SERVER['REDIRECT_REDIRECT_REDIRECT_QUERY_STRING'];
+                }
+                if (isset($_SERVER['REDIRECT_REDIRECT_QUERY_STRING'])) {
+                    $_SERVER['QUERY_STRING'] = $_SERVER['REDIRECT_REDIRECT_QUERY_STRING'];
+                }
+                
             }
         } elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'] AND $_SERVER['ORIG_PATH_INFO'] != '/403.shtml') {
             $current_uri = $_SERVER['ORIG_PATH_INFO'];

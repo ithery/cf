@@ -276,6 +276,7 @@ final class CF {
                 // Start validation of the controller
             } catch (ReflectionException $e) {
                 // Controller does not exist
+
                 CFEvent::run('system.404');
             }
         }
@@ -373,7 +374,7 @@ final class CF {
 
             // Controller constructor has been executed
             CFEvent::run('system.post_controller_constructor');
-            
+
             try {
                 // Load the controller method
                 $method = $class->getMethod(CFRouter::$method);
@@ -405,6 +406,7 @@ final class CF {
             // Start the controller execution benchmark
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_execution');
 
+
             // Execute the controller method
             $method->invokeArgs($controller, $arguments);
 
@@ -418,50 +420,6 @@ final class CF {
 
         return self::$instance;
     }
-
-    /*
-      public static function & get_controller($uri) {
-
-
-
-      $data = CFRouter::get_route_data($uri);
-      if (empty(carr::get($data, 'controller_path'))) {
-      CF::show_404();
-      }
-      // Include the Controller file
-      if (strlen(carr::get($data, 'controller_path')) > 0) {
-      require_once carr::get($data, 'controller_path');
-      }
-
-      try {
-      // Start validation of the controller
-      $class_name = str_replace('/', '_', carr::get($data, 'controller_dir_ucfirst'));
-      $class = new ReflectionClass('Controller_' . $class_name . ucfirst(carr::get($data, 'controller')));
-      } catch (ReflectionException $e) {
-      try {
-      $class = new ReflectionClass(ucfirst(carr::get($data, 'controller')) . '_Controller');
-      // Start validation of the controller
-      } catch (ReflectionException $e) {
-      // Controller does not exist
-      throw new Exception('controller not exists');
-      }
-      }
-
-      if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
-      // Controller is not allowed to run in production
-      throw new Exception('controller not allowed in production');
-      }
-
-      $controller = null;
-      // Create a new controller instance
-      if (isset($class)) {
-      $controller = $class->newInstance();
-      }
-
-      return $controller;
-      }
-     * 
-     */
 
     public static function get_dir($directory = '', $domain = null) {
         $include_paths = CF::paths();
@@ -985,8 +943,8 @@ final class CF {
             $output = str_replace(
                     array
                 (
-                '{kohana_version}',
-                '{kohana_codename}',
+                '{cf_version}',
+                '{cf_codename}',
                 '{execution_time}',
                 '{memory_usage}',
                 '{included_files}',
@@ -1054,6 +1012,13 @@ final class CF {
     public static function show_404($page = FALSE, $template = FALSE) {
         if (CFRouter::$current_uri == 'favicon.ico') {
             return false;
+        }
+        if (isset($_GET['debug_404'])) {
+            try {
+                throw new Exception('404');
+            } catch (Exception $ex) {
+                cdbg::var_dump(nl2br($ex->getTraceAsString()));
+            }
         }
         throw new CF_404_Exception($page, $template);
     }
@@ -1994,6 +1959,73 @@ final class CF {
     public static function modules($domain = null) {
         $data = self::data($domain);
         return isset($data['modules']) ? $data['modules'] : array('cresenity');
+    }
+
+    /**
+     * Call the given Closure with the given value then return the value.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function tap($value, $callback = null) {
+        if (is_null($callback)) {
+            return new HigherOrderTapProxy($value);
+        }
+
+        $callback($value);
+
+        return $value;
+    }
+
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    function class_basename($class) {
+        $class = is_object($class) ? get_class($class) : $class;
+
+        $basename = basename(str_replace('\\', '/', $class));
+        $basename = carr::last(explode("_", $basename));
+        return $basename;
+    }
+
+    /**
+     * Returns all traits used by a class, its subclasses and trait of their traits.
+     *
+     * @param  object|string  $class
+     * @return array
+     */
+    function class_uses_recursive($class) {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $results = [];
+
+        foreach (array_merge([$class => $class], class_parents($class)) as $class) {
+            $results += self::trait_uses_recursive($class);
+        }
+
+        return array_unique($results);
+    }
+
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @param  string  $trait
+     * @return array
+     */
+    function trait_uses_recursive($trait) {
+        $traits = class_uses($trait);
+
+        foreach ($traits as $trait) {
+            $traits += self::trait_uses_recursive($trait);
+        }
+
+        return $traits;
     }
 
 }

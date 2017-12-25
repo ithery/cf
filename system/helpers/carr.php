@@ -566,6 +566,22 @@ class carr {
     }
 
     /**
+     * Return the last element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function last($array, callable $callback = null, $default = null) {
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : end($array);
+        }
+
+        return static::first(array_reverse($array, true), $callback, $default);
+    }
+
+    /**
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  array  $array

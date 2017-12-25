@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 25, 2017, 10:08:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CModel_AttributesTrait {
+trait CModel_Trait_Attributes {
 
     /**
      * The model's attributes.
@@ -293,8 +293,7 @@ trait CModel_AttributesTrait {
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-                $this->hasGetMutator($key)) {
+        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
             return $this->getAttributeValue($key);
         }
 
@@ -304,8 +303,7 @@ trait CModel_AttributesTrait {
         if (method_exists(self::class, $key)) {
             return;
         }
-        cdbg::var_dump($key);
-        die;
+
 
         return $this->getRelationValue($key);
     }
@@ -366,9 +364,11 @@ trait CModel_AttributesTrait {
         // If the key already exists in the relationships array, it just means the
         // relationship has already been loaded, so we'll just return it out of
         // here because there is no need to query within the relations twice.
+
         if ($this->relationLoaded($key)) {
             return $this->relations[$key];
         }
+
 
         // If the "attribute" exists as a method on the model, we will just assume
         // it is a relationship and will load and return results from the query
@@ -389,13 +389,13 @@ trait CModel_AttributesTrait {
     protected function getRelationshipFromMethod($method) {
         $relation = $this->$method();
 
-        if (!$relation instanceof Relation) {
+        if (!$relation instanceof CModel_Relation) {
             throw new LogicException(get_class($this) . '::' . $method . ' must return a relationship instance.');
         }
 
-        return tap($relation->getResults(), function ($results) use ($method) {
-            $this->setRelation($method, $results);
-        });
+        return CF::tap($relation->getResults(), function ($results) use ($method) {
+                    $this->setRelation($method, $results);
+                });
     }
 
     /**
@@ -405,7 +405,7 @@ trait CModel_AttributesTrait {
      * @return bool
      */
     public function hasGetMutator($key) {
-        return method_exists($this, 'get' . Str::studly($key) . 'Attribute');
+        return method_exists($this, 'get' . cstr::studly($key) . 'Attribute');
     }
 
     /**
@@ -731,7 +731,7 @@ trait CModel_AttributesTrait {
      * @return array
      */
     public function getDates() {
-        $defaults = [static::CREATED_AT, static::UPDATED_AT];
+        $defaults = [static::CREATED, static::UPDATED];
 
         return $this->usesTimestamps() ? array_unique(array_merge($this->dates, $defaults)) : $this->dates;
     }

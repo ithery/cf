@@ -9,7 +9,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CModel implements ArrayAccess {
 
-    use CModel_AttributesTrait;
+    use CModel_Trait_GuardsAttributes,
+        CModel_Trait_Attributes,
+        CModel_Trait_Relationships,
+        CModel_Trait_Event,
+        CModel_Trait_Timestamps,
+        CModel_Trait_QueriesRelationships;
 
     /**
      * The connection name for the model.
@@ -178,6 +183,12 @@ abstract class CModel implements ArrayAccess {
      */
     public function __construct(array $attributes = []) {
         $this->db = CDatabase::instance();
+        $this->primaryKey = $this->table . "_id";
+        $this->bootIfNotBooted();
+
+        $this->syncOriginal();
+
+        $this->fill($attributes);
     }
 
     /**
@@ -214,8 +225,10 @@ abstract class CModel implements ArrayAccess {
     protected static function bootTraits() {
         $class = static::class;
 
-        foreach (class_uses_recursive($class) as $trait) {
-            if (method_exists($class, $method = 'boot' . class_basename($trait))) {
+        foreach (CF::class_uses_recursive($class) as $trait) {
+
+            if (method_exists($class, $method = 'boot' . CF::class_basename($trait))) {
+
                 forward_static_call([$class, $method]);
             }
         }
@@ -296,9 +309,7 @@ abstract class CModel implements ArrayAccess {
 
         $model->exists = $exists;
 
-        $model->setConnection(
-                $this->getConnectionName()
-        );
+        
 
         return $model;
     }
@@ -314,8 +325,6 @@ abstract class CModel implements ArrayAccess {
         $model = $this->newInstance([], true);
 
         $model->setRawAttributes((array) $attributes, true);
-
-        $model->setConnection($connection ?: $this->getConnectionName());
 
         $model->fireModelEvent('retrieved', false);
 
@@ -807,12 +816,12 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get a new query builder for the model's table.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public function newQuery() {
-        $builder = new CDatabase_Query_Builder($this->db);
-        $builder->setModel($this);
-        return $builder;
+        $query = new CModel_Query(new CDatabase_Query_Builder($this->db));
+        $query->setModel($this);
+        return $query;
     }
 
     /**
@@ -822,7 +831,7 @@ abstract class CModel implements ArrayAccess {
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function newCollection(array $models = []) {
-        return new Collection($models);
+        return new CModel_Collection($models);
     }
 
     /**
@@ -963,7 +972,7 @@ abstract class CModel implements ArrayAccess {
      */
     public function getTable() {
         if (!isset($this->table)) {
-            return str_replace('\\', '', Str::snake(Str::plural(class_basename($this))));
+            return str_replace('\\', '', cstr::snake(cstr::plural(CF::class_basename($this))));
         }
 
         return $this->table;
@@ -1256,6 +1265,7 @@ abstract class CModel implements ArrayAccess {
      * @return mixed
      */
     public function __call($method, $parameters) {
+
         if (in_array($method, ['increment', 'decrement'])) {
             $class = new ReflectionClass(get_class($this));
 
@@ -1291,13 +1301,17 @@ abstract class CModel implements ArrayAccess {
                 $parameters = array($method, $parameters);
             }
 
-
             return $method_object->invokeArgs($query, $parameters);
         } catch (BadMethodCallException $e) {
+            try {
+                throw new Exception('404');
+            } catch (Exception $ex) {
+                cdbg::var_dump(nl2br($ex->getTraceAsString()));
+            }
             throw new BadMethodCallException(
             sprintf('Call to undefined method %s::%s()', get_class($this), $method)
             );
-        }
+        } 
     }
 
     /**

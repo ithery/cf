@@ -552,7 +552,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return static
      */
     public function flatten($depth = INF) {
-        return new static(Arr::flatten($this->items, $depth));
+        return new static(carr::flatten($this->items, $depth));
     }
 
     /**
@@ -752,7 +752,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return mixed
      */
     public function last(callable $callback = null, $default = null) {
-        return Arr::last($this->items, $callback, $default);
+        return carr::last($this->items, $callback, $default);
     }
 
     /**
@@ -763,7 +763,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return static
      */
     public function pluck($value, $key = null) {
-        return new static(Arr::pluck($this->items, $value, $key));
+        return new static(carr::pluck($this->items, $value, $key));
     }
 
     /**
@@ -972,7 +972,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
 
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        return new static(Arr::only($this->items, $keys));
+        return new static(carr::only($this->items, $keys));
     }
 
     /**
@@ -1033,7 +1033,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return $this
      */
     public function prepend($value, $key = null) {
-        $this->items = Arr::prepend($this->items, $value, $key);
+        $this->items = carr::prepend($this->items, $value, $key);
 
         return $this;
     }
