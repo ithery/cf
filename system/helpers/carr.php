@@ -606,6 +606,127 @@ class carr {
         return $result;
     }
 
+    /**
+     * If the given value is not an array, wrap it in one.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function wrap($value) {
+        return !is_array($value) ? [$value] : $value;
+    }
+
+    /**
+     * Add an element to an array using "dot" notation if it doesn't exist.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return array
+     */
+    public static function add($array, $key, $value) {
+        if (is_null(static::get($array, $key))) {
+            static::set($array, $key, $value);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Filter the array using the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function where($array, callable $callback) {
+        $new_array = array();
+        foreach ($array as $k => $v) {
+            $passed = true;
+            if ($callback != null) {
+                if (!call_user_func($callback, $v, $k)) {
+                    $passed = false;
+                }
+            }
+            if ($passed) {
+                $new_array[$k] = $v;
+            }
+        }
+        return $new_array;
+    }
+
+    /**
+     * Get all of the given array except for a specified array of keys.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return array
+     */
+    public static function except($array, $keys) {
+        static::forget($array, $keys);
+
+        return $array;
+    }
+
+    /**
+     * Remove one or many array items from a given array using "dot" notation.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return void
+     */
+    public static function forget(&$array, $keys) {
+        $original = &$array;
+
+        $keys = (array) $keys;
+
+        if (count($keys) === 0) {
+            return;
+        }
+
+        foreach ($keys as $key) {
+            // if the exact key exists in the top-level, remove it
+            if (static::exists($array, $key)) {
+                unset($array[$key]);
+
+                continue;
+            }
+
+            $parts = explode('.', $key);
+
+            // clean up before each pass
+            $array = &$original;
+
+            while (count($parts) > 1) {
+                $part = array_shift($parts);
+
+                if (isset($array[$part]) && is_array($array[$part])) {
+                    $array = &$array[$part];
+                } else {
+                    continue 2;
+                }
+            }
+
+            unset($array[array_shift($parts)]);
+        }
+    }
+    
+    /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int  $key
+     * @return bool
+     */
+    public static function exists($array, $key)
+    {
+        if ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
+        }
+
+        return array_key_exists($key, $array);
+    }
+
 }
 
-// End arr
+// End carr

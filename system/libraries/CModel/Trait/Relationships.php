@@ -1,5 +1,7 @@
 <?php
 
+defined('SYSPATH') OR die('No direct access allowed.');
+
 /**
  * @author Hery Kurniawan
  * @since Dec 25, 2017, 10:08:50 PM
@@ -94,7 +96,7 @@ trait CModel_Trait_Relationships {
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
         if (is_null($foreignKey)) {
-            
+
             $foreignKey = $instance->getKeyName();
         }
 
@@ -192,7 +194,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return CModel_Relation_HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null) {
         $instance = $this->newRelatedInstance($related);
@@ -201,7 +203,7 @@ trait CModel_Trait_Relationships {
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasMany(
+        return new CModel_Relation_HasMany(
                 $instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey
         );
     }
@@ -462,8 +464,8 @@ trait CModel_Trait_Relationships {
     protected function newRelatedInstance($class) {
 
         return CF::tap(new $class, function ($instance) {
-           //do nothing
-        });
+                    //do nothing
+                });
     }
 
     /**

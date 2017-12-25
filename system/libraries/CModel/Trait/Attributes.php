@@ -516,7 +516,7 @@ trait CModel_Trait_Attributes {
         // If this attribute contains a JSON ->, we'll set the proper value in the
         // attribute's underlying array. This takes care of properly nesting an
         // attribute in the array's value in the case of deeply nested items.
-        if (Str::contains($key, '->')) {
+        if (cstr::contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
         }
 
@@ -532,7 +532,7 @@ trait CModel_Trait_Attributes {
      * @return bool
      */
     public function hasSetMutator($key) {
-        return method_exists($this, 'set' . Str::studly($key) . 'Attribute');
+        return method_exists($this, 'set' . cstr::studly($key) . 'Attribute');
     }
 
     /**
@@ -648,7 +648,7 @@ trait CModel_Trait_Attributes {
         // If this value is already a Carbon instance, we shall just return it as is.
         // This prevents us having to re-instantiate a Carbon instance when we know
         // it already is one, which wouldn't be fulfilled by the DateTime check.
-        if ($value instanceof Carbon) {
+        if ($value instanceof CCarbon) {
             return $value;
         }
 
@@ -656,7 +656,7 @@ trait CModel_Trait_Attributes {
         // these checks since they will be a waste of time, and hinder performance
         // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTimeInterface) {
-            return new Carbon(
+            return new CCarbon(
                     $value->format('Y-m-d H:i:s.u'), $value->getTimezone()
             );
         }
@@ -665,20 +665,20 @@ trait CModel_Trait_Attributes {
         // and format a Carbon object from this timestamp. This allows flexibility
         // when defining your date fields as they might be UNIX timestamps here.
         if (is_numeric($value)) {
-            return Carbon::createFromTimestamp($value);
+            return CCarbon::createFromTimestamp($value);
         }
 
         // If the value is in simply year, month, day format, we will instantiate the
         // Carbon instances from that format. Again, this provides for simple date
         // fields on the database, while still supporting Carbonized conversion.
         if ($this->isStandardDateFormat($value)) {
-            return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
+            return CCarbon::createFromFormat('Y-m-d', $value)->startOfDay();
         }
 
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
-        return Carbon::createFromFormat(
+        return CCarbon::createFromFormat(
                         $this->getDateFormat(), $value
         );
     }
@@ -839,7 +839,7 @@ trait CModel_Trait_Attributes {
      * @return mixed|array
      */
     public function getOriginal($key = null, $default = null) {
-        return Arr::get($this->original, $key, $default);
+        return carr::get($this->original, $key, $default);
     }
 
     /**
@@ -944,7 +944,7 @@ trait CModel_Trait_Attributes {
         // Here we will spin through every attribute and see if this is in the array of
         // dirty attributes. If it is, we will return true and if we make it through
         // all of the attributes for the entire array we will return false at end.
-        foreach (Arr::wrap($attributes) as $attribute) {
+        foreach (carr::wrap($attributes) as $attribute) {
             if (array_key_exists($attribute, $changes)) {
                 return true;
             }

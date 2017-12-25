@@ -50,6 +50,13 @@ class CDatabase {
      */
     protected $events;
 
+    /**
+     * The query grammar implementation.
+     *
+     * @var CDatabase_Query_Grammar
+     */
+    protected $queryGrammar;
+
     public function config() {
         return $this->config;
     }
@@ -1428,6 +1435,21 @@ class CDatabase {
         if (isset($this->events)) {
             $this->events->listen(CDatabase_Events_QueryExecuted::class, $callback);
         }
+    }
+
+    /**
+     * Get the query grammar used by the connection.
+     *
+     * @return CDatabase_Query_Grammar
+     */
+    public function getQueryGrammar() {
+
+        if ($this->queryGrammar == null) {
+            $driver_name = $this->driver_name();
+            $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
+            $this->queryGrammar = new $grammar_class();
+        }
+        return $this->queryGrammar;
     }
 
 }

@@ -367,7 +367,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      */
     public function filter(callable $callback = null) {
         if ($callback) {
-            return new static(Arr::where($this->items, $callback));
+            return new static(carr::where($this->items, $callback));
         }
 
         return new static(array_filter($this->items));

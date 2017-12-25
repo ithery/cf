@@ -1,5 +1,7 @@
 <?php
 
+defined('SYSPATH') OR die('No direct access allowed.');
+
 /**
  * @author Hery Kurniawan
  * @since Dec 25, 2017, 10:08:50 PM
@@ -37,11 +39,11 @@ trait CModel_Trait_Timestamps {
     protected function updateTimestamps() {
         $time = $this->freshTimestamp();
 
-        if (!is_null(static::UPDATED_AT) && !$this->isDirty(static::UPDATED_AT)) {
+        if (!is_null(static::UPDATED) && !$this->isDirty(static::UPDATED)) {
             $this->setUpdatedAt($time);
         }
 
-        if (!$this->exists && !$this->isDirty(static::CREATED_AT)) {
+        if (!$this->exists && !$this->isDirty(static::CREATED)) {
             $this->setCreatedAt($time);
         }
     }
@@ -53,7 +55,7 @@ trait CModel_Trait_Timestamps {
      * @return $this
      */
     public function setCreatedAt($value) {
-        $this->{static::CREATED_AT} = $value;
+        $this->{static::CREATED} = $value;
 
         return $this;
     }
@@ -65,7 +67,7 @@ trait CModel_Trait_Timestamps {
      * @return $this
      */
     public function setUpdatedAt($value) {
-        $this->{static::UPDATED_AT} = $value;
+        $this->{static::UPDATED} = $value;
 
         return $this;
     }
@@ -76,7 +78,7 @@ trait CModel_Trait_Timestamps {
      * @return \Illuminate\Support\Carbon
      */
     public function freshTimestamp() {
-        return new Carbon;
+        return new CCarbon;
     }
 
     /**
@@ -103,7 +105,7 @@ trait CModel_Trait_Timestamps {
      * @return string
      */
     public function getCreatedAtColumn() {
-        return static::CREATED_AT;
+        return static::CREATED;
     }
 
     /**
@@ -112,7 +114,7 @@ trait CModel_Trait_Timestamps {
      * @return string
      */
     public function getUpdatedAtColumn() {
-        return static::UPDATED_AT;
+        return static::UPDATED;
     }
 
 }

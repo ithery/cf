@@ -693,10 +693,10 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return array
      */
     public function prepareBindingsForUpdate(array $bindings, array $values) {
-        $cleanBindings = Arr::except($bindings, ['join', 'select']);
+        $cleanBindings = carr::except($bindings, ['join', 'select']);
 
         return array_values(
-                array_merge($bindings['join'], $values, Arr::flatten($cleanBindings))
+                array_merge($bindings['join'], $values, carr::flatten($cleanBindings))
         );
     }
 

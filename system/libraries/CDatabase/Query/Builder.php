@@ -156,7 +156,6 @@ class CDatabase_Query_Builder {
      */
     public $lock;
 
-
     /**
      * All of the available clause operators.
      *
@@ -345,6 +344,646 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add an "or where" clause to the query.
+     *
+     * @param  string|array|\Closure  $column
+     * @param  string|null  $operator
+     * @param  mixed   $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhere($column, $operator = null, $value = null) {
+        return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where" clause comparing two columns to the query.
+     *
+     * @param  string|array  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string|null  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereColumn($first, $operator = null, $second = null, $boolean = 'and') {
+        // If the column is an array, we will assume it is an array of key-value pairs
+        // and can add them each as a where clause. We will maintain the boolean we
+        // received when the method was called and pass it into the nested where.
+        if (is_array($first)) {
+            return $this->addArrayOfWheres($first, $boolean, 'whereColumn');
+        }
+
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            list($second, $operator) = [$operator, '='];
+        }
+
+        // Finally, we will add this where clause into this array of clauses that we
+        // are building for the query. All of them will be compiled via a grammar
+        // once the query is about to be executed and run against the database.
+        $type = 'Column';
+
+        $this->wheres[] = compact(
+                'type', 'first', 'operator', 'second', 'boolean'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where" clause comparing two columns to the query.
+     *
+     * @param  string|array  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereColumn($first, $operator = null, $second = null) {
+        return $this->whereColumn($first, $operator, $second, 'or');
+    }
+
+    /**
+     * Add a raw where clause to the query.
+     *
+     * @param  string  $sql
+     * @param  mixed   $bindings
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereRaw($sql, $bindings = [], $boolean = 'and') {
+        $this->wheres[] = ['type' => 'raw', 'sql' => $sql, 'boolean' => $boolean];
+
+        $this->addBinding((array) $bindings, 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a raw or where clause to the query.
+     *
+     * @param  string  $sql
+     * @param  mixed   $bindings
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereRaw($sql, $bindings = []) {
+        return $this->whereRaw($sql, $bindings, 'or');
+    }
+
+    /**
+     * Add a "where in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @param  string  $boolean
+     * @param  bool    $not
+     * @return $this
+     */
+    public function whereIn($column, $values, $boolean = 'and', $not = false) {
+        $type = $not ? 'NotIn' : 'In';
+
+        if ($values instanceof EloquentBuilder) {
+            $values = $values->getQuery();
+        }
+
+        // If the value is a query builder instance we will assume the developer wants to
+        // look for any values that exists within this given query. So we will add the
+        // query accordingly so that this query is properly executed when it is run.
+        if ($values instanceof self) {
+            return $this->whereInExistingQuery(
+                            $column, $values, $boolean, $not
+            );
+        }
+
+        // If the value of the where in clause is actually a Closure, we will assume that
+        // the developer is using a full sub-select for this "in" statement, and will
+        // execute those Closures, then we can re-construct the entire sub-selects.
+        if ($values instanceof Closure) {
+            return $this->whereInSub($column, $values, $boolean, $not);
+        }
+
+        // Next, if the value is Arrayable we need to cast it to its raw array form so we
+        // have the underlying array value instead of an Arrayable object which is not
+        // able to be added as a binding, etc. We will then add to the wheres array.
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean');
+
+        // Finally we'll add a binding for each values unless that value is an expression
+        // in which case we will just skip over it since it will be the query as a raw
+        // string and not as a parameterized place-holder to be replaced by the PDO.
+        foreach ($values as $value) {
+            if (!$value instanceof Expression) {
+                $this->addBinding($value, 'where');
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereIn($column, $values) {
+        return $this->whereIn($column, $values, 'or');
+    }
+
+    /**
+     * Add a "where not in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotIn($column, $values, $boolean = 'and') {
+        return $this->whereIn($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotIn($column, $values) {
+        return $this->whereNotIn($column, $values, 'or');
+    }
+
+    /**
+     * Add a where in with a sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    protected function whereInSub($column, Closure $callback, $boolean, $not) {
+        $type = $not ? 'NotInSub' : 'InSub';
+
+        // To create the exists sub-select, we will actually create a query and call the
+        // provided callback with the query so the developer may set any of the query
+        // conditions they want for the in clause, then we'll put it in this array.
+        call_user_func($callback, $query = $this->forSubQuery());
+
+        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add an external sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  \Illuminate\Database\Query\Builder|static  $query
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    protected function whereInExistingQuery($column, $query, $boolean, $not) {
+        $type = $not ? 'NotInSub' : 'InSub';
+
+        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a "where null" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @param  bool    $not
+     * @return $this
+     */
+    public function whereNull($column, $boolean = 'and', $not = false) {
+        $type = $not ? 'NotNull' : 'Null';
+
+        $this->wheres[] = compact('type', 'column', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where null" clause to the query.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNull($column) {
+        return $this->whereNull($column, 'or');
+    }
+
+    /**
+     * Add a "where not null" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotNull($column, $boolean = 'and') {
+        return $this->whereNull($column, $boolean, true);
+    }
+
+    /**
+     * Add a where between statement to the query.
+     *
+     * @param  string  $column
+     * @param  array   $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereBetween($column, array $values, $boolean = 'and', $not = false) {
+        $type = 'between';
+
+        $this->wheres[] = compact('column', 'type', 'boolean', 'not');
+
+        $this->addBinding($values, 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add an or where between statement to the query.
+     *
+     * @param  string  $column
+     * @param  array   $values
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereBetween($column, array $values) {
+        return $this->whereBetween($column, $values, 'or');
+    }
+
+    /**
+     * Add a where not between statement to the query.
+     *
+     * @param  string  $column
+     * @param  array   $values
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotBetween($column, array $values, $boolean = 'and') {
+        return $this->whereBetween($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an or where not between statement to the query.
+     *
+     * @param  string  $column
+     * @param  array   $values
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotBetween($column, array $values) {
+        return $this->whereNotBetween($column, $values, 'or');
+    }
+
+    /**
+     * Add an "or where not null" clause to the query.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotNull($column) {
+        return $this->whereNotNull($column, 'or');
+    }
+
+    /**
+     * Add a "where date" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereDate($column, $operator, $value = null, $boolean = 'and') {
+        list($value, $operator) = $this->prepareValueAndOperator(
+                $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add an "or where date" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  string  $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereDate($column, $operator, $value) {
+        return $this->whereDate($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where time" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string   $operator
+     * @param  string   $value
+     * @param  string   $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereTime($column, $operator, $value = null, $boolean = 'and') {
+        list($value, $operator) = $this->prepareValueAndOperator(
+                $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add an "or where time" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string   $operator
+     * @param  int   $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereTime($column, $operator, $value) {
+        return $this->whereTime($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where day" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereDay($column, $operator, $value = null, $boolean = 'and') {
+        list($value, $operator) = $this->prepareValueAndOperator(
+                $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add a "where month" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereMonth($column, $operator, $value = null, $boolean = 'and') {
+        list($value, $operator) = $this->prepareValueAndOperator(
+                $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add a "where year" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereYear($column, $operator, $value = null, $boolean = 'and') {
+        list($value, $operator) = $this->prepareValueAndOperator(
+                $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add a date based (year, month, day, time) statement to the query.
+     *
+     * @param  string  $type
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  int  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    protected function addDateBasedWhere($type, $column, $operator, $value, $boolean = 'and') {
+        $this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
+
+        $this->addBinding($value, 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a nested where statement to the query.
+     *
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNested(Closure $callback, $boolean = 'and') {
+        call_user_func($callback, $query = $this->forNestedWhere());
+
+        return $this->addNestedWhereQuery($query, $boolean);
+    }
+
+    /**
+     * Create a new query instance for nested where condition.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function forNestedWhere() {
+        return $this->newQuery()->from($this->from);
+    }
+
+    /**
+     * Add another query builder as a nested where to the query builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder|static $query
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function addNestedWhereQuery($query, $boolean = 'and') {
+        if (count($query->wheres)) {
+            $type = 'Nested';
+
+            $this->wheres[] = compact('type', 'query', 'boolean');
+
+            $this->addBinding($query->getBindings(), 'where');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a full sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  string   $operator
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @return $this
+     */
+    protected function whereSub($column, $operator, Closure $callback, $boolean) {
+        $type = 'Sub';
+
+        // Once we have the query instance we can simply execute it so it can add all
+        // of the sub-select's conditions to itself, and then we can cache it off
+        // in the array of where clauses for the "main" parent query instance.
+        call_user_func($callback, $query = $this->forSubQuery());
+
+        $this->wheres[] = compact(
+                'type', 'column', 'operator', 'query', 'boolean'
+        );
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add an exists clause to the query.
+     *
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    public function whereExists(Closure $callback, $boolean = 'and', $not = false) {
+        $query = $this->forSubQuery();
+
+        // Similar to the sub-select clause, we will create a new query instance so
+        // the developer may cleanly specify the entire exists query and we will
+        // compile the whole thing in the grammar and insert it into the SQL.
+        call_user_func($callback, $query);
+
+        return $this->addWhereExistsQuery($query, $boolean, $not);
+    }
+
+    /**
+     * Add an or exists clause to the query.
+     *
+     * @param  \Closure $callback
+     * @param  bool     $not
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereExists(Closure $callback, $not = false) {
+        return $this->whereExists($callback, 'or', $not);
+    }
+
+    /**
+     * Add a where not exists clause to the query.
+     *
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotExists(Closure $callback, $boolean = 'and') {
+        return $this->whereExists($callback, $boolean, true);
+    }
+
+    /**
+     * Add a where not exists clause to the query.
+     *
+     * @param  \Closure  $callback
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotExists(Closure $callback) {
+        return $this->orWhereExists($callback, true);
+    }
+
+    /**
+     * Add an exists clause to the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function addWhereExistsQuery(self $query, $boolean = 'and', $not = false) {
+        $type = $not ? 'NotExists' : 'Exists';
+
+        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Handles dynamic "where" clauses to the query.
+     *
+     * @param  string  $method
+     * @param  string  $parameters
+     * @return $this
+     */
+    public function dynamicWhere($method, $parameters) {
+        $finder = substr($method, 5);
+
+        $segments = preg_split(
+                '/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE
+        );
+
+        // The connector variable will determine which connector will be used for the
+        // query condition. We will change it as we come across new boolean values
+        // in the dynamic method strings, which could contain a number of these.
+        $connector = 'and';
+
+        $index = 0;
+
+        foreach ($segments as $segment) {
+            // If the segment is not a boolean connector, we can assume it is a column's name
+            // and we will add it to the query as a new constraint as a where clause, then
+            // we can keep iterating through the dynamic method string's segments again.
+            if ($segment !== 'And' && $segment !== 'Or') {
+                $this->addDynamic($segment, $connector, $parameters, $index);
+
+                $index++;
+            }
+
+            // Otherwise, we will store the connector so we know how the next where clause we
+            // find in the query should be connected to the previous ones, meaning we will
+            // have the proper boolean connector to connect the next where clause found.
+            else {
+                $connector = $segment;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a single dynamic where clause statement to the query.
+     *
+     * @param  string  $segment
+     * @param  string  $connector
+     * @param  array   $parameters
+     * @param  int     $index
+     * @return void
+     */
+    protected function addDynamic($segment, $connector, $parameters, $index) {
+        // Once we have parsed out the columns and formatted the boolean operators we
+        // are ready to add it to this query as a where clause just like any other
+        // clause on the query. Then we'll increment the parameter index values.
+        $bool = strtolower($connector);
+
+        $this->where(cstr::snake($segment), '=', $parameters[$index], $bool);
+    }
+
+    /**
      * Prepare the value and operator for a where clause.
      *
      * @param  string  $value
@@ -488,8 +1127,6 @@ class CDatabase_Query_Builder {
 
         return $this;
     }
-
-    
 
     /**
      * Execute a query for a single record by ID.
@@ -766,25 +1403,47 @@ class CDatabase_Query_Builder {
         return $this;
     }
 
-    public function __get($name) {
-
-        if ($this->model != null) {
-            return $this->model->$name;
-        }
-        throw new Exception(sprintf('Invalid property %s::%s()', get_class($this), $name));
+    /**
+     * Get the database connection instance.
+     *
+     * @return CDatabase
+     */
+    public function getConnection() {
+        return $this->db;
     }
 
-    public function __call($method, $parameters) {
+    /**
+     * Get the database query processor instance.
+     *
+     * @return \Illuminate\Database\Query\Processors\Processor
+     */
+    public function getProcessor() {
+        return $this->processor;
+    }
 
-        if ($this->model != null) {
-            try {
+    /**
+     * Get the query grammar instance.
+     *
+     * @return \Illuminate\Database\Query\Grammars\Grammar
+     */
+    public function getGrammar() {
+        return $this->grammar;
+    }
 
-                return $this->newQuery()->$method($parameters);
-            } catch (BadMethodCallException $e) {
-                throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($this), $method));
-            }
-        }
-        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($this), $method));
+    /**
+     * Update a record in the database.
+     *
+     * @param  array  $values
+     * @return int
+     */
+    public function update(array $values) {
+        $sql = $this->grammar->compileUpdate($this, $values);
+        return $this->db->query($sql, $this->cleanBindings(
+                                $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+        ));
+        return $this->db->update($sql, $this->cleanBindings(
+                                $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+        ));
     }
 
 }

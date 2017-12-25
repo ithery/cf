@@ -13,7 +13,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CModel_Query {
 
-    use CModel_Query_Trait_BuildsQueries;
+    use CModel_Query_Trait_BuildsQueries,
+        CModel_Trait_QueriesRelationships;
 
     /**
      * The base query builder instance.
@@ -773,7 +774,7 @@ class CModel_Query {
             return $values;
         }
 
-        return Arr::add(
+        return carr::add(
                         $values, $this->model->getUpdatedAtColumn(), $this->model->freshTimestampString()
         );
     }
@@ -1190,9 +1191,40 @@ class CModel_Query {
             return $this->callScope([$this->model, $scope], $parameters);
         }
 
-//        if (in_array($method, $this->passthru)) {
-//            return $this->toBase()->{$method}(...$parameters);
-//        }
+        if (in_array($method, $this->passthru)) {
+            try {
+                $base = $this->toBase();
+                $class = new ReflectionClass(get_class($base));
+                try {
+                    // Load the controller method
+                    $method_object = $class->getMethod($method);
+                } catch (ReflectionException $e) {
+                    // Use __call instead
+
+                    try {
+                        throw new Exception('404');
+                    } catch (Exception $ex) {
+                        cdbg::var_dump(nl2br($ex->getTraceAsString()));
+                    }
+                    die(
+                            sprintf('Call to undefined method %s::%s()', get_class($base), $method)
+                    );
+                    $method_object = $class->getMethod('__call');
+
+                    // Use arguments in __call format
+                    $parameters = array($method, $parameters);
+                }
+
+
+                return $method_object->invokeArgs($this->query, $parameters);
+                //$this->query->{$method}(...$parameters);
+            } catch (BadMethodCallException $e) {
+
+                throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class($this), $method)
+                );
+            }
+        }
 
 
         $class = new ReflectionClass(get_class($this->query));
@@ -1203,6 +1235,15 @@ class CModel_Query {
                 $method_object = $class->getMethod($method);
             } catch (ReflectionException $e) {
                 // Use __call instead
+
+                try {
+                    throw new Exception('404');
+                } catch (Exception $ex) {
+                    cdbg::var_dump(nl2br($ex->getTraceAsString()));
+                }
+                die(
+                        sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
+                );
                 $method_object = $class->getMethod('__call');
 
                 // Use arguments in __call format

@@ -13,6 +13,7 @@ abstract class CModel implements ArrayAccess {
         CModel_Trait_Attributes,
         CModel_Trait_Relationships,
         CModel_Trait_Event,
+        CModel_Trait_GlobalScopes,
         CModel_Trait_Timestamps,
         CModel_Trait_QueriesRelationships;
 
@@ -309,7 +310,7 @@ abstract class CModel implements ArrayAccess {
 
         $model->exists = $exists;
 
-        
+
 
         return $model;
     }
@@ -597,10 +598,10 @@ abstract class CModel implements ArrayAccess {
     /**
      * Perform a model update operation.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  CModel_Query  $query
      * @return bool
      */
-    protected function performUpdate(Builder $query) {
+    protected function performUpdate(CModel_Query $query) {
         // If the updating event returns false, we will cancel the update operation so
         // developers can hook Validation systems into their models and cancel this
         // operation if the model does not pass validation. Otherwise, we update.
@@ -634,10 +635,10 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set the keys for a save update query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  CModel_Query  $query
+     * @return CModel_Query
      */
-    protected function setKeysForSaveQuery(Builder $query) {
+    protected function setKeysForSaveQuery(CModel_Query $query) {
         $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
 
         return $query;
@@ -655,10 +656,10 @@ abstract class CModel implements ArrayAccess {
     /**
      * Perform a model insert operation.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  CModel_Query  $query
      * @return bool
      */
-    protected function performInsert(Builder $query) {
+    protected function performInsert(CModel_Query $query) {
         if ($this->fireModelEvent('creating') === false) {
             return false;
         }
@@ -705,11 +706,11 @@ abstract class CModel implements ArrayAccess {
     /**
      * Insert the given attributes and set the ID on the model.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  CModel_Query  $query
      * @param  array  $attributes
      * @return void
      */
-    protected function insertAndSetId(Builder $query, $attributes) {
+    protected function insertAndSetId(CModel_Query $query, $attributes) {
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
         $this->setAttribute($keyName, $id);
@@ -819,9 +820,91 @@ abstract class CModel implements ArrayAccess {
      * @return CModel_Query
      */
     public function newQuery() {
-        $query = new CModel_Query(new CDatabase_Query_Builder($this->db));
-        $query->setModel($this);
-        return $query;
+        return $this->registerGlobalScopes($this->newQueryWithoutScopes());
+    }
+
+    /**
+     * Get a new query builder with no relationships loaded.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQueryWithoutRelationships() {
+        return $this->registerGlobalScopes($this->newModelQuery($this->newBaseQueryBuilder())->setModel($this));
+    }
+
+    /**
+     * Register the global scopes for this builder instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function registerGlobalScopes($builder) {
+        foreach ($this->getGlobalScopes() as $identifier => $scope) {
+            $builder->withGlobalScope($identifier, $scope);
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Get a new query builder that doesn't have any global scopes.
+     *
+     * @return CModel_Query|static
+     */
+    public function newQueryWithoutScopes() {
+        $builder = $this->newModelQuery($this->newBaseQueryBuilder());
+
+        // Once we have the query builders, we will set the model instances so the
+        // builder can easily access any information it may need from the model
+        // while it is constructing and executing various queries against it.
+        return $builder->setModel($this)
+                        ->with($this->with)
+                        ->withCount($this->withCount);
+    }
+
+    /**
+     * Get a new query instance without a given scope.
+     *
+     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQueryWithoutScope($scope) {
+        $builder = $this->newQuery();
+
+        return $builder->withoutGlobalScope($scope);
+    }
+
+    /**
+     * Get a new query to restore one or more models by their queueable IDs.
+     *
+     * @param  array|int  $ids
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQueryForRestoration($ids) {
+        if (is_array($ids)) {
+            return $this->newQueryWithoutScopes()->whereIn($this->getQualifiedKeyName(), $ids);
+        } else {
+            return $this->newQueryWithoutScopes()->whereKey($ids);
+        }
+    }
+
+    /**
+     * Create a new Eloquent query builder for the model.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function newModelQuery($query) {
+        return new CModel_Query($query);
+    }
+
+    /**
+     * Get a new query builder instance for the connection.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function newBaseQueryBuilder() {
+        return new CDatabase_Query_Builder($this->db);
     }
 
     /**
@@ -1150,7 +1233,8 @@ abstract class CModel implements ArrayAccess {
      * @return string
      */
     public function getForeignKey() {
-        return Str::snake(class_basename($this)) . '_' . $this->primaryKey;
+
+        return $this->primaryKey;
     }
 
     /**
@@ -1311,7 +1395,7 @@ abstract class CModel implements ArrayAccess {
             throw new BadMethodCallException(
             sprintf('Call to undefined method %s::%s()', get_class($this), $method)
             );
-        } 
+        }
     }
 
     /**

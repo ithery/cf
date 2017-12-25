@@ -129,7 +129,8 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
      * @return string
      */
     protected function compileUpdateColumns($values) {
-        return collect($values)->map(function ($value, $key) {
+        $collection = new CCollection($values);
+        return $collection->map(function ($value, $key) {
                     if ($this->isJsonSelector($key)) {
                         return $this->compileJsonUpdateColumn($key, new JsonExpression($value));
                     } else {
@@ -165,7 +166,8 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
      * @return array
      */
     public function prepareBindingsForUpdate(array $bindings, array $values) {
-        $values = collect($values)->reject(function ($value, $column) {
+        $collection = new CCollection($values);
+        $values = $collection->reject(function ($value, $column) {
                     return $this->isJsonSelector($column) &&
                             in_array(gettype($value), ['boolean', 'integer', 'double']);
                 })->all();
