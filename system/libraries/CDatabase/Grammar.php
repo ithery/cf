@@ -111,7 +111,6 @@ abstract class CDatabase_Grammar {
      * @return string
      */
     public function columnize(array $columns) {
-        
         return implode(', ', array_map([$this, 'wrap'], $columns));
     }
 

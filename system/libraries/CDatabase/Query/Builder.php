@@ -157,6 +157,13 @@ class CDatabase_Query_Builder {
     public $lock;
 
     /**
+     * model of this query builder.
+     *
+     * @var CModel
+     */
+    public $model;
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -233,7 +240,7 @@ class CDatabase_Query_Builder {
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function get($columns = ['*']) {
         $original = $this->columns;
@@ -241,6 +248,7 @@ class CDatabase_Query_Builder {
         if (is_null($original)) {
             $this->columns = $columns;
         }
+
 
         $results = $this->processor->processSelect($this, $this->runSelect());
 
@@ -255,11 +263,7 @@ class CDatabase_Query_Builder {
      * @return array
      */
     protected function runSelect() {
-        cdbg::var_dump($this->toSql());
-        cdbg::var_dump($this->getRawBindings());
-
-
-        //return $this->db->select($this->toSql(), $this->getBindings());
+        return $this->db->query($this->toSql(), $this->getBindings());
     }
 
     /**
@@ -454,7 +458,7 @@ class CDatabase_Query_Builder {
     /**
      * Merge an array of bindings into our bindings.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  CDatabase_Query_Builder  $query
      * @return $this
      */
     public function mergeBindings(self $query) {
@@ -473,6 +477,341 @@ class CDatabase_Query_Builder {
         return array_values(array_filter($bindings, function ($binding) {
                     return !$binding instanceof Expression;
                 }));
+    }
+
+    /**
+     * Set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function limit($value) {
+        $property = $this->unions ? 'unionLimit' : 'limit';
+
+        if ($value >= 0) {
+            $this->$property = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the model instance being queried.
+     *
+     * @return CModel
+     */
+    public function getModel() {
+        return $this->model;
+    }
+
+    /**
+     * Set a model instance for the model being queried.
+     *
+     * @param  CModel  $model
+     * @return $this
+     */
+    public function setModel(CModel $model) {
+        $this->model = $model;
+
+        $this->from($model->getTable());
+
+        return $this;
+    }
+
+    /**
+     * Execute a query for a single record by ID.
+     *
+     * @param  int    $id
+     * @param  array  $columns
+     * @return mixed|static
+     */
+    public function find($id, $columns = ['*']) {
+        return $this->where($this->from . '_id', '=', $id)->first($columns);
+    }
+
+    /**
+     * Chunk the results of the query.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @return bool
+     */
+    public function chunk($count, callable $callback) {
+        $this->enforceOrderBy();
+
+        $page = 1;
+
+        do {
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
+            $results = $this->forPage($page, $count)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // On each chunk result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
+            if ($callback($results, $page) === false) {
+                return false;
+            }
+
+            unset($results);
+
+            $page++;
+        } while ($countResults == $count);
+
+        return true;
+    }
+
+    /**
+     * Execute a callback over each item while chunking.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @return bool
+     */
+    public function each(callable $callback, $count = 1000) {
+        return $this->chunk($count, function ($results) use ($callback) {
+                    foreach ($results as $key => $value) {
+                        if ($callback($value, $key) === false) {
+                            return false;
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Execute the query and get the first result.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|static|null
+     */
+    public function first($columns = ['*']) {
+        return $this->take(1)->get($columns)->first();
+    }
+
+    /**
+     * Alias to set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return CDatabase_Query_Builder|static
+     */
+    public function take($value) {
+        return $this->limit($value);
+    }
+
+    /**
+     * Add a "group by" clause to the query.
+     *
+     * @param  array  ...$groups
+     * @return $this
+     */
+    public function groupBy() {
+
+        foreach (func_get_args() as $group) {
+            $this->groups = array_merge((array) $this->groups, carr::wrap($group));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a "having" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string|null  $operator
+     * @param  string|null  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function having($column, $operator = null, $value = null, $boolean = 'and') {
+        $type = 'Basic';
+
+        // Here we will make some assumptions about the operator. If only 2 values are
+        // passed to the method, we will assume that the operator is an equals sign
+        // and keep going. Otherwise, we'll require the operator to be passed in.
+        list($value, $operator) = $this->prepareValueAndOperator(
+                $value, $operator, func_num_args() == 2
+        );
+
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            list($value, $operator) = [$operator, '='];
+        }
+
+        $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
+
+        if (!$value instanceof Expression) {
+            $this->addBinding($value, 'having');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a "or having" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string|null  $operator
+     * @param  string|null  $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orHaving($column, $operator = null, $value = null) {
+        return $this->having($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a raw having clause to the query.
+     *
+     * @param  string  $sql
+     * @param  array   $bindings
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function havingRaw($sql, array $bindings = [], $boolean = 'and') {
+        $type = 'Raw';
+
+        $this->havings[] = compact('type', 'sql', 'boolean');
+
+        $this->addBinding($bindings, 'having');
+
+        return $this;
+    }
+
+    /**
+     * Add a raw or having clause to the query.
+     *
+     * @param  string  $sql
+     * @param  array   $bindings
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orHavingRaw($sql, array $bindings = []) {
+        return $this->havingRaw($sql, $bindings, 'or');
+    }
+
+    /**
+     * Add an "order by" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderBy($column, $direction = 'asc') {
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'column' => $column,
+            'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a descending "order by" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orderByDesc($column) {
+        return $this->orderBy($column, 'desc');
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function latest($column = 'created_at') {
+        return $this->orderBy($column, 'desc');
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function oldest($column = 'created_at') {
+        return $this->orderBy($column, 'asc');
+    }
+
+    /**
+     * Put the query's results in random order.
+     *
+     * @param  string  $seed
+     * @return $this
+     */
+    public function inRandomOrder($seed = '') {
+        return $this->orderByRaw($this->grammar->compileRandom($seed));
+    }
+
+    /**
+     * Add a raw "order by" clause to the query.
+     *
+     * @param  string  $sql
+     * @param  array  $bindings
+     * @return $this
+     */
+    public function orderByRaw($sql, $bindings = []) {
+        $type = 'Raw';
+
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = compact('type', 'sql');
+
+        $this->addBinding($bindings, 'order');
+
+        return $this;
+    }
+
+    /**
+     * Alias to set the "offset" value of the query.
+     *
+     * @param  int  $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function skip($value) {
+        return $this->offset($value);
+    }
+
+    /**
+     * Set the "offset" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function offset($value) {
+        $property = $this->unions ? 'unionOffset' : 'offset';
+
+        $this->$property = max(0, $value);
+
+        return $this;
+    }
+
+    public function __get($name) {
+
+        if ($this->model != null) {
+            return $this->model->$name;
+        }
+        throw new Exception(sprintf('Invalid property %s::%s()', get_class($this), $name));
+    }
+
+    public function __call($method, $parameters) {
+
+        if ($this->model != null) {
+            try {
+
+                return $this->newQuery()->$method($parameters);
+            } catch (BadMethodCallException $e) {
+                throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($this), $method));
+            }
+        }
+        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($this), $method));
     }
 
 }

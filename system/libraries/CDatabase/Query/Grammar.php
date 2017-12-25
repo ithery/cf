@@ -41,6 +41,10 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
+        if (is_array($query->columns) && count($query->columns) == 0) {
+            $query->columns = null;
+        }
+
         if (is_null($query->columns)) {
             $query->columns = ['*'];
         }
@@ -51,7 +55,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         $sql = trim($this->concatenate(
                         $this->compileComponents($query))
         );
-        
+
         $query->columns = $original;
 
         return $sql;

@@ -43,6 +43,13 @@ class CDatabase {
     // Stack of queries for push/pop
     protected $query_history = array();
 
+    /**
+     * The event dispatcher instance.
+     *
+     * @var CEvents
+     */
+    protected $events;
+
     public function config() {
         return $this->config;
     }
@@ -56,7 +63,7 @@ class CDatabase {
     public static function & instance($domain = '', $name = 'default', $config = NULL) {
         if (strlen($domain) == 0) {
             //get current domain
-            $domain = crouter::domain();
+            $domain = CF::domain();
         }
         if (!isset(CDatabase::$instances[$domain])) {
             CDatabase::$instances[$domain] = array();
@@ -78,7 +85,7 @@ class CDatabase {
     public static function instance_name(CDatabase $db, $domain = null) {
         if (strlen($domain) == 0) {
             //get current domain
-            $domain = crouter::domain();
+            $domain = CF::domain();
         }
         return array_search($db, CDatabase::$instances[$domain], TRUE);
     }
@@ -91,7 +98,7 @@ class CDatabase {
     public function __construct($config = array(), $domain = null) {
 
         if ($domain == null) {
-            $domain = crouter::domain();
+            $domain = CF::domain();
         }
         $load_config = true;
 
@@ -336,8 +343,6 @@ class CDatabase {
 
         return $result;
     }
-
-    
 
     /**
      * Selects the column names for a database query.
@@ -1411,6 +1416,18 @@ class CDatabase {
         }
 
         throw new LogicException('Lost connection and no reconnector available.');
+    }
+
+    /**
+     * Register a database query listener with the connection.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function listen(Closure $callback) {
+        if (isset($this->events)) {
+            $this->events->listen(CDatabase_Events_QueryExecuted::class, $callback);
+        }
     }
 
 }
