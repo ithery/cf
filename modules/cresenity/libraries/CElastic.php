@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Nov 18, 2017, 6:46:45 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use ONGR\ElasticsearchDSL\Search as DSLQuery;
+
 class CElastic {
 
     // Elastic instances
@@ -21,6 +23,13 @@ class CElastic {
     protected $hosts;
     //Client of instance
     protected $client;
+
+    /**
+     * Elastic Search default index.
+     *
+     * @var string
+     */
+    protected $index;
 
     /**
      * Returns a singleton instance of CElastic.
@@ -123,6 +132,15 @@ class CElastic {
     }
 
     /**
+     * Begin a fluent search query builder.
+     *
+     * @return CElastic_DSL_SearchBuilder
+     */
+    public function searchBuilder() {
+        return new CElastic_DSL_SearchBuilder($this, $this->getDSLQuery());
+    }
+
+    /**
      * 
      * @param string $index
      * @param string $document_type
@@ -130,6 +148,16 @@ class CElastic {
      */
     public function search($index, $document_type = '') {
         return new CElastic_Search($this, $index, $document_type);
+    }
+    /**
+     * Execute a map statement on index;.
+     *
+     * @param array $search
+     *
+     * @return array
+     */
+    public function searchStatement(array $search) {
+        return $this->client->search($this->setStatementIndex($search));
     }
 
     /**
@@ -158,6 +186,38 @@ class CElastic {
      */
     public function &client() {
         return $this->client;
+    }
+
+    /**
+     * Get DSL grammar instance for this connection.
+     *
+     * @return DSLGrammar
+     */
+    public function getDSLQuery() {
+        return new DSLQuery();
+    }
+
+    /**
+     * Get the default elastic index.
+     *
+     * @return string
+     */
+    public function getDefaultIndex() {
+        return $this->index;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return array
+     */
+    private function setStatementIndex(array $params) {
+        if (isset($params['index']) and $params['index']) {
+            return $params;
+        }
+
+        // merge the default index with the given params if the index is not set.
+        return array_merge($params, ['index' => $this->getDefaultIndex()]);
     }
 
 }

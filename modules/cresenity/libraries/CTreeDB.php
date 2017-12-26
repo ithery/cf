@@ -483,6 +483,8 @@ class CTreeDB {
         } else {
             $q .= " ORDER BY lft," . $db->escape_column($this->pk_column) . " asc";
         }
+        
+
         $r = $db->query($q)->result(false);
         foreach ($r as $row) {
             // recursive execution of this function for each   

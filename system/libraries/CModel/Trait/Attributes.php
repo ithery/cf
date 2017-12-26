@@ -674,6 +674,14 @@ trait CModel_Trait_Attributes {
         if ($this->isStandardDateFormat($value)) {
             return CCarbon::createFromFormat('Y-m-d', $value)->startOfDay();
         }
+        
+        // If the value is in simply year, month, day format, we will instantiate the
+        // Carbon instances from that format. Again, this provides for simple date
+        // fields on the database, while still supporting Carbonized conversion.
+        
+        if ($this->isElasticDateFormat($value)) {
+            return CCarbon::createFromFormat('Y-m-d\TH:i:s.u\Z', $value)->startOfDay();
+        }
 
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
@@ -683,6 +691,16 @@ trait CModel_Trait_Attributes {
         );
     }
 
+     /**
+     * Determine if the given value is a standard date format.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isElasticDateFormat($value) {
+        return preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2}).+?Z$/', $value);
+    }
+    
     /**
      * Determine if the given value is a standard date format.
      *

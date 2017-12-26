@@ -292,7 +292,7 @@ abstract class CModel implements ArrayAccess {
      * @return string
      */
     protected function removeTableFromKey($key) {
-        return Str::contains($key, '.') ? last(explode('.', $key)) : $key;
+        return cstr::contains($key, '.') ? last(explode('.', $key)) : $key;
     }
 
     /**

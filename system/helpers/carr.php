@@ -548,7 +548,7 @@ class carr {
     public static function first($array, callable $callback = null, $default = null) {
         if (is_null($callback)) {
             if (empty($array)) {
-                return value($default);
+                return CF::value($default);
             }
 
             foreach ($array as $item) {
@@ -562,7 +562,7 @@ class carr {
             }
         }
 
-        return value($default);
+        return CF::value($default);
     }
 
     /**
@@ -710,7 +710,7 @@ class carr {
             unset($array[array_shift($parts)]);
         }
     }
-    
+
     /**
      * Determine if the given key exists in the provided array.
      *
@@ -718,8 +718,7 @@ class carr {
      * @param  string|int  $key
      * @return bool
      */
-    public static function exists($array, $key)
-    {
+    public static function exists($array, $key) {
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
