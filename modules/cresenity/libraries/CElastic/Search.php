@@ -126,7 +126,7 @@ class CElastic_Search {
         }
     }
 
-    public function exec() {
+    public function buildParams() {
         $params = array();
         $params['index'] = $this->index;
         if (strlen($this->document_type) > 0) {
@@ -158,6 +158,11 @@ class CElastic_Search {
         }
 
         $params['body'] = $body;
+        return $params;
+    }
+    
+    public function exec() {
+        $params = $this->buildParams();
         $response = $this->client->search($params);
         $result = new CElastic_Result($response, $this->select);
         return $result;

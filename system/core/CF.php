@@ -1984,7 +1984,7 @@ final class CF {
      * @param  string|object  $class
      * @return string
      */
-    function class_basename($class) {
+    public static function class_basename($class) {
         $class = is_object($class) ? get_class($class) : $class;
 
         $basename = basename(str_replace('\\', '/', $class));
@@ -1998,7 +1998,7 @@ final class CF {
      * @param  object|string  $class
      * @return array
      */
-    function class_uses_recursive($class) {
+    public static function class_uses_recursive($class) {
         if (is_object($class)) {
             $class = get_class($class);
         }
@@ -2018,7 +2018,7 @@ final class CF {
      * @param  string  $trait
      * @return array
      */
-    function trait_uses_recursive($trait) {
+    public static function trait_uses_recursive($trait) {
         $traits = class_uses($trait);
 
         foreach ($traits as $trait) {
@@ -2034,7 +2034,7 @@ final class CF {
      * @param  mixed  $value
      * @return mixed
      */
-    function value($value) {
+    public static function value($value) {
         return $value instanceof Closure ? $value() : $value;
     }
 
