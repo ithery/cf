@@ -6,6 +6,15 @@ class RajaOngkir {
 	private $key = '9406fbe823f72dbfbe4d9b3c849c073e';
 	private $android_key;
 	private $ios_key;
+	private $curl;
+
+	function __construct() {
+		$this->curl = curl_init();
+	}
+
+	function __destruct() {
+		curl_close($this->curl);
+	}
 
 	function setKey($key) {
 		$this->key = $key;
@@ -20,13 +29,12 @@ class RajaOngkir {
 	}
 
 	function getProvince($provinceID = '') {
-		$curl = curl_init();
 		$method = 'GET';
 		$options = [
 			'id' => $provinceID,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/province?' . http_build_query($options),
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -39,10 +47,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -52,14 +58,13 @@ class RajaOngkir {
 	}
 
 	function getCity($provinceID = '', $cityID = '') {
-		$curl = curl_init();
 		$method = 'GET';
 		$options = [
 			'id' => $cityID,
 			'province' => $provinceID,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/city?' . http_build_query($options),
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -72,10 +77,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -85,14 +88,13 @@ class RajaOngkir {
 	}
 
 	function getDistrict($cityID = '', $districtID = '') {
-		$curl = curl_init();
 		$method = 'GET';
 		$options = [
 			'id' => $districtID,
 			'city' => $cityID,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/subdistrict?' . http_build_query($options),
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -105,10 +107,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -129,7 +129,6 @@ class RajaOngkir {
 		$height = '',
 		$diameter = ''
 	) {
-		$curl = curl_init();
 		$method = 'POST';
 		$options = [
 			'origin' => $origin,
@@ -144,7 +143,7 @@ class RajaOngkir {
 			'diameter' => $diameter,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/cost',
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -159,10 +158,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -172,14 +169,13 @@ class RajaOngkir {
 	}
 
 	function getInternationalOrigin($provinceID = '', $cityID = '') {
-		$curl = curl_init();
 		$method = 'GET';
 		$options = [
 			'id' => $cityID,
 			'province' => $provinceID,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/v2/internationalOrigin?' . http_build_query($options),
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -192,10 +188,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -205,13 +199,12 @@ class RajaOngkir {
 	}
 
 	function getInternationalDestination($countryID = '') {
-		$curl = curl_init();
 		$method = 'GET';
 		$options = [
 			'id' => $countryID,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/v2/internationalDestination?' . http_build_query($options),
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -224,10 +217,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -245,7 +236,6 @@ class RajaOngkir {
 		$width = '',
 		$height = ''
 	) {
-		$curl = curl_init();
 		$method = 'POST';
 		$options = [
 			'origin' => $origin,
@@ -257,7 +247,7 @@ class RajaOngkir {
 			'height' => $height,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/v2/internationalCost',
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -272,10 +262,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -285,10 +273,9 @@ class RajaOngkir {
 	}
 
 	function getCurrency() {
-		$curl = curl_init();
 		$method = 'GET';
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/currency',
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -301,10 +288,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -314,14 +299,13 @@ class RajaOngkir {
 	}
 
 	function getWaybill($courier, $waybill) {
-		$curl = curl_init();
 		$method = 'POST';
 		$options = [
 			'waybill' => $waybill,
 			'courier' => $courier,
 		];
 
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_URL => 'https://pro.rajaongkir.com/api/waybill',
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
@@ -335,10 +319,8 @@ class RajaOngkir {
 			],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-
-		curl_close($curl);
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
 
 		if ($err) {
 			return $this->error($err);
@@ -353,8 +335,8 @@ class RajaOngkir {
 
 	private function error($err) {
 		return (Object) [
-			'rajaongkir' => [
-				'status' => [
+			'rajaongkir' => (Object) [
+				'status' => (Object) [
 					'code' => 'ERROR',
 					'description' => $err,
 				],
