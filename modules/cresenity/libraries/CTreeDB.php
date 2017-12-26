@@ -229,7 +229,7 @@ class CTreeDB {
         $db = $this->db;
 
         $r = $db->update($this->table_name, $data, array($this->pk_column => $id));
-        if($this->org_id!=null) {
+        if ($this->org_id != null) {
             $this->rebuild_tree_all();
         }
     }
@@ -401,7 +401,7 @@ class CTreeDB {
 
     function rebuild_tree_all($force = false) {
         if (!$force) {
-            if($this->org_id==null) {
+            if ($this->org_id == null) {
                 throw new Exception('Service Unavailable on rebuild_tree_all on org_id null');
             }
         }
@@ -409,8 +409,13 @@ class CTreeDB {
         $db = $this->db;
         $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where status>0";
         if (strlen($this->org_id) > 0) {
-            $q .= " and org_id=" . $db->escape($this->org_id) . "";
+            if ($this->org_id == 'NONE') {
+                $q .= " and org_id is null";
+            } else {
+                $q .= " and org_id=" . $db->escape($this->org_id) . "";
+            }
         }
+
         $q .= " and parent_id is null order by lft," . $db->escape_column($this->pk_column) . " asc";
         $r = $db->query($q)->result(false);
         $left = 1;
@@ -421,7 +426,11 @@ class CTreeDB {
             //$qleft="select rgt from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
             $qleft = "select rgt from " . $db->escape_table($this->table_name) . " where status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
             if (strlen($this->org_id) > 0) {
-                $qleft .= " and org_id=" . $db->escape($this->org_id) . "";
+                if ($this->org_id == 'NONE') {
+                    $qleft .= " and org_id is null";
+                } else {
+                    $qleft .= " and org_id=" . $db->escape($this->org_id) . "";
+                }
             }
             $left = cdbutils::get_value($qleft) + 1;
         }
@@ -456,7 +465,11 @@ class CTreeDB {
         // get all children of this node   
         $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where  status>0";
         if (strlen($this->org_id) > 0) {
-            $q .= " and org_id=" . $db->escape($this->org_id) . "";
+            if ($this->org_id == 'NONE') {
+                $q .= " and org_id is null";
+            } else {
+                $q .= " and org_id=" . $db->escape($this->org_id) . "";
+            }
         }
 
         if ($id != null) {
