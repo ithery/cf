@@ -493,7 +493,7 @@ class MApp extends CMobile_Observable {
             $js = ClientScript::instance()->render_js_require($js);
         }
         if (ccfg::get("minify_js")) {
-            $js = CJSMin::minify($js);
+            //$js = CJSMin::minify($js);
         }
         $data["js"] = cbase64::encode($js);
         $data["css_require"] = CClientScript::instance()->url_css_file();
