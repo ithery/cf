@@ -26,6 +26,6 @@ $config["merge_js"] = false;
 $config["minify_js"] = false;
 
 $config["merge_css"] = false;
-$config["minify_css"] = true;
+$config["minify_css"] = false;
 
 return $config;
