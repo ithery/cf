@@ -49,7 +49,7 @@ return array(
     "jquery-ui-1.12.1.custom" => array(
         "js" => array("libs" . DS . "jquery-ui-1.12.1.custom" . DS . "jquery-ui.min.js"),
         "css" => array(
-            "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.min.css", 
+            "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.min.css",
             "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.theme.min.css",
             "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui.css",
             "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery.ui.theme.css"
@@ -57,13 +57,13 @@ return array(
         "requirements" => array("jquery"),
     ),
     "jquery.lazyload" => array(
-        "js" => array("plugins" . DS . "lazyload" . DS . "jquery.lazyload.min.js" ),
+        "js" => array("plugins" . DS . "lazyload" . DS . "jquery.lazyload.min.js"),
         "requirements" => array("jquery"),
     ),
     "jquery.dialog2" => array(
         "js" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.js", "plugins" . DS . "dialog2" . DS . "jquery.dialog2.helpers.js"),
         "css" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.css"),
-        "requirements" => array("jquery", "bootstrap"),
+        "requirements" => array("jquery"),
     ),
     "jquery.datatable" => array(
         "js" => array(
@@ -73,7 +73,7 @@ return array(
             "plugins" . DS . "datatable" . DS . "ColVis.min.js",
             "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
         ),
-        "requirements" => array("jquery", "bootstrap"),
+        "requirements" => array("jquery"),
     ),
     "jquery.datatable.tabletools" => array(
         "js" => array(
@@ -450,6 +450,21 @@ return array(
             "materialize/swiper/swiper.jquery.js",
         ),
 //            "requirements" => array("jquery-2.1.1"),
+    ),
+    "pace" => array(
+        "js" => array(
+            "plugins/pace/pace.js",
+        ),
+    ),
+    "metis-menu" => array(
+        "js" => array(
+            "plugins/metisMenu/jquery.metisMenu.js",
+        ),
+    ),
+    "animate" => array(
+        "css" => array(
+            "plugins/animate/animate.css",
+        ),
     ),
 );
 ?>

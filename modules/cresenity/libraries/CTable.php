@@ -148,6 +148,7 @@ class CTable extends CElement_Element {
         } else {
             CClientModules::instance()->register_module('jquery.datatable');
         }
+        
     }
 
     public static function factory($id = "") {

@@ -87,22 +87,21 @@ class cnav {
                 return true;
         }
 
-        
-        if (!isset(self::$role_navs[$app_id]) || !isset(self::$role_navs[$app_id][$role_id]) ) {
+
+        if (!isset(self::$role_navs[$app_id]) || !isset(self::$role_navs[$app_id][$role_id])) {
             if (!isset(self::$role_navs[$app_id])) {
                 self::$role_navs[$app_id] = array();
             }
             if (!isset(self::$role_navs[$app_id][$role_id])) {
-              
+
                 $q = "select nav from role_nav where role_id=" . $db->escape($role_id) . " and app_id=" . $db->escape($app_id);
                 if ($role_id == null) {
                     $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($app_id);
                 }
                 self::$role_navs[$app_id][$role_id] = cdbutils::get_array($q);
-                
             }
         }
-        
+
         return in_array($nav["name"], self::$role_navs[$app_id][$role_id]);
     }
 
@@ -359,7 +358,6 @@ class cnav {
     }
 
     public static function render($navs = null, $level = 0, &$child = 0) {
-
         $is_admin = CApp::instance()->is_admin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
@@ -498,7 +496,7 @@ class cnav {
 
         if (strlen($app_role_id) > 0) {
             $app_role = crole::get($app_role_id);
-            if ($app_role!=null && $app_role->parent_id == null)
+            if ($app_role != null && $app_role->parent_id == null)
                 return true;
             if ($app_role != null && (!isset($nav["subnav"]) || count($nav["subnav"]) == 0)) {
 
