@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 30, 2017, 3:11:24 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CTrait_App {
+trait CTrait_App {
 
     private static $org = null;
 
@@ -65,8 +65,6 @@ class CTrait_App {
         }
         return self::$org[$org_id];
     }
-
-   
 
     /**
      * 
