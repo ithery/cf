@@ -63,4 +63,14 @@ class CException extends Exception {
         return self::text($this);
     }
 
+    /**
+     * Sends an Internal Server Error header.
+     *
+     * @return  void
+     */
+    public function send_headers() {
+        // Send the 500 header
+        header('HTTP/1.1 500 Internal Server Error');
+    }
+
 }
