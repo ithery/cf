@@ -36,7 +36,14 @@ a:focus, a:hover {
     padding-right:15px;
 }
 
+.row-fluid:after, .row-fluid:before {
+    display: table;
+    content: " ";
+}
 
+.row-fluid:after {
+    clear: both;
+}
 input, textarea, select, .uneditable-input {
     height:28px;
 }
