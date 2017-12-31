@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 30, 2017, 3:11:24 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CTrait_App {
+trait CApp_Trait_Base {
 
     private static $org = null;
 
@@ -74,6 +74,35 @@ trait CTrait_App {
         $theme = CF::theme();
 
         return $theme;
+    }
+
+    /**
+     * User dari session CApp
+     * 
+     * @return stdClass 
+     */
+    public static function user() {
+        $session = PM::session();
+        $user = $session->get('user');
+        return $user;
+    }
+
+    /**
+     * User ID dari session CApp
+     * 
+     * @return int
+     */
+    public static function user_id() {
+        return cobj::get(self::user(), 'user_id');
+    }
+
+    /**
+     * Current Date Y-m-d H:i:s format
+     * 
+     * @return string
+     */
+    public function now() {
+        return date('Y-m-d H:i:s');
     }
 
 }
