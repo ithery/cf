@@ -2092,7 +2092,6 @@ class CTable extends CElement_Element {
 
                                         input.attr('transforms', transforms);
                                         input.attr('placeholder', 'Search ' + title );
-                                        input.css('width','90%');
                                     }
                                 }
                                 
