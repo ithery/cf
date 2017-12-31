@@ -22,4 +22,42 @@ $(document).ready(function () {
         e.stopPropagation();
         e.preventDefault();
     });
+
+    // Minimalize menu
+    $('.navbar-minimalize').on('click', function () {
+        $("body").toggleClass("mini-navbar");
+        SmoothlyMenu();
+
+    });
+});
+
+
+function SmoothlyMenu() {
+    if (!$('body').hasClass('mini-navbar') || $('body').hasClass('body-small')) {
+        // Hide menu in order to smoothly turn on when maximize menu
+        $('#side-menu').hide();
+        // For smoothly turn on menu
+        setTimeout(
+                function () {
+                    $('#side-menu').fadeIn(400);
+                }, 200);
+    } else if ($('body').hasClass('fixed-sidebar')) {
+        $('#side-menu').hide();
+        setTimeout(
+                function () {
+                    $('#side-menu').fadeIn(400);
+                }, 100);
+    } else {
+        // Remove all inline style from jquery fadeIn function to reset menu state
+        $('#side-menu').removeAttr('style');
+    }
+}
+
+// Minimalize menu when screen is less than 768px
+$(window).bind("resize", function () {
+    if ($(this).width() < 769) {
+        $('body').addClass('body-small')
+    } else {
+        $('body').removeClass('body-small')
+    }
 });

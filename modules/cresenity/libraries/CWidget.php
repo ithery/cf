@@ -261,7 +261,7 @@ class CWidget extends CElement_Element {
         }
 
         $html->appendln('	</div>');
-        $html->appendln('	<div class="' . $main_class_content . $nopadding . $scroll_class . '"' . $str_height . $content_attr . '>');
+        $html->appendln('	<div class="clearfix ' . $main_class_content . $nopadding . $scroll_class . '"' . $str_height . $content_attr . '>');
         $html->appendln('		' . $this->html_child() . '');
         $html->appendln('	</div>');
         $html->appendln('</div>');

@@ -34,45 +34,8 @@ a:focus, a:hover {
     margin-left: 0;
     padding-left:15px;
     padding-right:15px;
-    float: left;
 }
 
-.row-fluid > .span1 {
-    width: 8.33333333%;
-}
-.row-fluid > .span2 {
-    width: 16.66666667%;
-}
-.row-fluid > .span3 {
-    width:25%;
-}
-.row-fluid > .span4 {
-    width:33.33333333%;
-}
-.row-fluid > .span5 {
-    width: 41.66666667%;
-}
-.row-fluid > .span6 {
-    width: 50%;
-}
-.row-fluid > .span7 {
-    width: 58.33333333%;
-}
-.row-fluid > .span8 {
-    width: 66.66666667%;
-}    
-.row-fluid > .span9 {
-    width:75%;
-}
-.row-fluid > .span10 {
-    width: 83.33333333%;
-}
-.row-fluid > .span11 {
-    width: 91.66666667%;
-}
-.row-fluid > .span12 {
-    width: 100%;
-}
 
 input, textarea, select, .uneditable-input {
     height:28px;
@@ -321,4 +284,49 @@ input[type="file"] {
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1;
+}
+
+
+@media (min-width: 992px) {
+
+    .row-fluid > .span1 {
+        width: 8.33333333%;
+    }
+    .row-fluid > .span2 {
+        width: 16.66666667%;
+    }
+    .row-fluid > .span3 {
+        width:25%;
+    }
+    .row-fluid > .span4 {
+        width:33.33333333%;
+    }
+    .row-fluid > .span5 {
+        width: 41.66666667%;
+    }
+    .row-fluid > .span6 {
+        width: 50%;
+    }
+    .row-fluid > .span7 {
+        width: 58.33333333%;
+    }
+    .row-fluid > .span8 {
+        width: 66.66666667%;
+    }    
+    .row-fluid > .span9 {
+        width:75%;
+    }
+    .row-fluid > .span10 {
+        width: 83.33333333%;
+    }
+    .row-fluid > .span11 {
+        width: 91.66666667%;
+    }
+    .row-fluid > .span12 {
+        width: 100%;
+    }
+
+    .row-fluid>[class*="span"] {
+        float: left;
+    }
 }
