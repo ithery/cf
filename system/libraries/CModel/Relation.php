@@ -337,7 +337,6 @@ abstract class CModel_Relation {
             $parameters = array($method, $parameters);
         }
 
-
         $result = $method_object->invokeArgs($query, $parameters);
 
         //$result = $this->query->{$method}(...$parameters);
