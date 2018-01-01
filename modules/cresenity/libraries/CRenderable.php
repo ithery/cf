@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CRenderable extends CObject implements IRenderable {
+class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     protected $renderable;
     protected $additional_js;
