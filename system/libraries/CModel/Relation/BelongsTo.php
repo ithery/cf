@@ -43,8 +43,8 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Create a new belongs to relationship instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $child
+     * @param  CModel_Query  $query
+     * @param  CModel  $child
      * @param  string  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relation
@@ -224,12 +224,12 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Add the constraints for a relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  CModel_Query  $query
+     * @param  CModel_Query  $parentQuery
      * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
             return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
         }
@@ -242,12 +242,12 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Add the constraints for a relationship query on the same table.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  CModel_Query  $query
+     * @param  CModel_Query  $parentQuery
      * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
-    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQueryForSelfRelation(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         $query->select($columns)->from(
                 $query->getModel()->getTable() . ' as ' . $hash = $this->getRelationCountHash()
         );

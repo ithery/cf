@@ -230,6 +230,130 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a join clause to the query.
+     *
+     * @param  string  $table
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $type
+     * @param  bool    $where
+     * @return $this
+     */
+    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false) {
+        $join = new JoinClause($this, $type, $table);
+
+        // If the first "column" of the join is really a Closure instance the developer
+        // is trying to build a join with a complex "on" clause containing more than
+        // one condition, so we'll add the join and call a Closure with the query.
+        if ($first instanceof Closure) {
+            call_user_func($first, $join);
+
+            $this->joins[] = $join;
+
+            $this->addBinding($join->getBindings(), 'join');
+        }
+
+        // If the column is simply a string, we can assume the join simply has a basic
+        // "on" clause with a single condition. So we will just build the join with
+        // this simple join clauses attached to it. There is not a join callback.
+        else {
+            $method = $where ? 'where' : 'on';
+
+            $this->joins[] = $join->$method($first, $operator, $second);
+
+            $this->addBinding($join->getBindings(), 'join');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a "join where" clause to the query.
+     *
+     * @param  string  $table
+     * @param  string  $first
+     * @param  string  $operator
+     * @param  string  $second
+     * @param  string  $type
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function joinWhere($table, $first, $operator, $second, $type = 'inner') {
+        return $this->join($table, $first, $operator, $second, $type, true);
+    }
+
+    /**
+     * Add a left join to the query.
+     *
+     * @param  string  $table
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function leftJoin($table, $first, $operator = null, $second = null) {
+        return $this->join($table, $first, $operator, $second, 'left');
+    }
+
+    /**
+     * Add a "join where" clause to the query.
+     *
+     * @param  string  $table
+     * @param  string  $first
+     * @param  string  $operator
+     * @param  string  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function leftJoinWhere($table, $first, $operator, $second) {
+        return $this->joinWhere($table, $first, $operator, $second, 'left');
+    }
+
+    /**
+     * Add a right join to the query.
+     *
+     * @param  string  $table
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function rightJoin($table, $first, $operator = null, $second = null) {
+        return $this->join($table, $first, $operator, $second, 'right');
+    }
+
+    /**
+     * Add a "right join where" clause to the query.
+     *
+     * @param  string  $table
+     * @param  string  $first
+     * @param  string  $operator
+     * @param  string  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function rightJoinWhere($table, $first, $operator, $second) {
+        return $this->joinWhere($table, $first, $operator, $second, 'right');
+    }
+
+    /**
+     * Add a "cross join" clause to the query.
+     *
+     * @param  string  $table
+     * @param  string|null  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function crossJoin($table, $first = null, $operator = null, $second = null) {
+        if ($first) {
+            return $this->join($table, $first, $operator, $second, 'cross');
+        }
+
+        $this->joins[] = new JoinClause($this, 'cross', $table);
+
+        return $this;
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -247,7 +371,7 @@ class CDatabase_Query_Builder {
 
         $this->columns = $original;
 
-        return new CCollection($results);
+        return CF::collect($results);
     }
 
     /**
@@ -266,6 +390,21 @@ class CDatabase_Query_Builder {
      */
     public function toSql() {
         return $this->grammar->compileSelect($this);
+    }
+
+    /**
+     * Merge an array of where clauses and bindings.
+     *
+     * @param  array  $wheres
+     * @param  array  $bindings
+     * @return void
+     */
+    public function mergeWheres($wheres, $bindings) {
+        $this->wheres = array_merge($this->wheres, (array) $wheres);
+
+        $this->bindings['where'] = array_values(
+                array_merge($this->bindings['where'], (array) $bindings)
+        );
     }
 
     /**
@@ -1428,6 +1567,58 @@ class CDatabase_Query_Builder {
      */
     public function getGrammar() {
         return $this->grammar;
+    }
+
+    /**
+     * Insert a new record into the database.
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    public function insert(array $values) {
+        // Since every insert gets treated like a batch insert, we will make sure the
+        // bindings are structured in a way that is convenient when building these
+        // inserts statements by verifying these elements are actually an array.
+        if (empty($values)) {
+            return true;
+        }
+
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        // Here, we will sort the insert keys for every record so that each insert is
+        // in the same order for the record. We need to make sure this is the case
+        // so there are not any errors or problems when inserting these records.
+        else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        // Finally, we will run this query against the database connection and return
+        // the results. We will need to also flatten these bindings before running
+        // the query so they are all in one huge, flattened array for execution.
+        return $this->connection->insert(
+                        $this->grammar->compileInsert($this, $values), $this->cleanBindings(Arr::flatten($values, 1))
+        );
+    }
+
+    /**
+     * Insert a new record and get the value of the primary key.
+     *
+     * @param  array   $values
+     * @param  string|null  $sequence
+     * @return int
+     */
+    public function insertGetId(array $values, $sequence = null) {
+        $sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
+
+        $values = $this->cleanBindings($values);
+
+        return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
     }
 
     /**

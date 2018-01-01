@@ -39,7 +39,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return CModel_Relation_HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null) {
         $instance = $this->newRelatedInstance($related);
@@ -48,7 +48,7 @@ trait CModel_Trait_Relationships {
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasOne($instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey);
+        return new CModel_Relation_HasOne($instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey);
     }
 
     /**
@@ -59,7 +59,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @return CModel_Relation_MorphOne
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null) {
         $instance = $this->newRelatedInstance($related);
@@ -70,7 +70,7 @@ trait CModel_Trait_Relationships {
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new MorphOne($instance->newQuery(), $this, $table . '.' . $type, $table . '.' . $id, $localKey);
+        return new CModel_Relation_MorphOne($instance->newQuery(), $this, $table . '.' . $type, $table . '.' . $id, $localKey);
     }
 
     /**
@@ -80,7 +80,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return CModel_Relation_BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null) {
         // If no relation name was given, we will use this debug backtrace to extract
@@ -116,7 +116,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return CModel_Relation_MorphTo
      */
     public function morphTo($name = null, $type = null, $id = null) {
         // If no name is provided, we will use the backtrace to get the function name
@@ -140,7 +140,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return CModel_Relation_MorphTo
      */
     protected function morphEagerTo($name, $type, $id) {
         return new MorphTo(
@@ -155,14 +155,14 @@ trait CModel_Trait_Relationships {
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return CModel_Relation_MorphTo
      */
     protected function morphInstanceTo($target, $name, $type, $id) {
         $instance = $this->newRelatedInstance(
                 static::getActualClassNameForMorph($target)
         );
 
-        return new MorphTo(
+        return new CModel_Relation_MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
         );
     }
@@ -174,7 +174,7 @@ trait CModel_Trait_Relationships {
      * @return string
      */
     public static function getActualClassNameForMorph($class) {
-        return Arr::get(Relation::morphMap() ?: [], $class, $class);
+        return carr::get(CModel_Relation::morphMap() ?: [], $class, $class);
     }
 
     /**
@@ -217,7 +217,7 @@ trait CModel_Trait_Relationships {
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
      * @param  string|null  $secondLocalKey
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * @return CModel_Relation_HasManyThrough
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null) {
         $through = new $through;
@@ -232,7 +232,7 @@ trait CModel_Trait_Relationships {
 
         $instance = $this->newRelatedInstance($related);
 
-        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey, $secondLocalKey);
+        return new CModel_Relation_HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
 
     /**
@@ -243,7 +243,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return CModel_Relation_MorphMany
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null) {
         $instance = $this->newRelatedInstance($related);
@@ -257,7 +257,7 @@ trait CModel_Trait_Relationships {
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new MorphMany($instance->newQuery(), $this, $table . '.' . $type, $table . '.' . $id, $localKey);
+        return new CModel_Relation_MorphMany($instance->newQuery(), $this, $table . '.' . $type, $table . '.' . $id, $localKey);
     }
 
     /**
@@ -270,7 +270,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return CModel_Relation_BelongsToMany
      */
     public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $relation = null) {
         // If no relationship name was passed, we will pull backtraces to get the
@@ -296,7 +296,7 @@ trait CModel_Trait_Relationships {
             $table = $this->joiningTable($related);
         }
 
-        return new BelongsToMany(
+        return new CModel_Relation_BelongsToMany(
                 $instance->newQuery(), $this, $table, $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(), $relatedKey ?: $instance->getKeyName(), $relation
         );
     }
@@ -312,7 +312,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  bool  $inverse
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return CModel_Relation_MorphToMany
      */
     public function morphToMany($related, $name, $table = null, $foreignPivotKey = null, $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $inverse = false) {
         $caller = $this->guessBelongsToManyRelation();
@@ -329,9 +329,9 @@ trait CModel_Trait_Relationships {
         // Now we're ready to create a new query builder for this related model and
         // the relationship instances for this relation. This relations will set
         // appropriate query constraints then entirely manages the hydrations.
-        $table = $table ?: Str::plural($name);
+        $table = $table ?: cstr::plural($name);
 
-        return new MorphToMany(
+        return new CModel_Relation_MorphToMany(
                 $instance->newQuery(), $this, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(), $relatedKey ?: $instance->getKeyName(), $caller, $inverse
         );
     }
@@ -346,7 +346,7 @@ trait CModel_Trait_Relationships {
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $relatedKey
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return CModel_Relation_MorphToMany
      */
     public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null, $relatedPivotKey = null, $parentKey = null, $relatedKey = null) {
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
@@ -367,7 +367,7 @@ trait CModel_Trait_Relationships {
      * @return string
      */
     protected function guessBelongsToManyRelation() {
-        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
+        $caller = carr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
                     return !in_array($trace['function'], Model::$manyMethods);
                 });
 
@@ -385,8 +385,8 @@ trait CModel_Trait_Relationships {
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $models = [
-            Str::snake(class_basename($related)),
-            Str::snake(class_basename($this)),
+            cstr::snake(class_basename($related)),
+            cstr::snake(class_basename($this)),
         ];
 
         // Now that we have the model names in an array we can just sort them and
@@ -420,7 +420,7 @@ trait CModel_Trait_Relationships {
                 $this->$relation->fireModelEvent('saved', false);
 
                 $this->$relation->touchOwners();
-            } elseif ($this->$relation instanceof Collection) {
+            } elseif ($this->$relation instanceof CCollection) {
                 $this->$relation->each(function (Model $relation) {
                     $relation->touchOwners();
                 });
@@ -446,7 +446,7 @@ trait CModel_Trait_Relationships {
      * @return string
      */
     public function getMorphClass() {
-        $morphMap = Relation::morphMap();
+        $morphMap = CModel_Relation::morphMap();
 
         if (!empty($morphMap) && in_array(static::class, $morphMap)) {
             return array_search(static::class, $morphMap, true);

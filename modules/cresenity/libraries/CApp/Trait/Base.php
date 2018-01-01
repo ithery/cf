@@ -67,6 +67,15 @@ trait CApp_Trait_Base {
     }
 
     /**
+     * return current CSession object
+     * 
+     * @return CSession
+     */
+    public static function session() {
+        return CSession::instance();
+    }
+
+    /**
      * 
      * @return string value of current theme
      */

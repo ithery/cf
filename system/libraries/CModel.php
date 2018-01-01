@@ -14,8 +14,7 @@ abstract class CModel implements ArrayAccess {
         CModel_Trait_Relationships,
         CModel_Trait_Event,
         CModel_Trait_GlobalScopes,
-        CModel_Trait_Timestamps,
-        CModel_Trait_QueriesRelationships;
+        CModel_Trait_Timestamps;
 
     /**
      * The connection name for the model.
@@ -266,7 +265,7 @@ abstract class CModel implements ArrayAccess {
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded) {
-                throw new MassAssignmentException($key);
+                throw new CModel_Exception_MassAssignment($key);
             }
         }
 
@@ -866,7 +865,7 @@ abstract class CModel implements ArrayAccess {
      * Get a new query instance without a given scope.
      *
      * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public function newQueryWithoutScope($scope) {
         $builder = $this->newQuery();
@@ -878,7 +877,7 @@ abstract class CModel implements ArrayAccess {
      * Get a new query to restore one or more models by their queueable IDs.
      *
      * @param  array|int  $ids
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public function newQueryForRestoration($ids) {
         if (is_array($ids)) {
@@ -891,8 +890,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Create a new Eloquent query builder for the model.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @param  CDatabase_Query_Builder  $query
+     * @return CModel_Query|static
      */
     public function newModelQuery($query) {
         return new CModel_Query($query);
@@ -901,7 +900,7 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get a new query builder instance for the connection.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     protected function newBaseQueryBuilder() {
         return new CDatabase_Query_Builder($this->db);
@@ -911,7 +910,7 @@ abstract class CModel implements ArrayAccess {
      * Create a new Eloquent Collection instance.
      *
      * @param  array  $models
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function newCollection(array $models = []) {
         return new CModel_Collection($models);
@@ -1046,6 +1045,74 @@ abstract class CModel implements ArrayAccess {
      */
     public function isNot($model) {
         return !$this->is($model);
+    }
+
+    /**
+     * Get the database connection for the model.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    public function getConnection() {
+        return static::resolveConnection($this->getConnectionName());
+    }
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string
+     */
+    public function getConnectionName() {
+        return $this->db->name;
+    }
+
+    /**
+     * Set the connection associated with the model.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function setConnection($name) {
+        $this->db = $name;
+
+        return $this;
+    }
+
+    /**
+     * Resolve a connection instance.
+     *
+     * @param  string|null  $connection
+     * @return \Illuminate\Database\Connection
+     */
+    public static function resolveConnection($connection = null) {
+        return static::$resolver->connection($connection);
+    }
+
+    /**
+     * Get the connection resolver instance.
+     *
+     * @return \Illuminate\Database\ConnectionResolverInterface
+     */
+    public static function getConnectionResolver() {
+        return static::$resolver;
+    }
+
+    /**
+     * Set the connection resolver instance.
+     *
+     * @param  CDatabase_ResolverInterface  $resolver
+     * @return void
+     */
+    public static function setConnectionResolver(CDatabase_ResolverInterface $resolver) {
+        static::$resolver = $resolver;
+    }
+
+    /**
+     * Unset the connection resolver for models.
+     *
+     * @return void
+     */
+    public static function unsetConnectionResolver() {
+        static::$resolver = null;
     }
 
     /**

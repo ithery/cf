@@ -2038,6 +2038,16 @@ final class CF {
         return $value instanceof Closure ? $value() : $value;
     }
 
+    /**
+     * Create a collection from the given value.
+     *
+     * @param  mixed  $value
+     * @return CCollection
+     */
+    function collect($value = null) {
+        return new CCollection($value);
+    }
+
 }
 
 // End C

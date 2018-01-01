@@ -229,8 +229,8 @@ class CDatabase {
             throw new CDatabase_Exception('The :driver driver for the :class library could not be found', array(':driver' => $this->config['connection']['type'], 'class' => get_class($this)));
         }
 
-
-
+        $connectionResolver = new CDatabase_Resolver(array($this->name => $this));
+        CModel::setConnectionResolver($connectionResolver);
 
 
         // Validate the driver
@@ -1450,6 +1450,10 @@ class CDatabase {
             $this->queryGrammar = new $grammar_class();
         }
         return $this->queryGrammar;
+    }
+
+    public function getName() {
+        return $this->name;
     }
 
 }

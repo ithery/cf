@@ -34,10 +34,10 @@ trait CModel_Relation_Trait_SupportsDefaultModels {
     /**
      * Get the default value for this relation.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @param  CModel  $parent
+     * @return CModel|null
      */
-    protected function getDefaultFor(Model $parent) {
+    protected function getDefaultFor(CModel $parent) {
         if (!$this->withDefault) {
             return;
         }
