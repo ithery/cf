@@ -1601,8 +1601,8 @@ class CDatabase_Query_Builder {
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
-        return $this->connection->insert(
-                        $this->grammar->compileInsert($this, $values), $this->cleanBindings(Arr::flatten($values, 1))
+        return $this->db->query(
+                        $this->grammar->compileInsert($this, $values), $this->cleanBindings(carr::flatten($values, 1))
         );
     }
 
@@ -1632,9 +1632,9 @@ class CDatabase_Query_Builder {
         return $this->db->query($sql, $this->cleanBindings(
                                 $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
         ));
-        return $this->db->update($sql, $this->cleanBindings(
-                                $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
-        ));
+//        return $this->db->update($sql, $this->cleanBindings(
+//                                $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+//        ));
     }
 
     /**
