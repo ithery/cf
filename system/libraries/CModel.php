@@ -14,6 +14,7 @@ abstract class CModel implements ArrayAccess {
         CModel_Trait_Relationships,
         CModel_Trait_Event,
         CModel_Trait_GlobalScopes,
+        CModel_Trait_HidesAttributes,
         CModel_Trait_Timestamps;
 
     /**

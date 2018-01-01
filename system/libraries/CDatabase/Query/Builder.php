@@ -1637,4 +1637,91 @@ class CDatabase_Query_Builder {
         ));
     }
 
+    /**
+     * Insert or update a record matching the attributes, and fill it with values.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return bool
+     */
+    public function updateOrInsert(array $attributes, array $values = []) {
+        if (!$this->where($attributes)->exists()) {
+            return $this->insert(array_merge($attributes, $values));
+        }
+
+        return (bool) $this->take(1)->update($values);
+    }
+
+    /**
+     * Increment a column's value by a given amount.
+     *
+     * @param  string  $column
+     * @param  int     $amount
+     * @param  array   $extra
+     * @return int
+     */
+    public function increment($column, $amount = 1, array $extra = []) {
+        if (!is_numeric($amount)) {
+            throw new InvalidArgumentException('Non-numeric value passed to increment method.');
+        }
+
+        $wrapped = $this->grammar->wrap($column);
+
+        $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
+
+        return $this->update($columns);
+    }
+
+    /**
+     * Decrement a column's value by a given amount.
+     *
+     * @param  string  $column
+     * @param  int     $amount
+     * @param  array   $extra
+     * @return int
+     */
+    public function decrement($column, $amount = 1, array $extra = []) {
+        if (!is_numeric($amount)) {
+            throw new InvalidArgumentException('Non-numeric value passed to decrement method.');
+        }
+
+        $wrapped = $this->grammar->wrap($column);
+
+        $columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);
+
+        return $this->update($columns);
+    }
+
+    /**
+     * Delete a record from the database.
+     *
+     * @param  mixed  $id
+     * @return int
+     */
+    public function delete($id = null) {
+        // If an ID is passed to the method, we will set the where clause to check the
+        // ID to let developers to simply and quickly remove a single row from this
+        // database without manually specifying the "where" clauses on the query.
+        if (!is_null($id)) {
+            $this->where($this->from . '.id', '=', $id);
+        }
+
+        return $this->db->query(
+                        $this->grammar->compileDelete($this), $this->cleanBindings(
+                                $this->grammar->prepareBindingsForDelete($this->bindings)
+                        )
+        );
+    }
+
+    /**
+     * Run a truncate statement on the table.
+     *
+     * @return void
+     */
+    public function truncate() {
+        foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
+            $this->db->query($sql, $bindings);
+        }
+    }
+
 }

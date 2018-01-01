@@ -236,7 +236,7 @@ trait CModel_Trait_Attributes {
             // key so that the relation attribute is snake cased in this returned
             // array to the developers, making this consistent with attributes.
             if (static::$snakeAttributes) {
-                $key = Str::snake($key);
+                $key = cstr::snake($key);
             }
 
             // If the relation value has been set, we will set it on this attributes
@@ -573,7 +573,7 @@ trait CModel_Trait_Attributes {
      */
     protected function getArrayAttributeWithValue($path, $key, $value) {
         return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
-            Arr::set($array, str_replace('->', '.', $path), $value);
+            carr::set($array, str_replace('->', '.', $path), $value);
         });
     }
 
@@ -674,11 +674,11 @@ trait CModel_Trait_Attributes {
         if ($this->isStandardDateFormat($value)) {
             return CCarbon::createFromFormat('Y-m-d', $value)->startOfDay();
         }
-        
+
         // If the value is in simply year, month, day format, we will instantiate the
         // Carbon instances from that format. Again, this provides for simple date
         // fields on the database, while still supporting Carbonized conversion.
-        
+
         if ($this->isElasticDateFormat($value)) {
             return CCarbon::createFromFormat('Y-m-d\TH:i:s.u\Z', $value)->startOfDay();
         }
@@ -691,7 +691,7 @@ trait CModel_Trait_Attributes {
         );
     }
 
-     /**
+    /**
      * Determine if the given value is a standard date format.
      *
      * @param  string  $value
@@ -700,7 +700,7 @@ trait CModel_Trait_Attributes {
     protected function isElasticDateFormat($value) {
         return preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2}).+?Z$/', $value);
     }
-    
+
     /**
      * Determine if the given value is a standard date format.
      *
@@ -1072,8 +1072,8 @@ trait CModel_Trait_Attributes {
      * @return void
      */
     public static function cacheMutatedAttributes($class) {
-        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(function ($match) {
-                    return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+        static::$mutatorCache[$class] = CF::collect(static::getMutatorMethods($class))->map(function ($match) {
+                    return lcfirst(static::$snakeAttributes ? cstr::snake($match) : $match);
                 })->all();
     }
 

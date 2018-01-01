@@ -195,15 +195,15 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Associate the model instance to the given parent.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|int|string  $model
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  CModel|int|string  $model
+     * @return CModel
      */
     public function associate($model) {
-        $ownerKey = $model instanceof Model ? $model->getAttribute($this->ownerKey) : $model;
-
+        $ownerKey = $model instanceof CModel ? $model->getAttribute($this->ownerKey) : $model;
+        
         $this->child->setAttribute($this->foreignKey, $ownerKey);
 
-        if ($model instanceof Model) {
+        if ($model instanceof CModel) {
             $this->child->setRelation($this->relation, $model);
         }
 

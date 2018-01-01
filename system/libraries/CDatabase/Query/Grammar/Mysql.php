@@ -196,10 +196,10 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
      * @return array
      */
     public function prepareBindingsForDelete(array $bindings) {
-        $cleanBindings = Arr::except($bindings, ['join', 'select']);
+        $cleanBindings = carr::except($bindings, ['join', 'select']);
 
         return array_values(
-                array_merge($bindings['join'], Arr::flatten($cleanBindings))
+                array_merge($bindings['join'], carr::flatten($cleanBindings))
         );
     }
 

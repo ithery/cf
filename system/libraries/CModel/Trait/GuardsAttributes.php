@@ -145,7 +145,7 @@ trait CModel_Trait_GuardsAttributes {
         }
 
         return empty($this->getFillable()) &&
-                !Str::startsWith($key, '_');
+                !cstr::startsWith($key, '_');
     }
 
     /**
