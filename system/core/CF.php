@@ -1919,9 +1919,17 @@ final class CF {
         return isset($data['org_code']) ? $data['org_code'] : null;
     }
 
+    /**
+     * Add Shared App in runtime
+     * 
+     * @param string $app_code
+     */
     public static function add_shared_app_code($app_code) {
-
-        self::$shared_app_code[] = $app_code;
+        if (!in_array($app_code, self::$shared_app_code)) {
+            self::$shared_app_code[] = $app_code;
+            //do force reload
+            self::paths(null, true);
+        }
     }
 
     /**
