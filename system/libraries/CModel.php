@@ -228,6 +228,7 @@ abstract class CModel implements ArrayAccess {
 
         foreach (CF::class_uses_recursive($class) as $trait) {
 
+
             if (method_exists($class, $method = 'boot' . CF::class_basename($trait))) {
 
                 forward_static_call([$class, $method]);

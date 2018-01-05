@@ -12,7 +12,7 @@ trait CModel_Trait_GlobalScopes {
     /**
      * Register a new global scope on the model.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|\Closure|string  $scope
+     * @param  CModel_Interface_Scope|\Closure|string  $scope
      * @param  \Closure|null  $implementation
      * @return mixed
      *
@@ -23,7 +23,7 @@ trait CModel_Trait_GlobalScopes {
             return static::$globalScopes[static::class][$scope] = $implementation;
         } elseif ($scope instanceof Closure) {
             return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;
-        } elseif ($scope instanceof Scope) {
+        } elseif ($scope instanceof CModel_Interface_Scope) {
             return static::$globalScopes[static::class][get_class($scope)] = $scope;
         }
 
@@ -48,10 +48,10 @@ trait CModel_Trait_GlobalScopes {
      */
     public static function getGlobalScope($scope) {
         if (is_string($scope)) {
-            return Arr::get(static::$globalScopes, static::class . '.' . $scope);
+            return carr::get(static::$globalScopes, static::class . '.' . $scope);
         }
 
-        return Arr::get(
+        return carr::get(
                         static::$globalScopes, static::class . '.' . get_class($scope)
         );
     }

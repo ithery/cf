@@ -858,7 +858,7 @@ class CModel_Query {
                 continue;
             }
 
-            $builder->callScope(function (Builder $builder) use ($scope) {
+            $builder->callScope(function (CModel_Query $builder) use ($scope) {
                 // If the scope is a Closure we will just go ahead and call the scope with the
                 // builder instance. The "callScope" method will properly group the clauses
                 // that are added to this query so "where" clauses maintain proper logic.
@@ -869,7 +869,7 @@ class CModel_Query {
                 // If the scope is a scope object, we will call the apply method on this scope
                 // passing in the builder and the model instance. After we run all of these
                 // scopes we will return back the builder instance to the outside caller.
-                if ($scope instanceof Scope) {
+                if ($scope instanceof CModel_Interface_Scope) {
                     $scope->apply($builder, $this->getModel());
                 }
             });
@@ -897,7 +897,9 @@ class CModel_Query {
 
         //$result = $scope(...array_values($parameters)) ?? $this;
         //$result = isset($scope(array_values($parameters))) ? $scope(array_values($parameters)) : $this;
-        $result = $scope(array_values($parameters)) !== null ? $scope(array_values($parameters)) : $this;
+        $result = call_user_func_array($scope, array_values($parameters));
+        
+        $result = isset($result) && !is_null($result) ? $result : $this;
 
         if (count((array) $query->wheres) > $originalWhereCount) {
             $this->addNewWheresWithinGroup($query, $originalWhereCount);
@@ -933,12 +935,12 @@ class CModel_Query {
     /**
      * Slice where conditions at the given offset and add them to the query as a nested condition.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  CDatabase_Query_Builder  $query
      * @param  array  $whereSlice
      * @return void
      */
-    protected function groupWhereSliceForScope(QueryBuilder $query, $whereSlice) {
-        $whereBooleans = collect($whereSlice)->pluck('boolean');
+    protected function groupWhereSliceForScope(CDatabase_Query_Builder $query, $whereSlice) {
+        $whereBooleans = CF::collect($whereSlice)->pluck('boolean');
 
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way
@@ -1173,11 +1175,12 @@ class CModel_Query {
             return;
         }
 
-//        if (isset($this->localMacros[$method])) {
-//            array_unshift($parameters, $this);
-//
-//            return $this->localMacros[$method](...$parameters);
-//        }
+        if (isset($this->localMacros[$method])) {
+            array_unshift($parameters, $this);
+
+            //return $this->localMacros[$method](...$parameters);
+            return call_user_func_array($this->localMacros[$method],$parameters);
+        }
 
         if (isset(static::$macros[$method])) {
             if (static::$macros[$method] instanceof Closure) {
