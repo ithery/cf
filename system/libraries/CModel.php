@@ -920,15 +920,15 @@ abstract class CModel implements ArrayAccess {
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  CModel  $parent
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
      * @param  string|null  $using
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     * @return CModel_Relation_Pivot
      */
-    public function newPivot(Model $parent, array $attributes, $table, $exists, $using = null) {
-        return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists) : Pivot::fromAttributes($parent, $attributes, $table, $exists);
+    public function newPivot(CModel $parent, array $attributes, $table, $exists, $using = null) {
+        return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists) : CModel_Relation_Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
     /**

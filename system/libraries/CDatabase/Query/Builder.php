@@ -241,7 +241,7 @@ class CDatabase_Query_Builder {
      * @return $this
      */
     public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false) {
-        $join = new JoinClause($this, $type, $table);
+        $join = new CDatabase_Query_JoinClause($this, $type, $table);
 
         // If the first "column" of the join is really a Closure instance the developer
         // is trying to build a join with a complex "on" clause containing more than
@@ -258,8 +258,8 @@ class CDatabase_Query_Builder {
         // "on" clause with a single condition. So we will just build the join with
         // this simple join clauses attached to it. There is not a join callback.
         else {
+            
             $method = $where ? 'where' : 'on';
-
             $this->joins[] = $join->$method($first, $operator, $second);
 
             $this->addBinding($join->getBindings(), 'join');

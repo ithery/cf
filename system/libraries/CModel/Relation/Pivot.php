@@ -1,17 +1,17 @@
 <?php
 
-namespace Illuminate\Database\Eloquent\Relations;
+//namespace Illuminate\Database\Eloquent\Relations;
+//
+//use Illuminate\Support\Str;
+//use Illuminate\Database\Eloquent\Model;
+//use Illuminate\Database\Eloquent\Builder;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+class CModel_Relation_Pivot extends CModel {
 
-class Pivot extends Model
-{
     /**
      * The parent model of the relationship.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var CModel
      */
     public $pivotParent;
 
@@ -39,14 +39,13 @@ class Pivot extends Model
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  CModel  $parent
      * @param  array   $attributes
      * @param  string  $table
      * @param  bool    $exists
      * @return static
      */
-    public static function fromAttributes(Model $parent, $attributes, $table, $exists = false)
-    {
+    public static function fromAttributes(CModel $parent, $attributes, $table, $exists = false) {
         $instance = new static;
 
         // The pivot model is a "dynamic" model since we will set the tables dynamically
@@ -72,14 +71,13 @@ class Pivot extends Model
     /**
      * Create a new pivot model from raw values returned from a query.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  CModel  $parent
      * @param  array   $attributes
      * @param  string  $table
      * @param  bool    $exists
      * @return static
      */
-    public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
-    {
+    public static function fromRawAttributes(CModel $parent, $attributes, $table, $exists = false) {
         $instance = static::fromAttributes($parent, $attributes, $table, $exists);
 
         $instance->setRawAttributes($attributes, true);
@@ -90,11 +88,10 @@ class Pivot extends Model
     /**
      * Set the keys for a save update query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  CModel_Query  $query
+     * @return CModel_Query
      */
-    protected function setKeysForSaveQuery(Builder $query)
-    {
+    protected function setKeysForSaveQuery(CModel_Query $query) {
         if (isset($this->attributes[$this->getKeyName()])) {
             return parent::setKeysForSaveQuery($query);
         }
@@ -109,8 +106,7 @@ class Pivot extends Model
      *
      * @return int
      */
-    public function delete()
-    {
+    public function delete() {
         if (isset($this->attributes[$this->getKeyName()])) {
             return parent::delete();
         }
@@ -123,11 +119,10 @@ class Pivot extends Model
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function getDeleteQuery()
-    {
+    protected function getDeleteQuery() {
         return $this->newQuery()->where([
-            $this->foreignKey => $this->getAttribute($this->foreignKey),
-            $this->relatedKey => $this->getAttribute($this->relatedKey),
+                    $this->foreignKey => $this->getAttribute($this->foreignKey),
+                    $this->relatedKey => $this->getAttribute($this->relatedKey),
         ]);
     }
 
@@ -136,11 +131,10 @@ class Pivot extends Model
      *
      * @return string
      */
-    public function getTable()
-    {
-        if (! isset($this->table)) {
+    public function getTable() {
+        if (!isset($this->table)) {
             $this->setTable(str_replace(
-                '\\', '', Str::snake(Str::singular(class_basename($this)))
+                            '\\', '', Str::snake(Str::singular(class_basename($this)))
             ));
         }
 
@@ -152,8 +146,7 @@ class Pivot extends Model
      *
      * @return string
      */
-    public function getForeignKey()
-    {
+    public function getForeignKey() {
         return $this->foreignKey;
     }
 
@@ -162,8 +155,7 @@ class Pivot extends Model
      *
      * @return string
      */
-    public function getRelatedKey()
-    {
+    public function getRelatedKey() {
         return $this->relatedKey;
     }
 
@@ -172,8 +164,7 @@ class Pivot extends Model
      *
      * @return string
      */
-    public function getOtherKey()
-    {
+    public function getOtherKey() {
         return $this->getRelatedKey();
     }
 
@@ -184,8 +175,7 @@ class Pivot extends Model
      * @param  string  $relatedKey
      * @return $this
      */
-    public function setPivotKeys($foreignKey, $relatedKey)
-    {
+    public function setPivotKeys($foreignKey, $relatedKey) {
         $this->foreignKey = $foreignKey;
 
         $this->relatedKey = $relatedKey;
@@ -198,8 +188,7 @@ class Pivot extends Model
      *
      * @return bool
      */
-    public function hasTimestampAttributes()
-    {
+    public function hasTimestampAttributes() {
         return array_key_exists($this->getCreatedAtColumn(), $this->attributes);
     }
 
@@ -208,8 +197,7 @@ class Pivot extends Model
      *
      * @return string
      */
-    public function getCreatedAtColumn()
-    {
+    public function getCreatedAtColumn() {
         return $this->pivotParent->getCreatedAtColumn();
     }
 
@@ -218,8 +206,8 @@ class Pivot extends Model
      *
      * @return string
      */
-    public function getUpdatedAtColumn()
-    {
+    public function getUpdatedAtColumn() {
         return $this->pivotParent->getUpdatedAtColumn();
     }
+
 }

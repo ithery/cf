@@ -368,7 +368,7 @@ trait CModel_Trait_Relationships {
      */
     protected function guessBelongsToManyRelation() {
         $caller = carr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-                    return !in_array($trace['function'], Model::$manyMethods);
+                    return !in_array($trace['function'], CModel::$manyMethods);
                 });
 
         return !is_null($caller) ? $caller['function'] : null;
@@ -385,8 +385,8 @@ trait CModel_Trait_Relationships {
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $models = [
-            cstr::snake(class_basename($related)),
-            cstr::snake(class_basename($this)),
+            cstr::snake(CF::class_basename($related)),
+            cstr::snake(CF::class_basename($this)),
         ];
 
         // Now that we have the model names in an array we can just sort them and

@@ -27,12 +27,12 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder
     /**
      * Create a new join clause instance.
      *
-     * @param  \Illuminate\Database\Query\Builder $parentQuery
+     * @param  CDatabase_Query_Builder $parentQuery
      * @param  string  $type
      * @param  string  $table
      * @return void
      */
-    public function __construct(Builder $parentQuery, $type, $table)
+    public function __construct(CDatabase_Query_Builder $parentQuery, $type, $table)
     {
         $this->type = $type;
         $this->table = $table;

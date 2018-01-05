@@ -104,11 +104,11 @@ abstract class CModel_Relation {
      * Match the eagerly loaded results to their parents.
      *
      * @param  array   $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @param  string  $relation
      * @return array
      */
-    abstract public function match(array $models, Collection $results, $relation);
+    abstract public function match(array $models, CModel_Collection $results, $relation);
 
     /**
      * Get the results of the relationship.

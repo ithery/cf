@@ -144,7 +144,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return string
      */
     protected function compileJoins(CDatabase_Query_Builder $query, $joins) {
-        return collect($joins)->map(function ($join) use ($query) {
+        return CF::collect($joins)->map(function ($join) use ($query) {
                     $table = $this->wrapTable($join->table);
 
                     return trim("{$join->type} join {$table} {$this->compileWheres($join)}");
@@ -196,7 +196,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return string
      */
     protected function concatenateWhereClauses($query, $sql) {
-        $conjunction = $query instanceof JoinClause ? 'on' : 'where';
+        $conjunction = $query instanceof CDatabase_Query_JoinClause ? 'on' : 'where';
 
         return $conjunction . ' ' . $this->removeLeadingBoolean(implode(' ', $sql));
     }
