@@ -5,9 +5,9 @@ class Server_variables_Controller extends CController {
 		$app = CApp::instance();
 		$app->title(clang::__("PHP Info"));
 
-		$html = View::factory('admin/page/server_variables/html');
+		$html = CView::factory('admin/page/server_variables/html');
 		$html = $html->render();
-		$js = View::factory('admin/page/server_variables/js');
+		$js = CView::factory('admin/page/server_variables/js');
 		$js = $js->render();
 		$app->add($html);
 		$app->add_js($js);
