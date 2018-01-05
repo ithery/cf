@@ -152,11 +152,11 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      * Match the eagerly loaded results to their parents.
      *
      * @param  array   $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection $results, $relation) {
+    public function match(array $models, CModel_Collection $results, $relation) {
         $foreign = $this->foreignKey;
 
         $owner = $this->ownerKey;
