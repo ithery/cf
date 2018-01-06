@@ -41,6 +41,16 @@ class CElement_Factory {
         return false;
     }
 
+    /**
+     * 
+     * @param string $id optional
+     * @return \CElement_Template|boolean
+     */
+    public static function createTemplate($id = "") {
+
+        return new CElement_Template($id);
+    }
+
 }
 
 ?>

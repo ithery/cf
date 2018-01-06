@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @package PhpExt
- */
 abstract class CObservable extends CRenderable {
 
     protected $listeners;
@@ -89,6 +86,17 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($control);
 
         return $control;
+    }
+
+    /**
+     * 
+     * @param type $id
+     * @return CElement_Template
+     */
+    public function addTemplate($id = "") {
+        $template = CElement_Factory::createTemplate($id);
+        $this->wrapper->add($template);
+        return $template;
     }
 
     /**

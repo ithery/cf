@@ -7,70 +7,71 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jan 1, 2018, 4:15:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CRenderable_Template extends CRenderable {
+class CElement_Template extends CElement {
 
-    protected $template_name;
-    protected $template_data;
-    protected $html_output = '';
-    protected $js_output = '';
+    protected $templateName;
+    protected $templateData;
+    protected $htmlOutput = '';
+    protected $jsOutput = '';
 
-    protected function __construct($template_name, $data = array()) {
-        parent::__construct();
-        $this->template_data = array();
-        $this->template_name = $template_name;
-        $this->set_data($data);
+    public function __construct($id, $templateName = '', $data = array()) {
+        parent::__construct($id);
+        $this->templateData = array();
+        $this->templateName = $templateName;
+        $this->setData($data);
+    }
+
+    public function setTemplate($name) {
+        $this->templateName = $name;
+        return $this;
     }
 
     public function theme() {
         return CF::theme();
     }
 
-    public function get_data() {
-        return $this->template_data;
+    public function getData() {
+        return $this->templateData;
     }
 
-    public function set_data($data) {
+    public function setData($data) {
         foreach ($data as $k => $v) {
-            $this->set_var($k, $v);
+            $this->setVar($k, $v);
         }
         return $this;
     }
 
-    public function get_var($key) {
-        return carr::get($this->template_data, $key);
+    public function getVar($key) {
+        return carr::get($this->templateData, $key);
     }
 
-    public function set_var($key, $val) {
+    public function setVar($key, $val) {
 
-        $this->template_data[$key] = $val;
+        $this->templateData[$key] = $val;
         return $this;
     }
 
-    public static function factory($template_name, $data = array()) {
-        return new CTemplate($template_name, $data = array());
-    }
-
     public function html($indent = 0) {
-        $this->collect_html_js();
-        return $this->html_output;
+        $this->collectHtmlJs();
+        return $this->htmlOutput;
     }
 
     public function js($indent = 0) {
-        $this->collect_html_js();
-        return $this->js_output;
+        $this->collectHtmlJs();
+        return $this->jsOutput;
     }
 
-    private function get_view_path($template_name) {
-        $view_path = $template_name;
+    private function getTemplatePath($templateName) {
+        $viewPath = $templateName;
 
-        return $view_path;
+        return $viewPath;
     }
 
-    private function parse_view($template_name) {
-        $view_path = $this->get_view_path($template_name);
-        $view = PMView::factory($view_path);
-        PMBlocks::instance()->set_data($this->template_data);
-        $view->set($this->template_data);
+    private function parseTemplate($templateName) {
+        $viewPath = $this->getTemplatePath($templateName);
+        $view = CTemplate::factory($viewPath);
+        //PMBlocks::instance()->set_data($this->templateData);
+        $view->set($this->templateData);
         $output = $view->render();
         $output_js = "";
         preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
@@ -86,18 +87,18 @@ class CRenderable_Template extends CRenderable {
         );
     }
 
-    private function collect_html_js() {
-        if ($this->html_output == null) {
+    private function collectHtmlJs() {
+        if ($this->htmlOutput == null) {
             $result_header = array();
             $result_content = array();
             $result_footer = array();
 
 
-            $result_content = $this->parse_view($this->template_name);
+            $result_content = $this->parseTemplate($this->templateName);
 
 
-            $this->html_output = carr::get($result_header, 'html', '') . carr::get($result_content, 'html', '') . carr::get($result_footer, 'html', '');
-            $this->js_output = carr::get($result_header, 'js', '') . carr::get($result_content, 'js', '') . carr::get($result_footer, 'js', '');
+            $this->htmlOutput = carr::get($result_header, 'html', '') . carr::get($result_content, 'html', '') . carr::get($result_footer, 'html', '');
+            $this->jsOutput = carr::get($result_header, 'js', '') . carr::get($result_content, 'js', '') . carr::get($result_footer, 'js', '');
         }
         return true;
     }
