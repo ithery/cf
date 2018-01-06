@@ -41,20 +41,20 @@ final class CManager {
         }
     }
 
-    function get_theme_data() {
-        return $this->theme_data;
+    public static function get_theme_data() {
+        return self::instance()->theme_data;
     }
 
-    function set_theme_data($theme_data) {
-        $this->theme_data = $theme_data;
-        return $this;
+    public static function set_theme_data($theme_data) {
+        self::instance()->theme_data = $theme_data;
+        return self::instance();
     }
 
-    public function register_module($module) {
+    public static function register_module($module) {
         return CClientModules::instance()->register_module($module);
     }
 
-    public function unregister_module($module) {
+    public static function unregister_module($module) {
         return CClientModules::instance()->unregister_module($module);
     }
 
