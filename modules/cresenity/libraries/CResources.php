@@ -66,9 +66,9 @@ class CResources {
     /**
      * Currently just support image
      * 
-     * @param String $resource_type Possible value: image, pdf, dll or filename if 
-     * @param String $type              
-     * @param String $type              
+     * @param string $resource_type Possible value: image, pdf, dll or filename if 
+     * @param string $type              
+     * @param string $type              
      * 
      * @return CResources_Engine
      */
@@ -102,11 +102,12 @@ class CResources {
         return $object;
     }
 
-    
-    public static function encode($str){
+    public static function encode($str) {
         return CResources_Encode::encode($str);
     }
-    public static function decode($str){
+
+    public static function decode($str) {
         return CResources_Decode::decode($str);
     }
+
 }
