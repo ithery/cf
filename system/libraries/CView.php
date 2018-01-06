@@ -5,11 +5,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CView {
 
     // The view file name and type
-    protected $kohana_filename = FALSE;
-    protected $kohana_filetype = FALSE;
+    protected $cf_filename = FALSE;
+    protected $cf_filetype = FALSE;
     // CView variable storage
-    protected $kohana_local_data = array();
-    protected static $kohana_global_data = array();
+    protected $cf_local_data = array();
+    protected static $cf_global_data = array();
 
     /**
      * Creates a new CView using the given parameters.
@@ -51,7 +51,7 @@ class CView {
 
         if (is_array($data) AND ! empty($data)) {
             // Preload data using array_merge, to allow user extensions
-            $this->kohana_local_data = array_merge($this->kohana_local_data, $data);
+            $this->cf_local_data = array_merge($this->cf_local_data, $data);
         }
     }
 
@@ -77,20 +77,20 @@ class CView {
 
         if ($type == NULL) {
             // Load the filename and set the content type
-            $this->kohana_filename = CF::find_file('views', $name, TRUE);
-            $this->kohana_filetype = EXT;
+            $this->cf_filename = CF::find_file('views', $name, TRUE);
+            $this->cf_filetype = EXT;
         } else {
             // Check if the filetype is allowed by the configuration
             if (!in_array($type, CF::config('view.allowed_filetypes')))
                 throw new CF_Exception('core.invalid_filetype', $type);
 
             // Load the filename and set the content type
-            $this->kohana_filename = CF::find_file('views', $name, TRUE, $type);
-            $this->kohana_filetype = CF::config('mimes.' . $type);
+            $this->cf_filename = CF::find_file('views', $name, TRUE, $type);
+            $this->cf_filetype = CF::config('mimes.' . $type);
 
-            if ($this->kohana_filetype == NULL) {
+            if ($this->cf_filetype == NULL) {
                 // Use the specified type
-                $this->kohana_filetype = $type;
+                $this->cf_filetype = $type;
             }
         }
 
@@ -137,11 +137,11 @@ class CView {
             // Foreach key
             foreach ($key as $property) {
                 // Set the result to an associative array
-                $result[$property] = (array_key_exists($property, $this->kohana_local_data) OR array_key_exists($property, CView::$kohana_global_data)) ? TRUE : FALSE;
+                $result[$property] = (array_key_exists($property, $this->cf_local_data) OR array_key_exists($property, CView::$cf_global_data)) ? TRUE : FALSE;
             }
         } else {
             // Otherwise just check one property
-            $result = (array_key_exists($key, $this->kohana_local_data) OR array_key_exists($key, CView::$kohana_global_data)) ? TRUE : FALSE;
+            $result = (array_key_exists($key, $this->cf_local_data) OR array_key_exists($key, CView::$cf_global_data)) ? TRUE : FALSE;
         }
 
         // Return the result
@@ -156,7 +156,7 @@ class CView {
      * @return  object
      */
     public function bind($name, & $var) {
-        $this->kohana_local_data[$name] = & $var;
+        $this->cf_local_data[$name] = & $var;
 
         return $this;
     }
@@ -171,10 +171,10 @@ class CView {
     public static function set_global($name, $value = NULL) {
         if (is_array($name)) {
             foreach ($name as $key => $value) {
-                CView::$kohana_global_data[$key] = $value;
+                CView::$cf_global_data[$key] = $value;
             }
         } else {
-            CView::$kohana_global_data[$name] = $value;
+            CView::$cf_global_data[$name] = $value;
         }
     }
 
@@ -186,7 +186,7 @@ class CView {
      * @return  void
      */
     public function __set($key, $value) {
-        $this->kohana_local_data[$key] = $value;
+        $this->cf_local_data[$key] = $value;
     }
 
     /**
@@ -197,11 +197,11 @@ class CView {
      * @return void    if the key is not found
      */
     public function &__get($key) {
-        if (isset($this->kohana_local_data[$key]))
-            return $this->kohana_local_data[$key];
+        if (isset($this->cf_local_data[$key]))
+            return $this->cf_local_data[$key];
 
-        if (isset(CView::$kohana_global_data[$key]))
-            return CView::$kohana_global_data[$key];
+        if (isset(CView::$cf_global_data[$key]))
+            return CView::$cf_global_data[$key];
 
         if (isset($this->$key))
             return $this->$key;
@@ -261,15 +261,15 @@ class CView {
      * @return  void      if print is TRUE
      */
     public function render($print = FALSE, $renderer = FALSE) {
-        if (empty($this->kohana_filename))
+        if (empty($this->cf_filename))
             throw new CF_Exception('core.view_set_filename');
-        if (is_string($this->kohana_filetype)) {
+        if (is_string($this->cf_filetype)) {
             // Merge global and local data, local overrides global with the same name
-            $data = array_merge(CView::$kohana_global_data, $this->kohana_local_data);
+            $data = array_merge(CView::$cf_global_data, $this->cf_local_data);
 
 //            var_dump(CF::$instance);
             // Load the view in the controller for access to $this
-            $output = self::load_view($this->kohana_filename, $data);
+            $output = self::load_view($this->cf_filename, $data);
 
             if ($renderer !== FALSE AND is_callable($renderer, TRUE)) {
                 // Pass the output through the user defined renderer
@@ -283,10 +283,10 @@ class CView {
             }
         } else {
             // Set the content type and size
-            header('Content-Type: ' . $this->kohana_filetype[0]);
+            header('Content-Type: ' . $this->cf_filetype[0]);
 
             if ($print === TRUE) {
-                if ($file = fopen($this->kohana_filename, 'rb')) {
+                if ($file = fopen($this->cf_filename, 'rb')) {
                     // Display the output
                     fpassthru($file);
                     fclose($file);
@@ -295,7 +295,7 @@ class CView {
             }
 
             // Fetch the file contents
-            $output = file_get_contents($this->kohana_filename);
+            $output = file_get_contents($this->cf_filename);
         }
 
         return $output;
