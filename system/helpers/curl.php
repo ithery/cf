@@ -25,7 +25,7 @@ class curl {
      * @return  string
      */
     public static function base($index = FALSE, $protocol = FALSE) {
-        
+
         // Load the site domain
         $site_domain = (string) CF::config('core.site_domain', '');
 
@@ -51,7 +51,7 @@ class curl {
             // Append the index page
             $base_url = $base_url . $index;
         }
-        
+
         // Force a slash on the end of the URL
         return rtrim($base_url, '/') . '/';
     }
@@ -225,7 +225,12 @@ class curl {
                 }
             }
         } else {
-            $result .= '&' . urlencode((string) $prefix) . '=' . urlencode($val);
+            $encoded_val = urlencode($val);
+            if (isset($val[0]) && $val[0] == '@') {
+                //$encoded_val = '@' . urlencode(substr($val, 1));
+                $encoded_val = $val;
+            }
+            $result .= '&' . urlencode((string) $prefix) . '=' . $encoded_val;
         }
 
         $result = substr($result, 1);

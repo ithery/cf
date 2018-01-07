@@ -2,6 +2,65 @@
 
 class cmailapi {
 
+    public function sendgridv3($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+        $smtp_password = carr::get($options, 'smtp_password');
+        $smtp_host = carr::get($options, 'smtp_host');
+        if (!$smtp_password) {
+            $smtp_password = ccfg::get('smtp_password');
+        }
+        if (!$smtp_host) {
+            $smtp_host = ccfg::get('smtp_host');
+        }
+        if ($smtp_host != 'smtp.sendgrid.net') {
+            throw new Exception('Fail to send mail API, SMTP Host is not valid');
+        }
+        $sendgrid_apikey = $smtp_password;
+
+        $smtp_from = carr::get($options, 'smtp_from');
+        if ($smtp_from == null) {
+            $smtp_from = ccfg::get('smtp_from');
+        }
+        $smtp_from_name = carr::get($options, 'smtp_from_name');
+        if ($smtp_from_name == null) {
+            $smtp_from_name = ccfg::get('smtp_from_name');
+        }
+
+
+        $from = new CSendGrid_Email($smtp_from_name, $smtp_from);
+        $to = new CSendGrid_Email(null, $to);
+        $content = new CSendGrid_Content("text/html", $message);
+
+        $mail = new CSendGrid_Mail($from, $subject, $to, $content);
+        foreach ($attachments as $att) {
+            $filename = basename($att);
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $path = $att;
+            $type = 'application/text';
+            if ($ext == 'pdf') {
+                $type = 'application/pdf';
+            }
+            $attachment = new CSendGrid_Attachment();
+            $attachment->setContent(base64_encode(file_get_contents($att)));
+            $attachment->setType($type);
+            $attachment->setDisposition("attachment");
+            $attachment->setFilename($filename);
+            $mail->addAttachment($attachment);
+        }
+
+
+        $sg = new CSendGrid($sendgrid_apikey);
+
+
+        //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
+
+        $response = $sg->client->mail()->send()->post($mail);
+
+        if ($response->statusCode() > 400) {
+            throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
+        }
+        return $response;
+    }
+
     public function sendgrid($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         //$sendgrid_apikey = "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";
 
@@ -36,7 +95,7 @@ class cmailapi {
           );
          */
 
-
+        $files = array();
 
         $params = array(
             'to' => $to,
@@ -48,7 +107,10 @@ class cmailapi {
             'html' => $message,
         );
 
+
         $request = $url . 'api/mail.send.json';
+
+
 
         // Generate curl request
         $session = curl_init($request);
@@ -63,6 +125,9 @@ class cmailapi {
         curl_setopt($session, CURLOPT_HEADER, false);
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 
+        if (count($files) > 0) {
+            //curl_setopt($session, CURLOPT_SAFE_UPLOAD, false);
+        }
         // obtain response
         $response = curl_exec($session);
         curl_close($session);

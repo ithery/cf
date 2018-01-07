@@ -173,7 +173,6 @@ class cmail {
      * @return type
      * @throws Exception
      */
-    
     public static function send_smtp($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         $mail = CSMTP::factory();
         $smtp_username = carr::get($options, 'smtp_username');
@@ -197,20 +196,28 @@ class cmail {
             $secure = ccfg::get('smtp_secure');
         }
 
-        if (count($attachments) == 0) {
-            switch ($smtp_host) {
-                case 'smtp.sendgrid.net':
+
+        switch ($smtp_host) {
+            case 'smtp.sendgrid.net':
+                if (count($attachments) == 0) {
                     return cmailapi::sendgrid($to, $subject, $message, $attachments, $cc, $bcc, $options);
-                    break;
-                case 'smtp.elasticemail.com':
-                case 'smtp25.elasticemail.com':
+                } else {
+                    return cmailapi::sendgridv3($to, $subject, $message, $attachments, $cc, $bcc, $options);
+                }
+                break;
+            case 'smtp.elasticemail.com':
+            case 'smtp25.elasticemail.com':
+                if (count($attachments) == 0) {
                     return cmailapi::elasticemail($to, $subject, $message, $attachments, $cc, $bcc, $options);
-                    break;
-                case 'smtp.postmarkapp.com':
+                }
+                break;
+            case 'smtp.postmarkapp.com':
+                if (count($attachments) == 0) {
                     return cmailapi::postmark($to, $subject, $message, $attachments, $cc, $bcc, $options);
-                    break;
-            }
+                }
+                break;
         }
+
 
 
 
