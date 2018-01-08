@@ -405,7 +405,6 @@ class CTreeDB {
                 throw new Exception('Service Unavailable on rebuild_tree_all on org_id null');
             }
         }
-
         $db = $this->db;
         $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where status>0";
         if (strlen($this->org_id) > 0) {
