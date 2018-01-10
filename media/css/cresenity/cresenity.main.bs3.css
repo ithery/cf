@@ -204,8 +204,9 @@ table.responsive {
     transition: all 0.4s;
 }
 .main {
-    padding-bottom: 0;
+    padding-bottom: 40px;
     border-bottom: 0;
+    
 }
 #wrapper {
     width: 100%;
@@ -317,9 +318,7 @@ table.responsive {
     margin-bottom: 0;
     border: 1px solid transparent;
 }
-#page-wrapper {
-    min-height: auto;
-}
+
 #page-wrapper {
     padding: 0 15px;
     min-height: 568px;
