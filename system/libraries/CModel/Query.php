@@ -509,7 +509,7 @@ class CModel_Query {
         // We want to run a relationship query without any constrains so that we will
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
-        $relation = Relation::noConstraints(function () use ($name) {
+        $relation = CModel_Relation::noConstraints(function () use ($name) {
                     try {
                         return $this->getModel()->{$name}();
                     } catch (BadMethodCallException $e) {
@@ -558,7 +558,7 @@ class CModel_Query {
      * @return bool
      */
     protected function isNestedUnder($relation, $name) {
-        return Str::contains($name, '.') && Str::startsWith($name, $relation . '.');
+        return cstr::contains($name, '.') && cstr::startsWith($name, $relation . '.');
     }
 
     /**
@@ -1023,7 +1023,7 @@ class CModel_Query {
             if (is_numeric($name)) {
                 $name = $constraints;
 
-                list($name, $constraints) = Str::contains($name, ':') ? $this->createSelectWithConstraint($name) : [$name, function () {
+                list($name, $constraints) = cstr::contains($name, ':') ? $this->createSelectWithConstraint($name) : [$name, function () {
                         //
                     }];
             }
