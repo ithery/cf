@@ -72,6 +72,13 @@ input,select,textarea {
     width: 100%;
     box-shadow: none;
 }
+
+input[type=radio],input[type=checkbox] {
+    border:0;
+    background:transparent;
+    width: auto;
+    height: auto;
+}
 /* overwrite bootstrap */
 
 .btn {
@@ -177,6 +184,20 @@ input,select,textarea {
     background-color: #f5f5f5;
     background-image:none;
 
+}
+
+.checkbox, .radio {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
+    position:static;
+    margin: 4px 0 0;
+    margin-top: 1px\9;
+    line-height: normal;
 }
 
 .navbar .brand {
