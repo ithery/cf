@@ -9,7 +9,7 @@ class CElement_Factory {
      * @return \CElement_Element|boolean
      * @throws CApp_Exception
      */
-    public static function create_element($tag = "div", $id = "") {
+    public static function createElement($tag = "div", $id = "") {
         $class_name = 'CElement_Element_';
         switch (strtolower($tag)) {
             case 'div':
@@ -42,15 +42,31 @@ class CElement_Factory {
     }
 
     /**
+     * Backward compatibility of createElement
+     * 
+     * @param string $tag
+     * @param string $id optional
+     * @return \CElement_Element|boolean
+     * @throws CApp_Exception
+     */
+    public static function create_element($tag = "div", $id = "") {
+        return self::createElement($tag, $id);
+    }
+
+    /**
      * 
      * @param string $id optional
      * @return \CElement_Template|boolean
      */
     public static function createTemplate($id = "") {
-
         return new CElement_Template($id);
     }
 
+    
+    public static function createFormInput($class, $id="") {
+        return new $class($id);
+        
+    }
 }
 
 ?>

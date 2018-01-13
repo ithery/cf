@@ -99,6 +99,11 @@ final class CManager {
             trigger_error('Type of control ' . $type . ' not registered');
         }
         $class = $this->controls[$type];
+
+        if (cstr::startsWith($class, 'CElement_FormInput')) {
+            return CElement_Factory::createFormInput($class, $id);
+        }
+
         return call_user_func(array($class, 'factory'), ($id));
 
         //$obj = eval('new '.$class.'::factory("'.$id.'")');
