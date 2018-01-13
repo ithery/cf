@@ -554,10 +554,36 @@ class cajax {
         return $data;
     }
 
+    public static function imgupload($obj, $input) {
+        $return = array();
+        $data = $obj->data;
+        $input_name = $data->input_name;
+
+        if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
+            for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
+                $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
+                if (strtolower($extension) == 'php') {
+                    die('fatal error');
+                }
+                $file_id = date('Ymd') . cutils::randmd5() . $extension;
+                $fullfilename = ctemp::makepath("imgupload", $file_id);
+                move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename);
+                $return[] = $file_id;
+            }
+        }
+
+        $return = array(
+            'file_id' => $file_id,
+            'url' => ctemp::get_url('imgupload', $file_id),
+        );
+        return json_encode($return);
+    }
+
     public static function fileupload($obj, $input) {
         $return = array();
         $data = $obj->data;
         $input_name = $data->input_name;
+
         if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
             for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
                 $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
@@ -623,8 +649,8 @@ class cajax {
             $select_flip[carr::get($v, 'alias')] = carr::get($v, 'field');
         }
 
-        
-        
+
+
         foreach ($select_raw as $k => $v) {
             $v = (array) $v;
 

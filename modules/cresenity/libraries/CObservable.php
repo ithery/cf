@@ -107,7 +107,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_Div  Div Element
      */
     public function add_div($id = "") {
-        $element = CElement_Factory::create_element('div', $id);
+        $element = CElement_Factory::createElement('div', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -119,7 +119,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_A  Anchor Element
      */
     public function add_a($id = "") {
-        $element = CElement_Factory::create_element('a', $id);
+        $element = CElement_Factory::createElement('a', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -131,7 +131,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_H1  Heading 1 Element
      */
     public function add_h1($id = "") {
-        $element = CElement_Factory::create_element('h1', $id);
+        $element = CElement_Factory::createElement('h1', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -143,7 +143,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_H2  Heading 2 Element
      */
     public function add_h2($id = "") {
-        $element = CElement_Factory::create_element('h2', $id);
+        $element = CElement_Factory::createElement('h2', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -155,7 +155,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_H3  Heading 3 Element
      */
     public function add_h3($id = "") {
-        $element = CElement_Factory::create_element('h3', $id);
+        $element = CElement_Factory::createElement('h3', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -167,7 +167,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_H4  Heading 4 Element
      */
     public function add_h4($id = "") {
-        $element = CElement_Factory::create_element('h4', $id);
+        $element = CElement_Factory::createElement('h4', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -179,7 +179,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_H5  Heading 5 Element
      */
     public function add_h5($id = "") {
-        $element = CElement_Factory::create_element('h5', $id);
+        $element = CElement_Factory::createElement('h5', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -191,7 +191,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_H6  Heading 6 Element
      */
     public function add_h6($id = "") {
-        $element = CElement_Factory::create_element('h6', $id);
+        $element = CElement_Factory::createElement('h6', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -203,7 +203,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_Ol  Ordered List Element
      */
     public function add_ol($id = "") {
-        $element = CElement_Factory::create_element('ol', $id);
+        $element = CElement_Factory::createElement('ol', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -215,7 +215,7 @@ abstract class CObservable extends CRenderable {
      * @return  CElement_Element_Ul  Unordered List Element
      */
     public function add_ul($id = "") {
-        $element = CElement_Factory::create_element('ul', $id);
+        $element = CElement_Factory::createElement('ul', $id);
         //$element = CUlElement::factory($id);
         $this->wrapper->add($element);
         return $element;
@@ -228,7 +228,7 @@ abstract class CObservable extends CRenderable {
      * @return CElement_Element_Ol List Item Element
      */
     public function add_li($id = "") {
-        $element = CElement_Factory::create_element('li', $id);
+        $element = CElement_Factory::createElement('li', $id);
         $this->wrapper->add($element);
         return $element;
     }
