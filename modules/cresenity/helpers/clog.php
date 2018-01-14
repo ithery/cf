@@ -7,7 +7,7 @@ class clog {
         $app_id = $app->app_id();
         $db = CDatabase::instance();
         $ip_address = crequest::remote_address();
-        $session_id = csess::session_id();
+        $session_id = CSession::instance()->id();
         $browser = crequest::browser();
         $browser_version = crequest::browser_version();
         $platform = crequest::platform();
@@ -35,7 +35,7 @@ class clog {
         $app_id = $app->app_id();
         $db = CDatabase::instance();
         $ip_address = crequest::remote_address();
-        $session_id = csess::session_id();
+        $session_id = CSession::instance()->id();
         $browser = crequest::browser();
         $browser_version = crequest::browser_version();
         $platform = crequest::platform();
@@ -75,7 +75,7 @@ class clog {
         $data = array(
             "print_date" => date("Y-m-d H:i:s"),
             "org_id" => $org_id,
-            "session_id" => csess::session_id(),
+            "session_id" => CSession::instance()->id(),
             "user_agent" => CF::user_agent(),
             "browser" => $browser,
             "browser_version" => $browser_version,
@@ -142,7 +142,7 @@ class clog {
         }
         $db = CDatabase::instance();
         $ip_address = crequest::remote_address();
-        $session_id = csess::session_id();
+        $session_id = CSession::instance()->id();
         $browser = crequest::browser();
         $browser_version = crequest::browser_version();
         $platform = crequest::platform();
@@ -152,7 +152,7 @@ class clog {
         $data = array(
             "request_date" => date("Y-m-d H:i:s"),
             "org_id" => $org_id,
-            "session_id" => csess::session_id(),
+            "session_id" => CSession::instance()->id(),
             "user_agent" => CF::user_agent(),
             "browser" => $browser,
             "browser_version" => $browser_version,
@@ -196,7 +196,7 @@ class clog {
         $db = CDatabase::instance();
         $app = CApp::instance();
         $ip_address = crequest::remote_address();
-        $session_id = csess::session_id();
+        $session_id = CSession::instance()->id();
         $browser = crequest::browser();
         $browser_version = crequest::browser_version();
         $platform = crequest::platform();
@@ -232,7 +232,7 @@ class clog {
         $data = array(
             "activity_date" => date("Y-m-d H:i:s"),
             "org_id" => $org_id,
-            "session_id" => csess::session_id(),
+            "session_id" => CSession::instance()->id(),
             "user_agent" => CF::user_agent(),
             "browser" => $browser,
             "browser_version" => $browser_version,
@@ -336,7 +336,7 @@ class clog {
         $clogger_instance = CLogger::instance();
         $level = CLogger::INFO;
         $message = $options;
-        $param=array();
+        $param = array();
         if (is_array($options)) {
             $message = carr::get($options, 'message');
             $filename = carr::get($options, 'filename');
@@ -351,7 +351,7 @@ class clog {
               $clogger_instance->set_additional_path($path);
              * 
              */
-            $param['path']=$path;
+            $param['path'] = $path;
         }
         return $clogger_instance->add($level, $message);
     }
