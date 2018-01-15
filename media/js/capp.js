@@ -152,7 +152,7 @@ if (window.capp.have_clock) {
 
     $(document).ready(function () {
         $('#servertime').serverTime({
-            ajaxFile: window.cresenity.base_url + 'cresenity/server_time',
+            ajaxFile: window.capp.base_url + 'cresenity/server_time',
             displayDateFormat: "yyyy-mm-dd HH:MM:ss"
         });
     });
