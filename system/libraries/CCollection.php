@@ -191,7 +191,10 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return bool
      */
     public function contains($key, $operator = null, $value = null) {
-        if (func_num_args() == 1) {
+
+        if ($operator === null && $value === null) {
+
+
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass;
                 return $this->first($key, $placeholder) !== $placeholder;
@@ -200,7 +203,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
             return in_array($key, $this->items);
         }
 
-        return $this->contains($this->operatorForWhere(func_get_args()));
+        return $this->contains($this->operatorForWhere($key, $operator, $value));
+        //return $this->contains($this->operatorForWhere(func_get_args()));
+        //return $this->contains($this->operatorForWhere(...func_get_args()));
     }
 
     /**
@@ -213,7 +218,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
     public function containsStrict($key, $value = null) {
         if (func_num_args() == 2) {
             return $this->contains(function ($item) use ($key, $value) {
-                        return data_get($item, $key) === $value;
+                        return carr::path($item, $key) === $value;
                     });
         }
 
@@ -230,10 +235,14 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @param  mixed  ...$lists
      * @return static
      */
-    public function crossJoin($lists) {
-        return new static(Arr::crossJoin(
+    public function crossJoin($lists = null) {
+        $lists = func_get_args();
+        return new static(carr::crossJoin(
                         $this->items, array_map([$this, 'getArrayableItems'], $lists)
         ));
+//        return new static(carr::crossJoin(
+//                        $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
+//        ));
     }
 
     /**
@@ -241,7 +250,8 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      *
      * @return void
      */
-    public function dd($args) {
+    public function dd($args = null) {
+        $args = func_get_args();
         call_user_func_array([$this, 'dump'], $args);
 
         die(1);
@@ -318,7 +328,8 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         return $this->each(function ($chunk, $key) use ($callback) {
                     $chunk[] = $key;
 
-                    return $callback($chunk);
+                    return call_user_func_array($callback, $chunk);
+                    //return $callback(...$chunk);
                 });
     }
 
@@ -343,7 +354,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
             return true;
         }
 
-        return $this->every($this->operatorForWhere(func_get_args()));
+        return $this->every($this->operatorForWhere($key, $operator, $value));
     }
 
     /**
@@ -430,7 +441,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = data_get($item, $key);
+            $retrieved = carr::path($item, $key);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
@@ -479,7 +490,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         $values = $this->getArrayableItems($values);
 
         return $this->filter(function ($item) use ($key, $values, $strict) {
-                    return in_array(data_get($item, $key), $values, $strict);
+                    return in_array(carr::path($item, $key), $values, $strict);
                 });
     }
 
@@ -506,7 +517,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         $values = $this->getArrayableItems($values);
 
         return $this->reject(function ($item) use ($key, $values, $strict) {
-                    return in_array(data_get($item, $key), $values, $strict);
+                    return in_array(carr::path($item, $key), $values, $strict);
                 });
     }
 
@@ -541,7 +552,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return static
      */
     public function firstWhere($key, $operator, $value = null) {
-        return $this->first($this->operatorForWhere(func_get_args()));
+        return $this->first($this->operatorForWhere($key, $operator, $value));
     }
 
     /**
@@ -789,7 +800,8 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         return $this->map(function ($chunk, $key) use ($callback) {
                     $chunk[] = $key;
 
-                    return $callback($chunk);
+                    return call_user_func_array($callback, $chunk);
+                    //return $callback(...$chunk);
                 });
     }
 
@@ -1427,7 +1439,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         }
 
         return function ($item) use ($value) {
-            return data_get($item, $value);
+            return carr::path($item, $value);
         };
     }
 
@@ -1534,7 +1546,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
     /**
      * Get a base Support collection instance from this collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function toBase() {
         return new self($this);

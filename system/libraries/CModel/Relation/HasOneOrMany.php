@@ -43,7 +43,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * Create and return an un-saved instance of the related model.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function make(array $attributes = []) {
         return tap($this->related->newInstance($attributes), function ($instance) {
@@ -80,7 +80,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * Match the eagerly loaded results to their single parents.
      *
      * @param  array   $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @param  string  $relation
      * @return array
      */
@@ -92,7 +92,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * Match the eagerly loaded results to their many parents.
      *
      * @param  array   $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @param  string  $relation
      * @return array
      */
@@ -104,7 +104,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * Match the eagerly loaded results to their many parents.
      *
      * @param  array   $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @param  string  $relation
      * @param  string  $type
      * @return array
@@ -143,7 +143,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @return array
      */
     protected function buildDictionary(CModel_Collection $results) {
@@ -301,12 +301,12 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     /**
      * Add the constraints for a relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  CModel_Query $query
+     * @param  CModel_Query  $parentQuery
      * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         if ($query->getQuery()->from == $parentQuery->getQuery()->from) {
             return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
         }
@@ -317,12 +317,12 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     /**
      * Add the constraints for a relationship query on the same table.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  CModel_Query  $query
+     * @param  CModel_Query  $parentQuery
      * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
-    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQueryForSelfRelation(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         $query->from($query->getModel()->getTable() . ' as ' . $hash = $this->getRelationCountHash());
 
         $query->getModel()->setTable($hash);

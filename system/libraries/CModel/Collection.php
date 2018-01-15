@@ -7,10 +7,10 @@ class CModel_Collection extends CCollection {
      *
      * @param  mixed  $key
      * @param  mixed  $default
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return CModel|static
      */
     public function find($key, $default = null) {
-        if ($key instanceof Model) {
+        if ($key instanceof CModel) {
             $key = $key->getKey();
         }
 
@@ -22,7 +22,7 @@ class CModel_Collection extends CCollection {
             return $this->whereIn($this->first()->getKeyName(), $key);
         }
 
-        return Arr::first($this->items, function ($model) use ($key) {
+        return carr::first($this->items, function ($model) use ($key) {
                     return $model->getKey() == $key;
                 }, $default);
     }
@@ -69,6 +69,7 @@ class CModel_Collection extends CCollection {
      */
     public function contains($key, $operator = null, $value = null) {
         if (func_num_args() > 1 || $this->useAsCallable($key)) {
+
             return parent::contains($key, $operator, $value);
         }
 
@@ -114,14 +115,15 @@ class CModel_Collection extends CCollection {
      * Run a map over each of the items.
      *
      * @param  callable  $callback
-     * @return \Illuminate\Support\Collection|static
+     * @return CCollection|static
      */
     public function map(callable $callback) {
         $result = parent::map($callback);
 
-        return $result->contains(function ($item) {
-                    return !$item instanceof Model;
+        $a = $result->contains(function ($item) {
+                    return !$item instanceof CModel;
                 }) ? $result->toBase() : $result;
+        return $a;
     }
 
     /**
@@ -214,7 +216,7 @@ class CModel_Collection extends CCollection {
             return new static($this->items);
         }
 
-        $dictionary = Arr::only($this->getDictionary(), $keys);
+        $dictionary = carr::only($this->getDictionary(), $keys);
 
         return new static(array_values($dictionary));
     }
@@ -226,7 +228,7 @@ class CModel_Collection extends CCollection {
      * @return static
      */
     public function except($keys) {
-        $dictionary = Arr::except($this->getDictionary(), $keys);
+        $dictionary = carr::except($this->getDictionary(), $keys);
 
         return new static(array_values($dictionary));
     }
