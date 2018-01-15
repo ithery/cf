@@ -1,14 +1,14 @@
 <?php
 
-namespace Illuminate\Database\Eloquent\Relations;
+// namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+// use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Builder;
+// use Illuminate\Database\Eloquent\Collection;
+// use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class HasManyThrough extends Relation {
+class CModel_Relation_HasManyThrough extends CModel_Relation {
 
     /**
      * The "through" parent model instance.
@@ -71,7 +71,7 @@ class HasManyThrough extends Relation {
      * @param  string  $secondLocalKey
      * @return void
      */
-    public function __construct(Builder $query, Model $farParent, Model $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey) {
+    public function __construct(CModel_Query $query, CModel $farParent, CModel $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey) {
         $this->localKey = $localKey;
         $this->firstKey = $firstKey;
         $this->secondKey = $secondKey;
@@ -111,7 +111,7 @@ class HasManyThrough extends Relation {
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $farKey);
 
         if ($this->throughParentSoftDeletes()) {
-            $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+            $query->whereNull($this->throughParent->getQualifiedStatusColumn());
         }
     }
 
@@ -130,7 +130,7 @@ class HasManyThrough extends Relation {
      * @return bool
      */
     public function throughParentSoftDeletes() {
-        return in_array(CModel_SoftDelete_Trait::class, class_uses_recursive(
+        return in_array(CModel_SoftDelete_Trait::class, CF::class_uses_recursive(
                         get_class($this->throughParent)
         ));
     }

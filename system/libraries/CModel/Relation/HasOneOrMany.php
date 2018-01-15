@@ -84,7 +84,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @param  string  $relation
      * @return array
      */
-    public function matchOne(array $models, Collection $results, $relation) {
+    public function matchOne(array $models, CModel_Collection $results, $relation) {
         return $this->matchOneOrMany($models, $results, $relation, 'one');
     }
 
@@ -96,7 +96,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @param  string  $relation
      * @return array
      */
-    public function matchMany(array $models, Collection $results, $relation) {
+    public function matchMany(array $models, CModel_Collection $results, $relation) {
         return $this->matchOneOrMany($models, $results, $relation, 'many');
     }
 
@@ -109,7 +109,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @param  string  $type
      * @return array
      */
-    protected function matchOneOrMany(array $models, Collection $results, $relation, $type) {
+    protected function matchOneOrMany(array $models, CModel_Collection $results, $relation, $type) {
         $dictionary = $this->buildDictionary($results);
 
         // Once we have the dictionary we can simply spin through the parent models to
@@ -146,7 +146,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @return array
      */
-    protected function buildDictionary(Collection $results) {
+    protected function buildDictionary(CModel_Collection $results) {
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {

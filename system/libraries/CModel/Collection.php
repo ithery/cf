@@ -72,7 +72,7 @@ class CModel_Collection extends CCollection {
             return parent::contains($key, $operator, $value);
         }
 
-        if ($key instanceof Model) {
+        if ($key instanceof CModel) {
             return parent::contains(function ($model) use ($key) {
                         return $model->is($key);
                     });

@@ -194,7 +194,7 @@ abstract class CModel_Relation {
      * @return array
      */
     protected function getKeys(array $models, $key = null) {
-        return collect($models)->map(function ($value) use ($key) {
+        return CF::collect($models)->map(function ($value) use ($key) {
                     return $key ? $value->getAttribute($key) : $value->getKey();
                 })->values()->unique()->sort()->all();
     }

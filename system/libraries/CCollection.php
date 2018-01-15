@@ -194,7 +194,6 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         if (func_num_args() == 1) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass;
-
                 return $this->first($key, $placeholder) !== $placeholder;
             }
 
@@ -412,7 +411,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return static
      */
     public function where($key, $operator, $value = null) {
-        return $this->filter($this->operatorForWhere(func_get_args()));
+        return $this->filter($this->operatorForWhere($key, $operator, $value));
     }
 
     /**
