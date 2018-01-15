@@ -29,10 +29,9 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
     public function extend(CModel_Query $builder) {
         foreach ($this->extensions as $extension) {
             $this->{"add{$extension}"}($builder);
+           
         }
-
         $builder->onDelete(function (CModel_Query $builder) {
-            die('C');
             $column = $this->getStatusColumn($builder);
 
             return $builder->update([
@@ -65,7 +64,7 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
         $builder->macro('restore', function (CModel_Query $builder) {
             $builder->withTrashed();
 
-            return $builder->update([$builder->getModel()->getStatusColumn() => null]);
+            return $builder->update([$builder->getModel()->getStatusColumn() => 1]);
         });
     }
 
@@ -90,9 +89,8 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
     protected function addWithoutTrashed(CModel_Query $builder) {
         $builder->macro('withoutTrashed', function (CModel_Query $builder) {
             $model = $builder->getModel();
-
-            $builder->withoutGlobalScope($this)->whereNull(
-                    $model->getQualifiedStatusColumn()
+            $builder->withoutGlobalScope($this)->where(
+                    $model->getQualifiedStatusColumn(),'>',0
             );
 
             return $builder;
@@ -109,8 +107,8 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
         $builder->macro('onlyTrashed', function (CModel_Query $builder) {
             $model = $builder->getModel();
 
-            $builder->withoutGlobalScope($this)->whereNotNull(
-                    $model->getQualifiedStatusColumn()
+            $builder->withoutGlobalScope($this)->where(
+                    $model->getQualifiedStatusColumn(),'=',0
             );
 
             return $builder;

@@ -1,7 +1,6 @@
 <?php
 
 // namespace Illuminate\Database\Eloquent\Relations;
-
 // use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\Builder;
 // use Illuminate\Database\Eloquent\Collection;
@@ -111,7 +110,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $farKey);
 
         if ($this->throughParentSoftDeletes()) {
-            $query->whereNull($this->throughParent->getQualifiedStatusColumn());
+            $query->where($this->throughParent->getQualifiedStatusColumn(), '>', 0);
         }
     }
 
@@ -193,7 +192,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @return array
      */
-    protected function buildDictionary(Collection $results) {
+    protected function buildDictionary(CModel_Collection $results) {
         $dictionary = [];
 
         // First we will create a dictionary of models keyed by the foreign key of the
@@ -435,7 +434,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $hash . '.' . $this->secondLocalKey);
 
         if ($this->throughParentSoftDeletes()) {
-            $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+            $query->where($this->throughParent->getQualifiedDeletedAtColumn(), '>', 0);
         }
 
         $query->getModel()->setTable($hash);
