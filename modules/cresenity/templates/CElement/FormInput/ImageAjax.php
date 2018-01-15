@@ -46,6 +46,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     $('#container-<?php echo $id ?> .fileupload-preview').html(img);
                     $('#container-<?php echo $id ?>').removeClass('fileupload-new');
                     $('#container-<?php echo $id ?>').addClass('fileupload-exists');
+                    $('#container-<?php echo $id ?> .fileupload-preview img').addClass('loading');
                     var data = new FormData();
                     data.append('<?php echo $ajaxName; ?>[]', file);
                     var xhr = new XMLHttpRequest();
@@ -54,7 +55,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             var dataFile = JSON.parse(this.responseText);
                             $('#<?php echo $id; ?>').val(dataFile.file_id);
                             $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
-
+                            $('#container-<?php echo $id ?> .fileupload-preview img').removeClass('loading');
                         } else if (this.readyState == 4 && this.status != 200) {
                         }
                     };

@@ -1522,3 +1522,7 @@ body .modal{
 .data_table-quick_search {
     width:90%;
 }
+
+.loading, .loading * {
+    opacity:0.8;
+}
