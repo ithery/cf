@@ -179,7 +179,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return static
      */
     public function collapse() {
-        return new static(Arr::collapse($this->items));
+        return new static(carr::collapse($this->items));
     }
 
     /**
@@ -342,7 +342,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return bool
      */
     public function every($key, $operator = null, $value = null) {
-        if (func_num_args() == 1) {
+        if ($operator === null && $value === null) {
             $callback = $this->valueRetriever($key);
 
             foreach ($this->items as $k => $v) {
@@ -366,7 +366,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
     public function except($keys) {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        return new static(Arr::except($this->items, $keys));
+        return new static(carr::except($this->items, $keys));
     }
 
     /**
