@@ -90,7 +90,7 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
         $builder->macro('withoutTrashed', function (CModel_Query $builder) {
             $model = $builder->getModel();
             $builder->withoutGlobalScope($this)->where(
-                    $model->getQualifiedStatusColumn(),'>',0
+                    $model->getQualifiedStatusColumn(), '>', 0
             );
 
             return $builder;
@@ -108,7 +108,7 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
             $model = $builder->getModel();
 
             $builder->withoutGlobalScope($this)->where(
-                    $model->getQualifiedStatusColumn(),'=',0
+                    $model->getQualifiedStatusColumn(), '=', 0
             );
 
             return $builder;

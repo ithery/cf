@@ -86,7 +86,7 @@ trait CModel_SoftDelete_Trait {
             return false;
         }
 
-        $this->{$this->getStatusColumn()} = null;
+        $this->{$this->getStatusColumn()} = 1;
 
         // Once we have saved the model, we will fire the "restored" event so this
         // developer will do anything they need to after a restore operation is
