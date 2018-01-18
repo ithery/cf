@@ -630,7 +630,16 @@ class cajax {
         $row_action_list = $table->row_action_list;
         $key = $obj->data->key_field;
 
-        $search = $el->search(cobj::get($ajax_data, 'index'), cobj::get($ajax_data, 'document_type'));
+        $elastic_index = cobj::get($ajax_data, 'index');
+        $elastic_document_type = cobj::get($ajax_data, 'document_type');
+
+
+        $search = $el->search($elastic_index, $elastic_document_type);
+
+        $mapping = $search->indices()->get_mapping();
+        $properties = carr::path($mapping, $elastic_index . '.mappings.' . $elastic_document_type . '.properties');
+
+
         $must = cobj::get($ajax_data, 'must');
         foreach ($must as $m) {
             $search->must((array) $m);
@@ -712,17 +721,44 @@ class cajax {
                         if (isset($select_flip[$field])) {
                             $field = $select_flip[$field];
                         }
+
                         $s = array();
-                        carr::set_path($s, 'match.' . $field, $request['sSearch']);
-                        $should[] = $s;
+                        $fieldElastic = $search->getElasticField($field);
+                        $elastic_field_type = carr::path($properties, $fieldElastic . '.type');
+                       
+                        switch ($elastic_field_type) {
+                            case 'text':
+                                carr::set_path($s, 'match.' . $fieldElastic, $request['sSearch']);
+
+                                break;
+                            case 'date':
+                                //do nothing
+                                break;
+                            case 'long':
+                            case 'float':
+                            default:
+                                if (is_numeric($request['sSearch'])) {
+                                    carr::set_path($s, 'term.' . $fieldElastic, $request['sSearch']);
+                                }
+                                break;
+                        }
+                        if (count($s) > 0) {
+                            $should[] = $s;
+                        }
                     }
                 }
             }
             if (count($arr) > 0) {
+              
                 $search->must($arr);
             }
         }
 
+        if(isset($_GET['debug'])) {
+            cdbg::var_dump($search->buildParams());
+            die;
+        }
+        
         $r = $search->exec();
 
 
