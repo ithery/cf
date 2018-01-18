@@ -626,7 +626,7 @@ class carr {
      */
     public static function add($array, $key, $value) {
         if (is_null(static::get($array, $key))) {
-            static::set($array, $key, $value);
+            static::set_path($array, $key, $value);
         }
 
         return $array;

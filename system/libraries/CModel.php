@@ -552,7 +552,7 @@ abstract class CModel implements ArrayAccess {
 
             if (!$this->getConnectionName() &&
                     $connection = $query->getConnection()) {
-                $this->setConnection($connection->getName());
+                $this->setConnection($connection);
             }
         }
 
@@ -1073,8 +1073,9 @@ abstract class CModel implements ArrayAccess {
      * @param  string  $name
      * @return $this
      */
-    public function setConnection($name) {
-        $this->db = $name;
+    public function setConnection(CDatabase $db) {
+        
+        $this->db = $db;
 
         return $this;
     }

@@ -170,9 +170,12 @@ class CDatabase_Query_Builder {
         'not similar to', 'not ilike', '~~*', '!~~*',
     ];
 
-    public function __construct($db) {
+    public function __construct(CDatabase $db=null) {
+        if($db==null){
+            $db=CDatabase::instance();
+        }
         $this->db = $db;
-        //get driver
+        //get driver 
         $driver_name = $this->db->driver_name();
         $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
         $processor_class = 'CDatabase_Query_Processor_' . $driver_name;
