@@ -797,7 +797,7 @@ if (window.capp.have_clock) {
                         + "</div>"
                         + "</div>";
                 var selection = jQuery('#' + id_target);
-                console.log(selection);
+   
                 var handle;
                 var dialog_is_remove = false;
                 if (selection.length == 0) {
@@ -881,7 +881,7 @@ if (window.capp.have_clock) {
                     data_addition = {};
 
                 var _dialog_html = "<div class='modal' style=\"display: none;\" >" +
-                        "<div class='modal-header loading'>" +
+                        "<div class='modal-header'>" +
                         "<a href='#' class='close'></a>" +
                         "<span class='loader'></span><h3></h3>" +
                         "</div>" +
