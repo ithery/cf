@@ -33,11 +33,20 @@ class CElastic_Search {
         $this->document_type = $document_type;
         $this->must = array();
         $this->must_not = array();
+        $this->should = array();
         $this->select = array();
         $this->from = null;
         $this->size = null;
         $this->sort = array();
         $this->aggs = array();
+    }
+    
+    /**
+     * 
+     * @return CElastic_Indices
+     */
+    public function indices() {
+        return $this->elastic->indices($this->index,$this->document_type);
     }
 
     public function must($path, $value = null) {
@@ -48,6 +57,16 @@ class CElastic_Search {
             carr::set_path($arr, $path, $value);
         }
         $this->must[] = $arr;
+    }
+    
+    public function should($path, $value = null) {
+        $arr = array();
+        if (is_array($path)) {
+            $arr = $path;
+        } else {
+            carr::set_path($arr, $path, $value);
+        }
+        $this->should[] = $arr;
     }
 
     public function must_not($path, $value = null) {
@@ -142,6 +161,9 @@ class CElastic_Search {
         if (count($this->must_not) > 0) {
             carr::set_path($body, 'query.bool.must_not', $this->must_not);
         }
+        if (count($this->should) > 0) {
+            carr::set_path($body, 'query.bool.should', $this->should);
+        }
 
         if ($this->size != null) {
             $body['size'] = $this->size;
@@ -176,6 +198,26 @@ class CElastic_Search {
         $this->select[] = $arr;
     }
 
+    public function getAlias($field) {
+        foreach($this->select as $val) {
+            $fieldElastic = carr::get($val,'field');
+            if($fieldElastic==$field) {
+                return carr::get($val,'alias');
+            }
+        }
+        return $field;
+    }
+    
+    public function getElasticField($alias) {
+        foreach($this->select as $val) {
+            $fieldElastic = carr::get($val,'alias');
+            if($fieldElastic==$alias) {
+                return carr::get($val,'field');
+            }
+        }
+        return $alias;
+    }
+    
     public function ajax_data() {
         $data = array();
         $data['index'] = $this->index;
