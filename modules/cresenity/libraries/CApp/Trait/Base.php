@@ -110,7 +110,7 @@ trait CApp_Trait_Base {
      * 
      * @return string
      */
-    public function now() {
+    public static function now() {
         return date('Y-m-d H:i:s');
     }
 
