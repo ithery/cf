@@ -225,6 +225,7 @@ class CElastic_Search {
         $data['config'] = $this->elastic->config();
         $data['must'] = $this->must;
         $data['must_not'] = $this->must_not;
+        $data['should'] = $this->should;
         $data['select'] = $this->select;
         $data['from'] = $this->from;
         $data['size'] = $this->size;
