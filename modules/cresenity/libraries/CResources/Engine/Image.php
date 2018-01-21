@@ -23,7 +23,6 @@ class CResources_Engine_Image extends CResources_Engine {
         $new_height = $height;
         list($img_width, $img_height) = @getimagesize($fullfilename);
         if ($proportional) {
-
             if (!$img_width || !$img_height) {
                 throw new Exception('Fail to getimagesize ' . $fullfilename);
             }
@@ -69,6 +68,21 @@ class CResources_Engine_Image extends CResources_Engine {
                 //throw new Exception("Width:".$width.", Height:".$height.", Img Width:".$img_width.", Img Height:".$img_height.", Width New:".$width_new.", Height New:".$height_new);
                 $wideimage = $wideimage->resizeCanvas($width_new, $height_new, 'center', 'center', $white);
             }
+            if ($crop) {
+                $w = ($img_height / $height) * $width;
+                $h = ($img_width / $width) * $height;
+                $height_new = $img_height;
+                $width_new = $img_width;
+                if ($w > $h) {
+                    $height_new = $h;
+                } else {
+                    $width_new = $w;
+                }
+                
+                $white = $wideimage->allocateColor(255, 255, 255);
+                $wideimage = $wideimage->resizeCanvas($width_new, $height_new, 'center', 'center', $white);
+            }
+
             $wideimage = $wideimage->resize($new_width, $new_height);
             if ($crop) {
                 $wideimage = $wideimage->crop('center', 'center', $width, $height);
