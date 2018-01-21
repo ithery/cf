@@ -1526,3 +1526,67 @@ body .modal{
 .loading, .loading * {
     opacity:0.8;
 }
+
+.dataTables_wrapper {
+    overflow-x:auto;
+}
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+    background: transparent;
+    overflow-y:auto;
+}
+body .modal {
+    width: inherit;
+    margin-left: inherit;
+}
+
+.modal-backdrop {
+    opacity:0.8;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 10px;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #999;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 6px;
+    outline: 0;
+    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    box-shadow: 0 3px 9px rgba(0,0,0,.5);
+}
+.modal-body {
+    max-height: 100%;
+    padding: 15px;
+}
+body.modal-open {
+    overflow:hidden;
+}
+.modal.fade.in {
+    top: 0;
+}
+
+@media (min-width: 768px) {
+
+    .modal-dialog {
+        width: 80%;
+        margin: 30px auto;
+    }
+
+}

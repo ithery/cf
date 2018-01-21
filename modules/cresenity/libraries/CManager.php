@@ -50,11 +50,28 @@ final class CManager {
         return self::instance();
     }
 
-    public static function register_module($module, $data = array()) {
+    /**
+     * 
+     * @param string $module
+     * @param array $data optional
+     * @return boolean
+     */
+    public static function registerModule($module, $data = array()) {
         if (!empty($data)) {
             CClientModules::instance()->defineModule($module, $data);
         }
         return CClientModules::instance()->register_module($module);
+    }
+
+    /**
+     * backward compatibility of registerModule
+     * 
+     * @param string $module
+     * @param array $data optional
+     * @return boolean
+     */
+    public static function register_module($module, $data = array()) {
+        return self::registerModule($module, $data);
     }
 
     public static function unregister_module($module) {

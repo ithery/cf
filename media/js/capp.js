@@ -797,7 +797,7 @@ if (window.capp.have_clock) {
                         + "</div>"
                         + "</div>";
                 var selection = jQuery('#' + id_target);
-   
+
                 var handle;
                 var dialog_is_remove = false;
                 if (selection.length == 0) {
@@ -843,6 +843,7 @@ if (window.capp.have_clock) {
                 jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').addClass('loading'));
                 if (!handle.is(".opened")) {
                     handle.parents('.modal').addClass("in").show();
+
                 }
                 handle.data('xhr', jQuery.ajax({
                     type: method,
@@ -880,7 +881,7 @@ if (window.capp.have_clock) {
                 if (typeof data_addition == 'undefined')
                     data_addition = {};
 
-                var _dialog_html = "<div class='modal' style=\"display: none;\" >" +
+                var _dialog_html = "<div class='modal' style=\"display: none;\" ><div class='modal-dialog' ><div class='modal-content animated bounceInRight' >" +
                         "<div class='modal-header'>" +
                         "<a href='#' class='close'></a>" +
                         "<span class='loader'></span><h3></h3>" +
@@ -888,6 +889,8 @@ if (window.capp.have_clock) {
                         "<div class='modal-body'>" +
                         "</div>" +
                         "<div class='modal-footer'>" +
+                        "</div>" +
+                        "</div>" +
                         "</div>" +
                         "</div>";
 
@@ -909,11 +912,18 @@ if (window.capp.have_clock) {
                     jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function (event) {
                         event.preventDefault();
                         if (dialog_is_remove) {
-                            handle.parent().prev(".modal-backdrop").remove();
-                            jQuery(this).parents(".modal").find(".modal-body").parent().remove();
+                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                                handle.closest('.modal').remove();
+                            });
+                            handle.closest('.modal').prev(".modal-backdrop").hide(400, function () {
+                                handle.closest('.modal').prev(".modal-backdrop").remove();
+
+                            });
+                            $('body').removeClass('modal-open');
                         } else {
-                            handle.parent().prev(".modal-backdrop").hide();
-                            jQuery(this).parents(".modal").find(".modal-body").parent().hide();
+                            handle.closest('.modal').prev(".modal-backdrop").hide(400);
+                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400);
+                            $('body').removeClass('modal-open');
                         }
                     });
                     jQuery("body").append(overlay).append(parent);
@@ -946,7 +956,11 @@ if (window.capp.have_clock) {
                 jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
                 if (!handle.is(".opened")) {
                     overlay.show();
-                    handle.addClass("opened").parent().show();
+                    $('body').addClass('modal-open');
+                    handle.addClass("opened").closest('.modal').show();
+                    if(!$.fn.modal.Constructor.VERSION) {
+                        
+                    }
                 }
                 handle.data('xhr', jQuery.ajax({
                     type: method,

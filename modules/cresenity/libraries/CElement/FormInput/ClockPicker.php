@@ -2,9 +2,13 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CElement_FormInput_ClockPicker extends CFormInput {
+class CElement_FormInput_ClockPicker extends CElement_FormInput {
 
     protected $placeholder;
+    protected $show_second;
+    protected $template;
+    protected $show_meridian;
+    protected $minute_step;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -16,7 +20,17 @@ class CElement_FormInput_ClockPicker extends CFormInput {
         $this->minute_step = 1;
 
         $this->placeholder = "";
-        CManager::instance()->register_module('clockpicker');
+        $dataModule = array(
+            "css" => array(
+                "plugins/clockpicker/jquery-clockpicker.css",
+                "plugins/clockpicker/bootstrap-clockpicker.css",
+            ),
+            "js" => array(
+                "plugins/clockpicker/jquery-clockpicker.js",
+                "plugins/clockpicker/bootstrap-clockpicker.js",
+            ),
+        );
+        CManager::registerModule('clockpicker', $dataModule);
     }
 
     public function set_placeholder($placeholder) {

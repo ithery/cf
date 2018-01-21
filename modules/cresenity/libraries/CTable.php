@@ -148,7 +148,6 @@ class CTable extends CElement_Element {
         } else {
             CClientModules::instance()->register_module('jquery.datatable');
         }
-        
     }
 
     public static function factory($id = "") {
@@ -1839,6 +1838,12 @@ class CTable extends CElement_Element {
             $js->appendln("var tableStyled_" . $this->id . " = false;")->br()->
                     appendln("var oTable = table.dataTable({")->br()->inc_indent();
 
+
+//            $js->appendln("responsive: {
+//        details: {
+//            renderer: $.fn.dataTable.Responsive.renderer.tableAll()
+//        }
+//    },");
             if ($this->ajax) {
                 $js->append("")
                         ->appendln("'bRetrieve': true,")->br()

@@ -34,6 +34,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->register_control('currency', 'CFormInputCurrency');
         $this->manager->register_control('time', 'CFormInputTimePicker');
         $this->manager->register_control('timepicker', 'CFormInputTimePicker');
+        $this->manager->register_control('clockpicker', 'CElement_FormInput_ClockPicker');
         $this->manager->register_control('image', 'CFormInputImage');
         $this->manager->register_control('image-ajax', 'CElement_FormInput_ImageAjax');
         $this->manager->register_control('file', 'CFormInputFile');

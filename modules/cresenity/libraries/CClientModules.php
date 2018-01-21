@@ -144,6 +144,7 @@ final class CClientModules {
                 trigger_error('Module ' . $module . ' not defined');
             }
         }
+        return true;
     }
 
     /**
