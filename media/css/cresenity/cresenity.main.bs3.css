@@ -1011,6 +1011,13 @@ div.dataTables_filter input {
 
 }
 
+/* timepicker */
+.bootstrap-timepicker-widget table td input {
+    width: 35px;
+    margin: auto;
+    text-align: center;
+    padding: 5px 5px;
+}
 
 /* nestable */
 
