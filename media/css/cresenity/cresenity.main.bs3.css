@@ -1013,10 +1013,10 @@ div.dataTables_filter input {
 
 /* timepicker */
 .bootstrap-timepicker-widget table td input {
-    width: 35px;
-    margin: auto;
-    text-align: center;
-    padding: 5px 5px;
+    width: 35px!important;
+    margin: auto!important;
+    text-align: center!important;
+    padding: 5px 5px!important;
 }
 
 /* nestable */

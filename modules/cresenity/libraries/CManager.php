@@ -5,13 +5,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
 final class CManager {
 
     private static $_instance;
-    protected $controls = array();
-    protected $controls_code = array();
-    protected $elements = array();
-    protected $elements_code = array();
-    protected $is_mobile = false;
-    protected $mobile_path = '';
-    protected $theme_data = null;
+    protected static $controls = array();
+    protected static $controls_code = array();
+    protected static $elements = array();
+    protected static $elements_code = array();
+    protected static $is_mobile = false;
+    protected static $mobile_path = '';
+    protected static $theme_data = null;
 
     /**
      *
@@ -50,12 +50,19 @@ final class CManager {
         return self::instance();
     }
 
-    public static function register_module($module) {
+    public static function register_module($module, $data = array()) {
+        if (!empty($data)) {
+            CClientModules::instance()->defineModule($module, $data);
+        }
         return CClientModules::instance()->register_module($module);
     }
 
     public static function unregister_module($module) {
         return CClientModules::instance()->unregister_module($module);
+    }
+
+    public static function registerControl($type, $class, $codePath = '') {
+        return self::instance()->register_control($type, $class, $codePath);
     }
 
     public function register_control($type, $class, $code_path = '') {
@@ -70,6 +77,17 @@ final class CManager {
         }
     }
 
+    /**
+     * 
+     * @param string $type
+     * @param string $class
+     * @param string $codePath
+     * @return CElement
+     */
+    public static function registerElement($type, $class, $codePath = '') {
+        return self::instance()->register_element($type, $class, $codePath);
+    }
+
     public function register_element($type, $class, $code_path = '') {
         $this->elements[$type] = $class;
         $this->elements_code[$type] = $code_path;
@@ -82,12 +100,38 @@ final class CManager {
         }
     }
 
+    /**
+     * 
+     * @param string $type
+     * @return boolean
+     */
+    public static function isRegisteredControl($type) {
+        return self::instance()->is_registered_control($type);
+    }
+
     public function is_registered_control($type) {
         return isset($this->controls[$type]);
     }
 
+    /**
+     * 
+     * @return array
+     */
+    public static function getRegisteredControls() {
+        return self::instance()->get_registered_controls();
+    }
+
     public function get_registered_controls() {
         return $this->controls;
+    }
+
+    /**
+     * 
+     * @param string $type
+     * @return boolean
+     */
+    public static function isRegisteredElement($type) {
+        return self::instance()->is_registered_element($type);
     }
 
     public function is_registered_element($type) {
@@ -116,6 +160,10 @@ final class CManager {
             trigger_error('Type of element ' . $type . ' not registered');
         }
         $class = $this->elements[$type];
+
+        if (cstr::startsWith($class, 'CElement_Element')) {
+            return CElement_Factory::createElement($id);
+        }
         return call_user_func(array($class, 'factory'), ($id));
 
         //$obj = eval('new '.$class.'::factory("'.$id.'")');

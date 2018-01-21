@@ -4,7 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CClientModules {
 
-    public $mods;
+    public static $mods = array();
+    public static $all_modules = array();
     protected static $_instance;
 
     public function __construct() {
@@ -100,11 +101,20 @@ final class CClientModules {
     }
 
     public function register_modules($modules) {
-        if (!is_array($modules))
+        if (!is_array($modules)) {
             $modules = array($modules);
+        }
         foreach ($modules as $module) {
             $this->register_module($module);
         }
+    }
+
+    public function defineModule($name, $moduleData) {
+        //make sure all modules is collected
+        $this->all_modules();
+        //replace or make new module
+        $this->all_modules[$name] = $moduleData;
+        return $this;
     }
 
     public function register_module($module, $parent = null) {
