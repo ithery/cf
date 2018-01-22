@@ -91,7 +91,7 @@ trait CApp_Trait_Base {
      * @return stdClass 
      */
     public static function user() {
-        $session = PM::session();
+        $session = self::session();
         $user = $session->get('user');
         return $user;
     }

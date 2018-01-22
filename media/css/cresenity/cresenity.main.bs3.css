@@ -80,6 +80,17 @@ input[type=radio],input[type=checkbox] {
     background:transparent;
     width: auto;
     height: auto;
+    display: inline;
+}
+
+.input-append .add-on, .input-prepend .add-on {
+
+    height: 34px;
+    min-width: 34px;
+    padding: 9px 8px;
+
+    line-height: 34px;
+
 }
 /* overwrite bootstrap */
 

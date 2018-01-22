@@ -462,7 +462,7 @@ final class CF {
         if ($domain == null) {
             $domain = crouter::domain();
         }
-        $include_paths = CF::paths();
+        $include_paths = CF::paths($domain);
 
 
         $result = array();
