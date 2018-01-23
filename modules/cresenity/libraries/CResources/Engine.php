@@ -96,7 +96,8 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         if (strlen($size_add) > 0) {
             $size_add .= '/';
         }
-        $path = curl::base(false, 'http') . 'assets/image/' . $size_add . CResources_Encode::encode($filename);
+        $http_or_https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+        $path = curl::base(false, $http_or_https) . 'assets/image/' . $size_add . CResources_Encode::encode($filename);
 //            $file_name_encode = $this->encode($file_name,self::_digit);
         return $path;
     }
