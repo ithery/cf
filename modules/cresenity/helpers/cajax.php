@@ -80,7 +80,7 @@ class cajax {
         return $response;
     }
 
-    public static function searchSelectElastic($obj,$input){
+    public static function searchSelectElastic($obj, $input) {
         $callbackFunction = null;
         $callback = "";
         $term = "";
@@ -96,72 +96,72 @@ class cajax {
         if (isset($input["term"])) {
             $term = $input["term"];
         }
-        
+
         if (isset($input["limit"])) {
             $limit = $input["limit"];
         }
         if (isset($input["page"])) {
             $page = $input["page"];
         }
-        $elasticIndex=$obj->elasticIndex;
-        $elasticDocumentType=$obj->elasticDocumentType;
-        $dataSearchable=$obj->dataSearchable;
-        $dataSelect=$obj->dataSelect;
-        $dataWhere=$obj->dataWhere;
-        $dataCustomRow=$obj->dataCustomRow;
+        $elasticIndex = $obj->elasticIndex;
+        $elasticDocumentType = $obj->elasticDocumentType;
+        $dataSearchable = $obj->dataSearchable;
+        $dataSelect = $obj->dataSelect;
+        $dataWhere = $obj->dataWhere;
+        $dataCustomRow = $obj->dataCustomRow;
         $elastic = CElastic::instance();
         $search = $elastic->search($elasticIndex, $elasticDocumentType);
-        foreach($dataSelect as $key=>$val){
-            $search->select($key,$val);
+        foreach ($dataSelect as $key => $val) {
+            $search->select($key, $val);
         }
-        foreach($dataWhere as $key=>$detail){
-            if(is_array($detail)){
-                foreach($detail as $key_d=>$val_d){
-                    $search->$key($key_d,$val_d);
+        foreach ($dataWhere as $key => $detail) {
+            if (is_array($detail)) {
+                foreach ($detail as $key_d => $val_d) {
+                    $search->$key($key_d, $val_d);
                 }
             }
         }
-		if(strlen($term)>0){
-			if(strlen($dataSearchable)>0){
-				$search->must('match.'.$dataSearchable,$term);
-			}
-		}
-        if(strlen($limit)>0){
+        if (strlen($term) > 0) {
+            if (strlen($dataSearchable) > 0) {
+                $search->must('match.' . $dataSearchable, $term);
+            }
+        }
+        if (strlen($limit) > 0) {
             $search->size($limit);
         }
-        if(strlen($page)>0){
-            $start=$page*$limit;
+        if (strlen($page) > 0) {
+            $start = ($page-1) * $limit;
             $search->from($start);
         }
 
-        $elasticData=$search->exec();
+        $elasticData = $search->exec();
         $key_field = $obj->data->key_field;
         $search_field = $obj->data->search_field;
-        $data=array();
-        $total=0;
+        $data = array();
+        $total = 0;
         foreach ($elasticData as $row) {
             $p = array();
             foreach ($row as $k => $v) {
-                $v=($v == null) ? "" : $v;
-                if($callbackFunction!=null && is_callable($callbackFunction)){
-                    $v=call_user_func($callbackFunction,$row,$k,$v);
+                $v = ($v == null) ? "" : $v;
+                if ($callbackFunction != null && is_callable($callbackFunction)) {
+                    $v = call_user_func($callbackFunction, $row, $k, $v);
                 }
                 $p[$k] = $v;
             }
             $p["id"] = $row->$key_field;
             $data[] = $p;
         }
-        if(count($dataCustomRow)>0){
-            foreach($dataCustomRow as $row){
+        if (count($dataCustomRow) > 0) {
+            foreach ($dataCustomRow as $row) {
                 $p = array();
-                $temp=array();
+                $temp = array();
                 foreach ($row as $k => $v) {
-                    $v=($v == null) ? "" : $v;
+                    $v = ($v == null) ? "" : $v;
                     $p[$k] = $v;
                 }
                 $p["id"] = $row[$key_field];
-                $temp[]=$p;
-                $data = array_merge($temp,$data);                
+                $temp[] = $p;
+                $data = array_merge($temp, $data);
             }
         }
         $result = array();
@@ -174,7 +174,7 @@ class cajax {
         $response .= ")";
         return $response;
     }
-    
+
     public static function searchselect($obj, $input) {
         if (isset($obj->is_elastic)) {
             return self::searchSelectElastic($obj, $input);
@@ -823,7 +823,7 @@ class cajax {
                         $s = array();
                         $fieldElastic = $search->getElasticField($field);
                         $elastic_field_type = carr::path($properties, $fieldElastic . '.type');
-                       
+
                         switch ($elastic_field_type) {
                             case 'text':
                                 carr::set_path($s, 'match.' . $fieldElastic, $request['sSearch']);
@@ -847,16 +847,16 @@ class cajax {
                 }
             }
             if (count($arr) > 0) {
-              
+
                 $search->must($arr);
             }
         }
 
-        if(isset($_GET['debug'])) {
+        if (isset($_GET['debug'])) {
             cdbg::var_dump($search->buildParams());
             die;
         }
-        
+
         $r = $search->exec();
 
 
