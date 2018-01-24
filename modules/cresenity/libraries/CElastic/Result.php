@@ -1,216 +1,41 @@
 <?php
 
-class CElastic_Result implements ArrayAccess, Iterator, Countable {
+defined('SYSPATH') OR die('No direct access allowed.');
 
-    /**
-     * Time needed to execute the query.
-     *
-     * @var
-     */
-    protected $took;
+/**
+ * @author Hery Kurniawan
+ * @since Nov 18, 2017, 10:41:43 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CElastic_Result extends CElasticResult {
 
-    /**
-     * Check if the query timed out.
-     *
-     * @var
-     */
-    protected $timed_out;
+    protected $select;
 
-    /**
-     * @var
-     */
-    protected $shards;
+    public function __construct($elastic_response, $select) {
 
-    /**
-     * Result of the query.
-     *
-     * @var
-     */
-    protected $hits;
-
-    /**
-     * Total number of hits.
-     *
-     * @var
-     */
-    protected $totalHits;
-
-    /**
-     * Highest document score.
-     *
-     * @var
-     */
-    protected $maxScore;
-
-    /**
-     * The aggregations result.
-     *
-     * @var array|null
-     */
-    protected $aggregations = null;
-
-    /**
-     * The aggregations result.
-     *
-     * @var CElastic_Database_Result|null
-     */
-    protected $result = null;
-
-    /**
-     * _construct.
-     *
-     * @param array $results
-     */
-    public function __construct(array $results) {
-        $this->took = $results['took'];
-
-        $this->timed_out = $results['timed_out'];
-
-        $this->shards = $results['_shards'];
-
-        $this->hits = new CCollection($results['hits']['hits']);
-
-        $this->totalHits = $results['hits']['total'];
-
-        $this->maxScore = $results['hits']['max_score'];
-
-        $this->aggregations = isset($results['aggregations']) ? $results['aggregations'] : [];
-
-        $this->result = new CElastic_Database_Result($results);
+        $this->raw_response = $elastic_response;
+        $this->count_all = carr::path($this->raw_response, 'hits.total', 0);
+        $this->fetch_type = 'object';
+        $this->select = $select;
+        $this->result = $this->_get_result();
+        $this->total_rows = count($this->result);
     }
 
-    /**
-     * Total Hits.
-     *
-     * @return int
-     */
-    public function totalHits() {
-        return $this->totalHits;
-    }
+    protected function _get_result() {
+        $hits = carr::path($this->raw_response, 'hits.hits');
+        $result = array();
+        foreach ($hits as $k => $node) {
+            $row = carr::get($node, '_source');
+            foreach ($this->select as $k => $v) {
+                $field = carr::get($v, 'field');
+                $alias = carr::get($v, 'alias');
+                $row[$alias] = $row[$field];
+            }
 
-    /**
-     * Max Score.
-     *
-     * @return float
-     */
-    public function maxScore() {
-        return $this->maxScore;
-    }
+            $result[] = $row;
+        }
 
-    /**
-     * Get Shards.
-     *
-     * @return array
-     */
-    public function shards() {
-        return $this->shards;
-    }
-
-    /**
-     * Took.
-     *
-     * @return string
-     */
-    public function took() {
-        return $this->took;
-    }
-
-    /**
-     * Timed Out.
-     *
-     * @return bool
-     */
-    public function timedOut() {
-        return (bool) $this->timed_out;
-    }
-
-    /**
-     * Get Hits.
-     *
-     * Get the hits from Elasticsearch
-     * results as a Collection.
-     *
-     * @return Collection
-     */
-    public function hits() {
-        return $this->hits;
-    }
-
-    /**
-     * Set the hits value.
-     *
-     * @param $values
-     */
-    public function setHits($values) {
-        $this->hits = $values;
-    }
-
-    /**
-     * Get aggregations.
-     *
-     * Get the raw hits array from
-     * Elasticsearch results.
-     *
-     * @return array
-     */
-    public function aggregations() {
-        return $this->aggregations;
-    }
-
-    /**
-     * Get _source Hits.
-     *
-     * Get the _source from hits Elasticsearch
-     * results as a CDatabase_Result.
-     *
-     * @return CElastic_Database_Result
-     */
-    public function result() {
-        return $this->result;
-    }
-
-    public function count_all() {
-        return $this->result()->count_all();
-    }
-
-    public function count() {
-        return $this->result()->count();
-    }
-
-    public function current() {
-        return $this->result()->current();
-    }
-
-    public function key() {
-        return $this->result()->key();
-    }
-
-    public function next() {
-        return $this->result()->next();
-    }
-
-    public function offsetExists($offset) {
-        return $this->result()->offsetExists($offset);
-    }
-
-    public function offsetGet($offset) {
-        return $this->result()->offsetGet($offset);
-    }
-
-    public function offsetSet($offset, $value) {
-        return $this->result()->offsetSet($offset, $value);
-    }
-
-    public function offsetUnset($offset) {
-        return $this->result()->offsetUnset($offset);
-    }
-
-    public function rewind() {
-        return $this->result()->rewind();
-    }
-
-    public function valid() {
-        return $this->result()->valid();
+        return $result;
     }
 
 }
