@@ -148,6 +148,9 @@ class CTable extends CElement_Element {
         } else {
             CClientModules::instance()->register_module('jquery.datatable');
         }
+        
+        
+        $this->dom = CManager::theme()->getData('table.dom');
     }
 
     public static function factory($id = "") {
@@ -1886,7 +1889,7 @@ class CTable extends CElement_Element {
 							//$('td:eq(4)', nRow).html( '<b>A</b>' );
 						//$.cresenity.set_confirm($('a.confirm',nRow));
 						
-						var footer_action = $('#footer_action_" . $this->id . "');
+						var footer_action = $('#" . $this->id . "_wrapper .footer_action');
 						
 						" . ($this->have_footer_action() ? "footer_action.html(" . json_encode($this->footer_action_list->html()) . ");" : "") . " 
            
@@ -1993,7 +1996,7 @@ class CTable extends CElement_Element {
             }
 
             if ($this->dom == null) {
-                $this->dom = "<\"\"l>t<\"F\"<\"#footer_action_" . $this->id . "\">frp>";
+                $this->dom = "<\"\"l>t<\"F\"<\".footer_action\">frp>";
             } else {
                 $this->dom = str_replace("'", "\'", $this->dom);
             }

@@ -15,6 +15,12 @@ final class CManager {
 
     /**
      *
+     * @var CManager_Theme
+     */
+    protected static $theme = null;
+    
+    /**
+     *
      * @return CManager
      */
     public static function instance() {
@@ -39,8 +45,17 @@ final class CManager {
                 $this->bootstrap = carr::get($this->theme_data, 'bootstrap');
             }
         }
+        self::$theme = new CManager_Theme();
     }
 
+    /**
+     * 
+     * @return CManager_Theme
+     */
+    public static function theme() {
+        return self::$theme;
+    }
+    
     public static function get_theme_data() {
         return self::instance()->theme_data;
     }

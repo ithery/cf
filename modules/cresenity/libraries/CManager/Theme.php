@@ -7,16 +7,17 @@
  */
 class CManager_Theme {
 
-    public static $themes = array(
-        'cresenity' => 'Default',
-        'ittron-app' => 'ITtron Theme'
-    );
+    /**
+     *
+     * @var callable
+     */
+    protected static $themeCallback;
 
-    public static function get_theme_list() {
-        return self::$themes;
+    public static function setThemeCallback(callable $themeCallback) {
+        self::$themeCallback = $themeCallback;
     }
 
-    public static function get_default_theme() {
+    public static function getDefaultTheme() {
         $theme = CF::theme();
         if (strlen(ccfg::get('theme')) > 0) {
             $theme = ccfg::get('theme');
@@ -24,24 +25,44 @@ class CManager_Theme {
         return $theme;
     }
 
-    public static function get_current_theme() {
+    public static function getCurrentTheme() {
         $theme = CSession::instance()->get('theme');
         if ($theme == null) {
-            $theme = self::get_default_theme();
-            if ($theme == null)
+            $theme = self::getDefaultTheme();
+            if ($theme == null) {
                 $theme = 'cresenity';
+            }
+        }
+        if (self::$themeCallback != null && is_callable(self::$themeCallback)) {
+            $theme = $themeCallback($theme);
         }
         return $theme;
     }
 
-    public static function set_theme($theme) {
+    public static function setTheme($theme) {
         CSession::instance()->set('theme', $theme);
     }
 
-    public static function get_theme_path() {
+    public static function getThemeData() {
+        $theme = self::getCurrentTheme();
+        $themeFile = CF::get_file('themes', $theme);
+        $themeAllData = null;
+        if (file_exists($themeFile)) {
+            $themeAllData = include $themeFile;
+        }
+        return $themeAllData;
+    }
+
+    public static function getData($key) {
+        $themeAllData = self::getThemeData();
+        $themeData = carr::get($themeAllData, 'data');
+        return carr::path($themeData, $key);
+    }
+
+    public static function getThemePath() {
         $theme_path = '';
-        $theme = ctheme::get_current_theme();
-        $theme_file = CF::get_file('themes', $theme);
+        $theme = self::getCurrentTheme();
+        $themeFile = CF::get_file('themes', $theme);
         if (file_exists($theme_file)) {
             $theme_data = include $theme_file;
             $theme_path = carr::get($theme_data, 'theme_path');
