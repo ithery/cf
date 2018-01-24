@@ -54,7 +54,7 @@ class CNavigation extends CObject {
         if ($app_code == null) {
             $app_code = CF::app_code();
         }
-        if (!isset($_instance[$app_code])) {
+        if (!isset(self::$_instance[$app_code])) {
             self::$_instance[$app_code] = new CNavigation($app_code);
         }
         return self::$_instance[$app_code];

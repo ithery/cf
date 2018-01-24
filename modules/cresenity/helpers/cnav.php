@@ -164,6 +164,9 @@ class cnav {
 
         $result = array();
 
+       
+        
+            
         foreach ($navs as $d) {
             if (!cnav::access_available($d, $app_id, $domain, $app_role_id)) {
                 continue;
@@ -175,7 +178,7 @@ class cnav {
             $res["app_id"] = $app_id;
             $res["domain"] = $domain;
             $subnav = array();
-            if (isset($d["subnav"]) && is_array($d["subnav"])) {
+            if (isset($d["subnav"]) && is_array($d["subnav"]) && count($d["subnav"])>0) {
                 $subnav = cnav::as_user_rights_array($app_id, $role_id, $d["subnav"], $app_role_id, $domain, $level + 1);
             }
             if (count($subnav) == 0 && (!isset($d["controller"]) || strlen($d["controller"]) == 0 )) {
