@@ -15,6 +15,8 @@ body {
     overflow-x: hidden;
 }
 
+
+
 h1,
 h2,
 h3,
@@ -508,6 +510,9 @@ fieldset[disabled] .btn-white.active {
 }
 .form-horizontal input[type="text"], .form-horizontal input[type="password"], .form-horizontal textarea {
     width: 100%; 
+}
+input[readonly=readonly],select[readonly=readonly],textarea[readonly=readonly] {
+        background: #f0f0f0;
 }
 
 .form-horizontal input[type="text"].datepicker {
