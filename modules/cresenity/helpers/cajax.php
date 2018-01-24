@@ -80,7 +80,105 @@ class cajax {
         return $response;
     }
 
+    public static function searchSelectElastic($obj,$input){
+        $callbackFunction = null;
+        $callback = "";
+        $term = "";
+        $limit = "";
+        $page = "";
+
+        if (isset($input["callbackFunction"])) {
+            $callbackFunction = $input["callbackFunction"];
+        }
+        if (isset($input["callback"])) {
+            $callback = $input["callback"];
+        }
+        if (isset($input["term"])) {
+            $term = $input["term"];
+        }
+        
+        if (isset($input["limit"])) {
+            $limit = $input["limit"];
+        }
+        if (isset($input["page"])) {
+            $page = $input["page"];
+        }
+        $elasticIndex=$obj->elasticIndex;
+        $elasticDocumentType=$obj->elasticDocumentType;
+        $dataSearchable=$obj->dataSearchable;
+        $dataSelect=$obj->dataSelect;
+        $dataWhere=$obj->dataWhere;
+        $dataCustomRow=$obj->dataCustomRow;
+        $elastic = CElastic::instance();
+        $search = $elastic->search($elasticIndex, $elasticDocumentType);
+        foreach($dataSelect as $key=>$val){
+            $search->select($key,$val);
+        }
+        foreach($dataWhere as $key=>$detail){
+            if(is_array($detail)){
+                foreach($detail as $key_d=>$val_d){
+                    $search->$key($key_d,$val_d);
+                }
+            }
+        }
+		if(strlen($term)>0){
+			if(strlen($dataSearchable)>0){
+				$search->must('match.'.$dataSearchable,$term);
+			}
+		}
+        if(strlen($limit)>0){
+            $search->size($limit);
+        }
+        if(strlen($page)>0){
+            $start=$page*$limit;
+            $search->from($start);
+        }
+
+        $elasticData=$search->exec();
+        $key_field = $obj->data->key_field;
+        $search_field = $obj->data->search_field;
+        $data=array();
+        $total=0;
+        foreach ($elasticData as $row) {
+            $p = array();
+            foreach ($row as $k => $v) {
+                $v=($v == null) ? "" : $v;
+                if($callbackFunction!=null && is_callable($callbackFunction)){
+                    $v=call_user_func($callbackFunction,$row,$k,$v);
+                }
+                $p[$k] = $v;
+            }
+            $p["id"] = $row->$key_field;
+            $data[] = $p;
+        }
+        if(count($dataCustomRow)>0){
+            foreach($dataCustomRow as $row){
+                $p = array();
+                $temp=array();
+                foreach ($row as $k => $v) {
+                    $v=($v == null) ? "" : $v;
+                    $p[$k] = $v;
+                }
+                $p["id"] = $row[$key_field];
+                $temp[]=$p;
+                $data = array_merge($temp,$data);                
+            }
+        }
+        $result = array();
+        $result["data"] = $data;
+        $result["total"] = $total;
+
+        $response = "";
+        $response .= $callback . "(";
+        $response .= json_encode($result);
+        $response .= ")";
+        return $response;
+    }
+    
     public static function searchselect($obj, $input) {
+        if (isset($obj->is_elastic)) {
+            return self::searchSelectElastic($obj, $input);
+        }
         $db = CDatabase::instance();
         $q = $obj->data->query;
         $key_field = $obj->data->key_field;
