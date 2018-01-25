@@ -512,7 +512,10 @@ fieldset[disabled] .btn-white.active {
     width: 100%; 
 }
 input[readonly=readonly],select[readonly=readonly],textarea[readonly=readonly] {
-        background: #f0f0f0;
+    background: #f0f0f0;
+}
+input[disabled=disabled],select[disabled=disabled],textarea[disabled=disabled],input[disabled],select[disabled],textarea[disabled] {
+    background: #f0f0f0;
 }
 
 .form-horizontal input[type="text"].datepicker {
