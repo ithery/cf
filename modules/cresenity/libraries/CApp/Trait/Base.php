@@ -15,7 +15,7 @@ trait CApp_Trait_Base {
      * 
      * @return int
      */
-    public static function org_id() {
+    public static function orgId() {
         $org_id = CF::org_id();
         $app = CApp::instance();
         if ($app->user() != null) {
@@ -26,14 +26,22 @@ trait CApp_Trait_Base {
         return $org_id;
     }
 
+    public static function org_id() {
+        return self::orgId();
+    }
+
     /**
      * 
      * @param int $org_id optional, default using return values of SM::org_id()
      * @return string Code of org
      */
-    public static function org_code($org_id = null) {
-        $org = self::org($org_id);
+    public static function orgCode($orgId = null) {
+        $org = self::org($orgId);
         return cobj::get($org, 'code');
+    }
+
+    public static function org_code($orgId = null) {
+        return self::orgCode($orgId);
     }
 
     /**
@@ -41,9 +49,13 @@ trait CApp_Trait_Base {
      * @param int $org_id optional, default using return values of SM::org_id()
      * @return string Name of org
      */
-    public static function org_name($org_id = null) {
+    public static function orgName($orgId = null) {
         $org = self::org($org_id);
         return cobj::get($org, 'name');
+    }
+
+    public static function org_name($orgId = null) {
+        return self::orgName($orgId);
     }
 
     /**
@@ -101,8 +113,12 @@ trait CApp_Trait_Base {
      * 
      * @return int
      */
-    public static function user_id() {
+    public static function userId() {
         return cobj::get(self::user(), 'user_id');
+    }
+
+    public static function user_id() {
+        return self::userId();
     }
 
     /**
