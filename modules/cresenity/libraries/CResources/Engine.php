@@ -89,9 +89,20 @@ abstract class CResources_Engine implements CResources_EngineInterface {
     }
 
     public function get_url($filename = null, $size = '') {
+
+
+
         if ($filename == null) {
             $filename = $this->_filename;
         }
+        if ($this->_resource_type == 'image') {
+            $imageLoader = CResources::image($filename);
+            if (strlen($size) > 0) {
+                $imageLoader->setSize($size);
+            }
+            return $imageLoader->getUrl();
+        }
+
         $size_add = $size;
         if (strlen($size_add) > 0) {
             $size_add .= '/';

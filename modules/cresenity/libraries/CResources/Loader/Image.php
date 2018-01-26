@@ -19,6 +19,7 @@ class CResources_Loader_Image {
         $appCode = carr::get($options, 'app_code');
         $orgCode = carr::get($options, 'org_code');
         $sizeName = carr::get($options, 'size');
+        $sizeOptions = carr::get($options, 'size_options', array());
         $type = carr::get($options, 'type');
         if (strlen($appCode) == 0) {
             $appCode = CF::app_code();
@@ -27,6 +28,10 @@ class CResources_Loader_Image {
         $this->appCode = $appCode;
         $this->orgCode = $orgCode;
         $this->resourceName = $resourceName;
+
+        if ($sizeName != null) {
+            $this->setSize($sizeName, $sizeOptions);
+        }
         $this->sizeName = $sizeName;
         $this->type = $type;
     }

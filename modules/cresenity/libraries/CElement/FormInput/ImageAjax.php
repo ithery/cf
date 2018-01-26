@@ -40,6 +40,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
             $this->setVar('preTag', $this->pretag());
             $this->setVar('postTag', $this->posttag());
             $this->setVar('name', $this->name);
+            $this->setVar('value', $this->value);
             $this->setVar('ajaxName', $ajaxName);
             $this->setVar('ajaxUrl', $ajaxUrl);
         });

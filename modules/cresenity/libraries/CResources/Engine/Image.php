@@ -22,11 +22,13 @@ class CResources_Engine_Image extends CResources_Engine {
         $new_width = $width;
         $new_height = $height;
         list($img_width, $img_height) = @getimagesize($fullfilename);
+
         if ($proportional) {
             if (!$img_width || !$img_height) {
                 throw new Exception('Fail to getimagesize ' . $fullfilename);
             }
             $scale = min($width / $img_width, $height / $img_height);
+
             if ($scale >= 1) {
 
                 ///////////////////// jja ///////////////////// 
@@ -37,6 +39,7 @@ class CResources_Engine_Image extends CResources_Engine {
                 $file_path = $fullfilename;
                 $new_file_path = $size_path . $filename;
                 ///////////////////// jja ///////////////////// 
+
 
                 if ($file_path !== $new_file_path) {
 
@@ -52,37 +55,42 @@ class CResources_Engine_Image extends CResources_Engine {
         }
         $full_size_path = $size_path . $filename;
 
+
+
         try {
-            $wideimage = CWideImage::load($fullfilename);
+            //resize to propotional to maximum size, reduce memory load
+            $maxScale = max($width / $img_width, $height / $img_height);
+            $maxPropWidth = $img_width * $maxScale;
+            $maxPropHeight = $img_height * $maxScale;
+
+            $src = imagecreatefromjpeg($fullfilename);
+            $dst = imagecreatetruecolor($maxPropWidth, $maxPropHeight);
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxPropWidth, $maxPropHeight, $img_width, $img_height);
+            unset($src);
+
+            $wideimage = CWideImage::load($dst);
+
+            if ($crop) {
+                $wideimage = $wideimage->crop('center', 'center', $width, $height);
+            }
+
+
             if ($whitespace) {
-                $w = ($img_height / $height) * $width;
-                $h = ($img_width / $width) * $height;
-                $height_new = $img_height;
-                $width_new = $img_width;
+                $w = ($maxPropHeight / $height) * $width;
+                $h = ($maxPropWidth / $width) * $height;
+                $height_new = $maxPropHeight;
+                $width_new = $maxPropWidth;
                 if ($w > $h) {
                     $width_new = $w;
                 } else {
                     $height_new = $h;
                 }
+
                 $white = $wideimage->allocateColor(255, 255, 255);
+
                 //throw new Exception("Width:".$width.", Height:".$height.", Img Width:".$img_width.", Img Height:".$img_height.", Width New:".$width_new.", Height New:".$height_new);
                 $wideimage = $wideimage->resizeCanvas($width_new, $height_new, 'center', 'center', $white);
             }
-            if ($crop) {
-                $w = ($img_height / $height) * $width;
-                $h = ($img_width / $width) * $height;
-                $height_new = $img_height;
-                $width_new = $img_width;
-                if ($w > $h) {
-                    $height_new = $h;
-                } else {
-                    $width_new = $w;
-                }
-                
-                $white = $wideimage->allocateColor(255, 255, 255);
-                $wideimage = $wideimage->resizeCanvas($width_new, $height_new, 'center', 'center', $white);
-            }
-
             $wideimage = $wideimage->resize($new_width, $new_height);
             if ($crop) {
                 $wideimage = $wideimage->crop('center', 'center', $width, $height);

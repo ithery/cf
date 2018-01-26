@@ -102,12 +102,11 @@ class CResources {
         return $object;
     }
 
-    public static function image($name,$options) {
-        return new CResources_Loader_Image($name,$options);
+    public static function image($name, $options = array()) {
+        return new CResources_Loader_Image($name, $options);
     }
-    
-    
-    public static function encode($str){
+
+    public static function encode($str) {
         return CResources_Encode::encode($str);
     }
 
