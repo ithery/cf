@@ -70,7 +70,7 @@ input,select,textarea {
     border: 1px solid #e5e6e7;
     border-radius: 1px;
     color: inherit;
-    display: block;
+    display: inline-block;
     padding: 6px 12px;
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
     width: 100%;
@@ -502,7 +502,7 @@ fieldset[disabled] .btn-white.active {
     border: 1px solid #e5e6e7;
     border-radius: 1px;
     color: inherit;
-    display: block;
+    display: inline-block;
     padding: 6px 12px;
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
     width: 100%;
@@ -839,12 +839,16 @@ table.responsive {
     padding: 15px 15px 7px;
     min-height: 48px;
 }
+.widget-box.widget-table .widget-title {
+    border-width: 1px 1px 1px 1px;
+}
 .widget-box .widget-title span.icon {
     border-right: 0;
     margin: 0px 8px 7px 0px;
     padding:0;
     opacity: 1;
 }
+
 .widget-box .widget-title h5 {
     display: inline-block;
     font-size: 14px;
@@ -853,6 +857,10 @@ table.responsive {
     text-overflow: ellipsis;
     float: left;
     line-height: inherit;
+}
+.widget-box .widget-title .buttons {
+    float: right;
+    margin: -9px 10px 0 0;
 }
 
 .widget-box .widget-content {
@@ -959,9 +967,15 @@ div.dataTables_filter input {
 .data_table-quick_search {
     width: 100%;
 }
+
+div.dataTables_wrapper .ui-widget-header {
+    border: 1px solid #D5D5D5;
+}
+
 /* select2 */
 .form-horizontal .select2-container {
     width: 100%;
+    margin-top: -5px;
 }
 
 .select2-container {

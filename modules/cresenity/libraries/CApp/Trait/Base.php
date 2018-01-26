@@ -50,7 +50,7 @@ trait CApp_Trait_Base {
      * @return string Name of org
      */
     public static function orgName($orgId = null) {
-        $org = self::org($org_id);
+        $org = self::org($orgId);
         return cobj::get($org, 'name');
     }
 
@@ -130,4 +130,5 @@ trait CApp_Trait_Base {
         return date('Y-m-d H:i:s');
     }
 
+    
 }

@@ -296,40 +296,40 @@ body .modal {
 
 @media (min-width: 992px) {
 
-    .row-fluid > .span1 {
+    .row-fluid > .span1,.row > .span1 {
         width: 8.33333333%;
     }
-    .row-fluid > .span2 {
+    .row-fluid > .span2,.row > .span2 {
         width: 16.66666667%;
     }
-    .row-fluid > .span3 {
+    .row-fluid > .span3,.row > .span3 {
         width:25%;
     }
-    .row-fluid > .span4 {
+    .row-fluid > .span4,.row > .span4 {
         width:33.33333333%;
     }
-    .row-fluid > .span5 {
+    .row-fluid > .span5,.row > .span5 {
         width: 41.66666667%;
     }
-    .row-fluid > .span6 {
+    .row-fluid > .span6,.row > .span6 {
         width: 50%;
     }
-    .row-fluid > .span7 {
+    .row-fluid > .span7,.row > .span7 {
         width: 58.33333333%;
     }
-    .row-fluid > .span8 {
+    .row-fluid > .span8,.row > .span8 {
         width: 66.66666667%;
     }    
-    .row-fluid > .span9 {
+    .row-fluid > .span9,.row > .span9 {
         width:75%;
     }
-    .row-fluid > .span10 {
+    .row-fluid > .span10,.row > .span10 {
         width: 83.33333333%;
     }
-    .row-fluid > .span11 {
+    .row-fluid > .span11,.row > .span11 {
         width: 91.66666667%;
     }
-    .row-fluid > .span12 {
+    .row-fluid > .span12,.row > .span12 {
         width: 100%;
     }
 

@@ -82,4 +82,20 @@ trait CApp_Trait_GenerateCode {
         return $result;
     }
 
+    public static function _get_next_code_from_format($key_format) {
+        $db = CDatabase::instance();
+        $key_counter = self::_get_key_counter($key_format);
+        $result = $key_counter;
+        $counter = self::_get_next_counter($key_counter);
+        preg_match_all("/{([\w]*)}/", $key_format, $matches, PREG_SET_ORDER);
+        foreach ($matches as $val) {
+            $str = $val[1]; //matches str without bracket {}
+            $b_str = $val[0]; //matches str with bracket {}
+            $len_counter = strlen($str);
+            $pad_counter = str_pad($counter, $len_counter, "0", STR_PAD_LEFT);
+            $result = str_replace($b_str, $pad_counter, $result);
+        }
+        return $result;
+    }
+
 }
