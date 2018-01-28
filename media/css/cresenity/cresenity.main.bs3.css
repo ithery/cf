@@ -1053,6 +1053,14 @@ div.dataTables_wrapper .ui-widget-header {
     background: #fff url(/media/img/plugins/select2/select2.png) no-repeat 100% -22px;
 }
 
+.select2-dropdown-open.select2-drop-above .select2-choice, .select2-dropdown-open.select2-drop-above .select2-choices {
+    background-image:none;
+    border: 1px solid #e7eaec;
+
+}
+.select2-container.select2-drop-above .select2-choice { 
+    border-radius:0px
+}
 /* file upload*/
 .fileupload .btn.fileupload-exists {
     padding: 4px 10px;
@@ -1206,6 +1214,37 @@ body.mini-navbar #page-wrapper {
     margin: 0 0 0 70px;
 }
 
+
+
+.loading.spinner {
+    position:relative;
+    opacity:1;
+}
+.loading.spinner * {
+    opacity:0.8;
+}
+.loading.spinner:before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    opacity:1;
+    animation: spinner .6s linear infinite;
+}
+
+
+
+@keyframes spinner {
+    to {transform: rotate(360deg);}
+}
 
 @media (min-width: 768px) {
     #page-wrapper {
