@@ -131,7 +131,6 @@ abstract class CElement_Element extends CElement {
         if ($this->is_onetag) {
             $html->appendln($this->onetag());
         } else {
-            
             $html->appendln($this->pretag())->br();
             $html->inc_indent();
             $html->appendln($this->html_child($html->get_indent()))->br();

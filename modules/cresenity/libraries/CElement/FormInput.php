@@ -160,27 +160,28 @@ class CElement_FormInput extends CElement_Element {
         $js = "";
         if ($this->submit_onchange) {
             if ($this->type == "date") {
-                $js.="
+                $js .= "
 						$('#" . $this->id . "').on('changeDate',function() {
 							$(this).closest('form').submit();
 						});
 					
 					";
             }
-            $js.="
+            $js .= "
 					$('#" . $this->id . "').on('change',function() {
 						$(this).closest('form').submit();
 					});
 				
 				";
         }
-        $js.= $this->js_child($indent);
+        $js .= $this->js_child($indent);
         return $js;
     }
 
-    /**
-     * @return self
-     */
-//        abstract function set_placeholder();
-//        abstract function set_query();
+    protected function html_attr() {
+        $htmlAttr = parent::html_attr();
+        $nameAttr = ' name="' . $this->name . '"';
+        return $htmlAttr . $nameAttr;
+    }
+
 }

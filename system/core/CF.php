@@ -460,7 +460,7 @@ final class CF {
 
     public static function get_files($directory, $filename, $domain = null) {
         if ($domain == null) {
-            $domain = crouter::domain();
+            $domain = CF::domain();
         }
         $include_paths = CF::paths($domain);
 

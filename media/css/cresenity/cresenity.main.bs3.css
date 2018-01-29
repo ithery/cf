@@ -587,7 +587,9 @@ input[disabled=disabled],select[disabled=disabled],textarea[disabled=disabled],i
 .modal-body {
     background: #f8fafb;
 }
-
+.modal-header {
+    height:auto;
+}
 .alert {
     border-radius: 0;
 }
@@ -970,6 +972,13 @@ div.dataTables_filter input {
 
 div.dataTables_wrapper .ui-widget-header {
     border: 1px solid #D5D5D5;
+}
+
+/* summernote */
+
+
+.note-editable {
+    height:300px;
 }
 
 /* select2 */

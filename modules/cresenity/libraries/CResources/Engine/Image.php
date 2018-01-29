@@ -179,5 +179,6 @@ class CResources_Engine_Image extends CResources_Engine {
 
         return $filename;
     }
-
+    
+    
 }

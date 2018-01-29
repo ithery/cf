@@ -34,7 +34,7 @@ class CManager_Theme {
             }
         }
         if (self::$themeCallback != null && is_callable(self::$themeCallback)) {
-            $theme = $themeCallback($theme);
+            $theme = call_user_func($themeCallback, $theme);
         }
         return $theme;
     }

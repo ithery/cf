@@ -466,5 +466,14 @@ return array(
             "plugins/animate/animate.css",
         ),
     ),
+    "summernote" => array(
+        "css" => array(
+            "plugins/summernote/summernote.css",
+            "plugins/summernote/summernote-bs3.css",
+        ),
+        "js" => array(
+            "plugins/summernote/summernote-bs3.min.js",
+        ),
+    ),
 );
 ?>

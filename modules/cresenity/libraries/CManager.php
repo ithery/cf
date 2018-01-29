@@ -18,7 +18,7 @@ final class CManager {
      * @var CManager_Theme
      */
     protected static $theme = null;
-    
+
     /**
      *
      * @return CManager
@@ -55,7 +55,7 @@ final class CManager {
     public static function theme() {
         return self::$theme;
     }
-    
+
     public static function get_theme_data() {
         return self::instance()->theme_data;
     }
