@@ -160,22 +160,21 @@ class CResources_Loader_Image {
     }
 
     public function saveToS3() {
-        $s3Object = DigitalOcean_Client::factory();
-        $bucket = carr::get($this->s3Options, 'bucket');
-        $s3Object->setBucket($bucket);
-
-        $fullPath = $this->getSizePath($this->sizeName);
-        $basePath = $this->getBasePath($this->sizeName);
-        $path = trim(trim(dirname($basePath), '/'), DS);
-
         $resultSave = false;
-        if (file_exists($fullPath)) {
-            $resultSave = $s3Object->upload($path, file_get_contents($fullPath), $this->resourceName);
-            if ($resultSave) {
-                //@unlink($fullPath);
+        if ($this->s3Object != null) {
+            $this->s3Object->setBucket($bucket);
+
+            $fullPath = $this->getSizePath($this->sizeName);
+            $basePath = $this->getBasePath($this->sizeName);
+            $path = trim(trim(dirname($basePath), '/'), DS);
+
+            if (file_exists($fullPath)) {
+                $resultSave = $s3Object->upload($path, file_get_contents($fullPath), $this->resourceName);
+                if ($resultSave) {
+                    //@unlink($fullPath);
+                }
             }
         }
-
 
         return $resultSave;
     }
