@@ -85,6 +85,10 @@ class CResources_Loader_Image {
         return $fullPath;
     }
 
+    public function getPath() {
+        return $this->getSizePath($this->sizeName);
+    }
+
     public function setSize($sizeName, $sizeOptions = array()) {
         $sizeDefaultWidth = 100;
         $sizeDefaultHeight = 100;
