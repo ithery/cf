@@ -90,7 +90,8 @@ class CElement_FormInput_ClockPicker extends CElement_FormInput {
         $js->set_indent($indent);
 
         $js->appendln("$('#" . $this->id . "').clockpicker({");
-
+        $js->appendln("donetext: 'OK'");
+        
         $js->appendln("});");
 
         return $js->text();

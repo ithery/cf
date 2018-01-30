@@ -130,7 +130,7 @@ class cajax {
             $search->size($limit);
         }
         if (strlen($page) > 0) {
-            $start = ($page-1) * $limit;
+            $start = ($page - 1) * $limit;
             $search->from($start);
         }
 
@@ -504,7 +504,9 @@ class cajax {
         $qfilter .= " " . $temp_order_by . ' ' . $sLimit;
         //die(substr($temp_order_by,0,9).$sub[1]);
         //var_dump($db->query('select * from transaction limit 1')->result_array());
-
+        if (isset($_GET['debug'])) {
+            cdbg::var_dump($qfilter);
+        }
         $r = $db->query($qfilter);
 
         //$filtered_record = $r->count();

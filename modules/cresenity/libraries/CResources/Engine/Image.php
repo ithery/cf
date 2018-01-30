@@ -55,11 +55,12 @@ class CResources_Engine_Image extends CResources_Engine {
         }
         $full_size_path = $size_path . $filename;
 
-
-
         try {
             //resize to propotional to maximum size, reduce memory load
-            $maxScale = max($width / $img_width, $height / $img_height);
+            $maxScale = 1;
+            if ($img_width > 0 && $img_height > 0) {
+                $maxScale = max($width / $img_width, $height / $img_height);
+            }
             $maxPropWidth = $img_width * $maxScale;
             $maxPropHeight = $img_height * $maxScale;
 
@@ -179,6 +180,5 @@ class CResources_Engine_Image extends CResources_Engine {
 
         return $filename;
     }
-    
-    
+
 }
