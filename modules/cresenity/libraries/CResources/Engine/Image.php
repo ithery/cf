@@ -64,9 +64,14 @@ class CResources_Engine_Image extends CResources_Engine {
             $maxPropWidth = $img_width * $maxScale;
             $maxPropHeight = $img_height * $maxScale;
 
-            $src = imagecreatefromjpeg($fullfilename);
-            $dst = imagecreatetruecolor($maxPropWidth, $maxPropHeight);
-            imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxPropWidth, $maxPropHeight, $img_width, $img_height);
+            $ext = pathinfo($fullfilename, PATHINFO_EXTENSION);
+            if ($ext == 'png') {
+                $src = @imagecreatefrompng($fullfilename);
+            } else {
+                $src = @imagecreatefromjpeg($fullfilename);
+            }
+            $dst = @imagecreatetruecolor($maxPropWidth, $maxPropHeight);
+            @imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxPropWidth, $maxPropHeight, $img_width, $img_height);
             unset($src);
 
             $wideimage = CWideImage::load($dst);
