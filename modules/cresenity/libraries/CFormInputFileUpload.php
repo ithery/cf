@@ -84,9 +84,10 @@ class CFormInputFileUpload extends CFormInput {
         $html->appendln('
                 <style>
                     #' . $div_id . ' {
+                        border: 2px dashed #CDCDCD;
                         margin-left: 0px;
                         padding: 10px 10px;
-                        border: 2px dashed #CDCDCD;
+                        width: 100%;
                     }
                     #' . $div_id . '.ondrag {
                         border: 5px dashed #CDCDCD;
@@ -152,13 +153,22 @@ class CFormInputFileUpload extends CFormInput {
                     .div-custom-control{
                         margin-top:10px;
                     }
-                    
+                    #' . $div_id . '_btn_upload {
+                        width: 100%;
+                        margin: 15px 0;
+                    }
                     .div-custom-control label{
                         display:inline-block;
                     }
                     .div-custom-control input[type="text"]{
                         display:inline-block;
                         width:auto;
+                    }
+
+                    @media (min-width: 768px) {
+                        #' . $div_id . '_btn_upload {
+                            display: none;
+                        }
                     }
                 </style>
                 <input id="' . $div_id . '_input_temp" type="file" name="'.$div_id.'_input_temp[]" multiple style="display:none;">
@@ -204,6 +214,11 @@ class CFormInputFileUpload extends CFormInput {
                         '.$html_description.'
                 </div>
         ');
+        $html->appendln('
+            <div>
+                <div id="' . $div_id . '_btn_upload" class="btn btn-success">' . clang::__('Upload Image') . '</div>
+            </div>
+        ');
         return $html->text();
     }
 
@@ -223,6 +238,10 @@ class CFormInputFileUpload extends CFormInput {
             $js->appendln('
                 var index=0;
                 var description = $("#' . $div_id . '_description");
+
+                $("#' . $div_id . '_btn_upload").click(function() {
+                    $( "#' . $div_id . '_input_temp" ).trigger("click");
+                })
 
                 $(this).on({
                     "dragover dragenter": function(e) {
