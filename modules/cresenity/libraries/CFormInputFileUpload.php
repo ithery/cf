@@ -88,6 +88,7 @@ class CFormInputFileUpload extends CFormInput {
                         margin-left: 0px;
                         padding: 10px 10px;
                         width: 100%;
+                        min-height: 100px;
                     }
                     #' . $div_id . '.ondrag {
                         border: 5px dashed #CDCDCD;
@@ -128,6 +129,7 @@ class CFormInputFileUpload extends CFormInput {
                         text-align: center;
                         display: block;
                         font-size: 20px;
+                        margin: 15px 0;
                     }
                     #' . $div_id . '_message {
                         margin-left: 0px;
@@ -174,6 +176,7 @@ class CFormInputFileUpload extends CFormInput {
                 <input id="' . $div_id . '_input_temp" type="file" name="'.$div_id.'_input_temp[]" multiple style="display:none;">
                 <div id="' . $div_id . '_message" class="row alert alert-danger fade in">
                 </div>
+                <div id="' . $div_id . '_description">' . clang::__("Click or Drop Files On Box Below") . '</div>
                 <div id="' . $div_id . '" class="row control-fileupload">
                 ');
         foreach($this->files as $f) {
@@ -205,14 +208,9 @@ class CFormInputFileUpload extends CFormInput {
                 </div>
             ');
         }
-        
-        $html_description = '';
-        if(count($this->files)==0) {
-            $html_description = '<span id="' . $div_id . '_description">'.clang::__("Click Here or Drop Files Here").'</span>';
-        }
-        $html->appendln(        '
-                        '.$html_description.'
-                </div>
+
+        $html->appendln('
+            </div>
         ');
         $html->appendln('
             <div>
@@ -266,10 +264,6 @@ class CFormInputFileUpload extends CFormInput {
                        
                         
                         $(this).parent().remove();
-                       
-                        if ($("#' . $div_id . '").children().length==0) {
-                                $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">'.clang::__("Click Here or Drop Files Here").'</span>");
-                        }
                     })
                 }
 
