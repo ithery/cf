@@ -96,7 +96,7 @@ class CFormInputFileUpload extends CFormInput {
                     }
                     #' . $div_id . ' div.container-file-upload {
                         border: 1px solid #ddd;
-                        margin: 10px 10px;
+                        margin: 6px 6px;
                         width: 200px;
                         height: auto;
                         float: left;
