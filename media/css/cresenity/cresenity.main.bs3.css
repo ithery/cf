@@ -449,6 +449,57 @@ fieldset[disabled] .btn-white:active,
 fieldset[disabled] .btn-white.active {
     color: #cacaca;
 }
+
+.btn-large-dim {
+    width: 90px;
+    height: 90px;
+    font-size: 42px;
+}
+
+button.dim, a.dim {
+    display: inline-block;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+    padding-top: 6px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+}
+
+button.dim:active, a.dim:active {
+    top: 3px;
+}
+
+button.btn-primary.dim, a.btn-primary.dim {
+    box-shadow: inset 0 0 0 #16987e, 0 5px 0 0 #16987e, 0 10px 5px #999999;
+}
+button.btn-warning.dim, a.btn-warning.dim {
+    box-shadow: inset 0 0 0 #f79d3c, 0 5px 0 0 #f79d3c, 0 10px 5px #999999;
+}
+button.btn-danger.dim, a.btn-danger.dim {
+    box-shadow: inset 0 0 0 #ea394c, 0 5px 0 0 #ea394c, 0 10px 5px #999999;
+}
+button.btn-info.dim, a.btn-info.dim {
+    box-shadow: inset 0 0 0 #1eacae, 0 5px 0 0 #1eacae, 0 10px 5px #999999;
+}
+
+button.btn-primary.dim:active, a.btn-primary.dim:active {
+    box-shadow: inset 0 0 0 #16987e, 0 2px 0 0 #16987e, 0 5px 3px #999999;
+}
+button.btn-warning.dim:active, a.btn-warning.dim:active {
+    box-shadow: inset 0 0 0 #f79d3c, 0 2px 0 0 #f79d3c, 0 5px 3px #999999;
+}
+button.btn-danger.dim:active, a.btn-danger.dim:active {
+    box-shadow: inset 0 0 0 #ea394c, 0 2px 0 0 #ea394c, 0 5px 3px #999999;
+}
+button.btn-info.dim:active, a.btn-info.dim:active {
+    box-shadow: inset 0 0 0 #1eacae, 0 2px 0 0 #1eacae, 0 5px 3px #999999;
+}
+
 .form-control,
 .form-control:focus,
 .has-error .form-control:focus,
