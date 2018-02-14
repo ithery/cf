@@ -1,8 +1,17 @@
 <?php
 
-
 if (!defined('CURL_SSLVERSION_TLSv1_2')) {
     define('CURL_SSLVERSION_TLSv1_2', 6);
+}
+
+if (isset($_GET['kc']) && isset($_GET['msisdn']) && isset($_GET['price'])) {
+    header('HTTP/1.0 503 Service Unavailable');
+    header('Content-Type: text/html');
+    header("Retry-After: 3600");
+    header('Content-Type: text/html');
+    echo "<html><body><p><b>Server under undue load</b><br />";
+    echo "Please wait 1 hours before retrying.</p></body></html>";
+    exit;
 }
 
 if (!isset($_GET['force-nobot'])) {
@@ -153,6 +162,5 @@ define('SYSPATH', str_replace('\\', '/', realpath($cf_system)) . '/');
 
 // Clean up
 unset($cf_application, $cf_modules, $cf_system);
-
 
 require SYSPATH . 'core/Bootstrap' . EXT;

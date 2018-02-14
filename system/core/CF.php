@@ -1054,6 +1054,10 @@ final class CF {
                     die;
                 }
             }
+            $is404 = false;
+            if ($exception instanceof CF_404_Exception) {
+                $is404 = true;
+            }
 
             // Test to see if errors should be displayed
             if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
@@ -1111,7 +1115,7 @@ final class CF {
                 // Log the error
                 $need_to_log = true;
                 if (!$PHP_ERROR) {
-                    if ($exception instanceof CF_404_Exception) {
+                    if ($is404) {
                         $need_to_log = false;
                     }
                 }
@@ -1142,15 +1146,18 @@ final class CF {
 
             // Test if display_errors is on
             if (self::config('app.error_disabled') !== TRUE) {
-                if (!IN_PRODUCTION AND $line != FALSE) {
-                    // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                    $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
+                /*
+                  if (!IN_PRODUCTION AND $line != FALSE) {
+                  // Remove the first entry of debug_backtrace(), it is the exception_handler call
+                  $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
 
-                    // Beautify backtrace
-                    $trace = self::backtrace($trace);
-                }
+                  // Beautify backtrace
+                  $trace = self::backtrace($trace);
+                  }
+                 * 
+                 */
 
-                if (IN_PRODUCTION) {
+                if (IN_PRODUCTION && !$is404) {
                     $data = array(
                         'description' => $description,
                         'error' => $error,

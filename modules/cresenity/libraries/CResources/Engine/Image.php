@@ -11,6 +11,9 @@ class CResources_Engine_Image extends CResources_Engine {
     }
 
     public function resizeAndSave($fullfilename, $sizeName, $sizeOptions) {
+        if(strlen($fullfilename)==0) {
+            return null;
+        }
         $filename = basename($fullfilename);
         $path = dirname($fullfilename) . DS;
         $width = carr::get($sizeOptions, 'width', '100');
@@ -51,7 +54,7 @@ class CResources_Engine_Image extends CResources_Engine {
         }
         $size_path = $path . $sizeName . DS;
         if (!is_dir($size_path)) {
-            mkdir($size_path);
+            @mkdir($size_path);
         }
         $full_size_path = $size_path . $filename;
 
@@ -73,7 +76,9 @@ class CResources_Engine_Image extends CResources_Engine {
             $dst = @imagecreatetruecolor($maxPropWidth, $maxPropHeight);
             @imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxPropWidth, $maxPropHeight, $img_width, $img_height);
             unset($src);
-
+            if($dst==null) {
+                throw new Exception('Error when resizing image '.$fullfilename);
+            }
             $wideimage = CWideImage::load($dst);
 
             if ($crop) {

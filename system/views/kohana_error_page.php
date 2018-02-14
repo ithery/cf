@@ -13,7 +13,7 @@
 <div id="framework_error" style="width:42em;margin:20px auto;">
 <h3><?php echo chtml::specialchars($error) ?></h3>
 <p><?php echo chtml::specialchars($description) ?></p>
-<?php  if (!IN_PRODUCTION || (isset($_GET['show_debug_error']) && $_GET['show_debug_error'] == '1')|| (isset($show_debug_error) && $show_debug_error == '1')): ?>
+<?php  if (!IN_PRODUCTION || (isset($_GET['show_debug_error']) && $_GET['show_debug_error'] == '1')|| (isset($show_debug_error) && $show_debug_error )): ?>
 <?php if ( ! empty($line) AND ! empty($file)): ?>
 <p><?php echo CF::lang('core.error_file_line', $file, $line) ?></p>
 <?php endif ?>

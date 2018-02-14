@@ -53,15 +53,18 @@ final class CManager {
      * @return CManager_Theme
      */
     public static function theme() {
+        if(self::$theme==null) {
+            self::$theme = new CManager_Theme();
+        }
         return self::$theme;
     }
 
-    public static function get_theme_data() {
-        return self::instance()->theme_data;
+    public function get_theme_data() {
+        return self::$theme_data;
     }
 
     public static function set_theme_data($theme_data) {
-        self::instance()->theme_data = $theme_data;
+        self::$theme_data = $theme_data;
         return self::instance();
     }
 
