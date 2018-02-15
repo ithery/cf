@@ -592,7 +592,7 @@ class carr {
         $result = [];
 
         foreach ($array as $item) {
-            $item = $item instanceof Collection ? $item->all() : $item;
+            $item = $item instanceof CCollection ? $item->all() : $item;
 
             if (!is_array($item)) {
                 $result[] = $item;

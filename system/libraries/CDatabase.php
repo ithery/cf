@@ -67,7 +67,7 @@ class CDatabase {
      * @param   mixed   configuration array or DSN
      * @return  CDatabase
      */
-    public static function & instance($domain = '', $name = 'default', $config = NULL) {
+    public static function &instance($name = 'default', $domain = null, $config = NULL) {
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();
@@ -89,7 +89,7 @@ class CDatabase {
      * @param   CDatabase  instance of CDatabase
      * @return  string
      */
-    public static function instance_name(CDatabase $db, $domain = null) {
+    public static function instanceName(CDatabase $db, $domain = null) {
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();
@@ -110,7 +110,7 @@ class CDatabase {
         $load_config = true;
 
         if (!empty($config)) {
-            if (is_array($config) AND count($config) > 0) {
+            if (is_array($config) && count($config) > 0) {
                 if (!array_key_exists('connection', $config)) {
                     $config = array('connection' => $config);
                     $load_config = false;
@@ -128,6 +128,7 @@ class CDatabase {
 
         if ($load_config) {
             $file = CF::get_file('config', 'database', $domain);
+
 
             $found = false;
             $config_name = 'default';

@@ -44,6 +44,23 @@ class CApp extends CObservable {
         }
     }
 
+    /**
+     * 
+     * @param string $appCode
+     * @return CApp_Navigation
+     */
+    public static function nav($appCode = null) {
+        return CApp_Navigation::instance($appCode);
+    }
+
+    /**
+     * 
+     * @return CDatabase
+     */
+    public static function db($domain = null, $dbName = null) {
+        return CDatabase::instance($domain, $dbName);
+    }
+
     public function set_mobile($bool) {
         $this->mobile = $bool;
     }
@@ -150,18 +167,7 @@ class CApp extends CObservable {
 
         parent::__construct();
 
-        /*
-          $domain = crouter::domain();
-          if (cstg::get("domain"))
-          $domain = cstg::get("domain");
-          //get domain data
-          $domain_data = cdata::get($domain, 'domain');
-          $this->_app_id = 1;
-          if ($domain_data != null) {
-          $this->_org = corg::get($domain_data['org_id']);
-          $this->_app_id = $domain_data['app_id'];
-          }
-         */
+
 
         $this->_app_id = CF::app_id();
 
@@ -245,71 +251,6 @@ class CApp extends CObservable {
         return $this->app_list;
     }
 
-    public function store_list() {
-        $cdb = CJDB::instance();
-        $stores = $cdb->get("store", array("org_id" => $this->org()->org_id));
-        $result = array();
-        foreach ($stores as $store) {
-            $result[$store->store_id] = $store->name;
-        }
-        return $result;
-    }
-
-    public function have_store() {
-
-        $cdb = CJDB::instance();
-        $stores = $cdb->get("store", array("org_id" => $this->org()->org_id));
-        return $stores->count() > 0;
-    }
-
-    public function is_store() {
-        /*
-          if (ccfg::get("store_id"))
-          return true;
-          return false;
-         */
-        return strlen(CF::$store_code) > 0;
-    }
-
-    public function have_store_access($store_id) {
-        $db = CDatabase::instance();
-        $org_id = $this->org()->org_id;
-        $user_id = $this->user()->user_id;
-        $q = "select count(*) as cnt from users_store where store_id=" . $db->escape($store_id) . " and org_id=" . $db->escape($org_id) . " and user_id=" . $db->escape($user_id);
-        $val = cdbutils::get_value($q);
-        return $val > 0;
-    }
-
-    public function user_store_list() {
-        $cdb = CJDB::instance();
-        $org_id = $this->org()->org_id;
-        $all_store_list = $cdb->get_list('store', 'store_id', 'name', array("org_id" => $org_id));
-        $store_list = array();
-        foreach ($all_store_list as $k => $v) {
-            if ($this->have_store_access($k)) {
-                $store_list[$k] = $v;
-            }
-        }
-        return $store_list;
-    }
-
-    public function menu_list() {
-        $cdb = CJDB::instance();
-        $org_id = $this->org()->org_id;
-        $all_menu_list = $cdb->get_list('resto_menu', 'resto_menu_id', 'name', array("org_id" => $org_id));
-        $menu_list = array();
-        foreach ($all_menu_list as $k => $v) {
-            if ($this->have_store_access($k)) {
-                $menu_list[$k] = $v;
-            }
-        }
-        return $menu_list;
-    }
-
-    public function db() {
-        return CDatabase::instance();
-    }
-
     public function is_admin() {
         return $this->app_id() == 0;
     }
@@ -391,8 +332,8 @@ class CApp extends CObservable {
 
 //            $theme = ccfg::get('theme');
 //            if ($theme == null) $theme = 'cresenity';
-        
-        
+
+
         $theme = CManager::theme()->getCurrentTheme();
         $theme_file = CF::get_file('themes', $theme);
         if (file_exists($theme_file)) {

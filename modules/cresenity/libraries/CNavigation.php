@@ -70,11 +70,7 @@ class CNavigation extends CObject {
     }
 
     public function render($options = array()) {
-//        if (strlen($this->theme) > 0) {
-//            return cnav::render_theme($this->theme);
-//        } else {
-            return cnav::render();
-//        }
+        return cnav::render();
     }
 
 }

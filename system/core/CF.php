@@ -47,7 +47,7 @@ final class CF {
     private static $internal_cache_key;
     private static $internal_cache_encrypt;
     private static $data;
-    private static $shared_app_code = array();
+    private static $sharedAppCode = array();
     public static $instances;
 
     /**
@@ -498,9 +498,9 @@ final class CF {
             //we try to search all paths for this domain
             $paths = array();
             $theme = CF::theme($domain);
-            $org_code = CF::org_code($domain);
-            $app_code = CF::app_code($domain);
-            $shared_app_code = CF::shared_app_code($domain);
+            $org_code = CF::orgCode($domain);
+            $app_code = CF::appCode($domain);
+            $sharedAppCode = CF::getSharedApp($domain);
             $modules = CF::modules($domain);
             //when this domain is org
             if (strlen($org_code) > 0) {
@@ -517,7 +517,7 @@ final class CF {
                 }
                 $paths[] = APPPATH . $app_code . DS . 'default' . DS;
             }
-            foreach ($shared_app_code as $key => $value) {
+            foreach ($sharedAppCode as $key => $value) {
                 if (strlen($org_code) > 0) {
                     //add theme path if theme exists
                     if (strlen($theme) > 0) {
@@ -1888,12 +1888,33 @@ final class CF {
 
     /**
      * Get application id for domain
+     * This function is deprecated, use CF::appId
      *
      * @return  string
      */
     public static function app_id($domain = null) {
+        return self::appId($domain);
+    }
+
+    /**
+     * Get application id for domain
+     *
+     * @return  string
+     */
+    public static function appId($domain = null) {
         $data = self::data($domain);
         return isset($data['app_id']) ? $data['app_id'] : null;
+    }
+
+    /**
+     * Get application code for domain
+     * This function is deprecated, use CF::appCode
+     * 
+     * @deprecated
+     * @return  string
+     */
+    public static function app_code($domain = null) {
+        return self::appCode($domain);
     }
 
     /**
@@ -1901,29 +1922,66 @@ final class CF {
      *
      * @return  string
      */
-    public static function app_code($domain = null) {
+    public static function appCode($domain = null) {
         $data = self::data($domain);
         return isset($data['app_code']) ? $data['app_code'] : null;
     }
 
     /**
-     * Get org id for this domain
-     *
-     * @return  string
+     * Get org id for domain
+     * This function is deprecated, use CF::orgId
+     * 
+     * @deprecated
+     * @param string $domain
+     * @return int
      */
     public static function org_id($domain = null) {
+        return self::orgId($domain);
+    }
+
+    /**
+     * Get org id for domain
+     * 
+     * @param string $domain
+     * @return int
+     */
+    public static function orgId($domain = null) {
         $data = self::data($domain);
         return isset($data['org_id']) ? $data['org_id'] : null;
     }
 
     /**
      * Get org code for this domain
+     * This function is deprecated, use CF::orgCode
      *
-     * @return  string
+     * @deprecated
+     * @param string $domain
+     * @return string
      */
     public static function org_code($domain = null) {
+        return self::orgCode($domain);
+    }
+
+    /**
+     * Get org code for this domain
+     * 
+     * @param string $domain
+     * @return string
+     */
+    public static function orgCode($domain = null) {
         $data = self::data($domain);
         return isset($data['org_code']) ? $data['org_code'] : null;
+    }
+
+    /**
+     * Add Shared App in runtime
+     * This function is deprecated, use CF::addSharedApp
+     * 
+     * @deprecated
+     * @param string $app_code
+     */
+    public static function add_shared_app_code($app_code) {
+        return self::addSharedApp($app_code);
     }
 
     /**
@@ -1931,9 +1989,9 @@ final class CF {
      * 
      * @param string $app_code
      */
-    public static function add_shared_app_code($app_code) {
-        if (!in_array($app_code, self::$shared_app_code)) {
-            self::$shared_app_code[] = $app_code;
+    public static function addSharedApp($appCode) {
+        if (!in_array($appCode, self::$sharedAppCode)) {
+            self::$sharedAppCode[] = $appCode;
             //do force reload
             self::paths(null, true);
         }
@@ -1942,15 +2000,16 @@ final class CF {
     /**
      * Get shared application code for this domain
      *
+     * @param string $domain
      * @return  array
      */
-    public static function shared_app_code($domain = null) {
+    public static function getSharedApp($domain = null) {
         $data = self::data($domain);
         if (!isset($data['shared_app_code'])) {
             $data['shared_app_code'] = array();
         }
 
-        $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$shared_app_code);
+        $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$sharedAppCode);
 
 
         return isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
