@@ -1463,7 +1463,11 @@ border-top: 1px solid #bbb;
 
 .dd-handle .btn-group {
     margin-top:-5px;
-
+}
+.dd-item .btn-group {
+    position: absolute; 
+    top: 1px;
+    right: 1px;
 }
 
 

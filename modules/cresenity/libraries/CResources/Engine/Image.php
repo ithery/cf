@@ -53,11 +53,15 @@ class CResources_Engine_Image extends CResources_Engine {
             $new_height = $img_height * $scale;
         }
         $size_path = $path . $sizeName . DS;
+        if (!is_dir($path)) {
+            @mkdir($path);
+        }
+        
         if (!is_dir($size_path)) {
             @mkdir($size_path);
         }
         $full_size_path = $size_path . $filename;
-
+        
         try {
             //resize to propotional to maximum size, reduce memory load
             $maxScale = 1;

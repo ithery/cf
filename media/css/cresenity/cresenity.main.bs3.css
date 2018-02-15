@@ -1035,7 +1035,7 @@ div.dataTables_wrapper .ui-widget-header {
 /* select2 */
 .form-horizontal .select2-container {
     width: 100%;
-    margin-top: -5px;
+
 }
 
 .select2-container {
@@ -1151,6 +1151,12 @@ div.dataTables_wrapper .ui-widget-header {
 
 .dd-handle .btn-group {
     margin-top: 0px;
+}
+
+.dd-item .btn-group {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 /*
 form

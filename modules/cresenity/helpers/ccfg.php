@@ -46,7 +46,7 @@ class ccfg {
 
             foreach ($ccfg_files as $f) {
 
-
+                
                 $config_path = DOCROOT . "config" . DIRECTORY_SEPARATOR;
                 $cresenity_config_file = $config_path . $f . EXT;
                 $config_file = $cresenity_config_file;
@@ -82,8 +82,6 @@ class ccfg {
                 }
 
                 $app_files = CF::get_files('config', $f, $domain);
-
-
 
                 $app_files = array_reverse($app_files);
 

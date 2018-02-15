@@ -140,7 +140,7 @@ class CNestable extends CElement_Element {
                             ->execute();
                 }
                 $html->appendln($new_v);
-
+                $html->dec_indent()->appendln('</div>');
                 if ($this->have_action()) {
 
                     foreach ($d as $k => $v) {
@@ -156,10 +156,10 @@ class CNestable extends CElement_Element {
                     $this->row_action_list->apply("set_handler_url_param", $jsparam);
 
                     $this->js_cell .= $this->row_action_list->js();
+                     $html->appendln($this->row_action_list->html($html->get_indent()));
 
-                    $html->appendln($this->row_action_list->html($html->get_indent()));
                 }
-                $html->dec_indent()->appendln('</div>');
+                
 
                 $depth_before = $depth;
             }

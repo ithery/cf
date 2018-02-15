@@ -42,6 +42,7 @@ abstract class CElement extends CObservable {
         $this->theme = ccfg::get('theme');
         $theme_data = CManager::instance()->get_theme_data();
         $this->theme_data = $theme_data;
+
         if (isset($theme_data)) {
             $this->select2 = carr::get($theme_data, 'select2');
             $this->bootstrap = carr::get($theme_data, 'bootstrap');
