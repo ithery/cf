@@ -67,7 +67,7 @@ class CDatabase {
      * @param   mixed   configuration array or DSN
      * @return  CDatabase
      */
-    public static function &instance($name = 'default', $domain = null, $config = NULL) {
+    public static function &instance($domain = null, $name = 'default', $config = NULL) {
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();
