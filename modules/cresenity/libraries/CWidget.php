@@ -194,7 +194,7 @@ class CWidget extends CElement_Element {
             $classes = " " . $classes;
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
-        $html->appendln('<div id="' . $this->id . '" class="' . $main_class . $classes . '" ' . $custom_css . '>');
+        $html->appendln('<div id="' . $this->id . '" class="' . $main_class . $classes . '" style="' . $custom_css . '">');
         $html->appendln('	<div class="' . $main_class_title . '">');
         if ($this->bootstrap >= '3') {
             $html->appendln('       <span class="icon pull-left">');
