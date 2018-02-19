@@ -36,6 +36,8 @@ class CApp extends CObservable {
     private $additional_head = '';
     private $mobile_path = '';
     private $variables;
+    private $ajaxData = array();
+    private $renderMessage = true;
 
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
@@ -51,6 +53,10 @@ class CApp extends CObservable {
      */
     public static function nav($appCode = null) {
         return CApp_Navigation::instance($appCode);
+    }
+
+    public static function isAjax() {
+        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     }
 
     /**
@@ -72,6 +78,19 @@ class CApp extends CObservable {
 
     public function get_mobile_path() {
         return $this->mobile_path;
+    }
+
+    public function setAjaxData($key, $value = null) {
+        if (is_array($key)) {
+            $this->ajaxData = array_merge($this->ajaxData, $key);
+        } else {
+            $this->ajaxData[$key] = $value;
+        }
+        return $this;
+    }
+
+    public function setRenderMessage($bool) {
+        $this->renderMessage = $bool;
     }
 
     public function setup($install = false) {
@@ -850,7 +869,12 @@ class CApp extends CObservable {
     public function json() {
         $data = array();
         $data["title"] = $this->title;
-        $data["html"] = cmsg::flash_all() . $this->html();
+        $messageOrig = cmsg::flash_all();
+        $message = '';
+        if ($this->renderMessage) {
+            $message = $messageOrig;
+        }
+        $data["html"] = $message . $this->html();
         $js = $this->js();
         $js = CClientScript::instance()->render_js_require($js);
         if (ccfg::get("minify_js")) {
@@ -858,6 +882,8 @@ class CApp extends CObservable {
         }
         $data["js"] = cbase64::encode($js);
         $data["css_require"] = CClientScript::instance()->url_css_file();
+        $data["message"] = $messageOrig;
+        $data["ajaxData"] = $this->ajaxData;
         return cjson::encode($data);
     }
 

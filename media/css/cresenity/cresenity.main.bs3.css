@@ -1122,11 +1122,38 @@ div.dataTables_wrapper .ui-widget-header {
     border-radius:0px
 }
 /* file upload*/
-.fileupload .btn.fileupload-exists {
-    padding: 4px 10px;
+
+
+.fileupload .uneditable-input {
+    width:150px;
+    border-radius: 0;
+
+    border: 1px solid #e5e6e7;
 
 }
+.fileupload .uneditable-input .fileupload-preview {
+    text-overflow: ellipsis;
+    width: 105px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.btn-file {
+    
+    padding: 6px 8px;
+    border: 1px solid #e5e6e7;
+}
+.fileupload .fileupload-exists:not(.btn),.fileupload .fileupload-new:not(.btn) {
 
+    display: inline-block;
+}
+
+.fileupload.fileupload-new .fileupload-exists:not(.btn) {
+    display: none;
+}
+.fileupload.fileupload-exists .fileupload-new:not(.btn) {
+    display: none;
+}
 /* timepicker */
 .bootstrap-timepicker-widget table td input {
     width: 35px!important;
