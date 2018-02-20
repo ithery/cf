@@ -130,5 +130,41 @@ trait CApp_Trait_Base {
         return date('Y-m-d H:i:s');
     }
 
-    
+    /**
+     * 
+     * @return array
+     */
+    public static function defaultInsert() {
+        $data = array();
+        $data['created'] = self::now();
+        $data['createdby'] = self::username();
+        $data['updated'] = self::now();
+        $data['updatedby'] = self::username();
+        $data['status'] = 1;
+
+        return $data;
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public static function defaultUpdate() {
+        $data = array();
+        $data['updated'] = self::now();
+        $data['updatedby'] = self::username();
+        return $data;
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public static function defaultDelete() {
+        $data = array();
+        $data['updated'] = self::now();
+        $data['updatedby'] = self::username();
+        return $data;
+    }
+
 }
