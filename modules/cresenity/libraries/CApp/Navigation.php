@@ -16,13 +16,13 @@ class CApp_Navigation {
         if ($appCode == null) {
             $appCode = CF::app_code();
         }
-        if (!isset(self::$instance[$app_code])) {
-            self::$instance[$appCode] = new CNavigation($appCode);
+        if (!isset(self::$instance[$appCode])) {
+            self::$instance[$appCode] = new CApp_Navigation($appCode);
         }
         return self::$instance[$appCode];
     }
 
-    protected function __construct($appCode = null) {
+    public function __construct($appCode = null) {
 
         if ($appCode == null) {
             $appCode = CF::app_code();

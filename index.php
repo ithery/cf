@@ -113,7 +113,7 @@ if (isset($_FILES) && is_array($_FILES)) {
                 if (!is_array($g)) {
                     $ext = pathinfo($g, PATHINFO_EXTENSION);
                     if ($ext == 'php' || $ext == 'sh') {
-                        die('Not Allowed X_X');
+                       // die('Not Allowed X_X');
                     }
                 }
             }

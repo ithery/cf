@@ -752,7 +752,7 @@ table.responsive {
 
     float: right;
     line-height: 1.42857;
-
+    margin-top: 10px;
 }
 
 .navbar-static-side .mainnav > li > ul.dropdown-menu {

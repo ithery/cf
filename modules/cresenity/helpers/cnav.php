@@ -14,7 +14,7 @@ class cnav {
 
 
         if ($nav == null) {
-            $navs = CApp::nav()->getArray();
+            $navs = CNavigation::instance()->navs();
             if ($navs == null)
                 return null;
             foreach ($navs as $nav) {
