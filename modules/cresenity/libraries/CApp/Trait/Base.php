@@ -167,4 +167,13 @@ trait CApp_Trait_Base {
         return $data;
     }
 
+    /**
+     * return protocol http or https depend on variables $_SERVER['HTTPS']
+     * 
+     * @return string
+     */
+    public static function protocol() {
+        return isset($_SERVER['HTTPS']) ? 'https' : 'http';
+    }
+
 }
