@@ -13,6 +13,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     protected $maxWidth;
     protected $maxHeight;
     protected $disabledUpload;
+    protected $cropper;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -43,6 +44,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
             $this->setVar('value', $this->value);
             $this->setVar('ajaxName', $ajaxName);
             $this->setVar('ajaxUrl', $ajaxUrl);
+            $this->setVar('cropper', $this->cropper);
         });
     }
 
@@ -79,11 +81,33 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     }
 
     public function html($indent = 0) {
-        return $this->getTemplateHtml();
+        $templateHtml = $this->getTemplateHtml();
+        $html = $templateHtml;
+        if($this->cropper!=null) {
+            $html.=$this->cropper->html();
+        }
+        return $html;
     }
 
     public function js($indent = 0) {
-        return $this->getTemplateJs();
+        $templateJs = $this->getTemplateJs();
+        $js = $templateJs;
+        if($this->cropper!=null) {
+            $js.=$this->cropper->js();
+        }
+        return $js;
+    }
+
+    /**
+     * 
+     * @return CElement_Helper_Cropper
+     */
+    public function cropper() {
+        if ($this->cropper == null) {
+            $this->cropper = new CElement_Helper_Cropper();
+            $this->cropper->setOwner($this);
+        }
+        return $this->cropper;
     }
 
 }

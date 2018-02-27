@@ -125,7 +125,7 @@ abstract class CElement_Element extends CElement {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
- 
+
         $html->set_indent($indent);
         $this->build_once();
         $html->appendln($this->before_html($indent));

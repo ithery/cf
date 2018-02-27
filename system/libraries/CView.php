@@ -263,8 +263,9 @@ class CView {
      * @return  void      if print is TRUE
      */
     public function render($print = FALSE, $renderer = FALSE) {
-        if (empty($this->filename))
+        if (empty($this->filename)) {
             throw new CF_Exception('core.view_set_filename');
+        }
         if (is_string($this->filetype)) {
             // Merge global and local data, local overrides global with the same name
             $data = array_merge(self::$global_data, $this->local_data);

@@ -672,6 +672,31 @@ class cajax {
             }
         }
 
+        if (isset($_POST[$input_name])) {
+
+            $imageDataArray = $_POST[$input_name];
+            $filenameArray = $_POST[$input_name.'_filename'];
+            if (!is_array($imageDataArray)) {
+                $imageDataArray = array($imageDataArray);
+            }
+            if (!is_array($filenameArray)) {
+                $filenameArray = array($filenameArray);
+            }
+            foreach ($imageDataArray as $k => $imageData) {
+                $filename = carr::get($filenameArray,$k);
+                $extension = "." . pathinfo($filename, PATHINFO_EXTENSION);
+                if (strtolower($extension) == 'php') {
+                    die('fatal error');
+                }
+                
+                $filteredData = substr($imageData, strpos($imageData, ",") + 1);
+                $unencodedData = base64_decode($filteredData);
+                $file_id = date('Ymd') . cutils::randmd5() . $extension;
+                $fullfilename = ctemp::makepath("imgupload", $file_id);
+                cfs::atomic_write($fullfilename, $unencodedData);
+                $return[] = $file_id;
+            }
+        }
         $return = array(
             'file_id' => $file_id,
             'url' => ctemp::get_url('imgupload', $file_id),
