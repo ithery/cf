@@ -13,6 +13,7 @@ abstract class CElement_Element extends CElement {
     protected $after;
     protected $is_builded = false;
     protected $is_onetag = false;
+    protected $is_show = true;
     private $is_build = false;
 
     public function __construct($id = "", $tag = "div") {
@@ -131,11 +132,17 @@ abstract class CElement_Element extends CElement {
         if ($this->is_onetag) {
             $html->appendln($this->onetag());
         } else {
-            $html->appendln($this->pretag())->br();
-            $html->inc_indent();
+            if ($this->is_show) {
+                $html->appendln($this->pretag())->br();
+                $html->inc_indent();
+            }
+            
             $html->appendln($this->html_child($html->get_indent()))->br();
-            $html->dec_indent();
-            $html->appendln($this->posttag())->br();
+
+            if ($this->is_show) {
+                $html->dec_indent();
+                $html->appendln($this->posttag())->br();
+            }
         }
         $html->appendln($this->after_html($indent));
 
