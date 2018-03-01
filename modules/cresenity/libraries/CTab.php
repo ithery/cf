@@ -120,6 +120,9 @@
             }
 
             $html = '<li class="' . $class_active . '"><a href="javascript:;" ' . $tab_class . $tab_icon . $tab_tab . $tab_target . $tab_responsive . $tab_url . ' class="tab-ajax-load">';
+            if ($this->icon) {
+                $html .= '<span class="icon"><i class="icon-' . $this->icon . '"></i></span> ';
+            }
             $html .= $tab_label;
             $html .= '</a></li>';
 
