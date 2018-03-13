@@ -31,11 +31,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     var <?php echo $id ?>HaveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
 
-<?php if ($cropper != null) : ?>
 
-        var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
-        var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
-<?php endif; ?>
 
 
     $('#container-<?php echo $id ?> img, #container-<?php echo $id ?> .btn-file span').click(function () {
@@ -49,6 +45,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
     });
 
     $('#input-temp-<?php echo $id; ?>').change(function (e) {
+
+<?php if ($cropper != null) : ?>
+
+            var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
+            var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
+<?php endif; ?>
         $.each(e.target.files, function (i, file) {
             var reader = new FileReader();
             reader.fileName = file.name;
@@ -82,7 +84,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 
                             cropperModal.find('.btn-crop').click(function () {
-                                imageData = cropperImg.cropper('getCroppedCanvas').toDataURL();
+
+                                var mime = 'image/png';
+                                if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
+                                    mime = 'image/jpeg';
+                                }
+
+
+                                imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
 
                                 var img = "<img src=" + imageData + " /> ";
                                 $('#container-<?php echo $id ?> .fileupload-preview').html(img);
