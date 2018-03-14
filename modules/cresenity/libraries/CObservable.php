@@ -37,6 +37,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('clockpicker', 'CElement_FormInput_ClockPicker');
         $this->manager->registerControl('image', 'CFormInputImage');
         $this->manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
+        $this->manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
         $this->manager->registerControl('file', 'CFormInputFile');
         $this->manager->registerControl('password', 'CFormInputPassword');
         $this->manager->registerControl('textarea', 'CFormInputTextarea');
@@ -46,6 +47,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('label', 'CFormInputLabel');
         $this->manager->registerControl('checkbox', 'CFormInputCheckbox');
         $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
+        $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
         $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
         $this->manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
         $this->manager->registerControl('ckeditor', 'CFormInputCKEditor');

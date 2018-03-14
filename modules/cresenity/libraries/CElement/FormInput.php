@@ -72,7 +72,7 @@ class CElement_FormInput extends CElement_Element {
     }
 
     public function get_field_id() {
-        return $this->field_id;
+        return $this->id;
     }
 
     public function add_transform($name, $args = array()) {

@@ -5,6 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CWidget extends CElement_Element {
 
     protected $header_action_list;
+    protected $switcher;
     public $title;
     public $content;
     public $span;
@@ -39,6 +40,7 @@ class CWidget extends CElement_Element {
         $this->header_action_list = CActionList::factory();
         $this->header_action_style = 'widget-action';
         $this->header_action_list->set_style('widget-action');
+        $this->switcher = '';
         $this->attr = array();
         $this->collapse = false;
         $this->close = false;
@@ -73,6 +75,20 @@ class CWidget extends CElement_Element {
     public function set_header_action_style($style) {
         $this->header_action_style = $style;
         $this->header_action_list->set_style($style);
+    }
+
+    public function have_switcher()
+    {  
+        if ($this->switcher) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function add_switcher($id = "")
+    {
+        return $this->switcher = CFactory::create_control($id, 'switcher');
     }
 
     public function set_title($title, $lang = true) {
@@ -243,6 +259,12 @@ class CWidget extends CElement_Element {
             }
         }
 
+        if ($this->have_switcher()) {
+            $html->appendln('<div class="pull-right">');
+            $html->appendln($this->switcher->html());
+            $html->appendln('</div>');
+        }
+
         $scroll_class = "";
         if ($this->scroll) {
             $scroll_class = ' slimscroll';
@@ -279,6 +301,24 @@ class CWidget extends CElement_Element {
         $js->set_indent($indent);
         if ($this->have_header_action()) {
             $js->appendln($this->header_action_list->js($js->get_indent()));
+        }
+
+        if ($this->have_switcher()) {
+            $js->appendln('
+                if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                    jQuery("#' . $this->id . '").find(".widget-content").show();
+                } else {
+                    jQuery("#' . $this->id . '").find(".widget-content").hide();
+                }
+
+                jQuery("#' . $this->switcher->get_field_id() . '").click(function() {
+                    if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                        jQuery("#' . $this->id . '").find(".widget-content").show();
+                    } else {
+                        jQuery("#' . $this->id . '").find(".widget-content").hide();
+                    }
+                })
+            ');
         }
 
         if ($this->bootstrap >= '3') {
