@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CElement_FormInput_ImageAjax extends CElement_FormInput {
+class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
 
     use CElement_Trait_Template;
 
@@ -14,6 +14,10 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     protected $maxHeight;
     protected $disabledUpload;
     protected $cropper;
+    protected $files;
+    protected $link;
+    protected $customControl;
+    protected $customControlValue;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -23,7 +27,10 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         $this->maxWidth = "200";
         $this->maxHeight = "150";
         $this->disabledUpload = false;
-        $this->templateName = 'CElement/FormInput/ImageAjax';
+        $this->templateName = 'CElement/FormInput/MultipleImageAjax';
+        $this->files = array();
+        $this->customControl = array();
+        $this->customControlValue = array();
         $this->onBeforeParse(function() {
 
             $ajaxName = $this->name;
@@ -44,47 +51,18 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
             $this->setVar('value', $this->value);
             $this->setVar('ajaxName', $ajaxName);
             $this->setVar('ajaxUrl', $ajaxUrl);
+            $this->setVar('files', $this->files);
+            $this->setVar('customControl', $this->customControl);
+            $this->setVar('customControlValue', $this->customControlValue);
             $this->setVar('cropper', $this->cropper);
         });
-    }
-
-    public function set_imgsrc($imgsrc) {
-        return $this->setImgSrc($imgsrc);
-    }
-
-    public function setImgSrc($imgsrc) {
-        $this->imgSrc = $imgsrc;
-        return $this;
-    }
-
-    public function set_maxwidth($maxwidth) {
-        return $this->setMaxWidth($maxwidth);
-    }
-
-    public function setMaxWidth($maxwidth) {
-        $this->maxWidth = $maxwidth;
-        return $this;
-    }
-
-    public function set_maxheight($maxheight) {
-        return $this->setMaxHeight($maxheight);
-    }
-
-    public function setMaxHeight($maxheight) {
-        $this->maxHeight = $maxheight;
-        return $this;
-    }
-
-    public function setDisabledUpload($bool) {
-        $this->disabledUpload = $bool;
-        return $this;
     }
 
     public function html($indent = 0) {
         $templateHtml = $this->getTemplateHtml();
         $html = $templateHtml;
-        if($this->cropper!=null) {
-            $html.=$this->cropper->html();
+        if ($this->cropper != null) {
+            $html .= $this->cropper->html();
         }
         return $html;
     }
@@ -92,8 +70,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     public function js($indent = 0) {
         $templateJs = $this->getTemplateJs();
         $js = $templateJs;
-        if($this->cropper!=null) {
-            $js.=$this->cropper->js();
+        if ($this->cropper != null) {
+            $js .= $this->cropper->js();
         }
         return $js;
     }
