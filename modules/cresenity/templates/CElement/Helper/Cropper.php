@@ -7,7 +7,7 @@
 ?>
 <div id="modal-cropper-<?php echo $id ?>" class="modal" >
     <div class="modal-dialog"><div class="modal-content animated bounceInRight">
-            <div class="modal-header"><a href="#" class="close">×</a><span class="loader"></span>
+            <div class="modal-header"><a href="#" class="close"></a><span class="loader"></span>
                 <h3>Cropper</h3>
             </div>
             <div class="modal-body opened">
