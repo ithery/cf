@@ -61,10 +61,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
         display: none;
         font-size: 20px;
     }
-    .multi-image-ajax_file.loading .multi-image-ajax_loading {
+    .multi-image-ajax-file.loading .multi-image-ajax-loading {
         display: block;
     }
-    .multi-image-ajax_file .multi-image-ajax_loading {
+    .multi-image-ajax-file .multi-image-ajax-loading {
         display: none;
     }
     .multi-image-ajax_loading {
@@ -134,20 +134,24 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 
 
-        <div>
-            <div class="multi-image-ajax-btn-upload btn-success"><?php echo clang::__('Upload Image'); ?></div>
-        </div>
+
 
     </div>
-
+    <div>
+        <div class="multi-image-ajax-btn-upload btn btn-success"><?php echo clang::__('Upload Image'); ?></div>
+    </div>
 
 </div>
 <script>
 
     (function ($) {
         $(function () {
+            var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
 
-
+<?php if ($cropper != null) : ?>
+                var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
+                var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
+<?php endif; ?>
             var index = 0;
             var descriptionElement = $("#container-<?php echo $id ?> .multi-image-ajax-description");
             $('#container-<?php echo $id ?> .multi-image-ajax-btn-upload').click(function () {
@@ -180,6 +184,107 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 })
             }
 
+            function insertFile(reader,file, fileList, event) {
+                var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
+                if (haveCropper) {
+
+                    reader.onloadend = (function (event) {
+                        
+
+                        var cropperId = '<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
+                        var cropperModal = $('#modal-cropper-' + cropperId);
+                        var cropperImgInitialized = cropperModal.find('img.cropper-hidden');
+                        if (cropperImgInitialized.length > 0) {
+                            cropperImgInitialized.cropper("destroy");
+                        }
+
+
+                        var cropperImg = cropperModal.find('img');
+                        cropperImg.attr('src', event.target.result);
+                        cropperModal.modal({backdrop: 'static', keyboard: false});
+                        cropperImg.cropper({
+                            aspectRatio: cropperWidth / cropperHeight,
+                            crop: function (e) {
+
+                            }
+                        });
+
+                        var clickAssigned = cropperModal.find('.btn-crop').attr('click-assigned');
+                        if(!clickAssigned) {
+                            cropperModal.find('.btn-crop').click(function () {
+                                cropperModal.find('.btn-crop').attr('click-assigned','1');
+                                var mime = 'image/png';
+                                if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
+                                    mime = 'image/jpeg';
+                                }
+
+
+                                imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
+
+                                addFile(file, fileList, event, imageData);
+                                $(this).closest('.modal').modal('hide');
+                            });
+                        }
+
+                    });
+
+
+                } else {
+                    addFile(file, fileList, event, event.target.result);
+                }
+            }
+
+            function addFile(file, fileList, event, imageData) {
+                var img = file.type.match("image.*") ? "<img src=" + imageData + " /> " : "";
+                var div = $("<div>").addClass("multi-image-ajax-file container-file-upload");
+                div.click(function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                var div_img = $("<div>").addClass("div-img");
+                div_img.append(img);
+                div.append(div_img);
+<?php
+foreach ($customControl as $cc):
+    $control = carr::get($cc, 'control');
+    $control_name = carr::get($cc, 'input_name');
+    $control_label = carr::get($cc, 'input_label');
+    ?>
+                    var div_cc = $("<div>").addClass("div-custom-control");
+                    var cc_label = $("<label>").html("<?php echo $control_label; ?> :");
+                    var cc = $("<input type=\"<?php echo $control; ?>\" name=\"<?php echo $name; ?>_custom_control[" + index + "][<?php echo $control_name; ?>]\">");
+                    div_cc.append(cc_label);
+                    div_cc.append(cc);
+                    div.append(div_cc);
+<?php endforeach; ?>
+
+<?php if ($removeLink): ?>
+
+                    var remove = $("<a>").addClass("multi-image-ajax-remove").html("Remove");
+                    div.append(remove);
+<?php endif; ?>
+                div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
+                fileList.append(div.addClass("loading"));
+                fileUploadRemove();
+
+                var data = new FormData();
+                data.append("<?php echo $name; ?>[]", file);
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var dataFile = JSON.parse(this.responseText);
+
+                        div.removeClass("loading");
+                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
+                        index++;
+                    } else if (this.readyState == 4 && this.status != 200) {
+                        //div.remove();
+                    }
+                };
+                xhr.open("post", "<?php echo $ajaxUrl; ?>");
+                xhr.send(data);
+            }
+
             fileUploadRemove();
 
             $("#<?php echo $id ?>").sortable();
@@ -201,53 +306,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         $.each(dataTransfer.files, function (i, file) {
                             var reader = new FileReader();
                             reader.onload = $.proxy(function (file, fileList, event) {
+                                insertFile(reader,file, fileList, event);
 
-                                var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
-                                var div = $("<div>").addClass("multi-image-ajax-file container-file-upload");
-                                div.click(function (e) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                });
-                                var div_img = $("<div>").addClass("div-img");
-                                div_img.append(img);
-                                div.append(div_img);
-<?php
-foreach ($customControl as $cc):
-    $control = carr::get($cc, 'control');
-    $control_name = carr::get($cc, 'input_name');
-    $control_label = carr::get($cc, 'input_label');
-    ?>
-                                    var div_cc = $("<div>").addClass("div-custom-control");
-                                    var cc_label = $("<label>").html("<?php echo $control_label; ?> :");
-                                    var cc = $("<input type=\"<?php echo $control; ?>\" name=\"<?php echo $name; ?>_custom_control[" + index + "][<?php echo $control_name; ?>]\">");
-                                    div_cc.append(cc_label);
-                                    div_cc.append(cc);
-                                    div.append(div_cc);
-<?php endforeach; ?>
-
-<?php if ($removeLink): ?>
-
-                                    var remove = $("<a>").addClass("multi-imagee-ajax-remove").html("Remove");
-                                    div.append(remove);
-<?php endif; ?>
-                                div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
-                                fileList.append(div.addClass("loading"));
-                                file_upload_remove();
-
-                                var data = new FormData();
-                                data.append("<?php echo $name; ?>[]", file);
-                                var xhr = new XMLHttpRequest();
-                                xhr.onreadystatechange = function () {
-                                    if (this.readyState == 4 && this.status == 200) {
-                                        div.removeClass("loading");
-                                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + this.responseText + ">");
-                                        index++;
-                                    } else if (this.readyState == 4 && this.status != 200) {
-                                        //div.remove();
-                                    }
-                                };
-                                xhr.open("post", "<?php echo $ajaxUrl; ?>");
-                                xhr.send(data);
                             }, this, file, $("#<?php echo $id; ?>"));
                             reader.readAsDataURL(file);
                         });
@@ -262,54 +322,10 @@ foreach ($customControl as $cc):
             $("#<?php echo $id; ?>_input_temp").change(function (e) {
                 $("#<?php echo $id; ?>_description").remove();
                 $.each(e.target.files, function (i, file) {
+                    
                     var reader = new FileReader();
                     reader.onload = $.proxy(function (file, fileList, event) {
-                        var img = file.type.match("image.*") ? "<img src=" + event.target.result + " /> " : "";
-                        var div = $("<div>").addClass("multi-image-ajax-file container-file-upload");
-                        div.click(function (e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        });
-                        var div_img = $("<div>").addClass("div-img");
-                        div_img.append(img);
-                        div.append(div_img);
-<?php
-foreach ($customControl as $cc):
-    $control = carr::get($cc, 'control');
-    $control_name = carr::get($cc, 'input_name');
-    $control_label = carr::get($cc, 'input_label');
-    ?>
-                            var div_cc = $("<div>").addClass("div-custom-control");
-                            var cc_label = $("<label>").html("<?php echo $control_label; ?> :");
-                            var cc = $("<input type=\"<?php echo $control; ?>\" name=\"<?php echo $name; ?>_custom_control[" + index + "][<?php echo $control_name; ?>]\">");
-                            div_cc.append(cc_label);
-                            div_cc.append(cc);
-                            div.append(div_cc);
-<?php endforeach; ?>
-
-<?php if ($removeLink): ?>
-
-                            var remove = $("<a>").addClass("multi-imagee-ajax-remove").html("Remove");
-                            div.append(remove);
-<?php endif; ?>
-                        div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
-                        fileList.append(div.addClass("loading"));
-                        file_upload_remove();
-
-                        var data = new FormData();
-                        data.append("<?php echo $name; ?>[]", file);
-                        var xhr = new XMLHttpRequest();
-                        xhr.onreadystatechange = function () {
-                            if (this.readyState == 4 && this.status == 200) {
-                                div.removeClass("loading");
-                                div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + this.responseText + ">");
-                                index++;
-                            } else if (this.readyState == 4 && this.status != 200) {
-                                //div.remove();
-                            }
-                        };
-                        xhr.open("post", "<?php echo $ajaxUrl; ?>");
-                        xhr.send(data);
+                        insertFile(reader,file, fileList, event);
                     }, this, file, $("#<?php echo $id; ?>"));
                     reader.readAsDataURL(file);
                 })

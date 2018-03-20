@@ -16,6 +16,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
     protected $cropper;
     protected $files;
     protected $link;
+    protected $removeLink;
     protected $customControl;
     protected $customControlValue;
 
@@ -28,6 +29,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->maxHeight = "150";
         $this->disabledUpload = false;
         $this->templateName = 'CElement/FormInput/MultipleImageAjax';
+        $this->removeLink = true;
         $this->files = array();
         $this->customControl = array();
         $this->customControlValue = array();
@@ -52,6 +54,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
             $this->setVar('ajaxName', $ajaxName);
             $this->setVar('ajaxUrl', $ajaxUrl);
             $this->setVar('files', $this->files);
+            $this->setVar('removeLink', $this->removeLink);
             $this->setVar('customControl', $this->customControl);
             $this->setVar('customControlValue', $this->customControlValue);
             $this->setVar('cropper', $this->cropper);
