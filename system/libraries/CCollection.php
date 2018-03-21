@@ -441,7 +441,13 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = carr::path($item, $key);
+            $retrieved = null;
+
+            if (is_array($item)) {
+                $retrieved = carr::path($item, $key);
+            } elseif (is_object($item)) {
+                $retrieved = cobj::get($item, $key);
+            }
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));

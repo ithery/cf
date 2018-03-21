@@ -238,6 +238,18 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
+     * Add Iframe Element &lt;iframe&gt
+     * 
+     * @param string $id
+     * @return CElement_Element_Iframe Iframe Element
+     */
+    public function add_iframe($id = "") {
+        $element = CElement_Factory::createElement('iframe', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
      * Add Form Field
      *
      * @param   string  field id
