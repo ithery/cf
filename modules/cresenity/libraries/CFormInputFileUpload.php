@@ -235,7 +235,7 @@ class CFormInputFileUpload extends CFormInput {
             
             $js->appendln('
                 var index=0;
-                var description = $("#' . $div_id . '_description");
+                //var description = $("#' . $div_id . '_description");
 
                 $("#' . $div_id . '_btn_upload").click(function() {
                     $( "#' . $div_id . '_input_temp" ).trigger("click");
@@ -285,7 +285,7 @@ class CFormInputFileUpload extends CFormInput {
                         if( dataTransfer && dataTransfer.files.length) {
                             e.preventDefault();
                             e.stopPropagation();
-                            $("#' . $div_id . '_description").remove();
+                            //$("#' . $div_id . '_description").remove();
                             $.each( dataTransfer.files, function(i, file) {
                                 var reader = new FileReader();
                                 reader.onload = $.proxy(function(file, fileList, event) {
@@ -350,7 +350,7 @@ class CFormInputFileUpload extends CFormInput {
                     $( "#' . $div_id . '_input_temp" ).trigger("click");
                 })
                 $( "#' . $div_id . '_input_temp" ).change(function(e) {
-                    $("#' . $div_id . '_description").remove();
+                    //$("#' . $div_id . '_description").remove();
                     $.each(e.target.files, function(i, file) {
                         var reader = new FileReader();
                         reader.onload = $.proxy(function(file, fileList, event) {
