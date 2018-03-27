@@ -77,12 +77,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             cropperModal.modal({backdrop: 'static', keyboard: false});
                             cropperImg.cropper({
                                 aspectRatio: cropperWidth / cropperHeight,
+
                                 crop: function (e) {
 
                                 }
                             });
-
-
+                          
                             cropperModal.find('.btn-crop').click(function () {
 
                                 var mime = 'image/png';
@@ -91,7 +91,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                 }
 
 
-                                imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
+                                imageData = cropperImg.cropper('getCroppedCanvas',{width:cropperWidth,height:cropperHeight}).toDataURL(mime);
 
                                 var img = "<img src=" + imageData + " /> ";
                                 $('#container-<?php echo $id ?> .fileupload-preview').html(img);
