@@ -28,7 +28,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 
 <script>
-
+    
     var <?php echo $id ?>HaveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
 
 
@@ -77,6 +77,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             cropperModal.modal({backdrop: 'static', keyboard: false});
                             cropperImg.cropper({
                                 aspectRatio: cropperWidth / cropperHeight,
+                                zoomOnWheel : false,
 
                                 crop: function (e) {
 

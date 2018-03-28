@@ -5,9 +5,26 @@
  * @author Hery
  */
 ?>
-<div id="modal-cropper-<?php echo $id ?>" class="modal" >
+<div id="modal-cropper-<?php echo $id ?>" class="modal " >
     <div class="modal-dialog"><div class="modal-content animated bounceInRight">
-            <div class="modal-header"><a href="#" class="close"></a><span class="loader"></span>
+            <div class="modal-header">
+                <div class="btn-group btn-group-header-modal">
+                            <button type="button" class="btn btn-primary btn-zoom-in" data-method="zoom" data-option="0.1" title="Zoom In">
+                                <span class="docs-tooltip" data-toggle="tooltip" title="cropper('zoom', 0.1)">
+                                    <span class="fa fa-search-plus"></span> 
+                                </span>
+                            </button>
+                            
+                            <button type="button" class="btn btn-primary btn-zoom-out" data-method="zoom" data-option="-0.1" title="Zoom Out">
+                                <span class="docs-tooltip" data-toggle="tooltip" title="cropper('zoom', -0.1)">
+                                    <span class="fa fa-search-minus"></span> 
+                                </span>
+                            </button>
+                            
+                           
+                        </div>
+                
+                <a href="#" class="close">X</a><span class="loader"></span>
                 <h3>Cropper</h3>
             </div>
             <div class="modal-body opened">
@@ -33,18 +50,13 @@
                         </div>
                         -->
                         <div class="btn-group">
-
+                           
                             <button type="button" class="btn btn-primary btn-crop" data-method="crop" data-option="crop" title="Crop">
                                 <span class="docs-tooltip" data-toggle="tooltip" title="cropper.setDragMode(&quot;crop&quot;)">
                                     <span class="fa fa-crop"></span> OK
                                 </span>
                             </button>
                         </div>
-
-
-
-
-
 
                     </div>
                 </div>
@@ -58,10 +70,18 @@
     var Cropper = window.Cropper;
     var URL = window.URL || window.webkitURL;
     var modalCropper = $('#modal-cropper-<?php echo $id ?>');
-    var container = modalCropper.find('cropper-image-container');
+    var container = modalCropper.find('.cropper-image-container');
     var image = container.find('img');
-
+    $('.btn-zoom-in').click(function(event){
+       
+        image.cropper('zoom', 0.1);
+        console.log(image.length);
+    });
+    $('.btn-zoom-out').click(function(event){
+        image.cropper('zoom', -0.1);
+    });
     modalCropper.find('.close').click(function (e) {
         modalCropper.modal('hide');
     });
+    
 </script>
