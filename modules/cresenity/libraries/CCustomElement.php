@@ -2,14 +2,13 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CCustomElement extends CElement {
+class CCustomElement extends CElement_Element {
 
     protected $tag;
 
     public function __construct($tag, $id = "") {
 
         parent::__construct($id);
-
 
         $this->tag = $tag;
     }
@@ -40,7 +39,7 @@ class CCustomElement extends CElement {
         $html->appendln('<' . $this->tag . ' id="' . $this->id . '" class="' . $classes . '"' . $custom_css . ' '.$attr.' >');
 
 
-        $html->appendln(parent::html($html->get_indent()))->br();
+        $html->appendln($this->html_child($indent))->br();
         $html->appendln('</' . $this->tag . '>');
 
         return $html->text();

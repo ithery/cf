@@ -1,6 +1,6 @@
 <?php 
 return array(
-	'Sign In'=>'Sign In 2',
+	'Sign In'=>'Sign In',
 	'Sign in using your registered account'=>'Sign in using your registered account',
 	'system_delete_success'=>'Success on delete data',
 	'system_edit_success'=>'Success on edit data',

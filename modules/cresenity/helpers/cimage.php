@@ -174,7 +174,8 @@ class cimage {
 
         $upload_directory = curl::base() . 'upload/';
 //        $upload_directory = curl::base() . 'upload';
-        
+        $upload_directory = CF::get_dir('upload');
+        $upload_directory = str_replace($_SERVER['DOCUMENT_ROOT'], '', $upload_directory);
         $org = CApp::instance()->org();
         $org_path = "";
         if ($org != null) {

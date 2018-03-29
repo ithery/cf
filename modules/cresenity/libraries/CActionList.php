@@ -1,6 +1,6 @@
 <?php
 
-class CActionList extends CElement {
+class CActionList extends CElement_Element {
 
     public $actions = array();
     protected $style;
@@ -25,16 +25,17 @@ class CActionList extends CElement {
         $this->label = $label;
         return $this;
     }
+
     public function set_label_size($label_size) {
         $this->label_size = $label_size;
         return $this;
     }
-    
-    public function add_btn_dropdown_class($class){
+
+    public function add_btn_dropdown_class($class) {
         $this->btn_dropdown_classes[] = $class;
         return $this;
     }
-	
+
     public function set_style($style) {
 
         if (in_array($style, array("form-action", "btn-group", "btn-icon-group", "btn-list", "icon-segment", "btn-dropdown", "widget-action", "table-header-action"))) {
@@ -60,7 +61,7 @@ class CActionList extends CElement {
                 $this->btn_dropdown_classes[] = 'btn-sm';
             }
         }
-        
+
         $this->apply('style', $this->style, 'CAction');
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -79,18 +80,17 @@ class CActionList extends CElement {
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $pretag = '<div id="'.$this->id.'" class="button-list ' . $classes . '">';
+        $pretag = '<div id="' . $this->id . '" class="button-list ' . $classes . '">';
         switch ($this->style) {
             case "form-action":
                 if ($this->bootstrap == '3.3') {
                     $control_size = 12 - $this->label_size;
                     $pretag = '
                         <div class="form-group clear-both ' . $classes . '">
-                            <label class="col-md-' .$this->label_size . ' control-label"></label>
-                                <div class="col-md-' .$control_size .'">
+                            <label class="col-md-' . $this->label_size . ' control-label"></label>
+                                <div class="col-md-' . $control_size . '">
                             ';
-                }
-                else {
+                } else {
                     $pretag = '<div class="form-actions clear-both ' . $classes . '">';
                 }
                 break;
@@ -101,7 +101,7 @@ class CActionList extends CElement {
             case "widget-action":
                 $pretag = '<div class="buttons ' . $classes . '">';
                 break;
-			case "table-header-action":
+            case "table-header-action":
                 $pretag = '<div class="buttons ' . $classes . '">';
                 break;
             case "btn-dropdown":
@@ -112,7 +112,7 @@ class CActionList extends CElement {
         if ($this->style == "btn-dropdown") {
 
             $html->appendln('
-                    <a class="btn ' .$btn_dropdown_classes .' dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle" data-toggle="dropdown" href="#">
                             ' . $this->label . '
                             <span class="caret"></span>
                     </a>
@@ -120,10 +120,10 @@ class CActionList extends CElement {
 
             ');
         }
-		
-        $html->appendln(parent::html($html->get_indent()));
-		
-		
+
+        $html->appendln($this->html_child($html->get_indent()));
+
+
         if ($this->style == "btn-dropdown") {
             $html->appendln('</ul>');
         }
@@ -136,8 +136,7 @@ class CActionList extends CElement {
             case "form-action":
                 if ($this->bootstrap == '3.3') {
                     $posttag = "</div></div>";
-                }
-                else {
+                } else {
                     $posttag = "</div>";
                 }
                 break;
@@ -152,7 +151,7 @@ class CActionList extends CElement {
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->set_indent($indent);
-        $js->appendln(parent::js($js->get_indent()));
+        $js->appendln($this->js_child($js->get_indent()));
         return $js->text();
     }
 

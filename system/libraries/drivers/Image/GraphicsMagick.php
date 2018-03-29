@@ -64,7 +64,7 @@ class Image_GraphicsMagick_Driver extends Image_Driver {
 		copy($image, $this->tmp_image);
 
 		// Quality change is done last
-		$quality = (int) arr::remove('quality', $actions);
+		$quality = (int) carr::remove('quality', $actions);
 
 		// Use 95 for the default quality
 		empty($quality) and $quality = 95;

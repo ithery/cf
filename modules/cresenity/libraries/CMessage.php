@@ -64,7 +64,7 @@
                 $html->appendln($this->message)->br();
             }
             else {
-                $html->appendln('<a class="close" data-dismiss="alert">&times;</a>')->br();
+                $html->appendln('<a href="#" class="close" data-dismiss="alert">&times;</a>')->br();
                 $html->appendln('<strong>' . $header . '</strong> ' . $this->message)->br();
             }
 

@@ -1,16 +1,28 @@
+#ignore system files
 .DS_Store
-*/nbproject/
-/nbproject/private/
-/nbproject/*
+Thumbs.db
 
-composer.json
+#ignore application folder, application folder must be another project
 application/*
-logs/*
-/logs/*
+
+#ignore data domain or org
+/data/*
+
+#ignore folder logs
+/logs/
+/temp/*
+/export/
+/upload/*
+
+#ignore netbeans ide config
+/nbproject/
+*/nbproject/*
+
+#ignore aptana IDE
+.project
+
+#ignore the other files
 .idea/*
 *.iml
-temp/*
-export/
-upload/*
-Thumbs.db
-/data/*
+composer.json
+sftp-config*.json

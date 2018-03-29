@@ -54,7 +54,7 @@ class CFormInputSelectTag extends CFormInput {
 
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $html->append(parent::html($indent));
+        $html->append($this->html_child($indent));
 
         $custom_css = crenderer::render_style($this->custom_css);
         $multiple = ' multiple="multiple"';

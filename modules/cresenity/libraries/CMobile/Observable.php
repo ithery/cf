@@ -13,7 +13,7 @@ abstract class CMobile_Observable extends CRenderable {
     public function add_listener($event) {
         $listener = CMobile_Listener::factory($this->id, $event);
         $this->listeners[] = $listener;
-        
+
         return $listener;
     }
 
@@ -23,18 +23,18 @@ abstract class CMobile_Observable extends CRenderable {
         $this->wrapper = $this;
         $this->listeners = array();
         $this->manager = CManager::instance();
-        $this->manager->register_control('text', 'CMobile_Element_Control_Input_Text');
-        $this->manager->register_control('hidden', 'CMobile_Element_Control_Input_Hidden');
-        $this->manager->register_control('email', 'CMobile_Element_Control_Input_Email');
-        $this->manager->register_control('password', 'CMobile_Element_Control_Input_Password');
-        $this->manager->register_control('radio', 'CMobile_Element_Control_Input_Radio');
-        $this->manager->register_control('checkbox', 'CMobile_Element_Control_Input_Checkbox');
-        $this->manager->register_control('search', 'CMobile_Element_Control_Input_Search');
-        $this->manager->register_control('date', 'CMobile_Element_Control_Input_Date');
-        $this->manager->register_control('time', 'CMobile_Element_Control_Input_Time');
-        $this->manager->register_control('file', 'CMobile_Element_Control_Input_File');
-        $this->manager->register_control('textarea', 'CMobile_Element_Control_Textarea');
-        $this->manager->register_control('select', 'CMobile_Element_Control_Select');
+        $this->manager->registerControl('text', 'CMobile_Element_Control_Input_Text');
+        $this->manager->registerControl('hidden', 'CMobile_Element_Control_Input_Hidden');
+        $this->manager->registerControl('email', 'CMobile_Element_Control_Input_Email');
+        $this->manager->registerControl('password', 'CMobile_Element_Control_Input_Password');
+        $this->manager->registerControl('radio', 'CMobile_Element_Control_Input_Radio');
+        $this->manager->registerControl('checkbox', 'CMobile_Element_Control_Input_Checkbox');
+        $this->manager->registerControl('search', 'CMobile_Element_Control_Input_Search');
+        $this->manager->registerControl('date', 'CMobile_Element_Control_Input_Date');
+        $this->manager->registerControl('time', 'CMobile_Element_Control_Input_Time');
+        $this->manager->registerControl('file', 'CMobile_Element_Control_Input_File');
+        $this->manager->registerControl('textarea', 'CMobile_Element_Control_Textarea');
+        $this->manager->registerControl('select', 'CMobile_Element_Control_Select');
     }
 
     /**
@@ -76,38 +76,43 @@ abstract class CMobile_Observable extends CRenderable {
         $this->wrapper->add($field);
         return $field;
     }
+
     public function add_slick($field_id = "") {
         $field = CMobile_Element_Component_Slick::factory($field_id);
         $this->wrapper->add($field);
         return $field;
     }
+
     public function add_iframe($field_id = "") {
         $field = CMobile_Element_Iframe::factory($field_id);
         $this->wrapper->add($field);
         return $field;
     }
+
     public function add_video($field_id = "") {
         $field = CMobile_Element_Video::factory($field_id);
         $this->wrapper->add($field);
         return $field;
     }
+
     public function add_source($field_id = "") {
         $field = CMobile_Element_Source::factory($field_id);
         $this->wrapper->add($field);
         return $field;
     }
+
     public function add_message($field_id = "") {
         $field = CMobile_Element_Message::factory($field_id);
         $this->wrapper->add($field);
         return $field;
     }
-    
+
     public function add_nav($field_id = "") {
         $field = CMobile_Element_Component_Nav::factory($field_id);
         $this->wrapper->add($field);
         return $field;
     }
-    
+
     public function add_side_nav($field_id = "") {
         $field = CMobile_Element_Component_SideNav::factory($field_id);
         $this->wrapper->add($field);
@@ -119,7 +124,6 @@ abstract class CMobile_Observable extends CRenderable {
         $this->wrapper->add($field);
         return $field;
     }
-
 
     public function add_chip($field_id = "") {
         $field = CMobile_Element_Component_Chip::factory($field_id);

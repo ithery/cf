@@ -15,6 +15,7 @@
             
             $this->title = false;
             $this->footer = false;
+            $this->is_show = false;
         }
         
         public static function factory($id = ''){

@@ -43,31 +43,35 @@ class ccfg {
         $ccfg_files = array('app', 'app_setting');
         if (!isset(self::$_config[$domain])) {
             self::$_config[$domain] = array();
+
             foreach ($ccfg_files as $f) {
 
-
-
+                
                 $config_path = DOCROOT . "config" . DIRECTORY_SEPARATOR;
                 $cresenity_config_file = $config_path . $f . EXT;
                 $config_file = $cresenity_config_file;
                 if ($org_code != "") {
 
                     $org_config_path = $config_path . $f . DIRECTORY_SEPARATOR;
-                    if (!is_dir($org_config_path))
+                    if (!is_dir($org_config_path)) {
                         mkdir($org_config_path);
+                    }
                     $org_config_path = $org_config_path . $org_code . DIRECTORY_SEPARATOR;
-                    if (!is_dir($org_config_path))
+                    if (!is_dir($org_config_path)) {
                         mkdir($org_config_path);
+                    }
                     $org_config_path = $org_config_path . $domain . DIRECTORY_SEPARATOR;
-                    if (!is_dir($org_config_path))
+                    if (!is_dir($org_config_path)) {
                         mkdir($org_config_path);
+                    }
                     $org_config_file = $org_config_path . $f . EXT;
 
                     $config_file = $org_config_file;
                 }
 
-                if (!file_exists($config_file))
+                if (!file_exists($config_file)) {
                     $config_file = $cresenity_config_file;
+                }
                 $ccfg = array();
                 if (file_exists($config_file)) {
                     $ccfg = require $config_file;
@@ -79,9 +83,8 @@ class ccfg {
 
                 $app_files = CF::get_files('config', $f, $domain);
 
-               
-                
                 $app_files = array_reverse($app_files);
+
                 foreach ($app_files as $file) {
                     $app_ccfg = include $file;
                     if (!is_array($app_ccfg)) {
@@ -94,7 +97,7 @@ class ccfg {
                 self::$_config[$domain] = array_merge(self::$_config[$domain], $ccfg);
             }
         }
-
+       
         if (isset(self::$_config[$domain][$key])) {
             $val = self::$_config[$domain][$key];
         }

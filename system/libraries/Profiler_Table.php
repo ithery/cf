@@ -26,7 +26,7 @@ class Profiler_Table {
 		if ( ! $styles_output)
 		{
 			$styles_output = TRUE;
-			return file_get_contents(Kohana::find_file('views', 'kohana_profiler_table', FALSE, 'css'));
+			return file_get_contents(CF::find_file('views', 'kohana_profiler_table', FALSE, 'css'));
 		}
 
 		return '';
@@ -64,6 +64,6 @@ class Profiler_Table {
 	{
 		$data['rows'] = $this->rows;
 		$data['columns'] = $this->columns;
-		return View::factory('kohana_profiler_table', $data)->render();
+		return CView::factory('kohana_profiler_table', $data)->render();
 	}
 }

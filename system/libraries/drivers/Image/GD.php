@@ -20,14 +20,14 @@ class Image_GD_Driver extends Image_Driver {
 	{
 		// Make sure that GD2 is available
 		if ( ! function_exists('gd_info'))
-			throw new Kohana_Exception('image.gd.requires_v2');
+			throw new CF_Exception('image.gd.requires_v2');
 
 		// Get the GD information
 		$info = gd_info();
 
 		// Make sure that the GD2 is installed
 		if (strpos($info['GD Version'], '2.') === FALSE)
-			throw new Kohana_Exception('image.gd.requires_v2');
+			throw new CF_Exception('image.gd.requires_v2');
 	}
 
 	public function process($image, $actions, $dir, $file, $render = FALSE)
@@ -63,11 +63,11 @@ class Image_GD_Driver extends Image_Driver {
 
 		// Make sure the image type is supported for import
 		if (empty($create) OR ! function_exists($create))
-			throw new Kohana_Exception('image.type_not_allowed', $image['file']);
+			throw new CF_Exception('image.type_not_allowed', $image['file']);
 
 		// Make sure the image type is supported for saving
 		if (empty($save) OR ! function_exists($save))
-			throw new Kohana_Exception('image.type_not_allowed', $dir.$file);
+			throw new CF_Exception('image.type_not_allowed', $dir.$file);
 
 		// Load the image
 		$this->image = $image;
@@ -76,7 +76,7 @@ class Image_GD_Driver extends Image_Driver {
 		$this->tmp_image = $create($image['file']);
 
 		// Get the quality setting from the actions
-		$quality = arr::remove('quality', $actions);
+		$quality = carr::remove('quality', $actions);
 
 		if ($status = $this->execute($actions))
 		{

@@ -67,7 +67,7 @@
             $html->appendln($this->css());
 
             $html->appendln('<div>');
-            $html->appendln('<div class="row calendar-body" id="' . $this->id . '">
+            $html->appendln('<div class="row-fluid calendar-body" id="' . $this->id . '">
                                 <div class="span12">');
             if ($this->use_navigate) {
                 $html->appendln($this->button());
@@ -90,7 +90,7 @@
             for ($i = 0; $i < ($max_day + $start_day); $i++) {
                 //if(($i % 7) == 0 ) echo "<tr>";
                 if ($i < $start_day) {
-                    $html->appendln("<li class='blank-date'></li>");
+                    $html->appendln('<li class="blank-date"><div class="day-cell"></div></li>');
                 }
                 else {
                     $li_right = "";
@@ -125,7 +125,7 @@
                         $modal_data .= $this->modal($the_date_complete, $the_date_complete_convert, $date_content);
                     }
                     $html->appendln('<li data-date="' . $the_date_complete_convert . '" ' . $id . ' '
-                            . $attributes . ' class="' . $li_right . '">' . $date_content . '</li>');
+                            . $attributes . ' class="' . $li_right . '"><div class="day-cell">' . $date_content . '</div></li>');
                 }
 
                 //            if(($i % 7) == 6 ) echo "<li class='blank-date'>".$i."</li>";
@@ -177,13 +177,13 @@
 
         public function selected_day() {
             return '<ol id="selectable-day">
-                        <li>' . clang::__('Sunday') . '</li>
-                        <li>' . clang::__('Monday') . '</li>
-                        <li>' . clang::__('Tuesday') . '</li>
-                        <li>' . clang::__('Wednesday') . '</li>
-                        <li>' . clang::__('Thursday') . '</li>
-                        <li>' . clang::__('Friday') . '</li>
-                        <li>' . clang::__('Saturday') . '</li>
+                        <li><div class="day-name">' . clang::__('Sunday') . '</div></li>
+                        <li><div class="day-name">' . clang::__('Monday') . '</div></li>
+                        <li><div class="day-name">' . clang::__('Tuesday') . '</div></li>
+                        <li><div class="day-name">' . clang::__('Wednesday') . '</div></li>
+                        <li><div class="day-name">' . clang::__('Thursday') . '</div></li>
+                        <li><div class="day-name">' . clang::__('Friday') . '</div></li>
+                        <li><div class="day-name">' . clang::__('Saturday') . '</div></li>
                     </ol>';
         }
 
@@ -390,28 +390,35 @@
                             /*border: 1px solid #CCCCCC;*/
                             margin: 0px;
                             float: left; 
-                            height: 100px;
                             /*height: 80px; */
                             /*font-size: 4em;*/
                             font-size: 1.2em; 
                             text-align: right; 
                             /* background-color: #FEFEFE; */
                             font-weight: normal;
+
+                            /* padding: 5px; */
+                            /* width: 152px; */
+                            width: 14.28571428571429%; 
+                        }
+                        
+                        
+                        #selectable li .day-cell{ 
+                            height: 100px;
                             border-right: 1px solid #CCCCCC;
                             border-bottom: 1px solid #CCCCCC;
                             background-color: #ebebeb;
-                            padding: 5px;
-                            width: 152px;
-                            /* width: 14%; */
-                        }
-                        #selectable li:hover {
-                            cursor: pointer;
-                            background-color: #f0f0f0;
                             overflow: auto;
                         }
                         
-                        #selectable li.left-over { border-left: none; }
-                        #selectable li.right-over { border-right: 1px solid #cccccc; width: 180px; }
+                        #selectable li .day-cell:hover {
+                            cursor: pointer;
+                            background-color: #f0f0f0;
+                            
+                        }
+                        
+                        #selectable li.left-over .day-cell { border-left: none; }
+                        #selectable li.right-over .day-cell { border-right: 1px solid #cccccc;  }
                         #selectable .blank-date { }
                         
                         #selectable-day { 
@@ -424,15 +431,18 @@
                             border-top: 1px solid #CCCCCC;
                             border-right: 1px solid #CCCCCC;
                         }
+                        
                         #selectable-day li { 
                             margin: 0px; 
                             padding: 20px 0px 10px 0px; 
                             float: left; 
-                            width: 14%; 
+                            width: 14.28571428571429%; 
                             height: auto; /*font-size: 4em;*/
                             font-size: 1.2em; 
-                            text-align: right;                             
+                            text-align: center;                             
                         }
+                        
+                        
                         
                         #calendar-content {
                             background-color: #FFFFFF;

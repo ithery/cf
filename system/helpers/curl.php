@@ -25,13 +25,9 @@ class curl {
      * @return  string
      */
     public static function base($index = FALSE, $protocol = FALSE) {
-        if ($protocol == FALSE) {
-            // Use the default configured protocol
-            $protocol = CF::config('core.site_protocol');
-        }
 
         // Load the site domain
-        $site_domain = (string) CF::config('core.site_domain', TRUE);
+        $site_domain = (string) CF::config('core.site_domain', '');
 
         if ($protocol == FALSE) {
             if ($site_domain === '' OR $site_domain[0] === '/') {
@@ -229,7 +225,12 @@ class curl {
                 }
             }
         } else {
-            $result .= '&' . urlencode((string) $prefix) . '=' . urlencode($val);
+            $encoded_val = urlencode($val);
+            if (isset($val[0]) && $val[0] == '@') {
+                //$encoded_val = '@' . urlencode(substr($val, 1));
+                $encoded_val = $val;
+            }
+            $result .= '&' . urlencode((string) $prefix) . '=' . $encoded_val;
         }
 
         $result = substr($result, 1);

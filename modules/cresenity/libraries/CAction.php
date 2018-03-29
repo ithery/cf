@@ -1,6 +1,6 @@
 <?php
 
-class CAction extends CElement {
+class CAction extends CElement_Element {
 
     protected $jsfunc;
     protected $icon;
@@ -162,8 +162,7 @@ class CAction extends CElement {
             $data['attr']['type'] = 'submit';
             $data['attr']['value'] = $this->label;
             unset($data['text']);
-        }
-        else {
+        } else {
             $data['tag'] = 'a';
             $data['attr']['href'] = $this->link;
             $data['text'] = $this->label;
@@ -252,12 +251,10 @@ class CAction extends CElement {
                     }
                 }
                 $html->appendln($this->label . '</button>');
-            }
-            else {
+            } else {
                 $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '/>');
             }
-        }
-        else {
+        } else {
             if ($this->type == "jsfunc") {
                 $link = 'javascript:;';
                 if ($this->jsfunc != "") {
@@ -269,15 +266,13 @@ class CAction extends CElement {
             }
             if ($this->style == "btn-dropdown") {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
-            }
-            else {
+            } else {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             }
             if (strlen($this->icon) > 0) {
                 if ($this->bootstrap == '3.3') {
                     $html->append('<i class="fa fa-' . $this->icon . '"></i> ');
-                }
-                else {
+                } else {
                     $html->append('<i class="icon icon-' . $this->icon . '"></i> ');
                 }
             }
@@ -299,20 +294,17 @@ class CAction extends CElement {
 
         if ($this->disabled) {
             $js->appendln("jQuery('#" . $this->id . "').click(function(e) { e.preventDefault(); });");
-        }
-        else {
+        } else {
             if ($this->render_as_input()) {
 
                 if (strlen($this->link) > 0) {
                     if ($this->submit) {
                         $js->appendln("jQuery('#" . $this->id . "').click(function() { jQuery(this).closest('form').attr('action','" . $this->link . "'); });");
-                    }
-                    else {
+                    } else {
                         $js->appendln("jQuery('#" . $this->id . "').click(function() { window.location.href='" . $this->link . "'; });");
                     }
                 }
-            }
-            else {
+            } else {
                 if (strlen($this->submit_to) > 0) {
                     $str_submit_to_target = "";
                     if (strlen($this->submit_to_target) > 0) {

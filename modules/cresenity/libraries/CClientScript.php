@@ -84,13 +84,13 @@ class CClientScript extends CObject {
 
             $base_url = curl::base(false, 'http');
         }
-        
+
 //        if(CF::domain()=='livemall.co.id') {
 //            $base_url = 'http://livemall-70ae.kxcdn.com/';
 //        }
-        
+
         $file = str_replace($docroot, $base_url, $file);
-        
+
         return $file;
     }
 
@@ -112,10 +112,8 @@ class CClientScript extends CObject {
 
             $base_url = curl::base(false, 'http');
         }
-        if(CF::domain()=='livemall.co.id') {
-            $base_url = 'http://livemall-70ae.kxcdn.com/';
-        }
         $file = str_replace($docroot, $base_url, $file);
+
         return $file;
     }
 
@@ -146,8 +144,7 @@ class CClientScript extends CObject {
         if (strpos($dir_file, 'http') !== false) {
             $js_file = $dir_file;
             // do nothing
-        }
-        else {
+        } else {
             $js_file = $this->fullpath_js_file($dir_file);
             if (!file_exists($js_file)) {
                 trigger_error('JS File not exists, ' . $file);
@@ -159,27 +156,26 @@ class CClientScript extends CObject {
         $this->scripts[$pos]['js_file'][] = $js_file;
     }
 
-        public function register_css_file($file, $pos = "head") {
-            $dir_file = $file;
-            $css_version = '';
-            if (strpos($file, '?') !== false) {
-                $dir_file = substr($file, 0, strpos($file, '?'));
-                $css_version = substr($file, strpos($file, '?'), strlen($file) - 1);
+    public function register_css_file($file, $pos = "head") {
+        $dir_file = $file;
+        $css_version = '';
+        if (strpos($file, '?') !== false) {
+            $dir_file = substr($file, 0, strpos($file, '?'));
+            $css_version = substr($file, strpos($file, '?'), strlen($file) - 1);
+        }
+        if (strpos($dir_file, 'http') !== false) {
+            $css_file = $dir_file;
+            // do nothing
+        } else {
+            $css_file = $this->fullpath_css_file($dir_file);
+            if (!file_exists($css_file)) {
+                trigger_error('CSS File not exists, ' . $file);
             }
-            if (strpos($dir_file, 'http') !== false) {
-                $css_file = $dir_file;
-                // do nothing
+            if (strlen($css_version) > 0) {
+                $css_file .= $css_version;
             }
-            else {
-                $css_file = $this->fullpath_css_file($dir_file);
-                if (!file_exists($css_file)) {
-                    trigger_error('CSS File not exists, ' . $file);
-                }
-                if (strlen($css_version) > 0) {
-                    $css_file .= $css_version;
-                }
-            }
-            $this->scripts[$pos]['css_file'][] = $css_file;
+        }
+        $this->scripts[$pos]['css_file'][] = $css_file;
     }
 
     public function js_files() {
@@ -247,7 +243,7 @@ class CClientScript extends CObject {
             $arr["url"] = $url_css_file;
             $arr["file"] = $f;
 
-            $file = explode('?',$fullpath_css_file);
+            $file = explode('?', $fullpath_css_file);
             $fullpath_css_file = $file[0];
 
 
@@ -267,6 +263,7 @@ class CClientScript extends CObject {
         $js_files = $this->js_files();
         $js_open = "";
         $js_close = "";
+        $js_before = "";
         $i = 0;
         $man = CManager::instance();
         foreach ($js_files as $f) {
@@ -276,17 +273,16 @@ class CClientScript extends CObject {
                 if (strlen($mobile_path) > 0) {
                     $url_js_file = $mobile_path . $f;
                 }
-
             }
 
 
-            $js_open.=str_repeat("\t", $i) . "require(['" . $url_js_file . "'],function(){" . PHP_EOL;
+            $js_open .= str_repeat("\t", $i) . "require(['" . $url_js_file . "'],function(){" . PHP_EOL;
 
-            $js_close.="})";
+            $js_close .= "})";
             $i++;
         }
 
-        $js.= "
+        $js .= "
                 if (typeof capp_started_event_initialized === 'undefined') {
                     capp_started_event_initialized=false;
                  }
@@ -301,14 +297,17 @@ class CClientScript extends CObject {
             ";
 
 
+        $js_before .= "
+            window.capp = " . json_encode(CApp::variables()) . ";
+            ";
 
-        return $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
+        return $js_before . $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
     }
 
     public function render($pos, $type = array("js_file", "css_file", "js", "css", "meta", "link")) {
         $script = "";
         $app = CApp::instance();
-		$man = CManager::instance();
+        $man = CManager::instance();
         if (!is_array($type))
             $type = array($type);
         foreach ($this->scripts[$pos] as $k => $v) {
@@ -320,12 +319,12 @@ class CClientScript extends CObject {
                                 $url_js_file = $this->url_js_file($s);
                                 if ($man->is_mobile()) {
                                     $mobile_path = $man->get_mobile_path();
-                                    if(strlen($mobile_path)>0) {
+                                    if (strlen($mobile_path) > 0) {
                                         $url_js_file = $mobile_path . $s;
                                     }
                                 }
 
-                                $script.='<script src="' . $url_js_file . '"></script>' . PHP_EOL;
+                                $script .= '<script src="' . $url_js_file . '"></script>' . PHP_EOL;
                             }
                             break;
                     }
@@ -335,12 +334,12 @@ class CClientScript extends CObject {
                                 $url_css_file = $this->url_css_file($s);
                                 if ($man->is_mobile()) {
                                     $mobile_path = $man->get_mobile_path();
-                                    if(strlen($mobile_path)>0) {
+                                    if (strlen($mobile_path) > 0) {
                                         $url_css_file = $mobile_path . $s;
                                     }
                                 }
 
-                                $script.='<link href="' . $url_css_file . '" rel="stylesheet" />' . PHP_EOL;
+                                $script .= '<link href="' . $url_css_file . '" rel="stylesheet" />' . PHP_EOL;
                             }
                             break;
                     }

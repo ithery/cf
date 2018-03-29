@@ -1,22 +1,46 @@
 <?php
 
+if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+    define('CURL_SSLVERSION_TLSv1_2', 6);
+}
+
+if (isset($_GET['kc']) && isset($_GET['msisdn']) && isset($_GET['price'])) {
+    header('HTTP/1.0 503 Service Unavailable');
+    header('Content-Type: text/html');
+    header("Retry-After: 3600");
+    header('Content-Type: text/html');
+    echo "<html><body><p><b>Server under undue load</b><br />";
+    echo "Please wait 1 hours before retrying.</p></body></html>";
+    exit;
+}
+
+if (!isset($_GET['force-nobot'])) {
+    if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])) {
+        //bot detected
+//    if (isset($_SERVER['HTTP_HOST'])) {
+//        preg_match('/^(?:(.+)\.)?([^.]+\.[^.]+)$/', $_SERVER['HTTP_HOST'], $matches);
+//        if (isset($matches[1]) && $matches[1] != 'www') {
+        //subdomain detected
+        if (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF'] AND $_SERVER['PHP_SELF'] != '/index.php/check') {
+
+            header('HTTP/1.0 503 Service Unavailable');
+            header('Content-Type: text/html');
+            header("Retry-After: 3600");
+            header('Content-Type: text/html');
+            echo "<html><body><p><b>Server under undue load</b><br />";
+            echo "Please wait 1 hours before retrying.</p></body></html>";
+            exit;
+        }
+//        }
+//    }
+    }
+}
+
+
 date_default_timezone_set('Asia/Jakarta');
 define('DS', DIRECTORY_SEPARATOR);
 
-/**
- * This file acts as the "front controller" to your application. You can
- * configure your application, modules, and system directories here.
- * PHP error_reporting level may also be changed.
- *
- * @see http://kohanaphp.com
- */
-/**
- * Define the website environment status. When this flag is set to TRUE, some
- * module demonstration controllers will result in 404 errors. For more information
- * about this option, read the documentation about deploying Kohana.
- *
- * @see http://docs.kohanaphp.com/installation/deployment
- */
+
 define('IN_PRODUCTION', FALSE);
 
 /**
@@ -25,32 +49,32 @@ define('IN_PRODUCTION', FALSE);
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_application = 'application';
+$cf_application = 'application';
 
 /**
- * Kohana modules directory. This directory should contain all the modules used
+ * CF modules directory. This directory should contain all the modules used
  * by your application. Modules are enabled and disabled by the application
  * configuration file.
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_modules = 'modules';
+$cf_modules = 'modules';
 
 /**
- * Kohana system directory. This directory should contain the core/ directory,
- * and the resources you included in your download of Kohana.
+ * CF system directory. This directory should contain the core/ directory,
+ * and the resources you included in your download of CF.
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_system = 'system';
+$cf_system = 'system';
 
 /**
- * Test to make sure that Kohana is running on PHP 5.2 or newer. Once you are
- * sure that your environment is compatible with Kohana, you can comment this
+ * Test to make sure that CF is running on PHP 5.2 or newer. Once you are
+ * sure that your environment is compatible with CF, you can comment this
  * line out. When running an application on a new server, uncomment this line
  * to check the PHP version quickly.
  */
-version_compare(PHP_VERSION, '5.2', '<') and exit('Kohana requires PHP 5.2 or newer.');
+version_compare(PHP_VERSION, '5.2', '<') and exit('CF requires PHP 5.2 or newer.');
 
 /**
  * Set the error reporting level. Unless you have a special need, E_ALL is a
@@ -59,8 +83,8 @@ version_compare(PHP_VERSION, '5.2', '<') and exit('Kohana requires PHP 5.2 or ne
 error_reporting(E_ALL & ~E_STRICT ^ E_DEPRECATED);
 
 /**
- * Turning off display_errors will effectively disable Kohana error display
- * and logging. You can turn off Kohana errors in application/config/config.php
+ * Turning off display_errors will effectively disable CF error display
+ * and logging. You can turn off CF errors in application/config/config.php
  */
 ini_set('display_errors', TRUE);
 
@@ -77,19 +101,19 @@ define('EXT', '.php');
 // $Id: index.php 3915 2009-01-20 20:52:20Z zombor $
 //
 
-if(isset($_FILES) && is_array($_FILES)) {
-    foreach($_FILES as $k=>$v) {
-        if(isset($v['name'])) {
+if (isset($_FILES) && is_array($_FILES)) {
+    foreach ($_FILES as $k => $v) {
+        if (isset($v['name'])) {
             $t = $v['name'];
 
-            if(!is_array($t)) {
+            if (!is_array($t)) {
                 $t = array($t);
             }
-            foreach($t as $g) {
+            foreach ($t as $g) {
                 if (!is_array($g)) {
                     $ext = pathinfo($g, PATHINFO_EXTENSION);
-                    if($ext == 'php' || $ext == 'sh') {
-                        die('Not Allowed X_X');
+                    if ($ext == 'php' || $ext == 'sh') {
+                       // die('Not Allowed X_X');
                     }
                 }
             }
@@ -97,10 +121,10 @@ if(isset($_FILES) && is_array($_FILES)) {
     }
 }
 
-$kohana_pathinfo = pathinfo(__FILE__);
+$cf_pathinfo = pathinfo(__FILE__);
 // Define the front controller name and docroot
-define('DOCROOT', $kohana_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
-define('KOHANA', $kohana_pathinfo['basename']);
+define('DOCROOT', $cf_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
+define('KOHANA', $cf_pathinfo['basename']);
 
 // If the front controller is a symlink, change to the real docroot
 is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
@@ -114,9 +138,8 @@ if (PHP_SAPI === 'cli') {
     }
 } else {
     $domain = $_SERVER["SERVER_NAME"];
-
 }
-$file.=$domain;
+$file .= $domain;
 
 
 if (file_exists($file)) {
@@ -124,26 +147,20 @@ if (file_exists($file)) {
     $data = json_decode($content, true);
     $app_code = $data['app_code'];
 
-    $kohana_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
+    $cf_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
 }
 
 // If kohana folders are relative paths, make them absolute.
-$kohana_application = file_exists($kohana_application) ? $kohana_application : DOCROOT . $kohana_application;
-$kohana_modules = file_exists($kohana_modules) ? $kohana_modules : DOCROOT . $kohana_modules;
-$kohana_system = file_exists($kohana_system) ? $kohana_system : DOCROOT . $kohana_system;
+$cf_application = file_exists($cf_application) ? $cf_application : DOCROOT . $cf_application;
+$cf_modules = file_exists($cf_modules) ? $cf_modules : DOCROOT . $cf_modules;
+$cf_system = file_exists($cf_system) ? $cf_system : DOCROOT . $cf_system;
 
 // Define application and system paths
-define('APPPATH', str_replace('\\', '/', realpath($kohana_application)) . '/');
-define('MODPATH', str_replace('\\', '/', realpath($kohana_modules)) . '/');
-define('SYSPATH', str_replace('\\', '/', realpath($kohana_system)) . '/');
+define('APPPATH', str_replace('\\', '/', realpath($cf_application)) . '/');
+define('MODPATH', str_replace('\\', '/', realpath($cf_modules)) . '/');
+define('SYSPATH', str_replace('\\', '/', realpath($cf_system)) . '/');
 
 // Clean up
-unset($kohana_application, $kohana_modules, $kohana_system);
+unset($cf_application, $cf_modules, $cf_system);
 
-if (file_exists(DOCROOT . 'install' . EXT)) {
-    // Load the installation tests
-    include DOCROOT . 'install' . EXT;
-} else {
-    // Initialize Kohana
-    require SYSPATH . 'core/Bootstrap' . EXT;
-}
+require SYSPATH . 'core/Bootstrap' . EXT;

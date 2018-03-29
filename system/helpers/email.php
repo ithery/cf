@@ -62,7 +62,7 @@ class email {
 
                 if (!empty($config['options']['auth'])) {
                     // Get the class name and params
-                    list ($class, $params) = arr::callback_string($config['options']['auth']);
+                    list ($class, $params) = carr::callback_string($config['options']['auth']);
 
                     if ($class === 'PopB4Smtp') {
                         // Load the PopB4Smtp class manually, due to its odd filename

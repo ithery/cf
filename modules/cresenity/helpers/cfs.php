@@ -83,8 +83,20 @@ class cfs {
         return basename($str);
     }
 
+    /**
+     * Creates a folder if missing, or ensures that it is writable.
+     * this is a safe function to check dir already exists or will create dir recursively
+     *
+     * @param string $dir The directory path.
+     *
+     * @return bool TRUE if folder exists and is writable, otherwise FALSE.
+     */
     public static function mkdir($dir) {
-        return mkdir($dir);
+        // Test write-permissions for the folder and create/fix if necessary.
+        if ((is_dir($dir) && is_writable($dir)) || (!is_dir($dir) && mkdir($dir, 0755, true)) || chmod($dir, 0755)) {
+            return true;
+        }
+        return false;
     }
 
     public static function is_dir($dir) {
@@ -114,6 +126,36 @@ class cfs {
         if (is_string($time))
             $time = strtotime($time);
         return $time - cfs::mtime($file);
+    }
+
+    /**
+     * Atomic filewriter.
+     *
+     * Safely writes new contents to a file using an atomic two-step process.
+     * If the script is killed before the write is complete, only the temporary
+     * trash file will be corrupted.
+     *
+     * @param string $filename     Filename to write the data to.
+     * @param string $data         Data to write to file.
+     * @param string $atomicSuffix Lets you optionally provide a different
+     *                             suffix for the temporary file.
+     *
+     * @return mixed Number of bytes written on success, otherwise FALSE.
+     */
+    public static function atomic_write($filename, $data, $atomic_suffix = 'atomictmp') {
+        // Perform an exclusive (locked) overwrite to a temporary file.
+        $filenameTmp = sprintf('%s.%s', $filename, $atomic_suffix);
+        $writeResult = @file_put_contents($filenameTmp, $data, LOCK_EX);
+        if ($writeResult !== false) {
+            // Now move the file to its real destination (replaced if exists).
+            $moveResult = @rename($filenameTmp, $filename);
+            if ($moveResult === true) {
+                // Successful write and move. Return number of bytes written.
+                return $writeResult;
+            }
+        }
+
+        return false; // Failed.
     }
 
 }

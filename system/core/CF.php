@@ -4,6 +4,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CF {
 
+    // Security check that is added to all generated PHP files
+    const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
+
     // The singleton instance of the controller
     public static $instance;
     // Output buffering level
@@ -19,9 +22,7 @@ final class CF {
     // Configuration
     private static $configuration;
     // Include paths
-    private static $include_paths;
-    // Theme Include paths
-    private static $include_paths_theme;
+    private static $paths;
     // Logged messages
     private static $log;
     // Cache lifetime
@@ -34,20 +35,30 @@ final class CF {
         'info' => 3,
         'debug' => 4,
     );
+    public static $charset = 'utf-8';
+
+    /* log threshold default , CLogger::LOG_WARNING (4) */
+    public static $log_threshold = 4;
+    public static $global_xss_filtering = TRUE;
     // Internal caches and write status
     private static $internal_cache = array();
     private static $write_cache;
     private static $internal_cache_path;
     private static $internal_cache_key;
     private static $internal_cache_encrypt;
-    private static $app_id;
-    private static $app_code;
-    private static $org_id;
-    private static $org_code;
-    private static $theme;
-    private static $store_id;
-    private static $store_code;
-    private static $shared_app_code = array();
+    private static $data;
+    private static $sharedAppCode = array();
+    public static $instances;
+
+    /**
+     * @var  CLogger  logging object
+     */
+    public static $logger;
+
+    /**
+     * @var  CConfig  config object
+     */
+    public static $config;
 
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
@@ -73,39 +84,7 @@ final class CF {
         }
         return $result;
     }
-    
-    public static function app_id() {
 
-        return self::$app_id;
-    }
-
-    public static function app_code() {
-        return self::$app_code;
-    }
-
-    public static function org_id() {
-        return self::$org_id;
-    }
-
-    public static function org_code() {
-        return self::$org_code;
-    }
-
-    public static function store_id() {
-        return self::$store_id;
-    }
-
-    public static function store_code() {
-        return self::$store_code;
-    }
-
-    public static function shared_app_code() {
-        return self::$shared_app_code;
-    }
-
-    public static function theme() {
-        return self::$theme;
-    }
     /**
      * Sets up the PHP environment. Adds error/exception handling, output
      * buffering, and adds an auto-loading method for loading classes.
@@ -131,38 +110,27 @@ final class CF {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
 
-        //we load the app, org and store from domain
-        $domain = self::domain();
-
-        //get domain data
-        $data = CFData::get($domain, 'domain');
-
-        if ($data != null) {
-            self::$app_id = isset($data['app_id']) ? $data['app_id'] : null;
-            self::$app_code = isset($data['app_code']) ? $data['app_code'] : null;
-            self::$shared_app_code = isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
-            self::$org_id = isset($data['org_id']) ? $data['org_id'] : null;
-            self::$org_code = isset($data['org_code']) ? $data['org_code'] : null;
-            self::$store_id = isset($data['store_id']) ? $data['store_id'] : null;
-            self::$store_code = isset($data['store_code']) ? $data['store_code'] : null;
-            self::$theme = isset($data['theme']) ? $data['theme'] : null;
+        $capppath = APPPATH;
+        $defaultpath = APPPATH;
+        if (strlen(self::app_code()) > 0) {
+            $capppath .= self::app_code() . DS;
+            $defaultpath .= self::app_code() . DS;
         }
-        $capp_path = APPPATH;
-        if (strlen(self::$app_code) > 0) {
-            $capp_path.=self::$app_code . DS;
-        }
-        if (strlen(self::$org_code) > 0) {
-            $capp_path.=self::$org_code . DS;
-        }
-        if (strlen(self::$store_code) > 0) {
-            $capp_path.=self::$store_code . DS;
+        if (strlen(self::org_code()) > 0) {
+            $capppath .= self::org_code() . DS;
         }
 
-        if (is_dir($capp_path . "default" . DS)) {
-            $capp_path.="default" . DS;
+
+        if (is_dir($defaultpath . "default" . DS)) {
+            $defaultpath .= "default" . DS;
+        }
+        if (is_dir($capppath . "default" . DS)) {
+            $capppath .= "default" . DS;
         }
 
-        define('CAPPPATH', $capp_path);
+        define('CAPPPATH', $capppath);
+        define('DEFAULTPATH', $defaultpath);
+
         // Define CF error constant
         define('E_CF', 42);
 
@@ -175,32 +143,27 @@ final class CF {
         // Define Handler error constant
         define('E_HANDLER_ERROR', 45);
 
-        if (self::$cache_lifetime = self::config('core.internal_cache')) {
-            // Are we using encryption for caches?
-            self::$internal_cache_encrypt = self::config('core.internal_cache_encrypt');
+        // Start output buffering
+        ob_start(array(__CLASS__, 'output_buffer'));
 
-            if (self::$internal_cache_encrypt === TRUE) {
-                self::$internal_cache_key = self::config('core.internal_cache_key');
+        // Save buffering level
+        self::$buffer_level = ob_get_level();
 
-                // Be sure the key is of acceptable length for the mcrypt algorithm used
-                self::$internal_cache_key = substr(self::$internal_cache_key, 0, 24);
-            }
+        // Set autoloader
+        spl_autoload_register(array('CF', 'auto_load'));
 
-            // Set the directory to be used for the internal cache
-            if (!self::$internal_cache_path = self::config('core.internal_cache_path')) {
-                self::$internal_cache_path = APPPATH . 'cache/';
-            }
+        // Set error handler
+        set_error_handler(array('CF', 'exception_handler'));
 
-            // Load cached configuration and language files
-            self::$internal_cache['configuration'] = self::cache('configuration', self::$cache_lifetime);
-            self::$internal_cache['language'] = self::cache('language', self::$cache_lifetime);
+        // Set exception handler
+        set_exception_handler(array('CF', 'exception_handler'));
 
-            // Load cached file paths
-            self::$internal_cache['find_file_paths'] = self::cache('find_file_paths', self::$cache_lifetime);
+        // Set and test the logger instance, we need to know whats wrong when CF Fail
+        self::$logger = CLogger::instance();
 
-            // Enable cache saving
-            CFEvent::add('system.shutdown', array(__CLASS__, 'internal_cache_save'));
-        }
+        // Set and test the config, we need config can loaded normally to run CF
+        self::$config = CConfig::instance('app');
+
 
         // Disable notices and "strict" errors
         $ER = error_reporting(~E_NOTICE & ~E_STRICT);
@@ -218,21 +181,6 @@ final class CF {
 
         // Restore error reporting
         error_reporting($ER);
-
-        // Start output buffering
-        ob_start(array(__CLASS__, 'output_buffer'));
-
-        // Save buffering level
-        self::$buffer_level = ob_get_level();
-
-        // Set autoloader
-        spl_autoload_register(array('CF', 'auto_load'));
-
-        // Set error handler
-        set_error_handler(array('CF', 'exception_handler'));
-
-        // Set exception handler
-        set_exception_handler(array('CF', 'exception_handler'));
 
         // Send default text/html UTF-8 header
         header('Content-Type: text/html; charset=UTF-8');
@@ -254,36 +202,120 @@ final class CF {
             register_shutdown_function(array(__CLASS__, 'log_save'));
         }
 
-        // Enable C routing
+        // Enable CF routing
         CFEvent::add('system.routing', array('CFRouter', 'find_uri'));
         CFEvent::add('system.routing', array('CFRouter', 'setup'));
 
-        // Enable C controller initialization
+        // Enable CF controller initialization
         CFEvent::add('system.execute', array('CF', 'instance'));
 
-        // Enable C 404 pages
+        // Enable CF 404 pages
         CFEvent::add('system.404', array('CF', 'show_404'));
 
-        // Enable C output handling
+        // Enable CF output handling
         CFEvent::add('system.shutdown', array('CF', 'shutdown'));
 
-        if (self::config('core.enable_hooks') === TRUE) {
-            // Find all the hook files
-            $hooks = self::list_files('hooks', TRUE);
-
-            foreach ($hooks as $file) {
-                // Load the hook
-                include $file;
-            }
+        CFBenchmark::start('system.cf.bootstrap');
+        //try to locate bootstrap files for modules 
+//        foreach (CF::modules() as $module) {
+//            $bootstrap_path = DOCROOT . 'modules' . DS . $module;
+//            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+//                include $bootstrap_path . 'bootstrap' . EXT;
+//            }
+//        }
+        //try to locate bootstrap files for application 
+        $bootstrap_path = DOCROOT . 'application' . DS . CF::app_code() . DS;
+        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+            include $bootstrap_path . 'bootstrap' . EXT;
         }
-
-
+        //try to locate bootstrap files for org
+        $bootstrap_path .= CF::org_code() . DS;
+        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+            include $bootstrap_path . 'bootstrap' . EXT;
+        }
+        CFBenchmark::stop('system.cf.bootstrap');
 
         // Setup is complete, prevent it from being run again
         $run = TRUE;
 
         // Stop the environment setup routine
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
+    }
+
+    public static function invoke($uri) {
+        $router_data = CFRouter::get_route_data($uri);
+        $routes = carr::get($router_data, 'routes');
+        $current_uri = carr::get($router_data, 'current_uri');
+        $query_string = carr::get($router_data, 'query_string');
+        $complete_uri = carr::get($router_data, 'complete_uri');
+        $routed_uri = carr::get($router_data, 'routed_uri');
+        $url_suffix = carr::get($router_data, 'url_suffix');
+        $segments = carr::get($router_data, 'segments');
+        $rsegments = carr::get($router_data, 'rsegments');
+        $controller = carr::get($router_data, 'controller');
+        $controller_dir = carr::get($router_data, 'controller_dir');
+        $controller_dir_ucfirst = carr::get($router_data, 'controller_dir_ucfirst');
+        $controller_path = carr::get($router_data, 'controller_path');
+        $method = carr::get($router_data, 'method');
+        $arguments = carr::get($router_data, 'arguments');
+
+        // Include the Controller file
+        if (strlen($controller_path) > 0) {
+            require_once $controller_path;
+        }
+        $class_name = '';
+        try {
+            // Start validation of the controller
+            $class_name = str_replace('/', '_', $controller_dir_ucfirst);
+            $class_name = 'Controller_' . $class_name . ucfirst($controller);
+            $class = new ReflectionClass($class_name);
+        } catch (ReflectionException $e) {
+            try {
+                $class_name = ucfirst($controller) . '_Controller';
+                $class = new ReflectionClass($class_name);
+                // Start validation of the controller
+            } catch (ReflectionException $e) {
+                // Controller does not exist
+
+                CFEvent::run('system.404');
+            }
+        }
+
+        if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
+            // Controller is not allowed to run in production
+            throw new CException('class is abstract or not allowed in production in :class_name', array(':class_name' => $class_name));
+        }
+        // Create a new controller instance
+        if (isset($class)) {
+            $controller = $class->newInstance();
+        }
+        try {
+            // Load the controller method
+            $method = $class->getMethod($method);
+
+            // Method exists
+            if (CFRouter::$method[0] === '_') {
+                // Do not allow access to hidden methods
+                throw new CException('method :method is hidden methods in :class_name', array(':method' => $method, ':class_name' => $class_name));
+            }
+
+            if ($method->isProtected() or $method->isPrivate()) {
+                // Do not attempt to invoke protected methods
+                throw new ReflectionException('protected controller method');
+            }
+
+            // Default arguments
+            $arguments = $arguments;
+        } catch (ReflectionException $e) {
+            // Use __call instead
+            $method = $class->getMethod('__call');
+
+            // Use arguments in __call format
+            $arguments = array($method, $arguments);
+        }
+
+        // Execute the controller method
+        return $method->invokeArgs($controller, $arguments);
     }
 
     /**
@@ -296,32 +328,36 @@ final class CF {
      * @return  object  instance of controller
      */
     public static function & instance() {
-
+        $null = NULL;
         if (self::$instance === NULL) {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
             if (empty(CFRouter::$controller_path)) {
-                exit;
+                CF::show_404();
             }
             // Include the Controller file
-            require CFRouter::$controller_path;
+            if (strlen(CFRouter::$controller_path) > 0) {
+                require_once CFRouter::$controller_path;
+            }
 
             try {
                 // Start validation of the controller
-                $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
+                $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
+                $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
             } catch (ReflectionException $e) {
                 try {
-                    $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
+                    $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
                     // Start validation of the controller
-                    $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
                 } catch (ReflectionException $e) {
                     // Controller does not exist
                     CFEvent::run('system.404');
+                    return $null;
                 }
             }
 
             if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
                 // Controller is not allowed to run in production
                 CFEvent::run('system.404');
+                return $null;
             }
 
             // Run system.pre_controller
@@ -330,6 +366,10 @@ final class CF {
             // Create a new controller instance
             if (isset($class)) {
                 $controller = $class->newInstance();
+
+                if (!isset(self::$instances[CFRouter::$current_uri])) {
+                    self::$instances[CFRouter::$current_uri] = $controller;
+                }
             }
 
             // Controller constructor has been executed
@@ -366,6 +406,7 @@ final class CF {
             // Start the controller execution benchmark
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_execution');
 
+
             // Execute the controller method
             $method->invokeArgs($controller, $arguments);
 
@@ -376,11 +417,12 @@ final class CF {
             CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
         }
 
+
         return self::$instance;
     }
 
     public static function get_dir($directory = '', $domain = null) {
-        $include_paths = CF::include_paths();
+        $include_paths = CF::paths();
         foreach ($include_paths as $p) {
             $path = $p;
             if (strlen($directory) > 0) {
@@ -394,7 +436,7 @@ final class CF {
     }
 
     public static function get_dirs($directory, $domain = null) {
-        $include_paths = CF::include_paths();
+        $include_paths = CF::paths();
         $dirs = array();
         foreach ($include_paths as $p) {
             $path = $p . $directory . DS;
@@ -418,9 +460,9 @@ final class CF {
 
     public static function get_files($directory, $filename, $domain = null) {
         if ($domain == null) {
-            $domain = crouter::domain();
+            $domain = CF::domain();
         }
-        $include_paths = CF::include_paths();
+        $include_paths = CF::paths($domain);
 
 
         $result = array();
@@ -441,74 +483,6 @@ final class CF {
         return null;
     }
 
-    
-    public static function include_paths_theme($process = FALSE) {
-        
-        $theme = self::$theme;
-        
-        if ($process === TRUE) {
-
-            // Add APPPATH as the first path
-            self::$include_paths_theme = array();
-            //self::$include_paths[] = APPPATH;
-
-            if (self::$store_code != null) {
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
-            }
-            if (self::$org_code != null) {
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
-            }
-            if (self::$app_code != null) {
-                if ($theme != null) {
-                    self::$include_paths_theme[] = APPPATH . self::$app_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS . "default" . DS;
-                self::$include_paths_theme[] = APPPATH . self::$app_code . DS;
-            }
-
-            foreach (self::$shared_app_code as $key => $value) {
-                if (self::$org_code != null) {
-                    self::$include_paths_theme[] = APPPATH . $value . DS . self::$org_code . DS . "default" . DS;
-                    self::$include_paths_theme[] = APPPATH . $value . DS . self::$org_code . DS;
-                }
-
-                self::$include_paths_theme[] = APPPATH . $value . DS . "default" . DS;
-                self::$include_paths_theme[] = APPPATH . $value . DS;
-            }
-
-            self::$include_paths_theme[] = APPPATH . "default" . DS;
-
-            if (isset(self::$configuration['core']['modules'])) {
-                foreach (self::$configuration['core']['modules'] as $path) {
-                    if ($path = str_replace('\\', '/', realpath($path))) {
-                        // Add a valid path
-                        self::$include_paths_theme[] = $path . '/';
-                    }
-                }
-            }
-
-            // Add SYSPATH as the last path
-            self::$include_paths_theme[] = SYSPATH;
-
-            self::$include_paths_theme[] = DOCROOT;
-        }
-
-        return self::$include_paths_theme;
-    }
     /**
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
@@ -516,73 +490,73 @@ final class CF {
      * @param   boolean  re-process the include paths
      * @return  array
      */
-    public static function include_paths($process = FALSE, $with_theme=false) {
-        $theme = '';
-        if($with_theme) {
-            $theme = self::$theme;
+    public static function paths($domain = null, $force_reload = false) {
+        if ($domain == null) {
+            $domain = CF::domain($domain);
         }
-        if ($process === TRUE) {
-
-            // Add APPPATH as the first path
-            self::$include_paths = array();
-            //self::$include_paths[] = APPPATH;
-
-            if (self::$store_code != null) {
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS . "themes" . DS . $theme . DS;
+        if (!isset(self::$paths[$domain]) || $force_reload) {
+            //we try to search all paths for this domain
+            $paths = array();
+            $theme = CF::theme($domain);
+            $org_code = CF::orgCode($domain);
+            $app_code = CF::appCode($domain);
+            $sharedAppCode = CF::getSharedApp($domain);
+            $modules = CF::modules($domain);
+            //when this domain is org
+            if (strlen($org_code) > 0) {
+                //add theme path if theme exists
+                if (strlen($theme) > 0) {
+                    $paths[] = APPPATH . $app_code . DS . $org_code . DS . "themes" . DS . $theme . DS;
                 }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . self::$store_code . DS;
+                $paths[] = APPPATH . $app_code . DS . $org_code . DS;
             }
-            if (self::$org_code != null) {
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS . "themse" . DS . $theme . DS;
+            if (strlen($app_code) > 0) {
+                //add theme path if theme exists
+                if (strlen($theme) > 0) {
+                    $paths[] = APPPATH . $app_code . DS . 'default' . DS . "themes" . DS . $theme . DS;
                 }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "default" . DS;
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . self::$org_code . DS;
+                $paths[] = APPPATH . $app_code . DS . 'default' . DS;
             }
-            if (self::$app_code != null) {
-                if ($theme != null) {
-                    self::$include_paths[] = APPPATH . self::$app_code . DS . "default" . DS . "themes" . DS . $theme . DS;
-                }
-                self::$include_paths[] = APPPATH . self::$app_code . DS . "default" . DS;
-                self::$include_paths[] = APPPATH . self::$app_code . DS;
-            }
-
-            foreach (self::$shared_app_code as $key => $value) {
-                if (self::$org_code != null) {
-                    self::$include_paths[] = APPPATH . $value . DS . self::$org_code . DS . "default" . DS;
-                    self::$include_paths[] = APPPATH . $value . DS . self::$org_code . DS;
-                }
-
-                self::$include_paths[] = APPPATH . $value . DS . "default" . DS;
-                self::$include_paths[] = APPPATH . $value . DS;
-            }
-
-            self::$include_paths[] = APPPATH . "default" . DS;
-
-            if (isset(self::$configuration['core']['modules'])) {
-                foreach (self::$configuration['core']['modules'] as $path) {
-                    if ($path = str_replace('\\', '/', realpath($path))) {
-                        // Add a valid path
-                        self::$include_paths[] = $path . '/';
+            foreach ($sharedAppCode as $key => $value) {
+                if (strlen($org_code) > 0) {
+                    //add theme path if theme exists
+                    if (strlen($theme) > 0) {
+                        $paths[] = APPPATH . $value . DS . $org_code . DS . "themes" . DS . $theme . DS;
                     }
+                    $paths[] = APPPATH . $value . DS . $org_code . DS;
                 }
+                if (strlen($theme) > 0) {
+                    $paths[] = APPPATH . $value . DS . 'default' . DS . "themes" . DS . $theme . DS;
+                }
+                $paths[] = APPPATH . $value . DS . 'default' . DS;
             }
 
-            // Add SYSPATH as the last path
-            self::$include_paths[] = SYSPATH;
-
-            self::$include_paths[] = DOCROOT;
+            foreach ($modules as $module) {
+                $paths[] = MODPATH . $module . DS;
+            }
+            $paths[] = SYSPATH;
+            $paths[] = DOCROOT;
+            self::$paths[$domain] = $paths;
         }
 
-        return self::$include_paths;
+
+        return self::$paths[$domain];
+    }
+
+    public static function include_paths_theme($process = FALSE) {
+
+        return self::include_paths($process, true);
+    }
+
+    /**
+     * Get all include paths. APPPATH is the first path, followed by module
+     * paths in the order they are configured, follow by the SYSPATH.
+     *
+     * @param   boolean  re-process the include paths
+     * @return  array
+     */
+    public static function include_paths($process = FALSE, $with_theme = false) {
+        return self::paths();
     }
 
     /**
@@ -593,34 +567,17 @@ final class CF {
      * @param   boolean  is the item required?
      * @return  mixed
      */
-    public static function config($key, $slash = FALSE, $required = TRUE) {
-        if (self::$configuration === NULL) {
-            // Re-parse the include paths
-            self::include_paths(TRUE);
-
-            // Load core configuration
-            self::$configuration['core'] = self::config_load('core');
-
-            // Re-parse the include paths
-            self::include_paths(TRUE);
+    public static function config($group, $default = null, $required = TRUE) {
+        $path = null;
+        if (strpos($group, '.') !== FALSE) {
+            // Split the config group and path
+            list($group, $path) = explode('.', $group, 2);
         }
 
-        // Get the group name from the key
-        $group = explode('.', $key, 2);
-        $group = $group[0];
+        $config = CConfig::instance($group);
 
-        if (!isset(self::$configuration[$group])) {
-            // Load the configuration group
-            self::$configuration[$group] = self::config_load($group, $required);
-        }
+        $value = $config->get($path, $default);
 
-        // Get the value of the key string
-        $value = self::key_string(self::$configuration, $key);
-
-        if ($slash === TRUE AND is_string($value) AND $value !== '') {
-            // Force the value to end with "/"
-            $value = rtrim($value, '/') . '/';
-        }
 
         return $value;
     }
@@ -749,14 +706,15 @@ final class CF {
      * @param   string  message text
      * @return  void
      */
-    public static function log($type, $message) {
-        if (self::$log_levels[$type] <= self::$configuration['core']['log_threshold']) {
-            $message = array(date('Y-m-d H:i:s P'), $type, $message);
-
-            // Run the system.log event
-            CFEvent::run('system.log', $message);
-
-            self::$log[] = $message;
+    public static function log($level, $message) {
+        if (!is_numeric($level)) {
+            $level = carr::get(self::$log_levels, $level);
+        }
+        if (!is_numeric($level)) {
+            $level = CLogger::EMERGENCY;
+        }
+        if ($level <= CF::$log_threshold) {
+            CLogger::instance()->add($level, $message);
         }
     }
 
@@ -985,8 +943,8 @@ final class CF {
             $output = str_replace(
                     array
                 (
-                '{kohana_version}',
-                '{kohana_codename}',
+                '{cf_version}',
+                '{cf_codename}',
                 '{execution_time}',
                 '{memory_usage}',
                 '{included_files}',
@@ -1052,12 +1010,17 @@ final class CF {
      * @return  void
      */
     public static function show_404($page = FALSE, $template = FALSE) {
-        if (CView::exists('ccore/404')) {
-            echo CView::factory('ccore/404')->render();
-        } else {
-
-            throw new CF_404_Exception($page, $template);
+        if (CFRouter::$current_uri == 'favicon.ico') {
+            return false;
         }
+        if (isset($_GET['debug_404'])) {
+            try {
+                throw new Exception('404');
+            } catch (Exception $ex) {
+                cdbg::var_dump(nl2br($ex->getTraceAsString()));
+            }
+        }
+        throw new CF_404_Exception($page, $template);
     }
 
     /**
@@ -1073,8 +1036,28 @@ final class CF {
     public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
 
         try {
+
             // PHP errors have 5 args, always
             $PHP_ERROR = (func_num_args() === 5);
+            if (isset($_GET['debug'])) {
+                if ($PHP_ERROR) {
+                    cdbg::var_dump($message);
+                    try {
+                        throw new Exception('testing');
+                    } catch (Exception $ex) {
+                        cdbg::var_dump($ex->getTraceAsString());
+                    }
+                    die;
+                } else {
+                    cdbg::var_dump($exception->getMessage());
+                    cdbg::var_dump($exception->getTraceAsString());
+                    die;
+                }
+            }
+            $is404 = false;
+            if ($exception instanceof CF_404_Exception) {
+                $is404 = true;
+            }
 
             // Test to see if errors should be displayed
             if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
@@ -1088,6 +1071,9 @@ final class CF {
             }
 
             // Error handling will use exactly 5 args, every time
+            $trace = '';
+            $uri = '';
+
             if ($PHP_ERROR) {
 
                 $code = $exception;
@@ -1099,7 +1085,9 @@ final class CF {
                 $message = $exception->getMessage();
                 $file = $exception->getFile();
                 $line = $exception->getLine();
-                $template = ($exception instanceof C_Exception) ? $exception->getTemplate() : 'kohana_error_page';
+                $trace = $exception->getTraceAsString();
+                $uri = CFRouter::$current_uri;
+                $template = ($exception instanceof CF_Exception) ? $exception->get_template() : 'kohana_error_page';
             }
 
             if (is_numeric($code)) {
@@ -1125,7 +1113,15 @@ final class CF {
 
             if ($level <= self::$configuration['core']['log_threshold']) {
                 // Log the error
-                self::log('error', self::lang('core.uncaught_exception', $type, $message, $file, $line));
+                $need_to_log = true;
+                if (!$PHP_ERROR) {
+                    if ($is404) {
+                        $need_to_log = false;
+                    }
+                }
+                if ($need_to_log) {
+                    self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
+                }
             }
 
             if ($PHP_ERROR) {
@@ -1149,43 +1145,47 @@ final class CF {
             }
 
             // Test if display_errors is on
-            if (self::$configuration['core']['display_errors'] === TRUE) {
-                if (!IN_PRODUCTION AND $line != FALSE) {
-                    // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                    $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
+            if (self::config('app.error_disabled') !== TRUE) {
+                /*
+                  if (!IN_PRODUCTION AND $line != FALSE) {
+                  // Remove the first entry of debug_backtrace(), it is the exception_handler call
+                  $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
 
-                    // Beautify backtrace
-                    $trace = self::backtrace($trace);
-                }
-                if (IN_PRODUCTION) {
+                  // Beautify backtrace
+                  $trace = self::backtrace($trace);
+                  }
+                 * 
+                 */
+
+                if (IN_PRODUCTION && !$is404) {
                     $data = array(
                         'description' => $description,
                         'error' => $error,
                         'message' => $message,
                         'show_debug_error' => '1',
                     );
+
                     $view = CView::factory('kohana_error_page', $data);
                     try {
                         cmail::error_mail($view->render());
-                    } catch(Exception $ex) {
-                       
-                        clog::log('error_mail.log', 'error', CF::domain()." - ".$ex->getMessage());
+                    } catch (Exception $ex) {
+                        clog::log('error_mail.log', 'error', CF::domain() . " - " . $ex->getMessage());
                     }
                 }
-                
+
                 // Load the error
                 $custom_error = false;
-                if(!isset($_GET['show_error'])) {
-                    if (CView::exists('ccore/error_page')) {
-                        $custom_error=true;
-                        echo CView::factory('ccore/error_page')->render();
-                    } 
+                if (IN_PRODUCTION) {
+                    if (!isset($_GET['show_error'])) {
+                        if (CView::exists('ccore/error_page')) {
+                            $custom_error = true;
+                            echo CView::factory('ccore/error_page')->render();
+                        }
+                    }
                 }
-                if(!$custom_error) {
+                if (!$custom_error) {
                     require self::find_file('views', empty($template) ? 'kohana_error_page' : $template);
                 }
-
-                
             } else {
                 // Get the i18n messages
                 $error = self::lang('core.generic_error');
@@ -1204,8 +1204,9 @@ final class CF {
             error_reporting(0);
             exit;
         } catch (Exception $e) {
+
             if (IN_PRODUCTION) {
-                if(isset($_GET['debug'])) {
+                if (isset($_GET['debug'])) {
                     die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
                 } else {
                     die('Fatal Error');
@@ -1219,7 +1220,7 @@ final class CF {
     /**
      * Provides class auto-loading.
      *
-     * @throws  C_Exception
+     * @throws  CF_Exception
      * @param   string  name of class
      * @return  bool
      */
@@ -1275,20 +1276,40 @@ final class CF {
             $routing_file = '';
             $namespace = '';
 
+
+            $is_namespace = false;
             if ($last_namespace_position = strripos($routing_class, '\\')) {
+                $is_namespace = true;
                 $namespace = substr($routing_class, 0, $last_namespace_position);
+
                 $routing_class = substr($routing_class, $last_namespace_position + 1);
                 $routing_file = str_replace('\\', DS, $namespace) . DS;
             }
 
-            // find file at libraries
+
+
             $routing_file .= str_replace('_', DS, $routing_class);
+
+            if ($directory == 'libraries') {
+                // find file at vendor first
+                if ($path = self::find_file('vendor', $routing_file)) {
+                    // Load the class file
+                    require $path;
+
+                    if (class_exists($class)) {
+                        $class_not_found = TRUE;
+                        return TRUE;
+                    }
+                }
+            }
+            // find file at libraries
             if ($path = self::find_file($directory, $routing_file)) {
                 // Load the class file
                 require $path;
                 $class_not_found = TRUE;
                 return TRUE;
             }
+
             // check route file at helpers
             if (!$class_not_found) {
                 $temp_routing_file = explode(DS, $routing_file);
@@ -1298,6 +1319,7 @@ final class CF {
                     $directory = 'helpers';
                     if ($path = self::find_file($directory, $routing_file)) {
                         // Load the class file
+
                         require $path;
                         $class_not_found = TRUE;
                         return TRUE;
@@ -1345,7 +1367,6 @@ final class CF {
             }
         } else {
             $domain = $_SERVER["SERVER_NAME"];
-
         }
         return $domain;
     }
@@ -1355,7 +1376,7 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @throws  C_Exception  if file is required and not found
+     * @throws  CF_Exception  if file is required and not found
      * @param   string   directory to search in
      * @param   string   filename to look for (without extension)
      * @param   boolean  file required
@@ -1382,7 +1403,7 @@ final class CF {
             return self::$internal_cache['find_file_paths'][$search];
 
         // Load include paths
-        $paths = self::$include_paths;
+        $paths = self::paths();
 
         // Nothing found, yet
         $found = NULL;
@@ -1398,6 +1419,7 @@ final class CF {
                 }
             }
         } else {
+
             foreach ($paths as $path) {
                 if (is_file($path . $search)) {
                     // A matching file has been found
@@ -1848,6 +1870,258 @@ final class CF {
         return $written;
     }
 
+    /**
+     * Get data domain
+     */
+    public static function data($domain = null) {
+        $domain = $domain == null ? self::domain() : $domain;
+        if (!isset(self::$data[$domain])) {
+            self::$data[$domain] = CFData::domain($domain);
+            if (self::$data[$domain] == null) {
+                //try to locate wildcard subdomain
+                $wildcard_domain = implode('.', array('_') + array_slice(explode('.', $domain), 0));
+                self::$data[$domain] = CFData::domain($wildcard_domain);
+            }
+        }
+        return self::$data[$domain];
+    }
+
+    /**
+     * Get application id for domain
+     * This function is deprecated, use CF::appId
+     *
+     * @return  string
+     */
+    public static function app_id($domain = null) {
+        return self::appId($domain);
+    }
+
+    /**
+     * Get application id for domain
+     *
+     * @return  string
+     */
+    public static function appId($domain = null) {
+        $data = self::data($domain);
+        return isset($data['app_id']) ? $data['app_id'] : null;
+    }
+
+    /**
+     * Get application code for domain
+     * This function is deprecated, use CF::appCode
+     * 
+     * @deprecated
+     * @return  string
+     */
+    public static function app_code($domain = null) {
+        return self::appCode($domain);
+    }
+
+    /**
+     * Get application code for domain
+     *
+     * @return  string
+     */
+    public static function appCode($domain = null) {
+        $data = self::data($domain);
+        return isset($data['app_code']) ? $data['app_code'] : null;
+    }
+
+    /**
+     * Get org id for domain
+     * This function is deprecated, use CF::orgId
+     * 
+     * @deprecated
+     * @param string $domain
+     * @return int
+     */
+    public static function org_id($domain = null) {
+        return self::orgId($domain);
+    }
+
+    /**
+     * Get org id for domain
+     * 
+     * @param string $domain
+     * @return int
+     */
+    public static function orgId($domain = null) {
+        $data = self::data($domain);
+        return isset($data['org_id']) ? $data['org_id'] : null;
+    }
+
+    /**
+     * Get org code for this domain
+     * This function is deprecated, use CF::orgCode
+     *
+     * @deprecated
+     * @param string $domain
+     * @return string
+     */
+    public static function org_code($domain = null) {
+        return self::orgCode($domain);
+    }
+
+    /**
+     * Get org code for this domain
+     * 
+     * @param string $domain
+     * @return string
+     */
+    public static function orgCode($domain = null) {
+        $data = self::data($domain);
+        return isset($data['org_code']) ? $data['org_code'] : null;
+    }
+
+    /**
+     * Add Shared App in runtime
+     * This function is deprecated, use CF::addSharedApp
+     * 
+     * @deprecated
+     * @param string $app_code
+     */
+    public static function add_shared_app_code($app_code) {
+        return self::addSharedApp($app_code);
+    }
+
+    /**
+     * Add Shared App in runtime
+     * 
+     * @param string $app_code
+     */
+    public static function addSharedApp($appCode) {
+        if (!in_array($appCode, self::$sharedAppCode)) {
+            self::$sharedAppCode[] = $appCode;
+            //do force reload
+            self::paths(null, true);
+        }
+    }
+
+    /**
+     * Get shared application code for this domain
+     *
+     * @param string $domain
+     * @return  array
+     */
+    public static function getSharedApp($domain = null) {
+        $data = self::data($domain);
+        if (!isset($data['shared_app_code'])) {
+            $data['shared_app_code'] = array();
+        }
+
+        $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$sharedAppCode);
+
+
+        return isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
+    }
+
+    /**
+     * Get theme for this domain
+     *
+     * @return  array
+     */
+    public static function theme($domain = null) {
+        $data = self::data($domain);
+        return isset($data['theme']) ? $data['theme'] : null;
+    }
+
+    /**
+     * Get modules for this domain
+     *
+     * @return  array
+     */
+    public static function modules($domain = null) {
+        $data = self::data($domain);
+        return isset($data['modules']) ? $data['modules'] : array('cresenity');
+    }
+
+    /**
+     * Call the given Closure with the given value then return the value.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function tap($value, $callback = null) {
+        if (is_null($callback)) {
+            return new HigherOrderTapProxy($value);
+        }
+
+        $callback($value);
+
+        return $value;
+    }
+
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    public static function class_basename($class) {
+        $class = is_object($class) ? get_class($class) : $class;
+
+        $basename = basename(str_replace('\\', '/', $class));
+        $basename = carr::last(explode("_", $basename));
+        return $basename;
+    }
+
+    /**
+     * Returns all traits used by a class, its subclasses and trait of their traits.
+     *
+     * @param  object|string  $class
+     * @return array
+     */
+    public static function class_uses_recursive($class) {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $results = [];
+
+        foreach (array_merge([$class => $class], class_parents($class)) as $class) {
+            $results += self::trait_uses_recursive($class);
+        }
+
+        return array_unique($results);
+    }
+
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @param  string  $trait
+     * @return array
+     */
+    public static function trait_uses_recursive($trait) {
+        $traits = class_uses($trait);
+
+        foreach ($traits as $trait) {
+            $traits += self::trait_uses_recursive($trait);
+        }
+
+        return $traits;
+    }
+
+    /**
+     * Return the default value of the given value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public static function value($value) {
+        return $value instanceof Closure ? $value() : $value;
+    }
+
+    /**
+     * Create a collection from the given value.
+     *
+     * @param  mixed  $value
+     * @return CCollection
+     */
+    function collect($value = null) {
+        return new CCollection($value);
+    }
+
 }
 
 // End C
@@ -1964,6 +2238,11 @@ class CF_404_Exception extends CF_Exception {
             $page = CFRouter::$current_uri . CFRouter::$url_suffix . CFRouter::$query_string;
         }
 
+        if ($template == false) {
+            if (CView::exists('ccore/404')) {
+                $template = 'ccore/404';
+            }
+        }
 
         Exception::__construct(CF::lang('core.page_not_found', $page));
 

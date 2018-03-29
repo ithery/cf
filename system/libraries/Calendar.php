@@ -339,7 +339,7 @@ class Calendar extends Event_Subject {
 	 */
 	public function render()
 	{
-		$view =  new View('kohana_calendar', array
+		$view =  new CView('kohana_calendar', array
 		(
 			'month'  => $this->month,
 			'year'   => $this->year,

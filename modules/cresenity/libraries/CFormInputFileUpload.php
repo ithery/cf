@@ -84,9 +84,11 @@ class CFormInputFileUpload extends CFormInput {
         $html->appendln('
                 <style>
                     #' . $div_id . ' {
+                        border: 2px dashed #CDCDCD;
                         margin-left: 0px;
                         padding: 10px 10px;
-                        border: 2px dashed #CDCDCD;
+                        width: 100%;
+                        min-height: 100px;
                     }
                     #' . $div_id . '.ondrag {
                         border: 5px dashed #CDCDCD;
@@ -94,7 +96,7 @@ class CFormInputFileUpload extends CFormInput {
                     }
                     #' . $div_id . ' div.container-file-upload {
                         border: 1px solid #ddd;
-                        margin: 10px 10px;
+                        margin: 6px 6px;
                         width: 200px;
                         height: auto;
                         float: left;
@@ -108,15 +110,26 @@ class CFormInputFileUpload extends CFormInput {
                         width: auto;
                         height: 100px;
                         margin: 10px 0px;
+                        position:relative;
                     }
                     #' . $div_id . ' div img {
-                        width: 100%;
-                        height: 100%;
+                        position: absolute;
+                        width: auto;
+                        max-width: 100%;
+                        height: auto;
+                        max-height: 100%;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        margin: auto;
+                        min-height: 1px;
                     }
                     #' . $div_id . '_description {
                         text-align: center;
                         display: block;
                         font-size: 20px;
+                        margin: 15px 0;
                     }
                     #' . $div_id . '_message {
                         margin-left: 0px;
@@ -142,7 +155,10 @@ class CFormInputFileUpload extends CFormInput {
                     .div-custom-control{
                         margin-top:10px;
                     }
-                    
+                    #' . $div_id . '_btn_upload {
+                        width: 100%;
+                        margin: 15px 0;
+                    }
                     .div-custom-control label{
                         display:inline-block;
                     }
@@ -150,10 +166,17 @@ class CFormInputFileUpload extends CFormInput {
                         display:inline-block;
                         width:auto;
                     }
+
+                    @media (min-width: 768px) {
+                        #' . $div_id . '_btn_upload {
+                            display: none;
+                        }
+                    }
                 </style>
                 <input id="' . $div_id . '_input_temp" type="file" name="'.$div_id.'_input_temp[]" multiple style="display:none;">
                 <div id="' . $div_id . '_message" class="row alert alert-danger fade in">
                 </div>
+                <div id="' . $div_id . '_description">' . clang::__("Click or Drop Files On Box Below") . '</div>
                 <div id="' . $div_id . '" class="row control-fileupload">
                 ');
         foreach($this->files as $f) {
@@ -185,14 +208,14 @@ class CFormInputFileUpload extends CFormInput {
                 </div>
             ');
         }
-        
-        $html_description = '';
-        if(count($this->files)==0) {
-            $html_description = '<span id="' . $div_id . '_description">'.clang::__("Click Here or Drop Files Here").'</span>';
-        }
-        $html->appendln(        '
-                        '.$html_description.'
-                </div>
+
+        $html->appendln('
+            </div>
+        ');
+        $html->appendln('
+            <div>
+                <div id="' . $div_id . '_btn_upload" class="btn btn-success">' . clang::__('Upload Image') . '</div>
+            </div>
         ');
         return $html->text();
     }
@@ -212,7 +235,11 @@ class CFormInputFileUpload extends CFormInput {
             
             $js->appendln('
                 var index=0;
-                var description = $("#' . $div_id . '_description");
+                //var description = $("#' . $div_id . '_description");
+
+                $("#' . $div_id . '_btn_upload").click(function() {
+                    $( "#' . $div_id . '_input_temp" ).trigger("click");
+                })
 
                 $(this).on({
                     "dragover dragenter": function(e) {
@@ -237,10 +264,6 @@ class CFormInputFileUpload extends CFormInput {
                        
                         
                         $(this).parent().remove();
-                       
-                        if ($("#' . $div_id . '").children().length==0) {
-                                $("#' . $div_id . '").append("<span id=\"' . $div_id . '_description\">'.clang::__("Click Here or Drop Files Here").'</span>");
-                        }
                     })
                 }
 
@@ -262,7 +285,7 @@ class CFormInputFileUpload extends CFormInput {
                         if( dataTransfer && dataTransfer.files.length) {
                             e.preventDefault();
                             e.stopPropagation();
-                            $("#' . $div_id . '_description").remove();
+                            //$("#' . $div_id . '_description").remove();
                             $.each( dataTransfer.files, function(i, file) {
                                 var reader = new FileReader();
                                 reader.onload = $.proxy(function(file, fileList, event) {
@@ -327,7 +350,7 @@ class CFormInputFileUpload extends CFormInput {
                     $( "#' . $div_id . '_input_temp" ).trigger("click");
                 })
                 $( "#' . $div_id . '_input_temp" ).change(function(e) {
-                    $("#' . $div_id . '_description").remove();
+                    //$("#' . $div_id . '_description").remove();
                     $.each(e.target.files, function(i, file) {
                         var reader = new FileReader();
                         reader.onload = $.proxy(function(file, fileList, event) {

@@ -19,6 +19,10 @@ class Account_Controller extends CController {
         $role = $app->role();
 
         $user = $app->user();
+        if ($user == null) {
+            echo $app->render();
+            return;
+        }
         $user_id = $user->user_id;
         $post = $this->input->post();
         if ($post != null) {

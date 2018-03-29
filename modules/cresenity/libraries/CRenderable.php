@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CRenderable extends CObject implements IRenderable {
+class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     protected $renderable;
     protected $additional_js;
@@ -59,7 +59,7 @@ class CRenderable extends CObject implements IRenderable {
     }
 
     public function add_js($js) {
-        $this->additional_js.=$js;
+        $this->additional_js .= $js;
         return $this;
     }
 
@@ -69,7 +69,11 @@ class CRenderable extends CObject implements IRenderable {
                 $r->clear();
             }
         }
-
+        foreach ($this->renderable as $r) {
+            if (CObject::is_instanceof($r)) {
+                CObserver::instance()->remove($r);
+            }
+        }
         $this->renderable = array();
         return $this;
     }
