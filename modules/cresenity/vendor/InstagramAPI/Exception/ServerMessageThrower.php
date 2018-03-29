@@ -36,7 +36,7 @@ class ServerMessageThrower
      *
      * @var array
      */
-    const EXCEPTION_MAP = [
+    public static $EXCEPTION_MAP = [
         'LoginRequiredException'       => ['login_required'],
         'ChallengeRequiredException'   => ['challenge_required'],
         'CheckpointRequiredException'  => [
@@ -102,7 +102,7 @@ class ServerMessageThrower
 
         // Check if the server message is in our CRITICAL exception table.
         foreach ($messages as $message) {
-            foreach (self::EXCEPTION_MAP as $className => $patterns) {
+            foreach (self::$EXCEPTION_MAP as $className => $patterns) {
                 foreach ($patterns as $pattern) {
                     if ($pattern[0] == '/') {
                         // Regex check.
