@@ -70,7 +70,7 @@
 </div>
 
 <script>
-
+(function($) {
     var Cropper = window.Cropper;
     var URL = window.URL || window.webkitURL;
     var modalCropper = $('#modal-cropper-<?php echo $id ?>');
@@ -87,5 +87,5 @@
     modalCropper.find('.close').click(function (e) {
         modalCropper.modal('hide');
     });
-    
+})(jQuery);    
 </script>

@@ -104,7 +104,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function cropper() {
         if ($this->cropper == null) {
-            $this->cropper = new CElement_Helper_Cropper();
+            $this->cropper = new CElement_Helper_Cropper($this->id."__cropper");
             $this->cropper->setOwner($this);
         }
         return $this->cropper;
