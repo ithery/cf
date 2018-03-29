@@ -24,7 +24,7 @@
                            
                         </div>
                 
-                <a href="#" class="close">X</a><span class="loader"></span>
+                <a href="#" class="close">&times;</a><span class="loader"></span>
                 <h3>Cropper</h3>
             </div>
             <div class="modal-body opened">
@@ -33,7 +33,10 @@
                 </div>
             </div>
             <div class="modal-footer">
+                 
+                
                 <div class="row" id="actions">
+                    
                     <div class="col-md-12 docs-buttons">
                         <!--
                         <div class="btn-group">
@@ -49,6 +52,7 @@
                             </button>
                         </div>
                         -->
+                       
                         <div class="btn-group">
                            
                             <button type="button" class="btn btn-primary btn-crop" data-method="crop" data-option="crop" title="Crop">

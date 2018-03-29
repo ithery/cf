@@ -294,7 +294,7 @@ body .modal {
     border-radius: 3px;
 }
 
-.btn-group, .btn-group-header-modal {
+.btn-group-header-modal {
     position: absolute;
     right: 40px;
     top: 8px;
