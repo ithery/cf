@@ -91,12 +91,26 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         return $this->cropper;
     }
 
-    public function addFile($fileUrl,$inputName="") {
+    public function addFile($fileUrl, $inputName = "") {
         $arr = array();
         $arr['input_name'] = $inputName;
         $arr['file_url'] = $fileUrl;
-        
+
         $this->files[] = $arr;
+        return $this;
+    }
+
+    public function addCustomControl($control, $inputName, $inputLabel) {
+        $arr = array();
+        $arr['control'] = $control;
+        $arr['input_name'] = $inputName;
+        $arr['input_label'] = $inputLabel;
+        $this->customControl[] = $arr;
+        return $this;
+    }
+
+    public function addCustomControlValue($inputName, $controlName, $inputValue) {
+        $this->customControlValue[$inputName][$controlName] = $inputValue;
         return $this;
     }
 
