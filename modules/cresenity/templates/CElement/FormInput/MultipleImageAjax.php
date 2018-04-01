@@ -116,12 +116,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="">
                 </div>
                 <?php
-                foreach (custom_control as $cc) :
+                foreach ($customControl as $cc) :
                     $control = carr::get($cc, 'control');
                     $control_name = carr::get($cc, 'input_name');
                     $control_label = carr::get($cc, 'input_label');
                     //get value
-                    $control_value_array = carr::get($this->custom_control_value, $input_name, array());
+                    $control_value_array = carr::get($customControlValue, $input_name, array());
                     $control_value = carr::get($control_value_array, $control_name);
                     ?>
                     <div class="div-custom-control">
