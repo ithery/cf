@@ -66,6 +66,11 @@
             $html->set_indent($indent);
             $disabled = "";
             if ($this->disabled) $disabled = ' disabled="disabled"';
+            $addition_attribute = "";
+            foreach ($this->attr as $k => $v) {
+                $addition_attribute.=" " . $k . '="' . $v . '"';
+            }
+            
             $classes = $this->classes;
             $classes = implode(" ", $classes);
             if (strlen($classes) > 0) $classes = " " . $classes;
@@ -79,7 +84,7 @@
             }
             if ($this->have_button) {
                 $html->appendln('<div class="input-append date" id="dp3" data-date="' . $this->value . '" data-date-format="' . $this->date_format . '">
-                        <input class="input-unstyled ' . $classes . $this->validation->validation_class() . '" size="16" type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" value="' . $this->value . '"' . $disabled . $custom_css . '>
+                        <input class="input-unstyled ' . $classes . $this->validation->validation_class() . '" size="16" type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" value="' . $this->value . '"' . $disabled .$addition_attribute. $custom_css . '>
                         <span class="add-on"><i class="icon-th"></i></span>
                     </div>')->br();
             }
@@ -87,7 +92,7 @@
                 if ($this->bootstrap == '3.3') {
                     $html->appendln('<div class="input-group">')->br();
                 }
-                $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . '>')->br();
+                $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled .$addition_attribute. $custom_css . '>')->br();
                 if ($this->bootstrap == '3.3') {
                     $html->appendln('</div>');
                 }

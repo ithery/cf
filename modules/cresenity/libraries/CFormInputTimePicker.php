@@ -52,6 +52,12 @@
             $html->set_indent($indent);
             $disabled = "";
             if ($this->disabled) $disabled = ' disabled="disabled"';
+            
+            $addition_attribute = "";
+            foreach ($this->attr as $k => $v) {
+                $addition_attribute.=" " . $k . '="' . $v . '"';
+            }
+            
             $classes = $this->classes;
             $classes = implode(" ", $classes);
             if (strlen($classes) > 0) $classes = " " . $classes;
@@ -66,14 +72,14 @@
             }
             if ($this->bootstrap == '3.3') {
                 $classes = $classes . " form-control timepicker";
-                $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $placeholder . '>')->br();
+                $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css .$addition_attribute. $placeholder . '>')->br();
             }
             else {
                 if ($this->bootstrap == '3') {
                     $classes = $classes . " form-control ";
                 }
                 $html->appendln('<div class="bootstrap-timepicker">');
-                $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $placeholder . '>')->br();
+                $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css .$addition_attribute. $placeholder . '>')->br();
                 $html->appendln('</div>');
             }
             return $html->text();
