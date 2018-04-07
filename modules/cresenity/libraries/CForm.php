@@ -544,7 +544,7 @@ class CForm extends CElement_Element {
                 $validation_if_close = "					} else {
 						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
 					}
-";
+                ";
             }
             $js->appendln("
 				$('#" . $this->id . " input[type=submit]').click(function() {
@@ -648,7 +648,14 @@ class CForm extends CElement_Element {
                                 }
                             })
                         });
-                        
+                        if($('#" . $this->id . " .fileupload-preview.loading').length>0) {
+                            alert('There\'s any file still uploading');
+                            error++;
+                        }
+                        if($('#" . $this->id . " .multi-image-ajax-file.loading').length>0) {
+                            alert('There\'s any file still uploading');
+                            error++;
+                        }
                         if (error > 0) {
                             $('#" . $this->id . " .confirm').removeAttr('data-submitted');
                             return false;
