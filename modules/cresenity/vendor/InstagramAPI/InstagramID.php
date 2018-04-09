@@ -11,8 +11,8 @@ namespace InstagramAPI;
  *
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class InstagramID
-{
+class InstagramID {
+
     /**
      * Base64 URL Safe Character Map.
      *
@@ -22,7 +22,7 @@ class InstagramID
      *
      * @see https://tools.ietf.org/html/rfc4648
      */
-    const BASE64URL_CHARMAP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    public static $BASE64URL_CHARMAP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
     /**
      * Internal map of the results of all base10 digits (0-9) modulo 2.
@@ -32,7 +32,7 @@ class InstagramID
      *
      * @var string
      */
-    const BASE10_MOD2 = ['0', '1', '0', '1', '0', '1', '0', '1', '0', '1'];
+    public static $BASE10_MOD2 = ['0', '1', '0', '1', '0', '1', '0', '1', '0', '1'];
 
     /**
      * Runtime cached bit-value lookup table.
@@ -52,9 +52,7 @@ class InstagramID
      *
      * @return string The shortcode.
      */
-    public static function toCode(
-        $id)
-    {
+    public static function toCode($id) {
         // First we must convert the ID number to a binary string.
         // NOTE: Conversion speed depends on number size. With the most common
         // number size used for Instagram's IDs, my old laptop can do ~18k/s.
@@ -66,7 +64,7 @@ class InstagramID
         // Left-pad with leading zeroes to make length a multiple of 6 bits.
         $padAmount = (6 - (strlen($base2) % 6));
         if ($padAmount != 6 || strlen($base2) === 0) {
-            $base2 = str_repeat('0', $padAmount).$base2;
+            $base2 = str_repeat('0', $padAmount) . $base2;
         }
 
         // Now chunk it in segments of 6 bits at a time. Every 6 "digits" in a
@@ -82,7 +80,7 @@ class InstagramID
             $base64 = bindec($chunk);
 
             // Look up that base64 character in Instagram's alphabet.
-            $encoded .= self::BASE64URL_CHARMAP[$base64];
+            $encoded .= self::$BASE64URL_CHARMAP[$base64];
         }
 
         return $encoded;
@@ -98,8 +96,7 @@ class InstagramID
      * @return string The numeric ID.
      */
     public static function fromCode(
-        $code)
-    {
+    $code) {
         if (!is_string($code) || preg_match('/[^A-Za-z0-9\-_]/', $code)) {
             throw new \InvalidArgumentException('Input must be a valid Instagram shortcode.');
         }
@@ -135,9 +132,7 @@ class InstagramID
      * @return string The binary bits as a string.
      */
     public static function base10to2(
-        $base10,
-        $padLeft = true)
-    {
+    $base10, $padLeft = true) {
         $base10 = (string) $base10;
         if ($base10 === '' || preg_match('/[^0-9]/', $base10)) {
             throw new \InvalidArgumentException('Input must be a positive integer.');
@@ -152,7 +147,7 @@ class InstagramID
 
             // If the last digit is uneven, put a one (1) in the base2 string,
             // otherwise use zero (0) instead. Array is 10x faster than bcmod.
-            $base2 .= self::BASE10_MOD2[$lastDigit];
+            $base2 .= self::$BASE10_MOD2[$lastDigit];
 
             // Now divide the whole base10 string by two, discarding decimals.
             // NOTE: Division is unavoidable when converting decimal to binary,
@@ -170,7 +165,7 @@ class InstagramID
         if ($padLeft) {
             $padAmount = (8 - (strlen($base2) % 8));
             if ($padAmount != 8 || strlen($base2) === 0) {
-                $base2 = str_repeat('0', $padAmount).$base2;
+                $base2 = str_repeat('0', $padAmount) . $base2;
             }
         } else {
             $base2 = ltrim($base2, '0');
@@ -188,8 +183,7 @@ class InstagramID
      *               offset 1 has the value of bit 2, and so on.
      */
     public static function buildBinaryLookupTable(
-        $maxBitCount)
-    {
+    $maxBitCount) {
         $table = [];
         for ($bitPosition = 0; $bitPosition < $maxBitCount; ++$bitPosition) {
             $bitValue = bcpow('2', (string) $bitPosition, 0);
@@ -209,9 +203,7 @@ class InstagramID
      *
      * @return string The decimal number as a string.
      */
-    public static function base2to10(
-        $base2)
-    {
+    public static function base2to10($base2) {
         if (!is_string($base2) || preg_match('/[^01]/', $base2)) {
             throw new \InvalidArgumentException('Input must be a binary string.');
         }
@@ -246,4 +238,5 @@ class InstagramID
 
         return $base10;
     }
+
 }
