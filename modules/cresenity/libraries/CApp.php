@@ -601,6 +601,7 @@ class CApp extends CObservable {
             $v->breadcrumb = $this->breadcrumb;
             $v->additional_head = $this->additional_head;
             $v->custom_data = $this->custom_data;
+            $v->login_required = $this->login_required;
         }
         if (isset($_GET['profiler'])) {
             new Profiler();
