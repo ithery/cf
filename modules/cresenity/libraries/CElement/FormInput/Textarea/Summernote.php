@@ -31,7 +31,13 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         $js .= "
             
         $('#" . $this->id . "').summernote({
-            height: '300px'
+            height: '300px',
+            maximumImageFileSize:1024*1024, // 1 MB
+            callbacks:{ 
+                onImageUploadError: function(msg){ 
+                    alert(msg + ' (1 MB)'); 
+                }
+            }
 	});
         
       

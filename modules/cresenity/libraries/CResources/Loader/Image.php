@@ -183,4 +183,10 @@ class CResources_Loader_Image {
         return $resultSave;
     }
 
+    public function delete() {
+        $fullPath = $this->getSizePath($this->sizeName);
+        
+        unlink($fullPath);
+    }
+    
 }
