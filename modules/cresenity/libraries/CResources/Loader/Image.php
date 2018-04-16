@@ -127,7 +127,11 @@ class CResources_Loader_Image {
         if (strlen($size_add) > 0) {
             $size_add .= '/';
         }
-        $baseUrl = curl::base(false, 'http');
+        
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+    
+        $baseUrl = curl::base(false, $protocol);
+        
         $path = $baseUrl . 'assets/image/' . $size_add . CResources_Encode::encode($this->resourceName);
         if ($this->s3Object != null) {
             $this->saveToS3();
