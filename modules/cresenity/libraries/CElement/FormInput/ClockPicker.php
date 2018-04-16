@@ -59,6 +59,10 @@ class CElement_FormInput_ClockPicker extends CElement_FormInput {
         $disabled = "";
         if ($this->disabled)
             $disabled = ' disabled="disabled"';
+        $addition_attribute = "";
+        foreach ($this->attr as $k => $v) {
+            $addition_attribute .= " " . $k . '="' . $v . '"';
+        }
         $classes = $this->classes;
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
@@ -75,7 +79,7 @@ class CElement_FormInput_ClockPicker extends CElement_FormInput {
 
 
         $html->appendln('<div class="input-group clockpicker" data-autoclose="true">');
-        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled ' . $classes . $this->validation->validation_class() . '" ' . $disabled . $custom_css . $placeholder . ' value="' . $this->value . '" >');
+        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled ' . $classes . $this->validation->validation_class() . '" ' . $disabled . $custom_css . $placeholder . $addition_attribute . ' value="' . $this->value . '" >');
         $html->appendln('<span class="input-group-addon">');
         $html->appendln('<span class="fa fa-clock-o"></span>');
         $html->appendln('</span>');
@@ -91,7 +95,7 @@ class CElement_FormInput_ClockPicker extends CElement_FormInput {
 
         $js->appendln("$('#" . $this->id . "').clockpicker({");
         $js->appendln("donetext: 'OK'");
-        
+
         $js->appendln("});");
 
         return $js->text();

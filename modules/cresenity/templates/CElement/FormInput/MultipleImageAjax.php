@@ -116,12 +116,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="">
                 </div>
                 <?php
-                foreach (custom_control as $cc) :
+                foreach ($customControl as $cc) :
                     $control = carr::get($cc, 'control');
                     $control_name = carr::get($cc, 'input_name');
                     $control_label = carr::get($cc, 'input_label');
                     //get value
-                    $control_value_array = carr::get($this->custom_control_value, $input_name, array());
+                    $control_value_array = carr::get($customControlValue, $input_name, array());
                     $control_value = carr::get($control_value_array, $control_name);
                     ?>
                     <div class="div-custom-control">
@@ -184,12 +184,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 })
             }
 
-            function insertFile(reader,file, fileList, event) {
+            function insertFile(reader, file, fileList, event) {
                 var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
                 if (haveCropper) {
 
                     reader.onloadend = (function (event) {
-                        
+
 
                         var cropperId = '<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
                         var cropperModal = $('#modal-cropper-' + cropperId);
@@ -204,15 +204,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         cropperModal.modal({backdrop: 'static', keyboard: false});
                         cropperImg.cropper({
                             aspectRatio: cropperWidth / cropperHeight,
+                            zoomOnWheel: false,
                             crop: function (e) {
 
                             }
                         });
 
                         var clickAssigned = cropperModal.find('.btn-crop').attr('click-assigned');
-                        if(!clickAssigned) {
+                        if (!clickAssigned) {
                             cropperModal.find('.btn-crop').click(function () {
-                                cropperModal.find('.btn-crop').attr('click-assigned','1');
+                                cropperModal.find('.btn-crop').attr('click-assigned', '1');
                                 var mime = 'image/png';
                                 if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
                                     mime = 'image/jpeg';
@@ -306,7 +307,7 @@ foreach ($customControl as $cc):
                         $.each(dataTransfer.files, function (i, file) {
                             var reader = new FileReader();
                             reader.onload = $.proxy(function (file, fileList, event) {
-                                insertFile(reader,file, fileList, event);
+                                insertFile(reader, file, fileList, event);
 
                             }, this, file, $("#<?php echo $id; ?>"));
                             reader.readAsDataURL(file);
@@ -322,10 +323,10 @@ foreach ($customControl as $cc):
             $("#<?php echo $id; ?>_input_temp").change(function (e) {
                 $("#<?php echo $id; ?>_description").remove();
                 $.each(e.target.files, function (i, file) {
-                    
+
                     var reader = new FileReader();
                     reader.onload = $.proxy(function (file, fileList, event) {
-                        insertFile(reader,file, fileList, event);
+                        insertFile(reader, file, fileList, event);
                     }, this, file, $("#<?php echo $id; ?>"));
                     reader.readAsDataURL(file);
                 })

@@ -122,10 +122,14 @@ abstract class CObservable extends CRenderable {
      * @param string $id optional
      * @return  CElement_Element_A  Anchor Element
      */
-    public function add_a($id = "") {
+    public function addA($id = "") {
         $element = CElement_Factory::createElement('a', $id);
         $this->wrapper->add($element);
         return $element;
+    }
+    
+    public function add_a($id = "") {
+        return $this->addA($id);
     }
 
     /**
