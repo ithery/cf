@@ -100,7 +100,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 </style>
 
 <div id="container-<?php echo $id ?>" class="container-multi-image-ajax" >
-    <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp" multiple style="display:none;">
+    <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
     <div id="<?php echo $id ?>_description" class="multi-image-ajax-description">Click or Drop Files On Box Below</div>
@@ -301,10 +301,16 @@ foreach ($customControl as $cc):
                     $("#<?php echo $id ?>").sortable();
                     var dataTransfer = e.originalEvent.dataTransfer;
                     if (dataTransfer && dataTransfer.files.length) {
+                        dataTransferFiles=dataTransfer.files;
+                        if(haveCropper) {
+                            if(dataTransfer.files.length>1) {
+                                dataTransferFiles = [dataTransfer.files[0]]
+                            }
+                        }
                         e.preventDefault();
                         e.stopPropagation();
                         $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
-                        $.each(dataTransfer.files, function (i, file) {
+                        $.each(dataTransferFiles, function (i, file) {
                             var reader = new FileReader();
                             reader.onload = $.proxy(function (file, fileList, event) {
                                 insertFile(reader, file, fileList, event);
@@ -315,7 +321,10 @@ foreach ($customControl as $cc):
                     }
                 }
             })
-
+            if(!haveCropper) {
+                $("#<?php echo $id; ?>_input_temp").attr('multiple','multiple');
+            }
+            
             // Add Image by Click
             $("#<?php echo $id; ?>").click(function () {
                 $("#<?php echo $id; ?>_input_temp").trigger("click");
