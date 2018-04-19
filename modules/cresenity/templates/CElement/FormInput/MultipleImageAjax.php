@@ -190,7 +190,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                     reader.onloadend = (function (event) {
 
-
                         var cropperId = '<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
                         var cropperModal = $('#modal-cropper-' + cropperId);
                         var cropperImgInitialized = cropperModal.find('img.cropper-hidden');
@@ -209,10 +208,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                             }
                         });
-
+                        cropperModal.find('.btn-crop').data('file',file);
                         var clickAssigned = cropperModal.find('.btn-crop').attr('click-assigned');
                         if (!clickAssigned) {
                             cropperModal.find('.btn-crop').click(function () {
+                                var fileRead = cropperModal.find('.btn-crop').data('file');
                                 cropperModal.find('.btn-crop').attr('click-assigned', '1');
                                 var mime = 'image/png';
                                 if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
@@ -222,7 +222,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                                 imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
 
-                                addFile(file, fileList, event, imageData);
+                                addFile(fileRead, fileList, event, imageData);
                                 $(this).closest('.modal').modal('hide');
                             });
                         }
