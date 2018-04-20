@@ -10,6 +10,7 @@ class CNestable extends CElement_Element {
     protected $row_action_list;
     protected $action_style;
     protected $display_callback;
+    protected $filter_action_callback_func;
     protected $requires;
     protected $checkbox;
     protected $disable_dnd;
@@ -26,6 +27,7 @@ class CNestable extends CElement_Element {
         $this->action_style = 'btn-icon-group';
         $this->row_action_list->set_style('btn-icon-group');
         $this->display_callback = false;
+        $this->filter_action_callback_func = "";
         $this->checkbox = false;
         $this->requires = array();
         $this->js_cell = '';
@@ -37,6 +39,14 @@ class CNestable extends CElement_Element {
 
     public function display_callback_func($func, $require = "") {
         $this->display_callback = $func;
+        if (strlen($require) > 0) {
+            $this->requires[] = $require;
+        }
+        return $this;
+    }
+
+    public function filter_action_callback_func($func, $require = "") {
+        $this->filter_action_callback_func = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -154,6 +164,21 @@ class CNestable extends CElement_Element {
                     $this->row_action_list->regenerate_id(true);
                     $this->row_action_list->apply("jsparam", $jsparam);
                     $this->row_action_list->apply("set_handler_url_param", $jsparam);
+
+                    if (($this->filter_action_callback_func) != null) {
+                        $actions = $this->row_action_list->childs();
+
+                        foreach ($actions as $action) {
+                            $visibility = CDynFunction::factory($this->filter_action_callback_func)
+                                    ->add_param($this)
+                                    ->add_param($d)
+                                    ->add_param($action)
+                                    ->set_require($this->requires)
+                                    ->execute();
+
+                            $action->set_visibility($visibility);
+                        }
+                    }
 
                     $this->js_cell .= $this->row_action_list->js();
                      $html->appendln($this->row_action_list->html($html->get_indent()));
