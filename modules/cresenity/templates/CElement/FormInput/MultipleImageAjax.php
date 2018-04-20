@@ -100,7 +100,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 </style>
 
 <div id="container-<?php echo $id ?>" class="container-multi-image-ajax" >
-    <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp" multiple style="display:none;">
+    <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
     <div id="<?php echo $id ?>_description" class="multi-image-ajax-description">Click or Drop Files On Box Below</div>
@@ -190,7 +190,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                     reader.onloadend = (function (event) {
 
-
                         var cropperId = '<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
                         var cropperModal = $('#modal-cropper-' + cropperId);
                         var cropperImgInitialized = cropperModal.find('img.cropper-hidden');
@@ -209,10 +208,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                             }
                         });
-
+                        cropperModal.find('.btn-crop').data('file',file);
                         var clickAssigned = cropperModal.find('.btn-crop').attr('click-assigned');
                         if (!clickAssigned) {
                             cropperModal.find('.btn-crop').click(function () {
+                                var fileRead = cropperModal.find('.btn-crop').data('file');
                                 cropperModal.find('.btn-crop').attr('click-assigned', '1');
                                 var mime = 'image/png';
                                 if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
@@ -222,7 +222,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                                 imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
 
-                                addFile(file, fileList, event, imageData);
+                                addFile(fileRead, fileList, event, imageData);
                                 $(this).closest('.modal').modal('hide');
                             });
                         }
@@ -301,10 +301,16 @@ foreach ($customControl as $cc):
                     $("#<?php echo $id ?>").sortable();
                     var dataTransfer = e.originalEvent.dataTransfer;
                     if (dataTransfer && dataTransfer.files.length) {
+                        dataTransferFiles=dataTransfer.files;
+                        if(haveCropper) {
+                            if(dataTransfer.files.length>1) {
+                                dataTransferFiles = [dataTransfer.files[0]]
+                            }
+                        }
                         e.preventDefault();
                         e.stopPropagation();
                         $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
-                        $.each(dataTransfer.files, function (i, file) {
+                        $.each(dataTransferFiles, function (i, file) {
                             var reader = new FileReader();
                             reader.onload = $.proxy(function (file, fileList, event) {
                                 insertFile(reader, file, fileList, event);
@@ -315,7 +321,10 @@ foreach ($customControl as $cc):
                     }
                 }
             })
-
+            if(!haveCropper) {
+                $("#<?php echo $id; ?>_input_temp").attr('multiple','multiple');
+            }
+            
             // Add Image by Click
             $("#<?php echo $id; ?>").click(function () {
                 $("#<?php echo $id; ?>_input_temp").trigger("click");
