@@ -56,6 +56,22 @@ class cdbg {
         }
     }
 
+    /**
+     * Dump the passed variables and end the script.
+     *
+     * @param  mixed
+     * @return void
+     */
+    function dd()
+    {
+        $args = func_get_args();
+        foreach ($args as $x) {
+            (new Illuminate\Support\Debug\Dumper)->dump($x);
+        }
+
+        die(1);
+    }
+
     public static function add_var($key, $var) {
         self::$debug_vars[$key] = $var;
     }
