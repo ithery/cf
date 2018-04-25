@@ -1640,6 +1640,9 @@
 }
 .note-editor .form-control[disabled],
 .note-editor .form-control[readonly],
+.note-group-select-from-files{
+    display:none;
+}
 fieldset[disabled] .note-editor .form-control {
     cursor: not-allowed;
     background-color: #eeeeee;
