@@ -360,7 +360,7 @@ class cnav {
         return $html;
     }
 
-    public static function render($navs = null, $level = 0, &$child = 0) {
+    public static function render($data_notif=array(),$navs = null, $level = 0, &$child = 0) {
         $is_admin = CApp::instance()->is_admin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
@@ -378,6 +378,7 @@ class cnav {
             $method = "";
             $label = "";
             $icon = "";
+            
             if (isset($d["controller"]))
                 $controller = $d["controller"];
             if (isset($d["method"]))
@@ -391,7 +392,7 @@ class cnav {
             $child_html = "";
 
             if (isset($d["subnav"])) {
-                $child_html .= cnav::render($d["subnav"], $level + 1, $child);
+                $child_html .= cnav::render($data_notif,$d["subnav"], $level + 1, $child);
             }
 
             $url = cnav::url($d);
@@ -457,10 +458,18 @@ class cnav {
                     $elem .= "</a>\r\n";
                 } else {
                     $target = "";
+                    $notif ="";
                     if (isset($d["target"]) && strlen($d["target"]) > 0) {
                         $target = ' target="' . $d["target"] . '"';
                     }
-                    $elem = '<a class="' . $active_class . '" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span></a>\r\n";
+                    if (isset($d["name"]) && strlen($d["name"]) > 0) {
+                        $notif=carr::get($data_notif,$d["name"]);
+                    }
+                    $strNotif='';
+                    if($notif!=null && $notif>0){
+                        $strNotif='<label style="color:#f00">&nbsp;('.$notif.')<label>';
+                    }
+                    $elem = '<a class="' . $active_class . '" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>".$strNotif."</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $child_html;

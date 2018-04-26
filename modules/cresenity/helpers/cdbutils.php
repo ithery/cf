@@ -515,7 +515,8 @@ class cdbutils {
 
     public static function load_sql($sql) {
         $db = CDatabase::instance();
-        $sql = explode("\n", $sql);
+        //$sql = explode("\n", $sql);
+        $sql = preg_split('/\r\n|\r|\n/', $sql);
 
         $buffer = '';
         foreach ($sql as $line) {
