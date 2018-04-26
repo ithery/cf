@@ -70,7 +70,7 @@ class CNavigation extends CObject {
     }
 
     public function render($options = array()) {
-        return cnav::render();
+        return cnav::render($options);
     }
 
 }
