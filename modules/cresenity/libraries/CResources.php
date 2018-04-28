@@ -72,23 +72,29 @@ class CResources {
      * 
      * @return CResources_Engine
      */
-    public static function factory($resource_type, $type, $options=array()) {
-        $app_code= CF::app_code();
+    public static function factory($resource_type, $type, $options = array()) {
+        $app_code = CF::app_code();
         $org_code = $options;
-        
-        if(is_array($options)) {
-            $org_code = carr::get($options,'org_code');
-            $app_code = carr::get($options,'app_code');
+
+        if (is_array($options)) {
+            $org_code = carr::get($options, 'org_code');
+            $app_code = carr::get($options, 'app_code');
         }
-        if(!is_array($org_code)) {
-            if(strlen($org_code)==0) {
+        if (!is_array($org_code)) {
+            if (strlen($org_code) == 0) {
                 $org_code = CF::org_code();
             }
         }
-        if(strlen($app_code)==0) {
+        if (strlen($app_code) == 0) {
             $app_code = CF::app_code();
         }
-        
+
+        if (!is_array($options)) {
+            $options = array(
+                'org_code' => $org_code,
+                'app_code' => $app_code,
+            );
+        }
 
         $root_directory = DOCROOT . 'application' . DS . $app_code . DS . 'default' . DS . 'resources';
         //try to get file_info
@@ -114,7 +120,7 @@ class CResources {
         }
 
         $class = 'CResources_Engine_' . $resource_type;
-        $object = new $class($type, $org_code);
+        $object = new $class($type, $options);
         $object->set_root_directory($root_directory);
         return $object;
     }

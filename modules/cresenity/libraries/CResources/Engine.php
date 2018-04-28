@@ -5,14 +5,17 @@ abstract class CResources_Engine implements CResources_EngineInterface {
     protected $_resource_type;
     protected $_type;
     protected $_org_code;
+    protected $_app_code;
     protected $_sizes;
     protected $_filename;
     protected $_root_directory;
 
-    public function __construct($resource_type, $type, $org_code = null) {
+    public function __construct($resource_type, $type, $options = array()) {
         $this->_resource_type = strtolower($resource_type);
         $this->_type = $type;
-        $this->_org_code = $org_code;
+
+        $this->_org_code = carr::get($options, 'org_code');
+        $this->_app_code = carr::get($options, 'app_code');
         $this->_sizes = array();
         $this->_root_directory = 'resources';
     }
@@ -89,14 +92,14 @@ abstract class CResources_Engine implements CResources_EngineInterface {
     }
 
     public function get_url($filename = null, $size = '') {
-
-
-
         if ($filename == null) {
             $filename = $this->_filename;
         }
         if ($this->_resource_type == 'image') {
-            $imageLoader = CResources::image($filename);
+            $options = array(
+                'app_code' => $this->_app_code,
+            );
+            $imageLoader = CResources::image($filename, $options);
             if (strlen($size) > 0) {
                 $imageLoader->setSize($size);
             }
