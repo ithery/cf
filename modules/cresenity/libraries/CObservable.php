@@ -81,7 +81,7 @@ abstract class CObservable extends CRenderable {
      */
     public function add_control($id, $type) {
         $control = null;
-        if ($this->manager->is_registered_control($type)) {
+        if ($this->manager->isRegisteredControl($type)) {
             $control = $this->manager->create_control($id, $type);
         } else {
             trigger_error('Unknown control type ' . $type);

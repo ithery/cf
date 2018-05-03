@@ -31,18 +31,18 @@ final class CManager {
     }
 
     public function __construct() {
-        $this->is_mobile = ccfg::get('is_mobile');
-        $this->mobile_path = '';
+        self::$is_mobile = ccfg::get('is_mobile');
+        self::$mobile_path = '';
 
 //            $theme = ccfg::get('theme');
 //            if ($theme == null) $theme = 'cresenity';
         $theme = ctheme::get_current_theme();
         $theme_file = CF::get_file('themes', $theme);
         if (file_exists($theme_file)) {
-            $this->theme_data = include $theme_file;
-            $bootstrap = carr::get($this->theme_data, 'bootstrap');
+            self::$theme_data = include $theme_file;
+            $bootstrap = carr::get(self::$theme_data, 'bootstrap');
             if (strlen($bootstrap) > 0) {
-                $this->bootstrap = carr::get($this->theme_data, 'bootstrap');
+                $this->bootstrap = $bootstrap;
             }
         }
         self::$theme = new CManager_Theme();
@@ -101,8 +101,8 @@ final class CManager {
     }
 
     public function register_control($type, $class, $code_path = '') {
-        $this->controls[$type] = $class;
-        $this->controls_code[$type] = $code_path;
+        self::$controls[$type] = $class;
+        self::$controls_code[$type] = $code_path;
         if (strlen($code_path) > 0) {
             if (file_exists($code_path)) {
                 include $code_path;
@@ -145,7 +145,7 @@ final class CManager {
     }
 
     public function is_registered_control($type) {
-        return isset($this->controls[$type]);
+        return isset(self::$controls[$type]);
     }
 
     /**
@@ -157,7 +157,7 @@ final class CManager {
     }
 
     public function get_registered_controls() {
-        return $this->controls;
+        return self::$controls;
     }
 
     /**
@@ -170,14 +170,16 @@ final class CManager {
     }
 
     public function is_registered_element($type) {
-        return isset($this->elements[$type]);
+        return isset(self::$elements[$type]);
     }
-
+    public function createControl($id, $type) {
+        $this->create_control($id,$type);
+    }
     public function create_control($id, $type) {
-        if (!isset($this->controls[$type])) {
+        if (!isset(self::$controls[$type])) {
             trigger_error('Type of control ' . $type . ' not registered');
         }
-        $class = $this->controls[$type];
+        $class = self::$controls[$type];
 
         if (cstr::startsWith($class, 'CElement_FormInput')) {
             return CElement_Factory::createFormInput($class, $id);
@@ -191,10 +193,10 @@ final class CManager {
     }
 
     public function create_element($id, $type) {
-        if (!isset($this->elements[$type])) {
+        if (!isset(self::$elements[$type])) {
             trigger_error('Type of element ' . $type . ' not registered');
         }
-        $class = $this->elements[$type];
+        $class = self::$elements[$type];
 
         if (cstr::startsWith($class, 'CElement_Element')) {
             return CElement_Factory::createElement($id);
@@ -207,16 +209,16 @@ final class CManager {
     }
 
     public function set_mobile_path($path) {
-        $this->mobile_path = $path;
+        self::$mobile_path = $path;
         return $this;
     }
 
     public function get_mobile_path() {
-        return $this->mobile_path;
+        return self::$mobile_path;
     }
 
     public function is_mobile() {
-        return $this->is_mobile;
+        return self::$is_mobile;
     }
 
 }

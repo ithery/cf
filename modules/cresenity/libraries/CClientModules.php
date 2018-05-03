@@ -10,13 +10,13 @@ final class CClientModules {
 
     public function __construct() {
 
-        $this->mods = array();
-        $this->all_modules = null;
+        self::$mods = array();
+        self::$all_modules = null;
     }
 
     public function all_modules() {
-        if ($this->all_modules == null) {
-            $this->all_modules = include DOCROOT . "config" . DS . "client_modules" . DS . "client_modules.php";
+        if (self::$all_modules == null) {
+            self::$all_modules = include DOCROOT . "config" . DS . "client_modules" . DS . "client_modules.php";
             $app_files = CF::get_files('config', 'client_modules');
             //$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
             $app_files = array_reverse($app_files);
@@ -27,10 +27,10 @@ final class CClientModules {
                     trigger_error("Invalid Client Modules Config Format On " . $file);
                 }
 
-                $this->all_modules = array_merge($this->all_modules, $app_modules);
+                self::$all_modules = array_merge(self::$all_modules, $app_modules);
             }
         }
-        return $this->all_modules;
+        return self::$all_modules;
     }
 
     public function requirements($module) {
@@ -51,7 +51,7 @@ final class CClientModules {
 
     public function is_registered_module($mod) {
 
-        return in_array($mod, $this->mods);
+        return in_array($mod, self::$mods);
     }
 
     private function add_to_tree($tree, $module) {
@@ -113,7 +113,7 @@ final class CClientModules {
         //make sure all modules is collected
         $this->all_modules();
         //replace or make new module
-        $this->all_modules[$name] = $moduleData;
+        self::$all_modules[$name] = $moduleData;
         return $this;
     }
 
@@ -121,7 +121,7 @@ final class CClientModules {
         $cs = CClientScript::instance();
 
         $all_modules = $this->all_modules();
-        if (!in_array($module, $this->mods)) {
+        if (!in_array($module, self::$mods)) {
 
             if (isset($all_modules[$module])) {
                 //array
@@ -131,13 +131,13 @@ final class CClientModules {
                         $this->register_module($req);
                     }
                 }
-                if (!in_array($module, $this->mods)) {
+                if (!in_array($module, self::$mods)) {
 
                     if (isset($mod["js"]))
                         $cs->register_js_files($mod["js"]);
                     if (isset($mod["css"]))
                         $cs->register_css_files($mod["css"]);
-                    $this->mods[] = $module;
+                    self::$mods[] = $module;
                 }
             } else {
 
