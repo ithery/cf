@@ -1,6 +1,6 @@
 <?php
 
-trait Observable {
+trait CTrait_Compat_Observable {
     public function get_listeners() {
         return $this->getListeners();
     }

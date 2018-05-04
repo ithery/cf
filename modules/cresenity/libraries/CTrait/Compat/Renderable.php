@@ -1,5 +1,5 @@
 <?php
-trait Renderable {
+trait CTrait_Compat_Renderable {
     public function child_count() {
         return $this->childCount();
     }

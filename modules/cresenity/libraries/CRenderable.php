@@ -3,6 +3,7 @@
 defined('SYSPATH') OR die('No direct access allowed.');
 
 class CRenderable extends CObject implements CApp_Interface_Renderable {
+    use CTrait_Compat_Renderable;
 
     protected $renderable;
     protected $additional_js;
@@ -19,7 +20,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $this->parent = null;
     }
 
-    public function child_count() {
+    public function childCount() {
         return count($this->renderable);
     }
 
@@ -27,12 +28,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $this->renderable;
     }
 
-    public function set_parent($parent) {
+    public function setParent($parent) {
         $this->parent = $parent;
         return $this;
     }
 
-    public function set_visibility($bool) {
+    public function setVisibility($bool) {
         $this->visibility = $bool;
     }
 
@@ -58,7 +59,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $this;
     }
 
-    public function add_js($js) {
+    public function addJs($js) {
         $this->additional_js .= $js;
         return $this;
     }
@@ -151,7 +152,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return cjson::encode($data);
     }
 
-    public function regenerate_id($recursive = false) {
+    public function regenerateId($recursive = false) {
         parent::regenerate_id();
         if ($recursive) {
             foreach ($this->renderable as $r) {
@@ -162,14 +163,14 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         }
     }
 
-    public static function is_instanceof($value) {
+    public static function isInstanceof($value) {
         if (is_object($value)) {
             return ($value instanceof CRenderable);
         }
         return false;
     }
 
-    public function toarray() {
+    public function toArray() {
         $arrays = array();
         foreach ($this->renderable as $r) {
             if (CRenderable::is_instanceof($r)) {
