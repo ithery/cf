@@ -6,9 +6,21 @@ class cajax {
 
     public static function callback($obj, $input) {
         $callable = $obj->data->callable;
+        $requires = cobj::get($obj->data, 'requires');
+        if (!is_array($requires)) {
+            $requires = array($requires);
+        }
+        
+        foreach ($requires as $require) {
+            if (strlen($require) > 0 && file_exists($require)) {
+                require_once $require;
+            }
+        }
         if (is_callable($callable)) {
             return call_user_func($callable, $obj->data);
         }
+        
+        return false;
     }
 
     public static function form_process($obj, $input) {
@@ -675,7 +687,7 @@ class cajax {
         if (isset($_POST[$input_name])) {
 
             $imageDataArray = $_POST[$input_name];
-            $filenameArray = $_POST[$input_name.'_filename'];
+            $filenameArray = $_POST[$input_name . '_filename'];
             if (!is_array($imageDataArray)) {
                 $imageDataArray = array($imageDataArray);
             }
@@ -683,12 +695,12 @@ class cajax {
                 $filenameArray = array($filenameArray);
             }
             foreach ($imageDataArray as $k => $imageData) {
-                $filename = carr::get($filenameArray,$k);
+                $filename = carr::get($filenameArray, $k);
                 $extension = "." . pathinfo($filename, PATHINFO_EXTENSION);
                 if (strtolower($extension) == 'php') {
                     die('fatal error');
                 }
-                
+
                 $filteredData = substr($imageData, strpos($imageData, ",") + 1);
                 $unencodedData = base64_decode($filteredData);
                 $file_id = date('Ymd') . cutils::randmd5() . $extension;
