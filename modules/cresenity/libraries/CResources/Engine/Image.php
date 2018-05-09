@@ -2,8 +2,8 @@
 
 class CResources_Engine_Image extends CResources_Engine {
 
-    public function __construct($type, $org_code) {
-        parent::__construct('Image', $type, $org_code);
+    public function __construct($type, $options) {
+        parent::__construct('Image', $type, $options);
     }
 
     public function add_size($size_name, $options) {

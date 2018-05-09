@@ -102,6 +102,20 @@ class CCore_Controller extends CController {
         CElfinder::factory()->set_folder($folder)->run();
     }
 
+    public function ajaxInfo($method) {
+        $file = ctemp::makepath("ajax", $method . ".tmp");
+        if (isset($_GET['profiler'])) {
+            new Profiler();
+        }
+        if (!file_exists($file)) {
+
+            return;
+        }
+        $text = file_get_contents($file);
+        $obj = json_decode($text);
+        cdbg::var_dump($obj);
+    }
+
     public function ajax($method) {
         $file = ctemp::makepath("ajax", $method . ".tmp");
         if (isset($_GET['profiler'])) {
