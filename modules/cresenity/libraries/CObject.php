@@ -27,8 +27,8 @@ class CObject {
         }
 
         // normal __get() code here
-
-        trigger_error('Cannot access private property ' . __CLASS__ . '::$' . $key, E_USER_ERROR);
+        throw new CException('Cannot access private property :class::$:key', array(':class' => __CLASS__, ':key' => $key));
+        //trigger_error(, E_USER_ERROR);
     }
 
     public function __set($key, $value) {

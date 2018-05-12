@@ -97,9 +97,8 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function set_submit($bool) {
+    public function setSubmit($bool = true) {
         $this->submit = $bool;
-
         return $this;
     }
 

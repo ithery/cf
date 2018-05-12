@@ -20,11 +20,47 @@ trait CTrait_Compat_Element_DataTable {
 
     /**
      * 
-     * @deprecated since version 1.2
+     * @deprecated since version 1.2, please use setDataFromQuery
      * @return CElement_Component_DataTable
      */
     public function set_data_from_query($q) {
         return $this->setDataFromQuery($q);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use setAjax
+     * @return CElement_Component_DataTable
+     */
+    public function set_ajax($bool) {
+        return $this->setAjax($bool);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use rowActionCount
+     * @return int
+     */
+    public function action_count() {
+        return $this->rowActionCount();
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use haveRowAction
+     * @return bool
+     */
+    public function have_action() {
+        return $this->haveRowAction();
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use addRowAction
+     * @return CElement_Component_Action
+     */
+    public function add_row_action($id = "") {
+        return $this->addRowAction($id);
     }
 
 }

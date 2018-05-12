@@ -2,7 +2,8 @@
 
 class CElement_Component_DataTable extends CElement_Component {
 
-    use CTrait_Compat_Element_DataTable;
+    use CTrait_Compat_Element_DataTable,
+        CTrait_Element_ActionList_Row;
 
     public $default_paging_list = array(
         "10" => "10",
@@ -71,6 +72,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function __construct($id = "") {
         parent::__construct($id);
+        $this->row_action_list = &$this->rowActionList;
         $this->default_paging_list["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
@@ -82,12 +84,15 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->data = array();
         $this->key_field = "";
         $this->columns = array();
-        $this->row_action_list = CActionList::factory();
-        $this->header_action_list = CActionList::factory();
+        $this->rowActionList = CElement_List_ActionList::factory();
+        $this->rowActionList->set_style('btn-icon-group');
+        $this->action_style = 'btn-icon-group';
+        $this->header_action_list = CElement_List_ActionList::factory();
         $this->header_action_style = 'widget-action';
         $this->header_action_list->set_style('widget-action');
-        $this->action_style = 'btn-icon-group';
-        $this->row_action_list->set_style('btn-icon-group');
+        $this->footer_action_list = CElement_List_ActionList::factory();
+        $this->footer_action_style = 'btn-list';
+        $this->footer_action_list->set_style('btn-list');
         $this->checkbox = false;
         $this->checkbox_value = array();
         $this->numbering = false;
@@ -126,9 +131,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->tbody_id = '';
 
         $this->report_header = array();
-        $this->footer_action_list = CActionList::factory();
-        $this->footer_action_style = 'btn-list';
-        $this->footer_action_list->set_style('btn-list');
+
 
         $this->widget_title = true;
 
@@ -558,11 +561,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function have_action() {
-        //return $this->can_edit||$this->can_delete||$this->can_view;
-        return $this->row_action_list->child_count() > 0;
-    }
-
     public function have_header_action() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->header_action_list->child_count() > 0;
@@ -570,16 +568,12 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function set_action_style($style) {
         $this->action_style = $style;
-        return $this->row_action_list->set_style($style);
+        return $this->rowActionList->set_style($style);
     }
 
     public function set_header_action_style($style) {
         $this->header_action_style = $style;
         $this->header_action_list->set_style($style);
-    }
-
-    public function action_count() {
-        return $this->row_action_list->child_count();
     }
 
     public function header_action_count() {
@@ -595,7 +589,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->options->get_by_name($key);
     }
 
-    public function set_ajax($bool) {
+    public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
     }
@@ -645,12 +639,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public function set_group_by($group_by) {
         $this->group_by = $group_by;
         return $this;
-    }
-
-    public function add_row_action($id = "") {
-        $row_act = CAction::factory($id);
-        $this->row_action_list->add($row_act);
-        return $row_act;
     }
 
     public function add_header_action($id = "") {
@@ -1584,14 +1572,14 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $jsparam["param1"] = $key;
                     if ($this->action_style == "btn-dropdown") {
-                        $this->row_action_list->add_class("pull-right");
+                        $this->rowActionList->add_class("pull-right");
                     }
-                    $this->row_action_list->regenerate_id(true);
-                    $this->row_action_list->apply("jsparam", $jsparam);
-                    $this->row_action_list->apply("set_handler_url_param", $jsparam);
+                    $this->rowActionList->regenerate_id(true);
+                    $this->rowActionList->apply("jsparam", $jsparam);
+                    $this->rowActionList->apply("set_handler_url_param", $jsparam);
 
                     if (($this->filter_action_callback_func) != null) {
-                        $actions = $this->row_action_list->childs();
+                        $actions = $this->rowActionList->childs();
 
                         foreach ($actions as $action) {
                             $visibility = CDynFunction::factory($this->filter_action_callback_func)
@@ -1610,9 +1598,9 @@ class CElement_Component_DataTable extends CElement_Component {
                     }
 
 
-                    $this->js_cell .= $this->row_action_list->js();
+                    $this->js_cell .= $this->rowActionList->js();
 
-                    $html->appendln($this->row_action_list->html($html->get_indent()));
+                    $html->appendln($this->rowActionList->html($html->get_indent()));
                     $html->dec_indent()->appendln('</td>')->br();
                 }
 
@@ -1744,7 +1732,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajax_url = CAjaxMethod::factory()->set_type('datatable')
                     ->set_data('columns', $columns)
                     ->set_data('query', $this->query)
-                    ->set_data('row_action_list', $this->row_action_list)
+                    ->set_data('row_action_list', $this->rowActionList)
                     ->set_data('key_field', $this->key_field)
                     ->set_data('table', serialize($this))
                     ->set_data('domain', $this->domain)
@@ -1761,7 +1749,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 $action_url = CAjaxMethod::factory()->set_type('callback')
                         ->set_data('callable', array('CTable', 'action_download_excel'))
                         ->set_data('query', $this->query)
-                        ->set_data('row_action_list', $this->row_action_list)
+                        ->set_data('row_action_list', $this->rowActionList)
                         ->set_data('key_field', $this->key_field)
                         ->set_data('table', serialize($this))
                         ->makeurl();
@@ -1775,7 +1763,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
         $total_column = count($this->columns);
-        if (count($this->row_action_list->child_count()) > 0) {
+        if (count($this->rowActionList->child_count()) > 0) {
             $total_column++;
         }
         if ($this->checkbox) {

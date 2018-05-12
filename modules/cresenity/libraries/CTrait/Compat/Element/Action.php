@@ -30,4 +30,13 @@ trait CTrait_Compat_Element_Action {
         return $this->setIcon($ic);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use setSubmit
+     * @param CElement_Component_Action
+     */
+    public function set_submit($bool) {
+        return $this->setSubmit($bool);
+    }
+
 }
