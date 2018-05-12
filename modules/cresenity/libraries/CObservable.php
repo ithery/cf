@@ -1,6 +1,7 @@
 <?php
 
 abstract class CObservable extends CRenderable {
+
     use CTrait_Compat_Observable;
 
     protected $listeners;
@@ -128,7 +129,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     public function add_a($id = "") {
         return $this->addA($id);
     }
@@ -339,7 +340,7 @@ abstract class CObservable extends CRenderable {
     }
 
     public function addWidget($id = "") {
-        $widget = CWidget::factory($id);
+        $widget = CElement_Component_Widget::factory($id);
         $this->add($widget);
         return $widget;
     }
