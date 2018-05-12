@@ -273,8 +273,13 @@ abstract class CObservable extends CRenderable {
         return $fieldset;
     }
 
-    public function addTable($table_id = "") {
-        $table = CTable::factory($table_id);
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_DataTable
+     */
+    public function addTable($id = "") {
+        $table = CElement_Factory::createComponent('DataTable', $id);
         $this->add($table);
         return $table;
     }
