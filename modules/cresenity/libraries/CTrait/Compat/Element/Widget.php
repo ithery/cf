@@ -18,4 +18,13 @@ trait CTrait_Compat_Element_Widget {
         return $this->setTitle($title, $lang);
     }
 
+    /**
+     * 
+     * @param type $icon
+     * @return $this
+     */
+    public function set_icon($icon) {
+        return $this->setIcon($icon);
+    }
+
 }

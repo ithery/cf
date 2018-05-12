@@ -9,7 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_Component_Widget extends CElement_Component {
 
-    use CTrait_Compat_Element_Widget;
+    use CTrait_Compat_Element_Widget,
+        CTrait_Element_Property_Icon;
 
     protected $header_action_list;
     protected $switcher;
@@ -17,7 +18,6 @@ class CElement_Component_Widget extends CElement_Component {
     public $content;
     public $span;
     public $scroll;
-    public $icon;
     public $wrapped;
     public $nopadding;
     public $info;
@@ -106,11 +106,6 @@ class CElement_Component_Widget extends CElement_Component {
 
     public function set_height($height) {
         $this->height = $height;
-        return $this;
-    }
-
-    public function set_icon($icon) {
-        $this->icon = $icon;
         return $this;
     }
 

@@ -11,12 +11,21 @@ trait CTrait_Element_Property_Icon {
 
     protected $icon;
 
+    /**
+     * 
+     * @param string $icon
+     * @return $this
+     */
     public function setIcon($icon) {
 
         $this->icon = $icon;
         return $this;
     }
 
+    /**
+     * 
+     * @return string
+     */
     public function getIcon() {
         return $this->icon;
     }
