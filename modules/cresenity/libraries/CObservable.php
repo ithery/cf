@@ -396,11 +396,17 @@ abstract class CObservable extends CRenderable {
         return $element;
     }
 
+    /**
+     * 
+     * 
+     * @param string $id
+     * @return CElement_List_ActionList
+     */
     public function addActionList($id = "") {
-        $actlist = CActionList::factory($id);
+        $actlist = CElement_Factory::createList('ActionList', $id);
         $this->add($actlist);
-        if ($this instanceof CForm) {
-            $actlist->set_style('form-action');
+        if ($this instanceof CElement_Component_Form) {
+            $actlist->setStyle('form-action');
         }
         return $actlist;
     }
