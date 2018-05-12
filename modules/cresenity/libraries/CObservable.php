@@ -258,11 +258,11 @@ abstract class CObservable extends CRenderable {
     /**
      * Add Form Field
      *
-     * @param   string  field id
-     * @return  CFormField  Form Field
+     * @param   string id
+     * @return  CElement_Component_Form_Field  Form Field
      */
-    public function addField($field_id = "") {
-        $field = CFormField::factory($field_id);
+    public function addField($id = "") {
+        $field = CElement_Factory::createComponent('Form_Field', $id);
         $this->add($field);
         return $field;
     }
@@ -353,7 +353,7 @@ abstract class CObservable extends CRenderable {
     /**
      * 
      * @param string $id
-     * @return CForm
+     * @return CElement_Component_Form
      */
     public function addForm($id = "") {
         $form = CElement_Factory::createComponent('Form', $id);
