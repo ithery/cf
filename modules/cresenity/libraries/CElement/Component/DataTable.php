@@ -636,8 +636,8 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function add_column($fieldname) {
-        $col = CTableColumn::factory($fieldname);
+    public function addColumn($fieldname) {
+        $col = CElement_Component_DataTable_Column::factory($fieldname);
         $this->columns[] = $col;
         return $col;
     }

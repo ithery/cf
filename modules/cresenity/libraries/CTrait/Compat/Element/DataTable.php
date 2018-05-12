@@ -8,9 +8,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CTrait_Compat_Element_DataTable {
+
     /**
      * 
      * @deprecated since version 1.2
-     * @return type
+     * @return CElement_Component_DataTable_Column
      */
+    public function add_column($fieldname) {
+        return $this->addColumn($fieldname);
+    }
+
 }

@@ -1,35 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+class CElement_Component_DataTable_Column extends CObject {
 
-/**
- * @author Hery Kurniawan
- * @since Feb 16, 2018, 4:48:48 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
-class CElement_Component_DataTable_Column {
+    public $transforms = array();
+    public $fieldname;
+    public $label;
+    public $width;
+    public $align;
+    public $format;
+    public $sortable;
+    public $searchable;
+    public $editable;
+    public $visible;
+    public $input_type;
+    public $no_line_break;
+    public $hidden_phone;
+    public $hidden_tablet;
+    public $hidden_desktop;
 
-    use CTrait_Element_Property_Label,
-        CTrait_Element_Property_Align,
-        CTrait_Element_Property_Visible,
-        CTrait_Element_Behavior_Sortable,
-        CTrait_Element_Behavior_Searchable,
-        CTrait_Element_Behavior_Editable,
-        CTrait_Element_Transform,
-        CTrait_Element_Responsive,
-        CTrait_Compat_Element_Table_Column;
+    public function __construct($fieldname) {
+        parent::__construct();
 
-    protected $fieldName;
-    protected $format;
-    protected $inputType;
-    protected $noLineBreak;
-
-    protected $dataTable;
-
-    public function __construct($fieldName, CElement_Component_DataTable $dataTable) {
-        $this->dataTable = $dataTable;
-
-        $this->fieldName = $fieldName;
+        $this->fieldname = $fieldname;
         $this->align = "left";
         $this->label = "";
         $this->width = "";
@@ -38,55 +30,116 @@ class CElement_Component_DataTable_Column {
         $this->sortable = true;
         $this->searchable = true;
         $this->visible = true;
-        $this->inputType = "text";
+        $this->input_type = "text";
         $this->editable = true;
-        $this->noLineBreak = false;
-        $this->hiddenPhone = false;
-        $this->hiddenTablet = false;
-        $this->hiddenDesktop = false;
+        $this->no_line_break = false;
+        $this->hidden_phone = false;
+        $this->hidden_tablet = false;
+        $this->hidden_desktop = false;
     }
 
-    public function getFieldName() {
-        return $this->fieldName;
+    public static function factory($fieldname) {
+        return new CElement_Component_DataTable_Column($fieldname);
     }
 
-    
+    public function get_fieldname() {
+        return $this->fieldname;
+    }
 
-    public function setInputType($type) {
-        $this->inputType = $type;
+    public function get_align() {
+        return $this->align;
+    }
+
+    public function set_hidden_phone($bool) {
+        $this->hidden_phone = $bool;
         return $this;
     }
 
-    public function getNoLineBreak() {
-        return $this->noLineBreak;
+    public function set_hidden_tablet($bool) {
+        $this->hidden_tablet = $bool;
+        return $this;
     }
 
-    public function setNoLineBreak($bool) {
+    public function set_hidden_desktop($bool) {
+        $this->hidden_desktop = $bool;
+        return $this;
+    }
+
+    public function set_input_type($type) {
+        $this->input_type = $type;
+        return $this;
+    }
+
+    public function get_no_line_break() {
+        return $this->no_line_break;
+    }
+
+    public function set_no_line_break($bool) {
         $this->no_line_break = $bool;
         return $this;
     }
 
-    /**
-     * Set format of column
-     * 
-     * @param string $s
-     * @return $this
-     */
-    public function setFormat($s) {
+    public function set_visible($bool) {
+        $this->visible = $bool;
+        return $this;
+    }
+
+    public function set_sortable($bool) {
+        $this->sortable = $bool;
+        return $this;
+    }
+
+    public function set_searchable($bool) {
+        $this->searchable = $bool;
+        return $this;
+    }
+
+    public function set_editable($bool) {
+        $this->editable = $bool;
+        return $this;
+    }
+
+    public function set_label($text, $lang = true) {
+        if ($lang)
+            $text = clang::__($text);
+        $this->label = $text;
+        return $this;
+    }
+
+    public function set_width($w) {
+        $this->width = $w;
+        return $this;
+    }
+
+    public function set_align($al) {
+        $this->align = $al;
+        return $this;
+    }
+
+    public function get_label() {
+        return $this->label;
+    }
+
+    public function add_transform($name, $args = array()) {
+        $func = CDynFunction::factory($name);
+        if (!is_array($args)) {
+            $args = array($args);
+        }
+        foreach ($args as $arg) {
+            $func->add_param($arg);
+        }
+
+
+        $this->transforms[] = $func;
+        return $this;
+    }
+
+    public function set_format($s) {
         $this->format = $s;
         return $this;
     }
-    
-    /**
-     * Get the format of this column
-     * 
-     * @return string
-     */
-    public function getFormat() {
-        return $this->format;
-    }
 
-    public function renderHeaderHtml($export_pdf, $th_class = "", $indent = 0) {
+    public function render_header_html($export_pdf, $th_class = "", $indent = 0) {
 
         $pdf_thead_td_attr = '';
         if ($export_pdf) {
@@ -126,18 +179,20 @@ class CElement_Component_DataTable_Column {
         }
         if ($this->sortable)
             $class .= " sortable";
-        if ($this->hiddenPhone)
+        if ($this->hidden_phone)
             $class .= " hidden-phone";
-        if ($this->hiddenTablet)
+        if ($this->hidden_tablet)
             $class .= " hidden-tablet";
-        if ($this->hiddenDesktop)
+        if ($this->hidden_desktop)
             $class .= " hidden-desktop";
         if ($export_pdf) {
-            $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldName . '" align="center" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
+            $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldname . '" align="center" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
         } else {
-            $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldName . '" data-no-line-break="' . $data_no_line_break . '" data-align="' . $data_align . '" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
+            $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldname . '" data-no-line-break="' . $data_no_line_break . '" data-align="' . $data_align . '" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
         }
         return $html->text();
     }
 
 }
+
+?>
