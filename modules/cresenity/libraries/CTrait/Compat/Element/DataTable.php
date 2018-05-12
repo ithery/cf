@@ -63,4 +63,9 @@ trait CTrait_Compat_Element_DataTable {
         return $this->addRowAction($id);
     }
 
+    
+    public function set_action_style($style) {
+        return $this->setRowActionStyle($style);
+       
+    }
 }

@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTrait_Element_ActionList_Row {
 
+    /**
+     *
+     * @var CElement_List_ActionList
+     */
     protected $rowActionList;
 
     public function rowActionCount() {
@@ -31,6 +35,10 @@ trait CTrait_Element_ActionList_Row {
     public function setRowActionStyle($style) {
         $this->rowActionList->setStyle($style);
         return $this;
+    }
+
+    public function getRowActionStyle() {
+        return $this->rowActionList->getStyle();
     }
 
     public function getRowActionList() {

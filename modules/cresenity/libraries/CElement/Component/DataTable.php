@@ -47,7 +47,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $can_add;
     public $can_delete;
     public $can_view;
-    public $action_style;
     public $header_no_line_break;
     public $export_xml;
     public $export_excel;
@@ -84,9 +83,8 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->data = array();
         $this->key_field = "";
         $this->columns = array();
-        $this->rowActionList = CElement_List_ActionList::factory();
+        $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->rowActionList->set_style('btn-icon-group');
-        $this->action_style = 'btn-icon-group';
         $this->header_action_list = CElement_List_ActionList::factory();
         $this->header_action_style = 'widget-action';
         $this->header_action_list->set_style('widget-action');
@@ -564,11 +562,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public function have_header_action() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->header_action_list->child_count() > 0;
-    }
-
-    public function set_action_style($style) {
-        $this->action_style = $style;
-        return $this->rowActionList->set_style($style);
     }
 
     public function set_header_action_style($style) {
@@ -1436,7 +1429,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 }
                 if ($this->have_action()) {
                     $action_width = 31 * $this->action_count() + 5;
-                    if ($this->action_style == "btn-dropdown") {
+                    if ($this->getRowActionStyle() == "btn-dropdown") {
                         $action_width = 70;
                     }
                     $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $th_class . '">' . clang::__('Actions') . '</th>')->br();
@@ -1571,7 +1564,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     }
 
                     $jsparam["param1"] = $key;
-                    if ($this->action_style == "btn-dropdown") {
+                    if ($this->getRowActionStyle() == "btn-dropdown") {
                         $this->rowActionList->add_class("pull-right");
                     }
                     $this->rowActionList->regenerate_id(true);
@@ -1763,7 +1756,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
         $total_column = count($this->columns);
-        if (count($this->rowActionList->child_count()) > 0) {
+        if ($this->haveRowAction()) {
             $total_column++;
         }
         if ($this->checkbox) {

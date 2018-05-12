@@ -3,6 +3,7 @@
 defined('SYSPATH') OR die('No direct access allowed.');
 
 class CRenderable extends CObject implements CApp_Interface_Renderable {
+
     use CTrait_Compat_Renderable;
 
     protected $renderable;
@@ -13,7 +14,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     protected function __construct($id = "") {
         parent::__construct($id);
 
-        $this->renderable = array();
+        $this->renderable = new CCollection();
 
         $this->additional_js = "";
         $this->visibility = true;
@@ -84,12 +85,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             return '';
         }
         $html = new CStringBuilder();
-        $html->set_indent($indent);
-        $html->inc_indent();
+        $html->setIndent($indent);
+        $html->incIndent();
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
+            if ($r instanceof CRenderable) {
                 if ($r->visibility) {
-                    $html->append($r->html($html->get_indent()));
+                    $html->append($r->html($html->getIndent()));
                 }
             } else {
                 if (is_object($r) || is_array($r)) {
@@ -99,7 +100,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 }
             }
         }
-        $html->dec_indent();
+        $html->decIndent();
         return $html->text();
     }
 
@@ -108,10 +109,10 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             return '';
         }
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
-                $js->append($r->js($js->get_indent()));
+            if ($r instanceof CRenderable) {
+                $js->append($r->js($js->getIndent()));
             }
         }
         $js->append($this->additional_js);

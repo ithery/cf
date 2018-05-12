@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CElement_List_ActionList extends CElement_List {
 
     use CTrait_Compat_Element_ActionList;
-    
+
     public $actions = array();
     protected $style;
     protected $label;
@@ -58,6 +58,10 @@ class CElement_List_ActionList extends CElement_List {
         return $this;
     }
 
+    public function getStyle() {
+        return $this->style;
+    }
+
     public function html($indent = 0) {
         if ($this->id == "test-123") {
             //die($this->style);
@@ -71,7 +75,7 @@ class CElement_List_ActionList extends CElement_List {
             }
         }
 
-        $this->apply('style', $this->style, 'CAction');
+        $this->apply('style', $this->style, 'CElement_Component_Action');
         $html = new CStringBuilder();
         $html->set_indent($indent);
         $classes = $this->classes;

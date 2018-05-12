@@ -613,8 +613,8 @@ class cajax {
                     $jsparam[$k] = $v;
                 }
                 $jsparam["param1"] = $key;
-                if ($table->action_style == "btn-dropdown") {
-                    $table->row_action_list->add_class("pull-right");
+                if ($table->getRowActionStyle() == "btn-dropdown") {
+                    $table->getRowActionList()->add_class("pull-right");
                 }
                 $row_action_list->regenerate_id(true);
                 $row_action_list->apply("jsparam", $jsparam);
