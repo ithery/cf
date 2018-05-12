@@ -13,7 +13,8 @@
  */
 class CElement_FormInput extends CElement_Element {
 
-    use CTrait_Compat_Element_FormInput;
+    use CTrait_Compat_Element_FormInput,
+        CTrait_Element_Transform;
 
     protected $transforms = array();
     protected $name;
