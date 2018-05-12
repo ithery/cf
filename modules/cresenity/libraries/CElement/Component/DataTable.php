@@ -3,7 +3,7 @@
 class CElement_Component_DataTable extends CElement_Component {
 
     use CTrait_Compat_Element_DataTable;
-    
+
     public $default_paging_list = array(
         "10" => "10",
         "25" => "25",
@@ -78,7 +78,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->db_config = $this->db->config();
         $this->display_length = "10";
         $this->paging_list = $this->default_paging_list;
-        $this->options = CTableOptions::factory();
+        $this->options = CElement_Component_DataTable_Options::factory();
         $this->data = array();
         $this->key_field = "";
         $this->columns = array();
