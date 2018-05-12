@@ -157,8 +157,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         parent::regenerate_id();
         if ($recursive) {
             foreach ($this->renderable as $r) {
-                if (CRenderable::is_instanceof($r)) {
-                    $r->regenerate_id($recursive);
+                if ($r instanceof CRenderable) {
+                    $r->regenerateId($recursive);
                 }
             }
         }
@@ -174,7 +174,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     public function toArray() {
         $arrays = array();
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
+            if ($r instanceof CRenderable) {
                 $arrays[] = $r->toarray();
             } else {
                 $arrays[] = $r;

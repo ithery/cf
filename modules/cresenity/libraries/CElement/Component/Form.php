@@ -3,7 +3,7 @@
 class CElement_Component_Form extends CElement_Component {
 
     use CTrait_Compat_Element_Form;
-    
+
     protected $name;
     protected $method;
     protected $autocomplete;
@@ -78,17 +78,24 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function set_action($action) {
+    /**
+     * Set action attribute value of form element
+     * 
+     * @param string $action action attribute of form
+     * @return CElement_Component_Form
+     */
+    public function setAction($action) {
         $this->action = $action;
         return $this;
     }
 
     /**
-     *
-     * @param string $method
-     * @return CForm
+     * Set method attribute value of form element
+     * 
+     * @param string $method POST|GET|PUT|DELETE
+     * @return CElement_Component_Form
      */
-    public function set_method($method) {
+    public function setMethod($method) {
         $this->method = $method;
         return $this;
     }
@@ -113,7 +120,13 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function set_ajax_submit($bool) {
+    /**
+     * Make form to submit through ajax
+     * 
+     * @param string $bool
+     * @return CElement_Component_Form
+     */
+    public function setAjaxSubmit($bool = true) {
         $this->ajax_submit = $bool;
         return $this;
     }
@@ -123,7 +136,7 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function set_ajax_submit_target($target) {
+    public function setAjaxSubmitTarget($target) {
         $this->ajax_submit_target = $target;
         return $this;
     }

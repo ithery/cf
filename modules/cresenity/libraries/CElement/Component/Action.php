@@ -56,7 +56,12 @@ class CElement_Component_Action extends CElement_Component {
         return new CElement_Component_Action($id);
     }
 
-    public function set_confirm($bool) {
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setConfirm($bool = true) {
         $this->confirm = $bool;
         return $this;
     }
@@ -86,7 +91,7 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function set_link($link) {
+    public function setLink($link) {
         $this->type = "link";
         $this->link = $link;
         return $this;

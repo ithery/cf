@@ -39,4 +39,22 @@ trait CTrait_Compat_Element_Action {
         return $this->setSubmit($bool);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use setLink
+     * @param CElement_Component_Action
+     */
+    public function set_link($link) {
+        return $this->setLink($link);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use setConfirm
+     * @param CElement_Component_Action
+     */
+    public function set_confirm($bool) {
+        return $this->setConfirm($bool);
+    }
+
 }

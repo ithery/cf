@@ -9,9 +9,26 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTrait_Element_Property_Label {
 
+    /**
+     * Label of element
+     * 
+     * @var string
+     */
     protected $label;
+
+    /**
+     * Label of element before translation
+     * 
+     * @var string 
+     */
     protected $rawLabel;
 
+    /**
+     * 
+     * @param string $label
+     * @param string $lang
+     * @return $this
+     */
     public function setLabel($label, $lang = true) {
         $this->rawLabel = $label;
         if ($lang) {
@@ -21,10 +38,18 @@ trait CTrait_Element_Property_Label {
         return $this;
     }
 
+    /**
+     * 
+     * @return string
+     */
     public function getLabel() {
         return $this->rawLabel;
     }
 
+    /**
+     * 
+     * @return string
+     */
     public function getTranslationLabel() {
         return $this->label;
     }

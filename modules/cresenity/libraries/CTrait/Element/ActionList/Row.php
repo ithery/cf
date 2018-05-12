@@ -15,6 +15,10 @@ trait CTrait_Element_ActionList_Row {
      */
     protected $rowActionList;
 
+    /**
+     * 
+     * @return int
+     */
     public function rowActionCount() {
         if ($this->rowActionList != null) {
             return $this->rowActionList->childCount();
@@ -22,25 +26,47 @@ trait CTrait_Element_ActionList_Row {
         return 0;
     }
 
+    /**
+     * 
+     * @return bool
+     */
     public function haveRowAction() {
         return $this->rowActionCount() > 0;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Action
+     */
     public function addRowAction($id = "") {
         $row_act = CElement_Factory::createComponent('Action', $id);
         $this->rowActionList->add($row_act);
         return $row_act;
     }
 
+    /**
+     * 
+     * @param string $style
+     * @return $this
+     */
     public function setRowActionStyle($style) {
         $this->rowActionList->setStyle($style);
         return $this;
     }
 
+    /**
+     * 
+     * @return string
+     */
     public function getRowActionStyle() {
         return $this->rowActionList->getStyle();
     }
 
+    /**
+     * 
+     * @return CElement_List_ActionList
+     */
     public function getRowActionList() {
         return $this->rowActionList;
     }
