@@ -9,6 +9,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTrait_Compat_Element_Action {
 
-   
+    /**
+     * @deprecated since version 1.2
+     */
+    public function get_label() {
+        return $this->getLabel();
+    }
+
+    public function set_label($label, $lang = true) {
+        return $this->setLabel($label, $lang);
+    }
 
 }

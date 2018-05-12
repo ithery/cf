@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_Component_Form_Field extends CElement_Component {
 
+    use CTrait_Compat_Element_Form_Field;
+
     protected $group_classes = array();
     protected $group_id = "";
     protected $group_custom_css = array();
