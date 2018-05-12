@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 17, 2018, 1:56:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CElement_Component_Widget extends CElement_Element {
+class CElement_Component_Widget extends CElement_Component {
 
     use CTrait_Compat_Element_Widget;
 

@@ -1,6 +1,6 @@
 <?php
 
-class CElement_Component_Form extends CElement_Element {
+class CElement_Component_Form extends CElement_Component {
 
     use CTrait_Compat_Element_Form;
     
