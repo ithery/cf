@@ -2,9 +2,11 @@
 
 class CElement_Component_DataTable_Column extends CObject {
 
+    use CTrait_Compat_Element_DataTable_Column,
+        CTrait_Element_Property_Label;
+
     public $transforms = array();
     public $fieldname;
-    public $label;
     public $width;
     public $align;
     public $format;
@@ -99,13 +101,6 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
-    public function set_label($text, $lang = true) {
-        if ($lang)
-            $text = clang::__($text);
-        $this->label = $text;
-        return $this;
-    }
-
     public function set_width($w) {
         $this->width = $w;
         return $this;
@@ -114,10 +109,6 @@ class CElement_Component_DataTable_Column extends CObject {
     public function set_align($al) {
         $this->align = $al;
         return $this;
-    }
-
-    public function get_label() {
-        return $this->label;
     }
 
     public function add_transform($name, $args = array()) {
