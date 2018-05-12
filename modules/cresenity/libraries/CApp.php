@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CApp extends CObservable {
 
+    use CTrait_Compat_App;
+
     private $title = "";
     private $content = "";
     private $js = "";
@@ -336,7 +338,13 @@ class CApp extends CObservable {
         
     }
 
-    public function add_breadcrumb($caption, $url) {
+    /**
+     * 
+     * @param string $caption
+     * @param string $url
+     * @return CApp
+     */
+    public function addBreadcrumb($caption, $url) {
         $this->breadcrumb[$caption] = $url;
         return $this;
     }

@@ -704,7 +704,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function set_data_from_query($q) {
+    public function setDataFromQuery($q) {
         if ($this->ajax == false) {
             $db = $this->db;
             $r = $db->query($q);

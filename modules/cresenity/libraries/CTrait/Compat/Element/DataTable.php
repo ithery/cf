@@ -18,4 +18,13 @@ trait CTrait_Compat_Element_DataTable {
         return $this->addColumn($fieldname);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2
+     * @return CElement_Component_DataTable
+     */
+    public function set_data_from_query($q) {
+        return $this->setDataFromQuery($q);
+    }
+
 }
