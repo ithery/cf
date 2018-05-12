@@ -16,8 +16,18 @@ trait CTrait_Compat_Element_Action {
         return $this->getLabel();
     }
 
+    /**
+     * @deprecated since version 1.2
+     */
     public function set_label($label, $lang = true) {
         return $this->setLabel($label, $lang);
+    }
+
+    /**
+     * @deprecated since version 1.2
+     */
+    public function set_icon($ic) {
+        return $this->setIcon($ic);
     }
 
 }

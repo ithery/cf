@@ -10,10 +10,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CElement_Component_Action extends CElement_Component {
 
     use CTrait_Compat_Element_Action,
-        CTrait_Element_Property_Label;
+        CTrait_Element_Property_Label,
+        CTrait_Element_Property_Icon;
 
     protected $jsfunc;
-    protected $icon;
     protected $disabled;
     protected $type;
     protected $link_target;
@@ -54,11 +54,6 @@ class CElement_Component_Action extends CElement_Component {
 
     public static function factory($id = '') {
         return new CElement_Component_Action($id);
-    }
-
-    public function set_icon($ic) {
-        $this->icon = $ic;
-        return $this;
     }
 
     public function set_confirm($bool) {
