@@ -339,8 +339,13 @@ abstract class CObservable extends CRenderable {
         return $span;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Widget
+     */
     public function addWidget($id = "") {
-        $widget = CElement_Component_Widget::factory($id);
+        $widget = CElement_Factory::createComponent('Widget', $id);
         $this->add($widget);
         return $widget;
     }
@@ -351,7 +356,7 @@ abstract class CObservable extends CRenderable {
      * @return CForm
      */
     public function addForm($id = "") {
-        $form = CForm::factory($id);
+        $form = CElement_Factory::createComponent('Form', $id);
         $this->add($form);
         return $form;
     }
