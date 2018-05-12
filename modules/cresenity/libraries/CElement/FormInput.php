@@ -13,6 +13,8 @@
  */
 class CElement_FormInput extends CElement_Element {
 
+    use CTrait_Compat_Element_FormInput;
+
     protected $transforms = array();
     protected $name;
     protected $type;
@@ -89,7 +91,7 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function set_value($val) {
+    public function setValue($val) {
         $this->value = $val;
         return $this;
     }
