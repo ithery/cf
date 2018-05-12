@@ -164,7 +164,7 @@ abstract class CModel_Relation {
      * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationExistenceCountQuery(Builder $query, Builder $parentQuery) {
+    public function getRelationExistenceCountQuery(CModel_Query $query, CModel_Query $parentQuery) {
         return $this->getRelationExistenceQuery(
                         $query, $parentQuery, new Expression('count(*)')
                 )->setBindings([], 'select');

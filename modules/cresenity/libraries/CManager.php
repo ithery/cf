@@ -124,8 +124,8 @@ final class CManager {
     }
 
     public function register_element($type, $class, $code_path = '') {
-        $this->elements[$type] = $class;
-        $this->elements_code[$type] = $code_path;
+        self::$elements[$type] = $class;
+        self::$elements_code[$type] = $code_path;
         if (strlen($code_path) > 0) {
             if (file_exists($code_path)) {
                 include $code_path;

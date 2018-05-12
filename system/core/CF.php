@@ -2118,7 +2118,7 @@ final class CF {
      * @param  mixed  $value
      * @return CCollection
      */
-    function collect($value = null) {
+    public static function collect($value = null) {
         return new CCollection($value);
     }
 
