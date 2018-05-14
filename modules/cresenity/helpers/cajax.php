@@ -10,7 +10,7 @@ class cajax {
         if (!is_array($requires)) {
             $requires = array($requires);
         }
-        
+
         foreach ($requires as $require) {
             if (strlen($require) > 0 && file_exists($require)) {
                 require_once $require;
@@ -19,7 +19,7 @@ class cajax {
         if (is_callable($callable)) {
             return call_user_func($callable, $obj->data);
         }
-        
+
         return false;
     }
 
@@ -358,14 +358,13 @@ class cajax {
         $domain = $obj->data->domain;
         $db = CDatabase::instance($domain);
 
-
         $request = $_GET;
 
         if (strtoupper($table->ajax_method) == "POST") {
             $request = $_POST;
         }
         $columns = $obj->data->columns;
-        $row_action_list = $table->row_action_list;
+        $row_action_list = $table->getRowActionList();
         $key = $obj->data->key_field;
         $base_q = $q;
 
@@ -510,15 +509,8 @@ class cajax {
             $temp_order_by = substr($temp_order_by, 2);
             $temp_order_by = "ORDER BY " . $temp_order_by;
         }
-        //die($temp_order_by);
-        //$temp_order_by=substr($temp_order_by,0,9).$sub[1];
 
         $qfilter .= " " . $temp_order_by . ' ' . $sLimit;
-        //die(substr($temp_order_by,0,9).$sub[1]);
-        //var_dump($db->query('select * from transaction limit 1')->result_array());
-        if (isset($_GET['debug'])) {
-            cdbg::var_dump($qfilter);
-        }
         $r = $db->query($qfilter);
 
         //$filtered_record = $r->count();
@@ -590,9 +582,6 @@ class cajax {
                         $js .= $new_v['js'];
                         $new_v = $new_v['html'];
                     }
-
-
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                 }
                 $class = "";
                 switch ($col->get_align()) {
@@ -605,9 +594,8 @@ class cajax {
                 }
                 $arr[] = $new_v;
             }
-            if (count($row_action_list) > 0) {
+            if ($row_action_list != null) {
                 $html = new CStringBuilder();
-                ;
                 $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
@@ -635,9 +623,6 @@ class cajax {
 
                         $action->set_visibility($visibility);
                     }
-
-
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                 }
 
                 $html->appendln($row_action_list->html($html->get_indent()));

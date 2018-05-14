@@ -5,6 +5,8 @@
  */
 class CObject {
 
+    use CTrait_Compat_Object;
+    
     protected $id;
     protected $valid_prop = array();
     protected $prop = array();
@@ -52,9 +54,7 @@ class CObject {
         $observer->add($this);
     }
 
-    public function regenerate_id() {
-
-        
+    public function regenerateId() {
         $this->id = CObserver::instance()->new_id();
     }
 

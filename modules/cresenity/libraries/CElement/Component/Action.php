@@ -166,7 +166,6 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function html($indent = 0) {
-
         $this->reassign_confirm();
         $html = new CStringBuilder();
         $html->set_indent($indent);
@@ -285,7 +284,7 @@ class CElement_Component_Action extends CElement_Component {
         $this->reassign_confirm();
         $js = new CStringBuilder();
         $js->set_indent($indent);
-
+        
         if ($this->disabled) {
             $js->appendln("jQuery('#" . $this->id . "').click(function(e) { e.preventDefault(); });");
         } else {
@@ -316,8 +315,8 @@ class CElement_Component_Action extends CElement_Component {
         }
 
 
-
         $js->appendln(parent::js($js->get_indent()))->br();
+
         return $js->text();
     }
 

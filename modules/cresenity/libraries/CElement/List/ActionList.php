@@ -118,7 +118,7 @@ class CElement_List_ActionList extends CElement_List {
                 $pretag = '<div class="buttons ' . $classes . '">';
                 break;
             case "btn-dropdown":
-                $pretag = '<div class="btn-group ' . $classes . '">';
+                $pretag = '<div id="' . $this->id . '" class="btn-group ' . $classes . '">';
                 break;
         }
         $html->appendln($pretag)->inc_indent()->br();
