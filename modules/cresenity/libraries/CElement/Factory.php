@@ -61,6 +61,54 @@ class CElement_Factory {
         return new $class($id);
     }
 
+    /**
+     * 
+     * @param string $name
+     * @param string $id optional
+     * @return \CElement_Component
+     * @throws CApp_Exception
+     */
+    public static function createComponent($name, $id = "") {
+        $className = 'CElement_Component_' . $name;
+        if (!class_exists($className)) {
+            throw new CApp_Exception('component [:name] not found', array(':name' => $name));
+        }
+
+        return new $className($id);
+    }
+
+    /**
+     * 
+     * @param string $name
+     * @param string $id optional
+     * @return \CElement_Composite
+     * @throws CApp_Exception
+     */
+    public static function createComposite($name, $id = "") {
+        $className = 'CElement_Composite_' . $name;
+        if (!class_exists($className)) {
+            throw new CApp_Exception('composite element [:name] not found', array(':name' => $name));
+        }
+
+        return new $className($id);
+    }
+
+    /**
+     * 
+     * @param string $name
+     * @param string $id optional
+     * @return \CElement_List
+     * @throws CApp_Exception
+     */
+    public static function createList($name, $id = "") {
+        $className = 'CElement_List_' . $name;
+        if (!class_exists($className)) {
+            throw new CApp_Exception('list element [:name] not found', array(':name' => $name));
+        }
+
+        return new $className($id);
+    }
+
 }
 
 ?>

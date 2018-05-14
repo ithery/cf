@@ -5,6 +5,8 @@
  */
 class CObject {
 
+    use CTrait_Compat_Object;
+    
     protected $id;
     protected $valid_prop = array();
     protected $prop = array();
@@ -27,8 +29,8 @@ class CObject {
         }
 
         // normal __get() code here
-
-        trigger_error('Cannot access private property ' . __CLASS__ . '::$' . $key, E_USER_ERROR);
+        throw new CException('Cannot access private property :class::$:key', array(':class' => __CLASS__, ':key' => $key));
+        //trigger_error(, E_USER_ERROR);
     }
 
     public function __set($key, $value) {
@@ -52,8 +54,7 @@ class CObject {
         $observer->add($this);
     }
 
-    public function regenerate_id() {
-
+    public function regenerateId() {
         $this->id = CObserver::instance()->new_id();
     }
 

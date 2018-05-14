@@ -1,6 +1,7 @@
 <?php
 
 abstract class CObservable extends CRenderable {
+
     use CTrait_Compat_Observable;
 
     protected $listeners;
@@ -128,7 +129,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     public function add_a($id = "") {
         return $this->addA($id);
     }
@@ -257,11 +258,11 @@ abstract class CObservable extends CRenderable {
     /**
      * Add Form Field
      *
-     * @param   string  field id
-     * @return  CFormField  Form Field
+     * @param   string id
+     * @return  CElement_Component_Form_Field  Form Field
      */
-    public function addField($field_id = "") {
-        $field = CFormField::factory($field_id);
+    public function addField($id = "") {
+        $field = CElement_Factory::createComponent('Form_Field', $id);
         $this->add($field);
         return $field;
     }
@@ -272,8 +273,13 @@ abstract class CObservable extends CRenderable {
         return $fieldset;
     }
 
-    public function addTable($table_id = "") {
-        $table = CTable::factory($table_id);
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_DataTable
+     */
+    public function addTable($id = "") {
+        $table = CElement_Factory::createComponent('DataTable', $id);
         $this->add($table);
         return $table;
     }
@@ -338,8 +344,13 @@ abstract class CObservable extends CRenderable {
         return $span;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Widget
+     */
     public function addWidget($id = "") {
-        $widget = CWidget::factory($id);
+        $widget = CElement_Factory::createComponent('Widget', $id);
         $this->add($widget);
         return $widget;
     }
@@ -347,10 +358,10 @@ abstract class CObservable extends CRenderable {
     /**
      * 
      * @param string $id
-     * @return CForm
+     * @return CElement_Component_Form
      */
     public function addForm($id = "") {
-        $form = CForm::factory($id);
+        $form = CElement_Factory::createComponent('Form', $id);
         $this->add($form);
         return $form;
     }
@@ -390,11 +401,17 @@ abstract class CObservable extends CRenderable {
         return $element;
     }
 
+    /**
+     * 
+     * 
+     * @param string $id
+     * @return CElement_List_ActionList
+     */
     public function addActionList($id = "") {
-        $actlist = CActionList::factory($id);
+        $actlist = CElement_Factory::createList('ActionList', $id);
         $this->add($actlist);
-        if ($this instanceof CForm) {
-            $actlist->set_style('form-action');
+        if ($this instanceof CElement_Component_Form) {
+            $actlist->setStyle('form-action');
         }
         return $actlist;
     }
@@ -442,14 +459,16 @@ abstract class CObservable extends CRenderable {
             $js->appendln($listener->js($js->get_indent()));
         }
 
+        
         $js->appendln(parent::js($js->get_indent()))->br();
 
         return $js->text();
     }
 
-    public function regenerate_id($recursive = false) {
+    public function regenerateId($recursive = false) {
         $before_id = $this->id;
-        parent::regenerate_id($recursive);
+        
+        parent::regenerateId($recursive);
         //we change the owner of listener
         foreach ($this->listeners as $listener) {
             if ($listener->owner() == $before_id) {
