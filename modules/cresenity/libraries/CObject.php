@@ -54,6 +54,7 @@ class CObject {
 
     public function regenerate_id() {
 
+        
         $this->id = CObserver::instance()->new_id();
     }
 

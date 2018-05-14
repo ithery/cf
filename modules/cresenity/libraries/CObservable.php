@@ -459,14 +459,16 @@ abstract class CObservable extends CRenderable {
             $js->appendln($listener->js($js->get_indent()));
         }
 
+        
         $js->appendln(parent::js($js->get_indent()))->br();
 
         return $js->text();
     }
 
-    public function regenerate_id($recursive = false) {
+    public function regenerateId($recursive = false) {
         $before_id = $this->id;
-        parent::regenerate_id($recursive);
+        
+        parent::regenerateId($recursive);
         //we change the owner of listener
         foreach ($this->listeners as $listener) {
             if ($listener->owner() == $before_id) {

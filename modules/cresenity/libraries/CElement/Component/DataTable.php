@@ -1835,33 +1835,34 @@ class CElement_Component_DataTable extends CElement_Component {
                         ->appendln("'sAjaxSource': '" . $ajax_url . "',")->br()
                         ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
                         ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
-                                            var data_quick_search = [];
-                                            jQuery('.data_table-quick_search').each(function(){
-                                                if (jQuery(this).val() != '') {
-                                                    var input_name = jQuery(this).attr('name');
-                                                    var cur_transforms = jQuery(this).attr('transforms');
-                                                    data_quick_search.push({'name': input_name, 'value': jQuery(this).val(), 'transforms': cur_transforms});
+                                        var data_quick_search = [];
+                                        jQuery('.data_table-quick_search').each(function(){
+                                            if (jQuery(this).val() != '') {
+                                                var input_name = jQuery(this).attr('name');
+                                                var cur_transforms = jQuery(this).attr('transforms');
+                                                data_quick_search.push({'name': input_name, 'value': jQuery(this).val(), 'transforms': cur_transforms});
+                                            }
+                                        });
+                                        aoData.push({'name': 'dttable_quick_search', 'value': JSON.stringify(data_quick_search)});
+                                        oSettings.jqXHR = $.ajax( {
+                                            'dataType': 'json',
+                                            'type': '" . strtoupper($this->ajax_method) . "',
+                                            'url': sSource,
+                                            'data': aoData,
+                                            'success': function(data) {
+                                                fnCallback(data.datatable);
+                                                if(data.js && data.js.length>0) {
+                                                    var script = $.cresenity.base64.decode(data.js);
+                                                    console.log(script);
+                                                    eval(script);
                                                 }
-                                            });
-                                            aoData.push({'name': 'dttable_quick_search', 'value': JSON.stringify(data_quick_search)});
-                                            oSettings.jqXHR = $.ajax( {
-                                                    'dataType': 'json',
-                                                    'type': '" . strtoupper($this->ajax_method) . "',
-                                                    'url': sSource,
-                                                    'data': aoData,
-                                                    'success': function(data) {
-                                                            fnCallback(data.datatable);
-															if(data.js && data.js.length>0) {
-																var script = $.cresenity.base64.decode(data.js);
-																eval(script);
-															}
 
-                                                    },
-                                                    'error': function(a,b,c) {
-                                                            $.cresenity.message(a);
-                                                    }
-                                            })
-                                        },
+                                            },
+                                            'error': function(a,b,c) {
+                                                $.cresenity.message(a);
+                                            }
+                                        })
+                                    },
                                     ")
                         ->appendln("'fnRowCallback': function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
 						// Bold the grade for all 'A' grade browsers

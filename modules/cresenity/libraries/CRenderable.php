@@ -53,7 +53,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     public function add($renderable) {
-        if (CRenderable::is_instanceof($renderable)) {
+        if ($renderable instanceof CRenderable) {
             $renderable->set_parent($this);
         }
         $this->renderable[] = $renderable;
