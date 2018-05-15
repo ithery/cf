@@ -44,7 +44,7 @@ class CElement_Component_Form_Field extends CElement_Component {
         return new CFormField($id);
     }
 
-    public function toarray() {
+    public function toArray() {
         $data = array();
 
         $control_data = array_merge_recursive($data, parent::toarray());
@@ -217,22 +217,22 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $js->text();
     }
 
-    public function set_style_form_group($style_form_group) {
+    public function setStyleFormGroup($style_form_group) {
         $this->style_form_group = $style_form_group;
         return $this;
     }
 
-    public function set_group_id($id) {
+    public function setGroupId($id) {
         $this->group_id = $id;
         return $this;
     }
 
-    public function add_group_class($class) {
+    public function addGroupClass($class) {
         $this->group_classes[] = $class;
         return $this;
     }
 
-    public function group_custom_css($key, $val) {
+    public function groupCustomCss($key, $val) {
         $this->group_custom_css[$key] = $val;
         return $this;
     }
@@ -244,14 +244,14 @@ class CElement_Component_Form_Field extends CElement_Component {
     //     return $this;
     // }
 
-    public function set_label_size($size) {
+    public function setLabelSize($size) {
         if (in_array($size, array("small", "medium", "large", "none")) || is_numeric($size)) {
             $this->label_size = $size;
         }
         return $this;
     }
 
-    public function set_info_text($info_text) {
+    public function setInfoText($info_text) {
         $this->info_text = $info_text;
         return $this;
     }
@@ -264,36 +264,36 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $this;
     }
 
-    public function show_label() {
+    public function showLabel() {
         $this->show_label = true;
         return $this;
     }
 
-    public function hide_label() {
+    public function hideLabel() {
         $this->show_label = false;
         return $this;
     }
 
-    public function style_form_inline() {
+    public function styleFormInline() {
         $this->style_form_group = "inline";
         return $this;
     }
 
-    public function add_label_class($label_class) {
+    public function addLabelClass($label_class) {
         $this->label_class[] = $label_class;
         return $this;
     }
 
-    public function add_control_class($control_class) {
+    public function addControlClass($control_class) {
         $this->control_class[] = $control_class;
         return $this;
     }
 
-    function get_inline_without_default() {
+    function getInlineWithoutDefault() {
         return $this->inline_without_default;
     }
 
-    function set_inline_without_default($inline_without_default) {
+    function setInlineWithoutDefault($inline_without_default) {
         $this->inline_without_default = $inline_without_default;
         return $this;
     }
