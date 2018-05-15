@@ -101,7 +101,7 @@ trait CTrait_Compat_Element_DataTable {
     }
     
     public function add_footer_action($id = "") {
-        return $this->addFooterAction($id = "");
+        return $this->addFooterAction($id);
     }
     
     private static function export_excelxml_static($filename, $sheet_name = null, $table) {
@@ -117,7 +117,7 @@ trait CTrait_Compat_Element_DataTable {
     }
     
     public function set_title($title, $lang = true) {
-        return $this->setTitle($title, $lang = true);
+        return $this->setTitle($title, $lang);
     }
     
     public function set_dom($dom) {
@@ -149,7 +149,7 @@ trait CTrait_Compat_Element_DataTable {
     }
     
     public function add_footer_field($label, $value, $align = "left", $labelcolspan = 0) {
-        return $this->addFooterField($label, $value, $align = "left", $labelcolspan = 0);
+        return $this->addFooterField($label, $value, $align, $labelcolspan);
     }
     
     public function set_header_no_line_break($bool) {
@@ -189,11 +189,11 @@ trait CTrait_Compat_Element_DataTable {
     }
     
     public function cell_callback_func($func, $require = "") {
-        return $this->cellCallbackFunc($func, $require = "");
+        return $this->cellCallbackFunc($func, $require);
     }
     
     public function filter_action_callback_func($func, $require = "") {
-        return $this->filterActionCallbackFunc($func, $require = "");
+        return $this->filterActionCallbackFunc($func, $require);
     }
     
     public function set_key($fieldname) {
@@ -205,7 +205,7 @@ trait CTrait_Compat_Element_DataTable {
     }
     
     public function add_header_action($id = "") {
-        return $this->addHeaderAction($id = "");
+        return $this->addHeaderAction($id);
     }
     
     public function set_checkbox($bool) {
@@ -269,7 +269,7 @@ trait CTrait_Compat_Element_DataTable {
     }
     
     public function export_excelxml($filename, $sheet_name = null) {
-        return $this->exportExcelxml($filename, $sheet_name = null);
+        return $this->exportExcelxml($filename, $sheet_name);
     }
     
     public function add_report_header($line) {
