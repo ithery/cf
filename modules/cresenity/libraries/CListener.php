@@ -1,9 +1,7 @@
 <?php
 
 class CListener extends CObject {
-    
-    use CTrait_Compat_Listener;
-    
+
     protected $event;
     protected $handlers;
     protected $owner;
@@ -28,17 +26,17 @@ class CListener extends CObject {
         return new CListener($owner, $event);
     }
 
-    public function setConfirm($bool) {
+    public function set_confirm($bool) {
         $this->confirm = $bool;
         return $this;
     }
 
-    public function setNoDouble($bool) {
+    public function set_no_double($bool) {
         $this->no_double = $bool;
         return $this;
     }
 
-    public function setConfirmMessage($message) {
+    public function set_confirm_message($message) {
         $this->confirm_message = $message;
         return $this;
     }
@@ -47,7 +45,7 @@ class CListener extends CObject {
         return $this->owner;
     }
 
-    public function setOwner($owner) {
+    public function set_owner($owner) {
         $this->owner = $owner;
         //we set all handler owner too
         foreach ($this->handlers as $handler) {
@@ -60,7 +58,7 @@ class CListener extends CObject {
         return $this->handlers;
     }
 
-    public function setHandlerUrlParam($param) {
+    public function set_handler_url_param($param) {
 
         foreach ($this->handlers as $handler) {
             $handler->set_url_param($param);
@@ -72,7 +70,7 @@ class CListener extends CObject {
      * @param string $handler_name
      * @return CHandler
      */
-    public function addHandler($handler_name) {
+    public function add_handler($handler_name) {
         $handler = CHandler::factory($this->owner, $this->event, $handler_name);
         $this->handlers[] = $handler;
         return $handler;

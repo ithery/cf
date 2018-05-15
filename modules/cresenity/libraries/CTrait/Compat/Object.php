@@ -18,19 +18,4 @@ trait CTrait_Compat_Object {
         return $this->regenerateId();
     }
 
-    public function add_friend($classname) {
-        return $this->addFriend($classname);
-    }
-    
-    public function set_domain($domain) {
-        return $this->setDomain($domain);
-    }
-    
-    public function class_name() {
-        return $this->className();
-    }
-    
-    static public function is_instanceof($value) {
-        return $this->isInstanceof($value);
-    }
 }
