@@ -48,36 +48,36 @@ class CElement_FormInput extends CElement_Element {
         $this->validation = CFormValidation::factory();
     }
 
-    public function set_submit_onchange($bool) {
+    public function setSubmit_onchange($bool) {
         $this->submit_onchange = $bool;
         return $this;
     }
 
-    public function set_ajax($bool) {
+    public function setAjax($bool) {
         $this->ajax = $bool;
         return $this;
     }
 
-    public function set_disabled($bool) {
+    public function setDisabled($bool) {
         $this->disabled = $bool;
         return $this;
     }
 
-    public function set_size($size) {
+    public function setSize($size) {
         $this->size = $size;
         return $this;
     }
 
-    public function set_readonly($bool) {
+    public function setReadonly($bool) {
         $this->readonly = $bool;
         return $this;
     }
 
-    public function get_field_id() {
+    public function getFieldId() {
         return $this->id;
     }
 
-    public function add_transform($name, $args = array()) {
+    public function addTransform($name, $args = array()) {
         $func = CDynFunction::factory($name);
         if (!is_array($args)) {
             $args = array($args);
@@ -96,54 +96,54 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function set_list($list) {
+    public function setList($list) {
         $this->list = $list;
         return $this;
     }
 
-    public function set_name($val) {
+    public function setName($val) {
         $this->name = $val;
         return $this;
     }
 
-    public function add_validation($name, $value = "") {
+    public function addValidation($name, $value = "") {
         if (strlen($value) == 0)
             $value = $name;
         $this->validation->add_validation($name, $value);
         return $this;
     }
 
-    public function set_type($type) {
+    public function setType($type) {
         $this->type = $type;
         return $this;
     }
 
-    public function set_on_text($text) {
+    public function setOnText($text) {
         $this->on_text = $text;
         return $this;
     }
 
-    public function set_off_text($text) {
+    public function setOffText($text) {
         $this->off_text = $text;
         return $this;
     }
 
-    public function set_checked($bool) {
+    public function setChecked($bool) {
         $this->checked = $bool;
         return $this;
     }
 
-    public function show_updown() {
+    public function showUpdown() {
         $this->showupdown = true;
         return $this;
     }
 
-    public function hide_updown() {
+    public function hideUpdown() {
         $this->showupdown = false;
         return $this;
     }
 
-    public function toarray() {
+    public function toArray() {
         $data = array();
         if ($this->disabled) {
             $data['attr']['disabled'] = "disabled";
@@ -180,7 +180,7 @@ class CElement_FormInput extends CElement_Element {
         return $js;
     }
 
-    protected function html_attr() {
+    protected function htmlAttr() {
         $htmlAttr = parent::html_attr();
         $nameAttr = ' name="' . $this->name . '"';
         return $htmlAttr . $nameAttr;
