@@ -53,7 +53,7 @@ trait CTrait_Compat_Element_FormInput {
     }
     
     public function add_validation($name, $value = "") {
-        return $this->setValidation($name, $value);
+        return $this->addValidation($name, $value);
     }
     
     public function set_type($type) {
