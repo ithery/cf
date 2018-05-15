@@ -44,74 +44,74 @@ class CElement_Component_DataTable_Column extends CObject {
         return new CElement_Component_DataTable_Column($fieldname);
     }
 
-    public function get_fieldname() {
+    public function getFieldname() {
         return $this->fieldname;
     }
 
-    public function get_align() {
+    public function getAlign() {
         return $this->align;
     }
 
-    public function set_hidden_phone($bool) {
+    public function setHiddenPhone($bool) {
         $this->hidden_phone = $bool;
         return $this;
     }
 
-    public function set_hidden_tablet($bool) {
+    public function setHiddenTablet($bool) {
         $this->hidden_tablet = $bool;
         return $this;
     }
 
-    public function set_hidden_desktop($bool) {
+    public function setHiddenDesktop($bool) {
         $this->hidden_desktop = $bool;
         return $this;
     }
 
-    public function set_input_type($type) {
+    public function setInputType($type) {
         $this->input_type = $type;
         return $this;
     }
 
-    public function get_no_line_break() {
+    public function getNoLineBreak() {
         return $this->no_line_break;
     }
 
-    public function set_no_line_break($bool) {
+    public function setNoLineBreak($bool) {
         $this->no_line_break = $bool;
         return $this;
     }
 
-    public function set_visible($bool) {
+    public function setVisible($bool) {
         $this->visible = $bool;
         return $this;
     }
 
-    public function set_sortable($bool) {
+    public function setSortable($bool) {
         $this->sortable = $bool;
         return $this;
     }
 
-    public function set_searchable($bool) {
+    public function setSearchable($bool) {
         $this->searchable = $bool;
         return $this;
     }
 
-    public function set_editable($bool) {
+    public function setEditable($bool) {
         $this->editable = $bool;
         return $this;
     }
 
-    public function set_width($w) {
+    public function setWidth($w) {
         $this->width = $w;
         return $this;
     }
 
-    public function set_align($al) {
+    public function setAlign($al) {
         $this->align = $al;
         return $this;
     }
 
-    public function add_transform($name, $args = array()) {
+    public function addTransform($name, $args = array()) {
         $func = CDynFunction::factory($name);
         if (!is_array($args)) {
             $args = array($args);
@@ -125,12 +125,12 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
-    public function set_format($s) {
+    public function setFormat($s) {
         $this->format = $s;
         return $this;
     }
 
-    public function render_header_html($export_pdf, $th_class = "", $indent = 0) {
+    public function renderHeaderHtml($export_pdf, $th_class = "", $indent = 0) {
 
         $pdf_thead_td_attr = '';
         if ($export_pdf) {
@@ -186,4 +186,3 @@ class CElement_Component_DataTable_Column extends CObject {
 
 }
 
-?>
