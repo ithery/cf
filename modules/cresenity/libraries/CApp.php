@@ -906,6 +906,7 @@ class CApp extends CObservable {
         $variables['thousand_separator'] = ccfg::get('thousand_separator') == null ? ',' : ccfg::get('thousand_separator');
         $variables['decimal_digit'] = ccfg::get('decimal_digit') == null ? '0' : ccfg::get('decimal_digit');
         $variables['have_clock'] = ccfg::get('have_clock') == null ? false : ccfg::get('have_clock');
+        $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') == null ? true : ccfg::get('have_scroll_to_top');
 
         $bootstrap = ccfg::get('bootstrap');
         $theme_data = CManager::instance()->get_theme_data();

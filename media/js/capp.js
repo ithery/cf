@@ -72,8 +72,9 @@ var scrolltotop = {
         })
     }
 }
-
-scrolltotop.init();
+if(typeof window.capp.have_scroll_to_top !='undefined' && window.capp.have_scroll_to_top) {
+    scrolltotop.init();
+}
 jQuery(document).on('click', 'a.confirm', function (e) {
     var ahref = $(this).attr('href');
     var message = $(this).attr('data-confirm-message');
