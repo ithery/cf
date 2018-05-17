@@ -2,6 +2,8 @@
 
 class CFormInputSelectSearch extends CFormInput {
 
+    use CTrait_Compat_FormInputSelectSearch;
+    
     protected $query;
     protected $format_selection;
     protected $format_result;
@@ -35,57 +37,57 @@ class CFormInputSelectSearch extends CFormInput {
         return new CFormInputSelectSearch($id);
     }
 
-    public function set_multiple($bool) {
+    public function setMultiple($bool) {
         $this->multiple = $bool;
         return $this;
     }
 
-    public function set_delay($val) {
+    public function setDelay($val) {
         $this->delay = $val;
         return $this;
     }
 
-    public function set_auto_select($bool) {
+    public function setAutoSelect($bool) {
         $this->auto_select = $bool;
         return $this;
     }
 
-    public function set_min_input_length($min_input_length) {
+    public function setMinInputLength($min_input_length) {
         $this->min_input_length = $min_input_length;
         return $this;
     }
 
-    public function set_key_field($key_field) {
+    public function setKeyField($key_field) {
         $this->key_field = $key_field;
         return $this;
     }
 
-    public function set_search_field($search_field) {
+    public function setSearchField($search_field) {
         $this->search_field = $search_field;
         return $this;
     }
 
-    public function set_query($query) {
+    public function setQuery($query) {
         $this->query = $query;
         return $this;
     }
 
-    public function set_format_result($fmt) {
+    public function setFormatResult($fmt) {
         $this->format_result = $fmt;
         return $this;
     }
 
-    public function set_format_selection($fmt) {
+    public function setFormatSelection($fmt) {
         $this->format_selection = $fmt;
         return $this;
     }
 
-    public function set_placeholder($placeholder) {
+    public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
         return $this;
     }
 
-    public function add_dropdown_class($c) {
+    public function addDropdownClass($c) {
         if (is_array($c)) {
             $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
         } else {
@@ -171,7 +173,7 @@ class CFormInputSelectSearch extends CFormInput {
         return $html->text();
     }
 
-    public function create_ajax_url() {
+    public function createAjaxUrl() {
         return CAjaxMethod::factory()
                         ->set_type('searchselect')
                         ->set_data('query', $this->query)

@@ -2,6 +2,8 @@
 
 class CAjaxMethod {
 
+    use CTrait_Compat_AjaxMethod;
+    
     public $name = "";
     public $method = "GET";
     public $data = array();
@@ -17,22 +19,22 @@ class CAjaxMethod {
         return new CAjaxMethod();
     }
 
-    public function set_data($key, $data) {
+    public function setData($key, $data) {
         $this->data[$key] = $data;
         return $this;
     }
 
-    public function set_type($type) {
+    public function setType($type) {
         $this->type = $type;
         return $this;
     }
 
-    public function set_method($method) {
+    public function setMethod($method) {
         $this->method = $method;
         return $this;
     }
 
-    public function makeurl($indent = 0) {
+    public function makeUrl($indent = 0) {
         $js = CStringBuilder::factory()->set_indent($indent);
         //generate ajax_method
         //save this object to file.

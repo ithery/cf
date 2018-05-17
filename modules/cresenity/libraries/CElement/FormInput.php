@@ -48,7 +48,7 @@ class CElement_FormInput extends CElement_Element {
         $this->validation = CFormValidation::factory();
     }
 
-    public function setSubmit_onchange($bool) {
+    public function setSubmitOnchange($bool) {
         $this->submit_onchange = $bool;
         return $this;
     }
