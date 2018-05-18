@@ -26,3 +26,5 @@ application/*
 *.iml
 composer.json
 sftp-config*.json
+.well-known
+.well-known/*
