@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CRenderable extends CObject implements CApp_Interface_Renderable {
 
+    use CTrait_Compat_Renderable;
+
     protected $renderable;
     protected $additional_js;
     protected $visibility;
@@ -12,14 +14,14 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     protected function __construct($id = "") {
         parent::__construct($id);
 
-        $this->renderable = array();
+        $this->renderable = new CCollection();
 
         $this->additional_js = "";
         $this->visibility = true;
         $this->parent = null;
     }
 
-    public function child_count() {
+    public function childCount() {
         return count($this->renderable);
     }
 
@@ -27,12 +29,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $this->renderable;
     }
 
-    public function set_parent($parent) {
+    public function setParent($parent) {
         $this->parent = $parent;
         return $this;
     }
 
-    public function set_visibility($bool) {
+    public function setVisibility($bool) {
         $this->visibility = $bool;
     }
 
@@ -51,14 +53,14 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     public function add($renderable) {
-        if (CRenderable::is_instanceof($renderable)) {
+        if ($renderable instanceof CRenderable) {
             $renderable->set_parent($this);
         }
         $this->renderable[] = $renderable;
         return $this;
     }
 
-    public function add_js($js) {
+    public function addJs($js) {
         $this->additional_js .= $js;
         return $this;
     }
@@ -83,12 +85,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             return '';
         }
         $html = new CStringBuilder();
-        $html->set_indent($indent);
-        $html->inc_indent();
+        $html->setIndent($indent);
+        $html->incIndent();
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
+            if ($r instanceof CRenderable) {
                 if ($r->visibility) {
-                    $html->append($r->html($html->get_indent()));
+                    $html->append($r->html($html->getIndent()));
                 }
             } else {
                 if (is_object($r) || is_array($r)) {
@@ -98,7 +100,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 }
             }
         }
-        $html->dec_indent();
+        $html->decIndent();
         return $html->text();
     }
 
@@ -107,10 +109,10 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             return '';
         }
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
-                $js->append($r->js($js->get_indent()));
+            if ($r instanceof CRenderable) {
+                $js->append($r->js($js->getIndent()));
             }
         }
         $js->append($this->additional_js);
@@ -151,28 +153,28 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return cjson::encode($data);
     }
 
-    public function regenerate_id($recursive = false) {
-        parent::regenerate_id();
+    public function regenerateId($recursive = false) {
+        parent::regenerateId();
         if ($recursive) {
             foreach ($this->renderable as $r) {
-                if (CRenderable::is_instanceof($r)) {
-                    $r->regenerate_id($recursive);
+                if ($r instanceof CRenderable) {
+                    $r->regenerateId($recursive);
                 }
             }
         }
     }
 
-    public static function is_instanceof($value) {
+    public static function isInstanceof($value) {
         if (is_object($value)) {
             return ($value instanceof CRenderable);
         }
         return false;
     }
 
-    public function toarray() {
+    public function toArray() {
         $arrays = array();
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
+            if ($r instanceof CRenderable) {
                 $arrays[] = $r->toarray();
             } else {
                 $arrays[] = $r;

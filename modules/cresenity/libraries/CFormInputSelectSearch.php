@@ -1,242 +1,240 @@
 <?php
 
-    class CFormInputSelectSearch extends CFormInput {
+class CFormInputSelectSearch extends CFormInput {
 
-        protected $query;
-        protected $format_selection;
-        protected $format_result;
-        protected $key_field;
-        protected $search_field;
-        protected $multiple;
-        protected $placeholder;
-        protected $auto_select;
-        protected $min_input_length;
-        protected $dropdown_classes;
-        protected $delay;
+    protected $query;
+    protected $format_selection;
+    protected $format_result;
+    protected $key_field;
+    protected $search_field;
+    protected $multiple;
+    protected $placeholder;
+    protected $auto_select;
+    protected $min_input_length;
+    protected $dropdown_classes;
+    protected $delay;
 
-        public function __construct($id) {
-            parent::__construct($id);
+    public function __construct($id) {
+        parent::__construct($id);
 
-            $this->dropdown_classes = array();
-            $this->type = "selectsearch";
-            $this->query = "";
-            $this->format_selection = "";
-            $this->format_result = "";
-            $this->key_field = "";
-            $this->search_field = "";
-            $this->placeholder = "Search for a item";
-            $this->multiple = false;
-            $this->auto_select = false;
-            $this->min_input_length = 0;
-            $this->delay = 100;
-        }
+        $this->dropdown_classes = array();
+        $this->type = "selectsearch";
+        $this->query = "";
+        $this->format_selection = "";
+        $this->format_result = "";
+        $this->key_field = "";
+        $this->search_field = "";
+        $this->placeholder = "Search for a item";
+        $this->multiple = false;
+        $this->auto_select = false;
+        $this->min_input_length = 0;
+        $this->delay = 100;
+    }
 
-        public static function factory($id) {
-            return new CFormInputSelectSearch($id);
-        }
+    public static function factory($id) {
+        return new CFormInputSelectSearch($id);
+    }
 
-        public function set_multiple($bool) {
-            $this->multiple = $bool;
-            return $this;
-        }
-        
-        public function set_delay($val) {
-            $this->delay = $val;
-            return $this;
-        }
+    public function set_multiple($bool) {
+        $this->multiple = $bool;
+        return $this;
+    }
 
-        public function set_auto_select($bool) {
-            $this->auto_select = $bool;
-            return $this;
-        }
+    public function set_delay($val) {
+        $this->delay = $val;
+        return $this;
+    }
 
-        public function set_min_input_length($min_input_length) {
-            $this->min_input_length = $min_input_length;
-            return $this;
-        }
+    public function set_auto_select($bool) {
+        $this->auto_select = $bool;
+        return $this;
+    }
 
-        public function set_key_field($key_field) {
-            $this->key_field = $key_field;
-            return $this;
-        }
+    public function set_min_input_length($min_input_length) {
+        $this->min_input_length = $min_input_length;
+        return $this;
+    }
 
-        public function set_search_field($search_field) {
-            $this->search_field = $search_field;
-            return $this;
-        }
+    public function set_key_field($key_field) {
+        $this->key_field = $key_field;
+        return $this;
+    }
 
-        public function set_query($query) {
-            $this->query = $query;
-            return $this;
-        }
+    public function set_search_field($search_field) {
+        $this->search_field = $search_field;
+        return $this;
+    }
 
-        public function set_format_result($fmt) {
-            $this->format_result = $fmt;
-            return $this;
-        }
+    public function set_query($query) {
+        $this->query = $query;
+        return $this;
+    }
 
-        public function set_format_selection($fmt) {
-            $this->format_selection = $fmt;
-            return $this;
-        }
+    public function set_format_result($fmt) {
+        $this->format_result = $fmt;
+        return $this;
+    }
 
-        public function set_placeholder($placeholder) {
-            $this->placeholder = $placeholder;
-            return $this;
-        }
+    public function set_format_selection($fmt) {
+        $this->format_selection = $fmt;
+        return $this;
+    }
 
-        public function add_dropdown_class($c) {
-            if (is_array($c)) {
-                $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
+    public function set_placeholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
+
+    public function add_dropdown_class($c) {
+        if (is_array($c)) {
+            $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
+        } else {
+            if ($this->bootstrap == '3.3') {
+                $c = str_replace('span', 'col-md-', $c);
+                $c = str_replace('row-fluid', 'row', $c);
             }
-            else {
-                if ($this->bootstrap == '3.3') {
-                    $c = str_replace('span', 'col-md-', $c);
-                    $c = str_replace('row-fluid', 'row', $c);
-                }
-                $this->dropdown_classes[] = $c;
-            }
-            return $this;
+            $this->dropdown_classes[] = $c;
+        }
+        return $this;
+    }
+
+    public function html($indent = 0) {
+        $html = new CStringBuilder();
+        $custom_css = $this->custom_css;
+        $custom_css = crenderer::render_style($custom_css);
+        $disabled = "";
+        if ($this->disabled) {
+            $disabled = ' disabled="disabled"';
+        }
+        $multiple = "";
+        if ($this->multiple) {
+            $multiple = ' multiple="multiple"';
+        }
+        if (strlen($custom_css) > 0) {
+            $custom_css = ' style="' . $custom_css . '"';
         }
 
-        public function html($indent = 0) {
-            $html = new CStringBuilder();
-            $custom_css = $this->custom_css;
-            $custom_css = crenderer::render_style($custom_css);
-            $disabled = "";
-            if ($this->disabled) {
-                $disabled = ' disabled="disabled"';
-            }
-            $multiple = "";
-            if ($this->multiple) {
-                $multiple = ' multiple="multiple"';
-            }
-            if (strlen($custom_css) > 0) {
-                $custom_css = ' style="' . $custom_css . '"';
-            }
+        $classes = $this->classes;
+        $classes = implode(" ", $classes);
+        if (strlen($classes) > 0)
+            $classes = " " . $classes;
+        if ($this->bootstrap >= '3') {
+            $classes = $classes . " form-control ";
+        }
+        $html->set_indent($indent);
+        $value = $this->value;
+        if ($this->auto_select) {
+            $db = CDatabase::instance();
+            $rjson = 'false';
 
-            $classes = $this->classes;
-            $classes = implode(" ", $classes);
-            if (strlen($classes) > 0) $classes = " " . $classes;
-            if ($this->bootstrap >= '3') {
-                $classes = $classes . " form-control ";
-            }
-            $html->set_indent($indent);
+            $q = "select `" . $this->key_field . "` from (" . $this->query . ") as a limit 1";
+            $value = cdbutils::get_value($q);
+        }
+        if (strlen($this->value) > 0) {
             $value = $this->value;
-            if ($this->auto_select) {
+        }
+
+        if ($this->select2 >= '4') {
+            $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . '">');
+
+            // select2 4.0 using option to set default value
+            if (strlen($this->value) > 0 || $this->auto_select) {
                 $db = CDatabase::instance();
                 $rjson = 'false';
 
-                $q = "select `" . $this->key_field . "` from (" . $this->query . ") as a limit 1";
-                $value = cdbutils::get_value($q);
-            }
-            if (strlen($this->value) > 0) {
-                $value = $this->value;
-            }
-
-            if ($this->select2 >= '4') {
-                $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' .$disabled .$custom_css . $multiple . '">');
-                
-                // select2 4.0 using option to set default value
-                if (strlen($this->value) > 0 || $this->auto_select) {
-                    $db = CDatabase::instance();
-                    $rjson = 'false';
-
-                    if ($this->auto_select) {
-                        $q = "select * from (" . $this->query . ") as a limit 1";
-                    }
-                    else {
-                        $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
-                    }
-                    $r = $db->query($q)->result_array(false);
-                    if (count($r) > 0) {
-                        $r = $r[0];
-                        $str_selection = $this->format_selection;
-                        $str_selection = str_replace("'", "\'", $str_selection);
-                        preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
-
-                        foreach ($matches as $val) {
-                            $str = $val[1]; //matches str without bracket {}
-                            $b_str = $val[0]; //matches str with bracket {}
-                            $str_selection = str_replace($b_str, $r[$str], $str_selection);
-                        }
-                        
-                        $html->appendln('<option value="' .$this->value .'">' .$str_selection .'</option>');
-                    }
+                if ($this->auto_select) {
+                    $q = "select * from (" . $this->query . ") as a limit 1";
+                } else {
+                    $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
                 }
-                $html->appendln('</select>');
-                $html->br();
-            }
-            else {
-                $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '>')->br();
-            }
-            return $html->text();
-        }
-
-        public function create_ajax_url() {
-            return CAjaxMethod::factory()
-                            ->set_type('searchselect')
-                            ->set_data('query', $this->query)
-                            ->set_data('key_field', $this->key_field)
-                            ->set_data('search_field', $this->search_field)
-                            ->makeurl();
-        }
-
-        public function js($indent = 0) {
-            $ajax_url = $this->create_ajax_url();
-
-            $str_selection = $this->format_selection;
-            $str_result = $this->format_result;
-            $str_selection = str_replace("'", "\'", $str_selection);
-            $str_result = str_replace("'", "\'", $str_result);
-            preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
-
-            foreach ($matches as $val) {
-                $thousand_separator_pre = '';
-                $thousand_separator_post = '';
-                $str = $val[1]; //matches str without bracket {}
-                $b_str = $val[0]; //matches str with bracket {}
-                $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
-            }
-
-            preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
-            foreach ($matches as $val) {
-                $thousand_separator_pre = '';
-                $thousand_separator_post = '';
-                $str = $val[1]; //matches str without bracket {}
-                $b_str = $val[0]; //matches str with bracket {}
-                $str_result = str_replace($b_str, "'+item." . $str . "+'", $str_result);
-            }
-            if (strlen($str_result) == 0) {
-                $str_result = "'+item." . $this->search_field . "+'";
-            }
-            if (strlen($str_selection) == 0) {
-                $str_selection = "'+item." . $this->search_field . "+'";
-            }
-
-            $placeholder = "Search for a item";
-            if (strlen($this->placeholder) > 0) {
-                $placeholder = $this->placeholder;
-            }
-            $str_js_change = "";
-            if ($this->submit_onchange) {
-                $str_js_change = "$(this).closest('form').submit();";
-            }
-
-            $str_js_init = "";
-            if ($this->auto_select) {
-                $db = CDatabase::instance();
-                $rjson = 'false';
-
-                $q = "select * from (" . $this->query . ") as a limit 1";
                 $r = $db->query($q)->result_array(false);
                 if (count($r) > 0) {
                     $r = $r[0];
+                    $str_selection = $this->format_selection;
+                    $str_selection = str_replace("'", "\'", $str_selection);
+                    preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+
+                    foreach ($matches as $val) {
+                        $str = $val[1]; //matches str without bracket {}
+                        $b_str = $val[0]; //matches str with bracket {}
+                        $str_selection = str_replace($b_str, $r[$str], $str_selection);
+                    }
+
+                    $html->appendln('<option value="' . $this->value . '">' . $str_selection . '</option>');
                 }
-                $rjson = json_encode($r);
+            }
+            $html->appendln('</select>');
+            $html->br();
+        } else {
+            $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '>')->br();
+        }
+        return $html->text();
+    }
+
+    public function create_ajax_url() {
+        return CAjaxMethod::factory()
+                        ->set_type('searchselect')
+                        ->set_data('query', $this->query)
+                        ->set_data('key_field', $this->key_field)
+                        ->set_data('search_field', $this->search_field)
+                        ->makeurl();
+    }
+
+    public function js($indent = 0) {
+        $ajax_url = $this->create_ajax_url();
+
+        $str_selection = $this->format_selection;
+        $str_result = $this->format_result;
+        $str_selection = str_replace("'", "\'", $str_selection);
+        $str_result = str_replace("'", "\'", $str_result);
+        preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $val) {
+            $thousand_separator_pre = '';
+            $thousand_separator_post = '';
+            $str = $val[1]; //matches str without bracket {}
+            $b_str = $val[0]; //matches str with bracket {}
+            $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
+        }
+
+        preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
+        foreach ($matches as $val) {
+            $thousand_separator_pre = '';
+            $thousand_separator_post = '';
+            $str = $val[1]; //matches str without bracket {}
+            $b_str = $val[0]; //matches str with bracket {}
+            $str_result = str_replace($b_str, "'+item." . $str . "+'", $str_result);
+        }
+        if (strlen($str_result) == 0) {
+            $str_result = "'+item." . $this->search_field . "+'";
+        }
+        if (strlen($str_selection) == 0) {
+            $str_selection = "'+item." . $this->search_field . "+'";
+        }
+
+        $placeholder = "Search for a item";
+        if (strlen($this->placeholder) > 0) {
+            $placeholder = $this->placeholder;
+        }
+        $str_js_change = "";
+        if ($this->submit_onchange) {
+            $str_js_change = "$(this).closest('form').submit();";
+        }
+
+        $str_js_init = "";
+        if ($this->auto_select) {
+            $db = CDatabase::instance();
+            $rjson = 'false';
+
+            $q = "select * from (" . $this->query . ") as a limit 1";
+            $r = $db->query($q)->result_array(false);
+            if (count($r) > 0) {
+                $r = $r[0];
+            }
+            $rjson = json_encode($r);
 
 
-                $str_js_init = "
+            $str_js_init = "
 				initSelection : function (element, callback) {
 					
 				var data = " . $rjson . ";
@@ -244,23 +242,23 @@
 				callback(data);
 			},
 			";
-            }
-            
-            if ($this->select2 >= '4') {
-                // change concept, using select at function html()
-            }
-            else {
-                if (strlen($this->value) > 0) {
+        }
 
-                    $db = CDatabase::instance();
-                    $rjson = 'false';
+        if ($this->select2 >= '4') {
+            // change concept, using select at function html()
+        } else {
+            if (strlen($this->value) > 0) {
 
-                    $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
-                    $r = $db->query($q)->result_array(false);
-                    if (count($r) > 0) $r = $r[0];
-                    $rjson = json_encode($r);
+                $db = CDatabase::instance();
+                $rjson = 'false';
 
-                    $str_js_init = "
+                $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
+                $r = $db->query($q)->result_array(false);
+                if (count($r) > 0)
+                    $r = $r[0];
+                $rjson = json_encode($r);
+
+                $str_js_init = "
                                 initSelection : function (element, callback) {
 
                                 var data = " . $rjson . ";
@@ -268,27 +266,28 @@
                                 callback(data);
                         },
                         ";
-                }
             }
-            
+        }
 
-            $str_multiple = "";
-            if ($this->multiple) $str_multiple = " multiple:'true',";
-            $classes = $this->classes;
-            $classes = implode(" ", $classes);
-            if (strlen($classes) > 0) {
-                $classes = " " . $classes;
-            }
-            if ($this->bootstrap == '3.3') {
-                $classes = $classes . " form-control ";
-            }
-            $dropdown_classes = $this->dropdown_classes;
-            $dropdown_classes = implode(" ", $dropdown_classes);
-            if (strlen($dropdown_classes) > 0) {
-                $dropdown_classes = " " . $dropdown_classes;
-            }
-            if ($this->select2 >= '4') {
-                $str = "
+
+        $str_multiple = "";
+        if ($this->multiple)
+            $str_multiple = " multiple:'true',";
+        $classes = $this->classes;
+        $classes = implode(" ", $classes);
+        if (strlen($classes) > 0) {
+            $classes = " " . $classes;
+        }
+        if ($this->bootstrap == '3.3') {
+            $classes = $classes . " form-control ";
+        }
+        $dropdown_classes = $this->dropdown_classes;
+        $dropdown_classes = implode(" ", $dropdown_classes);
+        if (strlen($dropdown_classes) > 0) {
+            $dropdown_classes = " " . $dropdown_classes;
+        }
+        if ($this->select2 >= '4') {
+            $str = "
                     $('#" . $this->id . "').select2({
                         width: '100%',
                         placeholder: '" . $placeholder . "',
@@ -296,8 +295,8 @@
                         ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
                                 url: '" . $ajax_url . "',
                                 dataType: 'jsonp',
-                                quietMillis: ".$this->delay.", 
-                                delay: ".$this->delay.", 
+                                quietMillis: " . $this->delay . ", 
+                                delay: " . $this->delay . ", 
                                 " . $str_multiple . "
                                 data: function (params) {
                                     return {
@@ -345,16 +344,15 @@
                     ";
 //                var_dump($str);
 //                die();
-            }
-            else {
-                $str = "
+        } else {
+            $str = "
 			$('#" . $this->id . "').select2({
 				placeholder: '" . $placeholder . "',
 				minimumInputLength: '" . $this->min_input_length . "',
 				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 					url: '" . $ajax_url . "',
-                                        quietMillis: ".$this->delay.", 
-                                        delay: ".$this->delay.", 
+                                        quietMillis: " . $this->delay . ", 
+                                        delay: " . $this->delay . ", 
 					dataType: 'jsonp',
 					" . $str_multiple . "
 					data: function (term, page) {
@@ -387,20 +385,19 @@
 			});
 	
                 ";
-            }
-
-            $js = new CStringBuilder();
-            $js->append(parent::js($indent))->br();
-            $js->set_indent($indent);
-            //echo $str;
-            $js->append($str)->br();
-
-
-
-
-
-            return $js->text();
         }
 
+        $js = new CStringBuilder();
+        $js->append(parent::js($indent))->br();
+        $js->set_indent($indent);
+        //echo $str;
+        $js->append($str)->br();
+
+
+
+
+
+        return $js->text();
     }
-    
+
+}

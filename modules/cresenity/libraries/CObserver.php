@@ -24,8 +24,6 @@ class CObserver {
     }
 
     public function new_id() {
-        //$this->autoid++;
-        //return md5("capp_autoid_".$this->autoid.date("YmdHis"));
         $uniqid = uniqid(time(), true);
         $uniqid = str_replace(".", "", $uniqid);
         return $uniqid;

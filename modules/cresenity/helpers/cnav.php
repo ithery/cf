@@ -361,7 +361,7 @@ class cnav {
         $is_admin = CApp::instance()->is_admin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
-
+        
         if ($navs == null)
             return false;
         $html = "";
@@ -448,7 +448,14 @@ class cnav {
                     if ($level == 0) {
                         $caret = '<b class="caret">';
                     }
-                    $elem = '<a class="' . $active_class . ' dropdown-toggle " href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
+                    if (isset($d["name"]) && strlen($d["name"]) > 0) {
+                        $notif = carr::get($data_notif, $d["name"]);
+                    }
+                    $strNotif = '';
+                    if ($notif != null && $notif > 0) {
+                        $strNotif = '<span style="color:#f00">&nbsp;(' . $notif . ')</span>';
+                    }
+                    $elem = '<a class="' . $active_class . ' dropdown-toggle " href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>' . $strNotif . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -464,7 +471,7 @@ class cnav {
                     }
                     $strNotif = '';
                     if ($notif != null && $notif > 0) {
-                        $strNotif = '<label style="color:#f00">&nbsp;(' . $notif . ')<label>';
+                        $strNotif = '<label style="color:#f00">&nbsp;(' . $notif . ')</label>';
                     }
                     $elem = '<a class="' . $active_class . '" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
                 }

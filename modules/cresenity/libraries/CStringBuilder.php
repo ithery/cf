@@ -1,6 +1,13 @@
 <?php
 
+/**
+ * @author Hery Kurniawan
+ * @since Feb 17, 2018, 2:16:00 AM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 class CStringBuilder {
+
+    use CTrait_Compat_StringBuilder;
 
     private $text = "";
     private $indent = 0;
@@ -13,37 +20,60 @@ class CStringBuilder {
         return new CStringBuilder();
     }
 
-    public function set_indent($ind) {
+    /**
+     * Set indentation of string
+     * 
+     * @param int $ind
+     * @return $this
+     */
+    public function setIndent($ind) {
         $this->indent = $ind;
         return $this;
     }
 
-    public function get_indent() {
+    /**
+     * Get indentation of string
+     * 
+     * @return int
+     */
+    public function getIndent() {
         return $this->indent;
     }
 
-    public function inc_indent($n = 1) {
-        $this->indent+=$n;
+    /**
+     * Increment the indentation
+     * 
+     * @param int $n
+     * @return $this
+     */
+    public function incIndent($n = 1) {
+        $this->indent += $n;
         return $this;
     }
 
-    public function dec_indent($n = 1) {
-        $this->indent-=$n;
+    /**
+     * Decrement the indentation
+     * 
+     * @param int $n
+     * @return $this
+     */
+    public function decIndent($n = 1) {
+        $this->indent -= $n;
         return $this;
     }
 
     public function append($str) {
-        $this->text.=$str;
+        $this->text .= $str;
         return $this;
     }
 
     public function appendln($str) {
-        $this->text.= cutils::indent($this->indent);
+        $this->text .= cutils::indent($this->indent);
         return $this->append($str);
     }
 
     public function br() {
-        $this->text.= "\r\n";
+        $this->text .= "\r\n";
         return $this;
     }
 

@@ -65,7 +65,7 @@ class CTemplate extends CView {
      */
     public function render($print = FALSE, $renderer = FALSE) {
         if (empty($this->filename)) {
-            throw new CException('The requested view, :view_name, could not be found', array(':view_name' => $this->filename));
+            throw new CException('The requested template, :template_name, could not be found', array(':template_name' => $this->filename));
         }
         return parent::render();
     }
