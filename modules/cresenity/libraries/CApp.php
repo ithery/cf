@@ -885,6 +885,7 @@ class CApp extends CObservable {
         $data = array();
         $data["title"] = $this->title;
         $message = '';
+        $messageOrig = '';
         if (!$this->keepMessage) {
             $messageOrig = cmsg::flash_all();
             if ($this->renderMessage) {
