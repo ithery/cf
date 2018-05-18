@@ -40,6 +40,7 @@ class CApp extends CObservable {
     private $variables;
     private $ajaxData = array();
     private $renderMessage = true;
+    private $keepMessage = false;
 
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
@@ -95,10 +96,15 @@ class CApp extends CObservable {
         $this->renderMessage = $bool;
     }
 
+    public function setKeepMessage($bool) {
+        $this->keepMessage = $bool;
+    }
+
     public function setup($install = false) {
 
-        if ($this->run)
+        if ($this->run) {
             return;
+        }
 
         $this->register_core_modules();
 
@@ -878,10 +884,12 @@ class CApp extends CObservable {
     public function json() {
         $data = array();
         $data["title"] = $this->title;
-        $messageOrig = cmsg::flash_all();
-        $message = '';
-        if ($this->renderMessage) {
-            $message = $messageOrig;
+        if (!$this->keepMessage) {
+            $messageOrig = cmsg::flash_all();
+            $message = '';
+            if ($this->renderMessage) {
+                $message = $messageOrig;
+            }
         }
         $data["html"] = $message . $this->html();
         $js = $this->js();
