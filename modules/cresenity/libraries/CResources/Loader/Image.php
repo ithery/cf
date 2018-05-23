@@ -161,7 +161,7 @@ class CResources_Loader_Image {
             if ($this->sizeName != null) {
                 $temp .= $this->sizeName . '/';
             }
-            $temp .= $this->resourceName;
+            $temp .= urlencode($this->resourceName);
             $path .= $temp;
         }
         return $path;
@@ -190,7 +190,7 @@ class CResources_Loader_Image {
     public function delete() {
         $fullPath = $this->getSizePath($this->sizeName);
         
-        unlink($fullPath);
+        @unlink($fullPath);
     }
     
 }

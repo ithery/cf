@@ -26,24 +26,23 @@ class cnav {
             $nav_path = carr::get($nav, 'path', '');
             $nav_method = carr::get($nav, 'method', '');
             $nav_controller = carr::get($nav, 'controller', '');
-            
-            if($nav_controller != '' && $nav_method != '' && $path.$controller == $nav_path.$nav_controller && $method==$nav_method) {
+
+            if ($nav_controller != '' && $nav_method != '' && $path . $controller == $nav_path . $nav_controller && $method == $nav_method) {
                 return $nav;
             }
-            
+
 //                var_dump($path .$controller);
 //                cdbg::var_dump($nav);
-           
-            
+
+
             if (isset($nav["action"])) {
                 foreach ($nav["action"] as $act) {
                     $act_path = carr::get($act, 'path', $nav_path);
                     $act_method = carr::get($act, 'method', $nav_method);
                     $act_controller = carr::get($act, 'controller', $nav_controller);
-                    if($act_controller != '' && $act_method != '' && $path.$controller == $act_path.$act_controller && $method==$act_method) {
+                    if ($act_controller != '' && $act_method != '' && $path . $controller == $act_path . $act_controller && $method == $act_method) {
                         return $nav;
                     }
-
                 }
             }
             if (isset($nav["subnav"])) {
@@ -361,7 +360,7 @@ class cnav {
         $is_admin = CApp::instance()->is_admin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
-        
+
         if ($navs == null)
             return false;
         $html = "";
@@ -448,14 +447,8 @@ class cnav {
                     if ($level == 0) {
                         $caret = '<b class="caret">';
                     }
-                    if (isset($d["name"]) && strlen($d["name"]) > 0) {
-                        $notif = carr::get($data_notif, $d["name"]);
-                    }
-                    $strNotif = '';
-                    if ($notif != null && $notif > 0) {
-                        $strNotif = '<span style="color:#f00">&nbsp;(' . $notif . ')</span>';
-                    }
-                    $elem = '<a class="' . $active_class . ' dropdown-toggle " href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>' . $strNotif . $caret . '</b>';
+
+                    $elem = '<a class="' . $active_class . ' dropdown-toggle " href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>'  . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -466,12 +459,17 @@ class cnav {
                     if (isset($d["target"]) && strlen($d["target"]) > 0) {
                         $target = ' target="' . $d["target"] . '"';
                     }
-                    if (isset($d["name"]) && strlen($d["name"]) > 0) {
-                        $notif = carr::get($data_notif, $d["name"]);
+                    if (isset($d["notif_count"])) {
+                        $callable = $d["notif_count"];
+                      
+                        if (is_callable($callable)) {
+                            $notif = call_user_func($callable);
+                        }
                     }
+                   
                     $strNotif = '';
                     if ($notif != null && $notif > 0) {
-                        $strNotif = '<label style="color:#f00">&nbsp;(' . $notif . ')</label>';
+                        $strNotif = ' <span class="label label-info nav-notif nav-notif-count">'.$notif.'</span>';
                     }
                     $elem = '<a class="' . $active_class . '" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
                 }
