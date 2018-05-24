@@ -35,7 +35,7 @@ class CAjaxMethod {
     }
 
     public function makeUrl($indent = 0) {
-        $js = CStringBuilder::factory()->set_indent($indent);
+        $js = CStringBuilder::factory()->setIndent($indent);
         //generate ajax_method
         //save this object to file.
         $json = json_encode($this);
