@@ -67,12 +67,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     public function clear() {
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
+            if ($r instanceof CRenderable) {
                 $r->clear();
             }
         }
         foreach ($this->renderable as $r) {
-            if (CObject::is_instanceof($r)) {
+            if ($r instanceof CObject) {
                 CObserver::instance()->remove($r);
             }
         }

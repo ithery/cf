@@ -1,6 +1,8 @@
 <?php
 
 abstract class CElement extends CObservable {
+    
+    use CTrait_Compat_Element;
 
     protected $classes;
     protected $tag;
@@ -23,7 +25,7 @@ abstract class CElement extends CObservable {
     protected $is_empty = false;
     private $is_build = false;
 
-    public static function valid_tag() {
+    public static function validTag() {
         $available_tag = array('div', 'a', 'p', 'span');
     }
 
@@ -57,25 +59,25 @@ abstract class CElement extends CObservable {
         }
     }
 
-    public function set_radio($radio) {
+    public function setRadio($radio) {
         $this->radio = $radio;
         return $this;
     }
 
-    public function set_text($text) {
+    public function setText($text) {
         $this->text = $text;
     }
 
-    public function custom_css($key, $val) {
+    public function customCss($key, $val) {
         $this->custom_css[$key] = $val;
         return $this;
     }
 
-    public function set_tag($tag) {
+    public function setTag($tag) {
         $this->tag = $tag;
     }
 
-    public function add_class($c) {
+    public function addClass($c) {
         if (is_array($c)) {
             $this->classes = array_merge($c, $this->classes);
         } else {
@@ -88,23 +90,23 @@ abstract class CElement extends CObservable {
         return $this;
     }
 
-    public function delete_attr($k) {
+    public function deleteAttr($k) {
         if (isset($this->attr[$k])) {
             unset($this->attr[$k]);
         }
         return $this;
     }
 
-    public function set_attr($k, $v) {
+    public function setAttr($k, $v) {
         $this->attr[$k] = $v;
         return $this;
     }
 
-    public function add_attr($k, $v) {
+    public function addAttr($k, $v) {
         return $this->set_attr($k, $v);
     }
 
-    public function get_attr($k) {
+    public function getAttr($k) {
         if (isset($this->attr[$k])) {
             return $this->attr[$k];
         }
@@ -120,7 +122,7 @@ abstract class CElement extends CObservable {
         return '</' . $this->tag . '>';
     }
 
-    public function generate_class() {
+    public function generateClass() {
         $classes = $this->classes;
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0) {
@@ -129,14 +131,14 @@ abstract class CElement extends CObservable {
         return $classes;
     }
 
-    public static function is_instanceof($val) {
+    public static function isInstanceof($val) {
         if (is_object($val)) {
             return ($val instanceof CElement);
         }
         return false;
     }
 
-    public function toarray() {
+    public function toArray() {
         if (!empty($this->classes)) {
             $data['attr']['class'] = implode(" ", $this->classes);
         }
@@ -150,11 +152,11 @@ abstract class CElement extends CObservable {
         return $data;
     }
 
-    protected function html_child($indent = 0) {
+    protected function htmlChild($indent = 0) {
         return parent::html($indent);
     }
 
-    protected function js_child($indent = 0) {
+    protected function jsChild($indent = 0) {
         return parent::js($indent);
     }
     

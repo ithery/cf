@@ -157,39 +157,39 @@ class CElement_Component_DataTable extends CElement_Component {
         return new CElement_Component_DataTable($id);
     }
 
-    public function set_export_filename($filename) {
+    public function setExportFilename($filename) {
         $this->export_filename = $filename;
         return $this;
     }
 
-    public function set_export_sheetname($sheetname) {
+    public function setExportSheetname($sheetname) {
         $this->export_sheetname = $sheetname;
         return $this;
     }
 
-    public function set_domain($domain) {
+    public function setDomain($domain) {
         parent::set_domain($domain);
         $this->db = CDatabase::instance($domain);
     }
 
-    public function set_database($db) {
+    public function setDatabase($db) {
         $this->db = $db;
         $this->db_config = $db->config();
 
         return $this;
     }
 
-    function set_table_striped($table_striped) {
+    function setTableStriped($table_striped) {
         $this->table_striped = $table_striped;
         return $this;
     }
 
-    public function set_widget_title($bool) {
+    public function setWidgetTitle($bool) {
         $this->widget_title = $bool;
         return $this;
     }
 
-    public static function action_download_excel($data) {
+    public static function actionDownloadExcel($data) {
         $table = $data->table;
         $table = unserialize($table);
         $export_filename = $table->export_filename;
@@ -199,14 +199,14 @@ class CElement_Component_DataTable extends CElement_Component {
         self::export_excelxml_static($export_filename, $table->export_sheetname, $table);
     }
 
-    public function add_footer_action($id = "") {
+    public function addFooterAction($id = "") {
         $row_act = CAction::factory($id);
         $this->footer_action_list->add($row_act);
 
         return $row_act;
     }
 
-    private static function export_excelxml_static($filename, $sheet_name = null, $table) {
+    private static function exportExcelxmlStatic($filename, $sheet_name = null, $table) {
 
 
         header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -492,58 +492,58 @@ class CElement_Component_DataTable extends CElement_Component {
         exit;
     }
 
-    public function have_footer_action() {
+    public function haveFooterAction() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->footer_action_list->child_count() > 0;
     }
 
-    public function is_exported() {
+    public function isExported() {
         return $this->export_excel || $this->export_excelxml || $this->export_excelcsv || $this->export_pdf;
     }
 
-    public function set_title($title, $lang = true) {
+    public function setTitle($title, $lang = true) {
         if ($lang)
             $title = clang::__($title);
         $this->title = $title;
         return $this;
     }
 
-    public function set_dom($dom) {
+    public function setDom($dom) {
         $this->dom = $dom;
         return $this;
     }
 
-    public function set_custom_column_header($html) {
+    public function setCustomColumnHeader($html) {
         $this->custom_column_header = $html;
         return $this;
     }
 
-    public function set_footer($bool) {
+    public function setFooter($bool) {
         $this->footer = $bool;
         return $this;
     }
 
-    public function set_responsive($bool) {
+    public function setResponsive($bool) {
         $this->responsive = $bool;
         return $this;
     }
 
-    public function set_show_header($bool) {
+    public function setShowHeader($bool) {
         $this->show_header = $bool;
         return $this;
     }
 
-    public function set_quick_search($quick_search) {
+    public function setQuickSearch($quick_search) {
         $this->quick_search = $quick_search;
         return $this;
     }
 
-    public function set_tbody_id($id) {
+    public function setTbodyId($id) {
         $this->tbody_id = $id;
         return $this;
     }
 
-    public function add_footer_field($label, $value, $align = "left", $labelcolspan = 0) {
+    public function addFooterField($label, $value, $align = "left", $labelcolspan = 0) {
         $f = array(
             "label" => $label,
             "value" => $value,
@@ -554,31 +554,31 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function set_header_no_line_break($bool) {
+    public function setHeaderNoLineBreak($bool) {
         $this->header_no_line_break = $bool;
         return $this;
     }
 
-    public function have_header_action() {
+    public function haveHeaderAction() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->header_action_list->child_count() > 0;
     }
 
-    public function set_header_action_style($style) {
+    public function setHeaderActionStyle($style) {
         $this->header_action_style = $style;
         $this->header_action_list->set_style($style);
     }
 
-    public function header_action_count() {
+    public function headerActionCount() {
         return $this->header_action_list->child_count();
     }
 
-    public function set_option($key, $val) {
+    public function setOption($key, $val) {
         $this->options->add($key, $val);
         return $this;
     }
 
-    public function get_option($key) {
+    public function getOption($key) {
         return $this->options->get_by_name($key);
     }
 
@@ -587,22 +587,22 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function set_ajax_method($value) {
+    public function setAjaxMethod($value) {
         $this->ajax_method = $value;
         return $this;
     }
 
-    public function set_apply_data_table($bool) {
+    public function setApplyDataTable($bool) {
         $this->apply_data_table = $bool;
         return $this;
     }
 
-    public function set_display_length($length) {
+    public function setDisplayLength($length) {
         $this->display_length = $length;
         return $this;
     }
 
-    public function cell_callback_func($func, $require = "") {
+    public function cellCallbackFunc($func, $require = "") {
         $this->cell_callback_func = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -610,7 +610,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function filter_action_callback_func($func, $require = "") {
+    public function filterActionCallbackFunc($func, $require = "") {
         $this->filter_action_callback_func = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -618,7 +618,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function set_key($fieldname) {
+    public function setKey($fieldname) {
         $this->key_field = $fieldname;
         return $this;
     }
@@ -629,58 +629,58 @@ class CElement_Component_DataTable extends CElement_Component {
         return $col;
     }
 
-    public function set_group_by($group_by) {
+    public function setGroupBy($group_by) {
         $this->group_by = $group_by;
         return $this;
     }
 
-    public function add_header_action($id = "") {
+    public function addHeaderAction($id = "") {
         return $this->header_action_list->add_action($id);
     }
 
-    public function set_checkbox($bool) {
+    public function setCheckbox($bool) {
         $this->checkbox = $bool;
         return $this;
     }
 
-    public function set_checkbox_value($val) {
+    public function setCheckboxValue($val) {
         if (!is_array($val))
             $val = array($val);
         $this->checkbox_value = $val;
         return $this;
     }
 
-    public function set_header_sortable($bool) {
+    public function setHeaderSortable($bool) {
         $this->header_sortable = $bool;
         return $this;
     }
 
-    public function set_numbering($bool) {
+    public function setNumbering($bool) {
         $this->numbering = $bool;
         return $this;
     }
 
-    public function enable_numbering() {
+    public function enableNumbering() {
         $this->numbering = true;
         return $this;
     }
 
-    public function disable_numbering() {
+    public function disableNumbering() {
         $this->numbering = false;
         return $this;
     }
 
-    public function enable_checkbox() {
+    public function enableCheckbox() {
         $this->checkbox = true;
         return $this;
     }
 
-    public function disable_checkbox() {
+    public function disableCheckbox() {
         $this->checkbox = false;
         return $this;
     }
 
-    public function set_query($q) {
+    public function setQuery($q) {
         $this->query = $q;
         return $this;
     }
@@ -695,7 +695,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function set_data_from_elastic($el) {
+    public function setDataFromElastic($el) {
         $this->query = $el;
         $this->is_elastic = true;
         if ($el instanceof CElastic_Search) {
@@ -705,17 +705,17 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function set_data_from_array($a) {
+    public function setDataFromArray($a) {
         $this->data = $a;
         return $this;
     }
 
-    public function set_pdf_font_size($size) {
+    public function setPdfFontSize($size) {
         $this->pdf_font_size = $size;
         return $this;
     }
 
-    public function set_pdf_orientation($orientation) {
+    public function setPdfOrientation($orientation) {
 
         if (strtoupper($orientation) == "PORTRAIT")
             $orientation = "P";
@@ -728,7 +728,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function export_pdf($filename) {
+    public function exportPdf($filename) {
         $this->export_pdf = true;
         $html = $this->html();
         $p = new CPDFTable($this->pdf_orientation);
@@ -740,7 +740,7 @@ class CElement_Component_DataTable extends CElement_Component {
         die();
     }
 
-    public function export_excelcsv($filename) {
+    public function exportExcelcsv($filename) {
         $this->export_excelcsv = true;
         $csv_field_terminated = ",";
         $csv_field_enclosed = "\"";
@@ -865,7 +865,7 @@ class CElement_Component_DataTable extends CElement_Component {
         exit;
     }
 
-    public function export_excelxml($filename, $sheet_name = null) {
+    public function exportExcelxml($filename, $sheet_name = null) {
         $this->export_excelxml = true;
         header("Cache-Control: no-cache, no-store, must-revalidate");
         header("Content-Type: application/vnd.ms-excel");
@@ -1146,12 +1146,12 @@ class CElement_Component_DataTable extends CElement_Component {
         exit;
     }
 
-    public function add_report_header($line) {
+    public function addReportHeader($line) {
         $this->report_header[] = $line;
         return $this;
     }
 
-    public function export_excel($filename, $sheet_name) {
+    public function exportExcel($filename, $sheet_name) {
         $this->export_excel = true;
         $excel = CExcel::factory()->set_creator("cresenity_system")->set_subject("Cresenity Report");
         $excel->set_active_sheet_name($sheet_name);
