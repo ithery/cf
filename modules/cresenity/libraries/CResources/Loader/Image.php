@@ -144,24 +144,24 @@ class CResources_Loader_Image {
             $arr_name = explode("_", $this->resourceName);
             //org_code
             if (isset($arr_name[0])) {
-                $temp .= $arr_name[0] . '/';
+                $temp .= urlencode($arr_name[0]) . '/';
             }
             //resource_type
             if (isset($arr_name[1])) {
-                $temp .= $arr_name[1] . '/';
+                $temp .= urlencode($arr_name[1]) . '/';
             }
             //name
             if (isset($arr_name[2])) {
-                $temp .= $arr_name[2] . '/';
+                $temp .= urlencode($arr_name[2]) . '/';
             }
             //date
             if (isset($arr_name[3])) {
-                $temp .= $arr_name[3] . '/';
+                $temp .= urlencode($arr_name[3]) . '/';
             }
             if ($this->sizeName != null) {
-                $temp .= $this->sizeName . '/';
+                $temp .= urlencode($this->sizeName) . '/';
             }
-            $temp .= $this->resourceName;
+            $temp .= urlencode($this->resourceName);
             $path .= $temp;
         }
         return $path;
@@ -190,7 +190,7 @@ class CResources_Loader_Image {
     public function delete() {
         $fullPath = $this->getSizePath($this->sizeName);
         
-        unlink($fullPath);
+        @unlink($fullPath);
     }
     
 }

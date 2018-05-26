@@ -40,6 +40,7 @@ class CApp extends CObservable {
     private $variables;
     private $ajaxData = array();
     private $renderMessage = true;
+    private $keepMessage = false;
 
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
@@ -95,10 +96,15 @@ class CApp extends CObservable {
         $this->renderMessage = $bool;
     }
 
+    public function setKeepMessage($bool) {
+        $this->keepMessage = $bool;
+    }
+
     public function setup($install = false) {
 
-        if ($this->run)
+        if ($this->run) {
             return;
+        }
 
         $this->register_core_modules();
 
@@ -878,10 +884,13 @@ class CApp extends CObservable {
     public function json() {
         $data = array();
         $data["title"] = $this->title;
-        $messageOrig = cmsg::flash_all();
         $message = '';
-        if ($this->renderMessage) {
-            $message = $messageOrig;
+        $messageOrig = '';
+        if (!$this->keepMessage) {
+            $messageOrig = cmsg::flash_all();
+            if ($this->renderMessage) {
+                $message = $messageOrig;
+            }
         }
         $data["html"] = $message . $this->html();
         $js = $this->js();
@@ -906,6 +915,7 @@ class CApp extends CObservable {
         $variables['thousand_separator'] = ccfg::get('thousand_separator') == null ? ',' : ccfg::get('thousand_separator');
         $variables['decimal_digit'] = ccfg::get('decimal_digit') == null ? '0' : ccfg::get('decimal_digit');
         $variables['have_clock'] = ccfg::get('have_clock') == null ? false : ccfg::get('have_clock');
+        $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') == null ? true : ccfg::get('have_scroll_to_top');
 
         $bootstrap = ccfg::get('bootstrap');
         $theme_data = CManager::instance()->get_theme_data();

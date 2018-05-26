@@ -1181,7 +1181,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $i++;
         }
         foreach ($this->columns as $col) {
-            $excel->write_by_index($i, $header_count + 1, $col->label);
+            $excel->write_by_index($i, $header_count + 1, $col->getLabel());
             $i++;
         }
 
