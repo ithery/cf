@@ -2,7 +2,7 @@
 
 class CFormInputSelectSearch extends CFormInput {
 
-    use CTrait_Compat_FormInputSelectSearch;
+    use CTrait_Compat_Element_FormInput_SelectSearch;
     
     protected $query;
     protected $format_selection;

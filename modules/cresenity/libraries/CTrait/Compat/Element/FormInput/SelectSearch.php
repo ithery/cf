@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-trait CTrait_Compat_FormInputSelectSearch {
+trait CTrait_Compat_Element_FormInput_SelectSearch {
     
     public function set_multiple($bool) {
         return $this->setMultiple($bool);
