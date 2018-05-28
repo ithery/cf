@@ -11,8 +11,8 @@ trait CTrait_Compat_Element_Widget {
 
     /**
      * 
-     * @deprecated since version 1.2
-     * @return type
+     * @deprecated since version 1.2, please Use setTitle
+     * @return CElement_Component_Widget
      */
     public function set_title($title, $lang = true) {
         return $this->setTitle($title, $lang);

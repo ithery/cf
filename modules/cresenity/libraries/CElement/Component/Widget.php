@@ -96,6 +96,13 @@ class CElement_Component_Widget extends CElement_Component {
         return $this->switcher = CFactory::create_control($id, 'switcher');
     }
 
+    /**
+     * Set the title of the widget
+     * 
+     * @param string $title
+     * @param string $lang
+     * @return $this
+     */
     public function setTitle($title, $lang = true) {
         if ($lang) {
             $title = clang::__($title);

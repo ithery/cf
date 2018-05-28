@@ -13,11 +13,11 @@ class CObject {
     protected $domain = "";
     private $friends = array();
 
-    public function add_friend($classname) {
+    public function addFriend($classname) {
         $this->friends[] = $classname;
     }
 
-    public function set_domain($domain) {
+    public function setDomain($domain) {
         $this->domain = $domain;
     }
 
@@ -62,7 +62,7 @@ class CObject {
         return $this->id;
     }
 
-    public function class_name() {
+    public function className() {
         return get_class($this);
     }
 
@@ -70,7 +70,7 @@ class CObject {
         return $this->domain;
     }
 
-    static public function is_instanceof($value) {
+    static public function isInstanceof($value) {
         if (is_object($value)) {
             return ($value instanceof CObject);
         }
