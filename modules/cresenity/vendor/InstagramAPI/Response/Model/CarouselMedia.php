@@ -19,7 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Headline getHeadline()
  * @method bool getHideNuxText()
  * @method string getId()
- * @method Image_Versions2 getImageVersions2()
+ * @method ImageVersions2 getImageVersions2()
  * @method int getIsDashEligible()
  * @method string getLink()
  * @method string getLinkHintText()
@@ -77,7 +77,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHeadline(Headline $value)
  * @method $this setHideNuxText(bool $value)
  * @method $this setId(string $value)
- * @method $this setImageVersions2(Image_Versions2 $value)
+ * @method $this setImageVersions2(ImageVersions2 $value)
  * @method $this setIsDashEligible(int $value)
  * @method $this setLink(string $value)
  * @method $this setLinkHintText(string $value)
@@ -135,7 +135,7 @@ class CarouselMedia extends AutoPropertyMapper
         'carousel_parent_id'  => 'string',
         'fb_user_tags'        => 'Usertag',
         'is_dash_eligible'    => 'int',
-        'image_versions2'     => 'Image_Versions2',
+        'image_versions2'     => 'ImageVersions2',
         'video_versions'      => 'VideoVersions[]',
         'has_audio'           => 'bool',
         'video_duration'      => 'float',

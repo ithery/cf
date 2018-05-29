@@ -11,7 +11,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method ImageCandidate getCroppedImageVersion()
  * @method ImageCandidate getFullImageVersion()
  * @method string getId()
- * @method Image_Versions2 getImageVersions2()
+ * @method ImageVersions2 getImageVersions2()
  * @method string getMediaId()
  * @method int getMediaType()
  * @method int getOriginalHeight()
@@ -29,7 +29,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCroppedImageVersion(ImageCandidate $value)
  * @method $this setFullImageVersion(ImageCandidate $value)
  * @method $this setId(string $value)
- * @method $this setImageVersions2(Image_Versions2 $value)
+ * @method $this setImageVersions2(ImageVersions2 $value)
  * @method $this setMediaId(string $value)
  * @method $this setMediaType(int $value)
  * @method $this setOriginalHeight(int $value)
@@ -53,7 +53,7 @@ class CoverMedia extends AutoPropertyMapper
          * A number describing what type of media this is.
          */
         'media_type'            => 'int',
-        'image_versions2'       => 'Image_Versions2',
+        'image_versions2'       => 'ImageVersions2',
         'original_width'        => 'int',
         'original_height'       => 'int',
         'cropped_image_version' => 'ImageCandidate',

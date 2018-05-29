@@ -7,7 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * DirectThreadItemMedia.
  *
- * @method Image_Versions2 getImageVersions2()
+ * @method ImageVersions2 getImageVersions2()
  * @method int getMediaType()
  * @method int getOriginalHeight()
  * @method int getOriginalWidth()
@@ -17,7 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isOriginalHeight()
  * @method bool isOriginalWidth()
  * @method bool isVideoVersions()
- * @method $this setImageVersions2(Image_Versions2 $value)
+ * @method $this setImageVersions2(ImageVersions2 $value)
  * @method $this setMediaType(int $value)
  * @method $this setOriginalHeight(int $value)
  * @method $this setOriginalWidth(int $value)
@@ -40,7 +40,7 @@ class DirectThreadItemMedia extends AutoPropertyMapper
          * `DirectThreadItemMedia::VIDEO` constants!
          */
         'media_type'      => 'int',
-        'image_versions2' => 'Image_Versions2',
+        'image_versions2' => 'ImageVersions2',
         'video_versions'  => 'VideoVersions[]',
         'original_width'  => 'int',
         'original_height' => 'int',

@@ -479,14 +479,14 @@ class Request {
     protected function _getStreamForFile(
     array $file) {
         if (isset($file['contents'])) {
-            $result = stream_for($file['contents']); // Throws.
+            $result = \GuzzleHttp\Psr7\stream_for($file['contents']); // Throws.
         } elseif (isset($file['filepath'])) {
             $handle = fopen($file['filepath'], 'rb');
             if ($handle === false) {
                 throw new \RuntimeException(sprintf('Could not open file "%s" for reading.', $file['filepath']));
             }
             $this->_handles[] = $handle;
-            $result = stream_for($handle); // Throws.
+            $result = \GuzzleHttp\Psr7\stream_for($handle); // Throws.
         } else {
             throw new \InvalidArgumentException('No data for stream creation.');
         }
@@ -562,7 +562,7 @@ class Request {
     protected function _getUrlencodedBody() {
         $this->_headers['Content-Type'] = Constants::CONTENT_TYPE;
 
-        return stream_for(// Throws.
+        return \GuzzleHttp\Psr7\stream_for(// Throws.
                 http_build_query(Utils::reorderByHashCode($this->_posts))
         );
     }
@@ -741,8 +741,7 @@ class Request {
      *
      * @return Response The provided responseObject with all JSON properties filled.
      */
-    public function getResponse(
-    Response $responseObject) {
+    public function getResponse(Response $responseObject, $url = null) {
         // Check for API response success and put its response in the object.
         $this->_parent->client->mapServerResponse(// Throws.
                 $responseObject, $this->getRawResponse(), // Throws.

@@ -558,7 +558,7 @@ class StorageHandler {
     protected function _triggerCallback(
     $cbName) {
         // Reject anything that isn't in our list of VALID callbacks.
-        if (!in_array($cbName, self::SUPPORTED_CALLBACKS)) {
+        if (!in_array($cbName, self::$SUPPORTED_CALLBACKS)) {
             throw new SettingsException(sprintf(
                     'The string "%s" is not a valid callback name.', $cbName
             ));
@@ -591,7 +591,7 @@ class StorageHandler {
     public function setExperiments(
     array $experiments) {
         $filtered = [];
-        foreach (self::EXPERIMENT_KEYS as $key) {
+        foreach (self::$EXPERIMENT_KEYS as $key) {
             if (!isset($experiments[$key])) {
                 continue;
             }

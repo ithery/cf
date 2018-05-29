@@ -7,7 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * MediaData.
  *
- * @method Image_Versions2 getImageVersions2()
+ * @method ImageVersions2 getImageVersions2()
  * @method int getMediaType()
  * @method int getOriginalHeight()
  * @method int getOriginalWidth()
@@ -17,7 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isOriginalHeight()
  * @method bool isOriginalWidth()
  * @method bool isVideoVersions()
- * @method $this setImageVersions2(Image_Versions2 $value)
+ * @method $this setImageVersions2(ImageVersions2 $value)
  * @method $this setMediaType(int $value)
  * @method $this setOriginalHeight(int $value)
  * @method $this setOriginalWidth(int $value)
@@ -31,7 +31,7 @@ use InstagramAPI\AutoPropertyMapper;
 class MediaData extends AutoPropertyMapper
 {
     public static $JSON_PROPERTY_MAP = [
-        'image_versions2' => 'Image_Versions2',
+        'image_versions2' => 'ImageVersions2',
         'original_width'  => 'int',
         'original_height' => 'int',
         /*

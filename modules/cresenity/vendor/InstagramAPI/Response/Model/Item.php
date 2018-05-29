@@ -61,7 +61,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getITunesItem()
  * @method mixed getIcon()
  * @method string getId()
- * @method Image_Versions2 getImageVersions2()
+ * @method ImageVersions2 getImageVersions2()
  * @method mixed getImportedTakenAt()
  * @method string getImpressionToken()
  * @method Injected getInjected()
@@ -349,7 +349,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setITunesItem(mixed $value)
  * @method $this setIcon(mixed $value)
  * @method $this setId(string $value)
- * @method $this setImageVersions2(Image_Versions2 $value)
+ * @method $this setImageVersions2(ImageVersions2 $value)
  * @method $this setImportedTakenAt(mixed $value)
  * @method $this setImpressionToken(string $value)
  * @method $this setInjected(Injected $value)
@@ -607,7 +607,7 @@ class Item extends AutoPropertyMapper
         'code'                                     => 'string',
         'client_cache_key'                         => 'string',
         'filter_type'                              => 'int',
-        'image_versions2'                          => 'Image_Versions2',
+        'image_versions2'                          => 'ImageVersions2',
         'original_width'                           => 'int',
         'original_height'                          => 'int',
         'caption_position'                         => 'float',
