@@ -47,11 +47,12 @@ class File implements StorageInterface
         array $locationConfig)
     {
         // Determine which base folder to store all per-user data in.
-        $this->_baseFolder = ((isset($locationConfig['basefolder'])
-                               && !empty($locationConfig['basefolder']))
-                              ? $locationConfig['basefolder']
-                              : Constants::SRC_DIR.'/../sessions/');
-        $this->_createFolder($this->_baseFolder);
+        $baseFolder = ((isset($locationConfig['basefolder'])
+                        && !empty($locationConfig['basefolder']))
+                       ? $locationConfig['basefolder']
+                       : Constants::SRC_DIR.'/../sessions');
+        // Create the base folder and normalize its path to a clean value.
+        $this->_baseFolder = $this->_createFolder($baseFolder);
     }
 
     /**
@@ -152,7 +153,7 @@ class File implements StorageInterface
     {
         $userSettings = [];
 
-        if (!file_exists($this->_settingsFile)) {
+        if (!is_file($this->_settingsFile)) {
             return $userSettings; // Nothing to load.
         }
 
@@ -208,29 +209,40 @@ class File implements StorageInterface
      */
     public function hasUserCookies()
     {
-        return file_exists($this->_cookiesFile);
+        return is_file($this->_cookiesFile)
+            && filesize($this->_cookiesFile) > 0;
     }
 
     /**
-     * Load all cookies for the currently active user.
+     * Get the cookiefile disk path (only if a file-based cookie jar is wanted).
+     *
+     * {@inheritdoc}
+     */
+    public function getUserCookiesFilePath()
+    {
+        // Tell the caller to use a file-based cookie jar.
+        return $this->_cookiesFile;
+    }
+
+    /**
+     * (Non-cookiefile) Load all cookies for the currently active user.
      *
      * {@inheritdoc}
      */
     public function loadUserCookies()
     {
-        // Tell the caller to use a file-based cookie jar.
-        return 'cookiefile:'.$this->_cookiesFile;
+        // Never called for "cookiefile" format.
     }
 
     /**
-     * Save all cookies for the currently active user.
+     * (Non-cookiefile) Save all cookies for the currently active user.
      *
      * {@inheritdoc}
      */
     public function saveUserCookies(
         $rawData)
     {
-        // Never called for "cookiefile:" format.
+        // Never called for "cookiefile" format.
     }
 
     /**
@@ -326,9 +338,9 @@ class File implements StorageInterface
     private function _generateUserPaths(
         $username)
     {
-        $userFolder = $this->_baseFolder.'/'.$username.'/';
-        $settingsFile = $userFolder.sprintf(self::SETTINGSFILE_NAME, $username);
-        $cookiesFile = $userFolder.sprintf(self::COOKIESFILE_NAME, $username);
+        $userFolder = $this->_baseFolder.'/'.$username;
+        $settingsFile = $userFolder.'/'.sprintf(self::SETTINGSFILE_NAME, $username);
+        $cookiesFile = $userFolder.'/'.sprintf(self::COOKIESFILE_NAME, $username);
 
         return [
             'userFolder'   => $userFolder,
@@ -343,6 +355,9 @@ class File implements StorageInterface
      * @param string $folder The directory path.
      *
      * @throws \InstagramAPI\Exception\SettingsException
+     *
+     * @return string The canonicalized absolute pathname of the folder, without
+     *                any trailing slash.
      */
     private function _createFolder(
         $folder)
@@ -353,5 +368,18 @@ class File implements StorageInterface
                 $folder
             ));
         }
+
+        // Determine the real path of the folder we created/checked.
+        // NOTE: This ensures that the path will work even on stingy systems
+        // such as Windows Server which chokes on multiple slashes in a row.
+        $realPath = @realpath($folder);
+        if (!is_string($realPath)) {
+            throw new SettingsException(sprintf(
+                'Unable to resolve real path to folder "%s".',
+                $folder
+            ));
+        }
+
+        return $realPath;
     }
 }

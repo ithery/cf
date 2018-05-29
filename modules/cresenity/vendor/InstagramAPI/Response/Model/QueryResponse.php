@@ -2,17 +2,19 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * QueryResponse.
+ *
  * @method ShadowInstagramUser getShadowInstagramUser()
  * @method bool isShadowInstagramUser()
- * @method setShadowInstagramUser(ShadowInstagramUser $value)
+ * @method $this setShadowInstagramUser(ShadowInstagramUser $value)
+ * @method $this unsetShadowInstagramUser()
  */
-class QueryResponse extends AutoPropertyHandler
+class QueryResponse extends AutoPropertyMapper
 {
-    /**
-     * @var ShadowInstagramUser
-     */
-    public $shadow_instagram_user;
+    public static $JSON_PROPERTY_MAP = [
+        'shadow_instagram_user' => 'ShadowInstagramUser',
+    ];
 }

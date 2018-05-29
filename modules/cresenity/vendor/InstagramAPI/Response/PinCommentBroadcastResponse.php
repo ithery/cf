@@ -2,21 +2,31 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * PinCommentBroadcastResponse.
+ *
  * @method string getCommentId()
+ * @method mixed getMessage()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isCommentId()
- * @method setCommentId(string $value)
+ * @method bool isMessage()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setCommentId(string $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetCommentId()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class PinCommentBroadcastResponse extends AutoPropertyHandler implements ResponseInterface
+class PinCommentBroadcastResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var string
-     */
-    public $comment_id;
+    public static $JSON_PROPERTY_MAP = [
+        'comment_id' => 'string',
+    ];
 }

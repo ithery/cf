@@ -2,46 +2,56 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * DirectInboxResponse.
+ *
  * @method Model\DirectInbox getInbox()
  * @method Model\Megaphone getMegaphone()
+ * @method mixed getMessage()
  * @method mixed getPendingRequestsTotal()
  * @method Model\User[] getPendingRequestsUsers()
  * @method string getSeqId()
+ * @method string getSnapshotAtMs()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isInbox()
  * @method bool isMegaphone()
+ * @method bool isMessage()
  * @method bool isPendingRequestsTotal()
  * @method bool isPendingRequestsUsers()
  * @method bool isSeqId()
- * @method setInbox(Model\DirectInbox $value)
- * @method setMegaphone(Model\Megaphone $value)
- * @method setPendingRequestsTotal(mixed $value)
- * @method setPendingRequestsUsers(Model\User[] $value)
- * @method setSeqId(string $value)
+ * @method bool isSnapshotAtMs()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setInbox(Model\DirectInbox $value)
+ * @method $this setMegaphone(Model\Megaphone $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setPendingRequestsTotal(mixed $value)
+ * @method $this setPendingRequestsUsers(Model\User[] $value)
+ * @method $this setSeqId(string $value)
+ * @method $this setSnapshotAtMs(string $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetInbox()
+ * @method $this unsetMegaphone()
+ * @method $this unsetMessage()
+ * @method $this unsetPendingRequestsTotal()
+ * @method $this unsetPendingRequestsUsers()
+ * @method $this unsetSeqId()
+ * @method $this unsetSnapshotAtMs()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class DirectInboxResponse extends AutoPropertyHandler implements ResponseInterface
+class DirectInboxResponse extends Response
 {
-    use ResponseTrait;
-
-    public $pending_requests_total;
-    /**
-     * @var string
-     */
-    public $seq_id;
-    /**
-     * @var Model\User[]
-     */
-    public $pending_requests_users;
-    /**
-     * @var Model\DirectInbox
-     */
-    public $inbox;
-    /**
-     * @var Model\Megaphone
-     */
-    public $megaphone;
+    public static $JSON_PROPERTY_MAP = [
+        'pending_requests_total' => '',
+        'seq_id'                 => 'string',
+        'pending_requests_users' => 'Model\User[]',
+        'inbox'                  => 'Model\DirectInbox',
+        'megaphone'              => 'Model\Megaphone',
+        'snapshot_at_ms'         => 'string',
+    ];
 }

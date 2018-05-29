@@ -2,21 +2,31 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
- * @method Model\FriendshipStatus[] getFriendshipStatuses()
+ * FriendshipsShowManyResponse.
+ *
+ * @method Model\UnpredictableKeys\FriendshipStatusUnpredictableContainer getFriendshipStatuses()
+ * @method mixed getMessage()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isFriendshipStatuses()
- * @method setFriendshipStatuses(Model\FriendshipStatus[] $value)
+ * @method bool isMessage()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setFriendshipStatuses(Model\UnpredictableKeys\FriendshipStatusUnpredictableContainer $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetFriendshipStatuses()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class FriendshipsShowManyResponse extends AutoPropertyHandler implements ResponseInterface
+class FriendshipsShowManyResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\FriendshipStatus[]
-     */
-    public $friendship_statuses;
+    public static $JSON_PROPERTY_MAP = [
+        'friendship_statuses' => 'Model\UnpredictableKeys\FriendshipStatusUnpredictableContainer',
+    ];
 }

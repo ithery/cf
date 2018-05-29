@@ -2,34 +2,51 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
- * @method mixed getHasMore()
+ * FBSearchResponse.
+ *
+ * @method bool getHasMore()
  * @method mixed getHashtags()
+ * @method mixed getMessage()
  * @method mixed getPlaces()
- * @method mixed getRankToken()
+ * @method string getRankToken()
+ * @method string getStatus()
  * @method mixed getUsers()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isHasMore()
  * @method bool isHashtags()
+ * @method bool isMessage()
  * @method bool isPlaces()
  * @method bool isRankToken()
+ * @method bool isStatus()
  * @method bool isUsers()
- * @method setHasMore(mixed $value)
- * @method setHashtags(mixed $value)
- * @method setPlaces(mixed $value)
- * @method setRankToken(mixed $value)
- * @method setUsers(mixed $value)
+ * @method bool isZMessages()
+ * @method $this setHasMore(bool $value)
+ * @method $this setHashtags(mixed $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setPlaces(mixed $value)
+ * @method $this setRankToken(string $value)
+ * @method $this setStatus(string $value)
+ * @method $this setUsers(mixed $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetHasMore()
+ * @method $this unsetHashtags()
+ * @method $this unsetMessage()
+ * @method $this unsetPlaces()
+ * @method $this unsetRankToken()
+ * @method $this unsetStatus()
+ * @method $this unsetUsers()
+ * @method $this unsetZMessages()
  */
-class FBSearchResponse extends AutoPropertyHandler implements ResponseInterface
+class FBSearchResponse extends Response
 {
-    use ResponseTrait;
-
-    public $has_more;
-    public $hashtags;
-    public $users;
-    public $places;
-    public $rank_token;
+    public static $JSON_PROPERTY_MAP = [
+        'has_more'   => 'bool',
+        'hashtags'   => '',
+        'users'      => '',
+        'places'     => '',
+        'rank_token' => 'string',
+    ];
 }

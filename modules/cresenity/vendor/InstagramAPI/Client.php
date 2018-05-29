@@ -4,14 +4,15 @@ namespace InstagramAPI;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\HandlerStack;
+use InstagramAPI\Exception\InstagramException;
+use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\ServerMessageThrower;
-use InstagramAPI\Exception\SettingsException;
+use LazyJsonMapper\Exception\LazyJsonMapperException;
 use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
-
-
-require_once dirname(__FILE__).DS.'../GuzzleHttp/Psr7/functions_include.php';
+require_once dirname(__FILE__) . DS . '../GuzzleHttp/Psr7/functions_include.php';
 
 /**
  * This class handles core API network communication.
@@ -94,22 +95,6 @@ class Client
     private $_cookieJar;
 
     /**
-     * The cookie format expected by the current settings storage.
-     *
-     * @var string
-     */
-    private $_settingsCookieFormat;
-
-    /**
-     * The disk path for file-based cookie jars.
-     *
-     * Only used when the cookieformat is set to "cookiefile".
-     *
-     * @var string|null
-     */
-    private $_settingsCookieFilePath;
-
-    /**
      * The timestamp of when we last saved our cookie jar to disk.
      *
      * Used for automatically saving the jar after any API call, after enough
@@ -117,18 +102,7 @@ class Client
      *
      * @var int
      */
-    private $_settingsCookieLastSaved;
-
-    /**
-     * Our JSON object mapper instance.
-     *
-     * This object must be globally preserved and always re-used, so that its
-     * runtime class analysis cache stays in memory, otherwise it wastes time
-     * analyzing our class source code every time it has to map a class again.
-     *
-     * @var \JsonMapper
-     */
-    private $_mapper;
+    private $_cookieJarLastSaved;
 
     /**
      * Constructor.
@@ -167,10 +141,6 @@ class Client
             // We'll instead MANUALLY be throwing on certain other HTTP codes.
             'http_errors'     => false,
         ]);
-
-        // Create our JSON object mapper and set global default options.
-        $this->_mapper = new \JsonMapper();
-        $this->_mapper->bStrictNullTypes = false; // Allow NULL values.
     }
 
     /**
@@ -195,7 +165,7 @@ class Client
         // these checks succeed, the cookie may still not be valid. It's just a
         // preliminary check to detect definitely-invalid session cookies!
         if ($this->getToken() === null) {
-            $this->_parent->isLoggedIn = false;
+            $this->_parent->isMaybeLoggedIn = false;
         }
     }
 
@@ -212,56 +182,16 @@ class Client
         // Mark any previous cookie jar for garbage collection.
         $this->_cookieJar = null;
 
-        // Get all cookies for the currently active user.
-        $userCookies = $this->_parent->settings->getCookies();
-        $this->_settingsCookieFormat = $userCookies['format'];
-        $this->_settingsCookieFilePath = null;
-
-        // Get the raw cookie string from the storage backend.
-        $cookieString = '';
-        if ($userCookies['format'] == 'cookiefile') {
-            $this->_settingsCookieFilePath = $userCookies['data'];
-            if (empty($this->_settingsCookieFilePath)) {
-                throw new SettingsException(
-                    'Cookie file format requested, but no file path provided.'
-                );
-            }
-
-            // Ensure that the whole directory path to the cookie file exists.
-            $cookieDir = dirname($this->_settingsCookieFilePath); // Can be "." in case of CWD.
-            if (!Utils::createFolder($cookieDir)) {
-                throw new SettingsException(sprintf(
-                    'The "%s" cookie folder is not writable.',
-                    $cookieDir
-                ));
-            }
-
-            // Process the existing cookie jar file if it already exists.
-            if (is_file($this->_settingsCookieFilePath)) {
-                if ($resetCookieJar) {
-                    // Delete existing cookie jar since this is a reset.
-                    @unlink($this->_settingsCookieFilePath);
-                } else {
-                    // Read the existing cookies from disk.
-                    $rawData = file_get_contents($this->_settingsCookieFilePath);
-                    if ($rawData !== false) {
-                        $cookieString = $rawData;
-                    }
-                }
-            }
-        } else {
-            // Delete existing cookie data from the storage if this is a reset.
-            if ($resetCookieJar) {
-                $userCookies['data'] = '';
-                $this->_parent->settings->setCookies('');
-            }
-
-            // Read the existing cookies provided by the storage.
-            $cookieString = $userCookies['data'];
+        // Delete all current cookies from the storage if this is a reset.
+        if ($resetCookieJar) {
+            $this->_parent->settings->setCookies('');
         }
 
+        // Get all cookies for the currently active user.
+        $cookieData = $this->_parent->settings->getCookies();
+
         // Attempt to restore the cookies, otherwise create a new, empty jar.
-        $restoredCookies = @json_decode($cookieString, true);
+        $restoredCookies = is_string($cookieData) ? @json_decode($cookieData, true) : null;
         if (!is_array($restoredCookies)) {
             $restoredCookies = [];
         }
@@ -271,7 +201,7 @@ class Client
 
         // Reset the "last saved" timestamp to the current time to prevent
         // auto-saving the cookies again immediately after this jar is loaded.
-        $this->_settingsCookieLastSaved = time();
+        $this->_cookieJarLastSaved = time();
     }
 
     /**
@@ -287,8 +217,8 @@ class Client
     public function getToken()
     {
         $cookie = $this->getCookie('csrftoken', 'i.instagram.com');
-        if ($cookie === null || $cookie->getExpires() <= time()) {
-            return; // Ugh, StyleCI doesn't allow "return null;" for clarity. ;)
+        if ($cookie === null || $cookie->getValue() === '') {
+            return null;
         }
 
         return $cookie->getValue();
@@ -301,7 +231,7 @@ class Client
      * @param string|null $domain (optional) Require a specific domain match.
      * @param string|null $path   (optional) Require a specific path match.
      *
-     * @return \GuzzleHttp\Cookie\SetCookie|null A cookie if found, otherwise NULL.
+     * @return \GuzzleHttp\Cookie\SetCookie|null A cookie if found and non-expired, otherwise NULL.
      */
     public function getCookie(
         $name,
@@ -310,12 +240,20 @@ class Client
     {
         $foundCookie = null;
         if ($this->_cookieJar instanceof CookieJar) {
+            /** @var SetCookie $cookie */
             foreach ($this->_cookieJar->getIterator() as $cookie) {
-                if ($cookie->getName() == $name
-                    && ($domain === null || $cookie->getDomain() == $domain)
-                    && ($path === null || $cookie->getPath() == $path)) {
+                if ($cookie->getName() === $name
+                    && !$cookie->isExpired()
+                    && ($domain === null || $cookie->matchesDomain($domain))
+                    && ($path === null || $cookie->matchesPath($path))) {
+                    // Loop-"break" is omitted intentionally, because we might
+                    // have more than one cookie with the same name, so we will
+                    // return the LAST one. This is necessary because Instagram
+                    // has changed their cookie domain from `i.instagram.com` to
+                    // `.instagram.com` and we want the *most recent* cookie.
+                    // Guzzle's `CookieJar::setCookie()` always places the most
+                    // recently added/modified cookies at the *end* of array.
                     $foundCookie = $cookie;
-                    break;
                 }
             }
         }
@@ -362,27 +300,12 @@ class Client
      */
     public function saveCookieJar()
     {
+        // Tell the settings storage to persist the latest cookies.
         $newCookies = $this->getCookieJarAsJSON();
-        if ($this->_settingsCookieFormat != 'cookiefile') {
-            // Tell non-file settings storage to persist the latest cookies.
-            $this->_parent->settings->setCookies($newCookies);
-        } else {
-            // This is a file-based cookie storage. It's our job to write it.
-            if (!empty($this->_settingsCookieFilePath)) {
-                // Perform an atomic diskwrite, which prevents accidental
-                // truncation if the script is ever interrupted mid-write.
-                $written = Utils::atomicWrite($this->_settingsCookieFilePath, $newCookies);
-                if ($written === false) {
-                    throw new SettingsException(sprintf(
-                        'The "%s" cookie file is not writable.',
-                        $this->_settingsCookieFilePath
-                    ));
-                }
-            }
-        }
+        $this->_parent->settings->setCookies($newCookies);
 
         // Reset the "last saved" timestamp to the current time.
-        $this->_settingsCookieLastSaved = time();
+        $this->_cookieJarLastSaved = time();
     }
 
     /**
@@ -465,21 +388,21 @@ class Client
     /**
      * Output debugging information.
      *
-     * @param string      $method        "GET" or "POST".
-     * @param string      $url           The URL or endpoint used for the request.
-     * @param string|null $uploadedBody  What was sent to the server. Use NULL to
-     *                                   avoid displaying it.
-     * @param int|null    $uploadedBytes How many bytes were uploaded. Use NULL to
-     *                                   avoid displaying it.
-     * @param object      $response      The Guzzle response object from the request.
-     * @param string      $responseBody  The actual text-body reply from the server.
+     * @param string                $method        "GET" or "POST".
+     * @param string                $url           The URL or endpoint used for the request.
+     * @param string|null           $uploadedBody  What was sent to the server. Use NULL to
+     *                                             avoid displaying it.
+     * @param int|null              $uploadedBytes How many bytes were uploaded. Use NULL to
+     *                                             avoid displaying it.
+     * @param HttpResponseInterface $response      The Guzzle response object from the request.
+     * @param string                $responseBody  The actual text-body reply from the server.
      */
     protected function _printDebug(
         $method,
         $url,
         $uploadedBody,
         $uploadedBytes,
-        $response,
+        HttpResponseInterface $response,
         $responseBody)
     {
         Debug::printRequest($method, $url);
@@ -498,9 +421,11 @@ class Client
 
         // Display the number of bytes received from the response, and status code.
         if ($response->hasHeader('x-encoded-content-length')) {
-            $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+            $bytes = Utils::formatBytes((int) $response->getHeaderLine('x-encoded-content-length'));
+        } elseif ($response->hasHeader('Content-Length')) {
+            $bytes = Utils::formatBytes((int) $response->getHeaderLine('Content-Length'));
         } else {
-            $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+            $bytes = 0;
         }
         Debug::printHttpCode($response->getStatusCode(), $bytes);
 
@@ -509,28 +434,31 @@ class Client
     }
 
     /**
-     * Converts a server response to a specific kind of result object.
+     * Maps a server response onto a specific kind of result object.
      *
-     * @param ResponseInterface     $baseClass      An instance of a class object whose
+     * The result is placed directly inside `$responseObject`.
+     *
+     * @param Response              $responseObject An instance of a class object whose
      *                                              properties to fill with the response.
-     * @param mixed                 $serverResponse A decoded JSON response from
-     *                                              Instagram's server.
+     * @param string                $rawResponse    A raw JSON response string
+     *                                              from Instagram's server.
      * @param HttpResponseInterface $httpResponse   HTTP response object.
      *
-     * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
-     *                                                    failed API response.
-     *
-     * @return ResponseInterface
+     * @throws InstagramException In case of invalid or failed API response.
      */
-    public function getMappedResponseObject(
-        ResponseInterface $baseClass,
-        $serverResponse,
+    public function mapServerResponse(
+        Response $responseObject,
+        $rawResponse,
         HttpResponseInterface $httpResponse)
     {
-        // If the server response is not an object, it means that JSON decoding
+        // Attempt to decode the raw JSON to an array.
+        // Important: Special JSON decoder which handles 64-bit numbers!
+        $jsonArray = $this->api_body_decode($rawResponse, true);
+
+        // If the server response is not an array, it means that JSON decoding
         // failed or some other bad thing happened. So analyze the HTTP status
         // code (if available) to see what really happened.
-        if (!is_object($serverResponse)) {
+        if (!is_array($jsonArray)) {
             $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
             switch ($httpStatusCode) {
                 case 400:
@@ -542,15 +470,68 @@ class Client
             }
         }
 
-        // Use API developer debugging? Throws if class lacks properties.
-        $this->_mapper->bExceptionOnUndefinedProperty = $this->_parent->apiDeveloperDebug;
-
         // Perform mapping of all response properties.
-        /** @var ResponseInterface $responseObject */
-        $responseObject = $this->_mapper->map($serverResponse, $baseClass);
+        try {
+            // Assign the new object data. Only throws if custom _init() fails.
+            // NOTE: False = assign data without automatic analysis.
+            $responseObject->assignObjectData($jsonArray, false); // Throws.
 
-        // Save the raw response object as the "getFullResponse()" value.
-        $responseObject->setFullResponse($serverResponse);
+            // Use API developer debugging? We'll throw if class lacks property
+            // definitions, or if they can't be mapped as defined in the class
+            // property map. But we'll ignore missing properties in our custom
+            // UnpredictableKeys containers, since those ALWAYS lack keys. ;-)
+            if ($this->_parent->apiDeveloperDebug) {
+                // Perform manual analysis (so that we can intercept its analysis result).
+                $analysis = $responseObject->exportClassAnalysis(); // Never throws.
+
+                // Remove all "missing_definitions" errors for UnpredictableKeys containers.
+                // NOTE: We will keep any "bad_definitions" errors for them.
+                foreach ($analysis->missing_definitions as $className => $x) {
+                    if (strpos($className, '\\Response\\Model\\UnpredictableKeys\\') !== false) {
+                        unset($analysis->missing_definitions[$className]);
+                    }
+                }
+
+                // If any problems remain after that, throw with all combined summaries.
+                if ($analysis->hasProblems()) {
+                    throw new LazyJsonMapperException(
+                        $analysis->generateNiceSummariesAsString()
+                    );
+                }
+            }
+        } catch (LazyJsonMapperException $e) {
+            // Since there was a problem, let's help our developers by
+            // displaying the server's JSON data in a human-readable format,
+            // which makes it easy to see the structure and necessary changes
+            // and speeds up the job of updating responses and models.
+            try {
+                // Decode to stdClass to properly preserve empty objects `{}`,
+                // otherwise they would appear as empty `[]` arrays in output.
+                // NOTE: Large >32-bit numbers will be transformed into strings,
+                // which helps us see which numeric values need "string" type.
+                $jsonObject = $this->api_body_decode($rawResponse, false);
+                if (is_object($jsonObject)) {
+                    $prettyJson = @json_encode(
+                        $jsonObject,
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                    );
+                    if ($prettyJson !== false) {
+                        Debug::printResponse(
+                            'Human-Readable Response:'.PHP_EOL.$prettyJson,
+                            false // Not truncated.
+                        );
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore errors.
+            }
+
+            // Exceptions will only be thrown if API developer debugging is
+            // enabled and finds a problem. Either way, we should re-wrap the
+            // exception to our native type instead. The message gives enough
+            // details and we don't need to know the exact Lazy sub-exception.
+            throw new InstagramException($e->getMessage());
+        }
 
         // Save the HTTP response object as the "getHttpResponse()" value.
         $responseObject->setHttpResponse($httpResponse);
@@ -565,15 +546,25 @@ class Client
             } else {
                 $message = $responseObject->getMessage();
             }
-            ServerMessageThrower::autoThrow(
-                get_class($baseClass),
-                $message,
-                $responseObject,
-                $httpResponse
-            );
-        }
 
-        return $responseObject;
+            try {
+                ServerMessageThrower::autoThrow(
+                    get_class($responseObject),
+                    $message,
+                    $responseObject,
+                    $httpResponse
+                );
+            } catch (LoginRequiredException $e) {
+                // Instagram told us that our session is invalid (that we are
+                // not logged in). Update our cached "logged in?" state. This
+                // ensures that users with various retry-algorithms won't hammer
+                // their server. When this flag is false, ALL further attempts
+                // at AUTHENTICATED requests will be aborted by our library.
+                $this->_parent->isMaybeLoggedIn = false;
+
+                throw $e; // Re-throw.
+            }
+        }
     }
 
     /**
@@ -634,10 +625,11 @@ class Client
      * @param HttpRequestInterface $request       HTTP request to send.
      * @param array                $guzzleOptions Extra Guzzle options for this request.
      *
-     * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
-     * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
+     * @throws \InstagramAPI\Exception\NetworkException                For any network/socket related errors.
+     * @throws \InstagramAPI\Exception\ThrottledException              When we're throttled by server.
+     * @throws \InstagramAPI\Exception\RequestHeadersTooLargeException When request is too large.
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return HttpResponseInterface
      */
     protected function _guzzleRequest(
         HttpRequestInterface $request,
@@ -660,14 +652,17 @@ class Client
         case 429: // "429 Too Many Requests"
             throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
             break;
+        case 431: // "431 Request Header Fields Too Large"
+            throw new \InstagramAPI\Exception\RequestHeadersTooLargeException('The request start-line and/or headers are too large to process.');
+            break;
         // WARNING: Do NOT detect 404 and other higher-level HTTP errors here,
-        // since we catch those later during steps like getMappedResponseObject
+        // since we catch those later during steps like mapServerResponse()
         // and autoThrow. This is a warning to future contributors!
         }
 
         // We'll periodically auto-save our cookies at certain intervals. This
         // complements the "onCloseUser" and "login()/logout()" force-saving.
-        if ((time() - $this->_settingsCookieLastSaved) > self::COOKIE_AUTOSAVE_INTERVAL) {
+        if ((time() - $this->_cookieJarLastSaved) > self::COOKIE_AUTOSAVE_INTERVAL) {
             $this->saveCookieJar();
         }
 
@@ -751,7 +746,7 @@ class Client
      * @param HttpRequestInterface $request       HTTP request to send.
      * @param array                $guzzleOptions Extra Guzzle options for this request.
      *
-     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws InstagramException
      *
      * @return HttpResponseInterface
      */
@@ -760,7 +755,7 @@ class Client
         array $guzzleOptions = [])
     {
         // Set up headers that are required for every request.
-        $request = \GuzzleHttp\Psr7\modify_request($request, [
+        $request = modify_request($request, [
             'set_headers' => [
                 'User-Agent'       => $this->_userAgent,
                 // Keep the API's HTTPS connection alive in Guzzle for future
@@ -794,16 +789,16 @@ class Client
      * OF BIG NUMBERS! OTHERWISE YOU'LL TRUNCATE VARIOUS INSTAGRAM API FIELDS!
      *
      * @param string $json  The body (JSON string) of the API response.
-     * @param bool   $assoc When TRUE, decode to associative array instead of object.
+     * @param bool   $assoc When FALSE, decode to object instead of associative array.
      *
      * @return object|array|null Object if assoc false, Array if assoc true,
      *                           or NULL if unable to decode JSON.
      */
     public static function api_body_decode(
         $json,
-        $assoc = false)
+        $assoc = true)
     {
-        return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
+        return @json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
     }
 
     /**

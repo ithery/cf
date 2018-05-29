@@ -2,16 +2,18 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Button.
+ *
  * @method mixed getAction()
  * @method mixed getActionInfo()
  * @method mixed getBackgroundColor()
  * @method mixed getBorderColor()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getTextColor()
- * @method mixed getUrl()
+ * @method string getUrl()
  * @method bool isAction()
  * @method bool isActionInfo()
  * @method bool isBackgroundColor()
@@ -19,21 +21,30 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isText()
  * @method bool isTextColor()
  * @method bool isUrl()
- * @method setAction(mixed $value)
- * @method setActionInfo(mixed $value)
- * @method setBackgroundColor(mixed $value)
- * @method setBorderColor(mixed $value)
- * @method setText(mixed $value)
- * @method setTextColor(mixed $value)
- * @method setUrl(mixed $value)
+ * @method $this setAction(mixed $value)
+ * @method $this setActionInfo(mixed $value)
+ * @method $this setBackgroundColor(mixed $value)
+ * @method $this setBorderColor(mixed $value)
+ * @method $this setText(string $value)
+ * @method $this setTextColor(mixed $value)
+ * @method $this setUrl(string $value)
+ * @method $this unsetAction()
+ * @method $this unsetActionInfo()
+ * @method $this unsetBackgroundColor()
+ * @method $this unsetBorderColor()
+ * @method $this unsetText()
+ * @method $this unsetTextColor()
+ * @method $this unsetUrl()
  */
-class Button extends AutoPropertyHandler
+class Button extends AutoPropertyMapper
 {
-    public $text;
-    public $url;
-    public $action;
-    public $background_color;
-    public $border_color;
-    public $text_color;
-    public $action_info;
+    public static $JSON_PROPERTY_MAP = [
+        'text'             => 'string',
+        'url'              => 'string',
+        'action'           => '',
+        'background_color' => '',
+        'border_color'     => '',
+        'text_color'       => '',
+        'action_info'      => '',
+    ];
 }

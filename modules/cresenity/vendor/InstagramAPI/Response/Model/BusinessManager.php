@@ -2,31 +2,29 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BusinessManager.
+ *
  * @method BusinessNode getAccountInsightsUnit()
  * @method PromotionsUnit getPromotionsUnit()
  * @method BusinessFeed get_Feed2py0Z1()
  * @method bool isAccountInsightsUnit()
  * @method bool isPromotionsUnit()
  * @method bool is_Feed2py0Z1()
- * @method setAccountInsightsUnit(BusinessNode $value)
- * @method setPromotionsUnit(PromotionsUnit $value)
- * @method set_Feed2py0Z1(BusinessFeed $value)
+ * @method $this setAccountInsightsUnit(BusinessNode $value)
+ * @method $this setPromotionsUnit(PromotionsUnit $value)
+ * @method $this set_Feed2py0Z1(BusinessFeed $value)
+ * @method $this unsetAccountInsightsUnit()
+ * @method $this unsetPromotionsUnit()
+ * @method $this unset_Feed2py0Z1()
  */
-class BusinessManager extends AutoPropertyHandler
+class BusinessManager extends AutoPropertyMapper
 {
-    /**
-     * @var PromotionsUnit
-     */
-    public $promotions_unit;
-    /**
-     * @var BusinessNode
-     */
-    public $account_insights_unit;
-    /**
-     * @var BusinessFeed
-     */
-    public $_feed2py0Z1;
+    public static $JSON_PROPERTY_MAP = [
+        'promotions_unit'       => 'PromotionsUnit',
+        'account_insights_unit' => 'BusinessNode',
+        '_feed2py0Z1'           => 'BusinessFeed',
+    ];
 }

@@ -5,6 +5,7 @@ namespace InstagramAPI\Settings;
 use Fbns\Client\Auth\DeviceAuth;
 use Fbns\Client\AuthInterface;
 use InstagramAPI\Exception\SettingsException;
+use InstagramAPI\Utils;
 
 /**
  * Advanced, modular settings storage engine.
@@ -14,8 +15,8 @@ use InstagramAPI\Exception\SettingsException;
  *
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class StorageHandler
-{
+class StorageHandler {
+
     /**
      * Complete list of all settings that will be stored/retrieved persistently.
      *
@@ -38,6 +39,8 @@ class StorageHandler
         'last_fbns_token', // Tracks time elapsed since our last FBNS token refresh.
         'last_login', // Tracks time elapsed since our last login state refresh.
         'last_experiments', // Tracks time elapsed since our last experiments refresh.
+        'datacenter', // Preferred data center (region-based).
+        'presence_disabled', // Whether the presence feature has been disabled by user.
     ];
 
     /**
@@ -47,7 +50,7 @@ class StorageHandler
      * the values of all settings EXCEPT the keys listed here. It is therefore
      * VERY important to list ALL important NON-DEVICE specific settings here!
      *
-     * @var arrayKEEP_KEYS_WHEN_ERASING_DEVICE
+     * @var array
      *
      * @see StorageHandler::eraseDeviceSettings()
      */
@@ -68,6 +71,15 @@ class StorageHandler
         'ig_android_skywalker_live_event_start_end',
         'ig_android_gqls_typing_indicator',
         'ig_android_upload_reliability_universe',
+        'ig_android_photo_fbupload_universe',
+        'ig_android_video_segmented_upload_universe',
+        'ig_android_direct_video_segmented_upload_universe',
+        'ig_android_reel_raven_video_segmented_upload_universe',
+        'ig_android_ad_async_ads_universe',
+        'ig_android_direct_inbox_presence',
+        'ig_android_direct_thread_presence',
+        'ig_android_mqtt_region_hint_universe',
+        'ig_android_rtc_reshare',
     ];
 
     /**
@@ -93,6 +105,9 @@ class StorageHandler
     /** @var array Cache for the current user's key-value settings pairs. */
     private $_userSettings;
 
+    /** @var string|null Location of the cookiefile if file-based jar wanted. */
+    private $_cookiesFilePath;
+
     /**
      * Constructor.
      *
@@ -103,19 +118,15 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function __construct(
-        $storageInstance,
-        array $locationConfig = [],
-        array $callbacks = [])
-    {
+    public function __construct($storageInstance, array $locationConfig = [], array $callbacks = []) {
         if (!$storageInstance instanceof StorageInterface) {
             throw new SettingsException(
-                'You must provide an instance of a StorageInterface class.'
+            'You must provide an instance of a StorageInterface class.'
             );
         }
         if (!is_array($locationConfig)) {
             throw new SettingsException(
-                'The storage location configuration must be an array.'
+            'The storage location configuration must be an array.'
             );
         }
 
@@ -132,8 +143,7 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function __destruct()
-    {
+    public function __destruct() {
         // The storage handler is being killed, so tell the location to close.
         if ($this->_username !== null) {
             $this->_triggerCallback('onCloseUser');
@@ -152,9 +162,7 @@ class StorageHandler
      *
      * @return bool TRUE if user exists, otherwise FALSE.
      */
-    public function hasUser(
-        $username)
-    {
+    public function hasUser($username) {
         $this->_throwIfEmptyValue($username);
 
         return $this->_storage->hasUser($username);
@@ -183,17 +191,13 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function moveUser(
-        $oldUsername,
-        $newUsername)
-    {
+    public function moveUser($oldUsername, $newUsername) {
         $this->_throwIfEmptyValue($oldUsername);
         $this->_throwIfEmptyValue($newUsername);
 
-        if ($oldUsername === $this->_username
-            || $newUsername === $this->_username) {
+        if ($oldUsername === $this->_username || $newUsername === $this->_username) {
             throw new SettingsException(
-                'Attempted to move settings to/from the currently active user.'
+            'Attempted to move settings to/from the currently active user.'
             );
         }
 
@@ -207,14 +211,12 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function deleteUser(
-        $username)
-    {
+    public function deleteUser($username) {
         $this->_throwIfEmptyValue($username);
 
         if ($username === $this->_username) {
             throw new SettingsException(
-                'Attempted to delete the currently active user.'
+            'Attempted to delete the currently active user.'
             );
         }
 
@@ -228,9 +230,7 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function setActiveUser(
-        $username)
-    {
+    public function setActiveUser($username) {
         $this->_throwIfEmptyValue($username);
 
         // If that user is already loaded, there's no need to do anything.
@@ -267,6 +267,14 @@ class StorageHandler
                 $this->_userSettings[$key] = (string) $value;
             }
         }
+
+        // Determine what type of cookie storage the backend wants for the user.
+        // NOTE: Do NOT validate file existence, since we'll create if missing.
+        $cookiesFilePath = $this->_storage->getUserCookiesFilePath();
+        if ($cookiesFilePath !== null && (!is_string($cookiesFilePath) || !strlen($cookiesFilePath))) {
+            $cookiesFilePath = null; // Disable since it isn't a non-empty string.
+        }
+        $this->_cookiesFilePath = $cookiesFilePath;
     }
 
     /**
@@ -279,33 +287,31 @@ class StorageHandler
      *
      * @return bool TRUE if possibly logged in, otherwise FALSE.
      */
-    public function isMaybeLoggedIn()
-    {
+    public function isMaybeLoggedIn() {
         $this->_throwIfNoActiveUser();
 
-        return $this->_storage->hasUserCookies()
-                && !empty($this->get('account_id'));
+        return $this->_storage->hasUserCookies() && !empty($this->get('account_id'));
     }
 
     /**
-     * Erase all device-specific settings.
+     * Erase all device-specific settings and all cookies.
      *
      * This is useful when assigning a new Android device to the account, upon
      * which it's very important that we erase all previous, device-specific
      * settings so that our account still looks natural to Instagram.
      *
-     * Note that cookies will NOT be erased, since that action isn't supported
-     * by all storage backends. Ignoring old cookies is the job of the caller!
+     * Note that ALL cookies will be erased too, to clear out the old session.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function eraseDeviceSettings()
-    {
+    public function eraseDeviceSettings() {
         foreach (self::$PERSISTENT_KEYS as $key) {
-            if (!in_array($key, self::$KEEP_KEYS_WHEN_ERASING_DEVICE)) {
-                $this->set($key, '');
+            if (!in_array($key, self::KEEP_KEYS_WHEN_ERASING_DEVICE)) {
+                $this->set($key, ''); // Erase the setting.
             }
         }
+
+        $this->setCookies(''); // Erase all cookies.
     }
 
     /**
@@ -320,25 +326,19 @@ class StorageHandler
      * @return string|null The value as a string IF the setting exists AND is
      *                     a NON-EMPTY string. Otherwise NULL.
      */
-    public function get(
-        $key)
-    {
+    public function get($key) {
         $this->_throwIfNoActiveUser();
 
         // Reject anything that isn't in our list of VALID persistent keys.
         if (!in_array($key, self::$PERSISTENT_KEYS)) {
             throw new SettingsException(sprintf(
-                'The settings key "%s" is not a valid persistent key name.',
-                $key
+                    'The settings key "%s" is not a valid persistent key name.', $key
             ));
         }
 
         // Return value if it's a NON-EMPTY string, otherwise return NULL.
         // NOTE: All values are cached as strings so no casting is needed.
-        return (isset($this->_userSettings[$key])
-                 && $this->_userSettings[$key] !== '')
-                ? $this->_userSettings[$key]
-                : null;
+        return (isset($this->_userSettings[$key]) && $this->_userSettings[$key] !== '') ? $this->_userSettings[$key] : null;
     }
 
     /**
@@ -352,17 +352,13 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function set(
-        $key,
-        $value)
-    {
+    public function set($key, $value) {
         $this->_throwIfNoActiveUser();
 
         // Reject anything that isn't in our list of VALID persistent keys.
         if (!in_array($key, self::$PERSISTENT_KEYS)) {
             throw new SettingsException(sprintf(
-                'The settings key "%s" is not a valid persistent key name.',
-                $key
+                    'The settings key "%s" is not a valid persistent key name.', $key
             ));
         }
 
@@ -370,7 +366,7 @@ class StorageHandler
         // the caller must explicitly pass in an empty string instead.
         if ($value === null) {
             throw new SettingsException(
-                'Illegal attempt to store null value in settings storage.'
+            'Illegal attempt to store null value in settings storage.'
             );
         }
 
@@ -380,8 +376,7 @@ class StorageHandler
 
         // Check if the value differs from our storage (cached representation).
         // NOTE: This optimizes writes by only writing when values change!
-        if (!array_key_exists($key, $this->_userSettings)
-            || $this->_userSettings[$key] !== $value) {
+        if (!array_key_exists($key, $this->_userSettings) || $this->_userSettings[$key] !== $value) {
             // The value differs, so save to memory cache and write to storage.
             $this->_userSettings[$key] = $value;
             $this->_storage->saveUserSettings($this->_userSettings, $key);
@@ -397,8 +392,7 @@ class StorageHandler
      *
      * @return bool TRUE if cookies exist, otherwise FALSE.
      */
-    public function hasCookies()
-    {
+    public function hasCookies() {
         $this->_throwIfNoActiveUser();
 
         return $this->_storage->hasUserCookies();
@@ -411,54 +405,104 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      *
-     * @return array Cookies with their "format" ("cookiefile", "cookiestring")
-     *               and a "data" field pointing to the file (if "cookiefile")
-     *               or containing the raw cookie data (if "cookiestring"). The
-     *               cookiestring will be an empty string if no cookies exist.
+     * @return string|null A previously-stored, raw cookie data string
+     *                     (non-empty), or NULL if no cookies exist for
+     *                     the active user.
      */
-    public function getCookies()
-    {
+    public function getCookies() {
         $this->_throwIfNoActiveUser();
 
-        // Load and parse the cookie format.
-        $cookieFormat = 'cookiestring'; // Assume regular raw cookie-string.
-        $cookieData = $this->_storage->loadUserCookies();
-        if (!is_string($cookieData)) {
-            $cookieData = ''; // No cookies exist.
-        }
-        if (strncmp($cookieData, 'cookiefile:', 11) === 0) {
-            $cookieFormat = 'cookiefile';
-            $cookieData = substr($cookieData, strpos($cookieData, ':') + 1);
+        // Read the cookies via the appropriate backend method.
+        $userCookies = null;
+        if ($this->_cookiesFilePath === null) { // Backend storage.
+            $userCookies = $this->_storage->loadUserCookies();
+        } else { // Cookiefile on disk.
+            if (empty($this->_cookiesFilePath)) { // Just for extra safety.
+                throw new SettingsException(
+                'Cookie file format requested, but no file path provided.'
+                );
+            }
+
+            // Ensure that the cookie file's folder exists and is writable.
+            $this->_createCookiesFileDirectory();
+
+            // Read the existing cookie jar file if it already exists.
+            if (is_file($this->_cookiesFilePath)) {
+                $rawData = file_get_contents($this->_cookiesFilePath);
+                if ($rawData !== false) {
+                    $userCookies = $rawData;
+                }
+            }
         }
 
-        return [
-            'format' => $cookieFormat,
-            'data'   => $cookieData,
-        ];
+        // Ensure that we'll always return NULL if no cookies exist.
+        if ($userCookies !== null && !strlen($userCookies)) {
+            $userCookies = null;
+        }
+
+        return $userCookies;
     }
 
     /**
      * Save all cookies for the currently active user.
      *
      * Can only be executed after setActiveUser(). Note that this function is
-     * called frequently! But it is ONLY called if a non-"cookiefile" answer
-     * was returned by the getCookies() call.
+     * called frequently!
      *
      * NOTE: It is very important that the owner of this SettingsHandler either
      * continuously calls "setCookies", or better yet listens to the "closeUser"
      * callback to save all cookies in bulk to storage at the end of a session.
      *
-     * @param string $rawData An encoded string with all cookie data.
+     * @param string $rawData An encoded string with all cookie data. Use an
+     *                        empty string to erase currently stored cookies.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
     public function setCookies(
-        $rawData)
-    {
+    $rawData) {
         $this->_throwIfNoActiveUser();
         $this->_throwIfNotString($rawData);
 
-        return $this->_storage->saveUserCookies($rawData);
+        if ($this->_cookiesFilePath === null) { // Backend storage.
+            $this->_storage->saveUserCookies($rawData);
+        } else { // Cookiefile on disk.
+            if (strlen($rawData)) { // Update cookies (new value is non-empty).
+                // Perform an atomic diskwrite, which prevents accidental
+                // truncation if the script is ever interrupted mid-write.
+                $this->_createCookiesFileDirectory(); // Ensures dir exists.
+                $written = Utils::atomicWrite($this->_cookiesFilePath, $rawData);
+                if ($written === false) {
+                    throw new SettingsException(sprintf(
+                            'The "%s" cookie file is not writable.', $this->_cookiesFilePath
+                    ));
+                }
+            } else { // Delete cookies (empty string).
+                // Delete any existing cookie jar since the new data is empty.
+                if (is_file($this->_cookiesFilePath) && !@unlink($this->_cookiesFilePath)) {
+                    throw new SettingsException(sprintf(
+                            'Unable to delete the "%s" cookie file.', $this->_cookiesFilePath
+                    ));
+                }
+            }
+        }
+    }
+
+    /**
+     * Ensures the whole directory path to the cookie file exists/is writable.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
+    protected function _createCookiesFileDirectory() {
+        if ($this->_cookiesFilePath === null) {
+            return;
+        }
+
+        $cookieDir = dirname($this->_cookiesFilePath); // Can be "." in case of CWD.
+        if (!Utils::createFolder($cookieDir)) {
+            throw new SettingsException(sprintf(
+                    'The "%s" cookie folder is not writable.', $cookieDir
+            ));
+        }
     }
 
     /**
@@ -469,8 +513,7 @@ class StorageHandler
      * @throws \InstagramAPI\Exception\SettingsException
      */
     protected function _throwIfNotString(
-        $value)
-    {
+    $value) {
         if (!is_string($value)) {
             throw new SettingsException('Parameter must be string.');
         }
@@ -483,9 +526,7 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    protected function _throwIfEmptyValue(
-        $value)
-    {
+    protected function _throwIfEmptyValue($value) {
         if (!is_string($value) || $value === '') {
             throw new SettingsException('Parameter must be non-empty string.');
         }
@@ -496,11 +537,10 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    protected function _throwIfNoActiveUser()
-    {
+    protected function _throwIfNoActiveUser() {
         if ($this->_username === null) {
             throw new SettingsException(
-                'Called user-related function before setting the current storage user.'
+            'Called user-related function before setting the current storage user.'
             );
         }
     }
@@ -516,13 +556,11 @@ class StorageHandler
      * @throws \InstagramAPI\Exception\SettingsException
      */
     protected function _triggerCallback(
-        $cbName)
-    {
+    $cbName) {
         // Reject anything that isn't in our list of VALID callbacks.
-        if (!in_array($cbName, self::$SUPPORTED_CALLBACKS)) {
+        if (!in_array($cbName, self::SUPPORTED_CALLBACKS)) {
             throw new SettingsException(sprintf(
-                'The string "%s" is not a valid callback name.',
-                $cbName
+                    'The string "%s" is not a valid callback name.', $cbName
             ));
         }
 
@@ -551,10 +589,9 @@ class StorageHandler
      * @return array A list of "good" experiments.
      */
     public function setExperiments(
-        array $experiments)
-    {
+    array $experiments) {
         $filtered = [];
-        foreach (self::$EXPERIMENT_KEYS as $key) {
+        foreach (self::EXPERIMENT_KEYS as $key) {
             if (!isset($experiments[$key])) {
                 continue;
             }
@@ -565,9 +602,9 @@ class StorageHandler
         // We must compare gzipped with double encoded JSON.
         $doubleJson = json_encode($json);
         if (strlen($gzipped) < strlen($doubleJson)) {
-            $serialized = 'Z'.$gzipped;
+            $serialized = 'Z' . $gzipped;
         } else {
-            $serialized = 'J'.$json;
+            $serialized = 'J' . $json;
         }
         $this->set('experiments', $serialized);
 
@@ -581,8 +618,7 @@ class StorageHandler
      *
      * @return array
      */
-    public function getExperiments()
-    {
+    public function getExperiments() {
         $experiments = $this->get('experiments');
         if ($experiments === null || !strlen($experiments)) {
             return [];
@@ -591,17 +627,13 @@ class StorageHandler
         $experiments = substr($experiments, 1);
         switch ($format) {
             case 'Z':
-                if (($experiments = base64_decode($experiments)) === false
-                    || ($experiments = zlib_decode($experiments)) === false
-                    || ($experiments = json_decode($experiments, true)) === null
-                    || !is_array($experiments)
+                if (($experiments = base64_decode($experiments)) === false || ($experiments = zlib_decode($experiments)) === false || ($experiments = json_decode($experiments, true)) === null || !is_array($experiments)
                 ) {
                     return [];
                 }
                 break;
             case 'J':
-                if (($experiments = json_decode($experiments, true)) === null
-                    || !is_array($experiments)
+                if (($experiments = json_decode($experiments, true)) === null || !is_array($experiments)
                 ) {
                     return [];
                 }
@@ -619,8 +651,7 @@ class StorageHandler
      * @param AuthInterface $auth
      */
     public function setFbnsAuth(
-        AuthInterface $auth)
-    {
+    AuthInterface $auth) {
         $this->set('fbns_auth', $auth);
     }
 
@@ -632,15 +663,16 @@ class StorageHandler
      *
      * @return AuthInterface
      */
-    public function getFbnsAuth()
-    {
+    public function getFbnsAuth() {
         $result = new DeviceAuth();
 
         try {
             $result->read($this->get('fbns_auth'));
         } catch (\Exception $e) {
+            
         }
 
         return $result;
     }
+
 }

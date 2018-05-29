@@ -87,9 +87,8 @@ class Usertag extends RequestCollection
     /**
      * Get user taggings for a user.
      *
-     * @param string      $userId       Numerical UserPK ID.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
-     * @param null|int    $minTimestamp Minimum timestamp.
+     * @param string      $userId Numerical UserPK ID.
+     * @param null|string $maxId  Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -97,27 +96,30 @@ class Usertag extends RequestCollection
      */
     public function getUserFeed(
         $userId,
-        $maxId = null,
-        $minTimestamp = null)
+        $maxId = null)
     {
-        return $this->ig->request("usertags/{$userId}/feed/")
-            ->addParam('rank_token', $this->ig->rank_token)
-            ->addParam('ranked_content', 'true')
-            ->addParam('max_id', ($maxId !== null ? $maxId : ''))
-            ->addParam('min_timestamp', ($minTimestamp !== null ? $minTimestamp : ''))
-            ->getResponse(new Response\UsertagsResponse());
+        $request = $this->ig->request("usertags/{$userId}/feed/");
+
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\UsertagsResponse());
     }
 
     /**
      * Get user taggings for your own account.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\UsertagsResponse
      */
-    public function getSelfUserFeed()
+    public function getSelfUserFeed(
+        $maxId = null)
     {
-        return $this->getUserFeed($this->ig->account_id);
+        return $this->getUserFeed($this->ig->account_id, $maxId);
     }
 
     /**

@@ -2,13 +2,95 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class UserReelMediaFeedResponse extends Model\Reel implements ResponseInterface
+/**
+ * UserReelMediaFeedResponse.
+ *
+ * @method Model\Broadcast getBroadcast()
+ * @method bool getCanReply()
+ * @method bool getCanReshare()
+ * @method Model\CoverMedia getCoverMedia()
+ * @method mixed getExpiringAt()
+ * @method bool getHasBestiesMedia()
+ * @method string getId()
+ * @method Model\Item[] getItems()
+ * @method string getLatestReelMedia()
+ * @method Model\Location getLocation()
+ * @method mixed getMessage()
+ * @method mixed getPrefetchCount()
+ * @method string getRankedPosition()
+ * @method string getReelType()
+ * @method string getSeen()
+ * @method string getSeenRankedPosition()
+ * @method string getStatus()
+ * @method string getTitle()
+ * @method Model\User getUser()
+ * @method Model\ZMessage[] getZMessages()
+ * @method bool isBroadcast()
+ * @method bool isCanReply()
+ * @method bool isCanReshare()
+ * @method bool isCoverMedia()
+ * @method bool isExpiringAt()
+ * @method bool isHasBestiesMedia()
+ * @method bool isId()
+ * @method bool isItems()
+ * @method bool isLatestReelMedia()
+ * @method bool isLocation()
+ * @method bool isMessage()
+ * @method bool isPrefetchCount()
+ * @method bool isRankedPosition()
+ * @method bool isReelType()
+ * @method bool isSeen()
+ * @method bool isSeenRankedPosition()
+ * @method bool isStatus()
+ * @method bool isTitle()
+ * @method bool isUser()
+ * @method bool isZMessages()
+ * @method $this setBroadcast(Model\Broadcast $value)
+ * @method $this setCanReply(bool $value)
+ * @method $this setCanReshare(bool $value)
+ * @method $this setCoverMedia(Model\CoverMedia $value)
+ * @method $this setExpiringAt(mixed $value)
+ * @method $this setHasBestiesMedia(bool $value)
+ * @method $this setId(string $value)
+ * @method $this setItems(Model\Item[] $value)
+ * @method $this setLatestReelMedia(string $value)
+ * @method $this setLocation(Model\Location $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setPrefetchCount(mixed $value)
+ * @method $this setRankedPosition(string $value)
+ * @method $this setReelType(string $value)
+ * @method $this setSeen(string $value)
+ * @method $this setSeenRankedPosition(string $value)
+ * @method $this setStatus(string $value)
+ * @method $this setTitle(string $value)
+ * @method $this setUser(Model\User $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetBroadcast()
+ * @method $this unsetCanReply()
+ * @method $this unsetCanReshare()
+ * @method $this unsetCoverMedia()
+ * @method $this unsetExpiringAt()
+ * @method $this unsetHasBestiesMedia()
+ * @method $this unsetId()
+ * @method $this unsetItems()
+ * @method $this unsetLatestReelMedia()
+ * @method $this unsetLocation()
+ * @method $this unsetMessage()
+ * @method $this unsetPrefetchCount()
+ * @method $this unsetRankedPosition()
+ * @method $this unsetReelType()
+ * @method $this unsetSeen()
+ * @method $this unsetSeenRankedPosition()
+ * @method $this unsetStatus()
+ * @method $this unsetTitle()
+ * @method $this unsetUser()
+ * @method $this unsetZMessages()
+ */
+class UserReelMediaFeedResponse extends Response
 {
-    use ResponseTrait;
-
-    // NOTE: This is a special response object which extends
-    // Model\Reel to inherit all of its properties!
+    public static $JSON_PROPERTY_MAP = [
+        Model\Reel::class, // Import property map.
+    ];
 }
