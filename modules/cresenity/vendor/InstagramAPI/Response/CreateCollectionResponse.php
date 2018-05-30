@@ -2,25 +2,39 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * CreateCollectionResponse.
+ *
  * @method string getCollectionId()
- * @method mixed getCollectionName()
+ * @method string getCollectionName()
+ * @method Model\Item getCoverMedia()
+ * @method mixed getMessage()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isCollectionId()
  * @method bool isCollectionName()
- * @method setCollectionId(string $value)
- * @method setCollectionName(mixed $value)
+ * @method bool isCoverMedia()
+ * @method bool isMessage()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setCollectionId(string $value)
+ * @method $this setCollectionName(string $value)
+ * @method $this setCoverMedia(Model\Item $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetCollectionId()
+ * @method $this unsetCollectionName()
+ * @method $this unsetCoverMedia()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class CreateCollectionResponse extends AutoPropertyHandler implements ResponseInterface
+class CreateCollectionResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var string
-     */
-    public $collection_id;
-    public $collection_name;
+    public static $JSON_PROPERTY_MAP = [
+        Model\Collection::class, // Import property map.
+    ];
 }

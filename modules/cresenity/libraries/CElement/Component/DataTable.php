@@ -602,6 +602,13 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * Set callback for table cell render
+     * 
+     * @param callable $func parameter: $table,$col,$row,$value 
+     * @param string $require File location of callable function to require
+     * @return $this
+     */
     public function cellCallbackFunc($func, $require = "") {
         $this->cell_callback_func = $func;
         if (strlen($require) > 0) {

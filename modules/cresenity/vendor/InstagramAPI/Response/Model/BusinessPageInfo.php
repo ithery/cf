@@ -2,18 +2,24 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method mixed getHasNextPage()
- * @method mixed getHasPreviousPage()
+ * BusinessPageInfo.
+ *
+ * @method bool getHasNextPage()
+ * @method bool getHasPreviousPage()
  * @method bool isHasNextPage()
  * @method bool isHasPreviousPage()
- * @method setHasNextPage(mixed $value)
- * @method setHasPreviousPage(mixed $value)
+ * @method $this setHasNextPage(bool $value)
+ * @method $this setHasPreviousPage(bool $value)
+ * @method $this unsetHasNextPage()
+ * @method $this unsetHasPreviousPage()
  */
-class BusinessPageInfo extends AutoPropertyHandler
+class BusinessPageInfo extends AutoPropertyMapper
 {
-    public $has_next_page;
-    public $has_previous_page;
+    public static $JSON_PROPERTY_MAP = [
+        'has_next_page'     => 'bool',
+        'has_previous_page' => 'bool',
+    ];
 }

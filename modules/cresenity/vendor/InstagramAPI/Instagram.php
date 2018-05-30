@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 /**
- * Instagram's Private API v3.
+ * Instagram's Private API v5.
  *
  * TERMS OF USE:
  * - This code is in no way affiliated with, authorized, maintained, sponsored
@@ -17,7 +17,7 @@ namespace InstagramAPI;
  * @author mgp25: Founder, Reversing, Project Leader (https://github.com/mgp25)
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class Instagram
+class Instagram implements ExperimentsInterface
 {
     /**
      * Experiments refresh interval in sec.
@@ -76,6 +76,23 @@ class Instagram
     public $apiDeveloperDebug = false;
 
     /**
+     * Global flag for users who want to run the library incorrectly online.
+     *
+     * YOU ENABLE THIS AT YOUR OWN RISK! WE GIVE _ZERO_ SUPPORT FOR THIS MODE!
+     * EMBEDDING THE LIBRARY DIRECTLY IN A WEBPAGE (WITHOUT ANY INTERMEDIARY
+     * PROTECTIVE LAYER) CAN CAUSE ALL KINDS OF DAMAGE AND DATA CORRUPTION!
+     *
+     * YOU HAVE BEEN WARNED. ANY DATA CORRUPTION YOU CAUSE IS YOUR OWN PROBLEM!
+     *
+     * The right way to run the library online is described in `webwarning.htm`.
+     *
+     * @var bool
+     *
+     * @see Instagram::__construct()
+     */
+    public static $allowDangerousWebUsageAtMyOwnRisk = true;
+
+    /**
      * UUID.
      *
      * @var string
@@ -116,18 +133,24 @@ class Instagram
     public $account_id;
 
     /**
-     * Session status.
+     * Our current guess about the session status.
+     *
+     * This contains our current GUESS about whether the current user is still
+     * logged in. There is NO GUARANTEE that we're still logged in. For example,
+     * the server may have invalidated our current session due to the account
+     * password being changed AFTER our last login happened (which kills all
+     * existing sessions for that account), or the session may have expired
+     * naturally due to not being used for a long time, and so on...
+     *
+     * NOTE TO USERS: The only way to know for sure if you're logged in is to
+     * try a request. If it throws a `LoginRequiredException`, then you're not
+     * logged in anymore. The `login()` function will always ensure that your
+     * current session is valid. But AFTER that, anything can happen... It's up
+     * to Instagram, and we have NO control over what they do with your session!
      *
      * @var bool
      */
-    public $isLoggedIn = false;
-
-    /**
-     * Rank token.
-     *
-     * @var string
-     */
-    public $rank_token;
+    public $isMaybeLoggedIn = false;
 
     /**
      * Raw API communication/networking class.
@@ -174,6 +197,8 @@ class Instagram
     public $discover;
     /** @var Request\Hashtag Collection of Hashtag related functions. */
     public $hashtag;
+    /** @var Request\Highlight Collection of Highlight related functions. */
+    public $highlight;
     /** @var Request\Internal Collection of Internal (non-public) functions. */
     public $internal;
     /** @var Request\Live Collection of Live related functions. */
@@ -208,13 +233,42 @@ class Instagram
         $truncatedDebug = false,
         array $storageConfig = [])
     {
-        // Prevent people from running this library on ancient PHP versions.
-        if (!defined('PHP_VERSION_ID')) { // Emulate version value if missing.
-            $version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+        // Disable incorrect web usage by default. People should never embed
+        // this application emulator library directly in a webpage, or they
+        // might cause all kinds of damage and data corruption. They should
+        // use an intermediary layer such as a database or a permanent process!
+        // NOTE: People can disable this safety via the flag at their own risk.
+        if (!self::$allowDangerousWebUsageAtMyOwnRisk && (!defined('PHP_SAPI') || PHP_SAPI !== 'cli')) {
+            // IMPORTANT: We do NOT throw any exception here for users who are
+            // running the library via a webpage. Many webservers are configured
+            // to hide all PHP errors, and would just give the user a totally
+            // blank webpage with "Error 500" if we throw here, which would just
+            // confuse the newbies even more. Instead, we output a HTML warning
+            // message for people who try to run the library on a webpage.
+            //echo file_get_contents(__DIR__.'/../webwarning.htm');
+            echo '<p>If you truly want to enable <em>incorrect</em> website usage by directly embedding this application emulator library in your page, then you can do that <strong>AT YOUR OWN RISK</strong> by setting the following flag <em>before</em> you create the <code>Instagram()</code> object:</p>'.PHP_EOL;
+            echo '<p><code>\InstagramAPI\Instagram::$allowDangerousWebUsageAtMyOwnRisk = true;</code></p>'.PHP_EOL;
+            exit(0); // Exit without error to avoid triggering Error 500.
         }
-        if (PHP_VERSION_ID < 50600) {
-            //throw new \InstagramAPI\Exception\InternalException('You must have PHP 5.6 or higher to use the Instagram API library.');
+
+        // Prevent people from running this library on ancient PHP versions, and
+        // verify that people have the most critically important PHP extensions.
+        // NOTE: All of these are marked as requirements in composer.json, but
+        // some people install the library at home and then move it somewhere
+        // else without the requirements, and then blame us for their errors.
+        if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50500) {
+            throw new \InstagramAPI\Exception\InternalException(
+                'You must have PHP 5.5 or higher to use the Instagram API library.'
+            );
+        }
+        static $extensions = ['curl', 'mbstring', 'gd', 'exif', 'zlib'];
+        foreach ($extensions as $ext) {
+            if (!@extension_loaded($ext)) {
+                throw new \InstagramAPI\Exception\InternalException(sprintf(
+                    'You must have the "%s" PHP extension to use the Instagram API library.',
+                    $ext
+                ));
+            }
         }
 
         // Debugging options.
@@ -229,6 +283,7 @@ class Instagram
         $this->direct = new Request\Direct($this);
         $this->discover = new Request\Discover($this);
         $this->hashtag = new Request\Hashtag($this);
+        $this->highlight = new Request\Highlight($this);
         $this->internal = new Request\Internal($this);
         $this->live = new Request\Live($this);
         $this->location = new Request\Location($this);
@@ -290,7 +345,8 @@ class Instagram
      * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
      *
      * @param string|array|null $value String or Array specifying a proxy in
-     *                                 Guzzle format, or NULL to disable proxying.
+     *                                 Guzzle format, or NULL to disable
+     *                                 proxying.
      */
     public function setProxy(
         $value)
@@ -316,8 +372,9 @@ class Instagram
      *
      * @see http://php.net/curl_setopt CURLOPT_INTERFACE
      *
-     * @param string|null $value Interface name, IP address or hostname, or NULL to
-     *                           disable override and let Guzzle use any interface.
+     * @param string|null $value Interface name, IP address or hostname, or NULL
+     *                           to disable override and let Guzzle use any
+     *                           interface.
      */
     public function setOutputInterface(
         $value)
@@ -338,42 +395,82 @@ class Instagram
     /**
      * Login to Instagram or automatically resume and refresh previous session.
      *
-     * Sets the active account for the class instance. You can call this multiple times to switch
-     * between multiple Instagram accounts.
+     * Sets the active account for the class instance. You can call this
+     * multiple times to switch between multiple Instagram accounts.
      *
-     * WARNING: You MUST run this function EVERY time your script runs! It handles automatic session
-     * resume and relogin and app session state refresh and other absolutely *vital* things that are
-     * important if you don't want to be banned from Instagram!
+     * WARNING: You MUST run this function EVERY time your script runs! It
+     * handles automatic session resume and relogin and app session state
+     * refresh and other absolutely *vital* things that are important if you
+     * don't want to be banned from Instagram!
      *
-     * WARNING: This function MAY return a CHALLENGE telling you that the account needs two-factor
-     * login before letting you log in! Read the two-factor login example to see how to handle that.
+     * WARNING: This function MAY return a CHALLENGE telling you that the
+     * account needs two-factor login before letting you log in! Read the
+     * two-factor login example to see how to handle that.
      *
      * @param string $username           Your Instagram username.
      * @param string $password           Your Instagram password.
-     * @param bool   $forceLogin         Force login to Instagram instead of resuming previous session.
-     * @param int    $appRefreshInterval How frequently login() should act like an Instagram app
-     *                                   that's been closed and reopened and needs to "refresh its
-     *                                   state", by asking for extended account state details.
-     *                                   Default: After 1800 seconds, meaning 30 minutes since the
-     *                                   last state-refreshing login() call.
-     *                                   This CANNOT be longer than 6 hours. Read _sendLoginFlow()!
-     *                                   The shorter your delay is the BETTER. You may even want to
-     *                                   set it to an even LOWER value than the default 30 minutes!
+     * @param int    $appRefreshInterval How frequently `login()` should act
+     *                                   like an Instagram app that's been
+     *                                   closed and reopened and needs to
+     *                                   "refresh its state", by asking for
+     *                                   extended account state details.
+     *                                   Default: After `1800` seconds, meaning
+     *                                   `30` minutes after the last
+     *                                   state-refreshing `login()` call.
+     *                                   This CANNOT be longer than `6` hours.
+     *                                   Read `_sendLoginFlow()`! The shorter
+     *                                   your delay is the BETTER. You may even
+     *                                   want to set it to an even LOWER value
+     *                                   than the default 30 minutes!
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\LoginResponse|null A login response if a full (re-)login happens,
-     *                                                   otherwise NULL if an existing session is resumed.
+     * @return \InstagramAPI\Response\LoginResponse|null A login response if a
+     *                                                   full (re-)login
+     *                                                   happens, otherwise
+     *                                                   `NULL` if an existing
+     *                                                   session is resumed.
      */
     public function login(
+        $username,
+        $password,
+        $appRefreshInterval = 1800)
+    {
+        if (empty($username) || empty($password)) {
+            throw new \InvalidArgumentException('You must provide a username and password to login().');
+        }
+
+        return $this->_login($username, $password, false, $appRefreshInterval);
+    }
+
+    /**
+     * Internal login handler.
+     *
+     * @param string $username
+     * @param string $password
+     * @param bool   $forceLogin         Force login to Instagram instead of
+     *                                   resuming previous session. Used
+     *                                   internally to do a new, full relogin
+     *                                   when we detect an expired/invalid
+     *                                   previous session.
+     * @param int    $appRefreshInterval
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\LoginResponse|null
+     *
+     * @see Instagram::login() The public login handler with a full description.
+     */
+    protected function _login(
         $username,
         $password,
         $forceLogin = false,
         $appRefreshInterval = 1800)
     {
         if (empty($username) || empty($password)) {
-            throw new \InvalidArgumentException('You must provide a username and password to login().');
+            throw new \InvalidArgumentException('You must provide a username and password to _login().');
         }
 
         // Switch the currently active user/pass if the details are different.
@@ -382,7 +479,7 @@ class Instagram
         }
 
         // Perform a full relogin if necessary.
-        if (!$this->isLoggedIn || $forceLogin) {
+        if (!$this->isMaybeLoggedIn || $forceLogin) {
             $this->_sendPreLoginFlow();
 
             try {
@@ -425,29 +522,49 @@ class Instagram
      * Finish a two-factor authenticated login.
      *
      * This function finishes a two-factor challenge that was provided by the
-     * regular login() function. If you successfully answer their challenge,
+     * regular `login()` function. If you successfully answer their challenge,
      * you will be logged in after this function call.
      *
-     * @param string $verificationCode    Verification code you have received via SMS.
-     * @param string $twoFactorIdentifier Two factor identifier, obtained in login() response. Format: "123456".
-     * @param int    $appRefreshInterval  See login() for description of this parameter.
+     * @param string $username            Your Instagram username.
+     * @param string $password            Your Instagram password.
+     * @param string $twoFactorIdentifier Two factor identifier, obtained in
+     *                                    login() response. Format: `123456`.
+     * @param string $verificationCode    Verification code you have received
+     *                                    via SMS.
+     * @param int    $appRefreshInterval  See `login()` for description of this
+     *                                    parameter.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\LoginResponse
      */
     public function finishTwoFactorLogin(
-        $verificationCode,
+        $username,
+        $password,
         $twoFactorIdentifier,
+        $verificationCode,
         $appRefreshInterval = 1800)
     {
-        if (empty($this->username) || empty($this->password)) {
-            throw new \InstagramAPI\Exception\LoginRequiredException(
-                'You must provide a username and password to login() before attempting to finish the two-factor login process.'
-            );
+        if (empty($username) || empty($password)) {
+            throw new \InvalidArgumentException('You must provide a username and password to finishTwoFactorLogin().');
+        }
+        if (empty($verificationCode) || empty($twoFactorIdentifier)) {
+            throw new \InvalidArgumentException('You must provide a verification code and two-factor identifier to finishTwoFactorLogin().');
         }
 
-        $verificationCode = trim(str_replace(' ', '', $verificationCode));
+        // Switch the currently active user/pass if the details are different.
+        // NOTE: The username and password AREN'T actually necessary for THIS
+        // endpoint, but this extra step helps people who statelessly embed the
+        // library directly into a webpage, so they can `finishTwoFactorLogin()`
+        // on their second page load without having to begin any new `login()`
+        // call (since they did that in their previous webpage's library calls).
+        if ($this->username !== $username || $this->password !== $password) {
+            $this->_setUser($username, $password);
+        }
+
+        // Remove all whitespace from the verification code.
+        $verificationCode = preg_replace('/\s+/', '', $verificationCode);
 
         $response = $this->request('accounts/two_factor_login/')
             ->setNeedsAuth(false)
@@ -464,6 +581,159 @@ class Instagram
         $this->_sendLoginFlow(true, $appRefreshInterval);
 
         return $response;
+    }
+
+    /**
+     * Request a new security code SMS for a Two Factor login account.
+     *
+     * NOTE: You should first attempt to `login()` which will automatically send
+     * you a two factor SMS. This function is just for asking for a new SMS if
+     * the old code has expired.
+     *
+     * NOTE: Instagram can only send you a new code every 60 seconds.
+     *
+     * @param string $username            Your Instagram username.
+     * @param string $password            Your Instagram password.
+     * @param string $twoFactorIdentifier Two factor identifier, obtained in
+     *                                    `login()` response.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TwoFactorLoginSMSResponse
+     */
+    public function sendTwoFactorLoginSMS(
+        $username,
+        $password,
+        $twoFactorIdentifier)
+    {
+        if (empty($username) || empty($password)) {
+            throw new \InvalidArgumentException('You must provide a username and password to sendTwoFactorLoginSMS().');
+        }
+        if (empty($twoFactorIdentifier)) {
+            throw new \InvalidArgumentException('You must provide a two-factor identifier to sendTwoFactorLoginSMS().');
+        }
+
+        // Switch the currently active user/pass if the details are different.
+        // NOTE: The password IS NOT actually necessary for THIS
+        // endpoint, but this extra step helps people who statelessly embed the
+        // library directly into a webpage, so they can `sendTwoFactorLoginSMS()`
+        // on their second page load without having to begin any new `login()`
+        // call (since they did that in their previous webpage's library calls).
+        if ($this->username !== $username || $this->password !== $password) {
+            $this->_setUser($username, $password);
+        }
+
+        return $this->ig->request('accounts/send_two_factor_login_sms/')
+            ->setNeedsAuth(false)
+            ->addPost('two_factor_identifier', $twoFactorIdentifier)
+            ->addPost('username', $username)
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('guid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\TwoFactorLoginSMSResponse());
+    }
+
+    /**
+     * Request information about available password recovery methods for an account.
+     *
+     * This will tell you things such as whether SMS or EMAIL-based recovery is
+     * available for the given account name.
+     *
+     * `WARNING:` You can call this function without having called `login()`,
+     * but be aware that a user database entry will be created for every
+     * username you try to look up. This is ONLY meant for recovering your OWN
+     * accounts.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UsersLookupResponse
+     */
+    public function userLookup(
+        $username)
+    {
+        // Set active user (without pwd), and create database entry if new user.
+        $this->_setUserWithoutPassword($username);
+
+        return $this->request('users/lookup/')
+            ->setNeedsAuth(false)
+            ->addPost('q', $username)
+            ->addPost('directly_sign_in', true)
+            ->addPost('username', $username)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('guid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\UsersLookupResponse());
+    }
+
+    /**
+     * Request a recovery EMAIL to get back into your account.
+     *
+     * `WARNING:` You can call this function without having called `login()`,
+     * but be aware that a user database entry will be created for every
+     * username you try to look up. This is ONLY meant for recovering your OWN
+     * accounts.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RecoveryResponse
+     */
+    public function sendRecoveryEmail(
+        $username)
+    {
+        // Set active user (without pwd), and create database entry if new user.
+        $this->_setUserWithoutPassword($username);
+
+        // Verify that they can use the recovery email option.
+        $userLookup = $this->userLookup($username);
+        if (!$userLookup->getCanEmailReset()) {
+            throw new \InstagramAPI\Exception\InternalException('Email recovery is not available, since your account lacks a verified email address.');
+        }
+
+        return $this->request('accounts/send_recovery_flow_email/')
+            ->setNeedsAuth(false)
+            ->addPost('query', $username)
+            ->addPost('adid', $this->advertising_id)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('guid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\RecoveryResponse());
+    }
+
+    /**
+     * Request a recovery SMS to get back into your account.
+     *
+     * `WARNING:` You can call this function without having called `login()`,
+     * but be aware that a user database entry will be created for every
+     * username you try to look up. This is ONLY meant for recovering your OWN
+     * accounts.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RecoveryResponse
+     */
+    public function sendRecoverySMS(
+        $username)
+    {
+        // Set active user (without pwd), and create database entry if new user.
+        $this->_setUserWithoutPassword($username);
+
+        // Verify that they can use the recovery SMS option.
+        $userLookup = $this->userLookup($username);
+        if (!$userLookup->getHasValidPhone() || !$userLookup->getCanSmsReset()) {
+            throw new \InstagramAPI\Exception\InternalException('SMS recovery is not available, since your account lacks a verified phone number.');
+        }
+
+        return $this->request('users/lookup_phone/')
+            ->setNeedsAuth(false)
+            ->addPost('query', $username)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\RecoveryResponse());
     }
 
     /**
@@ -492,7 +762,12 @@ class Instagram
         // user's last-used device IF they've got a valid, good one stored.
         // But if they've got a BAD/none, this will create a brand-new device.
         $savedDeviceString = $this->settings->get('devicestring');
-        $this->device = new Devices\Device(Constants::IG_VERSION, Constants::VERSION_CODE, Constants::USER_AGENT_LOCALE, $savedDeviceString);
+        $this->device = new Devices\Device(
+            Constants::IG_VERSION,
+            Constants::VERSION_CODE,
+            Constants::USER_AGENT_LOCALE,
+            $savedDeviceString
+        );
 
         // Get active device string so that we can compare it to any saved one.
         $deviceString = $this->device->getDeviceString();
@@ -509,7 +784,7 @@ class Instagram
             || empty($this->settings->get('uuid')) // one of the critically...
             || empty($this->settings->get('phone_id')) // ...important device...
             || empty($this->settings->get('device_id'))) { // ...parameters.
-            // Erase all previously stored device-specific settings.
+            // Erase all previously stored device-specific settings and cookies.
             $this->settings->eraseDeviceSettings();
 
             // Save the chosen device string to settings.
@@ -552,20 +827,61 @@ class Instagram
 
         // Load the previous session details if we're possibly logged in.
         if (!$resetCookieJar && $this->settings->isMaybeLoggedIn()) {
-            $this->isLoggedIn = true;
+            $this->isMaybeLoggedIn = true;
             $this->account_id = $this->settings->get('account_id');
-            $this->rank_token = $this->account_id.'_'.$this->uuid;
         } else {
-            $this->isLoggedIn = false;
+            $this->isMaybeLoggedIn = false;
             $this->account_id = null;
-            $this->rank_token = null;
         }
 
-        // Configures Client for current user AND updates isLoggedIn state
+        // Configures Client for current user AND updates isMaybeLoggedIn state
         // if it fails to load the expected cookies from the user's jar.
-        // Must be done last here, so that isLoggedIn is properly updated!
+        // Must be done last here, so that isMaybeLoggedIn is properly updated!
         // NOTE: If we generated a new device we start a new cookie jar.
         $this->client->updateFromCurrentSettings($resetCookieJar);
+    }
+
+    /**
+     * Set the active account for the class instance, without knowing password.
+     *
+     * This internal function is used by all unauthenticated pre-login functions
+     * whenever they need to perform unauthenticated requests, such as looking
+     * up a user's account recovery options.
+     *
+     * `WARNING:` A user database entry will be created for every username you
+     * set as the active user, exactly like the normal `_setUser()` function.
+     * This is necessary so that we generate a user-device and data storage for
+     * each given username, which gives us necessary data such as a "device ID"
+     * for the new user's virtual device, to use in various API-call parameters.
+     *
+     * `WARNING:` This function CANNOT be used for performing logins, since
+     * Instagram will validate the password and will reject the missing
+     * password. It is ONLY meant to be used for *RECOVERY* PRE-LOGIN calls that
+     * need device parameters when the user DOESN'T KNOW their password yet.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     */
+    protected function _setUserWithoutPassword(
+        $username)
+    {
+        if (empty($username) || !is_string($username)) {
+            throw new \InvalidArgumentException('You must provide a username.');
+        }
+
+        // Switch the currently active user/pass if the username is different.
+        // NOTE: Creates a user database (device) for the user if they're new!
+        // NOTE: Because we don't know their password, we'll mark the user as
+        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
+        // `login()` with the ACTUAL password, which will tell us what it is.
+        // We CANNOT use an empty string since `_setUser()` will not allow that!
+        // NOTE: If the user tries to look up themselves WHILE they are logged
+        // in, we'll correctly NOT call `_setUser()` since they're already set.
+        if ($this->username !== $username) {
+            $this->_setUser($username, 'NOPASSWORD');
+        }
     }
 
     /**
@@ -586,10 +902,9 @@ class Instagram
             throw new \InvalidArgumentException('Invalid login response provided to _updateLoginState().');
         }
 
-        $this->isLoggedIn = true;
+        $this->isMaybeLoggedIn = true;
         $this->account_id = $response->getLoggedInUser()->getPk();
         $this->settings->set('account_id', $this->account_id);
-        $this->rank_token = $this->account_id.'_'.$this->uuid;
         $this->settings->set('last_login', time());
     }
 
@@ -602,9 +917,11 @@ class Instagram
     {
         // Calling this non-token API will put a csrftoken in our cookie
         // jar. We must do this before any functions that require a token.
-        $this->internal->syncDeviceFeatures(true);
         $this->internal->readMsisdnHeader();
+        $this->internal->syncDeviceFeatures(true);
+        $this->internal->getZeroRatingTokenResult();
         $this->internal->logAttribution();
+        $this->account->setContactPointPrefill('prefill');
     }
 
     /**
@@ -656,19 +973,27 @@ class Instagram
     /**
      * Sends login flow. This is required to emulate real device behavior.
      *
-     * @param bool $justLoggedIn
-     * @param int  $appRefreshInterval
+     * @param bool $justLoggedIn       Whether we have just performed a full
+     *                                 relogin (rather than doing a resume).
+     * @param int  $appRefreshInterval See `login()` for description of this
+     *                                 parameter.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\LoginResponse|null A login response if a full (re-)login is needed
-     *                                                   during the login flow attempt, otherwise NULL.
+     * @return \InstagramAPI\Response\LoginResponse|null A login response if a
+     *                                                   full (re-)login is
+     *                                                   needed during the login
+     *                                                   flow attempt, otherwise
+     *                                                   `NULL`.
      */
     protected function _sendLoginFlow(
         $justLoggedIn,
         $appRefreshInterval = 1800)
     {
+        if (!is_int($appRefreshInterval) || $appRefreshInterval < 0) {
+            throw new \InvalidArgumentException("Instagram's app state refresh interval must be a positive integer.");
+        }
         if ($appRefreshInterval > 21600) {
             throw new \InvalidArgumentException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!");
         }
@@ -694,41 +1019,43 @@ class Instagram
         // You have been warned.
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
-            $this->people->getAutoCompleteUserList();
+            $this->internal->getZeroRatingTokenResult();
+            $this->people->getBootstrapUsers();
             $this->story->getReelsTrayFeed();
-            $this->timeline->getTimelineFeed();
-            $this->direct->getRecentRecipients();
+            $this->timeline->getTimelineFeed(null, ['recovered_from_crash' => true]);
             $this->internal->syncUserFeatures();
             $this->_registerPushChannels();
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             $this->direct->getInbox();
-            $this->direct->getVisualInbox();
-            // bootstrap users
+            $this->account->getPresenceStatus();
             $this->internal->getProfileNotice();
             //$this->internal->getMegaphoneLog();
             $this->people->getRecentActivityInbox();
-            $this->internal->getQPFetch();
+            $this->internal->getQPFetch(Constants::$SURFACE_PARAM[0]);
             $this->media->getBlockedMedia();
+            $this->internal->getQPFetch(Constants::$SURFACE_PARAM[1]);
             $this->discover->getExploreFeed(null, true);
-            //$this->internal->getFacebookOTA();
+            $this->internal->getFacebookOTA();
         } else {
+            $lastLoginTime = $this->settings->get('last_login');
+            $isSessionExpired = $lastLoginTime === null || (time() - $lastLoginTime) > $appRefreshInterval;
+
             // Act like a real logged in app client refreshing its news timeline.
             // This also lets us detect if we're still logged in with a valid session.
             try {
                 $this->timeline->getTimelineFeed(null, [
-                    'is_pull_to_refresh' => mt_rand(1, 3) < 3,
+                    'is_pull_to_refresh' => $isSessionExpired ? null : mt_rand(1, 3) < 3,
                 ]);
             } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
                 // If our session cookies are expired, we were now told to login,
                 // so handle that by running a forced relogin in that case!
-                return $this->login($this->username, $this->password, true, $appRefreshInterval);
+                return $this->_login($this->username, $this->password, true, $appRefreshInterval);
             }
 
             // Perform the "user has returned to their already-logged in app,
             // so refresh all feeds to check for news" API flow.
-            $lastLoginTime = $this->settings->get('last_login');
-            if ($lastLoginTime === null || (time() - $lastLoginTime) > $appRefreshInterval) {
+            if ($isSessionExpired) {
                 $this->settings->set('last_login', time());
 
                 // Generate and save a new application session ID.
@@ -736,14 +1063,14 @@ class Instagram
                 $this->settings->set('session_id', $this->session_id);
 
                 // Do the rest of the "user is re-opening the app" API flow...
-                $this->people->getAutoCompleteUserList();
+                $this->people->getBootstrapUsers();
                 $this->story->getReelsTrayFeed();
                 $this->direct->getRankedRecipients('reshare', true);
                 $this->direct->getRankedRecipients('raven', true);
                 $this->_registerPushChannels();
-                $this->direct->getRecentRecipients();
                 //$this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
+                $this->account->getPresenceStatus();
                 $this->people->getRecentActivityInbox();
                 $this->internal->getProfileNotice();
                 $this->discover->getExploreFeed();
@@ -767,11 +1094,11 @@ class Instagram
     /**
      * Log out of Instagram.
      *
-     * WARNING: Most people should NEVER call logout()! Our library emulates
+     * WARNING: Most people should NEVER call `logout()`! Our library emulates
      * the Instagram app for Android, where you are supposed to stay logged in
      * forever. By calling this function, you will tell Instagram that you are
      * logging out of the APP. But you SHOULDN'T do that! In almost 100% of all
-     * cases you want to *stay logged in* so that LOGIN() resumes your session!
+     * cases you want to *stay logged in* so that `login()` resumes your session!
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -811,6 +1138,25 @@ class Instagram
     {
         return isset($this->experiments[$experiment][$param])
             && in_array($this->experiments[$experiment][$param], ['enabled', 'true', '1']);
+    }
+
+    /**
+     * Get a parameter value for the given experiment.
+     *
+     * @param string $experiment
+     * @param string $param
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getExperimentParam(
+        $experiment,
+        $param,
+        $default = null)
+    {
+        return isset($this->experiments[$experiment][$param])
+            ? $this->experiments[$experiment][$param]
+            : $default;
     }
 
     /**

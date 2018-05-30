@@ -2,18 +2,31 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
- * @method mixed getHasChangePasswordMegaphone()
+ * ProfileNoticeResponse.
+ *
+ * @method bool getHasChangePasswordMegaphone()
+ * @method mixed getMessage()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isHasChangePasswordMegaphone()
- * @method setHasChangePasswordMegaphone(mixed $value)
+ * @method bool isMessage()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setHasChangePasswordMegaphone(bool $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetHasChangePasswordMegaphone()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class ProfileNoticeResponse extends AutoPropertyHandler implements ResponseInterface
+class ProfileNoticeResponse extends Response
 {
-    use ResponseTrait;
-
-    public $has_change_password_megaphone;
+    public static $JSON_PROPERTY_MAP = [
+        'has_change_password_megaphone' => 'bool',
+    ];
 }

@@ -2,21 +2,24 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ImageVersions2.
+ *
  * @method ImageCandidate[] getCandidates()
  * @method mixed getTraceToken()
  * @method bool isCandidates()
  * @method bool isTraceToken()
- * @method setCandidates(ImageCandidate[] $value)
- * @method setTraceToken(mixed $value)
+ * @method $this setCandidates(ImageCandidate[] $value)
+ * @method $this setTraceToken(mixed $value)
+ * @method $this unsetCandidates()
+ * @method $this unsetTraceToken()
  */
-class ImageVersions2 extends AutoPropertyHandler
+class ImageVersions2 extends AutoPropertyMapper
 {
-    /**
-     * @var ImageCandidate[]
-     */
-    public $candidates;
-    public $trace_token;
+    public static $JSON_PROPERTY_MAP = [
+        'candidates'  => 'ImageCandidate[]',
+        'trace_token' => '',
+    ];
 }

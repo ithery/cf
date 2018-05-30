@@ -2,17 +2,19 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method mixed getBitFlags()
+ * Headline.
+ *
+ * @method int getBitFlags()
  * @method mixed getContentType()
  * @method string getCreatedAt()
  * @method string getCreatedAtUtc()
  * @method string getMediaId()
  * @method string getPk()
  * @method mixed getStatus()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getType()
  * @method User getUser()
  * @method string getUserId()
@@ -27,47 +29,42 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isType()
  * @method bool isUser()
  * @method bool isUserId()
- * @method setBitFlags(mixed $value)
- * @method setContentType(mixed $value)
- * @method setCreatedAt(string $value)
- * @method setCreatedAtUtc(string $value)
- * @method setMediaId(string $value)
- * @method setPk(string $value)
- * @method setStatus(mixed $value)
- * @method setText(mixed $value)
- * @method setType(mixed $value)
- * @method setUser(User $value)
- * @method setUserId(string $value)
+ * @method $this setBitFlags(int $value)
+ * @method $this setContentType(mixed $value)
+ * @method $this setCreatedAt(string $value)
+ * @method $this setCreatedAtUtc(string $value)
+ * @method $this setMediaId(string $value)
+ * @method $this setPk(string $value)
+ * @method $this setStatus(mixed $value)
+ * @method $this setText(string $value)
+ * @method $this setType(mixed $value)
+ * @method $this setUser(User $value)
+ * @method $this setUserId(string $value)
+ * @method $this unsetBitFlags()
+ * @method $this unsetContentType()
+ * @method $this unsetCreatedAt()
+ * @method $this unsetCreatedAtUtc()
+ * @method $this unsetMediaId()
+ * @method $this unsetPk()
+ * @method $this unsetStatus()
+ * @method $this unsetText()
+ * @method $this unsetType()
+ * @method $this unsetUser()
+ * @method $this unsetUserId()
  */
-class Headline extends AutoPropertyHandler
+class Headline extends AutoPropertyMapper
 {
-    public $content_type;
-    /**
-     * @var User
-     */
-    public $user;
-    /**
-     * @var string
-     */
-    public $user_id;
-    /**
-     * @var string
-     */
-    public $pk;
-    public $text;
-    public $type;
-    /**
-     * @var string
-     */
-    public $created_at;
-    /**
-     * @var string
-     */
-    public $created_at_utc;
-    /**
-     * @var string
-     */
-    public $media_id;
-    public $bit_flags;
-    public $status;
+    public static $JSON_PROPERTY_MAP = [
+        'content_type'   => '',
+        'user'           => 'User',
+        'user_id'        => 'string',
+        'pk'             => 'string',
+        'text'           => 'string',
+        'type'           => '',
+        'created_at'     => 'string',
+        'created_at_utc' => 'string',
+        'media_id'       => 'string',
+        'bit_flags'      => 'int',
+        'status'         => '',
+    ];
 }

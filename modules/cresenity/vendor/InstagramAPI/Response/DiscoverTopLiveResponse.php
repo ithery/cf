@@ -2,36 +2,56 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
- * @method mixed getAutoLoadMoreEnabled()
- * @method Model\BroadcastItem[] getBroadcasts()
- * @method mixed getMoreAvailable()
+ * DiscoverTopLiveResponse.
+ *
+ * @method bool getAutoLoadMoreEnabled()
+ * @method Model\Broadcast[] getBroadcasts()
+ * @method mixed getMessage()
+ * @method bool getMoreAvailable()
  * @method string getNextMaxId()
+ * @method Model\PostLiveItem[] getPostLiveBroadcasts()
+ * @method mixed getScoreMap()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isAutoLoadMoreEnabled()
  * @method bool isBroadcasts()
+ * @method bool isMessage()
  * @method bool isMoreAvailable()
  * @method bool isNextMaxId()
- * @method setAutoLoadMoreEnabled(mixed $value)
- * @method setBroadcasts(Model\BroadcastItem[] $value)
- * @method setMoreAvailable(mixed $value)
- * @method setNextMaxId(string $value)
+ * @method bool isPostLiveBroadcasts()
+ * @method bool isScoreMap()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setAutoLoadMoreEnabled(bool $value)
+ * @method $this setBroadcasts(Model\Broadcast[] $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setMoreAvailable(bool $value)
+ * @method $this setNextMaxId(string $value)
+ * @method $this setPostLiveBroadcasts(Model\PostLiveItem[] $value)
+ * @method $this setScoreMap(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetAutoLoadMoreEnabled()
+ * @method $this unsetBroadcasts()
+ * @method $this unsetMessage()
+ * @method $this unsetMoreAvailable()
+ * @method $this unsetNextMaxId()
+ * @method $this unsetPostLiveBroadcasts()
+ * @method $this unsetScoreMap()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class DiscoverTopLiveResponse extends AutoPropertyHandler implements ResponseInterface
+class DiscoverTopLiveResponse extends Response
 {
-    use ResponseTrait;
-
-    public $auto_load_more_enabled;
-    /**
-     * @var Model\BroadcastItem[]
-     */
-    public $broadcasts;
-    public $more_available;
-    /**
-     * @var string
-     */
-    public $next_max_id;
+    public static $JSON_PROPERTY_MAP = [
+        'broadcasts'             => 'Model\Broadcast[]',
+        'post_live_broadcasts'   => 'Model\PostLiveItem[]',
+        'score_map'              => '',
+        'more_available'         => 'bool',
+        'auto_load_more_enabled' => 'bool',
+        'next_max_id'            => 'string',
+    ];
 }

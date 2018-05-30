@@ -2,38 +2,56 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * AccountSecurityInfoResponse.
+ *
  * @method mixed getBackupCodes()
- * @method mixed getCountryCode()
+ * @method int getCountryCode()
  * @method mixed getIsPhoneConfirmed()
  * @method mixed getIsTwoFactorEnabled()
- * @method mixed getNationalNumber()
- * @method mixed getPhoneNumber()
+ * @method mixed getMessage()
+ * @method string getNationalNumber()
+ * @method string getPhoneNumber()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isBackupCodes()
  * @method bool isCountryCode()
  * @method bool isIsPhoneConfirmed()
  * @method bool isIsTwoFactorEnabled()
+ * @method bool isMessage()
  * @method bool isNationalNumber()
  * @method bool isPhoneNumber()
- * @method setBackupCodes(mixed $value)
- * @method setCountryCode(mixed $value)
- * @method setIsPhoneConfirmed(mixed $value)
- * @method setIsTwoFactorEnabled(mixed $value)
- * @method setNationalNumber(mixed $value)
- * @method setPhoneNumber(mixed $value)
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setBackupCodes(mixed $value)
+ * @method $this setCountryCode(int $value)
+ * @method $this setIsPhoneConfirmed(mixed $value)
+ * @method $this setIsTwoFactorEnabled(mixed $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setNationalNumber(string $value)
+ * @method $this setPhoneNumber(string $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetBackupCodes()
+ * @method $this unsetCountryCode()
+ * @method $this unsetIsPhoneConfirmed()
+ * @method $this unsetIsTwoFactorEnabled()
+ * @method $this unsetMessage()
+ * @method $this unsetNationalNumber()
+ * @method $this unsetPhoneNumber()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class AccountSecurityInfoResponse extends AutoPropertyHandler implements ResponseInterface
+class AccountSecurityInfoResponse extends Response
 {
-    use ResponseTrait;
-
-    public $backup_codes;
-    public $is_phone_confirmed;
-    public $country_code;
-    public $phone_number;
-    public $is_two_factor_enabled;
-    public $national_number;
+    public static $JSON_PROPERTY_MAP = [
+        'backup_codes'          => '',
+        'is_phone_confirmed'    => '',
+        'country_code'          => 'int',
+        'phone_number'          => 'string',
+        'is_two_factor_enabled' => '',
+        'national_number'       => 'string', // Really int, but may be >32bit.
+    ];
 }

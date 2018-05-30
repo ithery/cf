@@ -2,21 +2,31 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * FriendshipResponse.
+ *
  * @method Model\FriendshipStatus getFriendshipStatus()
+ * @method mixed getMessage()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isFriendshipStatus()
- * @method setFriendshipStatus(Model\FriendshipStatus $value)
+ * @method bool isMessage()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setFriendshipStatus(Model\FriendshipStatus $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetFriendshipStatus()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class FriendshipResponse extends AutoPropertyHandler implements ResponseInterface
+class FriendshipResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\FriendshipStatus
-     */
-    public $friendship_status;
+    public static $JSON_PROPERTY_MAP = [
+        'friendship_status' => 'Model\FriendshipStatus',
+    ];
 }

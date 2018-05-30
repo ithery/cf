@@ -3,14 +3,14 @@
 class CResources {
 
     public static function get_file_info($filename) {
-        $org_code = '';
+        $orgCode = '';
         $resource_type = '';
         $type = '';
         $date = '';
         $arr_name = explode("_", $filename);
         //org_code
         if (isset($arr_name[0])) {
-            $org_code = $arr_name[0];
+            $orgCode = $arr_name[0];
         }
         //resource_type
         if (isset($arr_name[1])) {
@@ -24,10 +24,10 @@ class CResources {
         if (isset($arr_name[3])) {
             $date = $arr_name[3];
         }
-        if ($org_code == 'default')
-            $org_code = null;
+        if ($orgCode == 'default')
+            $orgCode = null;
         return array(
-            'org_code' => $org_code,
+            'org_code' => $orgCode,
             'resource_type' => $resource_type,
             'type' => $type,
             'date' => $date,
@@ -73,37 +73,37 @@ class CResources {
      * @return CResources_Engine
      */
     public static function factory($resource_type, $type, $options = array()) {
-        $app_code = CF::app_code();
-        $org_code = $options;
+        $appCode = CF::appCode();
+        $orgCode = $options;
 
         if (is_array($options)) {
-            $org_code = carr::get($options, 'org_code');
-            $app_code = carr::get($options, 'app_code');
+            $orgCode = carr::get($options, 'org_code');
+            $appCode = carr::get($options, 'app_code');
         }
-        if (!is_array($org_code)) {
-            if (strlen($org_code) == 0) {
-                $org_code = CF::org_code();
+        if (!is_array($orgCode)) {
+            if (strlen($orgCode) == 0) {
+                $orgCode = CF::orgCode();
             }
         }
-        if (strlen($app_code) == 0) {
-            $app_code = CF::app_code();
+        if (strlen($appCode) == 0) {
+            $appCode = CF::appCode();
         }
 
         if (!is_array($options)) {
             $options = array(
-                'org_code' => $org_code,
-                'app_code' => $app_code,
+                'org_code' => $orgCode,
+                'app_code' => $appCode,
             );
         }
 
-        $root_directory = DOCROOT . 'application' . DS . $app_code . DS . 'default' . DS . 'resources';
+        $root_directory = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . 'resources';
         //try to get file_info
         $filepath = CResources::get_path($resource_type);
         if (file_exists($filepath)) {
             $info = CResources::get_file_info($resource_type);
             $resource_type = carr::get($info, 'resource_type');
             $type = carr::get($info, 'type');
-            $org_code = carr::get($info, 'org_code');
+            $orgCode = carr::get($info, 'org_code');
         }
 
         //validate resource_type and type

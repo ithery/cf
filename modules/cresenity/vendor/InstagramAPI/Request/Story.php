@@ -71,6 +71,9 @@ class Story extends RequestCollection
     public function getReelsTrayFeed()
     {
         return $this->ig->request('feed/reels_tray/')
+            ->setSignedPost(false)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\ReelsTrayFeedResponse());
     }
 
@@ -123,29 +126,58 @@ class Story extends RequestCollection
     }
 
     /**
-     * Get multiple users' story feeds at once.
+     * Get multiple users' story feeds (or specific highlight-details) at once.
      *
-     * @param string|string[] $userList List of numerical UserPK IDs.
+     * NOTE: Normally, you would only use this endpoint for stories (by passing
+     * UserPK IDs as the parameter). But if you're looking at people's highlight
+     * feeds (via `Highlight::getUserFeed()`), you may also sometimes discover
+     * highlight entries that don't have any `items` array. In that case, you
+     * are supposed to get the items for those highlights via this endpoint!
+     * Simply pass their `id` values as the argument to this API to get details.
+     *
+     * @param string|string[] $feedList List of numerical UserPK IDs, OR highlight IDs (such as `highlight:123882132324123`).
+     * @param string          $source   (optional) Source app-module where the request was made.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ReelsMediaResponse
+     *
+     * @see Highlight::getUserFeed() More info about when to use this API for highlight-details.
      */
     public function getReelsMediaFeed(
-        $userList)
+        $feedList,
+        $source = 'feed_timeline')
     {
-        if (!is_array($userList)) {
-            $userList = [$userList];
+        if (!is_array($feedList)) {
+            $feedList = [$feedList];
         }
 
-        foreach ($userList as &$value) {
+        foreach ($feedList as &$value) {
             $value = (string) $value;
         }
         unset($value); // Clear reference.
 
         return $this->ig->request('feed/reels_media/')
-            ->addPost('user_ids', $userList) // Must be string[] array.
+            ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_ids', $feedList) // Must be string[] array.
             ->getResponse(new Response\ReelsMediaResponse());
+    }
+
+    /**
+     * Get your archived story media feed.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ArchivedStoriesFeedResponse
+     */
+    public function getArchivedStoriesFeed()
+    {
+        return $this->ig->request('archive/reel/day_shells/')
+            ->addParam('include_cover', 0)
+            ->getResponse(new Response\ArchivedStoriesFeedResponse());
     }
 
     /**
@@ -186,60 +218,27 @@ class Story extends RequestCollection
      * feed (retrieved via any of the other story endpoints), to easily mark
      * all of that user's story media items as seen.
      *
-     * @param \InstagramAPI\Response\Model\Item[] $items An array of one or more
-     *                                                   story media Items.
+     * WARNING: ONLY USE *THIS* ENDPOINT IF THE STORIES CAME FROM THE ENDPOINTS
+     * IN *THIS* REQUEST-COLLECTION FILE: From "getReelsTrayFeed()" or the
+     * user-specific story endpoints. Do NOT use this endpoint if the stories
+     * came from any OTHER request-collections, such as Location-based stories!
+     * Other request-collections have THEIR OWN special story-marking functions!
+     *
+     * @param Response\Model\Item[] $items Array of one or more story media Items.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\MediaSeenResponse
+     *
+     * @see Location::markStoryMediaSeen()
+     * @see Hashtag::markStoryMediaSeen()
      */
     public function markMediaSeen(
         array $items)
     {
-        // Build the list of seen media, with human randomization of seen-time.
-        $reels = [];
-        $maxSeenAt = time(); // Get current global UTC timestamp.
-        $seenAt = $maxSeenAt - (3 * count($items)); // Start seenAt in the past.
-        foreach ($items as $item) {
-            if (!$item instanceof Response\Model\Item) {
-                throw new \InvalidArgumentException(
-                    'markMediaSeen(): All items must be instances of \InstagramAPI\Response\Model\Item.'
-                );
-            }
-
-            // Raise "seenAt" if it's somehow older than the item's "takenAt".
-            // NOTE: Can only happen if you see a story instantly when posted.
-            $itemTakenAt = $item->getTakenAt();
-            if ($seenAt < $itemTakenAt) {
-                $seenAt = $itemTakenAt + 2;
-            }
-
-            // Do not let "seenAt" exceed the current global UTC time.
-            if ($seenAt > $maxSeenAt) {
-                $seenAt = $maxSeenAt;
-            }
-
-            // Key Format: "mediaPk_userPk_userPk" (yes, userPK is repeated).
-            $reelId = $item->getId().'_'.$item->getUser()->getPk();
-
-            // Value Format: ["mediaTakenAt_seenAt"] (array with single string).
-            $reels[$reelId] = [$item->getTakenAt().'_'.$seenAt];
-
-            // Randomly add 1-3 seconds to next seenAt timestamp, to act human.
-            $seenAt += rand(1, 3);
-        }
-
-        return $this->ig->request('media/seen/')
-            ->setVersion(2)
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('reels', $reels)
-            ->addPost('live_vods', [])
-            ->addParam('reel', 1)
-            ->addParam('live_vod', 0)
-            ->getResponse(new Response\MediaSeenResponse());
+        // NOTE: NULL = Use each item's owner ID as the "source ID".
+        return $this->ig->internal->markStoryMediaSeen($items, null);
     }
 
     /**
@@ -256,18 +255,19 @@ class Story extends RequestCollection
     public function getReelSettings()
     {
         return $this->ig->request('users/reel_settings/')
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\ReelSettingsResponse());
     }
 
     /**
      * Set your story settings.
      *
-     * @param string $messagePrefs Who can reply to your story. Valid values are "anyone" (meaning
-     *                             your followers), "following" (followers that you follow back),
-     *                             or "off" (meaning that nobody can reply to your story).
+     * @param string      $messagePrefs      Who can reply to your story. Valid values are "anyone" (meaning
+     *                                       your followers), "following" (followers that you follow back),
+     *                                       or "off" (meaning that nobody can reply to your story).
+     * @param null|bool   $allowStoryReshare Allow story reshare.
+     * @param null|string $autoArchive       Auto archive stories for viewing them later. It will appear in your
+     *                                       archive once it has disappeared from your story feed. Valid values
+     *                                       "on" and "off".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -275,17 +275,34 @@ class Story extends RequestCollection
      * @return \InstagramAPI\Response\ReelSettingsResponse
      */
     public function setReelSettings(
-        $messagePrefs)
+        $messagePrefs,
+        $allowStoryReshare = null,
+        $autoArchive = null)
     {
         if (!in_array($messagePrefs, ['anyone', 'following', 'off'])) {
             throw new \InvalidArgumentException('You must provide a valid message preference value.');
         }
 
-        return $this->ig->request('users/set_reel_settings/')
+        $request = $this->ig->request('users/set_reel_settings/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('message_prefs', $messagePrefs)
-            ->getResponse(new Response\ReelSettingsResponse());
+            ->addPost('message_prefs', $messagePrefs);
+
+        if ($allowStoryReshare !== null) {
+            if (!is_bool($allowStoryReshare)) {
+                throw new \InvalidArgumentException('You must provide a valid value for allowing story reshare.');
+            }
+            $request->addPost('allow_story_reshare', $allowStoryReshare);
+        }
+
+        if ($autoArchive !== null) {
+            if (!in_array($autoArchive, ['on', 'off'])) {
+                throw new \InvalidArgumentException('You must provide a valid value for auto archive.');
+            }
+            $request->addPost('reel_auto_archive', $autoArchive);
+        }
+
+        return $request->getResponse(new Response\ReelSettingsResponse());
     }
 }

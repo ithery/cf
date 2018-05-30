@@ -2,29 +2,41 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * PostLiveViewerListResponse.
+ *
+ * @method mixed getMessage()
  * @method mixed getNextMaxId()
- * @method mixed getTotalViewerCount()
+ * @method string getStatus()
+ * @method int getTotalViewerCount()
  * @method Model\User[] getUsers()
+ * @method Model\ZMessage[] getZMessages()
+ * @method bool isMessage()
  * @method bool isNextMaxId()
+ * @method bool isStatus()
  * @method bool isTotalViewerCount()
  * @method bool isUsers()
- * @method setNextMaxId(mixed $value)
- * @method setTotalViewerCount(mixed $value)
- * @method setUsers(Model\User[] $value)
+ * @method bool isZMessages()
+ * @method $this setMessage(mixed $value)
+ * @method $this setNextMaxId(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setTotalViewerCount(int $value)
+ * @method $this setUsers(Model\User[] $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetMessage()
+ * @method $this unsetNextMaxId()
+ * @method $this unsetStatus()
+ * @method $this unsetTotalViewerCount()
+ * @method $this unsetUsers()
+ * @method $this unsetZMessages()
  */
-class PostLiveViewerListResponse extends AutoPropertyHandler implements ResponseInterface
+class PostLiveViewerListResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\User[]
-     */
-    public $users;
-    public $next_max_id;
-    public $total_viewer_count;
+    public static $JSON_PROPERTY_MAP = [
+        'users'              => 'Model\User[]',
+        'next_max_id'        => '',
+        'total_viewer_count' => 'int',
+    ];
 }

@@ -214,6 +214,7 @@ class CFormInputSelectSearch extends CFormInput {
             $str_selection = "'+item." . $this->search_field . "+'";
         }
 
+        $str_result = preg_replace("/[\r\n]+/", "", $str_result);
         $placeholder = "Search for a item";
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;

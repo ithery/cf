@@ -2,18 +2,20 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method mixed getBlocking()
- * @method mixed getFollowedBy()
- * @method mixed getFollowing()
- * @method mixed getIncomingRequest()
- * @method mixed getIsBestie()
- * @method mixed getIsBlockingReel()
- * @method mixed getIsMutingReel()
- * @method mixed getIsPrivate()
- * @method mixed getOutgoingRequest()
+ * FriendshipStatus.
+ *
+ * @method bool getBlocking()
+ * @method bool getFollowedBy()
+ * @method bool getFollowing()
+ * @method bool getIncomingRequest()
+ * @method bool getIsBestie()
+ * @method bool getIsBlockingReel()
+ * @method bool getIsMutingReel()
+ * @method bool getIsPrivate()
+ * @method bool getOutgoingRequest()
  * @method bool isBlocking()
  * @method bool isFollowedBy()
  * @method bool isFollowing()
@@ -23,29 +25,36 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isIsMutingReel()
  * @method bool isIsPrivate()
  * @method bool isOutgoingRequest()
- * @method setBlocking(mixed $value)
- * @method setFollowedBy(mixed $value)
- * @method setFollowing(mixed $value)
- * @method setIncomingRequest(mixed $value)
- * @method setIsBestie(mixed $value)
- * @method setIsBlockingReel(mixed $value)
- * @method setIsMutingReel(mixed $value)
- * @method setIsPrivate(mixed $value)
- * @method setOutgoingRequest(mixed $value)
+ * @method $this setBlocking(bool $value)
+ * @method $this setFollowedBy(bool $value)
+ * @method $this setFollowing(bool $value)
+ * @method $this setIncomingRequest(bool $value)
+ * @method $this setIsBestie(bool $value)
+ * @method $this setIsBlockingReel(bool $value)
+ * @method $this setIsMutingReel(bool $value)
+ * @method $this setIsPrivate(bool $value)
+ * @method $this setOutgoingRequest(bool $value)
+ * @method $this unsetBlocking()
+ * @method $this unsetFollowedBy()
+ * @method $this unsetFollowing()
+ * @method $this unsetIncomingRequest()
+ * @method $this unsetIsBestie()
+ * @method $this unsetIsBlockingReel()
+ * @method $this unsetIsMutingReel()
+ * @method $this unsetIsPrivate()
+ * @method $this unsetOutgoingRequest()
  */
-class FriendshipStatus extends AutoPropertyHandler
+class FriendshipStatus extends AutoPropertyMapper
 {
-    // NOTE: We must use full paths to all model objects in THIS class, because
-    // "FriendshipsShowResponse" re-uses this object and JSONMapper won't be
-    // able to find these sub-objects if the paths aren't absolute!
-
-    public $following;
-    public $followed_by;
-    public $incoming_request;
-    public $outgoing_request;
-    public $is_private;
-    public $is_blocking_reel;
-    public $is_muting_reel;
-    public $blocking;
-    public $is_bestie;
+    public static $JSON_PROPERTY_MAP = [
+        'following'        => 'bool',
+        'followed_by'      => 'bool',
+        'incoming_request' => 'bool',
+        'outgoing_request' => 'bool',
+        'is_private'       => 'bool',
+        'is_blocking_reel' => 'bool',
+        'is_muting_reel'   => 'bool',
+        'blocking'         => 'bool',
+        'is_bestie'        => 'bool',
+    ];
 }

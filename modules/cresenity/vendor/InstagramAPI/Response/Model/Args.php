@@ -2,99 +2,119 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method mixed getActionUrl()
- * @method mixed getClicked()
+ * Args.
+ *
+ * @method string getActionUrl()
+ * @method string[] getActions()
+ * @method bool getClicked()
  * @method string getCommentId()
  * @method string[] getCommentIds()
- * @method mixed getDestination()
+ * @method string getDestination()
  * @method InlineFollow getInlineFollow()
+ * @method string getLatestReelMedia()
  * @method Link[] getLinks()
  * @method Media[] getMedia()
+ * @method string getMediaDestination()
  * @method string getProfileId()
- * @method mixed getProfileImage()
+ * @method string getProfileImage()
  * @method mixed getProfileImageDestination()
+ * @method string getProfileName()
  * @method mixed getRequestCount()
  * @method string getSecondProfileId()
  * @method mixed getSecondProfileImage()
- * @method mixed getText()
- * @method mixed getTimestamp()
- * @method mixed getTuuid()
+ * @method string getText()
+ * @method string getTimestamp()
+ * @method string getTuuid()
  * @method bool isActionUrl()
+ * @method bool isActions()
  * @method bool isClicked()
  * @method bool isCommentId()
  * @method bool isCommentIds()
  * @method bool isDestination()
  * @method bool isInlineFollow()
+ * @method bool isLatestReelMedia()
  * @method bool isLinks()
  * @method bool isMedia()
+ * @method bool isMediaDestination()
  * @method bool isProfileId()
  * @method bool isProfileImage()
  * @method bool isProfileImageDestination()
+ * @method bool isProfileName()
  * @method bool isRequestCount()
  * @method bool isSecondProfileId()
  * @method bool isSecondProfileImage()
  * @method bool isText()
  * @method bool isTimestamp()
  * @method bool isTuuid()
- * @method setActionUrl(mixed $value)
- * @method setClicked(mixed $value)
- * @method setCommentId(string $value)
- * @method setCommentIds(string[] $value)
- * @method setDestination(mixed $value)
- * @method setInlineFollow(InlineFollow $value)
- * @method setLinks(Link[] $value)
- * @method setMedia(Media[] $value)
- * @method setProfileId(string $value)
- * @method setProfileImage(mixed $value)
- * @method setProfileImageDestination(mixed $value)
- * @method setRequestCount(mixed $value)
- * @method setSecondProfileId(string $value)
- * @method setSecondProfileImage(mixed $value)
- * @method setText(mixed $value)
- * @method setTimestamp(mixed $value)
- * @method setTuuid(mixed $value)
+ * @method $this setActionUrl(string $value)
+ * @method $this setActions(string[] $value)
+ * @method $this setClicked(bool $value)
+ * @method $this setCommentId(string $value)
+ * @method $this setCommentIds(string[] $value)
+ * @method $this setDestination(string $value)
+ * @method $this setInlineFollow(InlineFollow $value)
+ * @method $this setLatestReelMedia(string $value)
+ * @method $this setLinks(Link[] $value)
+ * @method $this setMedia(Media[] $value)
+ * @method $this setMediaDestination(string $value)
+ * @method $this setProfileId(string $value)
+ * @method $this setProfileImage(string $value)
+ * @method $this setProfileImageDestination(mixed $value)
+ * @method $this setProfileName(string $value)
+ * @method $this setRequestCount(mixed $value)
+ * @method $this setSecondProfileId(string $value)
+ * @method $this setSecondProfileImage(mixed $value)
+ * @method $this setText(string $value)
+ * @method $this setTimestamp(string $value)
+ * @method $this setTuuid(string $value)
+ * @method $this unsetActionUrl()
+ * @method $this unsetActions()
+ * @method $this unsetClicked()
+ * @method $this unsetCommentId()
+ * @method $this unsetCommentIds()
+ * @method $this unsetDestination()
+ * @method $this unsetInlineFollow()
+ * @method $this unsetLatestReelMedia()
+ * @method $this unsetLinks()
+ * @method $this unsetMedia()
+ * @method $this unsetMediaDestination()
+ * @method $this unsetProfileId()
+ * @method $this unsetProfileImage()
+ * @method $this unsetProfileImageDestination()
+ * @method $this unsetProfileName()
+ * @method $this unsetRequestCount()
+ * @method $this unsetSecondProfileId()
+ * @method $this unsetSecondProfileImage()
+ * @method $this unsetText()
+ * @method $this unsetTimestamp()
+ * @method $this unsetTuuid()
  */
-class Args extends AutoPropertyHandler
+class Args extends AutoPropertyMapper
 {
-    /**
-     * @var Media[]
-     */
-    public $media;
-    /**
-     * @var Link[]
-     */
-    public $links;
-    public $text;
-    /**
-     * @var string
-     */
-    public $profile_id;
-    public $profile_image;
-    public $timestamp;
-    /**
-     * @var string
-     */
-    public $comment_id;
-    public $request_count;
-    public $action_url;
-    public $destination;
-    /**
-     * @var InlineFollow
-     */
-    public $inline_follow;
-    /**
-     * @var string[]
-     */
-    public $comment_ids;
-    /**
-     * @var string
-     */
-    public $second_profile_id;
-    public $second_profile_image;
-    public $profile_image_destination;
-    public $tuuid;
-    public $clicked;
+    public static $JSON_PROPERTY_MAP = [
+        'media_destination'         => 'string',
+        'text'                      => 'string',
+        'links'                     => 'Link[]',
+        'profile_id'                => 'string',
+        'profile_image'             => 'string',
+        'media'                     => 'Media[]',
+        'timestamp'                 => 'string',
+        'tuuid'                     => 'string',
+        'clicked'                   => 'bool',
+        'profile_name'              => 'string',
+        'action_url'                => 'string',
+        'destination'               => 'string',
+        'actions'                   => 'string[]',
+        'latest_reel_media'         => 'string',
+        'comment_id'                => 'string',
+        'request_count'             => '',
+        'inline_follow'             => 'InlineFollow',
+        'comment_ids'               => 'string[]',
+        'second_profile_id'         => 'string',
+        'second_profile_image'      => '',
+        'profile_image_destination' => '',
+    ];
 }
