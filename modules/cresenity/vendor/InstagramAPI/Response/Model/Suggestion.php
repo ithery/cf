@@ -2,22 +2,26 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method mixed getAlgorithm()
+ * Suggestion.
+ *
+ * @method string getAlgorithm()
  * @method mixed getCaption()
  * @method mixed getIcon()
+ * @method bool getIsNewSuggestion()
  * @method string[] getLargeUrls()
  * @method mixed getMediaIds()
  * @method mixed getMediaInfos()
- * @method mixed getSocialContext()
+ * @method string getSocialContext()
  * @method string[] getThumbnailUrls()
  * @method User getUser()
- * @method mixed getValue()
+ * @method float getValue()
  * @method bool isAlgorithm()
  * @method bool isCaption()
  * @method bool isIcon()
+ * @method bool isIsNewSuggestion()
  * @method bool isLargeUrls()
  * @method bool isMediaIds()
  * @method bool isMediaInfos()
@@ -25,36 +29,42 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isThumbnailUrls()
  * @method bool isUser()
  * @method bool isValue()
- * @method setAlgorithm(mixed $value)
- * @method setCaption(mixed $value)
- * @method setIcon(mixed $value)
- * @method setLargeUrls(string[] $value)
- * @method setMediaIds(mixed $value)
- * @method setMediaInfos(mixed $value)
- * @method setSocialContext(mixed $value)
- * @method setThumbnailUrls(string[] $value)
- * @method setUser(User $value)
- * @method setValue(mixed $value)
+ * @method $this setAlgorithm(string $value)
+ * @method $this setCaption(mixed $value)
+ * @method $this setIcon(mixed $value)
+ * @method $this setIsNewSuggestion(bool $value)
+ * @method $this setLargeUrls(string[] $value)
+ * @method $this setMediaIds(mixed $value)
+ * @method $this setMediaInfos(mixed $value)
+ * @method $this setSocialContext(string $value)
+ * @method $this setThumbnailUrls(string[] $value)
+ * @method $this setUser(User $value)
+ * @method $this setValue(float $value)
+ * @method $this unsetAlgorithm()
+ * @method $this unsetCaption()
+ * @method $this unsetIcon()
+ * @method $this unsetIsNewSuggestion()
+ * @method $this unsetLargeUrls()
+ * @method $this unsetMediaIds()
+ * @method $this unsetMediaInfos()
+ * @method $this unsetSocialContext()
+ * @method $this unsetThumbnailUrls()
+ * @method $this unsetUser()
+ * @method $this unsetValue()
  */
-class Suggestion extends AutoPropertyHandler
+class Suggestion extends AutoPropertyMapper
 {
-    public $media_infos;
-    public $social_context;
-    public $algorithm;
-    /**
-     * @var string[]
-     */
-    public $thumbnail_urls;
-    public $value;
-    public $caption;
-    /**
-     * @var User
-     */
-    public $user;
-    /**
-     * @var string[]
-     */
-    public $large_urls;
-    public $media_ids;
-    public $icon;
+    public static $JSON_PROPERTY_MAP = [
+        'media_infos'       => '',
+        'social_context'    => 'string',
+        'algorithm'         => 'string',
+        'thumbnail_urls'    => 'string[]',
+        'value'             => 'float',
+        'caption'           => '',
+        'user'              => 'User',
+        'large_urls'        => 'string[]',
+        'media_ids'         => '',
+        'icon'              => '',
+        'is_new_suggestion' => 'bool',
+    ];
 }

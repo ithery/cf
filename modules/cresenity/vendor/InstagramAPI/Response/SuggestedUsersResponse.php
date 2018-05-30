@@ -2,25 +2,36 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * SuggestedUsersResponse.
+ *
  * @method mixed getIsBackup()
+ * @method mixed getMessage()
+ * @method string getStatus()
  * @method Model\User[] getUsers()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isIsBackup()
+ * @method bool isMessage()
+ * @method bool isStatus()
  * @method bool isUsers()
- * @method setIsBackup(mixed $value)
- * @method setUsers(Model\User[] $value)
+ * @method bool isZMessages()
+ * @method $this setIsBackup(mixed $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setUsers(Model\User[] $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetIsBackup()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetUsers()
+ * @method $this unsetZMessages()
  */
-class SuggestedUsersResponse extends AutoPropertyHandler implements ResponseInterface
+class SuggestedUsersResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\User[]
-     */
-    public $users;
-    public $is_backup;
+    public static $JSON_PROPERTY_MAP = [
+        'users'     => 'Model\User[]',
+        'is_backup' => '',
+    ];
 }

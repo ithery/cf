@@ -2,33 +2,39 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method mixed getBroadcastStatus()
- * @method mixed getCoverFrameUrl()
- * @method mixed getHasReducedVisibility()
+ * BroadcastStatusItem.
+ *
+ * @method string getBroadcastStatus()
+ * @method string getCoverFrameUrl()
+ * @method bool getHasReducedVisibility()
  * @method string getId()
- * @method mixed getViewerCount()
+ * @method int getViewerCount()
  * @method bool isBroadcastStatus()
  * @method bool isCoverFrameUrl()
  * @method bool isHasReducedVisibility()
  * @method bool isId()
  * @method bool isViewerCount()
- * @method setBroadcastStatus(mixed $value)
- * @method setCoverFrameUrl(mixed $value)
- * @method setHasReducedVisibility(mixed $value)
- * @method setId(string $value)
- * @method setViewerCount(mixed $value)
+ * @method $this setBroadcastStatus(string $value)
+ * @method $this setCoverFrameUrl(string $value)
+ * @method $this setHasReducedVisibility(bool $value)
+ * @method $this setId(string $value)
+ * @method $this setViewerCount(int $value)
+ * @method $this unsetBroadcastStatus()
+ * @method $this unsetCoverFrameUrl()
+ * @method $this unsetHasReducedVisibility()
+ * @method $this unsetId()
+ * @method $this unsetViewerCount()
  */
-class BroadcastStatusItem extends AutoPropertyHandler
+class BroadcastStatusItem extends AutoPropertyMapper
 {
-    public $broadcast_status;
-    public $has_reduced_visibility;
-    public $cover_frame_url;
-    public $viewer_count;
-    /**
-     * @var string
-     */
-    public $id;
+    public static $JSON_PROPERTY_MAP = [
+        'broadcast_status'       => 'string',
+        'has_reduced_visibility' => 'bool',
+        'cover_frame_url'        => 'string',
+        'viewer_count'           => 'int',
+        'id'                     => 'string',
+    ];
 }

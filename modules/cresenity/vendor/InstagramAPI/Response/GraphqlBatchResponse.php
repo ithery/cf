@@ -2,39 +2,57 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * GraphqlBatchResponse.
+ *
  * @method mixed getIsError()
  * @method mixed getIsSkipped()
  * @method mixed getIsSuccessful()
+ * @method mixed getMessage()
  * @method Model\GraphQuery getQ0()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isIsError()
  * @method bool isIsSkipped()
  * @method bool isIsSuccessful()
+ * @method bool isMessage()
  * @method bool isQ0()
- * @method setIsError(mixed $value)
- * @method setIsSkipped(mixed $value)
- * @method setIsSuccessful(mixed $value)
- * @method setQ0(Model\GraphQuery $value)
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setIsError(mixed $value)
+ * @method $this setIsSkipped(mixed $value)
+ * @method $this setIsSuccessful(mixed $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setQ0(Model\GraphQuery $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetIsError()
+ * @method $this unsetIsSkipped()
+ * @method $this unsetIsSuccessful()
+ * @method $this unsetMessage()
+ * @method $this unsetQ0()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class GraphqlBatchResponse extends AutoPropertyHandler implements ResponseInterface
+class GraphqlBatchResponse extends Response
 {
-    use ResponseTrait;
+    public static $JSON_PROPERTY_MAP = [
+        'q0'            => 'Model\GraphQuery',
+        'is_successful' => '',
+        'is_error'      => '',
+        'is_skipped'    => '',
+    ];
 
     /**
-     * @var Model\GraphQuery
+     * Checks if the response was successful.
+     *
+     * @return bool
      */
-    public $q0;
-    public $is_successful;
-    public $is_error;
-    public $is_skipped;
-
     public function isOk()
     {
-        if ($this->getQ0() !== null && $this->getIsSuccessful() === 1) {
+        if ($this->_getProperty('q0') !== null && $this->_getProperty('is_successful') == 1) {
             return true;
         } else {
             // Set a nice message for exceptions.

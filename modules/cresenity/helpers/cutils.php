@@ -5,7 +5,7 @@ class cutils {
     public static function indent($n, $char = "\t") {
         $res = "";
         for ($i = 0; $i < $n; $i++) {
-            $res.=$char;
+            $res .= $char;
         }
         return $res;
     }

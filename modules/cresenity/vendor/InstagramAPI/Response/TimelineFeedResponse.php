@@ -2,51 +2,76 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * TimelineFeedResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
+ * @method bool getClientFeedChangelistApplied()
  * @method Model\FeedItem[] getFeedItems()
+ * @method string getFeedPillText()
  * @method mixed getIsDirectV2Enabled()
  * @method Model\FeedAysf getMegaphone()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
- * @method mixed getNumResults()
+ * @method int getNumResults()
+ * @method string getStatus()
+ * @method string getViewStateVersion()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isAutoLoadMoreEnabled()
+ * @method bool isClientFeedChangelistApplied()
  * @method bool isFeedItems()
+ * @method bool isFeedPillText()
  * @method bool isIsDirectV2Enabled()
  * @method bool isMegaphone()
+ * @method bool isMessage()
  * @method bool isMoreAvailable()
  * @method bool isNextMaxId()
  * @method bool isNumResults()
- * @method setAutoLoadMoreEnabled(mixed $value)
- * @method setFeedItems(Model\FeedItem[] $value)
- * @method setIsDirectV2Enabled(mixed $value)
- * @method setMegaphone(Model\FeedAysf $value)
- * @method setMoreAvailable(mixed $value)
- * @method setNextMaxId(string $value)
- * @method setNumResults(mixed $value)
+ * @method bool isStatus()
+ * @method bool isViewStateVersion()
+ * @method bool isZMessages()
+ * @method $this setAutoLoadMoreEnabled(mixed $value)
+ * @method $this setClientFeedChangelistApplied(bool $value)
+ * @method $this setFeedItems(Model\FeedItem[] $value)
+ * @method $this setFeedPillText(string $value)
+ * @method $this setIsDirectV2Enabled(mixed $value)
+ * @method $this setMegaphone(Model\FeedAysf $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setMoreAvailable(mixed $value)
+ * @method $this setNextMaxId(string $value)
+ * @method $this setNumResults(int $value)
+ * @method $this setStatus(string $value)
+ * @method $this setViewStateVersion(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetAutoLoadMoreEnabled()
+ * @method $this unsetClientFeedChangelistApplied()
+ * @method $this unsetFeedItems()
+ * @method $this unsetFeedPillText()
+ * @method $this unsetIsDirectV2Enabled()
+ * @method $this unsetMegaphone()
+ * @method $this unsetMessage()
+ * @method $this unsetMoreAvailable()
+ * @method $this unsetNextMaxId()
+ * @method $this unsetNumResults()
+ * @method $this unsetStatus()
+ * @method $this unsetViewStateVersion()
+ * @method $this unsetZMessages()
  */
-class TimelineFeedResponse extends AutoPropertyHandler implements ResponseInterface
+class TimelineFeedResponse extends Response
 {
-    use ResponseTrait;
-
-    public $num_results;
-    public $is_direct_v2_enabled;
-    public $auto_load_more_enabled;
-    public $more_available;
-    /**
-     * @var string
-     */
-    public $next_max_id;
-    /**
-     * @var Model\FeedItem[]
-     */
-    public $feed_items;
-    /**
-     * @var Model\FeedAysf
-     */
-    public $megaphone;
+    public static $JSON_PROPERTY_MAP = [
+        'num_results'                    => 'int',
+        'is_direct_v2_enabled'           => '',
+        'auto_load_more_enabled'         => '',
+        'more_available'                 => '',
+        'next_max_id'                    => 'string',
+        'feed_items'                     => 'Model\FeedItem[]',
+        'megaphone'                      => 'Model\FeedAysf',
+        'client_feed_changelist_applied' => 'bool',
+        'view_state_version'             => 'string',
+        'feed_pill_text'                 => 'string',
+    ];
 }

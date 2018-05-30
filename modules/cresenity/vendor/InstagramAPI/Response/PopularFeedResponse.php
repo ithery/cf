@@ -2,47 +2,56 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * PopularFeedResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
  * @method string getMaxId()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
- * @method mixed getNumResults()
+ * @method int getNumResults()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isAutoLoadMoreEnabled()
  * @method bool isItems()
  * @method bool isMaxId()
+ * @method bool isMessage()
  * @method bool isMoreAvailable()
  * @method bool isNextMaxId()
  * @method bool isNumResults()
- * @method setAutoLoadMoreEnabled(mixed $value)
- * @method setItems(Model\Item[] $value)
- * @method setMaxId(string $value)
- * @method setMoreAvailable(mixed $value)
- * @method setNextMaxId(string $value)
- * @method setNumResults(mixed $value)
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setAutoLoadMoreEnabled(mixed $value)
+ * @method $this setItems(Model\Item[] $value)
+ * @method $this setMaxId(string $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setMoreAvailable(mixed $value)
+ * @method $this setNextMaxId(string $value)
+ * @method $this setNumResults(int $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetAutoLoadMoreEnabled()
+ * @method $this unsetItems()
+ * @method $this unsetMaxId()
+ * @method $this unsetMessage()
+ * @method $this unsetMoreAvailable()
+ * @method $this unsetNextMaxId()
+ * @method $this unsetNumResults()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class PopularFeedResponse extends AutoPropertyHandler implements ResponseInterface
+class PopularFeedResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var string
-     */
-    public $next_max_id;
-    public $more_available;
-    public $auto_load_more_enabled;
-    /**
-     * @var Model\Item[]
-     */
-    public $items;
-    public $num_results;
-    /**
-     * @var string
-     */
-    public $max_id;
+    public static $JSON_PROPERTY_MAP = [
+        'next_max_id'            => 'string',
+        'more_available'         => '',
+        'auto_load_more_enabled' => '',
+        'items'                  => 'Model\Item[]',
+        'num_results'            => 'int',
+        'max_id'                 => 'string',
+    ];
 }

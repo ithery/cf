@@ -2,17 +2,21 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
+use InstagramAPI\Response\PropertyCollection;
 
 /**
- * @method Attribution getAttribution()
+ * StoryLocation.
+ *
+ * @method string getAttribution()
  * @method float getHeight()
- * @method mixed getIsPinned()
+ * @method int getIsPinned()
  * @method Location getLocation()
  * @method float getRotation()
  * @method float getWidth()
  * @method float getX()
  * @method float getY()
+ * @method float getZ()
  * @method bool isAttribution()
  * @method bool isHeight()
  * @method bool isIsPinned()
@@ -21,44 +25,31 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
- * @method setAttribution(Attribution $value)
- * @method setHeight(float $value)
- * @method setIsPinned(mixed $value)
- * @method setLocation(Location $value)
- * @method setRotation(float $value)
- * @method setWidth(float $value)
- * @method setX(float $value)
- * @method setY(float $value)
+ * @method bool isZ()
+ * @method $this setAttribution(string $value)
+ * @method $this setHeight(float $value)
+ * @method $this setIsPinned(int $value)
+ * @method $this setLocation(Location $value)
+ * @method $this setRotation(float $value)
+ * @method $this setWidth(float $value)
+ * @method $this setX(float $value)
+ * @method $this setY(float $value)
+ * @method $this setZ(float $value)
+ * @method $this unsetAttribution()
+ * @method $this unsetHeight()
+ * @method $this unsetIsPinned()
+ * @method $this unsetLocation()
+ * @method $this unsetRotation()
+ * @method $this unsetWidth()
+ * @method $this unsetX()
+ * @method $this unsetY()
+ * @method $this unsetZ()
  */
-class StoryLocation extends AutoPropertyHandler
+class StoryLocation extends AutoPropertyMapper
 {
-    /**
-     * @var float
-     */
-    public $rotation;
-    /**
-     * @var float
-     */
-    public $x;
-    /**
-     * @var float
-     */
-    public $y;
-    /**
-     * @var float
-     */
-    public $height;
-    /**
-     * @var float
-     */
-    public $width;
-    /**
-     * @var Location
-     */
-    public $location;
-    /**
-     * @var Attribution
-     */
-    public $attribution;
-    public $is_pinned;
+    public static $JSON_PROPERTY_MAP = [
+        PropertyCollection\Sticker::class,
+        'location'    => 'Location',
+        'attribution' => 'string',
+    ];
 }

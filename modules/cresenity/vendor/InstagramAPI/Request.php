@@ -5,15 +5,18 @@ namespace InstagramAPI;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request as HttpRequest;
 use GuzzleHttp\Psr7\Stream;
+use InstagramAPI\Exception\InstagramException;
+use InstagramAPI\Exception\LoginRequiredException;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-require_once dirname(__FILE__).DS.'../GuzzleHttp/Psr7/functions_include.php';
+require_once dirname(__FILE__) . DS . '../GuzzleHttp/Psr7/functions_include.php';
+
 /**
  * Bridge between Instagram Client calls, the object mapper & response objects.
  */
-class Request
-{
+class Request {
+
     /**
      * The Instagram class instance we belong to.
      *
@@ -103,6 +106,15 @@ class Request
     protected $_signedPost;
 
     /**
+     * Whether this API call needs signing of the GET params.
+     *
+     * Off by default.
+     *
+     * @var bool
+     */
+    protected $_signedGet;
+
+    /**
      * Whether this API endpoint responds with multiple JSON objects.
      *
      * Off by default.
@@ -139,9 +151,7 @@ class Request
      * @param string    $url
      */
     public function __construct(
-        \InstagramAPI\Instagram $parent,
-        $url)
-    {
+    \InstagramAPI\Instagram $parent, $url) {
         $this->_parent = $parent;
         $this->_url = $url;
 
@@ -155,6 +165,7 @@ class Request
         $this->_guzzleOptions = [];
         $this->_needsAuth = true;
         $this->_signedPost = true;
+        $this->_signedGet = false;
         $this->_isMultiResponse = false;
         $this->_excludeSigned = [];
         $this->_defaultHeaders = true;
@@ -163,8 +174,7 @@ class Request
     /**
      * Destructor.
      */
-    public function __destruct()
-    {
+    public function __destruct() {
         // Ensure that all opened handles are closed.
         $this->_closeHandles();
     }
@@ -179,9 +189,8 @@ class Request
      * @return self
      */
     public function setVersion(
-        $apiVersion)
-    {
-        if (!array_key_exists($apiVersion, Constants::API_URLS)) {
+    $apiVersion) {
+        if (!array_key_exists($apiVersion, Constants::$API_URLS)) {
             throw new \InvalidArgumentException(sprintf('"%d" is not a supported API version.', $apiVersion));
         }
         $this->_apiVersion = $apiVersion;
@@ -198,9 +207,7 @@ class Request
      * @return self
      */
     public function addParam(
-        $key,
-        $value)
-    {
+    $key, $value) {
         if ($value === true) {
             $value = 'true';
         } elseif ($value === false) {
@@ -220,9 +227,7 @@ class Request
      * @return self
      */
     public function addPost(
-        $key,
-        $value)
-    {
+    $key, $value) {
         if ($value === true) {
             $value = 'true';
         } elseif ($value === false) {
@@ -245,9 +250,7 @@ class Request
      * @return self
      */
     public function addUnsignedPost(
-        $key,
-        $value)
-    {
+    $key, $value) {
         $this->addPost($key, $value);
         $this->_excludeSigned[] = $key;
 
@@ -267,11 +270,7 @@ class Request
      * @return self
      */
     public function addFile(
-        $key,
-        $filepath,
-        $filename = null,
-        array $headers = [])
-    {
+    $key, $filepath, $filename = null, array $headers = []) {
         // Validate
         if (!is_file($filepath)) {
             throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $filepath));
@@ -286,13 +285,13 @@ class Request
         $filename = basename($filename);
         // Default headers.
         $headers = $headers + [
-            'Content-Type'              => 'application/octet-stream',
+            'Content-Type' => 'application/octet-stream',
             'Content-Transfer-Encoding' => 'binary',
         ];
         $this->_files[$key] = [
             'filepath' => $filepath,
             'filename' => $filename,
-            'headers'  => $headers,
+            'headers' => $headers,
         ];
 
         return $this;
@@ -306,26 +305,20 @@ class Request
      * @param string|null $filename Filename to use in Content-Disposition header.
      * @param array       $headers  An associative array of headers.
      *
-     * @throws \InvalidArgumentException
-     *
      * @return self
      */
     public function addFileData(
-        $key,
-        $data,
-        $filename,
-        array $headers = [])
-    {
+    $key, $data, $filename, array $headers = []) {
         $filename = basename($filename);
         // Default headers.
         $headers = $headers + [
-            'Content-Type'              => 'application/octet-stream',
+            'Content-Type' => 'application/octet-stream',
             'Content-Transfer-Encoding' => 'binary',
         ];
         $this->_files[$key] = [
             'contents' => $data,
             'filename' => $filename,
-            'headers'  => $headers,
+            'headers' => $headers,
         ];
 
         return $this;
@@ -349,9 +342,7 @@ class Request
      * @return self
      */
     public function addHeader(
-        $key,
-        $value)
-    {
+    $key, $value) {
         $this->_headers[$key] = $value;
 
         return $this;
@@ -362,12 +353,16 @@ class Request
      *
      * @return self
      */
-    protected function _addDefaultHeaders()
-    {
+    protected function _addDefaultHeaders() {
         if ($this->_defaultHeaders) {
+            $this->_headers['X-IG-App-ID'] = Constants::FACEBOOK_ANALYTICS_APPLICATION_ID;
             $this->_headers['X-IG-Capabilities'] = Constants::X_IG_Capabilities;
             $this->_headers['X-IG-Connection-Type'] = Constants::X_IG_Connection_Type;
-            $this->_headers['X-IG-Connection-Speed'] = mt_rand(1000, 3700).'kbps';
+            $this->_headers['X-IG-Connection-Speed'] = mt_rand(1000, 3700) . 'kbps';
+            // TODO: IMPLEMENT PROPER CALCULATION OF THESE HEADERS.
+            $this->_headers['X-IG-Bandwidth-Speed-KBPS'] = '-1.000';
+            $this->_headers['X-IG-Bandwidth-TotalBytes-B'] = '0';
+            $this->_headers['X-IG-Bandwidth-TotalTime-MS'] = '0';
         }
 
         return $this;
@@ -381,8 +376,7 @@ class Request
      * @return self
      */
     public function setAddDefaultHeaders(
-        $flag)
-    {
+    $flag) {
         $this->_defaultHeaders = $flag;
 
         return $this;
@@ -396,8 +390,7 @@ class Request
      * @return self
      */
     public function setGuzzleOptions(
-        array $guzzleOptions)
-    {
+    array $guzzleOptions) {
         $this->_guzzleOptions = $guzzleOptions;
 
         return $this;
@@ -411,8 +404,7 @@ class Request
      * @return self
      */
     public function setBody(
-        StreamInterface $stream)
-    {
+    StreamInterface $stream) {
         $this->_body = $stream;
 
         return $this;
@@ -426,24 +418,36 @@ class Request
      * @return self
      */
     public function setNeedsAuth(
-        $needsAuth)
-    {
+    $needsAuth) {
         $this->_needsAuth = $needsAuth;
 
         return $this;
     }
 
     /**
-     * Set signed request flag.
+     * Set signed request data flag.
      *
      * @param bool $signedPost
      *
      * @return self
      */
     public function setSignedPost(
-        $signedPost = true)
-    {
+    $signedPost = true) {
         $this->_signedPost = $signedPost;
+
+        return $this;
+    }
+
+    /**
+     * Set signed request params flag.
+     *
+     * @param bool $signedGet
+     *
+     * @return self
+     */
+    public function setSignedGet(
+    $signedGet = false) {
+        $this->_signedGet = $signedGet;
 
         return $this;
     }
@@ -456,8 +460,7 @@ class Request
      * @return self
      */
     public function setIsMultiResponse(
-        $flag = false)
-    {
+    $flag = false) {
         $this->_isMultiResponse = $flag;
 
         return $this;
@@ -468,24 +471,24 @@ class Request
      *
      * @param array $file
      *
-     * @throws \BadMethodCallException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      *
      * @return StreamInterface
      */
     protected function _getStreamForFile(
-        array $file)
-    {
+    array $file) {
         if (isset($file['contents'])) {
-            $result = \GuzzleHttp\Psr7\stream_for($file['contents']);
+            $result = \GuzzleHttp\Psr7\stream_for($file['contents']); // Throws.
         } elseif (isset($file['filepath'])) {
             $handle = fopen($file['filepath'], 'rb');
             if ($handle === false) {
                 throw new \RuntimeException(sprintf('Could not open file "%s" for reading.', $file['filepath']));
             }
             $this->_handles[] = $handle;
-            $result = \GuzzleHttp\Psr7\stream_for($handle);
+            $result = \GuzzleHttp\Psr7\stream_for($handle); // Throws.
         } else {
-            throw new \BadMethodCallException('No data for stream creation.');
+            throw new \InvalidArgumentException('No data for stream creation.');
         }
 
         return $result;
@@ -494,13 +497,12 @@ class Request
     /**
      * Convert the request's data into its HTTP POST multipart body contents.
      *
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException
-     * @throws \BadMethodCallException
      *
      * @return MultipartStream
      */
-    protected function _getMultipartBody()
-    {
+    protected function _getMultipartBody() {
         // Here is a tricky part: all form data (including files) must be ordered by hash code.
         // So we are creating an index for building POST data.
         $index = Utils::reorderByHashCode(array_merge($this->_posts, $this->_files));
@@ -509,29 +511,30 @@ class Request
         foreach ($index as $key => $value) {
             if (!isset($this->_files[$key])) {
                 $element = [
-                    'name'     => $key,
+                    'name' => $key,
                     'contents' => $value,
                 ];
             } else {
                 $file = $this->_files[$key];
                 $element = [
-                    'name'     => $key,
-                    'contents' => $this->_getStreamForFile($file),
+                    'name' => $key,
+                    'contents' => $this->_getStreamForFile($file), // Throws.
                     'filename' => isset($file['filename']) ? $file['filename'] : null,
-                    'headers'  => isset($file['headers']) ? $file['headers'] : [],
+                    'headers' => isset($file['headers']) ? $file['headers'] : [],
                 ];
             }
             $elements[] = $element;
         }
 
-        return new MultipartStream($elements, Utils::generateMultipartBoundary());
+        return new MultipartStream(// Throws.
+                $elements, Utils::generateMultipartBoundary()
+        );
     }
 
     /**
      * Close opened file handles.
      */
-    protected function _closeHandles()
-    {
+    protected function _closeHandles() {
         if (!is_array($this->_handles) || !count($this->_handles)) {
             return;
         }
@@ -545,30 +548,34 @@ class Request
     /**
      * Reset opened handles array.
      */
-    protected function _resetHandles()
-    {
+    protected function _resetHandles() {
         $this->_handles = [];
     }
 
     /**
      * Convert the request's data into its HTTP POST urlencoded body contents.
      *
+     * @throws \InvalidArgumentException
+     *
      * @return Stream
      */
-    protected function _getUrlencodedBody()
-    {
+    protected function _getUrlencodedBody() {
         $this->_headers['Content-Type'] = Constants::CONTENT_TYPE;
 
-        return \GuzzleHttp\Psr7\stream_for(http_build_query(Utils::reorderByHashCode($this->_posts)));
+        return \GuzzleHttp\Psr7\stream_for(// Throws.
+                http_build_query(Utils::reorderByHashCode($this->_posts))
+        );
     }
 
     /**
      * Convert the request's data into its HTTP POST body contents.
      *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     *
      * @return StreamInterface|null The body stream if POST request; otherwise NULL if GET request.
      */
-    protected function _getRequestBody()
-    {
+    protected function _getRequestBody() {
         // Check and return raw body stream if set.
         if ($this->_body !== null) {
             return $this->_body;
@@ -583,9 +590,9 @@ class Request
         }
         // Switch between multipart (at least one file) or urlencoded body.
         if (!count($this->_files)) {
-            $result = $this->_getUrlencodedBody();
+            $result = $this->_getUrlencodedBody(); // Throws.
         } else {
-            $result = $this->_getMultipartBody();
+            $result = $this->_getMultipartBody(); // Throws.
         }
 
         return $result;
@@ -594,29 +601,37 @@ class Request
     /**
      * Build HTTP request object.
      *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     *
      * @return HttpRequest
      */
-    protected function _buildHttpRequest()
-    {
+    protected function _buildHttpRequest() {
         $endpoint = $this->_url;
         // Determine the URI to use (it's either relative to API, or a full URI).
         if (strncmp($endpoint, 'http:', 5) !== 0 && strncmp($endpoint, 'https:', 6) !== 0) {
-            $endpoint = Constants::$API_URLS[$this->_apiVersion].$endpoint;
+            $endpoint = Constants::$API_URLS[$this->_apiVersion] . $endpoint;
+        }
+        // Check signed request params flag.
+        if ($this->_signedGet) {
+            $this->_params = Signatures::signData($this->_params);
         }
         // Generate the final endpoint URL, by adding any custom query params.
         if (count($this->_params)) {
             $endpoint = $endpoint
-                .(strpos($endpoint, '?') === false ? '?' : '&')
-                .http_build_query(Utils::reorderByHashCode($this->_params));
+                    . (strpos($endpoint, '?') === false ? '?' : '&')
+                    . http_build_query(Utils::reorderByHashCode($this->_params));
         }
-        // Add default headers.
+        // Add default headers (if enabled).
         $this->_addDefaultHeaders();
         /** @var StreamInterface|null $postData The POST body stream; is NULL if GET request instead. */
-        $postData = $this->_getRequestBody();
+        $postData = $this->_getRequestBody(); // Throws.
         // Determine request method.
         $method = $postData !== null ? 'POST' : 'GET';
         // Build HTTP request object.
-        return new HttpRequest($method, $endpoint, $this->_headers, $postData);
+        return new HttpRequest(// Throws (they didn't document that properly).
+                $method, $endpoint, $this->_headers, $postData
+        );
     }
 
     /**
@@ -625,24 +640,26 @@ class Request
      * Remember to ALWAYS call this function at the top of any API request that
      * requires the user to be logged in!
      *
-     * @throws \InstagramAPI\Exception\LoginRequiredException
+     * @throws LoginRequiredException
      */
-    protected function _throwIfNotLoggedIn()
-    {
+    protected function _throwIfNotLoggedIn() {
         // Check the cached login state. May not reflect what will happen on the
         // server. But it's the best we can check without trying the actual request!
-        if (!$this->_parent->isLoggedIn) {
-            throw new \InstagramAPI\Exception\LoginRequiredException('User not logged in. Please call login() and then try again.');
+        if (!$this->_parent->isMaybeLoggedIn) {
+            throw new LoginRequiredException('User not logged in. Please call login() and then try again.');
         }
     }
 
     /**
      * Perform the request and get its raw HTTP response.
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
+     *
+     * @return HttpResponseInterface
      */
-    public function getHttpResponse()
-    {
+    public function getHttpResponse() {
         // Prevent request from sending multiple times.
         if ($this->_httpResponse === null) {
             if ($this->_needsAuth) {
@@ -653,7 +670,10 @@ class Request
             $this->_resetHandles();
 
             try {
-                $this->_httpResponse = $this->_parent->client->api($this->_buildHttpRequest(), $this->_guzzleOptions);
+                $this->_httpResponse = $this->_parent->client->api(// Throws.
+                        $this->_buildHttpRequest(), // Throws.
+                        $this->_guzzleOptions
+                );
             } finally {
                 $this->_closeHandles();
             }
@@ -663,17 +683,17 @@ class Request
     }
 
     /**
-     * Return JSON-decoded HTTP response.
+     * Return the raw HTTP response body.
      *
-     * @param bool $assoc When TRUE, decode to associative array instead of object.
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
      *
-     * @return mixed
+     * @return string
      */
-    public function getRawResponse(
-        $assoc = false)
-    {
-        $httpResponse = $this->getHttpResponse();
-        $body = $httpResponse->getBody();
+    public function getRawResponse() {
+        $httpResponse = $this->getHttpResponse(); // Throws.
+        $body = (string) $httpResponse->getBody();
 
         // Handle API endpoints that respond with multiple JSON objects.
         // NOTE: We simply merge all JSON objects into a single object. This
@@ -685,25 +705,50 @@ class Request
             $body = str_replace("}\r\n{", ',', $body);
         }
 
-        // Important: Special JSON decoder.
-        return Client::api_body_decode((string) $body, $assoc);
+        return $body;
     }
 
     /**
-     * Perform the request and map its response data to provided object.
+     * Return safely JSON-decoded HTTP response.
      *
-     * @param ResponseInterface $baseClass An instance of a class object whose properties to fill with the response.
+     * This uses a special decoder which handles 64-bit numbers correctly.
      *
-     * @throws \InstagramAPI\Exception\InstagramException
+     * @param bool $assoc When FALSE, decode to object instead of associative array.
      *
-     * @return ResponseInterface An instance of baseClass.
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
+     *
+     * @return mixed
      */
-    public function getResponse(
-        ResponseInterface $baseClass)
-    {
-        // Check for API response success and attempt to decode it to the desired class.
-        $result = $this->_parent->client->getMappedResponseObject($baseClass, $this->getRawResponse(), $this->getHttpResponse());
-
-        return $result;
+    public function getDecodedResponse(
+    $assoc = true) {
+        // Important: Special JSON decoder.
+        return Client::api_body_decode(
+                        $this->getRawResponse(), // Throws.
+                        $assoc
+        );
     }
+
+    /**
+     * Perform the request and map its response data to the provided object.
+     *
+     * @param Response $responseObject An instance of a class object whose properties to fill with the response.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
+     *
+     * @return Response The provided responseObject with all JSON properties filled.
+     */
+    public function getResponse(Response $responseObject, $url = null) {
+        // Check for API response success and put its response in the object.
+        $this->_parent->client->mapServerResponse(// Throws.
+                $responseObject, $this->getRawResponse(), // Throws.
+                $this->getHttpResponse() // Throws.
+        );
+
+        return $responseObject;
+    }
+
 }

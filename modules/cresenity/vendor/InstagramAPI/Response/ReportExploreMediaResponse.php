@@ -2,18 +2,31 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * ReportExploreMediaResponse.
+ *
  * @method mixed getExploreReportStatus()
+ * @method mixed getMessage()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isExploreReportStatus()
- * @method setExploreReportStatus(mixed $value)
+ * @method bool isMessage()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setExploreReportStatus(mixed $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetExploreReportStatus()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class ReportExploreMediaResponse extends AutoPropertyHandler implements ResponseInterface
+class ReportExploreMediaResponse extends Response
 {
-    use ResponseTrait;
-
-    public $explore_report_status;
+    public static $JSON_PROPERTY_MAP = [
+        'explore_report_status' => '',
+    ];
 }

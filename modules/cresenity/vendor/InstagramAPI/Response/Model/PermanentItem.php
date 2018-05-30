@@ -2,24 +2,30 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * PermanentItem.
+ *
+ * @method string getClientContext()
  * @method string getItemId()
  * @method mixed getItemType()
  * @method mixed getLike()
  * @method Link getLink()
+ * @method LiveVideoShare getLiveVideoShare()
  * @method Location getLocation()
  * @method MediaData getMedia()
  * @method Item getMediaShare()
  * @method ReelShare getReelShare()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getTimestamp()
  * @method string getUserId()
+ * @method bool isClientContext()
  * @method bool isItemId()
  * @method bool isItemType()
  * @method bool isLike()
  * @method bool isLink()
+ * @method bool isLiveVideoShare()
  * @method bool isLocation()
  * @method bool isMedia()
  * @method bool isMediaShare()
@@ -27,50 +33,48 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isText()
  * @method bool isTimestamp()
  * @method bool isUserId()
- * @method setItemId(string $value)
- * @method setItemType(mixed $value)
- * @method setLike(mixed $value)
- * @method setLink(Link $value)
- * @method setLocation(Location $value)
- * @method setMedia(MediaData $value)
- * @method setMediaShare(Item $value)
- * @method setReelShare(ReelShare $value)
- * @method setText(mixed $value)
- * @method setTimestamp(mixed $value)
- * @method setUserId(string $value)
+ * @method $this setClientContext(string $value)
+ * @method $this setItemId(string $value)
+ * @method $this setItemType(mixed $value)
+ * @method $this setLike(mixed $value)
+ * @method $this setLink(Link $value)
+ * @method $this setLiveVideoShare(LiveVideoShare $value)
+ * @method $this setLocation(Location $value)
+ * @method $this setMedia(MediaData $value)
+ * @method $this setMediaShare(Item $value)
+ * @method $this setReelShare(ReelShare $value)
+ * @method $this setText(string $value)
+ * @method $this setTimestamp(mixed $value)
+ * @method $this setUserId(string $value)
+ * @method $this unsetClientContext()
+ * @method $this unsetItemId()
+ * @method $this unsetItemType()
+ * @method $this unsetLike()
+ * @method $this unsetLink()
+ * @method $this unsetLiveVideoShare()
+ * @method $this unsetLocation()
+ * @method $this unsetMedia()
+ * @method $this unsetMediaShare()
+ * @method $this unsetReelShare()
+ * @method $this unsetText()
+ * @method $this unsetTimestamp()
+ * @method $this unsetUserId()
  */
-class PermanentItem extends AutoPropertyHandler
+class PermanentItem extends AutoPropertyMapper
 {
-    /**
-     * @var string
-     */
-    public $item_id;
-    /**
-     * @var string
-     */
-    public $user_id;
-    public $timestamp;
-    public $item_type;
-    public $text;
-    /**
-     * @var Location
-     */
-    public $location;
-    public $like;
-    /**
-     * @var MediaData
-     */
-    public $media;
-    /**
-     * @var Link
-     */
-    public $link;
-    /**
-     * @var Item
-     */
-    public $media_share;
-    /**
-     * @var ReelShare
-     */
-    public $reel_share;
+    public static $JSON_PROPERTY_MAP = [
+        'item_id'          => 'string',
+        'user_id'          => 'string',
+        'timestamp'        => '',
+        'item_type'        => '',
+        'text'             => 'string',
+        'location'         => 'Location',
+        'like'             => '',
+        'media'            => 'MediaData',
+        'link'             => 'Link',
+        'media_share'      => 'Item',
+        'reel_share'       => 'ReelShare',
+        'client_context'   => 'string',
+        'live_video_share' => 'LiveVideoShare',
+    ];
 }

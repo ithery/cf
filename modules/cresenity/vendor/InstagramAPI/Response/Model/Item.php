@@ -2,121 +2,152 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Item.
+ *
  * @method string getActorFbid()
- * @method mixed getAdAction()
- * @method mixed getAdHeaderStyle()
+ * @method string getAdAction()
+ * @method int getAdHeaderStyle()
  * @method string getAdId()
- * @method mixed getAdLinkType()
+ * @method int getAdLinkType()
  * @method AdMetadata[] getAdMetadata()
- * @method mixed getAlgorithm()
+ * @method string getAlgorithm()
  * @method AndroidLinks[] getAndroidLinks()
  * @method Attribution getAttribution()
  * @method mixed getBoostUnavailableReason()
  * @method mixed getBoostedStatus()
- * @method mixed getCanViewerSave()
+ * @method bool getCanReshare()
+ * @method bool getCanViewerReshare()
+ * @method bool getCanViewerSave()
  * @method Caption getCaption()
- * @method mixed getCaptionIsEdited()
- * @method mixed getCaptionPosition()
+ * @method bool getCaptionIsEdited()
+ * @method float getCaptionPosition()
  * @method CarouselMedia[] getCarouselMedia()
  * @method mixed getCarouselMediaType()
  * @method Channel getChannel()
- * @method mixed getClientCacheKey()
- * @method mixed getCode()
- * @method mixed getCollapseComments()
- * @method string getCollectionId()
- * @method mixed getCollectionName()
- * @method mixed getCommentCount()
- * @method mixed getCommentLikesEnabled()
- * @method mixed getCommentThreadingEnabled()
+ * @method string getClientCacheKey()
+ * @method string getCode()
+ * @method bool getCollapseComments()
+ * @method int getCommentCount()
+ * @method bool getCommentLikesEnabled()
+ * @method bool getCommentThreadingEnabled()
+ * @method mixed getCommentingDisabledForViewer()
  * @method Comment[] getComments()
  * @method mixed getCommentsDisabled()
  * @method CoverMedia getCoverMedia()
- * @method mixed getDeviceTimestamp()
- * @method mixed getDrAdType()
- * @method mixed getExpiringAt()
+ * @method mixed getCreativeConfig()
+ * @method string getDeviceTimestamp()
+ * @method string getDominantColor()
+ * @method int getDrAdType()
+ * @method string getExpiringAt()
  * @method Explore getExplore()
- * @method mixed getExploreContext()
- * @method mixed getExploreSourceToken()
- * @method mixed getFilterType()
- * @method mixed getForceOverlay()
+ * @method string getExploreContext()
+ * @method bool getExploreHideComments()
+ * @method string getExploreSourceToken()
+ * @method string getFbPageUrl()
+ * @method Usertag getFbUserTags()
+ * @method int getFilterType()
+ * @method bool getForceOverlay()
  * @method Gating getGating()
- * @method mixed getHasAudio()
- * @method mixed getHasLiked()
- * @method mixed getHasMoreComments()
- * @method mixed getHasViewerSaved()
- * @method mixed getHideNuxText()
+ * @method bool getHasAudio()
+ * @method bool getHasLiked()
+ * @method bool getHasMoreComments()
+ * @method bool getHasSharedToFb()
+ * @method bool getHasViewerSaved()
+ * @method bool getHideNuxText()
+ * @method string[] getHighlightReelIds()
  * @method mixed getITunesItem()
  * @method mixed getIcon()
  * @method string getId()
  * @method ImageVersions2 getImageVersions2()
  * @method mixed getImportedTakenAt()
- * @method mixed getImpressionToken()
+ * @method string getImpressionToken()
  * @method Injected getInjected()
+ * @method string getInlineComposerDisplayCondition()
+ * @method string getInventorySource()
+ * @method IOSLinks[] getIosLinks()
  * @method mixed getIsAd4ad()
- * @method mixed getIsDashEligible()
- * @method mixed getIsNewSuggestion()
- * @method mixed getIsReelMedia()
+ * @method int getIsDashEligible()
+ * @method bool getIsEof()
+ * @method bool getIsNewSuggestion()
+ * @method bool getIsReelMedia()
+ * @method mixed getIsSeen()
  * @method mixed getIsSidecarChild()
  * @method mixed getLargeUrls()
  * @method float getLat()
  * @method string getLeadGenFormId()
- * @method mixed getLikeCount()
+ * @method int getLikeCount()
  * @method User[] getLikers()
- * @method mixed getLink()
- * @method mixed getLinkHintText()
- * @method mixed getLinkText()
+ * @method string getLink()
+ * @method string getLinkHintText()
+ * @method string getLinkText()
  * @method float getLng()
  * @method Location getLocation()
- * @method mixed getMaxNumVisiblePreviewComments()
+ * @method int getMaxNumVisiblePreviewComments()
  * @method Media getMedia()
  * @method string getMediaId()
  * @method string[] getMediaIds()
  * @method mixed getMediaInfos()
- * @method mixed getMediaType()
+ * @method int getMediaType()
  * @method mixed getMultiAuthorReelNames()
  * @method string getNextMaxId()
- * @method mixed getNumberOfQualities()
+ * @method int getNumberOfQualities()
  * @method string getOrganicPostId()
- * @method mixed getOrganicTrackingToken()
- * @method mixed getOriginalHeight()
- * @method mixed getOriginalWidth()
- * @method mixed getOverlaySubtitle()
- * @method mixed getOverlayText()
- * @method mixed getOverlayTitle()
- * @method mixed getPhotoOfYou()
+ * @method string getOrganicTrackingToken()
+ * @method int getOriginalHeight()
+ * @method int getOriginalWidth()
+ * @method string getOverlaySubtitle()
+ * @method string getOverlayText()
+ * @method string getOverlayTitle()
+ * @method bool getPhotoOfYou()
  * @method string getPk()
  * @method Placeholder getPlaceholder()
  * @method mixed getPlaybackDurationSecs()
- * @method mixed getPreview()
+ * @method string getPreview()
  * @method Comment[] getPreviewComments()
- * @method mixed getReelMentions()
+ * @method ProductTags getProductTags()
+ * @method ReelMention[] getReelMentions()
  * @method ReelShare getReelShare()
  * @method string[] getSavedCollectionIds()
- * @method mixed getSocialContext()
+ * @method mixed getScreenshotterUserIds()
+ * @method bool getShowOneTapFbShareTooltip()
+ * @method string getSocialContext()
  * @method User[] getSponsorTags()
  * @method Stories getStories()
- * @method mixed getStoryCta()
- * @method mixed getStoryHashtags()
+ * @method StoryCta[] getStoryCta()
+ * @method mixed getStoryEvents()
+ * @method mixed getStoryFeedMedia()
+ * @method mixed getStoryFriendLists()
+ * @method StoryHashtag[] getStoryHashtags()
+ * @method bool getStoryIsSavedToArchive()
  * @method StoryLocation[] getStoryLocations()
  * @method mixed getStoryPollVoterInfos()
  * @method mixed getStoryPolls()
+ * @method mixed getStoryProductItems()
+ * @method mixed getStoryQuestions()
+ * @method mixed getStorySliders()
+ * @method mixed getStorySoundOn()
  * @method SuggestedUsers getSuggestedUsers()
- * @method mixed getTakenAt()
+ * @method bool getSupportsReelReactions()
+ * @method string getTakenAt()
  * @method mixed getThumbnailUrls()
- * @method mixed getTopLikers()
- * @method mixed getTotalViewerCount()
+ * @method int getTimezoneOffset()
+ * @method string[] getTopFollowers()
+ * @method int getTopFollowersCount()
+ * @method string[] getTopLikers()
+ * @method int getTotalScreenshotCount()
+ * @method int getTotalViewerCount()
  * @method mixed getUrlExpireAtSecs()
  * @method User getUser()
  * @method Usertag getUsertags()
- * @method mixed getValue()
- * @method mixed getVideoDashManifest()
- * @method mixed getVideoDuration()
+ * @method float getValue()
+ * @method string getVideoDashManifest()
+ * @method float getVideoDuration()
  * @method VideoVersions[] getVideoVersions()
- * @method mixed getViewCount()
- * @method mixed getViewerCount()
+ * @method int getViewCount()
+ * @method int getViewerCount()
  * @method mixed getViewerCursor()
  * @method User[] getViewers()
  * @method mixed getVisibility()
@@ -131,6 +162,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isAttribution()
  * @method bool isBoostUnavailableReason()
  * @method bool isBoostedStatus()
+ * @method bool isCanReshare()
+ * @method bool isCanViewerReshare()
  * @method bool isCanViewerSave()
  * @method bool isCaption()
  * @method bool isCaptionIsEdited()
@@ -141,28 +174,34 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isClientCacheKey()
  * @method bool isCode()
  * @method bool isCollapseComments()
- * @method bool isCollectionId()
- * @method bool isCollectionName()
  * @method bool isCommentCount()
  * @method bool isCommentLikesEnabled()
  * @method bool isCommentThreadingEnabled()
+ * @method bool isCommentingDisabledForViewer()
  * @method bool isComments()
  * @method bool isCommentsDisabled()
  * @method bool isCoverMedia()
+ * @method bool isCreativeConfig()
  * @method bool isDeviceTimestamp()
+ * @method bool isDominantColor()
  * @method bool isDrAdType()
  * @method bool isExpiringAt()
  * @method bool isExplore()
  * @method bool isExploreContext()
+ * @method bool isExploreHideComments()
  * @method bool isExploreSourceToken()
+ * @method bool isFbPageUrl()
+ * @method bool isFbUserTags()
  * @method bool isFilterType()
  * @method bool isForceOverlay()
  * @method bool isGating()
  * @method bool isHasAudio()
  * @method bool isHasLiked()
  * @method bool isHasMoreComments()
+ * @method bool isHasSharedToFb()
  * @method bool isHasViewerSaved()
  * @method bool isHideNuxText()
+ * @method bool isHighlightReelIds()
  * @method bool isITunesItem()
  * @method bool isIcon()
  * @method bool isId()
@@ -170,10 +209,15 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isImportedTakenAt()
  * @method bool isImpressionToken()
  * @method bool isInjected()
+ * @method bool isInlineComposerDisplayCondition()
+ * @method bool isInventorySource()
+ * @method bool isIosLinks()
  * @method bool isIsAd4ad()
  * @method bool isIsDashEligible()
+ * @method bool isIsEof()
  * @method bool isIsNewSuggestion()
  * @method bool isIsReelMedia()
+ * @method bool isIsSeen()
  * @method bool isIsSidecarChild()
  * @method bool isLargeUrls()
  * @method bool isLat()
@@ -207,21 +251,37 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isPlaybackDurationSecs()
  * @method bool isPreview()
  * @method bool isPreviewComments()
+ * @method bool isProductTags()
  * @method bool isReelMentions()
  * @method bool isReelShare()
  * @method bool isSavedCollectionIds()
+ * @method bool isScreenshotterUserIds()
+ * @method bool isShowOneTapFbShareTooltip()
  * @method bool isSocialContext()
  * @method bool isSponsorTags()
  * @method bool isStories()
  * @method bool isStoryCta()
+ * @method bool isStoryEvents()
+ * @method bool isStoryFeedMedia()
+ * @method bool isStoryFriendLists()
  * @method bool isStoryHashtags()
+ * @method bool isStoryIsSavedToArchive()
  * @method bool isStoryLocations()
  * @method bool isStoryPollVoterInfos()
  * @method bool isStoryPolls()
+ * @method bool isStoryProductItems()
+ * @method bool isStoryQuestions()
+ * @method bool isStorySliders()
+ * @method bool isStorySoundOn()
  * @method bool isSuggestedUsers()
+ * @method bool isSupportsReelReactions()
  * @method bool isTakenAt()
  * @method bool isThumbnailUrls()
+ * @method bool isTimezoneOffset()
+ * @method bool isTopFollowers()
+ * @method bool isTopFollowersCount()
  * @method bool isTopLikers()
+ * @method bool isTotalScreenshotCount()
  * @method bool isTotalViewerCount()
  * @method bool isUrlExpireAtSecs()
  * @method bool isUser()
@@ -235,371 +295,476 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isViewerCursor()
  * @method bool isViewers()
  * @method bool isVisibility()
- * @method setActorFbid(string $value)
- * @method setAdAction(mixed $value)
- * @method setAdHeaderStyle(mixed $value)
- * @method setAdId(string $value)
- * @method setAdLinkType(mixed $value)
- * @method setAdMetadata(AdMetadata[] $value)
- * @method setAlgorithm(mixed $value)
- * @method setAndroidLinks(AndroidLinks[] $value)
- * @method setAttribution(Attribution $value)
- * @method setBoostUnavailableReason(mixed $value)
- * @method setBoostedStatus(mixed $value)
- * @method setCanViewerSave(mixed $value)
- * @method setCaption(Caption $value)
- * @method setCaptionIsEdited(mixed $value)
- * @method setCaptionPosition(mixed $value)
- * @method setCarouselMedia(CarouselMedia[] $value)
- * @method setCarouselMediaType(mixed $value)
- * @method setChannel(Channel $value)
- * @method setClientCacheKey(mixed $value)
- * @method setCode(mixed $value)
- * @method setCollapseComments(mixed $value)
- * @method setCollectionId(string $value)
- * @method setCollectionName(mixed $value)
- * @method setCommentCount(mixed $value)
- * @method setCommentLikesEnabled(mixed $value)
- * @method setCommentThreadingEnabled(mixed $value)
- * @method setComments(Comment[] $value)
- * @method setCommentsDisabled(mixed $value)
- * @method setCoverMedia(CoverMedia $value)
- * @method setDeviceTimestamp(mixed $value)
- * @method setDrAdType(mixed $value)
- * @method setExpiringAt(mixed $value)
- * @method setExplore(Explore $value)
- * @method setExploreContext(mixed $value)
- * @method setExploreSourceToken(mixed $value)
- * @method setFilterType(mixed $value)
- * @method setForceOverlay(mixed $value)
- * @method setGating(Gating $value)
- * @method setHasAudio(mixed $value)
- * @method setHasLiked(mixed $value)
- * @method setHasMoreComments(mixed $value)
- * @method setHasViewerSaved(mixed $value)
- * @method setHideNuxText(mixed $value)
- * @method setITunesItem(mixed $value)
- * @method setIcon(mixed $value)
- * @method setId(string $value)
- * @method setImageVersions2(ImageVersions2 $value)
- * @method setImportedTakenAt(mixed $value)
- * @method setImpressionToken(mixed $value)
- * @method setInjected(Injected $value)
- * @method setIsAd4ad(mixed $value)
- * @method setIsDashEligible(mixed $value)
- * @method setIsNewSuggestion(mixed $value)
- * @method setIsReelMedia(mixed $value)
- * @method setIsSidecarChild(mixed $value)
- * @method setLargeUrls(mixed $value)
- * @method setLat(float $value)
- * @method setLeadGenFormId(string $value)
- * @method setLikeCount(mixed $value)
- * @method setLikers(User[] $value)
- * @method setLink(mixed $value)
- * @method setLinkHintText(mixed $value)
- * @method setLinkText(mixed $value)
- * @method setLng(float $value)
- * @method setLocation(Location $value)
- * @method setMaxNumVisiblePreviewComments(mixed $value)
- * @method setMedia(Media $value)
- * @method setMediaId(string $value)
- * @method setMediaIds(string[] $value)
- * @method setMediaInfos(mixed $value)
- * @method setMediaType(mixed $value)
- * @method setMultiAuthorReelNames(mixed $value)
- * @method setNextMaxId(string $value)
- * @method setNumberOfQualities(mixed $value)
- * @method setOrganicPostId(string $value)
- * @method setOrganicTrackingToken(mixed $value)
- * @method setOriginalHeight(mixed $value)
- * @method setOriginalWidth(mixed $value)
- * @method setOverlaySubtitle(mixed $value)
- * @method setOverlayText(mixed $value)
- * @method setOverlayTitle(mixed $value)
- * @method setPhotoOfYou(mixed $value)
- * @method setPk(string $value)
- * @method setPlaceholder(Placeholder $value)
- * @method setPlaybackDurationSecs(mixed $value)
- * @method setPreview(mixed $value)
- * @method setPreviewComments(Comment[] $value)
- * @method setReelMentions(mixed $value)
- * @method setReelShare(ReelShare $value)
- * @method setSavedCollectionIds(string[] $value)
- * @method setSocialContext(mixed $value)
- * @method setSponsorTags(User[] $value)
- * @method setStories(Stories $value)
- * @method setStoryCta(mixed $value)
- * @method setStoryHashtags(mixed $value)
- * @method setStoryLocations(StoryLocation[] $value)
- * @method setStoryPollVoterInfos(mixed $value)
- * @method setStoryPolls(mixed $value)
- * @method setSuggestedUsers(SuggestedUsers $value)
- * @method setTakenAt(mixed $value)
- * @method setThumbnailUrls(mixed $value)
- * @method setTopLikers(mixed $value)
- * @method setTotalViewerCount(mixed $value)
- * @method setUrlExpireAtSecs(mixed $value)
- * @method setUser(User $value)
- * @method setUsertags(Usertag $value)
- * @method setValue(mixed $value)
- * @method setVideoDashManifest(mixed $value)
- * @method setVideoDuration(mixed $value)
- * @method setVideoVersions(VideoVersions[] $value)
- * @method setViewCount(mixed $value)
- * @method setViewerCount(mixed $value)
- * @method setViewerCursor(mixed $value)
- * @method setViewers(User[] $value)
- * @method setVisibility(mixed $value)
+ * @method $this setActorFbid(string $value)
+ * @method $this setAdAction(string $value)
+ * @method $this setAdHeaderStyle(int $value)
+ * @method $this setAdId(string $value)
+ * @method $this setAdLinkType(int $value)
+ * @method $this setAdMetadata(AdMetadata[] $value)
+ * @method $this setAlgorithm(string $value)
+ * @method $this setAndroidLinks(AndroidLinks[] $value)
+ * @method $this setAttribution(Attribution $value)
+ * @method $this setBoostUnavailableReason(mixed $value)
+ * @method $this setBoostedStatus(mixed $value)
+ * @method $this setCanReshare(bool $value)
+ * @method $this setCanViewerReshare(bool $value)
+ * @method $this setCanViewerSave(bool $value)
+ * @method $this setCaption(Caption $value)
+ * @method $this setCaptionIsEdited(bool $value)
+ * @method $this setCaptionPosition(float $value)
+ * @method $this setCarouselMedia(CarouselMedia[] $value)
+ * @method $this setCarouselMediaType(mixed $value)
+ * @method $this setChannel(Channel $value)
+ * @method $this setClientCacheKey(string $value)
+ * @method $this setCode(string $value)
+ * @method $this setCollapseComments(bool $value)
+ * @method $this setCommentCount(int $value)
+ * @method $this setCommentLikesEnabled(bool $value)
+ * @method $this setCommentThreadingEnabled(bool $value)
+ * @method $this setCommentingDisabledForViewer(mixed $value)
+ * @method $this setComments(Comment[] $value)
+ * @method $this setCommentsDisabled(mixed $value)
+ * @method $this setCoverMedia(CoverMedia $value)
+ * @method $this setCreativeConfig(mixed $value)
+ * @method $this setDeviceTimestamp(string $value)
+ * @method $this setDominantColor(string $value)
+ * @method $this setDrAdType(int $value)
+ * @method $this setExpiringAt(string $value)
+ * @method $this setExplore(Explore $value)
+ * @method $this setExploreContext(string $value)
+ * @method $this setExploreHideComments(bool $value)
+ * @method $this setExploreSourceToken(string $value)
+ * @method $this setFbPageUrl(string $value)
+ * @method $this setFbUserTags(Usertag $value)
+ * @method $this setFilterType(int $value)
+ * @method $this setForceOverlay(bool $value)
+ * @method $this setGating(Gating $value)
+ * @method $this setHasAudio(bool $value)
+ * @method $this setHasLiked(bool $value)
+ * @method $this setHasMoreComments(bool $value)
+ * @method $this setHasSharedToFb(bool $value)
+ * @method $this setHasViewerSaved(bool $value)
+ * @method $this setHideNuxText(bool $value)
+ * @method $this setHighlightReelIds(string[] $value)
+ * @method $this setITunesItem(mixed $value)
+ * @method $this setIcon(mixed $value)
+ * @method $this setId(string $value)
+ * @method $this setImageVersions2(ImageVersions2 $value)
+ * @method $this setImportedTakenAt(mixed $value)
+ * @method $this setImpressionToken(string $value)
+ * @method $this setInjected(Injected $value)
+ * @method $this setInlineComposerDisplayCondition(string $value)
+ * @method $this setInventorySource(string $value)
+ * @method $this setIosLinks(IOSLinks[] $value)
+ * @method $this setIsAd4ad(mixed $value)
+ * @method $this setIsDashEligible(int $value)
+ * @method $this setIsEof(bool $value)
+ * @method $this setIsNewSuggestion(bool $value)
+ * @method $this setIsReelMedia(bool $value)
+ * @method $this setIsSeen(mixed $value)
+ * @method $this setIsSidecarChild(mixed $value)
+ * @method $this setLargeUrls(mixed $value)
+ * @method $this setLat(float $value)
+ * @method $this setLeadGenFormId(string $value)
+ * @method $this setLikeCount(int $value)
+ * @method $this setLikers(User[] $value)
+ * @method $this setLink(string $value)
+ * @method $this setLinkHintText(string $value)
+ * @method $this setLinkText(string $value)
+ * @method $this setLng(float $value)
+ * @method $this setLocation(Location $value)
+ * @method $this setMaxNumVisiblePreviewComments(int $value)
+ * @method $this setMedia(Media $value)
+ * @method $this setMediaId(string $value)
+ * @method $this setMediaIds(string[] $value)
+ * @method $this setMediaInfos(mixed $value)
+ * @method $this setMediaType(int $value)
+ * @method $this setMultiAuthorReelNames(mixed $value)
+ * @method $this setNextMaxId(string $value)
+ * @method $this setNumberOfQualities(int $value)
+ * @method $this setOrganicPostId(string $value)
+ * @method $this setOrganicTrackingToken(string $value)
+ * @method $this setOriginalHeight(int $value)
+ * @method $this setOriginalWidth(int $value)
+ * @method $this setOverlaySubtitle(string $value)
+ * @method $this setOverlayText(string $value)
+ * @method $this setOverlayTitle(string $value)
+ * @method $this setPhotoOfYou(bool $value)
+ * @method $this setPk(string $value)
+ * @method $this setPlaceholder(Placeholder $value)
+ * @method $this setPlaybackDurationSecs(mixed $value)
+ * @method $this setPreview(string $value)
+ * @method $this setPreviewComments(Comment[] $value)
+ * @method $this setProductTags(ProductTags $value)
+ * @method $this setReelMentions(ReelMention[] $value)
+ * @method $this setReelShare(ReelShare $value)
+ * @method $this setSavedCollectionIds(string[] $value)
+ * @method $this setScreenshotterUserIds(mixed $value)
+ * @method $this setShowOneTapFbShareTooltip(bool $value)
+ * @method $this setSocialContext(string $value)
+ * @method $this setSponsorTags(User[] $value)
+ * @method $this setStories(Stories $value)
+ * @method $this setStoryCta(StoryCta[] $value)
+ * @method $this setStoryEvents(mixed $value)
+ * @method $this setStoryFeedMedia(mixed $value)
+ * @method $this setStoryFriendLists(mixed $value)
+ * @method $this setStoryHashtags(StoryHashtag[] $value)
+ * @method $this setStoryIsSavedToArchive(bool $value)
+ * @method $this setStoryLocations(StoryLocation[] $value)
+ * @method $this setStoryPollVoterInfos(mixed $value)
+ * @method $this setStoryPolls(mixed $value)
+ * @method $this setStoryProductItems(mixed $value)
+ * @method $this setStoryQuestions(mixed $value)
+ * @method $this setStorySliders(mixed $value)
+ * @method $this setStorySoundOn(mixed $value)
+ * @method $this setSuggestedUsers(SuggestedUsers $value)
+ * @method $this setSupportsReelReactions(bool $value)
+ * @method $this setTakenAt(string $value)
+ * @method $this setThumbnailUrls(mixed $value)
+ * @method $this setTimezoneOffset(int $value)
+ * @method $this setTopFollowers(string[] $value)
+ * @method $this setTopFollowersCount(int $value)
+ * @method $this setTopLikers(string[] $value)
+ * @method $this setTotalScreenshotCount(int $value)
+ * @method $this setTotalViewerCount(int $value)
+ * @method $this setUrlExpireAtSecs(mixed $value)
+ * @method $this setUser(User $value)
+ * @method $this setUsertags(Usertag $value)
+ * @method $this setValue(float $value)
+ * @method $this setVideoDashManifest(string $value)
+ * @method $this setVideoDuration(float $value)
+ * @method $this setVideoVersions(VideoVersions[] $value)
+ * @method $this setViewCount(int $value)
+ * @method $this setViewerCount(int $value)
+ * @method $this setViewerCursor(mixed $value)
+ * @method $this setViewers(User[] $value)
+ * @method $this setVisibility(mixed $value)
+ * @method $this unsetActorFbid()
+ * @method $this unsetAdAction()
+ * @method $this unsetAdHeaderStyle()
+ * @method $this unsetAdId()
+ * @method $this unsetAdLinkType()
+ * @method $this unsetAdMetadata()
+ * @method $this unsetAlgorithm()
+ * @method $this unsetAndroidLinks()
+ * @method $this unsetAttribution()
+ * @method $this unsetBoostUnavailableReason()
+ * @method $this unsetBoostedStatus()
+ * @method $this unsetCanReshare()
+ * @method $this unsetCanViewerReshare()
+ * @method $this unsetCanViewerSave()
+ * @method $this unsetCaption()
+ * @method $this unsetCaptionIsEdited()
+ * @method $this unsetCaptionPosition()
+ * @method $this unsetCarouselMedia()
+ * @method $this unsetCarouselMediaType()
+ * @method $this unsetChannel()
+ * @method $this unsetClientCacheKey()
+ * @method $this unsetCode()
+ * @method $this unsetCollapseComments()
+ * @method $this unsetCommentCount()
+ * @method $this unsetCommentLikesEnabled()
+ * @method $this unsetCommentThreadingEnabled()
+ * @method $this unsetCommentingDisabledForViewer()
+ * @method $this unsetComments()
+ * @method $this unsetCommentsDisabled()
+ * @method $this unsetCoverMedia()
+ * @method $this unsetCreativeConfig()
+ * @method $this unsetDeviceTimestamp()
+ * @method $this unsetDominantColor()
+ * @method $this unsetDrAdType()
+ * @method $this unsetExpiringAt()
+ * @method $this unsetExplore()
+ * @method $this unsetExploreContext()
+ * @method $this unsetExploreHideComments()
+ * @method $this unsetExploreSourceToken()
+ * @method $this unsetFbPageUrl()
+ * @method $this unsetFbUserTags()
+ * @method $this unsetFilterType()
+ * @method $this unsetForceOverlay()
+ * @method $this unsetGating()
+ * @method $this unsetHasAudio()
+ * @method $this unsetHasLiked()
+ * @method $this unsetHasMoreComments()
+ * @method $this unsetHasSharedToFb()
+ * @method $this unsetHasViewerSaved()
+ * @method $this unsetHideNuxText()
+ * @method $this unsetHighlightReelIds()
+ * @method $this unsetITunesItem()
+ * @method $this unsetIcon()
+ * @method $this unsetId()
+ * @method $this unsetImageVersions2()
+ * @method $this unsetImportedTakenAt()
+ * @method $this unsetImpressionToken()
+ * @method $this unsetInjected()
+ * @method $this unsetInlineComposerDisplayCondition()
+ * @method $this unsetInventorySource()
+ * @method $this unsetIosLinks()
+ * @method $this unsetIsAd4ad()
+ * @method $this unsetIsDashEligible()
+ * @method $this unsetIsEof()
+ * @method $this unsetIsNewSuggestion()
+ * @method $this unsetIsReelMedia()
+ * @method $this unsetIsSeen()
+ * @method $this unsetIsSidecarChild()
+ * @method $this unsetLargeUrls()
+ * @method $this unsetLat()
+ * @method $this unsetLeadGenFormId()
+ * @method $this unsetLikeCount()
+ * @method $this unsetLikers()
+ * @method $this unsetLink()
+ * @method $this unsetLinkHintText()
+ * @method $this unsetLinkText()
+ * @method $this unsetLng()
+ * @method $this unsetLocation()
+ * @method $this unsetMaxNumVisiblePreviewComments()
+ * @method $this unsetMedia()
+ * @method $this unsetMediaId()
+ * @method $this unsetMediaIds()
+ * @method $this unsetMediaInfos()
+ * @method $this unsetMediaType()
+ * @method $this unsetMultiAuthorReelNames()
+ * @method $this unsetNextMaxId()
+ * @method $this unsetNumberOfQualities()
+ * @method $this unsetOrganicPostId()
+ * @method $this unsetOrganicTrackingToken()
+ * @method $this unsetOriginalHeight()
+ * @method $this unsetOriginalWidth()
+ * @method $this unsetOverlaySubtitle()
+ * @method $this unsetOverlayText()
+ * @method $this unsetOverlayTitle()
+ * @method $this unsetPhotoOfYou()
+ * @method $this unsetPk()
+ * @method $this unsetPlaceholder()
+ * @method $this unsetPlaybackDurationSecs()
+ * @method $this unsetPreview()
+ * @method $this unsetPreviewComments()
+ * @method $this unsetProductTags()
+ * @method $this unsetReelMentions()
+ * @method $this unsetReelShare()
+ * @method $this unsetSavedCollectionIds()
+ * @method $this unsetScreenshotterUserIds()
+ * @method $this unsetShowOneTapFbShareTooltip()
+ * @method $this unsetSocialContext()
+ * @method $this unsetSponsorTags()
+ * @method $this unsetStories()
+ * @method $this unsetStoryCta()
+ * @method $this unsetStoryEvents()
+ * @method $this unsetStoryFeedMedia()
+ * @method $this unsetStoryFriendLists()
+ * @method $this unsetStoryHashtags()
+ * @method $this unsetStoryIsSavedToArchive()
+ * @method $this unsetStoryLocations()
+ * @method $this unsetStoryPollVoterInfos()
+ * @method $this unsetStoryPolls()
+ * @method $this unsetStoryProductItems()
+ * @method $this unsetStoryQuestions()
+ * @method $this unsetStorySliders()
+ * @method $this unsetStorySoundOn()
+ * @method $this unsetSuggestedUsers()
+ * @method $this unsetSupportsReelReactions()
+ * @method $this unsetTakenAt()
+ * @method $this unsetThumbnailUrls()
+ * @method $this unsetTimezoneOffset()
+ * @method $this unsetTopFollowers()
+ * @method $this unsetTopFollowersCount()
+ * @method $this unsetTopLikers()
+ * @method $this unsetTotalScreenshotCount()
+ * @method $this unsetTotalViewerCount()
+ * @method $this unsetUrlExpireAtSecs()
+ * @method $this unsetUser()
+ * @method $this unsetUsertags()
+ * @method $this unsetValue()
+ * @method $this unsetVideoDashManifest()
+ * @method $this unsetVideoDuration()
+ * @method $this unsetVideoVersions()
+ * @method $this unsetViewCount()
+ * @method $this unsetViewerCount()
+ * @method $this unsetViewerCursor()
+ * @method $this unsetViewers()
+ * @method $this unsetVisibility()
  */
-class Item extends AutoPropertyHandler
+class Item extends AutoPropertyMapper
 {
     const PHOTO = 1;
     const VIDEO = 2;
     const ALBUM = 8;
 
-    /**
-     * @var string
-     */
-    public $pk;
-    /**
-     * @var string
-     */
-    public $id;
-    public $media_type;
-    public $code;
-    public $visibility;
-    public $taken_at;
-    public $device_timestamp;
-    public $client_cache_key;
-    public $filter_type;
-    /**
-     * @var Attribution
-     */
-    public $attribution;
-    /**
-     * @var ImageVersions2
-     */
-    public $image_versions2;
-    public $original_width;
-    public $original_height;
-    public $view_count;
-    public $viewer_count;
-    public $organic_tracking_token;
-    public $comment_count;
-    public $has_more_comments;
-    public $max_num_visible_preview_comments;
-    /**
-     * Preview of comments via feed replies.
-     *
-     * If "has_more_comments" is FALSE, then this has ALL of the comments.
-     * Otherwise, you'll need to get all comments by querying the media.
-     *
-     * @var Comment[]
-     */
-    public $preview_comments;
-    /**
-     * Comments for the item.
-     *
-     * TODO: As of mid-2017, this field seems to no longer be used for timeline
-     * feed items? They now use "preview_comments" instead. But we won't delete
-     * it, since some other feed MAY use this property for ITS Item object.
-     *
-     * @var Comment[]
-     */
-    public $comments;
-    public $comments_disabled;
-    public $reel_mentions;
-    public $story_cta;
-    public $caption_position;
-    public $expiring_at;
-    public $is_reel_media;
-    /**
-     * @var string
-     */
-    public $next_max_id;
-    /**
-     * @var CarouselMedia[]
-     */
-    public $carousel_media;
-    public $carousel_media_type;
-    /**
-     * @var Caption
-     */
-    public $caption;
-    public $caption_is_edited;
-    public $photo_of_you;
-    /**
-     * @var VideoVersions[]
-     */
-    public $video_versions;
-    public $has_audio;
-    public $video_duration;
-    /**
-     * @var User
-     */
-    public $user;
-    /**
-     * @var User[]
-     */
-    public $likers;
-    public $like_count;
-    public $preview;
-    public $has_liked;
-    public $explore_context;
-    public $explore_source_token;
-    /**
-     * @var Explore
-     */
-    public $explore;
-    public $impression_token;
-    /**
-     * @var Usertag
-     */
-    public $usertags;
-    /**
-     * @var Media
-     */
-    public $media;
-    /**
-     * @var Stories
-     */
-    public $stories;
-    public $top_likers;
-    /**
-     * @var SuggestedUsers
-     */
-    public $suggested_users;
-    public $is_new_suggestion;
-    public $comment_likes_enabled;
-    public $can_viewer_save;
-    public $has_viewer_saved;
-    /**
-     * @var Location
-     */
-    public $location;
-    /**
-     * @var float
-     */
-    public $lat;
-    /**
-     * @var float
-     */
-    public $lng;
-    /**
-     * @var StoryLocation[]
-     */
-    public $story_locations;
-    public $algorithm;
-    /**
-     * @var Channel
-     */
-    public $channel;
-    /**
-     * @var Gating
-     */
-    public $gating;
-    public $story_hashtags;
-    public $ad_action;
-    public $is_dash_eligible;
-    public $video_dash_manifest;
-    public $number_of_qualities;
-    /**
-     * @var Injected
-     */
-    public $injected;
-    /**
-     * @var Placeholder
-     */
-    public $placeholder;
-    public $social_context;
-    public $icon;
-    /**
-     * @var string[]
-     */
-    public $media_ids;
-    /**
-     * @var string
-     */
-    public $media_id;
-    public $thumbnail_urls;
-    public $large_urls;
-    public $media_infos;
-    public $value;
-    public $collapse_comments;
-    /**
-     * @var AdMetadata[]
-     */
-    public $ad_metadata;
-    public $link;
-    public $link_text;
-    public $link_hint_text;
-    public $iTunesItem;
-    public $ad_link_type;
-    public $ad_header_style;
-    public $dr_ad_type;
-    /**
-     * @var AndroidLinks[]
-     */
-    public $android_links;
-    public $force_overlay;
-    public $hide_nux_text;
-    public $overlay_text;
-    public $overlay_title;
-    public $overlay_subtitle;
-    public $playback_duration_secs;
-    public $url_expire_at_secs;
-    public $is_sidecar_child;
-    public $comment_threading_enabled;
-    /**
-     * @var string
-     */
-    public $collection_id;
-    public $collection_name;
-    /**
-     * @var CoverMedia
-     */
-    public $cover_media;
-    /**
-     * @var string[]
-     */
-    public $saved_collection_ids;
-    public $boosted_status;
-    public $boost_unavailable_reason;
-    /**
-     * @var User[]
-     */
-    public $viewers;
-    public $viewer_cursor;
-    public $total_viewer_count;
-    public $multi_author_reel_names;
-    /**
-     * @var ReelShare
-     */
-    public $reel_share;
-    public $story_polls;
-    /**
-     * @var string
-     */
-    public $organic_post_id;
-    /**
-     * @var User[]
-     */
-    public $sponsor_tags;
-    public $story_poll_voter_infos;
-    public $imported_taken_at;
-    /**
-     * @var string
-     */
-    public $lead_gen_form_id;
-    /**
-     * @var string
-     */
-    public $ad_id;
-    /**
-     * @var string
-     */
-    public $actor_fbid;
-    public $is_ad4ad;
+    public static $JSON_PROPERTY_MAP = [
+        /*
+         * The Unix timestamp (UTC) of when the media was UPLOADED by the user.
+         * It is NOT when the media was "taken". It's the upload time.
+         */
+        'taken_at'                         => 'string',
+        'pk'                               => 'string',
+        'id'                               => 'string',
+        'device_timestamp'                 => 'string',
+        /*
+         * A number describing what type of media this is. Should be compared
+         * against the `Item::PHOTO`, `Item::VIDEO` and `Item::ALBUM` constants!
+         */
+        'media_type'                               => 'int',
+        'code'                                     => 'string',
+        'client_cache_key'                         => 'string',
+        'filter_type'                              => 'int',
+        'image_versions2'                          => 'ImageVersions2',
+        'original_width'                           => 'int',
+        'original_height'                          => 'int',
+        'caption_position'                         => 'float',
+        'is_reel_media'                            => 'bool',
+        'video_versions'                           => 'VideoVersions[]',
+        'has_audio'                                => 'bool',
+        'video_duration'                           => 'float',
+        'user'                                     => 'User',
+        'caption'                                  => 'Caption',
+        'caption_is_edited'                        => 'bool',
+        'photo_of_you'                             => 'bool',
+        'fb_user_tags'                             => 'Usertag',
+        'can_viewer_save'                          => 'bool',
+        'has_viewer_saved'                         => 'bool',
+        'organic_tracking_token'                   => 'string',
+        'expiring_at'                              => 'string',
+        'is_dash_eligible'                         => 'int',
+        'video_dash_manifest'                      => 'string',
+        'number_of_qualities'                      => 'int',
+        'can_reshare'                              => 'bool',
+        'can_viewer_reshare'                       => 'bool',
+        'visibility'                               => '',
+        'attribution'                              => 'Attribution',
+        /*
+         * This is actually a float in the reply, but is always `.0`, so we cast
+         * it to an int instead to make the number easier to manage.
+         */
+        'view_count'                       => 'int',
+        'viewer_count'                     => 'int',
+        'comment_count'                    => 'int',
+        'has_more_comments'                => 'bool',
+        'max_num_visible_preview_comments' => 'int',
+        /*
+         * Preview of comments via feed replies.
+         *
+         * If "has_more_comments" is FALSE, then this has ALL of the comments.
+         * Otherwise, you'll need to get all comments by querying the media.
+         */
+        'preview_comments'                 => 'Comment[]',
+        /*
+         * Comments for the item.
+         *
+         * TODO: As of mid-2017, this field seems to no longer be used for
+         * timeline feed items? They now use "preview_comments" instead. But we
+         * won't delete it, since some other feed MAY use this property for ITS
+         * Item object.
+         */
+        'comments'                                    => 'Comment[]',
+        'comments_disabled'                           => '',
+        'reel_mentions'                               => 'ReelMention[]',
+        'story_cta'                                   => 'StoryCta[]',
+        'next_max_id'                                 => 'string',
+        'carousel_media'                              => 'CarouselMedia[]',
+        'carousel_media_type'                         => '',
+        'likers'                                      => 'User[]',
+        'like_count'                                  => 'int',
+        'preview'                                     => 'string',
+        'has_liked'                                   => 'bool',
+        'explore_context'                             => 'string',
+        'explore_source_token'                        => 'string',
+        'explore_hide_comments'                       => 'bool',
+        'explore'                                     => 'Explore',
+        'impression_token'                            => 'string',
+        'usertags'                                    => 'Usertag',
+        'media'                                       => 'Media',
+        'stories'                                     => 'Stories',
+        'top_likers'                                  => 'string[]',
+        'suggested_users'                             => 'SuggestedUsers',
+        'is_new_suggestion'                           => 'bool',
+        'comment_likes_enabled'                       => 'bool',
+        'location'                                    => 'Location',
+        'lat'                                         => 'float',
+        'lng'                                         => 'float',
+        'channel'                                     => 'Channel',
+        'gating'                                      => 'Gating',
+        'injected'                                    => 'Injected',
+        'placeholder'                                 => 'Placeholder',
+        'algorithm'                                   => 'string',
+        'social_context'                              => 'string',
+        'icon'                                        => '',
+        'media_ids'                                   => 'string[]',
+        'media_id'                                    => 'string',
+        'thumbnail_urls'                              => '',
+        'large_urls'                                  => '',
+        'media_infos'                                 => '',
+        'value'                                       => 'float',
+        'collapse_comments'                           => 'bool',
+        'link'                                        => 'string',
+        'link_text'                                   => 'string',
+        'link_hint_text'                              => 'string',
+        'iTunesItem'                                  => '',
+        'ad_header_style'                             => 'int',
+        'ad_metadata'                                 => 'AdMetadata[]',
+        'ad_action'                                   => 'string',
+        'ad_link_type'                                => 'int',
+        'dr_ad_type'                                  => 'int',
+        'android_links'                               => 'AndroidLinks[]',
+        'ios_links'                                   => 'IOSLinks[]',
+        'force_overlay'                               => 'bool',
+        'hide_nux_text'                               => 'bool',
+        'overlay_text'                                => 'string',
+        'overlay_title'                               => 'string',
+        'overlay_subtitle'                            => 'string',
+        'fb_page_url'                                 => 'string',
+        'playback_duration_secs'                      => '',
+        'url_expire_at_secs'                          => '',
+        'is_sidecar_child'                            => '',
+        'comment_threading_enabled'                   => 'bool',
+        'cover_media'                                 => 'CoverMedia',
+        'saved_collection_ids'                        => 'string[]',
+        'boosted_status'                              => '',
+        'boost_unavailable_reason'                    => '',
+        'viewers'                                     => 'User[]',
+        'viewer_cursor'                               => '',
+        'total_viewer_count'                          => 'int',
+        'multi_author_reel_names'                     => '',
+        'screenshotter_user_ids'                      => '',
+        'reel_share'                                  => 'ReelShare',
+        'organic_post_id'                             => 'string',
+        'sponsor_tags'                                => 'User[]',
+        'story_poll_voter_infos'                      => '',
+        'imported_taken_at'                           => '',
+        'lead_gen_form_id'                            => 'string',
+        'ad_id'                                       => 'string',
+        'actor_fbid'                                  => 'string',
+        'is_ad4ad'                                    => '',
+        'commenting_disabled_for_viewer'              => '',
+        'is_seen'                                     => '',
+        'story_events'                                => '',
+        'story_hashtags'                              => 'StoryHashtag[]',
+        'story_polls'                                 => '',
+        'story_feed_media'                            => '',
+        'story_sound_on'                              => '',
+        'creative_config'                             => '',
+        'story_locations'                             => 'StoryLocation[]',
+        'story_sliders'                               => '',
+        'story_friend_lists'                          => '',
+        'story_product_items'                         => '',
+        'story_questions'                             => '',
+        'supports_reel_reactions'                     => 'bool',
+        'show_one_tap_fb_share_tooltip'               => 'bool',
+        'has_shared_to_fb'                            => 'bool',
+        'inventory_source'                            => 'string',
+        'is_eof'                                      => 'bool',
+        'top_followers'                               => 'string[]',
+        'top_followers_count'                         => 'int',
+        'story_is_saved_to_archive'                   => 'bool',
+        'timezone_offset'                             => 'int',
+        'product_tags'                                => 'ProductTags',
+        'inline_composer_display_condition'           => 'string',
+        'highlight_reel_ids'                          => 'string[]',
+        'total_screenshot_count'                      => 'int',
+        /*
+         * HTML color string such as "#812A2A".
+         */
+        'dominant_color'                   => 'string',
+    ];
 
     /**
      * Get the web URL for this media item.
@@ -608,7 +773,7 @@ class Item extends AutoPropertyHandler
      */
     public function getItemUrl()
     {
-        return 'https://www.instagram.com/p/'.$this->code.'/';
+        return sprintf('https://www.instagram.com/p/%s/', $this->_getProperty('code'));
     }
 
     /**
@@ -618,6 +783,6 @@ class Item extends AutoPropertyHandler
      */
     public function isAd()
     {
-        return $this->dr_ad_type !== null;
+        return $this->_getProperty('dr_ad_type') !== null;
     }
 }

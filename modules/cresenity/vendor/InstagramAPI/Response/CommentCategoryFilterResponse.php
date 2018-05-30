@@ -2,18 +2,31 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
 /**
+ * CommentCategoryFilterResponse.
+ *
  * @method mixed getDisabled()
+ * @method mixed getMessage()
+ * @method string getStatus()
+ * @method Model\ZMessage[] getZMessages()
  * @method bool isDisabled()
- * @method setDisabled(mixed $value)
+ * @method bool isMessage()
+ * @method bool isStatus()
+ * @method bool isZMessages()
+ * @method $this setDisabled(mixed $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setZMessages(Model\ZMessage[] $value)
+ * @method $this unsetDisabled()
+ * @method $this unsetMessage()
+ * @method $this unsetStatus()
+ * @method $this unsetZMessages()
  */
-class CommentCategoryFilterResponse extends AutoPropertyHandler implements ResponseInterface
+class CommentCategoryFilterResponse extends Response
 {
-    use ResponseTrait;
-
-    public $disabled;
+    public static $JSON_PROPERTY_MAP = [
+        'disabled' => '',
+    ];
 }
