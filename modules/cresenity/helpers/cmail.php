@@ -205,6 +205,9 @@ class cmail {
                     return cmailapi::sendgridv3($to, $subject, $message, $attachments, $cc, $bcc, $options);
                 }
                 break;
+            case 'smtp.mailgun.org':
+                return cmailapi::mailgun($to, $subject, $message, $attachments, $cc, $bcc, $options);
+                break;
             case 'smtp.elasticemail.com':
             case 'smtp25.elasticemail.com':
                 if (count($attachments) == 0) {
