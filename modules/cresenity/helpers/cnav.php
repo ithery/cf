@@ -246,117 +246,7 @@ class cnav {
         return $url;
     }
 
-    public static function render_theme($theme, $navs = null, $level = 0, &$child = 0, &$activated = false) {
-        $is_admin = CApp::instance()->is_admin();
-        if ($navs == null)
-            $navs = CNavigation::instance()->navs();
-
-        if ($navs == null)
-            return false;
-        $html = "";
-        $child_count = 0;
-        $nav_active = false;
-        foreach ($navs as $d) {
-            if ($level <= 1) {
-                $activated = false;
-            }
-            $child = 0;
-            $active_class = "";
-            $controller = "";
-            $method = "";
-            $label = "";
-            $icon = "";
-            if (isset($d["controller"]))
-                $controller = $d["controller"];
-            if (isset($d["method"]))
-                $method = $d["method"];
-            if (isset($d["label"]))
-                $label = $d["label"];
-            if (isset($d["icon"]))
-                $icon = $d["icon"];
-
-            $child_html = "";
-
-            if (isset($d["subnav"])) {
-                $child_html .= cnav::render_theme($theme, $d["subnav"], $level + 1, $child, $activated);
-            }
-
-            $url = cnav::url($d);
-            if (!isset($url) || $url == null) {
-                $url = "";
-            }
-
-            if (strlen($child_html) > 0 || strlen($url) > 0) {
-                if (!cnav::access_available($d, CF::app_id(), CF::domain())) {
-                    continue;
-                }
-                if (isset($d["controller"]) && $d["controller"] != "") {
-                    if (!$is_admin && ccfg::get("have_user_access")) {
-                        if (!cnav::have_access($d)) {
-                            continue;
-                        }
-                    }
-                }
-
-                $child_count++;
-
-                $li_class = "";
-                if ($child > 0) {
-//                        $li_class.=" with-right-arrow";
-                    if ($level == 0) {
-                        $li_class .= " treeview";
-                    }
-                }
-
-                // selected navigator
-                $find_nav = cnav::nav($d);
-                if ($find_nav !== false || $activated == true) {
-                    $nav_active = true;
-                    $active_class = " active";
-                }
-
-                // icon
-                $icon_html = "";
-                if (isset($d["icon"]) && strlen($d["icon"]) > 0) {
-                    $icon_html = '<i class="fa fa-' . $d["icon"] . '"></i>';
-                }
-
-                $html .= "<li class='" . $active_class . " " . $li_class . "'>";
-
-                if ($url == "") {
-                    $elem = "<a href='#'>
-                                    " . $icon_html . "</i><span>" . clang::__($label) . "</span> 
-                                    <i class='fa fa-angle-left pull-right'></i>
-                                  </a>";
-                } else {
-                    $elem = "<a href='" . $url . "'>" . $icon_html . "<span>" . clang::__($label) . "</span></a>";
-                }
-                $html .= $elem;
-                $html .= $child_html;
-                $html .= '</li>';
-            }
-        }
-
-        if ($nav_active == true) {
-            $activated = true;
-        }
-
-        if (strlen($html) > 0) {
-            if ($level == 0) {
-                $html = "<ul class='sidebar-menu'>" . $html . "</ul>";
-            } else {
-                $html = "<ul class=\"treeview-menu\">\r\n" . $html . "  </ul>\r\n";
-            }
-        }
-
-        if ($child_count == 0) {
-            $html = "";
-        }
-        $child = $child_count;
-        return $html;
-    }
-
-    public static function render($data_notif = array(), $navs = null, $level = 0, &$child = 0) {
+    public static function render($navs = null, $level = 0, &$child = 0) {
         $is_admin = CApp::instance()->is_admin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
@@ -388,7 +278,7 @@ class cnav {
             $child_html = "";
 
             if (isset($d["subnav"])) {
-                $child_html .= cnav::render($data_notif, $d["subnav"], $level + 1, $child);
+                $child_html .= cnav::render($d["subnav"], $level + 1, $child);
             }
 
             $url = cnav::url($d);
@@ -419,7 +309,7 @@ class cnav {
                     $active_class = " active";
                 }
 
-                $li_class = "";
+                $li_class = "sidenav-item ";
                 if ($child > 0) {
                     $li_class .= " with-right-arrow";
                     if ($level == 0) {
@@ -438,9 +328,14 @@ class cnav {
                 }
 
                 $html .= '<li class="' . $li_class . $active_class . '" ' . $addition_style . '>';
+
+                $iconClass = carr::get($d, 'icon');
+                if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
+                    $iconClass = 'icon-' . $iconClass;
+                }
                 $icon_html = "";
-                if (isset($d["icon"]) && strlen($d["icon"]) > 0) {
-                    $icon_html = '<i class="icon-' . $d["icon"] . '"></i>';
+                if (strlen($iconClass) > 0) {
+                    $icon_html = '<i class="' . $iconClass . '"></i>';
                 }
                 if ($url == "") {
                     $caret = "";
@@ -448,7 +343,7 @@ class cnav {
                         $caret = '<b class="caret">';
                     }
 
-                    $elem = '<a class="' . $active_class . ' dropdown-toggle " href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>'  . $caret . '</b>';
+                    $elem = '<a class="' . $active_class . ' dropdown-toggle sidenav-link sidenav-toggle" href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -461,17 +356,17 @@ class cnav {
                     }
                     if (isset($d["notif_count"])) {
                         $callable = $d["notif_count"];
-                      
+
                         if (is_callable($callable)) {
                             $notif = call_user_func($callable);
                         }
                     }
-                   
+
                     $strNotif = '';
                     if ($notif != null && $notif > 0) {
-                        $strNotif = ' <span class="label label-info nav-notif nav-notif-count">'.$notif.'</span>';
+                        $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $active_class . '" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
+                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $child_html;

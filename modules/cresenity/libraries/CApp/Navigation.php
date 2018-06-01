@@ -43,9 +43,18 @@ class CApp_Navigation {
         return $this->navs;
     }
 
+    public function navs() {
+        return $this->getArray();
+    }
+
     public function render($options = array()) {
 
-        return cnav::render();
+        $engine = carr::get($options, 'engine', 'bootstrap');
+        $layout = carr::get($options, 'layout', 'horizontal');
+
+        $engineClassName = 'CApp_Navigation_Engine_' . ucfirst($engine);
+        $engineClass = new $engineClassName();
+        return $engineClass->render();
     }
 
 }
