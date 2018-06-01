@@ -12,19 +12,50 @@ use \CApp_Navigation_Helper as Helper;
 class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
 
     protected $roleNavs = array();
-    protected $roleId;
-    protected $appId;
-    
-    public function __construct($options=array()) {
+    protected $roleId = null;
+    protected $appId = null;
+    protected $navs = null;
+
+    public function __construct($options = array()) {
         $app = CApp::instance();
-        
-        $roleId = carr::get($options,'role_id');
-        $appId = carr::get($options,'app_id');
-        
+        $db = CDatabase::instance();
+
+        $roleId = carr::get($options, 'role_id');
+        $appId = carr::get($options, 'app_id');
+        $navs = carr::get($options, 'navs');
+
         if ($roleId == null) {
             $role = $app->role();
             if ($role != null)
                 $roleId = $role->role_id;
+        }
+        if ($appId == null) {
+            $appId = CF::appId();
+        }
+        $this->roleId = $roleId;
+        $this->appId = $appId;
+
+        /* get nav */
+        if ($navs == null) {
+            $navs = CApp_Navigation_Data::get();
+        }
+
+        $this->navs = $navs;
+        
+        $q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
+        if ($roleId == null) {
+            $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
+        }
+        $this->roleNavs = cdbutils::get_array($q);
+    }
+
+    public static function have_access($nav = null, $role_id = null, $app_id = null, $domain = null) {
+
+        $app = CApp::instance();
+        if ($role_id == null) {
+            $role = $app->role();
+            if ($role != null)
+                $role_id = $role->role_id;
         }
         if ($app_id == null) {
             $app_id = $app->app_id();
@@ -44,6 +75,8 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
             if ($role->parent_id == null)
                 return true;
         }
+
+
         if (!isset(self::$role_navs[$app_id]) || !isset(self::$role_navs[$app_id][$role_id])) {
             if (!isset(self::$role_navs[$app_id])) {
                 self::$role_navs[$app_id] = array();
@@ -57,6 +90,8 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
                 self::$role_navs[$app_id][$role_id] = cdbutils::get_array($q);
             }
         }
+
+        return in_array($nav["name"], self::$role_navs[$app_id][$role_id]);
     }
-    
+
 }

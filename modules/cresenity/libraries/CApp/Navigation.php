@@ -9,42 +9,27 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CApp_Navigation {
 
-    protected $navs;
+
     public static $instance = array();
 
-    public static function instance($appCode = null) {
-        if ($appCode == null) {
-            $appCode = CF::app_code();
+    /**
+     * 
+     * @param string $appCode
+     * @return CApp_Navigation
+     */
+    public static function instance($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
         }
-        if (!isset(self::$instance[$appCode])) {
-            self::$instance[$appCode] = new CApp_Navigation($appCode);
+
+        if (!isset(self::$instance[$domain])) {
+            self::$instance[$domain] = new CApp_Navigation($domain);
         }
-        return self::$instance[$appCode];
+        return self::$instance[$domain];
     }
 
-    public function __construct($appCode = null) {
+    public function __construct($domain = null) {
 
-        if ($appCode == null) {
-            $appCode = CF::app_code();
-        }
-
-        $path = '';
-        $temp_path = '';
-        $org_code = CF::org_code();
-        $navFile = CF::get_file('config', 'nav');
-
-        $this->navs = null;
-        if ($navFile != null) {
-            $this->navs = include $navFile;
-        }
-    }
-
-    public function getArray() {
-        return $this->navs;
-    }
-
-    public function navs() {
-        return $this->getArray();
     }
 
     public function render($options = array()) {
