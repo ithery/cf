@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CClientScript extends CObject {
 
+    use CTrait_Compat_ClientScript;
+
     protected $scripts;
     protected static $_instance;
 
@@ -16,7 +18,10 @@ class CClientScript extends CObject {
     //type
     //js_file,css_file, js, css, meta, link
 
-
+    /**
+     * 
+     * @return CClientScript
+     */
     public static function instance() {
         if (self::$_instance == null) {
             self::$_instance = new CClientScript();
@@ -133,7 +138,7 @@ class CClientScript extends CObject {
         }
     }
 
-    public function register_js_file($file, $pos = "end") {
+    public function registerJsFile($file, $pos = "end") {
         $dir_file = $file;
         $js_version = '';
         if (strpos($file, '?') !== false) {
@@ -154,9 +159,10 @@ class CClientScript extends CObject {
             }
         }
         $this->scripts[$pos]['js_file'][] = $js_file;
+        return $this;
     }
 
-    public function register_css_file($file, $pos = "head") {
+    public function registerCssFile($file, $pos = "head") {
         $dir_file = $file;
         $css_version = '';
         if (strpos($file, '?') !== false) {
@@ -176,6 +182,7 @@ class CClientScript extends CObject {
             }
         }
         $this->scripts[$pos]['css_file'][] = $css_file;
+        return $this;
     }
 
     public function js_files() {

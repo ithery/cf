@@ -53,7 +53,7 @@ final class CManager {
      * @return CManager_Theme
      */
     public static function theme() {
-        if(self::$theme==null) {
+        if (self::$theme == null) {
             self::$theme = new CManager_Theme();
         }
         return self::$theme;
@@ -172,9 +172,11 @@ final class CManager {
     public function is_registered_element($type) {
         return isset(self::$elements[$type]);
     }
+
     public function createControl($id, $type) {
-        $this->create_control($id,$type);
+        $this->create_control($id, $type);
     }
+
     public function create_control($id, $type) {
         if (!isset(self::$controls[$type])) {
             trigger_error('Type of control ' . $type . ' not registered');
@@ -219,6 +221,22 @@ final class CManager {
 
     public function is_mobile() {
         return self::$is_mobile;
+    }
+
+    /**
+     * 
+     * @return CClientScript
+     */
+    public static function clientScript() {
+        return CClientScript::instance();
+    }
+
+    /**
+     * 
+     * @return CClientModule
+     */
+    public static function clientModule() {
+        return CClientModules::instance();
     }
 
 }
