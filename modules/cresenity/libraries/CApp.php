@@ -325,7 +325,7 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function show_title($bool) {
+    public function showTitle($bool) {
         $this->show_title = $bool;
         return $this;
     }
