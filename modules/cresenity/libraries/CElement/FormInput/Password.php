@@ -7,14 +7,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 3, 2018, 2:34:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
-
 class CElement_FormInput_Password extends CElement_FormInput {
 
-    use CTrait_Compat_Element_FormInput_Password;
-    
+    use CTrait_Compat_Element_FormInput_Password,
+        CTrait_Element_Property_Placeholder;
+
     protected $autocomplete;
-    protected $placeholder;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -29,11 +27,6 @@ class CElement_FormInput_Password extends CElement_FormInput {
 
     public function set_autocomplete($bool) {
         $this->autocomplete = $bool;
-        return $this;
-    }
-
-    public function set_placeholder($placeholder) {
-        $this->placeholder = $placeholder;
         return $this;
     }
 
@@ -57,7 +50,7 @@ class CElement_FormInput_Password extends CElement_FormInput {
         if ($this->autocomplete) {
             $additional_attr = ' autocomplete="on"';
         }
-        $html->appendln('<input type="password" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" '.$custom_css.' class="form-control input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '" ' . $additional_attr . '>')->br();
+        $html->appendln('<input type="password" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . ' class="form-control input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '" ' . $additional_attr . '>')->br();
         return $html->text();
     }
 

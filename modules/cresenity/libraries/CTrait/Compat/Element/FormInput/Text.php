@@ -8,5 +8,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CTrait_Compat_Element_FormInput_Text {
-    
+
+    /**
+     * 
+     * @deprecated, please use setPlaceholder
+     * @param type $placeholder
+     * @return type
+     */
+    public function set_placeholder($placeholder) {
+        return $this->setPlaceholder($placeholder);
+    }
+
 }

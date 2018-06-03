@@ -9,9 +9,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_FormInput_Text extends CElement_FormInput {
 
-    use CTrait_Compat_Element_FormInput_Text;
+    use CTrait_Compat_Element_FormInput_Text,
+        CTrait_Element_Property_Placeholder;
 
-    protected $placeholder;
     protected $bootstrap;
     protected $input_style;
     protected $button_position;
@@ -38,11 +38,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
      */
     public static function factory($id = '') {
         return new CElement_FormInput_Text($id);
-    }
-
-    public function set_placeholder($placeholder) {
-        $this->placeholder = $placeholder;
-        return $this;
     }
 
     public function set_name($name) {
