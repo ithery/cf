@@ -9,11 +9,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_FormInput_Select extends CElement_FormInput {
 
-    use CTrait_Compat_Element_FormInput_Select;
+    use CTrait_Compat_Element_FormInput_Select,
+        CTrait_Element_Property_ApplyJs;
 
     protected $group_list = array();
     protected $multiple;
-    protected $applyjs;
     protected $dropdown_classes;
     protected $hide_search;
     protected $maximumSelectionLength;
@@ -25,19 +25,13 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->tag = "select";
         $this->multiple = false;
         $this->type = "select";
-        $this->applyjs = "false";
+        $this->applyJs = "false";
         $this->hide_search = false;
-        $this->readonly = false;
         $this->maximumSelectionLength = false;
     }
 
-    public function set_multiple($bool) {
+    public function setMultiple($bool) {
         $this->multiple = $bool;
-        return $this;
-    }
-
-    public function set_applyjs($applyjs) {
-        $this->applyjs = $applyjs;
         return $this;
     }
 
@@ -126,7 +120,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0)
             $classes = " " . $classes;
-       
+
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
@@ -197,7 +191,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $js = new CStringBuilder();
         $js->set_indent($indent);
         $js->append(parent::js($indent))->br();
-        if ($this->applyjs == "select2") {
+        if ($this->applyJs == "select2") {
             if ($this->select2 == '4') {
                 CManager::instance()->register_module('select2-4.0');
             } else {
@@ -208,9 +202,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
             if (strlen($classes) > 0) {
                 $classes = " " . $classes;
             }
-            if ($this->bootstrap == '3.3') {
-                $classes = $classes . " form-control ";
-            }
+
             $dropdown_classes = $this->dropdown_classes;
             $dropdown_classes = implode(" ", $dropdown_classes);
             if (strlen($dropdown_classes) > 0) {
@@ -228,10 +220,10 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $js->append("containerCssClass : 'tpx-select2-container " . $classes . "'");
             $js->append("});")->br();
         }
-        if ($this->applyjs == "chosen") {
+        if ($this->applyJs == "chosen") {
             $js->append("$('#" . $this->id . "').chosen();")->br();
         }
-        if ($this->applyjs == "dualselect") {
+        if ($this->applyJs == "dualselect") {
             $js->append("$('#" . $this->id . "').multiSelect();")->br();
         }
 
@@ -242,8 +234,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
         return $this->hide_search;
     }
 
-    public function set_hide_search($hide_search) {
-        $this->hide_search = $hide_search;
+    public function setHideSearch($bool) {
+        $this->hide_search = $bool;
         return $this;
     }
 

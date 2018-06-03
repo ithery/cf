@@ -16,4 +16,18 @@ trait CTrait_Compat_Element_FormInput_Select {
         return $this->setList($list);
     }
 
+    /**
+     * @deprecated since version 1.2
+     */
+    public function set_multiple($bool) {
+        return $this->setMultiple($bool);
+    }
+
+    /**
+     * @deprecated since version 1.2
+     */
+    public function set_applyjs($applyjs) {
+        return $this->setApplyJs($applyjs);
+    }
+
 }
