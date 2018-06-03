@@ -1,6 +1,6 @@
 <?php
 
-    class CFormInputTextarea extends CFormInput {
+    class CFormInputTextarea extends CElement_FormInput_Textarea {
 
         protected $col;
         protected $row;
@@ -50,7 +50,7 @@
             foreach ($this->attr as $k => $v) {
                 $addition_attribute.=" " . $k . '="' . $v . '"';
             }
-            $html->appendln('<textarea cols="' . $this->col . '" rows="' . $this->row . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" ' . $disabled . $custom_css . $addition_attribute .' placeholder="' .$this->placeholder .'">' . $this->value . '</textarea>')->br();
+            $html->appendln('<textarea cols="' . $this->col . '" rows="' . $this->row . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validation_class() . '" ' . $disabled . $custom_css . $addition_attribute .' placeholder="' .$this->placeholder .'">' . $this->value . '</textarea>')->br();
             //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
             return $html->text();
         }
