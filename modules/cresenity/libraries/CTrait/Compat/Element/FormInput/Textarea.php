@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 3, 2018, 10:51:38 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CTrait_Compat_FormInput_Textarea {
+trait CTrait_Compat_Element_FormInput_Textarea {
 
     /**
      * @deprecated since version 1.2

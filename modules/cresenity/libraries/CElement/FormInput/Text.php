@@ -1,6 +1,15 @@
 <?php
 
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 3, 2018, 2:00:52 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 class CElement_FormInput_Text extends CElement_FormInput {
+
+    use CTrait_Compat_Element_FormInput_Text;
 
     protected $vk;
     protected $vk_opt;

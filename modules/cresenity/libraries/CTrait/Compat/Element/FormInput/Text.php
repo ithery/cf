@@ -1,0 +1,12 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 3, 2018, 2:00:52 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+trait CTrait_Compat_Element_FormInput_Text {
+    
+}

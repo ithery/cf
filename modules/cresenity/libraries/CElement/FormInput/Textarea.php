@@ -27,7 +27,7 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
 
         $this->tag = "textarea";
         $this->is_onetag = false;
-        $this->addClass('form-control');
+        
         $this->placeholder = "";
         $this->col = 60;
         $this->row = 10;
@@ -40,9 +40,9 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         $this->build_once();
         $html->appendln($this->before_html($indent));
 
-        $html->appendln($this->pretag());
-        $html->appendln($this->value);
-        $html->appendln($this->posttag());
+        $html->append($this->pretag());
+        $html->append($this->value);
+        $html->append($this->posttag());
 
         $html->appendln($this->after_html($indent));
 

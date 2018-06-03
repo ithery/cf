@@ -30,7 +30,7 @@ abstract class CObservable extends CRenderable {
         $this->listeners = array();
         $this->manager = CManager::instance();
 
-        $this->manager->registerControl('text', 'CFormInputText');
+        $this->manager->registerControl('text', 'CElement_FormInput_Text');
         $this->manager->registerControl('datepicker', 'CFormInputDate');
         $this->manager->registerControl('date', 'CFormInputDate');
         $this->manager->registerControl('currency', 'CFormInputCurrency');
@@ -42,7 +42,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
         $this->manager->registerControl('file', 'CFormInputFile');
         $this->manager->registerControl('password', 'CFormInputPassword');
-        $this->manager->registerControl('textarea', 'CFormInputTextarea');
+        $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
         $this->manager->registerControl('select', 'CFormInputSelect');
         $this->manager->registerControl('select-tag', 'CFormInputSelectTag');
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
@@ -459,7 +459,7 @@ abstract class CObservable extends CRenderable {
             $js->appendln($listener->js($js->get_indent()));
         }
 
-        
+
         $js->appendln(parent::js($js->get_indent()))->br();
 
         return $js->text();
@@ -467,7 +467,7 @@ abstract class CObservable extends CRenderable {
 
     public function regenerateId($recursive = false) {
         $before_id = $this->id;
-        
+
         parent::regenerateId($recursive);
         //we change the owner of listener
         foreach ($this->listeners as $listener) {
