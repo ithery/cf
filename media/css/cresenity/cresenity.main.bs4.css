@@ -122,6 +122,19 @@ input[disabled=disabled],select[disabled=disabled],textarea[disabled=disabled],i
 
 }
 
+.dropdown-menu a.dropdown-item, .dropdown-menu>li>a.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: .5rem 1.25rem;
+    clear: both;
+    font-weight: 400;
+    color: #4E5155;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+
 .checkbox, .radio {
     position: relative;
     display: inline-block;
