@@ -156,7 +156,7 @@ class CApp_Navigation_Helper {
 
     public static function appUserRightsArray($appId, $roleId, $app_role_id = "", $domain = null) {
         $navs = CApp_Navigation_Data::get($domain);
-        return self::as_user_rights_array($appId, $roleId, $navs, $app_role_id, $domain);
+        return self::asUserRightsArray($appId, $roleId, $navs, $app_role_id, $domain);
     }
 
     public static function asUserRightsArray($appId, $roleId, $navs = null, $app_role_id = "", $domain = "", $level = 0) {
@@ -182,7 +182,7 @@ class CApp_Navigation_Helper {
             $res["domain"] = $domain;
             $subnav = array();
             if (isset($d["subnav"]) && is_array($d["subnav"]) && count($d["subnav"]) > 0) {
-                $subnav = self::as_user_rights_array($appId, $roleId, $d["subnav"], $app_role_id, $domain, $level + 1);
+                $subnav = self::asUserRightsArray($appId, $roleId, $d["subnav"], $app_role_id, $domain, $level + 1);
             }
             if (count($subnav) == 0 && (!isset($d["controller"]) || strlen($d["controller"]) == 0 )) {
                 if (!isset($d["link"]) || strlen($d["link"]) == 0) {
