@@ -46,6 +46,7 @@ class CElement_FormInput extends CElement_Element {
         $this->disabled = "";
         $this->list = array();
         $this->validation = CFormValidation::factory();
+
     }
 
     public function setSubmitOnchange($bool) {

@@ -26,7 +26,6 @@ class CApp extends CObservable {
     private $_user = null;
     private $_admin = null;
     private $_member = null;
-    private $_app_id = null;
     private $_clientmodules;
     public static $_instance = null;
     private $app_list = null;
@@ -44,9 +43,12 @@ class CApp extends CObservable {
 
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
-
             gc_collect_cycles();
         }
+    }
+
+    public static function navigation($domain = null) {
+        return CApp_Navigation::instance($domain);
     }
 
     /**
@@ -120,11 +122,7 @@ class CApp extends CObservable {
         //check for admin or app
         $router_uri = CFRouter::routed_uri(CFRouter::$current_uri);
         $rsegment = explode('/', $router_uri);
-        if (count($rsegment) > 0) {
-            if ($rsegment[0] == "admin") {
-                $this->_app_id = 0;
-            }
-        }
+
 
         //we load another configuration for this app
         //org configuration
@@ -195,9 +193,6 @@ class CApp extends CObservable {
         parent::__construct();
 
 
-
-        $this->_app_id = CF::app_id();
-
         $this->_org = corg::get(CF::org_code());
 
         $this->run = false;
@@ -225,8 +220,8 @@ class CApp extends CObservable {
         return $this->login_required = $bool;
     }
 
-    public function app_id() {
-        return $this->_app_id;
+    public function appId() {
+        return CF::appId();
     }
 
     public function manager() {

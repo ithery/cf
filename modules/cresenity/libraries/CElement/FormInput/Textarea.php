@@ -15,12 +15,24 @@
  */
 class CElement_FormInput_Textarea extends CElement_FormInput {
 
+    use CTrait_Compat_Element_FormInput_Textarea;
+    
+    protected $col;
+    protected $row;
+    protected $placeholder;
+
     //put your code here
     public function __construct($id) {
         parent::__construct($id);
 
         $this->tag = "textarea";
         $this->is_onetag = false;
+        
+        $this->placeholder = "";
+        $this->col = 60;
+        $this->row = 10;
+        
+        $this->addClass('form-control');
     }
 
     public function html($indent = 0) {
@@ -30,13 +42,23 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         $this->build_once();
         $html->appendln($this->before_html($indent));
 
-        $html->appendln($this->pretag());
-        $html->appendln($this->value);
-        $html->appendln($this->posttag());
+        $html->append($this->pretag());
+        $html->append($this->value);
+        $html->append($this->posttag());
 
         $html->appendln($this->after_html($indent));
 
         return $html->text();
+    }
+
+    public function setCol($col) {
+        $this->col = $col;
+        return $this;
+    }
+
+    public function setRow($row) {
+        $this->row = $row;
+        return $this;
     }
 
 }

@@ -1,10 +1,17 @@
 <?php
 
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 3, 2018, 2:00:52 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 class CElement_FormInput_Text extends CElement_FormInput {
 
-    protected $vk;
-    protected $vk_opt;
-    protected $placeholder;
+    use CTrait_Compat_Element_FormInput_Text,
+        CTrait_Element_Property_Placeholder;
+
     protected $bootstrap;
     protected $input_style;
     protected $button_position;
@@ -14,18 +21,14 @@ class CElement_FormInput_Text extends CElement_FormInput {
         parent::__construct($id);
 
         $this->type = "text";
-        $this->vk = false;
+
         $this->placeholder = "";
-        $default_option = array(
-            'layout' => 'qwerty',
-            'restrictInput' => 'true',
-            'preventPaste' => 'true',
-            'autoAccept' => 'true',
-        );
-        $this->vk_opt = $default_option;
+
         $this->input_style = 'default';
         $this->button_position = null;
         $this->action = null;
+
+        $this->addClass('form-control');
     }
 
     /**
@@ -35,21 +38,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
      */
     public static function factory($id = '') {
         return new CElement_FormInput_Text($id);
-    }
-
-    public function set_vk($bool) {
-        $this->vk = $bool;
-        return $this;
-    }
-
-    public function set_placeholder($placeholder) {
-        $this->placeholder = $placeholder;
-        return $this;
-    }
-
-    public function set_vk_opt($option) {
-        $this->vk_opt = array_merge($this->vk_opt, $option);
-        return $this;
     }
 
     public function set_name($name) {
@@ -123,7 +111,7 @@ class CElement_FormInput_Text extends CElement_FormInput {
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= " " . $k . '="' . $v . '"';
         }
-        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . '/>')->br();
+        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . '/>')->br();
 
         if ($this->bootstrap >= '3') {
             if ($this->button_position == 'right') {
@@ -149,9 +137,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
         }
 
         $js->append(parent::js());
-        if ($this->vk) {
-            $js->append("$('#" . $this->id . "').keyboard(" . json_encode($this->vk_opt) . ");")->br();
-        }
 
 
         return $js->text();

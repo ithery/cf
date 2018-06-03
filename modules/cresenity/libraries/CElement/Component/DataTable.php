@@ -296,7 +296,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         </style>
                         </head>
                         <body>';
-        echo '<table class="data table table-bordered table-striped responsive" id="' . $table->id . '">';
+        echo '<table class="data table table-responsive table-bordered table-striped responsive" id="' . $table->id . '">';
         echo '<thead>';
 
         $header_count = count($table->report_header);
@@ -1399,8 +1399,8 @@ class CElement_Component_DataTable extends CElement_Component {
             }
             $html->appendln('<div class="' . $main_class_content . ' nopadding">')->inc_indent();
         }
-        $data_responsive_open = '';
-        $data_responsive_close = '';
+        $data_responsive_open = '<div class="table-responsive">';
+        $data_responsive_close = '</div>';
         if ($this->responsive) {
             $data_responsive_open = '<div class="span12" style="overflow: auto;margin-left: 0;">';
             $data_responsive_close = '</div>';

@@ -28,8 +28,7 @@ final class CF {
     // Cache lifetime
     private static $cache_lifetime;
     // Log levels
-    private static $log_levels = array
-        (
+    private static $log_levels = array(
         'error' => 1,
         'alert' => 2,
         'info' => 3,
@@ -338,7 +337,6 @@ final class CF {
             if (strlen(CFRouter::$controller_path) > 0) {
                 require_once CFRouter::$controller_path;
             }
-
             try {
                 // Start validation of the controller
                 $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);

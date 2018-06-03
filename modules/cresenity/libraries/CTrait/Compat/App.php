@@ -20,4 +20,12 @@ trait CTrait_Compat_App {
         return $this->addBreadcrumb($caption, $url);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use function appId
+     * @return int
+     */
+    public function app_id() {
+        return $this->appId();
+    }
 }

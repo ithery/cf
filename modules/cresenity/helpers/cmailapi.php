@@ -139,6 +139,91 @@ class cmailapi {
         return $response_array;
     }
 
+    public function mailgun($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+        //$sendgrid_apikey = "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";
+        //public key: pubkey-c338bfc1568e4d6e79331119e6c56645
+        //private key: key-5f194bedfdade1fa513910895857d447
+        $smtp_password = carr::get($options, 'smtp_password');
+        $smtp_host = carr::get($options, 'smtp_host');
+        if (!$smtp_password) {
+            $smtp_password = ccfg::get('smtp_password');
+        }
+        if (!$smtp_host) {
+            $smtp_host = ccfg::get('smtp_host');
+        }
+        if ($smtp_host != 'smtp.mailgun.org') {
+            throw new Exception('Fail to send mail API, SMTP Host is not valid Mailgun SMTP');
+        }
+        $mailgun_apikey = $smtp_password;
+        $smtp_from = carr::get($options, 'smtp_from');
+        if ($smtp_from == null) {
+            $smtp_from = ccfg::get('smtp_from');
+        }
+        $smtp_from_name = carr::get($options, 'smtp_from_name');
+        if ($smtp_from_name == null) {
+            $smtp_from_name = ccfg::get('smtp_from_name');
+        }
+
+
+        $smtp_domain = carr::get($options, 'smtp_domain');
+        if ($smtp_domain == null) {
+            $smtp_domain = ccfg::get('smtp_domain');
+        }
+        if ($smtp_domain == null) {
+            $smtp_domain = 'mg.compro.id';
+        }
+        $url = 'https://api.mailgun.net/v3/' . $smtp_domain . '/messages';
+        $pass = $mailgun_apikey;
+        /*
+          $template_id = '<your_template_id>';
+          $js = array(
+          'sub' => array(':name' => array('Elmer')),
+          'filters' => array('templates' => array('settings' => array('enable' => 1, 'template_id' => $template_id)))
+          );
+         */
+
+        $files = array();
+
+        $params = array(
+            'to' => $to,
+            'cc' => $cc,
+            'bcc' => $bcc,
+            'from' => $smtp_from,
+            'subject' => $subject . '',
+            'html' => $message,
+        );
+
+        if (isset($_GET['debug2'])) {
+            cdbg::var_dump($url);
+        }
+        // Generate curl request
+        $session = curl_init($url);
+        curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($session, CURLOPT_USERPWD, 'api:' . $mailgun_apikey);
+        curl_setopt($session, CURLOPT_ENCODING, 'UTF-8');
+        // Tell curl to use HTTP POST
+        curl_setopt($session, CURLOPT_POST, true);
+        // Tell curl that this is the body of the POST
+        curl_setopt($session, CURLOPT_POSTFIELDS, curl::as_post_string($params));
+        // Tell curl not to return headers, but do return the response
+        curl_setopt($session, CURLOPT_HEADER, false);
+        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+
+        if (count($files) > 0) {
+            //curl_setopt($session, CURLOPT_SAFE_UPLOAD, false);
+        }
+        // obtain response
+        $response = curl_exec($session);
+        curl_close($session);
+
+        $response_array = json_decode($response, true);
+        if (carr::get($response_array, 'message') != 'success') {
+            throw new Exception('Fail to send mail, API Response:' . $response);
+        }
+        return $response_array;
+    }
+
     public function elasticemail($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
 
         $smtp_password = carr::get($options, 'smtp_password');
