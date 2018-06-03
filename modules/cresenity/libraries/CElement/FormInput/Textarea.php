@@ -31,6 +31,8 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         $this->placeholder = "";
         $this->col = 60;
         $this->row = 10;
+        
+        $this->addClass('form-control');
     }
 
     public function html($indent = 0) {

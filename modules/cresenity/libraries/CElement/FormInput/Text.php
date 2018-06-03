@@ -11,8 +11,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
 
     use CTrait_Compat_Element_FormInput_Text;
 
-    protected $vk;
-    protected $vk_opt;
     protected $placeholder;
     protected $bootstrap;
     protected $input_style;
@@ -23,18 +21,14 @@ class CElement_FormInput_Text extends CElement_FormInput {
         parent::__construct($id);
 
         $this->type = "text";
-        $this->vk = false;
+
         $this->placeholder = "";
-        $default_option = array(
-            'layout' => 'qwerty',
-            'restrictInput' => 'true',
-            'preventPaste' => 'true',
-            'autoAccept' => 'true',
-        );
-        $this->vk_opt = $default_option;
+
         $this->input_style = 'default';
         $this->button_position = null;
         $this->action = null;
+
+        $this->addClass('form-control');
     }
 
     /**
@@ -46,18 +40,8 @@ class CElement_FormInput_Text extends CElement_FormInput {
         return new CElement_FormInput_Text($id);
     }
 
-    public function set_vk($bool) {
-        $this->vk = $bool;
-        return $this;
-    }
-
     public function set_placeholder($placeholder) {
         $this->placeholder = $placeholder;
-        return $this;
-    }
-
-    public function set_vk_opt($option) {
-        $this->vk_opt = array_merge($this->vk_opt, $option);
         return $this;
     }
 
@@ -158,9 +142,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
         }
 
         $js->append(parent::js());
-        if ($this->vk) {
-            $js->append("$('#" . $this->id . "').keyboard(" . json_encode($this->vk_opt) . ");")->br();
-        }
 
 
         return $js->text();

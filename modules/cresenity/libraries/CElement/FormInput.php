@@ -46,8 +46,7 @@ class CElement_FormInput extends CElement_Element {
         $this->disabled = "";
         $this->list = array();
         $this->validation = CFormValidation::factory();
-        $this->addClass('form-control');
-        $this->addClass('input-unstyled');
+
     }
 
     public function setSubmitOnchange($bool) {
