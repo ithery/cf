@@ -43,9 +43,12 @@ class CApp extends CObservable {
 
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
-
             gc_collect_cycles();
         }
+    }
+
+    public static function navigation($domain = null) {
+        return CApp_Navigation::instance($domain);
     }
 
     /**

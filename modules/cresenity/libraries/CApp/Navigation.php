@@ -9,7 +9,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CApp_Navigation {
 
-
     public static $instance = array();
 
     /**
@@ -29,15 +28,20 @@ class CApp_Navigation {
     }
 
     public function __construct($domain = null) {
-
+        
     }
 
+    /**
+     * 
+     * @param array $options 
+     * @return html of the element
+     */
     public function render($options = array()) {
 
-        $engine = carr::get($options, 'engine', 'bootstrap');
+        $engine = carr::get($options, 'engine', 'Bootstrap');
         $layout = carr::get($options, 'layout', 'horizontal');
 
-        $engineClassName = 'CApp_Navigation_Engine_' . ucfirst($engine);
+        $engineClassName = 'CApp_Navigation_Engine_' . $engine;
         $engineClass = new $engineClassName();
         return $engineClass->render();
     }

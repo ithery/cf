@@ -2,13 +2,13 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-use CApp_Navigation_Helper as Helper;
-
 /**
  * @author Hery Kurniawan
  * @since Jun 1, 2018, 11:57:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use CApp_Navigation_Helper as Helper;
+
 class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
 
     public function render($navs = null, $level = 0, &$child = 0) {
@@ -156,5 +156,3 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
     }
 
 }
-
-?>
