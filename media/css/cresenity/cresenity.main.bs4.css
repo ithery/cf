@@ -326,7 +326,6 @@ table.responsive {
 
 
 .breadcrumb {
-    background-color: #ffffff;
     padding: 0;
     margin-bottom: 0;
 
@@ -371,7 +370,7 @@ table.responsive {
     border-bottom-width: 1px;
     color: inherit;
     margin-bottom: 0;
-    padding: 15px 15px 7px;
+    padding: .875rem 1.5rem;
     min-height: 48px;
     border-radius: calc(.125rem - 0px) calc(.125rem - 0px) 0 0;
     border-color: rgba(24,28,33,0.06);

@@ -604,7 +604,7 @@ class cajax {
                 if ($table->getRowActionStyle() == "btn-dropdown") {
                     $table->getRowActionList()->add_class("pull-right");
                 }
-                $row_action_list->regenerate_id(true);
+                $row_action_list->regenerateId(true);
                 $row_action_list->apply("jsparam", $jsparam);
 
                 $row_action_list->apply("set_handler_url_param", $jsparam);
@@ -983,7 +983,7 @@ class cajax {
                     $table->getRowActionList()->add_class("pull-right");
                 }
                 
-                $row_action_list->regenerate_id(true);
+                $row_action_list->regenerateId(true);
                 $row_action_list->apply("jsparam", $jsparam);
 
                 $row_action_list->apply("set_handler_url_param", $jsparam);

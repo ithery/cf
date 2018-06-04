@@ -43,7 +43,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('file', 'CFormInputFile');
         $this->manager->registerControl('password', 'CElement_FormInput_Password');
         $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
-        $this->manager->registerControl('select', 'CFormInputSelect');
+        $this->manager->registerControl('select', 'CElement_FormInput_Select');
         $this->manager->registerControl('select-tag', 'CFormInputSelectTag');
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');

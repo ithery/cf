@@ -28,4 +28,14 @@ trait CTrait_Compat_App {
     public function app_id() {
         return $this->appId();
     }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use function appId
+     * @return $this
+     */
+    public function show_title($bool) {
+        return $this->showTitle($bool);
+    }
+
 }

@@ -17,7 +17,7 @@ class cnav {
     }
 
     public static function app_user_rights_array($app_id, $role_id, $app_role_id = "", $domain = "") {
-        return Helper::appUserRightsArray($app_id, $role_id, $navs, $app_role_id, $domain);
+        return Helper::appUserRightsArray($app_id, $role_id, $app_role_id, $domain);
     }
 
     public static function as_user_rights_array($app_id, $role_id, $navs = null, $app_role_id = "", $domain = "", $level = 0) {
@@ -44,12 +44,12 @@ class cnav {
         return Helper::url($nav);
     }
 
-    public static function access_available($nav = null, $app_id = "", $domain = "", $app_role_id = "") {
-        return Helper::accessAvailable($nav, $appId, $domain, $app_role_id);
+    public static function access_available($nav = null, $app_id = "", $domain = "", $appRoleId = "") {
+        return Helper::accessAvailable($nav, $appId, $domain, $appRoleId);
     }
 
-    public static function permission_available($action, $nav = null, $app_id = "", $domain = "", $app_role_id = "") {
-        return Helper::permissionAvailable($action, $nav, $appId, $domain, $app_role_id);
+    public static function permission_available($action, $nav = null, $appId = "", $domain = "", $appRoleId = "") {
+        return Helper::permissionAvailable($action, $nav, $appId, $domain, $appRoleId);
     }
 
     public static function render($navs = null, $level = 0, &$child = 0) {
