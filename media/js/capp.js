@@ -618,7 +618,6 @@ if (window.capp.have_clock) {
                     jQuery('#' + id_target).append(data.html);
                     jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
                     var script = $.cresenity.base64.decode(data.js);
-                    console.log(script);
                     eval(script);
                     jQuery('#' + id_target).removeClass('loading');
                     jQuery('#' + id_target).data('xhr', false);
