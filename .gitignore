@@ -13,6 +13,7 @@ application/*
 /temp/*
 /export/
 /upload/*
+/payment_log/
 
 #ignore netbeans ide config
 /nbproject/
