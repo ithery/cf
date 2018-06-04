@@ -218,7 +218,7 @@ class cmailapi {
         curl_close($session);
 
         $response_array = json_decode($response, true);
-        if (carr::get($response_array, 'message') != 'success') {
+        if (strlen(carr::get($response_array, 'id')) == 0) {
             throw new Exception('Fail to send mail, API Response:' . $response);
         }
         return $response_array;
