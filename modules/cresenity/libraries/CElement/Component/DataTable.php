@@ -592,6 +592,11 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return CElement_Component_DataTable
+     */
     public function setApplyDataTable($bool) {
         $this->apply_data_table = $bool;
         return $this;
