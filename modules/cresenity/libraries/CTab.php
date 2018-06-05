@@ -2,7 +2,8 @@
 
 class CTab extends CElement {
 
-    use CTrait_Element_Property_Label;
+    use CTrait_Compat_Element_Tab,
+        CTrait_Element_Property_Label;
 
     protected $active;
     protected $icon;
@@ -59,7 +60,7 @@ class CTab extends CElement {
     public function getAjaxUrl() {
         return $this->ajax_url;
     }
-    
+
     public function set_ajax($bool) {
         $this->ajax = $bool;
         return $this;
@@ -199,7 +200,7 @@ class CTab extends CElement {
         }
         $html->appendln('<div class="tab-pane ' . $class_active . '" id="' . $this->id . '" style="' . $additional_style . '">');
         $html->appendln('<div class="tab-container ">');
-        $html->appendln(parent::html($html->get_indent()));
+        $html->appendln(parent::htmlChild($html->get_indent()));
         $html->appendln('</div>');
         $html->appendln('</div>');
         return $html->text();
