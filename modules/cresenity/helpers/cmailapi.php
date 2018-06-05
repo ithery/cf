@@ -186,12 +186,19 @@ class cmailapi {
 
         $params = array(
             'to' => $to,
-            'cc' => $cc,
-            'bcc' => $bcc,
             'from' => $smtp_from,
             'subject' => $subject . '',
             'html' => $message,
         );
+        
+        
+        if(count($cc)>0) {
+            $params['cc']=$cc;
+        }
+        if(count($bcc)>0) {
+            $params['bcc']=$bcc;
+        }
+        
 
         if (isset($_GET['debug2'])) {
             cdbg::var_dump($url);
