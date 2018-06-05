@@ -1453,7 +1453,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $tbody_id = (strlen($this->tbody_id) > 0 ? "id='" . $this->tbody_id . "' " : "");
 
-        $html->appendln("<tbody " . $tbody_id . " >" . $data_responsive_close)->inc_indent()->br();
+        $html->appendln("<tbody " . $tbody_id . " >")->inc_indent()->br();
         //render body;
         $html->appendln($this->html_child($indent));
         $no = 0;
@@ -1690,7 +1690,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $html->dec_indent()->appendln('</tfoot>')->br();
         }
         $html->dec_indent()
-                ->appendln('</table>');
+                ->appendln('</table>'. $data_responsive_close);
         if ($wrapped > 0) {
             $html->dec_indent()->appendln('</div>');
             $html->dec_indent()->appendln('</div>');
