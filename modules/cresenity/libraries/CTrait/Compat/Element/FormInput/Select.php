@@ -30,4 +30,8 @@ trait CTrait_Compat_Element_FormInput_Select {
         return $this->setApplyJs($applyjs);
     }
 
+    public function set_hide_search($bool) {
+        return $this->setHideSearch($bool);
+    }
+
 }
