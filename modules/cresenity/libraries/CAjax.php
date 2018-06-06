@@ -1,11 +1,20 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+defined('SYSPATH') OR die('No direct access allowed.');
 
+/**
+ * 
+ * @author Hery Kurniawan
+ * @since Jun 6, 2018, 11:32:00 AM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 class CAjax {
-    
+
+    public static function createMethod($json = null) {
+        if ($json != null) {
+            return CAjax_Method::createFromJson($json);
+        }
+        return new CAjax_Method();
+    }
+
 }
