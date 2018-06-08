@@ -222,7 +222,7 @@ class CElement_Component_Form extends CElement_Component {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
 
         $classes = $this->classes;
         $classes = implode(" ", $classes);
@@ -281,7 +281,7 @@ class CElement_Component_Form extends CElement_Component {
         if ($this->disable_js)
             return parent::js($indent);
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         if ($this->ajax_submit) {
             $ajax_url = "";
             $ajax_process_script = "";

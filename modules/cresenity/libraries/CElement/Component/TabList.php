@@ -82,7 +82,7 @@ class CElement_Component_TabList extends CElement_Component {
 
         /*
           $html = new CStringBuilder();
-          $html->set_indent($indent);
+          $html->setIndent($indent);
           $add_class="";
           if($this->tab_position=="left") {
           $add_class.=" tabs-left";
@@ -106,7 +106,7 @@ class CElement_Component_TabList extends CElement_Component {
           ;
          */
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $ajax_class = "";
         if ($this->ajax) {
             $ajax_class = "ajax";
@@ -315,7 +315,7 @@ class CElement_Component_TabList extends CElement_Component {
     public function js($indent = 0) {
 
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         foreach ($this->tabs as $tab) {
             $js->appendln($tab->js($js->get_indent()));
         }

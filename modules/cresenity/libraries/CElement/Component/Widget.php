@@ -172,7 +172,7 @@ class CElement_Component_Widget extends CElement_Component {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $disabled = "";
 
         $main_class = ' widget-box ';
@@ -292,7 +292,7 @@ class CElement_Component_Widget extends CElement_Component {
 
         $html->appendln('	</div>');
         $html->appendln('	<div class="clearfix ' . $main_class_content . $nopadding . $scroll_class . '"' . $str_height . $content_attr . '>');
-        $html->appendln('		' . $this->html_child() . '');
+        $html->appendln('		' . $this->htmlChild() . '');
         $html->appendln('	</div>');
         $html->appendln('</div>');
         $html->br();
@@ -306,7 +306,7 @@ class CElement_Component_Widget extends CElement_Component {
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         if ($this->have_header_action()) {
             $js->appendln($this->header_action_list->js($js->get_indent()));
         }
@@ -350,7 +350,7 @@ class CElement_Component_Widget extends CElement_Component {
                 }
             }
         }
-        $js->append($this->js_child($js->get_indent()));
+        $js->append($this->jsChild($js->get_indent()));
         return $js->text();
     }
 
