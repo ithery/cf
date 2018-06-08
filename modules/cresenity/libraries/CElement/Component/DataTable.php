@@ -1368,7 +1368,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $th_class = " no-line-break";
         }
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $wrapped = ($this->apply_data_table > 0) || $this->have_header_action();
         if ($wrapped) {
 
@@ -1764,7 +1764,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $js = new CStringBuilder();
 
 
-        $js->set_indent($indent);
+        $js->setIndent($indent);
 
 
         $total_column = count($this->columns);
