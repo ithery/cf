@@ -1579,7 +1579,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     if ($this->getRowActionStyle() == "btn-dropdown") {
                         $this->rowActionList->add_class("pull-right");
                     }
-                    $this->rowActionList->regenerate_id(true);
+                    $this->rowActionList->regenerateId(true);
                     $this->rowActionList->apply("jsparam", $jsparam);
                     $this->rowActionList->apply("set_handler_url_param", $jsparam);
 
