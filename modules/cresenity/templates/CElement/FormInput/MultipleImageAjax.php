@@ -112,7 +112,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             ?>
             <div class="multi-image-ajax-file container-file-upload">
                 <div class="div-img">
-                    <img src="<?php echo $file_url; ?>" style="max-height: <?php echo $maxHeight; ?>px;max-width: <?php echo $maxWidth; ?>px; "/>
+                    <img src="<?php echo $file_url; ?>" />
                     <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="">
                 </div>
                 <?php
@@ -208,7 +208,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                             }
                         });
-                        cropperModal.find('.btn-crop').data('file',file);
+                        cropperModal.find('.btn-crop').data('file', file);
                         var clickAssigned = cropperModal.find('.btn-crop').attr('click-assigned');
                         if (!clickAssigned) {
                             cropperModal.find('.btn-crop').click(function () {
@@ -236,7 +236,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             }
 
             function addFile(file, fileList, event, imageData) {
-                var img = file.type.match("image.*") ? "<img src=" + imageData + " /> " : "";
+                var img = file.type.match("image.*") ? $("<img src=" + imageData + " /> ") : "";
                 var div = $("<div>").addClass("multi-image-ajax-file container-file-upload");
                 div.click(function (e) {
                     e.preventDefault();
@@ -245,15 +245,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 var div_img = $("<div>").addClass("div-img");
                 div_img.append(img);
                 div.append(div_img);
+
+                var div_cc;
+                var cc_label;
+                var cc;
 <?php
 foreach ($customControl as $cc):
     $control = carr::get($cc, 'control');
     $control_name = carr::get($cc, 'input_name');
     $control_label = carr::get($cc, 'input_label');
     ?>
-                    var div_cc = $("<div>").addClass("div-custom-control");
-                    var cc_label = $("<label>").html("<?php echo $control_label; ?> :");
-                    var cc = $("<input type=\"<?php echo $control; ?>\" name=\"<?php echo $name; ?>_custom_control[" + index + "][<?php echo $control_name; ?>]\">");
+                    div_cc = $("<div>").addClass("div-custom-control");
+                    cc_label = $("<label>").html("<?php echo $control_label; ?> :");
+                    cc = $("<input type=\"<?php echo $control; ?>\" name=\"<?php echo $name; ?>_custom_control[" + index + "][<?php echo $control_name; ?>]\">");
                     div_cc.append(cc_label);
                     div_cc.append(cc);
                     div.append(div_cc);
@@ -267,7 +271,6 @@ foreach ($customControl as $cc):
                 div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
                 fileList.append(div.addClass("loading"));
                 fileUploadRemove();
-                console.log(event.target);  
                 var data = new FormData();
                 data.append("<?php echo $name; ?>[]", imageData);
                 data.append('<?php echo $ajaxName; ?>_filename[]', event.target.fileName);
@@ -275,9 +278,9 @@ foreach ($customControl as $cc):
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
                         var dataFile = JSON.parse(this.responseText);
-                        console.log(dataFile);    
                         div.removeClass("loading");
                         div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
+                        img.attr('src', data.url);
                         index++;
                     } else if (this.readyState == 4 && this.status != 200) {
                         //div.remove();
@@ -302,9 +305,9 @@ foreach ($customControl as $cc):
                     $("#<?php echo $id ?>").sortable();
                     var dataTransfer = e.originalEvent.dataTransfer;
                     if (dataTransfer && dataTransfer.files.length) {
-                        dataTransferFiles=dataTransfer.files;
-                        if(haveCropper) {
-                            if(dataTransfer.files.length>1) {
+                        dataTransferFiles = dataTransfer.files;
+                        if (haveCropper) {
+                            if (dataTransfer.files.length > 1) {
                                 dataTransferFiles = [dataTransfer.files[0]]
                             }
                         }
@@ -313,6 +316,8 @@ foreach ($customControl as $cc):
                         $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
                         $.each(dataTransferFiles, function (i, file) {
                             var reader = new FileReader();
+                            reader.fileName = file.name;
+
                             reader.onload = $.proxy(function (file, fileList, event) {
                                 insertFile(reader, file, fileList, event);
 
@@ -322,10 +327,10 @@ foreach ($customControl as $cc):
                     }
                 }
             })
-            if(!haveCropper) {
-                $("#<?php echo $id; ?>_input_temp").attr('multiple','multiple');
+            if (!haveCropper) {
+                $("#<?php echo $id; ?>_input_temp").attr('multiple', 'multiple');
             }
-            
+
             // Add Image by Click
             $("#<?php echo $id; ?>").click(function () {
                 $("#<?php echo $id; ?>_input_temp").trigger("click");
@@ -335,6 +340,7 @@ foreach ($customControl as $cc):
                 $.each(e.target.files, function (i, file) {
 
                     var reader = new FileReader();
+                    reader.fileName = file.name;
                     reader.onload = $.proxy(function (file, fileList, event) {
                         insertFile(reader, file, fileList, event);
                     }, this, file, $("#<?php echo $id; ?>"));
