@@ -1,5 +1,12 @@
 <?php
 
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Feb 16, 2018, 5:40:40 AM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 trait CTrait_Compat_Observable {
 
     public function get_listeners() {
@@ -169,14 +176,29 @@ trait CTrait_Compat_Observable {
         return $this->addPieChart($id);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use function addDashboard
+     * @return CElement
+     */
     public function add_dashboard($id = "") {
         return $this->addDashboard($id);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use function clearBoth
+     * @return $this
+     */
     public function clear_both() {
         return $this->clearBoth();
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use function setHandlerUrlParam
+     * @return $this
+     */
     public function set_handler_url_param($param) {
         return $this->setHandlerUrlParam($param);
     }
@@ -185,19 +207,13 @@ trait CTrait_Compat_Observable {
         return $this->isInstanceof($value);
     }
 
-    public function js($indent = 0) {
-        return $this->js($indent);
-    }
-
+    /**
+     * 
+     * @deprecated since version 1.2, please use function regenerateId
+     * @return $this
+     */
     public function regenerate_id($recursive = false) {
         return $this->regenerateId($recursive);
     }
 
 }
-
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
