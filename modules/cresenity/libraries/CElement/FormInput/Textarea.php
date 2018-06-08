@@ -26,7 +26,7 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         parent::__construct($id);
 
         $this->tag = "textarea";
-        $this->is_onetag = false;
+        $this->isOneTag = false;
         
         $this->placeholder = "";
         $this->col = 60;
