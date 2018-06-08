@@ -197,7 +197,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             cropperImgInitialized.cropper("destroy");
                         }
 
-
                         var cropperImg = cropperModal.find('img');
                         cropperImg.attr('src', event.target.result);
                         cropperModal.modal({backdrop: 'static', keyboard: false});
@@ -209,20 +208,21 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             }
                         });
                         cropperModal.find('.btn-crop').data('file', file);
+                        cropperModal.find('.btn-crop').data('event', event);
                         var clickAssigned = cropperModal.find('.btn-crop').attr('click-assigned');
                         if (!clickAssigned) {
                             cropperModal.find('.btn-crop').click(function () {
                                 var fileRead = cropperModal.find('.btn-crop').data('file');
+                                var fileEvent = cropperModal.find('.btn-crop').data('event');
                                 cropperModal.find('.btn-crop').attr('click-assigned', '1');
                                 var mime = 'image/png';
                                 if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
                                     mime = 'image/jpeg';
                                 }
 
-
                                 imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
 
-                                addFile(fileRead, fileList, event, imageData);
+                                addFile(fileRead, fileList, fileEvent, imageData);
                                 $(this).closest('.modal').modal('hide');
                             });
                         }
@@ -317,7 +317,7 @@ foreach ($customControl as $cc):
                         $.each(dataTransferFiles, function (i, file) {
                             var reader = new FileReader();
                             reader.fileName = file.name;
-
+                            
                             reader.onload = $.proxy(function (file, fileList, event) {
                                 insertFile(reader, file, fileList, event);
 
