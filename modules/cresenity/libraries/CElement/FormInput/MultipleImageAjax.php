@@ -113,5 +113,14 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->customControlValue[$inputName][$controlName] = $inputValue;
         return $this;
     }
+    
+    public function setMaxHeight($value){
+        $this->maxHeight=$value;
+        return $this;
+    }
+    public function setMaxWidth($value){
+        $this->maxWidth=$value;
+        return $this;
+    }
 
 }

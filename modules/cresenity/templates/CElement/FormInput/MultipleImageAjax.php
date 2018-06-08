@@ -112,7 +112,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             ?>
             <div class="multi-image-ajax-file container-file-upload">
                 <div class="div-img">
-                    <img src="<?php echo $file_url; ?>" />
+                    <img src="<?php echo $file_url; ?>" style="max-height: <?php echo $maxHeight; ?>px;max-width: <?php echo $maxWidth; ?>px; "/>
                     <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="">
                 </div>
                 <?php
@@ -267,14 +267,15 @@ foreach ($customControl as $cc):
                 div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
                 fileList.append(div.addClass("loading"));
                 fileUploadRemove();
-
+                console.log(event.target);  
                 var data = new FormData();
-                data.append("<?php echo $name; ?>[]", file);
+                data.append("<?php echo $name; ?>[]", imageData);
+                data.append('<?php echo $ajaxName; ?>_filename[]', event.target.fileName);
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
                         var dataFile = JSON.parse(this.responseText);
-
+                        console.log(dataFile);    
                         div.removeClass("loading");
                         div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
                         index++;
