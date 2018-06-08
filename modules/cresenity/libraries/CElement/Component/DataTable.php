@@ -1384,25 +1384,25 @@ class CElement_Component_DataTable extends CElement_Component {
                 $main_class_title = ' ';
             }
 
-            $html->appendln('<div class="' . $main_class . ' widget-table">')->inc_indent();
+            $html->appendln('<div class="' . $main_class . ' widget-table">')->incIndent();
             $show_title = true;
             if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
                 $show_title = false;
             }
             if ($show_title) {
-                $html->appendln('<div class="' . $main_class_title . '">')->inc_indent();
+                $html->appendln('<div class="' . $main_class_title . '">')->incIndent();
                 if (strlen($this->icon > 0)) {
-                    $html->appendln('<span class="icon">')->inc_indent();
+                    $html->appendln('<span class="icon">')->incIndent();
                     $html->appendln('<i class="icon-' . $this->icon . '"></i>');
-                    $html->dec_indent()->appendln('</span');
+                    $html->decIndent()->appendln('</span');
                 }
                 $html->appendln('<h5>' . $this->title . '</h5>');
                 if ($this->have_header_action()) {
-                    $html->appendln($this->header_action_list->html($html->get_indent()));
+                    $html->appendln($this->header_action_list->html($html->getIndent()));
                 }
-                $html->dec_indent()->appendln('</div>');
+                $html->decIndent()->appendln('</div>');
             }
-            $html->appendln('<div class="' . $main_class_content . ' nopadding">')->inc_indent();
+            $html->appendln('<div class="' . $main_class_content . ' nopadding">')->incIndent();
         }
         $data_responsive_open = '<div class="table-responsive">';
         $data_responsive_close = '</div>';
@@ -1420,15 +1420,15 @@ class CElement_Component_DataTable extends CElement_Component {
             $classes .= " table-striped ";
         }
         $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered  responsive ' . $classes . '" id="' . $this->id . '">')
-                ->inc_indent()->br();
+                ->incIndent()->br();
         if ($this->show_header) {
             $html->appendln('<thead>')
-                    ->inc_indent()->br();
+                    ->incIndent()->br();
             if (strlen($this->custom_column_header) > 0) {
                 $html->appendln($this->custom_column_header);
             } else {
                 $html->appendln('<tr>')
-                        ->inc_indent()->br();
+                        ->incIndent()->br();
 
                 if ($this->numbering) {
                     $html->appendln('<th data-align="align-right" class="' . $th_class . '" width="20" scope="col">No</th>')->br();
@@ -1437,7 +1437,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln('<th data-align="align-center" class="' . $th_class . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
                 }
                 foreach ($this->columns as $col) {
-                    $html->appendln($col->render_header_html($this->export_pdf, $th_class, $html->get_indent()))->br();
+                    $html->appendln($col->render_header_html($this->export_pdf, $th_class, $html->getIndent()))->br();
                 }
                 if ($this->have_action()) {
                     $action_width = 31 * $this->action_count() + 5;
@@ -1446,14 +1446,14 @@ class CElement_Component_DataTable extends CElement_Component {
                     }
                     $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $th_class . '">' . clang::__('Actions') . '</th>')->br();
                 }
-                $html->dec_indent()->appendln("</tr>")->br();
+                $html->decIndent()->appendln("</tr>")->br();
             }
-            $html->dec_indent()->appendln("</thead>")->br();
+            $html->decIndent()->appendln("</thead>")->br();
         }
 
         $tbody_id = (strlen($this->tbody_id) > 0 ? "id='" . $this->tbody_id . "' " : "");
 
-        $html->appendln("<tbody " . $tbody_id . " >")->inc_indent()->br();
+        $html->appendln("<tbody " . $tbody_id . " >")->incIndent()->br();
         //render body;
         $html->appendln($this->html_child($indent));
         $no = 0;
@@ -1471,7 +1471,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $key = $row[$this->key_field];
                 }
-                $html->appendln('<tr id="tr-' . $key . '">')->inc_indent()->br();
+                $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
 
                 if ($this->numbering) {
                     $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
@@ -1570,7 +1570,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 }
 
                 if ($this->have_action()) {
-                    $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
+                    $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
                     foreach ($row as $k => $v) {
                         $jsparam[$k] = $v;
                     }
@@ -1605,21 +1605,21 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $this->js_cell .= $this->rowActionList->js();
 
-                    $html->appendln($this->rowActionList->html($html->get_indent()));
-                    $html->dec_indent()->appendln('</td>')->br();
+                    $html->appendln($this->rowActionList->html($html->getIndent()));
+                    $html->decIndent()->appendln('</td>')->br();
                 }
 
 
 
-                $html->dec_indent()->appendln('</tr>')->br();
+                $html->decIndent()->appendln('</tr>')->br();
             }
         }
 
 
-        $html->dec_indent()->appendln('</tbody>')->br();
+        $html->decIndent()->appendln('</tbody>')->br();
         //footer
         if ($this->footer) {
-            $html->inc_indent()->appendln('<tfoot>')->br();
+            $html->incIndent()->appendln('<tfoot>')->br();
             $total_column = count($this->columns);
             $addition_column = 0;
             if ($this->have_action())
@@ -1630,13 +1630,13 @@ class CElement_Component_DataTable extends CElement_Component {
                 $addition_column++;
 
             foreach ($this->footer_field as $f) {
-                $html->inc_indent()->appendln('<tr>')->br();
+                $html->incIndent()->appendln('<tr>')->br();
                 $colspan = $f["labelcolspan"];
                 if ($colspan == 0)
                     $colspan = $total_column + $addition_column - 1;
-                $html->inc_indent()->appendln('<td colspan="' . ($colspan) . '">')->br();
+                $html->incIndent()->appendln('<td colspan="' . ($colspan) . '">')->br();
                 $html->appendln($f["label"])->br();
-                $html->dec_indent()->appendln('</td>')->br();
+                $html->decIndent()->appendln('</td>')->br();
                 $class = "";
                 switch ($f["align"]) {
                     case "left": $class .= " align-left";
@@ -1649,9 +1649,9 @@ class CElement_Component_DataTable extends CElement_Component {
 
                 $fval = $f["value"];
                 if ($fval instanceof CRenderable) {
-                    $html->inc_indent()->appendln('<td class="' . $class . '">')->br();
+                    $html->incIndent()->appendln('<td class="' . $class . '">')->br();
                     $html->appendln($fval->html($indent))->br();
-                    $html->dec_indent()->appendln('</td>')->br();
+                    $html->decIndent()->appendln('</td>')->br();
                 } else if (is_array($fval)) {
                     $skip_column = 0;
 
@@ -1675,25 +1675,25 @@ class CElement_Component_DataTable extends CElement_Component {
                                 case "center": $class .= " align-center";
                                     break;
                             }
-                            $html->inc_indent()->appendln('<td class="' . $class . '">')->br();
+                            $html->incIndent()->appendln('<td class="' . $class . '">')->br();
                             $html->appendln($fcolval)->br();
-                            $html->dec_indent()->appendln('</td>')->br();
+                            $html->decIndent()->appendln('</td>')->br();
                         }
                     }
                 } else {
-                    $html->inc_indent()->appendln('<td class="' . $class . '">')->br();
+                    $html->incIndent()->appendln('<td class="' . $class . '">')->br();
                     $html->appendln($fval)->br();
-                    $html->dec_indent()->appendln('</td>')->br();
+                    $html->decIndent()->appendln('</td>')->br();
                 }
-                $html->dec_indent()->appendln('</tr>')->br();
+                $html->decIndent()->appendln('</tr>')->br();
             }
-            $html->dec_indent()->appendln('</tfoot>')->br();
+            $html->decIndent()->appendln('</tfoot>')->br();
         }
-        $html->dec_indent()
+        $html->decIndent()
                 ->appendln('</table>'. $data_responsive_close);
         if ($wrapped > 0) {
-            $html->dec_indent()->appendln('</div>');
-            $html->dec_indent()->appendln('</div>');
+            $html->decIndent()->appendln('</div>');
+            $html->decIndent()->appendln('</div>');
         }
 
 
@@ -1717,7 +1717,7 @@ class CElement_Component_DataTable extends CElement_Component {
           $actions->set_style('form-action');
           $form->add($actions);
           $modal->add($form);
-          $html->append($modal->html($html->get_indent()));
+          $html->append($modal->html($html->getIndent()));
           }
          */
 
@@ -1831,7 +1831,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
             $js->appendln("var tableStyled_" . $this->id . " = false;")->br()->
-                    appendln("var oTable = table.dataTable({")->br()->inc_indent();
+                    appendln("var oTable = table.dataTable({")->br()->incIndent();
 
 
 //            $js->appendln("responsive: {
@@ -2045,7 +2045,7 @@ class CElement_Component_DataTable extends CElement_Component {
              */
 
             $js->append("")
-                    ->dec_indent()->appendln("});")->br();
+                    ->decIndent()->appendln("});")->br();
 
 
 //                $js->append("oTable.columns().every( function () {
