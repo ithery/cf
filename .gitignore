@@ -8,6 +8,9 @@ application/*
 #ignore data domain or org
 /data/*
 
+#ignore git bak
+/.git.bak
+
 #ignore libs of CPDF
 /modules/cresenity/vendor/lib/fonts/Helvetica.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-Bold.afm.php
