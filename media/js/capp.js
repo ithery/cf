@@ -72,7 +72,7 @@ var scrolltotop = {
         })
     }
 }
-if(typeof window.capp.have_scroll_to_top !='undefined' && window.capp.have_scroll_to_top) {
+if (typeof window.capp.have_scroll_to_top != 'undefined' && window.capp.have_scroll_to_top) {
     scrolltotop.init();
 }
 jQuery(document).on('click', 'a.confirm', function (e) {
@@ -220,7 +220,6 @@ if (window.capp.have_clock) {
                 $.cresenity._filesneeded += data.css_require.length;
             if (data.js_require && data.js_require.length > 0)
                 $.cresenity._filesneeded += data.js_require.length;
-            //console.log('needed:'+$.cresenity._filesneeded);
             if (data.css_require && data.css_require.length > 0) {
                 for (var i = 0; i < data.css_require.length; i++) {
                     $.cresenity.require(data.css_require[i], 'css', callback);
@@ -237,7 +236,6 @@ if (window.capp.have_clock) {
         },
         _handle_response_callback: function (callback) {
             $.cresenity._filesloaded++;
-            //console.log('dynamic loaded:'+$.cresenity._filesloaded);
             if ($.cresenity._filesloaded == $.cresenity._filesneeded) {
                 callback();
             }
@@ -248,7 +246,6 @@ if (window.capp.have_clock) {
                 $.cresenity._filesadded += "[" + filename + "]" //List of files added in the form "[filename1],[filename2],etc"
             } else {
                 $.cresenity._filesloaded++;
-                //console.log('already loaded:'+$.cresenity._filesloaded);
                 if ($.cresenity._filesloaded == $.cresenity._filesneeded) {
                     callback();
                 }
@@ -618,7 +615,6 @@ if (window.capp.have_clock) {
                     jQuery('#' + id_target).append(data.html);
                     jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
                     var script = $.cresenity.base64.decode(data.js);
-                    console.log(script);
                     eval(script);
                     jQuery('#' + id_target).removeClass('loading');
                     jQuery('#' + id_target).data('xhr', false);
@@ -777,6 +773,11 @@ if (window.capp.have_clock) {
         },
         show_dialog: function (id_target, url, method, title, data_addition) {
 
+            var bootstrapVersion = $.fn.tooltip.Constructor.VERSION;
+            if (typeof bootstrapVersion == 'undefined') {
+                bootstrapVersion = '2';
+            }
+
             if (window.capp.bootstrap >= '3.3') {
 
                 if (!title)
@@ -918,13 +919,21 @@ if (window.capp.have_clock) {
                             });
                             handle.closest('.modal').prev(".modal-backdrop").hide(400, function () {
                                 handle.closest('.modal').prev(".modal-backdrop").remove();
+                                var modalExists = $('.modal:visible').length > 0;
+                                if (!modalExists) {
+                                    $('body').removeClass('modal-open');
+                                }
 
                             });
-                            $('body').removeClass('modal-open');
                         } else {
                             handle.closest('.modal').prev(".modal-backdrop").hide(400);
-                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400);
-                            $('body').removeClass('modal-open');
+                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                                var modalExists = $('.modal:visible').length > 0;
+                                if (!modalExists) {
+                                    $('body').removeClass('modal-open');
+                                }
+
+                            });
                         }
                     });
                     jQuery("body").append(overlay).append(parent);
@@ -959,8 +968,8 @@ if (window.capp.have_clock) {
                     overlay.show();
                     $('body').addClass('modal-open');
                     handle.addClass("opened").closest('.modal').show();
-                    if(!$.fn.modal.Constructor.VERSION) {
-                        
+                    if (!$.fn.modal.Constructor.VERSION) {
+
                     }
                 }
                 handle.data('xhr', jQuery.ajax({
