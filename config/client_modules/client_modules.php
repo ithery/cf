@@ -486,5 +486,29 @@ return array(
         "css" => array("libs/bootstrap-4-material/bootstrap-material.css"),
         "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js", "libs/material/material-ripple.js"),
     ),
+    /*
+     * ICON
+     */
+    "fontawesome-3" => array(
+        "css" => array("icon/fontawesome-3.css"),
+    ),
+    "fontawesome-4.5" => array(
+        "css" => array("icon/fontawesome-4.5.css"),
+    ),
+    "fontawesome-5" => array(
+        "css" => array("icon/fontawesome-5.css"),
+    ),
+    "ionicons" => array(
+        "css" => array("icon/ionicons.css"),
+    ),
+    "linearicons" => array(
+        "css" => array("icon/linearicons.css"),
+    ),
+    "open-ionic" => array(
+        "css" => array("icon/open-ionic.css"),
+    ),
+    "pe-icon-7-stroke" => array(
+        "css" => array("icon/pe-icon-7-stroke.css"),
+    ),
 );
 ?>
