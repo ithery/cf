@@ -31,6 +31,10 @@ class CApp_Navigation {
         
     }
 
+	
+	public static function navs()  {
+		return CApp_Navigation_Data::get();
+	}
     /**
      * 
      * @param array $options 
