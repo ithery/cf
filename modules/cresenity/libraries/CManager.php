@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CManager {
 
+    use CTrait_Compat_Manager;
+    
     private static $_instance;
     protected static $controls = array();
     protected static $controls_code = array();
@@ -174,7 +176,7 @@ final class CManager {
     }
 
     public function createControl($id, $type) {
-        $this->create_control($id, $type);
+        return $this->create_control($id, $type);
     }
 
     public function create_control($id, $type) {
