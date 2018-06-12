@@ -417,7 +417,7 @@ abstract class CObservable extends CRenderable {
     }
 
     public function addAction($id = "") {
-        $act = CAction::factory($id);
+        $act = CElement_Factory::createComponent('Action', $id);
         $this->add($act);
         return $act;
     }
