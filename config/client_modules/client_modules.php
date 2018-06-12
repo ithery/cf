@@ -475,5 +475,16 @@ return array(
             "plugins/summernote/summernote-bs3.min.js",
         ),
     ),
+    "jquery-3.2.1" => array(
+        "js" => array("libs/jquery-3.2.1/jquery.min.js"),
+    ),
+    "bootstrap-4" => array(
+        "css" => array("libs/bootstrap-4/bootstrap.css"),
+        "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js"),
+    ),
+    "bootstrap-4-material" => array(
+        "css" => array("libs/bootstrap-4-material/bootstrap-material.css"),
+        "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js", "libs/material/material-ripple.js"),
+    ),
 );
 ?>

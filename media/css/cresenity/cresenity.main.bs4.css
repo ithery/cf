@@ -19,6 +19,61 @@
 }
 
 
+.material-style .layout-sidenav .brand {
+    height: 70px;
+}
+
+.layout-sidenav .brand {
+    padding: 0 1.75rem;
+}
+
+a.brand, div.brand {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-flex: 0;
+    -ms-flex-positive: 0;
+    flex-grow: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.brand-name {
+    display: block;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+.brand-logo {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    overflow: hidden;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-flex: 0;
+    -ms-flex-positive: 0;
+    flex-grow: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.brand-logo img {
+    width: 30px;
+    height: 30px;
+}
+
 .block {
     display: block;
 }
