@@ -8,6 +8,15 @@ application/*
 #ignore data domain or org
 /data/*
 
+#ignore git bak
+/.git.bak
+
+#ignore libs of CPDF
+/modules/cresenity/vendor/lib/fonts/Helvetica.afm.php
+/modules/cresenity/vendor/lib/fonts/Helvetica-Bold.afm.php
+/modules/cresenity/vendor/lib/fonts/Helvetica-Oblique.afm.php
+/modules/cresenity/vendor/lib/fonts/Helvetica-BoldOblique.afm.php
+
 #ignore folder logs
 /logs/
 /temp/*
@@ -29,3 +38,4 @@ composer.json
 sftp-config*.json
 .well-known
 .well-known/*
+robots.txt
