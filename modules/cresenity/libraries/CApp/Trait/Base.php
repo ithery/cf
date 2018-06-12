@@ -92,7 +92,7 @@ trait CApp_Trait_Base {
      * @return string value of current theme
      */
     public static function theme() {
-        $theme = CF::theme();
+        $theme = CManager::theme()->getCurrentTheme();
 
         return $theme;
     }
