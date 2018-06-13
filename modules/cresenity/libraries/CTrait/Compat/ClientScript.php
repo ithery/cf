@@ -11,6 +11,26 @@ trait CTrait_Compat_ClientScript {
 
     /**
      * 
+     * @deprecated please use registerJsFiles
+     * @param type $files
+     * @param type $pos
+     * @return type
+     */
+    public function register_js_files($files, $pos = "end") {
+        return $this->registerJsFiles($files,$pos);
+    }
+    /**
+     * 
+     * @deprecated please use registerCssFiles
+     * @param type $files
+     * @param type $pos
+     * @return type
+     */
+    public function register_css_files($files, $pos = "head") {
+        return $this->registerCssFiles($files,$pos);
+    }
+    /**
+     * 
      * @deprecated please use registerCssFile
      * @param string $file
      * @param string $pos

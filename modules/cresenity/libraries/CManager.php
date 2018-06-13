@@ -5,7 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 final class CManager {
 
     use CTrait_Compat_Manager;
-    
+
     private static $_instance;
     protected static $controls = array();
     protected static $controls_code = array();
@@ -81,6 +81,15 @@ final class CManager {
             CClientModules::instance()->defineModule($module, $data);
         }
         return CClientModules::instance()->register_module($module);
+    }
+
+    /**
+     * 
+     * @param string $module
+     * @return boolean
+     */
+    public static function unregisterModule($module) {
+        return CClientModules::instance()->unregisterModule($module);
     }
 
     /**

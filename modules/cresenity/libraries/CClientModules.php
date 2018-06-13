@@ -4,19 +4,21 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CClientModules {
 
+    use CTrait_Compat_ClientModules;
+
     public static $mods = array();
-    public static $all_modules = array();
+    public static $allModules = array();
     protected static $_instance;
 
     public function __construct() {
 
         self::$mods = array();
-        self::$all_modules = null;
+        self::$allModules = null;
     }
 
-    public function all_modules() {
-        if (self::$all_modules == null) {
-            self::$all_modules = include DOCROOT . "config" . DS . "client_modules" . DS . "client_modules.php";
+    public function allModules() {
+        if (self::$allModules == null) {
+            self::$allModules = include DOCROOT . "config" . DS . "client_modules" . DS . "client_modules.php";
             $app_files = CF::get_files('config', 'client_modules');
             //$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
             $app_files = array_reverse($app_files);
@@ -27,17 +29,17 @@ final class CClientModules {
                     trigger_error("Invalid Client Modules Config Format On " . $file);
                 }
 
-                self::$all_modules = array_merge(self::$all_modules, $app_modules);
+                self::$allModules = array_merge(self::$allModules, $app_modules);
             }
         }
-        return self::$all_modules;
+        return self::$allModules;
     }
 
     public function requirements($module) {
         $data = array();
-        $all_modules = $this->all_modules();
-        if (isset($all_modules[$module])) {
-            $mod = $all_modules[$module];
+        $allModules = $this->allModules();
+        if (isset($allModules[$module])) {
+            $mod = $allModules[$module];
             if (isset($mod["requirements"])) {
                 foreach ($mod["requirements"] as $req) {
                     $data_req = $this->requirements($req);
@@ -54,13 +56,13 @@ final class CClientModules {
         return in_array($mod, self::$mods);
     }
 
-    private function add_to_tree($tree, $module) {
-        $all_modules = $this->all_modules();
-        $mod = $all_modules[$module];
+    private function addToTree($tree, $module) {
+        $allModules = $this->allModules();
+        $mod = $allModules[$module];
         $last_req = null;
         if (isset($mod["requirements"])) {
             foreach ($mod["requirements"] as $req) {
-                $this->add_to_tree($tree, $req);
+                $this->addToTree($tree, $req);
                 $last_req = $req;
             }
         }
@@ -79,7 +81,7 @@ final class CClientModules {
         $tree = CTree::factory('root', null);
 
         foreach ($this->mods as $mod) {
-            $this->add_to_tree($tree, $mod);
+            $this->addToTree($tree, $mod);
         }
         return $tree;
     }
@@ -92,7 +94,7 @@ final class CClientModules {
         return $text;
     }
 
-    public function require_js($js) {
+    public function requireJs($js) {
         $tree = $this->jstree();
 
         //$tree->set_walker_callback(array('CClientModules','walker_callback'));
@@ -100,7 +102,7 @@ final class CClientModules {
         die();
     }
 
-    public function register_modules($modules) {
+    public function registerModules($modules) {
         if (!is_array($modules)) {
             $modules = array($modules);
         }
@@ -111,21 +113,45 @@ final class CClientModules {
 
     public function defineModule($name, $moduleData) {
         //make sure all modules is collected
-        $this->all_modules();
+        $this->allModules();
         //replace or make new module
-        self::$all_modules[$name] = $moduleData;
+        self::$allModules[$name] = $moduleData;
         return $this;
     }
 
-    public function register_module($module, $parent = null) {
+    public function unregisterModule($module) {
         $cs = CClientScript::instance();
 
-        $all_modules = $this->all_modules();
+        $allModules = $this->allModules();
+
+        if (in_array($module, self::$mods)) {
+            //locate mods
+
+            foreach (self::$mods as $mod) {
+
+                if ($mod == $module) {
+
+                    //mod found, we need locate js and css files from allModules
+                    $moduleData = carr::get($allModules, $module);
+                    $jsFiles = carr::get($moduleData, 'js');
+                    $cssFiles = carr::get($moduleData, 'css');
+                    $cs->unregisterJsFiles($jsFiles);
+                    $cs->unregisterCssFiles($cssFiles);
+                }
+            }
+        }
+        return false;
+    }
+
+    public function registerModule($module, $parent = null) {
+        $cs = CClientScript::instance();
+
+        $allModules = $this->allModules();
         if (!in_array($module, self::$mods)) {
 
-            if (isset($all_modules[$module])) {
+            if (isset($allModules[$module])) {
                 //array
-                $mod = $all_modules[$module];
+                $mod = $allModules[$module];
                 if (isset($mod["requirements"])) {
                     foreach ($mod["requirements"] as $req) {
                         $this->register_module($req);
