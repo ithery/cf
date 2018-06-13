@@ -7,7 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 14, 2018, 5:11:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 use Symfony\Component\Finder\Finder;
 
 class CHelper_File {
@@ -358,6 +357,7 @@ class CHelper_File {
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
     public function files($directory, $hidden = false) {
+
         return iterator_to_array(
                 Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0), false
         );
@@ -371,6 +371,7 @@ class CHelper_File {
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
     public function allFiles($directory, $hidden = false) {
+
         return iterator_to_array(
                 Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory), false
         );

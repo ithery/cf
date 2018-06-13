@@ -17,8 +17,16 @@ class CApp_Api_Method_GetDomainList extends CApp_Api_Method {
         $domain = $this->domain;
 
         $fileHelper = CHelper::file();
-        $files = $fileHelper->allFiles(CFData::path() . 'domain');
-
+        $allFiles = $fileHelper->files(CFData::path() . 'domain');
+        $files = array();
+        foreach ($allFiles as $fileObject) {
+            $file = $fileObject->getPathname();
+            $file = basename($file);
+            if (substr($file, -4) == '.php') {
+                $file = substr($file, 0, strlen($file) - 4);
+            }
+            $files[] = $file;
+        }
 
 
         $this->errCode = $errCode;
