@@ -31,6 +31,8 @@ abstract class CObservable extends CRenderable {
         $this->manager = CManager::instance();
 
         $this->manager->registerControl('text', 'CElement_FormInput_Text');
+        $this->manager->registerControl('number', 'CElement_FormInput_Number');
+        $this->manager->registerControl('email', 'CElement_FormInput_Email');
         $this->manager->registerControl('datepicker', 'CFormInputDate');
         $this->manager->registerControl('date', 'CFormInputDate');
         $this->manager->registerControl('currency', 'CFormInputCurrency');
