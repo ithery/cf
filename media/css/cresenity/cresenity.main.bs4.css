@@ -144,21 +144,17 @@ input[disabled=disabled],select[disabled=disabled],textarea[disabled=disabled],i
     margin-top: 7px;
     padding: 0;
 }
-.dropdown-menu {
-    border: medium none;
-    border-radius: 3px;
-    box-shadow: 0 0 3px rgba(86, 96, 117, 0.7);
-    display: none;
-    float: left;
-    font-size: 12px;
-    left: 0;
-    list-style: none outside none;
-    padding: 0;
-    position: absolute;
-    text-shadow: none;
-    top: 100%;
-    z-index: 1000;
+
+.btn.dropdown-toggle,.btn.dropdown-toggle:hover {
+    background: #4a4e51;
+    color:#fff;
 }
+
+.dropdown-menu {
+    padding: 0;
+}
+
+
 .dropdown-menu > li > a {
     border-radius: 3px;
     color: inherit;

@@ -17,7 +17,11 @@ trait CTrait_Element_Property_Icon {
      * @return $this
      */
     public function setIcon($icon) {
-
+        
+        if (strpos($icon, 'fa-') === false && strpos($icon, 'ion-') === false) {
+            $icon = 'icon-' . $icon;
+        }
+       
         $this->icon = $icon;
         return $this;
     }
@@ -27,6 +31,7 @@ trait CTrait_Element_Property_Icon {
      * @return string
      */
     public function getIcon() {
+         
         return $this->icon;
     }
 
