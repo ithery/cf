@@ -1,0 +1,83 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 14, 2018, 4:40:47 AM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CApp_Api {
+
+    private static $instance = array();
+    protected $domain = null;
+
+    protected function __construct($domain) {
+        $this->domain = $domain;
+    }
+
+    /**
+     * 
+     * @param int $org_id
+     * @return CMApi
+     */
+    public static function instance($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+        if (self::$instance == null) {
+            self::$instance = array();
+        }
+        if (self::$instance == null) {
+            self::$instance[$domain] = new static($domain);
+        }
+        return self::$instance[$domain];
+    }
+
+    /**
+     * 
+     * @return string domain accessed
+     */
+    public function getDomain() {
+        return $this->domain;
+    }
+
+    /**
+     * 
+     * @param string $method
+     * @return array
+     */
+    public function exec($method) {
+
+        //locate file method
+        $response = array();
+        /**
+         * @var CMApi_Method Description
+         */
+        $class_name = 'CApp_Api_Method_' . $method;
+        $logger = null;
+        if (class_exists($class_name)) {
+            $methodObject = new $class_name($this, $method);
+            //$logger = new CApp_Api_Logger($methodObject->sessionId());
+            //$logger->logRequest($method, $methodObject->request());
+            if ($methodObject->getErrCode() == 0) {
+                $methodObject->execute();
+            }
+            $response = $methodObject->result();
+        } else {
+            $response = array(
+                'err_code' => '11',
+                'err_message' => 'Class not found',
+            );
+        }
+        //if ($logger != null) {
+        //$logger->logResponse($method, $response);
+        //}
+
+
+
+
+        return $response;
+    }
+
+}

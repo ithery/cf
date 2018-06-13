@@ -47,17 +47,40 @@ class CApp extends CObservable {
         }
     }
 
+    /**
+     * 
+     * @param string $domain
+     * @return CApp_Navigation
+     */
     public static function navigation($domain = null) {
         return CApp_Navigation::instance($domain);
     }
 
     /**
      * 
-     * @param string $appCode
+     * @param string $domain
+     * @return CApp_Api
+     */
+    public static function api($domain = null) {
+        return CApp_Api::instance($domain);
+    }
+
+    /**
+     * 
+     * @param string $domain
+     * @return CApp_Remote
+     */
+    public static function remote($domain = null) {
+        return CApp_Remote::instance($domain);
+    }
+
+    /**
+     * 
+     * @param string $domain
      * @return CApp_Navigation
      */
-    public static function nav($appCode = null) {
-        return CApp_Navigation::instance($appCode);
+    public static function nav($domain = null) {
+        return CApp_Navigation::instance($domain);
     }
 
     public static function isAjax() {
