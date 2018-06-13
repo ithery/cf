@@ -32,15 +32,14 @@ namespace Symfony\Component\Finder\Comparator;
  *
  * @see http://physics.nist.gov/cuu/Units/binary.html
  */
-class NumberComparator extends Comparator
-{
+class NumberComparator extends Comparator {
+
     /**
      * @param string|int $test A comparison string or an integer
      *
      * @throws \InvalidArgumentException If the test is not understood
      */
-    public function __construct(?string $test)
-    {
+    public function __construct($test) {
         if (!preg_match('#^\s*(==|!=|[<>]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches)) {
             throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a number test.', $test));
         }
@@ -76,4 +75,5 @@ class NumberComparator extends Comparator
         $this->setTarget($target);
         $this->setOperator(isset($matches[1]) ? $matches[1] : '==');
     }
+
 }
