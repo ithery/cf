@@ -84,7 +84,7 @@ abstract class CObservable extends CRenderable {
     public function addControl($id, $type) {
         $control = null;
         if ($this->manager->isRegisteredControl($type)) {
-            $control = $this->manager->create_control($id, $type);
+            $control = $this->manager->createControl($id, $type);
         } else {
             trigger_error('Unknown control type ' . $type);
         }
@@ -388,10 +388,10 @@ abstract class CObservable extends CRenderable {
 
     public function addElement($type, $id = "") {
         $element = null;
-        if ($this->manager->is_registered_element($type)) {
-            $element = $this->manager->create_element($id, $type);
+        if ($this->manager->isRegisteredElement($type)) {
+            $element = $this->manager->createElement($id, $type);
         } else {
-            trigger_error('Unknown element type ' . $type);
+            throw new CException('Unknow element type :element_type', array(':element_type' => $type));
         }
 
 
@@ -416,6 +416,12 @@ abstract class CObservable extends CRenderable {
         return $actlist;
     }
 
+    /**
+     * Add Action Element
+     * 
+     * @param string $id optional
+     * @return CElement_Component_Action
+     */
     public function addAction($id = "") {
         $act = CElement_Factory::createComponent('Action', $id);
         $this->add($act);

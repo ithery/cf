@@ -166,7 +166,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function html($indent = 0) {
-        $this->reassign_confirm();
+        $this->reassignConfirm();
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $jsparam = $this->jsparam;
@@ -262,12 +262,10 @@ class CElement_Component_Action extends CElement_Component {
             } else {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             }
+
             if (strlen($this->icon) > 0) {
-                if ($this->bootstrap == '3.3') {
-                    $html->append('<i class="fa fa-' . $this->icon . '"></i> ');
-                } else {
-                    $html->append('<i class="icon icon-' . $this->icon . '"></i> ');
-                }
+
+                $html->append('<i class="icon icon-' . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
             }
             if ($this->style != "btn-icon-group") {
                 $html->append($this->label);

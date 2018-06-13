@@ -15,6 +15,11 @@ trait CElement_Trait_Template {
     protected $jsOutput = '';
     protected $onBeforeParse = null;
 
+    /**
+     * 
+     * @param string $name
+     * @return $this
+     */
     public function setTemplate($name) {
         $this->templateName = $name;
         return $this;
