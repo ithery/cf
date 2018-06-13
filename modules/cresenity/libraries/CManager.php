@@ -94,6 +94,10 @@ final class CManager {
         }
         return CClientModules::instance()->register_module($module);
     }
+    
+    public static function isRegisteredModule($module) {
+        return CClientModules::instance()->isRegisteredModule($module);
+    }
 
     /**
      * 

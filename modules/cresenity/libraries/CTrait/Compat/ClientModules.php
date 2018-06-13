@@ -40,8 +40,24 @@ trait CTrait_Compat_ClientModules {
         return $this->requireJs($js);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use function allModules
+     * @return type
+     */
     public function all_modules() {
         return $this->allModules();
+    }
+    
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use function isRegisteredModule
+     * @param type $mod
+     * @return type
+     */
+    public function is_registered_module($mod) {
+        return $this->isRegisteredModule($mod);
     }
 
 }

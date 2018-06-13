@@ -51,7 +51,7 @@ final class CClientModules {
         return $data;
     }
 
-    public function is_registered_module($mod) {
+    public function isRegisteredModule($mod) {
 
         return in_array($mod, self::$mods);
     }
