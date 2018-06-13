@@ -883,10 +883,10 @@ if (window.capp.have_clock) {
                 if (typeof data_addition == 'undefined')
                     data_addition = {};
 
-                var _dialog_html = "<div class='modal' style=\"display: none;\" ><div class='modal-dialog' ><div class='modal-content animated bounceInRight' >" +
+                var _dialog_html = "<div class='modal' style=\"display: none;\" ><div class='modal-dialog modal-lg' ><div class='modal-content animated bounceInRight' >" +
                         "<div class='modal-header'>" +
                         "<a href='#' class='close'></a>" +
-                        "<span class='loader'></span><h3></h3>" +
+                        "<h3></h3><span class='loader'></span>" +
                         "</div>" +
                         "<div class='modal-body'>" +
                         "</div>" +
