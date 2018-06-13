@@ -439,10 +439,10 @@ table.responsive {
 .widget-box .widget-title h5 {
     display: inline-block;
     font-size: 14px;
-    margin: 0 0 7px;
+    margin: 0;
     padding: 0;
     text-overflow: ellipsis;
-    float: left;
+
     line-height: inherit;
 }
 .widget-box .widget-title .buttons {
