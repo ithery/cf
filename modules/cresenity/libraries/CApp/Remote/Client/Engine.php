@@ -41,7 +41,7 @@ abstract class CApp_Remote_Client_Engine {
         $responseData = json_decode($response, true);
         if (!is_array($responseData)) {
             //failed to decode json
-            throw new Exception('failed to decode api from url :url, response :response', array(':url' => $url, ':response' => htmlspecialchars($response)));
+            throw new CException('failed to decode api from url :url, response :response', array(':url' => $url, ':response' => htmlspecialchars($response)));
         }
 
         $errCode = carr::get($responseData, 'err_code');
