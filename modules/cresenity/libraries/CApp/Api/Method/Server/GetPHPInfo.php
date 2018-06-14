@@ -4,18 +4,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 14, 2018, 4:40:47 AM
+ * @since Jun 14, 2018, 5:57:04 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_Api_Method_GetDomainDetail extends CApp_Api_Method {
+class CApp_Api_Method_Server_GetPHPInfo extends CApp_Api_Method_Server {
 
     public function execute() {
-
-
         $errCode = 0;
         $errMessage = '';
         $domain = $this->domain;
-        $data = CFData::domain($domain);
+
+
+        $data = CServer::phpInfo()->get();
+
         $this->errCode = $errCode;
         $this->errMessage = $errMessage;
         $this->data = $data;

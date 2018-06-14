@@ -70,8 +70,8 @@ class CApp extends CObservable {
      * @param string $domain
      * @return CApp_Remote
      */
-    public static function remote($domain = null) {
-        return CApp_Remote::instance($domain);
+    public static function remote($domain = null, $options = array()) {
+        return CApp_Remote::instance($domain, $options);
     }
 
     /**

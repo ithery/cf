@@ -47,7 +47,7 @@ class CApp_Api {
      * @param string $method
      * @return array
      */
-    public function exec($method) {
+    public function exec($method, $submethod = null) {
 
         //locate file method
         $response = array();
@@ -55,6 +55,9 @@ class CApp_Api {
          * @var CMApi_Method Description
          */
         $class_name = 'CApp_Api_Method_' . $method;
+        if ($submethod != null) {
+            $class_name = 'CApp_Api_Method_' . $method . '_' . $submethod;
+        }
         $logger = null;
         if (class_exists($class_name)) {
             $methodObject = new $class_name($this, $method);

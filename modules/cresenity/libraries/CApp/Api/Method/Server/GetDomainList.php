@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 14, 2018, 4:40:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_Api_Method_GetDomainList extends CApp_Api_Method {
+class CApp_Api_Method_Server_GetDomainList extends CApp_Api_Method_Server {
 
     public function execute() {
 
