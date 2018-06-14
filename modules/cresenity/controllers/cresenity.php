@@ -8,8 +8,9 @@ class Cresenity_Controller extends CController {
         curl::redirect('');
     }
 
-    public function api($method) {
-        $data = CApp::api()->exec($method);
+    public function api($method, $submethod = null) {
+
+        $data = CApp::api()->exec($method, $submethod);
         if (!isset($_GET['noheader'])) {
             header('content-type:application/json');
         }

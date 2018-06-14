@@ -1,0 +1,27 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 14, 2018, 9:32:42 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
+
+    public function __construct($options) {
+        parent::__construct($options);
+        $this->baseUrl .= 'Server/';
+    }
+
+    public function getPHPInfo() {
+        $data = $this->request($this->baseUrl . 'GetPHPInfo');
+        return $data;
+    }
+
+    public function getDomainList() {
+        $data = $this->request($this->baseUrl . 'GetDomainList');
+        return $data;
+    }
+
+}

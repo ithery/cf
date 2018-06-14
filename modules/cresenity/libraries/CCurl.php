@@ -316,7 +316,7 @@ class CCurl {
         return $this;
     }
 
-    public function set_post($data) {
+    public function setPost(array $data) {
         $this->post_data = $data;
         $post_data = curl::as_post_string($data);
         $this->set_opt(CURLOPT_POST, true);

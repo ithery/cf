@@ -18,4 +18,14 @@ trait CTrait_Compat_Curl {
         return $this->setSSL();
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use function setPost
+     * @param array $data
+     * @return $this
+     */
+    public function set_post($data) {
+        return $this->setPost($data);
+    }
+
 }

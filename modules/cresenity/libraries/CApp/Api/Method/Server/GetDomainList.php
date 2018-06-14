@@ -29,9 +29,13 @@ class CApp_Api_Method_Server_GetDomainList extends CApp_Api_Method_Server {
         }
 
 
+        $data = array();
+        $data['list'] = $files;
+        $data['count'] = count($files);
+
         $this->errCode = $errCode;
         $this->errMessage = $errMessage;
-        $this->data = $files;
+        $this->data = $data;
 
         return $this;
     }
