@@ -16,8 +16,11 @@ class CAjax_Method implements CInterface_Jsonable {
     public $target = "";
     public $param = array();
 
-    public function __construct() {
-        
+    public function __construct($options = array()) {
+        if ($options == null) {
+            $options = array();
+        }
+        $this->fromArray($options);
     }
 
     /**
@@ -109,9 +112,13 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function fromJson($json) {
         $jsonArray = json_decode($json, true);
-        $this->data = carr::get($jsonArray, 'data');
-        $this->method = carr::get($jsonArray, 'method');
-        $this->type = carr::get($jsonArray, 'type');
+        return $this->fromArray($jsonArray);
+    }
+
+    public function fromArray(array $array) {
+        $this->data = carr::get($array, 'data', array());
+        $this->method = carr::get($array, 'method', 'GET');
+        $this->type = carr::get($array, 'type');
         return $this;
     }
 

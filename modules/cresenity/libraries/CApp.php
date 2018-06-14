@@ -87,6 +87,15 @@ class CApp extends CObservable {
         return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     }
 
+    
+    /**
+     * 
+     * @return CApp_Temp
+     */
+    public static function temp() {
+        return new CApp_Temp();
+    }
+
     /**
      * 
      * @return CDatabase
