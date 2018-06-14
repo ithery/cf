@@ -24,4 +24,9 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         return $data;
     }
 
+    public function getServerInfo() {
+        $data = $this->request($this->baseUrl . 'GetServerInfo');
+        return $data;
+    }
+
 }

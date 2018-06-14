@@ -94,7 +94,7 @@ final class CManager {
         }
         return CClientModules::instance()->register_module($module);
     }
-    
+
     public static function isRegisteredModule($module) {
         return CClientModules::instance()->isRegisteredModule($module);
     }
@@ -208,7 +208,6 @@ final class CManager {
         if (cstr::startsWith($class, 'CElement_FormInput')) {
             return CElement_Factory::createFormInput($class, $id);
         }
-
         return call_user_func(array($class, 'factory'), ($id));
     }
 
