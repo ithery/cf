@@ -50,7 +50,11 @@ class CServer {
     }
 
     public static function getOS() {
-        return PHP_OS;
+        $os = self::config()->get('os');
+        if ($os == null) {
+            $os = PHP_OS;
+        }
+        return $os;
     }
 
     public static function getLoadAvg() {
