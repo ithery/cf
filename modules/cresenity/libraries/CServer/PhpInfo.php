@@ -9,7 +9,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 final class CServer_PhpInfo {
 
+    protected static $instance;
     protected static $info = array();
+
+    public static function instance() {
+        if (self::$instance == null) {
+            self::$instance = new CServer_Storage();
+        }
+        return self::$instance;
+    }
 
     public static function get() {
         if (empty(self::$info)) {

@@ -20,8 +20,11 @@ class CApp_Api_Method_Server_GetServerInfo extends CApp_Api_Method_Server {
         $dataStorage['used'] = $dataStorage['total'] - $dataStorage['free'];
 
         
-
         $data = array();
+
+        $data['hostname'] = CServer::getHostname();
+        $data['os'] = CServer::getOs();
+        $data['load_avg'] = CServer::getLoadAvg();
         $data['storage'] = $dataStorage;
 
         $this->errCode = $errCode;
