@@ -81,6 +81,13 @@ class CServer_System_Info {
      */
     private $processes;
 
+    /**
+     * array with cpu devices
+     * @see CServer_System_Device_Cpu
+     * @var array
+     */
+    private $cpus;
+
     public function getHostname() {
         return $this->hostname;
     }
@@ -288,6 +295,44 @@ class CServer_System_Info {
      */
     public function setProcesses($processes) {
         $this->processes = $processes;
+    }
+
+    /**
+     * Returns $cpus.
+     * @see CServer_System_Info::$_cpus
+     * @return array
+     */
+    public function getCpus() {
+        return $this->cpus;
+    }
+
+    /**
+     * Sets $_cpus.
+     * @param CpuDevice $cpus cpu device
+     *
+     * @see System::$_cpus
+     * @see CpuDevice
+     *
+     * @return Void
+     */
+    public function addCpus($cpus) {
+        if (!is_array($this->cpus)) {
+            $this->cpus = array();
+        }
+        array_push($this->cpus, $cpus);
+    }
+
+    /**
+     * Sets $_cpus.
+     * @param CpuDevice $cpus cpu device
+     *
+     * @see System::$_cpus
+     * @see CpuDevice
+     *
+     * @return Void
+     */
+    public function setCpus($cpus) {
+        $this->cpus = $cpus;
     }
 
 }

@@ -109,11 +109,25 @@ class CServer_System {
         return $this->info->getLoad();
     }
 
-    public function getLoadPercent($forceEnabled = false) {
+    public function getLoadPercent() {
         if (!$this->info->getLoadPercent()) {
             $this->os->buildLoadAvg();
         }
         return $this->info->getLoadPercent();
+    }
+
+    public function getMachine() {
+        if (!$this->info->getMachine()) {
+            $this->os->buildMachine();
+        }
+        return $this->info->getMachine();
+    }
+
+    public function getCpus() {
+        if (!$this->info->getCpus()) {
+            $this->os->buildCpuInfo();
+        }
+        return $this->info->getCpus();
     }
 
 }

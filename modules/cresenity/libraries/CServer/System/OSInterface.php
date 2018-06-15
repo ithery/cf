@@ -34,6 +34,12 @@ interface CServer_System_OSInterface {
     public function buildKernel();
 
     /**
+     * build the machine information
+     * @return void
+     */
+    public function buildMachine();
+
+    /**
      * build the uptime information
      * @return void
      */
@@ -50,10 +56,16 @@ interface CServer_System_OSInterface {
      * @return void
      */
     public function buildProcesses();
-    
+
     /**
      * build the loadavg information
      * @return void
      */
     public function buildLoadAvg();
+
+    /**
+     * build the cpu information
+     * @return void
+     */
+    public function buildCpuInfo();
 }
