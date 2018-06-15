@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 15, 2018, 5:40:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CServer_System_Device_Cpu extends CServer_System_Device {
+class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * model of the cpu

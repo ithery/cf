@@ -57,4 +57,29 @@ class CServer {
         return sys_getloadavg();
     }
 
+    /**
+     * 
+     * @return CServer_System_Device
+     */
+    public static function createDevice($deviceName) {
+        $class = 'CServer_Device_' . $deviceName;
+        return new $class();
+    }
+
+    /**
+     * 
+     * @return CServer_System_Device_Cpu
+     */
+    public static function createDeviceCpu() {
+        return self::createDevice('Cpu');
+    }
+
+    /**
+     * 
+     * @return CServer_System_Device_Disk
+     */
+    public static function createDeviceDisk() {
+        return self::createDevice('Disk');
+    }
+
 }

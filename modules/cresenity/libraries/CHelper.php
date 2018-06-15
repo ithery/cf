@@ -21,12 +21,6 @@ class CHelper {
         return new CHelper_Formatter();
     }
 
-    public static function formatSize($bytes) {
-        self::formatter()->formatSize($bytes);
-    }
-
-    public static function formatNumber($number) {
-        self::formatter()->formatNumber($number);
-    }
+   
 
 }

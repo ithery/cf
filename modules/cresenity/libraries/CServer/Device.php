@@ -7,6 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 15, 2018, 5:39:23 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CServer_System_Device {
+class CServer_Device {
     
 }

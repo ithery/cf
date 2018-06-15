@@ -16,15 +16,10 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
 
     /**
      * 
-     * @param CServer_System $system
+     * @param CServer_System_Info $info
      */
     public function __construct(CServer_System_Info $info) {
         $this->info = $info;
-    }
-
-    public function buildAll() {
-        $this->buildHostname();
-        $this->buildDistro();
     }
 
     /**
@@ -88,23 +83,6 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
                 }
             }
         }
-    }
-
-    /**
-     * 
-     * @return CServer_System_Device
-     */
-    public static function createDevice($deviceName) {
-        $class = 'CServer_System_Device_' . $deviceName;
-        return new $class();
-    }
-
-    /**
-     * 
-     * @return CServer_System_Device_Cpu
-     */
-    public static function createDeviceCpu() {
-        return self::createDevice('Cpu');
     }
 
 }
