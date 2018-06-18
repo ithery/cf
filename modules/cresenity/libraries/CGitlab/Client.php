@@ -152,7 +152,7 @@ class CGitlab_Client {
         }
 
         $this->curl->setUrl($path);
-        
+       
         $this->curl->setOpt(CURLOPT_HTTPHEADER, $headers);
 
         $response = $this->curl->exec()->response();

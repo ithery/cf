@@ -20,7 +20,7 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
     /**
      * Default entries per page
      */
-    const PER_PAGE = 10000;
+    const PER_PAGE = 100;
 
     /**
      * The client
