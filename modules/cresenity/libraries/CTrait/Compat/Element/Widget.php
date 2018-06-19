@@ -27,4 +27,8 @@ trait CTrait_Compat_Element_Widget {
         return $this->setIcon($icon);
     }
 
+    public function set_nopadding($bool) {
+        return $this->setNoPadding($bool);
+    }
+
 }
