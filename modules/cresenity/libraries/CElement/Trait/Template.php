@@ -41,14 +41,12 @@ trait CElement_Trait_Template {
     }
 
     public function setVar($key, $val) {
-
         $this->templateData[$key] = $val;
         return $this;
     }
 
     private function getTemplatePath($templateName) {
         $viewPath = $templateName;
-
         return $viewPath;
     }
 
@@ -59,8 +57,12 @@ trait CElement_Trait_Template {
         }
 
         $viewPath = $this->getTemplatePath($templateName);
-        $view = CTemplate::factory($viewPath);
-        //PMBlocks::instance()->set_data($this->templateData);
+        $view = new CTemplate($viewPath);
+        $helpers = $view->getHelpers();
+        $helpers->set('content', function () {
+
+            return $this->htmlChild();
+        });
         $view->set($this->templateData);
         $output = $view->render();
         $output_js = "";
@@ -96,6 +98,9 @@ trait CElement_Trait_Template {
 
         $this->htmlOutput = carr::get($resultHeader, 'html', '') . carr::get($resultContent, 'html', '') . carr::get($resultFooter, 'html', '');
         $this->jsOutput = carr::get($resultHeader, 'js', '') . carr::get($resultContent, 'js', '') . carr::get($resultFooter, 'js', '');
+
+        //htmlChild will concat in helper template content, we need to concat the js here
+        $this->jsOutput .= parent::jsChild();
 
         return true;
     }
