@@ -35,7 +35,8 @@ class CElement_Component_Widget_Header extends CElement_Element {
 
     public function addAction($id = "") {
         $action = CElement_Factory::createComponent('Action', $id);
-        $this->actions->add($action);
+        $this->actions()->add($action);
+        return $action;
     }
 
     public function build() {

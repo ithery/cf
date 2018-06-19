@@ -31,7 +31,8 @@ class CElement_Component_Widget extends CElement_Component {
         parent::__construct($id);
         $this->header = CElement_Factory::createComponent('Widget_Header');
         $this->add($this->header);
-        $this->content = $this->add_div();
+        $this->content = $this->add_div()->addClass('widget-content');
+        $this->addClass('widget-box');
         $this->wrapper = $this->content;
 
         $this->height = "";
@@ -48,19 +49,24 @@ class CElement_Component_Widget extends CElement_Component {
      * @return CElement_Component_Widget_Header
      */
     public function header() {
-
-
-
         return $this->header;
     }
 
-    public function add_header_action($id = "") {
+    /**
+     * 
+     * @return CElement_Element_Div
+     */
+    public function content() {
+        return $this->content;
+    }
+
+    public function addHeaderAction($id = "") {
         return $this->header()->addAction($id);
     }
 
-    public function set_header_action_style($style) {
-        $this->header_action_style = $style;
-        $this->header_action_list->set_style($style);
+    public function setHeaderActionStyle($style) {
+        $this->header()->actions()->setStyle($style);
+        return $this;
     }
 
     /**
@@ -71,10 +77,7 @@ class CElement_Component_Widget extends CElement_Component {
      * @return $this
      */
     public function setTitle($title, $lang = true) {
-        if ($lang) {
-            $title = clang::__($title);
-        }
-        $this->header()->setTitle($title);
+        $this->header()->setTitle($title, $lang);
         return $this;
     }
 
@@ -94,8 +97,6 @@ class CElement_Component_Widget extends CElement_Component {
     }
 
     public function build() {
-        $this->addClass('widget-box');
-        $this->content->addClass('widget-content');
         if ($this->nopadding) {
             $this->content->addClass('nopadding p-0');
         }
