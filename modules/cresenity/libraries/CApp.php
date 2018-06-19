@@ -76,6 +76,16 @@ class CApp extends CObservable {
 
     /**
      * 
+     * @param string $modelName
+     * @return CApp_Model
+     */
+    public static function model($modelName) {
+        $modelClass = 'CApp_Model_' . $modelName;
+        return new $modelClass();
+    }
+
+    /**
+     * 
      * @param string $domain
      * @return CApp_Navigation
      */
@@ -87,7 +97,6 @@ class CApp extends CObservable {
         return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     }
 
-    
     /**
      * 
      * @return CApp_Temp

@@ -7,8 +7,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 19, 2018, 3:37:54 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+class CApp_Model_Users extends CApp_Model {
 
-class CApp_Model_User extends CApp_Model {
+    use CApp_Model_Trait_Users;
+
+   
     
     
+
 }
