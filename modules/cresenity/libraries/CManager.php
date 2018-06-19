@@ -43,7 +43,7 @@ final class CManager {
         if (file_exists($theme_file)) {
             $this->theme_data = include $theme_file;
         }
-        $this->theme = new CManager_Theme();
+        self::theme();
     }
 
     /**
