@@ -19,7 +19,7 @@ trait CTrait_Element_Property_Icon {
     public function setIcon($icon) {
         
         if (strpos($icon, 'fa-') === false && strpos($icon, 'ion-') === false) {
-            $icon = 'icon-' . $icon;
+            $icon = $icon.' icon-' . $icon;
         }
        
         $this->icon = $icon;

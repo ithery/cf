@@ -40,7 +40,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
     }
 
     public function build() {
-        $this->addClass('widget-title');
+        $this->addClass('widget-title clearfix');
         if (strlen($this->icon) > 0) {
             $this->addSpan()->addClass('icon')->addIcon($this->icon);
         }
