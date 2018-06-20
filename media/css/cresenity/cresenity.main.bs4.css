@@ -23,6 +23,17 @@
     height: 70px;
 }
 
+.align-right, .table td.align-right {
+    text-align:right;
+}
+.align-center, .table td.align-center {
+    text-align:center;
+}
+.align-left, .table td.align-left {
+    text-align:left;
+}
+
+
 .layout-sidenav .brand {
     padding: 0 1.75rem;
 }
@@ -447,7 +458,7 @@ table.responsive {
 }
 .widget-box .widget-title .buttons {
     float: right;
-    margin: -9px 10px 0 0;
+    margin: -7px 0px 0 0;
 }
 
 .widget-box .widget-content {
@@ -663,7 +674,9 @@ div.dataTables_wrapper .ui-widget-header {
 }
 /* file upload*/
 
-
+.fileupload {
+    position:relative;
+}
 .fileupload .uneditable-input {
     width:150px;
     border-radius: 0;
@@ -682,6 +695,34 @@ div.dataTables_wrapper .ui-widget-header {
 
     padding: 6px 8px;
     border: 1px solid #e5e6e7;
+}
+
+
+.btn-file > input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    font-size: 23px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    direction: ltr;
+}
+
+.fileupload-exists .fileupload-new, .fileupload-new .fileupload-exists {
+    display: none;
+}
+.fileupload .thumbnail {
+    display: inline-block;
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-align: center;
+    vertical-align: middle;
 }
 .fileupload .fileupload-exists:not(.btn),.fileupload .fileupload-new:not(.btn) {
 

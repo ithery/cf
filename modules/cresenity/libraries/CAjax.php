@@ -10,11 +10,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CAjax {
 
-    public static function createMethod($json = null) {
-        if ($json != null) {
-            return CAjax_Method::createFromJson($json);
+    public static function createMethod($options = null) {
+        if (!is_array($options)) {
+            if ($options != null) {
+                return CAjax_Method::createFromJson($options);
+            }
         }
-        return new CAjax_Method();
+        return new CAjax_Method($options);
     }
 
 }

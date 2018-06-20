@@ -10,12 +10,13 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     protected $additional_js;
     protected $visibility;
     protected $parent;
+    protected $wrapper;
 
     protected function __construct($id = "") {
         parent::__construct($id);
 
         $this->renderable = new CCollection();
-
+        $this->wrapper = $this;
         $this->additional_js = "";
         $this->visibility = true;
         $this->parent = null;
@@ -56,7 +57,9 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         if ($renderable instanceof CRenderable) {
             $renderable->set_parent($this);
         }
-        $this->renderable[] = $renderable;
+
+        $this->wrapper->renderable[] = $renderable;
+
         return $this;
     }
 

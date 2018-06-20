@@ -248,6 +248,7 @@ input[type="button"], input[type="reset"], input[type="submit"] {
     width: auto;
     height: auto;
 }
+
 input[type="file"] {
     width: auto;
     padding: initial;

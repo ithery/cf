@@ -8,8 +8,24 @@ class Cresenity_Controller extends CController {
         curl::redirect('');
     }
 
-    public function api($method) {
-        $data = CApp::api()->exec($method);
+    public function ajax($method) {
+        $file = CApp::temp()->makePath("ajax", $method . ".tmp");
+        if (isset($_GET['profiler'])) {
+            new Profiler();
+        }
+        if (!file_exists($file)) {
+            throw new CException('failed to get temporary file :filename', array(':filename' => $file));
+        }
+        $json = file_get_contents($file);
+        $ajaxMethod = CAjax::createMethod($json);
+        $response = $ajaxMethod->executeEngine();
+
+        echo $response;
+    }
+    
+    public function api($method, $submethod = null) {
+
+        $data = CApp::api()->exec($method, $submethod);
         if (!isset($_GET['noheader'])) {
             header('content-type:application/json');
         }

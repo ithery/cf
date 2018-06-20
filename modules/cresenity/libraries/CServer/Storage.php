@@ -9,12 +9,29 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CServer_Storage {
 
-    public static function getFreeSpace() {
-        return disk_free_space(".");
+    protected static $instance;
+    protected $freeSpace;
+    protected $totalSpace;
+
+    public static function instance() {
+        if (self::$instance == null) {
+            self::$instance = new CServer_Storage();
+        }
+        return self::$instance;
     }
 
-    public static function getTotalSpace() {
-        return disk_total_space("/");
+    public function getFreeSpace() {
+        if ($this->freeSpace == null) {
+            $this->freeSpace = disk_free_space(".");
+        }
+        return $this->freeSpace;
+    }
+
+    public function getTotalSpace() {
+        if ($this->totalSpace == null) {
+            $this->totalSpace = disk_total_space("/");
+        }
+        return $this->totalSpace;
     }
 
 }

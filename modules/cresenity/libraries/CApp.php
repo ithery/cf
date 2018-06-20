@@ -70,8 +70,18 @@ class CApp extends CObservable {
      * @param string $domain
      * @return CApp_Remote
      */
-    public static function remote($domain = null) {
-        return CApp_Remote::instance($domain);
+    public static function remote($domain = null, $options = array()) {
+        return CApp_Remote::instance($domain, $options);
+    }
+
+    /**
+     * 
+     * @param string $modelName
+     * @return CApp_Model
+     */
+    public static function model($modelName) {
+        $modelClass = 'CApp_Model_' . $modelName;
+        return new $modelClass();
     }
 
     /**
@@ -85,6 +95,14 @@ class CApp extends CObservable {
 
     public static function isAjax() {
         return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+    }
+
+    /**
+     * 
+     * @return CApp_Temp
+     */
+    public static function temp() {
+        return new CApp_Temp();
     }
 
     /**

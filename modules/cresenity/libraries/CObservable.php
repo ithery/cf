@@ -6,7 +6,6 @@ abstract class CObservable extends CRenderable {
 
     protected $listeners;
     protected $manager;
-    protected $wrapper;
 
     public function getListeners() {
         return $this->listeners;
@@ -26,7 +25,6 @@ abstract class CObservable extends CRenderable {
     protected function __construct($id = "") {
 
         parent::__construct($id);
-        $this->wrapper = $this;
         $this->listeners = array();
         $this->manager = CManager::instance();
 
@@ -76,6 +74,8 @@ abstract class CObservable extends CRenderable {
     public function detachListener($event) {
         $this->listeners->remove($event);
     }
+
+   
 
     /**
      * 
@@ -130,10 +130,6 @@ abstract class CObservable extends CRenderable {
         $element = CElement_Factory::createElement('a', $id);
         $this->wrapper->add($element);
         return $element;
-    }
-
-    public function add_a($id = "") {
-        return $this->addA($id);
     }
 
     /**
@@ -329,6 +325,12 @@ abstract class CObservable extends CRenderable {
     }
 
     public function addSpan($id = "") {
+        $span = CElement_Factory::createElement('span', $id);
+        $this->add($span);
+        return $span;
+    }
+
+    public function add_span($id = "") {
         $span = CSpan::factory($id);
         $this->add($span);
         return $span;
@@ -428,6 +430,12 @@ abstract class CObservable extends CRenderable {
         $act = CElement_Factory::createComponent('Action', $id);
         $this->add($act);
         return $act;
+    }
+
+    public function addIcon($id = "") {
+        $icon = CElement_Factory::createComponent('Icon', $id);
+        $this->add($icon);
+        return $icon;
     }
 
     public function addPieChart($id = "") {
