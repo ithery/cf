@@ -31,7 +31,7 @@ class CElement_Component_Widget extends CElement_Component {
         parent::__construct($id);
         $this->header = CElement_Factory::createComponent('Widget_Header');
         $this->add($this->header);
-        $this->content = $this->add_div()->addClass('widget-content');
+        $this->content = $this->add_div()->addClass('widget-content clearfix');
         $this->addClass('widget-box');
         $this->wrapper = $this->content;
 

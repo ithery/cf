@@ -92,7 +92,7 @@ final class CManager {
         if (!empty($data)) {
             CClientModules::instance()->defineModule($module, $data);
         }
-        return CClientModules::instance()->register_module($module);
+        return CClientModules::instance()->registerModule($module);
     }
 
     public static function isRegisteredModule($module) {
@@ -153,8 +153,8 @@ final class CManager {
      * @throws CException 
      */
     public function registerElement($type, $class, $code_path = '') {
-        self::$elements[$type] = $class;
-        self::$elements_code[$type] = $code_path;
+        $this->elements[$type] = $class;
+        $this->elements_code[$type] = $code_path;
         if (strlen($code_path) > 0) {
             if (file_exists($code_path)) {
                 include $code_path;
