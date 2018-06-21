@@ -155,4 +155,28 @@ class CResources {
         return CResources_Decode::decode($str);
     }
 
+
+    /**
+     * 
+     * @param type $org_code
+     * @param type $app_code
+     */
+    public static function get_directory($org_code, $app_code) {
+        $root_directory = DOCROOT . 'application' . DS . $app_code . DS . 'default' . DS . 'resources' . DS . $org_code;
+        $dir = $root_directory;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        $data = array();
+        $files = scandir($dir);
+        $content = array_values(array_diff($files, array('.', '..')));
+        if (count($content) > 0) {
+            foreach ($content as $file) {
+                $data[] = $file;
+            }
+        }
+        
+        return $data;
+    }
+    
 }
