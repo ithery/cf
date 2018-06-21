@@ -85,7 +85,7 @@ class CModel_Query {
     /**
      * Create a new Eloquent query builder instance.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  CDatabase_Query_Builder  $query
      * @return void
      */
     public function __construct(CDatabase_Query_Builder $query) {
@@ -225,7 +225,7 @@ class CModel_Query {
      * @param  \Closure|array|string  $column
      * @param  string  $operator
      * @param  mixed  $value
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function orWhere($column, $operator = null, $value = null) {
         return $this->where($column, $operator, $value, 'or');
@@ -250,7 +250,7 @@ class CModel_Query {
      *
      * @param  string  $query
      * @param  array  $bindings
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function fromQuery($query, $bindings = []) {
         return $this->hydrate(
@@ -263,7 +263,7 @@ class CModel_Query {
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return CModel|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     * @return CModel|CModel_Collection|static[]|static|null
      */
     public function find($id, $columns = ['*']) {
         if (is_array($id) || $id instanceof Arrayable) {
@@ -293,7 +293,7 @@ class CModel_Query {
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return CModel|CModel_Collection
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
