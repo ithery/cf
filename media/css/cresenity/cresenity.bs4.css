@@ -211,9 +211,7 @@ input, textarea, select, .uneditable-input {
     margin-left: 160px;
 }
 
-.form-horizontal .form-actions {
-    padding-left: 160px;
-}
+
 
 .form-actions {
     padding: 17px 20px 18px;

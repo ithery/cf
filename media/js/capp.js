@@ -561,27 +561,28 @@ if (window.capp.have_clock) {
                 url: url,
                 dataType: 'json',
                 data: data_addition,
-            }).done(function (data) {
+                success: function (data) {
+                    $.cresenity._handle_response(data, function () {
+                        jQuery('#' + id_target).html(data.html);
+                        if (data.js && data.js.length > 0) {
+                            var script = $.cresenity.base64.decode(data.js);
+                            eval(script);
+                        }
 
-                $.cresenity._handle_response(data, function () {
-                    jQuery('#' + id_target).html(data.html);
-                    if (data.js && data.js.length > 0) {
-                        var script = $.cresenity.base64.decode(data.js);
-                        eval(script);
+                        jQuery('#' + id_target).removeClass('loading');
+                        jQuery('#' + id_target).data('xhr', false);
+                        if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
+                            window.prettyPrint && prettyPrint();
+                        }
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError != 'abort') {
+                        $.cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
                     }
 
-                    jQuery('#' + id_target).removeClass('loading');
-                    jQuery('#' + id_target).data('xhr', false);
-                    if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
-                        window.prettyPrint && prettyPrint();
-                    }
-                });
-            }).error(function (obj, t, msg) {
-                if (msg != 'abort') {
-                    $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                 }
-            })
-                    );
+            }));
         },
         append: function (id_target, url, method, data_addition) {
 

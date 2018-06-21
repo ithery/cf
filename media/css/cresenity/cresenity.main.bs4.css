@@ -5,6 +5,7 @@
 
 
 .navbar .brand {
+    color:unset!important;
     float: none;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -930,16 +931,20 @@ body.mini-navbar #page-wrapper {
 
 }
 
+@media (max-width:1200px) {
+
+}
+
+@media (max-width:968px) {
+    .form-horizontal .form-actions {
+        padding-left: 0px;
+    }
+}
+
 @media (max-width: 768px) {
     .navbar-header {
         display: inline;
         float: left;
-    }
-    .navbar-static-side {
-        display: none;
-        z-index: 2001;
-        position: absolute;
-        width: 70px;
     }
 
     .dropdown-submenu:hover>a:after {
