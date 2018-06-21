@@ -8,11 +8,11 @@ final class CFData {
         $dir = DOCROOT . 'data' . DIRECTORY_SEPARATOR . '';
         return $dir;
     }
-    
+
     public static function domain($domain) {
-        return CFData::get($domain,'domain');
+        return CFData::get($domain, 'domain');
     }
-    
+
     public static function get($data_name, $folder = "") {
         $file = self::path();
         if (strlen($folder) > 0) {
@@ -54,8 +54,8 @@ final class CFData {
         return true;
     }
 
-    public static function delete($data_name, $folder = "") {
-        $file = cdata::path();
+    public static function delete($dataName, $folder = "") {
+        $file = self::path();
         if (strlen($folder) > 0) {
             $folder = explode('/', $folder);
             foreach ($folder as $row) {
@@ -64,11 +64,11 @@ final class CFData {
                 }
                 $file .= $row . DIRECTORY_SEPARATOR;
                 if (!is_dir($file)) {
-                    mkdir($file);
+                    throw new CException('Error, :path is not directory', array(':path' => $file));
                 }
             }
         }
-        $file .= $data_name . EXT;
+        $file .= $dataName . EXT;
         if (file_exists($file)) {
             unlink($file);
         }

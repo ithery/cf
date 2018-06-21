@@ -23,7 +23,7 @@ class CObserver {
         return $this->obj_list;
     }
 
-    public function new_id() {
+    public function newId() {
         $uniqid = uniqid(time(), true);
         $uniqid = str_replace(".", "", $uniqid);
         return $uniqid;

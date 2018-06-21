@@ -12,20 +12,20 @@ abstract class CElement_Element extends CElement {
     protected $before;
     protected $after;
     protected $is_builded = false;
-    protected $is_onetag = false;
+    protected $isOneTag = false;
     protected $is_show = true;
     private $is_build = false;
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id);
 
-        $this->theme = ctheme::get_current_theme();
+        $this->theme = CManager::theme()->getCurrentTheme();
 
         $this->before = null;
         $this->after = null;
 
         $this->is_builded = false;
-        $this->is_onetag = false;
+        $this->isOneTag = false;
 
 
 
@@ -68,7 +68,7 @@ abstract class CElement_Element extends CElement {
 
     public static function is_instanceof($val) {
         if (is_object($val)) {
-            return ($val instanceof CElement);
+            return ($val instanceof CElement_Element);
         }
         return false;
     }
@@ -129,14 +129,14 @@ abstract class CElement_Element extends CElement {
         $html->set_indent($indent);
         $this->build_once();
         $html->appendln($this->before_html($indent));
-        if ($this->is_onetag) {
+        if ($this->isOneTag) {
             $html->appendln($this->onetag());
         } else {
             if ($this->is_show) {
                 $html->appendln($this->pretag())->br();
                 $html->inc_indent();
             }
-            
+
             $html->appendln($this->html_child($html->get_indent()))->br();
 
             if ($this->is_show) {

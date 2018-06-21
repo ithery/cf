@@ -27,4 +27,16 @@ trait CTrait_Compat_Element_Widget {
         return $this->setIcon($icon);
     }
 
+    public function set_nopadding($bool) {
+        return $this->setNoPadding($bool);
+    }
+
+    public function add_header_action($id = "") {
+        return $this->addHeaderAction($id);
+    }
+
+    public function set_header_action_style($style) {
+        return $this->setHeaderActionStyle($style);
+    }
+
 }

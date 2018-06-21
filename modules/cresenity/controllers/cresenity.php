@@ -8,6 +8,30 @@ class Cresenity_Controller extends CController {
         curl::redirect('');
     }
 
+    public function ajax($method) {
+        $file = CApp::temp()->makePath("ajax", $method . ".tmp");
+        if (isset($_GET['profiler'])) {
+            new Profiler();
+        }
+        if (!file_exists($file)) {
+            throw new CException('failed to get temporary file :filename', array(':filename' => $file));
+        }
+        $json = file_get_contents($file);
+        $ajaxMethod = CAjax::createMethod($json);
+        $response = $ajaxMethod->executeEngine();
+
+        echo $response;
+    }
+    
+    public function api($method, $submethod = null) {
+
+        $data = CApp::api()->exec($method, $submethod);
+        if (!isset($_GET['noheader'])) {
+            header('content-type:application/json');
+        }
+        echo json_encode($data);
+    }
+
     public function user_agent() {
         echo CF::user_agent();
     }
@@ -28,7 +52,7 @@ class Cresenity_Controller extends CController {
     public function convertinnodb() {
         cdbutils::convert_table_engine();
     }
-    
+
     public function convertutf8() {
         cdbutils::convert_table_charset();
     }
@@ -353,10 +377,10 @@ class Cresenity_Controller extends CController {
                         $org_id = CF::org_id();
 
                         if ($org_id != null) {
-                            $q.=" and (org_id=" . $db->escape($org_id) . ' or org_id is null)';
+                            $q .= " and (org_id=" . $db->escape($org_id) . ' or org_id is null)';
                         }
 
-                        $q.=" order by org_id desc";
+                        $q .= " order by org_id desc";
                         $row = $db->query($q);
                         if ($row->count() > 0) {
                             //check activation
@@ -389,7 +413,6 @@ class Cresenity_Controller extends CController {
                         } else {
                             $error_message = "Email/Password Invalid";
                         }
-                        
                     }
                 } catch (Exception $ex) {
                     $error++;

@@ -9,14 +9,36 @@ class CClientScript extends CObject {
     protected $scripts;
     protected static $_instance;
 
+    /**
+     * POS CONST
+     */
+    const POS_HEAD = 'head';
+    const POS_BEGIN = 'begin';
+    const POS_END = 'end';
+    const POS_READY = 'ready';
+    const POS_LOAD = 'load';
+
+    /**
+     * TYPE CONST
+     */
+    const TYPE_JS_FILE = 'js_file';
+    const TYPE_JS = 'js';
+    const TYPE_CSS_FILE = 'css_file';
+    const TYPE_CSS = 'css';
+    const TYPE_META = 'meta';
+    const TYPE_LINK = 'link';
+
     public function __construct() {
         $this->reset();
     }
 
-    //position
-    //head, begin, end, load, ready
-    //type
-    //js_file,css_file, js, css, meta, link
+    public static function allAvailablePos() {
+        return array(self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY);
+    }
+
+    public static function allAvailableType() {
+        return array(self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK);
+    }
 
     /**
      * 
@@ -30,8 +52,8 @@ class CClientScript extends CObject {
     }
 
     public function reset() {
-        $ALLPOS = array("head", "begin", "end", "load", "ready");
-        $ALLTYPE = array("js_file", "css_file", "js", "css", "meta", "link");
+        $ALLPOS = self::allAvailablePos();
+        $ALLTYPE = self::allAvailableType();
         $this->scripts = array();
         foreach ($ALLPOS as $pos) {
             $this->scripts[$pos] = array();
@@ -122,19 +144,48 @@ class CClientScript extends CObject {
         return $file;
     }
 
-    public function register_js_files($files, $pos = "end") {
-        if (!is_array($files))
+    public function registerJsFiles($files, $pos = "end") {
+        if (!is_array($files)) {
             $files = array($files);
+        }
         foreach ($files as $file) {
-            $this->register_js_file($file, $pos);
+            $this->registerJsFile($file, $pos);
         }
     }
 
-    public function register_css_files($files, $pos = "head") {
-        if (!is_array($files))
+    public function registerCssFiles($files, $pos = "head") {
+        if (!is_array($files)) {
             $files = array($files);
+        }
         foreach ($files as $file) {
-            $this->register_css_file($file, $pos);
+            $this->registerCssFile($file, $pos);
+        }
+    }
+
+    public function unregisterJsFiles($files, $pos = null) {
+        if (!is_array($files)) {
+            $files = array($files);
+        }
+        foreach ($files as $file) {
+            $this->unregisterJsFile($file, $pos);
+        }
+    }
+
+    public function unregisterJsFile($file, $pos = null) {
+        //we will locate all pos for this pos if pos =null;
+        if ($pos == null) {
+            $pos = self::allAvailablePos();
+        }
+        if (!is_array($pos)) {
+            $pos = array($pos);
+        }
+        foreach ($pos as $p) {
+            $jsFiles = &$this->scripts[$p]['js_file'];
+            foreach ($jsFiles as $k => $jsFile) {
+                if ($jsFile == $file) {
+                    unset($jsFiles[$k]);
+                }
+            }
         }
     }
 
@@ -162,6 +213,34 @@ class CClientScript extends CObject {
         return $this;
     }
 
+    
+    public function unregisterCssFiles($files, $pos = null) {
+        if (!is_array($files)) {
+            $files = array($files);
+        }
+        foreach ($files as $file) {
+            $this->unregisterCssFile($file, $pos);
+        }
+    }
+
+    public function unregisterCssFile($file, $pos = null) {
+        //we will locate all pos for this pos if pos =null;
+        if ($pos == null) {
+            $pos = self::allAvailablePos();
+        }
+        if (!is_array($pos)) {
+            $pos = array($pos);
+        }
+        foreach ($pos as $p) {
+            $cssFiles = &$this->scripts[$p]['css_file'];
+            foreach ($cssFiles as $k => $cssFile) {
+                if ($cssFile == $file) {
+                    unset($cssFiles[$k]);
+                }
+            }
+        }
+    }
+    
     public function registerCssFile($file, $pos = "head") {
         $dir_file = $file;
         $css_version = '';

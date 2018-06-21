@@ -710,7 +710,7 @@ $fontList = array(
 <div class="row-fluid">
     <?php foreach ($fontList as $fontClass => $fontContent) : ?>
         <div class="span4">
-            <i class="icon-fixed-width">&#x<?php echo $fontContent; ?></i>
+            <i class="icon-fixed-width fa <?php echo $fontClass; ?>"></i>
             <?php echo $fontClass; ?>
             <span class="muted">(&amp;#x<?php echo $fontContent; ?>;)</span>
         </div>

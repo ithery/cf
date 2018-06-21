@@ -113,5 +113,6 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->customControlValue[$inputName][$controlName] = $inputValue;
         return $this;
     }
-
+    
+    
 }

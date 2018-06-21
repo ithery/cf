@@ -12,6 +12,7 @@ class CManager_Theme {
      * @var callable
      */
     protected static $themeCallback;
+    protected static $themeData = array();
 
     public static function setThemeCallback(callable $themeCallback) {
         self::$themeCallback = $themeCallback;
@@ -43,14 +44,28 @@ class CManager_Theme {
         CSession::instance()->set('theme', $theme);
     }
 
-    public static function getThemeData() {
-        $theme = self::getCurrentTheme();
-        $themeFile = CF::get_file('themes', $theme);
-        $themeAllData = null;
-        if (file_exists($themeFile)) {
-            $themeAllData = include $themeFile;
+    public static function getThemeData($theme = null) {
+        if ($theme == null) {
+            $theme = self::getCurrentTheme();
         }
-        return $themeAllData;
+        if (!isset(self::$themeData[$theme])) {
+            $themeFile = CF::get_file('themes', $theme);
+            $themeAllData = null;
+            if (file_exists($themeFile)) {
+                $themeAllData = include $themeFile;
+            }
+            self::$themeData[$theme] = $themeAllData;
+        }
+        return self::$themeData[$theme];
+    }
+
+    public static function setThemeData($themeData, $theme = null) {
+        if ($theme == null) {
+            $theme = self::getCurrentTheme();
+        }
+        self::$themeData[$theme] = $themeData;
+
+        return self::$themeData[$theme];
     }
 
     public static function getData($key) {

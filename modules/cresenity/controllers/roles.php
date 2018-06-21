@@ -10,7 +10,7 @@ class Roles_Controller extends CController {
         $tree = CTreeDB::factory('roles');
         $role = $app->role();
         if (cnav::have_permission('add_roles') || cnav::have_permission('order_roles')) {
-            $actions = $app->add_div()->add_class("row-fluid")->add_action_list();
+            $actions = $app->add_action_list();
             if (cnav::have_permission('add_roles')) {
                 $actadd = $actions->add_action();
                 $actadd->set_label(" " . clang::__("Add") . " " . clang::__("Roles"))->set_icon("plus")->set_link(curl::base() . "roles/add/");

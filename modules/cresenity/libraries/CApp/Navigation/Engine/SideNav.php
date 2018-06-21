@@ -72,7 +72,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                 $find_nav = Helper::nav($d);
 
                 if ($find_nav !== false) {
-                    $active_class = " active";
+                    $active_class = " active open";
                 }
 
                 $li_class = "sidenav-item ";

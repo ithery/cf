@@ -186,12 +186,19 @@ class cmailapi {
 
         $params = array(
             'to' => $to,
-            'cc' => $cc,
-            'bcc' => $bcc,
             'from' => $smtp_from,
             'subject' => $subject . '',
             'html' => $message,
         );
+        
+        
+        if(count($cc)>0) {
+            $params['cc']=$cc;
+        }
+        if(count($bcc)>0) {
+            $params['bcc']=$bcc;
+        }
+        
 
         if (isset($_GET['debug2'])) {
             cdbg::var_dump($url);
@@ -218,7 +225,7 @@ class cmailapi {
         curl_close($session);
 
         $response_array = json_decode($response, true);
-        if (carr::get($response_array, 'message') != 'success') {
+        if (strlen(carr::get($response_array, 'id')) == 0) {
             throw new Exception('Fail to send mail, API Response:' . $response);
         }
         return $response_array;

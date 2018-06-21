@@ -2,7 +2,9 @@
 
 class CResources {
 
-    public static function get_file_info($filename) {
+    use CTrait_Compat_Resources;
+
+    public static function getFileInfo($filename) {
         $orgCode = '';
         $resource_type = '';
         $type = '';
@@ -34,7 +36,7 @@ class CResources {
         );
     }
 
-    public static function get_path($filename, $size = null) {
+    public static function getPath($filename, $size = null) {
         $temp = '';
         $arr_name = explode("_", $filename);
         //org_code
@@ -125,14 +127,30 @@ class CResources {
         return $object;
     }
 
+    /**
+     * 
+     * @param string $name
+     * @param array $options
+     * @return \CResources_Loader_Image
+     */
     public static function image($name, $options = array()) {
         return new CResources_Loader_Image($name, $options);
     }
 
+    /**
+     * 
+     * @param string $str
+     * @return string
+     */
     public static function encode($str) {
         return CResources_Encode::encode($str);
     }
 
+    /**
+     * 
+     * @param string $str
+     * @return string
+     */
     public static function decode($str) {
         return CResources_Decode::decode($str);
     }

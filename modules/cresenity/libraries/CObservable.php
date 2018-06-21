@@ -6,7 +6,6 @@ abstract class CObservable extends CRenderable {
 
     protected $listeners;
     protected $manager;
-    protected $wrapper;
 
     public function getListeners() {
         return $this->listeners;
@@ -26,11 +25,12 @@ abstract class CObservable extends CRenderable {
     protected function __construct($id = "") {
 
         parent::__construct($id);
-        $this->wrapper = $this;
         $this->listeners = array();
         $this->manager = CManager::instance();
 
         $this->manager->registerControl('text', 'CElement_FormInput_Text');
+        $this->manager->registerControl('number', 'CElement_FormInput_Number');
+        $this->manager->registerControl('email', 'CElement_FormInput_Email');
         $this->manager->registerControl('datepicker', 'CFormInputDate');
         $this->manager->registerControl('date', 'CFormInputDate');
         $this->manager->registerControl('currency', 'CFormInputCurrency');
@@ -75,6 +75,8 @@ abstract class CObservable extends CRenderable {
         $this->listeners->remove($event);
     }
 
+   
+
     /**
      * 
      * @param type $id
@@ -84,7 +86,7 @@ abstract class CObservable extends CRenderable {
     public function addControl($id, $type) {
         $control = null;
         if ($this->manager->isRegisteredControl($type)) {
-            $control = $this->manager->create_control($id, $type);
+            $control = $this->manager->createControl($id, $type);
         } else {
             trigger_error('Unknown control type ' . $type);
         }
@@ -128,10 +130,6 @@ abstract class CObservable extends CRenderable {
         $element = CElement_Factory::createElement('a', $id);
         $this->wrapper->add($element);
         return $element;
-    }
-
-    public function add_a($id = "") {
-        return $this->addA($id);
     }
 
     /**
@@ -327,6 +325,12 @@ abstract class CObservable extends CRenderable {
     }
 
     public function addSpan($id = "") {
+        $span = CElement_Factory::createElement('span', $id);
+        $this->add($span);
+        return $span;
+    }
+
+    public function add_span($id = "") {
         $span = CSpan::factory($id);
         $this->add($span);
         return $span;
@@ -388,10 +392,10 @@ abstract class CObservable extends CRenderable {
 
     public function addElement($type, $id = "") {
         $element = null;
-        if ($this->manager->is_registered_element($type)) {
-            $element = $this->manager->create_element($id, $type);
+        if ($this->manager->isRegisteredElement($type)) {
+            $element = $this->manager->createElement($id, $type);
         } else {
-            trigger_error('Unknown element type ' . $type);
+            throw new CException('Unknow element type :element_type', array(':element_type' => $type));
         }
 
 
@@ -416,10 +420,22 @@ abstract class CObservable extends CRenderable {
         return $actlist;
     }
 
+    /**
+     * Add Action Element
+     * 
+     * @param string $id optional
+     * @return CElement_Component_Action
+     */
     public function addAction($id = "") {
-        $act = CAction::factory($id);
+        $act = CElement_Factory::createComponent('Action', $id);
         $this->add($act);
         return $act;
+    }
+
+    public function addIcon($id = "") {
+        $icon = CElement_Factory::createComponent('Icon', $id);
+        $this->add($icon);
+        return $icon;
     }
 
     public function addPieChart($id = "") {

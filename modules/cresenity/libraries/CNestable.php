@@ -161,7 +161,7 @@ class CNestable extends CElement_Element {
                     if ($this->action_style == "btn-dropdown") {
                         $this->row_action_list->add_class("pull-right");
                     }
-                    $this->row_action_list->regenerate_id(true);
+                    $this->row_action_list->regenerateId(true);
                     $this->row_action_list->apply("jsparam", $jsparam);
                     $this->row_action_list->apply("set_handler_url_param", $jsparam);
 

@@ -97,8 +97,8 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function set_link_target($link_target) {
-        $this->link_target = $link_target;
+    public function setLinkTarget($linkTarget) {
+        $this->link_target = $linkTarget;
         return $this;
     }
 
@@ -134,7 +134,7 @@ class CElement_Component_Action extends CElement_Component {
         return $render_as_input;
     }
 
-    public function reassign_confirm() {
+    public function reassignConfirm() {
         if ($this->confirm) {
             //we check the listener
             if (count($this->listeners) > 0) {
@@ -166,9 +166,9 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function html($indent = 0) {
-        $this->reassign_confirm();
+        $this->reassignConfirm();
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $jsparam = $this->jsparam;
         $link = $this->link;
         $param = "";
@@ -262,12 +262,10 @@ class CElement_Component_Action extends CElement_Component {
             } else {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             }
+
             if (strlen($this->icon) > 0) {
-                if ($this->bootstrap == '3.3') {
-                    $html->append('<i class="fa fa-' . $this->icon . '"></i> ');
-                } else {
-                    $html->append('<i class="icon icon-' . $this->icon . '"></i> ');
-                }
+
+                $html->append('<i class="icon icon-' . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
             }
             if ($this->style != "btn-icon-group") {
                 $html->append($this->label);
@@ -283,8 +281,8 @@ class CElement_Component_Action extends CElement_Component {
     public function js($indent = 0) {
         $this->reassign_confirm();
         $js = new CStringBuilder();
-        $js->set_indent($indent);
-        
+        $js->setIndent($indent);
+
         if ($this->disabled) {
             $js->appendln("jQuery('#" . $this->id . "').click(function(e) { e.preventDefault(); });");
         } else {
@@ -315,7 +313,7 @@ class CElement_Component_Action extends CElement_Component {
         }
 
 
-        $js->appendln(parent::js($js->get_indent()))->br();
+        $js->appendln(parent::jsChild($js->getIndent()))->br();
 
         return $js->text();
     }

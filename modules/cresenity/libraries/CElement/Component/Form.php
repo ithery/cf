@@ -222,7 +222,7 @@ class CElement_Component_Form extends CElement_Component {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
 
         $classes = $this->classes;
         $classes = implode(" ", $classes);
@@ -251,7 +251,7 @@ class CElement_Component_Form extends CElement_Component {
                 $form_style_layout = 'form-' . $this->layout;
             }
             $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->inc_indent()
+                    ->incIndent()
                     ->br();
 //                $html->appendln("<div class='box-body'>");
         } else {
@@ -260,19 +260,19 @@ class CElement_Component_Form extends CElement_Component {
                 $form_style_layout = 'form-' . $this->layout;
             }
             $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->inc_indent()
+                    ->incIndent()
                     ->br();
         }
 
         if ($this->ajax_process_progress) {
             $html->appendln('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
         }
-        $html->appendln($this->html_child($html->get_indent()));
+        $html->appendln($this->html_child($html->getIndent()));
         if ($this->bootstrap == '3.3') {
 //                $html->appendln("</div>");
         }
 
-        $html->dec_indent()
+        $html->decIndent()
                 ->appendln('</form>');
         return $html->text();
     }
@@ -281,7 +281,7 @@ class CElement_Component_Form extends CElement_Component {
         if ($this->disable_js)
             return parent::js($indent);
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         if ($this->ajax_submit) {
             $ajax_url = "";
             $ajax_process_script = "";
@@ -709,7 +709,7 @@ class CElement_Component_Form extends CElement_Component {
                         $js->appendln("jQuery('#" . $t->element_id . "')." . $t->event . "(function(event) {")->br();
                     }
                     //submit method
-                    $js->inc_indent()->appendln("jQuery('#" . $this->form_id . "').submit();")->br()->dec_indent();
+                    $js->incIndent()->appendln("jQuery('#" . $this->form_id . "').submit();")->br()->decIndent();
 
                     //closing
                     $js->appendln("});")->br();
@@ -721,7 +721,7 @@ class CElement_Component_Form extends CElement_Component {
 				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
 			");
         }
-        $js->appendln($this->js_child($js->get_indent()))->br();
+        $js->appendln($this->js_child($js->getIndent()))->br();
 
         return $js->text();
     }

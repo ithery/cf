@@ -23,7 +23,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
 
         $this->type = "checkbox";
         $this->tag = "input";
-        $this->is_onetag = true;
+        $this->isOneTag = true;
         $this->checked = false;
     }
 
@@ -52,7 +52,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         $this->build_once();
         $html->appendln($this->before_html($indent));
 
-        if ($this->is_onetag) {
+        if ($this->isOneTag) {
             $html->appendln($this->onetag());
             $html->appendln($this->value);
         } else {

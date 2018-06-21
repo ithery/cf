@@ -19,6 +19,72 @@
 }
 
 
+.material-style .layout-sidenav .brand {
+    height: 70px;
+}
+
+.align-right, .table td.align-right {
+    text-align:right;
+}
+.align-center, .table td.align-center {
+    text-align:center;
+}
+.align-left, .table td.align-left {
+    text-align:left;
+}
+
+
+.layout-sidenav .brand {
+    padding: 0 1.75rem;
+}
+
+a.brand, div.brand {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-flex: 0;
+    -ms-flex-positive: 0;
+    flex-grow: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.brand-name {
+    display: block;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+.brand-logo {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    overflow: hidden;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-flex: 0;
+    -ms-flex-positive: 0;
+    flex-grow: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.brand-logo img {
+    width: 30px;
+    height: 30px;
+}
+
 .block {
     display: block;
 }
@@ -89,21 +155,17 @@ input[disabled=disabled],select[disabled=disabled],textarea[disabled=disabled],i
     margin-top: 7px;
     padding: 0;
 }
-.dropdown-menu {
-    border: medium none;
-    border-radius: 3px;
-    box-shadow: 0 0 3px rgba(86, 96, 117, 0.7);
-    display: none;
-    float: left;
-    font-size: 12px;
-    left: 0;
-    list-style: none outside none;
-    padding: 0;
-    position: absolute;
-    text-shadow: none;
-    top: 100%;
-    z-index: 1000;
+
+.btn.dropdown-toggle,.btn.dropdown-toggle:hover {
+    background: #4a4e51;
+    color:#fff;
 }
+
+.dropdown-menu {
+    padding: 0;
+}
+
+
 .dropdown-menu > li > a {
     border-radius: 3px;
     color: inherit;
@@ -388,15 +450,15 @@ table.responsive {
 .widget-box .widget-title h5 {
     display: inline-block;
     font-size: 14px;
-    margin: 0 0 7px;
+    margin: 0;
     padding: 0;
     text-overflow: ellipsis;
-    float: left;
+
     line-height: inherit;
 }
 .widget-box .widget-title .buttons {
     float: right;
-    margin: -9px 10px 0 0;
+    margin: -7px 0px 0 0;
 }
 
 .widget-box .widget-content {
@@ -612,7 +674,9 @@ div.dataTables_wrapper .ui-widget-header {
 }
 /* file upload*/
 
-
+.fileupload {
+    position:relative;
+}
 .fileupload .uneditable-input {
     width:150px;
     border-radius: 0;
@@ -631,6 +695,34 @@ div.dataTables_wrapper .ui-widget-header {
 
     padding: 6px 8px;
     border: 1px solid #e5e6e7;
+}
+
+
+.btn-file > input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    font-size: 23px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    direction: ltr;
+}
+
+.fileupload-exists .fileupload-new, .fileupload-new .fileupload-exists {
+    display: none;
+}
+.fileupload .thumbnail {
+    display: inline-block;
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-align: center;
+    vertical-align: middle;
 }
 .fileupload .fileupload-exists:not(.btn),.fileupload .fileupload-new:not(.btn) {
 
