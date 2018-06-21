@@ -2,7 +2,9 @@
 
 class CResources {
 
-    public static function get_file_info($filename) {
+    use CTrait_Compat_Resources;
+
+    public static function getFileInfo($filename) {
         $orgCode = '';
         $resource_type = '';
         $type = '';
@@ -34,7 +36,7 @@ class CResources {
         );
     }
 
-    public static function get_path($filename, $size = null) {
+    public static function getPath($filename, $size = null) {
         $temp = '';
         $arr_name = explode("_", $filename);
         //org_code
@@ -125,16 +127,56 @@ class CResources {
         return $object;
     }
 
+    /**
+     * 
+     * @param string $name
+     * @param array $options
+     * @return \CResources_Loader_Image
+     */
     public static function image($name, $options = array()) {
         return new CResources_Loader_Image($name, $options);
     }
 
+    /**
+     * 
+     * @param string $str
+     * @return string
+     */
     public static function encode($str) {
         return CResources_Encode::encode($str);
     }
 
+    /**
+     * 
+     * @param string $str
+     * @return string
+     */
     public static function decode($str) {
         return CResources_Decode::decode($str);
     }
 
+
+    /**
+     * 
+     * @param type $org_code
+     * @param type $app_code
+     */
+    public static function get_directory($org_code, $app_code) {
+        $root_directory = DOCROOT . 'application' . DS . $app_code . DS . 'default' . DS . 'resources' . DS . $org_code;
+        $dir = $root_directory;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        $data = array();
+        $files = scandir($dir);
+        $content = array_values(array_diff($files, array('.', '..')));
+        if (count($content) > 0) {
+            foreach ($content as $file) {
+                $data[] = $file;
+            }
+        }
+        
+        return $data;
+    }
+    
 }
