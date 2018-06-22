@@ -76,7 +76,7 @@ class CClientScript_Compiler_Css_Scss {
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, "C");
 
-        $this->parser = new scss_parser($name);
+        $this->parser = new CClientScript_Compiler_Css_Scss_Parser($name);
 
         $tree = $this->parser->parse($code);
 
@@ -2676,4 +2676,5 @@ class CClientScript_Compiler_Css_Scss {
         'yellowgreen' => '154,205,50'
     );
 
+    
 }
