@@ -21,7 +21,11 @@ trait CApp_Model_Trait_Roles {
      * @return CModel_Relation_BelongsTo
      */
     public function org() {
-        return $this->belongsTo('CMModel_Org');
+        return $this->belongsTo('CApp_Model_Org');
+    }
+
+    public function rolePermission() {
+        return $this->hasMany('CApp_Model_RolePermission', 'role_id', 'role_id');
     }
 
 }

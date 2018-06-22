@@ -21,7 +21,7 @@ trait CApp_Model_Trait_Users {
      * @return CModel_Relation_BelongsTo
      */
     public function org() {
-        return $this->belongsTo('CMModel_Org');
+        return $this->belongsTo('CApp_Model_Org');
     }
 
 }
