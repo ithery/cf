@@ -935,7 +935,7 @@ class CApp extends CObservable {
             $js = CJSMin::minify($js);
         }
         $data["js"] = cbase64::encode($js);
-        $data["css_require"] = CClientScript::instance()->url_css_file();
+        $data["css_require"] = CClientScript::instance()->urlCssFile();
         $data["message"] = $messageOrig;
         $data["ajaxData"] = $this->ajaxData;
         return cjson::encode($data);

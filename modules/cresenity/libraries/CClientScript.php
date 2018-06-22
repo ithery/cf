@@ -112,10 +112,6 @@ class CClientScript extends CObject {
             $base_url = curl::base(false, 'http');
         }
 
-//        if(CF::domain()=='livemall.co.id') {
-//            $base_url = 'http://livemall-70ae.kxcdn.com/';
-//        }
-
         $file = str_replace($docroot, $base_url, $file);
 
         return $file;
@@ -145,18 +141,15 @@ class CClientScript extends CObject {
     }
 
     public function registerJsFiles($files, $pos = "end") {
-        if (!is_array($files)) {
-            $files = array($files);
-        }
+        $files = $files !== null ? (is_array($files) ? $files : array($files)) : array();
         foreach ($files as $file) {
             $this->registerJsFile($file, $pos);
         }
+        return $this;
     }
 
     public function registerCssFiles($files, $pos = "head") {
-        if (!is_array($files)) {
-            $files = array($files);
-        }
+        $files = $files !== null ? (is_array($files) ? $files : array($files)) : array();
         foreach ($files as $file) {
             $this->registerCssFile($file, $pos);
         }
@@ -393,8 +386,9 @@ class CClientScript extends CObject {
         $script = "";
         $app = CApp::instance();
         $man = CManager::instance();
-        if (!is_array($type))
+        if (!is_array($type)) {
             $type = array($type);
+        }
         foreach ($this->scripts[$pos] as $k => $v) {
             if (in_array($k, $type)) {
                 foreach ($v as $s) {

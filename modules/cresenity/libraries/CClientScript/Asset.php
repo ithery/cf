@@ -12,16 +12,13 @@ class CClientScript_Asset {
     protected $filePath;
     protected $minify = false;
     protected $type;
-    
-    
+
     public function __construct($filePath) {
         //define this is css/js by extension
     }
-    
-    
+
     public function getUrl() {
         
     }
-    
-    
+
 }
