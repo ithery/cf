@@ -9,24 +9,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 final class CHelper {
 
-    private static $helper;
-    private static $instance;
-
-    private static function instance() {
-        if (self::$instance == null) {
-            self::$instance = new CHelper();
-        }
-        return self::$instance;
-    }
-
     /**
      * 
      * @return \CHelper_File
      */
     public static function file() {
-
-        self::$helper = 'File';
-        return self::instance();
+        return new CHelper_File();
     }
 
     /**
@@ -34,8 +22,7 @@ final class CHelper {
      * @return \CHelper_Formatter
      */
     public static function formatter() {
-        self::$helper = 'Formatter';
-        return self::instance();
+        return new CHelper_Formatter();
     }
 
     /**
@@ -43,13 +30,7 @@ final class CHelper {
      * @return \CHelper_Base64
      */
     public static function base64() {
-        self::$helper = 'Base64';
-        return self::instance();
-    }
-
-    public function __call($method, $args) {
-        $helperClass = 'CHelper_' . self::$helper;
-        return call_user_func_array(array($helperClass, $method), $args);
+        return new CHelper_Base64();
     }
 
 }
