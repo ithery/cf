@@ -29,10 +29,8 @@ class CApp extends CObservable {
     public static $_instance = null;
     private $run;
     protected $rendered = false;
-    private $mobile = false;
     private $header_body = '';
     private $additional_head = '';
-    private $mobile_path = '';
     private $ajaxData = array();
     private $renderMessage = true;
     private $keepMessage = false;
@@ -70,10 +68,6 @@ class CApp extends CObservable {
         return CApp_Remote::instance($domain, $options);
     }
 
-    
-    public static function helper() {
-        return CHelper::instance();
-    }
     /**
      * 
      * @param string $modelName
@@ -113,19 +107,6 @@ class CApp extends CObservable {
         return CDatabase::instance($domain, $dbName);
     }
 
-    public function set_mobile($bool) {
-        $this->mobile = $bool;
-    }
-
-    public function set_mobile_path($path) {
-        $this->mobile_path = $path;
-        return $this;
-    }
-
-    public function get_mobile_path() {
-        return $this->mobile_path;
-    }
-
     public function setAjaxData($key, $value = null) {
         if (is_array($key)) {
             $this->ajaxData = array_merge($this->ajaxData, $key);
@@ -149,7 +130,7 @@ class CApp extends CObservable {
             return;
         }
 
-        $this->register_core_modules();
+        $this->registerCoreModules();
 
 
         $db = CDatabase::instance();
@@ -160,25 +141,20 @@ class CApp extends CObservable {
             }
         }
 
-        //check for admin or app
-        $router_uri = CFRouter::routed_uri(CFRouter::$current_uri);
-        $rsegment = explode('/', $router_uri);
-
-
         //we load another configuration for this app
         //org configuration
-        if (strlen(CF::org_code()) > 0) {
-            $org_boot_file = DOCROOT . "application" . DS . $this->code() . DS . CF::org_code() . DS . CF::org_code() . EXT;
-            if (file_exists($org_boot_file)) {
-                include($org_boot_file);
+        if (strlen(CF::orgCode()) > 0) {
+            $orgBootFile = DOCROOT . "application" . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
+            if (file_exists($orgBootFile)) {
+                include($orgBootFile);
             }
         }
 
 
-        $app_boot_file = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
+        $appBootFile = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
 
-        if (file_exists($app_boot_file)) {
-            include($app_boot_file);
+        if (file_exists($appBootFile)) {
+            include($appBootFile);
         }
 
 
@@ -234,7 +210,7 @@ class CApp extends CObservable {
         parent::__construct();
 
 
-        $this->_org = corg::get(CF::org_code());
+        $this->_org = corg::get(CF::orgCode());
 
         $this->run = false;
 
@@ -242,7 +218,7 @@ class CApp extends CObservable {
         //$theme_path = ctheme::path();
     }
 
-    public function set_login_required($bool) {
+    public function setLoginRequired($bool) {
         return $this->login_required = $bool;
     }
 
@@ -320,7 +296,7 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function show_breadcrumb($bool) {
+    public function showBreadcrumb($bool) {
         $this->show_breadcrumb = $bool;
         return $this;
     }
@@ -330,7 +306,7 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function add_custom_js($js) {
+    public function addCustomJs($js) {
         $this->custom_js .= $js;
         return $this;
     }
@@ -354,31 +330,32 @@ class CApp extends CObservable {
         CManager::instance()->register_module($module);
     }
 
-    public function register_core_modules() {
+    public function registerCoreModules() {
+        $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
-        $theme_file = CF::get_file('themes', $theme);
-        if (file_exists($theme_file)) {
-            $theme_data = include $theme_file;
-            $module_arr = carr::get($theme_data, 'client_modules');
-            $css_arr = carr::get($theme_data, 'css');
-            $js_arr = carr::get($theme_data, 'js');
+        $themeFile = CF::get_file('themes', $theme);
+        if (file_exists($themeFile)) {
+            $themeData = include $themeFile;
+            $moduleArray = carr::get($themeData, 'client_modules');
+            $cssArray = carr::get($themeData, 'css');
+            $jsArray = carr::get($themeData, 'js');
             $cs = CClientScript::instance();
-            if ($module_arr != null) {
-                foreach ($module_arr as $module) {
-                    $this->register_client_module($module);
+            if ($moduleArray != null) {
+                foreach ($moduleArray as $module) {
+                    $manager->registerModule($module);
                 }
             }
             if (ccfg::get('have_clock')) {
-                $this->register_client_module('servertime');
+                $manager->registerModule('servertime');
             }
-            if ($css_arr != null) {
-                foreach ($css_arr as $css) {
-                    $cs->register_css_files($css);
+            if ($cssArray != null) {
+                foreach ($cssArray as $css) {
+                    $cs->registerCssFiles($css);
                 }
             }
-            if ($js_arr != null) {
-                foreach ($js_arr as $js) {
-                    $cs->register_js_files($js);
+            if ($jsArray != null) {
+                foreach ($jsArray as $js) {
+                    $cs->registerJsFiles($js);
                 }
             }
         }
@@ -406,10 +383,10 @@ class CApp extends CObservable {
 
         $theme = ctheme::get_current_theme();
 
-        $theme_file = CF::get_file('themes', $theme);
-        if (file_exists($theme_file)) {
-            $theme_data = include $theme_file;
-            $theme_path = carr::get($theme_data, 'theme_path');
+        $themeFile = CF::get_file('themes', $theme);
+        if (file_exists($themeFile)) {
+            $themeData = include $themeFile;
+            $theme_path = carr::get($themeData, 'theme_path');
             if ($theme_path == null) {
                 $theme_path = '';
             } else {
@@ -463,7 +440,7 @@ class CApp extends CObservable {
 
             $js .= PHP_EOL . $this->js . $additional_js;
 
-            $js = $cs->render_js_require($js);
+            $js = $cs->renderJsRequire($js);
 
             if (ccfg::get("minify_js")) {
                 $js = CJSMin::minify($js);
@@ -596,7 +573,7 @@ class CApp extends CObservable {
         return $this->_org;
     }
 
-    public function org_id() {
+    public function orgId() {
         $org = $this->org();
         if ($org == null)
             return null;
@@ -620,7 +597,7 @@ class CApp extends CObservable {
             $store_id = CF::store_id();
 
             if ($store_id != "") {
-                $this->_store = cstore::get(CF::org_code(), CF::store_code());
+                $this->_store = cstore::get(CF::orgCode(), CF::store_code());
             }
         }
         return $this->_store;
@@ -639,7 +616,7 @@ class CApp extends CObservable {
         if (strlen($id) > 0) {
             $q .= " and parent_id=" . $db->escape($id);
         }
-        $org_id = CF::org_id();
+        $org_id = CF::orgId();
         $user = $this->user();
         if ($user != null) {
             if (strlen($org_id) == 0) {
@@ -795,10 +772,6 @@ class CApp extends CObservable {
         return cjson::encode($data);
     }
 
-    public function is_mobile() {
-        return $this->mobile;
-    }
-
     public static function variables() {
         $variables = array();
         $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
@@ -808,9 +781,9 @@ class CApp extends CObservable {
         $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
 
         $bootstrap = ccfg::get('bootstrap');
-        $theme_data = CManager::instance()->get_theme_data();
-        if (isset($theme_data) && strlen(carr::get($theme_data, 'bootstrap')) > 0) {
-            $bootstrap = carr::get($theme_data, 'bootstrap');
+        $themeData = CManager::instance()->get_theme_data();
+        if (isset($themeData) && strlen(carr::get($themeData, 'bootstrap')) > 0) {
+            $bootstrap = carr::get($themeData, 'bootstrap');
         }
 
         if (strlen($bootstrap) == 0) {

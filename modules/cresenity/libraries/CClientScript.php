@@ -107,7 +107,7 @@ class CClientScript extends CObject {
         $docroot = str_replace(DS, "/", DOCROOT);
         $file = str_replace(DS, "/", $file);
         $base_url = curl::base();
-        if (CApp::instance()->is_mobile()) {
+        if (CManager::instance()->isMobile()) {
 
             $base_url = curl::base(false, 'http');
         }
@@ -131,8 +131,7 @@ class CClientScript extends CObject {
         $docroot = str_replace(DS, "/", DOCROOT);
         $file = str_replace(DS, "/", $file);
         $base_url = curl::base();
-        if (CApp::instance()->is_mobile()) {
-
+        if (CManager::instance()->isMobile()) {
             $base_url = curl::base(false, 'http');
         }
         $file = str_replace($docroot, $base_url, $file);
@@ -298,7 +297,7 @@ class CClientScript extends CObject {
         $cssFiles = $this->cssFiles();
         $manifest = array();
         $manifest["files"] = array();
-        $last_filemtime = 0;
+        $lastFilemtime = 0;
         foreach ($jsFiles as $f) {
             $urlJsFile = $this->urlJsFile($f);
             $fullpathJsFile = $f;
@@ -308,33 +307,34 @@ class CClientScript extends CObject {
             $arr["file"] = $f;
             $filemtime = filemtime($fullpathJsFile);
             $arr["version"] = $filemtime;
-            if ($last_filemtime < $filemtime)
-                $last_filemtime = $filemtime;
+            if ($lastFilemtime < $filemtime) {
+                $lastFilemtime = $filemtime;
+            }
             $manifest["files"][] = $arr;
         }
         foreach ($cssFiles as $f) {
             $urlCssFile = $this->urlCssFile($f);
-            $fullpath_css_file = $f;
+            $fullpathCssFile = $f;
             $arr = array();
             $arr["type"] = "css";
             $arr["url"] = $urlCssFile;
             $arr["file"] = $f;
 
-            $file = explode('?', $fullpath_css_file);
-            $fullpath_css_file = $file[0];
+            $file = explode('?', $fullpathCssFile);
+            $fullpathCssFile = $file[0];
 
 
-            $filemtime = filemtime($fullpath_css_file);
+            $filemtime = filemtime($fullpathCssFile);
             $arr["version"] = $filemtime;
-            if ($last_filemtime < $filemtime)
-                $last_filemtime = $filemtime;
+            if ($lastFilemtime < $filemtime)
+                $lastFilemtime = $filemtime;
             $manifest["files"][] = $arr;
         }
-        $manifest["version"] = $last_filemtime;
+        $manifest["version"] = $lastFilemtime;
         return $manifest;
     }
 
-    public function render_js_require($js) {
+    public function renderJsRequire($js) {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
         $jsFiles = $this->jsFiles();
@@ -342,13 +342,13 @@ class CClientScript extends CObject {
         $js_close = "";
         $js_before = "";
         $i = 0;
-        $man = CManager::instance();
+        $manager = CManager::instance();
         foreach ($jsFiles as $f) {
             $urlJsFile = $this->urlJsFile($f);
-            if ($man->is_mobile()) {
-                $mobile_path = $man->get_mobile_path();
-                if (strlen($mobile_path) > 0) {
-                    $urlJsFile = $mobile_path . $f;
+            if ($manager->is_mobile()) {
+                $mobilePath = $manager->getMobilePath();
+                if (strlen($mobilePath) > 0) {
+                    $urlJsFile = $mobilePath . $f;
                 }
             }
 
@@ -360,13 +360,13 @@ class CClientScript extends CObject {
         }
 
         $js .= "
-                if (typeof capp_started_event_initialized === 'undefined') {
-                    capp_started_event_initialized=false;
+                if (typeof cappStartedEventInitilized === 'undefined') {
+                    cappStartedEventInitilized=false;
                  }
-                if(!capp_started_event_initialized) {
+                if(!cappStartedEventInitilized) {
                     var evt = document.createEvent('Events');
-                    evt.initEvent( 'capp-started', false, true, window, 0);
-                    capp_started_event_initialized=true;
+                    evt.initEvent('capp-started', false, true, window, 0);
+                    cappStartedEventInitilized=true;
                     document.dispatchEvent(evt);
                 }
 
@@ -384,7 +384,7 @@ class CClientScript extends CObject {
     public function render($pos, $type = array("js_file", "css_file", "js", "css", "meta", "link")) {
         $script = "";
         $app = CApp::instance();
-        $man = CManager::instance();
+        $manager = CManager::instance();
         if (!is_array($type)) {
             $type = array($type);
         }
@@ -395,10 +395,10 @@ class CClientScript extends CObject {
                         case "js_file":
                             if (!ccfg::get('merge_js')) {
                                 $urlJsFile = $this->urlJsFile($s);
-                                if ($man->is_mobile()) {
-                                    $mobile_path = $man->get_mobile_path();
-                                    if (strlen($mobile_path) > 0) {
-                                        $urlJsFile = $mobile_path . $s;
+                                if ($manager->is_mobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlJsFile = $mobilePath . $s;
                                     }
                                 }
 
@@ -410,10 +410,10 @@ class CClientScript extends CObject {
                         case "css_file":
                             if (!ccfg::get('merge_css')) {
                                 $urlCssFile = $this->urlCssFile($s);
-                                if ($man->is_mobile()) {
-                                    $mobile_path = $man->get_mobile_path();
-                                    if (strlen($mobile_path) > 0) {
-                                        $urlCssFile = $mobile_path . $s;
+                                if ($manager->is_mobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlCssFile = $mobilePath . $s;
                                     }
                                 }
 

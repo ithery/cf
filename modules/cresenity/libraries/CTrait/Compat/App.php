@@ -31,11 +31,22 @@ trait CTrait_Compat_App {
 
     /**
      * 
-     * @deprecated since version 1.2, please use function appId
+     * @deprecated since version 1.2, please use function showTitle
+     * @param bool $bool
      * @return $this
      */
     public function show_title($bool) {
         return $this->showTitle($bool);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use function showBreadcrumb
+     * @param bool $bool
+     * @return $this
+     */
+    public function show_breadcrumb($bool) {
+        return $this->showBreadcrumb($bool);
     }
 
     /**
@@ -45,6 +56,34 @@ trait CTrait_Compat_App {
      */
     public function is_admin() {
         return $this->isAdmin();
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use function orgId
+     * @return bool
+     */
+    public function org_id() {
+        return $this->orgId();
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use function isAdmin
+     * @param bool $bool
+     * @return $this
+     */
+    public function set_login_required($bool) {
+        return $this->setLoginRequired($bool);
+    }
+
+    /**
+     * 
+     * @param string $js
+     * @return $this
+     */
+    public function add_custom_js($js) {
+        return $this->addCustomJs($js);
     }
 
 }
