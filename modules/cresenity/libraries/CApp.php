@@ -26,17 +26,13 @@ class CApp extends CObservable {
     private $_user = null;
     private $_admin = null;
     private $_member = null;
-    private $_clientmodules;
     public static $_instance = null;
-    private $app_list = null;
     private $run;
-    protected $_template = array();
     protected $rendered = false;
     private $mobile = false;
     private $header_body = '';
     private $additional_head = '';
     private $mobile_path = '';
-    private $variables;
     private $ajaxData = array();
     private $renderMessage = true;
     private $keepMessage = false;
@@ -74,6 +70,10 @@ class CApp extends CObservable {
         return CApp_Remote::instance($domain, $options);
     }
 
+    
+    public static function helper() {
+        return CHelper::instance();
+    }
     /**
      * 
      * @param string $modelName
@@ -240,21 +240,6 @@ class CApp extends CObservable {
 
         $theme_path = "";
         //$theme_path = ctheme::path();
-        $this->_template = array(
-            'install' => $theme_path . 'cinstall/page',
-            'sign_up' => $theme_path . 'ccore/signup',
-            'resend_activation' => $theme_path . 'ccore/resend_activation',
-            'activation' => $theme_path . 'ccore/activation',
-            'login' => $theme_path . 'ccore/login',
-            'static_login' => $theme_path . 'ccore/static_login',
-            'cpage' => $theme_path . 'cpage',
-            'cheader' => $theme_path . 'cheader',
-            'cfooter' => $theme_path . 'cfooter',
-        );
-    }
-
-    public function set_template($k, $v) {
-        $this->_template[$k] = $v;
     }
 
     public function set_login_required($bool) {
@@ -276,9 +261,7 @@ class CApp extends CObservable {
     }
 
     public function code() {
-        //$app = CJDB::instance()->get("app", array("app_id" => $this->app_id()));
-        //return $app[0]->code;
-        return CF::app_code();
+        return CF::appCode();
     }
 
     public function controller() {
@@ -290,32 +273,8 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function app_list() {
-        if ($this->app_list == null) {
-            //we will get all available app for this org
-            $cdb = CJDB::instance();
-            $data = $cdb->get('domain', array("org_id" => $this->org()->org_id))->result_array();
-            $this->app_list = array();
-            foreach ($data as $domain) {
-                $app_id = $domain["app_id"];
-                $app = $cdb->get('app', array('app_id' => $app_id));
-                $app_name = $app[0]->name;
-                $this->app_list[$app_id] = $app_name;
-            }
-            //if array is empty, we make default is app with id 1
-            if (empty($this->app_list)) {
-                $app_id = 1;
-                $app = $cdb->get('app', array('app_id' => $app_id));
-                $app_name = $app[0]->name;
-                $this->app_list[$app_id] = $app_name;
-            }
-        }
-
-        return $this->app_list;
-    }
-
-    public function is_admin() {
-        return $this->app_id() == 0;
+    public function isAdmin() {
+        return $this->appId() == 0;
     }
 
     /**
@@ -396,13 +355,6 @@ class CApp extends CObservable {
     }
 
     public function register_core_modules() {
-
-
-
-//            $theme = ccfg::get('theme');
-//            if ($theme == null) $theme = 'cresenity';
-
-
         $theme = CManager::theme()->getCurrentTheme();
         $theme_file = CF::get_file('themes', $theme);
         if (file_exists($theme_file)) {
@@ -430,104 +382,6 @@ class CApp extends CObservable {
                 }
             }
         }
-    }
-
-    public function render_template() {
-
-        if (crequest::is_ajax()) {
-            return $this->json();
-        }
-        $theme_path = "";
-        $theme_path = ctheme::path();
-
-//            var_dump($this->_template);
-        if (ccfg::get("install")) {
-            $v = CView::factory($this->_template['install']);
-        } else if ($this->signup) {
-            $v = CView::factory($this->_template['sign_up']);
-        } else if ($this->resend) {
-            $v = CView::factory($this->_template['resend_activation']);
-        } else if ($this->activation) {
-            $v = CView::factory($this->_template['activation']);
-        } else if (!$this->is_user_login() && ccfg::get("have_user_login")) {
-            $v = CView::factory($this->_template['login']);
-        } else if (!$this->is_user_login() && ccfg::get("have_static_login")) {
-            $v = CView::factory($this->_template['static_login']);
-        } else {
-
-            $v = CView::factory($this->_template['cpage']);
-
-            $this->content = parent::html();
-            $this->js = parent::js();
-            $v->content = $this->content;
-            $v->title = $this->title;
-            $cs = CClientScript::instance();
-            $css_urls = $cs->url_css_file();
-
-            $v->header_body = $this->header_body;
-
-
-
-            $js_urls = $cs->url_js_file();
-            $additional_js = "";
-
-            foreach ($css_urls as $url) {
-
-                $additional_js .= "
-					$.cresenity._filesadded+='['+'" . $url . "'+']'
-				";
-            }
-            $js = "";
-            //$vjs = CView::factory('ccore/js');
-            //$js .= PHP_EOL . $vjs->render();
-
-            $js .= PHP_EOL . $this->js . $additional_js;
-
-            $js = $cs->render_js_require($js);
-
-            if (ccfg::get("minify_js")) {
-                $js = CJSMin::minify($js);
-            }
-
-            $v->js = $js;
-
-            $v->css_hash = "";
-            $v->js_hash = "";
-            if (ccfg::get("merge_css")) {
-                $v->css_hash = $cs->create_css_hash();
-            }
-            if (ccfg::get("merge_js")) {
-                $v->js_hash = $cs->create_js_hash();
-            }
-
-            $v->head_client_script = "";
-            $v->begin_client_script = "";
-            $v->end_client_script = "";
-
-            $v->load_client_script = "";
-            $v->ready_client_script = "";
-
-
-            $v->head_client_script = $cs->render('head');
-            $v->begin_client_script = $cs->render('begin');
-            // $v->end_client_script = $cs->render('end');
-
-            $v->load_client_script = $cs->render('load');
-            $v->ready_client_script = $cs->render('ready');
-
-
-            $v->custom_js = $this->custom_js;
-            $v->custom_header = $this->custom_header;
-            $v->custom_footer = $this->custom_footer;
-            $v->show_breadcrumb = $this->show_breadcrumb;
-            $v->show_title = $this->show_title;
-            $v->breadcrumb = $this->breadcrumb;
-            $v->custom_data = $this->custom_data;
-            $v->cheader = $this->_template['cheader'];
-            $v->cfooter = $this->_template['cfooter'];
-        }
-
-        return $v->render();
     }
 
     public function set_additional_head($str) {

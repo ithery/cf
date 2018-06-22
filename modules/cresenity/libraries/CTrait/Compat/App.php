@@ -38,4 +38,13 @@ trait CTrait_Compat_App {
         return $this->showTitle($bool);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use function isAdmin
+     * @return bool
+     */
+    public function is_admin() {
+        return $this->isAdmin();
+    }
+
 }

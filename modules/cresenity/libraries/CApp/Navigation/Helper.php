@@ -247,9 +247,6 @@ class CApp_Navigation_Helper {
         }
 
 
-        if (CApp::instance()->is_admin()) {
-            //$url =curl::base().'admin/'.$controller."/".$method; 
-        }
         return $url;
     }
 
@@ -329,7 +326,7 @@ class CApp_Navigation_Helper {
     }
 
     public static function render($navs = null, $level = 0, &$child = 0) {
-        $is_admin = CApp::instance()->is_admin();
+        $is_admin = CApp::instance()->isAdmin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
 

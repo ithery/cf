@@ -258,9 +258,9 @@ class CClientScript extends CObject {
 
     public function jsFiles() {
         $js_file_array = array();
-        foreach ($this->scripts as $sc) {
+        foreach ($this->scripts as $script) {
 
-            foreach ($sc['js_file'] as $k) {
+            foreach ($script['js_file'] as $k) {
                 $js_file_array[] = $k;
             }
         }
@@ -273,9 +273,8 @@ class CClientScript extends CObject {
 
     public function cssFiles() {
         $cssFileArray = array();
-        foreach ($this->scripts as $sc) {
-
-            foreach ($sc['css_file'] as $k) {
+        foreach ($this->scripts as $script) {
+            foreach ($script['css_file'] as $k) {
                 $cssFileArray[] = $k;
             }
         }
