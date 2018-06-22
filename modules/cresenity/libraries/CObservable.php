@@ -75,8 +75,6 @@ abstract class CObservable extends CRenderable {
         $this->listeners->remove($event);
     }
 
-   
-
     /**
      * 
      * @param type $id
