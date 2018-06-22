@@ -17,8 +17,9 @@ trait CTrait_Compat_ClientScript {
      * @return type
      */
     public function register_js_files($files, $pos = "end") {
-        return $this->registerJsFiles($files,$pos);
+        return $this->registerJsFiles($files, $pos);
     }
+
     /**
      * 
      * @deprecated please use registerCssFiles
@@ -27,8 +28,9 @@ trait CTrait_Compat_ClientScript {
      * @return type
      */
     public function register_css_files($files, $pos = "head") {
-        return $this->registerCssFiles($files,$pos);
+        return $this->registerCssFiles($files, $pos);
     }
+
     /**
      * 
      * @deprecated please use registerCssFile
@@ -48,6 +50,9 @@ trait CTrait_Compat_ClientScript {
      * @return $this
      */
     public function register_js_file($file, $pos = "end") {
-        return $this->registerJsFile($file,$pos);
+        return $this->registerJsFile($file, $pos);
     }
+
+   
+
 }

@@ -592,9 +592,9 @@ class CApp extends CObservable {
 
             $v->title = $this->title;
             $cs = CClientScript::instance();
-            $css_urls = $cs->url_css_file();
+            $css_urls = $cs->urlCssFile();
 
-            $js_urls = $cs->url_js_file();
+            $js_urls = $cs->urlJsFile();
             $additional_js = "";
 
             foreach ($css_urls as $url) {

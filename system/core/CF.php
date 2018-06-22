@@ -433,7 +433,7 @@ final class CF {
         return null;
     }
 
-    public static function get_dirs($directory, $domain = null) {
+    public static function getDirs($directory, $domain = null) {
         $include_paths = CF::paths();
         $dirs = array();
         foreach ($include_paths as $p) {
