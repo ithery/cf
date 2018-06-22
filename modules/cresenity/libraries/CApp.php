@@ -552,11 +552,7 @@ class CApp extends CObservable {
         if ($this->_role == null) {
             $user = $this->user();
             if ($user != null) {
-                if (is_object($user)) {
-                    if (property_exists($user, 'role_id')) {
-                        $this->_role = crole::get($user->role_id);
-                    }
-                }
+                $this->_role = crole::get(cobj::get($user, 'role_id'));
             }
         }
         return $this->_role;
