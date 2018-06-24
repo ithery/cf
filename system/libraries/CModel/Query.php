@@ -439,6 +439,7 @@ class CModel_Query {
             $models = $builder->eagerLoadRelations($models);
         }
 
+
         return $builder->getModel()->newCollection($models);
     }
 
