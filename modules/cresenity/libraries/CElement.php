@@ -20,9 +20,7 @@ abstract class CElement extends CObservable {
     protected $theme_data = array();
     protected $before;
     protected $after;
-    protected $is_builded = false;
     protected $is_empty = false;
-    private $is_build = false;
 
     public static function validTag() {
         $available_tag = array('div', 'a', 'p', 'span');

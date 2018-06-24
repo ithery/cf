@@ -267,7 +267,7 @@ class CElement_Component_Form extends CElement_Component {
         if ($this->ajax_process_progress) {
             $html->appendln('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
         }
-        $html->appendln($this->html_child($html->getIndent()));
+        $html->appendln($this->htmlChild($html->getIndent()));
         if ($this->bootstrap == '3.3') {
 //                $html->appendln("</div>");
         }
@@ -721,7 +721,7 @@ class CElement_Component_Form extends CElement_Component {
 				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
 			");
         }
-        $js->appendln($this->js_child($js->getIndent()))->br();
+        $js->appendln($this->jsChild($js->getIndent()))->br();
 
         return $js->text();
     }
