@@ -95,18 +95,39 @@ trait CTrait_Compat_Manager {
         return $this->setMobilePath($path);
     }
 
+    /**
+     * 
+     * @deprecated plase use getMobilePath
+     * @return this
+     */
     public function get_mobile_path() {
         return $this->getMobilePath();
     }
 
+    /**
+     * 
+     * @deprecated plase use isMobile
+     * @return this
+     */
     public function is_mobile() {
         return $this->isMobile();
     }
 
+    /**
+     * 
+     * @deprecated plase use isMobile
+     * @return array
+     */
     public function get_theme_data() {
         return $this->getThemeData();
     }
 
+    /**
+     * 
+     * @deprecated plase use isMobile
+     * @param array $theme_data
+     * @return $this
+     */
     public function set_theme_data($theme_data) {
         return $this->setThemeData($theme_data);
     }

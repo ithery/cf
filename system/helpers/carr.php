@@ -2,17 +2,17 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-/**
- * Array helper class.
- *
- * $Id: arr.php 4346 2009-05-11 17:08:15Z zombor $
- *
- * @package    Core
- * @author     Kohana Team
- * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license.html
- */
 class carr {
+
+    /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function accessible($value) {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
 
     /**
      * Tests if an array is associative or not.
@@ -737,10 +737,11 @@ class carr {
     public static function pluck($array, $value, $key = null) {
         $results = [];
 
+
         list($value, $key) = static::explodePluckParameters($value, $key);
 
         foreach ($array as $item) {
-            $itemValue = carr::path($item, $value);
+            $itemValue = CF::get($item, $value);
 
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
@@ -748,7 +749,7 @@ class carr {
             if (is_null($key)) {
                 $results[] = $itemValue;
             } else {
-                $itemKey = carr::path($item, $key);
+                $itemKey = CF::get($item, $key);
 
                 if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
                     $itemKey = (string) $itemKey;
@@ -774,6 +775,25 @@ class carr {
         $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
 
         return [$value, $key];
+    }
+
+    /**
+     * Collapse an array of arrays into a single array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function collapse($array) {
+        $results = [];
+        foreach ($array as $values) {
+            if ($values instanceof CCollection) {
+                $values = $values->all();
+            } elseif (!is_array($values)) {
+                continue;
+            }
+            $results = array_merge($results, $values);
+        }
+        return $results;
     }
 
 }

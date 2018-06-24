@@ -97,11 +97,13 @@ class CApp_Navigation_Helper {
             }
             if (!isset(self::$role_navs[$appId][$roleId])) {
 
-                $q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
-                if ($roleId == null) {
-                    $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
+                $roleNavModel = CApp::model('RoleNav')->whereNull('role_id');
+                //$q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
+                if ($roleId != null) {
+                    $roleNavModel = CApp::model('RoleNav')->where('role_id', '=', $roleId);
+                    //$q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
                 }
-                self::$role_navs[$appId][$roleId] = cdbutils::get_array($q);
+                self::$role_navs[$appId][$roleId] = $roleNavModel->where('app_id', '=', $appId)->get()->pluck('nav')->toArray();
             }
         }
 
@@ -109,49 +111,33 @@ class CApp_Navigation_Helper {
     }
 
     public static function havePermission($action, $nav = null, $roleId = null, $appId = null, $domain = null) {
+
+
         $app = CApp::instance();
 
         if ($roleId == null) {
             $role = $app->role();
-            if ($role == null)
+            if ($role == null) {
                 return false;
+            }
             $roleId = $role->role_id;
         }
         if ($appId == null) {
-            $appId = $app->app_id();
+            $appId = $app->appId();
         }
         $db = CDatabase::instance($domain);
 
-        $role = cdbutils::get_row('select * from roles where role_id=' . $db->escape($roleId));
-        if ($role->parent_id == null)
+        /* @var $role CApp_Model */
+        $role = CApp::model('Roles')->find($roleId);
+
+        if ($role != null && $role->parent_id == null) {
             return true;
+        }
 
 
         $db = CDatabase::instance($domain);
-        $q = "select * from role_permission where name=" . $db->escape($action) . " and role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
-        $r = $db->query($q);
 
-        return $r->count() > 0;
-
-
-        /*
-          if($nav==null) $nav = self::nav();
-
-          if($nav===false) return false;
-
-          $navname = $nav;
-          if(is_array($navname)) {
-          $navname = $nav["name"];
-          }
-
-
-          $q = "select * from role_permission where name=".$db->escape($action)." and nav=".$db->escape($navname)." and role_id=".$db->escape($roleId)." and app_id=".$db->escape($appId);
-
-
-
-          $r = $db->query($q);
-          return $r->count()>0;
-         */
+        return $role->rolePermission()->where('name', '=', $action)->where('app_id', '=', $appId)->count() > 0;
     }
 
     public static function appUserRightsArray($appId, $roleId, $app_role_id = "", $domain = null) {
@@ -247,9 +233,6 @@ class CApp_Navigation_Helper {
         }
 
 
-        if (CApp::instance()->is_admin()) {
-            //$url =curl::base().'admin/'.$controller."/".$method; 
-        }
         return $url;
     }
 
@@ -329,7 +312,7 @@ class CApp_Navigation_Helper {
     }
 
     public static function render($navs = null, $level = 0, &$child = 0) {
-        $is_admin = CApp::instance()->is_admin();
+        $is_admin = CApp::instance()->isAdmin();
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
 

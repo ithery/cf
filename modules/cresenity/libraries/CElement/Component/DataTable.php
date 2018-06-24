@@ -1455,7 +1455,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $html->appendln("<tbody " . $tbody_id . " >")->incIndent()->br();
         //render body;
-        $html->appendln($this->html_child($indent));
+        $html->appendln($this->htmlChild($indent));
         $no = 0;
         if (!$this->ajax) {
             foreach ($this->data as $row) {

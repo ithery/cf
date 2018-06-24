@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 13, 2018, 10:51:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CHelper {
+final class CHelper {
 
     /**
      * 
@@ -17,10 +17,20 @@ class CHelper {
         return new CHelper_File();
     }
 
+    /**
+     * 
+     * @return \CHelper_Formatter
+     */
     public static function formatter() {
         return new CHelper_Formatter();
     }
 
-   
+    /**
+     * 
+     * @return \CHelper_Base64
+     */
+    public static function base64() {
+        return new CHelper_Base64();
+    }
 
 }

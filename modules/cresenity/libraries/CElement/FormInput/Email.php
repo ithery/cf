@@ -19,7 +19,7 @@ class CElement_FormInput_Email extends CElement_FormInput {
     }
 
     protected function build() {
-        $this->setAttr('type', $this->email);
+        $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
     }
 

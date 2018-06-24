@@ -31,13 +31,14 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('text', 'CElement_FormInput_Text');
         $this->manager->registerControl('number', 'CElement_FormInput_Number');
         $this->manager->registerControl('email', 'CElement_FormInput_Email');
-        $this->manager->registerControl('datepicker', 'CFormInputDate');
-        $this->manager->registerControl('date', 'CFormInputDate');
-        $this->manager->registerControl('currency', 'CFormInputCurrency');
-        $this->manager->registerControl('time', 'CFormInputTimePicker');
-        $this->manager->registerControl('timepicker', 'CFormInputTimePicker');
-        $this->manager->registerControl('clockpicker', 'CElement_FormInput_ClockPicker');
-        $this->manager->registerControl('image', 'CFormInputImage');
+        $this->manager->registerControl('datepicker', 'CElement_FormInput_Date');
+        $this->manager->registerControl('date', 'CElement_FormInput_Date');
+        $this->manager->registerControl('currency', 'CElement_FormInput_Currency');
+        $this->manager->registerControl('time', 'CElement_FormInput_Time');
+        $this->manager->registerControl('timepicker', 'CElement_FormInput_Time');
+        $this->manager->registerControl('clock', 'CElement_FormInput_Clock');
+        $this->manager->registerControl('clockpicker', 'CElement_FormInput_Clock');
+        $this->manager->registerControl('image', 'CElement_FormInput_Image');
         $this->manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
         $this->manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
         $this->manager->registerControl('file', 'CFormInputFile');
@@ -47,7 +48,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('select-tag', 'CFormInputSelectTag');
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');
-        $this->manager->registerControl('checkbox', 'CFormInputCheckbox');
+        $this->manager->registerControl('checkbox', 'CElement_FormInput_Checkbox');
         $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
         $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
         $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
@@ -74,8 +75,6 @@ abstract class CObservable extends CRenderable {
     public function detachListener($event) {
         $this->listeners->remove($event);
     }
-
-   
 
     /**
      * 

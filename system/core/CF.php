@@ -433,7 +433,7 @@ final class CF {
         return null;
     }
 
-    public static function get_dirs($directory, $domain = null) {
+    public static function getDirs($directory, $domain = null) {
         $include_paths = CF::paths();
         $dirs = array();
         foreach ($include_paths as $p) {
@@ -2108,6 +2108,93 @@ final class CF {
      */
     public static function value($value) {
         return $value instanceof Closure ? $value() : $value;
+    }
+
+    /**
+     * Get an item from an array or object using "dot" notation.
+     *
+     * @param  mixed   $target
+     * @param  string|array  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    public static function get($target, $key, $default = null) {
+        if (is_null($key)) {
+            return $target;
+        }
+        $key = is_array($key) ? $key : explode('.', $key);
+        while (!is_null($segment = array_shift($key))) {
+            if ($segment === '*') {
+                if ($target instanceof CCollection) {
+                    $target = $target->all();
+                } elseif (!is_array($target)) {
+                    return CF::value($default);
+                }
+                $result = carr::pluck($target, $key);
+                return in_array('*', $key) ? carr::collapse($result) : $result;
+            }
+            if (carr::accessible($target) && carr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && isset($target->{$segment})) {
+                $target = $target->{$segment};
+            } else {
+                return value($default);
+            }
+        }
+        return $target;
+    }
+
+    /**
+     * Set an item on an array or object using dot notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @param  bool  $overwrite
+     * @return mixed
+     */
+    function set(&$target, $key, $value, $overwrite = true) {
+        $segments = is_array($key) ? $key : explode('.', $key);
+        if (($segment = array_shift($segments)) === '*') {
+            if (!carr::accessible($target)) {
+                $target = [];
+            }
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    CF::set($inner, $segments, $value, $overwrite);
+                }
+            } elseif ($overwrite) {
+                foreach ($target as &$inner) {
+                    $inner = $value;
+                }
+            }
+        } elseif (carr::accessible($target)) {
+            if ($segments) {
+                if (!carr::exists($target, $segment)) {
+                    $target[$segment] = [];
+                }
+                CF::set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite || !Arr::exists($target, $segment)) {
+                $target[$segment] = $value;
+            }
+        } elseif (is_object($target)) {
+            if ($segments) {
+                if (!isset($target->{$segment})) {
+                    $target->{$segment} = [];
+                }
+                CF::set($target->{$segment}, $segments, $value, $overwrite);
+            } elseif ($overwrite || !isset($target->{$segment})) {
+                $target->{$segment} = $value;
+            }
+        } else {
+            $target = [];
+            if ($segments) {
+                CF::set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite) {
+                $target[$segment] = $value;
+            }
+        }
+        return $target;
     }
 
     /**

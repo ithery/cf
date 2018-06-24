@@ -12,7 +12,7 @@ use CApp_Navigation_Helper as Helper;
 class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
 
     public function render($navs = null, $level = 0, &$child = 0) {
-        $is_admin = CApp::instance()->is_admin();
+        $is_admin = CApp::instance()->isAdmin();
         if ($navs == null) {
             $navs = $this->navs;
         }

@@ -2,8 +2,10 @@
 
 class CFormInputCheckbox extends CFormInput {
 
+    use CTrait_Compat_Element_FormInput_Checkbox,
+        CTrait_Element_Property_Label;
+
     protected $checked = "";
-    protected $label = "";
     protected $applyjs = "";
     protected $display_inline = "";
     protected $label_wrap;
@@ -37,14 +39,6 @@ class CFormInputCheckbox extends CFormInput {
 
     public function set_checked($bool) {
         $this->checked = $bool;
-        return $this;
-    }
-
-    public function set_label($label, $lang = true) {
-        if ($lang == true) {
-            $label = clang::__($label);
-        }
-        $this->label = $label;
         return $this;
     }
 
@@ -101,7 +95,7 @@ class CFormInputCheckbox extends CFormInput {
         }
         $addition_attribute = "";
         foreach ($this->attr as $k => $v) {
-            $addition_attribute.=" " . $k . '="' . $v . '"';
+            $addition_attribute .= " " . $k . '="' . $v . '"';
         }
         $html->append('<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . '' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $checked . $addition_attribute . '>');
         //$html->append('<span></span>');

@@ -10,9 +10,4 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CApp_Model_Users extends CApp_Model {
 
     use CApp_Model_Trait_Users;
-
-   
-    
-    
-
 }

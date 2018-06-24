@@ -63,6 +63,9 @@ trait CElement_Trait_Template {
 
             return $this->htmlChild();
         });
+        $helpers->set('element', function () {
+            return $this;
+        });
         $view->set($this->templateData);
         $output = $view->render();
         $output_js = "";

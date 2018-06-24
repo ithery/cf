@@ -50,21 +50,11 @@ class CDynFunction {
 
         $error = 0;
         if ($error == 0) {
-            if (is_array($this->func)) {
-
-                if (is_callable($this->func)) {
-                    return call_user_func_array($this->func, $params);
-                } else {
-                    $error++;
-                }
-            }
-        }
-        if ($error == 0) {
-            //not array let check if it is a function name
-            if (function_exists($this->func)) {
+            if (is_callable($this->func)) {
                 return call_user_func_array($this->func, $params);
             }
         }
+
         if ($error == 0) {
             //not the function name, let check it if it is function from ctransform class
             if (is_callable(array('ctransform', $this->func))) {
@@ -77,11 +67,18 @@ class CDynFunction {
                 return call_user_func_array(explode("::", $this->func), $params);
             }
         }
-        //last return this name of function
         if ($error == 0) {
-            return $this->func;
+            //not array let check if it is a function name
+            if (@function_exists($this->func)) {
+                return call_user_func_array($this->func, $params);
+            }
         }
-        return "ERROR";
+
+        if ($error > 0) {
+            throw new CException('function :function is not callable', array(':function' => $this->func));
+        }
+        //last return this name of function
+        return $this->func;
     }
 
 }

@@ -46,7 +46,6 @@ class CElement_FormInput extends CElement_Element {
         $this->disabled = "";
         $this->list = array();
         $this->validation = CFormValidation::factory();
-
     }
 
     public function setSubmitOnchange($bool) {
@@ -182,7 +181,7 @@ class CElement_FormInput extends CElement_Element {
     }
 
     protected function htmlAttr() {
-        $htmlAttr = parent::html_attr();
+        $htmlAttr = parent::htmlAttr();
         $nameAttr = ' name="' . $this->name . '"';
         return $htmlAttr . $nameAttr;
     }

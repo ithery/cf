@@ -486,6 +486,35 @@ return array(
         "css" => array("libs/bootstrap-4-material/bootstrap-material.css"),
         "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js", "libs/material/material-ripple.js"),
     ),
+    "bootstrap-4-datepicker" => array(
+        "css" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css"
+        ),
+        "js" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js"
+        ),
+        "requirements" => array("bootstrap-4-moment"),
+    ),
+    "bootstrap-4-material-datepicker" => array(
+        "css" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css",
+            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.css",
+        ),
+        "js" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js",
+            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.js",
+        ),
+        "requirements" => array("bootstrap-4-moment"),
+    ),
+    "bootstrap-4-moment" => array(
+        "js" => array(
+            "libs/bootstrap-4/plugins/moment/moment.js",
+        ),
+    ),
     /*
      * ICON
      */
@@ -512,6 +541,9 @@ return array(
     ),
     "pe-icon-7-stroke" => array(
         "css" => array("icon/pe-icon-7-stroke.css"),
+    ),
+    "glyphicons" => array(
+        "css" => array("icon/glyphicons.css"),
     ),
 );
 ?>

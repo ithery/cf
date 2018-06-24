@@ -41,7 +41,7 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
         }
 
         $this->navs = $navs;
-        
+
         $q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
         if ($roleId == null) {
             $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
@@ -49,16 +49,16 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
         $this->roleNavs = cdbutils::get_array($q);
     }
 
-    public static function have_access($nav = null, $role_id = null, $app_id = null, $domain = null) {
+    public static function have_access($nav = null, $roleId = null, $appId = null, $domain = null) {
 
         $app = CApp::instance();
-        if ($role_id == null) {
+        if ($roleId == null) {
             $role = $app->role();
             if ($role != null)
-                $role_id = $role->role_id;
+                $roleId = $role->role_id;
         }
-        if ($app_id == null) {
-            $app_id = $app->app_id();
+        if ($appId == null) {
+            $appId = CF::appId();
         }
         if ($nav == null)
             $nav = cnav::nav();
@@ -66,32 +66,34 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
         if ($nav === false)
             return false;
         $db = CDatabase::instance($domain);
-        if ($role_id == "PUBLIC") {
-            $role_id = null;
+        if ($roleId == "PUBLIC") {
+            $roleId = null;
         }
 
-        $role = crole::get($role_id);
+        $role = crole::get($roleId);
         if ($role != null) {
             if ($role->parent_id == null)
                 return true;
         }
 
 
-        if (!isset(self::$role_navs[$app_id]) || !isset(self::$role_navs[$app_id][$role_id])) {
-            if (!isset(self::$role_navs[$app_id])) {
-                self::$role_navs[$app_id] = array();
+        if (!isset(self::$role_navs[$appId]) || !isset(self::$role_navs[$appId][$roleId])) {
+            if (!isset(self::$role_navs[$appId])) {
+                self::$role_navs[$appId] = array();
             }
-            if (!isset(self::$role_navs[$app_id][$role_id])) {
-
-                $q = "select nav from role_nav where role_id=" . $db->escape($role_id) . " and app_id=" . $db->escape($app_id);
-                if ($role_id == null) {
-                    $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($app_id);
+            if (!isset(self::$role_navs[$appId][$roleId])) {
+                $roleNavModel = CApp::model('RoleNav')->where('role_id', 'is', null);
+                //$q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
+                if ($roleId != null) {
+                    $roleNavModel = CApp::model('RoleNav')->where('role_id', '=', $roleId);
+                    //$q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
                 }
-                self::$role_navs[$app_id][$role_id] = cdbutils::get_array($q);
+                self::$role_navs[$appId][$roleId] = $roleNavModel->where('app_id', '=', $appId)->get()->pluck('word_two')->toArray();
+                //self::$role_navs[$appId][$roleId] = cdbutils::get_array($q);
             }
         }
 
-        return in_array($nav["name"], self::$role_navs[$app_id][$role_id]);
+        return in_array($nav["name"], self::$role_navs[$appId][$roleId]);
     }
 
 }

@@ -107,7 +107,7 @@ final class CClientModules {
             $modules = array($modules);
         }
         foreach ($modules as $module) {
-            $this->register_module($module);
+            $this->registerModule($module);
         }
     }
 
@@ -148,26 +148,25 @@ final class CClientModules {
 
         $allModules = $this->allModules();
         if (!in_array($module, self::$mods)) {
-
-            if (isset($allModules[$module])) {
-                //array
-                $mod = $allModules[$module];
-                if (isset($mod["requirements"])) {
-                    foreach ($mod["requirements"] as $req) {
-                        $this->register_module($req);
-                    }
+            if (!isset($allModules[$module])) {
+                throw new CException('Module :module not defined', array(':module' => $module));
+            }
+            //array
+            $mod = $allModules[$module];
+            if (isset($mod["requirements"])) {
+                foreach ($mod["requirements"] as $req) {
+                    $this->registerModule($req);
                 }
-                if (!in_array($module, self::$mods)) {
+            }
+            if (!in_array($module, self::$mods)) {
 
-                    if (isset($mod["js"]))
-                        $cs->register_js_files($mod["js"]);
-                    if (isset($mod["css"]))
-                        $cs->register_css_files($mod["css"]);
-                    self::$mods[] = $module;
+                if (isset($mod["js"])) {
+                    $cs->registerJsFiles($mod["js"]);
                 }
-            } else {
-
-                trigger_error('Module ' . $module . ' not defined');
+                if (isset($mod["css"])) {
+                    $cs->registerCssFiles($mod["css"]);
+                }
+                self::$mods[] = $module;
             }
         }
         return true;

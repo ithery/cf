@@ -12,7 +12,7 @@ use CApp_Navigation_Helper as Helper;
 class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
 
     public function render($navs = null, $level = 0, &$child = 0) {
-        $is_admin = CApp::instance()->is_admin();
+        $is_admin = CApp::instance()->isAdmin();
         if ($navs == null) {
             $navs = $this->navs;
         }
@@ -53,7 +53,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                 $url = "";
 
             if (strlen($child_html) > 0 || strlen($url) > 0) {
-                if (!Helper::accessAvailable($d, CF::app_id(), CF::domain())) {
+                if (!Helper::accessAvailable($d, CF::appId(), CF::domain())) {
                     continue;
                 }
                 if (isset($d["controller"]) && $d["controller"] != "") {

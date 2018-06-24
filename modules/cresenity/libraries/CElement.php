@@ -1,7 +1,7 @@
 <?php
 
 abstract class CElement extends CObservable {
-    
+
     use CTrait_Compat_Element;
 
     protected $classes;
@@ -18,12 +18,9 @@ abstract class CElement extends CObservable {
     protected $theme_style = array();
     protected $client_modules = array();
     protected $theme_data = array();
-    
     protected $before;
     protected $after;
-    protected $is_builded = false;
     protected $is_empty = false;
-    private $is_build = false;
 
     public static function validTag() {
         $available_tag = array('div', 'a', 'p', 'span');
@@ -159,7 +156,7 @@ abstract class CElement extends CObservable {
     protected function jsChild($indent = 0) {
         return parent::js($indent);
     }
-    
+
     public function __to_string() {
         $return = "<h3> HTML </h3>"
                 . "<pre>"

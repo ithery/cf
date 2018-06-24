@@ -17,7 +17,7 @@ class CHelper_File {
      * @param  string  $path
      * @return bool
      */
-    public function exists($path) {
+    public static function exists($path) {
         return file_exists($path);
     }
 
@@ -30,9 +30,9 @@ class CHelper_File {
      *
      * @throws CApp_Exception_FileNotFoundException
      */
-    public function get($path, $lock = false) {
-        if ($this->isFile($path)) {
-            return $lock ? $this->sharedGet($path) : file_get_contents($path);
+    public static function get($path, $lock = false) {
+        if (self::isFile($path)) {
+            return $lock ? self::sharedGet($path) : file_get_contents($path);
         }
 
         throw new CApp_Exception_FileNotFoundException("File does not exist at path :path", array(':path' => $path));
@@ -44,7 +44,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string
      */
-    public function sharedGet($path) {
+    public static function sharedGet($path) {
         $contents = '';
 
         $handle = fopen($path, 'rb');
@@ -54,7 +54,7 @@ class CHelper_File {
                 if (flock($handle, LOCK_SH)) {
                     clearstatcache(true, $path);
 
-                    $contents = fread($handle, $this->size($path) ?: 1);
+                    $contents = fread($handle, self::size($path) ?: 1);
 
                     flock($handle, LOCK_UN);
                 }
@@ -74,8 +74,8 @@ class CHelper_File {
      *
      * @throws CApp_Exception_FileNotFoundException
      */
-    public function getRequire($path) {
-        if ($this->isFile($path)) {
+    public static function getRequire($path) {
+        if (self::isFile($path)) {
             return require $path;
         }
 
@@ -88,7 +88,7 @@ class CHelper_File {
      * @param  string  $file
      * @return mixed
      */
-    public function requireOnce($file) {
+    public static function requireOnce($file) {
         require_once $file;
     }
 
@@ -98,7 +98,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string
      */
-    public function hash($path) {
+    public static function hash($path) {
         return md5_file($path);
     }
 
@@ -110,7 +110,7 @@ class CHelper_File {
      * @param  bool  $lock
      * @return int
      */
-    public function put($path, $contents, $lock = false) {
+    public static function put($path, $contents, $lock = false) {
         return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
     }
 
@@ -121,12 +121,12 @@ class CHelper_File {
      * @param  string  $data
      * @return int
      */
-    public function prepend($path, $data) {
-        if ($this->exists($path)) {
-            return $this->put($path, $data . $this->get($path));
+    public static function prepend($path, $data) {
+        if (self::exists($path)) {
+            return self::put($path, $data . self::get($path));
         }
 
-        return $this->put($path, $data);
+        return self::put($path, $data);
     }
 
     /**
@@ -136,7 +136,7 @@ class CHelper_File {
      * @param  string  $data
      * @return int
      */
-    public function append($path, $data) {
+    public static function append($path, $data) {
         return file_put_contents($path, $data, FILE_APPEND);
     }
 
@@ -147,7 +147,7 @@ class CHelper_File {
      * @param  int  $mode
      * @return mixed
      */
-    public function chmod($path, $mode = null) {
+    public static function chmod($path, $mode = null) {
         if ($mode) {
             return chmod($path, $mode);
         }
@@ -161,7 +161,7 @@ class CHelper_File {
      * @param  string|array  $paths
      * @return bool
      */
-    public function delete($paths) {
+    public static function delete($paths) {
         $paths = is_array($paths) ? $paths : func_get_args();
 
         $success = true;
@@ -186,7 +186,7 @@ class CHelper_File {
      * @param  string  $target
      * @return bool
      */
-    public function move($path, $target) {
+    public static function move($path, $target) {
         return rename($path, $target);
     }
 
@@ -197,7 +197,7 @@ class CHelper_File {
      * @param  string  $target
      * @return bool
      */
-    public function copy($path, $target) {
+    public static function copy($path, $target) {
         return copy($path, $target);
     }
 
@@ -208,12 +208,12 @@ class CHelper_File {
      * @param  string  $link
      * @return void
      */
-    public function link($target, $link) {
+    public static function link($target, $link) {
         if (!windows_os()) {
             return symlink($target, $link);
         }
 
-        $mode = $this->isDirectory($target) ? 'J' : 'H';
+        $mode = self::isDirectory($target) ? 'J' : 'H';
 
         exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
     }
@@ -224,7 +224,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string
      */
-    public function name($path) {
+    public static function name($path) {
         return pathinfo($path, PATHINFO_FILENAME);
     }
 
@@ -234,7 +234,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string
      */
-    public function basename($path) {
+    public static function basename($path) {
         return pathinfo($path, PATHINFO_BASENAME);
     }
 
@@ -244,7 +244,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string
      */
-    public function dirname($path) {
+    public static function dirname($path) {
         return pathinfo($path, PATHINFO_DIRNAME);
     }
 
@@ -254,7 +254,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string
      */
-    public function extension($path) {
+    public static function extension($path) {
         return pathinfo($path, PATHINFO_EXTENSION);
     }
 
@@ -264,7 +264,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string
      */
-    public function type($path) {
+    public static function type($path) {
         return filetype($path);
     }
 
@@ -274,7 +274,7 @@ class CHelper_File {
      * @param  string  $path
      * @return string|false
      */
-    public function mimeType($path) {
+    public static function mimeType($path) {
         return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
     }
 
@@ -284,7 +284,7 @@ class CHelper_File {
      * @param  string  $path
      * @return int
      */
-    public function size($path) {
+    public static function size($path) {
         return filesize($path);
     }
 
@@ -294,7 +294,7 @@ class CHelper_File {
      * @param  string  $path
      * @return int
      */
-    public function lastModified($path) {
+    public static function lastModified($path) {
         return filemtime($path);
     }
 
@@ -304,7 +304,7 @@ class CHelper_File {
      * @param  string  $directory
      * @return bool
      */
-    public function isDirectory($directory) {
+    public static function isDirectory($directory) {
         return is_dir($directory);
     }
 
@@ -314,7 +314,7 @@ class CHelper_File {
      * @param  string  $path
      * @return bool
      */
-    public function isReadable($path) {
+    public static function isReadable($path) {
         return is_readable($path);
     }
 
@@ -324,7 +324,7 @@ class CHelper_File {
      * @param  string  $path
      * @return bool
      */
-    public function isWritable($path) {
+    public static function isWritable($path) {
         return is_writable($path);
     }
 
@@ -334,7 +334,7 @@ class CHelper_File {
      * @param  string  $file
      * @return bool
      */
-    public function isFile($file) {
+    public static function isFile($file) {
         return is_file($file);
     }
 
@@ -345,7 +345,7 @@ class CHelper_File {
      * @param  int     $flags
      * @return array
      */
-    public function glob($pattern, $flags = 0) {
+    public static function glob($pattern, $flags = 0) {
         return glob($pattern, $flags);
     }
 
@@ -356,7 +356,7 @@ class CHelper_File {
      * @param  bool  $hidden
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function files($directory, $hidden = false) {
+    public static function files($directory, $hidden = false) {
 
         return iterator_to_array(
                 Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0), false
@@ -370,7 +370,7 @@ class CHelper_File {
      * @param  bool  $hidden
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function allFiles($directory, $hidden = false) {
+    public static function allFiles($directory, $hidden = false) {
 
         return iterator_to_array(
                 Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory), false
@@ -383,7 +383,7 @@ class CHelper_File {
      * @param  string  $directory
      * @return array
      */
-    public function directories($directory) {
+    public static function directories($directory) {
         $directories = [];
 
         foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir) {
@@ -402,7 +402,7 @@ class CHelper_File {
      * @param  bool    $force
      * @return bool
      */
-    public function makeDirectory($path, $mode = 0755, $recursive = false, $force = false) {
+    public static function makeDirectory($path, $mode = 0755, $recursive = false, $force = false) {
         if ($force) {
             return @mkdir($path, $mode, $recursive);
         }
@@ -418,9 +418,9 @@ class CHelper_File {
      * @param  bool  $overwrite
      * @return bool
      */
-    public function moveDirectory($from, $to, $overwrite = false) {
-        if ($overwrite && $this->isDirectory($to)) {
-            if (!$this->deleteDirectory($to)) {
+    public static function moveDirectory($from, $to, $overwrite = false) {
+        if ($overwrite && self::isDirectory($to)) {
+            if (!self::deleteDirectory($to)) {
                 return false;
             }
         }
@@ -436,8 +436,8 @@ class CHelper_File {
      * @param  int     $options
      * @return bool
      */
-    public function copyDirectory($directory, $destination, $options = null) {
-        if (!$this->isDirectory($directory)) {
+    public static function copyDirectory($directory, $destination, $options = null) {
+        if (!self::isDirectory($directory)) {
             return false;
         }
 
@@ -446,8 +446,8 @@ class CHelper_File {
         // If the destination directory does not actually exist, we will go ahead and
         // create it recursively, which just gets the destination prepared to copy
         // the files over. Once we make the directory we'll proceed the copying.
-        if (!$this->isDirectory($destination)) {
-            $this->makeDirectory($destination, 0777, true);
+        if (!self::isDirectory($destination)) {
+            self::makeDirectory($destination, 0777, true);
         }
 
         $items = new FilesystemIterator($directory, $options);
@@ -461,7 +461,7 @@ class CHelper_File {
             if ($item->isDir()) {
                 $path = $item->getPathname();
 
-                if (!$this->copyDirectory($path, $target, $options)) {
+                if (!self::copyDirectory($path, $target, $options)) {
                     return false;
                 }
             }
@@ -470,7 +470,7 @@ class CHelper_File {
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
             else {
-                if (!$this->copy($item->getPathname(), $target)) {
+                if (!self::copy($item->getPathname(), $target)) {
                     return false;
                 }
             }
@@ -488,8 +488,8 @@ class CHelper_File {
      * @param  bool    $preserve
      * @return bool
      */
-    public function deleteDirectory($directory, $preserve = false) {
-        if (!$this->isDirectory($directory)) {
+    public static function deleteDirectory($directory, $preserve = false) {
+        if (!self::isDirectory($directory)) {
             return false;
         }
 
@@ -500,14 +500,14 @@ class CHelper_File {
             // delete that sub-directory otherwise we'll just delete the file and
             // keep iterating through each file until the directory is cleaned.
             if ($item->isDir() && !$item->isLink()) {
-                $this->deleteDirectory($item->getPathname());
+                self::deleteDirectory($item->getPathname());
             }
 
             // If the item is just a file, we can go ahead and delete it since we're
             // just looping through and waxing all of the files in this directory
             // and calling directories recursively, so we delete the real path.
             else {
-                $this->delete($item->getPathname());
+                self::delete($item->getPathname());
             }
         }
 
@@ -524,8 +524,8 @@ class CHelper_File {
      * @param  string  $directory
      * @return bool
      */
-    public function cleanDirectory($directory) {
-        return $this->deleteDirectory($directory, true);
+    public static function cleanDirectory($directory) {
+        return self::deleteDirectory($directory, true);
     }
 
 }

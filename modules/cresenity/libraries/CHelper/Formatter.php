@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CHelper_Formatter {
 
-    public function formatDatetime($time, $format = null) {
+    public static function formatDatetime($time, $format = null) {
         if (strlen($time) == 0) {
             return $time;
         }
@@ -26,7 +26,7 @@ class CHelper_Formatter {
         return date($format, $time);
     }
 
-    public function formatTime($seconds, $format = '%a days, %h hours, %i minutes and %s seconds') {
+    public static function formatTime($seconds, $format = '%a days, %h hours, %i minutes and %s seconds') {
         $dtF = new \DateTime('@0');
         $dtT = new \DateTime("@$seconds");
         return $dtF->diff($dtT)->format($format);

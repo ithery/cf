@@ -7,7 +7,8 @@
  */
 class CElement_FormInput_ImageAjax extends CElement_FormInput {
 
-    use CElement_Trait_Template;
+    use CElement_Trait_Template,
+        CTrait_Compat_Element_FormInput_Image;
 
     protected $imgSrc;
     protected $maxWidth;
@@ -19,7 +20,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         parent::__construct($id);
         $this->type = "image";
         $this->tag = "div";
-        $this->imgSrc = "";
+        $this->imgSrc = CApp_Base::noImageUrl();
         $this->maxWidth = "200";
         $this->maxHeight = "150";
         $this->disabledUpload = false;
@@ -48,26 +49,14 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         });
     }
 
-    public function set_imgsrc($imgsrc) {
-        return $this->setImgSrc($imgsrc);
-    }
-
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;
         return $this;
     }
 
-    public function set_maxwidth($maxwidth) {
-        return $this->setMaxWidth($maxwidth);
-    }
-
     public function setMaxWidth($maxwidth) {
         $this->maxWidth = $maxwidth;
         return $this;
-    }
-
-    public function set_maxheight($maxheight) {
-        return $this->setMaxHeight($maxheight);
     }
 
     public function setMaxHeight($maxheight) {
@@ -83,8 +72,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     public function html($indent = 0) {
         $templateHtml = $this->getTemplateHtml();
         $html = $templateHtml;
-        if($this->cropper!=null) {
-            $html.=$this->cropper->html();
+        if ($this->cropper != null) {
+            $html .= $this->cropper->html();
         }
         return $html;
     }
@@ -92,8 +81,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     public function js($indent = 0) {
         $templateJs = $this->getTemplateJs();
         $js = $templateJs;
-        if($this->cropper!=null) {
-            $js.=$this->cropper->js();
+        if ($this->cropper != null) {
+            $js .= $this->cropper->js();
         }
         return $js;
     }
@@ -104,7 +93,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function cropper() {
         if ($this->cropper == null) {
-            $this->cropper = new CElement_Helper_Cropper($this->id."__cropper");
+            $this->cropper = new CElement_Helper_Cropper($this->id . "__cropper");
             $this->cropper->setOwner($this);
         }
         return $this->cropper;
