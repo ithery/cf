@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CDatabase_Query_Builder {
 
+    use CDatabase_Trait_Builder;
+
     /**
      * The current connection
      *
@@ -170,9 +172,9 @@ class CDatabase_Query_Builder {
         'not similar to', 'not ilike', '~~*', '!~~*',
     ];
 
-    public function __construct(CDatabase $db=null) {
-        if($db==null){
-            $db=CDatabase::instance();
+    public function __construct(CDatabase $db = null) {
+        if ($db == null) {
+            $db = CDatabase::instance();
         }
         $this->db = $db;
         //get driver 
@@ -261,7 +263,7 @@ class CDatabase_Query_Builder {
         // "on" clause with a single condition. So we will just build the join with
         // this simple join clauses attached to it. There is not a join callback.
         else {
-            
+
             $method = $where ? 'where' : 'on';
             $this->joins[] = $join->$method($first, $operator, $second);
 
@@ -1552,8 +1554,7 @@ class CDatabase_Query_Builder {
      * @param  bool  $all
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function union($query, $all = false)
-    {
+    public function union($query, $all = false) {
         if ($query instanceof Closure) {
             call_user_func($query, $query = $this->newQuery());
         }
@@ -1571,8 +1572,7 @@ class CDatabase_Query_Builder {
      * @param  \Illuminate\Database\Query\Builder|\Closure  $query
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function unionAll($query)
-    {
+    public function unionAll($query) {
         return $this->union($query, true);
     }
 
@@ -1582,8 +1582,7 @@ class CDatabase_Query_Builder {
      * @param  string  $columns
      * @return int
      */
-    public function count($columns = '*')
-    {
+    public function count($columns = '*') {
         return (int) $this->aggregate(__FUNCTION__, carr::wrap($columns));
     }
 
@@ -1593,8 +1592,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @return mixed
      */
-    public function min($column)
-    {
+    public function min($column) {
         return $this->aggregate(__FUNCTION__, [$column]);
     }
 
@@ -1604,8 +1602,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @return mixed
      */
-    public function max($column)
-    {
+    public function max($column) {
         return $this->aggregate(__FUNCTION__, [$column]);
     }
 
@@ -1615,8 +1612,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @return mixed
      */
-    public function sum($column)
-    {
+    public function sum($column) {
         $result = $this->aggregate(__FUNCTION__, [$column]);
 
         return $result ?: 0;
@@ -1628,8 +1624,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @return mixed
      */
-    public function avg($column)
-    {
+    public function avg($column) {
         return $this->aggregate(__FUNCTION__, [$column]);
     }
 
@@ -1639,8 +1634,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @return mixed
      */
-    public function average($column)
-    {
+    public function average($column) {
         return $this->avg($column);
     }
 
@@ -1651,14 +1645,13 @@ class CDatabase_Query_Builder {
      * @param  array   $columns
      * @return mixed
      */
-    public function aggregate($function, $columns = ['*'])
-    {
+    public function aggregate($function, $columns = ['*']) {
         $results = $this->cloneWithout(['columns'])
-                        ->cloneWithoutBindings(['select'])
-                        ->setAggregate($function, $columns)
-                        ->get($columns);
+                ->cloneWithoutBindings(['select'])
+                ->setAggregate($function, $columns)
+                ->get($columns);
 
-        if (! $results->isEmpty()) {
+        if (!$results->isEmpty()) {
             return array_change_key_case((array) $results[0])['aggregate'];
         }
     }
@@ -1670,14 +1663,13 @@ class CDatabase_Query_Builder {
      * @param  array   $columns
      * @return float|int
      */
-    public function numericAggregate($function, $columns = ['*'])
-    {
+    public function numericAggregate($function, $columns = ['*']) {
         $result = $this->aggregate($function, $columns);
 
         // If there is no result, we can obviously just return 0 here. Next, we will check
         // if the result is an integer or float. If it is already one of these two data
         // types we can just return the result as-is, otherwise we will convert this.
-        if (! $result) {
+        if (!$result) {
             return 0;
         }
 
@@ -1688,8 +1680,7 @@ class CDatabase_Query_Builder {
         // If the result doesn't contain a decimal place, we will assume it is an int then
         // cast it to one. When it does we will cast it to a float since it needs to be
         // cast to the expected data type for the developers out of pure convenience.
-        return strpos((string) $result, '.') === false
-                ? (int) $result : (float) $result;
+        return strpos((string) $result, '.') === false ? (int) $result : (float) $result;
     }
 
     /**
@@ -1699,8 +1690,7 @@ class CDatabase_Query_Builder {
      * @param  array  $columns
      * @return $this
      */
-    protected function setAggregate($function, $columns)
-    {
+    protected function setAggregate($function, $columns) {
         $this->aggregate = compact('function', 'columns');
 
         if (empty($this->groups)) {
@@ -1745,13 +1735,12 @@ class CDatabase_Query_Builder {
      * @param  array  $except
      * @return static
      */
-    public function cloneWithout(array $except)
-    {
+    public function cloneWithout(array $except) {
         return CF::tap(clone $this, function ($clone) use ($except) {
-            foreach ($except as $property) {
-                $clone->{$property} = null;
-            }
-        });
+                    foreach ($except as $property) {
+                        $clone->{$property} = null;
+                    }
+                });
     }
 
     /**
@@ -1760,13 +1749,12 @@ class CDatabase_Query_Builder {
      * @param  array  $except
      * @return static
      */
-    public function cloneWithoutBindings(array $except)
-    {
+    public function cloneWithoutBindings(array $except) {
         return CF::tap(clone $this, function ($clone) use ($except) {
-            foreach ($except as $type) {
-                $clone->bindings[$type] = [];
-            }
-        });
+                    foreach ($except as $type) {
+                        $clone->bindings[$type] = [];
+                    }
+                });
     }
 
     /**

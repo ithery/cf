@@ -13,7 +13,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CModel_Query {
 
-    use CModel_Query_Trait_BuildsQueries,
+    use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships;
 
     /**
@@ -898,7 +898,7 @@ class CModel_Query {
         //$result = $scope(...array_values($parameters)) ?? $this;
         //$result = isset($scope(array_values($parameters))) ? $scope(array_values($parameters)) : $this;
         $result = call_user_func_array($scope, array_values($parameters));
-        
+
         $result = isset($result) && !is_null($result) ? $result : $this;
 
         if (count((array) $query->wheres) > $originalWhereCount) {
@@ -1179,7 +1179,7 @@ class CModel_Query {
             array_unshift($parameters, $this);
 
             //return $this->localMacros[$method](...$parameters);
-            return call_user_func_array($this->localMacros[$method],$parameters);
+            return call_user_func_array($this->localMacros[$method], $parameters);
         }
 
         if (isset(static::$macros[$method])) {
