@@ -31,8 +31,8 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('text', 'CElement_FormInput_Text');
         $this->manager->registerControl('number', 'CElement_FormInput_Number');
         $this->manager->registerControl('email', 'CElement_FormInput_Email');
-        $this->manager->registerControl('datepicker', 'CFormInputDate');
-        $this->manager->registerControl('date', 'CFormInputDate');
+        $this->manager->registerControl('datepicker', 'CElement_FormInput_Date');
+        $this->manager->registerControl('date', 'CElement_FormInput_Date');
         $this->manager->registerControl('currency', 'CFormInputCurrency');
         $this->manager->registerControl('time', 'CFormInputTimePicker');
         $this->manager->registerControl('timepicker', 'CFormInputTimePicker');
@@ -47,7 +47,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('select-tag', 'CFormInputSelectTag');
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');
-        $this->manager->registerControl('checkbox', 'CFormInputCheckbox');
+        $this->manager->registerControl('checkbox', 'CElement_FormInput_Checkbox');
         $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
         $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
         $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');

@@ -81,14 +81,6 @@ abstract class CElement_Element extends CElement {
         }
     }
 
-    protected function html_child($indent = 0) {
-        return parent::html($indent);
-    }
-
-    protected function js_child($indent = 0) {
-        return parent::js($indent);
-    }
-
     public function before_html($indent = 0) {
         return $this->before()->html($indent);
     }
