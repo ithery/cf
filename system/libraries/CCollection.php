@@ -606,7 +606,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
             return $this->items[$key];
         }
 
-        return value($default);
+        return CF::value($default);
     }
 
     /**
