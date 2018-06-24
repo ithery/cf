@@ -42,6 +42,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $this->start_date = "";
         $this->disable_day = array();
         $this->inline = false;
+        $this->addClass('form-control');
     }
 
     public function set_have_button($boolean) {

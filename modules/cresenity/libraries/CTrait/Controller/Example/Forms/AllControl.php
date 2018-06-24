@@ -15,7 +15,11 @@ trait CTrait_Controller_Example_Forms_AllControl {
         $app->addForm();
         $app->addField()->setLabel('Text')->addControl('textControl', 'text');
         $app->addField()->setLabel('Textarea')->addControl('textareaControl', 'textarea');
+        $app->addField()->setLabel('Number')->addControl('numberControl', 'number');
+        $app->addField()->setLabel('Email')->addControl('emailControl', 'email');
+        $app->addField()->setLabel('Currency')->addControl('currencyControl', 'currency');
         $app->addField()->setLabel('Date')->addControl('dateControl', 'date');
+        $app->addField()->setLabel('Time')->addControl('timeControl', 'time');
 
 
         echo $app->render();

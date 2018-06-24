@@ -2,7 +2,12 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CFormInputTimePicker extends CFormInput {
+/**
+ * @author Hery Kurniawan
+ * @since Jun 24, 2018, 6:09:43 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CElement_FormInput_Time extends CElement_FormInput {
 
     use CTrait_Compat_Element_FormInput_Time,
         CTrait_Element_Property_Placeholder;
@@ -22,11 +27,8 @@ class CFormInputTimePicker extends CFormInput {
         $this->minute_step = 1;
 
         $this->placeholder = "";
-        CManager::instance()->register_module('timepicker');
-    }
-
-    public static function factory($id) {
-        return new CFormInputTimePicker($id);
+        $this->addClass('form-control');
+        CManager::instance()->registerModule('timepicker');
     }
 
     public function set_show_meridian($bool) {
