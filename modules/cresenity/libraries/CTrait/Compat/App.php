@@ -79,6 +79,7 @@ trait CTrait_Compat_App {
 
     /**
      * 
+     * @deprecated since version 1.2
      * @param string $js
      * @return $this
      */
@@ -86,4 +87,14 @@ trait CTrait_Compat_App {
         return $this->addCustomJs($js);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2
+     * @param int $roleId
+     * @param int $orgId
+     * @return array
+     */
+    public function get_role_child_list($roleId = null, $orgId = null) {
+        return $this->getRoleChildList($roleId,$orgId);
+    }
 }

@@ -28,4 +28,25 @@ trait CApp_Model_Trait_Roles {
         return $this->hasMany('CApp_Model_RolePermission', 'role_id', 'role_id');
     }
 
+    public function getDescendantsTree($rootId = null, $orgId = null) {
+        $root = $this;
+        if (strlen($rootId) > 0) {
+            $root = $this->find($rootId);
+        }
+
+        if ($orgId == null) {
+            $orgId = CApp_Base::orgId();
+        }
+
+        $root = $root->descendants();
+        if (strlen($orgId) > 0) {
+            $root = $root->where(function($query) use ($orgId) {
+                $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
+            });
+        }
+
+        $tree = $root->get()->toTree();
+        return $tree;
+    }
+
 }

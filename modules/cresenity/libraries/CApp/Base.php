@@ -4,14 +4,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2018, 3:37:54 AM
+ * @since Jun 23, 2018, 4:53:49 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_Model_Roles extends CApp_Model {
+class CApp_Base {
 
-    use CApp_Model_Trait_Roles,
-        CModel_Nested_Trait;
-
-    
-
+    use CApp_Trait_Base;
 }

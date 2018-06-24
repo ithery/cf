@@ -606,54 +606,27 @@ class CApp extends CObservable {
         return $store->store_id;
     }
 
-    public function get_child_array($id = "", $level = 0) {
-        $db = CDatabase::instance();
-        $q = "select role_id,name,lft,rgt from roles where status>0 ";
-        if (strlen($id) > 0) {
-            $q .= " and parent_id=" . $db->escape($id);
+    public function getRoleChildList($roleId = null, $orgId = null) {
+        if (strlen($roleId) == 0) {
+            $roleId = $this->role()->role_id;
         }
-        $org_id = CF::orgId();
-        $user = $this->user();
-        if ($user != null) {
-            if (strlen($org_id) == 0) {
-                $org_id = $user->org_id;
+        if (strlen($orgId) == 0) {
+            $orgId = CApp_Base::orgId();
+        }
+       
+        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId);
+        $childList = array();
+
+        $traverse = function ($childs, $level = 0) use (&$traverse, &$childList) {
+            foreach ($childs as $child) {
+                $childList[$child["role_id"]] = cutils::indent($level, "&nbsp;&nbsp;&nbsp;&nbsp;") . $child["name"];
+                $traverse($child->getChildren, ++$level);
             }
-        }
-        if ($org_id == 0)
-            $org_id = null;
-        if (strlen($org_id) > 0) {
-            $q .= " and (org_id is null or org_id = 0 or org_id=" . $db->escape($org_id) . ")";
-        }
-        $result = array();
-        $r = $db->query($q);
-        foreach ($r as $row) {
-            $role = array();
-            $role["id"] = $row->role_id;
-            $role["name"] = $row->name;
-            $role["level"] = $level;
-            $result[] = $role;
-            $childs = array();
-            if ($row->rgt != $row->lft + 1) {
-                $childs = $this->get_child_array($row->role_id, $level + 1);
-            }
-            if (count($childs) > 0)
-                $result = array_merge($result, $childs);
-        }
-        return $result;
-    }
+        };
 
-    public function get_role_child_list($role_id = null) {
-        if (strlen($role_id) == 0)
-            $role_id = $this->role()->role_id;
-        $child_array = $this->get_child_array($role_id);
-        $child_list = array();
+        $traverse($nodes);
 
-
-        foreach ($child_array as $child) {
-
-            $child_list[$child["id"]] = cutils::indent($child["level"], "&nbsp;&nbsp;&nbsp;&nbsp;") . $child["name"];
-        }
-        return $child_list;
+        return $childList;
     }
 
     public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
