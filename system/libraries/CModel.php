@@ -228,7 +228,7 @@ abstract class CModel implements ArrayAccess {
         $booted = [];
         foreach (CF::class_uses_recursive($class) as $trait) {
             $method = 'boot' . CF::class_basename($trait);
-            $classMethod = $class.$method;
+            $classMethod = $class . $method;
             if (method_exists($class, $method) && !in_array($classMethod, $booted)) {
                 forward_static_call([$class, $method]);
                 $booted[] = $classMethod;
@@ -852,12 +852,7 @@ abstract class CModel implements ArrayAccess {
      * @return CModel_Query|static
      */
     public function newQueryWithoutScopes() {
-        $builder = $this->newModelQuery($this->newBaseQueryBuilder());
-
-        // Once we have the query builders, we will set the model instances so the
-        // builder can easily access any information it may need from the model
-        // while it is constructing and executing various queries against it.
-        return $builder->setModel($this)
+        return $this->newModelQuery()
                         ->with($this->with)
                         ->withCount($this->withCount);
     }
@@ -889,12 +884,21 @@ abstract class CModel implements ArrayAccess {
     }
 
     /**
+     * Get a new query builder that doesn't have any global scopes or eager loading.
+     *
+     * @return CModel_Query|static
+     */
+    public function newModelQuery() {
+        return $this->newModelBuilder($this->newBaseQueryBuilder())->setModel($this);
+    }
+
+    /**
      * Create a new Eloquent query builder for the model.
      *
      * @param  CDatabase_Query_Builder  $query
      * @return CModel_Query|static
      */
-    public function newModelQuery($query) {
+    public function newModelBuilder($query) {
         return new CModel_Query($query);
     }
 
