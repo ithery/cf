@@ -1,6 +1,13 @@
 <?php
 
-class CFormInputDate extends CFormInput {
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 24, 2018, 3:56:10 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CElement_FormInput_Date extends CElement_FormInput {
 
     use CTrait_Compat_Element_FormInput_Date;
 
@@ -12,10 +19,13 @@ class CFormInputDate extends CFormInput {
 
     public function __construct($id) {
         parent::__construct($id);
-        if ($this->bootstrap == '3.3') {
-            CManager::instance()->register_module('bootstrap3-datepicker');
+
+        if (CManager::isRegisteredModule('bootstrap-4-material')) {
+            CManager::instance()->registerModule('bootstrap-4-material-datepicker');
+        } elseif (CManager::isRegisteredModule('bootstrap-4')) {
+            CManager::instance()->registerModule('bootstrap-4-datepicker');
         } else {
-            CManager::instance()->register_module('datepicker');
+            CManager::instance()->registerModule('datepicker');
         }
 
         $this->type = "date";
@@ -32,10 +42,6 @@ class CFormInputDate extends CFormInput {
         $this->start_date = "";
         $this->disable_day = array();
         $this->inline = false;
-    }
-
-    public static function factory($id) {
-        return new CFormInputDate($id);
     }
 
     public function set_have_button($boolean) {
