@@ -19,4 +19,8 @@ trait CTrait_Compat_Element_FormInput_Password {
         return $this->setPlaceholder($placeholder);
     }
 
+    public function set_autocomplete($bool) {
+        return $this->setAutocomplete($bool);
+    }
+
 }

@@ -11,7 +11,7 @@ trait CTrait_Element_Property_Placeholder {
 
     /**
      *
-     * @var int 
+     * @var string 
      */
     public $placeholder;
 

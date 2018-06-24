@@ -14,6 +14,7 @@ trait CTrait_Controller_Example_Forms_AllControl {
 
         $app->addForm();
         $app->addField()->setLabel('Text')->addControl('textControl', 'text');
+        $app->addField()->setLabel('Password')->addControl('passwordControl', 'password');
         $app->addField()->setLabel('Textarea')->addControl('textareaControl', 'textarea');
         $app->addField()->setLabel('Number')->addControl('numberControl', 'number');
         $app->addField()->setLabel('Email')->addControl('emailControl', 'email');
