@@ -21,6 +21,8 @@ trait CTrait_Controller_Example_Forms_AllControl {
         $app->addField()->setLabel('Date')->addControl('dateControl', 'date');
         $app->addField()->setLabel('Time')->addControl('timeControl', 'time');
         $app->addField()->setLabel('Clock')->addControl('clockControl', 'clockpicker');
+        $app->addField()->setLabel('Image')->addControl('imageControl', 'image');
+        $app->addField()->setLabel('Image Ajax')->addControl('imageAjaxControl', 'image-ajax');
 
 
         echo $app->render();

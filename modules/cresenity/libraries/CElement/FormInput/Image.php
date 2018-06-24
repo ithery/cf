@@ -1,11 +1,13 @@
 <?php
 
+defined('SYSPATH') OR die('No direct access allowed.');
+
 /**
- * Description of ImageAjax
- *
- * @author Hery
+ * @author Hery Kurniawan
+ * @since Jun 24, 2018, 6:55:42 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CElement_FormInput_ImageAjax extends CElement_FormInput {
+class CElement_FormInput_Image extends CElement_FormInput {
 
     use CElement_Trait_Template,
         CTrait_Compat_Element_FormInput_Image;
@@ -14,7 +16,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     protected $maxWidth;
     protected $maxHeight;
     protected $disabledUpload;
-    protected $cropper;
+   
 
     public function __construct($id) {
         parent::__construct($id);
@@ -24,16 +26,10 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         $this->maxWidth = "200";
         $this->maxHeight = "150";
         $this->disabledUpload = false;
-        $this->templateName = 'CElement/FormInput/ImageAjax';
+        $this->templateName = 'CElement/FormInput/Image';
+
         $this->onBeforeParse(function() {
 
-            $ajaxName = $this->name;
-            $ajaxName = str_replace('[', '-', $ajaxName);
-            $ajaxName = str_replace(']', '-', $ajaxName);
-
-            $ajaxUrl = CAjaxMethod::factory()->set_type('imgupload')
-                    ->set_data('input_name', $ajaxName)
-                    ->makeurl();
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('maxWidth', $this->maxWidth);
@@ -43,9 +39,6 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
             $this->setVar('postTag', $this->posttag());
             $this->setVar('name', $this->name);
             $this->setVar('value', $this->value);
-            $this->setVar('ajaxName', $ajaxName);
-            $this->setVar('ajaxUrl', $ajaxUrl);
-            $this->setVar('cropper', $this->cropper);
         });
     }
 
@@ -72,31 +65,15 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     public function html($indent = 0) {
         $templateHtml = $this->getTemplateHtml();
         $html = $templateHtml;
-        if ($this->cropper != null) {
-            $html .= $this->cropper->html();
-        }
+
         return $html;
     }
 
     public function js($indent = 0) {
         $templateJs = $this->getTemplateJs();
         $js = $templateJs;
-        if ($this->cropper != null) {
-            $js .= $this->cropper->js();
-        }
-        return $js;
-    }
 
-    /**
-     * 
-     * @return CElement_Helper_Cropper
-     */
-    public function cropper() {
-        if ($this->cropper == null) {
-            $this->cropper = new CElement_Helper_Cropper($this->id . "__cropper");
-            $this->cropper->setOwner($this);
-        }
-        return $this->cropper;
+        return $js;
     }
 
 }
