@@ -1912,4 +1912,28 @@ class CDatabase_Query_Builder {
         }
     }
 
+    /**
+     * Handle dynamic method calls into the method.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters) {
+        /*
+          if (static::hasMacro($method)) {
+          return $this->macroCall($method, $parameters);
+          }
+         * 
+         */
+        if (cstr::startsWith($method, 'where')) {
+            return $this->dynamicWhere($method, $parameters);
+        }
+        throw new BadMethodCallException(sprintf(
+                'Method %s::%s does not exist.', static::class, $method
+        ));
+    }
+
 }

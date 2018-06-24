@@ -446,12 +446,10 @@ class CModel_Query {
      * Get the hydrated models without eager loading.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model[]
+     * @return CModel[]
      */
     public function getModels($columns = ['*']) {
-        return $this->model->hydrate(
-                        $this->query->get($columns)->all()
-                )->all();
+        return $this->model->hydrate($this->query->get($columns)->all())->all();
     }
 
     /**
@@ -1237,20 +1235,22 @@ class CModel_Query {
                 // Load the controller method
                 $method_object = $class->getMethod($method);
             } catch (ReflectionException $e) {
-                // Use __call instead
-
-                try {
-                    throw new Exception('404');
-                } catch (Exception $ex) {
-                    cdbg::var_dump(nl2br($ex->getTraceAsString()));
+                if ($class->hasMethod('__call')) {
+                    // Use __call instead
+                    $method_object = $class->getMethod('__call');
+                    // Use arguments in __call format
+                    $parameters = array($method, $parameters);
+                } else {
+                    try {
+                        throw new Exception('404 doesn\'t have method __call on CDatabase_Query_Builder');
+                    } catch (Exception $ex) {
+                        cdbg::var_dump(nl2br($ex->getTraceAsString()));
+                        cdbg::var_dump($ex->getMessage());
+                    }
+                    die(
+                            sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
+                    );
                 }
-                die(
-                        sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
-                );
-                $method_object = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $parameters = array($method, $parameters);
             }
 
 
