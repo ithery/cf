@@ -542,5 +542,8 @@ return array(
     "pe-icon-7-stroke" => array(
         "css" => array("icon/pe-icon-7-stroke.css"),
     ),
+    "glyphicons" => array(
+        "css" => array("icon/glyphicons.css"),
+    ),
 );
 ?>

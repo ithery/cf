@@ -20,6 +20,7 @@ trait CTrait_Controller_Example_Forms_AllControl {
         $app->addField()->setLabel('Currency')->addControl('currencyControl', 'currency');
         $app->addField()->setLabel('Date')->addControl('dateControl', 'date');
         $app->addField()->setLabel('Time')->addControl('timeControl', 'time');
+        $app->addField()->setLabel('Clock')->addControl('clockControl', 'clockpicker');
 
 
         echo $app->render();
