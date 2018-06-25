@@ -15,6 +15,9 @@
  */
 class CElement_FormInput_Checkbox extends CElement_FormInput {
 
+    use CTrait_Compat_Element_FormInput_Checkbox,
+        CTrait_Element_Property_Label;
+
     protected $checked;
 
     //put your code here
@@ -39,8 +42,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         return '</' . $this->tag . '>';
     }
 
-    public function setChecked($bool)
-    {
+    public function setChecked($bool) {
         $this->checked = $bool;
         return $this;
     }
@@ -49,8 +51,8 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         $html = new CStringBuilder();
 
         $html->set_indent($indent);
-        $this->build_once();
-        $html->appendln($this->before_html($indent));
+        $this->buildOnce();
+        $html->appendln($this->beforeHtml($indent));
 
         if ($this->isOneTag) {
             $html->appendln($this->onetag());
@@ -61,7 +63,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
             $html->appendln($this->posttag());
         }
 
-        $html->appendln($this->after_html($indent));
+        $html->appendln($this->afterHtml($indent));
 
         return $html->text();
     }
