@@ -27,6 +27,9 @@ class CElement_Component_Widget extends CElement_Component {
     public $nopadding;
     public $height;
     protected $switcher;
+    private $collapse;
+    private $close;
+    private $js_collapse;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -39,6 +42,10 @@ class CElement_Component_Widget extends CElement_Component {
         $this->height = "";
         $this->scroll = false;
         $this->nopadding = false;
+
+        $this->collapse = false;
+        $this->close = false;
+        $this->js_collapse = true;
     }
 
     public static function factory($id = "") {
@@ -80,6 +87,25 @@ class CElement_Component_Widget extends CElement_Component {
 
     public function add_switcher($id = "") {
         return $this->switcher = CFactory::create_control($id, 'switcher');
+    }
+
+    function get_collapse() {
+        return $this->collapse;
+    }
+
+    function get_close() {
+        return $this->close;
+    }
+
+    function set_collapse($collapse, $js_collapse = false) {
+        $this->collapse = $collapse;
+        $this->js_collapse = $js_collapse;
+        return $this;
+    }
+
+    function set_close($close) {
+        $this->close = $close;
+        return $this;
     }
 
     /**
