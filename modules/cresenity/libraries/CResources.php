@@ -26,6 +26,10 @@ class CResources {
         if (isset($arr_name[3])) {
             $date = $arr_name[3];
         }
+        //name
+        if (isset($arr_name[4])) {
+            $name = $arr_name[4];
+        }
         if ($orgCode == 'default')
             $orgCode = null;
         return array(
@@ -33,6 +37,7 @@ class CResources {
             'resource_type' => $resource_type,
             'type' => $type,
             'date' => $date,
+            'name' => $name,
         );
     }
 
@@ -136,6 +141,16 @@ class CResources {
     public static function image($name, $options = array()) {
         return new CResources_Loader_Image($name, $options);
     }
+    
+    /**
+     * 
+     * @param type $name
+     * @param type $options
+     * @return \CResources_Loader_Image
+     */
+    public static function files($name, $options = array()) {
+        return new CResources_Loader_File($name, $options);
+    }
 
     /**
      * 
@@ -179,16 +194,7 @@ class CResources {
                 CResources::scanDirectory($path, $filter, $results);
             }
         }        
-//        foreach($scan as $key => $value){
-//            $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
-//            if(!is_dir($path)) {
-//                $results[] = $path;
-//            } else if($value != "." && $value != "..") {
-//                CResources::scanDirectory($path, $results);
-//                $results[] = basename($path);
-//            }
-//        }
         return $results;
     }
-    
+        
 }

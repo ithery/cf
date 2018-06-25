@@ -85,10 +85,23 @@ class CResources_Loader_File {
         return $path;        
     }
     
-    public function delete() {
-//        $fullPath = $this->getSizePath($this->sizeName);
-//
-//        @unlink($fullPath);
+    public function delete($filename) {
+        $fullPath = CResources::getPath($filename);
+        if (unlink($fullPath)) {
+            return true;
+        } else {
+            return false;
+        }
+    }  
+
+    public function rename($oldFile, $newFile) {
+        $old = CResources::getPath($oldFile);
+        $new = CResources::getPath($newFile);
+        if (rename($old, $new)) {
+            return true;
+        } else {
+            return false;
+        }
     }  
     
 }

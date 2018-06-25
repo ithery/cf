@@ -91,7 +91,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         return $temp_file_name;
     }
 
-    public function get_url($filename = null, $size = '') {
+    public function get_url($filename = null, $size = '', $encode = true) {
         if ($filename == null) {
             $filename = $this->_filename;
         }
@@ -112,6 +112,10 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         }
         $http_or_https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
         $path = curl::base(false, $http_or_https) . 'assets/image/' . $size_add . CResources_Encode::encode($filename);
+        if ($encode == false) {
+            $path = curl::base(false, $http_or_https) . 'assets/image/' . $size_add . $filename;
+        }
+        
 //            $file_name_encode = $this->encode($file_name,self::_digit);
         return $path;
     }
