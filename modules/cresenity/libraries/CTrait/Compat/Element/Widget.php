@@ -39,4 +39,7 @@ trait CTrait_Compat_Element_Widget {
         return $this->setHeaderActionStyle($style);
     }
 
+    public function add_switcher($id = "") {
+        return $this->addSwitcher($id);
+    }
 }

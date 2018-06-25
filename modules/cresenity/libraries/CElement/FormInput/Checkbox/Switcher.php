@@ -42,27 +42,6 @@ class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
         return $html;
     }
 
-    public function js($indent = 0) {
-
-        $js = "";
-
-        $js .= '
-
-            var input = $("#' . $this->id . '");
-            var label = input.next()[0];
-
-            $(label).click(function() {
-                if (input.prop("checked")) {
-                    input.removeAttr("checked");
-                } else {
-                    input.prop("checked", true);
-                }
-            });
-      
-        ';
-
-        $js .= parent::js();
-        return $js;
-    }
+  
 
 }
