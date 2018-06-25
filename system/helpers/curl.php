@@ -212,7 +212,7 @@ class curl {
         exit('<h1>' . $method . ' - ' . $codes[$method] . '</h1>' . $output);
     }
 
-    public function as_post_string($val, $key = null) {
+    public static function as_post_string($val, $key = null) {
         $result = '';
         $prefix = $key;
 
