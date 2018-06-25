@@ -20,6 +20,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
 
     protected $checked;
 
+    
     //put your code here
     public function __construct($id) {
         parent::__construct($id);

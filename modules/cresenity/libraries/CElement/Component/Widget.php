@@ -26,6 +26,7 @@ class CElement_Component_Widget extends CElement_Component {
     public $scroll;
     public $nopadding;
     public $height;
+    protected $switcher;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -69,6 +70,18 @@ class CElement_Component_Widget extends CElement_Component {
         return $this;
     }
 
+    public function have_switcher() {
+        if ($this->switcher) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function add_switcher($id = "") {
+        return $this->switcher = CFactory::create_control($id, 'switcher');
+    }
+
     /**
      * Set the title of the widget
      * 
@@ -100,6 +113,35 @@ class CElement_Component_Widget extends CElement_Component {
         if ($this->nopadding) {
             $this->content->addClass('nopadding p-0');
         }
+        if ($this->have_switcher()) {
+            $this->header->add('<div class="pull-right">');
+            $this->header->add($this->switcher->html());
+            $this->header->add('</div>');
+        }
+    }
+
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
+        if ($this->have_switcher()) {
+            $js->appendln('
+                if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                    jQuery("#' . $this->id . '").find(".widget-content").show();
+                } else {
+                    jQuery("#' . $this->id . '").find(".widget-content").hide();
+                }
+
+                jQuery("#' . $this->switcher->get_field_id() . '").click(function() {
+                    if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                        jQuery("#' . $this->id . '").find(".widget-content").show();
+                    } else {
+                        jQuery("#' . $this->id . '").find(".widget-content").hide();
+                    }
+                })
+            ');
+        }
+        $js->append($this->jsChild($js->get_indent()));
+        return $js->text();
     }
 
 }
