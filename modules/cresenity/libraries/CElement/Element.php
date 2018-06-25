@@ -24,7 +24,7 @@ abstract class CElement_Element extends CElement {
         $this->before = null;
         $this->after = null;
 
-        $this->is_builded = false;
+        $this->isBuilded = false;
         $this->isOneTag = false;
 
 
@@ -75,9 +75,9 @@ abstract class CElement_Element extends CElement {
 
     protected function buildOnce() {
         //just build once
-        if (!$this->is_builded) {
+        if (!$this->isBuilded) {
             $this->build();
-            $this->is_builded = true;
+            $this->isBuilded = true;
         }
     }
 

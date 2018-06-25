@@ -506,7 +506,7 @@ class CApp extends CObservable {
 
         $js .= PHP_EOL . $this->js . $additional_js;
 
-        $js = $cs->render_js_require($js);
+        $js = $cs->renderJsRequire($js);
 
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
@@ -730,7 +730,7 @@ class CApp extends CObservable {
         }
         $data["html"] = $message . $this->html();
         $js = $this->js();
-        $js = CClientScript::instance()->render_js_require($js);
+        $js = CClientScript::instance()->renderJsRequire($js);
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
         }
