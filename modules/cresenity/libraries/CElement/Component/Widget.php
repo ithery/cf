@@ -26,6 +26,10 @@ class CElement_Component_Widget extends CElement_Component {
     public $scroll;
     public $nopadding;
     public $height;
+    protected $switcher;
+    private $collapse;
+    private $close;
+    private $js_collapse;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -38,6 +42,10 @@ class CElement_Component_Widget extends CElement_Component {
         $this->height = "";
         $this->scroll = false;
         $this->nopadding = false;
+
+        $this->collapse = false;
+        $this->close = false;
+        $this->js_collapse = true;
     }
 
     public static function factory($id = "") {
@@ -66,6 +74,37 @@ class CElement_Component_Widget extends CElement_Component {
 
     public function setHeaderActionStyle($style) {
         $this->header()->actions()->setStyle($style);
+        return $this;
+    }
+
+    public function have_switcher() {
+        if ($this->switcher) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function add_switcher($id = "") {
+        return $this->switcher = CFactory::create_control($id, 'switcher');
+    }
+
+    function get_collapse() {
+        return $this->collapse;
+    }
+
+    function get_close() {
+        return $this->close;
+    }
+
+    function set_collapse($collapse, $js_collapse = false) {
+        $this->collapse = $collapse;
+        $this->js_collapse = $js_collapse;
+        return $this;
+    }
+
+    function set_close($close) {
+        $this->close = $close;
         return $this;
     }
 
@@ -100,6 +139,35 @@ class CElement_Component_Widget extends CElement_Component {
         if ($this->nopadding) {
             $this->content->addClass('nopadding p-0');
         }
+        if ($this->have_switcher()) {
+            $this->header->add('<div class="pull-right">');
+            $this->header->add($this->switcher->html());
+            $this->header->add('</div>');
+        }
+    }
+
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
+        if ($this->have_switcher()) {
+            $js->appendln('
+                if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                    jQuery("#' . $this->id . '").find(".widget-content").show();
+                } else {
+                    jQuery("#' . $this->id . '").find(".widget-content").hide();
+                }
+
+                jQuery("#' . $this->switcher->get_field_id() . '").click(function() {
+                    if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                        jQuery("#' . $this->id . '").find(".widget-content").show();
+                    } else {
+                        jQuery("#' . $this->id . '").find(".widget-content").hide();
+                    }
+                })
+            ');
+        }
+        $js->append($this->jsChild($js->get_indent()));
+        return $js->text();
     }
 
 }

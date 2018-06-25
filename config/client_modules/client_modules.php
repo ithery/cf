@@ -212,7 +212,7 @@ return array(
     ),
     "validation" => array(
         "js" => array(
-            "plugins" . DS . "validation-engine" . DS . "jquery.validationEngine-2.6.2.js",
+            "plugins" . DS . "validation-engine" . DS . "jquery.validationEngine-2.6.2.js?v=1",
             "plugins" . DS . "validation-engine" . DS . "languages" . DS . "jquery.validationEngine-en.js",
         ),
         "css" => array("plugins" . DS . "validation-engine" . DS . "jquery.validationEngine.css"),

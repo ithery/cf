@@ -610,25 +610,26 @@ if (window.capp.have_clock) {
                 url: url,
                 dataType: 'json',
                 data: data_addition,
-            }).done(function (data) {
+                success: function (data) {
 
-                $.cresenity._handle_response(data, function () {
-                    jQuery('#' + id_target).append(data.html);
-                    jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
-                    var script = $.cresenity.base64.decode(data.js);
-                    eval(script);
-                    jQuery('#' + id_target).removeClass('loading');
-                    jQuery('#' + id_target).data('xhr', false);
-                    if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
-                        window.prettyPrint && prettyPrint();
+                    $.cresenity._handle_response(data, function () {
+                        jQuery('#' + id_target).append(data.html);
+                        jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
+                        var script = $.cresenity.base64.decode(data.js);
+                        eval(script);
+                        jQuery('#' + id_target).removeClass('loading');
+                        jQuery('#' + id_target).data('xhr', false);
+                        if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
+                            window.prettyPrint && prettyPrint();
+                        }
+                    });
+                },
+                error: function (obj, t, msg) {
+                    if (msg != 'abort') {
+                        $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                     }
-                });
-            }).error(function (obj, t, msg) {
-                if (msg != 'abort') {
-                    $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                 }
-            })
-                    );
+            }));
         },
         show_tooltip: function (id_target, url, method, text, toggle, position, title, data_addition) {
             if (typeof title == 'undefined')
@@ -683,47 +684,48 @@ if (window.capp.have_clock) {
                         url: url,
                         dataType: 'json',
                         data: data_addition,
-                    }).done(function (data) {
-                        $.cresenity._handle_response(data, function () {
-                            $('#' + id_target).popover('destroy');
-                            if (position == 'auto' || position == '') {
-                                $('#' + id_target).popover({
-                                    animation: false,
-                                    title: close_button + title,
-                                    html: true,
-                                    trigger: "manual",
-                                    content: html_content + data.html,
-                                    selector: true,
-                                    template: _tooltip_html,
-                                });
-                            } else {
-                                $('#' + id_target).popover({
-                                    animation: false,
-                                    title: close_button + title,
-                                    html: true,
-                                    trigger: "manual",
-                                    content: html_content + data.html,
-                                    placement: position,
-                                    selector: true,
-                                    template: _tooltip_html,
-                                });
-                            }
-                            $('#' + id_target).popover('show');
-                            if (data.js && data.js.length > 0) {
-                                var script = $.cresenity.base64.decode(data.js);
-                                eval(script);
-                            }
-                            $("#closetooltip" + id_target).on("click", function () {
+                        success: function (data) {
+                            $.cresenity._handle_response(data, function () {
                                 $('#' + id_target).popover('destroy');
+                                if (position == 'auto' || position == '') {
+                                    $('#' + id_target).popover({
+                                        animation: false,
+                                        title: close_button + title,
+                                        html: true,
+                                        trigger: "manual",
+                                        content: html_content + data.html,
+                                        selector: true,
+                                        template: _tooltip_html,
+                                    });
+                                } else {
+                                    $('#' + id_target).popover({
+                                        animation: false,
+                                        title: close_button + title,
+                                        html: true,
+                                        trigger: "manual",
+                                        content: html_content + data.html,
+                                        placement: position,
+                                        selector: true,
+                                        template: _tooltip_html,
+                                    });
+                                }
+                                $('#' + id_target).popover('show');
+                                if (data.js && data.js.length > 0) {
+                                    var script = $.cresenity.base64.decode(data.js);
+                                    eval(script);
+                                }
+                                $("#closetooltip" + id_target).on("click", function () {
+                                    $('#' + id_target).popover('destroy');
+                                });
                             });
-                        });
-                    }).error(function (obj, t, msg) {
-                        if (msg != 'abort') {
-                            $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
+                        },
+                        error: function (obj, t, msg) {
+                            if (msg != 'abort') {
+                                $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
+                            }
+                            $('#' + id_target + '-loading').remove();
                         }
-                        $('#' + id_target + '-loading').remove();
-                    })
-                            );
+                    }));
                 } else {
                     $("#closetooltip" + id_target).on("click", function () {
                         $('#' + id_target).popover('destroy');
@@ -748,29 +750,30 @@ if (window.capp.have_clock) {
             handle.data('xhr', jQuery.ajax({
                 type: 'post',
                 data: {
-                    'title': document.title,
+                    title: document.title,
                 },
                 url: url,
                 dataType: 'json',
-            }).done(function (data) {
-                $.cresenity._handle_response(data, function () {
-                    jQuery('#' + id_target).html(data.html);
-                    if (data.js && data.js.length > 0) {
-                        var script = $.cresenity.base64.decode(data.js);
-                        eval(script);
+                success: function (data) {
+                    $.cresenity._handle_response(data, function () {
+                        jQuery('#' + id_target).html(data.html);
+                        if (data.js && data.js.length > 0) {
+                            var script = $.cresenity.base64.decode(data.js);
+                            eval(script);
+                        }
+                        jQuery('#' + id_target).removeClass('loading');
+                        jQuery('#' + id_target).data('xhr', false);
+                        if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
+                            window.prettyPrint && prettyPrint();
+                        }
+                    });
+                },
+                error: function (obj, t, msg) {
+                    if (msg != 'abort') {
+                        $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                     }
-                    jQuery('#' + id_target).removeClass('loading');
-                    jQuery('#' + id_target).data('xhr', false);
-                    if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
-                        window.prettyPrint && prettyPrint();
-                    }
-                });
-            }).error(function (obj, t, msg) {
-                if (msg != 'abort') {
-                    $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                 }
-            })
-                    );
+            }));
         },
         show_dialog: function (id_target, url, method, title, data_addition) {
 
@@ -853,28 +856,29 @@ if (window.capp.have_clock) {
                     url: url,
                     dataType: 'json',
                     data: data_addition,
-                }).done(function (data) {
-                    $.cresenity._handle_response(data, function () {
-                        jQuery('#' + id_target).html(data.html);
-                        if (data.js && data.js.length > 0) {
-                            var script = $.cresenity.base64.decode(data.js);
-                            eval(script);
+                    success: function (data) {
+                        $.cresenity._handle_response(data, function () {
+                            jQuery('#' + id_target).html(data.html);
+                            if (data.js && data.js.length > 0) {
+                                var script = $.cresenity.base64.decode(data.js);
+                                eval(script);
+                            }
+                            jQuery('#' + id_target).removeClass('loading');
+                            jQuery('#' + id_target).data('xhr', false);
+                            if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
+                                window.prettyPrint && prettyPrint();
+                            }
+                            if (data.title) {
+                                jQuery('#' + id_target + '').parent().find('.modal-header .modal-title').html(data.title);
+                            }
+                        });
+                    },
+                    error: function (obj, t, msg) {
+                        if (msg != 'abort') {
+                            $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                         }
-                        jQuery('#' + id_target).removeClass('loading');
-                        jQuery('#' + id_target).data('xhr', false);
-                        if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
-                            window.prettyPrint && prettyPrint();
-                        }
-                        if (data.title) {
-                            jQuery('#' + id_target + '').parent().find('.modal-header .modal-title').html(data.title);
-                        }
-                    });
-                }).error(function (obj, t, msg) {
-                    if (msg != 'abort') {
-                        $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                     }
-                })
-                        );
+                }));
 
             } else {
                 // do Old show_dialog
@@ -978,30 +982,31 @@ if (window.capp.have_clock) {
                     url: url,
                     dataType: 'json',
                     data: data_addition,
-                }).done(function (data) {
+                    success: function (data) {
 
-                    $.cresenity._handle_response(data, function () {
-                        jQuery('#' + id_target).html(data.html);
-                        if (data.js && data.js.length > 0) {
-                            var script = $.cresenity.base64.decode(data.js);
-                            eval(script);
-                        }
-                        jQuery('#' + id_target).removeClass('loading');
-                        jQuery('#' + id_target).data('xhr', false);
-                        if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
-                            window.prettyPrint && prettyPrint();
-                        }
-                        if (data.title) {
-                            jQuery('#' + id_target + '').parent().find('.modal-header h4').html(data.title);
-                        }
+                        $.cresenity._handle_response(data, function () {
+                            jQuery('#' + id_target).html(data.html);
+                            if (data.js && data.js.length > 0) {
+                                var script = $.cresenity.base64.decode(data.js);
+                                eval(script);
+                            }
+                            jQuery('#' + id_target).removeClass('loading');
+                            jQuery('#' + id_target).data('xhr', false);
+                            if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
+                                window.prettyPrint && prettyPrint();
+                            }
+                            if (data.title) {
+                                jQuery('#' + id_target + '').parent().find('.modal-header h4').html(data.title);
+                            }
 
-                    });
-                }).error(function (obj, t, msg) {
-                    if (msg != 'abort') {
-                        $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
+                        });
+                    },
+                    error: function (obj, t, msg) {
+                        if (msg != 'abort') {
+                            $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
+                        }
                     }
-                })
-                        );
+                }));
             } // old show dialog
         },
         value: function (elm) {

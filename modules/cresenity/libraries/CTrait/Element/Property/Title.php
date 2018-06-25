@@ -29,4 +29,8 @@ trait CTrait_Element_Property_Title {
         return $this->title;
     }
 
+    public function haveTitle() {
+        return strlen($this->title) > 0;
+    }
+
 }
