@@ -82,6 +82,10 @@ version_compare(PHP_VERSION, '5.2', '<') and exit('CF requires PHP 5.2 or newer.
  */
 error_reporting(E_ALL & ~E_STRICT ^ E_DEPRECATED);
 
+if(isset($_COOKIE['use_strict'])) {
+    error_reporting(E_ALL);
+}
+
 /**
  * Turning off display_errors will effectively disable CF error display
  * and logging. You can turn off CF errors in application/config/config.php
@@ -139,7 +143,7 @@ if (PHP_SAPI === 'cli') {
 } else {
     $domain = $_SERVER["SERVER_NAME"];
 }
-$file .= $domain;
+$file .= $domain.'.php';
 
 
 if (file_exists($file)) {

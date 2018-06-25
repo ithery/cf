@@ -106,7 +106,7 @@ class CApp_Navigation_Helper {
                 self::$role_navs[$appId][$roleId] = $roleNavModel->where('app_id', '=', $appId)->get()->pluck('nav')->toArray();
             }
         }
-
+       
         return in_array($nav["name"], self::$role_navs[$appId][$roleId]);
     }
 

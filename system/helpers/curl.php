@@ -40,7 +40,7 @@ class curl {
         } else {
             if ($site_domain === '' OR $site_domain[0] === '/') {
                 // Guess the server name if the domain starts with slash
-                $base_url = $protocol . '://' . $_SERVER['HTTP_HOST'] . $site_domain;
+                $base_url = $protocol . '://' . carr::get($_SERVER,'HTTP_HOST') . $site_domain;
             } else {
                 // Use the configured site domain
                 $base_url = $protocol . '://' . $site_domain;
