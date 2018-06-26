@@ -150,8 +150,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $data = array();
         $data["html"] = cmsg::flash_all() . $this->html();
         $data["js"] = cbase64::encode($this->js());
-        $data["js_require"] = CClientScript::instance()->url_js_file();
-        $data["css_require"] = CClientScript::instance()->url_css_file();
+        $data["js_require"] = CClientScript::instance()->urlJsFile();
+        $data["css_require"] = CClientScript::instance()->urlCssFile();
 
         return cjson::encode($data);
     }

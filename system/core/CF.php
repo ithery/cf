@@ -111,12 +111,12 @@ final class CF {
 
         $capppath = APPPATH;
         $defaultpath = APPPATH;
-        if (strlen(self::app_code()) > 0) {
-            $capppath .= self::app_code() . DS;
-            $defaultpath .= self::app_code() . DS;
+        if (strlen(self::appCode()) > 0) {
+            $capppath .= self::appCode() . DS;
+            $defaultpath .= self::appCode() . DS;
         }
-        if (strlen(self::org_code()) > 0) {
-            $capppath .= self::org_code() . DS;
+        if (strlen(self::orgCode()) > 0) {
+            $capppath .= self::orgCode() . DS;
         }
 
 
@@ -242,21 +242,21 @@ final class CF {
     }
 
     public static function invoke($uri) {
-        $router_data = CFRouter::get_route_data($uri);
-        $routes = carr::get($router_data, 'routes');
-        $current_uri = carr::get($router_data, 'current_uri');
-        $query_string = carr::get($router_data, 'query_string');
-        $complete_uri = carr::get($router_data, 'complete_uri');
-        $routed_uri = carr::get($router_data, 'routed_uri');
-        $url_suffix = carr::get($router_data, 'url_suffix');
-        $segments = carr::get($router_data, 'segments');
-        $rsegments = carr::get($router_data, 'rsegments');
-        $controller = carr::get($router_data, 'controller');
-        $controller_dir = carr::get($router_data, 'controller_dir');
-        $controller_dir_ucfirst = carr::get($router_data, 'controller_dir_ucfirst');
-        $controller_path = carr::get($router_data, 'controller_path');
-        $method = carr::get($router_data, 'method');
-        $arguments = carr::get($router_data, 'arguments');
+        $routerData = CFRouter::get_route_data($uri);
+        $routes = carr::get($routerData, 'routes');
+        $current_uri = carr::get($routerData, 'current_uri');
+        $query_string = carr::get($routerData, 'query_string');
+        $complete_uri = carr::get($routerData, 'complete_uri');
+        $routed_uri = carr::get($routerData, 'routed_uri');
+        $url_suffix = carr::get($routerData, 'url_suffix');
+        $segments = carr::get($routerData, 'segments');
+        $rsegments = carr::get($routerData, 'rsegments');
+        $controller = carr::get($routerData, 'controller');
+        $controller_dir = carr::get($routerData, 'controller_dir');
+        $controller_dir_ucfirst = carr::get($routerData, 'controller_dir_ucfirst');
+        $controller_path = carr::get($routerData, 'controller_path');
+        $method = carr::get($routerData, 'method');
+        $arguments = carr::get($routerData, 'arguments');
 
         // Include the Controller file
         if (strlen($controller_path) > 0) {
@@ -433,6 +433,23 @@ final class CF {
         return null;
     }
 
+    /**
+     * 
+     * @deprecated
+     * @param string $directory
+     * @param string $domain
+     * @return array array of directory
+     */
+    public static function get_dirs($directory, $domain = null) {
+        return self::getDirs($directory, $domain);
+    }
+
+    /**
+     * 
+     * @param string $directory
+     * @param string $domain
+     * @return array array of directory
+     */
     public static function getDirs($directory, $domain = null) {
         $include_paths = CF::paths();
         $dirs = array();
