@@ -48,7 +48,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('select-tag', 'CFormInputSelectTag');
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');
-        $this->manager->registerControl('checkbox', 'CElement_FormInput_Checkbox');
+        $this->manager->registerControl('checkbox', 'CFormInputCheckbox');
         $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
         $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
         $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
@@ -119,6 +119,17 @@ abstract class CObservable extends CRenderable {
         return $element;
     }
 
+    /**
+     * Add Label &lt;label&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Label  Label Element
+     */
+    public function addLabel($id = "") {
+        $element = CElement_Factory::createElement('label', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
     /**
      * Add Anchor Element &lt;a&gt
      *

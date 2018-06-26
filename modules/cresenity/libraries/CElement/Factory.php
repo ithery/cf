@@ -32,6 +32,7 @@ class CElement_Factory {
             case 'thead':
             case 'iframe':
             case 'blockquote':
+            case 'label':
                 $class_name = 'CElement_Element_' . ucfirst($tag);
                 return new $class_name($id);
                 break;
