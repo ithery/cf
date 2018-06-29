@@ -25,7 +25,7 @@ class CApp_Api_Method_Server_GitPull extends CApp_Api_Method_Server {
         $data = array();
 
         try {
-            file_put_contents($appCode, "");
+            file_put_contents($path . $appCode, "");
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
