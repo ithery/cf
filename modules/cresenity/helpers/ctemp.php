@@ -22,7 +22,7 @@ class ctemp {
     public static function makefolder($path, $folder) {
         $path = $path . $folder . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
-            mkdir($path);
+            mkdir($path, 0777, true);
         }
 
         return $path;

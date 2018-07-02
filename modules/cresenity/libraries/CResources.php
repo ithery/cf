@@ -26,6 +26,10 @@ class CResources {
         if (isset($arr_name[3])) {
             $date = $arr_name[3];
         }
+        //name
+        if (isset($arr_name[4])) {
+            $name = $arr_name[4];
+        }
         if ($orgCode == 'default')
             $orgCode = null;
         return array(
@@ -33,6 +37,7 @@ class CResources {
             'resource_type' => $resource_type,
             'type' => $type,
             'date' => $date,
+            'name' => $name,
         );
     }
 
@@ -107,7 +112,7 @@ class CResources {
             $type = carr::get($info, 'type');
             $orgCode = carr::get($info, 'org_code');
         }
-
+        
         //validate resource_type and type
         if (strpos($resource_type, '_') !== false) {
             throw new CResources_Exception('Resource type cannot have underscore character');
@@ -136,6 +141,16 @@ class CResources {
     public static function image($name, $options = array()) {
         return new CResources_Loader_Image($name, $options);
     }
+    
+    /**
+     * 
+     * @param type $name
+     * @param type $options
+     * @return \CResources_Loader_Image
+     */
+    public static function files($name, $options = array()) {
+        return new CResources_Loader_File($name, $options);
+    }
 
     /**
      * 
@@ -155,4 +170,31 @@ class CResources {
         return CResources_Decode::decode($str);
     }
 
+
+    /**
+     * 
+     * @param type $org_code
+     * @param type $app_code
+     */
+    public static function get_all_file($org_code, $app_code, $resource_type, $depth = 0) {
+        $root_directory = DOCROOT . 'application' . DS . $app_code . DS . 'default' . DS . 'resources' . DS . $org_code . DS . $resource_type;
+        $files = CResources::scanDirectory($root_directory);
+        return $files;
+    }
+    
+    public static function scanDirectory($dir, $filter = "", &$results = array()) {
+        $scan = scandir($dir);
+        
+        foreach($scan as $key => $value){
+            $path = realpath($dir.DIRECTORY_SEPARATOR.$value); 
+
+            if(!is_dir($path)) {
+                if(empty($filter) || preg_match($filter, $path)) $results[] = basename ($path);
+            } elseif($value != "." && $value != "..") {
+                CResources::scanDirectory($path, $filter, $results);
+            }
+        }        
+        return $results;
+    }
+        
 }
