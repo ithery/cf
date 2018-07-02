@@ -1,10 +1,11 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 class CResources_Loader_File {
 
     protected $appCode = '';
@@ -24,9 +25,8 @@ class CResources_Loader_File {
         $this->appCode = $appCode;
         $this->orgCode = $orgCode;
         $this->resourceName = $resourceName;
-        
     }
-    
+
     protected function getBasePath($sizeName = null) {
         $filename = $this->resourceName;
         $temp = '';
@@ -53,7 +53,7 @@ class CResources_Loader_File {
         $basepath = $dir . $temp;
         return $basepath;
     }
-    
+
     public function getUrl($encoded = false) {
 
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
@@ -82,18 +82,22 @@ class CResources_Loader_File {
             $temp .= urlencode($this->resourceName);
             $path .= $temp;
         }
-        return $path;        
+        return $path;
     }
-    
-    public function delete($filename) {
-        $fullPath = CResources::getPath($filename);
-        if (unlink($fullPath)) {
+
+    public function delete() {
+        $fullPath = $this->getBasePath();
+        if (@unlink($fullPath)) {
             return true;
         } else {
             return false;
         }
-    }  
+    }
 
+    public function getPath() {
+        return $this->getBasePath();
+    }
+    
     public function rename($oldFile, $newFile) {
         $old = CResources::getPath($oldFile);
         $new = CResources::getPath($newFile);
@@ -102,6 +106,6 @@ class CResources_Loader_File {
         } else {
             return false;
         }
-    }  
-    
+    }
+
 }
