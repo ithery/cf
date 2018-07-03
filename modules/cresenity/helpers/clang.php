@@ -9,7 +9,7 @@ class clang {
         "id" => "Indonesia",
     );
 
-    public static function __($word) {
+    public static function __($word, $params = array()) {
         if (!is_string($word))
             return $word;
         if (clang::$lang == null) {
@@ -30,7 +30,10 @@ class clang {
         }
 
         if (isset(clang::$lang[$word])) {
-            return clang::$lang[$word];
+            $word = clang::$lang[$word];
+        }
+        if (is_array($params)) {
+            $word = strtr($word, $params);
         }
         return $word;
     }
