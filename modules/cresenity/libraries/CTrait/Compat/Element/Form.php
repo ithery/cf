@@ -51,4 +51,14 @@ trait CTrait_Compat_Element_Form {
         return $this->SetAjaxSubmitTarget($target);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2, please use setEncType
+     * @param string $enctype multipart/form-data
+     * @return CElement_Component_Form
+     */
+    public function set_enctype($enctype = 'multipart/form-data') {
+        return $this->setEncType($enctype);
+    }
+
 }
