@@ -105,14 +105,8 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    /**
-     * Set enctype attribute value of form element
-     * 
-     * @param string $method multipart/form-data|
-     * @return CElement_Component_Form
-     */
-    public function setEncType($encType = 'multipart/form-data') {
-        $this->enctype = $encType;
+    public function set_enctype($enctype) {
+        $this->enctype = $enctype;
         return $this;
     }
 
