@@ -1,14 +1,14 @@
 <?php
 
 /**
- * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin CModel_Query
  */
 abstract class CModel_Relation {
 
     /**
      * The Eloquent query builder instance.
      *
-     * @var CDatabase_Query_Builder
+     * @var CModel_Query
      */
     protected $query;
 
@@ -43,7 +43,7 @@ abstract class CModel_Relation {
     /**
      * Create a new relation instance.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param  CModel_Query  $query
      * @param  CModel  $parent
      * @return void
      */
@@ -120,7 +120,7 @@ abstract class CModel_Relation {
     /**
      * Get the relationship for eager loading.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function getEager() {
         return $this->get();
@@ -130,7 +130,7 @@ abstract class CModel_Relation {
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function get($columns = ['*']) {
         return $this->query->get($columns);
@@ -160,9 +160,9 @@ abstract class CModel_Relation {
     /**
      * Add the constraints for a relationship count query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  CModel_Query  $query
+     * @param  CModel_Query  $parentQuery
+     * @return CModel_Query
      */
     public function getRelationExistenceCountQuery(CModel_Query $query, CModel_Query $parentQuery) {
         return $this->getRelationExistenceQuery(
@@ -175,12 +175,12 @@ abstract class CModel_Relation {
      *
      * Essentially, these queries compare on column names like whereColumn.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  CModel_Query  $query
+     * @param  CModel_Query  $parentQuery
      * @param  array|mixed $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         return $query->select($columns)->whereColumn(
                         $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
         );
@@ -202,7 +202,7 @@ abstract class CModel_Relation {
     /**
      * Get the underlying query for the relation.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public function getQuery() {
         return $this->query;
@@ -211,7 +211,7 @@ abstract class CModel_Relation {
     /**
      * Get the base query builder driving the Eloquent builder.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     public function getBaseQuery() {
         return $this->query->getQuery();
@@ -220,7 +220,7 @@ abstract class CModel_Relation {
     /**
      * Get the parent model of the relation.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function getParent() {
         return $this->parent;

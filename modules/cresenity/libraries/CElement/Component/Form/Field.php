@@ -119,12 +119,12 @@ class CElement_Component_Form_Field extends CElement_Component {
             $label_class .= ' ' . implode(' ', $this->label_class);
             $control_class .= ' ' . implode(' ', $this->control_class);
             if ($this->show_label) {
-                $html->appendln('<label class="' . $label_class . '" id="' . $this->id . '">' . $this->label . '</label>')->br();
+                $html->appendln('<label class="form-label ' . $label_class . '" id="' . $this->id . '">' . $this->label . '</label>')->br();
             }
             if ($this->style_form_group == 'inline') {
                 $html->appendln('<div class="' . $control_class . '">');
             }
-            $html->appendln($this->html_child($html->get_indent()))->br();
+            $html->appendln($this->htmlChild($html->get_indent()))->br();
             if ($this->style_form_group == 'inline') {
                 $html->appendln('</div>');
             }
@@ -164,7 +164,7 @@ class CElement_Component_Form_Field extends CElement_Component {
             $control_class .= ' ' . implode(' ', $this->control_class);
             $html->appendln('<div class="' . $class_form_field . ' ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
             if ($this->show_label) {
-                $html->appendln('<label id="' . $this->id . '" class="' . $label_class . ' control-label">' . $this->label . '</label>')->br();
+                $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $this->label . '</label>')->br();
             }
             $fullwidth = "";
             if ($this->fullwidth) {
@@ -180,7 +180,7 @@ class CElement_Component_Form_Field extends CElement_Component {
             }
 
 
-            $html->appendln($this->html_child($html->get_indent()))->br();
+            $html->appendln($this->htmlChild($html->get_indent()))->br();
             if (strlen($this->info_text) > 0) {
                 $html->appendln('<p class="help-block">' . $this->info_text . '</p>')->inc_indent()->br();
             }

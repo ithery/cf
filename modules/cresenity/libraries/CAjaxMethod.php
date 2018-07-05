@@ -44,7 +44,7 @@ class CAjaxMethod {
         $file = ctemp::makepath("ajax", $ajax_method . ".tmp");
         file_put_contents($file, $json);
         $base_url = curl::base();
-        if (CApp::instance()->is_mobile()) {
+        if (CManager::instance()->isMobile()) {
             $base_url = curl::base(false, 'http');
         }
         return $base_url . "ccore/ajax/" . $ajax_method;

@@ -212,7 +212,7 @@ return array(
     ),
     "validation" => array(
         "js" => array(
-            "plugins" . DS . "validation-engine" . DS . "jquery.validationEngine-2.6.2.js",
+            "plugins" . DS . "validation-engine" . DS . "jquery.validationEngine-2.6.2.js?v=1",
             "plugins" . DS . "validation-engine" . DS . "languages" . DS . "jquery.validationEngine-en.js",
         ),
         "css" => array("plugins" . DS . "validation-engine" . DS . "jquery.validationEngine.css"),
@@ -474,6 +474,76 @@ return array(
         "js" => array(
             "plugins/summernote/summernote-bs3.min.js",
         ),
+    ),
+    "jquery-3.2.1" => array(
+        "js" => array("libs/jquery-3.2.1/jquery.min.js"),
+    ),
+    "bootstrap-4" => array(
+        "css" => array("libs/bootstrap-4/bootstrap.css"),
+        "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js"),
+    ),
+    "bootstrap-4-material" => array(
+        "css" => array("libs/bootstrap-4-material/bootstrap-material.css"),
+        "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js", "libs/material/material-ripple.js"),
+    ),
+    "bootstrap-4-datepicker" => array(
+        "css" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css"
+        ),
+        "js" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js"
+        ),
+        "requirements" => array("bootstrap-4-moment"),
+    ),
+    "bootstrap-4-material-datepicker" => array(
+        "css" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css",
+            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.css",
+        ),
+        "js" => array(
+            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
+            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js",
+            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.js",
+        ),
+        "requirements" => array("bootstrap-4-moment"),
+    ),
+    "bootstrap-4-moment" => array(
+        "js" => array(
+            "libs/bootstrap-4/plugins/moment/moment.js",
+        ),
+    ),
+    /*
+     * ICON
+     */
+    "fontawesome-3" => array(
+        "css" => array("icon/fontawesome-3.css"),
+    ),
+    "fontawesome-4.5" => array(
+        "css" => array("icon/fontawesome-4.5.css"),
+    ),
+    "fontawesome-5" => array(
+        "css" => array("icon/fontawesome-5.css"),
+    ),
+    "fontawesome-5-f" => array(
+        "css" => array("icon/fontawesome-5-f.css"),
+    ),
+    "ionicons" => array(
+        "css" => array("icon/ionicons.css"),
+    ),
+    "linearicons" => array(
+        "css" => array("icon/linearicons.css"),
+    ),
+    "open-ionic" => array(
+        "css" => array("icon/open-ionic.css"),
+    ),
+    "pe-icon-7-stroke" => array(
+        "css" => array("icon/pe-icon-7-stroke.css"),
+    ),
+    "glyphicons" => array(
+        "css" => array("icon/glyphicons.css"),
     ),
 );
 ?>

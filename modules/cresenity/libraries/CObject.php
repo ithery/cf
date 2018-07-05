@@ -41,7 +41,7 @@ class CObject {
 
         // normal __set() code here
 
-        trigger_error('Cannot access private property ' . __CLASS__ . '::$' . $key, E_USER_ERROR);
+        trigger_error('Cannot access private property ' . get_called_class() . '::$' . $key, E_USER_ERROR);
     }
 
     protected function __construct($id = "") {
@@ -55,7 +55,7 @@ class CObject {
     }
 
     public function regenerateId() {
-        $this->id = CObserver::instance()->new_id();
+        $this->id = CObserver::instance()->newId();
     }
 
     public function id() {

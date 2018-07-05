@@ -2,7 +2,7 @@
 
 class cmailapi {
 
-    public function sendgridv3($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function sendgridv3($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
         if (!$smtp_password) {
@@ -61,7 +61,7 @@ class cmailapi {
         return $response;
     }
 
-    public function sendgrid($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function sendgrid($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         //$sendgrid_apikey = "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";
 
         $smtp_password = carr::get($options, 'smtp_password');
@@ -139,7 +139,7 @@ class cmailapi {
         return $response_array;
     }
 
-    public function mailgun($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function mailgun($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
         //$sendgrid_apikey = "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";
         //public key: pubkey-c338bfc1568e4d6e79331119e6c56645
         //private key: key-5f194bedfdade1fa513910895857d447
@@ -231,7 +231,7 @@ class cmailapi {
         return $response_array;
     }
 
-    public function elasticemail($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function elasticemail($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
 
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
@@ -304,7 +304,7 @@ class cmailapi {
         return true;
     }
 
-    public function postmark($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function postmark($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
 
 
         $smtp_password = carr::get($options, 'smtp_password');

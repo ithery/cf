@@ -28,8 +28,7 @@ final class CF {
     // Cache lifetime
     private static $cache_lifetime;
     // Log levels
-    private static $log_levels = array
-        (
+    private static $log_levels = array(
         'error' => 1,
         'alert' => 2,
         'info' => 3,
@@ -112,12 +111,12 @@ final class CF {
 
         $capppath = APPPATH;
         $defaultpath = APPPATH;
-        if (strlen(self::app_code()) > 0) {
-            $capppath .= self::app_code() . DS;
-            $defaultpath .= self::app_code() . DS;
+        if (strlen(self::appCode()) > 0) {
+            $capppath .= self::appCode() . DS;
+            $defaultpath .= self::appCode() . DS;
         }
-        if (strlen(self::org_code()) > 0) {
-            $capppath .= self::org_code() . DS;
+        if (strlen(self::orgCode()) > 0) {
+            $capppath .= self::orgCode() . DS;
         }
 
 
@@ -243,21 +242,21 @@ final class CF {
     }
 
     public static function invoke($uri) {
-        $router_data = CFRouter::get_route_data($uri);
-        $routes = carr::get($router_data, 'routes');
-        $current_uri = carr::get($router_data, 'current_uri');
-        $query_string = carr::get($router_data, 'query_string');
-        $complete_uri = carr::get($router_data, 'complete_uri');
-        $routed_uri = carr::get($router_data, 'routed_uri');
-        $url_suffix = carr::get($router_data, 'url_suffix');
-        $segments = carr::get($router_data, 'segments');
-        $rsegments = carr::get($router_data, 'rsegments');
-        $controller = carr::get($router_data, 'controller');
-        $controller_dir = carr::get($router_data, 'controller_dir');
-        $controller_dir_ucfirst = carr::get($router_data, 'controller_dir_ucfirst');
-        $controller_path = carr::get($router_data, 'controller_path');
-        $method = carr::get($router_data, 'method');
-        $arguments = carr::get($router_data, 'arguments');
+        $routerData = CFRouter::get_route_data($uri);
+        $routes = carr::get($routerData, 'routes');
+        $current_uri = carr::get($routerData, 'current_uri');
+        $query_string = carr::get($routerData, 'query_string');
+        $complete_uri = carr::get($routerData, 'complete_uri');
+        $routed_uri = carr::get($routerData, 'routed_uri');
+        $url_suffix = carr::get($routerData, 'url_suffix');
+        $segments = carr::get($routerData, 'segments');
+        $rsegments = carr::get($routerData, 'rsegments');
+        $controller = carr::get($routerData, 'controller');
+        $controller_dir = carr::get($routerData, 'controller_dir');
+        $controller_dir_ucfirst = carr::get($routerData, 'controller_dir_ucfirst');
+        $controller_path = carr::get($routerData, 'controller_path');
+        $method = carr::get($routerData, 'method');
+        $arguments = carr::get($routerData, 'arguments');
 
         // Include the Controller file
         if (strlen($controller_path) > 0) {
@@ -338,7 +337,6 @@ final class CF {
             if (strlen(CFRouter::$controller_path) > 0) {
                 require_once CFRouter::$controller_path;
             }
-
             try {
                 // Start validation of the controller
                 $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
@@ -435,7 +433,24 @@ final class CF {
         return null;
     }
 
+    /**
+     * 
+     * @deprecated
+     * @param string $directory
+     * @param string $domain
+     * @return array array of directory
+     */
     public static function get_dirs($directory, $domain = null) {
+        return self::getDirs($directory, $domain);
+    }
+
+    /**
+     * 
+     * @param string $directory
+     * @param string $domain
+     * @return array array of directory
+     */
+    public static function getDirs($directory, $domain = null) {
         $include_paths = CF::paths();
         $dirs = array();
         foreach ($include_paths as $p) {
@@ -2110,6 +2125,93 @@ final class CF {
      */
     public static function value($value) {
         return $value instanceof Closure ? $value() : $value;
+    }
+
+    /**
+     * Get an item from an array or object using "dot" notation.
+     *
+     * @param  mixed   $target
+     * @param  string|array  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    public static function get($target, $key, $default = null) {
+        if (is_null($key)) {
+            return $target;
+        }
+        $key = is_array($key) ? $key : explode('.', $key);
+        while (!is_null($segment = array_shift($key))) {
+            if ($segment === '*') {
+                if ($target instanceof CCollection) {
+                    $target = $target->all();
+                } elseif (!is_array($target)) {
+                    return CF::value($default);
+                }
+                $result = carr::pluck($target, $key);
+                return in_array('*', $key) ? carr::collapse($result) : $result;
+            }
+            if (carr::accessible($target) && carr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && isset($target->{$segment})) {
+                $target = $target->{$segment};
+            } else {
+                return value($default);
+            }
+        }
+        return $target;
+    }
+
+    /**
+     * Set an item on an array or object using dot notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @param  bool  $overwrite
+     * @return mixed
+     */
+    function set(&$target, $key, $value, $overwrite = true) {
+        $segments = is_array($key) ? $key : explode('.', $key);
+        if (($segment = array_shift($segments)) === '*') {
+            if (!carr::accessible($target)) {
+                $target = [];
+            }
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    CF::set($inner, $segments, $value, $overwrite);
+                }
+            } elseif ($overwrite) {
+                foreach ($target as &$inner) {
+                    $inner = $value;
+                }
+            }
+        } elseif (carr::accessible($target)) {
+            if ($segments) {
+                if (!carr::exists($target, $segment)) {
+                    $target[$segment] = [];
+                }
+                CF::set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite || !Arr::exists($target, $segment)) {
+                $target[$segment] = $value;
+            }
+        } elseif (is_object($target)) {
+            if ($segments) {
+                if (!isset($target->{$segment})) {
+                    $target->{$segment} = [];
+                }
+                CF::set($target->{$segment}, $segments, $value, $overwrite);
+            } elseif ($overwrite || !isset($target->{$segment})) {
+                $target->{$segment} = $value;
+            }
+        } else {
+            $target = [];
+            if ($segments) {
+                CF::set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite) {
+                $target[$segment] = $value;
+            }
+        }
+        return $target;
     }
 
     /**

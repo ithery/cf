@@ -127,12 +127,12 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `name` varchar(60) DEFAULT NULL COMMENT 'The name of an entity (record) is used as an default search option in addition to the search key. The name is up to 60 characters in length.',
   `description` varchar(255) DEFAULT NULL,
   `store_id` bigint(20) DEFAULT NULL,
+  `role_level` int(11) DEFAULT '0',
   `created` datetime DEFAULT NULL,
   `createdby` varchar(32) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(32) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
-  `role_level` int(11) DEFAULT '0',
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `roleid` (`role_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;

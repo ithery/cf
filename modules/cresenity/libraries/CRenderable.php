@@ -10,12 +10,13 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     protected $additional_js;
     protected $visibility;
     protected $parent;
+    protected $wrapper;
 
     protected function __construct($id = "") {
         parent::__construct($id);
 
         $this->renderable = new CCollection();
-
+        $this->wrapper = $this;
         $this->additional_js = "";
         $this->visibility = true;
         $this->parent = null;
@@ -56,7 +57,9 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         if ($renderable instanceof CRenderable) {
             $renderable->set_parent($this);
         }
-        $this->renderable[] = $renderable;
+
+        $this->wrapper->renderable[] = $renderable;
+
         return $this;
     }
 
@@ -147,8 +150,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $data = array();
         $data["html"] = cmsg::flash_all() . $this->html();
         $data["js"] = cbase64::encode($this->js());
-        $data["js_require"] = CClientScript::instance()->url_js_file();
-        $data["css_require"] = CClientScript::instance()->url_css_file();
+        $data["js_require"] = CClientScript::instance()->urlJsFile();
+        $data["css_require"] = CClientScript::instance()->urlCssFile();
 
         return cjson::encode($data);
     }

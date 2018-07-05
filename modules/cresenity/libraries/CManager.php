@@ -4,14 +4,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CManager {
 
+    use CTrait_Compat_Manager;
+
     private static $_instance;
-    protected static $controls = array();
-    protected static $controls_code = array();
-    protected static $elements = array();
-    protected static $elements_code = array();
-    protected static $is_mobile = false;
-    protected static $mobile_path = '';
-    protected static $theme_data = null;
+    protected $controls = array();
+    protected $controls_code = array();
+    protected $elements = array();
+    protected $elements_code = array();
+    protected $is_mobile = false;
+    protected $mobile_path = '';
+    protected $theme_data = null;
 
     /**
      *
@@ -31,21 +33,17 @@ final class CManager {
     }
 
     public function __construct() {
-        self::$is_mobile = ccfg::get('is_mobile');
-        self::$mobile_path = '';
+        $this->is_mobile = ccfg::get('is_mobile');
+        $this->mobile_path = '';
 
 //            $theme = ccfg::get('theme');
 //            if ($theme == null) $theme = 'cresenity';
         $theme = ctheme::get_current_theme();
         $theme_file = CF::get_file('themes', $theme);
         if (file_exists($theme_file)) {
-            self::$theme_data = include $theme_file;
-            $bootstrap = carr::get(self::$theme_data, 'bootstrap');
-            if (strlen($bootstrap) > 0) {
-                $this->bootstrap = $bootstrap;
-            }
+            $this->theme_data = include $theme_file;
         }
-        self::$theme = new CManager_Theme();
+        self::theme();
     }
 
     /**
@@ -53,19 +51,35 @@ final class CManager {
      * @return CManager_Theme
      */
     public static function theme() {
-        if(self::$theme==null) {
+        if (self::$theme == null) {
             self::$theme = new CManager_Theme();
         }
         return self::$theme;
     }
 
-    public function get_theme_data() {
-        return self::$theme_data;
+    /**
+     * 
+     * @return CClientScript
+     */
+    public static function clientScript() {
+        return CClientScript::instance();
     }
 
-    public static function set_theme_data($theme_data) {
-        self::$theme_data = $theme_data;
-        return self::instance();
+    /**
+     * 
+     * @return CClientModule
+     */
+    public static function clientModule() {
+        return CClientModules::instance();
+    }
+
+    public function getThemeData() {
+        return $this->theme()->getThemeData();
+    }
+
+    public function setThemeData($themeData) {
+        $this->theme()->setThemeData($themeData);
+        return $this;
     }
 
     /**
@@ -78,7 +92,20 @@ final class CManager {
         if (!empty($data)) {
             CClientModules::instance()->defineModule($module, $data);
         }
-        return CClientModules::instance()->register_module($module);
+        return CClientModules::instance()->registerModule($module);
+    }
+
+    public static function isRegisteredModule($module) {
+        return CClientModules::instance()->isRegisteredModule($module);
+    }
+
+    /**
+     * 
+     * @param string $module
+     * @return boolean
+     */
+    public static function unregisterModule($module) {
+        return CClientModules::instance()->unregisterModule($module);
     }
 
     /**
@@ -96,43 +123,46 @@ final class CManager {
         return CClientModules::instance()->unregister_module($module);
     }
 
-    public static function registerControl($type, $class, $codePath = '') {
-        return self::instance()->register_control($type, $class, $codePath);
-    }
-
-    public function register_control($type, $class, $code_path = '') {
-        self::$controls[$type] = $class;
-        self::$controls_code[$type] = $code_path;
+    /**
+     * 
+     * @param string $type
+     * @param string $class
+     * @param string $code_path
+     * @return boolean
+     * @throws CException
+     */
+    public function registerControl($type, $class, $code_path = '') {
+        $this->controls[$type] = $class;
+        $this->controls_code[$type] = $code_path;
         if (strlen($code_path) > 0) {
             if (file_exists($code_path)) {
                 include $code_path;
             } else {
-                trigger_error('File ' . $code_path . ' Not Exists');
+                throw new CException('File :code_path not exists', array(':code_path' => $code_path));
             }
         }
+        return true;
     }
 
     /**
      * 
      * @param string $type
      * @param string $class
-     * @param string $codePath
-     * @return CElement
+     * @param string $code_path optional
+     * @return boolean true if no error
+     * @throws CException 
      */
-    public static function registerElement($type, $class, $codePath = '') {
-        return self::instance()->register_element($type, $class, $codePath);
-    }
-
-    public function register_element($type, $class, $code_path = '') {
-        self::$elements[$type] = $class;
-        self::$elements_code[$type] = $code_path;
+    public function registerElement($type, $class, $code_path = '') {
+        $this->elements[$type] = $class;
+        $this->elements_code[$type] = $code_path;
         if (strlen($code_path) > 0) {
             if (file_exists($code_path)) {
                 include $code_path;
             } else {
-                trigger_error('File ' . $code_path . ' Not Exists');
+                throw new CException('File :code_path not exists', array(':code_path' => $code_path));
             }
         }
+        return true;
     }
 
     /**
@@ -140,12 +170,8 @@ final class CManager {
      * @param string $type
      * @return boolean
      */
-    public static function isRegisteredControl($type) {
-        return self::instance()->is_registered_control($type);
-    }
-
-    public function is_registered_control($type) {
-        return isset(self::$controls[$type]);
+    public function isRegisteredControl($type) {
+        return isset($this->controls[$type]);
     }
 
     /**
@@ -153,11 +179,7 @@ final class CManager {
      * @return array
      */
     public static function getRegisteredControls() {
-        return self::instance()->get_registered_controls();
-    }
-
-    public function get_registered_controls() {
-        return self::$controls;
+        return $this->controls;
     }
 
     /**
@@ -165,60 +187,69 @@ final class CManager {
      * @param string $type
      * @return boolean
      */
-    public static function isRegisteredElement($type) {
-        return self::instance()->is_registered_element($type);
+    public function isRegisteredElement($type) {
+        return isset($this->elements[$type]);
     }
 
-    public function is_registered_element($type) {
-        return isset(self::$elements[$type]);
-    }
+    /**
+     * 
+     * @param string $id
+     * @param string $type
+     * @return CElement_FormInput
+     * @throws CException
+     */
     public function createControl($id, $type) {
-        $this->create_control($id,$type);
-    }
-    public function create_control($id, $type) {
-        if (!isset(self::$controls[$type])) {
-            trigger_error('Type of control ' . $type . ' not registered');
+
+        if (!isset($this->controls[$type])) {
+            throw new CException('Type of control :type not registered', array(':type' => $type));
         }
-        $class = self::$controls[$type];
+        $class = $this->controls[$type];
 
         if (cstr::startsWith($class, 'CElement_FormInput')) {
             return CElement_Factory::createFormInput($class, $id);
         }
-
         return call_user_func(array($class, 'factory'), ($id));
-
-        //$obj = eval('new '.$class.'::factory("'.$id.'")');
-        //return $obj;
-        //return $class::factory($id);
     }
 
-    public function create_element($id, $type) {
-        if (!isset(self::$elements[$type])) {
-            trigger_error('Type of element ' . $type . ' not registered');
+    /**
+     * 
+     * @param string $id
+     * @param string $type
+     * @return CElement_Element
+     * @throws CException
+     */
+    public function createElement($id, $type) {
+        if (!isset($this->elements[$type])) {
+            throw new CException('Type of element :type not registered', array(':type' => $type));
         }
-        $class = self::$elements[$type];
+        $class = $this->elements[$type];
 
         if (cstr::startsWith($class, 'CElement_Element')) {
             return CElement_Factory::createElement($id);
         }
         return call_user_func(array($class, 'factory'), ($id));
-
-        //$obj = eval('new '.$class.'::factory("'.$id.'")');
-        //return $obj;
-        //return $class::factory($id);
     }
 
-    public function set_mobile_path($path) {
-        self::$mobile_path = $path;
+    /**
+     * 
+     * @param type $path
+     * @return $this
+     */
+    public function setMobilePath($path) {
+        $this->mobile_path = $path;
         return $this;
     }
 
-    public function get_mobile_path() {
-        return self::$mobile_path;
+    /**
+     * 
+     * @return string
+     */
+    public function getMobilePath() {
+        return $this->mobile_path;
     }
 
-    public function is_mobile() {
-        return self::$is_mobile;
+    public function isMobile() {
+        return $this->is_mobile;
     }
 
 }

@@ -11,6 +11,8 @@ use ONGR\ElasticsearchDSL\Search as DSLQuery;
 
 class CElastic {
 
+    use CTrait_Compat_Elastic;
+
     // Elastic instances
     public static $instances = array();
     //domain of instance
@@ -23,6 +25,11 @@ class CElastic {
     protected $hosts;
     //Client of instance
     protected $client;
+
+    /**
+     * @var CElastic_Manager_Indices
+     */
+    protected $indicesManager;
 
     /**
      * Elastic Search default index.
@@ -58,20 +65,6 @@ class CElastic {
     }
 
     /**
-     * Returns the name of a given database instance.
-     *
-     * @param   CDatabase  instance of CDatabase
-     * @return  string
-     */
-    public static function instance_name(CElastic $el, $domain = null) {
-        if (strlen($domain) == 0) {
-            //get current domain
-            $domain = CF::domain();
-        }
-        return array_search($db, CDatabase::$instances[$domain], TRUE);
-    }
-
-    /**
      * Sets up the elastic configuration.
      *
      * @throws  CElastic_Exception
@@ -101,21 +94,21 @@ class CElastic {
         }
 
         if ($load_config) {
-            $all_config = CF::config('elastic');
+            $allConfig = CF::config('elastic');
 
             $found = false;
-            $config_name = 'default';
+            $configName = 'default';
             if (is_string($config)) {
-                $config_name = $config;
+                $configName = $config;
             }
 
-            if (isset($all_config[$config_name])) {
-                $config = $all_config[$config_name];
+            if (isset($allConfig[$configName])) {
+                $config = $allConfig[$configName];
                 $found = true;
             }
 
             if ($found == false) {
-                throw new Exception('Config ' . $config_name . ' Not Found');
+                throw new CException('Config :config_name Not Found', array(':config_name' => $configName));
             }
         }
 
@@ -124,20 +117,21 @@ class CElastic {
         $this->hosts = carr::path($this->config, 'connection.hosts');
 
 
-        $client_builder = Elasticsearch\ClientBuilder::create();
-        $client_builder->setHosts($this->hosts);
-        $this->client = $client_builder->build();
+        $clientBuilder = Elasticsearch\ClientBuilder::create();
+        $clientBuilder->setHosts($this->hosts);
+        $this->client = $clientBuilder->build();
 
         CF::log(CLogger::DEBUG, 'Elastic Library initialized');
     }
 
     /**
-     * Begin a fluent search query builder.
-     *
-     * @return CElastic_DSL_SearchBuilder
+     * @return CElastic_Manager_Indices
      */
-    public function searchBuilder() {
-        return new CElastic_DSL_SearchBuilder($this, $this->getDSLQuery());
+    public function indicesManager() {
+        if (!$this->indicesManager) {
+            $this->indicesManager = new CElastic_Manager_Indices($this);
+        }
+        return $this->indicesManager;
     }
 
     /**
@@ -149,6 +143,7 @@ class CElastic {
     public function search($index, $document_type = '') {
         return new CElastic_Search($this, $index, $document_type);
     }
+
     /**
      * Execute a map statement on index;.
      *

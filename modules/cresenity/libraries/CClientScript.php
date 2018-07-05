@@ -4,19 +4,46 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CClientScript extends CObject {
 
+    use CTrait_Compat_ClientScript;
+
     protected $scripts;
     protected static $_instance;
+
+    /**
+     * POS CONST
+     */
+    const POS_HEAD = 'head';
+    const POS_BEGIN = 'begin';
+    const POS_END = 'end';
+    const POS_READY = 'ready';
+    const POS_LOAD = 'load';
+
+    /**
+     * TYPE CONST
+     */
+    const TYPE_JS_FILE = 'js_file';
+    const TYPE_JS = 'js';
+    const TYPE_CSS_FILE = 'css_file';
+    const TYPE_CSS = 'css';
+    const TYPE_META = 'meta';
+    const TYPE_LINK = 'link';
 
     public function __construct() {
         $this->reset();
     }
 
-    //position
-    //head, begin, end, load, ready
-    //type
-    //js_file,css_file, js, css, meta, link
+    public static function allAvailablePos() {
+        return array(self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY);
+    }
 
+    public static function allAvailableType() {
+        return array(self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK);
+    }
 
+    /**
+     * 
+     * @return CClientScript
+     */
     public static function instance() {
         if (self::$_instance == null) {
             self::$_instance = new CClientScript();
@@ -25,8 +52,8 @@ class CClientScript extends CObject {
     }
 
     public function reset() {
-        $ALLPOS = array("head", "begin", "end", "load", "ready");
-        $ALLTYPE = array("js_file", "css_file", "js", "css", "meta", "link");
+        $ALLPOS = self::allAvailablePos();
+        $ALLTYPE = self::allAvailableType();
         $this->scripts = array();
         foreach ($ALLPOS as $pos) {
             $this->scripts[$pos] = array();
@@ -36,8 +63,8 @@ class CClientScript extends CObject {
         }
     }
 
-    public function fullpath_js_file($file) {
-        $dirs = CF::get_dirs('media');
+    public function fullpathJsFile($file) {
+        $dirs = CF::getDirs('media');
 
         foreach ($dirs as $dir) {
             $path = $dir . 'js' . DS . $file;
@@ -52,8 +79,8 @@ class CClientScript extends CObject {
         return $path . $file;
     }
 
-    public function fullpath_css_file($file) {
-        $dirs = CF::get_dirs('media');
+    public function fullpathCssFile($file) {
+        $dirs = CF::getDirs('media');
 
         foreach ($dirs as $dir) {
             $path = $dir . 'css' . DS . $file;
@@ -66,12 +93,12 @@ class CClientScript extends CObject {
         return $path . $file;
     }
 
-    public function url_js_file($file = null) {
+    public function urlJsFile($file = null) {
         if ($file == null) {
-            $files = $this->js_files();
+            $files = $this->jsFiles();
             $urls = array();
             foreach ($files as $f) {
-                $urls[] = $this->url_js_file($f);
+                $urls[] = $this->urlJsFile($f);
             }
             return $urls;
         }
@@ -80,27 +107,23 @@ class CClientScript extends CObject {
         $docroot = str_replace(DS, "/", DOCROOT);
         $file = str_replace(DS, "/", $file);
         $base_url = curl::base();
-        if (CApp::instance()->is_mobile()) {
+        if (CManager::instance()->isMobile()) {
 
             $base_url = curl::base(false, 'http');
         }
-
-//        if(CF::domain()=='livemall.co.id') {
-//            $base_url = 'http://livemall-70ae.kxcdn.com/';
-//        }
 
         $file = str_replace($docroot, $base_url, $file);
 
         return $file;
     }
 
-    public function url_css_file($file = null) {
+    public function urlCssFile($file = null) {
         if ($file == null) {
-            $files = $this->css_files();
+            $files = $this->cssFiles();
 
             $urls = array();
             foreach ($files as $f) {
-                $urls[] = $this->url_css_file($f);
+                $urls[] = $this->urlCssFile($f);
             }
             return $urls;
         }
@@ -108,8 +131,7 @@ class CClientScript extends CObject {
         $docroot = str_replace(DS, "/", DOCROOT);
         $file = str_replace(DS, "/", $file);
         $base_url = curl::base();
-        if (CApp::instance()->is_mobile()) {
-
+        if (CManager::instance()->isMobile()) {
             $base_url = curl::base(false, 'http');
         }
         $file = str_replace($docroot, $base_url, $file);
@@ -117,35 +139,61 @@ class CClientScript extends CObject {
         return $file;
     }
 
-    public function register_js_files($files, $pos = "end") {
-        if (!is_array($files))
-            $files = array($files);
+    public function registerJsFiles($files, $pos = "end") {
+        $files = $files !== null ? (is_array($files) ? $files : array($files)) : array();
         foreach ($files as $file) {
-            $this->register_js_file($file, $pos);
+            $this->registerJsFile($file, $pos);
+        }
+        return $this;
+    }
+
+    public function registerCssFiles($files, $pos = "head") {
+        $files = $files !== null ? (is_array($files) ? $files : array($files)) : array();
+        foreach ($files as $file) {
+            $this->registerCssFile($file, $pos);
         }
     }
 
-    public function register_css_files($files, $pos = "head") {
-        if (!is_array($files))
+    public function unregisterJsFiles($files, $pos = null) {
+        if (!is_array($files)) {
             $files = array($files);
+        }
         foreach ($files as $file) {
-            $this->register_css_file($file, $pos);
+            $this->unregisterJsFile($file, $pos);
         }
     }
 
-    public function register_js_file($file, $pos = "end") {
+    public function unregisterJsFile($file, $pos = null) {
+        //we will locate all pos for this pos if pos =null;
+        if ($pos == null) {
+            $pos = self::allAvailablePos();
+        }
+        if (!is_array($pos)) {
+            $pos = array($pos);
+        }
+        foreach ($pos as $p) {
+            $jsFiles = &$this->scripts[$p]['js_file'];
+            foreach ($jsFiles as $k => $jsFile) {
+                if ($jsFile == $file) {
+                    unset($jsFiles[$k]);
+                }
+            }
+        }
+    }
+
+    public function registerJsFile($file, $pos = "end") {
         $dir_file = $file;
         $js_version = '';
         if (strpos($file, '?') !== false) {
             $dir_file = substr($file, 0, strpos($file, '?'));
             $js_version = substr($file, strpos($file, '?'), strlen($file) - 1);
         }
-        $js_file = $this->fullpath_js_file($dir_file);
+        $js_file = $this->fullpathJsFile($dir_file);
         if (strpos($dir_file, 'http') !== false) {
             $js_file = $dir_file;
             // do nothing
         } else {
-            $js_file = $this->fullpath_js_file($dir_file);
+            $js_file = $this->fullpathJsFile($dir_file);
             if (!file_exists($js_file)) {
                 trigger_error('JS File not exists, ' . $file);
             }
@@ -154,9 +202,37 @@ class CClientScript extends CObject {
             }
         }
         $this->scripts[$pos]['js_file'][] = $js_file;
+        return $this;
     }
 
-    public function register_css_file($file, $pos = "head") {
+    public function unregisterCssFiles($files, $pos = null) {
+        if (!is_array($files)) {
+            $files = array($files);
+        }
+        foreach ($files as $file) {
+            $this->unregisterCssFile($file, $pos);
+        }
+    }
+
+    public function unregisterCssFile($file, $pos = null) {
+        //we will locate all pos for this pos if pos =null;
+        if ($pos == null) {
+            $pos = self::allAvailablePos();
+        }
+        if (!is_array($pos)) {
+            $pos = array($pos);
+        }
+        foreach ($pos as $p) {
+            $cssFiles = &$this->scripts[$p]['css_file'];
+            foreach ($cssFiles as $k => $cssFile) {
+                if ($cssFile == $file) {
+                    unset($cssFiles[$k]);
+                }
+            }
+        }
+    }
+
+    public function registerCssFile($file, $pos = "head") {
         $dir_file = $file;
         $css_version = '';
         if (strpos($file, '?') !== false) {
@@ -167,7 +243,7 @@ class CClientScript extends CObject {
             $css_file = $dir_file;
             // do nothing
         } else {
-            $css_file = $this->fullpath_css_file($dir_file);
+            $css_file = $this->fullpathCssFile($dir_file);
             if (!file_exists($css_file)) {
                 trigger_error('CSS File not exists, ' . $file);
             }
@@ -176,13 +252,14 @@ class CClientScript extends CObject {
             }
         }
         $this->scripts[$pos]['css_file'][] = $css_file;
+        return $this;
     }
 
-    public function js_files() {
+    public function jsFiles() {
         $js_file_array = array();
-        foreach ($this->scripts as $sc) {
+        foreach ($this->scripts as $script) {
 
-            foreach ($sc['js_file'] as $k) {
+            foreach ($script['js_file'] as $k) {
                 $js_file_array[] = $k;
             }
         }
@@ -190,22 +267,21 @@ class CClientScript extends CObject {
     }
 
     public function create_js_hash() {
-        return CResource::instance('js')->create_hash($this->js_files());
+        return CResource::instance('js')->create_hash($this->jsFiles());
     }
 
-    public function css_files() {
-        $css_file_array = array();
-        foreach ($this->scripts as $sc) {
-
-            foreach ($sc['css_file'] as $k) {
-                $css_file_array[] = $k;
+    public function cssFiles() {
+        $cssFileArray = array();
+        foreach ($this->scripts as $script) {
+            foreach ($script['css_file'] as $k) {
+                $cssFileArray[] = $k;
             }
         }
-        return $css_file_array;
+        return $cssFileArray;
     }
 
     public function create_css_hash() {
-        return CResource::instance('css')->create_hash($this->css_files());
+        return CResource::instance('css')->create_hash($this->cssFiles());
     }
 
     public function js($hash) {
@@ -217,79 +293,80 @@ class CClientScript extends CObject {
     }
 
     public function manifest() {
-        $js_files = $this->js_files();
-        $css_files = $this->css_files();
+        $jsFiles = $this->jsFiles();
+        $cssFiles = $this->cssFiles();
         $manifest = array();
         $manifest["files"] = array();
-        $last_filemtime = 0;
-        foreach ($js_files as $f) {
-            $url_js_file = $this->url_js_file($f);
-            $fullpath_js_file = $f;
+        $lastFilemtime = 0;
+        foreach ($jsFiles as $f) {
+            $urlJsFile = $this->urlJsFile($f);
+            $fullpathJsFile = $f;
             $arr = array();
             $arr["type"] = "js";
-            $arr["url"] = $url_js_file;
+            $arr["url"] = $urlJsFile;
             $arr["file"] = $f;
-            $filemtime = filemtime($fullpath_js_file);
+            $filemtime = filemtime($fullpathJsFile);
             $arr["version"] = $filemtime;
-            if ($last_filemtime < $filemtime)
-                $last_filemtime = $filemtime;
+            if ($lastFilemtime < $filemtime) {
+                $lastFilemtime = $filemtime;
+            }
             $manifest["files"][] = $arr;
         }
-        foreach ($css_files as $f) {
-            $url_css_file = $this->url_css_file($f);
-            $fullpath_css_file = $f;
+        foreach ($cssFiles as $f) {
+            $urlCssFile = $this->urlCssFile($f);
+            $fullpathCssFile = $f;
             $arr = array();
             $arr["type"] = "css";
-            $arr["url"] = $url_css_file;
+            $arr["url"] = $urlCssFile;
             $arr["file"] = $f;
 
-            $file = explode('?', $fullpath_css_file);
-            $fullpath_css_file = $file[0];
+            $file = explode('?', $fullpathCssFile);
+            $fullpathCssFile = $file[0];
 
 
-            $filemtime = filemtime($fullpath_css_file);
+            $filemtime = filemtime($fullpathCssFile);
             $arr["version"] = $filemtime;
-            if ($last_filemtime < $filemtime)
-                $last_filemtime = $filemtime;
+            if ($lastFilemtime < $filemtime)
+                $lastFilemtime = $filemtime;
             $manifest["files"][] = $arr;
         }
-        $manifest["version"] = $last_filemtime;
+        $manifest["version"] = $lastFilemtime;
         return $manifest;
     }
 
-    public function render_js_require($js) {
+    public function renderJsRequire($js) {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
-        $js_files = $this->js_files();
+        $jsFiles = $this->jsFiles();
         $js_open = "";
         $js_close = "";
         $js_before = "";
         $i = 0;
-        $man = CManager::instance();
-        foreach ($js_files as $f) {
-            $url_js_file = $this->url_js_file($f);
-            if ($man->is_mobile()) {
-                $mobile_path = $man->get_mobile_path();
-                if (strlen($mobile_path) > 0) {
-                    $url_js_file = $mobile_path . $f;
+        $manager = CManager::instance();
+        foreach ($jsFiles as $f) {
+            $urlJsFile = $this->urlJsFile($f);
+            if ($manager->is_mobile()) {
+                $mobilePath = $manager->getMobilePath();
+                if (strlen($mobilePath) > 0) {
+                    $urlJsFile = $mobilePath . $f;
                 }
             }
 
 
-            $js_open .= str_repeat("\t", $i) . "require(['" . $url_js_file . "'],function(){" . PHP_EOL;
+            $js_open .= str_repeat("\t", $i) . "require(['" . $urlJsFile . "'],function(){" . PHP_EOL;
 
             $js_close .= "})";
             $i++;
         }
 
         $js .= "
-                if (typeof capp_started_event_initialized === 'undefined') {
-                    capp_started_event_initialized=false;
+                if (typeof cappStartedEventInitilized === 'undefined') {
+                    cappStartedEventInitilized=false;
                  }
-                if(!capp_started_event_initialized) {
+                if(!cappStartedEventInitilized) {
                     var evt = document.createEvent('Events');
-                    evt.initEvent( 'capp-started', false, true, window, 0);
-                    capp_started_event_initialized=true;
+                    evt.initEvent('capp-started', false, true, window, 0);
+                    cappStartedEventInitilized=true;
                     document.dispatchEvent(evt);
                 }
 
@@ -307,39 +384,40 @@ class CClientScript extends CObject {
     public function render($pos, $type = array("js_file", "css_file", "js", "css", "meta", "link")) {
         $script = "";
         $app = CApp::instance();
-        $man = CManager::instance();
-        if (!is_array($type))
+        $manager = CManager::instance();
+        if (!is_array($type)) {
             $type = array($type);
+        }
         foreach ($this->scripts[$pos] as $k => $v) {
             if (in_array($k, $type)) {
                 foreach ($v as $s) {
                     switch ($k) {
                         case "js_file":
                             if (!ccfg::get('merge_js')) {
-                                $url_js_file = $this->url_js_file($s);
-                                if ($man->is_mobile()) {
-                                    $mobile_path = $man->get_mobile_path();
-                                    if (strlen($mobile_path) > 0) {
-                                        $url_js_file = $mobile_path . $s;
+                                $urlJsFile = $this->urlJsFile($s);
+                                if ($manager->is_mobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlJsFile = $mobilePath . $s;
                                     }
                                 }
 
-                                $script .= '<script src="' . $url_js_file . '"></script>' . PHP_EOL;
+                                $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
                             }
                             break;
                     }
                     switch ($k) {
                         case "css_file":
                             if (!ccfg::get('merge_css')) {
-                                $url_css_file = $this->url_css_file($s);
-                                if ($man->is_mobile()) {
-                                    $mobile_path = $man->get_mobile_path();
-                                    if (strlen($mobile_path) > 0) {
-                                        $url_css_file = $mobile_path . $s;
+                                $urlCssFile = $this->urlCssFile($s);
+                                if ($manager->is_mobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlCssFile = $mobilePath . $s;
                                     }
                                 }
 
-                                $script .= '<link href="' . $url_css_file . '" rel="stylesheet" />' . PHP_EOL;
+                                $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
                             }
                             break;
                     }

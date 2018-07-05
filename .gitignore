@@ -18,7 +18,9 @@ application/*
 /modules/cresenity/vendor/lib/fonts/Helvetica-BoldOblique.afm.php
 
 #ignore folder logs
+/application/logs
 /logs/
+/temp
 /temp/*
 /export/
 /upload/*
