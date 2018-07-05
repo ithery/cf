@@ -122,7 +122,7 @@ trait CDatabase_Trait_Builder {
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options) {
-        return CContainer::getInstance()->makeWith(Illuminate\Pagination\LengthAwarePaginator::class, compact(
+        return CContainer::getInstance()->makeWith(LengthAwarePaginator::class, compact(
                                 'items', 'total', 'perPage', 'currentPage', 'options'
         ));
     }
@@ -137,21 +137,9 @@ trait CDatabase_Trait_Builder {
      * @return \Illuminate\Pagination\Paginator
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options) {
-        return CContainer::getInstance()->makeWith(Illuminate\Pagination\Paginator::class, compact(
+        return CContainer::getInstance()->makeWith(Paginator::class, compact(
                                 'items', 'perPage', 'currentPage', 'options'
         ));
-    }
-
-    /**
-     * Set the limit and offset for a given page.
-     *
-     * @param  int  $page
-     * @param  int  $perPage
-     * @return \Illuminate\Database\Query\Builder|static
-     */
-    public function forPage($page, $perPage = 15)
-    {
-        return $this->skip(($page - 1) * $perPage)->take($perPage);
     }
 
 }
