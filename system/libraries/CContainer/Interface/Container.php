@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 24, 2018, 1:17:43 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-interface CContainer_Interface_Container extends ContainerInterface {
+interface CContainer_Interface_Container {
 
     /**
      * Determine if the given abstract type has been bound.

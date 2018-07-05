@@ -663,14 +663,14 @@ class CModel_Query {
      * @throws \InvalidArgumentException
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
-        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Illuminate\Pagination\Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
-
+        
         $results = ($total = $this->toBase()->getCountForPagination()) ? $this->forPage($page, $perPage)->get($columns) : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
-                    'path' => Paginator::resolveCurrentPath(),
+                    'path' => Illuminate\Pagination\Paginator::resolveCurrentPath(),
                     'pageName' => $pageName,
         ]);
     }
