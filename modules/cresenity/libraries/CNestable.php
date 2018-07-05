@@ -2,12 +2,14 @@
 
 class CNestable extends CElement_Element {
 
+    use CTrait_Compat_Element_Nestable,
+        CTrait_Element_ActionList_Row;
+
     protected $data;
     protected $id_key;
     protected $value_key;
     protected $applyjs;
     protected $input;
-    protected $row_action_list;
     protected $action_style;
     protected $display_callback;
     protected $filter_action_callback_func;
@@ -23,9 +25,9 @@ class CNestable extends CElement_Element {
         $this->data = array();
         $this->applyjs = true;
         $this->input = '';
-        $this->row_action_list = CActionList::factory();
+        $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->action_style = 'btn-icon-group';
-        $this->row_action_list->set_style('btn-icon-group');
+        $this->rowActionList->setStyle('btn-icon-group');
         $this->display_callback = false;
         $this->filter_action_callback_func = "";
         $this->checkbox = false;
@@ -53,27 +55,7 @@ class CNestable extends CElement_Element {
         return $this;
     }
 
-    public function have_action() {
-        //return $this->can_edit||$this->can_delete||$this->can_view;
-        return $this->row_action_list->child_count() > 0;
-    }
-
-    public function set_action_style($style) {
-        $this->action_style = $style;
-        $this->row_action_list->set_style($style);
-    }
-
-    public function action_count() {
-        return $this->row_action_list->child_count();
-    }
-
-    public function add_row_action($id = "") {
-        $row_act = CAction::factory($id);
-        $this->row_action_list->add($row_act);
-        return $row_act;
-    }
-
-    public function set_data_from_treedb($treedb, $parent_id = null) {
+    public function setDataFromTreeDb($treedb, $parent_id = null) {
         $this->data = $treedb->get_children_data($parent_id);
         return $this;
     }
@@ -103,7 +85,7 @@ class CNestable extends CElement_Element {
         return $this;
     }
 
-    public function set_applyjs($boolean) {
+    public function setApplyJs($boolean) {
         $this->applyjs = $boolean;
         return $this;
     }
@@ -157,16 +139,16 @@ class CNestable extends CElement_Element {
                         $jsparam[$k] = $v;
                     }
                     $jsparam["param1"] = $d[$this->id_key];
-                    $this->row_action_list->add_class("pull-right");
+                    $this->rowActionList->add_class("pull-right");
                     if ($this->action_style == "btn-dropdown") {
-                        $this->row_action_list->add_class("pull-right");
+                        $this->rowActionList->add_class("pull-right");
                     }
-                    $this->row_action_list->regenerate_id(true);
-                    $this->row_action_list->apply("jsparam", $jsparam);
-                    $this->row_action_list->apply("set_handler_url_param", $jsparam);
+                    $this->rowActionList->regenerateId(true);
+                    $this->rowActionList->apply("jsparam", $jsparam);
+                    $this->rowActionList->apply("set_handler_url_param", $jsparam);
 
                     if (($this->filter_action_callback_func) != null) {
-                        $actions = $this->row_action_list->childs();
+                        $actions = $this->rowActionList->childs();
 
                         foreach ($actions as $action) {
                             $visibility = CDynFunction::factory($this->filter_action_callback_func)
@@ -180,11 +162,10 @@ class CNestable extends CElement_Element {
                         }
                     }
 
-                    $this->js_cell .= $this->row_action_list->js();
-                     $html->appendln($this->row_action_list->html($html->get_indent()));
-
+                    $this->js_cell .= $this->rowActionList->js();
+                    $html->appendln($this->rowActionList->html($html->get_indent()));
                 }
-                
+
 
                 $depth_before = $depth;
             }

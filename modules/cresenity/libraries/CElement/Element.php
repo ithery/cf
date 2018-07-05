@@ -11,21 +11,21 @@ abstract class CElement_Element extends CElement {
 
     protected $before;
     protected $after;
-    protected $is_builded = false;
-    protected $is_onetag = false;
+    protected $isBuilded = false;
+    protected $isOneTag = false;
     protected $is_show = true;
-    private $is_build = false;
+    private $isBuild = false;
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id);
 
-        $this->theme = ctheme::get_current_theme();
+        $this->theme = CManager::theme()->getCurrentTheme();
 
         $this->before = null;
         $this->after = null;
 
-        $this->is_builded = false;
-        $this->is_onetag = false;
+        $this->isBuilded = false;
+        $this->isOneTag = false;
 
 
 
@@ -36,18 +36,18 @@ abstract class CElement_Element extends CElement {
     }
 
     public function onetag() {
-        return '<' . $this->tag . ' ' . $this->html_attr() . ' />';
+        return '<' . $this->tag . ' ' . $this->htmlAttr() . ' />';
     }
 
     public function pretag() {
-        return '<' . $this->tag . ' ' . $this->html_attr() . ' >';
+        return '<' . $this->tag . ' ' . $this->htmlAttr() . ' >';
     }
 
     public function posttag() {
         return '</' . $this->tag . '>';
     }
 
-    protected function html_attr() {
+    protected function htmlAttr() {
         $classes = $this->classes;
         $classes = implode(" ", $classes);
 
@@ -68,40 +68,32 @@ abstract class CElement_Element extends CElement {
 
     public static function is_instanceof($val) {
         if (is_object($val)) {
-            return ($val instanceof CElement);
+            return ($val instanceof CElement_Element);
         }
         return false;
     }
 
-    protected function build_once() {
+    protected function buildOnce() {
         //just build once
-        if (!$this->is_builded) {
+        if (!$this->isBuilded) {
             $this->build();
-            $this->is_builded = true;
+            $this->isBuilded = true;
         }
     }
 
-    protected function html_child($indent = 0) {
-        return parent::html($indent);
-    }
-
-    protected function js_child($indent = 0) {
-        return parent::js($indent);
-    }
-
-    public function before_html($indent = 0) {
+    public function beforeHtml($indent = 0) {
         return $this->before()->html($indent);
     }
 
-    public function after_html($indent = 0) {
+    public function afterHtml($indent = 0) {
         return $this->after()->html($indent);
     }
 
-    public function before_js($indent = 0) {
+    public function beforeJs($indent = 0) {
         return $this->before()->js($indent);
     }
 
-    public function after_js($indent = 0) {
+    public function afterJs($indent = 0) {
         return $this->after()->js($indent);
     }
 
@@ -126,37 +118,37 @@ abstract class CElement_Element extends CElement {
     public function html($indent = 0) {
         $html = new CStringBuilder();
 
-        $html->set_indent($indent);
-        $this->build_once();
-        $html->appendln($this->before_html($indent));
-        if ($this->is_onetag) {
+        $html->setIndent($indent);
+        $this->buildOnce();
+        $html->appendln($this->beforeHtml($indent));
+        if ($this->isOneTag) {
             $html->appendln($this->onetag());
         } else {
             if ($this->is_show) {
                 $html->appendln($this->pretag())->br();
-                $html->inc_indent();
+                $html->incIndent();
             }
-            
-            $html->appendln($this->html_child($html->get_indent()))->br();
+
+            $html->appendln($this->htmlChild($html->getIndent()))->br();
 
             if ($this->is_show) {
-                $html->dec_indent();
+                $html->decIndent();
                 $html->appendln($this->posttag())->br();
             }
         }
-        $html->appendln($this->after_html($indent));
+        $html->appendln($this->afterHtml($indent));
 
         return $html->text();
     }
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
-        $this->build_once();
+        $js->setIndent($indent);
+        $this->buildOnce();
 
-        $js->appendln($this->before_js($js->get_indent()));
-        $js->appendln($this->js_child($js->get_indent()))->br();
-        $js->appendln($this->after_js($js->get_indent()));
+        $js->appendln($this->beforeJs($js->getIndent()));
+        $js->appendln($this->jsChild($js->getIndent()))->br();
+        $js->appendln($this->afterJs($js->getIndent()));
 
         return $js->text();
     }

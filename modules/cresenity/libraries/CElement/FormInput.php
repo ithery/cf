@@ -181,7 +181,7 @@ class CElement_FormInput extends CElement_Element {
     }
 
     protected function htmlAttr() {
-        $htmlAttr = parent::html_attr();
+        $htmlAttr = parent::htmlAttr();
         $nameAttr = ' name="' . $this->name . '"';
         return $htmlAttr . $nameAttr;
     }

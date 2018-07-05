@@ -1186,6 +1186,11 @@ div.dataTables_wrapper .ui-widget-header {
     vertical-align: middle;
 } 
 
+.select2-container.form-control {
+    padding: 0;
+    border: 0;
+}
+
 .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple {
     border-color: #e7eaec;
 }

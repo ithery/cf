@@ -5,15 +5,8 @@ class CFormInputSelectSearch extends CFormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
     
     protected $query;
-    protected $format_selection;
-    protected $format_result;
-    protected $key_field;
-    protected $search_field;
     protected $multiple;
     protected $placeholder;
-    protected $auto_select;
-    protected $min_input_length;
-    protected $dropdown_classes;
     protected $delay;
 
     public function __construct($id) {

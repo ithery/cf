@@ -105,7 +105,7 @@ class CCurl {
         return $this;
     }
 
-    public function set_opt($key, $value, $overwrite = true) {
+    public function setOpt($key, $value, $overwrite = true) {
         if (!$overwrite) {
             if (isset($this->options[$key])) {
                 return $this;
@@ -115,18 +115,18 @@ class CCurl {
         return $this;
     }
 
-    public function get_opt($key) {
+    public function getOpt($key) {
         if (isset($this->options[$key])) {
             return $this->options[$key];
         }
         return null;
     }
 
-    public function get_handle() {
+    public function getHandle() {
         return $this->handle;
     }
 
-    public function set_http_user_agent($http_user_agent) {
+    public function setHttpUserAgent($http_user_agent) {
         $this->http_user_agent = $http_user_agent;
         return $this;
     }
@@ -304,7 +304,7 @@ class CCurl {
         return $this;
     }
 
-    public function set_timeout($milisecond) {
+    public function setTimeout($milisecond) {
         $this->set_opt(CURLOPT_TIMEOUT, $milisecond);
         return $this;
     }
@@ -316,7 +316,7 @@ class CCurl {
         return $this;
     }
 
-    public function set_post($data) {
+    public function setPost(array $data) {
         $this->post_data = $data;
         $post_data = curl::as_post_string($data);
         $this->set_opt(CURLOPT_POST, true);
@@ -345,8 +345,8 @@ class CCurl {
         return $this;
     }
 
-    public function set_url($url) {
-        $this->set_opt(CURLOPT_URL, $url);
+    public function setUrl($url) {
+        $this->setOpt(CURLOPT_URL, $url);
         $this->url = $url;
         return $this;
     }

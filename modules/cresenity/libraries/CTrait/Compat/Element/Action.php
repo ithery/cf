@@ -33,7 +33,7 @@ trait CTrait_Compat_Element_Action {
     /**
      * 
      * @deprecated since version 1.2, please use setSubmit
-     * @param CElement_Component_Action
+     * @param $this
      */
     public function set_submit($bool) {
         return $this->setSubmit($bool);
@@ -42,7 +42,7 @@ trait CTrait_Compat_Element_Action {
     /**
      * 
      * @deprecated since version 1.2, please use setLink
-     * @param CElement_Component_Action
+     * @param $this
      */
     public function set_link($link) {
         return $this->setLink($link);
@@ -51,10 +51,29 @@ trait CTrait_Compat_Element_Action {
     /**
      * 
      * @deprecated since version 1.2, please use setConfirm
-     * @param CElement_Component_Action
+     * @param $this
      */
     public function set_confirm($bool) {
         return $this->setConfirm($bool);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use setLinkTarget
+     * @param string $linkTarget
+     * @return $this
+     */
+    public function set_link_target($linkTarget) {
+        return $this->setLinkTarget($linkTarget);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use reassignConfirm
+     * @return $this
+     */
+    public function reassign_confirm() {
+        return $this->reassignConfirm();
     }
 
 }

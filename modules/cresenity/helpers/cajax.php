@@ -195,11 +195,15 @@ class cajax {
         $q = $obj->data->query;
         $key_field = $obj->data->key_field;
         $search_field = $obj->data->search_field;
+        $callbackFunction = "";
         $callback = "";
         $term = "";
         $limit = "";
         $page = "";
 
+        if (isset($input["callbackFunction"])) {
+            $callbackFunction = $input["callbackFunction"];
+        }
         if (isset($input["callback"])) {
             $callback = $input["callback"];
         }
@@ -281,8 +285,7 @@ class cajax {
             //order
             if (is_array($search_field)) {
                 foreach ($search_field as $f) {
-                    if (strlen($sOrder) > 0)
-                        $sOrder .= ",";
+                    if (strlen($sOrder) > 0) $sOrder .= ",";
                     $sOrder .= "`" . $f . "` = " . $db->escape($term) . " DESC";
                 }
             }
@@ -298,10 +301,8 @@ class cajax {
             $temp_order_by = "";
             foreach ($sub as $val) {
                 $kata = explode(".", $val);
-                if (isset($kata[1]))
-                    $temp_order_by .= ", " . $kata[1];
-                else
-                    $temp_order_by .= ", " . $kata[0];
+                if (isset($kata[1])) $temp_order_by .= ", " . $kata[1];
+                else $temp_order_by .= ", " . $kata[0];
             }
             $temp_order_by = substr($temp_order_by, 2);
             $temp_order_by = "ORDER BY " . $temp_order_by;
@@ -317,10 +318,15 @@ class cajax {
 
         $result = $r->result(false);
         $data = array();
+
         foreach ($r as $row) {
             $p = array();
             foreach ($row as $k => $v) {
-                $p[$k] = ($v == null) ? "" : $v;
+                $v = ($v == null) ? "" : $v;
+                if ($callbackFunction != null && is_callable($callbackFunction)) {
+                    $v = call_user_func($callbackFunction, $row, $k, $v);
+                }
+                $p[$k] = $v;
             }
             $p["id"] = $row[$key_field];
             //$p["id"]=$row["item_id"];
@@ -393,8 +399,7 @@ class cajax {
         $qtotal = "select count(*) as cnt from (" . $q . ") as a";
         $rtotal = $db->query($qtotal);
         $total_record = 0;
-        if ($rtotal->count() > 0)
-            $total_record = $rtotal[0]->cnt;
+        if ($rtotal->count() > 0) $total_record = $rtotal[0]->cnt;
 
         /* Paging */
         $sLimit = "";
@@ -463,7 +468,7 @@ class cajax {
             }
             $qs_condition_str = substr_replace($qs_condition_str, "", -4);
             if (strlen(trim($sWhere)) > 0)
-                $sWhere = ' ( ' . $sWhere . ' ) AND ';
+                    $sWhere = ' ( ' . $sWhere . ' ) AND ';
 
             $sWhere .= $qs_condition_str;
         }
@@ -491,8 +496,7 @@ class cajax {
         $qtotal = "select count(*) as cnt from (" . $qfilter . ") as a";
         $rtotal = $db->query($qtotal);
         $filtered_record = 0;
-        if ($rtotal->count() > 0)
-            $filtered_record = $rtotal[0]->cnt;
+        if ($rtotal->count() > 0) $filtered_record = $rtotal[0]->cnt;
 
 
         //die($temp_order_by);
@@ -501,10 +505,8 @@ class cajax {
             $temp_order_by = "";
             foreach ($sub as $val) {
                 $kata = explode(".", $val);
-                if (isset($kata[1]))
-                    $temp_order_by .= ", " . $kata[1];
-                else
-                    $temp_order_by .= ", " . $kata[0];
+                if (isset($kata[1])) $temp_order_by .= ", " . $kata[1];
+                else $temp_order_by .= ", " . $kata[0];
             }
             $temp_order_by = substr($temp_order_by, 2);
             $temp_order_by = "ORDER BY " . $temp_order_by;
@@ -604,7 +606,7 @@ class cajax {
                 if ($table->getRowActionStyle() == "btn-dropdown") {
                     $table->getRowActionList()->add_class("pull-right");
                 }
-                $row_action_list->regenerate_id(true);
+                $row_action_list->regenerateId(true);
                 $row_action_list->apply("jsparam", $jsparam);
 
                 $row_action_list->apply("set_handler_url_param", $jsparam);
@@ -982,8 +984,8 @@ class cajax {
                 if ($table->getRowActionStyle() == "btn-dropdown") {
                     $table->getRowActionList()->add_class("pull-right");
                 }
-                
-                $row_action_list->regenerate_id(true);
+
+                $row_action_list->regenerateId(true);
                 $row_action_list->apply("jsparam", $jsparam);
 
                 $row_action_list->apply("set_handler_url_param", $jsparam);

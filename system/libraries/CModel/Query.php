@@ -13,7 +13,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CModel_Query {
 
-    use CModel_Query_Trait_BuildsQueries,
+    use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships;
 
     /**
@@ -85,7 +85,7 @@ class CModel_Query {
     /**
      * Create a new Eloquent query builder instance.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  CDatabase_Query_Builder  $query
      * @return void
      */
     public function __construct(CDatabase_Query_Builder $query) {
@@ -225,7 +225,7 @@ class CModel_Query {
      * @param  \Closure|array|string  $column
      * @param  string  $operator
      * @param  mixed  $value
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function orWhere($column, $operator = null, $value = null) {
         return $this->where($column, $operator, $value, 'or');
@@ -250,7 +250,7 @@ class CModel_Query {
      *
      * @param  string  $query
      * @param  array  $bindings
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function fromQuery($query, $bindings = []) {
         return $this->hydrate(
@@ -263,7 +263,7 @@ class CModel_Query {
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return CModel|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     * @return CModel|CModel_Collection|static[]|static|null
      */
     public function find($id, $columns = ['*']) {
         if (is_array($id) || $id instanceof Arrayable) {
@@ -293,7 +293,7 @@ class CModel_Query {
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return CModel|CModel_Collection
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -439,6 +439,7 @@ class CModel_Query {
             $models = $builder->eagerLoadRelations($models);
         }
 
+
         return $builder->getModel()->newCollection($models);
     }
 
@@ -446,12 +447,10 @@ class CModel_Query {
      * Get the hydrated models without eager loading.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model[]
+     * @return CModel[]
      */
     public function getModels($columns = ['*']) {
-        return $this->model->hydrate(
-                        $this->query->get($columns)->all()
-                )->all();
+        return $this->model->hydrate($this->query->get($columns)->all())->all();
     }
 
     /**
@@ -898,7 +897,7 @@ class CModel_Query {
         //$result = $scope(...array_values($parameters)) ?? $this;
         //$result = isset($scope(array_values($parameters))) ? $scope(array_values($parameters)) : $this;
         $result = call_user_func_array($scope, array_values($parameters));
-        
+
         $result = isset($result) && !is_null($result) ? $result : $this;
 
         if (count((array) $query->wheres) > $originalWhereCount) {
@@ -1179,7 +1178,7 @@ class CModel_Query {
             array_unshift($parameters, $this);
 
             //return $this->localMacros[$method](...$parameters);
-            return call_user_func_array($this->localMacros[$method],$parameters);
+            return call_user_func_array($this->localMacros[$method], $parameters);
         }
 
         if (isset(static::$macros[$method])) {
@@ -1237,20 +1236,22 @@ class CModel_Query {
                 // Load the controller method
                 $method_object = $class->getMethod($method);
             } catch (ReflectionException $e) {
-                // Use __call instead
-
-                try {
-                    throw new Exception('404');
-                } catch (Exception $ex) {
-                    cdbg::var_dump(nl2br($ex->getTraceAsString()));
+                if ($class->hasMethod('__call')) {
+                    // Use __call instead
+                    $method_object = $class->getMethod('__call');
+                    // Use arguments in __call format
+                    $parameters = array($method, $parameters);
+                } else {
+                    try {
+                        throw new Exception('404 doesn\'t have method __call on CDatabase_Query_Builder');
+                    } catch (Exception $ex) {
+                        cdbg::var_dump(nl2br($ex->getTraceAsString()));
+                        cdbg::var_dump($ex->getMessage());
+                    }
+                    die(
+                            sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
+                    );
                 }
-                die(
-                        sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
-                );
-                $method_object = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $parameters = array($method, $parameters);
             }
 
 

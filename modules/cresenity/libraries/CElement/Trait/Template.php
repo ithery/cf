@@ -15,6 +15,11 @@ trait CElement_Trait_Template {
     protected $jsOutput = '';
     protected $onBeforeParse = null;
 
+    /**
+     * 
+     * @param string $name
+     * @return $this
+     */
     public function setTemplate($name) {
         $this->templateName = $name;
         return $this;
@@ -36,26 +41,31 @@ trait CElement_Trait_Template {
     }
 
     public function setVar($key, $val) {
-
         $this->templateData[$key] = $val;
         return $this;
     }
 
     private function getTemplatePath($templateName) {
         $viewPath = $templateName;
-
         return $viewPath;
     }
 
     private function parseTemplate($templateName) {
-        if ($this->onBeforeParse != null) { 
+        if ($this->onBeforeParse != null) {
             $callable = $this->onBeforeParse;
             $callable();
         }
 
         $viewPath = $this->getTemplatePath($templateName);
-        $view = CTemplate::factory($viewPath);
-        //PMBlocks::instance()->set_data($this->templateData);
+        $view = new CTemplate($viewPath);
+        $helpers = $view->getHelpers();
+        $helpers->set('content', function () {
+
+            return $this->htmlChild();
+        });
+        $helpers->set('element', function () {
+            return $this;
+        });
         $view->set($this->templateData);
         $output = $view->render();
         $output_js = "";
@@ -81,16 +91,19 @@ trait CElement_Trait_Template {
 
     protected function collectHtmlJs() {
 
-        $result_header = array();
-        $result_content = array();
-        $result_footer = array();
+        $resultHeader = array();
+        $resultContent = array();
+        $resultFooter = array();
 
 
-        $result_content = $this->parseTemplate($this->templateName);
+        $resultContent = $this->parseTemplate($this->templateName);
 
 
-        $this->htmlOutput = carr::get($result_header, 'html', '') . carr::get($result_content, 'html', '') . carr::get($result_footer, 'html', '');
-        $this->jsOutput = carr::get($result_header, 'js', '') . carr::get($result_content, 'js', '') . carr::get($result_footer, 'js', '');
+        $this->htmlOutput = carr::get($resultHeader, 'html', '') . carr::get($resultContent, 'html', '') . carr::get($resultFooter, 'html', '');
+        $this->jsOutput = carr::get($resultHeader, 'js', '') . carr::get($resultContent, 'js', '') . carr::get($resultFooter, 'js', '');
+
+        //htmlChild will concat in helper template content, we need to concat the js here
+        $this->jsOutput .= parent::jsChild();
 
         return true;
     }

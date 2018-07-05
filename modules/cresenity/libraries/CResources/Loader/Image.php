@@ -4,6 +4,7 @@
  * Description of Image
  *
  * @author Hery
+ * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CResources_Loader_Image {
 
@@ -127,11 +128,11 @@ class CResources_Loader_Image {
         if (strlen($size_add) > 0) {
             $size_add .= '/';
         }
-        
+
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
-    
+
         $baseUrl = curl::base(false, $protocol);
-        
+
         $path = $baseUrl . 'assets/image/' . $size_add . CResources_Encode::encode($this->resourceName);
         if ($this->s3Object != null) {
             $this->saveToS3();
@@ -189,8 +190,8 @@ class CResources_Loader_Image {
 
     public function delete() {
         $fullPath = $this->getSizePath($this->sizeName);
-        
+
         @unlink($fullPath);
     }
-    
+
 }
