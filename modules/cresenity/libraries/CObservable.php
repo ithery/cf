@@ -130,6 +130,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
+
     /**
      * Add Anchor Element &lt;a&gt
      *
@@ -440,6 +441,12 @@ abstract class CObservable extends CRenderable {
         $act = CElement_Factory::createComponent('Action', $id);
         $this->add($act);
         return $act;
+    }
+
+    public function addAlert($id = "") {
+        $element = CElement_Factory::createComponent('Alert', $id);
+        $this->add($element);
+        return $element;
     }
 
     public function addIcon($id = "") {
