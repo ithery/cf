@@ -74,7 +74,9 @@ class CElement_Component_Accordion_Item extends CElement_Component {
 
     public function build() {
         $this->body->setAttr('data-parent', $this->parent->id);
-        
+        if($this->active) {
+            $this->body->addClass('show');
+        }
     }
 
 }
