@@ -448,6 +448,12 @@ abstract class CObservable extends CRenderable {
         $this->add($element);
         return $element;
     }
+    
+    public function addAccordion($id = "") {
+        $element = CElement_Factory::createComponent('Accordion', $id);
+        $this->add($element);
+        return $element;
+    }
 
     public function addIcon($id = "") {
         $icon = CElement_Factory::createComponent('Icon', $id);
