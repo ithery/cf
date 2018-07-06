@@ -30,7 +30,6 @@ class CElement_Component_Accordion extends CElement_Component {
         $this->add($item);
         if (strlen($this->activeItemId) == 0) {
             $this->activeItemId = $item->id;
-            $item->setActive();
         }
         return $item;
     }
