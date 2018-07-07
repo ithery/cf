@@ -9,12 +9,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_Component_Accordion extends CElement_Component {
 
-    /**
-     *
-     * @var string
-     */
-    protected $activeItemId;
-
     public function __construct($id) {
         parent::__construct($id);
         $this->addClass('component-accordion');
@@ -28,9 +22,7 @@ class CElement_Component_Accordion extends CElement_Component {
     public function addItem($id = null) {
         $item = CElement_Factory::createComponent('Accordion_Item');
         $this->add($item);
-        if (strlen($this->activeItemId) == 0) {
-            $this->activeItemId = $item->id;
-        }
+
         return $item;
     }
 
