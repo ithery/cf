@@ -57,9 +57,9 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      * @param \Illuminate\Filesystem\Filesystem $files
      * @param                                   $timeout
      */
-    public function __construct($host, array $auth, $timeout) {
+    public function __construct($host, $port, array $auth, $timeout) {
         $this->auth = $auth;
-        $this->setHostAndPort($host);
+        $this->setHostAndPort($host, $port);
         $this->setTimeout($timeout);
     }
 
@@ -67,10 +67,12 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      * Set the host and port from a full host string.
      *
      * @param string $host
+     * @param string $port
      *
      * @return void
      */
-    protected function setHostAndPort($host) {
+    protected function setHostAndPort($host, $port) {
+        $this->port = $port;
         if (!cstr::contains($host, ':')) {
             $this->host = $host;
         } else {

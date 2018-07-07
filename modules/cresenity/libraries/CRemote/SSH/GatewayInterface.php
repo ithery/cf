@@ -102,13 +102,6 @@ interface CRemote_SSH_GatewayInterface {
     public function delete($remote);
 
     /**
-     * Get the next line of output from the server.
-     *
-     * @return string|null
-     */
-    public function nextLine();
-
-    /**
      * Get the exit status of the last command.
      *
      * @return int|bool
