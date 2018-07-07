@@ -215,4 +215,17 @@ class CElastic {
         return array_merge($params, ['index' => $this->getDefaultIndex()]);
     }
 
+    public function createClient() {
+        $config = array();
+        foreach ($this->hosts as $host) {
+            $hostArray = explode(':', $host);
+            $config[] = array(
+                'host' => carr::get($hostArray, 0),
+                'port' => carr::get($hostArray, 1, '9200'),
+            );
+        }
+
+        return new CElastic_Client($config);
+    }
+
 }
