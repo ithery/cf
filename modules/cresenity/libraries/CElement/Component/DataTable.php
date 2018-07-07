@@ -61,7 +61,10 @@ class CElement_Component_DataTable extends CElement_Component {
     public $footer_action_style;
     public $export_filename = '';
     public $export_sheetname = '';
-    public $is_elastic = false;
+    public $isElastic = false;
+    public $isCallback = false;
+    public $callbackRequire = null;
+    public $callbackOptions = null;
     protected $table_striped;
     protected $quick_search = FALSE;
     protected $tbody_id;
@@ -707,13 +710,22 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setDataFromElastic($el) {
+    public function setDataFromElastic($el, $require) {
         $this->query = $el;
-        $this->is_elastic = true;
+        $this->isElastic = true;
         if ($el instanceof CElastic_Search) {
 
             $this->query = $el->ajax_data();
         }
+        return $this;
+    }
+
+    public function setDataFromCallback($callback, $callbackOptions = array(), $require = null) {
+        $this->query = $callback;
+        $this->isCallback = true;
+        $this->callbackOptions = $callbackOptions;
+        $this->callbackRequire = $require;
+
         return $this;
     }
 
@@ -1690,7 +1702,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $html->decIndent()->appendln('</tfoot>')->br();
         }
         $html->decIndent()
-                ->appendln('</table>'. $data_responsive_close);
+                ->appendln('</table>' . $data_responsive_close);
         if ($wrapped > 0) {
             $html->decIndent()->appendln('</div>');
             $html->decIndent()->appendln('</div>');
@@ -1734,6 +1746,21 @@ class CElement_Component_DataTable extends CElement_Component {
             foreach ($this->columns as $col) {
                 $columns[] = $col;
             }
+            
+            $ajaxMethod = CAjax::createMethod();
+            $ajaxMethod->setType('DataTable');
+            $ajaxMethod->setData('columns',$columns);
+            $ajaxMethod->setData('query',$this->query);
+            $ajaxMethod->setData('row_action_list',$this->rowActionList);
+            $ajaxMethod->setData('key_field',$this->key_field);
+            $ajaxMethod->setData('table',serialize($this));
+            $ajaxMethod->setData('domain',$this->domain);
+            $ajaxMethod->setData('is_elastic',$this->isElastic);
+            $ajaxMethod->setData('is_callback',$this->isCallback);
+            $ajaxMethod->setData('callback_require',$this->callbackRequire);
+            $ajaxMethod->setData('callback_options',$this->callbackOptions);
+            $ajax_url = $ajaxMethod->makeUrl();
+            /*
             $ajax_url = CAjaxMethod::factory()->set_type('datatable')
                     ->set_data('columns', $columns)
                     ->set_data('query', $this->query)
@@ -1741,8 +1768,12 @@ class CElement_Component_DataTable extends CElement_Component {
                     ->set_data('key_field', $this->key_field)
                     ->set_data('table', serialize($this))
                     ->set_data('domain', $this->domain)
-                    ->set_data('is_elastic', $this->is_elastic)
+                    ->set_data('is_elastic', $this->isElastic)
+                    ->set_data('is_callback', $this->isCallback)
+                    ->set_data('callback_require', $this->callbackRequire)
                     ->makeurl();
+             * 
+             */
         }
 
         foreach ($this->footer_action_list->childs() as $row_act) {
