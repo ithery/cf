@@ -58,6 +58,7 @@ class CElastic_Connection extends CElastic_Param {
         if (!$this->hasParam('config')) {
             $this->setParam('config', []);
         }
+        
     }
 
     /**
@@ -221,13 +222,13 @@ class CElastic_Connection extends CElastic_Param {
     /**
      * Returns an instance of the transport type.
      *
-     * @throws \Elastica\Exception\InvalidException If invalid transport type
+     * @throws CElastic_Exception_InvalidException If invalid transport type
      *
-     * @return \Elastica\Transport\AbstractTransport Transport object
+     * @return CElastic_Transport_AbstractTransport Transport object
      */
     public function getTransportObject() {
         $transport = $this->getTransport();
-        return AbstractTransport::create($transport, $this);
+        return CElastic_Transport_AbstractTransport::create($transport, $this);
     }
 
     /**
@@ -289,7 +290,7 @@ class CElastic_Connection extends CElastic_Param {
     }
 
     /**
-     * @param \Elastica\Connection|array $params Params to create a connection
+     * @param CElastic_Connection|array $params Params to create a connection
      *
      * @throws Exception\InvalidException
      *
@@ -302,7 +303,7 @@ class CElastic_Connection extends CElastic_Param {
         if ($params instanceof self) {
             return $params;
         }
-        throw new InvalidException('Invalid data type');
+        throw new CElastic_Exception_InvalidException('Invalid data type');
     }
 
     /**

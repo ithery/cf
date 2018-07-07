@@ -217,9 +217,10 @@ class CElastic {
 
     public function createClient() {
         $config = array();
+        $config['servers'] = array();
         foreach ($this->hosts as $host) {
             $hostArray = explode(':', $host);
-            $config[] = array(
+            $config['servers'][] = array(
                 'host' => carr::get($hostArray, 0),
                 'port' => carr::get($hostArray, 1, '9200'),
             );

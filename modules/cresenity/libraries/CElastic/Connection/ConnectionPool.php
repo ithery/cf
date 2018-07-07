@@ -88,7 +88,7 @@ class CElastic_Connection_ConnectionPool {
      * @param \Exception           $e
      * @param CElastic_Client               $client
      */
-    public function onFail(Connection $connection, Exception $e, CElastic_Client $client) {
+    public function onFail(CElastic_Connection $connection, Exception $e, CElastic_Client $client) {
         $connection->setEnabled(false);
         if ($this->_callback) {
             call_user_func($this->_callback, $connection, $e, $client);

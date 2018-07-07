@@ -74,7 +74,7 @@ class CElastic_Client {
     protected $_version;
 
     /**
-     * Creates a new Elastica client.
+     * Creates a new CElastic client.
      *
      * @param array           $config   OPTIONAL Additional config options
      * @param callback        $callback OPTIONAL Callback function which can be used to be notified about errors (for example connection down)
@@ -83,7 +83,7 @@ class CElastic_Client {
     public function __construct(array $config = [], $callback = null, LoggerInterface $logger = null) {
         $this->_callback = $callback;
         if (!$logger && isset($config['log']) && $config['log']) {
-            $logger = new Log($config['log']);
+            $logger = new CElastic_Log($config['log']);
         }
         $this->_logger = $logger ?: new NullLogger();
         $this->setConfig($config);
@@ -109,13 +109,14 @@ class CElastic_Client {
     protected function _initConnections() {
         $connections = [];
         foreach ($this->getConfig('connections') as $connection) {
-            $connections[] = Connection::create($this->_prepareConnectionParams($connection));
+            $connections[] = CElastic_Connection::create($this->_prepareConnectionParams($connection));
         }
         if (isset($this->_config['servers'])) {
             foreach ($this->getConfig('servers') as $server) {
-                $connections[] = Connection::create($this->_prepareConnectionParams($server));
+                $connections[] = CElastic_Connection::create($this->_prepareConnectionParams($server));
             }
         }
+
         // If no connections set, create default connection
         if (empty($connections)) {
             $connections[] = CElastic_Connection::create($this->_prepareConnectionParams($this->getConfig()));
@@ -220,10 +221,10 @@ class CElastic_Client {
      *
      * @param string $name Index name to create connection to
      *
-     * @return \Elastica\Index Index for the given name
+     * @return CElastic_Index Index for the given name
      */
     public function getIndex($name) {
-        return new Index($this, $name);
+        return new CElastic_Index($this, $name);
     }
 
     /**
@@ -447,19 +448,19 @@ class CElastic_Client {
     /**
      * Returns the status object for all indices.
      *
-     * @return \Elastica\Status Status object
+     * @return CElastic_Client_Status Status object
      */
     public function getStatus() {
-        return new Status($this);
+        return new CElastic_Client_Status($this);
     }
 
     /**
      * Returns the current cluster.
      *
-     * @return \Elastica\Cluster Cluster object
+     * @return CElastic_Cluster Cluster object
      */
     public function getCluster() {
-        return new Cluster($this);
+        return new CElastic_Cluster($this);
     }
 
     /**
@@ -598,13 +599,13 @@ class CElastic_Client {
      *
      * @return Response Response object
      */
-    public function request($path, $method = Request::GET, $data = [], array $query = [], $contentType = Request::DEFAULT_CONTENT_TYPE) {
+    public function request($path, $method = CElastic_Client_Request::GET, $data = [], array $query = [], $contentType = CElastic_Client_Request::DEFAULT_CONTENT_TYPE) {
         $connection = $this->getConnection();
-        $request = $this->_lastRequest = new Request($path, $method, $data, $query, $connection, $contentType);
+        $request = $this->_lastRequest = new CElastic_Client_Request($path, $method, $data, $query, $connection, $contentType);
         $this->_lastResponse = null;
         try {
             $response = $this->_lastResponse = $request->send();
-        } catch (ConnectionException $e) {
+        } catch (CElastic_Exception_ConnectionException $e) {
             $this->_connectionPool->onFail($connection, $e, $this);
             $this->_log($e);
             // In case there is no valid connection left, throw exception which caused the disabling of the connection.

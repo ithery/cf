@@ -72,7 +72,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
      * @return string name
      */
     protected function _getBaseName() {
-        return Util::getParamName($this);
+        return CElastic_Util::getParamName($this);
     }
 
     /**
