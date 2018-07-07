@@ -727,4 +727,12 @@ class CElastic_Client {
         return $this;
     }
 
+    public static function createQueryBuilder() {
+        return new CElastic_Client_QueryBuilder();
+    }
+
+    public static function createQuery() {
+        return new CElastic_Client_Query();
+    }
+
 }

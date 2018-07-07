@@ -215,6 +215,10 @@ class CElastic {
         return array_merge($params, ['index' => $this->getDefaultIndex()]);
     }
 
+    /**
+     * 
+     * @return \CElastic_Client
+     */
     public function createClient() {
         $config = array();
         $config['servers'] = array();
