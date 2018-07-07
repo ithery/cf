@@ -121,7 +121,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
                 // ... and tell ES that it is compressed
                 array_push($headers, 'Content-Encoding: gzip');
             } else {
-                cdbg::var_dump($content);
+
                 curl_setopt($conn, CURLOPT_POSTFIELDS, $content);
             }
         } else {

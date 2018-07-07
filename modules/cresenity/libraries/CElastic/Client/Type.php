@@ -7,6 +7,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jul 7, 2018, 9:55:15 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Elasticsearch\Endpoints\AbstractEndpoint;
+use Elasticsearch\Endpoints\Delete;
+use Elasticsearch\Endpoints\DeleteByQuery;
+use Elasticsearch\Endpoints\Indices\Mapping\Get;
+use Elasticsearch\Endpoints\Indices\Type\Exists;
 
 /**
  * Elastica type object.
@@ -254,13 +259,13 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
     /**
      * Sets value type mapping for this type.
      *
-     * @param \Elastica\Type\Mapping|array $mapping Elastica\Type\MappingType object or property array with all mappings
+     * @param CElastic_Client_Type_Mapping|array $mapping Elastica\Type\MappingType object or property array with all mappings
      * @param array                        $query   querystring when put mapping (for example update_all_types)
      *
      * @return CElastic_Client_Response
      */
     public function setMapping($mapping, array $query = []) {
-        $mapping = Mapping::create($mapping);
+        $mapping = CElastic_Client_Type_Mapping::create($mapping);
         $mapping->setType($this);
         return $mapping->send($query);
     }
@@ -479,5 +484,7 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
         $response = $this->requestEndpoint(new Exists());
         return $response->getStatus() === 200;
     }
+
+   
 
 }

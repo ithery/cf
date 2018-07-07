@@ -253,7 +253,7 @@ class CElastic_Client_Index implements CElastic_Interface_SearchableInterface {
         if (is_bool($options) && $options) {
             try {
                 $this->delete();
-            } catch (ResponseException $e) {
+            } catch (CElastic_Exception_ResponseException $e) {
                 // Table can't be deleted, because doesn't exist
             }
         } elseif (is_array($options)) {

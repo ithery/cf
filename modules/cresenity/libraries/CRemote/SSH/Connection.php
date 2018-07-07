@@ -27,6 +27,13 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     protected $name;
 
     /**
+     * The port of the connection.
+     *
+     * @var int
+     */
+    protected $port;
+
+    /**
      * The host name of the server.
      *
      * @var string
@@ -64,11 +71,12 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      * @param CRemote_SSH_GatewayInterface        $gateway
      * @param int                                 $timeout
      */
-    public function __construct($name, $host, $username, array $auth, CRemote_SSH_GatewayInterface $gateway = null, $timeout = 10) {
+    public function __construct($name, $host, $port, $username, array $auth, CRemote_SSH_GatewayInterface $gateway = null, $timeout = 10) {
         $this->name = $name;
         $this->host = $host;
+        $this->port = $port;
         $this->username = $username;
-        $this->gateway = $gateway ?: new CRemote_SSH_Gateway($host, $auth, $timeout);
+        $this->gateway = $gateway ?: new CRemote_SSH_Gateway($host, $port, $auth, $timeout);
     }
 
     /**
