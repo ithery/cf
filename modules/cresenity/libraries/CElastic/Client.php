@@ -172,7 +172,7 @@ class CElastic_Client {
      *
      * @param string $key Config key
      *
-     * @throws \Elastica\Exception\InvalidException
+     * @throws CElastic_Exception_InvalidException
      *
      * @return array|string Config value
      */
@@ -221,10 +221,10 @@ class CElastic_Client {
      *
      * @param string $name Index name to create connection to
      *
-     * @return CElastic_Index Index for the given name
+     * @return CElastic_Client_Index Index for the given name
      */
     public function getIndex($name) {
-        return new CElastic_Index($this, $name);
+        return new CElastic_Client_Index($this, $name);
     }
 
     /**
@@ -233,7 +233,7 @@ class CElastic_Client {
      * @param string $header      The HTTP Header
      * @param string $headerValue The HTTP Header Value
      *
-     * @throws \Elastica\Exception\InvalidException If $header or $headerValue is not a string
+     * @throws CElastic_Exception_InvalidException If $header or $headerValue is not a string
      *
      * @return $this
      */
@@ -251,7 +251,7 @@ class CElastic_Client {
      *
      * @param string $header The HTTP Header to remove
      *
-     * @throws \Elastica\Exception\InvalidException If $header is not a string
+     * @throws CElastic_Exception_InvalidException If $header is not a string
      *
      * @return $this
      */
@@ -278,7 +278,7 @@ class CElastic_Client {
      * @param array|\Elastica\Document[] $docs          Array of Elastica\Document
      * @param array                      $requestParams
      *
-     * @throws \Elastica\Exception\InvalidException If docs is empty
+     * @throws CElastic_Exception_InvalidException If docs is empty
      *
      * @return \Elastica\Bulk\ResponseSet Response object
      */
@@ -306,7 +306,7 @@ class CElastic_Client {
      * @param array|\Elastica\Document[] $docs          Array of Elastica\Document
      * @param array                      $requestParams
      *
-     * @throws \Elastica\Exception\InvalidException If docs is empty
+     * @throws CElastic_Exception_InvalidException If docs is empty
      *
      * @return \Elastica\Bulk\ResponseSet Response object
      */
@@ -429,7 +429,7 @@ class CElastic_Client {
      * @param array|\Elastica\Document[] $docs
      * @param array                      $requestParams
      *
-     * @throws \Elastica\Exception\InvalidException
+     * @throws CElastic_Exception_InvalidException
      *
      * @return \Elastica\Bulk\ResponseSet
      */
@@ -457,10 +457,10 @@ class CElastic_Client {
     /**
      * Returns the current cluster.
      *
-     * @return CElastic_Cluster Cluster object
+     * @return CElastic_Client_Cluster Cluster object
      */
     public function getCluster() {
-        return new CElastic_Cluster($this);
+        return new CElastic_Client_Cluster($this);
     }
 
     /**
@@ -532,7 +532,7 @@ class CElastic_Client {
      * @param string|\Elastica\Type  $type    Type of documents
      * @param string|bool            $routing Optional routing key for all ids
      *
-     * @throws \Elastica\Exception\InvalidException
+     * @throws CElastic_Exception_InvalidException
      *
      * @return \Elastica\Bulk\ResponseSet Response  object
      */
@@ -571,7 +571,7 @@ class CElastic_Client {
      * @param array $params Parameter array
      *
      * @throws \Elastica\Exception\ResponseException
-     * @throws \Elastica\Exception\InvalidException
+     * @throws CElastic_Exception_InvalidException
      *
      * @return \Elastica\Bulk\ResponseSet Response object
      */

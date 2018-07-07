@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 use Elasticsearch\Endpoints\Cluster\State;
 
-class CElastic_Cluster {
+class CElastic_Client_Cluster {
 
     /**
      * Client.
@@ -134,19 +134,19 @@ class CElastic_Cluster {
      *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
      *
-     * @return CElastic_Cluster_Health
+     * @return CElastic_Client_Cluster_Health
      */
     public function getHealth() {
-        return new CElastic_Cluster_Health($this->getClient());
+        return new CElastic_Client_Cluster_Health($this->getClient());
     }
 
     /**
      * Return Cluster settings.
      *
-     * @return CElastic_Cluster_Settings
+     * @return CElastic_Client_Cluster_Settings
      */
     public function getSettings() {
-        return new CElastic_Cluster_Settings($this->getClient());
+        return new CElastic_Client_Cluster_Settings($this->getClient());
     }
 
 }

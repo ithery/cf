@@ -65,7 +65,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
             );
         }
         curl_setopt($conn, CURLOPT_URL, $baseUri);
-        
+
         curl_setopt($conn, CURLOPT_TIMEOUT, $connection->getTimeout());
         curl_setopt($conn, CURLOPT_FORBID_REUSE, 0);
         // Tell ES that we support the compressed responses
@@ -108,7 +108,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
                 $httpMethod = CElastic_Client_Request::POST;
             }
             if (is_array($data)) {
-                $content = JSON::stringify($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $content = CJSON::stringify($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             } else {
                 $content = $data;
                 // Escaping of / not necessary. Causes problems in base64 encoding of files
@@ -121,6 +121,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
                 // ... and tell ES that it is compressed
                 array_push($headers, 'Content-Encoding: gzip');
             } else {
+                cdbg::var_dump($content);
                 curl_setopt($conn, CURLOPT_POSTFIELDS, $content);
             }
         } else {

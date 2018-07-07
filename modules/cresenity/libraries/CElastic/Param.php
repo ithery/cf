@@ -133,7 +133,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
      *
      * @param string $key Key to return
      *
-     * @throws \Elastica\Exception\InvalidException If requested key is not set
+     * @throws CElastic_Exception_InvalidException If requested key is not set
      *
      * @return mixed Key value
      */

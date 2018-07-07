@@ -22,10 +22,10 @@ class CElastic_Exception_ResponseException extends \RuntimeException implements 
     /**
      * Construct Exception.
      *
-     * @param \Elastica\Request  $request
-     * @param \Elastica\Response $response
+     * @param CElastic_Client_Request  $request
+     * @param CElastic_Client_Response $response
      */
-    public function __construct(Request $request, Response $response) {
+    public function __construct(CElastic_Client_Request $request, CElastic_Client_Response $response) {
         $this->_request = $request;
         $this->_response = $response;
         parent::__construct($response->getErrorMessage());

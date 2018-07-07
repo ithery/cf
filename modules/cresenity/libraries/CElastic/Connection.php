@@ -274,7 +274,7 @@ class CElastic_Connection extends CElastic_Param {
      *
      * @param string $key Config key
      *
-     * @throws \Elastica\Exception\InvalidException
+     * @throws CElastic_Exception_InvalidException
      *
      * @return array|string Config value
      */
