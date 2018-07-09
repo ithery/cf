@@ -55,7 +55,7 @@ class CRemote_SSH {
         $timeout = isset($config['timeout']) ? $config['timeout'] : 10;
 
         $this->setOutput($connection = new CRemote_SSH_Connection(
-                $name, $config['host'], $config['port'], $config['username'], $this->getAuth($config), null, $timeout
+                $name, $config['host'], carr::get($config,'port',22), $config['username'], $this->getAuth($config), null, $timeout
         ));
 
         return $connection;
