@@ -30,4 +30,14 @@ trait CTrait_Compat_Resources {
         return self::getPath($filename, $size);
     }
 
+    /**
+     * @deprecated
+     * @param string $name
+     * @param array $options
+     * @return \CResources_Loader_File
+     */
+    public static function files($name, $options = array()) {
+        return self::file($name, $options);
+    }
+
 }

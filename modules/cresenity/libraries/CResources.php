@@ -144,11 +144,11 @@ class CResources {
     
     /**
      * 
-     * @param type $name
-     * @param type $options
-     * @return \CResources_Loader_Image
+     * @param string $name
+     * @param array $options
+     * @return \CResources_Loader_File
      */
-    public static function files($name, $options = array()) {
+    public static function file($name, $options = array()) {
         return new CResources_Loader_File($name, $options);
     }
 
