@@ -28,35 +28,50 @@ and open the template in the editor.
     position:relative;
 }
 .icon-register-email {
-    background: url(../../img/login/user.png) no-repeat;
-    width:39px;
-    height:38px;
+    background: #26B4FF;
+    width: 40px;
+    height: 40px;
     content:" ";
     position: absolute;
-    top: 2px;
-    left: 1px;
+    top: 0px;
+    left: 0px;
+}
+
+.icon-register-email i {
+    color:white;
+    margin:auto;
 }
 
 .icon-register-password {
-    background: url(../../img/login/password.png) no-repeat;
-    width:39px;
-    height:38px;
+    background: #26B4FF;
+    width:40px;
+    height:40px;
     content:" ";
     position: absolute;
-    top: 2px;
-    left: 1px;
+    top: 0px;
+    left: 0px;
 }
-
+.icon-register-password i {
+    color:white;
+    margin:auto;
+}
 .btn-login {
+    border-radius: .125rem;
+    -webkit-transition: all 0.2s ease-in-out;
+    border: 0px solid transparent;
     width:100%;
-    background-color: #1ab394;
-    border-color: #1ab394;
-    color: #FFFFFF;
-    background-image: none;
+    background: #26B4FF;
+    border-color: #26B4FF;
+    -webkit-box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.07), 0px 4px 5px 0px rgba(0,0,0,0.05), 0px 1px 10px 0px rgba(0,0,0,0.03);
+    box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.07), 0px 4px 5px 0px rgba(0,0,0,0.05), 0px 1px 10px 0px rgba(0,0,0,0.03);
+    color: #fff;
+    padding: 1rem 1rem;
 }
 
 .btn-login:hover, .btn-login:focus, .btn-login:active, .btn-login.active, .open .dropdown-toggle.btn-login, .btn-login:active:focus, .btn-login:active:hover, .btn-login.active:hover, .btn-login.active:focus {
-    background-color: #18a689;
-    border-color: #18a689;
-    color: #FFFFFF;
+    border: 0px solid transparent;
+    background: #26B4FF;
+    border-color: #26B4FF;
+    -webkit-box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.15), 0px 4px 5px 0px rgba(0,0,0,0.1), 0px 1px 10px 0px rgba(0,0,0,0.06);
+    box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.15), 0px 4px 5px 0px rgba(0,0,0,0.1), 0px 1px 10px 0px rgba(0,0,0,0.06);
 }
