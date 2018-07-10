@@ -15,11 +15,22 @@ abstract class CServer_Memory_OS implements CServer_Memory_OSInterface {
     protected $info;
 
     /**
+     *
+     * @var CServer_Memory
+     */
+    protected $memory;
+
+    /**
      * 
      * @param CServer_Memory_Info $info
      */
-    public function __construct(CServer_Memory_Info $info) {
+    public function __construct(CServer_Memory $memory, CServer_Memory_Info $info) {
         $this->info = $info;
+        $this->memory = $memory;
+    }
+
+    public function createCommand() {
+        return CServer::command($this->memory->getSSHConfig());
     }
 
 }

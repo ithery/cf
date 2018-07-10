@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 15, 2018, 1:45:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CServer_Memory {
+class CServer_Memory extends CServer_Base {
 
     /**
      *
@@ -27,18 +27,28 @@ class CServer_Memory {
      */
     protected $info;
 
-    public function __construct() {
+    public function __construct(array $sshConfig = null) {
         $os = CServer::getOS();
         $this->info = new CServer_Memory_Info();
         $osClass = 'CServer_Memory_OS_' . $os;
-        $this->os = new $osClass($this->info);
+        $this->os = new $osClass($this, $this->info);
+        $this->sshConfig = $sshConfig;
+        $this->host = carr::get($sshConfig, 'host');
     }
 
-    public static function instance() {
-        if (self::$instance == null) {
-            return new CServer_Memory();
+    public static function instance(array $sshConfig = null) {
+        if (!is_array(self::$instance)) {
+            self::$instance = array();
         }
-        return self::$instance;
+        $host = 'localhost';
+
+        if ($sshConfig != null) {
+            $host = carr::get($sshConfig, 'host');
+        }
+        if (!isset(self::$instance[$host])) {
+            self::$instance[$host] = new CServer_Memory($sshConfig);
+        }
+        return self::$instance[$host];
     }
 
     public function getMemApplication() {

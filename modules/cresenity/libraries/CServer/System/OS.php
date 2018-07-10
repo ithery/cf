@@ -13,13 +13,15 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
      * @var CServer_System_Info
      */
     protected $info;
+    protected $system;
 
     /**
      * 
      * @param CServer_System_Info $info
      */
-    public function __construct(CServer_System_Info $info) {
+    public function __construct(CServer_System $system, CServer_System_Info $info) {
         $this->info = $info;
+        $this->system = $system;
     }
 
     /**
@@ -28,7 +30,7 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
      * @return void
      */
     public function buildIp() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if (CServer::config()->isUseVHost()) {
             if (($cmd->readEnv('SERVER_ADDR', $result) || $cmd->readEnv('LOCAL_ADDR', $result)) //is server address defined
                     && !strstr($result, '.') && strstr($result, ':')) { //is IPv6, quick version of preg_match('/\(([[0-9A-Fa-f\:]+)\)/', $result)
@@ -56,7 +58,7 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
      * @return void
      */
     public function buildUsers() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if ($cmd->executeProgram('who', '', $strBuf, CServer::config()->isDebug())) {
             if (strlen($strBuf) > 0) {
                 $lines = preg_split('/\n/', $strBuf);
@@ -83,6 +85,10 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
                 }
             }
         }
+    }
+
+    public function createCommand() {
+        return CServer::command($this->system->getSSHConfig());
     }
 
 }

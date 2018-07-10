@@ -20,6 +20,10 @@ class CServer_Storage {
         return self::$instance;
     }
 
+    /**
+     * 
+     * @return float
+     */
     public function getFreeSpace() {
         if ($this->freeSpace == null) {
             $this->freeSpace = disk_free_space(".");
