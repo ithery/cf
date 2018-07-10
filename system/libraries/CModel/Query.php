@@ -512,7 +512,7 @@ class CModel_Query {
                     try {
                         return $this->getModel()->{$name}();
                     } catch (BadMethodCallException $e) {
-                        throw RelationNotFoundException::make($this->getModel(), $name);
+                        throw CModel_Exception_RelationNotFoundException::make($this->getModel(), $name);
                     }
                 });
 
