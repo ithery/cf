@@ -52,4 +52,24 @@ trait CTrait_Compat_Curl {
         return $this->setUrl($url);
     }
 
+    public function set_raw_post($string) {
+        return $this->setRawPost($string);
+    }
+
+    public function set_referrer($referrer) {
+        return $this->setReferrer($referrer);
+    }
+
+    public function set_useragent($useragent) {
+        return $this->setUserAgent($referrer);
+    }
+
+    public function set_http_header($http_header) {
+        return $this->setHttpHeader($referrer);
+    }
+
+    public function get_post_data() {
+        return $this->getPostData();
+    }
+
 }

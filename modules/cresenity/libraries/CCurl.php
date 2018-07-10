@@ -309,7 +309,7 @@ class CCurl {
         return $this;
     }
 
-    public function set_raw_post($string) {
+    public function setRawPost($string) {
         $this->post_data = $string;
         $this->set_opt(CURLOPT_POST, TRUE);
         $this->set_opt(CURLOPT_POSTFIELDS, $string);
@@ -330,17 +330,17 @@ class CCurl {
         return $this;
     }
 
-    public function set_referrer($referrer) {
+    public function setReferrer($referrer) {
         $this->set_opt(CURLOPT_REFERER, $referrer);
         return $this;
     }
 
-    public function set_useragent($useragent) {
+    public function setUserAgent($useragent) {
         $this->set_opt(CURLOPT_USERAGENT, $useragent);
         return $this;
     }
 
-    public function set_http_header($http_header) {
+    public function setHttpHeader($http_header) {
         $this->set_opt(CURLOPT_HTTPHEADER, $http_header);
         return $this;
     }
@@ -351,7 +351,7 @@ class CCurl {
         return $this;
     }
 
-    public function get_post_data() {
+    public function getPostData() {
         return $this->post_data;
     }
 
