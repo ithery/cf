@@ -61,11 +61,11 @@ trait CTrait_Compat_Curl {
     }
 
     public function set_useragent($useragent) {
-        return $this->setUserAgent($referrer);
+        return $this->setUserAgent($useragent);
     }
 
     public function set_http_header($http_header) {
-        return $this->setHttpHeader($referrer);
+        return $this->setHttpHeader($http_header);
     }
 
     public function get_post_data() {
