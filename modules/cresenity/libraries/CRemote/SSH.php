@@ -29,6 +29,7 @@ class CRemote_SSH {
      */
     public function __construct(array $config) {
         $this->config = $config;
+
         $this->name = carr::get($config, 'name', carr::get($config, 'host'));
         $this->connection = $this->makeConnection($this->name, $config);
     }
@@ -53,9 +54,12 @@ class CRemote_SSH {
      */
     protected function makeConnection($name, array $config) {
         $timeout = isset($config['timeout']) ? $config['timeout'] : 10;
-
+        $host = carr::get($config, 'ip_address');
+        if (strlen($host) == 0) {
+            $host = carr::get($config, 'host');
+        }
         $this->setOutput($connection = new CRemote_SSH_Connection(
-                $name, $config['host'], carr::get($config,'port',22), $config['username'], $this->getAuth($config), null, $timeout
+                $name, $host, carr::get($config, 'port', 22), $config['username'], $this->getAuth($config), null, $timeout
         ));
 
         return $connection;

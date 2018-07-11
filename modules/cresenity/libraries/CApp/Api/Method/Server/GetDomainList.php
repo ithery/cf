@@ -16,6 +16,9 @@ class CApp_Api_Method_Server_GetDomainList extends CApp_Api_Method_Server {
         $errMessage = '';
         $domain = $this->domain;
 
+        $files = cfs::list_files(CFData::path() . 'domain');
+        
+        /*
         $fileHelper = CHelper::file();
         $allFiles = $fileHelper->files(CFData::path() . 'domain');
         $files = array();
@@ -32,7 +35,7 @@ class CApp_Api_Method_Server_GetDomainList extends CApp_Api_Method_Server {
             );
             $files[] = $file;
         }
-
+        */
 
         $data = array();
         $data['list'] = $files;
