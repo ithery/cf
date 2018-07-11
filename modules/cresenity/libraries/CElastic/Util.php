@@ -201,7 +201,7 @@ class CElastic_Util {
         if (is_object($class)) {
             $class = get_class($class);
         }
-        $parts = explode('\\', $class);
+        $parts = explode('_', $class);
         $last = array_pop($parts);
         $last = preg_replace('/Query$/', '', $last); // for BoolQuery
         return self::toSnakeCase($last);

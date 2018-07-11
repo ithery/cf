@@ -20,7 +20,7 @@ class CElastic_Client_QueryBuilder_Version_Version240 extends CElastic_Client_Qu
     protected $queries = [
         'match',
         'multi_match',
-        'bool',
+        'boolQuery',
         'boosting',
         'common_terms',
         'constant_score',

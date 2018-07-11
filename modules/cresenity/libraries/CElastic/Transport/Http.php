@@ -103,6 +103,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
         // TODO: REFACTOR
         $data = $request->getData();
         $httpMethod = $request->getMethod();
+        $content='';
         if (!empty($data) || '0' === $data) {
             if ($this->hasParam('postWithRequestBody') && $this->getParam('postWithRequestBody') == true) {
                 $httpMethod = CElastic_Client_Request::POST;

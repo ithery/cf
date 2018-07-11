@@ -53,8 +53,8 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
     protected function _convertArrayable(array $array) {
         $arr = [];
         foreach ($array as $key => $value) {
-            if ($value instanceof ArrayableInterface) {
-                $arr[$value instanceof NameableInterface ? $value->getName() : $key] = $value->toArray();
+            if ($value instanceof CInterface_Arrayable) {
+                $arr[$value instanceof CInterface_Nameable ? $value->getName() : $key] = $value->toArray();
             } elseif (is_array($value)) {
                 $arr[$key] = $this->_convertArrayable($value);
             } else {

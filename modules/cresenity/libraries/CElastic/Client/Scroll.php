@@ -132,7 +132,7 @@ class CElastic_Client_Scroll implements \Iterator {
     public function clear() {
         if (null !== $this->_nextScrollId) {
             $this->_search->getClient()->request(
-                    '_search/scroll', CElastic_Client_Request::DELETE, [Search::OPTION_SCROLL_ID => [$this->_nextScrollId]]
+                    '_search/scroll', CElastic_Client_Request::DELETE, [CElastic_Client_Search::OPTION_SCROLL_ID => [$this->_nextScrollId]]
             );
             // Reset scroll ID so valid() returns false.
             $this->_nextScrollId = null;

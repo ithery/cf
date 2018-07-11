@@ -28,7 +28,7 @@ class CElastic_Exception_ResponseException extends \RuntimeException implements 
     public function __construct(CElastic_Client_Request $request, CElastic_Client_Response $response) {
         $this->_request = $request;
         $this->_response = $response;
-        parent::__construct($response->getErrorMessage());
+        parent::__construct($response->getErrorMessage().':'.json_encode($request->getData()));
     }
 
     /**

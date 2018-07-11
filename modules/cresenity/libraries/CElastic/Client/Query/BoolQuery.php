@@ -53,11 +53,11 @@ class CElastic_Client_Query_BoolQuery extends CElastic_Client_Query_AbstractQuer
     /**
      * Sets the filter.
      *
-     * @param \Elastica\Query\AbstractQuery $filter Filter object
+     * @param CElastic_Client_Query_AbstractQuery $filter Filter object
      *
      * @return $this
      */
-    public function addFilter(AbstractQuery $filter) {
+    public function addFilter(CElastic_Client_Query_AbstractQuery $filter) {
         return $this->addParam('filter', $filter);
     }
 
@@ -72,8 +72,8 @@ class CElastic_Client_Query_BoolQuery extends CElastic_Client_Query_AbstractQuer
      * @return $this
      */
     protected function _addQuery($type, $args) {
-        if (!is_array($args) && !($args instanceof AbstractQuery)) {
-            throw new CElastic_Exception_InvalidException('Invalid parameter. Has to be array or instance of Elastica\Query\AbstractQuery');
+        if (!is_array($args) && !($args instanceof CElastic_Client_Query_AbstractQuery)) {
+            throw new CElastic_Exception_InvalidException('Invalid parameter. Has to be array or instance of CElastic_Client_Query_AbstractQuery');
         }
         return $this->addParam($type, $args);
     }

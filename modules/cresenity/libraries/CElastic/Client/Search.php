@@ -472,7 +472,7 @@ class CElastic_Client_Search {
      * @return Scroll
      */
     public function scroll($expiryTime = '1m') {
-        return new Scroll($this, $expiryTime);
+        return new CElastic_Client_Scroll($this, $expiryTime);
     }
 
     /**
