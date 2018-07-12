@@ -299,6 +299,11 @@ body .modal {
     top: 16px;
 }
 
+.fileupload-preview img {
+    width: 100%;
+    height: auto;
+}
+
 /* 404 */
 
 .gray-bg, .bg-muted {
