@@ -17,6 +17,18 @@ class CApp_Remote {
 
     /**
      *
+     * @var int protocol of this instance
+     */
+    protected $port;
+    
+    /**
+     *
+     * @var string protocol of this instance
+     */
+    protected $protocol;
+    
+    /**
+     *
      * @var string domain of this instance
      */
     protected $domain;
@@ -58,6 +70,8 @@ class CApp_Remote {
     protected function __construct($domain, $options = array()) {
         $this->domain = $domain;
         $this->options = $options;
+        $this->protocol = carr::get($options,'protocol','http');
+        $this->port = carr::get($options,'port',80);
         $this->client = new CApp_Remote_Client($this);
     }
 
