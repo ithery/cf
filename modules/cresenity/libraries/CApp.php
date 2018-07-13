@@ -99,6 +99,10 @@ class CApp extends CObservable {
         return new CApp_Temp();
     }
 
+    public static function getTranslation($message, $params = array(), $lang = null) {
+        return CApp_Lang::__($message, $params, $lang);
+    }
+
     /**
      * 
      * @return CDatabase
@@ -613,7 +617,7 @@ class CApp extends CObservable {
         if (strlen($orgId) == 0) {
             $orgId = CApp_Base::orgId();
         }
-       
+
         $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId);
         $childList = array();
 
