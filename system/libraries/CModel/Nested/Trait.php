@@ -187,7 +187,7 @@ trait CModel_Nested_Trait {
     /**
      * Relation to the parent.
      *
-     * @return BelongsTo
+     * @return CModel_Relation_BelongsTo
      */
     public function getParent() {
         return $this->belongsTo(get_class($this), $this->getParentIdName())
@@ -197,7 +197,7 @@ trait CModel_Nested_Trait {
     /**
      * Relation to children.
      *
-     * @return HasMany
+     * @return CModel_Relation_HasMany
      */
     public function getChildren() {
         return $this->hasMany(get_class($this), $this->getParentIdName())
@@ -207,7 +207,7 @@ trait CModel_Nested_Trait {
     /**
      * Get query for descendants of the node.
      *
-     * @return DescendantsRelation
+     * @return CModel_Nested_Relation_Descendants
      */
     public function descendants() {
         return new CModel_Nested_Relation_Descendants($this->newScopedQuery(), $this);
