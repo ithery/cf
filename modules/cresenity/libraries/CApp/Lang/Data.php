@@ -21,7 +21,7 @@ class CApp_Lang_Data {
     }
 
     public static function getLangDir() {
-        $dir = DOCROOT . "application/" . CM::FRONTEND_APPCODE . "/default/lang/";
+        $dir = DOCROOT . "application/" . CF::appCode() . "/default/lang/";
         if (!is_dir($dir)) {
             mkdir($dir);
         }
