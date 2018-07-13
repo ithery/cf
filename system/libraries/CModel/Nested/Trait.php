@@ -239,7 +239,7 @@ trait CModel_Nested_Trait {
      *
      * @param  array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function getSiblingsAndSelf(array $columns = ['*']) {
         return $this->siblingsAndSelf()->get($columns);
