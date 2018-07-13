@@ -233,4 +233,12 @@ class CElastic {
         return new CElastic_Client($config);
     }
 
+    /**
+     * 
+     * @return array
+     */
+    public static function getDataTypeList() {
+        return CElastic_DataType::getList();
+    }
+
 }
