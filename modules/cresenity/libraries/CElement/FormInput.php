@@ -68,7 +68,7 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function setReadonly($bool) {
+    public function setReadonly($bool = true) {
         $this->readonly = $bool;
         return $this;
     }

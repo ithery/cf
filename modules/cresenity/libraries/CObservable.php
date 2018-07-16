@@ -80,7 +80,7 @@ abstract class CObservable extends CRenderable {
      * 
      * @param type $id
      * @param type $type
-     * @return CFormInput
+     * @return CElement_FormInput
      */
     public function addControl($id, $type) {
         $control = null;

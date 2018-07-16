@@ -8,6 +8,25 @@
 
 class CElastic_DataType {
 
+    const TYPE_LONG = 'long';
+    const TYPE_INT = 'integer';
+    const TYPE_SHORT = 'short';
+    const TYPE_BYTE = 'byte';
+    const TYPE_DOUBLE = 'double';
+    const TYPE_FLOAT = 'float';
+    const TYPE_FLOAT_HALF = 'half_float';
+    const TYPE_FLOAT_SCALED = 'scaled_float';
+    const TYPE_TEXT = 'text';
+    const TYPE_KEYWORD = 'keyword';
+    const TYPE_DATE = 'date';
+    const TYPE_BOOL = 'boolean';
+    const TYPE_BINARY = 'binary';
+    const TYPE_RANGE_INT = 'integer_range';
+    const TYPE_RANGE_FLOAT = 'float_range';
+    const TYPE_RANGE_LONG = 'long_range';
+    const TYPE_RANGE_DOUBLE = 'double_range';
+    const TYPE_RANGE_DATE = 'date_range';
+
     protected static $numericTypes = array(
         'long' => 'Long',
         'integer' => 'Integer',

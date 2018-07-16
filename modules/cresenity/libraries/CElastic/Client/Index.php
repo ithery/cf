@@ -364,7 +364,7 @@ class CElastic_Client_Index implements CElastic_Interface_SearchableInterface {
     /**
      * Returns index client.
      *
-     * @return \Elastica\Client Index client object
+     * @return CElastic_Client Index client object
      */
     public function getClient() {
         return $this->_client;

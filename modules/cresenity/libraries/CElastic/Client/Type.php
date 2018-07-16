@@ -125,7 +125,7 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
      *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html
      *
-     * @param CElastic_Client_Document|\Elastica\Script\AbstractScript $data    Document with update data
+     * @param CElastic_Client_Document|CElastic_Client_Script_AbstractScript $data    Document with update data
      * @param array                                              $options array of query params to use for query. For possible options check es api
      *
      * @throws CElastic_Exception_InvalidException
@@ -133,11 +133,11 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
      * @return CElastic_Client_Response
      */
     public function updateDocument($data, array $options = []) {
-        if (!($data instanceof Document) && !($data instanceof AbstractScript)) {
+        if (!($data instanceof CElastic_Client_Document) && !($data instanceof CElastic_Client_Script_AbstractScript)) {
             throw new \InvalidArgumentException('Data should be a Document or Script');
         }
         if (!$data->hasId()) {
-            throw new InvalidException('Document or Script id is not set');
+            throw new CElastic_Exception_InvalidException('Document or Script id is not set');
         }
         return $this->getIndex()->getClient()->updateDocument(
                         $data->getId(), $data, $this->getIndex()->getName(), $this->getName(), $options
@@ -147,10 +147,10 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
     /**
      * Uses _bulk to send documents to the server.
      *
-     * @param array|CElastic_Client_Document[] $docs    Array of Elastica\Document
-     * @param array                      $options Array of query params to use for query. For possible options check es api
+     * @param array|CElastic_Client_Document[]  $docs    Array of Elastica\Document
+     * @param array                             $options Array of query params to use for query. For possible options check es api
      *
-     * @return \Elastica\Bulk\ResponseSet
+     * @return CElastic_Client_Bulk_ResponseSet
      *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
      */
@@ -164,8 +164,8 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
     /**
      * Uses _bulk to send documents to the server.
      *
-     * @param array|CElastic_Client_Document[] $docs    Array of Elastica\Document
-     * @param array                      $options Array of query params to use for query. For possible options check es api
+     * @param array|CElastic_Client_Document[]  $docs    Array of Elastica\Document
+     * @param array                             $options Array of query params to use for query. For possible options check es api
      *
      * @return \Elastica\Bulk\ResponseSet
      *
@@ -209,8 +209,8 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
      * @param string $id      Document id
      * @param array  $options Options for the get request.
      *
-     * @throws \Elastica\Exception\NotFoundException
-     * @throws \Elastica\Exception\ResponseException
+     * @throws CElastic_Exception_NotFoundException
+     * @throws CElastic_Exception_ResponseException
      *
      * @return CElastic_Client_Document
      */
@@ -221,7 +221,7 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
         $response = $this->requestEndpoint($endpoint);
         $result = $response->getData();
         if (!isset($result['found']) || $result['found'] === false) {
-            throw new NotFoundException('doc id ' . $id . ' not found');
+            throw new CElastic_Exception_NotFoundException('doc id ' . $id . ' not found');
         }
         if (isset($result['fields'])) {
             $data = $result['fields'];
@@ -230,7 +230,7 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
         } else {
             $data = [];
         }
-        $document = new Document($id, $data, $this->getName(), $this->getIndex());
+        $document = new CElastic_Client_Document($id, $data, $this->getName(), $this->getIndex());
         $document->setVersion($result['_version']);
         return $document;
     }
@@ -239,10 +239,10 @@ class CElastic_Client_Type implements CElastic_Interface_SearchableInterface {
      * @param string       $id
      * @param array|string $data
      *
-     * @return Document
+     * @return CElastic_Client_Document
      */
     public function createDocument($id = '', $data = []) {
-        $document = new Document($id, $data);
+        $document = new CElastic_Client_Document($id, $data);
         $document->setType($this);
         return $document;
     }

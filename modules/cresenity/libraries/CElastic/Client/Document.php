@@ -93,7 +93,7 @@ class CElastic_Client_Document extends CElastic_Client_AbstractUpdateAction {
      */
     public function get($key) {
         if (!$this->has($key)) {
-            throw new InvalidException("Field {$key} does not exist");
+            throw new CElastic_Exception_InvalidException("Field {$key} does not exist");
         }
         return $this->_data[$key];
     }
@@ -108,7 +108,7 @@ class CElastic_Client_Document extends CElastic_Client_AbstractUpdateAction {
      */
     public function set($key, $value) {
         if (!is_array($this->_data)) {
-            throw new InvalidException('Document data is serialized data. Data creation is forbidden.');
+            throw new CElastic_Exception_InvalidException('Document data is serialized data. Data creation is forbidden.');
         }
         $this->_data[$key] = $value;
         return $this;

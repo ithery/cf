@@ -34,7 +34,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
      *
      * All calls that are made to the server are done through this function
      *
-     * @param \Elastica\Request $request
+     * @param CElastic_Client_Request $request
      * @param array             $params  Host, Port, ...
      *
      * @throws CElastic_Exception_ConnectionException
@@ -65,7 +65,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
             );
         }
         curl_setopt($conn, CURLOPT_URL, $baseUri);
-
+        
         curl_setopt($conn, CURLOPT_TIMEOUT, $connection->getTimeout());
         curl_setopt($conn, CURLOPT_FORBID_REUSE, 0);
         // Tell ES that we support the compressed responses
@@ -102,19 +102,23 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
         }
         // TODO: REFACTOR
         $data = $request->getData();
+        
         $httpMethod = $request->getMethod();
         $content='';
+        
         if (!empty($data) || '0' === $data) {
             if ($this->hasParam('postWithRequestBody') && $this->getParam('postWithRequestBody') == true) {
                 $httpMethod = CElastic_Client_Request::POST;
             }
             if (is_array($data)) {
                 $content = CHelper::json()->stringify($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                
             } else {
                 $content = $data;
                 // Escaping of / not necessary. Causes problems in base64 encoding of files
                 $content = str_replace('\/', '/', $content);
             }
+            
             array_push($headers, sprintf('Content-Type: %s', $request->getContentType()));
             if ($connection->hasCompression()) {
                 // Compress the body of the request ...

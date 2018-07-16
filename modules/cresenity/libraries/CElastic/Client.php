@@ -325,11 +325,11 @@ class CElastic_Client {
     /**
      * Update document, using update script. Requires elasticsearch >= 0.19.0.
      *
-     * @param int|string                                               $id      document id
-     * @param array|\Elastica\Script\AbstractScript|\Elastica\Document $data    raw data for request body
-     * @param string                                                   $index   index to update
-     * @param string                                                   $type    type of index to update
-     * @param array                                                    $options array of query params to use for query. For possible options check es api
+     * @param int|string                                                            $id      document id
+     * @param array|CElastic_Client_Script_AbstractScript|CElastic_Client_Document  $data    raw data for request body
+     * @param string                                                                $index   index to update
+     * @param string                                                                $type    type of index to update
+     * @param array                                                                 $options array of query params to use for query. For possible options check es api
      *
      * @return \Elastica\Response
      *
@@ -340,9 +340,9 @@ class CElastic_Client {
         $endpoint->setID($id);
         $endpoint->setIndex($index);
         $endpoint->setType($type);
-        if ($data instanceof AbstractScript) {
+        if ($data instanceof CElastic_Client_Script_AbstractScript) {
             $requestData = $data->toArray();
-        } elseif ($data instanceof Document) {
+        } elseif ($data instanceof CElastic_Client_Document) {
             $requestData = ['doc' => $data->getData()];
             if ($data->getDocAsUpsert()) {
                 $requestData['doc_as_upsert'] = true;
@@ -364,15 +364,14 @@ class CElastic_Client {
             );
             $options += $docOptions;
             // set fields param to source only if options was not set before
-            if ($data instanceof Document && ($data->isAutoPopulate() || $this->getConfigValue(['document', 'autoPopulate'], false)) && !isset($options['fields'])
-            ) {
+            if ($data instanceof CElastic_Client_Document && ($data->isAutoPopulate() || $this->getConfigValue(['document', 'autoPopulate'], false)) && !isset($options['fields'])) {
                 $options['fields'] = '_source';
             }
         } else {
             $requestData = $data;
         }
         //If an upsert document exists
-        if ($data instanceof AbstractScript || $data instanceof Document) {
+        if ($data instanceof CElastic_Client_Script_AbstractScript || $data instanceof CElastic_Client_Document) {
             if ($data->hasUpsert()) {
                 $requestData['upsert'] = $data->getUpsert()->getData();
             }
@@ -382,11 +381,11 @@ class CElastic_Client {
                 $options['retry_on_conflict'] = $retryOnConflict;
             }
         }
+
         $endpoint->setBody($requestData);
         $endpoint->setParams($options);
         $response = $this->requestEndpoint($endpoint);
-        if ($response->isOk() && $data instanceof Document && ($data->isAutoPopulate() || $this->getConfigValue(['document', 'autoPopulate'], false))
-        ) {
+        if ($response->isOk() && $data instanceof CElastic_Client_Document && ($data->isAutoPopulate() || $this->getConfigValue(['document', 'autoPopulate'], false))) {
             $responseData = $response->getData();
             if (isset($responseData['_version'])) {
                 $data->setVersion($responseData['_version']);
@@ -601,6 +600,7 @@ class CElastic_Client {
      */
     public function request($path, $method = CElastic_Client_Request::GET, $data = [], array $query = [], $contentType = CElastic_Client_Request::DEFAULT_CONTENT_TYPE) {
         $connection = $this->getConnection();
+
         $request = $this->_lastRequest = new CElastic_Client_Request($path, $method, $data, $query, $connection, $contentType);
         $this->_lastResponse = null;
         try {
@@ -626,6 +626,7 @@ class CElastic_Client {
      * @return Response
      */
     public function requestEndpoint(AbstractEndpoint $endpoint) {
+
         return $this->request(
                         ltrim($endpoint->getURI(), '/'), $endpoint->getMethod(), null === $endpoint->getBody() ? [] : $endpoint->getBody(), $endpoint->getParams()
         );

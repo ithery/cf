@@ -166,7 +166,7 @@ class CElastic_Client_Request extends CElastic_Param {
     /**
      * Sends request to server.
      *
-     * @return \Elastica\Response Response object
+     * @return CElastic_Client_Response Response object
      */
     public function send() {
         $transport = $this->getConnection()->getTransportObject();
