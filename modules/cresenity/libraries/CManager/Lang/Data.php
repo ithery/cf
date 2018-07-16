@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CApp_Lang_Data {
+class CManager_Lang_Data {
 
     protected static $langData = array();
 
@@ -32,114 +32,114 @@ class CApp_Lang_Data {
         if ($lang == null) {
             $lang = CApp_Lang::getLang();
         }
-        $dir = self::getLangDir();
+        $dir = static::getLangDir();
         $dir .= $lang . '/';
         if (!is_dir($dir)) {
             mkdir($dir);
         }
 
-        $char = self::getCharForFolder($message);
+        $char = static::getCharForFolder($message);
         $file = $dir . $char . '.php';
 
         return $file;
     }
 
     public static function langDataExists($lang, $char, $message) {
-        if (self::langDataLoaded($lang, $char)) {
-            return isset(self::$langData[$lang][$char][$message]);
+        if (static::langDataLoaded($lang, $char)) {
+            return isset(static::$langData[$lang][$char][$message]);
         }
 
         return false;
     }
 
     public static function langDataLoaded($lang, $char) {
-        if (!is_array(self::$langData)) {
+        if (!is_array(static::$langData)) {
             return false;
         }
-        if (!isset(self::$langData[$lang])) {
+        if (!isset(static::$langData[$lang])) {
             return false;
         }
-        if (!isset(self::$langData[$lang][$char])) {
+        if (!isset(static::$langData[$lang][$char])) {
             return false;
         }
         return true;
     }
 
     public static function addLangDataTranslation($lang, $message, $translation) {
-        $char = self::getCharForFolder($message);
+        $char = static::getCharForFolder($message);
 
-        if (!self::langDataExists($lang, $char, $message)) {
-            self::load($char, $lang);
+        if (!static::langDataExists($lang, $char, $message)) {
+            static::load($char, $lang);
             //$message = addslashes($message);
-            self::$langData[$lang][$char][$message] = $translation;
-            return self::save($lang, $char);
+            static::$langData[$lang][$char][$message] = $translation;
+            return static::save($lang, $char);
         }
         return false;
     }
 
     public static function setLangDataTranslation($lang, $message, $translation) {
-        $char = self::getCharForFolder($message);
+        $char = static::getCharForFolder($message);
 
 
-        self::load($char, $lang);
+        static::load($char, $lang);
         //$message = addslashes($message);
-        self::$langData[$lang][$char][$message] = $translation;
-        return self::save($lang, $char);
+        static::$langData[$lang][$char][$message] = $translation;
+        return static::save($lang, $char);
     }
 
     public static function getLangDataChar($lang, $message) {
-        $char = self::getCharForFolder($message);
-        if (!self::langDataLoaded($lang, $char)) {
-            self::load($char, $lang);
+        $char = static::getCharForFolder($message);
+        if (!static::langDataLoaded($lang, $char)) {
+            static::load($char, $lang);
         }
 
-        return self::$langData[$lang][$char];
+        return static::$langData[$lang][$char];
     }
 
     public static function getLangDataTranslation($lang, $message) {
-        $char = self::getCharForFolder($message);
-        if (!self::langDataExists($lang, $char, $message)) {
-            self::load($char, $lang);
+        $char = static::getCharForFolder($message);
+        if (!static::langDataExists($lang, $char, $message)) {
+            static::load($char, $lang);
         }
         $translation = null;
-        if (isset(self::$langData[$lang][$char][$message])) {
-            $translation = self::$langData[$lang][$char][$message];
+        if (isset(static::$langData[$lang][$char][$message])) {
+            $translation = static::$langData[$lang][$char][$message];
         }
         return $translation;
     }
 
     public static function load($char, $lang = null) {
 
-        $char = self::getCharForFolder($char);
-        if (!isset(self::$langData)) {
-            self::$langData = array();
+        $char = static::getCharForFolder($char);
+        if (!isset(static::$langData)) {
+            static::$langData = array();
         }
-        if (!isset(self::$langData[$lang])) {
-            self::$langData[$lang] = array();
+        if (!isset(static::$langData[$lang])) {
+            static::$langData[$lang] = array();
         }
-        if (!isset(self::$langData[$lang][$char])) {
-            self::$langData[$lang][$char] = array();
+        if (!isset(static::$langData[$lang][$char])) {
+            static::$langData[$lang][$char] = array();
         }
-        $filename = self::getLangFile($char, $lang);
+        $filename = static::getLangFile($char, $lang);
         if (file_exists($filename)) {
-            self::$langData[$lang][$char] = include $filename;
+            static::$langData[$lang][$char] = include $filename;
         }
 
-        return self::$langData;
+        return static::$langData;
     }
 
     public static function save($lang = null, $char = null) {
-        foreach (self::$langData as $langKey => $subData) {
+        foreach (static::$langData as $langKey => $subData) {
             if ($lang == null || $lang == $langKey) {
                 foreach ($subData as $charKey => $subSubData) {
                     if ($char == null || $char == $charKey) {
-                        $filename = self::getLangFile($charKey, $langKey);
+                        $filename = static::getLangFile($charKey, $langKey);
                         cphp::save_value($subSubData, $filename);
                     }
                 }
             }
         }
-       
+
         return true;
     }
 
