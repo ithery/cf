@@ -139,11 +139,7 @@ class CApp_Lang_Data {
                 }
             }
         }
-        try {
-            CMVar::set(CApp_Lang::VAR_KEY_LASTUPDATE, time());
-        } catch (Exception $ex) {
-            throw $ex;
-        }
+       
         return true;
     }
 

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Description of CMLang
+ * Description of CManager_Lang
  *
  * @author Hery
  */
-class CApp_Lang {
+class CManager_Lang {
 
     const LANG_SESSION_NAME = '_CAPP_LANG';
     const DEFAULT_LANG = 'id';
@@ -16,7 +16,7 @@ class CApp_Lang {
 
     public static function __($message, $params = array(), $lang = null) {
         if ($lang == null) {
-            $lang = CMLang::getLang();
+            $lang = self::getLang();
         }
 
         //get translation
