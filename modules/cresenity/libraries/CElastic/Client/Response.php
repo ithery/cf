@@ -195,11 +195,11 @@ class CElastic_Client_Response {
             $response = $this->_responseString;
             try {
                 if ($this->getJsonBigintConversion()) {
-                    $response = CJSON::parse($response, true, 512, JSON_BIGINT_AS_STRING);
+                    $response = CHelper::json()->parse($response, true, 512, JSON_BIGINT_AS_STRING);
                 } else {
-                    $response = CJSON::parse($response);
+                    $response = CHelper::json()->parse($response);
                 }
-            } catch (CJSON_Exception_JSONParseException $e) {
+            } catch (CHelper_Exception_JSONParseException $e) {
                 // leave response as is if parse fails
             }
             if (empty($response)) {

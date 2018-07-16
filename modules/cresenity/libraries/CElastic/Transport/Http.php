@@ -109,7 +109,7 @@ class CElastic_Transport_Http extends CElastic_Transport_AbstractTransport {
                 $httpMethod = CElastic_Client_Request::POST;
             }
             if (is_array($data)) {
-                $content = CJSON::stringify($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $content = CHelper::json()->stringify($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             } else {
                 $content = $data;
                 // Escaping of / not necessary. Causes problems in base64 encoding of files

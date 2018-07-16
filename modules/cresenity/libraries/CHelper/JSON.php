@@ -4,14 +4,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 7, 2018, 9:00:44 PM
+ * @since Jul 17, 2018, 12:20:01 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
 /**
  * JSON tools.
  */
-class CJSON {
+class CHelper_JSON {
 
     /**
      * Parse JSON string to an array.
@@ -21,7 +21,7 @@ class CJSON {
      *
      * @param string $args,... JSON string to parse
      *
-     * @throws CJSON_Exception_ParseException
+     * @throws CHelper_Exception_JSONParseException
      *
      * @return array PHP array representation of JSON string
      */
@@ -36,7 +36,7 @@ class CJSON {
         $array = call_user_func_array('json_decode', $args);
         // turn errors into exceptions for easier catching
         if ($error = self::getJsonLastErrorMsg()) {
-            throw new CJSON_Exception_ParseException($error);
+            throw new CHelper_Exception_JSONParseException($error);
         }
         // output
         return $array;
@@ -50,7 +50,7 @@ class CJSON {
      *
      * @param mixed $args,... Target to stringify
      *
-     * @throws CJSON_Exception_ParseException
+     * @throws CHelper_Exception_JSONParseException
      *
      * @return string Valid JSON representation of $input
      */
@@ -61,7 +61,7 @@ class CJSON {
         $string = call_user_func_array('json_encode', $args);
         // turn errors into exceptions for easier catching
         if ($error = self::getJsonLastErrorMsg()) {
-            throw new CJSON_Exception_ParseException($error);
+            throw new CHelper_Exception_JSONParseException($error);
         }
         // output
         return $string;

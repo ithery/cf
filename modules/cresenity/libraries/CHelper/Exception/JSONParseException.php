@@ -7,6 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jul 7, 2018, 9:01:44 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CJSON_Exception_ParseException extends CException {
+class CHelper_Exception_JSONParseException extends CException {
     
 }

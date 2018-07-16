@@ -50,7 +50,7 @@ class CElastic_Log extends AbstractLogger {
      */
     public function log($level, $message, array $context = []) {
         $context['error_message'] = $message;
-        $this->_lastMessage = CJSON::stringify($context);
+        $this->_lastMessage = CHelper::json()->stringify($context);
         if (!empty($this->_log) && is_string($this->_log)) {
             error_log($this->_lastMessage . PHP_EOL, 3, $this->_log);
         } else {
