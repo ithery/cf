@@ -37,6 +37,10 @@ class CTemplate {
         $this->data = $data;
     }
 
+    public static function factory($name, $data = array()) {
+        return new CTemplate($name,$data);
+    }
+    
     public function block($name, $data = array()) {
         $filename = CF::find_file($this->templateFolder, $name, TRUE);
         $this->registry->set($name, $filename);
