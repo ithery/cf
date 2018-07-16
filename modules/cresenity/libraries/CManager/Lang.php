@@ -5,11 +5,10 @@
  *
  * @author Hery
  */
-class CManager_Lang {
+class CManager_Lang implements CManager_LangInterface {
 
     const LANG_SESSION_NAME = '_CAPP_LANG';
     const DEFAULT_LANG = 'id';
-    const VAR_KEY_LASTUPDATE = 'language_lastupdate';
 
     public static function __($message, $params = array(), $lang = null) {
         if ($lang == null) {
