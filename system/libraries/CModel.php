@@ -527,7 +527,7 @@ abstract class CModel implements ArrayAccess {
      * @return bool
      */
     public function save(array $options = []) {
-        $query = $this->newQueryWithoutScopes();
+        $query = $this->newModelQuery();
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
@@ -800,7 +800,7 @@ abstract class CModel implements ArrayAccess {
      * @return void
      */
     protected function performDeleteOnModel() {
-        $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->delete();
+        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
 
         $this->exists = false;
     }
@@ -1422,7 +1422,7 @@ abstract class CModel implements ArrayAccess {
      * @return mixed
      */
     public function __call($method, $parameters) {
-
+        
         if (in_array($method, ['increment', 'decrement'])) {
             $class = new ReflectionClass(get_class($this));
 
@@ -1444,6 +1444,10 @@ abstract class CModel implements ArrayAccess {
 
         try {
             $query = $this->newQuery();
+            
+                
+            
+            
             $class = new ReflectionClass(get_class($query));
 
 

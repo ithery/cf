@@ -9,6 +9,20 @@ class clang {
         "id" => "Indonesia",
     );
 
+    public static function __($message, $params = array(), $lang = null) {
+
+        $langObject = CManager::lang();
+        if ($lang == null) {
+            $lang = $langObject->getLang();
+        }
+
+        //get translation
+        $translation = $langObject->getTranslation($message, $params, $lang);
+
+
+        return $translation;
+    }
+/*
     public static function __($word, $params = array()) {
         if (!is_string($word))
             return $word;
@@ -37,7 +51,7 @@ class clang {
         }
         return $word;
     }
-
+*/
     public static function current_lang_name() {
         $code = clang::getlang();
         $name = clang::get_lang_name_by_code($code);

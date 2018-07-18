@@ -145,24 +145,24 @@ class CResources_Loader_Image {
             $arr_name = explode("_", $this->resourceName);
             //org_code
             if (isset($arr_name[0])) {
-                $temp .= urlencode($arr_name[0]) . '/';
+                $temp .= rawurlencode($arr_name[0]) . '/';
             }
             //resource_type
             if (isset($arr_name[1])) {
-                $temp .= urlencode($arr_name[1]) . '/';
+                $temp .= rawurlencode($arr_name[1]) . '/';
             }
             //name
             if (isset($arr_name[2])) {
-                $temp .= urlencode($arr_name[2]) . '/';
+                $temp .= rawurlencode($arr_name[2]) . '/';
             }
             //date
             if (isset($arr_name[3])) {
-                $temp .= urlencode($arr_name[3]) . '/';
+                $temp .= rawurlencode($arr_name[3]) . '/';
             }
             if ($this->sizeName != null) {
-                $temp .= urlencode($this->sizeName) . '/';
+                $temp .= rawurlencode($this->sizeName) . '/';
             }
-            $temp .= urlencode($this->resourceName);
+            $temp .= rawurlencode($this->resourceName);
             $path .= $temp;
         }
         return $path;
