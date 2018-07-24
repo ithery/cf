@@ -32,7 +32,7 @@ class CElement_Component_TabList extends CElement_Component {
     }
 
     public static function factory($id) {
-        return new CTabList($id);
+        return new CElement_Component_TabList($id);
     }
 
     public function addTab($id = "") {

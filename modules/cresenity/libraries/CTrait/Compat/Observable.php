@@ -97,6 +97,11 @@ trait CTrait_Compat_Observable {
         return $this->addCalendar($calendar_id);
     }
 
+    /**
+     * 
+     * @param string $tabs_id
+     * @return CTabList
+     */
     public function add_tab_list($tabs_id = "") {
         return $this->addTabList($tabs_id);
     }

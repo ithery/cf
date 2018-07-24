@@ -1028,6 +1028,7 @@ textarea {
 .modal-header h3 {
     font-size: 12px;
     text-shadow: 0 1px 0 #ffffff;
+    display: inline-block;
 }
 
 .notify-ui ul {
