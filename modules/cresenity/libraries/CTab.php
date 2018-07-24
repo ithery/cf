@@ -77,7 +77,6 @@ class CTab extends CElement {
             }
         }
 
-
         $class_active = "";
         if ($this->active) {
             $class_active = "active";
@@ -123,7 +122,7 @@ class CTab extends CElement {
             $tab_label = $this->label;
         }
 
-        $html = '<li class="nav-item w-100 ' . $class_active . '"><a href="javascript:;" ' . $tab_class . $tab_icon . $tab_tab . $tab_target . $tab_responsive . $tab_url . ' class="nav-link '.$class_active.' tab-ajax-load">';
+        $html = '<li class="nav-item w-100 ' . $class_active . '"><a href="javascript:;" ' . $tab_class . $tab_icon . $tab_tab . $tab_target . $tab_responsive . $tab_url . ' class="nav-link ' . $class_active . ' tab-ajax-load">';
         if ($this->icon) {
             $html .= '<span class="icon"><i class="icon-' . $this->icon . '"></i></span> ';
         }

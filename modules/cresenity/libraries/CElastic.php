@@ -215,4 +215,30 @@ class CElastic {
         return array_merge($params, ['index' => $this->getDefaultIndex()]);
     }
 
+    /**
+     * 
+     * @return \CElastic_Client
+     */
+    public function createClient() {
+        $config = array();
+        $config['servers'] = array();
+        foreach ($this->hosts as $host) {
+            $hostArray = explode(':', $host);
+            $config['servers'][] = array(
+                'host' => carr::get($hostArray, 0),
+                'port' => carr::get($hostArray, 1, '9200'),
+            );
+        }
+
+        return new CElastic_Client($config);
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public static function getDataTypeList() {
+        return CElastic_DataType::getList();
+    }
+
 }

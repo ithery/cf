@@ -2224,6 +2224,17 @@ final class CF {
         return new CCollection($value);
     }
 
+    /**
+     * Return the given value, optionally passed through the given callback.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function with($value, callable $callback = null) {
+        return is_null($callback) ? $value : $callback($value);
+    }
+
 }
 
 // End C

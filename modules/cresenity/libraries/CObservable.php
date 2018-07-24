@@ -80,7 +80,7 @@ abstract class CObservable extends CRenderable {
      * 
      * @param type $id
      * @param type $type
-     * @return CFormInput
+     * @return CElement_FormInput
      */
     public function addControl($id, $type) {
         $control = null;
@@ -130,6 +130,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
+
     /**
      * Add Anchor Element &lt;a&gt
      *
@@ -304,6 +305,11 @@ abstract class CObservable extends CRenderable {
         return $calendar;
     }
 
+    /**
+     * 
+     * @param string $tabs_id
+     * @return CTabList
+     */
     public function addTabList($tabs_id = "") {
         $tabs = CTabList::factory($tabs_id);
         $this->add($tabs);
@@ -440,6 +446,18 @@ abstract class CObservable extends CRenderable {
         $act = CElement_Factory::createComponent('Action', $id);
         $this->add($act);
         return $act;
+    }
+
+    public function addAlert($id = "") {
+        $element = CElement_Factory::createComponent('Alert', $id);
+        $this->add($element);
+        return $element;
+    }
+    
+    public function addAccordion($id = "") {
+        $element = CElement_Factory::createComponent('Accordion', $id);
+        $this->add($element);
+        return $element;
     }
 
     public function addIcon($id = "") {
