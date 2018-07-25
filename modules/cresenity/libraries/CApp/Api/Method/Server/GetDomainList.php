@@ -16,7 +16,7 @@ class CApp_Api_Method_Server_GetDomainList extends CApp_Api_Method_Server {
         $errMessage = '';
         $domain = $this->domain;
 
-        $files = cfs::list_files(CFData::path() . 'domain');
+        $allFiles = cfs::list_files(CFData::path() . 'domain');
         
         /*
         $fileHelper = CHelper::file();
@@ -36,7 +36,18 @@ class CApp_Api_Method_Server_GetDomainList extends CApp_Api_Method_Server {
             $files[] = $file;
         }
         */
+        foreach($allFiles as $filename) {
+            $domain = basename($filename);
+            if (substr($domain, -4) == '.php') {
+                $domain = substr($domain, 0, strlen($domain) - 4);
+            }
 
+            $file = array(
+                'domain' => $domain,
+                'created' => date('Y-m-d H:i:s', filemtime($filename)),
+            );
+            $files[] = $file;
+        }
         $data = array();
         $data['list'] = $files;
         $data['count'] = count($files);
