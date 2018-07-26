@@ -11,6 +11,10 @@ use DigitalOceanV2\DigitalOceanV2;
 
 class CVendor_DigitalOcean {
 
+    /**
+     *
+     * @var \DigitalOceanV2\DigitalOceanV2 
+     */
     protected $do;
 
     public function __construct($accessToken) {
@@ -24,7 +28,7 @@ class CVendor_DigitalOcean {
 
     /**
      * 
-     * @return DigitalOceanV2\DigitalOceanV2
+     * @return \DigitalOceanV2\DigitalOceanV2
      */
     public function getObject() {
         return $this->do;
