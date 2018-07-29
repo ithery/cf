@@ -98,19 +98,21 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
             }
             if (strlen($sOrder) == 0) {
                 $stringOrderBy = $this->baseOrder();
+                
                 if (strlen($stringOrderBy) > 0) {
                     //remove prefixed column from order by
                     $sub = explode(",", substr($stringOrderBy, 9));
                     $sOrder = "";
+                    $newStringOrderBy = '';
                     foreach ($sub as $val) {
                         $columnNames = explode(".", $val);
                         $columnName = $columnNames[0];
                         if (isset($columnNames[1])) {
                             $columnName = $columnNames[1];
                         }
-                        $stringOrderBy .= ", " . $columnName;
+                        $newStringOrderBy .= ", " . $columnName;
                     }
-                    $sOrder = "ORDER BY " . substr($stringOrderBy, 2);
+                    $sOrder = "ORDER BY " . substr($newStringOrderBy, 2);
                 }
             }
             $this->queryOrderBy = $sOrder;
