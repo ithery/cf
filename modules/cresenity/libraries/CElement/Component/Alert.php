@@ -12,19 +12,32 @@ class CElement_Component_Alert extends CElement_Component {
 
     protected $header;
     protected $content;
+    protected $type;
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
         $this->header = $this->addH4();
-        $this->add($this->header);
         $this->content = $this->add_div()->addClass('widget-content clearfix');
         $this->addClass('alert');
         $this->wrapper = $this->content;
         $this->tag = 'div';
     }
 
+    public function setType($type) {
+        $this->type = $type;
+        return $this;
+    }
+
     public function build() {
         $this->header->add($this->getTranslationTitle());
+        switch ($this->type) {
+            case 'error':
+                $this->addClass('alert-danger');
+                break;
+            default:
+                $this->addClass('alert-success');
+                break;
+        }
     }
 
 }

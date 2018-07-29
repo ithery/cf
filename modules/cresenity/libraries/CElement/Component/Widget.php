@@ -9,8 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_Component_Widget extends CElement_Component {
 
-    use CTrait_Compat_Element_Widget,
-        CTrait_Element_Property_Icon;
+    use CTrait_Compat_Element_Widget;
 
     /**
      *
@@ -109,6 +108,18 @@ class CElement_Component_Widget extends CElement_Component {
      */
     public function setTitle($title, $lang = true) {
         $this->header()->setTitle($title, $lang);
+        return $this;
+    }
+    
+    /**
+     * Set the icon of the widget
+     * 
+     * @param string $title
+     * @param string $lang
+     * @return $this
+     */
+    public function setIcon($icon) {
+        $this->header()->setIcon($icon);
         return $this;
     }
 

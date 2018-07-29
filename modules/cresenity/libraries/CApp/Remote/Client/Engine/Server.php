@@ -36,17 +36,15 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         return $data;
     }
 
+    public function getServerStorageInfo() {
+        $data = $this->request($this->baseUrl . 'GetServerStorageInfo');
+        return $data;
+    }
+
     public function deleteDomain($domain) {
         $post = array();
         $post['domain'] = $domain;
         $data = $this->request($this->baseUrl . 'DomainDelete', $post);
-        return $data;
-    }
-
-    public function gitPull($appCode) {
-        $post = array();
-        $post['app_code'] = $appCode;
-        $data = $this->request($this->baseUrl . 'GitPull', $post);
         return $data;
     }
 

@@ -7,13 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 15, 2018, 1:45:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CServer_System {
+class CServer_System extends CServer_Base {
 
-    /**
-     *
-     * @var CServer_System
-     */
-    protected static $instance;
+    protected static $instance = array();
 
     /**
      *
@@ -27,18 +23,28 @@ class CServer_System {
      */
     protected $info;
 
-    public function __construct() {
+    public function __construct($sshConfig = null) {
         $os = CServer::getOS();
         $this->info = new CServer_System_Info();
         $osClass = 'CServer_System_OS_' . $os;
-        $this->os = new $osClass($this->info);
+        $this->os = new $osClass($this, $this->info);
+        $this->sshConfig = $sshConfig;
+        $this->host = carr::get($sshConfig, 'host');
     }
 
-    public static function instance() {
-        if (self::$instance == null) {
-            return new CServer_System();
+    public static function instance(array $sshConfig = null) {
+        if (!is_array(self::$instance)) {
+            self::$instance = array();
         }
-        return self::$instance;
+        $host = 'localhost';
+
+        if ($sshConfig != null) {
+            $host = carr::get($sshConfig, 'host');
+        }
+        if (!isset(self::$instance[$host])) {
+            self::$instance[$host] = new CServer_System($sshConfig);
+        }
+        return self::$instance[$host];
     }
 
     public function getHostname() {

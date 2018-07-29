@@ -8,8 +8,8 @@
 
 class CVendor {
 
-    public static function digitalOcean() {
-        return CVendor_DigitalOcean::instance();
+    public static function digitalOcean($accessToken) {
+        return new CVendor_DigitalOcean($accessToken);
     }
 
 }
