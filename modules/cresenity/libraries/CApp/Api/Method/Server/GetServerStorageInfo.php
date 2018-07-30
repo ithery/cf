@@ -7,25 +7,26 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 14, 2018, 4:40:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_Api_Method_Server_GitPull extends CApp_Api_Method_Server {
+class CApp_Api_Method_Server_GetServerStorageInfo extends CApp_Api_Method_Server {
 
     public function execute() {
         $errCode = 0;
         $errMessage = '';
         $domain = $this->domain;
 
-        $path = DOCROOT . '../bin/gitFile/';
-        $filename = '';
-
-        $request = $this->request();
-        $appCode = carr::get($request, 'app_code');
-
-
 
         $data = array();
 
         try {
-            file_put_contents($path . $appCode, "");
+            $serverStorage = CServer::storage();
+
+            $dataStorage = array();
+            $dataStorage['total'] = $serverStorage->getTotalSpace();
+            $dataStorage['free'] = $serverStorage->getFreeSpace();
+            $dataStorage['used'] = $dataStorage['total'] - $dataStorage['free'];
+
+
+            $data = $dataStorage;
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();

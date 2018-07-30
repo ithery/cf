@@ -7,15 +7,28 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 15, 2018, 3:04:56 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CServer_Command {
+class CServer_Command extends CServer_Base {
 
-    protected static $instance;
+    protected static $instance = array();
 
-    public static function instance() {
-        if (self::$instance == null) {
-            return new CServer_Command();
+    public function __construct($sshConfig = null) {
+        $this->sshConfig = $sshConfig;
+        $this->host = carr::get($sshConfig, 'host');
+    }
+
+    public static function instance($sshConfig = null) {
+        if (!is_array(self::$instance)) {
+            self::$instance = array();
         }
-        return self::$instance;
+        $host = 'localhost';
+
+        if ($sshConfig != null) {
+            $host = carr::get($sshConfig, 'host');
+        }
+        if (!isset(self::$instance[$host])) {
+            self::$instance[$host] = new CServer_Command($sshConfig);
+        }
+        return self::$instance[$host];
     }
 
     /**
@@ -233,7 +246,17 @@ class CServer_Command {
      * @return boolean command successfull or not
      */
     public function rfts($strFileName, &$strRet, $intLines = 0, $intBytes = 4096, $booErrorRep = true) {
-
+        if ($this->sshConfig != null) {
+            
+            $ssh = CRemote::ssh($this->sshConfig);
+            $output = '';
+            $ssh->run('cat ' . $strFileName, function($line) use (&$output) {
+                $output .= $line;
+            });
+            
+            $strRet = $output;
+            return true;
+        }
 
         $strFile = "";
         $intCurLine = 1;

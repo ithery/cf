@@ -256,6 +256,12 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $text
+     * @param bool $lang
+     * @return $this
+     */
     public function setLabel($text, $lang = true) {
         if ($lang) {
             $text = clang::__($text);

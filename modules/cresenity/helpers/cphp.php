@@ -11,8 +11,8 @@ class cphp {
             $str .= 'array(' . $eol;
             $indent2 = cutils::indent($level + 1, "\t");
             foreach ($val as $k => $v) {
-
-                $str .= $indent2 . "'" . addslashes($k) . "'=>";
+                $kSlashes = addcslashes($k, '\'\\');
+                $str .= $indent2 . "'" . $kSlashes . "'=>";
                 $str .= self::string_value($v, $level + 1);
                 $str .= "," . $eol;
             }
@@ -24,7 +24,7 @@ class cphp {
 
             $str .= ($val === TRUE ? "TRUE" : "FALSE");
         } else {
-            $str .= "'" . addslashes($val) . "'";
+            $str .= "'" . addcslashes($val, '\'\\') . "'";
         }
         return $str;
     }

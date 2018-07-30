@@ -15,8 +15,10 @@ class CServer_Memory_OS_Linux extends CServer_Memory_OS {
      * @return void
      */
     public function buildMemory() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if ($cmd->rfts('/proc/meminfo', $mbuf)) {
+
+
             $bufe = preg_split("/\n/", $mbuf, -1, PREG_SPLIT_NO_EMPTY);
             foreach ($bufe as $buf) {
                 if (preg_match('/^MemTotal:\s+(\d+)\s*kB/i', $buf, $ar_buf)) {
@@ -38,7 +40,7 @@ class CServer_Memory_OS_Linux extends CServer_Memory_OS {
     }
 
     public function buildSwap() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if ($cmd->rfts('/proc/swaps', $sbuf, 0, 4096, false)) {
             $swaps = preg_split("/\n/", $sbuf, -1, PREG_SPLIT_NO_EMPTY);
             unset($swaps[0]);

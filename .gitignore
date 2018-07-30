@@ -40,4 +40,8 @@ composer.json
 sftp-config*.json
 .well-known
 .well-known/*
+__sublime_sftp_offset
+
+#SEO
 robots.txt
+
