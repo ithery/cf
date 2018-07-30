@@ -221,10 +221,16 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
         }
         if (strlen($str_result) == 0) {
-            $str_result = "'+item." . CF::value($this->searchField) . "+'";
+            $searchFieldText = CF::value($this->searchField);
+            if (strlen($searchFieldText) > 0) {
+                $str_result = "'+item." . $searchFieldText . "+'";
+            }
         }
         if (strlen($str_selection) == 0) {
-            $str_selection = "'+item." . CF::value($this->searchField) . "+'";
+            $searchFieldText = CF::value($this->searchField);
+            if (strlen($searchFieldText) > 0) {
+                $str_selection = "'+item." . $searchFieldText . "+'";
+            }
         }
 
         $str_result = preg_replace("/[\r\n]+/", "", $str_result);
