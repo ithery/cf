@@ -323,11 +323,17 @@ class CTabList extends CElement_Element {
 				var pare = jQuery(this).parent();
 		
 				if(pare.prop('tagName')=='LI') {
+                                       
 					pare.parent().children().removeClass('active');
 					pare.addClass('active');
+                                        pare.parent().find('> li > a').removeClass('active');
+					pare.find('> a').addClass('active');
 				}
 				jQuery(this).parent().children().removeClass('active');
 				jQuery(this).addClass('active');
+                               
+                                jQuery(this).parent().find('> li > a').removeClass('active');
+                                jQuery(this).find('> a').addClass('active');
 				var widget_tab = jQuery('#" . $this->id . "-tab-widget');
 				if(widget_tab.length>0) {
 					

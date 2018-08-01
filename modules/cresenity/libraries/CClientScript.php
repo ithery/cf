@@ -164,6 +164,7 @@ class CClientScript extends CObject {
     }
 
     public function unregisterJsFile($file, $pos = null) {
+        $fullpathFile = $this->fullpathJsFile($file);
         //we will locate all pos for this pos if pos =null;
         if ($pos == null) {
             $pos = self::allAvailablePos();
@@ -172,9 +173,12 @@ class CClientScript extends CObject {
             $pos = array($pos);
         }
         foreach ($pos as $p) {
+            
             $jsFiles = &$this->scripts[$p]['js_file'];
             foreach ($jsFiles as $k => $jsFile) {
-                if ($jsFile == $file) {
+               
+                if ($jsFile == $fullpathFile) {
+                    
                     unset($jsFiles[$k]);
                 }
             }
@@ -215,6 +219,7 @@ class CClientScript extends CObject {
     }
 
     public function unregisterCssFile($file, $pos = null) {
+        $fullpathFile = $this->fullpathCssFile($file);
         //we will locate all pos for this pos if pos =null;
         if ($pos == null) {
             $pos = self::allAvailablePos();
@@ -225,7 +230,7 @@ class CClientScript extends CObject {
         foreach ($pos as $p) {
             $cssFiles = &$this->scripts[$p]['css_file'];
             foreach ($cssFiles as $k => $cssFile) {
-                if ($cssFile == $file) {
+                if ($cssFile == $fullpathFile) {
                     unset($cssFiles[$k]);
                 }
             }

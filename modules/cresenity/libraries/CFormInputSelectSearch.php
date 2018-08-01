@@ -176,7 +176,7 @@ class CFormInputSelectSearch extends CFormInput {
     }
 
     public function js($indent = 0) {
-        $ajax_url = $this->createAjaxUrl();
+        $ajax_url = $this->create_ajax_url();
 
         $str_selection = $this->format_selection;
         $str_result = $this->format_result;

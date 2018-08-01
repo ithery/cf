@@ -10,6 +10,7 @@ class CResources {
         $type = '';
         $date = '';
         $arr_name = explode("_", $filename);
+        $count_arr_name = count($arr_name);
         //org_code
         if (isset($arr_name[0])) {
             $orgCode = $arr_name[0];
@@ -29,6 +30,14 @@ class CResources {
         //name
         if (isset($arr_name[4])) {
             $name = $arr_name[4];
+            $file_name = array();
+            $i = 4;
+            if ($count_arr_name > $i) {
+                for ($i ; $i < $count_arr_name ; $i++) {
+                    $file_name[$i] = $arr_name[$i];
+                }
+                $name = implode("_", $file_name);
+            }
         }
         if ($orgCode == 'default')
             $orgCode = null;
@@ -144,14 +153,24 @@ class CResources {
     
     /**
      * 
-     * @param string $name
-     * @param array $options
+     * @param type $name
+     * @param type $options
+     * @return \CResources_Loader_File
+     * @deprecated since version 1.1
+     */
+    public static function files($name, $options = array()) {
+        return self::file($name,$options);
+    }
+
+    /**
+     * 
+     * @param type $name
+     * @param type $options
      * @return \CResources_Loader_File
      */
     public static function file($name, $options = array()) {
         return new CResources_Loader_File($name, $options);
     }
-
     /**
      * 
      * @param string $str
