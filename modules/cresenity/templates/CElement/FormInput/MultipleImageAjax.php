@@ -60,7 +60,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         text-align: center;
         display: block;
         font-size: 20px;
-        margin: 15px 0;
+        padding: 15px 0;
     }
     .multi-image-ajax-message {
         margin-left: 0px;
@@ -179,9 +179,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
             });
             function fileChanged() {
                 var container = $('#container-<?php echo $id ?>');
-                var maximum = container.attr('data-maximum');
+                var maximum = parseInt(container.attr('data-maximum'));
                 var fileCount = container.find('.multi-image-ajax-file').length;
-                if (fileCount >= maximum) {
+                if (maximum>0 && fileCount >= maximum) {
                     container.addClass('disabled');
                 } else {
                     container.removeClass('disabled');
