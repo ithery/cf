@@ -8,6 +8,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 ?>
 <style>
+    .container-multi-image-ajax.disabled {
+        background:#CDCDCD;
+        cursor: not-allowed;
+    }
     .multi-image-ajax {
         border: 2px dashed #CDCDCD;
         margin-left: 0px;
@@ -29,7 +33,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
         position: relative;
         border-radius: 4px;
         padding:4px;
+        background:#fff;
     }
+
     .multi-image-ajax .div-img{
         border: 0px;
         width: auto;
@@ -99,7 +105,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     }
 </style>
 
-<div id="container-<?php echo $id ?>" class="container-multi-image-ajax" >
+<div id="container-<?php echo $id ?>" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
     <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
@@ -171,7 +177,18 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 e.preventDefault();
                 e.stopPropagation();
             });
+            function fileChanged() {
+                var container = $('#container-<?php echo $id ?>');
+                var maximum = container.attr('data-maximum');
+                var fileCount = container.find('.multi-image-ajax-file').length;
+                if (fileCount >= maximum) {
+                    container.addClass('disabled');
+                } else {
+                    container.removeClass('disabled');
+                }
 
+            }
+            fileChanged();
             // Remove File
             function fileUploadRemove(e) {
 
@@ -179,8 +196,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     e.preventDefault();
                     e.stopPropagation();
 
-
                     $(this).parent().remove();
+                    fileChanged();
                 })
             }
 
@@ -282,6 +299,7 @@ foreach ($customControl as $cc):
                         div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
                         img.attr('src', data.url);
                         index++;
+                        fileChanged();
                     } else if (this.readyState == 4 && this.status != 200) {
                         //div.remove();
                     }
@@ -302,28 +320,31 @@ foreach ($customControl as $cc):
                 },
                 "drop": function (e) {
                     $(this).removeClass("ondrag");
-                    $("#<?php echo $id ?>").sortable();
-                    var dataTransfer = e.originalEvent.dataTransfer;
-                    if (dataTransfer && dataTransfer.files.length) {
-                        dataTransferFiles = dataTransfer.files;
-                        if (haveCropper) {
-                            if (dataTransfer.files.length > 1) {
-                                dataTransferFiles = [dataTransfer.files[0]]
+                    var container = $('#container-<?php echo $id ?>');
+                    if (!container.hasClass('disabled')) {
+                        $("#<?php echo $id ?>").sortable();
+                        var dataTransfer = e.originalEvent.dataTransfer;
+                        if (dataTransfer && dataTransfer.files.length) {
+                            dataTransferFiles = dataTransfer.files;
+                            if (haveCropper) {
+                                if (dataTransfer.files.length > 1) {
+                                    dataTransferFiles = [dataTransfer.files[0]]
+                                }
                             }
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                        $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
-                        $.each(dataTransferFiles, function (i, file) {
-                            var reader = new FileReader();
-                            reader.fileName = file.name;
-                            
-                            reader.onload = $.proxy(function (file, fileList, event) {
-                                insertFile(reader, file, fileList, event);
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
+                            $.each(dataTransferFiles, function (i, file) {
+                                var reader = new FileReader();
+                                reader.fileName = file.name;
 
-                            }, this, file, $("#<?php echo $id; ?>"));
-                            reader.readAsDataURL(file);
-                        });
+                                reader.onload = $.proxy(function (file, fileList, event) {
+                                    insertFile(reader, file, fileList, event);
+
+                                }, this, file, $("#<?php echo $id; ?>"));
+                                reader.readAsDataURL(file);
+                            });
+                        }
                     }
                 }
             })
@@ -333,7 +354,10 @@ foreach ($customControl as $cc):
 
             // Add Image by Click
             $("#<?php echo $id; ?>").click(function () {
-                $("#<?php echo $id; ?>_input_temp").trigger("click");
+                var container = $('#container-<?php echo $id ?>');
+                if (!container.hasClass('disabled')) {
+                    $("#<?php echo $id; ?>_input_temp").trigger("click");
+                }
             })
             $("#<?php echo $id; ?>_input_temp").change(function (e) {
                 $("#<?php echo $id; ?>_description").remove();
