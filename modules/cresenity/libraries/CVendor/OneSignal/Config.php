@@ -1,9 +1,7 @@
 <?php
 
-namespace OneSignal;
+class CVendor_OneSignal_Config {
 
-class Config
-{
     /**
      * @var string
      */
@@ -24,8 +22,7 @@ class Config
      *
      * @param string $applicationId
      */
-    public function setApplicationId($applicationId)
-    {
+    public function setApplicationId($applicationId) {
         $this->applicationId = $applicationId;
     }
 
@@ -34,8 +31,7 @@ class Config
      *
      * @return string
      */
-    public function getApplicationId()
-    {
+    public function getApplicationId() {
         return $this->applicationId;
     }
 
@@ -44,8 +40,7 @@ class Config
      *
      * @param string $applicationAuthKey
      */
-    public function setApplicationAuthKey($applicationAuthKey)
-    {
+    public function setApplicationAuthKey($applicationAuthKey) {
         $this->applicationAuthKey = $applicationAuthKey;
     }
 
@@ -54,8 +49,7 @@ class Config
      *
      * @return string
      */
-    public function getApplicationAuthKey()
-    {
+    public function getApplicationAuthKey() {
         return $this->applicationAuthKey;
     }
 
@@ -64,8 +58,7 @@ class Config
      *
      * @param string $userAuthKey
      */
-    public function setUserAuthKey($userAuthKey)
-    {
+    public function setUserAuthKey($userAuthKey) {
         $this->userAuthKey = $userAuthKey;
     }
 
@@ -74,8 +67,8 @@ class Config
      *
      * @return string
      */
-    public function getUserAuthKey()
-    {
+    public function getUserAuthKey() {
         return $this->userAuthKey;
     }
+
 }
