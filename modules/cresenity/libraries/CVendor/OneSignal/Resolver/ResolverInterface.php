@@ -1,9 +1,7 @@
 <?php
 
-namespace OneSignal\Resolver;
+interface CVendor_OneSignal_Resolver_ResolverInterface {
 
-interface ResolverInterface
-{
     /**
      * Resolve option array.
      *

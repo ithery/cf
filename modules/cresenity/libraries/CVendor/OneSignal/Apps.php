@@ -1,17 +1,11 @@
 <?php
 
-namespace OneSignal;
+class CVendor_OneSignal_Apps {
 
-use OneSignal\Resolver\ResolverFactory;
-
-class Apps
-{
     protected $api;
-
     private $resolverFactory;
 
-    public function __construct(OneSignal $api, ResolverFactory $resolverFactory)
-    {
+    public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {
         $this->api = $api;
         $this->resolverFactory = $resolverFactory;
     }
@@ -25,10 +19,9 @@ class Apps
      *
      * @return array
      */
-    public function getOne($id)
-    {
-        return $this->api->request('GET', '/apps/'.$id, [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getUserAuthKey(),
+    public function getOne($id) {
+        return $this->api->request('GET', '/apps/' . $id, [
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
         ]);
     }
 
@@ -39,10 +32,9 @@ class Apps
      *
      * @return array
      */
-    public function getAll()
-    {
+    public function getAll() {
         return $this->api->request('GET', '/apps', [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getUserAuthKey(),
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
         ]);
     }
 
@@ -55,13 +47,12 @@ class Apps
      *
      * @return array
      */
-    public function add(array $data)
-    {
+    public function add(array $data) {
         $data = $this->resolverFactory->createAppResolver()->resolve($data);
 
         return $this->api->request('POST', '/apps', [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getUserAuthKey(),
-        ], json_encode($data));
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
+                        ], json_encode($data));
     }
 
     /**
@@ -74,12 +65,12 @@ class Apps
      *
      * @return array
      */
-    public function update($id, array $data)
-    {
+    public function update($id, array $data) {
         $data = $this->resolverFactory->createAppResolver()->resolve($data);
 
-        return $this->api->request('PUT', '/apps/'.$id, [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getUserAuthKey(),
-        ], json_encode($data));
+        return $this->api->request('PUT', '/apps/' . $id, [
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
+                        ], json_encode($data));
     }
+
 }

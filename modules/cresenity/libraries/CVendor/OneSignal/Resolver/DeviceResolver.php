@@ -1,12 +1,8 @@
 <?php
 
-namespace OneSignal\Resolver;
-
-use OneSignal\Config;
-use OneSignal\Devices;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DeviceResolver implements ResolverInterface
+class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Resolver_ResolverInterface
 {
     private $config;
 
@@ -21,7 +17,7 @@ class DeviceResolver implements ResolverInterface
      * @param Config $config
      * @param bool   $isNewDevice
      */
-    public function __construct(Config $config, $isNewDevice = false)
+    public function __construct(CVendor_OneSignal_Config $config, $isNewDevice = false)
     {
         $this->config = $config;
         $this->isNewDevice = $isNewDevice;

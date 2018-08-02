@@ -26,7 +26,7 @@ class CVendor_OneSignal_Devices {
     protected $api;
     private $resolverFactory;
 
-    public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_ResolverFactory $resolverFactory) {
+    public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {
         $this->api = $api;
         $this->resolverFactory = $resolverFactory;
     }

@@ -6,6 +6,8 @@
  * and open the template in the editor.
  */
 
+use Http\Client\Common\HttpMethodsClient as Client;
+
 /**
  * @property-read Apps          $apps          Applications API service
  * @property-read Devices       $devices       Devices API service
@@ -37,12 +39,12 @@ class CVendor_OneSignal {
      * @param Config $config
      * @param Client $client
      */
-    public function __construct(Config $config = null, Client $client = null) {
-        $this->config = ($config ?: new Config());
+    public function __construct(CVendor_OneSignal_Config $config = null, Client $client = null) {
+        $this->config = ($config ?: new CVendor_OneSignal_Config());
         if (null !== $client) {
             $this->client = $client;
         }
-        $this->resolverFactory = new ResolverFactory($this->config);
+        $this->resolverFactory = new CVendor_OneSignal_Resolver_ResolverFactory($this->config);
     }
 
     /**
@@ -120,7 +122,7 @@ class CVendor_OneSignal {
             if (isset($this->services[$name])) {
                 return $this->services[$name];
             }
-            $serviceName = __NAMESPACE__ . '\\' . ucfirst($name);
+            $serviceName = 'CVendor_OneSignal_' . ucfirst($name);
             $this->services[$name] = new $serviceName($this, $this->resolverFactory);
             return $this->services[$name];
         }

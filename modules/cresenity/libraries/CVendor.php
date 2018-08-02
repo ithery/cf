@@ -13,10 +13,20 @@ use Http\Message\MessageFactory\GuzzleMessageFactory;
 
 class CVendor {
 
+    /**
+     * 
+     * @param string $accessToken
+     * @return \CVendor_DigitalOcean
+     */
     public static function digitalOcean($accessToken) {
         return new CVendor_DigitalOcean($accessToken);
     }
 
+    /**
+     * 
+     * @param array $options
+     * @return \CVendor_OneSignal
+     */
     public static function oneSignal($options) {
         $appId = carr::get($options, 'app_id');
         $appKey = carr::get($options, 'app_key');
@@ -40,6 +50,7 @@ class CVendor {
 
         $client = new HttpClient(new GuzzleAdapter($guzzle), new GuzzleMessageFactory());
         $api = new CVendor_OneSignal($config, $client);
+        return $api;
     }
 
 }

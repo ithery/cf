@@ -1,19 +1,13 @@
 <?php
 
-namespace OneSignal;
+class CVendor_OneSignal_Resolver_Notifications {
 
-use OneSignal\Resolver\ResolverFactory;
-
-class Notifications
-{
     const NOTIFICATIONS_LIMIT = 50;
 
     protected $api;
-
     private $resolverFactory;
 
-    public function __construct(OneSignal $api, ResolverFactory $resolverFactory)
-    {
+    public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {
         $this->api = $api;
         $this->resolverFactory = $resolverFactory;
     }
@@ -27,12 +21,11 @@ class Notifications
      *
      * @return array
      */
-    public function getOne($id)
-    {
-        $url = '/notifications/'.$id.'?app_id='.$this->api->getConfig()->getApplicationId();
+    public function getOne($id) {
+        $url = '/notifications/' . $id . '?app_id=' . $this->api->getConfig()->getApplicationId();
 
         return $this->api->request('GET', $url, [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getApplicationAuthKey(),
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
     }
 
@@ -46,16 +39,15 @@ class Notifications
      *
      * @return array
      */
-    public function getAll($limit = self::NOTIFICATIONS_LIMIT, $offset = 0)
-    {
+    public function getAll($limit = self::NOTIFICATIONS_LIMIT, $offset = 0) {
         $query = [
             'limit' => max(1, min(self::NOTIFICATIONS_LIMIT, filter_var($limit, FILTER_VALIDATE_INT))),
             'offset' => max(0, filter_var($offset, FILTER_VALIDATE_INT)),
             'app_id' => $this->api->getConfig()->getApplicationId(),
         ];
 
-        return $this->api->request('GET', '/notifications?'.http_build_query($query), [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getApplicationAuthKey(),
+        return $this->api->request('GET', '/notifications?' . http_build_query($query), [
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
     }
 
@@ -68,13 +60,12 @@ class Notifications
      *
      * @return array
      */
-    public function add(array $data)
-    {
+    public function add(array $data) {
         $data = $this->resolverFactory->createNotificationResolver()->resolve($data);
 
         return $this->api->request('POST', '/notifications', [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getApplicationAuthKey(),
-        ], json_encode($data));
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+                        ], json_encode($data));
     }
 
     /**
@@ -86,13 +77,12 @@ class Notifications
      *
      * @return array
      */
-    public function open($id)
-    {
-        return $this->api->request('PUT', '/notifications/'.$id, [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getApplicationAuthKey(),
-        ], json_encode([
-            'app_id' => $this->api->getConfig()->getApplicationId(),
-            'opened' => true,
+    public function open($id) {
+        return $this->api->request('PUT', '/notifications/' . $id, [
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+                        ], json_encode([
+                    'app_id' => $this->api->getConfig()->getApplicationId(),
+                    'opened' => true,
         ]));
     }
 
@@ -105,12 +95,12 @@ class Notifications
      *
      * @return array
      */
-    public function cancel($id)
-    {
-        $url = '/notifications/'.$id.'?app_id='.$this->api->getConfig()->getApplicationId();
+    public function cancel($id) {
+        $url = '/notifications/' . $id . '?app_id=' . $this->api->getConfig()->getApplicationId();
 
         return $this->api->request('DELETE', $url, [
-            'Authorization' => 'Basic '.$this->api->getConfig()->getApplicationAuthKey(),
+                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
     }
+
 }
