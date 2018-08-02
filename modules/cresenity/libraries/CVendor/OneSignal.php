@@ -9,9 +9,9 @@
 use Http\Client\Common\HttpMethodsClient as Client;
 
 /**
- * @property-read Apps          $apps          Applications API service
- * @property-read Devices       $devices       Devices API service
- * @property-read Notifications $notifications Notifications API service
+ * @property-read CVendor_OneSignal_Apps          $apps          Applications API service
+ * @property-read CVendor_OneSignal_Devices       $devices       Devices API service
+ * @property-read CVendor_OneSignal_Notifications $notifications Notifications API service
  */
 class CVendor_OneSignal {
 
