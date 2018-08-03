@@ -25,6 +25,57 @@ class Shipper {
 		$this->key = $key;
 	}
 
+	public function createMerchant($options) {
+		$method = 'GET';
+
+		$mandatoryKeys = [
+			'phoneNumber',
+			'email',
+			'password',
+			'fullName',
+			'companyName',
+			'address',
+			'direction',
+			'cityID',
+			'postcode',
+			'isCustomAWB',
+			'merchantLogo',
+			'isAutoTrack',
+		];
+
+		// VALIDATION
+
+		foreach ($mandatoryKeys as $key) {
+			if (!isset($options[$key])) {
+				throw new Exception('Key ' . $key . ' is required.');
+			}
+		}
+
+		curl_setopt_array($this->curl, [
+			CURLOPT_URL => $this->url . 'public/v1/merchants?apiKey=' . $this->key,
+			CURLOPT_RETURNTRANSFER => TRUE,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 30,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => $method,
+			CURLOPT_POSTFIELDS => http_build_query($options),
+			CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
+			CURLOPT_HTTPHEADER => [
+				'Content-Type: application/x-www-form-urlencoded',
+			],
+		]);
+
+		$response = curl_exec($this->curl);
+		$err = curl_error($this->curl);
+
+		if ($err) {
+			return $this->error($err);
+		} else {
+			return $this->response($response);
+		}
+	}
+
 	public function getMerchants($phone = '') {
 		$method = 'GET';
 		$options = [
@@ -59,23 +110,41 @@ class Shipper {
 		}
 	}
 
-	public function updateMerchant($merchantId) {
+	public function updateMerchant($merchantId, $options) {
 		$method = 'PUT';
-		$options = [
-			'apiKey' => $this->key,
+		$errCode = 0;
+
+		$parameterKeys = [
+			'apiKey',
+			'phoneNumber',
+			'fullName',
+			'companyName',
 		];
 
+		// VALIDATION
+
+		foreach ($parameterKeys as $key) {
+			if (!isset($options[$key])) {
+				$errCode++;
+			}
+		}
+
+		if ($errCode == count($parameterKeys)) {
+			throw new Exception('There must be at least one parameter. Parameter: ' . implode(',', $parameterKeys));
+		}
+
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/merchants/' . $merchantId . '?' . http_build_query($options),
+			CURLOPT_URL => $this->url . 'public/v1/merchants/' . $merchantId . '?apiKey=' . $this->key,
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => $method,
+			CURLOPT_POSTFIELDS => http_build_query($options),
 			CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
 			CURLOPT_HTTPHEADER => [
-				'Content-Type: application/json',
+				'Content-Type: application/x-www-form-urlencoded',
 			],
 		]);
 
@@ -89,26 +158,43 @@ class Shipper {
 		}
 	}
 
-	public function subscription($activation, $merchantLogo = '', $merchantAds = '') {
+	public function subscription($activation, $options) {
 		$method = 'PUT';
-		$options = [
-			'apiKey' => $this->key,
-			'customAWB' => $activation,
-			'merchantLogo' => $merchantLogo,
-			'merchantAds' => $merchantAds
+		$errCode = 0;
+
+		$parameterKeys = [
+			'merchantLogo',
+			'merchantAds',
 		];
 
+		if ($activation) {
+			foreach ($parameterKeys as $key) {
+				if (!isset($options[$key])) {
+					$errCode++;
+				}
+			}
+
+			if ($errCode == count($parameterKeys)) {
+				throw new Exception('There must be at least one parameter. Parameter: ' . implode(',', $parameterKeys));
+			}
+		}
+
+		$options['customAWB'] = $activation;
+
+		// VALIDATION
+
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/subscriptions?' . http_build_query($options),
+			CURLOPT_URL => $this->url . 'public/v1/subscriptions?apiKey=' . $this->key,
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => $method,
+			CURLOPT_POSTFIELDS => http_build_query($options),
 			CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
 			CURLOPT_HTTPHEADER => [
-				'Content-Type: application/json',
+				'Content-Type: application/x-www-form-urlencoded',
 			],
 		]);
 
@@ -280,7 +366,7 @@ class Shipper {
 		}
 	}
 
-	public function search($value = '') {
+	public function search($value) {
 		$method = 'GET';
 		$options = [
 			'apiKey' => $this->key,
@@ -310,6 +396,24 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Retrieve every rates based on the submitted query string parameters. This endpoint requires area ID for its o and d parameter
+	 *
+	 * @method getDomesticRates
+	 *
+	 * @param  integer           $origin      origin area ID. Obtained from getAreas.
+	 * @param  integer           $destination destination area ID. Obtained from getAreas.
+	 * @param  integer           $weight      package's weight (float in kilograms e.g. 1.5). The allowance for each logistic will be 												 calculated automatically.
+	 * @param  integer           $length      package's length (integer in centimeter e.g 10)
+	 * @param  integer           $width       package's width (integer in centimeter e.g 10)
+	 * @param  integer           $height      package's height (integer in centimeter e.g 10)
+	 * @param  integer           $value       package's value/price (integer in IDR e.g 100000)
+	 * @param  integer           $type        package type ID (1 for documents; 2 for small packages[DEFAULT]; and 3 for medium-sized packages)
+	 * @param  integer           $cod         is this a Cash on Delivery shipment? (1 for yes; 0 for no[DEFAULT])
+	 * @param  integer           $order       is this a Rate Checking only or is this for a valid Transaction Order?																 (1 for yes; 0 for no[DEFAULT])
+	 *
+	 * @return Object                        JSON Results
+	 */
 	public function getDomesticRates(
 		$origin
 		,$destination
@@ -318,9 +422,9 @@ class Shipper {
 		,$width
 		,$height
 		,$value
-		,$type
-		,$cod
-		,$order
+		,$type = 2
+		,$cod = 0
+		,$order = 0
 	) {
 		$method = 'GET';
 		$options = [
@@ -361,6 +465,22 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Retrieve rate for International shipment
+	 *
+	 * @method getDomesticRates
+	 *
+	 * @param  integer           $destination destination country ID. Obtained from getCountries.
+	 * @param  integer           $weight      package's weight (double in kilograms e.g. 1.40).
+	 * @param  integer           $length      package's length (integer in centimeter e.g 10)
+	 * @param  integer           $width       package's width (integer in centimeter e.g 10)
+	 * @param  integer           $height      package's height (integer in centimeter e.g 10)
+	 * @param  integer           $value       package's value/price (integer in IDR e.g 100000)
+	 * @param  integer           $type        package type ID (1 for documents; 2 for small parcels[DEFAULT]; and 3 for medium-sized parcels)
+	 * @param  integer           $order       is this a Rate Checking only or is this for a valid Transaction Order?																 (1 for yes; 0 for no[DEFAULT])
+	 *
+	 * @return Object                        JSON Results
+	 */
 	public function getInternationalRates(
 		$destination
 		,$weight
@@ -368,8 +488,8 @@ class Shipper {
 		,$width
 		,$height
 		,$value
-		,$type
-		,$order
+		,$type = 2
+		,$order = 0
 	) {
 		$method = 'GET';
 		$options = [
