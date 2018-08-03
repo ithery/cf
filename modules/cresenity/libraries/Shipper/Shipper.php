@@ -528,60 +528,114 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Creates a delivery order whose rate is the result of getDomesticRates. By default, every order is not activated so
+		you must activate it manually. The id returned is not our tracking ID. You
+		need to retrieve the tracking ID from getOrder and
+		use that as actual order ID.
+	 *
+	 * @method domesticOrder
+	 *
+	 * @param  integer        		$origin               origin area ID
+	 * @param  integer        		$destination          destination area ID
+	 * @param  float/integer        $weight               package's weight
+	 * @param  float/integer        $length               package's length
+	 * @param  float/integer        $width                package's width
+	 * @param  float/integer        $height               package's height
+	 * @param  integer        		$value                item's price (IDR e.g. 100000)
+	 * @param  integer        		$rateId               rate ID as you choose from rate search result
+	 * @param  string        		$consignerName        consigner's name
+	 * @param  string        		$consignerPhoneNumber consigner's phone number (with country code)
+	 * @param  string        		$originAddress        origin address
+	 * @param  string        		$originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
+	 * @param  string        		$consigneeName        consignee's name
+	 * @param  string        		$consigneePhoneNumber consignee's phone number (with country code)
+	 * @param  string        		$destinationAddress   destination address
+	 * @param  string        		$destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
+	 * @param  string        		$itemName             item name - ie: Shoes
+	 * @param  string        		$contents             item description - ie: One pair of red shoes
+	 * @param  integer        		$useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged														 by system, then this does not make any difference
+	 * @param  integer        		$packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
+	 * @param  string        		$externalId           the merchant's self-tailored order ID (optional - Unique)
+	 * @param  string        		$paymentType          payment type for the user's orders.																									 Valid values are currently cash and the default value : postpay (optional)
+	 * @param  integer        		$cod                  is this a COD order? Please note there is a fee for COD Order.																		 Accepted paymentType for COD is postpay. (1 for yes; 0 for no [default])
+	 *
+	 * @return Object                              JSON Results
+	 */
 	public function domesticOrder(
 		$origin
 		,$destination
-		,$weight
-		,$length
-		,$width
-		,$height
+		,$weight = ''
+		,$length = ''
+		,$width = ''
+		,$height = ''
 		,$value
 		,$rateId
-		,$consignerName
-		,$consignerPhoneNumber
+		,$consignerName = ''
+		,$consignerPhoneNumber = ''
 		,$originAddress
-		,$originDirection
+		,$originDirection = ''
 		,$consigneeName
 		,$consigneePhoneNumber
 		,$destinationAddress
-		,$destinationDirection
+		,$destinationDirection = ''
 		,$itemName
-		,$contents
-		,$useInsurance
+		,$contents = ''
+		,$useInsurance = 0
 		,$packageType
-		,$externalId
-		,$paymentType
-		,$cod
+		,$externalId = ''
+		,$paymentType = 'postpay'
+		,$cod = 0
 	) {
 		$method = 'POST';
 		$options = [
-			'apiKey' => $this->key,
 			'o' => $origin,
 			'd' => $destination,
-			'wt' => $weight,
-			'l' => $length,
-			'w' => $width,
-			'h' => $height,
 			'v' => $value,
-			'consignerName' => $consignerName,
-			'consignerPhoneNumber' => $consignerPhoneNumber,
 			'originAddress' => $originAddress,
-			'originDirection' => $originDirection,
 			'consigneeName' => $consigneeName,
 			'consigneePhoneNumber' => $consigneePhoneNumber,
 			'destinationAddress' => $destinationAddress,
-			'destinationDirection' => $destinationDirection,
 			'itemName' => $itemName,
-			'contents' => $contents,
 			'useInsurance' => $useInsurance,
 			'packageType' => $packageType,
-			'externalId' => $externalId,
 			'paymentType' => $paymentType,
 			'cod' => $cod,
 		];
 
+		if ($weight) {
+			$options['weight'] = $weight;
+		}
+		if ($length) {
+			$options['length'] = $length;
+		}
+		if ($width) {
+			$options['width'] = $width;
+		}
+		if ($height) {
+			$options['height'] = $height;
+		}
+		if ($consignerName) {
+			$options['consignerName'] = $consignerName;
+		}
+		if ($consignerPhoneNumber) {
+			$options['consignerPhoneNumber'] = $consignerPhoneNumber;
+		}
+		if ($originDirection) {
+			$options['originDirection'] = $originDirection;
+		}
+		if ($destinationDirection) {
+			$options['destinationDirection'] = $destinationDirection;
+		}
+		if ($contents) {
+			$options['contents'] = $contents;
+		}
+		if ($externalId) {
+			$options['externalId'] = $externalId;
+		}
+		
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/orders/domestics',
+			CURLOPT_URL => $this->url . 'public/v1/orders/domestics?apiKey=' . $this->key,
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
