@@ -22,7 +22,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
         $this->param_inputs_by_name = array();
     }
 
-    public function add_param_input($inputs) {
+    public function addParamInput($inputs) {
         if (!is_array($inputs)) {
             $inputs = array($inputs);
         }
@@ -32,7 +32,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
         return $this;
     }
 
-    public function add_param_input_by_name($inputs) {
+    public function addParamInputByName($inputs) {
         if (!is_array($inputs)) {
             $inputs = array($inputs);
         }
