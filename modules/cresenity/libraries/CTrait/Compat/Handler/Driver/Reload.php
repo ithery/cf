@@ -19,7 +19,7 @@ trait CTrait_Compat_Handler_Driver_Reload {
     public function set_target($target) {
         return $this->setTarget($target);
     }
-    
+
     /**
      * 
      * @deprecated, please use setMethod
@@ -28,6 +28,26 @@ trait CTrait_Compat_Handler_Driver_Reload {
      */
     public function set_method($method) {
         return $this->setMethod($method);
+    }
+
+    /**
+     * 
+     * @deprecated, please use addParamInput
+     * @param type $inputs
+     * @return type
+     */
+    public function add_param_input($inputs) {
+        return $this->addParamInput($inputs);
+    }
+
+    /**
+     * 
+     * @deprecated, please use addParamInputByName
+     * @param type $inputs
+     * @return type
+     */
+    public function add_param_input_by_name($inputs) {
+        return $this->addParamInputByName($inputs);
     }
 
 }
