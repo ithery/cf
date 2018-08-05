@@ -285,7 +285,8 @@ class cajax {
             //order
             if (is_array($search_field)) {
                 foreach ($search_field as $f) {
-                    if (strlen($sOrder) > 0) $sOrder .= ",";
+                    if (strlen($sOrder) > 0)
+                        $sOrder .= ",";
                     $sOrder .= "`" . $f . "` = " . $db->escape($term) . " DESC";
                 }
             }
@@ -301,8 +302,10 @@ class cajax {
             $temp_order_by = "";
             foreach ($sub as $val) {
                 $kata = explode(".", $val);
-                if (isset($kata[1])) $temp_order_by .= ", " . $kata[1];
-                else $temp_order_by .= ", " . $kata[0];
+                if (isset($kata[1]))
+                    $temp_order_by .= ", " . $kata[1];
+                else
+                    $temp_order_by .= ", " . $kata[0];
             }
             $temp_order_by = substr($temp_order_by, 2);
             $temp_order_by = "ORDER BY " . $temp_order_by;
@@ -399,7 +402,8 @@ class cajax {
         $qtotal = "select count(*) as cnt from (" . $q . ") as a";
         $rtotal = $db->query($qtotal);
         $total_record = 0;
-        if ($rtotal->count() > 0) $total_record = $rtotal[0]->cnt;
+        if ($rtotal->count() > 0)
+            $total_record = $rtotal[0]->cnt;
 
         /* Paging */
         $sLimit = "";
@@ -468,7 +472,7 @@ class cajax {
             }
             $qs_condition_str = substr_replace($qs_condition_str, "", -4);
             if (strlen(trim($sWhere)) > 0)
-                    $sWhere = ' ( ' . $sWhere . ' ) AND ';
+                $sWhere = ' ( ' . $sWhere . ' ) AND ';
 
             $sWhere .= $qs_condition_str;
         }
@@ -496,7 +500,8 @@ class cajax {
         $qtotal = "select count(*) as cnt from (" . $qfilter . ") as a";
         $rtotal = $db->query($qtotal);
         $filtered_record = 0;
-        if ($rtotal->count() > 0) $filtered_record = $rtotal[0]->cnt;
+        if ($rtotal->count() > 0)
+            $filtered_record = $rtotal[0]->cnt;
 
 
         //die($temp_order_by);
@@ -505,8 +510,10 @@ class cajax {
             $temp_order_by = "";
             foreach ($sub as $val) {
                 $kata = explode(".", $val);
-                if (isset($kata[1])) $temp_order_by .= ", " . $kata[1];
-                else $temp_order_by .= ", " . $kata[0];
+                if (isset($kata[1]))
+                    $temp_order_by .= ", " . $kata[1];
+                else
+                    $temp_order_by .= ", " . $kata[0];
             }
             $temp_order_by = substr($temp_order_by, 2);
             $temp_order_by = "ORDER BY " . $temp_order_by;
@@ -666,7 +673,9 @@ class cajax {
                 }
                 $file_id = date('Ymd') . cutils::randmd5() . $extension;
                 $fullfilename = ctemp::makepath("imgupload", $file_id);
-                move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename);
+                if (!move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename)) {
+                    die('fail upload from ' . $_FILES[$input_name]['tmp_name'][$i] . ' to ' . $fullfilename);
+                }
                 $return[] = $file_id;
             }
         }
