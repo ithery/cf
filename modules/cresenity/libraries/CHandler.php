@@ -86,10 +86,4 @@ class CHandler extends CObject {
 
 }
 
-class CHandler_Exception extends CException {
-
-    protected $code = E_HANDLER_ERROR;
-
-}
-
 // End Kohana Database Exception
