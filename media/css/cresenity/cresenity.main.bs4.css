@@ -33,7 +33,9 @@
 .align-left, .table td.align-left {
     text-align:left;
 }
-
+.nopadding {
+    padding: 0!important;
+}
 
 .layout-sidenav .brand {
     padding: 0 1.75rem;
