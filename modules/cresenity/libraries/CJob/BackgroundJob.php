@@ -62,6 +62,7 @@ class CJob_BackgroundJob {
     }
 
     public function run() {
+        
         $lockFile = $this->getLockFile();
         try {
             $this->checkMaxRuntime($lockFile);
@@ -77,6 +78,7 @@ class CJob_BackgroundJob {
         try {
             $this->helper->acquireLock($lockFile);
             $lockAcquired = true;
+            
             if (isset($this->config['closure'])) {
                 $this->runFunction();
             } else {
@@ -122,7 +124,7 @@ class CJob_BackgroundJob {
         if ($runtime < $maxRuntime) {
             return;
         }
-        throw new Exception("MaxRuntime of $maxRuntime secs exceeded! Current runtime: $runtime secs");
+        throw new CJob_Exception("MaxRuntime of $maxRuntime secs exceeded! Current runtime: $runtime secs");
     }
 
     /**
@@ -216,7 +218,7 @@ class CJob_BackgroundJob {
     protected function runFile() {
         // If job should run as another user, we must be on *nix and
         // must have sudo privileges.
-        $isUnix = ($this->helper->getPlatform() === Helper::UNIX);
+        $isUnix = ($this->helper->getPlatform() === CJob_Helper::UNIX);
         $useSudo = '';
         if ($isUnix) {
             $runAs = $this->config['runAs'];

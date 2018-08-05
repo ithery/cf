@@ -169,6 +169,7 @@ class CJob {
         $command = $this->getExecutableCommand($job, $config);
         $binary = $this->getPhpBinary();
         $output = $config['debug'] ? 'debug.log' : '/dev/null';
+       
         exec("$binary $command 1> $output 2>&1 &");
     }
 
