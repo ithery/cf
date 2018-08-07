@@ -217,6 +217,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         var cropperImg = cropperModal.find('img');
                         cropperImg.attr('src', event.target.result);
                         cropperModal.modal({backdrop: 'static', keyboard: false});
+                        
+                        if(typeof cropperModal.data('bs.modal') === 'undefined') {
+                            cropperModal.modal('open');
+                        }
                         cropperImg.cropper({
                             aspectRatio: cropperWidth / cropperHeight,
                             zoomOnWheel: false,
