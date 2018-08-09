@@ -13,6 +13,12 @@ class CGitlab {
     protected $client;
     protected static $instances;
 
+    /**
+     * 
+     * @param string $gitUrl
+     * @param string $token
+     * @return CGitlab
+     */
     public static function instance($gitUrl = '', $token = null) {
 
         if (!isset(self::$instances[$gitUrl])) {
@@ -24,7 +30,11 @@ class CGitlab {
         return self::$instances[$gitUrl];
     }
 
-    public function __construct($gitUrl) {
+    /**
+     * 
+     * @param string $gitUrl
+     */
+    protected function __construct($gitUrl) {
         $this->gitUrl = $gitUrl;
         $this->client = new CGitlab_Client($gitUrl);
     }
@@ -43,6 +53,14 @@ class CGitlab {
      */
     public function projects() {
         return $this->client->api('projects');
+    }
+
+    /**
+     * 
+     * @return CGitlab_Api_Users
+     */
+    public function users() {
+        return $this->client->api('users');
     }
 
 }
