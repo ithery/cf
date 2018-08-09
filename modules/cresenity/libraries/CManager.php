@@ -253,15 +253,20 @@ final class CManager {
         return $this->is_mobile;
     }
 
-    
     public static function lang() {
-        if(self::$langObjectCallback!=null) {
+        if (self::$langObjectCallback != null) {
             return call_user_func(self::$langObjectCallback);
         }
         return new CManager_Lang();
     }
-    
+
     public static function setLangObjectCallback(callable $callback) {
         self::$langObjectCallback = $callback;
     }
+
+    public static function addTransformCallback($method, callable $callback) {
+        $transformManager = CManager_Transform::instance();
+        return $transformManager->addCallback($method, $callback);
+    }
+
 }

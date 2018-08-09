@@ -232,6 +232,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         cropperModal.find('.btn-crop').data('event', event);
                         var clickAssigned = cropperModal.find('.btn-crop').attr('click-assigned');
                         if (!clickAssigned) {
+                            cropperModal.find('.btn-crop').off('click');
                             cropperModal.find('.btn-crop').click(function () {
                                 var fileRead = cropperModal.find('.btn-crop').data('file');
                                 var fileEvent = cropperModal.find('.btn-crop').data('event');
