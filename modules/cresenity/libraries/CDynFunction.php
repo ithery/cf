@@ -50,11 +50,20 @@ class CDynFunction {
 
         $error = 0;
         if ($error == 0) {
-            if (is_callable($this->func)) {
-                return call_user_func_array($this->func, $params);
+            if (is_array($this->func)) {
+                if (is_callable($this->func)) {
+                    return call_user_func_array($this->func, $params);
+                } else {
+                    $error++;
+                }
             }
         }
-
+        if ($error == 0) {
+            $transformManager = CManager_Transform::instance();
+            if ($transformManager->methodExists($this->func)) {
+                return $transformManager->call($this->func, $params);
+            }
+        }
         if ($error == 0) {
             //not the function name, let check it if it is function from ctransform class
             if (is_callable(array('ctransform', $this->func))) {

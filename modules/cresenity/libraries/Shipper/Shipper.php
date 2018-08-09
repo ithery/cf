@@ -479,7 +479,7 @@ class Shipper {
 	 * @param  integer           $type        package type ID (1 for documents; 2 for small parcels[DEFAULT]; and 3 for medium-sized parcels)
 	 * @param  integer           $order       is this a Rate Checking only or is this for a valid Transaction Order?																 (1 for yes; 0 for no[DEFAULT])
 	 *
-	 * @return Object                        JSON Results
+	 * @return Object                         JSON Results
 	 */
 	public function getInternationalRates(
 		$destination
@@ -529,10 +529,10 @@ class Shipper {
 	}
 
 	/**
-	 * Creates a delivery order whose rate is the result of getDomesticRates. By default, every order is not activated so
-		you must activate it manually. The id returned is not our tracking ID. You
-		need to retrieve the tracking ID from getOrder and
-		use that as actual order ID.
+	 * Creates a delivery order whose rate is the result of getDomesticRates.
+	 * By default, every order is not activated so you must activate it manually.
+	 * The id returned is not our tracking ID.
+	 * You need to retrieve the tracking ID from getOrder and use that as actual order ID.
 	 *
 	 * @method domesticOrder
 	 *
@@ -560,7 +560,7 @@ class Shipper {
 	 * @param  string        		$paymentType          payment type for the user's orders.																									 Valid values are currently cash and the default value : postpay (optional)
 	 * @param  integer        		$cod                  is this a COD order? Please note there is a fee for COD Order.																		 Accepted paymentType for COD is postpay. (1 for yes; 0 for no [default])
 	 *
-	 * @return Object                              JSON Results
+	 * @return Object                                     JSON Results
 	 */
 	public function domesticOrder(
 		$origin
@@ -659,66 +659,123 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Creates a delivery order whose rate is the result of getDomesticRates.
+	 * By default, every order is not activated so you must activate it manually.
+	 * The id returned is not our tracking ID.
+	 * You need to retrieve the tracking ID from getOrder and use that as actual order ID.
+	 *
+	 * @method internationalOrder
+	 *
+	 * @param  integer        		$origin               origin area ID
+	 * @param  integer        		$destination          destination country ID
+	 * @param  float/integer        $weight               package's weight
+	 * @param  float/integer        $length               package's length
+	 * @param  float/integer        $width                package's width
+	 * @param  float/integer        $height               package's height
+	 * @param  integer        		$value                item's price (IDR e.g. 100000)
+	 * @param  integer        		$rateId               rate ID as you choose from rate search result
+	 * @param  string        		$consignerName        consigner's name
+	 * @param  string        		$consignerPhoneNumber consigner's phone number (with country code)
+	 * @param  string        		$originAddress        origin address
+	 * @param  string        		$originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
+	 * @param  string        		$consigneeName        consignee's name
+	 * @param  string        		$consigneePhoneNumber consignee's phone number (with country code)
+	 * @param  string        		$destinationAddress   destination address
+	 * @param  string        		$destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
+	 * @param  string				$destinationArea	  destination area (can be empty)
+	 * @param  string				$destinationSuburb	  destination suburb (can be empty)
+	 * @param  string				$destinationCity	  destination city (can be empty)
+	 * @param  string				$destinationProvince  destination province (can be empty)
+	 * @param  string				$destinationPostcode  destination postcode (can be empty)
+	 * @param  string        		$itemName             item name - ie: Shoes
+	 * @param  string        		$contents             item description - ie: One pair of red shoes
+	 * @param  integer        		$useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged														 by system, then this does not make any difference
+	 * @param  integer        		$packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
+	 * @param  string        		$externalId           the merchant's self-tailored order ID (optional - Unique)
+	 * @param  string        		$paymentType          payment type for the user's orders.																									 Valid values are currently cash and the default value : postpay (optional)
+	 *
+	 * @return Object                                     JSON Results
+	 */
 	public function internationalOrder(
 		$origin
 		,$destination
-		,$weight
-		,$length
-		,$width
-		,$height
+		,$weight = ''
+		,$length = ''
+		,$width = ''
+		,$height = ''
 		,$value
 		,$rateId
-		,$consignerName
-		,$consignerPhoneNumber
+		,$consignerName = ''
+		,$consignerPhoneNumber = ''
 		,$originAddress
-		,$originDirection
+		,$originDirection = ''
 		,$consigneeName
 		,$consigneePhoneNumber
 		,$destinationAddress
-		,$destinationDirection
-		,$destinationArea = ''
-		,$destinationSuburb = ''
-		,$destinationCity = ''
-		,$destinationProvince = ''
-		,$destinationPostCode = ''
+		,$destinationDirection = ''
+		,$destinationArea
+		,$destinationSuburb
+		,$destinationCity
+		,$destinationProvince
+		,$destinationPostcode
 		,$itemName
-		,$contents
-		,$useInsurance
+		,$contents = ''
+		,$useInsurance = 0
 		,$packageType
-		,$externalId
-		,$paymentType
-		,$cod
+		,$externalId = ''
+		,$paymentType = 'postpay'
 	) {
 		$method = 'POST';
 		$options = [
 			'apiKey' => $this->key,
 			'o' => $origin,
 			'd' => $destination,
-			'wt' => $weight,
-			'l' => $length,
-			'w' => $width,
-			'h' => $height,
 			'v' => $value,
-			'consignerName' => $consignerName,
-			'consignerPhoneNumber' => $consignerPhoneNumber,
 			'originAddress' => $originAddress,
-			'originDirection' => $originDirection,
 			'consigneeName' => $consigneeName,
 			'consigneePhoneNumber' => $consigneePhoneNumber,
 			'destinationAddress' => $destinationAddress,
-			'destinationDirection' => $destinationDirection,
 			'destinationArea' => $destinationArea,
 			'destinationSuburb' => $destinationSuburb,
 			'destinationProvince' => $destinationProvince,
-			'destinationPostCode' => $destinationPostCode,
+			'destinationPostcode' => $destinationPostcode,
 			'itemName' => $itemName,
-			'contents' => $contents,
 			'useInsurance' => $useInsurance,
 			'packageType' => $packageType,
-			'externalId' => $externalId,
 			'paymentType' => $paymentType,
-			'cod' => $cod,
 		];
+
+		if ($weight) {
+			$options['weight'] = $weight;
+		}
+		if ($length) {
+			$options['length'] = $length;
+		}
+		if ($width) {
+			$options['width'] = $width;
+		}
+		if ($height) {
+			$options['height'] = $height;
+		}
+		if ($consignerName) {
+			$options['consignerName'] = $consignerName;
+		}
+		if ($consignerPhoneNumber) {
+			$options['consignerPhoneNumber'] = $consignerPhoneNumber;
+		}
+		if ($originDirection) {
+			$options['originDirection'] = $originDirection;
+		}
+		if ($destinationDirection) {
+			$options['destinationDirection'] = $destinationDirection;
+		}
+		if ($contents) {
+			$options['contents'] = $contents;
+		}
+		if ($externalId) {
+			$options['externalId'] = $externalId;
+		}
 
 		curl_setopt_array($this->curl, [
 			CURLOPT_URL => $this->url . 'public/v1/orders/internationals',
@@ -745,6 +802,15 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Retrieves tracking ID of the order with the provided ID
+	 *
+	 * @method getOrder
+	 *
+	 * @param  integer   $orderId	the ID retrieved after creating the order
+	 *
+	 * @return Object            	JSON Results
+	 */
 	public function getOrder($orderId) {
 		$method = 'GET';
 		$options = [
@@ -776,16 +842,24 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Activate/deactivate an order. Such activation will initiate Shipper’s pickup process.
+	 *
+	 * @method orderActivation
+	 *
+	 * @param  string          	$orderId	order ID obtained from Order Creation or order tracking ID
+	 * @param  integer          $active  	integer (0 for order deactivation and 1 for its activation)
+	 *
+	 * @return Object                   	JSON Results
+	 */
 	public function orderActivation($orderId, $active) {
 		$method = 'PUT';
 		$options = [
-			'apiKey' => $this->key,
-			'orderID' => $orderId,
 			'active' => $active,
 		];
 
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/activations?' . http_build_query($options),
+			CURLOPT_URL => $this->url . 'public/v1/activations/' . $orderId . '?apiKey=' . $this->key, 
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
@@ -795,7 +869,7 @@ class Shipper {
 			CURLOPT_POSTFIELDS => http_build_query($options),
 			CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
 			CURLOPT_HTTPHEADER => [
-				'Content-Type: application/json',
+				'Content-Type: application/x-www-form-urlencoded',
 			],
 		]);
 
@@ -809,21 +883,23 @@ class Shipper {
 		}
 	}
 
-	public function getOrderDetail($orderId, $labelChecksum, $externalId) {
+	/**
+	 * Retrieves an order’s detail
+	 *
+	 * @method getOrderDetail
+	 *
+	 * @param  string         $orderId       order ID obtained from Order Creation or order tracking ID
+	 *
+	 * @return Object                        JSON Result
+	 */
+	public function getOrderDetail($orderId) {
 		$method = 'GET';
 		$options = [
 			'apiKey' => $this->key,
-			'orderId' => $orderId,
-			'labelChecksum' => 'https://shipper.id/label/sticker.php?oid=' . $orderId . '&uid=' . $labelChecksum,
-			'externalId' => $externalId,
 		];
 
-		if ($this->environment == 'dev' || $this->environment == 'development') {
-			$options['labelChecksum'] = 'https://shipper.id/label-dev/sticker.php?oid=' . $orderId . '&uid=' . $labelChecksum;
-		}
-
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/orders?' . http_build_query($options),
+			CURLOPT_URL => $this->url . 'public/v1/orders/' . $orderId . '?' . http_build_query($options),
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
@@ -846,13 +922,50 @@ class Shipper {
 		}
 	}
 
-	public function generateAWB($externalId, $orderId) {
+	/**
+	 * Retrieve Label Checksum from getOrderDetail
+	 *
+	 * @method getLabelChecksum
+	 *
+	 * @param  string           $orderId       order ID obatined from Order Creation or order tracking ID
+	 * @param  string           $labelChecksum labelChecksum obtained from getOrderDetail
+	 *
+	 * @return string                          Label Checksum URL
+	 */
+	public function getLabelChecksum($orderId, $labelChecksum) {
+		if ($this->environment == 'dev' || $this->environment == 'development') {
+			return 'https://shipper.id/label-dev/sticker.php?oid=' . $orderId . '&uid=' . $labelChecksum;
+		}
+		return 'https://shipper.id/label/sticker.php?oid=' . $orderId . '&uid=' . $labelChecksum;
+	}
+
+	/**
+	 * Generate Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those)
+	 *
+	 * @method generateAWB
+	 *
+	 * @param  array      $options    eid (external ID) or oid (order ID)
+	 *
+	 * @return Object                  JSON Results
+	 */
+	public function generateAWB($options) {
 		$method = 'GET';
-		$options = [
-			'apiKey' => $this->key,
-			'eid' => $externalId,
-			'oid' => $orderId,
+		$errCode = 0;
+
+		$parameterKeys = [
+			'eid',
+			'oid',
 		];
+
+		foreach ($parameterKeys as $key) {
+			if (!isset($options[$key])) {
+				$errCode++;
+			}
+		}
+
+		if ($errCode == count($parameterKeys)) {
+			throw new Exception('There must be at least one parameter. Parameter: ' . implode(',', $parameterKeys));
+		}
 
 		curl_setopt_array($this->curl, [
 			CURLOPT_URL => $this->url . 'public/v1/awbs/generate?' . http_build_query($options),
@@ -878,13 +991,33 @@ class Shipper {
 		}
 	}
 
-	public function getAWB($externalId, $orderId) {
+	/**
+	 * Retrieves Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those)
+	 *
+	 * @method getAWB
+	 *
+	 * @param  array      $options    eid (external ID) or oid (order ID)
+	 *
+	 * @return Object                  JSON Results
+	 */
+	public function getAWB($options) {
 		$method = 'GET';
-		$options = [
-			'apiKey' => $this->key,
-			'eid' => $externalId,
-			'oid' => $orderId,
+		$errCode = 0;
+
+		$parameterKeys = [
+			'eid',
+			'oid',
 		];
+
+		foreach ($parameterKeys as $key) {
+			if (!isset($options[$key])) {
+				$errCode++;
+			}
+		}
+
+		if ($errCode == count($parameterKeys)) {
+			throw new Exception('There must be at least one parameter. Parameter: ' . implode(',', $parameterKeys));
+		}
 
 		curl_setopt_array($this->curl, [
 			CURLOPT_URL => $this->url . 'public/v1/awbs?' . http_build_query($options),
@@ -910,16 +1043,24 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Updates an order’s AWB number
+	 *
+	 * @method updateAWB
+	 *
+	 * @param  string    $orderId   order ID obtained from Order Creation or order tracking ID
+	 * @param  string    $awbNumber airway bill number
+	 *
+	 * @return Object               JSON Results
+	 */
 	public function updateAWB($orderId, $awbNumber) {
 		$method = 'PUT';
 		$options = [
-			'apiKey' => $this->key,
-			'orderID' => $orderId,
 			'awbNumber' => $awbNumber,
 		];
 
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/awbs?' . http_build_query($options),
+			CURLOPT_URL => $this->url . 'public/v1/awbs/' . $orderId . '?apiKey=' . $this->key,
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
@@ -943,11 +1084,22 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Update an order’s package’s weight and dimension.
+	 *
+	 * @method updateOrder
+	 *
+	 * @param  string      $orderId order ID obtained from Order Creation or order tracking ID
+	 * @param  integer      $weight  [description]
+	 * @param  integer      $length  [description]
+	 * @param  integer      $height  [description]
+	 * @param  integer      $width   [description]
+	 *
+	 * @return Object               JSON Results
+	 */
 	public function updateOrder($orderId, $weight, $length, $height, $width) {
 		$method = 'PUT';
 		$options = [
-			'apiKey' => $this->key,
-			'orderID' => $orderId,
 			'weight' => $weight,
 			'length' => $length,
 			'height' => $height,
@@ -955,7 +1107,7 @@ class Shipper {
 		];
 
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/orders?' . http_build_query($options),
+			CURLOPT_URL => $this->url . 'public/v1/orders/' . $orderId . '?apiKey=' . $this->key,
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
@@ -965,7 +1117,7 @@ class Shipper {
 			CURLOPT_POSTFIELDS => http_build_query($options),
 			CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
 			CURLOPT_HTTPHEADER => [
-				'Content-Type: application/json',
+				'Content-Type: application/x-www-form-urlencoded',
 			],
 		]);
 
@@ -979,6 +1131,15 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Cancel an order.
+	 *
+	 * @method cancelOrder
+	 *
+	 * @param  string      $orderId  order ID obtained from Order Creation or order tracking ID
+	 *
+	 * @return Object               JSON Results
+	 */
 	public function cancelOrder($orderId) {
 		$method = 'PUT';
 		$options = [
@@ -995,7 +1156,7 @@ class Shipper {
 			CURLOPT_CUSTOMREQUEST => $method,
 			CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
 			CURLOPT_HTTPHEADER => [
-				'Content-Type: application/json',
+				'Content-Type: application/x-www-form-urlencoded',
 			],
 		]);
 
@@ -1009,16 +1170,37 @@ class Shipper {
 		}
 	}
 
-	public function updateSubscription($orderId, $customAWB, $autoTrack) {
+	/**
+	 * Update subscription data in orders so you can determine which orders have the benefit of subscription.
+	 *
+	 * @method updateSubscription
+	 *
+	 * @param  string             $orderId    order ID or order tracking ID
+	 * @param  array      		  $options    customAWB or autoTrack
+	 *
+	 * @return Object                        JSON Results
+	 */
+	public function updateSubscription($orderId, $options) {
 		$method = 'PUT';
-		$options = [
-			'apiKey' => $this->key,
-			'customAWB' => $customAWB,
-			'autoTrack' => $autoTrack,
+		$errCode = 0;
+
+		$parameterKeys = [
+			'customAWB',
+			'autoTrack',
 		];
 
+		foreach ($parameterKeys as $key) {
+			if (!isset($options[$key])) {
+				$errCode++;
+			}
+		}
+
+		if ($errCode == count($parameterKeys)) {
+			throw new Exception('There must be at least one parameter. Parameter: ' . implode(',', $parameterKeys));
+		}
+
 		curl_setopt_array($this->curl, [
-			CURLOPT_URL => $this->url . 'public/v1/subscriptions/' . $orderId . '?' . http_build_query($options),
+			CURLOPT_URL => $this->url . 'public/v1/subscriptions/' . $orderId . '?apiKey=' . $this->key,
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
@@ -1028,7 +1210,7 @@ class Shipper {
 			CURLOPT_POSTFIELDS => http_build_query($options),
 			CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
 			CURLOPT_HTTPHEADER => [
-				'Content-Type: application/json',
+				'Content-Type: application/x-www-form-urlencoded',
 			],
 		]);
 
@@ -1042,17 +1224,49 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Retrieves the user’s order history.
+	 * If parameter merchantID is present, then order history displayed belongs to that particular merchant.
+	 * If parameter phone is present, then the history displayed is that of orders whose consigner’s phone number is the argument provided.
+	 * Both phone and merchantID could be combined in one request.
+	 * The orders are those that are sent by the user.
+	 * Date format is UTC time.
+	 *
+	 * @method getOrderHistory
+	 *
+	 * @param  string          $merchantId merchant’s ID
+	 * @param  string          $phone      consigner’s phone number with country code e.g. +6281112343231
+	 * @param  string          $limit      how many orders will be displayed in single response. Default value : 20.
+	 * @param  string          $startDate  retrieve orders created at and after the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
+	 * @param  string          $endDate    retrieve orders created at and before the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
+	 * @param  string          $page       page number to be shown from total number of possible pages in this request (totalRecord / limit) 
+	 *
+	 * @return Object                      JSON Results
+	 */
 	public function getOrderHistory($merchantId = '', $phone = '', $limit = '', $startDate = '', $endDate = '', $page = '') {
 		$method = 'GET';
 		$options = [
 			'apiKey' => $this->key,
-			'merchantID' => $merchantID,
-			'phone' => $phone,
-			'limit' => $limit,
-			'startDate' => $startDate,
-			'endDate' => $endDate,
-			'page' => $page,
 		];
+
+		if ($merchantID) {
+			$options['merchantID'] = $merchantId;
+		}
+		if ($phone) {
+			$options['phone'] = $phone;
+		}
+		if ($limit) {
+			$options['limit'] = $limit;
+		}
+		if ($startDate) {
+			$options['startDate'] = $startDate;
+		}
+		if ($endDate) {
+			$options['endDate'] = $endDate;
+		}
+		if ($page) {
+			$options['page'] = $page;
+		}
 
 		curl_setopt_array($this->curl, [
 			CURLOPT_URL => $this->url . 'public/v1/histories/orders?' . http_build_query($options),
@@ -1078,6 +1292,15 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Retrieve every available logistic in a city.
+	 *
+	 * @method getLogistics
+	 *
+	 * @param  integer       $cityId City ID
+	 *
+	 * @return Object               JSON Results
+	 */
 	public function getLogistics($cityId) {
 		$method = 'GET';
 		$options = [
@@ -1108,6 +1331,13 @@ class Shipper {
 		}
 	}
 
+	/**
+	 * Retrieves shipper Tracking Status.
+	 *
+	 * @method track
+	 *
+	 * @return Object JSON Results
+	 */
 	public function track() {
 		$method = 'GET';
 		$options = [

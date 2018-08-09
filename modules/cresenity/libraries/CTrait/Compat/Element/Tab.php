@@ -18,4 +18,19 @@ trait CTrait_Compat_Element_Tab {
         return $this->setLabel($label, $lang);
     }
 
+    public function set_ajax_url($url) {
+        return $this->setAjaxUrl($url);
+    }
+
+    public function set_target($target) {
+        return $this->setTarget($target);
+    }
+
+    public function set_ajax($bool) {
+        return $this->setAjax($bool);
+    }
+    public function set_nopadding($bool) {
+        return $this->setNoPadding($bool);
+    }
+
 }
