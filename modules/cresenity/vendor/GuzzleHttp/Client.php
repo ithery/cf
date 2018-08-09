@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 
 
 require_once dirname(__FILE__) . '/Promise/functions_include.php';
-
+require_once dirname(__FILE__) . '/Psr7/functions_include.php';
 /**
  * @method ResponseInterface get(string|UriInterface $uri, array $options = [])
  * @method ResponseInterface head(string|UriInterface $uri, array $options = [])
