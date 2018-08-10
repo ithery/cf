@@ -9,48 +9,69 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 
 	use CElement_Trait_Template;
 
+	protected $fields;
+	protected $keyField;
+	protected $searchField;
+	protected $limit;
 	protected $imgSrc;
 	protected $width;
 	protected $height;
 	protected $buttonLabel;
+	protected $delay;
 	
 	public function __construct($id) {
 		parent::__construct($id);
 
 		$this->type = 'dialogSelect';
 		$this->tag = 'div';
+		$this->fields = '';
+		$this->keyField = '';
+		$this->searchField = '';
+		$this->limit = 10;
 		$this->imgSrc = CApp_Base::noImageUrl();
-		$this->width = "100";
-		$this->height = "100";
+		$this->width = '100';
+		$this->height = '100';
 		$this->buttonLabel = 'Select an Item';
+		$this->delay = '1000';
 		$this->templateName = 'CElement/FormInput/DialogSelect';
 		$this->onBeforeParse(function() {
-
-		    $ajaxName = $this->name;
-		    $ajaxName = str_replace('[', '-', $ajaxName);
-		    $ajaxName = str_replace(']', '-', $ajaxName);
-
-		    $ajaxUrl = CAjaxMethod::factory()
-	    		->setType('dialogselect')
-	            ->setData('inputName', $ajaxName)
-	            ->makeurl();
-
 		    $this->setVar('id', $this->id);
 		    $this->setVar('imgSrc', $this->imgSrc);
 		    $this->setVar('width', $this->width);
 		    $this->setVar('height', $this->height);
 		    $this->setVar('buttonLabel', $this->buttonLabel);
+		    $this->setVar('delay', $this->delay);
 		    $this->setVar('preTag', $this->pretag());
 		    $this->setVar('postTag', $this->posttag());
 		    $this->setVar('name', $this->name);
 		    $this->setVar('value', $this->value);
-		    $this->setVar('ajaxName', $ajaxName);
-		    $this->setVar('ajaxUrl', $ajaxUrl);
+		    $this->setVar('ajaxName', $this->createAjaxName());
+		    $this->setVar('ajaxUrl', $this->createAjaxUrl());
 		});
 	}
 
 	public static function factory($id) {
 		return new CElement_FormInput_DialogSelect($id);
+	}
+
+	public function setFields($fields) {
+		$this->fields = $fields;
+		return $this;
+	}
+
+	public function setKeyField($key) {
+		$this->keyField = $key;
+		return $this;
+	}
+
+	public function setSearchField(array $fields) {
+		$this->searchField = $fields;
+		return $this;
+	}
+
+	public function setLimit($total) {
+		$this->limit = $total;
+		return $this;
 	}
 
 	public function setImgSrc($imgsrc) {
@@ -71,6 +92,27 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	public function setButtonLabel($label) {
 		$this->buttonLabel = $label;
 		return $this;
+	}
+
+	public function setDelay($delay) {
+		$this->delay = $delay;
+		return $this;
+	}
+
+	public function createAjaxName() {
+		$ajaxName = $this->name;
+		$ajaxName = str_replace('[', '-', $this->name);
+		$ajaxName = str_replace(']', '-', $ajaxName);
+
+		return $ajaxName;
+	}
+
+	public function createAjaxUrl() {
+		return CAjaxMethod::factory()
+    		->setType('DialogSelect')
+    		->setData('searchField', $this->searchField)
+    		->setData('totalItem', $this->totalItem)
+            ->makeurl();
 	}
 
 	public function html($indent = 0) {

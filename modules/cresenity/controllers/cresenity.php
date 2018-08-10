@@ -23,7 +23,7 @@ class Cresenity_Controller extends CController {
         $json = file_get_contents($file);
         $ajaxMethod = CAjax::createMethod($json);
         $response = $ajaxMethod->executeEngine();
-
+        
         echo $response;
     }
 

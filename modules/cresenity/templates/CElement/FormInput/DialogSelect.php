@@ -33,7 +33,24 @@
                 <a href="#" class="close">&times;</a><span class="loader"></span>
             </div>
             <div class="modal-body opened">
-            	<div></div>
+            	<div class="dialog-select-search" style="margin-bottom: 20px">
+            		<input type="text" name="search">
+            	</div>
+            	<div class="dialog-select-item-list" style="
+				    display: grid;
+				    grid-template-columns: repeat(5, 1fr);
+				    grid-template-rows: auto;
+				    grid-gap: 10px;
+				    height: 50vh;
+				">
+            		<?php foreach ($items as $key => $item): ?>
+            			<div class="item" style="border: 2px solid">
+            				<div class="item-name">
+            					<?= carr::get($item, 'name') ?>
+            				</div>
+            			</div>
+            		<?php endforeach ?>
+            	</div>
             </div>
             <div class="modal-footer">
                 <div class="row" id="actions">
@@ -54,8 +71,6 @@
 	$('.dialog-select img, .dialog-select .btn-dialog-select span').click(function() {
 		var modalDialog = $('#modal-dialog-select-' + "<?= $id ?>");
 
-		console.log(modalDialog);
-
 		modalDialog.modal({backdrop: 'static', keyboard:false});
 	});
 
@@ -67,16 +82,36 @@
 
 	(function ($) {
 	    var modalDialog = $('#modal-dialog-select-' + "<?= $id ?>");
-	    // var container = modalCropper.find('.cropper-image-container');
-	    // var image = container.find('img');
-	    // $('.btn-zoom-in').click(function (event) {
+	    var time = <?= $delay ?>;
 
-	    //     image.cropper('zoom', 0.1);
-	    //     console.log(image.length);
-	    // });
-	    // $('.btn-zoom-out').click(function (event) {
-	    //     image.cropper('zoom', -0.1);
-	    // });
+	    delay = (function() {
+	    	var timer;
+
+	    	return function(callback, delay) {
+	    		if (timer != undefined) {
+	    			clearTimeout(timer);
+	    		}
+
+	    		timer = setTimeout(callback, delay);
+	    	};
+	    })();
+
+	    modalDialog.find('.dialog-select-search input').keyup(function() {
+	    	var value = $(this).val();
+	    	delay(function() {
+	    		$.ajax("<?= $ajaxUrl ?>", {
+	    			data: {
+	    				keyword: value,
+	    				page: 1,
+	    			}
+	    		}).done(function(data) {
+	    		    modalDialog.find('.modal-body').addClass('loading spinner');
+	    		}).always(function() {
+	    			modalDialog.find('.modal-body').removeClass('loading spinner');
+	    		});
+	    	}, time);
+	    });
+
 	    modalDialog.find('.close').click(function (e) {
 	        modalDialog.modal('hide');
 	    });
