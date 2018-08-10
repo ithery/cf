@@ -13,7 +13,6 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
         $input = $this->input;
         $data = $this->ajaxMethod->getData();
 
-        $callback = carr::get($input, 'callback');
         $keyword = carr::get($input, 'keyword');
         $page = carr::get($input, 'page', 1);
 
@@ -59,11 +58,7 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
         $result["data"] = $data;
         $result["total"] = $total;
 
-        $response = "";
-        $response .= $callback . "(";
-        $response .= json_encode($result);
-        $response .= ")";
-        return $response;
+        return json_encode($result);
     }
 
 }

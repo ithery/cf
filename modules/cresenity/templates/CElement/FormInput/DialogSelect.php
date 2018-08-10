@@ -41,12 +41,12 @@
 				    grid-template-columns: repeat(5, 1fr);
 				    grid-template-rows: auto;
 				    grid-gap: 10px;
-				    height: 50vh;
+				    max-height: 50vh;
 				">
             		<?php foreach ($items as $key => $item): ?>
-            			<div class="item" style="border: 2px solid">
+            			<div class="item" data-id="<?= $item->product_id ?>" style="border: 2px solid grey">
             				<div class="item-name">
-            					<?= carr::get($item, 'name') ?>
+            					<?= $item->name ?>
             				</div>
             			</div>
             		<?php endforeach ?>
@@ -97,19 +97,40 @@
 	    })();
 
 	    modalDialog.find('.dialog-select-search input').keyup(function() {
+	    	modalDialog.find('.modal-body').addClass('loading spinner');
 	    	var value = $(this).val();
 	    	delay(function() {
 	    		$.ajax("<?= $ajaxUrl ?>", {
+	    			dataType: 'json',
 	    			data: {
 	    				keyword: value,
 	    				page: 1,
 	    			}
 	    		}).done(function(data) {
-	    		    modalDialog.find('.modal-body').addClass('loading spinner');
+	    		    var items = data.data.items;
+
+	    		    var list = modalDialog.find('.dialog-select-item-list');
+	    		    list.empty();
+
+	    		    $.each(items, function(k, v) {
+	    		    	var element = $('<div class="item" data-id="' + v.id + '" style="border: 2px solid grey"><div class="item-name">' + v.name + '</div></div>')
+
+	    		    	list.append(element);
+	    		    })
 	    		}).always(function() {
 	    			modalDialog.find('.modal-body').removeClass('loading spinner');
 	    		});
 	    	}, time);
+	    });
+
+	    modalDialog.find('.item').click(function (e) {
+	    	modalDialog.find('.item').css('border-color', 'grey');
+	    	if ($(this).hasClass('selected')) {
+	    		$(this).removeClass('selected');
+	    	} else {
+	    		$(this).addClass('selected');
+	    		$(this).css('border-color', 'black');
+	    	}
 	    });
 
 	    modalDialog.find('.close').click(function (e) {
