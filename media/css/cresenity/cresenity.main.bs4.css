@@ -929,7 +929,15 @@ body.mini-navbar #page-wrapper {
     }
 
 }
-
+@media (min-width: 992px) {
+    .layout-collapsed:not(.layout-offcanvas):not(.layout-fixed-offcanvas) .layout-sidenav:not(:hover) .brand-logo {
+        margin-right: 20px;
+        margin-left: 20px;
+    }
+    .layout-collapsed:not(.layout-offcanvas):not(.layout-fixed-offcanvas) .layout-sidenav:not(:hover) .brand {
+        padding: 0;
+    }
+}
 @media (max-width:1200px) {
 
 }
