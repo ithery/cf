@@ -17,6 +17,7 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
         $page = carr::get($input, 'page', 1);
 
         $orgId = carr::get($data, 'orgId');
+        $format = carr::get($data, 'format');
         $keyField = carr::get($data, 'keyField');
         $fields = carr::get($data, 'fields', ['*']);
         if ($fields != ['*']) {
@@ -32,11 +33,13 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
             if ($orgId) {
                 $model = $model->where('org_id', $orgId);
             }
-            foreach ($searchField as $key => $field) {
-                if (!$key) {
-                    $model = $model->where($field, 'LIKE', "%$keyword%");
-                } else {
-                    $model = $model->orWhere($field, 'LIKE', "%$keyword%");
+            if ($keyword) {
+                foreach ($searchField as $key => $field) {
+                    if (!$key) {
+                        $model = $model->where($field, 'LIKE', "%$keyword%");
+                    } else {
+                        $model = $model->orWhere($field, 'LIKE', "%$keyword%");
+                    }
                 }
             }
 
@@ -50,7 +53,16 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
                 if ($keyField) {
                     $arr['id'] = $item->{$keyField};
                 }
-                $items[] = array_merge($arr, $item->toArray());
+                if ($format) {
+                    $arr['name'] = $format;
+                    preg_match_all("/{(\w*)}/", $format, $matches);
+                    foreach ($matches[1] as $key => $match) {
+                        $arr['name'] = str_replace("{" . $match . "}", $item->{$match}, $arr['name']);
+                    }
+                } else {
+                    $arr['name'] = $item->{$keyField};
+                }
+                $items[] = $arr;
             }
 
             // ALTERNATIF
@@ -63,12 +75,25 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
             //     if ($keyField) {
             //         $arr['id'] = $item->{$keyField};
             //     }
-            //     $items[] = array_merge($arr, $item->toArray());
+            //     if ($format) {
+            //         $arr['name'] = $format;
+            //         preg_match_all("/{(.*)}/", $format, $matches);
+            //         foreach ($matches as $key => $match) {
+            //             $arr['name'] = str_replace("{$match}", $item->{$match}, $arr['name']);
+            //         }
+            //     } else {
+            //         $arr['name'] = $item->{$keyField};
+            //     }
+            //     $items[] = $arr;
             // }
         }
 
+        $template = CTemplate::factory('CElement/Modal/DialogSelect/ItemList', [
+            'items' => $items,
+        ]);
+
         $result = array();
-        $data['items'] = $items;
+        $data['result'] = $template->render();
         $result["data"] = $data;
         $result["total"] = $total;
 

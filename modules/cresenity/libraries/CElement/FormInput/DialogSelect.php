@@ -10,6 +10,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	use CElement_Trait_Template;
 
 	protected $fields;
+	protected $format;
 	protected $keyField;
 	protected $searchField;
 	protected $limit;
@@ -24,6 +25,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 
 		$this->type = 'dialogSelect';
 		$this->tag = 'div';
+		$this->format = '';
 		$this->fields = '';
 		$this->keyField = '';
 		$this->searchField = '';
@@ -56,6 +58,11 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 
 	public function setFields($fields) {
 		$this->fields = $fields;
+		return $this;
+	}
+
+	public function setFormat($format) {
+		$this->format = $format;
 		return $this;
 	}
 
@@ -110,8 +117,11 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	public function createAjaxUrl() {
 		return CAjaxMethod::factory()
     		->setType('DialogSelect')
+    		->setData('format', $this->format)
+    		->setData('fields', $this->fields)
+    		->setData('keyField', $this->keyField)
     		->setData('searchField', $this->searchField)
-    		->setData('totalItem', $this->totalItem)
+    		->setData('limit', $this->limit)
             ->makeurl();
 	}
 
