@@ -1,5 +1,28 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
 
+<style type="text/css">
+	.modal-dialog-select .dialog-select-item-list {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		grid-template-rows: auto;
+		grid-gap: 10px;
+		max-height: 50vh;
+	}
+
+	.modal-dialog-select .dialog-select-search {
+		margin-bottom: 20px;
+	}
+
+	.modal-dialog-select .dialog-select-item-list .item {
+		border: 2px solid black;
+		cursor: pointer;
+	}
+
+	.modal-dialog-select .dialog-select-item-list .item.selected {
+		border-color: green;
+	}
+</style>
+
 <div id="container-<?= $id ?>" class="dialog-select dialog-select-new">
 	<div class="dialog-select-new thumbnail" style="width: <?= $width ?>px; height: <?= $height ?>px;">
 		<div class="square">
@@ -26,25 +49,19 @@
 </div>
 
 <div id="modal-dialog-select-<?= $id ?>" class="modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog-select">
     	<div class="modal-content animated bounceInRight">
             <div class="modal-header">
                 <h3>Please choose an Item</h3>
                 <a href="#" class="close">&times;</a><span class="loader"></span>
             </div>
             <div class="modal-body opened">
-            	<div class="dialog-select-search" style="margin-bottom: 20px">
+            	<div class="dialog-select-search">
             		<input type="text" name="search">
             	</div>
-            	<div class="dialog-select-item-list" style="
-				    display: grid;
-				    grid-template-columns: repeat(5, 1fr);
-				    grid-template-rows: auto;
-				    grid-gap: 10px;
-				    max-height: 50vh;
-				">
+            	<div class="dialog-select-item-list">
             		<?php foreach ($items as $key => $item): ?>
-            			<div class="item" data-id="<?= $item->product_id ?>" style="border: 2px solid grey">
+            			<div class="item" data-id="<?= $item->product_id ?>">
             				<div class="item-name">
             					<?= $item->name ?>
             				</div>
@@ -124,12 +141,11 @@
 	    });
 
 	    modalDialog.find('.item').click(function (e) {
-	    	modalDialog.find('.item').css('border-color', 'grey');
 	    	if ($(this).hasClass('selected')) {
 	    		$(this).removeClass('selected');
 	    	} else {
+	    		modalDialog.find('.item').removeClass('selected');
 	    		$(this).addClass('selected');
-	    		$(this).css('border-color', 'black');
 	    	}
 	    });
 

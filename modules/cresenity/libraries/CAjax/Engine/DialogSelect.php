@@ -36,10 +36,11 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
                 if (!$key) {
                     $model = $model->where($field, 'LIKE', "%$keyword%");
                 } else {
-                    $model = $model->orWhere($field, 'LIKE', "$keyword");
+                    $model = $model->orWhere($field, 'LIKE', "%$keyword%");
                 }
             }
 
+            // WITH PAGINATE FUNCTION
             $model = $model->paginate($limit, $fields, 'page', $page);
             $total = $model->total();
 
@@ -51,6 +52,19 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
                 }
                 $items[] = array_merge($arr, $item->toArray());
             }
+
+            // ALTERNATIF
+            // $model = $model->skip(($page - 1) * $limit)->take($limit);
+            // $total = $model->count();
+
+            // foreach ($model->get($fields) as $item) {
+            //     $arr = array();
+            //     $arr['id'] = '';
+            //     if ($keyField) {
+            //         $arr['id'] = $item->{$keyField};
+            //     }
+            //     $items[] = array_merge($arr, $item->toArray());
+            // }
         }
 
         $result = array();
