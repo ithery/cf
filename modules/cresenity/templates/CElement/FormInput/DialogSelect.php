@@ -7,18 +7,19 @@
 		grid-template-rows: auto;
 		grid-gap: 10px;
 		max-height: 50vh;
+		overflow-y: scroll;
 	}
 
 	.modal-dialog-select .dialog-select-search {
 		margin-bottom: 20px;
 	}
 
-	.modal-dialog-select .dialog-select-item-list .item {
+	.modal-dialog-select .dialog-select-item-list .ccard-item {
 		border: 2px solid green;
 		cursor: pointer;
 	}
 
-	.modal-dialog-select .dialog-select-item-list .item.selected {
+	.modal-dialog-select .dialog-select-item-list .ccard-item.selected {
 		border-color: blue;
 	}
 
@@ -204,7 +205,7 @@
 	    		}
 
 	    		loader = (function() {
-	    			modalDialog.find('.modal-body').scroll(function(e) {
+	    			modalDialog.find('.dialog-select-item-list').off('scroll').scroll(function(e) {
 	    				var scrollTop = $(this).scrollTop();
 	    				var clientHeight = this.clientHeight;
 	    				var scrollHeight = this.scrollHeight;
@@ -224,7 +225,9 @@
 
 	    						var list = modalDialog.find('.dialog-select-item-list');
 	    						list.append(result);
-	    					}).always(function() {
+	    					}).always(function(data) {
+	    						var total = data.total;
+
 	    						modalDialog.find('.dialog-select-load-more').removeClass('processing');
 	    						removeLoading('.dialog-select-load-more');
 
@@ -237,7 +240,11 @@
 	    							}
 	    						});
 
-	    						loadMore(keyword, ++page);
+	    						if (!total) {
+	    							loadMore(keyword, ++page);
+	    						} else {
+	    							modalDialog.find('.dialog-select-item-list').off('scroll');
+	    						}
 	    					});
 	    				}
 	    			});

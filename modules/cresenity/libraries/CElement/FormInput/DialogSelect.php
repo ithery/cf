@@ -18,6 +18,8 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	protected $width;
 	protected $height;
 	protected $buttonLabel;
+	protected $itemTemplateName;
+	protected $itemTemplateVariables;
 	protected $delay;
 	
 	public function __construct($id) {
@@ -36,6 +38,8 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		$this->buttonLabel = 'Select an Item';
 		$this->delay = '1000';
 		$this->templateName = 'CElement/FormInput/DialogSelect';
+		$this->itemTemplateName = 'CElement/Card/Item';
+		$this->itemTemplateVariables = array('id', 'name', 'imageUrl');
 		$this->onBeforeParse(function() {
 		    $this->setVar('id', $this->id);
 		    $this->setVar('imgSrc', $this->imgSrc);
@@ -101,6 +105,16 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		return $this;
 	}
 
+	public function setItemTemplateName($templateName) {
+		$this->itemTemplateName = $templateName;
+		return $this;
+	}
+
+	public function setItemTemplateVariables(array $vars) {
+		$this->itemTemplateVariables = $vars;
+		return $this;
+	}
+
 	public function setDelay($delay) {
 		$this->delay = $delay;
 		return $this;
@@ -121,6 +135,8 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
     		->setData('fields', $this->fields)
     		->setData('keyField', $this->keyField)
     		->setData('searchField', $this->searchField)
+    		->setData('itemTemplateName', $this->itemTemplateName)
+    		->setData('itemTemplateVariables', $this->itemTemplateVariables)
     		->setData('limit', $this->limit)
             ->makeurl();
 	}

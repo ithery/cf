@@ -16,7 +16,6 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
         $keyword = carr::get($input, 'keyword');
         $page = carr::get($input, 'page', 1);
 
-        $orgId = carr::get($data, 'orgId');
         $format = carr::get($data, 'format');
         $keyField = carr::get($data, 'keyField');
         $fields = carr::get($data, 'fields', ['*']);
@@ -26,12 +25,15 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
         $searchField = carr::get($data, 'searchField', []);
         $limit = carr::get($data, 'limit');
         $model = carr::get($data, 'model');
+        $itemTemplateName = carr::get($data, 'itemTemplateName');
+        $itemTemplateVariables = carr::get($data, 'itemTemplateVariables', []);
+        $options = carr::get($data, 'options', []);
         $items = [];
         $total = 0;
 
         if ($model) {
-            if ($orgId) {
-                $model = $model->where('org_id', $orgId);
+            foreach ($options as $key => $option) {
+                $model = $model->where($key, $option);
             }
             if ($keyword) {
                 foreach ($searchField as $key => $field) {
@@ -45,7 +47,7 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
 
             // WITH PAGINATE FUNCTION
             $model = $model->paginate($limit, $fields, 'page', $page);
-            $total = $model->total();
+            $total = count($model->items());
 
             foreach ($model->items() as $item) {
                 $arr = array();
@@ -88,12 +90,20 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
             // }
         }
 
-        $template = CTemplate::factory('CElement/Modal/DialogSelect/ItemList', [
-            'items' => $items,
-        ]);
+        $data['result'] = '';
+
+        foreach ($items as $key => $item) {
+            $dataVariables = array();
+
+            foreach ($itemTemplateVariables as $varKey => $variable) {
+                $dataVariables[$variable] = carr::get($item, $varKey);
+            }
+
+            $template = CTemplate::factory($itemTemplateName, $dataVariables);
+            $data['result'] .= $template->render();
+        }
 
         $result = array();
-        $data['result'] = $template->render();
         $result["data"] = $data;
         $result["total"] = $total;
 
