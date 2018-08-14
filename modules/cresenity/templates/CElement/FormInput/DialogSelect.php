@@ -6,6 +6,7 @@
 		grid-template-columns: repeat(5, 1fr);
 		grid-template-rows: auto;
 		grid-gap: 10px;
+		min-height: 10vh;
 		max-height: 50vh;
 		overflow-y: scroll;
 	}
@@ -32,7 +33,7 @@
 	}
 </style>
 
-<div id="container-<?= $id ?>" class="dialog-select <?= ($value) ? 'dialog-select-exists' : 'dialog-select-new'; ?>">
+<div id="dialog-select-<?= $id ?>" class="dialog-select <?= ($value) ? 'dialog-select-exists' : 'dialog-select-new'; ?>">
 	<div class="dialog-select-new" style="width: <?= $width ?>px; height: <?= $height ?>px;">
 		<div class="dialog-select-image thumbnail">
 			<div class="square">
@@ -73,7 +74,7 @@
 	</div>
 </div>
 
-<div id="modal-dialog-select-<?= $id ?>" class="modal">
+<div id="modal-dialog-select-<?= $id ?>" class="modal" style="width: 100%">
     <div class="modal-dialog modal-dialog-select">
     	<div class="modal-content animated bounceInRight">
             <div class="modal-header">
@@ -107,33 +108,33 @@
 </div>
 
 <script>
-	$('.dialog-select img, .dialog-select .btn-dialog-select span').click(function() {
-		var modalDialog = $('#modal-dialog-select-' + "<?= $id ?>");
+	$("#dialog-select-<?= $id ?> img, #dialog-select-<?= $id ?> .btn-dialog-select span").click(function() {
+		var modalDialog = $("#modal-dialog-select-<?= $id ?>");
 
 		modalDialog.modal({backdrop: 'static', keyboard:false});
 	});
 
-	$(".dialog-select .dialog-select-remove").click(function() {
-		$("#container-<?= $id ?> .dialog-select-preview .dialog-select-name").html('');
-		$("#container-<?= $id ?> input").val('');
-		$("#container-<?= $id ?>").removeClass('dialog-select-exists');
-		$("#container-<?= $id ?>").addClass('dialog-select-new');
+	$("#dialog-select-<?= $id ?> .dialog-select-remove").click(function() {
+		$("#dialog-select-<?= $id ?> .dialog-select-preview .dialog-select-name").html('');
+		$("#dialog-select-<?= $id ?> input").val('');
+		$("#dialog-select-<?= $id ?>").removeClass('dialog-select-exists');
+		$("#dialog-select-<?= $id ?>").addClass('dialog-select-new');
 	});
 
-	$('#modal-dialog-select-' + "<?= $id ?>").find('.btn-choose').click(function() {
-		var modalDialog = $('#modal-dialog-select-' + "<?= $id ?>");
+	$("#modal-dialog-select-<?= $id ?>").find('.btn-choose').click(function() {
+		var modalDialog = $("#modal-dialog-select-<?= $id ?>");
 
 		var selected = modalDialog.find('.dialog-select-item-list .selected');
 
 		if (selected.length) {
-			var input = $("#container-<?= $id ?> input");
-			var preview = $("#container-<?= $id ?> .dialog-select-preview .dialog-select-name");
+			var input = $("#dialog-select-<?= $id ?> input");
+			var preview = $("#dialog-select-<?= $id ?> .dialog-select-preview .dialog-select-name");
 
 			input.val(selected.attr('data-id'));
 			preview.html(selected.attr('data-name'));
 
-			$("#container-<?= $id ?>").removeClass('dialog-select-new');
-			$("#container-<?= $id ?>").addClass('dialog-select-exists');
+			$("#dialog-select-<?= $id ?>").removeClass('dialog-select-new');
+			$("#dialog-select-<?= $id ?>").addClass('dialog-select-exists');
 
 			modalDialog.modal('hide');
 		} else {
@@ -142,7 +143,7 @@
 	});
 
 	(function ($) {
-	    var modalDialog = $('#modal-dialog-select-' + "<?= $id ?>");
+	    var modalDialog = $("#modal-dialog-select-<?= $id ?>");
 	    var time = <?= $delay ?>;
 
 	    delay = (function() {
@@ -157,15 +158,16 @@
 	    	};
 	    })();
 
-	    addLoading = (function(target) {
-	    	modalDialog.find(target).addClass('loading spinner');
+	    addLoading = (function(element, target) {
+	    	element.find(target).addClass('loading spinner');
 	    });
 
-	    removeLoading = (function(target) {
-	    	modalDialog.find(target).removeClass('loading spinner');
+	    removeLoading = (function(element, target) {
+	    	element.find(target).removeClass('loading spinner');
 	    })
 
-	    ajaxLoadItemList = (function(keyword = '', page = 1) {
+	    ajaxLoadItemList = (function(modalDialog, keyword = '', page = 1) {
+
 	    	return function() {
 	    		$.ajax("<?= $ajaxUrl ?>", {
 	    			dataType: 'json',
@@ -180,7 +182,7 @@
 	    		    list.empty();
 	    		    list.append(result);
 	    		}).always(function() {
-	    			removeLoading('.dialog-select-item-list');
+	    			removeLoading(modalDialog, '.dialog-select-item-list');
 
 	    			modalDialog.find('.dialog-select-item-list').children().off('click').click(function (e) {
 	    				if ($(this).hasClass('selected')) {
@@ -191,7 +193,7 @@
 	    				}
 	    			});
 
-	    			loadMore(keyword, ++page);
+	    			loadMore(modalDialog, keyword, ++page);
 	    		});
 	    	};
 	    });
@@ -199,12 +201,12 @@
 	    loadMore = (function() {
 	    	var loader;
 
-	    	return function(keyword = '', page = 1) {
+	    	return function(modalDialog, keyword = '', page = 1) {
 	    		if (loader != undefined) {
 	    			loader = undefined;
 	    		}
 
-	    		loader = (function() {
+	    		loader = (function(modalDialog) {
 	    			modalDialog.find('.dialog-select-item-list').off('scroll').scroll(function(e) {
 	    				var scrollTop = $(this).scrollTop();
 	    				var clientHeight = this.clientHeight;
@@ -212,7 +214,7 @@
 
 	    				if (scrollTop + clientHeight >= scrollHeight) {
 	    					modalDialog.find('.dialog-select-load-more').addClass('processing');
-	    					addLoading('.dialog-select-load-more');
+	    					addLoading(modalDialog, '.dialog-select-load-more');
 
 	    					$.ajax("<?= $ajaxUrl ?>", {
 	    						dataType: 'json',
@@ -227,9 +229,10 @@
 	    						list.append(result);
 	    					}).always(function(data) {
 	    						var total = data.total;
+	    						var limit = data.data.limit;
 
 	    						modalDialog.find('.dialog-select-load-more').removeClass('processing');
-	    						removeLoading('.dialog-select-load-more');
+	    						removeLoading(modalDialog, '.dialog-select-load-more');
 
 	    						modalDialog.find('.dialog-select-item-list').children().off('click').click(function (e) {
 	    							if ($(this).hasClass('selected')) {
@@ -240,8 +243,8 @@
 	    							}
 	    						});
 
-	    						if (!total) {
-	    							loadMore(keyword, ++page);
+	    						if (total >= limit) {
+	    							loadMore(modalDialog, keyword, ++page);
 	    						} else {
 	    							modalDialog.find('.dialog-select-item-list').off('scroll');
 	    						}
@@ -250,18 +253,21 @@
 	    			});
 	    		});
 
-	    		loader();
+	    		loader(modalDialog);
 	    	};
 	    })();
 
-	    $('.dialog-select-item-list').ready(function() {
-	    	addLoading('.dialog-select-item-list');
-	    	ajaxLoadItemList()();
-	    })
+	    $("#dialog-select-<?= $id ?> img, #dialog-select-<?= $id ?> .btn-dialog-select span").click(function() {
+	    	addLoading(modalDialog, '.dialog-select-item-list');
+	    	if (!modalDialog.hasClass('dialog-select-initialized')) {
+	    		modalDialog.addClass('dialog-select-initialized');
+	    		ajaxLoadItemList(modalDialog)();
+	    	}
+	    });
 
 	    modalDialog.find('.dialog-select-search input').keyup(function() {
-	    	addLoading('.dialog-select-item-list');
-	    	delay(ajaxLoadItemList($(this).val().trim()), time);
+	    	addLoading(modalDialog, '.dialog-select-item-list');
+	    	delay(ajaxLoadItemList(modalDialog, $(this).val().trim()), time);
 	    });
 
 	    modalDialog.find('.close').click(function (e) {
