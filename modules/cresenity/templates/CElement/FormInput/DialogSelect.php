@@ -74,7 +74,7 @@
 </div>
 
 <div id="modal-dialog-select-<?= $id ?>" class="modal">
-    <div class="modal-dialog-select">
+    <div class="modal-dialog modal-dialog-select">
     	<div class="modal-content animated bounceInRight">
             <div class="modal-header">
                 <h3>Please choose an Item</h3>
@@ -123,7 +123,7 @@
 	$('#modal-dialog-select-' + "<?= $id ?>").find('.btn-choose').click(function() {
 		var modalDialog = $('#modal-dialog-select-' + "<?= $id ?>");
 
-		var selected = modalDialog.find('.item.selected');
+		var selected = modalDialog.find('.dialog-select-item-list .selected');
 
 		if (selected.length) {
 			var input = $("#container-<?= $id ?> input");
@@ -182,11 +182,11 @@
 	    		}).always(function() {
 	    			removeLoading('.dialog-select-item-list');
 
-	    			modalDialog.find('.item').off('click').click(function (e) {
+	    			modalDialog.find('.dialog-select-item-list').children().off('click').click(function (e) {
 	    				if ($(this).hasClass('selected')) {
 	    					$(this).removeClass('selected');
 	    				} else {
-	    					modalDialog.find('.item').removeClass('selected');
+	    					modalDialog.find('.dialog-select-item-list').children().removeClass('selected');
 	    					$(this).addClass('selected');
 	    				}
 	    			});
@@ -231,11 +231,11 @@
 	    						modalDialog.find('.dialog-select-load-more').removeClass('processing');
 	    						removeLoading('.dialog-select-load-more');
 
-	    						modalDialog.find('.item').off('click').click(function (e) {
+	    						modalDialog.find('.dialog-select-item-list').children().off('click').click(function (e) {
 	    							if ($(this).hasClass('selected')) {
 	    								$(this).removeClass('selected');
 	    							} else {
-	    								modalDialog.find('.item').removeClass('selected');
+	    								modalDialog.find('.dialog-select-item-list').children().removeClass('selected');
 	    								$(this).addClass('selected');
 	    							}
 	    						});
@@ -261,7 +261,7 @@
 
 	    modalDialog.find('.dialog-select-search input').keyup(function() {
 	    	addLoading('.dialog-select-item-list');
-	    	delay(ajaxLoadItemList($(this).val()), time);
+	    	delay(ajaxLoadItemList($(this).val().trim()), time);
 	    });
 
 	    modalDialog.find('.close').click(function (e) {
