@@ -42,10 +42,11 @@ trait CApp_Model_Trait_Roles {
         if (strlen($orgId) > 0) {
             $root = $root->where(function($query) use ($orgId) {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
-            });
+            })->where('status', '>', 0);
         }
 
         $tree = $root->get()->toTree();
+
         return $tree;
     }
 
