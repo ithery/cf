@@ -733,10 +733,6 @@ class cajax {
         //return $response;
     }
 
-    public static function dialogselect($obj, $input) {
-        # code...
-    }
-
     public static function dataelastic($obj, $input) {
         $ajax_data = $obj->data->query;
         $param = $obj->param;
