@@ -14,10 +14,21 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
      */
     public function getDatabase(CDatabase $db) {
         $params = $db->config();
+        
         $dbname = carr::path($params, 'connection.database');
         if ($dbname == null) {
             $dbname = $conn->query('SELECT DATABASE()')->fetchColumn();
         }
+        return $dbname;
+    }
+    
+     /**
+     * {@inheritdoc}
+     * @return CDatabase_Platform_Mysql
+     */
+    public function getDatabasePlatform()
+    {
+        return new CDatabase_Platform_Mysql();
     }
 
 }

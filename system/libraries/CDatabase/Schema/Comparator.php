@@ -56,9 +56,14 @@ class CDatabase_Schema_Comparator {
             }
         }
 
+        
+      
         foreach ($toSchema->getTables() as $table) {
             $tableName = $table->getShortestName($toSchema->getName());
+        
+         
             if (!$fromSchema->hasTable($tableName)) {
+               
                 $diff->newTables[$tableName] = $toSchema->getTable($tableName);
             } else {
                 $tableDifferences = $this->diffTable($fromSchema->getTable($tableName), $toSchema->getTable($tableName));
@@ -71,7 +76,7 @@ class CDatabase_Schema_Comparator {
         /* Check if there are tables removed */
         foreach ($fromSchema->getTables() as $table) {
             $tableName = $table->getShortestName($fromSchema->getName());
-
+    
             $table = $fromSchema->getTable($tableName);
             if (!$toSchema->hasTable($tableName)) {
                 $diff->removedTables[$tableName] = $table;
@@ -427,7 +432,7 @@ class CDatabase_Schema_Comparator {
             if ($properties1['fixed'] != $properties2['fixed']) {
                 $changedProperties[] = 'fixed';
             }
-        } elseif ($properties1['type'] instanceof Types\DecimalType) {
+        } elseif ($properties1['type'] instanceof CDatabase_Type_DecimalType) {
             if (($properties1['precision'] ?: 10) != ($properties2['precision'] ?: 10)) {
                 $changedProperties[] = 'precision';
             }
@@ -473,11 +478,11 @@ class CDatabase_Schema_Comparator {
      * @deprecated
      */
     private function isALegacyJsonComparison(CDatabase_Type $one, CDatabase_Type $other) {
-        if (!$one instanceof Types\JsonType || !$other instanceof Types\JsonType) {
+        if (!$one instanceof CDatabase_Type_JsonType || !$other instanceof CDatabase_Type_JsonType) {
             return false;
         }
 
-        return (!$one instanceof Types\JsonArrayType && $other instanceof Types\JsonArrayType) || (!$other instanceof Types\JsonArrayType && $one instanceof Types\JsonArrayType);
+        return (!$one instanceof CDatabase_Type_JsonArrayType && $other instanceof CDatabase_Type_JsonArrayType) || (!$other instanceof CDatabase_Type_JsonArrayType && $one instanceof CDatabase_Type_JsonArrayType);
     }
 
     /**

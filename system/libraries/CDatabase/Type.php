@@ -41,6 +41,7 @@ abstract class CDatabase_Type {
     const FLOAT = 'float';
     const GUID = 'guid';
     const DATEINTERVAL = 'dateinterval';
+    const ENUM = 'enum';
 
     /**
      * Map of already instantiated type objects. One instance per type (flyweight).
@@ -80,6 +81,7 @@ abstract class CDatabase_Type {
         self::BLOB => CDatabase_Type_BlobType::class,
         self::GUID => CDatabase_Type_GuidType::class,
         self::DATEINTERVAL => CDatabase_Type_DateIntervalType::class,
+        self::ENUM => CDatabase_Type_EnumType::class,
     ];
 
     /**

@@ -176,7 +176,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function listTableNames() {
         $sql = $this->platform->getListTablesSQL();
-
+        
         $tables = $this->db->fetchAll($sql);
         $tableNames = $this->_getPortableTablesList($tables);
 
@@ -199,7 +199,7 @@ abstract class CDatabase_Schema_Manager {
 
         return array_values(
                 array_filter($assetNames, function ($assetName) use ($filterExpr) {
-                    $assetName = ($assetName instanceof AbstractAsset) ? $assetName->getName() : $assetName;
+                    $assetName = ($assetName instanceof CDatabase_AbstractAsset) ? $assetName->getName() : $assetName;
 
                     return preg_match($filterExpr, $assetName);
                 })
@@ -220,7 +220,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function listTables() {
         $tableNames = $this->listTableNames();
-
+      
         $tables = [];
         foreach ($tableNames as $tableName) {
             $tables[] = $this->listTableDetails($tableName);
@@ -948,7 +948,7 @@ abstract class CDatabase_Schema_Manager {
         }
 
         $tables = $this->listTables();
-
+       
         return new CDatabase_Schema($tables, $sequences, $this->createSchemaConfig(), $namespaces);
     }
 
@@ -962,6 +962,8 @@ abstract class CDatabase_Schema_Manager {
         $schemaConfig->setMaxIdentifierLength($this->platform->getMaxIdentifierLength());
 
         $searchPaths = $this->getSchemaSearchPaths();
+        
+        
         if (isset($searchPaths[0])) {
             $schemaConfig->setName($searchPaths[0]);
         }

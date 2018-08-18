@@ -240,7 +240,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
         $result = [];
         foreach ($list as $constraint) {
-            $result[] = new ForeignKeyConstraint(
+            $result[] = new CDatabase_Schema_ForeignKeyConstraint(
                     array_values($constraint['local']), $constraint['foreignTable'], array_values($constraint['foreign']), $constraint['name'], [
                 'onDelete' => $constraint['onDelete'],
                 'onUpdate' => $constraint['onUpdate'],

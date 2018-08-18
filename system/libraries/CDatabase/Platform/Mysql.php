@@ -618,12 +618,12 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * @param TableDiff $diff
-     * @param Index     $index
+     * @param CDatabase_Schema_Table_Diff   $diff
+     * @param CDatabase_Schema_Index        $index
      *
      * @return string[]
      */
-    private function getPreAlterTableAlterPrimaryKeySQL(TableDiff $diff, Index $index) {
+    private function getPreAlterTableAlterPrimaryKeySQL(CDatabase_Schema_Table_Diff $diff, CDatabase_Schema_Index $index) {
         $sql = [];
 
         if (!$index->isPrimary() || !$diff->fromTable instanceof CDatabase_Schema_Table) {
@@ -859,18 +859,18 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * {@inheritDoc}
      */
     public function getDropIndexSQL($index, $table = null) {
-        if ($index instanceof Index) {
+        if ($index instanceof CDatabase_Schema_Index) {
             $indexName = $index->getQuotedName($this);
         } elseif (is_string($index)) {
             $indexName = $index;
         } else {
-            throw new \InvalidArgumentException('MysqlPlatform::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
+            throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
         }
 
         if ($table instanceof Table) {
             $table = $table->getQuotedName($this);
         } elseif (!is_string($table)) {
-            throw new \InvalidArgumentException('MysqlPlatform::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
+            throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
         }
 
         if ($index instanceof Index && $index->isPrimary()) {
@@ -947,6 +947,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             'binary' => 'binary',
             'varbinary' => 'binary',
             'set' => 'simple_array',
+            'enum' => 'enum',
         ];
     }
 
@@ -968,7 +969,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * {@inheritDoc}
      */
     protected function getReservedKeywordsClass() {
-        return Keywords\MySQLKeywords::class;
+        return CDatabase_Platform_Keywords_Mysql::class;
     }
 
     /**

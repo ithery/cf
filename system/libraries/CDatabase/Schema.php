@@ -32,14 +32,14 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     protected $_schemaConfig = false;
 
     /**
-     * @param CDatabase_Schema_Table[]      $tables
-     * @param CDatabase_Schema_Sequence[]   $sequences
-     * @param CDatabase_Schema_SchemaConfig $schemaConfig
-     * @param array                              $namespaces
+     * @param CDatabase_Schema_Table[]          $tables
+     * @param CDatabase_Schema_Sequence[]       $sequences
+     * @param CDatabase_Schema_Config           $schemaConfig
+     * @param array                             $namespaces
      */
     public function __construct(array $tables = [], array $sequences = [], CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
         if ($schemaConfig == null) {
-            $schemaConfig = new SchemaConfig();
+            $schemaConfig = new CDatabase_Schema_Config();
         }
         $this->_schemaConfig = $schemaConfig;
         $this->_setName($schemaConfig->getName() ?: 'public');
@@ -150,11 +150,11 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     private function getFullQualifiedAssetName($name) {
         $name = $this->getUnquotedAssetName($name);
+       
 
         if (strpos($name, ".") === false) {
             $name = $this->getName() . "." . $name;
         }
-
         return strtolower($name);
     }
 
@@ -195,7 +195,6 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function hasTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
-
         return isset($this->_tables[$tableName]);
     }
 

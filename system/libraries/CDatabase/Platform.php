@@ -199,6 +199,7 @@ abstract class CDatabase_Platform {
         $this->initializeDoctrineTypeMappings();
 
         foreach (CDatabase_Type::getTypesMap() as $typeName => $className) {
+
             foreach (CDatabase_Type::getType($typeName)->getMappedDatabaseTypes($this) as $dbType) {
                 $this->doctrineTypeMapping[$dbType] = $typeName;
             }
@@ -373,17 +374,16 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws CDatabase_Exception
      */
     public function getDoctrineTypeMapping($dbType) {
         if ($this->doctrineTypeMapping === null) {
             $this->initializeAllDoctrineTypeMappings();
         }
-
         $dbType = strtolower($dbType);
 
         if (!isset($this->doctrineTypeMapping[$dbType])) {
-            throw new \Doctrine\DBAL\DBALException("Unknown database type " . $dbType . " requested, " . get_class($this) . " may not support it.");
+            throw new CDatabase_Exception("Unknown database type " . $dbType . " requested, " . get_class($this) . " may not support it.");
         }
 
         return $this->doctrineTypeMapping[$dbType];
@@ -1842,23 +1842,23 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param CDatabase_Schema_ColumnDiff $columnDiff
-     * @param CDatabase_Schema_TableDiff  $diff
-     * @param array                            $columnSql
+     * @param CDatabase_Schema_Column_Diff      $columnDiff
+     * @param CDatabase_Schema_Table_Diff       $diff
+     * @param array                             $columnSql
      *
      * @return bool
      */
-    protected function onSchemaAlterTableChangeColumn(ColumnDiff $columnDiff, TableDiff $diff, &$columnSql) {
+    protected function onSchemaAlterTableChangeColumn(CDatabase_Schema_Column_Diff $columnDiff, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
         if (null === $this->_eventManager) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(Events::onSchemaAlterTableChangeColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableChangeColumn)) {
             return false;
         }
 
         $eventArgs = new SchemaAlterTableChangeColumnEventArgs($columnDiff, $diff, $this);
-        $this->_eventManager->dispatchEvent(Events::onSchemaAlterTableChangeColumn, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTableChangeColumn, $eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1866,14 +1866,14 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param string                          $oldColumnName
-     * @param CDatabase_Schema_Column    $column
-     * @param CDatabase_Schema_TableDiff $diff
-     * @param array                           $columnSql
+     * @param string                            $oldColumnName
+     * @param CDatabase_Schema_Column           $column
+     * @param CDatabase_Schema_TableDiff        $diff
+     * @param array                             $columnSql
      *
      * @return bool
      */
-    protected function onSchemaAlterTableRenameColumn($oldColumnName, Column $column, TableDiff $diff, &$columnSql) {
+    protected function onSchemaAlterTableRenameColumn($oldColumnName, CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
         if (null === $this->_eventManager) {
             return false;
         }
@@ -1883,7 +1883,7 @@ abstract class CDatabase_Platform {
         }
 
         $eventArgs = new SchemaAlterTableRenameColumnEventArgs($oldColumnName, $column, $diff, $this);
-        $this->_eventManager->dispatchEvent(Events::onSchemaAlterTableRenameColumn, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTableRenameColumn, $eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
