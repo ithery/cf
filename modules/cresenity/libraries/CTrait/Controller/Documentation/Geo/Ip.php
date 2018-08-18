@@ -12,16 +12,20 @@ trait CTrait_Controller_Documentation_Geo_Ip {
     public function index() {
         $app = CApp::instance();
 
-        $app->title('Geo IP');
-
-        $code = 'CGeo::ip()->getLocation();';
+        $app->title('Geo IP Address');
 
 
-        $app->add($code);
+        $code = 'CGeo::ip()->getClientIP();';
+        $app->addDiv()->addClass('my-2 console')->add($code);
 
-        $k = CGeo::ip()->getLocation();
+        $result = CGeo::ip()->getClientIP();
+        $app->addDiv()->addClass('my-2 json-container')->add($result);
 
-        $app->add($k);
+        $code = 'CGeo::ip()->getLocation(CGeo::ip()->getClientIP());';
+        $app->addDiv()->addClass('my-2 console')->add($code);
+
+        $result = CGeo::ip()->getLocation();
+        $app->addDiv()->addClass('my-2 json-container')->add($result);
 
         echo $app->render();
     }
