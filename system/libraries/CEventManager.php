@@ -22,7 +22,7 @@ class CEventManager {
      *
      * @param string         $eventName The name of the event to dispatch. The name of the event is
      *                                  the name of the method that is invoked on listeners.
-     * @param EventArgs|null $eventArgs The event arguments to pass to the event handlers/listeners.
+     * @param CEventManager_Args|null $eventArgs The event arguments to pass to the event handlers/listeners.
      *                                  If not supplied, the single empty EventArgs instance is used.
      *
      * @return void

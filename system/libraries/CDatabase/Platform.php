@@ -1300,7 +1300,7 @@ abstract class CDatabase_Platform {
 
         if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Events::onSchemaDropTable)) {
             $eventArgs = new SchemaDropTableEventArgs($tableArg, $this);
-            $this->_eventManager->dispatchEvent(Events::onSchemaDropTable, $eventArgs);
+            $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaDropTable, $eventArgs);
 
             if ($eventArgs->isDefaultPrevented()) {
                 return $eventArgs->getSql();

@@ -1305,6 +1305,11 @@ final class CF {
 
             $routing_file .= str_replace('_', DS, $routing_class);
 
+
+            if (substr($routing_file, strlen($routing_file) - 1, 1) == DS) {
+                $routing_file = substr($routing_file, 0, strlen($routing_file) - 1) . '_';
+            }
+
             if ($directory == 'libraries') {
                 // find file at vendor first
                 if ($path = self::find_file('vendor', $routing_file)) {

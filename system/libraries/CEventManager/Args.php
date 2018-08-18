@@ -37,11 +37,11 @@ class CEventManager_Args {
      *
      * @link https://msdn.microsoft.com/en-us/library/system.eventargs.aspx
      *
-     * @return EventArgs
+     * @return CEventManager_Args
      */
     public static function getEmptyInstance() {
         if (!self::$_emptyEventArgsInstance) {
-            self::$_emptyEventArgsInstance = new CEvent_Args();
+            self::$_emptyEventArgsInstance = new CEventManager_Args();
         }
 
         return self::$_emptyEventArgsInstance;
