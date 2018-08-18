@@ -17,21 +17,21 @@ class CGeo_IP {
     protected $remote_ip = null;
 
     /**
-     * Current location instance.
+     * options of CGeo_IP.
      *
-     * @var Location
+     * @var array
      */
-    protected $location = null;
+    protected $options = null;
 
     /**
-     * Create a new GeoIP instance.
+     * Create a new Geo_IP instance.
      *
-     * @param array        $config
-     * @param CacheManager $cache
+     * @param array        $options
      */
-    public function __construct() {
+    public function __construct($options = array()) {
         // Set IP
         $this->remote_ip = $this->getClientIP();
+        $this->options = $options;
     }
 
     /**
@@ -43,9 +43,7 @@ class CGeo_IP {
      */
     public function getLocation($ip = null) {
         // Get location data
-        $this->location = $this->find($ip);
-
-        return $this->location;
+        return $this->find($ip);
     }
 
     /**
@@ -74,7 +72,7 @@ class CGeo_IP {
                 throw $e;
             }
         }
-        return $this->getService()->hydrate($this->default_location);
+        throw new CGeo_Exception_InvalidArgument('Invalid IP Address:' . $ip);
     }
 
     /**
