@@ -160,7 +160,7 @@ abstract class CDatabase_Type {
     public static function getType($name) {
         if (!isset(self::$_typeObjects[$name])) {
             if (!isset(self::$_typesMap[$name])) {
-                throw DBALException::unknownColumnType($name);
+                throw CDatabase_Exception::unknownColumnType($name);
             }
             self::$_typeObjects[$name] = new self::$_typesMap[$name]();
         }

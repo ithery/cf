@@ -259,7 +259,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      */
     private function _createIndex(array $columnNames, $indexName, $isUnique, $isPrimary, array $flags = [], array $options = []) {
         if (preg_match('(([^a-zA-Z0-9_]+))', $this->normalizeIdentifier($indexName))) {
-            throw SchemaException::indexNameInvalid($indexName);
+            throw CDatabase_Schema_Exception::indexNameInvalid($indexName);
         }
 
         foreach ($columnNames as $columnName => $indexColOptions) {
@@ -268,7 +268,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
             }
 
             if (!$this->hasColumn($columnName)) {
-                throw SchemaException::columnDoesNotExist($columnName, $this->_name);
+                throw CDatabase_Schema_Exception::columnDoesNotExist($columnName, $this->_name);
             }
         }
 
