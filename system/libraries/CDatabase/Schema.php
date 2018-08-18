@@ -17,12 +17,12 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     private $namespaces = [];
 
     /**
-     * @var \Doctrine\DBAL\Schema\Table[]
+     * @var CDatabase_Schema_Table[]
      */
     protected $_tables = [];
 
     /**
-     * @var \Doctrine\DBAL\Schema\Sequence[]
+     * @var CDatabase_Schema_Sequence[]
      */
     protected $_sequences = [];
 
@@ -32,9 +32,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     protected $_schemaConfig = false;
 
     /**
-     * @param \Doctrine\DBAL\Schema\Table[]      $tables
-     * @param \Doctrine\DBAL\Schema\Sequence[]   $sequences
-     * @param \Doctrine\DBAL\Schema\SchemaConfig $schemaConfig
+     * @param CDatabase_Schema_Table[]      $tables
+     * @param CDatabase_Schema_Sequence[]   $sequences
+     * @param CDatabase_Schema_SchemaConfig $schemaConfig
      * @param array                              $namespaces
      */
     public function __construct(array $tables = [], array $sequences = [], CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
@@ -76,7 +76,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
         $tableName = $table->getFullQualifiedName($this->getName());
 
         if (isset($this->_tables[$tableName])) {
-            throw SchemaException::tableAlreadyExists($tableName);
+            throw CDatabase_Schema_Exception::tableAlreadyExists($tableName);
         }
 
         if (!$table->isInDefaultNamespace($this->getName()) && !$this->hasNamespace($namespaceName)) {
@@ -121,7 +121,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Gets all tables of this schema.
      *
-     * @return \Doctrine\DBAL\Schema\Table[]
+     * @return CDatabase_Schema_Table[]
      */
     public function getTables() {
         return $this->_tables;
@@ -130,14 +130,14 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @param string $tableName
      *
-     * @return \Doctrine\DBAL\Schema\Table
+     * @return CDatabase_Schema_Table
      *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws CDatabase_Schema_SchemaException
      */
     public function getTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
         if (!isset($this->_tables[$tableName])) {
-            throw SchemaException::tableDoesNotExist($tableName);
+            throw CDatabase_Schema_Exception::tableDoesNotExist($tableName);
         }
 
         return $this->_tables[$tableName];
@@ -222,9 +222,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @param string $sequenceName
      *
-     * @return \Doctrine\DBAL\Schema\Sequence
+     * @return CDatabase_Schema_Sequence
      *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws CDatabase_Schema_SchemaException
      */
     public function getSequence($sequenceName) {
         $sequenceName = $this->getFullQualifiedAssetName($sequenceName);
@@ -236,7 +236,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @return \Doctrine\DBAL\Schema\Sequence[]
+     * @return CDatabase_Schema_Sequence[]
      */
     public function getSequences() {
         return $this->_sequences;
@@ -247,7 +247,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      *
      * @param string $namespaceName The name of the namespace to create.
      *
-     * @return \Doctrine\DBAL\Schema\Schema This schema instance.
+     * @return CDatabase_Schema_Schema This schema instance.
      *
      * @throws SchemaException
      */
@@ -287,7 +287,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @param string $oldTableName
      * @param string $newTableName
      *
-     * @return \Doctrine\DBAL\Schema\Schema
+     * @return CDatabase_Schema_Schema
      */
     public function renameTable($oldTableName, $newTableName) {
         $table = $this->getTable($oldTableName);
@@ -304,7 +304,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      *
      * @param string $tableName
      *
-     * @return \Doctrine\DBAL\Schema\Schema
+     * @return CDatabase_Schema_Schema
      */
     public function dropTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
@@ -333,7 +333,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @param string $sequenceName
      *
-     * @return \Doctrine\DBAL\Schema\Schema
+     * @return CDatabase_Schema_Schema
      */
     public function dropSequence($sequenceName) {
         $sequenceName = $this->getFullQualifiedAssetName($sequenceName);
@@ -345,12 +345,12 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Returns an array of necessary SQL queries to create the schema on the given platform.
      *
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param CDatabase_Schema $platform
      *
      * @return array
      */
-    public function toSql(AbstractPlatform $platform) {
-        $sqlCollector = new CreateSchemaSqlCollector($platform);
+    public function toSql(CDatabase_Platform $platform) {
+        $sqlCollector = new CDatabase_Schema_Visitor_CreateSchemaSqlCollector($platform);
         $this->visit($sqlCollector);
 
         return $sqlCollector->getQueries();
@@ -359,11 +359,11 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Return an array of necessary SQL queries to drop the schema on the given platform.
      *
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param CDatabase_Schema $platform
      *
      * @return array
      */
-    public function toDropSql(AbstractPlatform $platform) {
+    public function toDropSql(CDatabase_Schema $platform) {
         $dropSqlCollector = new DropSchemaSqlCollector($platform);
         $this->visit($dropSqlCollector);
 
@@ -371,8 +371,8 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\Schema              $toSchema
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param CDatabase_Schema_Schema              $toSchema
+     * @param CDatabase_Platform $platform
      *
      * @return array
      */
@@ -384,27 +384,27 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\Schema              $fromSchema
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param CDatabase_Schema              $fromSchema
+     * @param CDatabase_Platform            $platform
      *
      * @return array
      */
-    public function getMigrateFromSql(Schema $fromSchema, AbstractPlatform $platform) {
-        $comparator = new Comparator();
+    public function getMigrateFromSql(CDatabase_Schema $fromSchema, CDatabase_Platform $platform) {
+        $comparator = new CDatabase_Schema_Comparator();
         $schemaDiff = $comparator->compare($fromSchema, $this);
 
         return $schemaDiff->toSql($platform);
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\Visitor\Visitor $visitor
+     * @param CDatabase_Schema_Visitor_Interface $visitor
      *
      * @return void
      */
-    public function visit(Visitor $visitor) {
+    public function visit(CDatabase_Schema_Visitor_Interface $visitor) {
         $visitor->acceptSchema($this);
 
-        if ($visitor instanceof NamespaceVisitor) {
+        if ($visitor instanceof CDatabase_Schema_Visitor_NamespaceInterface) {
             foreach ($this->namespaces as $namespace) {
                 $visitor->acceptNamespace($namespace);
             }

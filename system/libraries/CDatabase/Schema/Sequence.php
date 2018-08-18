@@ -131,11 +131,11 @@ class CDatabase_Schema_Sequence extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\Visitor\Visitor $visitor
+     * @param CDatabase_Schema_Visitor_Interface $visitor
      *
      * @return void
      */
-    public function visit(Visitor $visitor) {
+    public function visit(CDatabase_Schema_Visitor_Interface $visitor) {
         $visitor->acceptSequence($this);
     }
 

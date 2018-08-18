@@ -434,7 +434,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
         $columnName = $this->normalizeIdentifier($columnName);
 
         if (isset($this->_columns[$columnName])) {
-            throw SchemaException::columnAlreadyExists($this->getName(), $columnName);
+            throw CDatabase_Schema_Exception::columnAlreadyExists($this->getName(), $columnName);
         }
 
         $this->_columns[$columnName] = $column;
@@ -742,11 +742,11 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param Visitor $visitor
+     * @param CDatabase_Schema_Visitor_Interface $visitor
      *
      * @return void
      */
-    public function visit(Visitor $visitor) {
+    public function visit(CDatabase_Schema_Visitor_Interface $visitor) {
         $visitor->acceptTable($this);
 
         foreach ($this->getColumns() as $column) {
