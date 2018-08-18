@@ -479,7 +479,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     /**
      * {@inheritDoc}
      */
-    public function getAlterTableSQL(TableDiff $diff) {
+    public function getAlterTableSQL(CDatabase_Schema_Table_Diff $diff) {
         $columnSql = [];
         $queryParts = [];
         if ($diff->newName !== false) {
@@ -562,7 +562,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     /**
      * {@inheritDoc}
      */
-    protected function getPreAlterTableIndexForeignKeySQL(TableDiff $diff) {
+    protected function getPreAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $sql = [];
         $table = $diff->getName($this)->getQuotedName($this);
 
@@ -599,7 +599,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
 
         $engine = 'INNODB';
 
-        if ($diff->fromTable instanceof Table && $diff->fromTable->hasOption('engine')) {
+        if ($diff->fromTable instanceof CDatabase_Schema_Table && $diff->fromTable->hasOption('engine')) {
             $engine = strtoupper(trim($diff->fromTable->getOption('engine')));
         }
 
@@ -626,7 +626,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     private function getPreAlterTableAlterPrimaryKeySQL(TableDiff $diff, Index $index) {
         $sql = [];
 
-        if (!$index->isPrimary() || !$diff->fromTable instanceof Table) {
+        if (!$index->isPrimary() || !$diff->fromTable instanceof CDatabase_Schema_Table) {
             return $sql;
         }
 
@@ -655,11 +655,11 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * @param TableDiff $diff The table diff to gather the SQL for.
+     * @param CDatabase_Schema_Table_Diff $diff The table diff to gather the SQL for.
      *
      * @return array
      */
-    private function getPreAlterTableAlterIndexForeignKeySQL(TableDiff $diff) {
+    private function getPreAlterTableAlterIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $sql = [];
         $table = $diff->getName($this)->getQuotedName($this);
 
@@ -690,11 +690,11 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * @param TableDiff $diff The table diff to gather the SQL for.
+     * @param CDatabase_Schema_Table_Diff $diff The table diff to gather the SQL for.
      *
      * @return array
      */
-    protected function getPreAlterTableRenameIndexForeignKeySQL(TableDiff $diff) {
+    protected function getPreAlterTableRenameIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $sql = [];
         $tableName = $diff->getName($this)->getQuotedName($this);
 
@@ -713,11 +713,11 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * "Remaining" here refers to the diff between the foreign keys currently defined in the associated
      * table and the foreign keys to be removed.
      *
-     * @param TableDiff $diff The table diff to evaluate.
+     * @param CDatabase_Schema_Table_Diff $diff The table diff to evaluate.
      *
      * @return array
      */
-    private function getRemainingForeignKeyConstraintsRequiringRenamedIndexes(TableDiff $diff) {
+    private function getRemainingForeignKeyConstraintsRequiringRenamedIndexes(CDatabase_Schema_Table_Diff $diff) {
         if (empty($diff->renamedIndexes) || !$diff->fromTable instanceof Table) {
             return [];
         }
@@ -744,7 +744,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     /**
      * {@inheritdoc}
      */
-    protected function getPostAlterTableIndexForeignKeySQL(TableDiff $diff) {
+    protected function getPostAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         return array_merge(
                 parent::getPostAlterTableIndexForeignKeySQL($diff), $this->getPostAlterTableRenameIndexForeignKeySQL($diff)
         );
@@ -755,7 +755,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      *
      * @return array
      */
-    protected function getPostAlterTableRenameIndexForeignKeySQL(TableDiff $diff) {
+    protected function getPostAlterTableRenameIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $sql = [];
         $tableName = (false !== $diff->newName) ? $diff->getNewName()->getQuotedName($this) : $diff->getName($this)->getQuotedName($this);
 
@@ -771,7 +771,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     /**
      * {@inheritDoc}
      */
-    protected function getCreateIndexSQLFlags(Index $index) {
+    protected function getCreateIndexSQLFlags(CDatabase_Schema_Index $index) {
         $type = '';
         if ($index->isUnique()) {
             $type .= 'UNIQUE ';
@@ -845,7 +845,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     /**
      * {@inheritDoc}
      */
-    public function getAdvancedForeignKeyOptionsSQL(\Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey) {
+    public function getAdvancedForeignKeyOptionsSQL(CDatabase_Schema_ForeignKeyConstraint $foreignKey) {
         $query = '';
         if ($foreignKey->hasOption('match')) {
             $query .= ' MATCH ' . $foreignKey->getOption('match');

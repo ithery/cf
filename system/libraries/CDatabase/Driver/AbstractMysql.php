@@ -9,6 +9,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implements CDatabase_Driver_VersionAwarePlatformInterface, CDatabase_Driver_ServerInfoAwareInterface {
 
-    
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatabase(CDatabase $db) {
+        $params = $db->config();
+        $dbname = carr::path($params, 'connection.database');
+        if ($dbname == null) {
+            $dbname = $conn->query('SELECT DATABASE()')->fetchColumn();
+        }
+    }
 
 }

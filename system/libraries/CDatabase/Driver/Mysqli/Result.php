@@ -161,7 +161,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
      * {@inheritdoc}
      */
     public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
-        return $this->result_array();
+        return $this->result_array(false);
     }
 
 }

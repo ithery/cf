@@ -23,7 +23,18 @@ class CDatabase {
      * @var CDatabase_Platform
      */
     protected $platform;
+
+    /**
+     *
+     * @var CEventManager
+     */
     protected $eventManager;
+
+    /**
+     *
+     * @var CDatabase_Configuration
+     */
+    protected $configuration;
     // Configuration
     protected $config = array(
         'benchmark' => TRUE,
@@ -248,6 +259,8 @@ class CDatabase {
 
 
         $this->eventManager = new CEventManager();
+
+        $this->configuration = new CDatabase_Configuration();
 
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
@@ -1578,6 +1591,24 @@ class CDatabase {
 
         // Unable to detect platform version.
         return null;
+    }
+
+    /**
+     * Gets the Configuration used by the Connection.
+     *
+     * @return CDatabase_Configuration
+     */
+    public function getConfiguration() {
+        return $this->configuration;
+    }
+
+    /**
+     * Gets the name of the database this Connection is connected to.
+     *
+     * @return string
+     */
+    public function getDatabase() {
+        return $this->driver->getDatabase($this);
     }
 
 }

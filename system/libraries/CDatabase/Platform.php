@@ -101,14 +101,14 @@ abstract class CDatabase_Platform {
     protected $doctrineTypeComments = null;
 
     /**
-     * @var \Doctrine\Common\EventManager
+     * @var CEventManager
      */
     protected $_eventManager;
 
     /**
      * Holds the KeywordList instance for the current platform.
      *
-     * @var \Doctrine\DBAL\Platforms\Keywords\KeywordList
+     * @var CDatabase_Platform_Keywords
      */
     protected $_keywords;
 
@@ -131,7 +131,7 @@ abstract class CDatabase_Platform {
     /**
      * Gets the EventManager used by the Platform.
      *
-     * @return \Doctrine\Common\EventManager
+     * @return CEventManager
      */
     public function getEventManager() {
         return $this->_eventManager;
@@ -198,8 +198,8 @@ abstract class CDatabase_Platform {
     private function initializeAllDoctrineTypeMappings() {
         $this->initializeDoctrineTypeMappings();
 
-        foreach (Type::getTypesMap() as $typeName => $className) {
-            foreach (Type::getType($typeName)->getMappedDatabaseTypes($this) as $dbType) {
+        foreach (CDatabase_Type::getTypesMap() as $typeName => $className) {
+            foreach (CDatabase_Type::getType($typeName)->getMappedDatabaseTypes($this) as $dbType) {
                 $this->doctrineTypeMapping[$dbType] = $typeName;
             }
         }
@@ -414,8 +414,8 @@ abstract class CDatabase_Platform {
     protected function initializeCommentedDoctrineTypes() {
         $this->doctrineTypeComments = [];
 
-        foreach (Type::getTypesMap() as $typeName => $className) {
-            $type = Type::getType($typeName);
+        foreach (CDatabase_Type::getTypesMap() as $typeName => $className) {
+            $type = CDatabase_Type::getType($typeName);
 
             if ($type->requiresSQLCommentHint($this)) {
                 $this->doctrineTypeComments[] = $typeName;
@@ -426,11 +426,11 @@ abstract class CDatabase_Platform {
     /**
      * Is it necessary for the platform to add a parsable type comment to allow reverse engineering the given type?
      *
-     * @param \Doctrine\DBAL\Types\Type $doctrineType
+     * @param CDatabase_Type $doctrineType
      *
      * @return bool
      */
-    public function isCommentedDoctrineType(Type $doctrineType) {
+    public function isCommentedDoctrineType(CDatabase_Type $doctrineType) {
         if ($this->doctrineTypeComments === null) {
             $this->initializeCommentedDoctrineTypes();
         }
@@ -456,22 +456,22 @@ abstract class CDatabase_Platform {
     /**
      * Gets the comment to append to a column comment that helps parsing this type in reverse engineering.
      *
-     * @param \Doctrine\DBAL\Types\Type $doctrineType
+     * @param CDatabase_Type $doctrineType
      *
      * @return string
      */
-    public function getDoctrineTypeComment(Type $doctrineType) {
+    public function getDoctrineTypeComment(CDatabase_Type $doctrineType) {
         return '(DC2Type:' . $doctrineType->getName() . ')';
     }
 
     /**
      * Gets the comment of a passed column modified by potential doctrine type comment hints.
      *
-     * @param \Doctrine\DBAL\Schema\Column $column
+     * @param CDatabase_Schema_Column $column
      *
      * @return string
      */
-    protected function getColumnComment(Column $column) {
+    protected function getColumnComment(CDatabase_Schema_Column $column) {
         $comment = $column->getComment();
 
         if ($this->isCommentedDoctrineType($column->getType())) {
@@ -1283,7 +1283,7 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL snippet to drop an existing table.
      *
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param CDatabase_Schema_Table|string $table
      *
      * @return string
      *
@@ -1292,13 +1292,13 @@ abstract class CDatabase_Platform {
     public function getDropTableSQL($table) {
         $tableArg = $table;
 
-        if ($table instanceof Table) {
+        if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         } elseif (!is_string($table)) {
-            throw new \InvalidArgumentException('getDropTableSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
+            throw new \InvalidArgumentException('getDropTableSQL() expects $table parameter to be string or CDatabase_Schema_Table.');
         }
 
-        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(Events::onSchemaDropTable)) {
+        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Events::onSchemaDropTable)) {
             $eventArgs = new SchemaDropTableEventArgs($tableArg, $this);
             $this->_eventManager->dispatchEvent(Events::onSchemaDropTable, $eventArgs);
 
@@ -1313,7 +1313,7 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to safely drop a temporary table WITHOUT implicitly committing an open transaction.
      *
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param CDatabase_Schema_Table|string $table
      *
      * @return string
      */
@@ -1324,8 +1324,8 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to drop an index from a table.
      *
-     * @param \Doctrine\DBAL\Schema\Index|string $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param CDatabase_Schema_Index|string $index
+     * @param CDatabase_Schema_Table|string $table
      *
      * @return string
      *
@@ -1335,7 +1335,7 @@ abstract class CDatabase_Platform {
         if ($index instanceof Index) {
             $index = $index->getQuotedName($this);
         } elseif (!is_string($index)) {
-            throw new \InvalidArgumentException('AbstractPlatform::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
+            throw new \InvalidArgumentException('AbstractPlatform::getDropIndexSQL() expects $index parameter to be string or CDatabase_Schema_Index.');
         }
 
         return 'DROP INDEX ' . $index;
@@ -1344,8 +1344,8 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to drop a constraint.
      *
-     * @param \Doctrine\DBAL\Schema\Constraint|string $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string      $table
+     * @param CDatabase_Schema_Constraint|string $constraint
+     * @param CDatabase_Schema_Table|string      $table
      *
      * @return string
      */
@@ -1367,8 +1367,8 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to drop a foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint|string $foreignKey
-     * @param \Doctrine\DBAL\Schema\Table|string                $table
+     * @param CDatabase_Schema_ForeignKeyConstraint|string $foreignKey
+     * @param CDatabase_Schema_Table|string                $table
      *
      * @return string
      */
@@ -1391,21 +1391,21 @@ abstract class CDatabase_Platform {
      * Returns the SQL statement(s) to create a table with the specified name, columns and constraints
      * on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Table $table
+     * @param CDatabase_Schema_Table $table
      * @param int                         $createFlags
      *
      * @return array The sequence of SQL statements.
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws CDatabase_Exception
      * @throws \InvalidArgumentException
      */
-    public function getCreateTableSQL(Table $table, $createFlags = self::CREATE_INDEXES) {
+    public function getCreateTableSQL(CDatabase_Schema_Table $table, $createFlags = self::CREATE_INDEXES) {
         if (!is_int($createFlags)) {
             throw new \InvalidArgumentException("Second argument of AbstractPlatform::getCreateTableSQL() has to be integer.");
         }
 
         if (count($table->getColumns()) === 0) {
-            throw DBALException::noColumnsSpecifiedForTable($table->getName());
+            throw CDatabase_Exception::noColumnsSpecifiedForTable($table->getName());
         }
 
         $tableName = $table->getQuotedName($this);
@@ -1430,9 +1430,9 @@ abstract class CDatabase_Platform {
         $columns = [];
 
         foreach ($table->getColumns() as $column) {
-            /* @var \Doctrine\DBAL\Schema\Column $column */
+            /* @var CDatabase_Schema_Column $column */
 
-            if (null !== $this->_eventManager && $this->_eventManager->hasListeners(Events::onSchemaCreateTableColumn)) {
+            if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Events::onSchemaCreateTableColumn)) {
                 $eventArgs = new SchemaCreateTableColumnEventArgs($column, $table, $this);
                 $this->_eventManager->dispatchEvent(Events::onSchemaCreateTableColumn, $eventArgs);
 
@@ -1466,7 +1466,7 @@ abstract class CDatabase_Platform {
             }
         }
 
-        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(Events::onSchemaCreateTable)) {
+        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Events::onSchemaCreateTable)) {
             $eventArgs = new SchemaCreateTableEventArgs($table, $columns, $options, $this);
             $this->_eventManager->dispatchEvent(Events::onSchemaCreateTable, $eventArgs);
 
@@ -1579,7 +1579,7 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to create a sequence on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param CDatabase_Schema_Sequence $sequence
      *
      * @return string
      *
@@ -1592,7 +1592,7 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to change a sequence on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param CDatabase_Schema_Sequence $sequence
      *
      * @return string
      *
@@ -1605,8 +1605,8 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to create a constraint on a table on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param CDatabase_Schema_Constraint   $constraint
+     * @param CDatabase_Schema_Table|string $table
      *
      * @return string
      *
@@ -1646,14 +1646,14 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to create an index on a table on this platform.
      *
-     * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table The name of the table on which the index is to be created.
+     * @param CDatabase_Schema_Index        $index
+     * @param CDatabase_Schema_Table|string $table The name of the table on which the index is to be created.
      *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function getCreateIndexSQL(Index $index, $table) {
+    public function getCreateIndexSQL(CDatabase_Schema_Index $index, $table) {
         if ($table instanceof Table) {
             $table = $table->getQuotedName($this);
         }
@@ -1677,11 +1677,11 @@ abstract class CDatabase_Platform {
     /**
      * Adds condition for partial index.
      *
-     * @param \Doctrine\DBAL\Schema\Index $index
+     * @param CDatabase_Schema_Index $index
      *
      * @return string
      */
-    protected function getPartialIndexSQL(Index $index) {
+    protected function getPartialIndexSQL(CDatabase_Schema_Index $index) {
         if ($this->supportsPartialIndexes() && $index->hasOption('where')) {
             return ' WHERE ' . $index->getOption('where');
         }
@@ -1692,19 +1692,19 @@ abstract class CDatabase_Platform {
     /**
      * Adds additional flags for index generation.
      *
-     * @param \Doctrine\DBAL\Schema\Index $index
+     * @param CDatabase_Schema_Index $index
      *
      * @return string
      */
-    protected function getCreateIndexSQLFlags(Index $index) {
+    protected function getCreateIndexSQLFlags(CDatabase_Schema_Index $index) {
         return $index->isUnique() ? 'UNIQUE ' : '';
     }
 
     /**
      * Returns the SQL to create an unnamed primary key constraint.
      *
-     * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param CDatabase_Schema_Index        $index
+     * @param CDatabase_Schema_Table|string $table
      *
      * @return string
      */
@@ -1763,13 +1763,13 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL to create a new foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey The foreign key constraint.
-     * @param \Doctrine\DBAL\Schema\Table|string         $table      The name of the table on which the foreign key is to be created.
+     * @param CDatabase_Schema_ForeignKeyConstraint $foreignKey The foreign key constraint.
+     * @param CDatabase_Schema_Table|string         $table      The name of the table on which the foreign key is to be created.
      *
      * @return string
      */
-    public function getCreateForeignKeySQL(ForeignKeyConstraint $foreignKey, $table) {
-        if ($table instanceof Table) {
+    public function getCreateForeignKeySQL(CDatabase_Schema_ForeignKeyConstraint $foreignKey, $table) {
+        if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         }
 
@@ -1783,29 +1783,29 @@ abstract class CDatabase_Platform {
      *
      * This method returns an array of SQL statements, since some platforms need several statements.
      *
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
+     * @param CDatabase_Schema_Table_Diff $diff
      *
      * @return array
      *
      * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
      */
-    public function getAlterTableSQL(TableDiff $diff) {
+    public function getAlterTableSQL(CDatabase_Schema_Table_Diff $diff) {
         throw DBALException::notSupported(__METHOD__);
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\Column    $column
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
-     * @param array                           $columnSql
+     * @param CDatabase_Schema_Column           $column
+     * @param CDatabase_Schema_Table_Diff       $diff
+     * @param array                             $columnSql
      *
      * @return bool
      */
-    protected function onSchemaAlterTableAddColumn(Column $column, TableDiff $diff, &$columnSql) {
+    protected function onSchemaAlterTableAddColumn(CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
         if (null === $this->_eventManager) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(Events::onSchemaAlterTableAddColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableAddColumn)) {
             return false;
         }
 
@@ -1818,23 +1818,23 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\Column    $column
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
-     * @param array                           $columnSql
+     * @param CDatabase_Schema_Column           $column
+     * @param CDatabase_Schema_Table_Diff       $diff
+     * @param array                             $columnSql
      *
      * @return bool
      */
-    protected function onSchemaAlterTableRemoveColumn(Column $column, TableDiff $diff, &$columnSql) {
+    protected function onSchemaAlterTableRemoveColumn(CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
         if (null === $this->_eventManager) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(Events::onSchemaAlterTableRemoveColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableRemoveColumn)) {
             return false;
         }
 
         $eventArgs = new SchemaAlterTableRemoveColumnEventArgs($column, $diff, $this);
-        $this->_eventManager->dispatchEvent(Events::onSchemaAlterTableRemoveColumn, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTableRemoveColumn, $eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1842,8 +1842,8 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\ColumnDiff $columnDiff
-     * @param \Doctrine\DBAL\Schema\TableDiff  $diff
+     * @param CDatabase_Schema_ColumnDiff $columnDiff
+     * @param CDatabase_Schema_TableDiff  $diff
      * @param array                            $columnSql
      *
      * @return bool
@@ -1867,8 +1867,8 @@ abstract class CDatabase_Platform {
 
     /**
      * @param string                          $oldColumnName
-     * @param \Doctrine\DBAL\Schema\Column    $column
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
+     * @param CDatabase_Schema_Column    $column
+     * @param CDatabase_Schema_TableDiff $diff
      * @param array                           $columnSql
      *
      * @return bool
@@ -1891,22 +1891,22 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
-     * @param array                           $sql
+     * @param CDatabase_Schema_Table_Diff       $diff
+     * @param array                             $sql
      *
      * @return bool
      */
-    protected function onSchemaAlterTable(TableDiff $diff, &$sql) {
+    protected function onSchemaAlterTable(CDatabase_Schema_Table_Diff $diff, &$sql) {
         if (null === $this->_eventManager) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(Events::onSchemaAlterTable)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTable)) {
             return false;
         }
 
         $eventArgs = new SchemaAlterTableEventArgs($diff, $this);
-        $this->_eventManager->dispatchEvent(Events::onSchemaAlterTable, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTable, $eventArgs);
 
         $sql = array_merge($sql, $eventArgs->getSql());
 
@@ -1914,11 +1914,11 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
+     * @param CDatabase_Schema_Table_Diff $diff
      *
      * @return array
      */
-    protected function getPreAlterTableIndexForeignKeySQL(TableDiff $diff) {
+    protected function getPreAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $tableName = $diff->getName($this)->getQuotedName($this);
 
         $sql = [];
@@ -1942,11 +1942,11 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
+     * @param CDatabase_Schema_Table_Diff $diff
      *
      * @return array
      */
-    protected function getPostAlterTableIndexForeignKeySQL(TableDiff $diff) {
+    protected function getPostAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $tableName = (false !== $diff->newName) ? $diff->getNewName()->getQuotedName($this) : $diff->getName($this)->getQuotedName($this);
 
         $sql = [];
@@ -1970,7 +1970,7 @@ abstract class CDatabase_Platform {
         }
 
         foreach ($diff->renamedIndexes as $oldIndexName => $index) {
-            $oldIndexName = new Identifier($oldIndexName);
+            $oldIndexName = new CDatabase_Schema_Identifier($oldIndexName);
             $sql = array_merge(
                     $sql, $this->getRenameIndexSQL($oldIndexName->getQuotedName($this), $index, $tableName)
             );
@@ -1983,12 +1983,12 @@ abstract class CDatabase_Platform {
      * Returns the SQL for renaming an index on a table.
      *
      * @param string                      $oldIndexName The name of the index to rename from.
-     * @param \Doctrine\DBAL\Schema\Index $index        The definition of the index to rename to.
+     * @param CDatabase_Schema_Index $index        The definition of the index to rename to.
      * @param string                      $tableName    The table to rename the given index on.
      *
      * @return array The sequence of SQL statements for renaming the given index.
      */
-    protected function getRenameIndexSQL($oldIndexName, Index $index, $tableName) {
+    protected function getRenameIndexSQL($oldIndexName, CDatabase_Schema_Index $index, $tableName) {
         return [
             $this->getDropIndexSQL($oldIndexName, $tableName),
             $this->getCreateIndexSQL($index, $tableName)
@@ -1998,7 +1998,7 @@ abstract class CDatabase_Platform {
     /**
      * Common code for alter table statement generation that updates the changed Index and Foreign Key definitions.
      *
-     * @param \Doctrine\DBAL\Schema\TableDiff $diff
+     * @param CDatabase_Schema_TableDiff $diff
      *
      * @return array
      */
@@ -2199,7 +2199,7 @@ abstract class CDatabase_Platform {
      * constraint declaration to be used in statements like CREATE TABLE.
      *
      * @param string                      $name  The name of the unique constraint.
-     * @param \Doctrine\DBAL\Schema\Index $index The index definition.
+     * @param CDatabase_Schema_Index $index The index definition.
      *
      * @return string DBMS specific SQL code portion needed to set a constraint.
      *
@@ -2223,15 +2223,15 @@ abstract class CDatabase_Platform {
      * declaration to be used in statements like CREATE TABLE.
      *
      * @param string                      $name  The name of the index.
-     * @param \Doctrine\DBAL\Schema\Index $index The index definition.
+     * @param CDatabase_Schema_Index $index The index definition.
      *
      * @return string DBMS specific SQL code portion needed to set an index.
      *
      * @throws \InvalidArgumentException
      */
-    public function getIndexDeclarationSQL($name, Index $index) {
+    public function getIndexDeclarationSQL($name, CDatabase_Schema_Index $index) {
         $columns = $index->getQuotedColumns($this);
-        $name = new Identifier($name);
+        $name = new CDatabase_Schema_Identifier($name);
 
         if (count($columns) === 0) {
             throw new \InvalidArgumentException("Incomplete definition. 'columns' required.");
@@ -2310,12 +2310,12 @@ abstract class CDatabase_Platform {
      * Obtain DBMS specific SQL code portion needed to set the FOREIGN KEY constraint
      * of a field declaration to be used in statements like CREATE TABLE.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey
+     * @param CDatabase_Schema_ForeignKeyConstraint $foreignKey
      *
      * @return string DBMS specific SQL code portion needed to set the FOREIGN KEY constraint
      *                of a field declaration.
      */
-    public function getForeignKeyDeclarationSQL(ForeignKeyConstraint $foreignKey) {
+    public function getForeignKeyDeclarationSQL(CDatabase_Schema_ForeignKeyConstraint $foreignKey) {
         $sql = $this->getForeignKeyBaseDeclarationSQL($foreignKey);
         $sql .= $this->getAdvancedForeignKeyOptionsSQL($foreignKey);
 
@@ -2326,11 +2326,11 @@ abstract class CDatabase_Platform {
      * Returns the FOREIGN KEY query section dealing with non-standard options
      * as MATCH, INITIALLY DEFERRED, ON UPDATE, ...
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey The foreign key definition.
+     * @param CDatabase_Schema_ForeignKeyConstraint $foreignKey The foreign key definition.
      *
      * @return string
      */
-    public function getAdvancedForeignKeyOptionsSQL(ForeignKeyConstraint $foreignKey) {
+    public function getAdvancedForeignKeyOptionsSQL(CDatabase_Schema_ForeignKeyConstraint $foreignKey) {
         $query = '';
         if ($this->supportsForeignKeyOnUpdate() && $foreignKey->hasOption('onUpdate')) {
             $query .= ' ON UPDATE ' . $this->getForeignKeyReferentialActionSQL($foreignKey->getOption('onUpdate'));
@@ -2369,13 +2369,13 @@ abstract class CDatabase_Platform {
      * Obtains DBMS specific SQL code portion needed to set the FOREIGN KEY constraint
      * of a field declaration to be used in statements like CREATE TABLE.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey
+     * @param CDatabase_Schema_ForeignKeyConstraint $foreignKey
      *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function getForeignKeyBaseDeclarationSQL(ForeignKeyConstraint $foreignKey) {
+    public function getForeignKeyBaseDeclarationSQL(CDatabase_Schema_ForeignKeyConstraint $foreignKey) {
         $sql = '';
         if (strlen($foreignKey->getName())) {
             $sql .= 'CONSTRAINT ' . $foreignKey->getQuotedName($this) . ' ';
@@ -3285,9 +3285,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the keyword list instance of this platform.
      *
-     * @return \Doctrine\DBAL\Platforms\Keywords\KeywordList
+     * @return CDatabase_Platform_Keywords
      *
-     * @throws \Doctrine\DBAL\DBALException If no keyword list is specified.
+     * @throws CDatabase_Exception If no keyword list is specified.
      */
     final public function getReservedKeywordsList() {
 // Check for an existing instantiation of the keywords class.
@@ -3297,7 +3297,7 @@ abstract class CDatabase_Platform {
 
         $class = $this->getReservedKeywordsClass();
         $keywords = new $class;
-        if (!$keywords instanceof \Doctrine\DBAL\Platforms\Keywords\KeywordList) {
+        if (!$keywords instanceof CDatabase_Platform_Keywords) {
             throw DBALException::notSupported(__METHOD__);
         }
 

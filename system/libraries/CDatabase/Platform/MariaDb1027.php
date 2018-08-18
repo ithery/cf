@@ -29,7 +29,7 @@ final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_Mysql {
      * {@inheritdoc}
      */
     protected function getReservedKeywordsClass() {
-        return Keywords\MariaDb102Keywords::class;
+        return CDatabase_Platform_Keywords_MariaDb102::class;
     }
 
     /**
@@ -38,7 +38,7 @@ final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_Mysql {
     protected function initializeDoctrineTypeMappings() {
         parent::initializeDoctrineTypeMappings();
 
-        $this->doctrineTypeMapping['json'] = Type::JSON;
+        $this->doctrineTypeMapping['json'] = CDatabase_Type::JSON;
     }
 
 }
