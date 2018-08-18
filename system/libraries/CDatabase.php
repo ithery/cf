@@ -11,6 +11,19 @@ class CDatabase {
     public $domain;
     public $name;
     public $config_file;
+
+    /**
+     *
+     * @var CDatabase_Schema_Manager
+     */
+    protected $schemaManager;
+
+    /**
+     *
+     * @var CDatabase_Platform
+     */
+    protected $platform;
+    protected $eventManager;
     // Configuration
     protected $config = array(
         'benchmark' => TRUE,
@@ -234,9 +247,12 @@ class CDatabase {
         CModel::setConnectionResolver($connectionResolver);
 
 
+        $this->eventManager = new CEventManager();
+
         // Validate the driver
-        if (!($this->driver instanceof CDatabase_Driver))
+        if (!($this->driver instanceof CDatabase_Driver)) {
             throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', array(':driver' => $this->config['connection']['type'], ':class' => get_class($this), ':interface' => 'CDatabase_Driver'));
+        }
 
         CF::log(CLogger::DEBUG, 'Database Library initialized');
     }
@@ -1407,6 +1423,19 @@ class CDatabase {
         return ucfirst($this->config['connection']['type']);
     }
 
+    /**
+     * Prepares and executes an SQL query and returns the result as an associative array.
+     *
+     * @param string $sql    The SQL query.
+     * @param array  $params The query parameters.
+     * @param array  $types  The query parameter types.
+     *
+     * @return array
+     */
+    public function fetchAll($sql, array $params = [], $types = []) {
+        return $this->query($sql, $params, $types)->fetchAll();
+    }
+
     public function table($table) {
         return (new CDatabase_Query_Builder($this))->from($table);
     }
@@ -1455,6 +1484,100 @@ class CDatabase {
 
     public function getName() {
         return $this->name;
+    }
+
+    /**
+     * Gets the SchemaManager that can be used to inspect or change the
+     * database schema through the connection.
+     *
+     * @return CDatabase_Schema_AbstractSchemaManager
+     */
+    public function getSchemaManager() {
+        if (!$this->schemaManager) {
+            $this->schemaManager = $this->driver->getSchemaManager($this);
+        }
+
+        return $this->schemaManager;
+    }
+
+    /**
+     * Gets the DatabasePlatform for the connection.
+     *
+     * @return CDatabase_Platform
+     *
+     * @throws CDatabase_Exception
+     */
+    public function getDatabasePlatform() {
+        if (null === $this->platform) {
+            $this->detectDatabasePlatform();
+        }
+
+        return $this->platform;
+    }
+
+    /**
+     * Detects and sets the database platform.
+     *
+     * Evaluates custom platform class and version in order to set the correct platform.
+     *
+     * @throws CDatabase_Exception if an invalid platform was specified for this connection.
+     */
+    private function detectDatabasePlatform() {
+        $version = $this->getDatabasePlatformVersion();
+
+        if ($version !== null) {
+            assert($this->driver instanceof CDatabase_Driver_VersionAwarePlatformInterface);
+
+            $this->platform = $this->driver->createDatabasePlatformForVersion($version);
+        } else {
+            $this->platform = $this->driver->getDatabasePlatform();
+        }
+
+        $this->platform->setEventManager($this->eventManager);
+    }
+
+    /**
+     * Returns the version of the related platform if applicable.
+     *
+     * Returns null if either the driver is not capable to create version
+     * specific platform instances, no explicit server version was specified
+     * or the underlying driver connection cannot determine the platform
+     * version without having to query it (performance reasons).
+     *
+     * @return string|null
+     *
+     * @throws Exception
+     */
+    private function getDatabasePlatformVersion() {
+        // Driver does not support version specific platforms.
+
+        if (!($this->driver instanceof CDatabase_Driver_VersionAwarePlatformInterface)) {
+            return null;
+        }
+
+        // Explicit platform version requested (supersedes auto-detection).
+        if (isset($this->config['serverVersion'])) {
+            return $this->config['serverVersion'];
+        }
+
+
+        return $this->getServerVersion();
+    }
+
+    /**
+     * Returns the database server version if the underlying driver supports it.
+     *
+     * @return string|null
+     */
+    private function getServerVersion() {
+        // Automatic platform version detection.
+
+        if ($this->driver instanceof CDatabase_Driver_ServerInfoAwareInterface && !$this->driver->requiresQueryForServerVersion()) {
+            return $this->driver->getServerVersion();
+        }
+
+        // Unable to detect platform version.
+        return null;
     }
 
 }

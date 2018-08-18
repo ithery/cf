@@ -1,11 +1,10 @@
 <?php
 
-
 /**
  * CDatabase_Result
  *
  */
-abstract class CDatabase_Result implements ArrayAccess, Iterator, Countable {
+abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAccess, Iterator, Countable {
 
     // Result resource, insert id, and SQL
     protected $result;
