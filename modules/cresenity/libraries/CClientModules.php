@@ -70,9 +70,9 @@ final class CClientModules {
         if ($last_req != null) {
             $node = $tree->get_node($last_req);
         }
-        if ($tree->get_node($module) == null) {
+        if ($tree->getNode($module) == null) {
             if (isset($mod['js'])) {
-                $tree->add_child($node, $module, $mod['js']);
+                $tree->addChild($node, $module, $mod['js']);
             }
         }
     }
@@ -86,7 +86,7 @@ final class CClientModules {
         return $tree;
     }
 
-    public static function walker_callback($tree, $node, $text) {
+    public static function walkerCallback($tree, $node, $text) {
 
         if (is_array($text)) {
             $text = implode(",", $text);
