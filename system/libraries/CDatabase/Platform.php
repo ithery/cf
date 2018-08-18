@@ -1373,12 +1373,12 @@ abstract class CDatabase_Platform {
      * @return string
      */
     public function getDropForeignKeySQL($foreignKey, $table) {
-        if (!$foreignKey instanceof ForeignKeyConstraint) {
-            $foreignKey = new Identifier($foreignKey);
+        if (!$foreignKey instanceof CDatabase_Schema_ForeignKeyConstraint) {
+            $foreignKey = new CDatabase_Schema_Identifier($foreignKey);
         }
 
-        if (!$table instanceof Table) {
-            $table = new Identifier($table);
+        if (!$table instanceof CDatabase_Schema_Table) {
+            $table = new CDatabase_Schema_Identifier($table);
         }
 
         $foreignKey = $foreignKey->getQuotedName($this);

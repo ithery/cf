@@ -53,7 +53,7 @@ abstract class CDatabase_AbstractAsset {
             $this->_namespace = $parts[0];
             $name = $parts[1];
         }
-        
+
         $this->_name = $name;
     }
 
@@ -155,11 +155,11 @@ abstract class CDatabase_AbstractAsset {
      * @return string
      */
     public function getName() {
-       
+
         if ($this->_namespace) {
             return $this->_namespace . "." . $this->_name;
         }
-        
+
         return $this->_name;
     }
 
