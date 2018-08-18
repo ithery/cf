@@ -441,7 +441,7 @@ abstract class CDatabase_Platform {
     /**
      * Marks this type as to be commented in ALTER TABLE and CREATE TABLE statements.
      *
-     * @param string|\Doctrine\DBAL\Types\Type $doctrineType
+     * @param string|CDatabase_Type $doctrineType
      *
      * @return void
      */
@@ -450,7 +450,7 @@ abstract class CDatabase_Platform {
             $this->initializeCommentedDoctrineTypes();
         }
 
-        $this->doctrineTypeComments[] = $doctrineType instanceof Type ? $doctrineType->getName() : $doctrineType;
+        $this->doctrineTypeComments[] = $doctrineType instanceof CDatabase_Type ? $doctrineType->getName() : $doctrineType;
     }
 
     /**
@@ -1332,7 +1332,7 @@ abstract class CDatabase_Platform {
      * @throws \InvalidArgumentException
      */
     public function getDropIndexSQL($index, $table = null) {
-        if ($index instanceof Index) {
+        if ($index instanceof CDatabase_Schema_Index) {
             $index = $index->getQuotedName($this);
         } elseif (!is_string($index)) {
             throw new \InvalidArgumentException('AbstractPlatform::getDropIndexSQL() expects $index parameter to be string or CDatabase_Schema_Index.');
@@ -1350,12 +1350,12 @@ abstract class CDatabase_Platform {
      * @return string
      */
     public function getDropConstraintSQL($constraint, $table) {
-        if (!$constraint instanceof Constraint) {
-            $constraint = new Identifier($constraint);
+        if (!$constraint instanceof CDatabase_Schema_Constraint) {
+            $constraint = new CDatabase_Schema_Identifier($constraint);
         }
 
-        if (!$table instanceof Table) {
-            $table = new Identifier($table);
+        if (!$table instanceof CDatabase_Schema_Table) {
+            $table = new CDatabase_Schema_Identifier($table);
         }
 
         $constraint = $constraint->getQuotedName($this);
@@ -1448,7 +1448,7 @@ abstract class CDatabase_Platform {
             $columnData['version'] = $column->hasPlatformOption("version") ? $column->getPlatformOption('version') : false;
             $columnData['comment'] = $this->getColumnComment($column);
 
-            if ($columnData['type'] instanceof Types\StringType && $columnData['length'] === null) {
+            if ($columnData['type'] instanceof CDatabase_Type_StringType && $columnData['length'] === null) {
                 $columnData['length'] = 255;
             }
 
@@ -1612,8 +1612,8 @@ abstract class CDatabase_Platform {
      *
      * @throws \InvalidArgumentException
      */
-    public function getCreateConstraintSQL(Constraint $constraint, $table) {
-        if ($table instanceof Table) {
+    public function getCreateConstraintSQL(CDatabase_Schema_Constraint $constraint, $table) {
+        if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         }
 
@@ -1622,7 +1622,7 @@ abstract class CDatabase_Platform {
         $columnList = '(' . implode(', ', $constraint->getQuotedColumns($this)) . ')';
 
         $referencesClause = '';
-        if ($constraint instanceof Index) {
+        if ($constraint instanceof CDatabase_Schema_Index) {
             if ($constraint->isPrimary()) {
                 $query .= ' PRIMARY KEY';
             } elseif ($constraint->isUnique()) {
@@ -1632,7 +1632,7 @@ abstract class CDatabase_Platform {
                 'Can only create primary or unique constraints, no common indexes with getCreateConstraintSQL().'
                 );
             }
-        } elseif ($constraint instanceof ForeignKeyConstraint) {
+        } elseif ($constraint instanceof CDatabase_Schema_ForeignKeyConstraint) {
             $query .= ' FOREIGN KEY';
 
             $referencesClause = ' REFERENCES ' . $constraint->getQuotedForeignTableName($this) .
@@ -1654,7 +1654,7 @@ abstract class CDatabase_Platform {
      * @throws \InvalidArgumentException
      */
     public function getCreateIndexSQL(CDatabase_Schema_Index $index, $table) {
-        if ($table instanceof Table) {
+        if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         }
         $name = $index->getQuotedName($this);
@@ -2144,23 +2144,23 @@ abstract class CDatabase_Platform {
 
         $type = $field['type'];
 
-        if ($type instanceof Types\PhpIntegerMappingType) {
+        if ($type instanceof CDatabase_Type_Interface_PhpIntegerMappingTypeInterface) {
             return ' DEFAULT ' . $default;
         }
 
-        if ($type instanceof Types\PhpDateTimeMappingType && $default === $this->getCurrentTimestampSQL()) {
+        if ($type instanceof CDatabase_Type_Interface_PhpDateTimeMappingTypeInterface && $default === $this->getCurrentTimestampSQL()) {
             return ' DEFAULT ' . $this->getCurrentTimestampSQL();
         }
 
-        if ($type instanceof Types\TimeType && $default === $this->getCurrentTimeSQL()) {
+        if ($type instanceof CDatabase_Type_TimeType && $default === $this->getCurrentTimeSQL()) {
             return ' DEFAULT ' . $this->getCurrentTimeSQL();
         }
 
-        if ($type instanceof Types\DateType && $default === $this->getCurrentDateSQL()) {
+        if ($type instanceof CDatabase_Type_DateType && $default === $this->getCurrentDateSQL()) {
             return ' DEFAULT ' . $this->getCurrentDateSQL();
         }
 
-        if ($type instanceof Types\BooleanType) {
+        if ($type instanceof CDatabase_Type_BooleanType) {
             return " DEFAULT '" . $this->convertBooleans($default) . "'";
         }
 

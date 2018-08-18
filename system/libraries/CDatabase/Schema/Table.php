@@ -388,7 +388,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @throws SchemaException
      */
     public function addNamedForeignKeyConstraint($name, $foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = []) {
-        if ($foreignTable instanceof Table) {
+        if ($foreignTable instanceof CDatabase_Schema_Table) {
             foreach ($foreignColumnNames as $columnName) {
                 if (!$foreignTable->hasColumn($columnName)) {
                     throw CDatabase_Schema_Exception::columnDoesNotExist($columnName, $foreignTable->getName());

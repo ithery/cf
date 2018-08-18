@@ -403,7 +403,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      */
     public function getDefaultValueDeclarationSQL($field) {
         // Unset the default value if the given field definition does not allow default values.
-        if ($field['type'] instanceof TextType || $field['type'] instanceof BlobType) {
+        if ($field['type'] instanceof CDatabase_Type_TextType || $field['type'] instanceof CDatabase_Type_BlobType) {
             $field['default'] = null;
         }
 
@@ -516,7 +516,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             // Don't propagate default value changes for unsupported column types.
             if ($columnDiff->hasChanged('default') &&
                     count($columnDiff->changedProperties) === 1 &&
-                    ($columnArray['type'] instanceof TextType || $columnArray['type'] instanceof BlobType)
+                    ($columnArray['type'] instanceof CDatabase_Type_TextType || $columnArray['type'] instanceof CDatabase_Type_BlobType)
             ) {
                 continue;
             }
@@ -665,7 +665,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
 
         foreach ($diff->changedIndexes as $changedIndex) {
             // Changed primary key
-            if ($changedIndex->isPrimary() && $diff->fromTable instanceof Table) {
+            if ($changedIndex->isPrimary() && $diff->fromTable instanceof CDatabase_Schema_Table) {
                 foreach ($diff->fromTable->getPrimaryKeyColumns() as $columnName) {
                     $column = $diff->fromTable->getColumn($columnName);
 
@@ -718,7 +718,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * @return array
      */
     private function getRemainingForeignKeyConstraintsRequiringRenamedIndexes(CDatabase_Schema_Table_Diff $diff) {
-        if (empty($diff->renamedIndexes) || !$diff->fromTable instanceof Table) {
+        if (empty($diff->renamedIndexes) || !$diff->fromTable instanceof CDatabase_Schema_Table) {
             return [];
         }
 
@@ -867,7 +867,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
         }
 
-        if ($table instanceof Table) {
+        if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         } elseif (!is_string($table)) {
             throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
@@ -979,7 +979,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * if DROP TEMPORARY TABLE is executed.
      */
     public function getDropTemporaryTableSQL($table) {
-        if ($table instanceof Table) {
+        if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         } elseif (!is_string($table)) {
             throw new \InvalidArgumentException('getDropTemporaryTableSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
