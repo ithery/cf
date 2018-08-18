@@ -35,7 +35,7 @@ class CElastic_Document {
 
     public function bulk($query, $index_field_name = "") {
         $params = ['body' => []];
-
+        
         $i = 0;
 
         $error = 0;
@@ -70,7 +70,9 @@ class CElastic_Document {
             foreach ($row as $key => $val) {
                 //we transform the mapping date to elastic date format
                 if (carr::path($properties, $key . '.type') == 'date') {
-                    $row[$key] = date_format(date_create($val), "Y-m-d") . "T" . date_format(date_create($val), "H:i:s") . ".000Z";
+                    if($val!==null) {
+                        $row[$key] = date_format(date_create($val), "Y-m-d") . "T" . date_format(date_create($val), "H:i:s") . ".000Z";
+                    }
                 }
             }
 
@@ -116,6 +118,7 @@ class CElastic_Document {
         }
 
         if (!empty($params['body']) && $error == 0) {
+           
             $result = $this->client->bulk($params);
 
             if (isset($result["items"])) {
