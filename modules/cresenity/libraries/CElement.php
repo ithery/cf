@@ -74,6 +74,12 @@ abstract class CElement extends CObservable {
         $this->tag = $tag;
     }
 
+    /**
+     * Add class attribute for the element
+     * 
+     * @param string $c
+     * @return $this
+     */
     public function addClass($c) {
         if (is_array($c)) {
             $this->classes = array_merge($c, $this->classes);

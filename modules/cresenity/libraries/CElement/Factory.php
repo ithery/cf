@@ -21,6 +21,7 @@ class CElement_Factory {
             case 'h4':
             case 'h5':
             case 'h6':
+            case 'p':
             case 'ol':
             case 'ul':
             case 'li':
