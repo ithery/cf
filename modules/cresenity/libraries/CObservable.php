@@ -216,6 +216,18 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
+     * Add Paragraph Element &lt;p&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_P  Paragraph Element
+     */
+    public function addP($id = "") {
+        $element = CElement_Factory::createElement('p', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
+    /**
      * Add Ordered List Element &lt;ol&gt
      *
      * @param string $id optional
