@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CHandler_Reload_Driver extends CHandler_Driver {
 
+    use CTrait_Compat_Handler_Driver_Reload;
+
     protected $target;
     protected $method;
     protected $content;
@@ -20,7 +22,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
         $this->param_inputs_by_name = array();
     }
 
-    public function add_param_input($inputs) {
+    public function addParamInput($inputs) {
         if (!is_array($inputs)) {
             $inputs = array($inputs);
         }
@@ -30,7 +32,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
         return $this;
     }
 
-    public function add_param_input_by_name($inputs) {
+    public function addParamInputByName($inputs) {
         if (!is_array($inputs)) {
             $inputs = array($inputs);
         }
@@ -40,14 +42,14 @@ class CHandler_Reload_Driver extends CHandler_Driver {
         return $this;
     }
 
-    public function set_target($target) {
+    public function setTarget($target) {
 
         $this->target = $target;
 
         return $this;
     }
 
-    public function set_method($method) {
+    public function setMethod($method) {
         $this->method = $method;
     }
 
@@ -61,19 +63,19 @@ class CHandler_Reload_Driver extends CHandler_Driver {
 
         foreach ($this->param_inputs as $inp) {
             if (strlen($data_addition) > 0)
-                $data_addition.=',';
-            $data_addition.="'" . $inp . "':$.cresenity.value('#" . $inp . "')";
+                $data_addition .= ',';
+            $data_addition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
         }
         foreach ($this->param_inputs_by_name as $k => $inp) {
             if (strlen($data_addition) > 0)
-                $data_addition.=',';
-            $data_addition.="'" . $k . "':$.cresenity.value('" . $inp . "')";
+                $data_addition .= ',';
+            $data_addition .= "'" . $k . "':$.cresenity.value('" . $inp . "')";
         }
         $data_addition = '{' . $data_addition . '}';
-        $js.= "
+        $js .= "
                 $.cresenity.reload('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
              ";
-       
+
         return $js;
     }
 

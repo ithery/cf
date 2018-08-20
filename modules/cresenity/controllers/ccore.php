@@ -159,6 +159,12 @@ class CCore_Controller extends CController {
             case "imgupload":
                 $response = cajax::imgupload($obj, $input);
                 break;
+            case "dialogselect":
+                $response = cajax::dialogselect($obj, $input);
+                break;
+            case "modaldialogselect":
+                $response = cajax::modaldialogselect($obj, $input);
+                break;
             case "reload":
             case "handler_reload":
                 $response = cajax::handler_reload($obj, $input);

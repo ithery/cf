@@ -16,6 +16,13 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
     private $baseOrder;
     private $query;
     private $db;
+    private $columns;
+
+    /**
+     *
+     * @var CElement_Component_DataTable
+     */
+    private $table;
 
     protected function db() {
         if ($this->db === null) {
@@ -77,9 +84,13 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
     }
 
     protected function getQueryOrderBy() {
+        
         if ($this->queryOrderBy === null) {
             $db = $this->db();
             $sOrder = "";
+            $columns = $this->columns;
+            $table = $this->table;
+            $request = $this->engine->getInput();
             if (isset($request['iSortCol_0'])) {
                 $sOrder = "ORDER BY  ";
                 for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
@@ -87,8 +98,9 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     if ($table->checkbox) {
                         $i2 = -1;
                     }
+                    $fieldName = carr::get($columns[intval($request['iSortCol_' . $i]) + $i2],'fieldname');
                     if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
-                        $sOrder .= "" . $db->escape_column($columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
+                        $sOrder .= "" . $db->escape_column($fieldName) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
                     }
                 }
                 $sOrder = substr_replace($sOrder, "", -2);
@@ -98,19 +110,21 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
             }
             if (strlen($sOrder) == 0) {
                 $stringOrderBy = $this->baseOrder();
+
                 if (strlen($stringOrderBy) > 0) {
                     //remove prefixed column from order by
                     $sub = explode(",", substr($stringOrderBy, 9));
                     $sOrder = "";
+                    $newStringOrderBy = '';
                     foreach ($sub as $val) {
                         $columnNames = explode(".", $val);
                         $columnName = $columnNames[0];
                         if (isset($columnNames[1])) {
                             $columnName = $columnNames[1];
                         }
-                        $stringOrderBy .= ", " . $columnName;
+                        $newStringOrderBy .= ", " . $columnName;
                     }
-                    $sOrder = "ORDER BY " . substr($stringOrderBy, 2);
+                    $sOrder = "ORDER BY " . substr($newStringOrderBy, 2);
                 }
             }
             $this->queryOrderBy = $sOrder;
@@ -126,19 +140,27 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
     }
 
     protected function getQueryWhere() {
-        if ($this->queryWhere) {
+
+        if ($this->queryWhere === null) {
+            $request = $this->engine->getInput();
+            $table=$this->table;
             $db = $this->db();
             $qs_condition_str = "";
+            $sWhere = '';
+            $columns = $this->columns;
+            
             if (isset($request['sSearch']) && $request['sSearch'] != "") {
                 for ($i = 0; $i < count($columns); $i++) {
                     $i2 = 0;
                     if ($table->checkbox) {
                         $i2 = -1;
                     }
+                    $fieldName = carr::get($columns[$i + $i2],'fieldname');
                     if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
-                        $sWhere .= "`" . $columns[$i + $i2]->fieldName . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
+                        $sWhere .= "`" . $fieldName . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                     }
                 }
+
                 $sWhere = substr_replace($sWhere, "", -3);
             }
             // Quick Search
@@ -187,6 +209,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
             }
             $this->queryWhere = $sWhere;
         }
+
         return $this->queryWhere;
     }
 
@@ -231,6 +254,12 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
         $request = $this->input;
 
         $columns = carr::get($data, 'columns');
+        if ($this->columns == null) {
+            $this->columns = $columns;
+        }
+        if ($this->table == null) {
+            $this->table = $table;
+        }
         $rowActionList = $table->getRowActionList();
         $key = carr::get($data, 'key_field');
 

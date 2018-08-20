@@ -105,6 +105,13 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             }
             return $imageLoader->getUrl();
         }
+        if ($this->_resource_type == 'file') {
+            $options = array(
+                'app_code' => $this->_app_code,
+            );
+            $fileLoader = CResources::files($filename, $options);
+            return $fileLoader->getUrl();
+        }
 
         $size_add = $size;
         if (strlen($size_add) > 0) {

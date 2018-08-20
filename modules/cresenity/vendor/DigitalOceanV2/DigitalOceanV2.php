@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of the DigitalOceanV2 library.
  *
@@ -8,9 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace DigitalOceanV2;
-
 use DigitalOceanV2\Adapter\AdapterInterface;
 use DigitalOceanV2\Api\Account;
 use DigitalOceanV2\Api\Action;
@@ -27,7 +24,6 @@ use DigitalOceanV2\Api\Region;
 use DigitalOceanV2\Api\Size;
 use DigitalOceanV2\Api\Snapshot;
 use DigitalOceanV2\Api\Volume;
-
 /**
  * @author Antoine Corcy <contact@sbin.dk>
  * @author Graham Campbell <graham@alt-three.com>
@@ -38,7 +34,6 @@ class DigitalOceanV2
      * @var AdapterInterface
      */
     protected $adapter;
-
     /**
      * @param AdapterInterface $adapter
      */
@@ -46,7 +41,6 @@ class DigitalOceanV2
     {
         $this->adapter = $adapter;
     }
-
     /**
      * @return Account
      */
@@ -54,7 +48,6 @@ class DigitalOceanV2
     {
         return new Account($this->adapter);
     }
-
     /**
      * @return Action
      */
@@ -62,7 +55,6 @@ class DigitalOceanV2
     {
         return new Action($this->adapter);
     }
-
     /**
      * @return Certificate
      */
@@ -70,7 +62,6 @@ class DigitalOceanV2
     {
         return new Certificate($this->adapter);
     }
-
     /**
      * @return Domain
      */
@@ -78,7 +69,6 @@ class DigitalOceanV2
     {
         return new Domain($this->adapter);
     }
-
     /**
      * @return DomainRecord
      */
@@ -86,7 +76,6 @@ class DigitalOceanV2
     {
         return new DomainRecord($this->adapter);
     }
-
     /**
      * @return Droplet
      */
@@ -94,7 +83,6 @@ class DigitalOceanV2
     {
         return new Droplet($this->adapter);
     }
-
     /**
      * @return FloatingIp
      */
@@ -102,7 +90,6 @@ class DigitalOceanV2
     {
         return new FloatingIp($this->adapter);
     }
-
     /**
      * @return Image
      */
@@ -110,7 +97,6 @@ class DigitalOceanV2
     {
         return new Image($this->adapter);
     }
-
     /**
      * @return Key
      */
@@ -118,7 +104,6 @@ class DigitalOceanV2
     {
         return new Key($this->adapter);
     }
-
     /**
      * @return LoadBalancer
      */
@@ -126,7 +111,6 @@ class DigitalOceanV2
     {
         return new LoadBalancer($this->adapter);
     }
-
     /**
      * @return RateLimit
      */
@@ -134,7 +118,6 @@ class DigitalOceanV2
     {
         return new RateLimit($this->adapter);
     }
-
     /**
      * @return Region
      */
@@ -142,7 +125,6 @@ class DigitalOceanV2
     {
         return new Region($this->adapter);
     }
-
     /**
      * @return Size
      */
@@ -150,7 +132,6 @@ class DigitalOceanV2
     {
         return new Size($this->adapter);
     }
-
     /**
      * @return Volume
      */
@@ -158,7 +139,6 @@ class DigitalOceanV2
     {
         return new Volume($this->adapter);
     }
-
     /**
      * @return Snapshot
      */
