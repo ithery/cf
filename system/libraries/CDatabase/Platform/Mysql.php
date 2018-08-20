@@ -531,7 +531,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
                 continue;
             }
 
-            $oldColumnName = new Identifier($oldColumnName);
+            $oldColumnName = new CDatabase_Schema_Identifier($oldColumnName);
             $columnArray = $column->toArray();
             $columnArray['comment'] = $this->getColumnComment($column);
             $queryParts[] = 'CHANGE ' . $oldColumnName->getQuotedName($this) . ' '

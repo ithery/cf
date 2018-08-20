@@ -1708,7 +1708,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      */
-    public function getCreatePrimaryKeySQL(Index $index, $table) {
+    public function getCreatePrimaryKeySQL(CDatabase_Schema_Index $index, $table) {
         return 'ALTER TABLE ' . $table . ' ADD PRIMARY KEY (' . $this->getIndexFieldDeclarationListSQL($index->getQuotedColumns($this)) . ')';
     }
 
@@ -1878,7 +1878,7 @@ abstract class CDatabase_Platform {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(Events::onSchemaAlterTableRenameColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableRenameColumn)) {
             return false;
         }
 
@@ -1982,9 +1982,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL for renaming an index on a table.
      *
-     * @param string                      $oldIndexName The name of the index to rename from.
-     * @param CDatabase_Schema_Index $index        The definition of the index to rename to.
-     * @param string                      $tableName    The table to rename the given index on.
+     * @param string                        $oldIndexName The name of the index to rename from.
+     * @param CDatabase_Schema_Index        $index        The definition of the index to rename to.
+     * @param string                        $tableName    The table to rename the given index on.
      *
      * @return array The sequence of SQL statements for renaming the given index.
      */
