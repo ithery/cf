@@ -855,7 +855,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
             $cpudevices = glob('/sys/devices/system/cpu/cpu*/uevent', GLOB_NOSORT);
             if (is_array($cpudevices) && (($cpustopped = count($cpudevices) - $cpucount) > 0)) {
                 for (; $cpustopped > 0; $cpustopped--) {
-                    $dev = new CpuDevice();
+                    $dev = new CServer_Device_Cpu();
                     $dev->setModel("stopped");
                     if ($speedset) {
                         $dev->setCpuSpeed(-1);

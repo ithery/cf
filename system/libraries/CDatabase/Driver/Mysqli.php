@@ -5,7 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * MySQLi Database Driver
  */
-class CDatabase_Driver_Mysqli extends CDatabase_Driver {
+class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
     // Database connection link
     protected $link;
@@ -22,9 +22,9 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver {
 
         CF::log(CLogger::DEBUG, 'MySQLi Database Driver Initialized');
     }
-    
+
     public function close() {
-        is_object($this->link) and @$this->link->close();
+        is_object($this->link) and @ $this->link->close();
     }
 
     /**
@@ -32,8 +32,8 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver {
      */
     public function __destruct() {
         try {
-            is_object($this->link) and @$this->link->close();
-        } catch(Exception $ex) {
+            is_object($this->link) and @ $this->link->close();
+        } catch (Exception $ex) {
             //do nothing
         }
     }
@@ -81,12 +81,12 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver {
             return $this->query_cache[$hash];
         }
 
-        return new CMysqli_Result($this->link, $this->db_config['object'], $sql);
+        return new CDatabase_Driver_Mysqli_Result($this->link, $this->db_config['object'], $sql);
     }
 
     public function set_charset($charset) {
         if ($this->link->set_charset($charset) === FALSE) {
-            throw new CDatabase_Exception('There was an SQL error: :error', array(':error'=>$this->show_error()));
+            throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => $this->show_error()));
         }
     }
 
@@ -270,7 +270,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver {
         }
 
         if (!isset($result))
-            throw new CDatabase_Exception('Table :table does not exist in your database', array(':table'=>$table));
+            throw new CDatabase_Exception('Table :table does not exist in your database', array(':table' => $table));
 
         return $result;
     }
@@ -281,166 +281,87 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver {
         return $result->result_array(TRUE);
     }
 
+    /**
+     * {@inheritdoc}
+     * @return CDatabase_Driver_Mysqli_MySqlSchemaManager
+     */
+    public function getSchemaManager(CDatabase $db) {
+        return new CDatabase_Schema_Manager_Mysql($db);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws DBALException
+     */
+    public function createDatabasePlatformForVersion($version) {
+        $mariadb = false !== stripos($version, 'mariadb');
+        if ($mariadb && version_compare($this->getMariaDbMysqlVersionNumber($version), '10.2.7', '>=')) {
+            return new CDatabase_Platform_MariaDb1027();
+        }
+
+        if (!$mariadb) {
+            $oracleMysqlVersion = $this->getOracleMysqlVersionNumber($version);
+            if (version_compare($oracleMysqlVersion, '8', '>=')) {
+                return new CDatabase_Platform_MySQL80();
+            }
+            if (version_compare($oracleMysqlVersion, '5.7.9', '>=')) {
+                return new CDatabase_Platform_MySQL57();
+            }
+        }
+
+        return $this->getDatabasePlatform();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * The server version detection includes a special case for MariaDB
+     * to support '5.5.5-' prefixed versions introduced in Maria 10+
+     * @link https://jira.mariadb.org/browse/MDEV-4088
+     */
+    public function getServerVersion() {
+        $serverInfos = $this->link->get_server_info();
+        if (false !== stripos($serverInfos, 'mariadb')) {
+            return $serverInfos;
+        }
+
+        $majorVersion = floor($this->link->server_version / 10000);
+        $minorVersion = floor(($this->link->server_version - $majorVersion * 10000) / 100);
+        $patchVersion = floor($this->link->server_version - $majorVersion * 10000 - $minorVersion * 100);
+
+        return $majorVersion . '.' . $minorVersion . '.' . $patchVersion;
+    }
+
+    /**
+     * Detect MariaDB server version, including hack for some mariadb distributions
+     * that starts with the prefix '5.5.5-'
+     *
+     * @param string $versionString Version string as returned by mariadb server, i.e. '5.5.5-Mariadb-10.0.8-xenial'
+     * @throws CDatabase_Exception
+     */
+    private function getMariaDbMysqlVersionNumber($versionString) {
+        if (!preg_match(
+                        '/^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)/i', $versionString, $versionParts
+                )) {
+            throw CDatabase_Exception::invalidPlatformVersionSpecified(
+                    $versionString, '^(?:5\.5\.5-)?(mariadb-)?<major_version>.<minor_version>.<patch_version>'
+            );
+        }
+
+        return $versionParts['major'] . '.' . $versionParts['minor'] . '.' . $versionParts['patch'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function requiresQueryForServerVersion() {
+        return false;
+    }
+
 }
 
 // End Database_Mysqli_Driver Class
-
-/**
- * MySQLi Result
- */
-class CMysqli_Result extends CDatabase_Result {
-
-    // Database connection
-    protected $link;
-    // Data fetching types
-    protected $fetch_type = 'mysqli_fetch_object';
-    protected $return_type = MYSQLI_ASSOC;
-
-    /**
-     * Sets up the result variables.
-     *
-     * @param  object    database link
-     * @param  boolean   return objects or arrays
-     * @param  string    SQL query that was run
-     */
-    public function __construct($link, $object = TRUE, $sql) {
-        $this->link = $link;
-
-        if (!$this->link->multi_query($sql)) {
-            // SQL error
-            throw new CDatabase_Exception('There was an SQL error: :error', array(':error'=>$this->link->error . ' - ' . $sql));
-        } else {
-            $this->result = $this->link->store_result();
-
-            // If the query is an object, it was a SELECT, SHOW, DESCRIBE, EXPLAIN query
-            if (is_object($this->result)) {
-                $this->current_row = 0;
-                $this->total_rows = $this->result->num_rows;
-                $this->fetch_type = ($object === TRUE) ? 'fetch_object' : 'fetch_array';
-            } elseif ($this->link->error) {
-                // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', array(':error'=>$this->link->error . ' - ' . $sql));
-            } else {
-                // Its an DELETE, INSERT, REPLACE, or UPDATE query
-                $this->insert_id = $this->link->insert_id;
-                $this->total_rows = $this->link->affected_rows;
-            }
-        }
-
-        // Set result type
-        $this->result($object);
-
-        // Store the SQL
-        $this->sql = $sql;
-    }
-
-    /**
-     * Magic __destruct function, frees the result.
-     */
-    public function __destruct() {
-        if (is_object($this->result)) {
-            @$this->result->free_result();
-            // this is kinda useless, but needs to be done to avoid the "Commands out of sync; you
-            // can't run this command now" error. Basically, we get all results after the first one
-            // (the one we actually need) and free them.
-            if (is_resource($this->link) AND $this->link->more_results()) {
-                do {
-                    if ($result = $this->link->store_result()) {
-                        $result->free_result();
-                    }
-                } while ($this->link->next_result());
-            }
-        }
-    }
-
-    public function result($object = TRUE, $type = MYSQLI_ASSOC) {
-        $this->fetch_type = ((bool) $object) ? 'fetch_object' : 'fetch_array';
-
-        // This check has to be outside the previous statement, because we do not
-        // know the state of fetch_type when $object = NULL
-        // NOTE - The class set by $type must be defined before fetching the result,
-        // autoloading is disabled to save a lot of stupid overhead.
-        if ($this->fetch_type == 'fetch_object') {
-            $this->return_type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
-        } else {
-            $this->return_type = $type;
-        }
-
-        return $this;
-    }
-
-    public function as_array($object = NULL, $type = MYSQLI_ASSOC) {
-        return $this->result_array($object, $type);
-    }
-
-    public function result_array($object = NULL, $type = MYSQLI_ASSOC) {
-        $rows = array();
-
-        if (is_string($object)) {
-            $fetch = $object;
-        } elseif (is_bool($object)) {
-            if ($object === TRUE) {
-                $fetch = 'fetch_object';
-
-                // NOTE - The class set by $type must be defined before fetching the result,
-                // autoloading is disabled to save a lot of stupid overhead.
-                $type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
-            } else {
-                $fetch = 'fetch_array';
-            }
-        } else {
-            // Use the default config values
-            $fetch = $this->fetch_type;
-
-            if ($fetch == 'fetch_object') {
-                $type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
-            }
-        }
-
-        if ($this->result->num_rows) {
-            // Reset the pointer location to make sure things work properly
-            $this->result->data_seek(0);
-
-            while ($row = $this->result->$fetch($type)) {
-                $rows[] = $row;
-            }
-        }
-
-        return isset($rows) ? $rows : array();
-    }
-
-    public function list_fields() {
-        $field_names = array();
-        while ($field = $this->result->fetch_field()) {
-            $field_names[] = $field->name;
-        }
-
-        return $field_names;
-    }
-
-    public function seek($offset) {
-        if ($this->offsetExists($offset) AND $this->result->data_seek($offset)) {
-            // Set the current row to the offset
-            $this->current_row = $offset;
-
-            return TRUE;
-        }
-
-        return FALSE;
-    }
-
-    public function offsetGet($offset) {
-        if (!$this->seek($offset))
-            return FALSE;
-
-        // Return the row
-        $fetch = $this->fetch_type;
-        return $this->result->$fetch($this->return_type);
-    }
-
-}
-
-// End Mysqli_Result Class
 
 /**
  * MySQLi Prepared Statement (experimental)

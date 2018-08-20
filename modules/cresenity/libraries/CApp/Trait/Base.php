@@ -124,8 +124,10 @@ trait CApp_Trait_Base {
     public static function username() {
         $app = CApp::instance();
         $user = $app->user();
-
-        return $user->username;
+        if ($user != null) {
+            return $user->username;
+        }
+        return 'system';
     }
 
     /**

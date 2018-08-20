@@ -70,12 +70,6 @@ class CServer_System_Info {
     private $loadPercent;
 
     /**
-     * Returns $hostname.
-     * @see CServer_System_Info::$hostname
-     * @return String
-     */
-
-    /**
      * array of types of processes
      * @var array
      */
@@ -88,6 +82,11 @@ class CServer_System_Info {
      */
     private $cpus;
 
+    /**
+     * Returns $hostname.
+     * @see CServer_System_Info::$hostname
+     * @return String
+     */
     public function getHostname() {
         return $this->hostname;
     }

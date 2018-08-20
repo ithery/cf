@@ -59,10 +59,11 @@ class CJob_BackgroundJob {
         ];
         $this->helper = $helper ?: new CJob_Helper();
         $this->tmpDir = $this->helper->getTempDir();
+        CJob_EventManager::initialize();
     }
 
     public function run() {
-        
+
         $lockFile = $this->getLockFile();
         try {
             $this->checkMaxRuntime($lockFile);
@@ -78,11 +79,22 @@ class CJob_BackgroundJob {
         try {
             $this->helper->acquireLock($lockFile);
             $lockAcquired = true;
-            
+            $retval = null;
             if (isset($this->config['closure'])) {
-                $this->runFunction();
+
+                $retval = $this->runFunction();
             } else {
-                $this->runFile();
+                $retval = $this->runFile();
+            }
+
+            $eventManager = CJob_EventManager::getEventManager();
+
+            if ($eventManager->hasListeners(CJob_Events::onBackgroundJobPostRun)) {
+                $eventArgs = new CJob_EventManager_Args();
+                $eventArgs->addArg('job', $this->job);
+                $eventArgs->addArg('config', $this->config);
+                $eventArgs->addArg('result', $retval);
+                $eventManager->dispatchEvent(CJob_Events::onBackgroundJobPostRun, $eventArgs);
             }
         } catch (CJob_Exception_InfoException $e) {
             $this->log('INFO: ' . $e->getMessage());
@@ -200,6 +212,8 @@ class CJob_BackgroundJob {
     protected function runFunction() {
         $command = $this->getSerializer()->unserialize($this->config['closure']);
         ob_start();
+
+
         try {
             $retval = $command();
         } catch (\Throwable $e) {
@@ -210,9 +224,12 @@ class CJob_BackgroundJob {
             file_put_contents($this->getLogfile(), $content, FILE_APPEND);
         }
         ob_end_clean();
-        if ($retval !== true) {
-            throw new Exception("Closure did not return true! Returned:\n" . print_r($retval, true));
+
+
+        if ($retval === false) {
+            throw new Exception("Closure did not return false Returned:\n" . print_r($retval, true));
         }
+        return $retval;
     }
 
     protected function runFile() {
@@ -234,6 +251,7 @@ class CJob_BackgroundJob {
         if ($retval !== 0) {
             throw new Exception("Job exited with status '$retval'.");
         }
+        return $retval;
     }
 
 }

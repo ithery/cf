@@ -13,7 +13,7 @@ class CServer_Memory extends CServer_Base {
      *
      * @var CServer_Memory
      */
-    protected static $instance;
+    protected static $instance = array();
 
     /**
      *
@@ -36,6 +36,11 @@ class CServer_Memory extends CServer_Base {
         $this->host = carr::get($sshConfig, 'host');
     }
 
+    /**
+     * 
+     * @param array $sshConfig
+     * @return CServer_Memory
+     */
     public static function instance(array $sshConfig = null) {
         if (!is_array(self::$instance)) {
             self::$instance = array();

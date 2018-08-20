@@ -173,12 +173,12 @@ class CClientScript extends CObject {
             $pos = array($pos);
         }
         foreach ($pos as $p) {
-            
+
             $jsFiles = &$this->scripts[$p]['js_file'];
             foreach ($jsFiles as $k => $jsFile) {
-               
+
                 if ($jsFile == $fullpathFile) {
-                    
+
                     unset($jsFiles[$k]);
                 }
             }
@@ -348,22 +348,23 @@ class CClientScript extends CObject {
         $js_before = "";
         $i = 0;
         $manager = CManager::instance();
-        foreach ($jsFiles as $f) {
-            $urlJsFile = $this->urlJsFile($f);
-            if ($manager->is_mobile()) {
-                $mobilePath = $manager->getMobilePath();
-                if (strlen($mobilePath) > 0) {
-                    $urlJsFile = $mobilePath . $f;
+        if ($manager->getUseRequireJs()) {
+            foreach ($jsFiles as $f) {
+                $urlJsFile = $this->urlJsFile($f);
+                if ($manager->is_mobile()) {
+                    $mobilePath = $manager->getMobilePath();
+                    if (strlen($mobilePath) > 0) {
+                        $urlJsFile = $mobilePath . $f;
+                    }
                 }
+
+
+                $js_open .= str_repeat("\t", $i) . "require(['" . $urlJsFile . "'],function(){" . PHP_EOL;
+
+                $js_close .= "})";
+                $i++;
             }
-
-
-            $js_open .= str_repeat("\t", $i) . "require(['" . $urlJsFile . "'],function(){" . PHP_EOL;
-
-            $js_close .= "})";
-            $i++;
         }
-
         $js .= "
                 if (typeof cappStartedEventInitilized === 'undefined') {
                     cappStartedEventInitilized=false;
