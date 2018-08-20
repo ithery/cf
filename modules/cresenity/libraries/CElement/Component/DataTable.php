@@ -1857,7 +1857,6 @@ class CElement_Component_DataTable extends CElement_Component {
                                                 fnCallback(data.datatable);
                                                 if(data.js && data.js.length>0) {
                                                     var script = $.cresenity.base64.decode(data.js);
-                                                    console.log(script);
                                                     eval(script);
                                                 }
 
