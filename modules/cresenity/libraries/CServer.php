@@ -72,7 +72,7 @@ class CServer {
 
     /**
      * 
-     * @return CServer_System_Device_Cpu
+     * @return CServer_Device_Cpu
      */
     public static function createDeviceCpu() {
         return self::createDevice('Cpu');
@@ -80,7 +80,7 @@ class CServer {
 
     /**
      * 
-     * @return CServer_System_Device_Disk
+     * @return CServer_Device_Disk
      */
     public static function createDeviceDisk() {
         return self::createDevice('Disk');

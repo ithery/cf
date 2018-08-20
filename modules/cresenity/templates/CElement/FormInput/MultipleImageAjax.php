@@ -186,7 +186,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 } else {
                     container.removeClass('disabled');
                 }
-
+                $("#<?= $id ?>").trigger('change');
             }
             fileChanged();
             // Remove File

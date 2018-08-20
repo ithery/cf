@@ -171,7 +171,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setDomain($domain) {
-        parent::set_domain($domain);
+        parent::setDomain($domain);
         $this->db = CDatabase::instance($domain);
     }
 
@@ -199,7 +199,7 @@ class CElement_Component_DataTable extends CElement_Component {
         if (substr($table->export_filename, 3) != 'xls') {
             $export_filename .= '.xls';
         }
-        self::export_excelxml_static($export_filename, $table->export_sheetname, $table);
+        self::exportExcelxmlStatic($export_filename, $table->export_sheetname, $table);
     }
 
     public function addFooterAction($id = "") {
@@ -1451,7 +1451,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 foreach ($this->columns as $col) {
                     $html->appendln($col->render_header_html($this->export_pdf, $th_class, $html->getIndent()))->br();
                 }
-                if ($this->have_action()) {
+                if ($this->haveRowAction()) {
                     $action_width = 31 * $this->action_count() + 5;
                     if ($this->getRowActionStyle() == "btn-dropdown") {
                         $action_width = 70;
@@ -1581,7 +1581,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $col_found = true;
                 }
 
-                if ($this->have_action()) {
+                if ($this->haveRowAction()) {
                     $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
                     foreach ($row as $k => $v) {
                         $jsparam[$k] = $v;
@@ -1634,7 +1634,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $html->incIndent()->appendln('<tfoot>')->br();
             $total_column = count($this->columns);
             $addition_column = 0;
-            if ($this->have_action())
+            if ($this->haveRowAction())
                 $addition_column++;
             if ($this->numbering)
                 $addition_column++;
@@ -1701,8 +1701,7 @@ class CElement_Component_DataTable extends CElement_Component {
             }
             $html->decIndent()->appendln('</tfoot>')->br();
         }
-        $html->decIndent()
-                ->appendln('</table>' . $data_responsive_close);
+        $html->decIndent()->appendln('</table>' . $data_responsive_close);
         if ($wrapped > 0) {
             $html->decIndent()->appendln('</div>');
             $html->decIndent()->appendln('</div>');
@@ -1711,30 +1710,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
 
-        /*
-          if($this->have_action()) {
-          $modal = CDialog::factory($this->id.'_modal')->set_title('Role');
-          $form = CForm::factory($this->id.'_form');
-          foreach($this->columns as $col) {
-          if($col->visible) {
-          $form->add_field($col->fieldname."_field")->set_label($col->label)->add_control($col->fieldname,$col->input_type)->set_disabled($col->editable==false);
-          }
-          }
-
-          $actions = CActionList::factory($this->id.'_form_actions');
-          $act_prev = CAction::factory($this->id.'_form_close')->set_label('Prev')->set_link(curl::base().'cresenity/install/');
-          $act_next = CAction::factory($this->id.'_form_submit')->set_label('Next')->set_submit(true);
-          $actions->add($act_prev);
-          $actions->add($act_next);
-          $actions->set_style('form-action');
-          $form->add($actions);
-          $modal->add($form);
-          $html->append($modal->html($html->getIndent()));
-          }
-         */
-
-
-//            echo '<textarea>' . $html->text() . '</textarea>';
 
         return $html->text();
     }
@@ -1746,34 +1721,20 @@ class CElement_Component_DataTable extends CElement_Component {
             foreach ($this->columns as $col) {
                 $columns[] = $col;
             }
-            
+
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DataTable');
-            $ajaxMethod->setData('columns',$columns);
-            $ajaxMethod->setData('query',$this->query);
-            $ajaxMethod->setData('row_action_list',$this->rowActionList);
-            $ajaxMethod->setData('key_field',$this->key_field);
-            $ajaxMethod->setData('table',serialize($this));
-            $ajaxMethod->setData('domain',$this->domain);
-            $ajaxMethod->setData('is_elastic',$this->isElastic);
-            $ajaxMethod->setData('is_callback',$this->isCallback);
-            $ajaxMethod->setData('callback_require',$this->callbackRequire);
-            $ajaxMethod->setData('callback_options',$this->callbackOptions);
+            $ajaxMethod->setData('columns', $columns);
+            $ajaxMethod->setData('query', $this->query);
+            $ajaxMethod->setData('row_action_list', $this->rowActionList);
+            $ajaxMethod->setData('key_field', $this->key_field);
+            $ajaxMethod->setData('table', serialize($this));
+            $ajaxMethod->setData('domain', $this->domain);
+            $ajaxMethod->setData('is_elastic', $this->isElastic);
+            $ajaxMethod->setData('is_callback', $this->isCallback);
+            $ajaxMethod->setData('callback_require', $this->callbackRequire);
+            $ajaxMethod->setData('callback_options', $this->callbackOptions);
             $ajax_url = $ajaxMethod->makeUrl();
-            /*
-            $ajax_url = CAjaxMethod::factory()->set_type('datatable')
-                    ->set_data('columns', $columns)
-                    ->set_data('query', $this->query)
-                    ->set_data('row_action_list', $this->rowActionList)
-                    ->set_data('key_field', $this->key_field)
-                    ->set_data('table', serialize($this))
-                    ->set_data('domain', $this->domain)
-                    ->set_data('is_elastic', $this->isElastic)
-                    ->set_data('is_callback', $this->isCallback)
-                    ->set_data('callback_require', $this->callbackRequire)
-                    ->makeurl();
-             * 
-             */
         }
 
         foreach ($this->footer_action_list->childs() as $row_act) {
@@ -1851,7 +1812,7 @@ class CElement_Component_DataTable extends CElement_Component {
                             
 					vaoColumns.push( " . json_encode($aojson) . " );");
             }
-            if ($this->have_action()) {
+            if ($this->haveRowAction()) {
                 $aojson = array();
                 $aojson["bSortable"] = false;
                 $aojson["bSearchable"] = false;
@@ -1896,7 +1857,6 @@ class CElement_Component_DataTable extends CElement_Component {
                                                 fnCallback(data.datatable);
                                                 if(data.js && data.js.length>0) {
                                                     var script = $.cresenity.base64.decode(data.js);
-                                                    console.log(script);
                                                     eval(script);
                                                 }
 
@@ -2094,7 +2054,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     ->appendln("var quick_search = jQuery('<tr>');")->br()
                     ->appendln("jQuery('#" . $this->id . " thead th').each( function (i) {
                             var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
-                            var have_action = " . ($this->have_action() ? "1" : "0") . ";
+                            var have_action = " . ($this->haveRowAction() ? "1" : "0") . ";
                             
                            
                             var total_th = jQuery('#" . $this->id . " thead th').length;
