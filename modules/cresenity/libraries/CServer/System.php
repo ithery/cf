@@ -32,6 +32,11 @@ class CServer_System extends CServer_Base {
         $this->host = carr::get($sshConfig, 'host');
     }
 
+    /**
+     * 
+     * @param array $sshConfig
+     * @return CServer_System
+     */
     public static function instance(array $sshConfig = null) {
         if (!is_array(self::$instance)) {
             self::$instance = array();

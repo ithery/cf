@@ -51,19 +51,40 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
 
             foreach ($model->items() as $item) {
                 $arr = array();
-                $arr['id'] = '';
-                if ($keyField) {
-                    $arr['id'] = $item->{$keyField};
-                }
-                if ($format) {
-                    $arr['name'] = $format;
-                    preg_match_all("/{(\w*)}/", $format, $matches);
-                    foreach ($matches[1] as $key => $match) {
-                        $arr['name'] = str_replace("{" . $match . "}", $item->{$match}, $arr['name']);
+                foreach ($itemTemplateVariables as $varKey => $variable) {
+                    switch ($variable) {
+                        case 'name':
+                            if ($format) {
+                                $arr[$variable] = $format;
+                                preg_match_all("/{(\w*)}/", $format, $matches);
+                                foreach ($matches[1] as $key => $match) {
+                                    $arr[$variable] = str_replace("{" . $match . "}", $item->{$match}, $arr[$variable]);
+                                }
+                            } else {
+                                $arr[$variable] = $item->{$varKey};
+                                if (!strlen($arr[$variable])) {
+                                    $arr[$variable] = $item->{$variable};
+                                }
+                            }
+                            break;
+                        case 'imageUrl':
+                            $arr[$variable] = $item->{$varKey};
+                            if (!strlen($arr[$variable])) {
+                                $arr[$variable] = $item->{$variable};
+                            }
+                            if (!strlen($arr[$variable])) {
+                                $arr[$variable] = CApp_Base::noImageUrl();
+                            }
+                            break;
+                        default:
+                            $arr[$variable] = $item->{$varKey};
+                            if (!strlen($arr[$variable])) {
+                                $arr[$variable] = $item->{$variable};
+                            }
+                            break;
                     }
-                } else {
-                    $arr['name'] = $item->{$keyField};
                 }
+
                 $items[] = $arr;
             }
 
@@ -93,13 +114,7 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
         $data['result'] = '';
 
         foreach ($items as $key => $item) {
-            $dataVariables = array();
-
-            foreach ($itemTemplateVariables as $varKey => $variable) {
-                $dataVariables[$variable] = carr::get($item, $varKey);
-            }
-
-            $template = CTemplate::factory($itemTemplateName, $dataVariables);
+            $template = CTemplate::factory($itemTemplateName, $item);
             $data['result'] .= $template->render();
         }
 

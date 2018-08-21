@@ -15,6 +15,7 @@ final class CManager {
     protected $mobile_path = '';
     protected $theme_data = null;
     protected static $langObjectCallback = null;
+    protected static $useRequireJs = null;
 
     /**
      *
@@ -267,6 +268,22 @@ final class CManager {
     public static function addTransformCallback($method, callable $callback) {
         $transformManager = CManager_Transform::instance();
         return $transformManager->addCallback($method, $callback);
+    }
+
+    public static function setUseRequireJs($bool) {
+        self::$useRequireJs = $bool;
+    }
+
+    public static function getUseRequireJs() {
+        return true;
+        if (self::$useRequireJs === null) {
+            $require = ccfg::get('require_js');
+            if ($require === null) {
+                return true;
+            }
+            return $require;
+        }
+        return self::$useRequireJs;
     }
 
 }

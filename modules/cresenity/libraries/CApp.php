@@ -481,7 +481,7 @@ class CApp extends CObservable {
 
             $v->head_client_script = $cs->render('head');
             $v->begin_client_script = $cs->render('begin');
-            // $v->end_client_script = $cs->render('end');
+            //$v->end_client_script = $cs->render('end');
 
             $v->load_client_script = $cs->render('load');
             $v->ready_client_script = $cs->render('ready');

@@ -17,7 +17,7 @@ class CElement_Component_Alert extends CElement_Component {
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
         $this->header = $this->addH4();
-        $this->content = $this->add_div()->addClass('widget-content clearfix');
+        $this->content = $this->add_div()->addClass(' clearfix');
         $this->addClass('alert');
         $this->wrapper = $this->content;
         $this->tag = 'div';

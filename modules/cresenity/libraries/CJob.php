@@ -34,7 +34,7 @@ class CJob {
     protected $jobs = [];
 
     /**
-     * @var Helper
+     * @var CJob_Helper
      */
     protected $helper;
 
@@ -47,6 +47,8 @@ class CJob {
 
         $this->script = carr::get($config, 'script', DOCROOT . 'index.php');
         $this->uri = carr::get($config, 'uri', 'cresenity/cron');
+
+        CJob_EventManager::initialize();
     }
 
     /**
@@ -158,6 +160,13 @@ class CJob {
             } else {
                 $this->runWindows($job, $config);
             }
+            $eventManager = CJob_EventManager::getEventManager();
+            if ($eventManager->hasListeners(CJob_Events::onJobPostRun)) {
+                $eventArgs = new CJob_EventManager_Args();
+                $eventArgs->addArg('job', $job);
+                $eventArgs->addArg('config', $config);
+                $eventManager->dispatchEvent(CJob_Events::onJobPostRun, $eventArgs);
+            }
         }
     }
 
@@ -169,7 +178,7 @@ class CJob {
         $command = $this->getExecutableCommand($job, $config);
         $binary = $this->getPhpBinary();
         $output = $config['debug'] ? 'debug.log' : '/dev/null';
-       
+        
         exec("$binary $command 1> $output 2>&1 &");
     }
 
@@ -214,15 +223,35 @@ class CJob {
         return $executableFinder->find();
     }
 
-    public static function cliRunner() {
+    public static function cliRunner($parameter = null) {
 
         $argv = carr::get($_SERVER, 'argv');
-        parse_str($argv[3], $config);
+        if ($parameter == null) {
+            $parameter = $argv[3];
+        }
+        parse_str($parameter, $config);
         $cls = $config['jobClass'];
         /** @var CJob_Exception $job */
         $jobName = carr::get($config, 'jobName');
+       
         $job = new $cls($jobName, $config);
         $job->run();
+    }
+
+    public static function onJobPreRun($callback) {
+        CJob_EventManager::addEventCallback(CJob_Events::onJobPreRun, $callback);
+    }
+
+    public static function onJobPostRun($callback) {
+        CJob_EventManager::addEventCallback(CJob_Events::onJobPostRun, $callback);
+    }
+
+    public static function onBackgroundJobPreRun($callback) {
+        CJob_EventManager::addEventCallback(CJob_Events::onBackgroundJobPreRun, $callback);
+    }
+
+    public static function onBackgroundJobPostRun($callback) {
+        CJob_EventManager::addEventCallback(CJob_Events::onBackgroundJobPostRun, $callback);
     }
 
 }

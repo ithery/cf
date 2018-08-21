@@ -12,7 +12,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     <div class="fileupload-new thumbnail" >
         <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px;"  />
     </div>
-    <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px; line-height: 20px;"></div>'
+    <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px; line-height: 20px;"></div>
     <div>
         <?php if (!$disabledUpload): ?>
             <span class="btn btn-file btn-primary">
@@ -40,6 +40,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     $('#container-<?php echo $id ?> .fileupload-remove').click(function () {
         $('#container-<?php echo $id ?> .fileupload-preview').html('');
+        $("#<?= $id ?>").val('');
+        $("#<?= $id ?>").trigger('change');
         $('#container-<?php echo $id ?>').removeClass('fileupload-exists');
         $('#container-<?php echo $id ?>').addClass('fileupload-new');
     });
@@ -136,6 +138,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             if (this.readyState == 4 && this.status == 200) {
                                 var dataFile = JSON.parse(this.responseText);
                                 $('#<?php echo $id; ?>').val(dataFile.file_id);
+                                $('#<?php echo $id; ?>').trigger('change');
                                 $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
                                 $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
                                 $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');

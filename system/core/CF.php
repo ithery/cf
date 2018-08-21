@@ -1151,6 +1151,11 @@ final class CF {
                 if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
                     // Send the headers if they have not already been sent
                     $exception->send_headers();
+                } else {
+                    if (!headers_sent()) {
+                        // Send the 500 header
+                        header('HTTP/1.1 500 Internal Server Error');
+                    }
                 }
             }
 
@@ -1304,6 +1309,11 @@ final class CF {
 
 
             $routing_file .= str_replace('_', DS, $routing_class);
+
+
+            if (substr($routing_file, strlen($routing_file) - 1, 1) == DS) {
+                $routing_file = substr($routing_file, 0, strlen($routing_file) - 1) . '_';
+            }
 
             if ($directory == 'libraries') {
                 // find file at vendor first

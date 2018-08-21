@@ -117,6 +117,7 @@
 	$("#dialog-select-<?= $id ?> .dialog-select-remove").click(function() {
 		$("#dialog-select-<?= $id ?> .dialog-select-preview .dialog-select-name").html('');
 		$("#dialog-select-<?= $id ?> input").val('');
+		$("#dialog-select-<?= $id ?> input").trigger('change');
 		$("#dialog-select-<?= $id ?>").removeClass('dialog-select-exists');
 		$("#dialog-select-<?= $id ?>").addClass('dialog-select-new');
 	});
@@ -129,9 +130,13 @@
 		if (selected.length) {
 			var input = $("#dialog-select-<?= $id ?> input");
 			var preview = $("#dialog-select-<?= $id ?> .dialog-select-preview .dialog-select-name");
+			var image = $("#dialog-select-<?= $id ?> .dialog-select-preview img");
 
 			input.val(selected.attr('data-id'));
 			preview.html(selected.attr('data-name'));
+			image.attr('src', selected.attr('data-image'));
+
+			input.trigger('change');
 
 			$("#dialog-select-<?= $id ?>").removeClass('dialog-select-new');
 			$("#dialog-select-<?= $id ?>").addClass('dialog-select-exists');
@@ -167,7 +172,6 @@
 	    })
 
 	    ajaxLoadItemList = (function(modalDialog, keyword = '', page = 1) {
-
 	    	return function() {
 	    		$.ajax("<?= $ajaxUrl ?>", {
 	    			dataType: 'json',
@@ -258,8 +262,8 @@
 	    })();
 
 	    $("#dialog-select-<?= $id ?> img, #dialog-select-<?= $id ?> .btn-dialog-select span").click(function() {
-	    	addLoading(modalDialog, '.dialog-select-item-list');
 	    	if (!modalDialog.hasClass('dialog-select-initialized')) {
+	    		addLoading(modalDialog, '.dialog-select-item-list');
 	    		modalDialog.addClass('dialog-select-initialized');
 	    		ajaxLoadItemList(modalDialog)();
 	    	}
