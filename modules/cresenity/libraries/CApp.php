@@ -98,7 +98,7 @@ class CApp extends CObservable {
     public static function temp() {
         return new CApp_Temp();
     }
-    
+
     /**
      * 
      * @return CApp_Data
@@ -387,6 +387,9 @@ class CApp extends CObservable {
             trigger_error('CApp already rendered');
         }
         $this->rendered = true;
+
+        CFEvent::run('CApp.beforeRender');
+
         if (crequest::is_ajax()) {
             return $this->json();
         }

@@ -366,23 +366,29 @@ class CClientScript extends CObject {
             }
         }
         $js .= "
-                if (typeof cappStartedEventInitilized === 'undefined') {
-                    cappStartedEventInitilized=false;
-                 }
-                if(!cappStartedEventInitilized) {
-                    var evt = document.createEvent('Events');
-                    evt.initEvent('capp-started', false, true, window, 0);
-                    cappStartedEventInitilized=true;
-                    document.dispatchEvent(evt);
-                }
+            if (typeof cappStartedEventInitilized === 'undefined') {
+                cappStartedEventInitilized=false;
+             }
+            if(!cappStartedEventInitilized) {
+                var evt = document.createEvent('Events');
+                evt.initEvent('capp-started', false, true, window, 0);
+                cappStartedEventInitilized=true;
+                document.dispatchEvent(evt);
+            }
 
 
-            ";
+        ";
 
 
         $js_before .= "
             window.capp = " . json_encode(CApp::variables()) . ";
             ";
+
+        $bar = CDebug::bar();
+        if ($bar->isEnabled()) {
+            $js .= $bar->getJavascriptReplaceCode();
+        }
+
 
         return $js_before . $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
     }
