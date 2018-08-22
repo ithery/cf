@@ -29,8 +29,6 @@ class CDebug {
         if (self::bar()->isEnabled()) {
 
             self::bar()->getCollector('messages')->debug($var);
-        } else {
-            cdbg::var_dump($var);
         }
     }
 
