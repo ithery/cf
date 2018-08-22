@@ -1057,6 +1057,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             if (xhr.getAllResponseHeaders().indexOf(this.headerName) === -1) {
                 return true;
             }
+            console.log('ajaxHandle');
             if (!this.loadFromId(xhr)) {
                 return this.loadFromData(xhr);
             }
@@ -1096,11 +1097,19 @@ if (typeof (PhpDebugBar) == 'undefined') {
          */
         loadFromData: function (xhr) {
             var raw = this.extractDataFromHeaders(xhr);
+            console.log('loadFromData');
+            console.log(raw);
             if (!raw) {
-                return false;
+                console.log('not header');
+                var raw = this.extractDataFromBody(xhr);
+                if (!raw) {
+                    return false;
+                }
             }
 
+
             var data = this.parseHeaders(raw);
+
             if (data.error) {
                 throw new Error('Error loading debugbar data: ' + data.error);
             } else if (data.data) {
@@ -1123,6 +1132,31 @@ if (typeof (PhpDebugBar) == 'undefined') {
             }
             for (var i = 1; ; i++) {
                 var header = xhr.getResponseHeader(this.headerName + '-' + i);
+                if (!header) {
+                    break;
+                }
+                data += header;
+            }
+            return decodeURIComponent(data);
+        },
+
+        extractDataFromBody: function (xhr) {
+            var dataText = xhr.responseText;
+            if (!dataText) {
+                return;
+            }
+            var dataJSON = dataText;
+            try {
+                dataJSON = JSON.parse(dataJSON);
+            } catch (ex) {
+                return;
+            }
+            var data = dataJSON[this.headerName];
+            if (!data) {
+                return;
+            }
+            for (var i = 1; ; i++) {
+                var header = dataJSON[this.headerName + '-' + i];
                 if (!header) {
                     break;
                 }

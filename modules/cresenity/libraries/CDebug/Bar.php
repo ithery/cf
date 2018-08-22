@@ -64,6 +64,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
 
         $queryCollector = new CDebug_DataCollector_QueryCollector();
 
+
         $queryCollector->setRenderSqlWithParams(true);
         $this->addCollector($queryCollector);
 
@@ -71,8 +72,13 @@ class CDebug_Bar extends CDebug_AbstractBar {
         $this->startMeasure('application', 'Application');
 
 
+        //if (CHelper::request()->isAjax()) {
+            //$this->sendDataInHeaders(true);
+        //}
+
         $this->renderer->populateAssets();
         $this->renderer->apply();
+        //$this->renderer->setBindAjaxHandlerToXHR(true);
         //$renderer->setIncludeVendors($this->app['config']->get('debugbar.include_vendors', true));
         //$renderer->setBindAjaxHandlerToXHR($app['config']->get('debugbar.capture_ajax', true));
         $this->booted = true;

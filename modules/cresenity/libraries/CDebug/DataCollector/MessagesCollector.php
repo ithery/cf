@@ -21,7 +21,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
     protected $varDumper;
     // The HTML var dumper requires debug bar users to support the new inline assets, which not all
     // may support yet - so return false by default for now.
-    protected $useHtmlVarDumper = false;
+    protected $useHtmlVarDumper = true;
 
     /**
      * @param string $name
@@ -46,7 +46,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      */
     public function getDataFormatter() {
         if ($this->dataFormater === null) {
-            $this->dataFormater = DataCollector::getDefaultDataFormatter();
+            $this->dataFormater = CDebug_DataCollector::getDefaultDataFormatter();
         }
         return $this->dataFormater;
     }
@@ -65,11 +65,11 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
     /**
      * Gets the variable dumper instance used by this collector
      *
-     * @return DebugBarVarDumper
+     * @return CDebug_DataFormatter_DebugBarVarDumper
      */
     public function getVarDumper() {
         if ($this->varDumper === null) {
-            $this->varDumper = DataCollector::getDefaultVarDumper();
+            $this->varDumper = CDebug_DataCollector::getDefaultVarDumper();
         }
         return $this->varDumper;
     }

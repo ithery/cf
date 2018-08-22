@@ -40,12 +40,13 @@ class CDebug_Bar_Renderer {
         'debug/debugbar/openhandler.css',
         'debug/debugbar/font-awesome/css/font-awesome.min.css',
         'debug/debugbar/highlightjs/styles/github.css',
+        'debug/debugbar-custom.css',
     );
     protected $jsFiles = array(
         'debug/debugbar.js',
         'debug/debugbar/widgets.js',
         'debug/debugbar/openhandler.js',
-        'debug/debugbar/highlightjs/highlight.pack.css',
+        'debug/debugbar/highlightjs/highlight.pack.js',
     );
 
     const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
@@ -208,7 +209,23 @@ class CDebug_Bar_Renderer {
 
     public function apply() {
         CFEvent::add('system.display', function() {
-            CF::$output = $this->replaceJavascriptCode(CF::$output);
+            $output = CF::$output;
+            if (CHelper::request()->isAjax()) {
+                try {
+                    if (!headers_sent()) {
+                        header('phpdebugbar-body:1');
+                    }
+                    $jsonHelper = CHelper::json();
+                    $json = $jsonHelper->parse($output);
+                    $json = array_merge($json, $this->debugBar->getDataAsHeaders());
+                    $output = $jsonHelper->stringify($json);
+                } catch (Exception $ex) {
+                    
+                }
+            } else {
+                $output = $this->replaceJavascriptCode(CF::$output);
+            }
+            CF::$output = $output;
         });
     }
 
@@ -223,6 +240,123 @@ class CDebug_Bar_Renderer {
     protected function getAddDatasetCode($requestId, $data, $suffix = null) {
         $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ", " . json_encode($suffix) : '');
         return $js;
+    }
+
+    /**
+     * Sets the class name of the ajax handler
+     *
+     * Set to false to disable
+     *
+     * @param string $className
+     */
+    public function setAjaxHandlerClass($className) {
+        $this->ajaxHandlerClass = $className;
+        return $this;
+    }
+
+    /**
+     * Returns the class name of the ajax handler
+     *
+     * @return string
+     */
+    public function getAjaxHandlerClass() {
+        return $this->ajaxHandlerClass;
+    }
+
+    /**
+     * Sets whether to call bindToJquery() on the ajax handler
+     *
+     * @param boolean $bind
+     */
+    public function setBindAjaxHandlerToJquery($bind = true) {
+        $this->ajaxHandlerBindToJquery = $bind;
+        return $this;
+    }
+
+    /**
+     * Checks whether bindToJquery() will be called on the ajax handler
+     *
+     * @return boolean
+     */
+    public function isAjaxHandlerBoundToJquery() {
+        return $this->ajaxHandlerBindToJquery;
+    }
+
+    /**
+     * Sets whether to call bindToXHR() on the ajax handler
+     *
+     * @param boolean $bind
+     */
+    public function setBindAjaxHandlerToXHR($bind = true) {
+        $this->ajaxHandlerBindToXHR = $bind;
+        return $this;
+    }
+
+    /**
+     * Checks whether bindToXHR() will be called on the ajax handler
+     *
+     * @return boolean
+     */
+    public function isAjaxHandlerBoundToXHR() {
+        return $this->ajaxHandlerBindToXHR;
+    }
+
+    /**
+     * Sets whether new ajax debug data will be immediately shown.  Setting to false could be useful
+     * if there are a lot of tracking events cluttering things.
+     *
+     * @param boolean $autoShow
+     */
+    public function setAjaxHandlerAutoShow($autoShow = true) {
+        $this->ajaxHandlerAutoShow = $autoShow;
+        return $this;
+    }
+
+    /**
+     * Checks whether the ajax handler will immediately show new ajax requests.
+     *
+     * @return boolean
+     */
+    public function isAjaxHandlerAutoShow() {
+        return $this->ajaxHandlerAutoShow;
+    }
+
+    /**
+     * Sets the class name of the js open handler
+     *
+     * @param string $className
+     */
+    public function setOpenHandlerClass($className) {
+        $this->openHandlerClass = $className;
+        return $this;
+    }
+
+    /**
+     * Returns the class name of the js open handler
+     *
+     * @return string
+     */
+    public function getOpenHandlerClass() {
+        return $this->openHandlerClass;
+    }
+
+    /**
+     * Sets the url of the open handler
+     *
+     * @param string $url
+     */
+    public function setOpenHandlerUrl($url) {
+        $this->openHandlerUrl = $url;
+        return $this;
+    }
+
+    /**
+     * Returns the url for the open handler
+     *
+     * @return string
+     */
+    public function getOpenHandlerUrl() {
+        return $this->openHandlerUrl;
     }
 
 }

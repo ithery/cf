@@ -126,12 +126,10 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             }
         }
         $source = [];
-        if ($this->findSource) {
-            try {
-                $source = $this->findSource();
-            } catch (\Exception $e) {
-                
-            }
+        try {
+            $source = $this->findSource();
+        } catch (\Exception $e) {
+            
         }
         $this->queries[] = [
             'query' => $query,
@@ -224,24 +222,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
                 !$this->fileIsInExcludedPath($trace['file'])
         ) {
             $file = $trace['file'];
-            if (isset($trace['object']) && is_a($trace['object'], 'Twig_Template')) {
-                list($file, $frame->line) = $this->getTwigInfo($trace);
-            } elseif (strpos($file, storage_path()) !== false) {
-                $hash = pathinfo($file, PATHINFO_FILENAME);
-                if (!$frame->name = $this->findViewFromHash($hash)) {
-                    $frame->name = $hash;
-                }
-                $frame->namespace = 'view';
-                return $frame;
-            } elseif (strpos($file, 'Middleware') !== false) {
-                $frame->name = $this->findMiddlewareFromFile($file);
-                if ($frame->name) {
-                    $frame->namespace = 'middleware';
-                } else {
-                    $frame->name = $this->normalizeFilename($file);
-                }
-                return $frame;
-            }
+
             $frame->name = $this->normalizeFilename($file);
             return $frame;
         }
@@ -256,9 +237,9 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      */
     protected function fileIsInExcludedPath($file) {
         $excludedPaths = [
-            '/vendor/laravel/framework/src/Illuminate/Database',
-            '/vendor/laravel/framework/src/Illuminate/Events',
-            '/vendor/barryvdh/laravel-debugbar',
+            '/system/core/',
+            '/system/libraries/',
+            '/modules/cresenity/libraries/CDebug/',
         ];
         $normalizedPath = str_replace('\\', '/', $file);
         foreach ($excludedPaths as $excludedPath) {
@@ -267,62 +248,6 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             }
         }
         return false;
-    }
-
-    /**
-     * Find the middleware alias from the file.
-     *
-     * @param  string $file
-     * @return string|null
-     */
-    protected function findMiddlewareFromFile($file) {
-        $filename = pathinfo($file, PATHINFO_FILENAME);
-        foreach ($this->middleware as $alias => $class) {
-            if (strpos($class, $filename) !== false) {
-                return $alias;
-            }
-        }
-    }
-
-    /**
-     * Find the template name from the hash.
-     *
-     * @param  string $hash
-     * @return null|string
-     */
-    protected function findViewFromHash($hash) {
-        $finder = app('view')->getFinder();
-        if (isset($this->reflection['viewfinderViews'])) {
-            $property = $this->reflection['viewfinderViews'];
-        } else {
-            $reflection = new \ReflectionClass($finder);
-            $property = $reflection->getProperty('views');
-            $property->setAccessible(true);
-            $this->reflection['viewfinderViews'] = $property;
-        }
-        foreach ($property->getValue($finder) as $name => $path) {
-            if (sha1($path) == $hash || md5($path) == $hash) {
-                return $name;
-            }
-        }
-    }
-
-    /**
-     * Get the filename/line from a Twig template trace
-     *
-     * @param array $trace
-     * @return array The file and line
-     */
-    protected function getTwigInfo($trace) {
-        $file = $trace['object']->getTemplateName();
-        if (isset($trace['line'])) {
-            foreach ($trace['object']->getDebugInfo() as $codeLine => $templateLine) {
-                if ($codeLine <= $trace['line']) {
-                    return [$file, $templateLine];
-                }
-            }
-        }
-        return [$file, -1];
     }
 
     /**
@@ -335,7 +260,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         if (file_exists($path)) {
             $path = realpath($path);
         }
-        return str_replace(base_path(), '', $path);
+        return str_replace(DOCROOT, '', $path);
     }
 
     /**

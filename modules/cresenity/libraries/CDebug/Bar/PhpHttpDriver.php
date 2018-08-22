@@ -18,7 +18,9 @@ class CDebug_Bar_PhpHttpDriver implements CDebug_Bar_Interface_HttpDriverInterfa
      */
     function setHeaders(array $headers) {
         foreach ($headers as $name => $value) {
-            header("$name: $value");
+            if (!headers_sent()) {
+                header($name . ":" . $value);
+            }
         }
     }
 

@@ -15,7 +15,7 @@
      * Options:
      *  - data
      */
-    var LaravelSQLQueriesWidget = PhpDebugBar.Widgets.CFSQLQueriesWidget = PhpDebugBar.Widget.extend({
+    var CFSQLQueriesWidget = PhpDebugBar.Widgets.CFSQLQueriesWidget = PhpDebugBar.Widget.extend({
 
         className: csscls('sqlqueries'),
 

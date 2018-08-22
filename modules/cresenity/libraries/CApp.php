@@ -388,7 +388,7 @@ class CApp extends CObservable {
     public function render() {
 
         if ($this->rendered) {
-            trigger_error('CApp already rendered');
+            throw new CException('CApp already rendered');
         }
         $this->rendered = true;
 

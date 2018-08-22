@@ -85,12 +85,12 @@ class CDebug_AbstractBar implements ArrayAccess {
      * Returns a data collector
      *
      * @param string $name
-     * @return DataCollectorInterface
-     * @throws DebugBarException
+     * @return CDebug_Interface_DataCollectorInterface
+     * @throws CDebug_Bar_Exception
      */
     public function getCollector($name) {
         if (!isset($this->collectors[$name])) {
-            throw new DebugBarException("'$name' is not a registered collector");
+            throw new CDebug_Bar_Exception("'$name' is not a registered collector");
         }
         return $this->collectors[$name];
     }
@@ -145,6 +145,63 @@ class CDebug_AbstractBar implements ArrayAccess {
             $this->requestId = $this->getRequestIdGenerator()->generate();
         }
         return $this->requestId;
+    }
+
+    /**
+     * Returns an array of HTTP headers containing the data
+     *
+     * @param string $headerName
+     * @param integer $maxHeaderLength
+     * @return array
+     */
+    public function getDataAsHeaders($headerName = 'phpdebugbar', $maxHeaderLength = 4096, $maxTotalHeaderLength = 250000) {
+        $data = rawurlencode(json_encode(array(
+            'id' => $this->getCurrentRequestId(),
+            'data' => $this->getData()
+        )));
+
+        if (strlen($data) > $maxTotalHeaderLength) {
+
+            $data = rawurlencode(json_encode(array(
+                'error' => 'Maximum header size exceeded'
+            )));
+        }
+        $chunks = array();
+        while (strlen($data) > $maxHeaderLength) {
+            $chunks[] = substr($data, 0, $maxHeaderLength);
+            $data = substr($data, $maxHeaderLength);
+        }
+        $chunks[] = $data;
+        $headers = array();
+        for ($i = 0, $c = count($chunks); $i < $c; $i++) {
+            $name = $headerName . ($i > 0 ? "-$i" : '');
+            $headers[$name] = $chunks[$i];
+        }
+        return $headers;
+    }
+
+    /**
+     * Sends the data through the HTTP headers
+     *
+     * @param bool $useOpenHandler
+     * @param string $headerName
+     * @param integer $maxHeaderLength
+     * @return $this
+     */
+    public function sendDataInHeaders($useOpenHandler = null, $headerName = 'phpdebugbar', $maxHeaderLength = 4096) {
+        if ($useOpenHandler === null) {
+            $useOpenHandler = self::$useOpenHandlerWhenSendingDataHeaders;
+        }
+        if ($useOpenHandler && $this->storage !== null) {
+            $this->getData();
+            $headerName .= '-id';
+            $headers = array($headerName => $this->getCurrentRequestId());
+        } else {
+            $headers = $this->getDataAsHeaders($headerName, $maxHeaderLength);
+        }
+
+        $this->getHttpDriver()->setHeaders($headers);
+        return $this;
     }
 
     /**
