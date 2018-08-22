@@ -34,7 +34,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
      *
      * @param DataFormatterInterface $formater
      */
-    public static function setDefaultDataFormatter(DataFormatterInterface $formater) {
+    public static function setDefaultDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
         self::$defaultDataFormatter = $formater;
     }
 
@@ -45,7 +45,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
      */
     public static function getDefaultDataFormatter() {
         if (self::$defaultDataFormatter === null) {
-            self::$defaultDataFormatter = new DataFormatter();
+            self::$defaultDataFormatter = new CDebug_DataFormatter();
         }
         return self::$defaultDataFormatter;
     }
@@ -97,7 +97,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
      *
      * @param DebugBarVarDumper $varDumper
      */
-    public static function setDefaultVarDumper(DebugBarVarDumper $varDumper) {
+    public static function setDefaultVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
         self::$defaultVarDumper = $varDumper;
     }
 
@@ -108,7 +108,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
      */
     public static function getDefaultVarDumper() {
         if (self::$defaultVarDumper === null) {
-            self::$defaultVarDumper = new DebugBarVarDumper();
+            self::$defaultVarDumper = new CDebug_DataFormatter_DebugBarVarDumper();
         }
         return self::$defaultVarDumper;
     }

@@ -84,7 +84,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     public function stopMeasure($name, $params = array()) {
         $end = microtime(true);
         if (!$this->hasStartedMeasure($name)) {
-            throw new DebugBarException("Failed stopping measure '$name' because it hasn't been started");
+            throw new CDebug_Exception("Failed stopping measure '$name' because it hasn't been started");
         }
         $this->addMeasure(
                 $this->startedMeasures[$name]['label'], $this->startedMeasures[$name]['start'], $end, $params, $this->startedMeasures[$name]['collector']

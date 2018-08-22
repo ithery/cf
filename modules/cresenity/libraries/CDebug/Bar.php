@@ -23,15 +23,8 @@ class CDebug_Bar extends CDebug_AbstractBar {
      */
     protected $enabled;
 
-    /**
-     *
-     * @var CDebug_Bar_Renderer
-     */
-    protected $renderer;
-
     public function __construct($options = array()) {
         parent::__construct($options);
-        $this->renderer = new CDebug_Bar_Renderer($this);
     }
 
     public function getJavascriptCode() {
@@ -62,8 +55,13 @@ class CDebug_Bar extends CDebug_AbstractBar {
         }
 
         $this->addCollector(new CDebug_DataCollector_PhpInfoCollector());
+        $this->addCollector(new CDebug_DataCollector_MemoryCollector());
+        $this->addCollector(new CDebug_DataCollector_LocalizationCollector());
         $this->addCollector(new CDebug_DataCollector_MessagesCollector());
+        $this->addCollector(new CDebug_DataCollector_RequestDataCollector());
         $this->addCollector(new CDebug_DataCollector_TimeDataCollector());
+        $this->addCollector(new CDebug_DataCollector_FilesCollector());
+        $this->addCollector(new CDebug_DataCollector_ExceptionsCollector());
         $this->startMeasure('application', 'Application');
 
 

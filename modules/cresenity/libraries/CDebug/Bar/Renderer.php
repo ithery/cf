@@ -28,6 +28,14 @@ class CDebug_Bar_Renderer {
     protected $variableName = 'phpdebugbar';
     protected $controls = array();
     protected $ignoredCollectors = array();
+    protected $ajaxHandlerClass = 'PhpDebugBar.AjaxHandler';
+    protected $ajaxHandlerBindToJquery = true;
+    protected $ajaxHandlerBindToXHR = false;
+    protected $ajaxHandlerAutoShow = true;
+    protected $openHandlerClass = 'PhpDebugBar.OpenHandler';
+    protected $openHandlerUrl;
+    protected $cssFiles = array('debug/debugbar.css', 'debug/debugbar/widgets.css', 'debug/debugbar/openhandler.css');
+    protected $jsFiles = array('debug/debugbar.js', 'debug/debugbar/widgets.js', 'debug/debugbar/openhandler.js');
 
     const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
     const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
@@ -37,17 +45,47 @@ class CDebug_Bar_Renderer {
     }
 
     public function populateAssets() {
-        $clientScript = CClientScript::instance();
-        $clientScript->registerCssFile('debug/debugbar.css');
-        $clientScript->registerCssFile('debug/debugbar/widgets.css');
-        $clientScript->registerJsFile('debug/debugbar.js');
-        $clientScript->registerJsFile('debug/debugbar/widgets.js');
-    }
+        $cssFiles = $this->cssFiles;
+        $jsFiles = $this->jsFiles;
+        $inlineCss = array();
+        $inlineJs = array();
+        $inlineHead = array();
 
-    public function getJavascriptCode() {
-        $initCode = sprintf("var %s = new %s();\n", $this->variableName, $this->javascriptClass);
-        $definitionCode = $this->getJsControlsDefinitionCode($this->variableName);
-        return $initCode . $definitionCode;
+
+        // finds assets provided by collectors
+        foreach ($this->debugBar->getCollectors() as $collector) {
+            if (($collector instanceof CDebug_DataCollector_AssetProviderInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+                $additionalAssets[] = $collector->getAssets();
+            }
+        }
+        foreach ($additionalAssets as $assets) {
+
+            if (isset($assets['css'])) {
+                $cssFiles = array_merge($cssFiles, $assets['css']);
+            }
+            if (isset($assets['js'])) {
+                $jsFiles = array_merge($jsFiles, $assets['js']);
+            }
+            if (isset($assets['inline_css'])) {
+                $inlineCss = array_merge($inlineCss, (array) $assets['inline_css']);
+            }
+            if (isset($assets['inline_js'])) {
+                $inlineJs = array_merge($inlineJs, (array) $assets['inline_js']);
+            }
+            if (isset($assets['inline_head'])) {
+                $inlineHead = array_merge($inlineHead, (array) $assets['inline_head']);
+            }
+        }
+        // Deduplicate files
+        $cssFiles = array_unique($cssFiles);
+        $jsFiles = array_unique($jsFiles);
+        $clientScript = CClientScript::instance();
+
+        $clientScript->registerCssFiles($cssFiles);
+        $clientScript->registerJsFiles($jsFiles);
+        $clientScript->registerCssInlines($inlineCss);
+        $clientScript->registerJsInlines($inlineJs);
+        $clientScript->registerPlains($inlineHead);
     }
 
     public function getJavascriptReplaceCode() {
@@ -56,6 +94,54 @@ class CDebug_Bar_Renderer {
 
     public function replaceJavascriptCode($string) {
         return str_replace($this->getJavascriptReplaceCode(), $this->getJavascriptCode(), $string);
+    }
+
+    /**
+     * Returns the code needed to display the debug bar
+     *
+     * AJAX request should not render the initialization code.
+     *
+     * @param boolean $initialize Whether or not to render the debug bar initialization code
+     * @param boolean $renderStackedData Whether or not to render the stacked data
+     * @return string
+     */
+    public function getJavascriptCode($initialize = true, $renderStackedData = true) {
+        $js = '';
+        if ($initialize) {
+            $js = $this->getJavaScriptInitializationCode();
+        }
+        if ($renderStackedData && $this->debugBar->hasStackedData()) {
+            foreach ($this->debugBar->getStackedData() as $id => $data) {
+                $js .= $this->getAddDatasetCode($id, $data, '(stacked)');
+            }
+        }
+        $suffix = !$initialize ? '(ajax)' : null;
+        $js .= $this->getAddDatasetCode($this->debugBar->getCurrentRequestId(), $this->debugBar->getData(), $suffix);
+        return $js;
+    }
+
+    /**
+     * Returns the js code needed to initialize the debug bar
+     *
+     * @return string
+     */
+    public function getJavaScriptInitializationCode() {
+        $js = '';
+        $js .= sprintf("var %s = new %s();\n", $this->variableName, $this->javascriptClass);
+        $js .= $this->getJsControlsDefinitionCode($this->variableName);
+
+        if ($this->ajaxHandlerClass) {
+            $js .= sprintf("%s.ajaxHandler = new %s(%s, undefined, %s);\n", $this->variableName, $this->ajaxHandlerClass, $this->variableName, $this->ajaxHandlerAutoShow ? 'true' : 'false');
+            if ($this->ajaxHandlerBindToXHR) {
+                $js .= sprintf("%s.ajaxHandler.bindToXHR();\n", $this->variableName);
+            } elseif ($this->ajaxHandlerBindToJquery) {
+                $js .= sprintf("if (jQuery) %s.ajaxHandler.bindToJquery(jQuery);\n", $this->variableName);
+            }
+        }
+        if ($this->openHandlerUrl !== null) {
+            $js .= sprintf("%s.setOpenHandler(new %s(%s));\n", $this->variableName, $this->openHandlerClass, json_encode(array("url" => $this->openHandlerUrl)));
+        }
+        return $js;
     }
 
     /**
@@ -113,6 +199,19 @@ class CDebug_Bar_Renderer {
         CFEvent::add('system.display', function() {
             CF::$output = $this->replaceJavascriptCode(CF::$output);
         });
+    }
+
+    /**
+     * Returns the js code needed to add a dataset
+     *
+     * @param string $requestId
+     * @param array $data
+     * @param mixed $suffix
+     * @return string
+     */
+    protected function getAddDatasetCode($requestId, $data, $suffix = null) {
+        $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ", " . json_encode($suffix) : '');
+        return $js;
     }
 
 }
