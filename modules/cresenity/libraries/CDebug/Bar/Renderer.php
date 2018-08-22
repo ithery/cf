@@ -34,8 +34,19 @@ class CDebug_Bar_Renderer {
     protected $ajaxHandlerAutoShow = true;
     protected $openHandlerClass = 'PhpDebugBar.OpenHandler';
     protected $openHandlerUrl;
-    protected $cssFiles = array('debug/debugbar.css', 'debug/debugbar/widgets.css', 'debug/debugbar/openhandler.css');
-    protected $jsFiles = array('debug/debugbar.js', 'debug/debugbar/widgets.js', 'debug/debugbar/openhandler.js');
+    protected $cssFiles = array(
+        'debug/debugbar.css',
+        'debug/debugbar/widgets.css',
+        'debug/debugbar/openhandler.css',
+        'debug/debugbar/font-awesome/css/font-awesome.min.css',
+        'debug/debugbar/highlightjs/styles/github.css',
+    );
+    protected $jsFiles = array(
+        'debug/debugbar.js',
+        'debug/debugbar/widgets.js',
+        'debug/debugbar/openhandler.js',
+        'debug/debugbar/highlightjs/highlight.pack.css',
+    );
 
     const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
     const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';

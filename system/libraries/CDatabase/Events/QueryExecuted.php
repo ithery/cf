@@ -24,6 +24,13 @@ class CDatabase_Events_QueryExecuted {
     public $time;
 
     /**
+     * The number of milliseconds it took to execute the query.
+     *
+     * @var int
+     */
+    public $rowsCount;
+
+    /**
      * The database connection instance.
      *
      * @var \Illuminate\Database\Connection
@@ -46,10 +53,11 @@ class CDatabase_Events_QueryExecuted {
      * @param  string  $connection
      * @return void
      */
-    public function __construct($sql, $bindings, $time, $db) {
+    public function __construct($sql, $bindings, $time, $rowsCount, $db) {
         $this->sql = $sql;
         $this->time = $time;
         $this->bindings = $bindings;
+        $this->rowsCount = $rowsCount;
         $this->connection = $db;
         $this->connectionName = $db->getName();
     }

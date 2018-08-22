@@ -331,7 +331,7 @@ class CDatabase {
         // Once we have run the query we will calculate the time that it took to run and
         // then log the query, bindings, and execution time so we will report them on
         // the event that the developer needs them. We'll log time in milliseconds.
-        $this->logQuery($sql, $bindings, $elapsedTime);
+        $this->logQuery($sql, $bindings, $elapsedTime, $result->count());
 
         return $result;
     }
@@ -1648,8 +1648,8 @@ class CDatabase {
      * @param  float|null  $time
      * @return void
      */
-    public function logQuery($query, $bindings, $time = null) {
-        $this->event(new CDatabase_Events_QueryExecuted($query, $bindings, $time, $this));
+    public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
+        $this->event(new CDatabase_Events_QueryExecuted($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
