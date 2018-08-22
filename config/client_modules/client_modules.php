@@ -373,11 +373,11 @@ return array(
             "materialize/materialize.css",
         ),
         "js" => array(
-            // "materialize/hammer.min.js",
+// "materialize/hammer.min.js",
             "materialize/materialize.min.js",
             // "materialize/material.min.js",
-            // "materialize/materialize.amd.js",
-            // "materialize/ripples.min.js",
+// "materialize/materialize.amd.js",
+// "materialize/ripples.min.js",
             "materialize/swiper/swiper.jquery.js",
             "materialize/materialize.clockpicker.js",
             "materialize/jscroll/jquery.jscroll.js",
@@ -544,6 +544,9 @@ return array(
     ),
     "glyphicons" => array(
         "css" => array("icon/glyphicons.css"),
+    ),
+    "jquery.event.drag" => array(
+        "js" => array("plugins/jquery.event.drag/jquery.event.drag-2.2.js"),
     ),
 );
 ?>
