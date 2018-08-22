@@ -144,7 +144,12 @@ class CApp extends CObservable {
 
         $this->registerCoreModules();
 
-
+        if (isset($_COOKIE['capp-profiler'])) {
+            new Profiler();
+        }
+        if (isset($_COOKIE['capp-debugbar'])) {
+            CDebug::bar()->enable();
+        }
         $db = CDatabase::instance();
         if ($this->_org == null) {
             $org_id = cstg::get("org_id");
@@ -227,7 +232,6 @@ class CApp extends CObservable {
         $this->run = false;
 
         $theme_path = "";
-        //$theme_path = ctheme::path();
     }
 
     public function setLoginRequired($bool) {
@@ -499,9 +503,7 @@ class CApp extends CObservable {
             $v->custom_data = $this->custom_data;
             $v->login_required = $this->login_required;
         }
-        if (isset($_GET['profiler'])) {
-            new Profiler();
-        }
+
 
         return $v->render();
     }

@@ -53,16 +53,16 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     /**
      * Sets the data formater instance used by this collector
      *
-     * @param DataFormatterInterface $formater
+     * @param CDebug_Interface_DataFormatterInterface $formater
      * @return $this
      */
-    public function setDataFormatter(DataFormatterInterface $formater) {
+    public function setDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
         $this->dataFormater = $formater;
         return $this;
     }
 
     /**
-     * @return DataFormatterInterface
+     * @return CDebug_Interface_DataFormatterInterface
      */
     public function getDataFormatter() {
         if ($this->dataFormater === null) {

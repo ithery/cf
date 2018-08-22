@@ -1,9 +1,7 @@
 <?php
 
-namespace Illuminate\Database\Events;
+class CDatabase_Events_QueryExecuted {
 
-class QueryExecuted
-{
     /**
      * The SQL query that was executed.
      *
@@ -48,12 +46,12 @@ class QueryExecuted
      * @param  string  $connection
      * @return void
      */
-    public function __construct($sql, $bindings, $time, $connection)
-    {
+    public function __construct($sql, $bindings, $time, $db) {
         $this->sql = $sql;
         $this->time = $time;
         $this->bindings = $bindings;
-        $this->connection = $connection;
-        $this->connectionName = $connection->getName();
+        $this->connection = $db;
+        $this->connectionName = $db->getName();
     }
+
 }

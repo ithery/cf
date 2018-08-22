@@ -61,6 +61,12 @@ class CDebug_Bar extends CDebug_AbstractBar {
         $this->addCollector(new CDebug_DataCollector_RequestDataCollector());
         $this->addCollector(new CDebug_DataCollector_TimeDataCollector());
         $this->addCollector(new CDebug_DataCollector_FilesCollector());
+
+        $queryCollector = new CDebug_DataCollector_QueryCollector();
+
+        $queryCollector->setRenderSqlWithParams(true);
+        $this->addCollector($queryCollector);
+
         $this->addCollector(new CDebug_DataCollector_ExceptionsCollector());
         $this->startMeasure('application', 'Application');
 
@@ -83,6 +89,29 @@ class CDebug_Bar extends CDebug_AbstractBar {
             /* @var CDebug_DataCollector_TimeDataCollector $collector  */
             $collector = $this->getCollector('time');
             $collector->startMeasure($name, $label);
+        }
+    }
+
+    /**
+     * Adds an exception to be profiled in the debug bar
+     *
+     * @param Exception $e
+     * @deprecated in favor of addThrowable
+     */
+    public function addException(Exception $e) {
+        return $this->addThrowable($e);
+    }
+
+    /**
+     * Adds an exception to be profiled in the debug bar
+     *
+     * @param Exception $e
+     */
+    public function addThrowable($e) {
+        if ($this->hasCollector('exceptions')) {
+            /** @var \DebugBar\DataCollector\ExceptionsCollector $collector */
+            $collector = $this->getCollector('exceptions');
+            $collector->addThrowable($e);
         }
     }
 

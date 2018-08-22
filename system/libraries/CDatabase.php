@@ -70,7 +70,7 @@ class CDatabase {
     /**
      * The event dispatcher instance.
      *
-     * @var CEvents
+     * @var CContracts_Events_Dispatcher
      */
     protected $events;
 
@@ -260,6 +260,8 @@ class CDatabase {
 
         $this->eventManager = new CEventManager();
 
+        $this->setEventDispatcher(new CEvents_Dispatcher(new CContainer()));
+
         $this->configuration = new CDatabase_Configuration();
 
         // Validate the driver
@@ -298,7 +300,7 @@ class CDatabase {
      * @param   string  SQL query to execute
      * @return  CDatabase_Result
      */
-    public function query($sql = '') {
+    public function query($sql = '', $bindings = array(), Closure $callback = null) {
         if ($sql == '')
             return FALSE;
 
@@ -308,77 +310,63 @@ class CDatabase {
         // Start the benchmark
         $start = microtime(TRUE);
 
-        if (func_num_args() > 1) { //if we have more than one argument ($sql)
-            $argv = func_get_args();
-            $binds = (is_array(next($argv))) ? current($argv) : array_slice($argv, 1);
-        }
 
         // Compile binds if needed
-        if (isset($binds)) {
-            $sql = $this->compile_binds($sql, $binds);
-        }
 
-        // log each query into log file based on domain and org
-        $is_log = carr::get($this->config, 'log', FALSE);
-        if ($is_log == TRUE) {
-            $log_sql = trim($sql);
-            $log_sql = preg_replace('#\s+#ims', ' ', $sql);
-            if (is_array($sql)) {
-                $log_sql = json_encode($sql);
-            }
-            $options = array(
-                'message' => $log_sql,
-                'level' => carr::get($this->config, 'log_level', CLogger::INFO),
-            );
-            $path = carr::get($this->config, 'log_path');
-            if (strlen($path) > 0) {
-                $options['path'] = $this->config['log_path'];
-            }
+        $sql = $this->compile_binds($sql, $bindings);
 
-            $is_write = TRUE;
-            $log_query_options = carr::get($this->config, 'log_query_options', array());
-            if (is_array($log_query_options)) {
-                $prefix = '';
-                $log_sql = ltrim($log_sql);
-                $has_found = FALSE;
-
-                // get query options
-                foreach ($log_query_options as $k => $v) {
-                    $prefix = $k;
-                    if ($has_found == TRUE)
-                        break;
-                    if ($v == TRUE)
-                        continue;
-
-                    $log_sql = strtoupper($log_sql);
-                    $v = strtoupper($v);
-
-                    // compare query sql with prefix
-                    if (strlen($log_sql) >= strlen($prefix)) {
-                        if (substr($log_sql, 0, strlen($prefix)) == $prefix) {
-                            $has_found = TRUE;
-                            $is_write = FALSE;
-                        }
-                    }
-                }
-            }
-            if ($is_write)
-                clog::write($options);
-        }
 
         // Fetch the result
         $result = $this->driver->query($this->last_query = $sql);
 
         // Stop the benchmark
-        $stop = microtime(TRUE);
+        $elapsedTime = $this->getElapsedTime($start);
 
         $is_benchmark = carr::get($this->config, 'benchmark', FALSE);
         if ($is_benchmark) {
             // Benchmark the query
-            CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $stop - $start, 'rows' => count($result), 'caller' => cdbg::caller_info());
+            CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::caller_info());
         }
 
+        // Once we have run the query we will calculate the time that it took to run and
+        // then log the query, bindings, and execution time so we will report them on
+        // the event that the developer needs them. We'll log time in milliseconds.
+        $this->logQuery($sql, $bindings, $elapsedTime);
+
         return $result;
+    }
+
+    /**
+     * Get the elapsed time since a given starting point.
+     *
+     * @param  int    $start
+     * @return float
+     */
+    protected function getElapsedTime($start) {
+        return round((microtime(true) - $start) * 1000, 2);
+    }
+
+    /**
+     * Prepare the query bindings for execution.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    public function prepareBindings(array $bindings) {
+        $grammar = $this->getQueryGrammar();
+
+        foreach ($bindings as $key => $value) {
+            // We need to transform all instances of DateTimeInterface into the actual
+            // date string. Each query grammar maintains its own date string format
+            // so we'll just ask the grammar for the format to get from the date.
+            if ($value instanceof DateTimeInterface) {
+                $bindings[$key] = $value->format($grammar->getDateFormat());
+            } elseif (is_bool($value)) {
+                $bindings[$key] = (int) $value;
+            }
+        }
+
+        return $bindings;
     }
 
     /**
@@ -1445,8 +1433,8 @@ class CDatabase {
      *
      * @return array
      */
-    public function fetchAll($sql, array $params = [], $types = []) {
-        return $this->query($sql, $params, $types)->fetchAll();
+    public function fetchAll($sql, array $params = []) {
+        return $this->query($sql, $params)->fetchAll();
     }
 
     public function table($table) {
@@ -1478,6 +1466,43 @@ class CDatabase {
         if (isset($this->events)) {
             $this->events->listen(CDatabase_Events_QueryExecuted::class, $callback);
         }
+    }
+
+    public function haveListener() {
+        if (isset($this->events)) {
+            $this->events->haveListener();
+        }
+    }
+
+    /**
+     * Fire the given event if possible.
+     *
+     * @param  mixed  $event
+     * @return void
+     */
+    protected function event($event) {
+        if (isset($this->events)) {
+            $this->events->dispatch($event);
+        }
+    }
+
+    /**
+     * Get the event dispatcher used by the connection.
+     *
+     * @return CContracts_Events_Dispatcher
+     */
+    public function getEventDispatcher() {
+        return $this->events;
+    }
+
+    /**
+     * Set the event dispatcher instance on the connection.
+     *
+     * @param  CContracts_Events_Dispatcher  $events
+     * @return void
+     */
+    public function setEventDispatcher(CContracts_Events_Dispatcher $events) {
+        $this->events = $events;
     }
 
     /**
@@ -1609,6 +1634,35 @@ class CDatabase {
      */
     public function getDatabase() {
         return $this->driver->getDatabase($this);
+    }
+
+    public function isLogQuery() {
+        return carr::get($this->config, 'log', false);
+    }
+
+    /**
+     * Log a query in the connection's query log.
+     *
+     * @param  string  $query
+     * @param  array   $bindings
+     * @param  float|null  $time
+     * @return void
+     */
+    public function logQuery($query, $bindings, $time = null) {
+        $this->event(new CDatabase_Events_QueryExecuted($query, $bindings, $time, $this));
+
+        if ($this->isLogQuery()) {
+            $this->queryLog[] = compact('query', 'bindings', 'time');
+        }
+    }
+
+    /**
+     * Get the name of the connected database.
+     *
+     * @return string
+     */
+    public function getDatabaseName() {
+        return carr::path($this->config, 'connection.database');
     }
 
 }
