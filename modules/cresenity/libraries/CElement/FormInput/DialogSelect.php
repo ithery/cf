@@ -14,6 +14,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	protected $keyField;
 	protected $searchField;
 	protected $limit;
+	protected $itemName;
 	protected $imgSrc;
 	protected $width;
 	protected $height;
@@ -32,6 +33,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		$this->keyField = '';
 		$this->searchField = '';
 		$this->limit = 10;
+		$this->itemName = '';
 		$this->imgSrc = CApp_Base::noImageUrl();
 		$this->width = '100';
 		$this->height = '100';
@@ -42,6 +44,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		$this->itemTemplateVariables = array('id', 'name', 'imageUrl');
 		$this->onBeforeParse(function() {
 		    $this->setVar('id', $this->id);
+		    $this->setVar('itemName', $this->itemName);
 		    $this->setVar('imgSrc', $this->imgSrc);
 		    $this->setVar('width', $this->width);
 		    $this->setVar('height', $this->height);
@@ -82,6 +85,11 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 
 	public function setLimit($total) {
 		$this->limit = $total;
+		return $this;
+	}
+
+	public function setItemName($itemName) {
+		$this->itemName = $itemName;
 		return $this;
 	}
 
