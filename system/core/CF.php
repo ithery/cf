@@ -1151,6 +1151,11 @@ final class CF {
                 if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
                     // Send the headers if they have not already been sent
                     $exception->send_headers();
+                } else {
+                    if (!headers_sent()) {
+                        // Send the 500 header
+                        header('HTTP/1.1 500 Internal Server Error');
+                    }
                 }
             }
 

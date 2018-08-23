@@ -596,7 +596,9 @@ div.dataTables_wrapper .ui-widget-header {
     position: relative;
     vertical-align: middle;
 } 
-
+body.modal-open .select2-container {
+    z-index: 1090;
+}
 .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple {
     border-color: #e7eaec;
 }
