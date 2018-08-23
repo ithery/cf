@@ -216,9 +216,16 @@ class CDebug_Bar_Renderer {
                         header('phpdebugbar-body:1');
                     }
                     $jsonHelper = CHelper::json();
-                    $json = $jsonHelper->parse($output);
-                    $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
-                    $output = $jsonHelper->stringify($json);
+                    $json = null;
+                    try {
+                        $json = $jsonHelper->parse($output);
+                    } catch (Exception $ex) {
+                        
+                    }
+                    if (is_array($json)) {
+                        $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+                        $output = $jsonHelper->stringify($json);
+                    }
                 } catch (Exception $ex) {
                     
                 }
