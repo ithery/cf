@@ -13,6 +13,11 @@ class CElement_Component_DataTable extends CElement_Component {
         "-1" => "ALL",
     );
     public $current_row = 1;
+
+    /**
+     *
+     * @var CDatabase
+     */
     public $db;
     public $db_config;
     public $columns;
@@ -1722,6 +1727,9 @@ class CElement_Component_DataTable extends CElement_Component {
                 $columns[] = $col;
             }
 
+            $dbTemp = $this->db;
+            $this->db = null;
+
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DataTable');
             $ajaxMethod->setData('columns', $columns);
@@ -1729,12 +1737,15 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajaxMethod->setData('row_action_list', $this->rowActionList);
             $ajaxMethod->setData('key_field', $this->key_field);
             $ajaxMethod->setData('table', serialize($this));
+            $ajaxMethod->setData('dbConfig', $this->db_config);
             $ajaxMethod->setData('domain', $this->domain);
+            $ajaxMethod->setData('checkbox', $this->checkbox);
             $ajaxMethod->setData('is_elastic', $this->isElastic);
             $ajaxMethod->setData('is_callback', $this->isCallback);
             $ajaxMethod->setData('callback_require', $this->callbackRequire);
             $ajaxMethod->setData('callback_options', $this->callbackOptions);
             $ajax_url = $ajaxMethod->makeUrl();
+            $this->db = $dbTemp;
         }
 
         foreach ($this->footer_action_list->childs() as $row_act) {

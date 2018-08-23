@@ -33,13 +33,20 @@ final class CHelper {
         return new CHelper_Base64();
     }
 
-    
     /**
      * 
      * @return \CHelper_JSON
      */
     public static function json() {
         return new CHelper_JSON();
+    }
+
+    /**
+     * 
+     * @return \CHelper_Request
+     */
+    public static function request() {
+        return new CHelper_Request();
     }
 
 }

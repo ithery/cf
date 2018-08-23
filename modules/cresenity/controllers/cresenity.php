@@ -13,6 +13,7 @@ class Cresenity_Controller extends CController {
     }
 
     public function ajax($method) {
+        $app = CApp::instance();
         $file = CApp::temp()->makePath("ajax", $method . ".tmp");
         if (isset($_GET['profiler'])) {
             new Profiler();
@@ -23,7 +24,7 @@ class Cresenity_Controller extends CController {
         $json = file_get_contents($file);
         $ajaxMethod = CAjax::createMethod($json);
         $response = $ajaxMethod->executeEngine();
-        
+
         echo $response;
     }
 

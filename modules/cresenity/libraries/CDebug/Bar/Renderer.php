@@ -1,0 +1,362 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Aug 22, 2018, 1:20:44 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CDebug_Bar_Renderer {
+
+    /**
+     *
+     * @var CDebug_Bar
+     */
+    protected $debugBar;
+
+    /**
+     *
+     * @var string
+     */
+    protected $javascriptClass = 'PhpDebugBar.DebugBar';
+
+    /**
+     *
+     * @var string
+     */
+    protected $variableName = 'phpdebugbar';
+    protected $controls = array();
+    protected $ignoredCollectors = array();
+    protected $ajaxHandlerClass = 'PhpDebugBar.AjaxHandler';
+    protected $ajaxHandlerBindToJquery = true;
+    protected $ajaxHandlerBindToXHR = false;
+    protected $ajaxHandlerAutoShow = true;
+    protected $openHandlerClass = 'PhpDebugBar.OpenHandler';
+    protected $openHandlerUrl;
+    protected $cssFiles = array(
+        'debug/debugbar.css',
+        'debug/debugbar/widgets.css',
+        'debug/debugbar/openhandler.css',
+        'debug/debugbar/font-awesome/css/font-awesome.min.css',
+        'debug/debugbar/highlightjs/styles/github.css',
+        'debug/debugbar-custom.css',
+    );
+    protected $jsFiles = array(
+        'debug/debugbar.js',
+        'debug/debugbar/widgets.js',
+        'debug/debugbar/openhandler.js',
+        'debug/debugbar/highlightjs/highlight.pack.js',
+    );
+
+    const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
+    const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
+
+    public function __construct(CDebug_Bar $bar) {
+        $this->debugBar = $bar;
+    }
+
+    public function populateAssets() {
+        $cssFiles = $this->cssFiles;
+        $jsFiles = $this->jsFiles;
+        $inlineCss = array();
+        $inlineJs = array();
+        $inlineHead = array();
+
+
+        // finds assets provided by collectors
+        foreach ($this->debugBar->getCollectors() as $collector) {
+            if (($collector instanceof CDebug_DataCollector_AssetProviderInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+                $additionalAssets[] = $collector->getAssets();
+            }
+        }
+        foreach ($additionalAssets as $assets) {
+
+            if (isset($assets['css'])) {
+                $cssFiles = array_merge($cssFiles, $assets['css']);
+            }
+            if (isset($assets['js'])) {
+                $jsFiles = array_merge($jsFiles, $assets['js']);
+            }
+            if (isset($assets['inline_css'])) {
+                $inlineCss = array_merge($inlineCss, (array) $assets['inline_css']);
+            }
+            if (isset($assets['inline_js'])) {
+                $inlineJs = array_merge($inlineJs, (array) $assets['inline_js']);
+            }
+            if (isset($assets['inline_head'])) {
+                $inlineHead = array_merge($inlineHead, (array) $assets['inline_head']);
+            }
+        }
+        // Deduplicate files
+        $cssFiles = array_unique($cssFiles);
+        $jsFiles = array_unique($jsFiles);
+        $clientScript = CClientScript::instance();
+
+        $clientScript->registerCssFiles($cssFiles);
+        $clientScript->registerJsFiles($jsFiles);
+        $clientScript->registerCssInlines($inlineCss);
+        $clientScript->registerJsInlines($inlineJs);
+        $clientScript->registerPlains($inlineHead);
+    }
+
+    public function getJavascriptReplaceCode() {
+        return self::REPLACEABLE_JS_TAG;
+    }
+
+    public function replaceJavascriptCode($string) {
+        return str_replace($this->getJavascriptReplaceCode(), $this->getJavascriptCode(), $string);
+    }
+
+    /**
+     * Returns the code needed to display the debug bar
+     *
+     * AJAX request should not render the initialization code.
+     *
+     * @param boolean $initialize Whether or not to render the debug bar initialization code
+     * @param boolean $renderStackedData Whether or not to render the stacked data
+     * @return string
+     */
+    public function getJavascriptCode($initialize = true, $renderStackedData = true) {
+        $js = '';
+        if ($initialize) {
+            $js = $this->getJavaScriptInitializationCode();
+        }
+        if ($renderStackedData && $this->debugBar->hasStackedData()) {
+            foreach ($this->debugBar->getStackedData() as $id => $data) {
+                $js .= $this->getAddDatasetCode($id, $data, '(stacked)');
+            }
+        }
+        $suffix = !$initialize ? '(ajax)' : null;
+        $js .= $this->getAddDatasetCode($this->debugBar->getCurrentRequestId(), $this->debugBar->getData(), $suffix);
+        return $js;
+    }
+
+    /**
+     * Returns the js code needed to initialize the debug bar
+     *
+     * @return string
+     */
+    public function getJavaScriptInitializationCode() {
+        $js = '';
+        $js .= sprintf("var %s = new %s();\n", $this->variableName, $this->javascriptClass);
+        $js .= $this->getJsControlsDefinitionCode($this->variableName);
+
+        if ($this->ajaxHandlerClass) {
+            $js .= sprintf("%s.ajaxHandler = new %s(%s, undefined, %s);\n", $this->variableName, $this->ajaxHandlerClass, $this->variableName, $this->ajaxHandlerAutoShow ? 'true' : 'false');
+            if ($this->ajaxHandlerBindToXHR) {
+                $js .= sprintf("%s.ajaxHandler.bindToXHR();\n", $this->variableName);
+            } elseif ($this->ajaxHandlerBindToJquery) {
+                $js .= sprintf("if (jQuery) %s.ajaxHandler.bindToJquery(jQuery);\n", $this->variableName);
+            }
+        }
+        if ($this->openHandlerUrl !== null) {
+            $js .= sprintf("%s.setOpenHandler(new %s(%s));\n", $this->variableName, $this->openHandlerClass, json_encode(array("url" => $this->openHandlerUrl)));
+        }
+        return $js;
+    }
+
+    /**
+     * Returns the js code needed to initialized the controls and data mapping of the debug bar
+     *
+     * Controls can be defined by collectors themselves or using {@see addControl()}
+     *
+     * @param string $varname Debug bar's variable name
+     * @return string
+     */
+    protected function getJsControlsDefinitionCode($varname) {
+        $js = '';
+        $dataMap = array();
+        $excludedOptions = array('indicator', 'tab', 'map', 'default', 'widget', 'position');
+        // finds controls provided by collectors
+        $widgets = array();
+        foreach ($this->debugBar->getCollectors() as $collector) {
+            if (($collector instanceof CDebug_Bar_Interface_RenderableInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+                if ($w = $collector->getWidgets()) {
+                    $widgets = array_merge($widgets, $w);
+                }
+            }
+        }
+
+        $controls = array_merge($widgets, $this->controls);
+
+        foreach (array_filter($controls) as $name => $options) {
+            $opts = array_diff_key($options, array_flip($excludedOptions));
+            if (isset($options['tab']) || isset($options['widget'])) {
+                if (!isset($opts['title'])) {
+                    $opts['title'] = ucfirst(str_replace('_', ' ', $name));
+                }
+                $js .= sprintf("%s.addTab(\"%s\", new %s({%s%s}));\n", $varname, $name, isset($options['tab']) ? $options['tab'] : 'PhpDebugBar.DebugBar.Tab', substr(json_encode($opts, JSON_FORCE_OBJECT), 1, -1), isset($options['widget']) ? sprintf('%s"widget": new %s()', count($opts) ? ', ' : '', $options['widget']) : ''
+                );
+            } elseif (isset($options['indicator']) || isset($options['icon'])) {
+                $js .= sprintf("%s.addIndicator(\"%s\", new %s(%s), \"%s\");\n", $varname, $name, isset($options['indicator']) ? $options['indicator'] : 'PhpDebugBar.DebugBar.Indicator', json_encode($opts, JSON_FORCE_OBJECT), isset($options['position']) ? $options['position'] : 'right'
+                );
+            }
+            if (isset($options['map']) && isset($options['default'])) {
+                $dataMap[$name] = array($options['map'], $options['default']);
+            }
+        }
+        // creates the data mapping object
+        $mapJson = array();
+        foreach ($dataMap as $name => $values) {
+            $mapJson[] = sprintf('"%s": ["%s", %s]', $name, $values[0], $values[1]);
+        }
+        $js .= sprintf("%s.setDataMap({\n%s\n});\n", $varname, implode(",\n", $mapJson));
+        // activate state restoration
+        $js .= sprintf("%s.restoreState();\n", $varname);
+        return $js;
+    }
+
+    public function apply() {
+        CFEvent::add('system.display', function() {
+            $output = CF::$output;
+            if (CHelper::request()->isAjax()) {
+                try {
+                    if (!headers_sent()) {
+                        header('phpdebugbar-body:1');
+                    }
+                    $jsonHelper = CHelper::json();
+                    $json = $jsonHelper->parse($output);
+                    $json = array_merge($json, $this->debugBar->getDataAsHeaders());
+                    $output = $jsonHelper->stringify($json);
+                } catch (Exception $ex) {
+                    
+                }
+            } else {
+                $output = $this->replaceJavascriptCode(CF::$output);
+            }
+            CF::$output = $output;
+        });
+    }
+
+    /**
+     * Returns the js code needed to add a dataset
+     *
+     * @param string $requestId
+     * @param array $data
+     * @param mixed $suffix
+     * @return string
+     */
+    protected function getAddDatasetCode($requestId, $data, $suffix = null) {
+        $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ", " . json_encode($suffix) : '');
+        return $js;
+    }
+
+    /**
+     * Sets the class name of the ajax handler
+     *
+     * Set to false to disable
+     *
+     * @param string $className
+     */
+    public function setAjaxHandlerClass($className) {
+        $this->ajaxHandlerClass = $className;
+        return $this;
+    }
+
+    /**
+     * Returns the class name of the ajax handler
+     *
+     * @return string
+     */
+    public function getAjaxHandlerClass() {
+        return $this->ajaxHandlerClass;
+    }
+
+    /**
+     * Sets whether to call bindToJquery() on the ajax handler
+     *
+     * @param boolean $bind
+     */
+    public function setBindAjaxHandlerToJquery($bind = true) {
+        $this->ajaxHandlerBindToJquery = $bind;
+        return $this;
+    }
+
+    /**
+     * Checks whether bindToJquery() will be called on the ajax handler
+     *
+     * @return boolean
+     */
+    public function isAjaxHandlerBoundToJquery() {
+        return $this->ajaxHandlerBindToJquery;
+    }
+
+    /**
+     * Sets whether to call bindToXHR() on the ajax handler
+     *
+     * @param boolean $bind
+     */
+    public function setBindAjaxHandlerToXHR($bind = true) {
+        $this->ajaxHandlerBindToXHR = $bind;
+        return $this;
+    }
+
+    /**
+     * Checks whether bindToXHR() will be called on the ajax handler
+     *
+     * @return boolean
+     */
+    public function isAjaxHandlerBoundToXHR() {
+        return $this->ajaxHandlerBindToXHR;
+    }
+
+    /**
+     * Sets whether new ajax debug data will be immediately shown.  Setting to false could be useful
+     * if there are a lot of tracking events cluttering things.
+     *
+     * @param boolean $autoShow
+     */
+    public function setAjaxHandlerAutoShow($autoShow = true) {
+        $this->ajaxHandlerAutoShow = $autoShow;
+        return $this;
+    }
+
+    /**
+     * Checks whether the ajax handler will immediately show new ajax requests.
+     *
+     * @return boolean
+     */
+    public function isAjaxHandlerAutoShow() {
+        return $this->ajaxHandlerAutoShow;
+    }
+
+    /**
+     * Sets the class name of the js open handler
+     *
+     * @param string $className
+     */
+    public function setOpenHandlerClass($className) {
+        $this->openHandlerClass = $className;
+        return $this;
+    }
+
+    /**
+     * Returns the class name of the js open handler
+     *
+     * @return string
+     */
+    public function getOpenHandlerClass() {
+        return $this->openHandlerClass;
+    }
+
+    /**
+     * Sets the url of the open handler
+     *
+     * @param string $url
+     */
+    public function setOpenHandlerUrl($url) {
+        $this->openHandlerUrl = $url;
+        return $this;
+    }
+
+    /**
+     * Returns the url for the open handler
+     *
+     * @return string
+     */
+    public function getOpenHandlerUrl() {
+        return $this->openHandlerUrl;
+    }
+
+}
