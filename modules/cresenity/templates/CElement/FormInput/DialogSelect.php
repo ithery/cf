@@ -59,7 +59,7 @@
 			</div>
 		</div>
 		<div class="dialog-select-name">
-			
+			<?= $itemName ?>
 		</div>
 	</div>
 	<div>
