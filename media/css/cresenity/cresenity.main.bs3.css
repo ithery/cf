@@ -843,7 +843,7 @@ table.responsive {
 }
 
 .navbar-static-side {
-    z-index: 2001;
+    z-index: 1020;
     position: absolute;
     width: 220px;
     border-color: #2f4050;
