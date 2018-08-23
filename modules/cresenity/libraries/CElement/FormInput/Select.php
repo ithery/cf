@@ -189,13 +189,13 @@ class CElement_FormInput_Select extends CElement_FormInput {
     public function js($indent = 0) {
 
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
         if ($this->applyJs == "select2") {
             if ($this->select2 == '4') {
-                CManager::instance()->register_module('select2-4.0');
+                CManager::instance()->registerModule('select2-4.0');
             } else {
-                CManager::instance()->register_module('select2');
+                CManager::instance()->registerModule('select2');
             }
             $classes = $this->classes;
             $classes = implode(" ", $classes);
