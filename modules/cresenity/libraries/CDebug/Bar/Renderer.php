@@ -217,7 +217,7 @@ class CDebug_Bar_Renderer {
                     }
                     $jsonHelper = CHelper::json();
                     $json = $jsonHelper->parse($output);
-                    $json = array_merge($json, $this->debugBar->getDataAsHeaders());
+                    $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
                     $output = $jsonHelper->stringify($json);
                 } catch (Exception $ex) {
                     
