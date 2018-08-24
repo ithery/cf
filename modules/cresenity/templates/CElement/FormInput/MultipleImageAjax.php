@@ -114,12 +114,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
         <?php
         foreach ($files as $f) :
             $input_name = carr::get($f, 'input_name');
+            $input_value = carr::get($f, 'input_value');
             $file_url = carr::get($f, 'file_url');
             ?>
             <div class="multi-image-ajax-file container-file-upload">
                 <div class="div-img">
                     <img src="<?php echo $file_url; ?>" />
-                    <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="">
+                    <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="<? echo $input_value; ?>">
                 </div>
                 <?php
                 foreach ($customControl as $cc) :
