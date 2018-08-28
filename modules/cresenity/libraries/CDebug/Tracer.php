@@ -15,6 +15,8 @@ use OpenTracing\SpanContext as OpenTracingContext;
 use OpenTracing\StartSpanOptions;
 use OpenTracing\Tracer as OpenTracingTracer;
 
+require_once DOCROOT . 'modules/cresenity/vendor/OpenTracing/Formats.php';
+
 final class CDebug_Tracer implements OpenTracingTracer {
 
     /**
@@ -62,8 +64,8 @@ final class CDebug_Tracer implements OpenTracingTracer {
      * @param Propagator[] $propagators
      * @param array $config
      */
-    public function __construct(Transport $transport = null, array $propagators = null, array $config = []) {
-        $this->transport = $transport ?: new Http(new Json());
+    public function __construct(CDebug_Tracer_Transport $transport = null, array $propagators = null, array $config = []) {
+        $this->transport = $transport ?: new CDebug_Tracer_Transport_Http(new CDebug_Tracer_Encoder_Json());
         $this->propagators = $propagators ?: [
             Formats\TEXT_MAP => new TextMap(),
         ];
