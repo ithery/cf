@@ -83,7 +83,7 @@
             </div>
             <div class="modal-body opened">
             	<div class="dialog-select-search">
-            		<input type="text">
+            		<input type="text" placeholder="<?= $placeholder ?>">
             	</div>
             	<div class="dialog-select-item-list">
 
