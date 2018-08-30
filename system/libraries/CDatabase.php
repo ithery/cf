@@ -1665,6 +1665,71 @@ class CDatabase {
         return carr::path($this->config, 'connection.database');
     }
 
+    public function getRow($query) {
+        $r = $this->query($query);
+        $result = null;
+        if ($r->count() > 0) {
+            $result = $r[0];
+        }
+        return $result;
+    }
+
+    public static function getValue($query) {
+        $r = $this->query($query);
+        $result = $r->result(false);
+        $res = array();
+        $value = null;
+        foreach ($result as $row) {
+            foreach ($row as $k => $v) {
+                $value = $v;
+                break;
+            }
+            break;
+        }
+        return $value;
+    }
+
+    public static function getArray($query) {
+        $r = $this->query($query);
+        $result = $r->result(false);
+        $res = array();
+        foreach ($result as $row) {
+            $cnt = 0;
+            $arr_val = "";
+            foreach ($row as $k => $v) {
+                if ($cnt == 0)
+                    $arr_val = $v;
+                $cnt++;
+                if ($cnt > 0)
+                    break;
+            }
+            $res[] = $arr_val;
+        }
+        return $res;
+    }
+
+    public static function getList($query) {
+        $r = $this->query($query);
+        $result = $r->result(false);
+        $res = array();
+        foreach ($result as $row) {
+            $cnt = 0;
+            $arr_key = "";
+            $arr_val = "";
+            foreach ($row as $k => $v) {
+                if ($cnt == 0)
+                    $arr_key = $v;
+                if ($cnt == 1)
+                    $arr_val = $v;
+                $cnt++;
+                if ($cnt > 1)
+                    break;
+            }
+            $res[$arr_key] = $arr_val;
+        }
+        return $res;
+    }
+
 }
 
 // End Database Class
