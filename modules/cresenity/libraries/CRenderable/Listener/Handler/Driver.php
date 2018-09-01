@@ -11,11 +11,31 @@ abstract class CRenderable_Listener_Handler_Driver {
 
     use CTrait_Compat_Handler_Driver;
 
+    /**
+     *
+     * @var url for ajax handler type
+     */
     protected $url;
+
+    /**
+     *
+     * @var name of the driver
+     */
     protected $name;
+
+    /**
+     *
+     * @var event from listener
+     */
     protected $event;
     protected $owner;
     protected $url_param;
+
+    /**
+     *
+     * @var id of handler targeted renderable
+     */
+    protected $target;
 
     public function __construct($owner, $event, $name) {
         $this->name = $name;
@@ -23,6 +43,16 @@ abstract class CRenderable_Listener_Handler_Driver {
         $this->owner = $owner;
         $this->url = "";
         $this->url_param = array();
+        $this->target = null;
+    }
+
+    public function setTarget($target) {
+        if ($target instanceof CRenderable) {
+            $target = $target->id();
+        }
+        $this->target = $target;
+
+        return $this;
     }
 
     public function setUrl($url) {
@@ -73,7 +103,7 @@ abstract class CRenderable_Listener_Handler_Driver {
 
     protected function script() {
         if (strlen($this->target) == 0) {
-            //$this->target = crequest::current_container_id();
+            
         }
         $js = "";
         return $js;

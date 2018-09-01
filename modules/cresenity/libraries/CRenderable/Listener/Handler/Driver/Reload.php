@@ -11,7 +11,7 @@ class CRenderable_Listener_Handler_Driver_Reload extends CRenderable_Listener_Ha
 
     use CTrait_Compat_Handler_Driver_Reload;
 
-    protected $target;
+  
     protected $method;
     protected $content;
     protected $param;
@@ -47,12 +47,7 @@ class CRenderable_Listener_Handler_Driver_Reload extends CRenderable_Listener_Ha
         return $this;
     }
 
-    public function setTarget($target) {
-
-        $this->target = $target;
-
-        return $this;
-    }
+   
 
     public function setMethod($method) {
         $this->method = $method;
@@ -64,22 +59,24 @@ class CRenderable_Listener_Handler_Driver_Reload extends CRenderable_Listener_Ha
 
     public function script() {
         $js = parent::script();
-        $data_addition = '';
+        $dataAddition = '';
 
         foreach ($this->param_inputs as $inp) {
-            if (strlen($data_addition) > 0)
-                $data_addition .= ',';
-            $data_addition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
+            if (strlen($dataAddition) > 0) {
+                $dataAddition .= ',';
+            }
+            $dataAddition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
         }
         foreach ($this->param_inputs_by_name as $k => $inp) {
-            if (strlen($data_addition) > 0)
-                $data_addition .= ',';
-            $data_addition .= "'" . $k . "':$.cresenity.value('" . $inp . "')";
+            if (strlen($dataAddition) > 0) {
+                $dataAddition .= ',';
+            }
+            $dataAddition .= "'" . $k . "':$.cresenity.value('" . $inp . "')";
         }
-        $data_addition = '{' . $data_addition . '}';
+        $dataAddition = '{' . $dataAddition . '}';
         $js .= "
-                $.cresenity.reload('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
-             ";
+            $.cresenity.reload('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $dataAddition . ");
+         ";
 
         return $js;
     }
