@@ -97,9 +97,15 @@ jQuery(document).on('click', 'a.confirm', function (e) {
     str_cancel = window.capp.label_cancel;
     e.preventDefault();
     e.stopPropagation();
+    $(this).off('click');
     bootbox.confirm(message, function (confirmed) {
         if (confirmed) {
-            window.location.href = ahref;
+            if (ahref) {
+                window.location.href = ahref;
+            } else {
+                $(this).on('click');
+
+            }
         } else {
             btn.removeAttr('data-clicked');
         }

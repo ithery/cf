@@ -76,4 +76,12 @@ trait CTrait_Compat_Element_Action {
         return $this->reassignConfirm();
     }
 
+    public function set_submit_to($url, $target = "") {
+        return $this->setSubmitTo($url, $target);
+    }
+
+    public function render_as_input() {
+        return $this->renderAsInput();
+    }
+
 }

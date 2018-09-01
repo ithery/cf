@@ -7,16 +7,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 3:22:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CTrait_Compat_Handler_Driver_Dialog {
+trait CTrait_Compat_Handler_Driver_Custom {
 
     /**
      * 
-     * @deprecated, please use setTitle
-     * @param string $title
+     * @deprecated, please use setJs
+     * @param string $js
      * @return $this
      */
-    public function set_title($title) {
-        return $this->setTitle($title);
+    public function set_js($js) {
+        return $this->setJs($target);
     }
 
 }

@@ -4,6 +4,10 @@ abstract class CObservable extends CRenderable {
 
     use CTrait_Compat_Observable;
 
+    /**
+     *
+     * @var CListener[]
+     */
     protected $listeners;
     protected $manager;
 

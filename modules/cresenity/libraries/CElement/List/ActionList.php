@@ -14,7 +14,6 @@ class CElement_List_ActionList extends CElement_List {
 
     public $actions = array();
     protected $style;
-    
 
     public function __construct($list_id) {
         parent::__construct($list_id);
@@ -29,7 +28,6 @@ class CElement_List_ActionList extends CElement_List {
         return new CElement_List_ActionList($list_id);
     }
 
-    
     public function setStyle($style) {
 
         if (in_array($style, array("form-action", "btn-group", "btn-icon-group", "btn-list", "icon-segment", "btn-dropdown", "widget-action", "table-header-action"))) {
