@@ -2,7 +2,14 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CHandler_Append_Driver extends CHandler_Driver {
+/**
+ * @author Hery Kurniawan
+ * @since Sep 1, 2018, 4:07:06 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CRenderable_Listener_Handler_Driver_Append extends CRenderable_Listener_Handler_Driver {
+
+    use CTrait_Compat_Handler_Driver_Append;
 
     protected $target;
     protected $method;
@@ -19,7 +26,7 @@ class CHandler_Append_Driver extends CHandler_Driver {
         $this->param_inputs = array();
     }
 
-    public function add_param_input($inputs) {
+    public function addParamInput($inputs) {
         if (!is_array($inputs)) {
             $inputs = array($inputs);
         }
@@ -29,14 +36,14 @@ class CHandler_Append_Driver extends CHandler_Driver {
         return $this;
     }
 
-    public function set_target($target) {
+    public function setTarget($target) {
 
         $this->target = $target;
 
         return $this;
     }
 
-    public function set_method($method) {
+    public function setMethod($method) {
         $this->method = $method;
     }
 
@@ -60,17 +67,17 @@ class CHandler_Append_Driver extends CHandler_Driver {
         }
         $data_addition = '{' . $data_addition . '}';
         $js .= "
-            var is_duplicate = 0;
-            var check_duplicate = " . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
-            if(check_duplicate==1){
-                if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
-                    is_duplicate = 1;
-                }
-            }
-            if (is_duplicate==0) {
-                $.cresenity.append('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
-            }
-        ";
+                    var is_duplicate = 0;
+                    var check_duplicate = " . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
+                    if(check_duplicate==1){
+                        if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
+                            is_duplicate = 1;
+                        }
+                    }
+                    if (is_duplicate==0) {
+			$.cresenity.append('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
+                    }
+		";
 
         return $js;
     }

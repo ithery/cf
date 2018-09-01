@@ -2,7 +2,12 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CHandler_Reload_Driver extends CHandler_Driver {
+/**
+ * @author Hery Kurniawan
+ * @since Sep 1, 2018, 4:04:55 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CRenderable_Listener_Handler_Driver_Reload extends CRenderable_Listener_Handler_Driver {
 
     use CTrait_Compat_Handler_Driver_Reload;
 
@@ -14,7 +19,6 @@ class CHandler_Reload_Driver extends CHandler_Driver {
     protected $param_inputs_by_name;
 
     public function __construct($owner, $event, $name) {
-
         parent::__construct($owner, $event, $name);
         $this->method = "get";
         $this->target = "";

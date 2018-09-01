@@ -1,9 +1,16 @@
 <?php
 
-class CListener extends CObject {
-    
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Sep 1, 2018, 3:43:55 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CRenderable_Listener {
+
     use CTrait_Compat_Listener;
-    
+
     protected $event;
     protected $handlers;
     protected $owner;
@@ -11,10 +18,7 @@ class CListener extends CObject {
     protected $confirm_message;
     protected $no_double;
 
-    protected function __construct($owner, $event) {
-        parent::__construct();
-
-
+    public function __construct($owner, $event) {
         $this->owner = $owner;
         $this->handlers = array();
         $this->confirm = false;
@@ -25,7 +29,7 @@ class CListener extends CObject {
 
     public static function factory($owner, $event) {
 
-        return new CListener($owner, $event);
+        return new CRenderable_Listener($owner, $event);
     }
 
     public function setConfirm($bool) {
@@ -69,76 +73,73 @@ class CListener extends CObject {
 
     /**
      * 
-     * @param string $handler_name
-     * @return CHandler
+     * @param string $handlerName
+     * @return CRenderable_Listener_Handler
      */
-    public function addHandler($handler_name) {
-        $handler = CHandler::factory($this->owner, $this->event, $handler_name);
+    public function addHandler($handlerName) {
+        $handler = new CRenderable_Listener_Handler($this->owner, $this->event, $handlerName);
         $this->handlers[] = $handler;
         return $handler;
     }
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
 
 
-        $start_script = "
-				var thiselm=jQuery(this);
-				var clicked = thiselm.attr('data-clicked');
-			";
+        $startScript = "
+            var thiselm=jQuery(this);
+            var clicked = thiselm.attr('data-clicked');
+        ";
         if ($this->no_double) {
-            $start_script.="
-					if(clicked) return false;
-				";
+            $startScript .= "
+                if(clicked) return false;
+            ";
         }
-        $start_script.="
-				thiselm.attr('data-clicked','1');
-			";
-        $handlers_script = "";
+        $startScript .= "
+            thiselm.attr('data-clicked','1');
+        ";
+        $handlersScript = "";
         foreach ($this->handlers as $handler) {
-            $handlers_script.= $handler->js();
+            $handlersScript .= $handler->js();
         }
-        $confirm_start_script = "";
-        $confirm_end_script = "";
+        $confirmStartScript = "";
+        $confirmEndScript = "";
         if ($this->confirm) {
 
             $confirm_message = $this->confirm_message;
             if (strlen($confirm_message) == 0) {
                 $confirm_message = clang::__('Are you sure') . " ?";
             }
-            $confirm_start_script = "
-				
-				
-				
-				bootbox.confirm('" . $confirm_message . "', function(confirmed) {
-					if(confirmed) {
-			";
+            $confirmStartScript = "	
+                bootbox.confirm('" . $confirm_message . "', function(confirmed) {
+                    if(confirmed) {
+            ";
 
-            $confirm_end_script = "
-					} else {
-						thiselm.removeAttr('data-clicked');
-					}
-				});
-			";
+            $confirmEndScript = "
+                    } else {
+                            thiselm.removeAttr('data-clicked');
+                    }
+                });
+            ";
         }
 
         if ($this->event == 'lazyload') {
             $js->append("
                     jQuery(window).ready(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $start_script . "
-                                " . $confirm_start_script . "
-                                " . $handlers_script . "
-                                " . $confirm_end_script . "
+                                " . $startScript . "
+                                " . $confirmStartScript . "
+                                " . $handlersScript . "
+                                " . $confirmEndScript . "
                             }
                     });
                     jQuery(window).scroll(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $start_script . "
-                                " . $confirm_start_script . "
-                                " . $handlers_script . "
-                                " . $confirm_end_script . "
+                                " . $startScript . "
+                                " . $confirmStartScript . "
+                                " . $handlersScript . "
+                                " . $confirmEndScript . "
                             }
                     });
                 ");
@@ -146,10 +147,10 @@ class CListener extends CObject {
             $js->append('
                     jQuery("#' . $this->owner . '").' . $this->event . '(function() {
 
-                        ' . $start_script . '
-                        ' . $confirm_start_script . '
-                        ' . $handlers_script . '
-                        ' . $confirm_end_script . '
+                        ' . $startScript . '
+                        ' . $confirmStartScript . '
+                        ' . $handlersScript . '
+                        ' . $confirmEndScript . '
 
                     });
                 ');
@@ -157,10 +158,10 @@ class CListener extends CObject {
 
         //           $js->append("
         // 	jQuery('#" . $this->owner . "')." . $this->event . "(function() {				
-        // 		" . $start_script . "
-        // 		" . $confirm_start_script . "
-        // 		" . $handlers_script . "
-        // 		" . $confirm_end_script . "
+        // 		" . $startScript . "
+        // 		" . $confirmStartScript . "
+        // 		" . $handlersScript . "
+        // 		" . $confirmEndScript . "
         // 	});
         // ");
 

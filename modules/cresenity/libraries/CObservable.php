@@ -6,7 +6,7 @@ abstract class CObservable extends CRenderable {
 
     /**
      *
-     * @var CListener[]
+     * @var CRenderable_Listener[]
      */
     protected $listeners;
     protected $manager;
@@ -21,7 +21,7 @@ abstract class CObservable extends CRenderable {
      * @return CListener
      */
     public function addListener($event) {
-        $listener = CListener::factory($this->id, $event);
+        $listener = new CRenderable_Listener($this->id, $event);
         $this->listeners[] = $listener;
         return $listener;
     }
