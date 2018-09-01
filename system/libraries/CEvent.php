@@ -4,15 +4,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 11:01:31 PM
+ * @since Sep 1, 2018, 12:16:41 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CEvents_Dispatcher implements CContracts_Events_Dispatcher {
+class CEvent implements CContracts_Events_Dispatcher {
 
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var CContacts_Container
      */
     protected $container;
 
@@ -495,7 +495,7 @@ class CEvents_Dispatcher implements CContracts_Events_Dispatcher {
      */
     public function forgetPushed() {
         foreach ($this->listeners as $key => $value) {
-            if (Str::endsWith($key, '_pushed')) {
+            if (cstr::endsWith($key, '_pushed')) {
                 $this->forget($key);
             }
         }
@@ -522,6 +522,11 @@ class CEvents_Dispatcher implements CContracts_Events_Dispatcher {
         return $this;
     }
 
+    /**
+     * get if listener have been set
+     * 
+     * @return int
+     */
     public function haveListener() {
         return count($this->listeners) > 0;
     }

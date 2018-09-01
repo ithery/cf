@@ -261,7 +261,7 @@ class CDatabase {
         $this->eventManager = new CEventManager();
 
 
-        $this->events = new CEvents();
+        $this->events = new CEvent();
 
         $this->configuration = new CDatabase_Configuration();
 
