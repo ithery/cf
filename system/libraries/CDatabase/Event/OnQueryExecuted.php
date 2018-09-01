@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Events_QueryExecuted {
+class CDatabase_Event_OnQueryExecuted {
 
     /**
      * The SQL query that was executed.
@@ -29,20 +29,6 @@ class CDatabase_Events_QueryExecuted {
      * @var int
      */
     public $rowsCount;
-
-    /**
-     * The database connection instance.
-     *
-     * @var \Illuminate\Database\Connection
-     */
-    public $connection;
-
-    /**
-     * The database connection name.
-     *
-     * @var string
-     */
-    public $connectionName;
 
     /**
      * Create a new event instance.

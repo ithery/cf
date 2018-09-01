@@ -368,7 +368,7 @@ class CEvent implements CContracts_Events_Dispatcher {
      * @return array
      */
     protected function parseClassCallable($listener) {
-        return Str::parseCallback($listener, 'handle');
+        return cstr::parseCallback($listener, 'handle');
     }
 
     /**
@@ -379,9 +379,7 @@ class CEvent implements CContracts_Events_Dispatcher {
      */
     protected function handlerShouldBeQueued($class) {
         try {
-            return (new ReflectionClass($class))->implementsInterface(
-                            ShouldQueue::class
-            );
+            return (new ReflectionClass($class))->implementsInterface(ShouldQueue::class);
         } catch (Exception $e) {
             return false;
         }

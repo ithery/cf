@@ -1465,7 +1465,7 @@ class CDatabase {
      */
     public function listen(Closure $callback) {
         if (isset($this->events)) {
-            $this->events->listen(CDatabase_Events_QueryExecuted::class, $callback);
+            $this->events->listen(CDatabase_Event_OnQueryExecuted::class, $callback);
         }
     }
 
@@ -1650,7 +1650,7 @@ class CDatabase {
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
-        $this->event(new CDatabase_Events_QueryExecuted($query, $bindings, $time, $rowsCount, $this));
+        $this->event(new CDatabase_Event_OnQueryExecuted($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {
             $this->queryLog[] = compact('query', 'bindings', 'time');

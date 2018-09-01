@@ -1298,9 +1298,9 @@ abstract class CDatabase_Platform {
             throw new \InvalidArgumentException('getDropTableSQL() expects $table parameter to be string or CDatabase_Schema_Table.');
         }
 
-        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Events::onSchemaDropTable)) {
+        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Event::onSchemaDropTable)) {
             $eventArgs = new SchemaDropTableEventArgs($tableArg, $this);
-            $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaDropTable, $eventArgs);
+            $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaDropTable, $eventArgs);
 
             if ($eventArgs->isDefaultPrevented()) {
                 return $eventArgs->getSql();
@@ -1432,7 +1432,7 @@ abstract class CDatabase_Platform {
         foreach ($table->getColumns() as $column) {
             /* @var CDatabase_Schema_Column $column */
 
-            if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Events::onSchemaCreateTableColumn)) {
+            if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Event::onSchemaCreateTableColumn)) {
                 $eventArgs = new SchemaCreateTableColumnEventArgs($column, $table, $this);
                 $this->_eventManager->dispatchEvent(Events::onSchemaCreateTableColumn, $eventArgs);
 
@@ -1466,7 +1466,7 @@ abstract class CDatabase_Platform {
             }
         }
 
-        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Events::onSchemaCreateTable)) {
+        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Event::onSchemaCreateTable)) {
             $eventArgs = new SchemaCreateTableEventArgs($table, $columns, $options, $this);
             $this->_eventManager->dispatchEvent(Events::onSchemaCreateTable, $eventArgs);
 
@@ -1805,7 +1805,7 @@ abstract class CDatabase_Platform {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableAddColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableAddColumn)) {
             return false;
         }
 
@@ -1829,12 +1829,12 @@ abstract class CDatabase_Platform {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableRemoveColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableRemoveColumn)) {
             return false;
         }
 
         $eventArgs = new SchemaAlterTableRemoveColumnEventArgs($column, $diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTableRemoveColumn, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTableRemoveColumn, $eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1853,12 +1853,12 @@ abstract class CDatabase_Platform {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableChangeColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableChangeColumn)) {
             return false;
         }
 
         $eventArgs = new SchemaAlterTableChangeColumnEventArgs($columnDiff, $diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTableChangeColumn, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTableChangeColumn, $eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1878,12 +1878,12 @@ abstract class CDatabase_Platform {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTableRenameColumn)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableRenameColumn)) {
             return false;
         }
 
         $eventArgs = new SchemaAlterTableRenameColumnEventArgs($oldColumnName, $column, $diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTableRenameColumn, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTableRenameColumn, $eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1901,12 +1901,12 @@ abstract class CDatabase_Platform {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Events::onSchemaAlterTable)) {
+        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTable)) {
             return false;
         }
 
         $eventArgs = new SchemaAlterTableEventArgs($diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Events::onSchemaAlterTable, $eventArgs);
+        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTable, $eventArgs);
 
         $sql = array_merge($sql, $eventArgs->getSql());
 
