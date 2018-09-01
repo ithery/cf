@@ -101,7 +101,7 @@ abstract class CDatabase_Platform {
     protected $doctrineTypeComments = null;
 
     /**
-     * @var CEventManager
+     * @var CDatabase_Event
      */
     protected $_eventManager;
 
@@ -122,9 +122,9 @@ abstract class CDatabase_Platform {
     /**
      * Sets the EventManager used by the Platform.
      *
-     * @param \Doctrine\Common\EventManager $eventManager
+     * @param CDatabase_Event $eventManager
      */
-    public function setEventManager(CEventManager $eventManager) {
+    public function setEventManager(CDatabase_Event $eventManager) {
         $this->_eventManager = $eventManager;
     }
 

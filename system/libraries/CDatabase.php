@@ -26,12 +26,6 @@ class CDatabase {
 
     /**
      *
-     * @var CEventManager
-     */
-    protected $eventManager;
-
-    /**
-     *
      * @var CDatabase_Configuration
      */
     protected $configuration;
@@ -258,10 +252,8 @@ class CDatabase {
         CModel::setConnectionResolver($connectionResolver);
 
 
-        $this->eventManager = new CEventManager();
 
-
-        $this->events = new CEvent();
+        $this->events = new CDatabase_Event();
 
         $this->configuration = new CDatabase_Configuration();
 
@@ -1572,7 +1564,7 @@ class CDatabase {
             $this->platform = $this->driver->getDatabasePlatform();
         }
 
-        $this->platform->setEventManager($this->eventManager);
+        $this->platform->setEventManager($this->events);
     }
 
     /**
