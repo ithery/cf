@@ -16,4 +16,34 @@ trait CJavascript_JQuery_Trait_BaseTrait {
         return $element;
     }
 
+    /**
+     * Ensures the speed parameter is valid for jQuery
+     * @param string|int $speed
+     * @return string
+     */
+    private function validateSpeed($speed) {
+        if (in_array($speed, array('slow', 'normal', 'fast'))) {
+            $speed = '"' . $speed . '"';
+        } elseif (preg_match("/[^0-9]/", $speed)) {
+            $speed = '';
+        }
+        return $speed;
+    }
+
+    /**
+     * Allows to attach a condition
+     * @param string $condition
+     * @param string $jsCodeIfTrue
+     * @param string $jsCodeIfFalse
+     */
+    public function condition($condition, $jsCodeIfTrue, $jsCodeIfFalse = null) {
+        $str = "if(" . $condition . "){" . $jsCodeIfTrue . "}";
+        if (isset($jsCodeIfFalse)) {
+            $str .= "else{" . $jsCodeIfFalse . "}";
+        }
+
+        $this->addScript($str);
+        return $str;
+    }
+
 }

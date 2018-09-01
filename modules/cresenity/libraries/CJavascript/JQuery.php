@@ -9,11 +9,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CJavascript_JQuery {
 
-    protected $codeForCompile = array();
+    protected $scriptForCompile = array();
+    protected $scriptForCompileLast = array();
+    protected $needForCompile = true;
 
     use CJavascript_JQuery_Trait_BaseTrait,
         CJavascript_JQuery_Trait_GenericTrait,
-        CJavascript_JQuery_Trait_ActionsTrait;
+        CJavascript_JQuery_Trait_EventsTrait,
+        CJavascript_JQuery_Trait_ActionsTrait,
+        CJavascript_JQuery_Trait_AjaxTrait,
+        CJavascript_JQuery_Trait_InternalTrait;
 
     /**
      * gather together all script needing to be output
@@ -51,8 +56,54 @@ class CJavascript_JQuery {
 //        if ($view !== NULL) {
 //            $this->createScriptVariable($view, $view_var, $output);
 //        }
-        $output = implode('', $this->codeForCompile);
+        $output = implode('', array_merge($this->scriptForCompile, $this->scriptForCompileLast));
         return $output;
+    }
+
+    /**
+     * Constructs the syntax for an event, and adds to into the array for compilation
+     *
+     * @param string $element The element to attach the event to
+     * @param string $js The code to execute
+     * @param string $event The event to pass
+     * @param boolean $preventDefault If set to true, the default action of the event will not be triggered.
+     * @param boolean $stopPropagation Prevents the event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event.
+     * @return string
+     */
+    public function addEvent($element, $js, $event, $preventDefault = false, $stopPropagation = false) {
+        $element = $this->getSelector($element);
+        if (\is_array($js)) {
+            $js = implode("\n\t\t", $js);
+        }
+        if ($preventDefault === true) {
+            $js = CJavascript_Helper_Javascript::$preventDefault . $js;
+        }
+        if ($stopPropagation === true) {
+            $js = CJavascript_Helper_Javascript::$stopPropagation . $js;
+        }
+        if (array_search($event, $this->jquery_events) === false) {
+            $event = "\n\t$(" . CJavascript_Helper_Javascript::prepElement($element) . ").bind('{$event}',function(event){\n\t\t{$js}\n\t});\n";
+        } else {
+            $event = "\n\t$(" . CJavascript_Helper_Javascript::prepElement($element) . ").{$event}(function(event){\n\t\t{$js}\n\t});\n";
+        }
+        $this->addScript($event);
+        return $event;
+    }
+
+    public function addScript($code) {
+        if ($this->needForCompile) {
+            $this->scriptForCompile[] = $code;
+        }
+    }
+
+    public function addScriptLast($code) {
+        if ($this->needForCompile) {
+            $this->scriptForCompileLast[] = $code;
+        }
+    }
+
+    public function setNeedForCompile($bool = true) {
+        $this->needForCompile = $bool;
     }
 
 }
