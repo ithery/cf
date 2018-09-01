@@ -16,6 +16,7 @@ final class CManager {
     protected $theme_data = null;
     protected static $langObjectCallback = null;
     protected static $useRequireJs = null;
+    protected static $javascript;
 
     /**
      *
@@ -292,6 +293,13 @@ final class CManager {
 
     public static function registerJs($file, $pos = CClientScript::POS_END) {
         $cs = CClientScript::instance()->registerJsFile($file, $pos);
+    }
+
+    public static function javascript() {
+        if (self::$javascript == null) {
+            self::$javascript = new CManager_Javascript();
+        }
+        return self::$javascript;
     }
 
 }
