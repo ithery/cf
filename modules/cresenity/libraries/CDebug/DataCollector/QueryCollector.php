@@ -31,11 +31,8 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         $this->setDataFormatter(new CDebug_DataFormatter_QueryFormatter());
         $db = CDatabase::instance();
         try {
-            $db->listen(function ($query) use ($db) {
+            $db->listenOnQueryExecuted(function ($query) use ($db) {
 
-                // Laravel 5.2 changed the way some core events worked. We must account for
-                // the first argument being an "event object", where arguments are passed
-                // via object properties, instead of individual arguments.
                 $bindings = $query->bindings;
                 $time = $query->time;
                 $connection = $query->connection;

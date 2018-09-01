@@ -1455,15 +1455,15 @@ class CDatabase {
      * @param  \Closure  $callback
      * @return void
      */
-    public function listen(Closure $callback) {
+    public function listenOnQueryExecuted(Closure $callback) {
         if (isset($this->events)) {
             $this->events->listen(CDatabase_Event_OnQueryExecuted::class, $callback);
         }
     }
 
-    public function haveListener() {
+    public function listen($event, Closure $callback) {
         if (isset($this->events)) {
-            $this->events->haveListener();
+            $this->events->listen($event, $callback);
         }
     }
 
@@ -1473,7 +1473,7 @@ class CDatabase {
      * @param  mixed  $event
      * @return void
      */
-    protected function event($event) {
+    protected function dispatchEvent($event) {
         if (isset($this->events)) {
             $this->events->dispatch($event);
         }
@@ -1642,7 +1642,7 @@ class CDatabase {
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
-        $this->event(new CDatabase_Event_OnQueryExecuted($query, $bindings, $time, $rowsCount, $this));
+        $this->dispatchEvent(new CDatabase_Event_OnQueryExecuted($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
