@@ -473,7 +473,24 @@ final class CF {
         return $ret;
     }
 
+    /**
+     * @deprecated Please use getFiles
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string[]
+     */
     public static function get_files($directory, $filename, $domain = null) {
+        return self::getFiles($directory, $filename, $domain);
+    }
+    /**
+     * 
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string[]
+     */
+    public static function getFiles($directory, $filename, $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }

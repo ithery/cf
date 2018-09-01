@@ -286,4 +286,12 @@ final class CManager {
         return self::$useRequireJs;
     }
 
+    public static function registerCss($file, $pos = CClientScript::POS_HEAD) {
+        $cs = CClientScript::instance()->registerCssFile($file, $pos);
+    }
+
+    public static function registerJs($file, $pos = CClientScript::POS_END) {
+        $cs = CClientScript::instance()->registerJsFile($file, $pos);
+    }
+
 }
