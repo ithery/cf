@@ -260,7 +260,8 @@ class CDatabase {
 
         $this->eventManager = new CEventManager();
 
-        $this->setEventDispatcher(new CEvents_Dispatcher(new CContainer()));
+
+        $this->events = new CEvents();
 
         $this->configuration = new CDatabase_Configuration();
 
@@ -313,7 +314,7 @@ class CDatabase {
 
         // Compile binds if needed
 
-        $sql = $this->compile_binds($sql, $bindings);
+        $sql = $this->compileBinds($sql, $bindings);
 
 
         // Fetch the result
@@ -1189,7 +1190,7 @@ class CDatabase {
      * @param   array   array of values to bind to the query
      * @return  string
      */
-    public function compile_binds($sql, $binds) {
+    public function compileBinds($sql, $binds) {
         foreach ((array) $binds as $val) {
             // If the SQL contains no more bind marks ("?"), we're done.
             if (($next_bind_pos = strpos($sql, '?')) === FALSE)
