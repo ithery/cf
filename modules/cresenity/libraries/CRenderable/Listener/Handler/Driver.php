@@ -7,33 +7,43 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 4:01:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CRenderable_Listener_Handler_Driver {
+abstract class CRenderable_Listener_Handler_Driver implements CRenderable_Listener_Handler_DriverInterface {
 
     use CTrait_Compat_Handler_Driver;
 
     /**
-     *
-     * @var url for ajax handler type
+     * url for ajax handler type
+     * @var string $url
      */
     protected $url;
 
     /**
      *
-     * @var name of the driver
+     * @var string $urlParam
+     */
+    protected $urlParam;
+
+    /**
+     * name of the driver
+     * @var string
      */
     protected $name;
 
     /**
-     *
-     * @var event from listener
+     * event from listener
+     * @var string
      */
     protected $event;
-    protected $owner;
-    protected $url_param;
 
     /**
-     *
-     * @var id of handler targeted renderable
+     * id element of owner this event listener
+     * @var string
+     */
+    protected $owner;
+
+    /**
+     * id of handler targeted renderable
+     * @var string
      */
     protected $target;
 
@@ -42,7 +52,7 @@ abstract class CRenderable_Listener_Handler_Driver {
         $this->event = $event;
         $this->owner = $owner;
         $this->url = "";
-        $this->url_param = array();
+        $this->urlParam = array();
         $this->target = null;
     }
 
@@ -60,25 +70,25 @@ abstract class CRenderable_Listener_Handler_Driver {
         return $this;
     }
 
-    public function set_owner($owner) {
+    public function setOwner($owner) {
         $this->owner = $owner;
         return $this;
     }
 
-    public function set_url_param($url_param) {
-        if (!is_array($url_param)) {
-            trigger_error('Invalid URL Param ' . cdbg::var_dump($url_param, true) . '');
+    public function setUrlParam($urlParam) {
+        if (!is_array($urlParam)) {
+            trigger_error('Invalid URL Param ' . cdbg::var_dump($urlParam, true) . '');
         }
-        $this->url_param = $url_param;
+        $this->urlParam = $urlParam;
         return $this;
     }
 
-    public function add_url_param($k, $url_param) {
-        $this->url_param[$k] = $url_param;
+    public function addUrlParam($k, $urlParam) {
+        $this->urlParam[$k] = $url_param;
         return $this;
     }
 
-    public function generated_url() {
+    public function generatedUrl() {
         $link = $this->url;
 
         if (strlen($link) == 0) {
@@ -88,7 +98,7 @@ abstract class CRenderable_Listener_Handler_Driver {
             $link = $ajax_url;
         }
 
-        foreach ($this->url_param as $k => $p) {
+        foreach ($this->urlParam as $k => $p) {
             preg_match_all("/{([\w]*)}/", $link, $matches, PREG_SET_ORDER);
             foreach ($matches as $val) {
                 $str = $val[1]; //matches str without bracket {}
@@ -99,14 +109,6 @@ abstract class CRenderable_Listener_Handler_Driver {
             }
         }
         return $link;
-    }
-
-    protected function script() {
-        if (strlen($this->target) == 0) {
-            
-        }
-        $js = "";
-        return $js;
     }
 
 }

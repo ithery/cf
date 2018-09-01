@@ -43,7 +43,7 @@ class CRenderable_Listener_Handler_Driver_Empty extends CRenderable_Listener_Han
     }
 
     public function script() {
-        $js = parent::script();
+        $js = '';
         $data_addition = '';
 
         foreach ($this->param_inputs as $inp) {

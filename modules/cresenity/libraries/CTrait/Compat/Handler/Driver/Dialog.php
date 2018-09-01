@@ -19,4 +19,7 @@ trait CTrait_Compat_Handler_Driver_Dialog {
         return $this->setTitle($title);
     }
 
+    public function add_param_input($inputs) {
+        return $this->addParamInput($inputs);
+    }
 }

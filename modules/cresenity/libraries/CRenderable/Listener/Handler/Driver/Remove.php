@@ -24,20 +24,8 @@ class CRenderable_Listener_Handler_Driver_Remove extends CRenderable_Listener_Ha
         $this->param_inputs = array();
     }
 
-    public function set_parent($parent) {
-        $this->parent = $parent;
-    }
-
     public function script() {
-        $js = parent::script();
-
-
-        $js .= 'jQuery("#' . $this->target . '")';
-        if (strlen($this->parent) > 0) {
-            $js .= '.parents("' . $this->parent . '")';
-        }
-        $js .= '.remove();';
-
+        $js = 'jQuery("#' . $this->target . '").remove()';
         return $js;
     }
 

@@ -11,16 +11,6 @@ trait CTrait_Compat_Handler_Driver_Empty {
 
     /**
      * 
-     * @deprecated, please use setTarget
-     * @param string $target
-     * @return $this
-     */
-    public function set_target($target) {
-        return $this->setTarget($target);
-    }
-
-    /**
-     * 
      * @deprecated, please use setMethod
      * @param string $method
      * @return $this

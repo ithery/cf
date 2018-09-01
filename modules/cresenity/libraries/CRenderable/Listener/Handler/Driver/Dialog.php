@@ -68,7 +68,7 @@ class CRenderable_Listener_Handler_Driver_Dialog extends CRenderable_Listener_Ha
         return $this;
     }
 
-    public function add_param_input($inputs) {
+    public function addParamInput($inputs) {
         if (!is_array($inputs)) {
             $inputs = array($inputs);
         }
@@ -97,7 +97,7 @@ class CRenderable_Listener_Handler_Driver_Dialog extends CRenderable_Listener_Ha
     }
 
     public function script() {
-        $js = parent::script();
+        $js = '';
         if (strlen($this->target) == 0) {
             $this->target = "modal_opt_" . $this->event . "_" . $this->owner . "_dialog";
         }
@@ -153,12 +153,12 @@ class CRenderable_Listener_Handler_Driver_Dialog extends CRenderable_Listener_Ha
                 $content = $this->generated_url();
             }
             $js .= "
-                    $." . $this->js_class . ".show_dialog('" . $this->target . "','" . $this->title . "','" . $content . "');
-                    ";
+                $." . $this->js_class . ".show_dialog('" . $this->target . "','" . $this->title . "','" . $content . "');
+            ";
         } else {
             $js .= "
-                        $.cresenity.show_dialog('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
-                    ";
+                $.cresenity.show_dialog('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
+            ";
         }
         return $js;
     }

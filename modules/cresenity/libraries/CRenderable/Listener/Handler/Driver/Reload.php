@@ -11,7 +11,6 @@ class CRenderable_Listener_Handler_Driver_Reload extends CRenderable_Listener_Ha
 
     use CTrait_Compat_Handler_Driver_Reload;
 
-  
     protected $method;
     protected $content;
     protected $param;
@@ -47,8 +46,6 @@ class CRenderable_Listener_Handler_Driver_Reload extends CRenderable_Listener_Ha
         return $this;
     }
 
-   
-
     public function setMethod($method) {
         $this->method = $method;
     }
@@ -58,7 +55,7 @@ class CRenderable_Listener_Handler_Driver_Reload extends CRenderable_Listener_Ha
     }
 
     public function script() {
-        $js = parent::script();
+        $js = '';
         $dataAddition = '';
 
         foreach ($this->param_inputs as $inp) {

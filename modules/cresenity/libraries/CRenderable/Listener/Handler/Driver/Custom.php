@@ -17,7 +17,7 @@ class CRenderable_Listener_Handler_Driver_Custom extends CRenderable_Listener_Ha
     }
 
     public function script() {
-        $js = parent::script();
+        $js = '';
         $js .= $this->js;
 
 
