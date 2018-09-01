@@ -24,8 +24,8 @@ class CDatabase_Event extends CEvent {
     const onSchemaColumnDefinition = 'CDatabase_Event_Schema_OnColumnDefinition';
     const onSchemaIndexDefinition = 'CDatabase_Event_Schema_OnIndexDefinition';
 
-    public static function createOnQueryExecutedListener($sql, $bindings, $time, $rowsCount, $db) {
-        return new CDatabase_Event_OnQueryExecutedListener($sql, $bindings, $time, $rowsCount, $db);
+    public static function createOnQueryExecutedEvent($sql, $bindings, $time, $rowsCount, $db) {
+        return new CDatabase_Event_OnQueryExecuted($sql, $bindings, $time, $rowsCount, $db);
     }
 
 }

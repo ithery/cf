@@ -1642,7 +1642,7 @@ class CDatabase {
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
-        $this->dispatchEvent(new CDatabase_Event_OnQueryExecuted($query, $bindings, $time, $rowsCount, $this));
+        $this->dispatchEvent(CDatabase_Event::createOnQueryExecutedEvent($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
