@@ -105,10 +105,11 @@ trait CTrait_Controller_Documentation_Javascript {
             $ajaxOptions['dataType'] = 'json';
             $ajaxOptions['data'] = array();
             $ajaxOptions['success'] = function($js, $data) use($divAjax) {
-                $divAjax->javascript()->jquery()->html($data->html);
+                $divAjax->jquery()->html($data->html);
             };
             $div->jquery()->ajax($ajaxOptions);
         });
+        $select->jquery()->trigger('change');
 
         echo $app->render();
     }

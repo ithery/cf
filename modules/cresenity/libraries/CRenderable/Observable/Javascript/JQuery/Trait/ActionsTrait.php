@@ -112,4 +112,9 @@ trait CRenderable_Observable_Javascript_JQuery_Trait_ActionsTrait {
         return $this;
     }
 
+    public function trigger($eventName) {
+        $this->jQueryStatement()->trigger($eventName);
+        $this->resetJQueryStatement();
+        return $this;
+    }
 }
