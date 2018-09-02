@@ -48,13 +48,59 @@ trait CTrait_Controller_Documentation_Javascript {
         echo $app->render();
     }
 
-    public function event() {
+    public function event($ajax = false) {
+        if ($ajax) {
+            echo 'ajax done';
+            die;
+        }
         $app = CApp::instance();
 
+        $divAppendPrepend = $app->addDiv()->add("Div After Before");
+
+
+        $divAppendPrepend->jquery()->after('<div>After</div>');
+        $divAppendPrepend->jquery()->before('<div>Before</div>');
+
+        $divAppendPrepend = $app->addDiv()->add("Content");
+        $divAppendPrepend->jquery()->prepend('Prepend');
+        $divAppendPrepend->jquery()->append('Append');
+
+
+        $divHtml = $app->addDiv()->add("HTML");
+        $divHtml->jquery()->html('Changed HTML');
+        $divHtml->jquery()->addClass('mt-3');
+
         $button = $app->addAction()->setLabel('Click Me');
+
+        $button->jquery()->addClass('btn-primary');
+        $button->jquery()->addClass('btn-primary');
+        $button->onClick(function($jquery) use ($divHtml) {
+            $jquery->bindDeferred($divHtml, function($divHtmlJq) use($jquery) {
+                $divHtmlJq->html('');
+            });
+            $jquery->appendTo($divHtml);
+        });
+        echo $app->render();
+    }
+
+    public function form() {
+        $app = CApp::instance();
+
+        $list = array(
+            'option1' => 'Option 1',
+            'option2' => 'Option 2',
+            'option3' => 'Option 3',
+            'option4' => 'Option 4',
+        );
+
+        $form = $app->addForm();
+        $select = $form->addField()->setLabel('Select')->addControl('optionSelect', 'select')->setList($list);
+
         $div = $app->addDiv();
-        $button->onClick(function($jquery) use ($div) {
-            
+        $select->onChange(function($selectJq) use($div) {
+            $selectJq->bindDeferred($div, function($divJq) use($selectJq) {
+                $divJq->html($selectJq->val());
+            });
         });
 
         echo $app->render();

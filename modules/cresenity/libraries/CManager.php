@@ -295,6 +295,10 @@ final class CManager {
         $cs = CClientScript::instance()->registerJsFile($file, $pos);
     }
 
+    /**
+     * 
+     * @return CManager_Javascript;
+     */
     public static function javascript() {
         if (self::$javascript == null) {
             self::$javascript = new CManager_Javascript();

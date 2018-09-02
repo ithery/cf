@@ -21,7 +21,29 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
         return $this->genericCallValue('addClass', $element, $class);
     }
 
+    /**
+     * Execute a javascript library detach action
+     *
+     * @param string $element element
+     * @param string $speed One of 'slow', 'normal', 'fast', or time in milliseconds
+     * @param string $callback Javascript callback function
+     * @return string
+     */
+    public function detach($element = 'this') {
+        return $this->genericCallValue("detach", $element);
+    }
     
+    /**
+     * Execute a javascript library remove action
+     *
+     * @param string $element element
+     * @param string $speed One of 'slow', 'normal', 'fast', or time in milliseconds
+     * @param string $callback Javascript callback function
+     * @return string
+     */
+    public function remove($element = 'this') {
+        return $this->genericCallValue("remove", $element);
+    }
 
     /**
      * Insert content, specified by the parameter, after each element in the set of matched elements
@@ -48,7 +70,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
      * @param string $element
      * @param string $value
      */
-    public function val($element = 'this', $value = '') {
+    public function val($element = 'this', $value = null) {
         return $this->genericCallValue('val', $element, $value);
     }
 
@@ -69,6 +91,16 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
      */
     public function append($to, $element) {
         return $this->genericCallElement('append', $to, $element);
+    }
+    
+    /**
+     * Insert content, specified by the parameter $element, to the end of each element in the set of matched elements $to.
+     * @param string $to
+     * @param string $element
+     * @return string
+     */
+    public function appendTo($element, $to) {
+        return $this->genericCallElement('appendTo', $element, $to);
     }
 
     /**
@@ -152,6 +184,8 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
         return $this->showHideWithEffect("slideToggle", $element, $speed, $callback);
     }
 
+    
+    
     /**
      * Execute a javascript library hide action
      *

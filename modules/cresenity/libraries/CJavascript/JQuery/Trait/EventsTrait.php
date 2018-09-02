@@ -35,7 +35,7 @@ trait CJavascript_JQuery_Trait_EventsTrait {
      * @param boolean $stopPropagation
      * @return string
      */
-    public function change($element = 'this', $js = '', $preventDefault = false, $stopPropagation = false) {
+    public function onChange($element = 'this', $js = '', $preventDefault = false, $stopPropagation = false) {
         return $this->addEvent($element, $js, 'change', $preventDefault, $stopPropagation);
     }
 
@@ -49,7 +49,7 @@ trait CJavascript_JQuery_Trait_EventsTrait {
      * @param boolean $stopPropagation
      * @return string
      */
-    public function click($element = 'this', $js = '', $ret_false = TRUE, $preventDefault = false, $stopPropagation = false) {
+    public function onClick($element = 'this', $js = '', $ret_false = TRUE, $preventDefault = false, $stopPropagation = false) {
         if (!is_array($js)) {
             $js = array(
                 $js

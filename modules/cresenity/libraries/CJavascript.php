@@ -18,6 +18,12 @@ class CJavascript {
         return $jQuery;
     }
 
+    public static function createJQueryDeferred() {
+        $jQuery = new CJavascript_JQuery();
+
+        return $jQuery;
+    }
+
     public static function compile() {
         $script = '';
         foreach (self::$jQuerys as $jQuery) {

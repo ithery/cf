@@ -17,10 +17,10 @@ trait CJavascript_JQuery_Trait_GenericTrait {
      * @param string $element
      * @param string $param
      */
-    public function genericCallValue($jQueryCall, $element = 'this', $param = "") {
+    public function genericCallValue($jQueryCall, $element = 'this', $param = null) {
         $element = $this->getSelector($element);
         $element = CJavascript_Helper_Javascript::prepElement($element);
-        if (isset($param)) {
+        if ($param !== null) {
             $param = CJavascript_Helper_Javascript::prepValue($param);
             $str = "$({$element}).{$jQueryCall}({$param});";
         } else

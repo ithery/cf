@@ -22,13 +22,15 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if (isset($this->params["ajax"])) {
             extract($this->params["ajax"]);
         }
+        $responseElement = $this->getSelector($responseElement);
         extract($parameters);
+
         $jsCallback = isset($jsCallback) ? $jsCallback : "";
         $retour = $this->_getAjaxUrl($url, $attr);
         $originalSelector = $responseElement;
         $responseElement = $this->_getResponseElement($responseElement);
         $retour .= "var self=this;\n";
-        if ($hasLoader === true && JString::isNotNull($responseElement)) {
+        if ($hasLoader === true && CJavascript_Helper_String::isNotNull($responseElement)) {
             $this->addLoading($retour, $responseElement, $ajaxLoader);
         } elseif ($hasLoader === "internal") {
             $retour .= "\n$(this).addClass('loading');";
@@ -47,8 +49,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         $retour .= "$.ajax({" . $this->implodeAjaxParameters($ajaxParameters) . "}).done(function( data, textStatus, jqXHR ) {\n";
         $retour .= $this->_getOnAjaxDone($responseElement, $jqueryDone, $ajaxTransition, $jsCallback, $hasLoader, ($historize ? $originalSelector : null)) . "});\n";
         $retour = $this->_addJsCondition($jsCondition, $retour);
-        if ($immediatly)
-            $this->jquery_code_for_compile[] = $retour;
+        $this->addScript($retour);
         return $retour;
     }
 
@@ -82,10 +83,10 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         $url = $this->_correctAjaxUrl($url);
         $retour = "url='" . $url . "';";
         $slash = "/";
-        if (JString::endswith($url, "/") === true) {
+        if (CJavascript_Helper_String::endswith($url, "/") === true) {
             $slash = "";
         }
-        if (JString::isNotNull($attr)) {
+        if (CJavascript_Helper_String::isNotNull($attr)) {
             if ($attr === "value") {
                 $retour .= "url=url+'" . $slash . "'+$(this).val();\n";
             } elseif ($attr === "html") {
@@ -111,7 +112,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     protected function _getOnAjaxDone($responseElement, $jqueryDone, $ajaxTransition, $jsCallback, $hasLoader = false, $history = null) {
         $retour = "";
         $call = null;
-        if (JString::isNotNull($responseElement)) {
+        if (CJavascript_Helper_String::isNotNull($responseElement)) {
             if (isset($ajaxTransition)) {
                 $call = $this->setAjaxDataCall($ajaxTransition);
             } elseif (isset($this->ajaxTransition)) {
@@ -136,14 +137,14 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     protected function _getResponseElement($responseElement) {
-        if (JString::isNotNull($responseElement)) {
-            $responseElement = Javascript::prep_jquery_selector($responseElement);
+        if (CJavascript_Helper_String::isNotNull($responseElement)) {
+            $responseElement = CJavascript_Helper_Javascript::prepJQuerySelector($responseElement);
         }
         return $responseElement;
     }
 
     protected function _correctAjaxUrl($url) {
-        if ($url !== "/" && JString::endsWith($url, "/") === true)
+        if ($url !== "/" && CJavascript_Helper_String::endsWith($url, "/") === true)
             $url = substr($url, 0, strlen($url) - 1);
         if (strncmp($url, 'http://', 7) != 0 && strncmp($url, 'https://', 8) != 0) {
             $url = $this->getUrl($url);
@@ -152,7 +153,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     public static function _correctParams($params) {
-        if (JString::isNull($params)) {
+        if (CJavascript_Helper_String::isNull($params)) {
             return "";
         }
         if (\preg_match("@^\{.*?\}$@", $params)) {
@@ -216,7 +217,41 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      * @param array $parameters default : array("params"=>"{}","jsCallback"=>NULL,"attr"=>"id","hasLoader"=>true,"ajaxLoader"=>null,"jqueryDone"=>"html","ajaxTransition"=>null,"jsCondition"=>NULL,"headers"=>null,"historize"=>false)
      */
     public function get($url, $responseElement = "", $parameters = []) {
-        $parameters["immediatly"] = true;
+        if (!isset($parameters['params'])) {
+            $parameters['params'] = '{}';
+        }
+        if (!isset($parameters['jsCallback'])) {
+            $parameters['jsCallback'] = null;
+        }
+        if (!isset($parameters['attr'])) {
+            $parameters['attr'] = 'id';
+        }
+        if (!isset($parameters['async'])) {
+            $parameters['async'] = false;
+        }
+        if (!isset($parameters['hasLoader'])) {
+            $parameters['hasLoader'] = true;
+        }
+        if (!isset($parameters['ajaxLoader'])) {
+            $parameters['ajaxLoader'] = null;
+        }
+        if (!isset($parameters['jqueryDone'])) {
+            $parameters['jqueryDone'] = 'html';
+        }
+        if (!isset($parameters['ajaxTransition'])) {
+            $parameters['ajaxTransition'] = null;
+        }
+        if (!isset($parameters['jsCondition'])) {
+            $parameters['jsCondition'] = null;
+        }
+        if (!isset($parameters['headers'])) {
+            $parameters['headers'] = null;
+        }
+        if (!isset($parameters['historize'])) {
+            $parameters['historize'] = false;
+        }
+
+
         return $this->_get($url, $responseElement, $parameters);
     }
 
@@ -440,7 +475,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function getHref($element, $responseElement = "", $parameters = array()) {
         $parameters["attr"] = "href";
-        if (JString::isNull($responseElement)) {
+        if (CJavascript_Helper_String::isNull($responseElement)) {
             $responseElement = '%$(self).attr("data-target")%';
         }
         if (!isset($parameters["historize"])) {
@@ -458,7 +493,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function postHref($element, $responseElement = "", $parameters = array()) {
         $parameters["attr"] = "href";
-        if (JString::isNull($responseElement)) {
+        if (CJavascript_Helper_String::isNull($responseElement)) {
             $responseElement = '%$(this).attr("data-target")%';
         }
         if (!isset($parameters["historize"])) {

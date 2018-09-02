@@ -25,7 +25,7 @@ class CJavascript_Helper_Javascript {
     }
 
     public static function isFunction($jsCode) {
-        return JString::startswith($jsCode, "function");
+        return CJavascript_Helper_String::startswith($jsCode, "function");
     }
 
     /**
@@ -63,8 +63,8 @@ class CJavascript_Helper_Javascript {
     }
 
     public static function prepJQuerySelector($value) {
-        if (JString::startswith($value, '$(') === false) {
-            return '$(' . self::prep_value($value) . ')';
+        if (CJavascript_Helper_String::startswith($value, '$(') === false) {
+            return '$(' . self::prepValue($value) . ')';
         }
         return $value;
     }

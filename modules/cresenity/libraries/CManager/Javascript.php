@@ -12,5 +12,9 @@ class CManager_Javascript {
     public static function jQuery() {
         return CJavascript::createJQuery();
     }
+    
+     public static function jQueryDeferred() {
+        return CJavascript::createJQueryDeferred();
+    }
 
 }

@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 2, 2018, 12:52:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class Javascript_Helper_String {
+class CJavascript_Helper_String {
 
     public static function contains($hay, $needle) {
         return strpos($hay, $needle) !== false;

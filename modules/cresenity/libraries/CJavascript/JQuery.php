@@ -102,12 +102,17 @@ class CJavascript_JQuery {
         }
     }
 
+    public function clearScript() {
+        $this->scriptForCompile = array();
+        $this->scriptForCompileLast = array();
+    }
+
     public function setNeedForCompile($bool = true) {
         $this->needForCompile = $bool;
     }
 
     public function getUrl($url) {
-        return url($url);
+        return $url;
     }
 
 }
