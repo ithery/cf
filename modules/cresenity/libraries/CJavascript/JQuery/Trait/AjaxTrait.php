@@ -14,9 +14,9 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
 
     abstract public function getUrl($url);
 
-    abstract public function addEvent($element, $js, $event, $preventDefault = false, $stopPropagation = false, $immediatly = true);
+    abstract public function addEvent($element, $js, $event, $preventDefault = false, $stopPropagation = false);
 
-    abstract public function interval($jsCode, $time, $globalName = null, $immediatly = true);
+    abstract public function interval($jsCode, $time, $globalName = null);
 
     protected function _ajax($method, $url, $responseElement = "", $parameters = []) {
         if (isset($this->params["ajax"])) {

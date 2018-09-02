@@ -41,12 +41,22 @@ trait CTrait_Controller_Documentation_Javascript {
         CManager::javascript()->jquery()->addClass($p, "alert alert-warning");
         CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append from Javascript</div>");
 
-        
-        
-        $input1 = $app->addControl('input-1','text');
+        $input1 = $app->addControl('input-1', 'text');
         $app->addDiv('message-1');
         CManager::javascript()->jquery()->onBlur($input1, "$('#message-1').html('blur');");
-        
+
+        echo $app->render();
+    }
+
+    public function event() {
+        $app = CApp::instance();
+
+        $button = $app->addAction()->setLabel('Click Me');
+        $div = $app->addDiv();
+        $button->onClick(function($jquery) use ($div) {
+            
+        });
+
         echo $app->render();
     }
 

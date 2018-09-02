@@ -21,16 +21,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
         return $this->genericCallValue('addClass', $element, $class);
     }
 
-    /**
-     * Insert content, specified by the parameter $element, to the end of each element in the set of matched elements $to.
-     * @param string $to
-     * @param string $element
-     * @return string
-     */
-    public function append($to, $element) {
-
-        return $this->genericCallElement('append', $to, $element);
-    }
+    
 
     /**
      * Insert content, specified by the parameter, after each element in the set of matched elements

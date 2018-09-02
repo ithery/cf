@@ -81,7 +81,7 @@ class CJavascript_JQuery {
         if ($stopPropagation === true) {
             $js = CJavascript_Helper_Javascript::$stopPropagation . $js;
         }
-        if (array_search($event, $this->jquery_events) === false) {
+        if (array_search($event, $this->jqueryEvents) === false) {
             $event = "\n\t$(" . CJavascript_Helper_Javascript::prepElement($element) . ").bind('{$event}',function(event){\n\t\t{$js}\n\t});\n";
         } else {
             $event = "\n\t$(" . CJavascript_Helper_Javascript::prepElement($element) . ").{$event}(function(event){\n\t\t{$js}\n\t});\n";
@@ -104,6 +104,10 @@ class CJavascript_JQuery {
 
     public function setNeedForCompile($bool = true) {
         $this->needForCompile = $bool;
+    }
+
+    public function getUrl($url) {
+        return url($url);
     }
 
 }

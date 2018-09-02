@@ -9,7 +9,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CJavascript_JQuery_Trait_EventsTrait {
 
-    abstract public function addEvent($element, $js, $event, $preventDefault = false, $stopPropagation = false, $immediatly = true);
+    protected $jqueryEvents = array(
+        "bind", "blur", "change", "click", "dblclick", "delegate", "die", "error", "focus", "focusin", "focusout", "hover", "keydown", "keypress", "keyup", "live", "load", "mousedown", "mousseenter", "mouseleave", "mousemove", "mouseout", "mouseover", "mouseup", "off", "on", "one", "ready", "resize", "scroll", "select", "submit", "toggle", "trigger", "triggerHandler", "undind", "undelegate", "unload"
+    );
+
+    abstract public function addEvent($element, $js, $event, $preventDefault = false, $stopPropagation = false);
 
     /**
      * Outputs a javascript library blur event
