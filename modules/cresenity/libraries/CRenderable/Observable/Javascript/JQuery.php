@@ -1,0 +1,74 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Sep 2, 2018, 5:38:11 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CRenderable_Observable_Javascript_JQuery {
+
+    use CRenderable_Observable_Javascript_JQuery_Trait_ActionsTrait,
+        CRenderable_Observable_Javascript_JQuery_Trait_EventsTrait,
+        CRenderable_Observable_Javascript_JQuery_Trait_AjaxTrait,
+        CRenderable_Observable_Javascript_JQuery_Trait_InternalTrait;
+
+    /**
+     *
+     * @var CRenderable_Observable_Javascript
+     */
+    protected $javascript;
+
+    /**
+     *
+     * @var CJavascript_Statement_JQuery
+     */
+    protected $jQueryStatement;
+
+    public function __construct($javascript) {
+        $this->javascript = $javascript;
+    }
+
+    public function getSelector() {
+        return $this->javascript->getSelector();
+    }
+
+    public function addStatement(CJavascript_Statement $statement) {
+        $this->javascript->addStatement($statement);
+    }
+
+    public function resetJQueryStatement() {
+        if ($this->jQueryStatement != null) {
+            $this->addStatement($this->jQueryStatement);
+        }
+        $this->jQueryStatement = null;
+    }
+
+    public function jQueryStatement() {
+        if ($this->jQueryStatement == null) {
+
+            $this->jQueryStatement = CJavascript::jqueryStatement($this->getSelector());
+        }
+        return $this->jQueryStatement;
+    }
+
+    public function filterArgs($args) {
+        if (!is_array($args)) {
+            $args = array($args);
+        }
+        foreach ($args as &$arg) {
+            $arg = $this->filterArg($arg);
+        }
+        return $args;
+    }
+
+    public function filterArg($arg) {
+        if ($arg instanceOf CJavascript_Statement) {
+            //this statement will used for args, remove this statement for being rendered
+            $this->javascript->removeStatement($arg);
+        }
+        return $arg;
+    }
+
+}

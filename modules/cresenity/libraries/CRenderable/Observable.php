@@ -18,14 +18,31 @@ abstract class CRenderable_Observable extends CRenderable {
      */
     protected $listeners;
     protected $manager;
-    protected $jquery;
+
+    /**
+     *
+     * @var CRenderable_Observable_Javascript
+     */
+    protected $javascript;
 
     public function getListeners() {
         return $this->listeners;
     }
 
+    
+    /**
+     * 
+     * @return CRenderable_Observable_Javascript
+     */
+    public function javascript() {
+        return $this->javascript;
+    }
+    /**
+     * 
+     * @return CRenderable_Observable_Javascript_JQuery
+     */
     public function jquery() {
-        return $this->jquery;
+        return $this->javascript->jquery();
     }
 
     /**
@@ -78,7 +95,7 @@ abstract class CRenderable_Observable extends CRenderable {
         $this->manager->registerControl('tooltip', 'CFormInputTooltip');
         $this->manager->registerControl('fileupload', 'CFormInputFileUpload');
 
-        $this->jquery = new CRenderable_Observable_JQuery($this);
+        $this->javascript = new CRenderable_Observable_Javascript($this);
     }
 
     /**
@@ -562,7 +579,7 @@ abstract class CRenderable_Observable extends CRenderable {
         //we change the owner of listener
         foreach ($this->listeners as $listener) {
             if ($listener->owner() == $before_id) {
-                $listener->set_owner($this->id);
+                $listener->setOwner($this->id);
             }
         }
     }

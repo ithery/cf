@@ -9,24 +9,32 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CRenderable_Observable_Trait_EventsTrait {
 
+    /**
+     *
+     * @var CRenderable_Observable_Javascript
+     */
+    protected $javascript;
+    
     public function onClick(Closure $event, $options = array()) {
         $compiledJs='';
         if ($event instanceof Closure) {
-            $this->jquery->startDeferred();
-            $event($this->jquery);
-            $compiledJs = $this->jquery->endDeferred();
+            $this->javascript->startDeferred();
+            $event($this->javascript);
+            $compiledJs = $this->javascript->endDeferred();
         }
-        $this->jquery->onClick($compiledJs);
+        $this->javascript->jquery()->onClick($compiledJs);
     }
     
     public function onChange(Closure $event, $options = array()) {
         $compiledJs='';
         if ($event instanceof Closure) {
-            $this->jquery->startDeferred();
-            $event($this->jquery);
-            $compiledJs = $this->jquery->endDeferred();
+            $this->javascript->startDeferred();
+            $event($this->javascript);
+            $compiledJs = $this->javascript->endDeferred();
+           
         }
-        $this->jquery->onChange($compiledJs);
+       
+        $this->javascript->jquery()->onChange($compiledJs);
     }
 
 }

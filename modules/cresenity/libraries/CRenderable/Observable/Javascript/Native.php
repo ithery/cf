@@ -1,0 +1,29 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Sep 3, 2018, 1:15:13 AM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CRenderable_Observable_Javascript_Native {
+
+    /**
+     *
+     * @var CRenderable_Observable_Javascript
+     */
+    protected $javascript;
+
+    public function __construct($javascript) {
+        $this->javascript = $javascript;
+    }
+
+    public function variable($varName, $varValue) {
+        $variableStatement = CJavascript::variableStatement($varName, $varValue);
+
+        $this->javascript->addStatement($variableStatement);
+        return $this;
+    }
+
+}

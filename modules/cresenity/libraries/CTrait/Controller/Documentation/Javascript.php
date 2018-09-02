@@ -74,11 +74,11 @@ trait CTrait_Controller_Documentation_Javascript {
 
         $button->jquery()->addClass('btn-primary');
         $button->jquery()->addClass('btn-primary');
-        $button->onClick(function($jquery) use ($divHtml) {
-            $jquery->bindDeferred($divHtml, function($divHtmlJq) use($jquery) {
-                $divHtmlJq->html('');
+        $button->onClick(function($js) use ($divHtml) {
+            $js->bindDeferred($divHtml, function($divHtmlJq) use($js) {
+                $divHtmlJq->jquery()->html('');
             });
-            $jquery->appendTo($divHtml);
+            $js->jquery()->appendTo($divHtml);
         });
         echo $app->render();
     }
@@ -97,11 +97,32 @@ trait CTrait_Controller_Documentation_Javascript {
         $select = $form->addField()->setLabel('Select')->addControl('optionSelect', 'select')->setList($list);
 
         $div = $app->addDiv();
-        $select->onChange(function($selectJq) use($div) {
-            $selectJq->bindDeferred($div, function($divJq) use($selectJq) {
-                $divJq->html($selectJq->val());
+        $divAjax = $app->addDiv('divAjax');
+        $select->onChange(function($selectJs) use($div) {
+            $selectJs->bindDeferred($div, function($divJs) use($selectJs) {
+                $divJs->jquery()->html($selectJs->jquery()->find(':selected')->html());
+                $divJs->variable('a', 'test');
+                $ajaxOptions = array();
+                $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
+                $function = new CJavascript_Statement_Function('', array('data'));
+                $function->addStatement('$("#divAjax").html(data);');
+                $ajaxOptions['success'] = $function;
+                $divJs->jquery()->ajax($ajaxOptions);
             });
         });
+
+        echo $app->render();
+    }
+
+    public function ajax() {
+        echo 'Ajax Content';
+    }
+
+    public function test() {
+        $app = CApp::instance();
+
+        $div = $app->addDiv('test')->add('Haha');
+        $div->jquery()->addClass('btn btn-primary');
 
         echo $app->render();
     }
