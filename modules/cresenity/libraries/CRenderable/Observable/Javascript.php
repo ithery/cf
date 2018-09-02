@@ -19,7 +19,7 @@ class CRenderable_Observable_Javascript {
      *
      * @var bool
      */
-    protected $deferred;
+    protected $deferred = 0;
 
     /**
      *
@@ -44,8 +44,8 @@ class CRenderable_Observable_Javascript {
      * @return $this
      */
     public function startDeferred() {
-        $this->deferred = true;
-        CJavascript::clearDeferredStatement();
+        $this->deferred++;
+        CJavascript::pushDeferredStack();
         return $this;
     }
 
@@ -70,13 +70,25 @@ class CRenderable_Observable_Javascript {
         }
     }
 
+    public function runClosure() {
+
+        $args = func_get_args();
+        $closure = carr::get($args, 0);
+        $args[0] = $this;
+
+        $this->startDeferred();
+        call_user_func_array($closure, $args);
+
+        return $this->endDeferred();
+    }
+
     /**
      * get compiled deferred JS
      * @return CJavascript_Statement[]
      */
     public function endDeferred() {
-        $this->deferred = false;
-        $statements = CJavascript::getDeferredStatements();
+        $this->deferred--;
+        $statements = CJavascript::popDeferredStack();
         return $statements;
     }
 
@@ -155,6 +167,24 @@ class CRenderable_Observable_Javascript {
      */
     public function getOwner() {
         return $this->owner;
+    }
+
+    public function filterArgs($args) {
+        if (!is_array($args)) {
+            $args = array($args);
+        }
+        foreach ($args as &$arg) {
+            $arg = $this->filterArg($arg);
+        }
+        return $args;
+    }
+
+    public function filterArg($arg) {
+        if ($arg instanceOf CJavascript_Statement) {
+            //this statement will used for args, remove this statement for being rendered
+            $this->removeStatement($arg);
+        }
+        return $arg;
     }
 
 }

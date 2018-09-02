@@ -23,7 +23,7 @@ class CJavascript_StatementFactory {
      * @return CJavascript_Statement_Raw
      */
     public static function createRaw($js) {
-        return CJavascript_Statement_Raw($js);
+        return new CJavascript_Statement_Raw($js);
     }
 
     /**
@@ -33,7 +33,7 @@ class CJavascript_StatementFactory {
      * @return CJavascript_Statement_Function
      */
     public static function createFunction($functionName, $functionParameter = array()) {
-        return CJavascript_Statement_Function($functionName, $functionParameter);
+        return new CJavascript_Statement_Function($functionName, $functionParameter);
     }
 
 }

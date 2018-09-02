@@ -26,4 +26,11 @@ class CRenderable_Observable_Javascript_Native {
         return $this;
     }
 
+    public function raw($js) {
+        $variableStatement = CJavascript::rawStatement($js);
+
+        $this->javascript->addStatement($variableStatement);
+        return $this;
+    }
+
 }

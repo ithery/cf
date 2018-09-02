@@ -40,6 +40,7 @@ class CRenderable_Observable_Javascript_JQuery {
 
     public function resetJQueryStatement() {
         if ($this->jQueryStatement != null) {
+           
             $this->addStatement($this->jQueryStatement);
         }
         $this->jQueryStatement = null;
@@ -54,21 +55,7 @@ class CRenderable_Observable_Javascript_JQuery {
     }
 
     public function filterArgs($args) {
-        if (!is_array($args)) {
-            $args = array($args);
-        }
-        foreach ($args as &$arg) {
-            $arg = $this->filterArg($arg);
-        }
-        return $args;
-    }
-
-    public function filterArg($arg) {
-        if ($arg instanceOf CJavascript_Statement) {
-            //this statement will used for args, remove this statement for being rendered
-            $this->javascript->removeStatement($arg);
-        }
-        return $arg;
+        return $this->javascript->filterArgs($args);
     }
 
 }

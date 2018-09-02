@@ -15,6 +15,7 @@ class CJavascript {
      */
     protected static $statements = array();
     protected static $deferredStatements = array();
+    protected static $deferredStack = -1;
 
     public static function compile() {
         $script = '';
@@ -31,15 +32,24 @@ class CJavascript {
     }
 
     public static function getDeferredStatements() {
-        return self::$deferredStatements;
+
+        if (!isset(self::$deferredStatements[self::$deferredStack])) {
+            self::$deferredStatements[self::$deferredStack] = array();
+        }
+
+        return self::$deferredStatements[self::$deferredStack];
     }
 
     public static function addStatement(CJavascript_Statement $statement) {
+
         self::$statements[$statement->hash()] = $statement;
     }
 
     public static function addDeferredStatement(CJavascript_Statement $statement) {
-        self::$deferredStatements[$statement->hash()] = $statement;
+        if (!isset(self::$deferredStatements[self::$deferredStack])) {
+            self::$deferredStatements[self::$deferredStack] = array();
+        }
+        self::$deferredStatements[self::$deferredStack][$statement->hash()] = $statement;
     }
 
     public static function removeStatement(CJavascript_Statement $statement) {
@@ -48,18 +58,51 @@ class CJavascript {
         }
     }
 
-    public static function removeDeferredStatement(CJavascript_Statement $statement) {
-        if (isset(self::$deferredStatements[$statement->hash()])) {
-            unset(self::$deferredStatements[$statement->hash()]);
+    public static function removeDeferredStatement(CJavascript_Statement $statement, $allStack = true) {
+        if (!isset(self::$deferredStatements[self::$deferredStack])) {
+            self::$deferredStatements[self::$deferredStack] = array();
+        }
+        if ($allStack) {
+            for ($i = 0; $i <= self::$deferredStack; $i++) {
+                if (isset(self::$deferredStatements[$i][$statement->hash()])) {
+                    unset(self::$deferredStatements[$i][$statement->hash()]);
+                }
+            }
+        } else {
+            if (isset(self::$deferredStatements[self::$deferredStack][$statement->hash()])) {
+                unset(self::$deferredStatements[self::$deferredStack][$statement->hash()]);
+            }
         }
     }
 
     public static function clearStatement() {
-        self::$statements = [];
+        self::$statements = array();
     }
 
     public static function clearDeferredStatement() {
+        if (!isset(self::$deferredStatements[self::$deferredStack])) {
+            self::$deferredStatements[self::$deferredStack] = array();
+        }
+        self::$deferredStatements[self::$deferredStack] = array();
+    }
+
+    public static function popDeferredStack() {
+        $statements = self::getDeferredStatements();
+        unset(self::$deferredStatements[self::$deferredStack--]);
+        return $statements;
+    }
+
+    public static function pushDeferredStack() {
+        self::$deferredStatements[++self::$deferredStack] = array();
+        return self::getDeferredStatements();
+    }
+
+    public static function clearDeferredStack() {
         self::$deferredStatements = [];
+    }
+
+    public static function getDeferredStack() {
+        return self::$deferredStatements;
     }
 
     /**

@@ -10,7 +10,17 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CRenderable_Observable_Javascript_JQuery_Trait_AjaxTrait {
 
     public function ajax($options = array()) {
-       
+        $success = carr::get($options, 'success', null);
+        if ($success != null) {
+            if ($success instanceof Closure) {
+                $data = array();
+                $success = $this->javascript->runClosure($success, $data);
+            }
+        }
+
+        $this->filterArgs($success);
+        $options['success'] = $success;
+
         $this->jQueryStatement()->ajax($options);
         $this->resetJQueryStatement();
 

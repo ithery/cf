@@ -28,7 +28,14 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
     }
 
     public function compileAjaxEvent($statement) {
-        if ($statement instanceOf CJavascript_Statement) {
+        if (is_array($statement)) {
+            $function = new CJavascript_Statement_Function('', array('data'));
+            foreach ($statement as $stat) {
+                $function->addStatement($stat);
+            }
+            $statement = $function;
+        }
+        if ($statement instanceOf CJavascript_Statement && (!$statement instanceOf CJavascript_Statement_Function)) {
             $function = new CJavascript_Statement_Function('', array('data'));
             $function->addStatement($statement);
             $statement = $function;

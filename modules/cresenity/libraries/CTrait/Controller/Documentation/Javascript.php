@@ -100,13 +100,13 @@ trait CTrait_Controller_Documentation_Javascript {
         $divAjax = $app->addDiv('divAjax');
         $select->onChange(function($selectJs) use($div) {
             $selectJs->bindDeferred($div, function($divJs) use($selectJs) {
-                $divJs->jquery()->html($selectJs->jquery()->find(':selected')->html());
-                $divJs->variable('a', 'test');
+//                $divJs->jquery()->html($selectJs->jquery()->find(':selected')->html());
+//                $divJs->variable('a', 'test');
                 $ajaxOptions = array();
                 $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
-                $function = new CJavascript_Statement_Function('', array('data'));
-                $function->addStatement('$("#divAjax").html(data);');
-                $ajaxOptions['success'] = $function;
+                $ajaxOptions['success'] = function($divJsAjax,$data) {
+                    $divJsAjax->raw('$("#divAjax").html(data);');
+                };
                 $divJs->jquery()->ajax($ajaxOptions);
             });
         });
