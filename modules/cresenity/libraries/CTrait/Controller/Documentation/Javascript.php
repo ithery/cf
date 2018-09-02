@@ -98,32 +98,43 @@ trait CTrait_Controller_Documentation_Javascript {
 
         $div = $app->addDiv();
         $divAjax = $app->addDiv('divAjax');
-        $select->onChange(function($selectJs) use($div) {
-            $selectJs->bindDeferred($div, function($divJs) use($selectJs) {
-//                $divJs->jquery()->html($selectJs->jquery()->find(':selected')->html());
-//                $divJs->variable('a', 'test');
-                $ajaxOptions = array();
-                $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
-                $ajaxOptions['success'] = function($divJsAjax,$data) {
-                    $divJsAjax->raw('$("#divAjax").html(data);');
-                };
-                $divJs->jquery()->ajax($ajaxOptions);
-            });
+        $select->onChange(function($selectJs) use($div, $divAjax) {
+
+            $ajaxOptions = array();
+            $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
+            $ajaxOptions['dataType'] = 'json';
+            $ajaxOptions['data'] = array();
+            $ajaxOptions['success'] = function($js, $data) use($divAjax) {
+                $divAjax->javascript()->jquery()->html($data->html);
+            };
+            $div->jquery()->ajax($ajaxOptions);
         });
 
         echo $app->render();
     }
 
     public function ajax() {
-        echo 'Ajax Content';
+        $data['html'] = 'html';
+        $data['js'] = 'js';
+        echo json_encode($data);
     }
 
     public function test() {
         $app = CApp::instance();
 
-        $div = $app->addDiv('test')->add('Haha');
-        $div->jquery()->addClass('btn btn-primary');
+        $data = new CJavascript_Mock_Variable('data');
+        $test = $data->test;
+        $test2 = $data->test->test2;
 
+        $test3 = $test->test3;
+        $test4 = $data->variable;
+        $app->add($test->getScript());
+        $app->addHr();
+        $app->add($test2->getScript());
+        $app->addHr();
+        $app->add($test3->getScript());
+        $app->addHr();
+        $app->add($test4->getScript());
         echo $app->render();
     }
 

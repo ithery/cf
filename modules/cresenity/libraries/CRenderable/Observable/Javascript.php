@@ -17,12 +17,6 @@ class CRenderable_Observable_Javascript {
 
     /**
      *
-     * @var bool
-     */
-    protected $deferred = 0;
-
-    /**
-     *
      * @var CRenderable_Observable_Javascript_JQuery
      */
     private $jQueryObject;
@@ -44,7 +38,7 @@ class CRenderable_Observable_Javascript {
      * @return $this
      */
     public function startDeferred() {
-        $this->deferred++;
+
         CJavascript::pushDeferredStack();
         return $this;
     }
@@ -87,7 +81,7 @@ class CRenderable_Observable_Javascript {
      * @return CJavascript_Statement[]
      */
     public function endDeferred() {
-        $this->deferred--;
+
         $statements = CJavascript::popDeferredStack();
         return $statements;
     }
@@ -98,11 +92,10 @@ class CRenderable_Observable_Javascript {
      * @return $this
      */
     public function addStatement(CJavascript_Statement $statement) {
-        if ($this->deferred) {
-            CJavascript::addDeferredStatement($statement);
-        } else {
-            CJavascript::addStatement($statement);
-        }
+
+
+        CJavascript::addStatement($statement);
+
         return $this;
     }
 

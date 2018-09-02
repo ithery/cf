@@ -41,7 +41,9 @@ class CJavascript {
     }
 
     public static function addStatement(CJavascript_Statement $statement) {
-
+        if(self::$deferredStack>=0) {
+            return self::addDeferredStatement($statement);
+        }
         self::$statements[$statement->hash()] = $statement;
     }
 

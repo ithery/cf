@@ -13,7 +13,7 @@ trait CRenderable_Observable_Javascript_JQuery_Trait_AjaxTrait {
         $success = carr::get($options, 'success', null);
         if ($success != null) {
             if ($success instanceof Closure) {
-                $data = array();
+                $data = new CJavascript_Mock_Variable('data');
                 $success = $this->javascript->runClosure($success, $data);
             }
         }

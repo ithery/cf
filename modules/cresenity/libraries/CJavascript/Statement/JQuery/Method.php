@@ -42,7 +42,11 @@ class CJavascript_Statement_JQuery_Method implements CJavascript_Statement_JQuer
             $preps = array();
             foreach ($params as $param) {
                 $needQuoted = true;
-                   
+
+                if ($param instanceof CJavascript_Mock_Variable) {
+                    $param = $param->getScript();
+                    $needQuoted = false;
+                }
                 if ($param instanceof CJavascript_Statement) {
                     $param = trim($param->getStatement());
                     $param = trim($param, ';');

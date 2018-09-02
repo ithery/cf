@@ -12,12 +12,16 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
     protected $method = 'GET';
     protected $url = null;
     protected $complete = null;
+    protected $dataType = 'json';
+    protected $data = null;
     protected $success = null;
     protected $error = null;
 
     public function __construct($options) {
         $this->method = carr::get($options, 'method', 'GET');
         $this->url = carr::get($options, 'url', curl::base());
+        $this->dataType = carr::get($options, 'dataType', 'json');
+        $this->data = carr::get($options, 'data', null);
 
         $this->complete = carr::get($options, 'complete', null);
         $this->success = carr::get($options, 'success', null);
@@ -50,6 +54,7 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
     public function compile() {
         $str = '.ajax({';
         $str .= 'url:' . CJavascript_Helper_Javascript::prepValue($this->url) . ',';
+        $str .= 'dataType:' . CJavascript_Helper_Javascript::prepValue($this->dataType) . ',';
 
         if ($this->complete != null) {
             $this->complete = $this->compileAjaxEvent($this->complete);
