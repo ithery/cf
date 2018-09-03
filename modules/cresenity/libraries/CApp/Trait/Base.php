@@ -198,4 +198,8 @@ trait CApp_Trait_Base {
         return curl::base() . 'cresenity/noimage/100/100';
     }
 
+    public static function havePermission($action) {
+        return CApp_Navigation_Helper::havePermission($action);
+    }
+
 }
