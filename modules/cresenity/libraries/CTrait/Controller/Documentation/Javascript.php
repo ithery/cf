@@ -93,21 +93,32 @@ trait CTrait_Controller_Documentation_Javascript {
             'option4' => 'Option 4',
         );
 
+        $list2 = array(
+            'list1' => 'List 1',
+            'list2' => 'List 2',
+            'list3' => 'List 3',
+            'list4' => 'List 4',
+        );
+
         $form = $app->addForm();
         $select = $form->addField()->setLabel('Select')->addControl('optionSelect', 'select')->setList($list);
+        $select2 = $form->addField()->setLabel('Select 2')->addControl('optionSelect2', 'select')->setList($list2);
 
         $div = $app->addDiv();
         $divAjax = $app->addDiv('divAjax');
-        $select->onChange(function($selectJs) use($div, $divAjax) {
-
+        $select->onChange(function($selectJs) use($div, $divAjax, $select2) {
+            
             $ajaxOptions = array();
             $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
             $ajaxOptions['dataType'] = 'json';
             $ajaxOptions['data'] = array();
-            $ajaxOptions['success'] = function($js, $data) use($divAjax) {
+            $ajaxOptions['success'] = function($data) use($divAjax) {
                 $divAjax->jquery()->html($data->html);
             };
             $div->jquery()->ajax($ajaxOptions);
+        });
+        $select2->onChange(function($selectJs) use($div, $divAjax, $select2) {
+            $div->jquery()->append('<a href="#">Test</a>');
         });
         $select->jquery()->trigger('change');
 

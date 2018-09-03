@@ -68,7 +68,7 @@ class CRenderable_Observable_Javascript {
 
         $args = func_get_args();
         $closure = carr::get($args, 0);
-        $args[0] = $this;
+        $args = array_slice($args,1);
 
         $this->startDeferred();
         call_user_func_array($closure, $args);
