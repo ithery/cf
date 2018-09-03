@@ -115,7 +115,7 @@ trait CTrait_Controller_Documentation_Javascript {
     }
 
     public function ajax() {
-        $data['html'] = 'html';
+        $data['html'] = 'html 2';
         $data['js'] = 'js';
         echo json_encode($data);
     }

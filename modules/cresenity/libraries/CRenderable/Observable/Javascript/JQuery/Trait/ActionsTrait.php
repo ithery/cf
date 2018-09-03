@@ -60,11 +60,12 @@ trait CRenderable_Observable_Javascript_JQuery_Trait_ActionsTrait {
         $args = func_get_args();
         $object = $this->jQueryStatement();
         $object = call_user_func_array(array($object, 'val'), $args);
-        $statement = $object->getStatement();
+        $statement = $object;
+        $this->resetJQueryStatement();
         if (count($args) == 0) {
+
             return $statement;
         }
-        $this->resetJQueryStatement();
         return $this;
     }
 
@@ -117,4 +118,5 @@ trait CRenderable_Observable_Javascript_JQuery_Trait_ActionsTrait {
         $this->resetJQueryStatement();
         return $this;
     }
+
 }
