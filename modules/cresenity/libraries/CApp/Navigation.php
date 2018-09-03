@@ -31,10 +31,15 @@ class CApp_Navigation {
         
     }
 
-	
-	public static function navs()  {
-		return CApp_Navigation_Data::get();
-	}
+    public static function navs($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+        $navsArray = CApp_Navigation_Data::get($domain);
+
+        return $navsArray;
+    }
+
     /**
      * 
      * @param array $options 
