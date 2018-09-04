@@ -113,6 +113,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                         $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
                                         $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
                                         $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
+                                        $('#<?php echo $id; ?>').trigger('change');
                                     } else if (this.readyState == 4 && this.status != 200) {
                                     }
                                 };
@@ -138,10 +139,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             if (this.readyState == 4 && this.status == 200) {
                                 var dataFile = JSON.parse(this.responseText);
                                 $('#<?php echo $id; ?>').val(dataFile.file_id);
-                                $('#<?php echo $id; ?>').trigger('change');
                                 $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
                                 $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
                                 $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
+                                $('#<?php echo $id; ?>').trigger('change');
                             } else if (this.readyState == 4 && this.status != 200) {
                             }
                         };
