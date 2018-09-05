@@ -483,6 +483,7 @@ final class CF {
     public static function get_files($directory, $filename, $domain = null) {
         return self::getFiles($directory, $filename, $domain);
     }
+
     /**
      * 
      * @param string $directory
