@@ -1143,7 +1143,7 @@ final class CF {
             $file = str_replace('\\', '/', realpath($file));
             $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
 
-            if ($level <= self::$configuration['core']['log_threshold']) {
+            if ($level <= self::$log_threshold) {
                 // Log the error
                 $need_to_log = true;
                 if (!$PHP_ERROR) {
