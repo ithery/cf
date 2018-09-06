@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 2, 2018, 5:12:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CRenderable_Observable_Javascript_JQuery_Trait_EventsTrait {
+trait CObservable_Javascript_JQuery_Trait_EventsTrait {
 
     /**
      * @return string

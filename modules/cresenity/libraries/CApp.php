@@ -512,7 +512,7 @@ class CApp extends CObservable {
         return $v->render();
     }
 
-    public function set_custom_data($data) {
+    public function setCustomData($data) {
         $this->custom_data = $data;
         return $this;
     }

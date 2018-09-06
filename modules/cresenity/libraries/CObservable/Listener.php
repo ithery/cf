@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 3:43:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CRenderable_Listener {
+class CObservable_Listener {
 
     use CTrait_Compat_Listener;
 
@@ -29,7 +29,7 @@ class CRenderable_Listener {
 
     public static function factory($owner, $event) {
 
-        return new CRenderable_Listener($owner, $event);
+        return new CObservable_Listener($owner, $event);
     }
 
     public function setConfirm($bool) {
@@ -74,10 +74,10 @@ class CRenderable_Listener {
     /**
      * 
      * @param string $handlerName
-     * @return CRenderable_Listener_Handler
+     * @return CObservable_Listener_Handler
      */
     public function addHandler($handlerName) {
-        $handler = new CRenderable_Listener_Handler($this->owner, $this->event, $handlerName);
+        $handler = new CObservable_Listener_Handler($this->owner, $this->event, $handlerName);
         $this->handlers[] = $handler;
         return $handler;
     }

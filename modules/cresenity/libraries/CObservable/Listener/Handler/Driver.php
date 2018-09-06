@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 4:01:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CRenderable_Listener_Handler_Driver implements CRenderable_Listener_Handler_DriverInterface {
+abstract class CObservable_Listener_Handler_Driver implements CObservable_Listener_Handler_DriverInterface {
 
     use CTrait_Compat_Handler_Driver;
 

@@ -7,21 +7,21 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 2, 2018, 5:09:28 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CRenderable_Observable extends CRenderable {
+abstract class CObservable extends CRenderable {
 
     use CTrait_Compat_Observable,
-        CRenderable_Observable_Trait_EventsTrait;
+        CObservable_Trait_EventsTrait;
 
     /**
      *
-     * @var CRenderable_Listener[]
+     * @var CObservable_Listener[]
      */
     protected $listeners;
     protected $manager;
 
     /**
      *
-     * @var CRenderable_Observable_Javascript
+     * @var CObservable_Javascript
      */
     protected $javascript;
 
@@ -32,14 +32,14 @@ abstract class CRenderable_Observable extends CRenderable {
     
     /**
      * 
-     * @return CRenderable_Observable_Javascript
+     * @return CObservable_Javascript
      */
     public function javascript() {
         return $this->javascript;
     }
     /**
      * 
-     * @return CRenderable_Observable_Javascript_JQuery
+     * @return CObservable_Javascript_JQuery
      */
     public function jquery() {
         return $this->javascript->jquery();
@@ -51,7 +51,7 @@ abstract class CRenderable_Observable extends CRenderable {
      * @return CListener
      */
     public function addListener($event) {
-        $listener = new CRenderable_Listener($this->id, $event);
+        $listener = new CObservable_Listener($this->id, $event);
         $this->listeners[] = $listener;
         return $listener;
     }
@@ -95,7 +95,7 @@ abstract class CRenderable_Observable extends CRenderable {
         $this->manager->registerControl('tooltip', 'CFormInputTooltip');
         $this->manager->registerControl('fileupload', 'CFormInputFileUpload');
 
-        $this->javascript = new CRenderable_Observable_Javascript($this);
+        $this->javascript = new CObservable_Javascript($this);
     }
 
     /**

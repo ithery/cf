@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 2, 2018, 10:41:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CRenderable_Observable_Javascript_JQuery_Trait_InternalTrait {
+trait CObservable_Javascript_JQuery_Trait_InternalTrait {
 
     public function bindVar($var, $value) {
         $this->getObject()->bindVar($var, $value);

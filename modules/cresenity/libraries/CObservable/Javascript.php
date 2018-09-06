@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 2, 2018, 11:07:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CRenderable_Observable_Javascript {
+class CObservable_Javascript {
 
     /**
      *
@@ -17,20 +17,20 @@ class CRenderable_Observable_Javascript {
 
     /**
      *
-     * @var CRenderable_Observable_Javascript_JQuery
+     * @var CObservable_Javascript_JQuery
      */
     private $jQueryObject;
 
     /**
      *
-     * @var CRenderable_Observable_Javascript_Native
+     * @var CObservable_Javascript_Native
      */
     private $nativeObject;
 
     public function __construct($owner = null) {
         $this->owner = $owner;
-        $this->jQueryObject = new CRenderable_Observable_Javascript_JQuery($this);
-        $this->nativeObject = new CRenderable_Observable_Javascript_Native($this);
+        $this->jQueryObject = new CObservable_Javascript_JQuery($this);
+        $this->nativeObject = new CObservable_Javascript_Native($this);
     }
 
     /**
@@ -45,7 +45,7 @@ class CRenderable_Observable_Javascript {
 
     /**
      * 
-     * @param CRenderable_Observable_Javascript|CRenderable $renderable
+     * @param CObservable_Javascript|CRenderable $renderable
      * @param Closure $closure
      */
     public function bindDeferred($object, Closure $closure) {
@@ -68,7 +68,7 @@ class CRenderable_Observable_Javascript {
 
         $args = func_get_args();
         $closure = carr::get($args, 0);
-        $args = array_slice($args,1);
+        $args = array_slice($args, 1);
 
         $this->startDeferred();
         call_user_func_array($closure, $args);
@@ -113,7 +113,7 @@ class CRenderable_Observable_Javascript {
 
     /**
      * 
-     * @return CRenderable_Observable_Javascript_Native
+     * @return CObservable_Javascript_Native
      */
     public function native() {
         return $this->nativeObject;
@@ -121,7 +121,7 @@ class CRenderable_Observable_Javascript {
 
     /**
      * 
-     * @return CRenderable_Observable_Javascript_JQuery
+     * @return CObservable_Javascript_JQuery
      */
     public function jquery() {
         return $this->jQueryObject;

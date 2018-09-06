@@ -7,11 +7,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 3, 2018, 1:15:13 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CRenderable_Observable_Javascript_Native {
+class CObservable_Javascript_Native {
 
     /**
      *
-     * @var CRenderable_Observable_Javascript
+     * @var CObservable_Javascript
      */
     protected $javascript;
 

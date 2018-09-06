@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 2, 2018, 6:38:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CRenderable_Observable_Javascript_JQuery_Trait_ActionsTrait {
+trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
 
     /**
      * @return string
@@ -107,7 +107,7 @@ trait CRenderable_Observable_Javascript_JQuery_Trait_ActionsTrait {
         return $this;
     }
 
-    public function appendTo(CRenderable_Observable $to) {
+    public function appendTo(CObservable $to) {
         $this->jQueryStatement()->appendTo($to->jquery()->getSelector());
         $this->resetJQueryStatement();
         return $this;

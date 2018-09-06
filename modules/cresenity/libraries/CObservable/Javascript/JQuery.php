@@ -7,16 +7,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 2, 2018, 5:38:11 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CRenderable_Observable_Javascript_JQuery {
+class CObservable_Javascript_JQuery {
 
-    use CRenderable_Observable_Javascript_JQuery_Trait_ActionsTrait,
-        CRenderable_Observable_Javascript_JQuery_Trait_EventsTrait,
-        CRenderable_Observable_Javascript_JQuery_Trait_AjaxTrait,
-        CRenderable_Observable_Javascript_JQuery_Trait_InternalTrait;
+    use CObservable_Javascript_JQuery_Trait_ActionsTrait,
+        CObservable_Javascript_JQuery_Trait_EventsTrait,
+        CObservable_Javascript_JQuery_Trait_AjaxTrait,
+        CObservable_Javascript_JQuery_Trait_InternalTrait;
 
     /**
      *
-     * @var CRenderable_Observable_Javascript
+     * @var CObservable_Javascript
      */
     protected $javascript;
 

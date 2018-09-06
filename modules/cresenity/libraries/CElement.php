@@ -1,6 +1,6 @@
 <?php
 
-abstract class CElement extends CRenderable_Observable {
+abstract class CElement extends CObservable {
 
     use CTrait_Compat_Element;
 

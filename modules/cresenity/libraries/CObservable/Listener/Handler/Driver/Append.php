@@ -4,17 +4,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 4:28:29 PM
+ * @since Sep 1, 2018, 4:07:06 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CRenderable_Listener_Handler_Driver_Empty extends CRenderable_Listener_Handler_Driver {
+class CObservable_Listener_Handler_Driver_Append extends CObservable_Listener_Handler_Driver {
 
-    use CTrait_Compat_Handler_Driver_Empty;
+    use CTrait_Compat_Handler_Driver_Append;
 
+    protected $target;
     protected $method;
     protected $content;
     protected $param;
     protected $param_inputs;
+    protected $check_duplicate_selector;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
@@ -24,7 +26,7 @@ class CRenderable_Listener_Handler_Driver_Empty extends CRenderable_Listener_Han
         $this->param_inputs = array();
     }
 
-    public function add_param_input($inputs) {
+    public function addParamInput($inputs) {
         if (!is_array($inputs)) {
             $inputs = array($inputs);
         }
@@ -34,12 +36,17 @@ class CRenderable_Listener_Handler_Driver_Empty extends CRenderable_Listener_Han
         return $this;
     }
 
-    public function set_method($method) {
+    public function setMethod($method) {
         $this->method = $method;
     }
 
     public function content() {
         return $this->content;
+    }
+
+    public function set_check_duplicate_selector($selector) {
+        $this->check_duplicate_selector = $selector;
+        return $this;
     }
 
     public function script() {
@@ -53,8 +60,16 @@ class CRenderable_Listener_Handler_Driver_Empty extends CRenderable_Listener_Han
         }
         $data_addition = '{' . $data_addition . '}';
         $js .= "
-			jQuery('#" . $this->target . "').empty();
-                        
+                    var is_duplicate = 0;
+                    var check_duplicate = " . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
+                    if(check_duplicate==1){
+                        if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
+                            is_duplicate = 1;
+                        }
+                    }
+                    if (is_duplicate==0) {
+			$.cresenity.append('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
+                    }
 		";
 
         return $js;

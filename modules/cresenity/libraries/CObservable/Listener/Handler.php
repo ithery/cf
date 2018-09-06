@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 3:50:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CRenderable_Listener_Handler {
+class CObservable_Listener_Handler {
 
     const TYPE_REMOVE = 'remove';
     const TYPE_RELOAD = 'reload';
@@ -25,7 +25,7 @@ class CRenderable_Listener_Handler {
 
         $this->name = ucfirst($name);
         // Set driver name
-        $driver = 'CRenderable_Listener_Handler_Driver_' . $this->name;
+        $driver = 'CObservable_Listener_Handler_Driver_' . $this->name;
 
         try {
             // Validation of the driver
@@ -34,7 +34,7 @@ class CRenderable_Listener_Handler {
             $this->driver = $class->newInstance($owner, $event, $this->name);
         } catch (ReflectionException $ex) {
 
-            throw new CRenderable_Listener_Handler_Exception('The :driver driver for the :class library could not be found', array(':driver' => ucfirst($this->name), ':class' => get_class($this)));
+            throw new CObservable_Listener_Handler_Exception('The :driver driver for the :class library could not be found', array(':driver' => ucfirst($this->name), ':class' => get_class($this)));
         }
     }
 
