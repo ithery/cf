@@ -4,6 +4,13 @@ class CFactory {
 
     use CTrait_Compat_Factory;
 
+    /**
+     * 
+     * @param string $id
+     * @param string $type
+     * @return CElement_FormInput
+     * @throws CException
+     */
     public static function createControl($id, $type) {
         $control = null;
         if (CManager::instance()->isRegisteredControl($type)) {

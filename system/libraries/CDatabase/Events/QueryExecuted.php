@@ -1,9 +1,7 @@
 <?php
 
-namespace Illuminate\Database\Events;
+class CDatabase_Events_QueryExecuted {
 
-class QueryExecuted
-{
     /**
      * The SQL query that was executed.
      *
@@ -24,6 +22,13 @@ class QueryExecuted
      * @var float
      */
     public $time;
+
+    /**
+     * The number of milliseconds it took to execute the query.
+     *
+     * @var int
+     */
+    public $rowsCount;
 
     /**
      * The database connection instance.
@@ -48,12 +53,13 @@ class QueryExecuted
      * @param  string  $connection
      * @return void
      */
-    public function __construct($sql, $bindings, $time, $connection)
-    {
+    public function __construct($sql, $bindings, $time, $rowsCount, $db) {
         $this->sql = $sql;
         $this->time = $time;
         $this->bindings = $bindings;
-        $this->connection = $connection;
-        $this->connectionName = $connection->getName();
+        $this->rowsCount = $rowsCount;
+        $this->connection = $db;
+        $this->connectionName = $db->getName();
     }
+
 }

@@ -226,7 +226,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Ordered List Element &lt;ol&gt
      *
@@ -460,18 +460,33 @@ abstract class CObservable extends CRenderable {
         return $act;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Alert
+     */
     public function addAlert($id = "") {
         $element = CElement_Factory::createComponent('Alert', $id);
         $this->add($element);
         return $element;
     }
-    
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Accordion
+     */
     public function addAccordion($id = "") {
         $element = CElement_Factory::createComponent('Accordion', $id);
         $this->add($element);
         return $element;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Icon
+     */
     public function addIcon($id = "") {
         $icon = CElement_Factory::createComponent('Icon', $id);
         $this->add($icon);

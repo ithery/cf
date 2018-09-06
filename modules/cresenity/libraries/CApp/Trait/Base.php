@@ -198,4 +198,26 @@ trait CApp_Trait_Base {
         return curl::base() . 'cresenity/noimage/100/100';
     }
 
+    public static function havePermission($action) {
+        return CApp_Navigation_Helper::havePermission($action);
+    }
+
+    public static function checkPermission($permissionName) {
+        if (!self::havePermission($permissionName)) {
+            self::notAccessible();
+            return false;
+        }
+    }
+
+    /**
+     * Always return false
+     *  
+     * @return boolean
+     */
+    public static function notAccessible() {
+        cmsg::add('error', clang::__('You do not have access to this module, please call administrator'));
+        curl::redirect('home');
+        return false;
+    }
+
 }

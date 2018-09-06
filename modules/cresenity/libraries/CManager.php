@@ -25,6 +25,12 @@ final class CManager {
 
     /**
      *
+     * @var CManager_Navigation
+     */
+    protected static $navigation = null;
+
+    /**
+     *
      * @return CManager
      */
     public static function instance() {
@@ -57,6 +63,17 @@ final class CManager {
             self::$theme = new CManager_Theme();
         }
         return self::$theme;
+    }
+
+    /**
+     * 
+     * @return CManager_Navigation
+     */
+    public static function navigation() {
+        if (self::$navigation == null) {
+            self::$navigation = new CManager_Navigation();
+        }
+        return self::$navigation;
     }
 
     /**
@@ -284,6 +301,14 @@ final class CManager {
             return $require;
         }
         return self::$useRequireJs;
+    }
+
+    public static function registerCss($file, $pos = CClientScript::POS_HEAD) {
+        $cs = CClientScript::instance()->registerCssFile($file, $pos);
+    }
+
+    public static function registerJs($file, $pos = CClientScript::POS_END) {
+        $cs = CClientScript::instance()->registerJsFile($file, $pos);
     }
 
 }

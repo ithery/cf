@@ -34,11 +34,11 @@ class CApp extends CObservable {
     private $ajaxData = array();
     private $renderMessage = true;
     private $keepMessage = false;
+    private $viewName = 'cpage';
+    protected static $viewCallback;
 
-    public function __destruct() {
-        if (function_exists('gc_collect_cycles')) {
-            gc_collect_cycles();
-        }
+    public function setViewCallback(callable $viewCallback) {
+        self::$viewCallback = $viewCallback;
     }
 
     /**
@@ -98,7 +98,7 @@ class CApp extends CObservable {
     public static function temp() {
         return new CApp_Temp();
     }
-    
+
     /**
      * 
      * @return CApp_Data
@@ -144,7 +144,12 @@ class CApp extends CObservable {
 
         $this->registerCoreModules();
 
-
+        if (isset($_COOKIE['capp-profiler'])) {
+            new Profiler();
+        }
+        if (isset($_COOKIE['capp-debugbar'])) {
+            CDebug::bar()->enable();
+        }
         $db = CDatabase::instance();
         if ($this->_org == null) {
             $org_id = cstg::get("org_id");
@@ -227,7 +232,6 @@ class CApp extends CObservable {
         $this->run = false;
 
         $theme_path = "";
-        //$theme_path = ctheme::path();
     }
 
     public function setLoginRequired($bool) {
@@ -384,9 +388,12 @@ class CApp extends CObservable {
     public function render() {
 
         if ($this->rendered) {
-            trigger_error('CApp already rendered');
+            throw new CException('CApp already rendered');
         }
         $this->rendered = true;
+
+        CFEvent::run('CApp.beforeRender');
+
         if (crequest::is_ajax()) {
             return $this->json();
         }
@@ -405,105 +412,107 @@ class CApp extends CObservable {
                 $theme_path .= '/';
             }
         }
-
+        $viewName = $this->viewName;
         if (ccfg::get("install")) {
-            $v = CView::factory($theme_path . 'cinstall/page');
+            $viewName = 'cinstall/page';
         } else if ($this->signup) {
-            $v = CView::factory($theme_path . 'ccore/signup');
+            $viewName = 'ccore/signup';
         } else if ($this->resend) {
-            $v = CView::factory($theme_path . 'ccore/resend_activation');
+            $viewName = 'ccore/resend_activation';
         } else if ($this->activation) {
-            $v = CView::factory($theme_path . 'ccore/activation');
+            $viewName = 'ccore/activation';
         } else if (!$this->is_user_login() && ccfg::get("have_user_login") && $this->login_required) {
-            $v = CView::factory($theme_path . 'ccore/login');
+            $viewName = 'ccore/login';
         } else if (!$this->is_user_login() && ccfg::get("have_static_login") && $this->login_required) {
-            $v = CView::factory($theme_path . 'ccore/static_login');
-        } else {
-            if (CView::exists($theme_path . 'cpage')) {
+            $viewName = 'ccore/static_login';
+        }
 
-                $v = CView::factory($theme_path . 'cpage');
-            }
-            if ($v == null) {
-                $v = CView::factory('cpage');
-            }
+        if (self::$viewCallback != null && is_callable(self::$viewCallback)) {
+            $viewName = self::$viewCallback($viewName);
+        }
 
-            $this->content = parent::html();
-            $this->js = parent::js();
+        if (CView::exists($theme_path . $viewName)) {
 
-            $v->content = $this->content;
-            $v->header_body = $this->header_body;
+            $v = CView::factory($theme_path . $viewName);
+        }
+        if ($v == null) {
+            $v = CView::factory($viewName);
+        }
+        $this->content = parent::html();
+        $this->js = parent::js();
 
-            $v->title = $this->title;
-            $cs = CClientScript::instance();
-            $css_urls = $cs->urlCssFile();
+        $v->content = $this->content;
+        $v->header_body = $this->header_body;
 
-            $js_urls = $cs->urlJsFile();
-            $additional_js = "";
+        $v->title = $this->title;
+        $cs = CClientScript::instance();
+        $css_urls = $cs->urlCssFile();
 
-            foreach ($css_urls as $url) {
+        $js_urls = $cs->urlJsFile();
+        $additional_js = "";
 
-                $additional_js .= "
+        foreach ($css_urls as $url) {
+
+            $additional_js .= "
 					$.cresenity._filesadded+='['+'" . $url . "'+']'
 				";
-            }
-            $js = "";
-            //$vjs = CView::factory('ccore/js');
-            //$js .= PHP_EOL . $vjs->render();
-
-            $js .= PHP_EOL . $this->js . $additional_js;
-
-            $js = $cs->renderJsRequire($js);
-
-            if (ccfg::get("minify_js")) {
-                $js = CJSMin::minify($js);
-            }
-
-            $v->js = $js;
-
-            $v->css_hash = "";
-            $v->js_hash = "";
-            if (ccfg::get("merge_css")) {
-                $v->css_hash = $cs->create_css_hash();
-            }
-            if (ccfg::get("merge_js")) {
-                $v->js_hash = $cs->create_js_hash();
-            }
-
-            $v->theme = $theme;
-            $v->theme_path = $theme_path;
-            $v->head_client_script = "";
-            $v->begin_client_script = "";
-            $v->end_client_script = "";
-
-            $v->load_client_script = "";
-            $v->ready_client_script = "";
-
-
-            $v->head_client_script = $cs->render('head');
-            $v->begin_client_script = $cs->render('begin');
-            //$v->end_client_script = $cs->render('end');
-
-            $v->load_client_script = $cs->render('load');
-            $v->ready_client_script = $cs->render('ready');
-
-            $v->custom_js = $this->custom_js;
-            $v->custom_header = $this->custom_header;
-            $v->custom_footer = $this->custom_footer;
-            $v->show_breadcrumb = $this->show_breadcrumb;
-            $v->show_title = $this->show_title;
-            $v->breadcrumb = $this->breadcrumb;
-            $v->additional_head = $this->additional_head;
-            $v->custom_data = $this->custom_data;
-            $v->login_required = $this->login_required;
         }
-        if (isset($_GET['profiler'])) {
-            new Profiler();
+        $js = "";
+        //$vjs = CView::factory('ccore/js');
+        //$js .= PHP_EOL . $vjs->render();
+
+        $js .= PHP_EOL . $this->js . $additional_js;
+
+        $js = $cs->renderJsRequire($js);
+
+        if (ccfg::get("minify_js")) {
+            $js = CJSMin::minify($js);
         }
+
+        $v->js = $js;
+
+        $v->css_hash = "";
+        $v->js_hash = "";
+        if (ccfg::get("merge_css")) {
+            $v->css_hash = $cs->create_css_hash();
+        }
+        if (ccfg::get("merge_js")) {
+            $v->js_hash = $cs->create_js_hash();
+        }
+
+        $v->theme = $theme;
+        $v->theme_path = $theme_path;
+        $v->head_client_script = "";
+        $v->begin_client_script = "";
+        $v->end_client_script = "";
+
+        $v->load_client_script = "";
+        $v->ready_client_script = "";
+
+
+        $v->head_client_script = $cs->render('head');
+        $v->begin_client_script = $cs->render('begin');
+        //$v->end_client_script = $cs->render('end');
+
+        $v->load_client_script = $cs->render('load');
+        $v->ready_client_script = $cs->render('ready');
+
+        $v->custom_js = $this->custom_js;
+        $v->custom_header = $this->custom_header;
+        $v->custom_footer = $this->custom_footer;
+        $v->show_breadcrumb = $this->show_breadcrumb;
+        $v->show_title = $this->show_title;
+        $v->breadcrumb = $this->breadcrumb;
+        $v->additional_head = $this->additional_head;
+        $v->custom_data = $this->custom_data;
+        $v->login_required = $this->login_required;
+
+
 
         return $v->render();
     }
 
-    public function set_custom_data($data) {
+    public function setCustomData($data) {
         $this->custom_data = $data;
         return $this;
     }
@@ -777,6 +786,20 @@ class CApp extends CObservable {
         $variables['label_ok'] = clang::__("OK");
         $variables['label_cancel'] = clang::__("Cancel");
         return $variables;
+    }
+
+    public function setViewName($viewName) {
+        $this->viewName = $viewName;
+    }
+
+    /**
+     * 
+     * @return void
+     */
+    public function __destruct() {
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
     }
 
 }

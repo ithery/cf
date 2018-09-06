@@ -14,10 +14,12 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	protected $keyField;
 	protected $searchField;
 	protected $limit;
+	protected $itemName;
 	protected $imgSrc;
 	protected $width;
 	protected $height;
 	protected $buttonLabel;
+	protected $placeholder;
 	protected $itemTemplateName;
 	protected $itemTemplateVariables;
 	protected $delay;
@@ -32,20 +34,24 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		$this->keyField = '';
 		$this->searchField = '';
 		$this->limit = 10;
+		$this->itemName = '';
 		$this->imgSrc = CApp_Base::noImageUrl();
 		$this->width = '100';
 		$this->height = '100';
 		$this->buttonLabel = 'Select an Item';
+		$this->placeholder = 'Search Item';
 		$this->delay = '1000';
 		$this->templateName = 'CElement/FormInput/DialogSelect';
 		$this->itemTemplateName = 'CElement/Card/Item';
 		$this->itemTemplateVariables = array('id', 'name', 'imageUrl');
 		$this->onBeforeParse(function() {
 		    $this->setVar('id', $this->id);
+		    $this->setVar('itemName', $this->itemName);
 		    $this->setVar('imgSrc', $this->imgSrc);
 		    $this->setVar('width', $this->width);
 		    $this->setVar('height', $this->height);
 		    $this->setVar('buttonLabel', $this->buttonLabel);
+		    $this->setVar('placeholder', $this->placeholder);
 		    $this->setVar('delay', $this->delay);
 		    $this->setVar('preTag', $this->pretag());
 		    $this->setVar('postTag', $this->posttag());
@@ -85,6 +91,11 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		return $this;
 	}
 
+	public function setItemName($itemName) {
+		$this->itemName = $itemName;
+		return $this;
+	}
+
 	public function setImgSrc($imgsrc) {
 		$this->imgSrc = $imgsrc;
 		return $this;
@@ -102,6 +113,11 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 
 	public function setButtonLabel($label) {
 		$this->buttonLabel = $label;
+		return $this;
+	}
+
+	public function setPlaceholder($placeholder) {
+		$this->placeholder = $placeholder;
 		return $this;
 	}
 

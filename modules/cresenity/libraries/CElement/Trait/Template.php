@@ -16,6 +16,12 @@ trait CElement_Trait_Template {
     protected $onBeforeParse = null;
 
     /**
+     *
+     * @var array
+     */
+    protected $helpers = array();
+
+    /**
      * 
      * @param string $name
      * @return $this
@@ -50,6 +56,10 @@ trait CElement_Trait_Template {
         return $viewPath;
     }
 
+    public function addHelper($helperName, callable $callable) {
+        $this->helpers[$helperName] = $callable;
+    }
+
     private function parseTemplate($templateName) {
         if ($this->onBeforeParse != null) {
             $callable = $this->onBeforeParse;
@@ -66,6 +76,10 @@ trait CElement_Trait_Template {
         $helpers->set('element', function () {
             return $this;
         });
+
+        foreach ($this->helpers as $helperName => $callback) {
+            $helpers->set($helperName, $callback);
+        }
         $view->set($this->templateData);
         $output = $view->render();
         $output_js = "";
