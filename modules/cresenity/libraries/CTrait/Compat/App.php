@@ -95,6 +95,17 @@ trait CTrait_Compat_App {
      * @return array
      */
     public function get_role_child_list($roleId = null, $orgId = null) {
-        return $this->getRoleChildList($roleId,$orgId);
+        return $this->getRoleChildList($roleId, $orgId);
     }
+
+    /**
+     * 
+     * @deprecated
+     * @param array $data
+     * @return $this
+     */
+    public function set_custom_data($data) {
+        return $this->setCustomData($data);
+    }
+
 }
