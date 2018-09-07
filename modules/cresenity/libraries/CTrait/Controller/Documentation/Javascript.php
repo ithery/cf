@@ -102,11 +102,10 @@ CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append fr
 
         $form = $app->addForm();
         $select = $form->addField()->setLabel('Select')->addControl('optionSelect', 'select')->setList($list);
-        $select2 = $form->addField()->setLabel('Select 2')->addControl('optionSelect2', 'select')->setList($list2);
 
         $div = $app->addDiv();
         $divAjax = $app->addDiv('divAjax');
-        $select->onChange(function($selectJs) use($div, $divAjax, $select2) {
+        $select->onChange(function($selectJs) use($div, $divAjax) {
 
             $ajaxOptions = array();
             $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
@@ -117,9 +116,7 @@ CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append fr
             };
             $div->jquery()->ajax($ajaxOptions);
         });
-        $select2->onChange(function($selectJs) use($div, $divAjax, $select2) {
-            $div->jquery()->append('<a href="#">Test</a>');
-        });
+
         $select->jquery()->trigger('change');
 
         echo $app->render();
@@ -129,6 +126,39 @@ CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append fr
         $data['html'] = 'html 2';
         $data['js'] = 'js';
         echo json_encode($data);
+    }
+
+    public function reload() {
+        $app = CApp::instance();
+
+        $list = array(
+            'option1' => 'Option 1',
+            'option2' => 'Option 2',
+            'option3' => 'Option 3',
+            'option4' => 'Option 4',
+        );
+
+
+        $form = $app->addForm();
+        $select = $form->addField()->setLabel('Select')->addControl('optionSelect', 'select')->setList($list);
+        $action = $form->addActionList()->addAction();
+        $action->setLabel('Submit')->addClass('btn-primary');
+
+        $divAjax = $app->addDiv('divAjax');
+        $action->onClick(function($selectJs) use($divAjax) {
+
+            $ajaxOptions = array();
+            $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
+            $ajaxOptions['dataType'] = 'json';
+            $ajaxOptions['data'] = array();
+            $ajaxOptions['success'] = function($data) use($divAjax) {
+                $divAjax->jquery()->html($data->html);
+            };
+            $divAjax->jquery()->ajax($ajaxOptions);
+        });
+
+        $select->jquery()->trigger('change');
+        echo $app->render();
     }
 
     public function test() {
