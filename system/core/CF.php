@@ -139,8 +139,6 @@ final class CF {
         // Define database error constant
         define('E_DATABASE_ERROR', 44);
 
-        // Define Handler error constant
-        define('E_HANDLER_ERROR', 45);
 
         // Start output buffering
         ob_start(array(__CLASS__, 'output_buffer'));

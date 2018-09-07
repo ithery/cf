@@ -2,23 +2,12 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Hery Kurniawan
+ * @since Sep 1, 2018, 3:22:30 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 trait CTrait_Compat_Handler_Driver_Reload {
-
-    /**
-     * 
-     * @deprecated, please use setTarget
-     * @param string $target
-     * @return $this
-     */
-    public function set_target($target) {
-        return $this->setTarget($target);
-    }
 
     /**
      * 

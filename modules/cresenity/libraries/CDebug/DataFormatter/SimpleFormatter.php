@@ -13,7 +13,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  *
  * @see https://github.com/symfony/symfony/blob/v3.4.4/src/Symfony/Component/HttpKernel/DataCollector/Util/ValueExporter.php
  */
-class CDebug_DataFormatter_SimpleFormatter extends CDebug_DataFormatter_DataFormatter {
+class CDebug_DataFormatter_SimpleFormatter extends CDebug_DataFormatter {
 
     /**
      * @param $data

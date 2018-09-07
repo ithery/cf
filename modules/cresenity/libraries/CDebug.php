@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Aug 22, 2018, 1:03:54 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use OpenTracing\GlobalTracer;
+
 class CDebug {
 
     protected static $bar;
@@ -30,6 +33,22 @@ class CDebug {
 
             self::bar()->getCollector('messages')->debug($var);
         }
+    }
+
+    public static function tracer() {
+        // Creates a tracer with default transport and default propagators
+        $tracer = new CDebug_Tracer();
+
+        // Sets a global tracer (singleton). Ideally tracer should be
+        // injected as a dependency
+        GlobalTracer::set($tracer);
+
+        $application->run();
+
+        // Flushes traces to agent.
+        register_shutdown_function(function() {
+            GlobalTracer::get()->flush();
+        });
     }
 
 }

@@ -20,8 +20,8 @@ class CElement_Component_Action extends CElement_Component {
     protected $link;
     protected $orig_label;
     protected $submit;
-    protected $submit_to;
-    protected $submit_to_target;
+    protected $submitTo;
+    protected $submitToTarget;
     protected $jsparam;
     protected $confirm;
     protected $style;
@@ -40,8 +40,8 @@ class CElement_Component_Action extends CElement_Component {
         $this->jsparam = array();
         $this->link_target = "";
         $this->submit = false;
-        $this->submit_to = false;
-        $this->submit_to_target = false;
+        $this->submitTo = false;
+        $this->submitToTarget = false;
         $this->label = "";
         $this->style = "";
         $this->disabled = false;
@@ -107,11 +107,11 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function set_submit_to($url, $target = "") {
-        $this->submit_to = $url;
+    public function setSubmitTo($url, $target = "") {
+        $this->submitTo = $url;
 
         if (strlen($target) > 0) {
-            $this->submit_to_target = $target;
+            $this->submitToTarget = $target;
         }
         return $this;
     }
@@ -126,7 +126,7 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function render_as_input() {
+    public function renderAsInput() {
         $render_as_input = false;
         if ($this->submit) {
             $render_as_input = true;
@@ -139,9 +139,9 @@ class CElement_Component_Action extends CElement_Component {
             //we check the listener
             if (count($this->listeners) > 0) {
                 foreach ($this->listeners as $lis) {
-                    $lis->set_confirm(true)->set_confirm_message($this->confirm_message);
+                    $lis->setConfirm(true)->setConfirmMessage($this->confirm_message);
                 }
-                $this->set_confirm(false);
+                $this->setConfirm(false);
             }
         }
     }
@@ -215,7 +215,7 @@ class CElement_Component_Action extends CElement_Component {
         }
         $add_class = "";
         $add_attr = "";
-        if ($this->confirm) {
+        if ($this->confirm && !$this->submitTo) {
             $add_class .= " confirm";
         }
         if ($this->bootstrap == '3.3') {
@@ -234,10 +234,11 @@ class CElement_Component_Action extends CElement_Component {
         if ($this->render_as_input()) {
             $input_type = "button";
 
-            if ($this->submit)
+            if ($this->submit) {
                 $input_type = "submit";
+            }
             if ($this->button) {
-                $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" value="' . $this->value . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
+                $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
                 if (strlen($this->icon) > 0) {
                     if ($this->bootstrap == '3.3') {
                         $html->append('<i class="fa fa-' . $this->icon . '"></i> ');
@@ -245,7 +246,7 @@ class CElement_Component_Action extends CElement_Component {
                 }
                 $html->appendln($this->label . '</button>');
             } else {
-                $html->appendln('<input id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" value="' . $this->label . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '/>');
+                $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
             }
         } else {
             if ($this->type == "jsfunc") {
@@ -279,7 +280,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function js($indent = 0) {
-        $this->reassign_confirm();
+        
         $js = new CStringBuilder();
         $js->setIndent($indent);
 
@@ -296,22 +297,21 @@ class CElement_Component_Action extends CElement_Component {
                     }
                 }
             } else {
-                if (strlen($this->submit_to) > 0) {
-                    $str_submit_to_target = "";
-                    if (strlen($this->submit_to_target) > 0) {
-                        $str_submit_to_target = "jQuery(this).closest('form').attr('target','" . $this->submit_to_target . "');";
+                if (strlen($this->submitTo) > 0) {
+                    $jsSubmitToTarget = "";
+                    if (strlen($this->submitToTarget) > 0) {
+                        $jsSubmitToTarget = "jQuery('#".$this->id."').closest('form').attr('target','" . $this->submitToTarget . "');";
                     }
-                    $js->appendln("
-						jQuery('#" . $this->id . "').click(function() {
-							jQuery(this).closest('form').attr('action','" . $this->submit_to . "');
-							" . $str_submit_to_target . "
-							jQuery(this).closest('form').submit();
-						}
-					);");
+                    $this->addListener('click')->addHandler('custom')->setJs("
+                        jQuery('#".$this->id."').closest('form').attr('action','" . $this->submitTo . "');
+                        " . $jsSubmitToTarget . "
+                        jQuery('#".$this->id."').closest('form').submit();
+                       
+                    ");
                 }
             }
         }
-
+        $this->reassignConfirm();
 
         $js->appendln(parent::jsChild($js->getIndent()))->br();
 

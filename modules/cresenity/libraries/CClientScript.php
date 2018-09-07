@@ -434,6 +434,7 @@ class CClientScript extends CObject {
             window.capp = " . json_encode(CApp::variables()) . ";
             ";
 
+        $js .= CJavascript::compile();
         $bar = CDebug::bar();
         if ($bar->isEnabled()) {
             $js .= $bar->getJavascriptReplaceCode();

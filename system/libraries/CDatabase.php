@@ -26,12 +26,6 @@ class CDatabase {
 
     /**
      *
-     * @var CEventManager
-     */
-    protected $eventManager;
-
-    /**
-     *
      * @var CDatabase_Configuration
      */
     protected $configuration;
@@ -258,9 +252,8 @@ class CDatabase {
         CModel::setConnectionResolver($connectionResolver);
 
 
-        $this->eventManager = new CEventManager();
 
-        $this->setEventDispatcher(new CEvents_Dispatcher(new CContainer()));
+        $this->events = new CDatabase_Event();
 
         $this->configuration = new CDatabase_Configuration();
 
@@ -313,7 +306,7 @@ class CDatabase {
 
         // Compile binds if needed
 
-        $sql = $this->compile_binds($sql, $bindings);
+        $sql = $this->compileBinds($sql, $bindings);
 
 
         // Fetch the result
@@ -1189,7 +1182,7 @@ class CDatabase {
      * @param   array   array of values to bind to the query
      * @return  string
      */
-    public function compile_binds($sql, $binds) {
+    public function compileBinds($sql, $binds) {
         foreach ((array) $binds as $val) {
             // If the SQL contains no more bind marks ("?"), we're done.
             if (($next_bind_pos = strpos($sql, '?')) === FALSE)
@@ -1462,15 +1455,15 @@ class CDatabase {
      * @param  \Closure  $callback
      * @return void
      */
-    public function listen(Closure $callback) {
+    public function listenOnQueryExecuted(Closure $callback) {
         if (isset($this->events)) {
-            $this->events->listen(CDatabase_Events_QueryExecuted::class, $callback);
+            $this->events->listen(CDatabase_Event_OnQueryExecuted::class, $callback);
         }
     }
 
-    public function haveListener() {
+    public function listen($event, Closure $callback) {
         if (isset($this->events)) {
-            $this->events->haveListener();
+            $this->events->listen($event, $callback);
         }
     }
 
@@ -1480,7 +1473,7 @@ class CDatabase {
      * @param  mixed  $event
      * @return void
      */
-    protected function event($event) {
+    protected function dispatchEvent($event) {
         if (isset($this->events)) {
             $this->events->dispatch($event);
         }
@@ -1571,7 +1564,7 @@ class CDatabase {
             $this->platform = $this->driver->getDatabasePlatform();
         }
 
-        $this->platform->setEventManager($this->eventManager);
+        $this->platform->setEventManager($this->events);
     }
 
     /**
@@ -1649,7 +1642,7 @@ class CDatabase {
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
-        $this->event(new CDatabase_Events_QueryExecuted($query, $bindings, $time, $rowsCount, $this));
+        $this->dispatchEvent(CDatabase_Event::createOnQueryExecutedEvent($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {
             $this->queryLog[] = compact('query', 'bindings', 'time');

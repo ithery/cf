@@ -14,6 +14,7 @@ class CHandler_Reload_Driver extends CHandler_Driver {
     protected $param_inputs_by_name;
 
     public function __construct($owner, $event, $name) {
+
         parent::__construct($owner, $event, $name);
         $this->method = "get";
         $this->target = "";

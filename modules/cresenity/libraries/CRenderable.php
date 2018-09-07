@@ -60,6 +60,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
         $this->wrapper->renderable[] = $renderable;
 
+        $this->dispatchEvent(CApp_Event::createOnRenderableAddedListener($renderable));
+
         return $this;
     }
 
@@ -188,6 +190,45 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             $data["children"] = $arrays;
         }
         return $data;
+    }
+
+    /**
+     * Fire the given event if possible.
+     *
+     * @param  mixed  $event
+     * @return void
+     */
+    protected function dispatchEvent($event) {
+
+        $this->getEvent()->dispatch($event);
+    }
+
+    /**
+     * 
+     * @return CApp_Event;
+     */
+    public function getEvent() {
+        return CManager_Event::app();
+    }
+
+    /**
+     * Register a renderable created listener with the CApp.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function listenOnRenderableAdded(Closure $callback) {
+        $this->getEvent()->listen(CApp_Event::onRenderableAdded, $callback);
+    }
+
+    /**
+     * Register custom event with the CApp.
+     * 
+     * @param string $event
+     * @param Closure $callback
+     */
+    public function listen($event, Closure $callback) {
+        $this->getEvent()->listen($event, $callback);
     }
 
 }

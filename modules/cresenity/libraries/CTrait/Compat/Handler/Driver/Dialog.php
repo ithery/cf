@@ -2,6 +2,11 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
+/**
+ * @author Hery Kurniawan
+ * @since Sep 1, 2018, 3:22:30 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 trait CTrait_Compat_Handler_Driver_Dialog {
 
     /**
@@ -14,4 +19,7 @@ trait CTrait_Compat_Handler_Driver_Dialog {
         return $this->setTitle($title);
     }
 
+    public function add_param_input($inputs) {
+        return $this->addParamInput($inputs);
+    }
 }
