@@ -432,10 +432,12 @@ class CApp extends CObservable {
         }
 
         if (CView::exists($theme_path . $viewName)) {
-
             $v = CView::factory($theme_path . $viewName);
         }
         if ($v == null) {
+            if (!CView::exists($viewName)) {
+                throw new CApp_Exception('view :viewName not exists', array(':viewName' => $viewName));
+            }
             $v = CView::factory($viewName);
         }
         $this->content = parent::html();

@@ -506,7 +506,26 @@ final class CF {
         return $result;
     }
 
+    /**
+     * 
+     * @deprecated
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string
+     */
     public static function get_file($directory, $filename, $domain = null) {
+        return self::getFile($directory,$filename,$domain);
+    }
+    
+    /**
+     * 
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string
+     */
+    public static function getFile($directory, $filename, $domain = null) {
         $files = CF::get_files($directory, $filename, $domain);
         if (count($files) > 0) {
             return $files[0];
