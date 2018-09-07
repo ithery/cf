@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 7, 2018, 8:32:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CObservable_Listener_Handler_Driver_Remove extends CObservable_Listener_Handler_Driver {
+class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Handler_Driver {
 
     protected $target;
     protected $method;
