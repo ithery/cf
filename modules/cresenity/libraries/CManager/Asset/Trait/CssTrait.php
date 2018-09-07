@@ -23,8 +23,6 @@ trait CManager_Asset_Trait_CssTrait {
         return $path . $file;
     }
 
-    
-
     public function getAllCssFileUrl() {
         $files = $this->cssFiles();
 
@@ -45,6 +43,7 @@ trait CManager_Asset_Trait_CssTrait {
     public function registerCssFile($file, $pos = "head") {
         $dir_file = $file;
         $css_version = '';
+     
         if (strpos($file, '?') !== false) {
             $dir_file = substr($file, 0, strpos($file, '?'));
             $css_version = substr($file, strpos($file, '?'), strlen($file) - 1);

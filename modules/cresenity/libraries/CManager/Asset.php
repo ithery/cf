@@ -57,18 +57,24 @@ class CManager_Asset {
      */
     protected $runTimeContainer;
 
+    /**
+     *
+     * @var CManager_Asset_Module
+     */
+    protected $module;
+
+    public function __construct() {
+        $this->runTimeContainer = new CManager_Asset_Container_RunTime();
+        $this->themeContainer = new CManager_Asset_Container_Theme();
+        $this->module = new CManager_Asset_Module();
+    }
+
     public static function allAvailablePos() {
         return array(self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY);
     }
 
     public static function allAvailableType() {
         return array(self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK);
-    }
-
-    public function __construct() {
-        $this->runTimeContainer = new CManager_Asset_Container_RunTime();
-        $this->themeContainer = new CManager_Asset_Container_Theme();
-      
     }
 
     /**
@@ -87,6 +93,14 @@ class CManager_Asset {
         return $this->themeContainer;
     }
 
+    /**
+     * 
+     * @return CManager_Asset_Module
+     */
+    public function module() {
+        return $this->module;
+    }
+
     public function getAllCssFileUrl() {
         $themeCss = $this->themeContainer->getAllCssFileUrl();
         $runTimeCss = $this->runTimeContainer->getAllCssFileUrl();
@@ -99,9 +113,14 @@ class CManager_Asset {
         $app = CApp::instance();
 
 
+        $moduleThemejsFiles = $this->module->getThemeContainer()->jsFiles();
         $themejsFiles = $this->themeContainer->jsFiles();
+        $moduleRunTimejsFiles = $this->module->getRunTimeContainer()->jsFiles();
         $runTimejsFiles = $this->runTimeContainer->jsFiles();
-        $jsFiles = array_merge($themejsFiles, $runTimejsFiles);
+
+
+
+        $jsFiles = array_merge($moduleThemejsFiles, $themejsFiles, $moduleRunTimejsFiles, $runTimejsFiles);
         $js_open = "";
         $js_close = "";
         $js_before = "";
@@ -154,12 +173,17 @@ class CManager_Asset {
     }
 
     public function render($pos, $type = null) {
+        $moduleThemejsScripts = $this->module->getThemeContainer()->getScripts($pos);
         $themeScripts = $this->themeContainer->getScripts($pos);
+        $moduleRunTimejsScripts = $this->module->getRunTimeContainer()->getScripts($pos);
         $runTimeScripts = $this->runTimeContainer->getScripts($pos);
-       
-        $scriptArray = carr::merge($themeScripts, $runTimeScripts);
+        $scriptArray = array();
+        $scriptArray = carr::merge($scriptArray, $moduleThemejsScripts);
+        $scriptArray = carr::merge($scriptArray, $themeScripts);
+        $scriptArray = carr::merge($scriptArray, $moduleRunTimejsScripts);
+        $scriptArray = carr::merge($scriptArray, $runTimeScripts);
         
-        $script='';
+        $script = '';
         $manager = CManager::instance();
         if ($type == null) {
             $type = self::$allType;

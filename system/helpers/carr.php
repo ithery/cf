@@ -360,13 +360,13 @@ class carr {
 
         if (func_num_args() > 2) {
             foreach (array_slice(func_get_args(), 2) as $array2) {
-                if (Arr::is_assoc($array2)) {
+                if (carr::is_assoc($array2)) {
                     foreach ($array2 as $key => $value) {
                         if (is_array($value)
                                 AND isset($array1[$key])
                                 AND is_array($array1[$key])
                         ) {
-                            $array1[$key] = Arr::merge($array1[$key], $value);
+                            $array1[$key] = carr::merge($array1[$key], $value);
                         } else {
                             $array1[$key] = $value;
                         }
