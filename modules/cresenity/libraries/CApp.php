@@ -142,8 +142,6 @@ class CApp extends CObservable {
             return;
         }
 
-        $this->registerCoreModules();
-
         if (isset($_COOKIE['capp-profiler'])) {
             new Profiler();
         }
@@ -342,10 +340,6 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function register_client_module($module) {
-        CManager::instance()->register_module($module);
-    }
-
     public function registerCoreModules() {
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
@@ -391,6 +385,8 @@ class CApp extends CObservable {
             throw new CException('CApp already rendered');
         }
         $this->rendered = true;
+
+        $this->registerCoreModules();
 
         CFEvent::run('CApp.beforeRender');
 
