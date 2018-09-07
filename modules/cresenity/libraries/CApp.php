@@ -136,6 +136,16 @@ class CApp extends CObservable {
         $this->keepMessage = $bool;
     }
 
+    public function translator() {
+        return new CApp_Translation_Translator(new CApp_Translation_Loader_ArrayLoader(), 'en');
+    }
+
+    public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
+        $translator = $this->translator();
+        $validation = new CApp_Validation($translator);
+        return $validation->validate($data, $rules, $messages, $customAttributes);
+    }
+
     public function setup($install = false) {
 
         if ($this->run) {
