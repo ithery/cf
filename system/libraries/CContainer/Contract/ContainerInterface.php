@@ -4,10 +4,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 1:17:43 PM
+ * @since Sep 7, 2018, 11:48:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-interface CContainer_Interface_Container {
+use Psr\Container\ContainerInterface;
+
+interface CContainer_Contract_ContainerInterface extends ContainerInterface {
 
     /**
      * Determine if the given abstract type has been bound.
@@ -38,7 +40,7 @@ interface CContainer_Interface_Container {
     /**
      * Resolve all of the bindings for a given tag.
      *
-     * @param  string  $tag
+     * @param  array  $tag
      * @return array
      */
     public function tagged($tag);
@@ -46,7 +48,7 @@ interface CContainer_Interface_Container {
     /**
      * Register a binding with the container.
      *
-     * @param  string  $abstract
+     * @param  string|array  $abstract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
@@ -66,7 +68,7 @@ interface CContainer_Interface_Container {
     /**
      * Register a shared binding in the container.
      *
-     * @param  string  $abstract
+     * @param  string|array  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
@@ -138,7 +140,7 @@ interface CContainer_Interface_Container {
     /**
      * Register a new resolving callback.
      *
-     * @param  \Closure|string  $abstract
+     * @param  string    $abstract
      * @param  \Closure|null  $callback
      * @return void
      */
@@ -147,7 +149,7 @@ interface CContainer_Interface_Container {
     /**
      * Register a new after resolving callback.
      *
-     * @param  \Closure|string  $abstract
+     * @param  string    $abstract
      * @param  \Closure|null  $callback
      * @return void
      */
