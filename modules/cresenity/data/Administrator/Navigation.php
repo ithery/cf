@@ -9,52 +9,28 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 return array(
     array(
-        "name" => "dashboard",
+        "name" => "administrator.dashboard",
         "label" => "Dashboard",
-        "controller" => "home",
+        "controller" => "administrator/home",
         "method" => "index",
-        "icon" => "home",
+        "icon" => "fas fa-home",
     ),
     array(
-        "name" => "core_menu",
+        "name" => "administrator.data",
         "label" => "Core",
         "icon" => "bullseye",
         "subnav" => array(
             array(
                 "name" => "application",
                 "label" => "Application",
-                "controller" => "application",
+                "controller" => "administrator/application",
                 "method" => "index",
             ),
             array(
                 "name" => "organization",
                 "label" => "Organization",
-                "controller" => "organization",
+                "controller" => "administrator/organization",
                 "method" => "index",
-            ),
-            array(
-                "name" => "store_type",
-                "label" => "Store Type",
-                "controller" => "store_type",
-                "method" => "index",
-            ),
-            array(
-                "name" => "client_version",
-                "label" => "Client Version",
-                "subnav" => array(
-                    array(
-                        "name" => "client_code_version",
-                        "label" => "Code Version",
-                        "controller" => "client_code_version",
-                        "method" => "index",
-                    ),
-                    array(
-                        "name" => "client_db_version",
-                        "label" => "DB Version",
-                        "controller" => "client_db_version",
-                        "method" => "index",
-                    ),
-                ),
             ),
         ),
     ),

@@ -49,7 +49,7 @@ class Controller_Administrator_Auth extends CApp_Administrator_Controller {
     public function logout() {
         Administrator::logout();
 
-        curl::redirect("admin/home");
+        curl::redirect("administrator/home");
     }
 
 }
