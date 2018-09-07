@@ -447,10 +447,11 @@ class CApp extends CObservable {
         $v->header_body = $this->header_body;
 
         $v->title = $this->title;
-        $cs = CClientScript::instance();
-        $css_urls = $cs->urlCssFile();
+        $asset = CManager::asset();
 
-        $js_urls = $cs->urlJsFile();
+        $css_urls = $asset->getAllCssFileUrl();
+
+        $js_urls = $asset->getAllCssFileUrl();
         $additional_js = "";
 
         foreach ($css_urls as $url) {
@@ -465,7 +466,7 @@ class CApp extends CObservable {
 
         $js .= PHP_EOL . $this->js . $additional_js;
 
-        $js = $cs->renderJsRequire($js);
+        $js = $asset->renderJsRequire($js);
 
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
@@ -492,12 +493,12 @@ class CApp extends CObservable {
         $v->ready_client_script = "";
 
 
-        $v->head_client_script = $cs->render('head');
-        $v->begin_client_script = $cs->render('begin');
-        //$v->end_client_script = $cs->render('end');
+        $v->head_client_script = $asset->render('head');
+        $v->begin_client_script = $asset->render('begin');
+        //$v->end_client_script = $asset->render('end');
 
-        $v->load_client_script = $cs->render('load');
-        $v->ready_client_script = $cs->render('ready');
+        $v->load_client_script = $asset->render('load');
+        $v->ready_client_script = $asset->render('ready');
 
         $v->custom_js = $this->custom_js;
         $v->custom_header = $this->custom_header;

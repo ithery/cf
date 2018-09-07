@@ -16,7 +16,18 @@ final class CManager {
     protected $theme_data = null;
     protected static $langObjectCallback = null;
     protected static $useRequireJs = null;
+    
+    /**
+     *
+     * @var CManager_Javascript
+     */
     protected static $javascript;
+    
+    /**
+     *
+     * @var CManager_Asset
+     */
+    protected static $asset;
 
     /**
      *
@@ -314,13 +325,25 @@ final class CManager {
 
     /**
      * 
-     * @return CManager_Javascript;
+     * @return CManager_Javascript
      */
     public static function javascript() {
         if (self::$javascript == null) {
             self::$javascript = new CManager_Javascript();
         }
         return self::$javascript;
+    }
+
+    /**
+     * 
+     * @return CManager_Asset
+     */
+    public static function asset() {
+        if (self::$asset == null) {
+             
+            self::$asset = new CManager_Asset();
+        }
+        return self::$asset;
     }
 
 }
