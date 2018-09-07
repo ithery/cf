@@ -27,7 +27,6 @@ abstract class CObservable extends CRenderable {
         return $this->listeners;
     }
 
-    
     /**
      * 
      * @return CObservable_Javascript
@@ -35,6 +34,7 @@ abstract class CObservable extends CRenderable {
     public function javascript() {
         return $this->javascript;
     }
+
     /**
      * 
      * @return CObservable_Javascript_JQuery
@@ -287,6 +287,18 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
+     * Add Code Element &lt;ul&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Code  Code Element
+     */
+    public function addCode($id = "") {
+        $element = CElement_Factory::createElement('code', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
      * Add List Item Element &lt;li&gt
      * 
      * @param string $id
@@ -430,6 +442,12 @@ abstract class CObservable extends CRenderable {
         $form = CElement_Factory::createComponent('Form', $id);
         $this->add($form);
         return $form;
+    }
+
+    public function addPrismCode($id = "") {
+        $code = CElement_Factory::createComponent('PrismCode', $id);
+        $this->add($code);
+        return $code;
     }
 
     public function addNestable($id = "") {

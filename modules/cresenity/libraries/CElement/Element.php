@@ -13,6 +13,7 @@ abstract class CElement_Element extends CElement {
     protected $after;
     protected $isBuilded = false;
     protected $isOneTag = false;
+    protected $isIndent = true;
     protected $is_show = true;
     private $isBuild = false;
 
@@ -118,25 +119,41 @@ abstract class CElement_Element extends CElement {
     public function html($indent = 0) {
         $html = new CStringBuilder();
 
+        if (!$this->isIndent) {
+            $indent = 0;
+        }
         $html->setIndent($indent);
         $this->buildOnce();
+        $appendMethod = $this->isIndent ? 'appendln' : 'append';
         $html->appendln($this->beforeHtml($indent));
         if ($this->isOneTag) {
-            $html->appendln($this->onetag());
+            $html->$appendMethod($this->onetag());
         } else {
             if ($this->is_show) {
-                $html->appendln($this->pretag())->br();
-                $html->incIndent();
+                $html->$appendMethod($this->pretag());
+                if ($this->isIndent) {
+                    $html->br();
+                }
+                if ($this->isIndent) {
+                    $html->incIndent();
+                }
             }
 
-            $html->appendln($this->htmlChild($html->getIndent()))->br();
-
+            $html->$appendMethod($this->htmlChild($html->getIndent()));
+            if ($this->isIndent) {
+                $html->br();
+            }
             if ($this->is_show) {
-                $html->decIndent();
-                $html->appendln($this->posttag())->br();
+                if ($this->isIndent) {
+                    $html->decIndent();
+                }
+                $html->$appendMethod($this->posttag());
+                if ($this->isIndent) {
+                    $html->br();
+                }
             }
         }
-        $html->appendln($this->afterHtml($indent));
+        $html->$appendMethod($this->afterHtml($indent));
 
         return $html->text();
     }

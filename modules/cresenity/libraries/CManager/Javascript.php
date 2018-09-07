@@ -10,11 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CManager_Javascript {
 
     public static function jQuery() {
-        return CJavascript::createJQuery();
-    }
-    
-     public static function jQueryDeferred() {
-        return CJavascript::createJQueryDeferred();
+        return CJavascript::jqueryStatement();
     }
 
 }

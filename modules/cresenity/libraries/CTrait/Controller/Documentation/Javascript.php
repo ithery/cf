@@ -18,23 +18,23 @@ trait CTrait_Controller_Documentation_Javascript {
 
 
         $code = '
-            $p = $app->addP();
-            $p->add("This is P Element");
-            CManager::javascript()->jquery()->addClass($p,"alert alert-warning");
+$p = $app->addP();
+$p->add("This is P Element");
+CManager::javascript()->jquery()->addClass($p,"alert alert-warning");
         ';
-        $app->addDiv()->addClass('my-2 console')->add(trim($code));
+        $app->addDiv()->addPrismCode()->add(trim($code));
 
         $p = $app->addP();
         $p->add("This is P Element");
         CManager::javascript()->jquery()->addClass($p, "alert alert-warning");
 
         $code = '
-            $p = $app->addP();
-            $p->add("This is P Element");
-            CManager::javascript()->jquery()->addClass($p,"alert alert-warning");
-            CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append from Javascript</div>");
+$p = $app->addP();
+$p->add("This is P Element");
+CManager::javascript()->jquery()->addClass($p,"alert alert-warning");
+CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append from Javascript</div>");
         ';
-        $app->addDiv()->addClass('my-2 console')->add(trim(htmlspecialchars($code)));
+        $app->addDiv()->addPrismCode()->add(trim($code));
 
         $p = $app->addP();
         $p->add("This is P Element");
@@ -107,7 +107,7 @@ trait CTrait_Controller_Documentation_Javascript {
         $div = $app->addDiv();
         $divAjax = $app->addDiv('divAjax');
         $select->onChange(function($selectJs) use($div, $divAjax, $select2) {
-            
+
             $ajaxOptions = array();
             $ajaxOptions['url'] = curl::base() . 'documentation/javascript/ajax';
             $ajaxOptions['dataType'] = 'json';
