@@ -43,7 +43,7 @@ class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Ha
     }
 
     public function script() {
-
+        $js = '';
         if (strlen($this->form_id) == 0) {
             $js .= "
 				$('#" . $this->owner . "').closest('form').submit();;
