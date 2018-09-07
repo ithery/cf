@@ -548,5 +548,11 @@ return array(
     "jquery.event.drag" => array(
         "js" => array("plugins/jquery.event.drag/jquery.event.drag-2.2.js"),
     ),
+    "prism-php" => array(
+        "js" => array(
+            "plugins/jquery/prism.js",
+            "plugins/jquery/components/prism-php.js",
+        ),
+    ),
 );
 ?>
