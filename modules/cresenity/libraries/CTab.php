@@ -33,7 +33,7 @@ class CTab extends CElement {
         return $this;
     }
 
-    public function set_nopadding($bool) {
+    public function setNoPadding($bool=true) {
         $this->nopadding = $bool;
         return $this;
     }
@@ -47,12 +47,12 @@ class CTab extends CElement {
         return $this->icon;
     }
 
-    public function set_target($target) {
+    public function setTarget($target) {
         $this->target = $target;
         return $this;
     }
 
-    public function set_ajax_url($url) {
+    public function setAjaxUrl($url) {
         $this->ajax_url = $url;
         return $this;
     }
@@ -61,7 +61,7 @@ class CTab extends CElement {
         return $this->ajax_url;
     }
 
-    public function set_ajax($bool) {
+    public function setAjax($bool) {
         $this->ajax = $bool;
         return $this;
     }
@@ -122,7 +122,7 @@ class CTab extends CElement {
             $tab_label = $this->label;
         }
 
-        $html = '<li class="nav-item w-100 ' . $class_active . '"><a href="javascript:;" ' . $tab_class . $tab_icon . $tab_tab . $tab_target . $tab_responsive . $tab_url . ' class="nav-link ' . $class_active . ' tab-ajax-load">';
+        $html = '<li class="nav-item w-100 p-1 ' . $class_active . '"><a href="javascript:;" ' . $tab_class . $tab_icon . $tab_tab . $tab_target . $tab_responsive . $tab_url . ' class="nav-link ' . $class_active . ' tab-ajax-load">';
         if ($this->icon) {
             $html .= '<span class="icon"><i class="icon-' . $this->icon . '"></i></span> ';
         }

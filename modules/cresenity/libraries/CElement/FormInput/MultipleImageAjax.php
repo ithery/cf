@@ -19,6 +19,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
     protected $removeLink;
     protected $customControl;
     protected $customControlValue;
+    protected $maximum;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -31,6 +32,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->templateName = 'CElement/FormInput/MultipleImageAjax';
         $this->removeLink = true;
         $this->files = array();
+        $this->maximum = null;
         $this->customControl = array();
         $this->customControlValue = array();
         $this->onBeforeParse(function() {
@@ -54,6 +56,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
             $this->setVar('ajaxName', $ajaxName);
             $this->setVar('ajaxUrl', $ajaxUrl);
             $this->setVar('files', $this->files);
+            $this->setVar('maximum', $this->maximum==null?0:$this->maximum);
             $this->setVar('removeLink', $this->removeLink);
             $this->setVar('customControl', $this->customControl);
             $this->setVar('customControlValue', $this->customControlValue);
@@ -91,9 +94,10 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         return $this->cropper;
     }
 
-    public function addFile($fileUrl, $inputName = "") {
+    public function addFile($fileUrl, $inputName = "", $inputValue = "") {
         $arr = array();
         $arr['input_name'] = $inputName;
+        $arr['input_value'] = $inputValue;
         $arr['file_url'] = $fileUrl;
 
         $this->files[] = $arr;
@@ -114,5 +118,9 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         return $this;
     }
     
+    public function setMaximum($maximum=null) {
+        $this->maximum = $maximum;
+        return $this;
+    }
     
 }

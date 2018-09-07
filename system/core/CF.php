@@ -473,7 +473,25 @@ final class CF {
         return $ret;
     }
 
+    /**
+     * @deprecated Please use getFiles
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string[]
+     */
     public static function get_files($directory, $filename, $domain = null) {
+        return self::getFiles($directory, $filename, $domain);
+    }
+
+    /**
+     * 
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string[]
+     */
+    public static function getFiles($directory, $filename, $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }
@@ -1126,7 +1144,7 @@ final class CF {
             $file = str_replace('\\', '/', realpath($file));
             $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
 
-            if ($level <= self::$configuration['core']['log_threshold']) {
+            if ($level <= self::$log_threshold) {
                 // Log the error
                 $need_to_log = true;
                 if (!$PHP_ERROR) {
@@ -1151,6 +1169,11 @@ final class CF {
                 if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
                     // Send the headers if they have not already been sent
                     $exception->send_headers();
+                } else {
+                    if (!headers_sent()) {
+                        // Send the 500 header
+                        header('HTTP/1.1 500 Internal Server Error');
+                    }
                 }
             }
 
@@ -1304,6 +1327,11 @@ final class CF {
 
 
             $routing_file .= str_replace('_', DS, $routing_class);
+
+
+            if (substr($routing_file, strlen($routing_file) - 1, 1) == DS) {
+                $routing_file = substr($routing_file, 0, strlen($routing_file) - 1) . '_';
+            }
 
             if ($directory == 'libraries') {
                 // find file at vendor first
@@ -2222,6 +2250,17 @@ final class CF {
      */
     public static function collect($value = null) {
         return new CCollection($value);
+    }
+
+    /**
+     * Return the given value, optionally passed through the given callback.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function with($value, callable $callback = null) {
+        return is_null($callback) ? $value : $callback($value);
     }
 
 }

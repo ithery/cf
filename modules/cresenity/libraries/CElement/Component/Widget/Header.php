@@ -44,7 +44,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
     public function build() {
         $this->addClass('widget-title clearfix');
         if (strlen($this->icon) > 0) {
-            $this->addSpan()->addClass('icon')->addIcon($this->icon);
+            $this->addSpan()->addClass('icon')->addIcon()->setIcon($this->icon);
         }
         $this->addH5()->add($this->title);
     }
@@ -57,8 +57,8 @@ class CElement_Component_Widget_Header extends CElement_Element {
         }
         return $this->switcher;
     }
-    
-     public function haveSwitcher() {
+
+    public function haveSwitcher() {
         if ($this->switcher) {
             return true;
         } else {
@@ -80,7 +80,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
 
                 jQuery("#' . $this->switcher->id . '").click(function() {
                     if (jQuery("#' . $this->switcher->id . '").prop("checked")) {
-                        console.log("parentId '.$this->parent->id .'");
+                        console.log("parentId ' . $this->parent->id . '");
                         jQuery("#' . $this->parent->id . '").find(".widget-content").show();
                     } else {
                         jQuery("#' . $this->parent->id . '").find(".widget-content").hide();

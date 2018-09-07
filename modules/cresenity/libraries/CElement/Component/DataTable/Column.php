@@ -130,6 +130,10 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    public function getFormat() {
+        return $this->format;
+    }
+
     public function renderHeaderHtml($export_pdf, $th_class = "", $indent = 0) {
 
         $pdf_thead_td_attr = '';
@@ -139,14 +143,14 @@ class CElement_Component_DataTable_Column extends CObject {
             $pdf_thead_td_attr = ' bgcolor="#9f9f9f" color="#000"  ';
         }
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $addition_attr = "";
         if (strlen($this->width) > 0) {
             $addition_attr .= ' width="' . $this->width . '"';
         }
         $class = "";
         $data_align = "";
-        switch ($this->get_align()) {
+        switch ($this->getAlign()) {
             case "left": $data_align .= "align-left";
                 break;
             case "right": $data_align .= "align-right";
@@ -155,11 +159,11 @@ class CElement_Component_DataTable_Column extends CObject {
                 break;
         }
         $data_no_line_break = "";
-        if ($this->get_no_line_break()) {
+        if ($this->getNoLineBreak()) {
             $data_no_line_break = "no-line-break";
         }
         if ($export_pdf) {
-            switch ($this->get_align()) {
+            switch ($this->getAlign()) {
                 case "left": $pdf_thead_td_attr .= ' align="left"';
                     break;
                 case "right": $pdf_thead_td_attr .= ' align="right"';
@@ -185,4 +189,3 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
 }
-

@@ -9,13 +9,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_List_ActionList extends CElement_List {
 
-    use CTrait_Compat_Element_ActionList;
+    use CTrait_Compat_Element_ActionList,
+        CTrait_Element_Property_Label;
 
     public $actions = array();
     protected $style;
-    protected $label;
-    protected $btn_dropdown_classes;
-    protected $label_size;
+    
 
     public function __construct($list_id) {
         parent::__construct($list_id);
@@ -30,21 +29,7 @@ class CElement_List_ActionList extends CElement_List {
         return new CElement_List_ActionList($list_id);
     }
 
-    public function set_label($label) {
-        $this->label = $label;
-        return $this;
-    }
-
-    public function set_label_size($label_size) {
-        $this->label_size = $label_size;
-        return $this;
-    }
-
-    public function add_btn_dropdown_class($class) {
-        $this->btn_dropdown_classes[] = $class;
-        return $this;
-    }
-
+    
     public function setStyle($style) {
 
         if (in_array($style, array("form-action", "btn-group", "btn-icon-group", "btn-list", "icon-segment", "btn-dropdown", "widget-action", "table-header-action"))) {
@@ -77,7 +62,7 @@ class CElement_List_ActionList extends CElement_List {
 
         $this->apply('style', $this->style, 'CElement_Component_Action');
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $classes = $this->classes;
         $classes = implode(" ", $classes);
         if (strlen($classes) > 0) {
@@ -121,7 +106,7 @@ class CElement_List_ActionList extends CElement_List {
                 $pretag = '<div id="' . $this->id . '" class="btn-group ' . $classes . '">';
                 break;
         }
-        $html->appendln($pretag)->inc_indent()->br();
+        $html->appendln($pretag)->incIndent()->br();
         if ($this->style == "btn-dropdown") {
 
             $html->appendln('
@@ -134,7 +119,7 @@ class CElement_List_ActionList extends CElement_List {
             ');
         }
 
-        $html->appendln($this->html_child($html->get_indent()));
+        $html->appendln($this->htmlChild($html->get_indent()));
 
 
         if ($this->style == "btn-dropdown") {
@@ -157,14 +142,14 @@ class CElement_List_ActionList extends CElement_List {
                 $posttag = "</div>";
                 break;
         }
-        $html->dec_indent()->appendln($posttag)->br();
+        $html->decIndent()->appendln($posttag)->br();
         return $html->text();
     }
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
-        $js->appendln($this->js_child($js->get_indent()));
+        $js->setIndent($indent);
+        $js->appendln($this->jsChild($js->getIndent()));
         return $js->text();
     }
 

@@ -14,12 +14,20 @@ final class CManager {
     protected $is_mobile = false;
     protected $mobile_path = '';
     protected $theme_data = null;
+    protected static $langObjectCallback = null;
+    protected static $useRequireJs = null;
 
     /**
      *
      * @var CManager_Theme
      */
     protected static $theme = null;
+
+    /**
+     *
+     * @var CManager_Navigation
+     */
+    protected static $navigation = null;
 
     /**
      *
@@ -55,6 +63,17 @@ final class CManager {
             self::$theme = new CManager_Theme();
         }
         return self::$theme;
+    }
+
+    /**
+     * 
+     * @return CManager_Navigation
+     */
+    public static function navigation() {
+        if (self::$navigation == null) {
+            self::$navigation = new CManager_Navigation();
+        }
+        return self::$navigation;
     }
 
     /**
@@ -250,6 +269,46 @@ final class CManager {
 
     public function isMobile() {
         return $this->is_mobile;
+    }
+
+    public static function lang() {
+        if (self::$langObjectCallback != null) {
+            return call_user_func(self::$langObjectCallback);
+        }
+        return new CManager_Lang();
+    }
+
+    public static function setLangObjectCallback(callable $callback) {
+        self::$langObjectCallback = $callback;
+    }
+
+    public static function addTransformCallback($method, callable $callback) {
+        $transformManager = CManager_Transform::instance();
+        return $transformManager->addCallback($method, $callback);
+    }
+
+    public static function setUseRequireJs($bool) {
+        self::$useRequireJs = $bool;
+    }
+
+    public static function getUseRequireJs() {
+        return true;
+        if (self::$useRequireJs === null) {
+            $require = ccfg::get('require_js');
+            if ($require === null) {
+                return true;
+            }
+            return $require;
+        }
+        return self::$useRequireJs;
+    }
+
+    public static function registerCss($file, $pos = CClientScript::POS_HEAD) {
+        $cs = CClientScript::instance()->registerCssFile($file, $pos);
+    }
+
+    public static function registerJs($file, $pos = CClientScript::POS_END) {
+        $cs = CClientScript::instance()->registerJsFile($file, $pos);
     }
 
 }

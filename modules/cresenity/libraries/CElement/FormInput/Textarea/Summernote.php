@@ -15,6 +15,8 @@
  */
 class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea {
 
+    protected $toolbarType = 'default';
+
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('summernote');
@@ -24,7 +26,30 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         $this->add_class('summernote-control');
     }
 
+    public function setToolbarType($toolbarType) {
+        $this->toolbarType = $toolbarType;
+        return $this;
+    }
+
+    protected function getToolbarJson($toolbarType = null) {
+        if ($toolbarType == null) {
+            $toolbarType = $this->toolbarType;
+        }
+        $json = '[]';
+        switch ($toolbarType) {
+            case 'standard':
+                $json = "[['style', ['bold', 'italic', 'underline', 'clear']],['font', ['strikethrough', 'superscript', 'subscript']],['fontsize', ['fontsize']],['color', ['color']],['para', ['ul', 'ol', 'paragraph']],['height', ['height']]]";
+                break;
+        }
+        return $json;
+    }
+
     public function js($indent = 0) {
+
+        $additionalOptions = '';
+        if ($this->toolbarType != 'default') {
+            $additionalOptions .= 'toolbar:' . $this->getToolbarJson() . ',';
+        }
 
         $js = "";
 
@@ -32,6 +57,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             
         $('#" . $this->id . "').summernote({
             height: '300px',
+            " . $additionalOptions . "
             maximumImageFileSize:1024*1024, // 1 MB
             callbacks:{ 
                 onImageUploadError: function(msg){ 

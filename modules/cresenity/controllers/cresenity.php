@@ -8,7 +8,12 @@ class Cresenity_Controller extends CController {
         curl::redirect('');
     }
 
+    public function cron() {
+        CJob::cliRunner();
+    }
+
     public function ajax($method) {
+        $app = CApp::instance();
         $file = CApp::temp()->makePath("ajax", $method . ".tmp");
         if (isset($_GET['profiler'])) {
             new Profiler();
@@ -22,7 +27,7 @@ class Cresenity_Controller extends CController {
 
         echo $response;
     }
-    
+
     public function api($method, $submethod = null) {
 
         $data = CApp::api()->exec($method, $submethod);

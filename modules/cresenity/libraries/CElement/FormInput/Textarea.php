@@ -35,6 +35,16 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    public function build() {
+        parent::build();
+        if ($this->readonly) {
+            $this->setAttr('readonly', 'readonly');
+        }
+        if ($this->disabled) {
+            $this->setAttr('disabled', 'disabled');
+        }
+    }
+
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);

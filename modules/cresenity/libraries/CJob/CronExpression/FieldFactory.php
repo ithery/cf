@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * CRON field factory implementing a flyweight factory
+ * @link http://en.wikipedia.org/wiki/Cron
+ */
+class CJob_CronExpression_FieldFactory {
+
+    /**
+     * @var array Cache of instantiated fields
+     */
+    private $fields = array();
+
+    /**
+     * Get an instance of a field object for a cron expression position
+     *
+     * @param int $position CRON expression position value to retrieve
+     *
+     * @return FieldInterface
+     * @throws InvalidArgumentException if a position is not valid
+     */
+    public function getField($position) {
+        if (!isset($this->fields[$position])) {
+            switch ($position) {
+                case 0:
+                    $this->fields[$position] = new CJob_CronExpression_MinutesField();
+                    break;
+                case 1:
+                    $this->fields[$position] = new CJob_CronExpression_HoursField();
+                    break;
+                case 2:
+                    $this->fields[$position] = new CJob_CronExpression_DayOfMonthField();
+                    break;
+                case 3:
+                    $this->fields[$position] = new CJob_CronExpression_MonthField();
+                    break;
+                case 4:
+                    $this->fields[$position] = new CJob_CronExpression_DayOfWeekField();
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                    $position . ' is not a valid position'
+                    );
+            }
+        }
+
+        return $this->fields[$position];
+    }
+
+}

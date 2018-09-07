@@ -21,7 +21,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return void
      */
     public function buildLoadAvg() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if ($cmd->rfts('/proc/loadavg', $buf, 1, 4096, CServer::getOS() != 'Android')) {
             $result = preg_split("/\s/", $buf, 4);
             // don't need the extra values, only first three
@@ -43,7 +43,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return Integer
      */
     protected function parseProcStat($cpuline) {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if (is_null($this->cpuLoads)) {
             $this->cpuLoads = array();
 
@@ -109,7 +109,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return Void
      */
     public function buildMachine() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         $machine = "";
         if (($cmd->rfts('/var/log/dmesg', $result, 0, 4096, false) && preg_match('/^[\s\[\]\.\d]*DMI:\s*(.*)/m', $result, $ar_buf)) || ($cmd->executeProgram('dmesg', '', $result, false) && preg_match('/^[\s\[\]\.\d]*DMI:\s*(.*)/m', $result, $ar_buf))) {
             $machine = trim($ar_buf[1]);
@@ -168,7 +168,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return Void
      */
     public function buildKernel() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         $cfg = CServer::config();
         $result = "";
         if ($cmd->executeProgram($uname = "uptrack-uname", '-r', $strBuf, false) || // show effective kernel if ksplice uptrack is installed
@@ -212,7 +212,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return void
      */
     public function buildUptime() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if ($cmd->rfts('/proc/uptime', $buf, 1, 4096, CServer::getOS() != 'Android')) {
             $ar_buf = preg_split('/ /', $buf);
             $this->info->setUptime(trim($ar_buf[0]));
@@ -244,7 +244,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      */
     public function buildDistro() {
 
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         $this->info->setDistribution("Linux");
         $list = CServer_Const::$distros;
 
@@ -535,7 +535,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return void
      */
     public function buildProcesses() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         $process = glob('/proc/*/status', GLOB_NOSORT);
         if (is_array($process) && (($total = count($process)) > 0)) {
             $processes['*'] = 0;
@@ -565,7 +565,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return Void
      */
     public function buildHostname() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if (CServer::config()->isUseVHost()) {
             if ($cmd->readEnv('SERVER_NAME', $hnm))
                 $this->info->setHostname($hnm);
@@ -589,7 +589,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
      * @return void
      */
     public function buildCpuInfo() {
-        $cmd = CServer::command();
+        $cmd = $this->createCommand();
         if ($cmd->rfts('/proc/cpuinfo', $bufr)) {
             $cpulist = null;
             $raslist = null;
@@ -855,7 +855,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
             $cpudevices = glob('/sys/devices/system/cpu/cpu*/uevent', GLOB_NOSORT);
             if (is_array($cpudevices) && (($cpustopped = count($cpudevices) - $cpucount) > 0)) {
                 for (; $cpustopped > 0; $cpustopped--) {
-                    $dev = new CpuDevice();
+                    $dev = new CServer_Device_Cpu();
                     $dev->setModel("stopped");
                     if ($speedset) {
                         $dev->setCpuSpeed(-1);

@@ -9,32 +9,32 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CServer {
 
-    public static function storage() {
-        return CServer_Storage::instance();
+    public static function storage($sshConfig = null) {
+        return CServer_Storage::instance($sshConfig);
     }
 
-    public static function php() {
-        return CServer_Php::instance();
+    public static function php($sshConfig = null) {
+        return CServer_Php::instance($sshConfig);
     }
 
     public static function database() {
         return CServer_Database::instance();
     }
 
-    public static function memory() {
-        return CServer_Memory::instance();
+    public static function memory($sshConfig = null) {
+        return CServer_Memory::instance($sshConfig);
     }
 
-    public static function system() {
-        return CServer_System::instance();
+    public static function system($sshConfig = null) {
+        return CServer_System::instance($sshConfig);
     }
 
     public static function error() {
         return CServer_Error::instance();
     }
 
-    public static function command() {
-        return CServer_Command::instance();
+    public static function command($sshConfig = null) {
+        return CServer_Command::instance($sshConfig);
     }
 
     public static function config() {
@@ -72,7 +72,7 @@ class CServer {
 
     /**
      * 
-     * @return CServer_System_Device_Cpu
+     * @return CServer_Device_Cpu
      */
     public static function createDeviceCpu() {
         return self::createDevice('Cpu');
@@ -80,10 +80,34 @@ class CServer {
 
     /**
      * 
-     * @return CServer_System_Device_Disk
+     * @return CServer_Device_Disk
      */
     public static function createDeviceDisk() {
         return self::createDevice('Disk');
+    }
+
+    public static function isProcOpenDisabled() {
+        $isDisabled = false;
+        if (!function_exists("proc_open")) {
+            $isDisabled = true;
+        }
+        $process = null;
+        try {
+            $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
+            $pipes = array();
+            $process = @proc_open('hostname', $descriptorspec, $pipes);
+        } catch (Exception $ex) {
+            $isDisabled = true;
+        }
+
+        if (is_resource($process)) {
+            proc_terminate($process);
+        } else {
+            $isDisabled = true;
+        }
+
+
+        return $isDisabled;
     }
 
 }

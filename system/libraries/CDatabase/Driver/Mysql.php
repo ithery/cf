@@ -271,7 +271,7 @@ class CDatabase_Driver_Mysql extends CDatabase_Driver {
         }
 
         if (!isset($result))
-            throw new CDatabase_Exception('Table :table does not exist in your database', array(':table'=>$table));
+            throw new CDatabase_Exception('Table :table does not exist in your database', array(':table' => $table));
 
         return $result;
     }
@@ -314,7 +314,7 @@ class CMysql_Result extends CDatabase_Result {
         } elseif (is_bool($result)) {
             if ($result == FALSE) {
                 // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', array(':error'=>mysql_error($link) . ' - ' . $sql));
+                throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => mysql_error($link) . ' - ' . $sql));
             } else {
                 // Its an DELETE, INSERT, REPLACE, or UPDATE query
                 $this->insert_id = mysql_insert_id($link);

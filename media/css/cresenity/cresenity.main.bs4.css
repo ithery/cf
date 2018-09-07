@@ -458,7 +458,7 @@ table.responsive {
 }
 .widget-box .widget-title .buttons {
     float: right;
-    margin: -7px 0px 0 0;
+
 }
 
 .widget-box .widget-content {
@@ -596,7 +596,9 @@ div.dataTables_wrapper .ui-widget-header {
     position: relative;
     vertical-align: middle;
 } 
-
+body.modal-open .select2-container {
+    z-index: 1090;
+}
 .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple {
     border-color: #e7eaec;
 }
@@ -929,7 +931,15 @@ body.mini-navbar #page-wrapper {
     }
 
 }
-
+@media (min-width: 992px) {
+    .layout-collapsed:not(.layout-offcanvas):not(.layout-fixed-offcanvas) .layout-sidenav:not(:hover) .brand-logo {
+        margin-right: 20px;
+        margin-left: 20px;
+    }
+    .layout-collapsed:not(.layout-offcanvas):not(.layout-fixed-offcanvas) .layout-sidenav:not(:hover) .brand {
+        padding: 0;
+    }
+}
 @media (max-width:1200px) {
 
 }

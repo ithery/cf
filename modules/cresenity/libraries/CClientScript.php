@@ -27,6 +27,23 @@ class CClientScript extends CObject {
     const TYPE_CSS = 'css';
     const TYPE_META = 'meta';
     const TYPE_LINK = 'link';
+    const TYPE_PLAIN = 'plain';
+
+    /**
+     * array of all type script
+     * 
+     * @var array
+     */
+    public static $allType = array(
+        self::TYPE_JS_FILE,
+        self::TYPE_JS,
+        self::TYPE_CSS_FILE,
+        self::TYPE_CSS,
+        self::TYPE_META,
+        self::TYPE_JS,
+        self::TYPE_LINK,
+        self::TYPE_PLAIN,
+    );
 
     public function __construct() {
         $this->reset();
@@ -164,6 +181,7 @@ class CClientScript extends CObject {
     }
 
     public function unregisterJsFile($file, $pos = null) {
+        $fullpathFile = $this->fullpathJsFile($file);
         //we will locate all pos for this pos if pos =null;
         if ($pos == null) {
             $pos = self::allAvailablePos();
@@ -172,9 +190,12 @@ class CClientScript extends CObject {
             $pos = array($pos);
         }
         foreach ($pos as $p) {
+
             $jsFiles = &$this->scripts[$p]['js_file'];
             foreach ($jsFiles as $k => $jsFile) {
-                if ($jsFile == $file) {
+
+                if ($jsFile == $fullpathFile) {
+
                     unset($jsFiles[$k]);
                 }
             }
@@ -215,6 +236,7 @@ class CClientScript extends CObject {
     }
 
     public function unregisterCssFile($file, $pos = null) {
+        $fullpathFile = $this->fullpathCssFile($file);
         //we will locate all pos for this pos if pos =null;
         if ($pos == null) {
             $pos = self::allAvailablePos();
@@ -225,7 +247,7 @@ class CClientScript extends CObject {
         foreach ($pos as $p) {
             $cssFiles = &$this->scripts[$p]['css_file'];
             foreach ($cssFiles as $k => $cssFile) {
-                if ($cssFile == $file) {
+                if ($cssFile == $fullpathFile) {
                     unset($cssFiles[$k]);
                 }
             }
@@ -264,6 +286,39 @@ class CClientScript extends CObject {
             }
         }
         return $js_file_array;
+    }
+
+    public function registerJsInlines($jsArray, $pos = self::POS_HEAD) {
+        $jsArray = $jsArray !== null ? (is_array($jsArray) ? $jsArray : array($jsArray)) : array();
+        foreach ($jsArray as $js) {
+            $this->registerJsInline($js, $pos);
+        }
+    }
+
+    public function registerJsInline($js, $pos = self::POS_HEAD) {
+        $this->scripts[$pos]['js'][] = $js;
+    }
+
+    public function registerCssInlines($cssArray, $pos = self::POS_HEAD) {
+        $cssArray = $cssArray !== null ? (is_array($cssArray) ? $cssArray : array($cssArray)) : array();
+        foreach ($cssArray as $css) {
+            $this->registerCssInline($css, $pos);
+        }
+    }
+
+    public function registerCssInline($css, $pos = self::POS_HEAD) {
+        $this->scripts[$pos]['css'][] = $css;
+    }
+
+    public function registerPlains($plains, $pos = self::POS_HEAD) {
+        $plains = $plains !== null ? (is_array($plains) ? $plains : array($plains)) : array();
+        foreach ($plains as $plain) {
+            $this->registerPlain($plain, $pos);
+        }
+    }
+
+    public function registerPlain($plain, $pos = self::POS_HEAD) {
+        $this->scripts[$pos]['plain'][] = $plain;
     }
 
     public function create_js_hash() {
@@ -343,82 +398,107 @@ class CClientScript extends CObject {
         $js_before = "";
         $i = 0;
         $manager = CManager::instance();
-        foreach ($jsFiles as $f) {
-            $urlJsFile = $this->urlJsFile($f);
-            if ($manager->is_mobile()) {
-                $mobilePath = $manager->getMobilePath();
-                if (strlen($mobilePath) > 0) {
-                    $urlJsFile = $mobilePath . $f;
+        if ($manager->getUseRequireJs()) {
+            foreach ($jsFiles as $f) {
+                $urlJsFile = $this->urlJsFile($f);
+                if ($manager->is_mobile()) {
+                    $mobilePath = $manager->getMobilePath();
+                    if (strlen($mobilePath) > 0) {
+                        $urlJsFile = $mobilePath . $f;
+                    }
                 }
+
+
+                $js_open .= str_repeat("\t", $i) . "require(['" . $urlJsFile . "'],function(){" . PHP_EOL;
+
+                $js_close .= "})";
+                $i++;
+            }
+        }
+        $js .= "
+            if (typeof cappStartedEventInitilized === 'undefined') {
+                cappStartedEventInitilized=false;
+             }
+            if(!cappStartedEventInitilized) {
+                var evt = document.createEvent('Events');
+                evt.initEvent('capp-started', false, true, window, 0);
+                cappStartedEventInitilized=true;
+                document.dispatchEvent(evt);
             }
 
 
-            $js_open .= str_repeat("\t", $i) . "require(['" . $urlJsFile . "'],function(){" . PHP_EOL;
-
-            $js_close .= "})";
-            $i++;
-        }
-
-        $js .= "
-                if (typeof cappStartedEventInitilized === 'undefined') {
-                    cappStartedEventInitilized=false;
-                 }
-                if(!cappStartedEventInitilized) {
-                    var evt = document.createEvent('Events');
-                    evt.initEvent('capp-started', false, true, window, 0);
-                    cappStartedEventInitilized=true;
-                    document.dispatchEvent(evt);
-                }
-
-
-            ";
+        ";
 
 
         $js_before .= "
             window.capp = " . json_encode(CApp::variables()) . ";
             ";
 
+        $bar = CDebug::bar();
+        if ($bar->isEnabled()) {
+            $js .= $bar->getJavascriptReplaceCode();
+        }
+
+
         return $js_before . $js_open . $js . PHP_EOL . $js_close . ";" . PHP_EOL;
     }
 
-    public function render($pos, $type = array("js_file", "css_file", "js", "css", "meta", "link")) {
+    public function render($pos, $type = null) {
         $script = "";
         $app = CApp::instance();
         $manager = CManager::instance();
+        if ($type == null) {
+            $type = self::$allType;
+        }
         if (!is_array($type)) {
             $type = array($type);
         }
-        foreach ($this->scripts[$pos] as $k => $v) {
-            if (in_array($k, $type)) {
-                foreach ($v as $s) {
-                    switch ($k) {
-                        case "js_file":
+        foreach ($this->scripts[$pos] as $scriptType => $scriptValueArray) {
+            if (in_array($scriptType, $type)) {
+                foreach ($scriptValueArray as $scriptValue) {
+                    switch ($scriptType) {
+                        case self::TYPE_JS_FILE:
                             if (!ccfg::get('merge_js')) {
-                                $urlJsFile = $this->urlJsFile($s);
+                                $urlJsFile = $this->urlJsFile($scriptValue);
                                 if ($manager->is_mobile()) {
                                     $mobilePath = $manager->getMobilePath();
                                     if (strlen($mobilePath) > 0) {
-                                        $urlJsFile = $mobilePath . $s;
+                                        $urlJsFile = $mobilePath . $scriptValue;
                                     }
                                 }
 
                                 $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
                             }
                             break;
-                    }
-                    switch ($k) {
-                        case "css_file":
+                        case self::TYPE_CSS_FILE:
                             if (!ccfg::get('merge_css')) {
-                                $urlCssFile = $this->urlCssFile($s);
+                                $urlCssFile = $this->urlCssFile($scriptValue);
                                 if ($manager->is_mobile()) {
                                     $mobilePath = $manager->getMobilePath();
                                     if (strlen($mobilePath) > 0) {
-                                        $urlCssFile = $mobilePath . $s;
+                                        $urlCssFile = $mobilePath . $scriptValue;
                                     }
                                 }
 
                                 $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
                             }
+                            break;
+
+                        case self::TYPE_JS:
+                            if (!ccfg::get('merge_js')) {
+
+                                $script .= '<script>' . $scriptValue . '</script>' . PHP_EOL;
+                            }
+                            break;
+                        case self::TYPE_CSS:
+                            if (!ccfg::get('merge_css')) {
+
+                                $script .= '<style>' . $scriptValue . '</style>' . PHP_EOL;
+                            }
+                            break;
+                        case self::TYPE_PLAIN:
+
+                            $script .= $scriptValue . PHP_EOL;
                             break;
                     }
                 }

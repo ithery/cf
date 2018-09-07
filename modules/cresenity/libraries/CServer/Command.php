@@ -7,15 +7,30 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 15, 2018, 3:04:56 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CServer_Command {
+class CServer_Command extends CServer_Base {
 
-    protected static $instance;
+    protected static $instance = array();
 
-    public static function instance() {
-        if (self::$instance == null) {
-            return new CServer_Command();
+    const IS_DEBUG = false;
+
+    public function __construct($sshConfig = null) {
+        $this->sshConfig = $sshConfig;
+        $this->host = carr::get($sshConfig, 'host');
+    }
+
+    public static function instance($sshConfig = null) {
+        if (!is_array(self::$instance)) {
+            self::$instance = array();
         }
-        return self::$instance;
+        $host = 'localhost';
+
+        if ($sshConfig != null) {
+            $host = carr::get($sshConfig, 'host');
+        }
+        if (!isset(self::$instance[$host])) {
+            self::$instance[$host] = new CServer_Command($sshConfig);
+        }
+        return self::$instance[$host];
     }
 
     /**
@@ -233,7 +248,17 @@ class CServer_Command {
      * @return boolean command successfull or not
      */
     public function rfts($strFileName, &$strRet, $intLines = 0, $intBytes = 4096, $booErrorRep = true) {
+        if ($this->sshConfig != null) {
 
+            $ssh = CRemote::ssh($this->sshConfig);
+            $output = '';
+            $ssh->run('cat ' . $strFileName, function($line) use (&$output) {
+                $output .= $line;
+            });
+
+            $strRet = $output;
+            return true;
+        }
 
         $strFile = "";
         $intCurLine = 1;
@@ -356,49 +381,303 @@ class CServer_Command {
             }
             $strArgs = ' ' . $strArgs;
         }
-
+        $cmd = $strSet . $strProgram . $strArgs;
         $strBuffer = '';
         $strError = '';
         $pipes = array();
         $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
-        if (defined("PSI_MODE_POPEN") && PSI_MODE_POPEN === true) {
-            if (PSI_OS == 'WINNT') {
-                $process = $pipes[1] = popen($strSet . $strProgram . $strArgs . " 2>nul", "r");
-            } else {
-                $process = $pipes[1] = popen($strSet . $strProgram . $strArgs . " 2>/dev/null", "r");
+        return $this->procOpen($cmd, $strBuffer, $strError, $booErrorRep, $timeout);
+    }
+
+    /**
+     * parsing the output of df command
+     *
+     * @param string $df_param   additional parameter for df command
+     * @param bool   $get_inodes
+     *
+     * @return array
+     */
+    public function df($df_param = "", $get_inodes = true) {
+
+        $arrResult = array();
+        if ($this->executeProgram('mount', '', $mount, CServer_Command::IS_DEBUG)) {
+
+            $mount = preg_split("/\n/", $mount, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($mount as $mount_line) {
+                if (preg_match("/(\S+) on ([\S ]+) type (.*) \((.*)\)/", $mount_line, $mount_buf)) {
+                    $parm = array();
+                    $parm['mountpoint'] = trim($mount_buf[2]);
+                    $parm['fstype'] = $mount_buf[3];
+                    $parm['name'] = $mount_buf[1];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = $mount_buf[4];
+                    }
+                    $mount_parm[] = $parm;
+                } elseif (preg_match("/(\S+) is (.*) mounted on (\S+) \(type (.*)\)/", $mount_line, $mount_buf)) {
+                    $parm = array();
+                    $parm['mountpoint'] = trim($mount_buf[3]);
+                    $parm['fstype'] = $mount_buf[4];
+                    $parm['name'] = $mount_buf[1];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION)
+                        $parm['options'] = $mount_buf[2];
+                    $mount_parm[] = $parm;
+                } elseif (preg_match("/(\S+) (.*) on (\S+) \((.*)\)/", $mount_line, $mount_buf)) {
+                    $parm = array();
+                    $parm['mountpoint'] = trim($mount_buf[3]);
+                    $parm['fstype'] = $mount_buf[2];
+                    $parm['name'] = $mount_buf[1];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = $mount_buf[4];
+                    }
+                    $mount_parm[] = $parm;
+                } elseif (preg_match("/(\S+) on ([\S ]+) \((\S+)(,\s(.*))?\)/", $mount_line, $mount_buf)) {
+                    $parm = array();
+                    $parm['mountpoint'] = trim($mount_buf[2]);
+                    $parm['fstype'] = $mount_buf[3];
+                    $parm['name'] = $mount_buf[1];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = isset($mount_buf[5]) ? $mount_buf[5] : '';
+                    }
+                    $mount_parm[] = $parm;
+                }
             }
-        } else {
-            $process = proc_open($strSet . $strProgram . $strArgs, $descriptorspec, $pipes);
+        } elseif ($this->rfts("/etc/mtab", $mount)) {
+            $mount = preg_split("/\n/", $mount, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($mount as $mount_line) {
+                if (preg_match("/(\S+) (\S+) (\S+) (\S+) ([0-9]+) ([0-9]+)/", $mount_line, $mount_buf)) {
+                    $parm = array();
+                    $mount_point = preg_replace("/\\\\040/i", ' ', $mount_buf[2]); //space as \040
+                    $parm['mountpoint'] = $mount_point;
+                    $parm['fstype'] = $mount_buf[3];
+                    $parm['name'] = $mount_buf[1];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = $mount_buf[4];
+                    }
+                    $mount_parm[] = $parm;
+                }
+            }
         }
-        if (is_resource($process)) {
-            $te = $this->timeoutfgets($pipes, $strBuffer, $strError, $timeout);
-            if (defined("PSI_MODE_POPEN") && PSI_MODE_POPEN === true) {
-                $return_value = pclose($pipes[1]);
-            } else {
-                fclose($pipes[0]);
-                fclose($pipes[1]);
-                fclose($pipes[2]);
-                // It is important that you close any pipes before calling
-                // proc_close in order to avoid a deadlock
-                if ($te) {
-                    proc_terminate($process); // proc_close tends to hang if the process is timing out
-                    $return_value = 0;
-                } else {
-                    $return_value = proc_close($process);
+        if ($this->executeProgram('df', '-k ' . $df_param, $df, CServer_Command::IS_DEBUG) && ($df !== "")) {
+            $df = preg_split("/\n/", $df, -1, PREG_SPLIT_NO_EMPTY);
+            if ($get_inodes && CServer_Storage::SHOW_INODES) {
+                if ($this->executeProgram('df', '-i ' . $df_param, $df2, CServer_Command::IS_DEBUG)) {
+                    $df2 = preg_split("/\n/", $df2, -1, PREG_SPLIT_NO_EMPTY);
+                    // Store inode use% in an associative array (df_inodes) for later use
+                    foreach ($df2 as $df2_line) {
+                        if (preg_match("/^(\S+).*\s([0-9]+)%/", $df2_line, $inode_buf)) {
+                            $df_inodes[$inode_buf[1]] = $inode_buf[2];
+                        }
+                    }
+                }
+            }
+            foreach ($df as $df_line) {
+                $df_buf1 = preg_split("/(\%\s)/", $df_line, 3);
+                if (count($df_buf1) < 2) {
+                    continue;
+                }
+                if (preg_match("/(.*)(\s+)(([0-9]+)(\s+)([0-9]+)(\s+)([\-0-9]+)(\s+)([0-9]+)$)/", $df_buf1[0], $df_buf2)) {
+                    if (count($df_buf1) == 3) {
+                        $df_buf = array($df_buf2[1], $df_buf2[4], $df_buf2[6], $df_buf2[8], $df_buf2[10], $df_buf1[2]);
+                    } else {
+                        $df_buf = array($df_buf2[1], $df_buf2[4], $df_buf2[6], $df_buf2[8], $df_buf2[10], $df_buf1[1]);
+                    }
+                    if (count($df_buf) == 6) {
+                        $df_buf[5] = trim($df_buf[5]);
+                        $dev = new CServer_Device_Disk();
+                        $dev->setName(trim($df_buf[0]));
+                        if ($df_buf[2] < 0) {
+                            $dev->setTotal($df_buf[3] * 1024);
+                            $dev->setUsed($df_buf[3] * 1024);
+                        } else {
+                            $dev->setTotal($df_buf[1] * 1024);
+                            $dev->setUsed($df_buf[2] * 1024);
+                            if ($df_buf[3] > 0) {
+                                $dev->setFree($df_buf[3] * 1024);
+                            }
+                        }
+                        if (CServer_Storage::SHOW_MOUNT_POINT) {
+                            $dev->setMountPoint($df_buf[5]);
+                        }
+
+                        $notwas = true;
+                        if (isset($mount_parm)) {
+                            foreach ($mount_parm as $mount_param) { //name and mountpoint find
+                                if (($mount_param['name'] === trim($df_buf[0])) && ($mount_param['mountpoint'] === $df_buf[5])) {
+                                    $dev->setFsType($mount_param['fstype']);
+                                    if (CServer_Storage::SHOW_MOUNT_OPTION && (trim($mount_param['options']) !== "")) {
+                                        if (CServer_Storage::SHOW_MOUNT_CREDENTIALS) {
+                                            $dev->setOptions($mount_param['options']);
+                                        } else {
+                                            $mpo = $mount_param['options'];
+
+                                            $mpo = preg_replace('/(^guest,)|(^guest$)|(,guest$)/i', '', $mpo);
+                                            $mpo = preg_replace('/,guest,/i', ',', $mpo);
+
+                                            $mpo = preg_replace('/(^user=[^,]*,)|(^user=[^,]*$)|(,user=[^,]*$)/i', '', $mpo);
+                                            $mpo = preg_replace('/,user=[^,]*,/i', ',', $mpo);
+
+                                            $mpo = preg_replace('/(^username=[^,]*,)|(^username=[^,]*$)|(,username=[^,]*$)/i', '', $mpo);
+                                            $mpo = preg_replace('/,username=[^,]*,/i', ',', $mpo);
+
+                                            $mpo = preg_replace('/(^password=[^,]*,)|(^password=[^,]*$)|(,password=[^,]*$)/i', '', $mpo);
+                                            $mpo = preg_replace('/,password=[^,]*,/i', ',', $mpo);
+
+                                            $dev->setOptions($mpo);
+                                        }
+                                    }
+                                    $notwas = false;
+                                    break;
+                                }
+                            }
+                            if ($notwas)
+                                foreach ($mount_parm as $mount_param) { //mountpoint find
+                                    if ($mount_param['mountpoint'] === $df_buf[5]) {
+                                        $dev->setFsType($mount_param['fstype']);
+                                        if (CServer_Storage::SHOW_MOUNT_OPTION && (trim($mount_param['options']) !== "")) {
+                                            if (CServer_Storage::SHOW_MOUNT_CREDENTIALS) {
+                                                $dev->setOptions($mount_param['options']);
+                                            } else {
+                                                $mpo = $mount_param['options'];
+
+                                                $mpo = preg_replace('/(^guest,)|(^guest$)|(,guest$)/i', '', $mpo);
+                                                $mpo = preg_replace('/,guest,/i', ',', $mpo);
+
+                                                $mpo = preg_replace('/(^user=[^,]*,)|(^user=[^,]*$)|(,user=[^,]*$)/i', '', $mpo);
+                                                $mpo = preg_replace('/,user=[^,]*,/i', ',', $mpo);
+
+                                                $mpo = preg_replace('/(^username=[^,]*,)|(^username=[^,]*$)|(,username=[^,]*$)/i', '', $mpo);
+                                                $mpo = preg_replace('/,username=[^,]*,/i', ',', $mpo);
+
+                                                $mpo = preg_replace('/(^password=[^,]*,)|(^password=[^,]*$)|(,password=[^,]*$)/i', '', $mpo);
+                                                $mpo = preg_replace('/,password=[^,]*,/i', ',', $mpo);
+
+                                                $dev->setOptions($mpo);
+                                            }
+                                        }
+                                        $notwas = false;
+                                        break;
+                                    }
+                                }
+                        }
+
+                        if ($notwas) {
+                            $dev->setFsType('unknown');
+                        }
+
+                        if ($get_inodes && CServer_Storage::SHOW_INODES && isset($df_inodes[trim($df_buf[0])])) {
+                            $dev->setPercentInodesUsed($df_inodes[trim($df_buf[0])]);
+                        }
+                        $arrResult[] = $dev;
+                    }
                 }
             }
         } else {
-            if ($booErrorRep) {
-                $error->addError($strProgram, "\nOpen process error");
-            }
+            if (isset($mount_parm)) {
+                foreach ($mount_parm as $mount_param) {
+                    $total = disk_total_space($mount_param['mountpoint']);
+                    if (($mount_param['fstype'] != 'none') && ($total > 0)) {
+                        $dev = new CServer_Device_Disk();
+                        $dev->setName($mount_param['name']);
+                        $dev->setFsType($mount_param['fstype']);
 
-            return false;
+                        if (CServer_Storage::SHOW_MOUNT_POINT)
+                            $dev->setMountPoint($mount_param['mountpoint']);
+
+                        $dev->setTotal($total);
+                        $free = disk_free_space($mount_param['mountpoint']);
+                        if ($free > 0) {
+                            $dev->setFree($free);
+                        } else {
+                            $free = 0;
+                        }
+                        if ($total > $free)
+                            $dev->setUsed($total - $free);
+
+                        if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                            if (CServer_Storage::SHOW_MOUNT_CREDENTIALS) {
+                                $dev->setOptions($mount_param['options']);
+                            } else {
+                                $mpo = $mount_param['options'];
+
+                                $mpo = preg_replace('/(^guest,)|(^guest$)|(,guest$)/i', '', $mpo);
+                                $mpo = preg_replace('/,guest,/i', ',', $mpo);
+
+                                $mpo = preg_replace('/(^user=[^,]*,)|(^user=[^,]*$)|(,user=[^,]*$)/i', '', $mpo);
+                                $mpo = preg_replace('/,user=[^,]*,/i', ',', $mpo);
+
+                                $mpo = preg_replace('/(^username=[^,]*,)|(^username=[^,]*$)|(,username=[^,]*$)/i', '', $mpo);
+                                $mpo = preg_replace('/,username=[^,]*,/i', ',', $mpo);
+
+                                $mpo = preg_replace('/(^password=[^,]*,)|(^password=[^,]*$)|(,password=[^,]*$)/i', '', $mpo);
+                                $mpo = preg_replace('/,password=[^,]*,/i', ',', $mpo);
+
+                                $dev->setOptions($mpo);
+                            }
+                        }
+                        $arrResult[] = $dev;
+                    }
+                }
+            }
+        }
+
+        return $arrResult;
+    }
+
+    public function procOpen($cmd, &$strBuffer, &$strError, $booErrorRep = true, $timeout = 30) {
+        $pipes = array();
+        $process = null;
+        $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
+        if ($this->sshConfig != null) {
+            $ssh = CRemote::ssh($this->sshConfig);
+            $output = '';
+            $ssh->run($cmd, function($line) use (&$strBuffer) {
+                $strBuffer .= $line;
+            });
+        } else {
+            if (defined("PSI_MODE_POPEN") && PSI_MODE_POPEN === true) {
+                if (PSI_OS == 'WINNT') {
+                    $process = $pipes[1] = popen($cmd . " 2>nul", "r");
+                } else {
+                    $process = $pipes[1] = popen($cmd . " 2>/dev/null", "r");
+                }
+            } else {
+
+                $process = proc_open($cmd, $descriptorspec, $pipes);
+            }
+        }
+        if ($this->sshConfig == null) {
+            if (is_resource($process)) {
+                $te = $this->timeoutfgets($pipes, $strBuffer, $strError, $timeout);
+                if (defined("PSI_MODE_POPEN") && PSI_MODE_POPEN === true) {
+                    $return_value = pclose($pipes[1]);
+                } else {
+                    fclose($pipes[0]);
+                    fclose($pipes[1]);
+                    fclose($pipes[2]);
+                    // It is important that you close any pipes before calling
+                    // proc_close in order to avoid a deadlock
+                    if ($te) {
+                        proc_terminate($process); // proc_close tends to hang if the process is timing out
+                        $return_value = 0;
+                    } else {
+                        $return_value = proc_close($process);
+                    }
+                }
+            } else {
+
+                if ($booErrorRep) {
+                    $error->addError($strProgram, "\nOpen process error");
+                }
+
+                return false;
+            }
         }
         $strError = trim($strError);
         $strBuffer = trim($strBuffer);
         if (defined('PSI_LOG') && is_string(PSI_LOG) && (strlen(PSI_LOG) > 0) && (substr(PSI_LOG, 0, 1) != "-") && (substr(PSI_LOG, 0, 1) != "+")) {
             error_log("---" . gmdate('r T') . "--- Executing: " . trim($strProgramname . $strArgs) . "\n" . $strBuffer . "\n", 3, PSI_LOG);
         }
+
         if (!empty($strError)) {
             if ($booErrorRep) {
                 $error->addError($strProgram, $strError . "\nReturn value: " . $return_value);
@@ -406,7 +685,6 @@ class CServer_Command {
 
             return $return_value == 0;
         }
-
         return true;
     }
 

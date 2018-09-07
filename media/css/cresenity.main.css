@@ -1178,7 +1178,7 @@ input[type="text"].80-percent, input[type="password"].80-percent, textarea.80-pe
 }
 
 
-.fileupload {
+.fileupload, .dialog-select {
     margin-bottom: 0px;
 }
 
@@ -1203,12 +1203,20 @@ input[type="text"].80-percent, input[type="password"].80-percent, textarea.80-pe
     vertical-align: middle;
 }
 
-.fileupload .btn {
+.dialog-select .thumbnail {
+    margin-bottom: 5px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.fileupload .btn, .dialog-select .btn {
     vertical-align: middle;
 }
 
 .fileupload-exists .fileupload-new,
-.fileupload-new .fileupload-exists {
+.fileupload-new .fileupload-exists,
+.dialog-select-exists .dialog-select-new,
+.dialog-select-new .dialog-select-exists {
     display: none;
 }
 
@@ -1234,6 +1242,10 @@ input[type="text"].80-percent, input[type="password"].80-percent, textarea.80-pe
 }
 
 .fileupload-new.thumbnail-borderless .thumbnail {
+    border: 1px solid #ddd;
+}
+
+.dialog-select-new.thumbnail-borderless .thumbnail {
     border: 1px solid #ddd;
 }
 
