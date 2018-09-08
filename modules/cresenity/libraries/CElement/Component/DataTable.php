@@ -1397,7 +1397,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 $html->appendln('<h5>' . $this->title . '</h5>');
                 if ($this->haveHeaderAction()) {
                     $html->appendln($this->headerActionList->html($html->getIndent()));
-                    
+
                     $this->js_cell .= $this->headerActionList->js();
                 }
                 $html->decIndent()->appendln('</div>');
@@ -1494,7 +1494,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         if ($v instanceof CRenderable) {
                             $v = $v->html();
                         }
-                        if ($k == $col->get_fieldname()) {
+                        if ($k == $col->getFieldname()) {
                             $col_v = $v;
                             $ori_v = $col_v;
                             foreach ($col->transforms as $trans) {
@@ -1565,7 +1565,8 @@ class CElement_Component_DataTable extends CElement_Component {
                         $this->js_cell .= carr::get($new_v, 'js', '');
                         $new_v = carr::get($new_v, 'html', '');
                     }
-                    $html->appendln('<td' . $pdf_tbody_td_current_attr . ' class="' . $class . '" data-column="' . $col->get_fieldname() . '">' . $new_v . '</td>')->br();
+
+                    $html->appendln('<td' . $pdf_tbody_td_current_attr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
                     $col_found = true;
                 }
 
