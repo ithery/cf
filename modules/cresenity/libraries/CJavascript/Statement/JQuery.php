@@ -59,7 +59,7 @@ class CJavascript_Statement_JQuery extends CJavascript_Statement {
 
     protected function compile() {
         $haveAjax = false;
-        $element = CJavascript_Helper_Javascript::prepElement($this->selector);
+        $element = '"' . addslashes($this->selector) . '"';
         $jQueryObjectStr = "$({$element})";
         $str = '';
         foreach ($this->needForCompile as $compilable) {
