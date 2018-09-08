@@ -107,7 +107,7 @@ class CManager_Asset_Module {
             $modules = array($modules);
         }
         foreach ($modules as $module) {
-            self::registerRunTimeModule($module);
+            $this->registerRunTimeModule($module);
         }
     }
 
@@ -161,6 +161,27 @@ class CManager_Asset_Module {
         return true;
     }
 
+    public function registerThemeModule($module) {
+        $allModules = self::allModules();
+        if (!in_array($module, $this->themeModules)) {
+            if (!isset($allModules[$module])) {
+                throw new CManager_Exception('Module :module not defined', array(':module' => $module));
+            }
+            //array
+            $mod = $allModules[$module];
+            if (isset($mod["requirements"])) {
+                foreach ($mod["requirements"] as $req) {
+                    $this->registerThemeModule($req);
+                }
+            }
+            if (!in_array($module, $this->themeModules)) {
+                $this->themeModules[] = $module;
+            }
+        }
+
+        return true;
+    }
+
     public function getRunTimeContainer() {
         $runTimeContainer = new CManager_Asset_Container_RunTime();
         $allModules = $this->allModules();
@@ -180,14 +201,17 @@ class CManager_Asset_Module {
 
     public function getThemeContainer() {
         $themeContainer = new CManager_Asset_Container_Theme();
-        foreach ($this->themeModules as $mod) {
+        $allModules = $this->allModules();
+        foreach ($this->themeModules as $themeModule) {
+            $mod = carr::get($allModules, $themeModule, array());
             if (isset($mod["js"])) {
-                $themeContainer->registerCssFiles($mod['js']);
+                $themeContainer->registerJsFiles($mod['js']);
             }
             if (isset($mod["css"])) {
                 $themeContainer->registerCssFiles($mod['css']);
             }
         }
+
         return $themeContainer;
     }
 

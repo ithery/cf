@@ -121,6 +121,7 @@ class CManager_Asset {
 
 
         $jsFiles = array_merge($moduleThemejsFiles, $themejsFiles, $moduleRunTimejsFiles, $runTimejsFiles);
+       
         $js_open = "";
         $js_close = "";
         $js_before = "";

@@ -12,7 +12,12 @@ trait CTrait_Controller_Documentation_Validation {
     public function quickstart() {
 
         $app = CApp::instance();
-        $data = array();
+        $data = array(
+            'title'=>'a',
+            'body'=>'c',
+            'publish_at'=>'a',
+            
+        );
         $app->validate($data, [
             'title' => 'required|unique:posts|max:255',
             'body' => 'required',

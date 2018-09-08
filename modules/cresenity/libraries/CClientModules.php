@@ -37,6 +37,14 @@ final class CClientModules {
     }
 
     public function registerModule($module, $parent = null) {
+        return self::registerRunTimeModule($module);
+    }
+
+    public function registerThemeModule($module, $parent = null) {
+        return CManager::asset()->module()->registerThemeModule($module);
+    }
+
+    public function registerRunTimeModule($module, $parent = null) {
         return CManager::asset()->module()->registerRunTimeModule($module);
     }
 
