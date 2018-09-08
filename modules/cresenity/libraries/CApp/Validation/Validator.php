@@ -288,7 +288,7 @@ class CApp_Validation_Validator implements CApp_Validation_ValidatorInterface {
      */
     public function validate() {
         if ($this->fails()) {
-            throw new ValidationException($this);
+            throw new CApp_Validation_Exception($this);
         }
     }
 
@@ -970,12 +970,12 @@ class CApp_Validation_Validator implements CApp_Validation_ValidatorInterface {
      * Get the Presence Verifier implementation.
      *
      * @param  string  $connection
-     * @return \Illuminate\Validation\PresenceVerifierInterface
+     * @return CApp_Validation_Contract_PresenceVerifierInterface
      *
      * @throws \RuntimeException
      */
     protected function getPresenceVerifierFor($connection) {
-        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
+        return CF::tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
             $verifier->setConnection($connection);
         });
     }
@@ -983,17 +983,17 @@ class CApp_Validation_Validator implements CApp_Validation_ValidatorInterface {
     /**
      * Set the Presence Verifier implementation.
      *
-     * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+     * @param  CApp_Validation_Contract_PresenceVerifierInterface  $presenceVerifier
      * @return void
      */
-    public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier) {
+    public function setPresenceVerifier(CApp_Validation_Contract_PresenceVerifierInterface $presenceVerifier) {
         $this->presenceVerifier = $presenceVerifier;
     }
 
     /**
      * Get the Translator implementation.
      *
-     * @return \Illuminate\Contracts\Translation\Translator
+     * @return CApp_Translation_TranslatorInterface
      */
     public function getTranslator() {
         return $this->translator;
@@ -1002,7 +1002,7 @@ class CApp_Validation_Validator implements CApp_Validation_ValidatorInterface {
     /**
      * Set the Translator implementation.
      *
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  CApp_Translation_TranslatorInterface  $translator
      * @return void
      */
     public function setTranslator(Translator $translator) {
@@ -1012,7 +1012,7 @@ class CApp_Validation_Validator implements CApp_Validation_ValidatorInterface {
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  CContainer_Contract_Container  $container
      * @return void
      */
     public function setContainer(Container $container) {

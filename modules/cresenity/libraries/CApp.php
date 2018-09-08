@@ -362,7 +362,7 @@ class CApp extends CObservable {
             $cs = CClientScript::instance();
             if ($moduleArray != null) {
                 foreach ($moduleArray as $module) {
-                    $manager->registerModule($module);
+                    $manager->registerThemeModule($module);
                 }
             }
             if (ccfg::get('have_clock')) {

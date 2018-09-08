@@ -138,9 +138,9 @@ class CApp_Message_Bag implements CInterface_Arrayable, Countable, CInterface_Js
     public function first($key = null, $format = null) {
         $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
-        $firstMessage = Arr::first($messages, null, '');
+        $firstMessage = carr::first($messages, null, '');
 
-        return is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
+        return is_array($firstMessage) ? carr::first($firstMessage) : $firstMessage;
     }
 
     /**
@@ -160,7 +160,7 @@ class CApp_Message_Bag implements CInterface_Arrayable, Countable, CInterface_Js
             );
         }
 
-        if (Str::contains($key, '*')) {
+        if (cstr::contains($key, '*')) {
             return $this->getMessagesForWildcardKey($key, $format);
         }
 
@@ -177,7 +177,7 @@ class CApp_Message_Bag implements CInterface_Arrayable, Countable, CInterface_Js
     protected function getMessagesForWildcardKey($key, $format) {
         return collect($this->messages)
                         ->filter(function ($messages, $messageKey) use ($key) {
-                            return Str::is($key, $messageKey);
+                            return cstr::is($key, $messageKey);
                         })
                         ->map(function ($messages, $messageKey) use ($format) {
                             return $this->transform(
