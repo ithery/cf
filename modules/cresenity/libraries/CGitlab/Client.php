@@ -34,11 +34,13 @@ class CGitlab_Client {
         'user_agent' => 'php-gitlab-api',
         'timeout' => 60
     );
+
     /**
      *
      * @var string
      */
     protected $gitUrl;
+
     /**
      *
      * @var CCurl
@@ -152,7 +154,7 @@ class CGitlab_Client {
         }
 
         $this->curl->setUrl($path);
-       
+
         $this->curl->setOpt(CURLOPT_HTTPHEADER, $headers);
 
         $response = $this->curl->exec()->response();
