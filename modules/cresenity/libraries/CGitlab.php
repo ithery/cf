@@ -63,4 +63,36 @@ class CGitlab {
         return $this->client->api('users');
     }
 
+    /**
+     * 
+     * @return CGitlab_Api_Repositories
+     */
+    public function repositories() {
+        return $this->client->api('repositories');
+    }
+
+    /**
+     * 
+     * @return CGitlab_Api_Issues
+     */
+    public function issues() {
+        return $this->client->api('issues');
+    }
+
+    /**
+     * 
+     * @return CGitlab_Api_Groups
+     */
+    public function groups() {
+        return $this->client->api('groups');
+    }
+
+    /**
+     * 
+     * @return CGitlab_Api_Groups
+     */
+    public function snippets() {
+        return $this->client->api('snippets');
+    }
+
 }
