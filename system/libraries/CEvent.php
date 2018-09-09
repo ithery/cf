@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 12:16:41 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CEvent implements CContracts_Events_Dispatcher {
+class CEvent implements CEvent_Contract_DispatcherInterface {
 
     /**
      * The IoC container instance.

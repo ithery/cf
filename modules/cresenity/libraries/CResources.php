@@ -33,7 +33,7 @@ class CResources {
             $file_name = array();
             $i = 4;
             if ($count_arr_name > $i) {
-                for ($i ; $i < $count_arr_name ; $i++) {
+                for ($i; $i < $count_arr_name; $i++) {
                     $file_name[$i] = $arr_name[$i];
                 }
                 $name = implode("_", $file_name);
@@ -121,7 +121,7 @@ class CResources {
             $type = carr::get($info, 'type');
             $orgCode = carr::get($info, 'org_code');
         }
-        
+
         //validate resource_type and type
         if (strpos($resource_type, '_') !== false) {
             throw new CResources_Exception('Resource type cannot have underscore character');
@@ -143,6 +143,16 @@ class CResources {
 
     /**
      * 
+     * @param string $type
+     * @param array $options
+     * @return CResources_Engine_Image
+     */
+    public static function imageEngine($type = 'Image', $options = array()) {
+        return self::factory('Image', $type, $options);
+    }
+
+    /**
+     * 
      * @param string $name
      * @param array $options
      * @return \CResources_Loader_Image
@@ -150,7 +160,7 @@ class CResources {
     public static function image($name, $options = array()) {
         return new CResources_Loader_Image($name, $options);
     }
-    
+
     /**
      * 
      * @param type $name
@@ -159,7 +169,7 @@ class CResources {
      * @deprecated since version 1.1
      */
     public static function files($name, $options = array()) {
-        return self::file($name,$options);
+        return self::file($name, $options);
     }
 
     /**
@@ -171,6 +181,7 @@ class CResources {
     public static function file($name, $options = array()) {
         return new CResources_Loader_File($name, $options);
     }
+
     /**
      * 
      * @param string $str
@@ -189,7 +200,6 @@ class CResources {
         return CResources_Decode::decode($str);
     }
 
-
     /**
      * 
      * @param type $org_code
@@ -200,20 +210,22 @@ class CResources {
         $files = CResources::scanDirectory($root_directory);
         return $files;
     }
-    
+
     public static function scanDirectory($dir, $filter = "", &$results = array()) {
         $scan = scandir($dir);
-        
-        foreach($scan as $key => $value){
-            $path = realpath($dir.DIRECTORY_SEPARATOR.$value); 
 
-            if(!is_dir($path)) {
-                if(empty($filter) || preg_match($filter, $path)) $results[] = basename ($path);
-            } elseif($value != "." && $value != "..") {
+        foreach ($scan as $key => $value) {
+            $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
+
+            if (!is_dir($path)) {
+                if (empty($filter) || preg_match($filter, $path)) {
+                    $results[] = basename($path);
+                }
+            } elseif ($value != "." && $value != "..") {
                 CResources::scanDirectory($path, $filter, $results);
             }
-        }        
+        }
         return $results;
     }
-        
+
 }

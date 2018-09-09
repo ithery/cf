@@ -360,13 +360,13 @@ class carr {
 
         if (func_num_args() > 2) {
             foreach (array_slice(func_get_args(), 2) as $array2) {
-                if (Arr::is_assoc($array2)) {
+                if (carr::is_assoc($array2)) {
                     foreach ($array2 as $key => $value) {
                         if (is_array($value)
                                 AND isset($array1[$key])
                                 AND is_array($array1[$key])
                         ) {
-                            $array1[$key] = Arr::merge($array1[$key], $value);
+                            $array1[$key] = carr::merge($array1[$key], $value);
                         } else {
                             $array1[$key] = $value;
                         }
@@ -793,6 +793,68 @@ class carr {
             }
             $results = array_merge($results, $values);
         }
+        return $results;
+    }
+
+    /**
+     * Check if an item or items exist in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function has($array, $keys) {
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
+        if (!$array) {
+            return false;
+        }
+
+        if ($keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            $subKeyArray = $array;
+
+            if (static::exists($array, $key)) {
+                continue;
+            }
+
+            foreach (explode('.', $key) as $segment) {
+                if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
+                    $subKeyArray = $subKeyArray[$segment];
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @param  array   $array
+     * @param  string  $prepend
+     * @return array
+     */
+    public static function dot($array, $prepend = '') {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value) && !empty($value)) {
+                $results = array_merge($results, static::dot($value, $prepend . $key . '.'));
+            } else {
+                $results[$prepend . $key] = $value;
+            }
+        }
+
         return $results;
     }
 

@@ -108,4 +108,12 @@ trait CTrait_Compat_App {
         return $this->setCustomData($data);
     }
 
+    /**
+     * @deprecated
+     * @param string $module
+     */
+    public function register_client_module($module) {
+        CManager::instance()->register_module($module);
+    }
+
 }

@@ -49,6 +49,7 @@ class CDynFunction {
         $params = array_merge($args, $this->params);
 
         $error = 0;
+
         if ($error == 0) {
             if (is_array($this->func)) {
                 if (is_callable($this->func)) {
@@ -56,6 +57,16 @@ class CDynFunction {
                 } else {
                     $error++;
                 }
+            }
+        }
+        if ($error == 0) {
+            if ($this->func instanceof Closure) {
+                return call_user_func_array($this->func, $params);
+            }
+        }
+        if ($error == 0) {
+            if (is_callable($this->func)) {
+                return call_user_func_array($this->func, $params);
             }
         }
         if ($error == 0) {
@@ -72,7 +83,7 @@ class CDynFunction {
         }
         if ($error == 0) {
             //it is not method from ctransform class, try the other class if it is found ::
-            if (strpos($this->func, "::") !== false) {
+            if (is_string($this->func) && strpos($this->func, "::") !== false) {
                 return call_user_func_array(explode("::", $this->func), $params);
             }
         }

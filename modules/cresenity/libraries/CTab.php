@@ -3,10 +3,10 @@
 class CTab extends CElement {
 
     use CTrait_Compat_Element_Tab,
-        CTrait_Element_Property_Label;
+        CTrait_Element_Property_Label,
+        CTrait_Element_Property_Icon;
 
     protected $active;
-    protected $icon;
     protected $target;
     protected $ajax_url;
     protected $ajax;
@@ -28,23 +28,14 @@ class CTab extends CElement {
         return new CTab($id);
     }
 
-    public function set_active($bool) {
+    public function setActive($bool) {
         $this->active = $bool;
         return $this;
     }
 
-    public function setNoPadding($bool=true) {
+    public function setNoPadding($bool = true) {
         $this->nopadding = $bool;
         return $this;
-    }
-
-    public function set_icon($icon) {
-        $this->icon = $icon;
-        return $this;
-    }
-
-    public function getIcon() {
-        return $this->icon;
     }
 
     public function setTarget($target) {

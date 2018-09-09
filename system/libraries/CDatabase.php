@@ -1667,7 +1667,8 @@ class CDatabase {
         return $result;
     }
 
-    public static function getValue($query) {
+    public function getValue($query) {
+
         $r = $this->query($query);
         $result = $r->result(false);
         $res = array();
@@ -1682,7 +1683,7 @@ class CDatabase {
         return $value;
     }
 
-    public static function getArray($query) {
+    public function getArray($query) {
         $r = $this->query($query);
         $result = $r->result(false);
         $res = array();
