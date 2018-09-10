@@ -1,11 +1,12 @@
 <?php
 
-/**
- * Description of CApp_Renderer
- *
- * @author Hery
- */
+defined('SYSPATH') OR die('No direct access allowed.');
 
-class CApp_Renderer extends CRenderable {
+/**
+ * @author Hery Kurniawan
+ * @since Sep 7, 2018, 7:10:59 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CApp_Renderer {
     
 }

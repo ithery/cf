@@ -29,6 +29,8 @@ class CElement_Factory {
             case 'th':
             case 'tr':
             case 'td':
+            case 'code':
+            case 'pre':
             case 'tbody':
             case 'thead':
             case 'iframe':

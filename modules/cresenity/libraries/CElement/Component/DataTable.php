@@ -3,7 +3,8 @@
 class CElement_Component_DataTable extends CElement_Component {
 
     use CTrait_Compat_Element_DataTable,
-        CTrait_Element_ActionList_Row;
+        CTrait_Element_ActionList_Row,
+        CTrait_Element_ActionList_Header;
 
     public $default_paging_list = array(
         "10" => "10",
@@ -13,14 +14,17 @@ class CElement_Component_DataTable extends CElement_Component {
         "-1" => "ALL",
     );
     public $current_row = 1;
+
+    /**
+     *
+     * @var CDatabase
+     */
     public $db;
     public $db_config;
     public $columns;
     public $footer;
     public $footer_field;
     public $row_action_list;
-    public $header_action_list;
-    public $header_action_style;
     public $requires = array();
     public $data;
     public $key_field;
@@ -87,10 +91,9 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->key_field = "";
         $this->columns = array();
         $this->rowActionList = CElement_Factory::createList('ActionList');
-        $this->rowActionList->set_style('btn-icon-group');
-        $this->header_action_list = CElement_List_ActionList::factory();
-        $this->header_action_style = 'widget-action';
-        $this->header_action_list->set_style('widget-action');
+        $this->rowActionList->setStyle('btn-icon-group');
+        $this->headerActionList = CElement_Factory::createList('ActionList');
+        $this->headerActionList->setStyle('widget-action');
         $this->footer_action_list = CElement_List_ActionList::factory();
         $this->footer_action_style = 'btn-list';
         $this->footer_action_list->set_style('btn-list');
@@ -562,20 +565,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function haveHeaderAction() {
-        //return $this->can_edit||$this->can_delete||$this->can_view;
-        return $this->header_action_list->child_count() > 0;
-    }
-
-    public function setHeaderActionStyle($style) {
-        $this->header_action_style = $style;
-        $this->header_action_list->set_style($style);
-    }
-
-    public function headerActionCount() {
-        return $this->header_action_list->child_count();
-    }
-
     public function setOption($key, $val) {
         $this->options->add($key, $val);
         return $this;
@@ -649,18 +638,15 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function addHeaderAction($id = "") {
-        return $this->header_action_list->add_action($id);
-    }
-
     public function setCheckbox($bool) {
         $this->checkbox = $bool;
         return $this;
     }
 
     public function setCheckboxValue($val) {
-        if (!is_array($val))
+        if (!is_array($val)) {
             $val = array($val);
+        }
         $this->checkbox_value = $val;
         return $this;
     }
@@ -1409,8 +1395,10 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->decIndent()->appendln('</span');
                 }
                 $html->appendln('<h5>' . $this->title . '</h5>');
-                if ($this->have_header_action()) {
-                    $html->appendln($this->header_action_list->html($html->getIndent()));
+                if ($this->haveHeaderAction()) {
+                    $html->appendln($this->headerActionList->html($html->getIndent()));
+
+                    $this->js_cell .= $this->headerActionList->js();
                 }
                 $html->decIndent()->appendln('</div>');
             }
@@ -1446,7 +1434,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln('<th data-align="align-right" class="' . $th_class . '" width="20" scope="col">No</th>')->br();
                 }
                 if ($this->checkbox) {
-                    $html->appendln('<th data-align="align-center" class="' . $th_class . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
+                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $th_class . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
                 }
                 foreach ($this->columns as $col) {
                     $html->appendln($col->render_header_html($this->export_pdf, $th_class, $html->getIndent()))->br();
@@ -1506,7 +1494,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         if ($v instanceof CRenderable) {
                             $v = $v->html();
                         }
-                        if ($k == $col->get_fieldname()) {
+                        if ($k == $col->getFieldname()) {
                             $col_v = $v;
                             $ori_v = $col_v;
                             foreach ($col->transforms as $trans) {
@@ -1577,7 +1565,8 @@ class CElement_Component_DataTable extends CElement_Component {
                         $this->js_cell .= carr::get($new_v, 'js', '');
                         $new_v = carr::get($new_v, 'html', '');
                     }
-                    $html->appendln('<td' . $pdf_tbody_td_current_attr . ' class="' . $class . '" data-column="' . $col->get_fieldname() . '">' . $new_v . '</td>')->br();
+
+                    $html->appendln('<td' . $pdf_tbody_td_current_attr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
                     $col_found = true;
                 }
 
@@ -1722,6 +1711,9 @@ class CElement_Component_DataTable extends CElement_Component {
                 $columns[] = $col;
             }
 
+            $dbTemp = $this->db;
+            $this->db = null;
+
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DataTable');
             $ajaxMethod->setData('columns', $columns);
@@ -1729,12 +1721,15 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajaxMethod->setData('row_action_list', $this->rowActionList);
             $ajaxMethod->setData('key_field', $this->key_field);
             $ajaxMethod->setData('table', serialize($this));
+            $ajaxMethod->setData('dbConfig', $this->db_config);
             $ajaxMethod->setData('domain', $this->domain);
+            $ajaxMethod->setData('checkbox', $this->checkbox);
             $ajaxMethod->setData('is_elastic', $this->isElastic);
             $ajaxMethod->setData('is_callback', $this->isCallback);
             $ajaxMethod->setData('callback_require', $this->callbackRequire);
             $ajaxMethod->setData('callback_options', $this->callbackOptions);
             $ajax_url = $ajaxMethod->makeUrl();
+            $this->db = $dbTemp;
         }
 
         foreach ($this->footer_action_list->childs() as $row_act) {

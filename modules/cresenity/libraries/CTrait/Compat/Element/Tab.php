@@ -29,8 +29,17 @@ trait CTrait_Compat_Element_Tab {
     public function set_ajax($bool) {
         return $this->setAjax($bool);
     }
+
     public function set_nopadding($bool) {
         return $this->setNoPadding($bool);
+    }
+
+    public function set_active($bool) {
+        return $this->setActive($bool);
+    }
+
+    public function set_icon($icon) {
+        return $this->setIcon($icon);
     }
 
 }

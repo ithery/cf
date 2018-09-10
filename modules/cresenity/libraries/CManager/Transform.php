@@ -32,7 +32,7 @@ class CManager_Transform {
     }
 
     public function methodExists($method) {
-        return isset($this->callbacks[$method]);
+        return !empty($this->callbacks) && isset($this->callbacks[$method]);
     }
 
     public function call($method, $value) {

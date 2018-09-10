@@ -139,8 +139,6 @@ final class CF {
         // Define database error constant
         define('E_DATABASE_ERROR', 44);
 
-        // Define Handler error constant
-        define('E_HANDLER_ERROR', 45);
 
         // Start output buffering
         ob_start(array(__CLASS__, 'output_buffer'));
@@ -473,7 +471,25 @@ final class CF {
         return $ret;
     }
 
+    /**
+     * @deprecated Please use getFiles
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string[]
+     */
     public static function get_files($directory, $filename, $domain = null) {
+        return self::getFiles($directory, $filename, $domain);
+    }
+
+    /**
+     * 
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string[]
+     */
+    public static function getFiles($directory, $filename, $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }
@@ -490,7 +506,26 @@ final class CF {
         return $result;
     }
 
+    /**
+     * 
+     * @deprecated
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string
+     */
     public static function get_file($directory, $filename, $domain = null) {
+        return self::getFile($directory,$filename,$domain);
+    }
+    
+    /**
+     * 
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string
+     */
+    public static function getFile($directory, $filename, $domain = null) {
         $files = CF::get_files($directory, $filename, $domain);
         if (count($files) > 0) {
             return $files[0];
@@ -1126,7 +1161,7 @@ final class CF {
             $file = str_replace('\\', '/', realpath($file));
             $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
 
-            if ($level <= self::$configuration['core']['log_threshold']) {
+            if ($level <= self::$log_threshold) {
                 // Log the error
                 $need_to_log = true;
                 if (!$PHP_ERROR) {

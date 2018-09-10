@@ -36,7 +36,7 @@ class CDatabase_Type_JsonType extends CDatabase_Type {
     /**
      * {@inheritdoc}
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform) {
+    public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if ($value === null || $value === '') {
             return null;
         }

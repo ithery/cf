@@ -1,11 +1,27 @@
 <?php
 
+/**
+ * @author Hery Kurniawan
+ * @since Sep 2, 2018, 5:09:28 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 abstract class CObservable extends CRenderable {
 
-    use CTrait_Compat_Observable;
+    use CTrait_Compat_Observable,
+        CObservable_Trait_EventsTrait;
 
+    /**
+     *
+     * @var CRenderable_Listener[]
+     */
     protected $listeners;
     protected $manager;
+
+    /**
+     *
+     * @var CObservable_Javascript
+     */
+    protected $javascript;
 
     public function getListeners() {
         return $this->listeners;
@@ -13,11 +29,27 @@ abstract class CObservable extends CRenderable {
 
     /**
      * 
+     * @return CObservable_Javascript
+     */
+    public function javascript() {
+        return $this->javascript;
+    }
+
+    /**
+     * 
+     * @return CObservable_Javascript_JQuery
+     */
+    public function jquery() {
+        return $this->javascript->jquery();
+    }
+
+    /**
+     * 
      * @param string $event
-     * @return CListener
+     * @return CObservable_Listener
      */
     public function addListener($event) {
-        $listener = CListener::factory($this->id, $event);
+        $listener = new CObservable_Listener($this->id, $event);
         $this->listeners[] = $listener;
         return $listener;
     }
@@ -60,6 +92,8 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('slider', 'CFormInputSlider');
         $this->manager->registerControl('tooltip', 'CFormInputTooltip');
         $this->manager->registerControl('fileupload', 'CFormInputFileUpload');
+
+        $this->javascript = new CObservable_Javascript($this);
     }
 
     /**
@@ -226,7 +260,7 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($element);
         return $element;
     }
-    
+
     /**
      * Add Ordered List Element &lt;ol&gt
      *
@@ -248,6 +282,18 @@ abstract class CObservable extends CRenderable {
     public function addUl($id = "") {
         $element = CElement_Factory::createElement('ul', $id);
         //$element = CUlElement::factory($id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
+     * Add Code Element &lt;ul&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Code  Code Element
+     */
+    public function addCode($id = "") {
+        $element = CElement_Factory::createElement('code', $id);
         $this->wrapper->add($element);
         return $element;
     }
@@ -398,6 +444,12 @@ abstract class CObservable extends CRenderable {
         return $form;
     }
 
+    public function addPrismCode($id = "") {
+        $code = CElement_Factory::createComponent('PrismCode', $id);
+        $this->add($code);
+        return $code;
+    }
+
     public function addNestable($id = "") {
         $nestable = CNestable::factory($id);
         $this->add($nestable);
@@ -460,18 +512,33 @@ abstract class CObservable extends CRenderable {
         return $act;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Alert
+     */
     public function addAlert($id = "") {
         $element = CElement_Factory::createComponent('Alert', $id);
         $this->add($element);
         return $element;
     }
-    
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Accordion
+     */
     public function addAccordion($id = "") {
         $element = CElement_Factory::createComponent('Accordion', $id);
         $this->add($element);
         return $element;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Icon
+     */
     public function addIcon($id = "") {
         $icon = CElement_Factory::createComponent('Icon', $id);
         $this->add($icon);
@@ -528,7 +595,7 @@ abstract class CObservable extends CRenderable {
         //we change the owner of listener
         foreach ($this->listeners as $listener) {
             if ($listener->owner() == $before_id) {
-                $listener->set_owner($this->id);
+                $listener->setOwner($this->id);
             }
         }
     }

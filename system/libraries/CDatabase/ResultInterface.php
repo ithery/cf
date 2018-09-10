@@ -29,5 +29,5 @@ interface CDatabase_ResultInterface {
      *
      * @return array
      */
-    public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null);
+    //public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null);
 }

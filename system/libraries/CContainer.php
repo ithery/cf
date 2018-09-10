@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 24, 2018, 1:17:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CContainer implements ArrayAccess, CContainer_Interface_Container {
+class CContainer implements ArrayAccess, CContainer_Contract_ContainerInterface {
 
     /**
      * The current globally available container (if any).

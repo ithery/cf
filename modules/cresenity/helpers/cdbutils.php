@@ -37,7 +37,7 @@ class cdbutils {
         }
         $q = "select count(1) as cnt from " . $db->escape_table($table) . " where 1=1 ";
         foreach ($where as $k => $v) {
-            $q.=" and " . $db->escape_column($k) . "=" . $db->escape($v);
+            $q .= " and " . $db->escape_column($k) . "=" . $db->escape($v);
         }
         $cnt = cdbutils::get_value($q, $db);
         return $cnt > 0;
@@ -319,8 +319,8 @@ class cdbutils {
                 $tables = cdbutils::get_array("show tables");
                 foreach ($tables as $table) {
                     $sqlct = cdbutils::get_value('show create table `' . $table . '`');
-                    $mysql.="DROP TABLE IF EXISTS `$table`;\r\n\r\n";
-                    $mysql.=$sqlct . ";\r\n\r\n";
+                    $mysql .= "DROP TABLE IF EXISTS `$table`;\r\n\r\n";
+                    $mysql .= $sqlct . ";\r\n\r\n";
                     $r = $db->query("select * from `" . $table . "`");
                     $result = $r->result(false);
                     foreach ($result as $row) {
@@ -332,7 +332,7 @@ class cdbutils {
                         }
                         $keys = join(",", $ckey);
                         $vals = join(",", $cval);
-                        $mysql.="insert into `$table`($keys) values($vals);\r\n";
+                        $mysql .= "insert into `$table`($keys) values($vals);\r\n";
                     }
                 }
             } catch (Exception $ex) {
@@ -365,13 +365,13 @@ class cdbutils {
                 $zip->addFromString("data_" . date("YmdHis") . ".sql", $datadump);
                 $zip->close();
             } else {
-                $fp = fopen($fullfilename, 'w');
+                $fp = fopen($file, 'w');
                 fputs($fp, $datadump);
                 fclose($fp);
             }
         }
         if ($error == 0) {
-            clogger::log($log_filename, "MSG", "Success Backup " . $file);
+            CLogger::instance()->add(CLogger::INFO, "Success Backup " . $file);
         }
         return $error;
     }
@@ -414,8 +414,8 @@ class cdbutils {
                 $q2 = mysql_query("show create table `$table`");
                 $sql = mysql_fetch_array($q2);
 
-                $mysql.="DROP TABLE IF EXISTS `$table`;\r\n\r\n";
-                $mysql.=$sql['Create Table'] . ";\r\n\r\n";
+                $mysql .= "DROP TABLE IF EXISTS `$table`;\r\n\r\n";
+                $mysql .= $sql['Create Table'] . ";\r\n\r\n";
 
                 $q3 = mysql_query("select * from `$table`");
                 while ($data = mysql_fetch_assoc($q3)) {
@@ -429,9 +429,9 @@ class cdbutils {
                     $vals = join("','", $vals);
                     $vals = "'" . $vals . "'";
 
-                    $mysql.="insert into `$table`($keys) values($vals);\r\n";
+                    $mysql .= "insert into `$table`($keys) values($vals);\r\n";
                 }
-                $mysql.="\r\n";
+                $mysql .= "\r\n";
             }
         }
         if ($error == 0) {

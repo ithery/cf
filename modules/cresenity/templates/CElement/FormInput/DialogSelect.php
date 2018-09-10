@@ -59,7 +59,7 @@
 			</div>
 		</div>
 		<div class="dialog-select-name">
-			
+			<?= $itemName ?>
 		</div>
 	</div>
 	<div>
@@ -83,7 +83,7 @@
             </div>
             <div class="modal-body opened">
             	<div class="dialog-select-search">
-            		<input type="text">
+            		<input type="text" placeholder="<?= $placeholder ?>">
             	</div>
             	<div class="dialog-select-item-list">
 
@@ -108,11 +108,11 @@
 </div>
 
 <script>
-	$("#dialog-select-<?= $id ?> img, #dialog-select-<?= $id ?> .btn-dialog-select span").click(function() {
-		var modalDialog = $("#modal-dialog-select-<?= $id ?>");
+	// $("#dialog-select-<?= $id ?> img, #dialog-select-<?= $id ?> .btn-dialog-select span").click(function() {
+	// 	var modalDialog = $("#modal-dialog-select-<?= $id ?>");
 
-		modalDialog.modal({backdrop: 'static', keyboard:false});
-	});
+	// 	modalDialog.modal({backdrop: 'static', keyboard:false});
+	// });
 
 	$("#dialog-select-<?= $id ?> .dialog-select-remove").click(function() {
 		$("#dialog-select-<?= $id ?> .dialog-select-preview .dialog-select-name").html('');
@@ -171,7 +171,7 @@
 	    	element.find(target).removeClass('loading spinner');
 	    })
 
-	    ajaxLoadItemList = (function(modalDialog, keyword = '', page = 1) {
+	    ajaxLoadItemList<?= $id ?> = (function(modalDialog, keyword = '', page = 1) {
 	    	return function() {
 	    		$.ajax("<?= $ajaxUrl ?>", {
 	    			dataType: 'json',
@@ -197,12 +197,12 @@
 	    				}
 	    			});
 
-	    			loadMore(modalDialog, keyword, ++page);
+	    			loadMore<?= $id ?>(modalDialog, keyword, ++page);
 	    		});
 	    	};
 	    });
 
-	    loadMore = (function() {
+	    loadMore<?= $id ?> = (function() {
 	    	var loader;
 
 	    	return function(modalDialog, keyword = '', page = 1) {
@@ -248,7 +248,7 @@
 	    						});
 
 	    						if (total >= limit) {
-	    							loadMore(modalDialog, keyword, ++page);
+	    							loadMore<?= $id ?>(modalDialog, keyword, ++page);
 	    						} else {
 	    							modalDialog.find('.dialog-select-item-list').off('scroll');
 	    						}
@@ -262,16 +262,18 @@
 	    })();
 
 	    $("#dialog-select-<?= $id ?> img, #dialog-select-<?= $id ?> .btn-dialog-select span").click(function() {
+	    	modalDialog.modal({backdrop: 'static', keyboard:false});
+
 	    	if (!modalDialog.hasClass('dialog-select-initialized')) {
 	    		addLoading(modalDialog, '.dialog-select-item-list');
 	    		modalDialog.addClass('dialog-select-initialized');
-	    		ajaxLoadItemList(modalDialog)();
+	    		ajaxLoadItemList<?= $id ?>(modalDialog)();
 	    	}
 	    });
 
 	    modalDialog.find('.dialog-select-search input').keyup(function() {
 	    	addLoading(modalDialog, '.dialog-select-item-list');
-	    	delay(ajaxLoadItemList(modalDialog, $(this).val().trim()), time);
+	    	delay(ajaxLoadItemList<?= $id ?>(modalDialog, $(this).val().trim()), time);
 	    });
 
 	    modalDialog.find('.close').click(function (e) {

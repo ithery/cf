@@ -19,9 +19,27 @@ final class CManager {
 
     /**
      *
+     * @var CManager_Javascript
+     */
+    protected static $javascript;
+
+    /**
+     *
+     * @var CManager_Asset
+     */
+    protected static $asset;
+
+    /**
+     *
      * @var CManager_Theme
      */
     protected static $theme = null;
+
+    /**
+     *
+     * @var CManager_Navigation
+     */
+    protected static $navigation = null;
 
     /**
      *
@@ -61,6 +79,17 @@ final class CManager {
 
     /**
      * 
+     * @return CManager_Navigation
+     */
+    public static function navigation() {
+        if (self::$navigation == null) {
+            self::$navigation = new CManager_Navigation();
+        }
+        return self::$navigation;
+    }
+
+    /**
+     * 
      * @return CClientScript
      */
     public static function clientScript() {
@@ -95,6 +124,13 @@ final class CManager {
             CClientModules::instance()->defineModule($module, $data);
         }
         return CClientModules::instance()->registerModule($module);
+    }
+
+    public static function registerThemeModule($module, $data = array()) {
+        if (!empty($data)) {
+            CClientModules::instance()->defineModule($module, $data);
+        }
+        return CClientModules::instance()->registerThemeModule($module);
     }
 
     public static function isRegisteredModule($module) {
@@ -284,6 +320,37 @@ final class CManager {
             return $require;
         }
         return self::$useRequireJs;
+    }
+
+    public static function registerCss($file, $pos = CClientScript::POS_HEAD) {
+        $cs = CClientScript::instance()->registerCssFile($file, $pos);
+    }
+
+    public static function registerJs($file, $pos = CClientScript::POS_END) {
+        $cs = CClientScript::instance()->registerJsFile($file, $pos);
+    }
+
+    /**
+     * 
+     * @return CManager_Javascript
+     */
+    public static function javascript() {
+        if (self::$javascript == null) {
+            self::$javascript = new CManager_Javascript();
+        }
+        return self::$javascript;
+    }
+
+    /**
+     * 
+     * @return CManager_Asset
+     */
+    public static function asset() {
+        if (self::$asset == null) {
+
+            self::$asset = new CManager_Asset();
+        }
+        return self::$asset;
     }
 
 }

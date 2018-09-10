@@ -176,7 +176,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function listTableNames() {
         $sql = $this->platform->getListTablesSQL();
-        
+
         $tables = $this->db->fetchAll($sql);
         $tableNames = $this->_getPortableTablesList($tables);
 
@@ -220,7 +220,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function listTables() {
         $tableNames = $this->listTableNames();
-      
+
         $tables = [];
         foreach ($tableNames as $tableName) {
             $tables[] = $this->listTableDetails($tableName);
@@ -729,9 +729,9 @@ abstract class CDatabase_Schema_Manager {
             $column = null;
             $defaultPrevented = false;
 
-            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Events::onSchemaColumnDefinition)) {
+            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaColumnDefinition)) {
                 $eventArgs = new SchemaColumnDefinitionEventArgs($tableColumn, $table, $database, $this->db);
-                $eventManager->dispatchEvent(CDatabase_Events::onSchemaColumnDefinition, $eventArgs);
+                $eventManager->dispatchEvent(CDatabase_Event::onSchemaColumnDefinition, $eventArgs);
 
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $column = $eventArgs->getColumn();
@@ -797,9 +797,9 @@ abstract class CDatabase_Schema_Manager {
             $index = null;
             $defaultPrevented = false;
 
-            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Events::onSchemaIndexDefinition)) {
+            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaIndexDefinition)) {
                 $eventArgs = new SchemaIndexDefinitionEventArgs($data, $tableName, $this->db);
-                $eventManager->dispatchEvent(CDatabase_Events::onSchemaIndexDefinition, $eventArgs);
+                $eventManager->dispatchEvent(CDatabase_Event::onSchemaIndexDefinition, $eventArgs);
 
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $index = $eventArgs->getIndex();
@@ -948,7 +948,7 @@ abstract class CDatabase_Schema_Manager {
         }
 
         $tables = $this->listTables();
-       
+
         return new CDatabase_Schema($tables, $sequences, $this->createSchemaConfig(), $namespaces);
     }
 
@@ -962,8 +962,8 @@ abstract class CDatabase_Schema_Manager {
         $schemaConfig->setMaxIdentifierLength($this->platform->getMaxIdentifierLength());
 
         $searchPaths = $this->getSchemaSearchPaths();
-        
-        
+
+
         if (isset($searchPaths[0])) {
             $schemaConfig->setName($searchPaths[0]);
         }

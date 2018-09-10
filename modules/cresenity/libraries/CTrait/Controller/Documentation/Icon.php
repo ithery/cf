@@ -24,7 +24,7 @@ trait CTrait_Controller_Documentation_Icon {
         $app->addTemplate()->setTemplate('Documentation/Icon/FA4');
         echo $app->render();
     }
-    
+
     public function fa5() {
         $app = CApp::instance();
         $app->manager()->registerModule('fontawesome-5-f');
