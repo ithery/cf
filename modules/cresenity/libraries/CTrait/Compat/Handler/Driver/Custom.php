@@ -16,7 +16,7 @@ trait CTrait_Compat_Handler_Driver_Custom {
      * @return $this
      */
     public function set_js($js) {
-        return $this->setJs($target);
+        return $this->setJs($js);
     }
 
 }
