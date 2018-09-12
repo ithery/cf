@@ -684,6 +684,7 @@ class cajax {
 
             $imageDataArray = $_POST[$input_name];
             $filenameArray = $_POST[$input_name . '_filename'];
+
             if (!is_array($imageDataArray)) {
                 $imageDataArray = array($imageDataArray);
             }
