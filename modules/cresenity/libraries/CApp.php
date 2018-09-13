@@ -165,7 +165,7 @@ class CApp extends CObservable {
                 $this->_org = cstg::get($org_id);
             }
         }
-
+        $this->registerCoreModules();
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
@@ -396,7 +396,7 @@ class CApp extends CObservable {
         }
         $this->rendered = true;
 
-        $this->registerCoreModules();
+
 
         CFEvent::run('CApp.beforeRender');
 
