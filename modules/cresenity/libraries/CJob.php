@@ -178,7 +178,7 @@ class CJob {
         $command = $this->getExecutableCommand($job, $config);
         $binary = $this->getPhpBinary();
         $output = $config['debug'] ? 'debug.log' : '/dev/null';
-        
+
         exec("$binary $command 1> $output 2>&1 &");
     }
 
@@ -230,10 +230,10 @@ class CJob {
             $parameter = $argv[3];
         }
         parse_str($parameter, $config);
-        $cls = $config['jobClass'];
+        $cls = carr::get($config, 'jobClass','CJob_BackgroundJob');
         /** @var CJob_Exception $job */
         $jobName = carr::get($config, 'jobName');
-       
+
         $job = new $cls($jobName, $config);
         $job->run();
     }

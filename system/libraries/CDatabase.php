@@ -64,7 +64,7 @@ class CDatabase {
     /**
      * The event dispatcher instance.
      *
-     * @var CContracts_Events_Dispatcher
+     * @var CDatabase_Event
      */
     protected $events;
 
@@ -1482,7 +1482,7 @@ class CDatabase {
     /**
      * Get the event dispatcher used by the connection.
      *
-     * @return CContracts_Events_Dispatcher
+     * @return CEvent
      */
     public function getEventDispatcher() {
         return $this->events;
@@ -1491,10 +1491,10 @@ class CDatabase {
     /**
      * Set the event dispatcher instance on the connection.
      *
-     * @param  CContracts_Events_Dispatcher  $events
+     * @param  CEvent  $events
      * @return void
      */
-    public function setEventDispatcher(CContracts_Events_Dispatcher $events) {
+    public function setEventDispatcher(CEvent $events) {
         $this->events = $events;
     }
 

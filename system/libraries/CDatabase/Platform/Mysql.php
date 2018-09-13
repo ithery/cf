@@ -256,7 +256,9 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * {@inheritDoc}
      */
     public function getBooleanTypeDeclarationSQL(array $field) {
-        return 'TINYINT(1)';
+        $unsigned = carr::get($field, 'unsigned', false);
+        $unsignedStr = $unsigned ? ' UNSIGNED' : '';
+        return 'TINYINT(1)' . $unsignedStr;
     }
 
     /**

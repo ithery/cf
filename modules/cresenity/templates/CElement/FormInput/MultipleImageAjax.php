@@ -182,7 +182,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 var container = $('#container-<?php echo $id ?>');
                 var maximum = parseInt(container.attr('data-maximum'));
                 var fileCount = container.find('.multi-image-ajax-file').length;
-                if (maximum>0 && fileCount >= maximum) {
+                if (maximum > 0 && fileCount >= maximum) {
                     container.addClass('disabled');
                 } else {
                     container.removeClass('disabled');
@@ -218,8 +218,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         var cropperImg = cropperModal.find('img');
                         cropperImg.attr('src', event.target.result);
                         cropperModal.modal({backdrop: 'static', keyboard: false});
-                        
-                        if(typeof cropperModal.data('bs.modal') === 'undefined') {
+
+                        if (typeof cropperModal.data('bs.modal') === 'undefined') {
                             cropperModal.modal('open');
                         }
                         cropperImg.cropper({
@@ -236,6 +236,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             cropperModal.find('.btn-crop').off('click');
                             cropperModal.find('.btn-crop').click(function () {
                                 var fileRead = cropperModal.find('.btn-crop').data('file');
+
                                 var fileEvent = cropperModal.find('.btn-crop').data('event');
                                 cropperModal.find('.btn-crop').attr('click-assigned', '1');
                                 var mime = 'image/png';
@@ -296,7 +297,8 @@ foreach ($customControl as $cc):
                 fileUploadRemove();
                 var data = new FormData();
                 data.append("<?php echo $name; ?>[]", imageData);
-                data.append('<?php echo $ajaxName; ?>_filename[]', event.target.fileName);
+
+                data.append('<?php echo $ajaxName; ?>_filename[]', file.name);
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
@@ -370,8 +372,10 @@ foreach ($customControl as $cc):
                 $.each(e.target.files, function (i, file) {
 
                     var reader = new FileReader();
+
                     reader.fileName = file.name;
                     reader.onload = $.proxy(function (file, fileList, event) {
+
                         insertFile(reader, file, fileList, event);
                     }, this, file, $("#<?php echo $id; ?>"));
                     reader.readAsDataURL(file);
