@@ -269,7 +269,6 @@ return array(
     "datepicker" => array(
         "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap-datepicker.js"),
         "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
-        "requirements" => array("jquery"),
     ),
     "bootstrap3-datepicker" => array(
         "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap3-datepicker.js"),
