@@ -97,16 +97,16 @@ jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
     str_cancel = window.capp.label_cancel;
     e.preventDefault();
     e.stopPropagation();
-    $(this).off('click');
+    btn.off('click');
     bootbox.confirm(message, function (confirmed) {
         if (confirmed) {
             if (ahref) {
                 window.location.href = ahref;
             } else {
-				if($(this).attr('type')=='submit') {
-					$(this).closest('form').submit();
+				if(btn.attr('type')=='submit') {
+					btn.closest('form').submit();
 				} else {
-					$(this).on('click');
+					btn.on('click');
 				}
 
             }
