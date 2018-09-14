@@ -103,7 +103,7 @@ jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
             if (ahref) {
                 window.location.href = ahref;
             } else {
-				if($(this).is('button[type="submit"]')) {
+				if($(this).attr('type')='submit')) {
 					$(this).closest('form').submit();
 				} else {
 					$(this).on('click');
