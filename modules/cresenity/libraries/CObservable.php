@@ -8,6 +8,7 @@
 abstract class CObservable extends CRenderable {
 
     use CTrait_Compat_Observable,
+        CObservable_Trait_ComponentTrait,
         CObservable_Trait_EventsTrait;
 
     /**
@@ -343,16 +344,7 @@ abstract class CObservable extends CRenderable {
         return $fieldset;
     }
 
-    /**
-     * 
-     * @param string $id
-     * @return CElement_Component_DataTable
-     */
-    public function addTable($id = "") {
-        $table = CElement_Factory::createComponent('DataTable', $id);
-        $this->add($table);
-        return $table;
-    }
+    
 
     public function addRow($row_id = '') {
         $row = CTableRow::factory($row_id);

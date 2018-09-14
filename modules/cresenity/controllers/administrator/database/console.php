@@ -14,17 +14,18 @@ class Controller_Administrator_Database_Console extends CApp_Administrator_Contr
         $app->title(clang::__("Database Console"));
         $app->manager()->registerModule('terminal');
 
-        $html = CView::factory('admin/page/console/db/html');
-        $html = $html->render();
-        $js = CView::factory('admin/page/console/db/js');
-        $js = $js->render();
-        $app->add($html);
-        $app->add_js($js);
-
+        $widget = $app->addWidget();
+        
+        $terminal = $widget->addTerminal();
+        $terminal->setAjaxUrl(curl::base().'administrator/database/console/rpc');
 
         echo $app->render();
     }
 
+    public function rpc() {
+        $db = CDatabaseRPC::factory();
+		handle_json_rpc($db);
+    }
 }
 
 // End Home Controller
