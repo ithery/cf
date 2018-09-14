@@ -459,12 +459,22 @@ abstract class CObservable extends CRenderable {
         return $nestable;
     }
 
+    /**
+     * 
+     * @return $this
+     */
     public function addHr() {
         $this->add('<hr />');
+        return $this;
     }
 
+    /**
+     * 
+     * @return $this
+     */
     public function addBr() {
         $this->add('<br />');
+        return $this;
     }
 
     // public function add_element($tag, $id = "") {
