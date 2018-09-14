@@ -127,9 +127,9 @@ return array(
                 "method" => "index",
             ),
             array(
-                "name" => "db_column_generator",
-                "label" => "DB Column Generator",
-                "controller" => "db_column_generator",
+                "name" => "administrator.database.generator",
+                "label" => "DB Generator",
+                "controller" => "administrator/database/generator",
                 "method" => "index",
             ),
         ),
