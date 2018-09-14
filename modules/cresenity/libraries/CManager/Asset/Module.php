@@ -198,9 +198,11 @@ class CManager_Asset_Module {
     public function getRunTimeContainer() {
         $runTimeContainer = new CManager_Asset_Container_RunTime();
         $allModules = $this->allModules();
+      
+           
         foreach ($this->runTimeModules as $runTimeModule) {
             $mod = carr::get($allModules, $runTimeModule, array());
-
+           
             if (isset($mod["js"])) {
                 $runTimeContainer->registerJsFiles($mod['js']);
             }

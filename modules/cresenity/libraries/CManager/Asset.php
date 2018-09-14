@@ -175,16 +175,16 @@ class CManager_Asset {
     }
 
     public function render($pos, $type = null) {
-        $moduleThemejsScripts = $this->module->getThemeContainer()->getScripts($pos);
+        $moduleThemeScripts = $this->module->getThemeContainer()->getScripts($pos);
         $themeScripts = $this->themeContainer->getScripts($pos);
-        $moduleRunTimejsScripts = $this->module->getRunTimeContainer()->getScripts($pos);
+        $moduleRunTimeScripts = $this->module->getRunTimeContainer()->getScripts($pos);
         $runTimeScripts = $this->runTimeContainer->getScripts($pos);
         $scriptArray = array();
-        $scriptArray = carr::merge($scriptArray, $moduleThemejsScripts);
+        $scriptArray = carr::merge($scriptArray, $moduleThemeScripts);
         $scriptArray = carr::merge($scriptArray, $themeScripts);
-        $scriptArray = carr::merge($scriptArray, $moduleRunTimejsScripts);
+        $scriptArray = carr::merge($scriptArray, $moduleRunTimeScripts);
         $scriptArray = carr::merge($scriptArray, $runTimeScripts);
-
+      
         $script = '';
         $manager = CManager::instance();
         if ($type == null) {

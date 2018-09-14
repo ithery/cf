@@ -116,28 +116,29 @@ return array(
         ),
     ),
     array(
+        "name" => "administrator.database",
+        "label" => "Database",
+        "icon" => " fas fa-database",
+        "subnav" => array(
+            array(
+                "name" => "administrator.database.console",
+                "label" => "DB Console",
+                "controller" => "administrator/database/console",
+                "method" => "index",
+            ),
+            array(
+                "name" => "db_column_generator",
+                "label" => "DB Column Generator",
+                "controller" => "db_column_generator",
+                "method" => "index",
+            ),
+        ),
+    ),
+    array(
         "name" => "tools",
         "label" => "Tools",
         "icon" => "bolt",
         "subnav" => array(
-            array(
-                "name" => "database_menu",
-                "label" => "Database",
-                "subnav" => array(
-                    array(
-                        "name" => "db_console",
-                        "label" => "DB Console",
-                        "controller" => "db_console",
-                        "method" => "index",
-                    ),
-                    array(
-                        "name" => "db_column_generator",
-                        "label" => "DB Column Generator",
-                        "controller" => "db_column_generator",
-                        "method" => "index",
-                    ),
-                ),
-            ),
             array(
                 "name" => "console_menu",
                 "label" => "Console",

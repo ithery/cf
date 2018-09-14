@@ -292,10 +292,14 @@ return array(
         "css" => array("plugins" . DS . "multiselect" . DS . "multi-select.css"),
     ),
     "terminal" => array(
+        "css" => array(
+            "plugins" . DS . "terminal" . DS . "jquery.terminal.css",
+        ),
         "js" => array(
             "plugins" . DS . "terminal" . DS . "jquery.mousewheel-min.js",
             "plugins" . DS . "terminal" . DS . "jquery.terminal-min.js",
         ),
+        
     ),
     "elfinder" => array(
         "js" => array("plugins" . DS . "elfinder" . DS . "elfinder.min.js"),
