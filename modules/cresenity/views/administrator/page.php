@@ -15,6 +15,7 @@ $username = '';
 if ($user) {
     $username = $user->username;
 }
+
 $appImageUrl = curl::base() . 'media/img/cresenity-logo.png';
 $appTitle = ccfg::get("title");
 ?>
@@ -23,30 +24,30 @@ $appTitle = ccfg::get("title");
     <head>
         <meta charset="utf-8">
         <title><?php echo $title; ?></title>
-<?php echo $head_client_script; ?>
+        <?php echo $head_client_script; ?>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
 
         <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
-<?php echo $additional_head; ?>
+        <?php echo $additional_head; ?>
     </head>
     <body>
         <?php echo $custom_header; ?>
-<?php echo $begin_client_script; ?>
+        <?php echo $begin_client_script; ?>
         <?php
         $showNavigation = true;
         $pageWrapperAttr = '';
         ?>
         <div id="wrapper" class="layout-wrapper layout-2">
             <div class="layout-inner">
-        <?php if ($showNavigation): ?>
+                <?php if ($showNavigation): ?>
                     <nav id="layout-sidenav" class="layout-sidenav sidenav sidenav-vertical bg-sidenav-theme navbar-default navbar-static-side" role="navigation">
 
                         <div class="brand">
                             <span class="brand-logo">
                                 <img src="<?php echo $appImageUrl; ?>" />
                             </span>
-                            <a href="index.html" class="brand-name sidenav-text font-weight-normal ml-2"><?php echo $appTitle; ?></a>
+                            <a href="index.html" class="brand-name sidenav-text font-weight-normal ml-2">CF Administrator</a>
                             <a href="javascript:void(0)" class="layout-sidenav-toggle sidenav-link text-large ml-auto">
                                 <i class="ion ion-md-menu align-middle"></i>
                             </a>
@@ -54,12 +55,12 @@ $appTitle = ccfg::get("title");
 
                         <div class="sidenav-divider mt-0"></div>
                         <div class="sidenav-inner py-1 ps">
-    <?php
-    echo CApp::navigation()->render(array('engine' => 'SideNav'));
-    ?>
+                            <?php
+                            echo CApp::navigation()->render(array('engine' => 'SideNav'));
+                            ?>
                         </div> <!-- /sidebar-collapse -->
                     </nav> <!-- /nav -->
-                        <?php endif; ?>
+                <?php endif; ?>
 
                 <div id="page-wrapper" class="layout-container" <?php echo $pageWrapperAttr; ?>>
                     <nav class="layout-navbar navbar navbar-expand-lg align-items-lg-center container-p-x bg-navbar-theme" id="layout-navbar">
@@ -92,7 +93,7 @@ $appTitle = ccfg::get("title");
                                 </div>
 
 
-<?php if (isset($login_required) && $login_required): ?>
+                                <?php if (isset($login_required) && $login_required): ?>
                                     <div class="navbar-user nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">
                                             <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle">
@@ -115,7 +116,7 @@ $appTitle = ccfg::get("title");
                                                 <i class="ion ion-ios-log-out text-danger"></i> &nbsp; Log Out</a>
                                         </div>
                                     </div>
-<?php endif; ?>
+                                <?php endif; ?>
                             </div>
 
                         </div>
@@ -126,10 +127,10 @@ $appTitle = ccfg::get("title");
                         <div class="main-inner container-fluid flex-grow-1 container-p-y">
                             <div class="row page-heading">
                                 <div class="col-lg-12">
-<?php
-if ($show_title):
-    $needShowTitle = true;
-    ?>
+                                    <?php
+                                    if ($show_title):
+                                        $needShowTitle = true;
+                                        ?>
 
                                         <?php if ($show_breadcrumb): ?>
                                             <?php
@@ -149,28 +150,28 @@ if ($show_title):
                                                         </li>
 
 
-            <?php foreach ($breadcrumb as $k => $b) : ?>
+                                                        <?php foreach ($breadcrumb as $k => $b) : ?>
                                                             <li class="breadcrumb-item">
                                                                 <a href="<?php echo $b ?>" class=""><?php echo $k; ?></a>
                                                             </li>
 
-            <?php endforeach; ?>
+                                                        <?php endforeach; ?>
                                                         <li class="breadcrumb-item active">
-                                                        <?php echo $title ?>
+                                                            <?php echo $title ?>
                                                         </li>
                                                     </ol>
                                                     <hr class="m-0">
                                                 </div>
-            <?php
-        endif;
-        ?>
+                                                <?php
+                                            endif;
+                                            ?>
                                         <?php endif; ?>
                                         <?php if ($needShowTitle): ?>
                                             <h4 class="font-weight-bold py-3 mb-4">    
-                                            <?php echo $title ?>
+                                                <?php echo $title ?>
                                             </h4>
-                                            <?php endif; ?>
                                         <?php endif; ?>
+                                    <?php endif; ?>
 
 
 
@@ -180,22 +181,22 @@ if ($show_title):
                                 </div>
                             </div>
 
-<?php
-$msg = cmsg::flash_all();
-if (strlen($msg) > 0) {
-    echo '<div class="row-fluid"><div class="span12">' . $msg . '</div></div>';
-}
-?>
+                            <?php
+                            $msg = cmsg::flash_all();
+                            if (strlen($msg) > 0) {
+                                echo '<div class="row-fluid"><div class="span12">' . $msg . '</div></div>';
+                            }
+                            ?>
                             <div class="wrapper wrapper-content ">
                                 <div class="row">
                                     <div class="col-lg-12">
-<?php if (!$showNavigation): ?>
+                                        <?php if (!$showNavigation): ?>
                                             <div class="container">
-                                        <?php endif; ?>
-                                        <?php echo $content; ?>
+                                            <?php endif; ?>
+                                            <?php echo $content; ?>
                                             <?php if (!$showNavigation): ?>
                                             </div>
-                                            <?php endif; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -222,19 +223,11 @@ if (strlen($msg) > 0) {
             </div><!-- /layout-inner -->
             <div class="layout-overlay layout-sidenav-toggle"></div>
         </div><!-- /layout-wrapper -->
-        <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-        <script>
-            var OneSignal = window.OneSignal || [];
-            OneSignal.push(function () {
-                OneSignal.init({
-                    appId: "83595533-c9a3-4fa2-af0e-3c98c7c4d71f",
-                });
-            });
-        </script>
+
         <script src="<?php echo curl::base(); ?>media/js/require.js"></script>
         <!-- Load javascript here -->
 
-<?php echo $end_client_script; ?>
+        <?php echo $end_client_script; ?>
 
         <script language="javascript">
 
@@ -250,7 +243,7 @@ echo $ready_client_script;
             }
 <?php echo $custom_js ?>
         </script>
-<?php echo $custom_footer; ?>
+        <?php echo $custom_footer; ?>
         <!-- CAPP-DEBUGBAR-CODE -->
     </body>
 </html>

@@ -13,6 +13,10 @@ class CApp_Administrator_Controller extends CController {
 
     public function __construct() {
         parent::__construct();
+        $manager = CManager::instance();
+        $manager->theme()->setThemeCallback(function($theme) {
+            return 'cresenity-administrator';
+        });
         $app = CApp::instance();
         $app->setLoginRequired(false);
 
@@ -20,7 +24,8 @@ class CApp_Administrator_Controller extends CController {
         if (!Administrator::isEnabled()) {
             $app->setViewName('administrator/disabled');
         }
-     
+
+        $app->setViewName('administrator/page');
     }
 
 }
