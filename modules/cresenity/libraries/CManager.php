@@ -137,6 +137,9 @@ final class CManager {
         return CClientModules::instance()->isRegisteredModule($module);
     }
 
+    public static function getRegisteredModule() {
+        return CClientModules::instance()->getRegisteredModule();
+    }
     /**
      * 
      * @param string $module

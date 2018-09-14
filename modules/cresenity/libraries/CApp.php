@@ -293,6 +293,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
+        
+        
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -351,6 +353,8 @@ class CApp extends CObservable {
     }
 
     public function registerCoreModules() {
+        
+       
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
