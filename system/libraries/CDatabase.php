@@ -1702,7 +1702,7 @@ class CDatabase {
         return $res;
     }
 
-    public static function getList($query) {
+    public function getList($query) {
         $r = $this->query($query);
         $result = $r->result(false);
         $res = array();
