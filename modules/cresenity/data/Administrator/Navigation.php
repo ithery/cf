@@ -35,6 +35,36 @@ return array(
             ),
         ),
     ),
-    
+    array(
+        "name" => "tools",
+        "label" => "Tools",
+        "icon" => "bolt",
+        "subnav" => array(
+            array(
+                "name" => "console_menu",
+                "label" => "Console",
+                "subnav" => array(
+                    array(
+                        "name" => "shell_console",
+                        "label" => "Shell Console",
+                        "controller" => "shell_console",
+                        "method" => "index",
+                    ),
+                ),
+            ),
+            array(
+                "name" => "file_manager",
+                "label" => "File Manager",
+                "controller" => "file_manager",
+                "method" => "index",
+            ),
+            array(
+                "name" => "ajax_http_request",
+                "label" => "Ajax HTTP Request",
+                "controller" => "ajax_http_request",
+                "method" => "index",
+            ),
+        ),
+    ),
     
 );
