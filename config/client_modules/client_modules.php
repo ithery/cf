@@ -269,7 +269,6 @@ return array(
     "datepicker" => array(
         "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap-datepicker.js"),
         "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
-        "requirements" => array("jquery"),
     ),
     "bootstrap3-datepicker" => array(
         "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap3-datepicker.js"),
@@ -293,10 +292,14 @@ return array(
         "css" => array("plugins" . DS . "multiselect" . DS . "multi-select.css"),
     ),
     "terminal" => array(
+        "css" => array(
+            "plugins" . DS . "terminal" . DS . "jquery.terminal.css",
+        ),
         "js" => array(
             "plugins" . DS . "terminal" . DS . "jquery.mousewheel-min.js",
             "plugins" . DS . "terminal" . DS . "jquery.terminal-min.js",
         ),
+        
     ),
     "elfinder" => array(
         "js" => array("plugins" . DS . "elfinder" . DS . "elfinder.min.js"),
@@ -547,6 +550,32 @@ return array(
     ),
     "jquery.event.drag" => array(
         "js" => array("plugins/jquery.event.drag/jquery.event.drag-2.2.js"),
+    ),
+    "prism-php" => array(
+        "js" => array(
+            "plugins/prism/prism.js",
+            "plugins/prism/components/prism-php.js",
+        ),
+    ),
+    "block-ui" => array(
+        "js" => array("plugins/jquery/block-ui/block-ui.js?v=1"),
+    ),
+    "layout-helpers" => array(
+        "js" => array("plugins/layout-helpers/layout-helpers.js"),
+    ),
+    "perfect-scrollbar" => array(
+        "css" => array("plugins/perfect-scrollbar/perfect-scrollbar.css"),
+        "js" => array("plugins/perfect-scrollbar/perfect-scrollbar.js"),
+    ),
+    "sidenav" => array(
+        "js" => array("plugins/sidenav/sidenav.js"),
+    ),
+    "theme-material" => array(
+        "css" => array(
+            "theme/theme-material/colors-material.css",
+            "theme/theme-material/app-material.css",
+            "theme/theme-material/theme-material.css",
+        ),
     ),
 );
 ?>

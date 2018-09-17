@@ -139,8 +139,6 @@ final class CF {
         // Define database error constant
         define('E_DATABASE_ERROR', 44);
 
-        // Define Handler error constant
-        define('E_HANDLER_ERROR', 45);
 
         // Start output buffering
         ob_start(array(__CLASS__, 'output_buffer'));
@@ -508,7 +506,26 @@ final class CF {
         return $result;
     }
 
+    /**
+     * 
+     * @deprecated
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string
+     */
     public static function get_file($directory, $filename, $domain = null) {
+        return self::getFile($directory,$filename,$domain);
+    }
+    
+    /**
+     * 
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
+     * @return string
+     */
+    public static function getFile($directory, $filename, $domain = null) {
         $files = CF::get_files($directory, $filename, $domain);
         if (count($files) > 0) {
             return $files[0];

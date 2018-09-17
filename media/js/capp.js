@@ -75,7 +75,7 @@ var scrolltotop = {
 if (typeof window.capp.have_scroll_to_top != 'undefined' && window.capp.have_scroll_to_top) {
     scrolltotop.init();
 }
-jQuery(document).on('click', 'a.confirm', function (e) {
+jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
     var ahref = $(this).attr('href');
     var message = $(this).attr('data-confirm-message');
     var no_double = $(this).attr('data-no-double');
@@ -97,9 +97,19 @@ jQuery(document).on('click', 'a.confirm', function (e) {
     str_cancel = window.capp.label_cancel;
     e.preventDefault();
     e.stopPropagation();
+    btn.off('click');
     bootbox.confirm(message, function (confirmed) {
         if (confirmed) {
-            window.location.href = ahref;
+            if (ahref) {
+                window.location.href = ahref;
+            } else {
+				if(btn.attr('type')=='submit') {
+					btn.closest('form').submit();
+				} else {
+					btn.on('click');
+				}
+
+            }
         } else {
             btn.removeAttr('data-clicked');
         }

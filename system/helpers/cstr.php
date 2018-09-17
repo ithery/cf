@@ -330,4 +330,14 @@ class cstr {
         return CPluralizer::plural($value, $count);
     }
 
+    /**
+     * Convert the given string to upper-case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function upper($value) {
+        return mb_strtoupper($value, 'UTF-8');
+    }
+
 }

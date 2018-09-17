@@ -21,6 +21,7 @@ class CDatabase_Type_BooleanType extends CDatabase_Type {
     public function getSQLDeclaration(array $fieldDeclaration, CDatabase_Platform $platform) {
         return $platform->getBooleanTypeDeclarationSQL($fieldDeclaration);
     }
+    
 
     /**
      * {@inheritdoc}

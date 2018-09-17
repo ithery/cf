@@ -399,6 +399,7 @@ class CDatabase_Schema_Comparator {
 
         foreach (['type', 'notnull', 'unsigned', 'autoincrement'] as $property) {
             if ($properties1[$property] != $properties2[$property]) {
+               
                 $changedProperties[] = $property;
             }
         }

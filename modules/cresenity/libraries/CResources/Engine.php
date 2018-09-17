@@ -2,6 +2,8 @@
 
 abstract class CResources_Engine implements CResources_EngineInterface {
 
+    use CTrait_Compat_Resources_Engine;
+
     protected $_resource_type;
     protected $_type;
     protected $_org_code;
@@ -91,7 +93,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         return $temp_file_name;
     }
 
-    public function get_url($filename = null, $size = '', $encode = true) {
+    public function getUrl($filename = null, $size = '', $encode = true) {
         if ($filename == null) {
             $filename = $this->_filename;
         }
@@ -122,7 +124,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         if ($encode == false) {
             $path = curl::base(false, $http_or_https) . 'assets/image/' . $size_add . $filename;
         }
-        
+
 //            $file_name_encode = $this->encode($file_name,self::_digit);
         return $path;
     }

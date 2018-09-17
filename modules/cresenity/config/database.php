@@ -1,4 +1,6 @@
-<?php defined("SYSPATH") or die("No direct script access.");
+<?php
+
+defined("SYSPATH") or die("No direct script access.");
 /**
  * @package  Database
  *
@@ -21,27 +23,27 @@
  *  table_prefix  - Database table prefix
  *  object        - Enable or disable object results
  *  cache         - Enable or disable query caching
- *	escape        - Enable automatic query builder escaping
+ * 	escape        - Enable automatic query builder escaping
  */
 return array(
-	'default' => array (
-		'benchmark'     => FALSE,
-		'persistent'    => FALSE,
-		'connection'    => array (
-			'type'     => 'mysql',
-			'user'     => 'root',
-			'pass'     => 'rodex0909',
-			'host'     => '192.168.1.222',
-			'port'     => FALSE,
-			'socket'   => FALSE,
-			'database' => 'torsapi3'
-		),
-		'character_set' => 'utf8',
-		'table_prefix'  => '',
-		'object'        => TRUE,
-		'cache'         => FALSE,
-		'escape'        => TRUE,
-	),
+    'default' => array(
+        'benchmark' => FALSE,
+        'persistent' => FALSE,
+        'connection' => array(
+            'type' => 'mysqli',
+            'user' => 'root',
+            'pass' => 'rodex0909',
+            'host' => '192.168.1.222',
+            'port' => FALSE,
+            'socket' => FALSE,
+            'database' => 'torsapi3'
+        ),
+        'character_set' => 'utf8',
+        'table_prefix' => '',
+        'object' => TRUE,
+        'cache' => FALSE,
+        'escape' => TRUE,
+    ),
 );
 // return array(
 // 'default' => array

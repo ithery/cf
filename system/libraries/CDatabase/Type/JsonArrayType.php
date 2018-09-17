@@ -12,7 +12,7 @@ class CDatabase_Type_JsonArrayType extends CDatabase_Type_JsonType {
     /**
      * {@inheritdoc}
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform) {
+    public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if ($value === null || $value === '') {
             return [];
         }

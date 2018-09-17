@@ -137,4 +137,5 @@ trait CElement_Trait_Template {
         return $this->jsOutput;
     }
 
+    
 }

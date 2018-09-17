@@ -136,13 +136,21 @@ class CApp extends CObservable {
         $this->keepMessage = $bool;
     }
 
+    public function translator() {
+        return new CApp_Translation_Translator(new CApp_Translation_Loader_ArrayLoader(), 'en');
+    }
+
+    public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
+        $translator = $this->translator();
+        $validation = new CApp_Validation($translator);
+        return $validation->validate($data, $rules, $messages, $customAttributes);
+    }
+
     public function setup($install = false) {
 
         if ($this->run) {
             return;
         }
-
-        $this->registerCoreModules();
 
         if (isset($_COOKIE['capp-profiler'])) {
             new Profiler();
@@ -157,7 +165,7 @@ class CApp extends CObservable {
                 $this->_org = cstg::get($org_id);
             }
         }
-
+        $this->registerCoreModules();
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
@@ -285,6 +293,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
+        
+        
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -342,11 +352,9 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function register_client_module($module) {
-        CManager::instance()->register_module($module);
-    }
-
     public function registerCoreModules() {
+        
+       
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
@@ -358,7 +366,7 @@ class CApp extends CObservable {
             $cs = CClientScript::instance();
             if ($moduleArray != null) {
                 foreach ($moduleArray as $module) {
-                    $manager->registerModule($module);
+                    $manager->registerThemeModule($module);
                 }
             }
             if (ccfg::get('have_clock')) {
@@ -391,6 +399,8 @@ class CApp extends CObservable {
             throw new CException('CApp already rendered');
         }
         $this->rendered = true;
+
+
 
         CFEvent::run('CApp.beforeRender');
 
@@ -432,10 +442,12 @@ class CApp extends CObservable {
         }
 
         if (CView::exists($theme_path . $viewName)) {
-
             $v = CView::factory($theme_path . $viewName);
         }
         if ($v == null) {
+            if (!CView::exists($viewName)) {
+                throw new CApp_Exception('view :viewName not exists', array(':viewName' => $viewName));
+            }
             $v = CView::factory($viewName);
         }
         $this->content = parent::html();
@@ -445,10 +457,11 @@ class CApp extends CObservable {
         $v->header_body = $this->header_body;
 
         $v->title = $this->title;
-        $cs = CClientScript::instance();
-        $css_urls = $cs->urlCssFile();
+        $asset = CManager::asset();
 
-        $js_urls = $cs->urlJsFile();
+        $css_urls = $asset->getAllCssFileUrl();
+
+        $js_urls = $asset->getAllCssFileUrl();
         $additional_js = "";
 
         foreach ($css_urls as $url) {
@@ -463,7 +476,7 @@ class CApp extends CObservable {
 
         $js .= PHP_EOL . $this->js . $additional_js;
 
-        $js = $cs->renderJsRequire($js);
+        $js = $asset->renderJsRequire($js);
 
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
@@ -490,12 +503,12 @@ class CApp extends CObservable {
         $v->ready_client_script = "";
 
 
-        $v->head_client_script = $cs->render('head');
-        $v->begin_client_script = $cs->render('begin');
-        //$v->end_client_script = $cs->render('end');
+        $v->head_client_script = $asset->render('head');
+        $v->begin_client_script = $asset->render('begin');
+        //$v->end_client_script = $asset->render('end');
 
-        $v->load_client_script = $cs->render('load');
-        $v->ready_client_script = $cs->render('ready');
+        $v->load_client_script = $asset->render('load');
+        $v->ready_client_script = $asset->render('ready');
 
         $v->custom_js = $this->custom_js;
         $v->custom_header = $this->custom_header;
@@ -750,13 +763,14 @@ class CApp extends CObservable {
             }
         }
         $data["html"] = $message . $this->html();
+        $asset = CManager::asset();
         $js = $this->js();
-        $js = CClientScript::instance()->renderJsRequire($js);
+        $js = $asset->renderJsRequire($js);
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
         }
         $data["js"] = cbase64::encode($js);
-        $data["css_require"] = CClientScript::instance()->urlCssFile();
+        $data["css_require"] = $asset->getAllCssFileUrl();
         $data["message"] = $messageOrig;
         $data["ajaxData"] = $this->ajaxData;
         return cjson::encode($data);

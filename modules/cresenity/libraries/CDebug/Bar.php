@@ -61,6 +61,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
         $this->addCollector(new CDebug_DataCollector_RequestDataCollector());
         $this->addCollector(new CDebug_DataCollector_TimeDataCollector());
         $this->addCollector(new CDebug_DataCollector_FilesCollector());
+        $this->addCollector(new CDebug_DataCollector_RenderableCollector());
 
         $queryCollector = new CDebug_DataCollector_QueryCollector();
 
@@ -73,7 +74,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
 
 
         //if (CHelper::request()->isAjax()) {
-            //$this->sendDataInHeaders(true);
+        //$this->sendDataInHeaders(true);
         //}
 
         $this->renderer->populateAssets();

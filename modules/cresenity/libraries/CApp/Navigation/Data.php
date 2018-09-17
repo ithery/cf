@@ -11,6 +11,11 @@ class CApp_Navigation_Data {
 
     protected static $navigationCallback = array();
 
+    /**
+     * 
+     * @param string $domain
+     * @return array
+     */
     public static function get($domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
@@ -21,19 +26,23 @@ class CApp_Navigation_Data {
         if ($navFile != null) {
             $data = include $navFile;
         }
-         
+
         if (isset(self::$navigationCallback[$domain]) && self::$navigationCallback[$domain] != null && is_callable(self::$navigationCallback[$domain])) {
-           
             $data = call_user_func(self::$navigationCallback[$domain], $data);
         }
         return $data;
     }
 
+    /**
+     * 
+     * @param callable $navigationCallback
+     * @param string $domain optional
+     */
     public static function setNavigationCallback(callable $navigationCallback, $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }
-       
+
         self::$navigationCallback[$domain] = $navigationCallback;
     }
 

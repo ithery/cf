@@ -6,170 +6,50 @@ final class CClientModules {
 
     use CTrait_Compat_ClientModules;
 
-    public static $mods = array();
-    public static $allModules = array();
     protected static $_instance;
 
-    public function __construct() {
-
-        self::$mods = array();
-        self::$allModules = null;
-    }
-
     public function allModules() {
-        if (self::$allModules == null) {
-            self::$allModules = include DOCROOT . "config" . DS . "client_modules" . DS . "client_modules.php";
-            $app_files = CF::get_files('config', 'client_modules');
-            //$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
-            $app_files = array_reverse($app_files);
-
-            foreach ($app_files as $file) {
-                $app_modules = include $file;
-                if (!is_array($app_modules)) {
-                    trigger_error("Invalid Client Modules Config Format On " . $file);
-                }
-
-                self::$allModules = array_merge(self::$allModules, $app_modules);
-            }
-        }
-        return self::$allModules;
+        return CManager::asset()->module()->allModules();
     }
 
     public function requirements($module) {
-        $data = array();
-        $allModules = $this->allModules();
-        if (isset($allModules[$module])) {
-            $mod = $allModules[$module];
-            if (isset($mod["requirements"])) {
-                foreach ($mod["requirements"] as $req) {
-                    $data_req = $this->requirements($req);
-                    $data[] = $req;
-                    $data = array_merge($data_req, $data);
-                }
-            }
-        }
-        return $data;
+        return CManager::asset()->module()->requirements($module);
     }
 
     public function isRegisteredModule($mod) {
-
-        return in_array($mod, self::$mods);
+        return CManager::asset()->module()->isRegisteredModule($mod);
     }
 
-    private function addToTree($tree, $module) {
-        $allModules = $this->allModules();
-        $mod = $allModules[$module];
-        $last_req = null;
-        if (isset($mod["requirements"])) {
-            foreach ($mod["requirements"] as $req) {
-                $this->addToTree($tree, $req);
-                $last_req = $req;
-            }
-        }
-        $node = $tree->root();
-        if ($last_req != null) {
-            $node = $tree->get_node($last_req);
-        }
-        if ($tree->getNode($module) == null) {
-            if (isset($mod['js'])) {
-                $tree->addChild($node, $module, $mod['js']);
-            }
-        }
+    public function getRegisteredModule() {
+        return CManager::asset()->module()->getRegisteredModule();
     }
 
     public function jstree() {
-        $tree = CTree::factory('root', null);
-
-        foreach ($this->mods as $mod) {
-            $this->addToTree($tree, $mod);
-        }
-        return $tree;
-    }
-
-    public static function walkerCallback($tree, $node, $text) {
-
-        if (is_array($text)) {
-            $text = implode(",", $text);
-        }
-        return $text;
-    }
-
-    public function requireJs($js) {
-        $tree = $this->jstree();
-
-        //$tree->set_walker_callback(array('CClientModules','walker_callback'));
-        echo $tree->html();
-        die();
+        return CManager::asset()->module()->jstree($module);
     }
 
     public function registerModules($modules) {
-        if (!is_array($modules)) {
-            $modules = array($modules);
-        }
-        foreach ($modules as $module) {
-            $this->registerModule($module);
-        }
+        return CManager::asset()->module()->registerRunTimeModules($modules);
     }
 
     public function defineModule($name, $moduleData) {
-        //make sure all modules is collected
-        $this->allModules();
-        //replace or make new module
-        self::$allModules[$name] = $moduleData;
-        return $this;
+        return CManager::asset()->module()->defineModule($name, $moduleData);
     }
 
     public function unregisterModule($module) {
-        $cs = CClientScript::instance();
-
-        $allModules = $this->allModules();
-
-        if (in_array($module, self::$mods)) {
-            //locate mods
-
-            foreach (self::$mods as $mod) {
-
-                if ($mod == $module) {
-
-                    //mod found, we need locate js and css files from allModules
-                    $moduleData = carr::get($allModules, $module);
-                    $jsFiles = carr::get($moduleData, 'js');
-                    $cssFiles = carr::get($moduleData, 'css');
-                    $cs->unregisterJsFiles($jsFiles);
-                    $cs->unregisterCssFiles($cssFiles);
-                }
-            }
-        }
-        return false;
+        return CManager::asset()->module()->unregisterRunTimeModule($module);
     }
 
     public function registerModule($module, $parent = null) {
-        $cs = CClientScript::instance();
+        return self::registerRunTimeModule($module);
+    }
 
-        $allModules = $this->allModules();
-        if (!in_array($module, self::$mods)) {
-            if (!isset($allModules[$module])) {
-                throw new CException('Module :module not defined', array(':module' => $module));
-            }
-            //array
-            $mod = $allModules[$module];
-            if (isset($mod["requirements"])) {
-                foreach ($mod["requirements"] as $req) {
-                    $this->registerModule($req);
-                }
-            }
-            if (!in_array($module, self::$mods)) {
+    public function registerThemeModule($module, $parent = null) {
+        return CManager::asset()->module()->registerThemeModule($module);
+    }
 
-                if (isset($mod["js"])) {
-                    $cs->registerJsFiles($mod["js"]);
-                }
-                if (isset($mod["css"])) {
-                    $cs->registerCssFiles($mod["css"]);
-                }
-                self::$mods[] = $module;
-            }
-        }
-        return true;
+    public function registerRunTimeModule($module, $parent = null) {
+        return CManager::asset()->module()->registerRunTimeModule($module);
     }
 
     /**

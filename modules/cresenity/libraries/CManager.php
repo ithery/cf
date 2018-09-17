@@ -19,6 +19,18 @@ final class CManager {
 
     /**
      *
+     * @var CManager_Javascript
+     */
+    protected static $javascript;
+
+    /**
+     *
+     * @var CManager_Asset
+     */
+    protected static $asset;
+
+    /**
+     *
      * @var CManager_Theme
      */
     protected static $theme = null;
@@ -114,10 +126,20 @@ final class CManager {
         return CClientModules::instance()->registerModule($module);
     }
 
+    public static function registerThemeModule($module, $data = array()) {
+        if (!empty($data)) {
+            CClientModules::instance()->defineModule($module, $data);
+        }
+        return CClientModules::instance()->registerThemeModule($module);
+    }
+
     public static function isRegisteredModule($module) {
         return CClientModules::instance()->isRegisteredModule($module);
     }
 
+    public static function getRegisteredModule() {
+        return CClientModules::instance()->getRegisteredModule();
+    }
     /**
      * 
      * @param string $module
@@ -309,6 +331,29 @@ final class CManager {
 
     public static function registerJs($file, $pos = CClientScript::POS_END) {
         $cs = CClientScript::instance()->registerJsFile($file, $pos);
+    }
+
+    /**
+     * 
+     * @return CManager_Javascript
+     */
+    public static function javascript() {
+        if (self::$javascript == null) {
+            self::$javascript = new CManager_Javascript();
+        }
+        return self::$javascript;
+    }
+
+    /**
+     * 
+     * @return CManager_Asset
+     */
+    public static function asset() {
+        if (self::$asset == null) {
+
+            self::$asset = new CManager_Asset();
+        }
+        return self::$asset;
     }
 
 }
