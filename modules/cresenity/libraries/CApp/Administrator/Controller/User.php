@@ -28,6 +28,8 @@ class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
             $navFile = CF::getFile('data', 'Administrator/Navigation');
             return include($navFile);
         });
+        
+      
     }
 
 }

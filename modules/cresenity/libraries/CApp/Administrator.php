@@ -42,4 +42,6 @@ class CApp_Administrator {
         $session->delete(self::ADMIN_SESSSION_KEY);
     }
 
+    
+   
 }

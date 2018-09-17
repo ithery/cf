@@ -2,6 +2,9 @@
 .DS_Store
 Thumbs.db
 
+#ignore php error
+error_log
+
 #ignore application folder, application folder must be another project
 application/*
 
@@ -10,6 +13,8 @@ application/*
 
 #ignore git bak
 /.git.bak
+
+
 
 #ignore libs of CPDF
 /modules/cresenity/vendor/lib/fonts/Helvetica.afm.php
@@ -20,6 +25,7 @@ application/*
 #ignore folder logs
 /application/logs
 /logs/
+*/logs/
 /temp
 /temp/*
 /export/

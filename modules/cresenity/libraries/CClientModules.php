@@ -20,6 +20,10 @@ final class CClientModules {
         return CManager::asset()->module()->isRegisteredModule($mod);
     }
 
+    public function getRegisteredModule() {
+        return CManager::asset()->module()->getRegisteredModule();
+    }
+
     public function jstree() {
         return CManager::asset()->module()->jstree($module);
     }

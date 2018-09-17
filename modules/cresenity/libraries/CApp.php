@@ -165,7 +165,7 @@ class CApp extends CObservable {
                 $this->_org = cstg::get($org_id);
             }
         }
-
+        $this->registerCoreModules();
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
@@ -293,6 +293,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
+        
+        
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -351,6 +353,8 @@ class CApp extends CObservable {
     }
 
     public function registerCoreModules() {
+        
+       
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
@@ -396,7 +400,7 @@ class CApp extends CObservable {
         }
         $this->rendered = true;
 
-        $this->registerCoreModules();
+
 
         CFEvent::run('CApp.beforeRender');
 

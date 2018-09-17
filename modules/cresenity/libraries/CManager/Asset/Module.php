@@ -56,12 +56,25 @@ class CManager_Asset_Module {
         return $data;
     }
 
+    /**
+     * 
+     * @param string $mod
+     * @return bool
+     */
     public function isRegisteredModule($mod) {
         $inArray = in_array($mod, $this->runTimeModules);
         if (!$inArray) {
             $inArray = in_array($mod, $this->themeModules);
         }
         return $inArray;
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public function getRegisteredModule() {
+        return array_merge($this->themeModules, $this->runTimeModules);
     }
 
     private function addToTree($tree, $module) {
@@ -185,9 +198,11 @@ class CManager_Asset_Module {
     public function getRunTimeContainer() {
         $runTimeContainer = new CManager_Asset_Container_RunTime();
         $allModules = $this->allModules();
+      
+           
         foreach ($this->runTimeModules as $runTimeModule) {
             $mod = carr::get($allModules, $runTimeModule, array());
-
+           
             if (isset($mod["js"])) {
                 $runTimeContainer->registerJsFiles($mod['js']);
             }

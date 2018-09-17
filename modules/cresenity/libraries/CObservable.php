@@ -8,6 +8,7 @@
 abstract class CObservable extends CRenderable {
 
     use CTrait_Compat_Observable,
+        CObservable_Trait_ComponentTrait,
         CObservable_Trait_EventsTrait;
 
     /**
@@ -77,7 +78,10 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('password', 'CElement_FormInput_Password');
         $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
         $this->manager->registerControl('select', 'CElement_FormInput_Select');
-        $this->manager->registerControl('select-tag', 'CFormInputSelectTag');
+
+        $this->manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
+        //$this->manager->registerControl('select-tag', 'CFormInputSelectTag');
+
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');
         $this->manager->registerControl('checkbox', 'CFormInputCheckbox');
@@ -340,16 +344,7 @@ abstract class CObservable extends CRenderable {
         return $fieldset;
     }
 
-    /**
-     * 
-     * @param string $id
-     * @return CElement_Component_DataTable
-     */
-    public function addTable($id = "") {
-        $table = CElement_Factory::createComponent('DataTable', $id);
-        $this->add($table);
-        return $table;
-    }
+    
 
     public function addRow($row_id = '') {
         $row = CTableRow::factory($row_id);
@@ -456,12 +451,22 @@ abstract class CObservable extends CRenderable {
         return $nestable;
     }
 
+    /**
+     * 
+     * @return $this
+     */
     public function addHr() {
         $this->add('<hr />');
+        return $this;
     }
 
+    /**
+     * 
+     * @return $this
+     */
     public function addBr() {
         $this->add('<br />');
+        return $this;
     }
 
     // public function add_element($tag, $id = "") {
