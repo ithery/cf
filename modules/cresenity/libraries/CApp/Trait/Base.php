@@ -220,4 +220,30 @@ trait CApp_Trait_Base {
         return false;
     }
 
+    /**
+     * 
+     * @return boolean
+     */
+    public static function isDevelopment() {
+        $domain = CF::domain();
+        $pos = strpos($domain, 'app.ittron.co.id');
+        if ($pos === false) {
+            $pos = strpos($domain, 'dev.ittron.co.id');
+        }
+        if ($pos === false) {
+            $pos = strpos($domain, 'staging.ittron.co.id');
+        }
+        return $pos !== false;
+    }
+
+    /**
+     * 
+     * @return boolean
+     */
+    public static function isStaging() {
+        $domain = CF::domain();
+        $pos = strpos($domain, 'staging.ittron.co.id');
+        return $pos !== false;
+    }
+
 }
