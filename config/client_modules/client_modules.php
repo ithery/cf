@@ -244,12 +244,10 @@ return array(
     ),
     "servertime" => array(
         "js" => array("plugins" . DS . "servertime" . DS . "jquery.servertime.js"),
-        "requirements" => array("jquery"),
     ),
     "uniform" => array(
         "js" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.js"),
         "css" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.css"),
-        "requirements" => array("jquery"),
     ),
     "select2_v4" => array(
         "js" => array("plugins" . DS . "select2" . DS . "select2_v4.js"),
@@ -278,11 +276,9 @@ return array(
     "timepicker" => array(
         "js" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.js"),
         "css" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.css"),
-        "requirements" => array("jquery"),
     ),
     "image-gallery" => array(
         "css" => array("plugins" . DS . "image-gallery" . DS . "bootstrap-image-gallery.min.css"),
-        "requirements" => array("jquery"),
     ),
     "modernizr" => array(
         "js" => array("libs" . DS . "modernizr.custom.js"),
@@ -424,7 +420,6 @@ return array(
         "js" => array(
             "plugins/datepicker_material/bootstrap-material-datetimepicker.js",
         ),
-        "requirements" => array("jquery-2.1.1", "bootstrap-3.3.5", "materialize"),
     ),
     "fullcalendar" => array(
         "css" => array(
