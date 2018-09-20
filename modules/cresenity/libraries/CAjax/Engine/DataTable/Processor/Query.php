@@ -155,7 +155,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     if ($table->checkbox) {
                         $i2 = -1;
                     }
-                    $fieldName = carr::get($columns[$i + $i2],'fieldname');
+                    $fieldName = carr::get($columns[$i ],'fieldname');
                     if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
                         $sWhere .= "`" . $fieldName . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                     }
