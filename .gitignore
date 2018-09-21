@@ -11,6 +11,9 @@ application/*
 #ignore data domain or org
 /data/*
 
+#ignore
+/index.php
+
 #ignore git bak
 /.git.bak
 
