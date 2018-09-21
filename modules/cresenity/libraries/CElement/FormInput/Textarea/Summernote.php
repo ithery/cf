@@ -38,7 +38,30 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         $json = '[]';
         switch ($toolbarType) {
             case 'standard':
-                $json = "[['style', ['bold', 'italic', 'underline', 'clear']],['font', ['strikethrough', 'superscript', 'subscript']],['fontsize', ['fontsize']],['color', ['color']],['para', ['ul', 'ol', 'paragraph']],['height', ['height']]]";
+                $json = "
+                    [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough', 'superscript', 'subscript']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['height', ['height']]
+                    ]
+                ";
+                break;
+            case 'non-video':
+                $json = "
+                    [
+                        ['fontstyle', ['style']],
+                        ['style', ['bold', 'underline', 'clear']],
+                        ['fontfamily', ['fontname']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['media', ['link', 'picture']],
+                        ['misc', ['fullscreen', 'codeview', 'help']]
+                    ]
+                ";
                 break;
         }
         return $json;
