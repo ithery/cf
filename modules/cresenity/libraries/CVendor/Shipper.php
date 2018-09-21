@@ -1,8 +1,7 @@
 <?php
 
-namespace Shipper;
+class CVendor_Shipper {
 
-class Shipper {
 	private $key = 'c46eacd847a2ab8d4459d3e54c8694dc';
 	private $url;
 	private $curl;

@@ -53,4 +53,12 @@ class CVendor {
         return $api;
     }
 
+    public static function rajaOngkir() {
+        return new CVendor_RajaOngkir();
+    }
+
+    public static function shipper($environment = 'production') {
+        return new CVendor_Shipper($environment);
+    }
+
 }
