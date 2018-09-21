@@ -1,8 +1,7 @@
 <?php
 
-namespace RajaOngkir;
-
-class RajaOngkir {
+class CVendor_RajaOngkir {
+	
 	private $key = '9406fbe823f72dbfbe4d9b3c849c073e';
 	private $android_key;
 	private $ios_key;
