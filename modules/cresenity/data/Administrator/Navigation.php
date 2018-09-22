@@ -38,11 +38,11 @@ return array(
     array(
         "name" => "administrator.stats",
         "label" => "Stats",
-        "icon" => " fas fa-graph",
+        "icon" => " fas fa-chart-bar",
         "subnav" => array(
             array(
                 "name" => "administrator.stats.phpinfo",
-                "label" => "DB Console",
+                "label" => "PHP Info",
                 "controller" => "administrator/stats/phpinfo",
                 "method" => "index",
             ),
