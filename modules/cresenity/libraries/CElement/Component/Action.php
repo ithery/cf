@@ -246,7 +246,7 @@ class CElement_Component_Action extends CElement_Component {
                 }
                 $html->appendln($this->label . '</button>');
             } else {
-                $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
+                $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . ' value="' . $this->label . '">' . $this->label . '</button>');
             }
         } else {
             if ($this->type == "jsfunc") {
@@ -280,7 +280,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function js($indent = 0) {
-        
+
         $js = new CStringBuilder();
         $js->setIndent($indent);
 
@@ -300,12 +300,12 @@ class CElement_Component_Action extends CElement_Component {
                 if (strlen($this->submitTo) > 0) {
                     $jsSubmitToTarget = "";
                     if (strlen($this->submitToTarget) > 0) {
-                        $jsSubmitToTarget = "jQuery('#".$this->id."').closest('form').attr('target','" . $this->submitToTarget . "');";
+                        $jsSubmitToTarget = "jQuery('#" . $this->id . "').closest('form').attr('target','" . $this->submitToTarget . "');";
                     }
                     $this->addListener('click')->addHandler('custom')->setJs("
-                        jQuery('#".$this->id."').closest('form').attr('action','" . $this->submitTo . "');
+                        jQuery('#" . $this->id . "').closest('form').attr('action','" . $this->submitTo . "');
                         " . $jsSubmitToTarget . "
-                        jQuery('#".$this->id."').closest('form').submit();
+                        jQuery('#" . $this->id . "').closest('form').submit();
                        
                     ");
                 }
