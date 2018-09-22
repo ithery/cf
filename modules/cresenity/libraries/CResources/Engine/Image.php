@@ -11,7 +11,10 @@ class CResources_Engine_Image extends CResources_Engine {
     }
 
     public function resizeAndSave($fullfilename, $sizeName, $sizeOptions) {
-        if(strlen($fullfilename)==0) {
+        if (strlen($fullfilename) == 0) {
+            return null;
+        }
+        if (!file_exists($fullfilename)) {
             return null;
         }
         $filename = basename($fullfilename);
@@ -54,14 +57,14 @@ class CResources_Engine_Image extends CResources_Engine {
         }
         $size_path = $path . $sizeName . DS;
         if (!is_dir($path)) {
-            @mkdir($path);
+            @mkdir($path, 0777, true);
         }
-        
+
         if (!is_dir($size_path)) {
-            @mkdir($size_path);
+            @mkdir($size_path, 0777, true);
         }
         $full_size_path = $size_path . $filename;
-        
+
         try {
             //resize to propotional to maximum size, reduce memory load
             $maxScale = 1;
@@ -72,16 +75,20 @@ class CResources_Engine_Image extends CResources_Engine {
             $maxPropHeight = $img_height * $maxScale;
 
             $ext = pathinfo($fullfilename, PATHINFO_EXTENSION);
+            $src = null;
             if ($ext == 'png') {
                 $src = @imagecreatefrompng($fullfilename);
             } else {
                 $src = @imagecreatefromjpeg($fullfilename);
             }
+            if ($src == null) {
+                throw new CException('Error when resizing image, creating ' . $filename);
+            }
             $dst = @imagecreatetruecolor($maxPropWidth, $maxPropHeight);
             @imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxPropWidth, $maxPropHeight, $img_width, $img_height);
             unset($src);
-            if($dst==null) {
-                throw new Exception('Error when resizing image '.$fullfilename);
+            if ($dst == null) {
+                throw new CException('Error when resizing image, resizing ' . $filename);
             }
             $wideimage = CWideImage::load($dst);
 
