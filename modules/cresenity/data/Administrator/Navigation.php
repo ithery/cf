@@ -15,6 +15,7 @@ return array(
         "method" => "index",
         "icon" => "fas fa-home",
     ),
+    
     array(
         "name" => "administrator.database",
         "label" => "Database",
@@ -32,6 +33,20 @@ return array(
                 "controller" => "administrator/database/generator",
                 "method" => "index",
             ),
+        ),
+    ),
+    array(
+        "name" => "administrator.stats",
+        "label" => "Stats",
+        "icon" => " fas fa-graph",
+        "subnav" => array(
+            array(
+                "name" => "administrator.stats.phpinfo",
+                "label" => "DB Console",
+                "controller" => "administrator/stats/phpinfo",
+                "method" => "index",
+            ),
+           
         ),
     ),
 );

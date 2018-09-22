@@ -54,11 +54,11 @@ class CResources_Engine_Image extends CResources_Engine {
         }
         $size_path = $path . $sizeName . DS;
         if (!is_dir($path)) {
-            @mkdir($path);
+            @mkdir($path,0777,true);
         }
         
         if (!is_dir($size_path)) {
-            @mkdir($size_path);
+            @mkdir($size_path,0777,true);
         }
         $full_size_path = $size_path . $filename;
         
@@ -81,7 +81,7 @@ class CResources_Engine_Image extends CResources_Engine {
             @imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxPropWidth, $maxPropHeight, $img_width, $img_height);
             unset($src);
             if($dst==null) {
-                throw new Exception('Error when resizing image '.$fullfilename);
+                throw new CException('Error when resizing image '.$fullfilename);
             }
             $wideimage = CWideImage::load($dst);
 
