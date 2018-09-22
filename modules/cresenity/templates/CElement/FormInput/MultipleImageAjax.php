@@ -120,7 +120,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             <div class="multi-image-ajax-file container-file-upload">
                 <div class="div-img">
                     <img src="<?php echo $file_url; ?>" />
-                    <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="<? echo $input_value; ?>">
+                    <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="<?php echo $input_value; ?>">
                 </div>
                 <?php
                 foreach ($customControl as $cc) :
