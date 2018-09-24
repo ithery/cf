@@ -19,7 +19,11 @@ class CVendor_SenangPay {
 	}
 
 	public function hashString(...$param) {
-		return md5($this->secretKey . implode('', urldecode($param)));
+		foreach ($param as &$value) {
+			$value = urldecode($value);
+		}
+
+		return md5($this->secretKey . implode('', $param));
 	}
 
 	public function payment(
