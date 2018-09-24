@@ -2,12 +2,14 @@
 
 class CVendor_SenangPay {
 	
-	private $merchantId = '';
-	private $secretKey = '';
+	private $merchantId = '509153777899632';
+	private $secretKey = '74-939';
+	private $environment;
+	private $url;
 	private $curl;
 
-	public function __construct() {
-		
+	public function __construct($environment = 'production') {
+		$this->environment = $environment;
 	}
 
 	public function setMerchantId($merchantId) {
@@ -26,6 +28,13 @@ class CVendor_SenangPay {
 		return md5($this->secretKey . implode('', $param));
 	}
 
+	public function createUrl() {
+		$this->url = 'https://app.senangpay.my/payment/' . $this->merchantId;
+		if ($this->environment == 'dev' || $this->environment == 'development') {
+			$this->url = 'https://sandbox.senangpay.my/payment/' . $this->merchantId;
+		}
+	}
+
 	public function payment(
 		$detail,
 		$amount,
@@ -34,7 +43,8 @@ class CVendor_SenangPay {
 		$email,
 		$phone
 	) {
-		$curl = CCurl::factory('https://app.senangpay.my/payment/' . $this->merchantId);
+		$this->createUrl();
+		$this->curl = CCurl::factory($this->url);
 
 		$data = [
 			'detail' => $detail,
@@ -46,10 +56,12 @@ class CVendor_SenangPay {
 			'hash' => $this->hashString($detail, $amount, $orderId),
 		];
 
-		$curl->setPost($data);
-		$curl->exec();
+		// $this->curl->setPost($data);
+		$this->curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
+		$this->curl->setOpt(CURLOPT_POSTFIELDS, http_build_query($data));
+		$this->curl->exec();
 
-		return $curl->response();
+		return $this->curl->response();
 	}
 
 	public function verify(
@@ -60,16 +72,27 @@ class CVendor_SenangPay {
 		$hash
 	) {
 		$hashedString = $this->hashString($statusId, $orderId, $transactionId, $message);
+		$errCode = 0;
+		$errMessage = '';
+		$result = '';
 
 		if ($hashedString == urldecode($hash)) {
 			if (urldecode($statusId) == '1') {
-				return 'Payment was sucessful with message: ' . urldecode($message);
+				$result = 'Payment was sucessful with message: ' . urldecode($message);
 			} else {
-				return 'Payment failed with message: ' . urldecode($message);
+				$errCode++;
+				$errMessage = 'Payment failed with message: ' . urldecode($message);
 			}
 		} else {
-			return 'Hashed value is not correct';
+			$errCode++;
+			$errMessage = 'Hashed value is not correct';
 		}
+
+		return [
+			'errCode' => $errCode,
+			'errMessage' => $errMessage,
+			'result' => $result,
+		];
 	}
 
 }
