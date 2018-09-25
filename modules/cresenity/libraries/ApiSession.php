@@ -101,7 +101,7 @@
             flock($fp, LOCK_UN);
             fclose($fp);
 
-            @chmod($filepath, FILE_WRITE_MODE);
+            //@chmod($filepath, FILE_WRITE_MODE);
         }
 
         public function load() {
