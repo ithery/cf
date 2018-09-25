@@ -44,24 +44,25 @@ class CVendor_SenangPay {
 		$phone
 	) {
 		$this->createUrl();
-		$this->curl = CCurl::factory($this->url);
 
-		$data = [
-			'detail' => $detail,
-			'amount' => $amount,
-			'order_id' => $orderId,
-			'name' => $name,
-			'email' => $email,
-			'phone' => $phone,
-			'hash' => $this->hashString($detail, $amount, $orderId),
-		];
-
-		// $this->curl->setPost($data);
-		$this->curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
-		$this->curl->setOpt(CURLOPT_POSTFIELDS, http_build_query($data));
-		$this->curl->exec();
-
-		return $this->curl->response();
+		return "
+			<html>
+			<head>
+			<title>senangPay Sample Code</title>
+			</head>
+			<body onload='document.order.submit()'>
+			    <form name='order' method='post' action='" . $this->url . "'>
+			        <input type='hidden' name='detail' value='" . $detail . "'>
+			        <input type='hidden' name='amount' value='" . $amount . "'>
+			        <input type='hidden' name='order_id' value='" . $orderId . "'>
+			        <input type='hidden' name='name' value='" . $name . "'>
+			        <input type='hidden' name='email' value='" . $email . "'>
+			        <input type='hidden' name='phone' value='" . $phone . "'>
+			        <input type='hidden' name='hash' value='" . $this->hashString($detail, $amount, $orderId) . "'>
+			    </form>
+			</body>
+			</html>
+		";
 	}
 
 	public function verify(
