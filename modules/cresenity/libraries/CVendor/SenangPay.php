@@ -2,14 +2,17 @@
 
 class CVendor_SenangPay {
 	
-	private $merchantId = '509153777899632';
-	private $secretKey = '74-939';
+	private $merchantId;
+	private $secretKey;
 	private $environment;
 	private $url;
 	private $curl;
 
-	public function __construct($environment = 'production') {
+	public function __construct(Array $options, $environment = 'production') {
 		$this->environment = $environment;
+
+		$this->merchantId = carr::get($options, 'merchantId');
+		$this->secretKey = carr::get($options, 'secretKey');
 	}
 
 	public function setMerchantId($merchantId) {
@@ -28,6 +31,14 @@ class CVendor_SenangPay {
 		return md5($this->secretKey . implode('', $param));
 	}
 
+	public function checkKey() {
+		if (!$this->merchantId && !$this->secretKey) {
+			throw new Exception('Senang Pay Merchant Id and SecretKey is Required.');
+		}
+
+		return true;
+	}
+
 	public function createUrl() {
 		$this->url = 'https://app.senangpay.my/payment/' . $this->merchantId;
 		if ($this->environment == 'dev' || $this->environment == 'development') {
@@ -43,6 +54,7 @@ class CVendor_SenangPay {
 		$email,
 		$phone
 	) {
+		$this->checkKey();
 		$this->createUrl();
 
 		return "
@@ -72,6 +84,8 @@ class CVendor_SenangPay {
 		$transactionId,
 		$hash
 	) {
+		$this->checkKey();
+
 		$hashedString = $this->hashString($statusId, $orderId, $transactionId, $message);
 		$errCode = 0;
 		$errMessage = '';
