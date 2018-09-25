@@ -127,6 +127,13 @@ class CClientScript extends CObject {
         return CResource::instance('js')->create_hash($this->jsFiles());
     }
 
+    public function urlJsFile() {
+        return CManager::asset()->getAllJsFileUrl();
+    }
+    public function urlCssFile() {
+        return CManager::asset()->getAllCssFileUrl();
+    }
+    
     public function cssFiles() {
         $cssFileArray = array();
         foreach ($this->scripts as $script) {
@@ -145,6 +152,7 @@ class CClientScript extends CObject {
         return CResource::instance('js')->load($hash);
     }
 
+    
     public function css($hash) {
         return CResource::instance('css')->load($hash);
     }
