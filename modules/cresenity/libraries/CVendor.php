@@ -61,8 +61,8 @@ class CVendor {
         return new CVendor_Shipper($environment);
     }
 
-    public static function senangPay($environment = 'production') {
-        return new CVendor_SenangPay($environment);
+    public static function senangPay($options, $environment = 'production') {
+        return new CVendor_SenangPay($options, $environment);
     }
 
 }
