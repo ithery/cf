@@ -80,13 +80,14 @@ class CVendor_SenangPay {
 	public function verify(
 		$statusId,
 		$orderId,
-		$message,
 		$transactionId,
+		$payment,
+		$message,
 		$hash
 	) {
 		$this->checkKey();
 
-		$hashedString = $this->hashString($statusId, $orderId, $transactionId, $message);
+		$hashedString = $this->hashString($statusId, $orderId, $transactionId, $payment, $message);
 		$errCode = 0;
 		$errMessage = '';
 		$result = '';
