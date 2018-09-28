@@ -23,7 +23,8 @@ class CVendor_SenangPay {
 		$this->secretKey = $secretKey;
 	}
 
-	public function hashString(...$param) {
+	public function hashString() {
+            $param=  func_get_args();
 		foreach ($param as &$value) {
 			$value = urldecode($value);
 		}
