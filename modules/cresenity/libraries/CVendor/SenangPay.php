@@ -77,17 +77,10 @@ class CVendor_SenangPay {
 		";
 	}
 
-	public function verify(
-		$statusId,
-		$orderId,
-		$transactionId,
-		$payment,
-		$message,
-		$hash
-	) {
+	public function verify($hash, ...$params) {
 		$this->checkKey();
 
-		$hashedString = $this->hashString($statusId, $orderId, $transactionId, $payment, $message);
+		$hashedString = $this->hashString($params);
 		$errCode = 0;
 		$errMessage = '';
 		$result = '';
