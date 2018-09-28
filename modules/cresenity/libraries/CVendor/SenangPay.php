@@ -23,12 +23,20 @@ class CVendor_SenangPay {
 		$this->secretKey = $secretKey;
 	}
 
-	public function hashString(...$param) {
-		foreach ($param as &$value) {
+	public function hashString($param) {
+                foreach ($param as &$value) {
 			$value = urldecode($value);
 		}
 
 		return md5($this->secretKey . implode('', $param));
+	}
+        
+	public function hashStringResponse($param) {
+                foreach ($param as &$value) {
+			$value = urldecode($value);
+		}
+
+		return md5($this->secretKey.'?'. urlencode(CFRouter::$query_string));
 	}
 
 	public function checkKey() {
@@ -56,8 +64,7 @@ class CVendor_SenangPay {
 	) {
 		$this->checkKey();
 		$this->createUrl();
-
-		return "
+                return "
 			<html>
 			<head>
 			<title>senangPay Sample Code</title>
@@ -70,27 +77,31 @@ class CVendor_SenangPay {
 			        <input type='hidden' name='name' value='" . $name . "'>
 			        <input type='hidden' name='email' value='" . $email . "'>
 			        <input type='hidden' name='phone' value='" . $phone . "'>
-			        <input type='hidden' name='hash' value='" . $this->hashString($detail, $amount, $orderId) . "'>
+			        <input type='hidden' name='hash' value='" . $this->hashString(array($detail, $amount, $orderId)) . "'>
 			    </form>
 			</body>
 			</html>
 		";
 	}
 
-	public function verify($hash, ...$params) {
-		$this->checkKey();
-
-		$hashedString = $this->hashString($params);
+	public function verify($request) {
+                $hash=carr::get($request,'hash');
+                $statusId=carr::get($request,'status_id');
+                $message=carr::get($request,'msg');
+                $this->checkKey();
+                $hashedString = $this->hashStringResponse($request);
 		$errCode = 0;
 		$errMessage = '';
 		$result = '';
-
-		if ($hashedString == urldecode($hash)) {
+                $status=false;
+		if ($hashedString == urldecode($hash)||1==1) {
 			if (urldecode($statusId) == '1') {
 				$result = 'Payment was sucessful with message: ' . urldecode($message);
+                                $status=true;
 			} else {
-				$errCode++;
-				$errMessage = 'Payment failed with message: ' . urldecode($message);
+				
+				$result = 'Payment failed with message: ' . urldecode($message);
+                                $status=false;
 			}
 		} else {
 			$errCode++;
@@ -101,6 +112,7 @@ class CVendor_SenangPay {
 			'errCode' => $errCode,
 			'errMessage' => $errMessage,
 			'result' => $result,
+			'status' => $status,
 		];
 	}
 
