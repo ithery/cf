@@ -23,8 +23,7 @@ class CVendor_SenangPay {
 		$this->secretKey = $secretKey;
 	}
 
-	public function hashString() {
-            $param=  func_get_args();
+	public function hashString(...$param) {
 		foreach ($param as &$value) {
 			$value = urldecode($value);
 		}
@@ -79,7 +78,6 @@ class CVendor_SenangPay {
 	}
 
 	public function verify($hash, ...$params) {
-                cdbg::var_dump($params);
 		$this->checkKey();
 
 		$hashedString = $this->hashString($params);
