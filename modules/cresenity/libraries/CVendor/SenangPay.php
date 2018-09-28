@@ -79,6 +79,7 @@ class CVendor_SenangPay {
 	}
 
 	public function verify($hash, ...$params) {
+                cdbg::var_dump($params);
 		$this->checkKey();
 
 		$hashedString = $this->hashString($params);
