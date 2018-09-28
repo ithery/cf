@@ -145,10 +145,10 @@ class cfs {
     public static function atomic_write($filename, $data, $atomic_suffix = 'atomictmp') {
         // Perform an exclusive (locked) overwrite to a temporary file.
         $filenameTmp = sprintf('%s.%s', $filename, $atomic_suffix);
-        $writeResult = @file_put_contents($filenameTmp, $data, LOCK_EX);
+        $writeResult = file_put_contents($filenameTmp, $data, LOCK_EX);
         if ($writeResult !== false) {
             // Now move the file to its real destination (replaced if exists).
-            $moveResult = @rename($filenameTmp, $filename);
+            $moveResult = rename($filenameTmp, $filename);
             if ($moveResult === true) {
                 // Successful write and move. Return number of bytes written.
                 return $writeResult;
