@@ -303,11 +303,20 @@ foreach ($customControl as $cc):
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
                         var dataFile = JSON.parse(this.responseText);
+                        var errCode = dataFile.err_code;
+                        var errMessage = dataFile.err_message;
+
                         div.removeClass("loading");
-                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
-                        img.attr('src', data.url);
+
+                        if (!errCode) {
+                            div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
+                            img.attr('src', data.url);
+                            fileChanged();
+                        } else {
+                            alert(errMessage);
+                        }
+
                         index++;
-                        fileChanged();
                     } else if (this.readyState == 4 && this.status != 200) {
                         //div.remove();
                     }

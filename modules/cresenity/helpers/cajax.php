@@ -664,23 +664,40 @@ class cajax {
         $return = array();
         $data = $obj->data;
         $input_name = $data->input_name;
+        $max_upload_size = $data->max_upload_size * 1024 * 1024;
+        $err_code = 0;
+        $err_message = '';
 
-        if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
+        if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name']) && !$err_code) {
             for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
                 $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
+                if ($max_upload_size) {
+                    if ($_FILES[$input_name]['size'] > $max_upload_size) {
+                        $err_code++;
+                        $err_message = 'Upload Failed: Image Size is more than ' . $data->max_upload_size . ' MB.';
+                        break;
+                    }
+                }
                 if (strtolower($extension) == 'php') {
-                    die('fatal error');
+                    $err_code++;
+                    $err_message = 'Upload Failed';
+                    break;
+                    // die('fatal error');
                 }
                 $file_id = date('Ymd') . cutils::randmd5() . $extension;
                 $fullfilename = ctemp::makepath("imgupload", $file_id);
                 if (!move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename)) {
-                    die('fail upload from ' . $_FILES[$input_name]['tmp_name'][$i] . ' to ' . $fullfilename);
+                    $err_code++;
+                    $err_message = 'Upload Failed: Fail to upload from ' . $_FILES[$input_name]['tmp_name'][$i] . ' to ' . $fullfilename;
+                    break;
+                    // die('fail upload from ' . $_FILES[$input_name]['tmp_name'][$i] . ' to ' . $fullfilename);
                 }
+
                 $return[] = $file_id;
             }
         }
 
-        if (isset($_POST[$input_name])) {
+        if (isset($_POST[$input_name]) && !$err_code) {
 
             $imageDataArray = $_POST[$input_name];
             $filenameArray = $_POST[$input_name . '_filename'];
@@ -695,7 +712,10 @@ class cajax {
                 $filename = carr::get($filenameArray, $k);
                 $extension = "." . pathinfo($filename, PATHINFO_EXTENSION);
                 if (strtolower($extension) == 'php') {
-                    die('fatal error');
+                    $err_code++;
+                    $err_message = 'Upload Failed';
+                    break;
+                    // die('fatal error');
                 }
 
                 $filteredData = substr($imageData, strpos($imageData, ",") + 1);
@@ -707,6 +727,8 @@ class cajax {
             }
         }
         $return = array(
+            'err_code' => $err_code,
+            'err_message' => $err_message,
             'file_id' => $file_id,
             'url' => ctemp::get_url('imgupload', $file_id),
         );

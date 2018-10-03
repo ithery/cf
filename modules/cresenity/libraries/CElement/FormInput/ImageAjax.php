@@ -13,6 +13,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     protected $imgSrc;
     protected $maxWidth;
     protected $maxHeight;
+    protected $maxUploadSize;   // in MB
     protected $disabledUpload;
     protected $cropper;
 
@@ -23,6 +24,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         $this->imgSrc = CApp_Base::noImageUrl();
         $this->maxWidth = "200";
         $this->maxHeight = "150";
+        $this->maxUploadSize = 0;
         $this->disabledUpload = false;
         $this->templateName = 'CElement/FormInput/ImageAjax';
         $this->onBeforeParse(function() {
@@ -33,7 +35,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
 
             $ajaxUrl = CAjaxMethod::factory()->set_type('imgupload')
                     ->set_data('input_name', $ajaxName)
-                    ->makeurl();
+                    ->set_data('max_upload_size', $this->maxUploadSize)
+                    ->makeurl();  
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('maxWidth', $this->maxWidth);
@@ -61,6 +64,11 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
 
     public function setMaxHeight($maxheight) {
         $this->maxHeight = $maxheight;
+        return $this;
+    }
+
+    public function setMaxUploadSize($size) {
+        $this->maxUploadSize = $size;
         return $this;
     }
 

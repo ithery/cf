@@ -109,11 +109,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                 xhr.onreadystatechange = function () {
                                     if (this.readyState == 4 && this.status == 200) {
                                         var dataFile = JSON.parse(this.responseText);
-                                        $('#<?php echo $id; ?>').val(dataFile.file_id);
-                                        $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
+                                        var errCode = dataFile.err_code;
+                                        var errMessage = dataFile.err_message;
+
+                                        if (!err_code) {
+                                            $('#<?php echo $id; ?>').val(dataFile.file_id);
+                                            $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
+                                            $('#<?php echo $id; ?>').trigger('change');
+                                        } else {
+                                            alert(errMessage);
+                                        }
+
                                         $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
                                         $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
-                                        $('#<?php echo $id; ?>').trigger('change');
                                     } else if (this.readyState == 4 && this.status != 200) {
                                     }
                                 };
@@ -138,11 +146,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         xhr.onreadystatechange = function () {
                             if (this.readyState == 4 && this.status == 200) {
                                 var dataFile = JSON.parse(this.responseText);
-                                $('#<?php echo $id; ?>').val(dataFile.file_id);
-                                $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
+                                var errCode = dataFile.err_code;
+                                var errMessage = dataFile.err_message;
+
+                                if (!$errCode) {
+                                    $('#<?php echo $id; ?>').val(dataFile.file_id);
+                                    $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
+                                    $('#<?php echo $id; ?>').trigger('change');
+                                } else {
+                                    alert(errMessage);
+                                }
+
                                 $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
                                 $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
-                                $('#<?php echo $id; ?>').trigger('change');
                             } else if (this.readyState == 4 && this.status != 200) {
                             }
                         };

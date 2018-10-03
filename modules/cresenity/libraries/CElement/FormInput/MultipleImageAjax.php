@@ -12,6 +12,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
     protected $imgSrc;
     protected $maxWidth;
     protected $maxHeight;
+    protected $maxUploadSize;
     protected $disabledUpload;
     protected $cropper;
     protected $files;
@@ -28,6 +29,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->imgSrc = "";
         $this->maxWidth = "200";
         $this->maxHeight = "150";
+        $this->maxUploadSize = 0;
         $this->disabledUpload = false;
         $this->templateName = 'CElement/FormInput/MultipleImageAjax';
         $this->removeLink = true;
@@ -43,6 +45,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
 
             $ajaxUrl = CAjaxMethod::factory()->set_type('imgupload')
                     ->set_data('input_name', $ajaxName)
+                    ->set_data('max_upload_size', $this->maxUploadSize)
                     ->makeurl();
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
@@ -80,6 +83,11 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
             $js .= $this->cropper->js();
         }
         return $js;
+    }
+
+    public function setMaxUploadSize($size) {
+        $this->maxUploadSize = $size;
+        return $this;
     }
 
     /**
