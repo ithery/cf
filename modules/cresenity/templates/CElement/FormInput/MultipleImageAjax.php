@@ -154,6 +154,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     (function ($) {
         $(function () {
             var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
+            var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
 
 <?php if ($cropper != null) : ?>
                 var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
@@ -303,20 +304,11 @@ foreach ($customControl as $cc):
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
                         var dataFile = JSON.parse(this.responseText);
-                        var errCode = dataFile.err_code;
-                        var errMessage = dataFile.err_message;
-
                         div.removeClass("loading");
-
-                        if (!errCode) {
-                            div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
-                            img.attr('src', data.url);
-                            fileChanged();
-                        } else {
-                            alert(errMessage);
-                        }
-
+                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
+                        img.attr('src', data.url);
                         index++;
+                        fileChanged();
                     } else if (this.readyState == 4 && this.status != 200) {
                         //div.remove();
                     }
@@ -356,8 +348,13 @@ foreach ($customControl as $cc):
                                 reader.fileName = file.name;
 
                                 reader.onload = $.proxy(function (file, fileList, event) {
-                                    insertFile(reader, file, fileList, event);
-
+                                    var filesize = event.total;
+                                    var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+                                    if (maxUploadSize && filesize > maxUploadSize) {
+                                        $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                                    } else {
+                                        insertFile(reader, file, fileList, event);
+                                    }
                                 }, this, file, $("#<?php echo $id; ?>"));
                                 reader.readAsDataURL(file);
                             });
@@ -384,8 +381,13 @@ foreach ($customControl as $cc):
 
                     reader.fileName = file.name;
                     reader.onload = $.proxy(function (file, fileList, event) {
-
-                        insertFile(reader, file, fileList, event);
+                        var filesize = event.total;
+                        var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+                        if (maxUploadSize && filesize > maxUploadSize) {
+                            $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                        } else {
+                            insertFile(reader, file, fileList, event);
+                        }
                     }, this, file, $("#<?php echo $id; ?>"));
                     reader.readAsDataURL(file);
                 })

@@ -45,12 +45,12 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
 
             $ajaxUrl = CAjaxMethod::factory()->set_type('imgupload')
                     ->set_data('input_name', $ajaxName)
-                    ->set_data('max_upload_size', $this->maxUploadSize)
                     ->makeurl();
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('maxWidth', $this->maxWidth);
             $this->setVar('maxHeight', $this->maxHeight);
+            $this->setVar('maxUploadSize', $this->maxUploadSize);
             $this->setVar('disabledUpload', $this->disabledUpload);
             $this->setVar('preTag', $this->pretag());
             $this->setVar('postTag', $this->posttag());
