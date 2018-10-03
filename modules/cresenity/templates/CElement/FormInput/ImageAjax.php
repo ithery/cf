@@ -112,7 +112,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                         var errCode = dataFile.err_code;
                                         var errMessage = dataFile.err_message;
 
-                                        if (!err_code) {
+                                        if (!errCode) {
                                             $('#<?php echo $id; ?>').val(dataFile.file_id);
                                             $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
                                             $('#<?php echo $id; ?>').trigger('change');
