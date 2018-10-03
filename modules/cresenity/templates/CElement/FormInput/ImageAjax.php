@@ -30,7 +30,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 <script>
     
     var <?php echo $id ?>HaveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
-
+    var <?= $id ?>maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
 
 
 
@@ -57,97 +57,102 @@ defined('SYSPATH') OR die('No direct access allowed.');
             var reader = new FileReader();
             reader.fileName = file.name;
             reader.onload = function (event) {
+                var filesize = event.total;
+                var maxUploadSize = <?= $id ?>maxUploadSize;
+                if (maxUploadSize && filesize > maxUploadSize) {
+                    $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                } else {
+                    if (file.type.match("image.*")) {
 
-                if (file.type.match("image.*")) {
+                        var haveCropper = <?php echo $id ?>HaveCropper;
 
-                    var haveCropper = <?php echo $id ?>HaveCropper;
+                        if (haveCropper) {
 
-                    if (haveCropper) {
+                            reader.onloadend = (function (event) {
 
-                        reader.onloadend = (function (event) {
-
-                            var cropperId = '<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
-                            var cropperModal = $('#modal-cropper-' + cropperId);
-                            var cropperImgInitialized = cropperModal.find('img.cropper-hidden');
-                            if (cropperImgInitialized.length > 0) {
-                                cropperImgInitialized.cropper("destroy");
-                            }
-
-
-                            var cropperImg = cropperModal.find('img');
-                            cropperImg.attr('src', event.target.result);
-                            cropperModal.modal({backdrop: 'static', keyboard: false});
-                            cropperImg.cropper({
-                                aspectRatio: cropperWidth / cropperHeight,
-                                zoomOnWheel : false,
-
-                                crop: function (e) {
-
-                                }
-                            });
-                          
-                            cropperModal.find('.btn-crop').click(function () {
-
-                                var mime = 'image/png';
-                                if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
-                                    mime = 'image/jpeg';
+                                var cropperId = '<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
+                                var cropperModal = $('#modal-cropper-' + cropperId);
+                                var cropperImgInitialized = cropperModal.find('img.cropper-hidden');
+                                if (cropperImgInitialized.length > 0) {
+                                    cropperImgInitialized.cropper("destroy");
                                 }
 
 
-                                imageData = cropperImg.cropper('getCroppedCanvas',{width:cropperWidth,height:cropperHeight}).toDataURL(mime);
+                                var cropperImg = cropperModal.find('img');
+                                cropperImg.attr('src', event.target.result);
+                                cropperModal.modal({backdrop: 'static', keyboard: false});
+                                cropperImg.cropper({
+                                    aspectRatio: cropperWidth / cropperHeight,
+                                    zoomOnWheel : false,
 
-                                var img = "<img src=" + imageData + " /> ";
-                                $('#container-<?php echo $id ?> .fileupload-preview').html(img);
-                                $('#container-<?php echo $id ?>').removeClass('fileupload-new');
-                                $('#container-<?php echo $id ?>').addClass('fileupload-exists');
-                                $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
-                                var data = new FormData();
+                                    crop: function (e) {
 
-                                data.append('<?php echo $ajaxName; ?>[]', imageData);
-                                data.append('<?php echo $ajaxName; ?>_filename[]', event.target.fileName);
-                                var xhr = new XMLHttpRequest();
-                                xhr.onreadystatechange = function () {
-                                    if (this.readyState == 4 && this.status == 200) {
-                                        var dataFile = JSON.parse(this.responseText);
-                                        $('#<?php echo $id; ?>').val(dataFile.file_id);
-                                        $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
-                                        $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
-                                        $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
-                                        $('#<?php echo $id; ?>').trigger('change');
-                                    } else if (this.readyState == 4 && this.status != 200) {
                                     }
-                                };
-                                xhr.open("post", '<?php echo $ajaxUrl; ?>');
-                                xhr.send(data);
-                                $(this).closest('.modal').modal('hide');
+                                });
+                              
+                                cropperModal.find('.btn-crop').click(function () {
+
+                                    var mime = 'image/png';
+                                    if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
+                                        mime = 'image/jpeg';
+                                    }
+
+
+                                    imageData = cropperImg.cropper('getCroppedCanvas',{width:cropperWidth,height:cropperHeight}).toDataURL(mime);
+
+                                    var img = "<img src=" + imageData + " /> ";
+                                    $('#container-<?php echo $id ?> .fileupload-preview').html(img);
+                                    $('#container-<?php echo $id ?>').removeClass('fileupload-new');
+                                    $('#container-<?php echo $id ?>').addClass('fileupload-exists');
+                                    $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
+                                    var data = new FormData();
+
+                                    data.append('<?php echo $ajaxName; ?>[]', imageData);
+                                    data.append('<?php echo $ajaxName; ?>_filename[]', event.target.fileName);
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.onreadystatechange = function () {
+                                        if (this.readyState == 4 && this.status == 200) {
+                                            var dataFile = JSON.parse(this.responseText);
+                                            $('#<?php echo $id; ?>').val(dataFile.file_id);
+                                            $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
+                                            $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
+                                            $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
+                                            $('#<?php echo $id; ?>').trigger('change');
+                                        } else if (this.readyState == 4 && this.status != 200) {
+                                        }
+                                    };
+                                    xhr.open("post", '<?php echo $ajaxUrl; ?>');
+                                    xhr.send(data);
+                                    $(this).closest('.modal').modal('hide');
+                                });
+
                             });
 
-                        });
 
+                        } else {
 
-                    } else {
-
-                        var img = "<img src=" + event.target.result + " /> ";
-                        $('#container-<?php echo $id ?> .fileupload-preview').html(img);
-                        $('#container-<?php echo $id ?>').removeClass('fileupload-new');
-                        $('#container-<?php echo $id ?>').addClass('fileupload-exists');
-                        $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
-                        var data = new FormData();
-                        data.append('<?php echo $ajaxName; ?>[]', file);
-                        var xhr = new XMLHttpRequest();
-                        xhr.onreadystatechange = function () {
-                            if (this.readyState == 4 && this.status == 200) {
-                                var dataFile = JSON.parse(this.responseText);
-                                $('#<?php echo $id; ?>').val(dataFile.file_id);
-                                $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
-                                $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
-                                $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
-                                $('#<?php echo $id; ?>').trigger('change');
-                            } else if (this.readyState == 4 && this.status != 200) {
-                            }
-                        };
-                        xhr.open("post", '<?php echo $ajaxUrl; ?>');
-                        xhr.send(data);
+                            var img = "<img src=" + event.target.result + " /> ";
+                            $('#container-<?php echo $id ?> .fileupload-preview').html(img);
+                            $('#container-<?php echo $id ?>').removeClass('fileupload-new');
+                            $('#container-<?php echo $id ?>').addClass('fileupload-exists');
+                            $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
+                            var data = new FormData();
+                            data.append('<?php echo $ajaxName; ?>[]', file);
+                            var xhr = new XMLHttpRequest();
+                            xhr.onreadystatechange = function () {
+                                if (this.readyState == 4 && this.status == 200) {
+                                    var dataFile = JSON.parse(this.responseText);
+                                    $('#<?php echo $id; ?>').val(dataFile.file_id);
+                                    $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
+                                    $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
+                                    $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
+                                    $('#<?php echo $id; ?>').trigger('change');
+                                } else if (this.readyState == 4 && this.status != 200) {
+                                }
+                            };
+                            xhr.open("post", '<?php echo $ajaxUrl; ?>');
+                            xhr.send(data);
+                        }
                     }
                 }
             };
