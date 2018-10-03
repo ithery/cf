@@ -178,7 +178,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                         $transforms = json_decode($transforms, TRUE);
 
                         foreach ($transforms as $transforms_k => $transforms_v) {
-                            $value = ctransform::$transforms_v['func']($value, TRUE);
+                            $value = ctransform::{$transforms_v['func']}($value, TRUE);
                         }
                     }
 
