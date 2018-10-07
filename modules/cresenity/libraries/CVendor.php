@@ -65,4 +65,8 @@ class CVendor {
         return new CVendor_SenangPay($options, $environment);
     }
 
+    public static function posMalaysia() {
+        return new CVendor_PosMalaysia();
+    }
+
 }

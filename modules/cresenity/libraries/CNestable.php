@@ -60,6 +60,11 @@ class CNestable extends CElement_Element {
         return $this;
     }
 
+    public function setDataFromArray($array = array()) {
+        $this->data = $array;
+        return $this;
+    }
+
     public function set_id_key($id_key) {
         $this->id_key = $id_key;
         return $this;
