@@ -68,7 +68,7 @@ class CVendor_GoSend {
 			'destination' => $destination,
 		];
 
-		$curl = CCUrl::factory($this->url . '/gokilat/v10/calculate/price?' . http_build_query($params));
+		$curl = CCurl::factory($this->url . '/gokilat/v10/calculate/price?' . http_build_query($params));
 		$curl->setHttpHeader([
 			'Content-Type: application/json',
 			'Client-ID: ' . $this->clientId,
@@ -91,7 +91,7 @@ class CVendor_GoSend {
 	 * @return JSON                  responses
 	 */
 	public function booking($paymentType, $shipmentMethod, array $shippingData) {
-		$curl = CCUrl::factory($this->url . '/gokilat/v10/booking');
+		$curl = CCurl::factory($this->url . '/gokilat/v10/booking');
 		$curl->setHttpHeader([
 			'Content-Type: application/json',
 			'Client-ID: ' . $this->clientId,
@@ -170,7 +170,7 @@ class CVendor_GoSend {
 	 * @return JSON              responses
 	 */
 	public function getDetails($orderNo) {
-		$curl = CCUrl::factory($this->url . '/gokilat/v10/booking/orderNo/' . $orderno);
+		$curl = CCurl::factory($this->url . '/gokilat/v10/booking/orderNo/' . $orderNo);
 		$curl->setHttpHeader([
 			'Content-Type: application/json',
 			'Client-ID: ' . $this->clientId,
@@ -191,7 +191,7 @@ class CVendor_GoSend {
 	 * @return JSON                                 responses
 	 */
 	public function getDetailsByStoreOrderId($storeOrderId) {
-		$curl = CCUrl::factory($this->url . '/gokilat/v10/booking/storeOrderId/' . $storeOrderId);
+		$curl = CCurl::factory($this->url . '/gokilat/v10/booking/storeOrderId/' . $storeOrderId);
 		$curl->setHttpHeader([
 			'Content-Type: application/json',
 			'Client-ID: ' . $this->clientId,
@@ -212,7 +212,7 @@ class CVendor_GoSend {
 	 * @return JSON                 responses
 	 */
 	public function cancelBooking($orderNo) {
-		$curl = CCUrl::factory($this->url . '/gokilat/v10/booking/cancel/');
+		$curl = CCurl::factory($this->url . '/gokilat/v10/booking/cancel/');
 		$curl->setHttpHeader([
 			'Content-Type: application/json',
 			'Client-ID: ' . $this->clientId,
