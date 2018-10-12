@@ -58,7 +58,7 @@ class CVendor_GoSend {
 	 * @return JSON                      responses
 	 */
 	public function calculatePrice($paymentType, $origin, $destination) {
-		if ($paymentType != 0 || $paymentType != 3) {
+		if ($paymentType != 0 && $paymentType != 3) {
 			throw new Exception('paymentType value should be 0 for Cash or 3 for Corporate');
 		}
 
@@ -98,11 +98,11 @@ class CVendor_GoSend {
 			'Pass-Key: ' . $this->passKey,
 		]);
 
-		if ($paymentType != 0 || $paymentType != 3) {
+		if ($paymentType != 0 && $paymentType != 3) {
 			throw new Exception('paymentType value must be 0 for Cash or 3 for Corporate');
 		}
 
-		if ($shipmentMethod != 'Instant' || $shipmentMethod != 'SameDay') {
+		if ($shipmentMethod != 'Instant' && $shipmentMethod != 'SameDay') {
 			throw new Exception('shipmentMethod value must be Instant or SameDay');
 		}
 
