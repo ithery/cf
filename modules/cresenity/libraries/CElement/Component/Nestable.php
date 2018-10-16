@@ -1,7 +1,13 @@
 <?php
 
-class CNestable extends CElement_Element {
+defined('SYSPATH') OR die('No direct access allowed.');
 
+/**
+ * @author Hery Kurniawan
+ * @since Oct 12, 2018, 1:48:18 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CElement_Component_Nestable extends CElement_Component {
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
 
@@ -36,7 +42,7 @@ class CNestable extends CElement_Element {
     }
 
     public static function factory($id) {
-        return new CNestable($id);
+        return new CElement_Component_Nestable($id);
     }
 
     public function display_callback_func($func, $require = "") {

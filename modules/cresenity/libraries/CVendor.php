@@ -65,4 +65,12 @@ class CVendor {
         return new CVendor_SenangPay($options, $environment);
     }
 
+    public static function posMalaysia() {
+        return new CVendor_PosMalaysia();
+    }
+
+    public static function goSend($environment = 'production') {
+        return new CVendor_GoSend($environment);
+    }
+
 }
