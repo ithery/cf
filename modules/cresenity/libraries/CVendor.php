@@ -69,4 +69,8 @@ class CVendor {
         return new CVendor_PosMalaysia();
     }
 
+    public static function goSend($environment = 'production') {
+        return new CVendor_GoSend($environment);
+    }
+
 }

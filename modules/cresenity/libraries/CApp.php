@@ -155,9 +155,7 @@ class CApp extends CObservable {
         if (isset($_COOKIE['capp-profiler'])) {
             new Profiler();
         }
-        if (isset($_COOKIE['capp-debugbar'])) {
-            CDebug::bar()->enable();
-        }
+        
         $db = CDatabase::instance();
         if ($this->_org == null) {
             $org_id = cstg::get("org_id");
@@ -166,6 +164,9 @@ class CApp extends CObservable {
             }
         }
         $this->registerCoreModules();
+        if (isset($_COOKIE['capp-debugbar'])) {
+            CDebug::bar()->enable();
+        }
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
