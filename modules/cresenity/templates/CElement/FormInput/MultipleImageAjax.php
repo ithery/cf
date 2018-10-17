@@ -245,7 +245,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                     mime = 'image/jpeg';
                                 }
 
-                                imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
+                                imageData = cropperImg.cropper('getCroppedCanvas', {width: cropperWidth, height: cropperHeight}).toDataURL(mime);
 
                                 addFile(fileRead, fileList, fileEvent, imageData);
                                 $(this).closest('.modal').modal('hide');
