@@ -384,8 +384,12 @@ class Cresenity_Controller extends CController {
                         if ($org_id != null) {
                             $q .= " and (org_id=" . $db->escape($org_id) . ' or org_id is null)';
                         }
-
-                        $q .= " order by org_id desc";
+                        $qOrder = " order by org_id desc";
+                        if($org_id==null) {
+                            $qOrder = " order by org_id asc";
+                            
+                        }
+                        $q.=$qOrder;
                         $row = $db->query($q);
                         if ($row->count() > 0) {
                             //check activation
