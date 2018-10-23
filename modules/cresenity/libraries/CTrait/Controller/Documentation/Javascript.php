@@ -123,12 +123,12 @@ CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append fr
     }
 
     public function ajax() {
-        $data['html'] = 'html 2';
+        $data['html'] = 'html 4';
         $data['js'] = 'js';
         echo json_encode($data);
     }
 
-    public function reload() {
+    public function reload2() {
         $app = CApp::instance();
 
         $list = array(
@@ -158,6 +158,26 @@ CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append fr
         });
 
         $select->jquery()->trigger('change');
+        echo $app->render();
+    }
+    
+    public function reload() {
+        $app = CApp::instance();
+
+        
+        $action = $app->addAction()->setLabel('Hide Me')->addClass('btn-primary');
+        $action2 = $app->addAction()->setLabel('Show Me')->addClass('btn-primary');
+        $div = $app->addDiv();
+        $div->add('Test');
+        $action->onClick(function($actionJs) use($div) {
+           $div->jquery()->hide();
+        });
+        $action2->onClick(function($actionJs) use($div) {
+           $div->jquery()->show(); 
+        });
+        
+       
+
         echo $app->render();
     }
 
