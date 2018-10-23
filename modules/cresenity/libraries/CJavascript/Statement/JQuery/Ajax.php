@@ -26,21 +26,22 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
         $this->complete = carr::get($options, 'complete', null);
         $this->success = carr::get($options, 'success', null);
         $this->error = carr::get($options, 'error', null);
+
         if ($this->error == null) {
             $this->error = carr::get($options, 'fail', null);
         }
     }
 
-    public function compileAjaxEvent($statement) {
+    public function compileAjaxEvent($statement, $args = array()) {
         if (is_array($statement)) {
-            $function = new CJavascript_Statement_Function('', array('data'));
+            $function = new CJavascript_Statement_Function('', $args);
             foreach ($statement as $stat) {
                 $function->addStatement($stat);
             }
             $statement = $function;
         }
         if ($statement instanceOf CJavascript_Statement && (!$statement instanceOf CJavascript_Statement_Function)) {
-            $function = new CJavascript_Statement_Function('', array('data'));
+            $function = new CJavascript_Statement_Function('', $args);
             $function->addStatement($statement);
             $statement = $function;
         }
@@ -57,12 +58,19 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
         $str .= 'dataType:' . CJavascript_Helper_Javascript::prepValue($this->dataType) . ',';
 
         if ($this->complete != null) {
-            $this->complete = $this->compileAjaxEvent($this->complete);
+            $args = array('data');
+            $this->complete = $this->compileAjaxEvent($this->complete, $args);
             $str .= 'complete:' . $this->complete . ',';
         }
         if ($this->success != null) {
-            $this->success = $this->compileAjaxEvent($this->success);
+            $args = array('data');
+            $this->success = $this->compileAjaxEvent($this->success, $args);
             $str .= 'success:' . $this->success . ',';
+        }
+        if ($this->error != null) {
+            $args = array('jqXhr', 'textStatus', 'errorThrown');
+            $this->error = $this->compileAjaxEvent($this->error, $args);
+            $str .= 'error:' . $this->error . ',';
         }
 
         $str .= 'method:' . CJavascript_Helper_Javascript::prepValue($this->method);

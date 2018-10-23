@@ -125,6 +125,7 @@ CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append fr
     public function ajax() {
         $data['html'] = 'html 4';
         $data['js'] = 'js';
+        die;
         echo json_encode($data);
     }
 
@@ -153,6 +154,10 @@ CManager::javascript()->jquery()->append($p, "<br/><div class=\"mt-3\">Append fr
             $ajaxOptions['data'] = array();
             $ajaxOptions['success'] = function($data) use($divAjax) {
                 $divAjax->jquery()->html($data->html);
+            };
+            $ajaxOptions['error'] = function($jqXhr,$textStatus,$errorThrown) use($divAjax) {
+                $divAjax->jquery()->html($jqXhr->statusText);
+                
             };
             $divAjax->jquery()->ajax($ajaxOptions);
         });
