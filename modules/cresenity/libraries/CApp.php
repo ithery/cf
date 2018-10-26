@@ -155,7 +155,7 @@ class CApp extends CObservable {
         if (isset($_COOKIE['capp-profiler'])) {
             new Profiler();
         }
-        
+
         $db = CDatabase::instance();
         if ($this->_org == null) {
             $org_id = cstg::get("org_id");
@@ -294,8 +294,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
-        
-        
+
+
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -318,8 +318,11 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function title($title) {
-        $this->title = clang::__($title);
+    public function title($title, $lang = true) {
+        if ($lang) {
+            $title = clang::__($title);
+        }
+        $this->title = $title;
         return $this;
     }
 
@@ -354,8 +357,8 @@ class CApp extends CObservable {
     }
 
     public function registerCoreModules() {
-        
-       
+
+
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
