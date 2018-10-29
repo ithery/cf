@@ -114,6 +114,13 @@ class CVendor_GoSend {
 						throw new Exception("$value type data must be boolean");
 					}
 					break;
+				case 'insuranceFee':
+					if ($insurance) {
+						if (${$value} == null) {
+							throw new Exception("$value is required");
+						}
+					}
+					break;
 				default:
 					if (${$value} == null) {
 						throw new Exception("$value is required");
