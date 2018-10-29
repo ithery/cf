@@ -115,7 +115,7 @@ class CVendor_GoSend {
 					}
 					break;
 				default:
-					if (!${$value}) {
+					if (${$value} != null) {
 						throw new Exception("$value is required");
 					}
 					break;
