@@ -177,7 +177,7 @@ class CVendor_GoSend {
 	 * @return JSON              responses
 	 */
 	public function getDetails($orderNo) {
-		$curl = CCurl::factory($this->url . '/gokilat/v10/booking/orderNo/' . $orderNo);
+		$curl = CCurl::factory($this->url . '/gokilat/v10/booking/orderno/' . $orderNo);
 		$curl->setHttpHeader([
 			'Content-Type: application/json',
 			'Client-ID: ' . $this->clientId,
