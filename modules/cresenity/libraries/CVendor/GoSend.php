@@ -106,10 +106,9 @@ class CVendor_GoSend {
 			throw new Exception('shipmentMethod value must be Instant or SameDay');
 		}
 
-		cdbg::dd($shippingData);
-
 		foreach ($this->required as $value) {
 			${$value} = carr::get($shippingData, $value);
+			cdbg::dd(${$value});
 			switch ($value) {
 				case 'insurance':
 					if (!is_bool(${$value})) {
