@@ -108,7 +108,6 @@ class CVendor_GoSend {
 
 		foreach ($this->required as $value) {
 			${$value} = carr::get($shippingData, $value);
-			cdbg::dd(${$value});
 			switch ($value) {
 				case 'insurance':
 					if (!is_bool(${$value})) {
@@ -117,13 +116,13 @@ class CVendor_GoSend {
 					break;
 				case 'insuranceFee':
 					if ($insurance) {
-						if (${$value} == null) {
+						if (${$value} === null) {
 							throw new Exception("$value is required");
 						}
 					}
 					break;
 				default:
-					if (${$value} == null) {
+					if (${$value} === null) {
 						throw new Exception("$value is required");
 					}
 					break;
