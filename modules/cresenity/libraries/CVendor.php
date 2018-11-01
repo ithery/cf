@@ -72,5 +72,9 @@ class CVendor {
     public static function goSend($environment = 'production') {
         return new CVendor_GoSend($environment);
     }
+    
+    public static function namecheap($options) {
+        return new CVendor_Namecheap($options);
+    }
 
 }

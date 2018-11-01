@@ -162,7 +162,7 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function set_ajax_redirect($bool) {
+    public function setAjaxRedirect($bool) {
         $this->ajax_redirect = $bool;
         return $this;
     }
