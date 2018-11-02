@@ -44,7 +44,7 @@ trait CTrait_Compat_TreeDb {
     }
 
     public static function get_list($indent = "") {
-        return self::getList($indent = "");
+        return self::getList($indent);
     }
 
     public static function get_parents($parent_id) {
@@ -56,19 +56,19 @@ trait CTrait_Compat_TreeDb {
     }
 
     public static function get_children_list($id = null, $indent = "") {
-        return self::getChildrenList($id = null, $indent = "");
+        return self::getChildrenList($id, $indent);
     }
 
     public static function get_children_leaf_list($id = null) {
-        return self::getChildrenLeafList($id = null);
+        return self::getChildrenLeafList($id);
     }
 
     public static function get_children_data($id = null) {
-        return self::getChildrenData($id = null);
+        return self::getChildrenData($id);
     }
 
     public static function rebuild_tree_all($force = false) {
-        return self::rebuildTreeAll($force = false);
+        return self::rebuildTreeAll($force);
     }
 
     public static function rebuild_tree_all_ignore_status() {
@@ -76,11 +76,11 @@ trait CTrait_Compat_TreeDb {
     }
 
     public static function rebuild_tree($id = null, $left = 1, $depth = 0) {
-        return self::rebuildTree($id = null, $left = 1, $depth = 0);
+        return self::rebuildTree($id, $left, $depth);
     }
 
     public static function rebuild_tree_ignore_status($id = null, $left = 1, $depth = 0) {
-        return self::rebuildTreeIgnoreStatus($id = null, $left = 1, $depth = 0);
+        return self::rebuildTreeIgnoreStatus($id, $left, $depth);
     }
 
 }
