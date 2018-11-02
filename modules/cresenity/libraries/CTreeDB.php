@@ -3,6 +3,7 @@
 defined('SYSPATH') OR die('No direct access allowed.');
 
 class CTreeDB {
+    use CTrait_Compat_TreeDb;
 
     protected $db = null;
     protected $pk_column = '';
@@ -46,38 +47,38 @@ class CTreeDB {
         return new CTreeDB($table_name, $domain, $db, $prefix);
     }
 
-    public function set_display_callback() {
+    public function setDisplayCallback() {
 
         return $this;
     }
 
-    public function set_pk_column($pk_column) {
+    public function setPkColumn($pk_column) {
         $this->pk_column = $pk_column;
         return $this;
     }
 
-    public function set_org_id($id) {
+    public function setOrgId($id) {
         $this->org_id = $id;
 
         return $this;
     }
 
-    public function add_filter($k, $v) {
+    public function addFilter($k, $v) {
         $this->filters[$k] = $v;
         return $this;
     }
 
-    public function set_delete_child($bool) {
+    public function setDeleteChild($bool) {
         $this->delete_child = $bool;
         return $this;
     }
 
-    public function set_have_priority($boolean) {
+    public function setHavePriority($boolean) {
         $this->have_priority = $boolean;
         return $this;
     }
 
-    protected function filter_where() {
+    protected function filterWhere() {
         $where = "";
         $db = $this->db;
         foreach ($this->filters as $k => $v) {
@@ -91,7 +92,7 @@ class CTreeDB {
         return $where;
     }
 
-    public function get_list($indent = "") {
+    public function getList($indent = "") {
         $db = $this->db;
 
         $q = "
@@ -234,7 +235,7 @@ class CTreeDB {
         }
     }
 
-    public function get_parents($parent_id) {
+    public function getParents($parent_id) {
         $db = $this->db;
 
         $q = "SELECT rgt,lft 
@@ -256,7 +257,7 @@ class CTreeDB {
         return $r;
     }
 
-    public function get_first_parent($parent_id) {
+    public function getFirstParent($parent_id) {
         $db = $this->db;
         $q = "SELECT rgt,lft 
                 FROM " . $db->escape_table($this->table_name) . " 
@@ -276,7 +277,7 @@ class CTreeDB {
         return $r;
     }
 
-    public function get_children_list($id = null, $indent = "") {
+    public function getChildrenList($id = null, $indent = "") {
         $db = $this->db;
 
         $q = "
@@ -320,7 +321,7 @@ class CTreeDB {
         return cdbutils::get_list($q);
     }
 
-    public function get_children_leaf_list($id = null) {
+    public function getChildrenLeafList($id = null) {
         $db = $this->db;
 
         $q = "
@@ -370,7 +371,7 @@ class CTreeDB {
         return $list;
     }
 
-    public function get_children_data($id = null) {
+    public function getChildrenData($id = null) {
         $db = $this->db;
         $q = "select * from " . $db->escape_table($this->table_name) . " where status>0 " . $this->filter_where();
         if (strlen($this->org_id) > 0 && $this->org_id != 'ALL' && $this->org_id != 'NONE') {
@@ -399,7 +400,7 @@ class CTreeDB {
         return $r;
     }
 
-    function rebuild_tree_all($force = false) {
+    function rebuildTreeAll($force = false) {
         if (!$force) {
             if ($this->org_id == null) {
                 throw new Exception('Service Unavailable on rebuild_tree_all on org_id null');
@@ -435,7 +436,7 @@ class CTreeDB {
         }
     }
 
-    function rebuild_tree_all_ignore_status() {
+    function rebuildTreeAllIgnoreStatus() {
         $db = $this->db;
         $q = "select " . $db->escape_column($this->pk_column) . " from " . $db->escape_table($this->table_name) . " where 1=1 ";
         if (strlen($this->org_id) > 0) {
@@ -457,7 +458,7 @@ class CTreeDB {
         }
     }
 
-    function rebuild_tree($id = null, $left = 1, $depth = 0) {
+    function rebuildTree($id = null, $left = 1, $depth = 0) {
         // the right value of this node is the left value + 1   
         $db = $this->db;
         $right = $left + 1;
@@ -507,7 +508,7 @@ class CTreeDB {
         return $right + 1;
     }
 
-    function rebuild_tree_ignore_status($id = null, $left = 1, $depth = 0) {
+    function rebuildTreeIgnoreStatus($id = null, $left = 1, $depth = 0) {
         // the right value of this node is the left value + 1   
         $db = $this->db;
         $right = $left + 1;
