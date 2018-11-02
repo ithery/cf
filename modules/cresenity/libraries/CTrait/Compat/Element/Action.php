@@ -80,6 +80,11 @@ trait CTrait_Compat_Element_Action {
         return $this->setSubmitTo($url, $target);
     }
 
+    public function set_disabled($bool) {
+        $this->disabled = $bool;
+        return $this;
+    }
+
     public function render_as_input() {
         return $this->renderAsInput();
     }

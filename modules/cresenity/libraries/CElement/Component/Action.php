@@ -116,7 +116,7 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function set_disabled($bool) {
+    public function setDisabled($bool = true) {
         $this->disabled = $bool;
         return $this;
     }
