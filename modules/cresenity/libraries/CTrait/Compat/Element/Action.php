@@ -81,8 +81,7 @@ trait CTrait_Compat_Element_Action {
     }
 
     public function set_disabled($bool) {
-        $this->disabled = $bool;
-        return $this;
+        return $this->setDisabled($bool);
     }
 
     public function render_as_input() {

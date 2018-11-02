@@ -15,72 +15,72 @@ trait CTrait_Compat_TreeDb {
      * @param type $filename
      * @return array
      */
-    public static function set_display_callback() {
-        return self::setDisplayCallback();
+    public function set_display_callback() {
+        return $this->setDisplayCallback();
     }
 
-    public static function set_pk_column($pk_column) {
-        return self::setPkColumn($pk_column);
+    public function set_pk_column($pk_column) {
+        return $this->setPkColumn($pk_column);
     }
 
-    public static function set_org_id($id) {
-        return self::setOrgId($id);
+    public function set_org_id($id) {
+        return $this->setOrgId($id);
     }
 
-    public static function add_filter($k, $v) {
-        return self::addFilter($k, $v);
+    public function add_filter($k, $v) {
+        return $this->addFilter($k, $v);
     }
 
-    public static function set_delete_child($bool) {
-        return self::setDeleteChild($bool);
+    public function set_delete_child($bool) {
+        return $this->setDeleteChild($bool);
     }
 
-    public static function set_have_priority($boolean) {
-        return self::setHavePriority($boolean);
+    public function set_have_priority($boolean) {
+        return $this->setHavePriority($boolean);
     }
 
-    public static function filter_where() {
-        return self::filterWhere();
+    protected function filter_where() {
+        return $this->filterWhere();
     }
 
-    public static function get_list($indent = "") {
-        return self::getList($indent);
+    public function get_list($indent = "") {
+        return $this->getList($indent);
     }
 
-    public static function get_parents($parent_id) {
-        return self::getParents($parent_id);
+    public function get_parents($parent_id) {
+        return $this->getParents($parent_id);
     }
 
-    public static function get_first_parent($parent_id) {
-        return self::getFirstParent($parent_id);
+    public function get_first_parent($parent_id) {
+        return $this->getFirstParent($parent_id);
     }
 
-    public static function get_children_list($id = null, $indent = "") {
-        return self::getChildrenList($id, $indent);
+    public function get_children_list($id = null, $indent = "") {
+        return $this->getChildrenList($id, $indent);
     }
 
-    public static function get_children_leaf_list($id = null) {
-        return self::getChildrenLeafList($id);
+    public function get_children_leaf_list($id = null) {
+        return $this->getChildrenLeafList($id);
     }
 
-    public static function get_children_data($id = null) {
-        return self::getChildrenData($id);
+    public function get_children_data($id = null) {
+        return $this->getChildrenData($id);
     }
 
-    public static function rebuild_tree_all($force = false) {
-        return self::rebuildTreeAll($force);
+    public function rebuild_tree_all($force = false) {
+        return $this->rebuildTreeAll($force);
     }
 
-    public static function rebuild_tree_all_ignore_status() {
-        return self::rebuildTreeAllIgnoreStatus();
+    public function rebuild_tree_all_ignore_status() {
+        return $this->rebuildTreeAllIgnoreStatus();
     }
 
-    public static function rebuild_tree($id = null, $left = 1, $depth = 0) {
-        return self::rebuildTree($id, $left, $depth);
+    public function rebuild_tree($id = null, $left = 1, $depth = 0) {
+        return $this->rebuildTree($id, $left, $depth);
     }
 
-    public static function rebuild_tree_ignore_status($id = null, $left = 1, $depth = 0) {
-        return self::rebuildTreeIgnoreStatus($id, $left, $depth);
+    public function rebuild_tree_ignore_status($id = null, $left = 1, $depth = 0) {
+        return $this->rebuildTreeIgnoreStatus($id, $left, $depth);
     }
 
 }
