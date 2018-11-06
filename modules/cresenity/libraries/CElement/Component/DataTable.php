@@ -1657,8 +1657,10 @@ class CElement_Component_DataTable extends CElement_Component {
                                     ->add_param($action)
                                     ->set_require($this->requires)
                                     ->execute();
-                            $action->setVisibility(false);
-                            //$action->setVisibility($visibility);
+                            if($visibility==false) {
+                                $action->addClass('d-none');
+                            }
+                            $action->setVisibility($visibility);
                         }
 
 
