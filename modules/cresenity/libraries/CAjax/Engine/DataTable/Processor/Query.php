@@ -392,16 +392,18 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 if (($table->filter_action_callback_func) != null) {
                     $actions = $rowActionList->childs();
 
-                    foreach ($actions as $action) {
+                    foreach ($actions as &$action) {
                         $visibility = CDynFunction::factory($table->filter_action_callback_func)
                                 ->add_param($table)
-                                ->add_param($col->get_fieldname())
+                                ->add_param($col->getFieldname())
                                 ->add_param($row)
                                 ->add_param($action)
                                 ->set_require($table->requires)
                                 ->execute();
-
-                        $action->set_visibility($visibility);
+                        if($visibility==false) {
+                                $action->addClass('d-none');
+                            }
+                        $action->setVisibility($visibility);
                     }
 
 
