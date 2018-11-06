@@ -1649,7 +1649,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     if (($this->filter_action_callback_func) != null) {
                         $actions = $this->rowActionList->childs();
 
-                        foreach ($actions as $action) {
+                        foreach ($actions as &$action) {
                             $visibility = CDynFunction::factory($this->filter_action_callback_func)
                                     ->add_param($this)
                                     ->add_param($col->getFieldname())
