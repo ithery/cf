@@ -405,9 +405,6 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                        
                         if ($visibility == false) {
                             $action->addClass('d-none');
-                             cdbg::var_dump($visibility);
-                        die;
-                            
                         }
                         $action->setVisibility($visibility);
                     }
