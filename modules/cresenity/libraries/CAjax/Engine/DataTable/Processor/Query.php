@@ -393,7 +393,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     $actions = $rowActionList->childs();
 
                     foreach ($actions as &$action) {
-                        die();
+                       
                         $visibility = CDynFunction::factory($table->filter_action_callback_func)
                                 ->add_param($table)
                                 ->add_param($col->getFieldname())
