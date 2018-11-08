@@ -18,6 +18,10 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
         $this->placeholder = "";
         $this->value = "0";
         $this->addClass('form-control');
+
+        if (!CManager::asset()->module()->isRegisteredModule('auto-numeric')) {
+            CManager::asset()->module()->registerRunTimeModule('auto-numeric');
+        }
     }
 
     protected function build() {
