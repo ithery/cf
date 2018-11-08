@@ -67,6 +67,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('datepicker', 'CElement_FormInput_Date');
         $this->manager->registerControl('date', 'CElement_FormInput_Date');
         $this->manager->registerControl('currency', 'CElement_FormInput_Currency');
+        $this->manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
         $this->manager->registerControl('time', 'CElement_FormInput_Time');
         $this->manager->registerControl('timepicker', 'CElement_FormInput_Time');
         $this->manager->registerControl('clock', 'CElement_FormInput_Clock');
