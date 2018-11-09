@@ -572,7 +572,7 @@ return array(
             "theme/theme-material/theme-material.css",
         ),
     ),
-    "autonumeric" => array(
+    "auto-numeric" => array(
         "js" => array("plugins/autonumeric/autonumeric.min.js"),
     ),
 );
