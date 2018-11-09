@@ -36,7 +36,6 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
 
         $js->append("
             $('#" . $this->id . "').autoNumeric('init');
-            // new AutoNumeric('#" . $this->id . "', {});
         ");
 
         return $js->text();
