@@ -573,7 +573,7 @@ return array(
         ),
     ),
     "auto-numeric" => array(
-        "js" => array("plugins/autonumeric/autonumeric.min.js"),
+        "js" => array("plugins/autonumeric/autonumeric.js"),
     ),
 );
 ?>
