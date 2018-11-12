@@ -27,6 +27,12 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
+        if ($this->readonly) {
+            $this->setAttr('readonly', 'readonly');
+        }
+        if ($this->disabled) {
+            $this->setAttr('disabled', 'disabled');
+        }
     }
 
     public function js($indent = 0) {
