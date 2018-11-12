@@ -162,10 +162,6 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 }
 
                 $sWhere = substr_replace($sWhere, "", -3);
-                if (isset($_GET['lalala'])) {
-                    cdbg::var_dump($sWhere);
-                    die;
-                }
             }
             // Quick Search
             $qs_cond = array();
