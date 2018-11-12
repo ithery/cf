@@ -627,22 +627,42 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $fieldname
+     * @return CElement_Component_DataTable_Column
+     */
     public function addColumn($fieldname) {
         $col = CElement_Component_DataTable_Column::factory($fieldname);
         $this->columns[] = $col;
         return $col;
     }
 
+    /**
+     * 
+     * @param string $group_by
+     * @return $this
+     */
     public function setGroupBy($group_by) {
         $this->group_by = $group_by;
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
     public function setCheckbox($bool) {
         $this->checkbox = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * @param string $val
+     * @return $this
+     */
     public function setCheckboxValue($val) {
         if (!is_array($val)) {
             $val = array($val);
@@ -651,21 +671,40 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setHeaderSortable($bool) {
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setHeaderSortable($bool=true) {
         $this->header_sortable = $bool;
         return $this;
     }
 
-    public function setNumbering($bool) {
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setNumbering($bool=true) {
         $this->numbering = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * alias for setNumbering(true)
+     * @return $this
+     */
     public function enableNumbering() {
         $this->numbering = true;
         return $this;
     }
 
+    /**
+     * alias for setNumbering(false)
+     * @return $this
+     */
     public function disableNumbering() {
         $this->numbering = false;
         return $this;
@@ -686,6 +725,11 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $q
+     * @return $this
+     */
     public function setDataFromQuery($q) {
         if ($this->ajax == false) {
             $db = $this->db;
@@ -696,6 +740,12 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param CElastic_Search $el
+     * @param string $require
+     * @return $this
+     */
     public function setDataFromElastic($el, $require) {
         $this->query = $el;
         $this->isElastic = true;
@@ -706,6 +756,13 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param callable $callback
+     * @param array $callbackOptions
+     * @param string $require
+     * @return $this
+     */
     public function setDataFromCallback($callback, $callbackOptions = array(), $require = null) {
         $this->query = $callback;
         $this->isCallback = true;
@@ -715,8 +772,13 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setDataFromArray($a) {
-        $this->data = $a;
+    /**
+     * 
+     * @param array $a
+     * @return $this
+     */
+    public function setDataFromArray($arr) {
+        $this->data = $arr;
         return $this;
     }
 
@@ -1587,16 +1649,18 @@ class CElement_Component_DataTable extends CElement_Component {
                     if (($this->filter_action_callback_func) != null) {
                         $actions = $this->rowActionList->childs();
 
-                        foreach ($actions as $action) {
+                        foreach ($actions as &$action) {
                             $visibility = CDynFunction::factory($this->filter_action_callback_func)
                                     ->add_param($this)
-                                    ->add_param($col->get_fieldname())
+                                    ->add_param($col->getFieldname())
                                     ->add_param($row)
                                     ->add_param($action)
                                     ->set_require($this->requires)
                                     ->execute();
-
-                            $action->set_visibility($visibility);
+                            if($visibility==false) {
+                                $action->addClass('d-none');
+                            }
+                            $action->setVisibility($visibility);
                         }
 
 
