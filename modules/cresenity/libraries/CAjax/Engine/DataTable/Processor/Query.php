@@ -153,15 +153,19 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 for ($i = 0; $i < count($columns); $i++) {
                     $i2 = 0;
                     if ($table->checkbox) {
-                        $i2 = -1;
+                        $i2 = 1;
                     }
                     $fieldName = carr::get($columns[$i ],'fieldname');
-                    if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
+                    if (isset($request['bSearchable_' . ($i + $i2)]) && $request['bSearchable_' . ($i + $i2)] == "true") {
                         $sWhere .= "`" . $fieldName . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                     }
                 }
 
                 $sWhere = substr_replace($sWhere, "", -3);
+                if (isset($_GET['lalala'])) {
+                    cdbg::var_dump($sWhere);
+                    die;
+                }
             }
             // Quick Search
             $qs_cond = array();
