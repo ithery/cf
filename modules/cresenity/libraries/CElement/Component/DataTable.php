@@ -508,8 +508,9 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setTitle($title, $lang = true) {
-        if ($lang)
+        if ($lang) {
             $title = clang::__($title);
+        }
         $this->title = $title;
         return $this;
     }
