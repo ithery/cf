@@ -22,6 +22,11 @@
             return $this;
         }
 
+        public function setSrc($src) {
+            $this->src = $src;
+            return $this;
+        }
+
         public function toarray() {
             $data["attr"]["src"] = $this->src;
             $data = array_merge_recursive($data, parent::toarray());
