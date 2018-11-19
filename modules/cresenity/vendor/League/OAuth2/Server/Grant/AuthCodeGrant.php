@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Alex Bilbie <hello@alexbilbie.com>
  * @copyright   Copyright (c) Alex Bilbie
@@ -25,8 +26,8 @@ use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use stdClass;
 
-class AuthCodeGrant extends AbstractAuthorizeGrant
-{
+class AuthCodeGrant extends AbstractAuthorizeGrant {
+
     /**
      * @var DateInterval
      */
@@ -45,9 +46,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
      * @throws Exception
      */
     public function __construct(
-        AuthCodeRepositoryInterface $authCodeRepository,
-        RefreshTokenRepositoryInterface $refreshTokenRepository,
-        DateInterval $authCodeTTL
+    AuthCodeRepositoryInterface $authCodeRepository, RefreshTokenRepositoryInterface $refreshTokenRepository, DateInterval $authCodeTTL
     ) {
         $this->setAuthCodeRepository($authCodeRepository);
         $this->setRefreshTokenRepository($refreshTokenRepository);
@@ -55,8 +54,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
         $this->refreshTokenTTL = new DateInterval('P1M');
     }
 
-    public function enableCodeExchangeProof()
-    {
+    public function enableCodeExchangeProof() {
         $this->enableCodeExchangeProof = true;
     }
 
@@ -72,9 +70,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
      * @return ResponseTypeInterface
      */
     public function respondToAccessTokenRequest(
-        ServerRequestInterface $request,
-        ResponseTypeInterface $responseType,
-        DateInterval $accessTokenTTL
+    ServerRequestInterface $request, ResponseTypeInterface $responseType, DateInterval $accessTokenTTL
     ) {
         // Validate request
         $client = $this->validateClient($request);
@@ -90,10 +86,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
             $this->validateAuthorizationCode($authCodePayload, $client, $request);
 
             $scopes = $this->scopeRepository->finalizeScopes(
-                $this->validateScopes($authCodePayload->scopes),
-                $this->getIdentifier(),
-                $client,
-                $authCodePayload->user_id
+                    $this->validateScopes($authCodePayload->scopes), $this->getIdentifier(), $client, $authCodePayload->user_id
             );
         } catch (LogicException $e) {
             throw OAuthServerException::invalidRequest('code', 'Cannot decrypt the authorization code', $e);
@@ -111,8 +104,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
             // @see: https://tools.ietf.org/html/rfc7636#section-4.1
             if (preg_match('/^[A-Za-z0-9-._~]{43,128}$/', $codeVerifier) !== 1) {
                 throw OAuthServerException::invalidRequest(
-                    'code_verifier',
-                    'Code Verifier must follow the specifications of RFC-7636.'
+                        'code_verifier', 'Code Verifier must follow the specifications of RFC-7636.'
                 );
             }
 
@@ -125,10 +117,9 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
                     break;
                 case 'S256':
                     if (
-                        hash_equals(
-                            strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_'),
-                            $authCodePayload->code_challenge
-                        ) === false
+                            hash_equals(
+                                    strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_'), $authCodePayload->code_challenge
+                            ) === false
                     ) {
                         throw OAuthServerException::invalidGrant('Failed to verify `code_verifier`.');
                     }
@@ -136,10 +127,9 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
                     break;
                 default:
                     throw OAuthServerException::serverError(
-                        sprintf(
-                            'Unsupported code challenge method `%s`',
-                            $authCodePayload->code_challenge_method
-                        )
+                            sprintf(
+                                    'Unsupported code challenge method `%s`', $authCodePayload->code_challenge_method
+                            )
                     );
                 // @codeCoverageIgnoreEnd
             }
@@ -171,9 +161,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
      * @param ServerRequestInterface $request
      */
     private function validateAuthorizationCode(
-        $authCodePayload,
-        ClientEntityInterface $client,
-        ServerRequestInterface $request
+    $authCodePayload, ClientEntityInterface $client, ServerRequestInterface $request
     ) {
         if (time() > $authCodePayload->expire_time) {
             throw OAuthServerException::invalidRequest('code', 'Authorization code has expired');
@@ -203,32 +191,25 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
      *
      * @return string
      */
-    public function getIdentifier()
-    {
+    public function getIdentifier() {
         return 'authorization_code';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function canRespondToAuthorizationRequest(ServerRequestInterface $request)
-    {
+    public function canRespondToAuthorizationRequest(ServerRequestInterface $request) {
         return (
-            array_key_exists('response_type', $request->getQueryParams())
-            && $request->getQueryParams()['response_type'] === 'code'
-            && isset($request->getQueryParams()['client_id'])
-        );
+                array_key_exists('response_type', $request->getQueryParams()) && $request->getQueryParams()['response_type'] === 'code' && isset($request->getQueryParams()['client_id'])
+                );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validateAuthorizationRequest(ServerRequestInterface $request)
-    {
+    public function validateAuthorizationRequest(ServerRequestInterface $request) {
         $clientId = $this->getQueryStringParameter(
-            'client_id',
-            $request,
-            $this->getServerParameter('PHP_AUTH_USER', $request)
+                'client_id', $request, $this->getServerParameter('PHP_AUTH_USER', $request)
         );
 
         if ($clientId === null) {
@@ -236,10 +217,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
         }
 
         $client = $this->clientRepository->getClientEntity(
-            $clientId,
-            $this->getIdentifier(),
-            null,
-            false
+                $clientId, $this->getIdentifier(), null, false
         );
 
         if ($client instanceof ClientEntityInterface === false) {
@@ -252,18 +230,15 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
         if ($redirectUri !== null) {
             $this->validateRedirectUri($redirectUri, $client, $request);
         } elseif (empty($client->getRedirectUri()) ||
-            (\is_array($client->getRedirectUri()) && \count($client->getRedirectUri()) !== 1)) {
+                (\is_array($client->getRedirectUri()) && \count($client->getRedirectUri()) !== 1)) {
             $this->getEmitter()->emit(new RequestEvent(RequestEvent::CLIENT_AUTHENTICATION_FAILED, $request));
             throw OAuthServerException::invalidClient();
         } else {
-            $redirectUri = \is_array($client->getRedirectUri())
-                ? $client->getRedirectUri()[0]
-                : $client->getRedirectUri();
+            $redirectUri = \is_array($client->getRedirectUri()) ? $client->getRedirectUri()[0] : $client->getRedirectUri();
         }
 
         $scopes = $this->validateScopes(
-            $this->getQueryStringParameter('scope', $request, $this->defaultScope),
-            $redirectUri
+                $this->getQueryStringParameter('scope', $request, $this->defaultScope), $redirectUri
         );
 
         $stateParameter = $this->getQueryStringParameter('state', $request);
@@ -289,8 +264,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
 
             if (\in_array($codeChallengeMethod, ['plain', 'S256'], true) === false) {
                 throw OAuthServerException::invalidRequest(
-                    'code_challenge_method',
-                    'Code challenge method must be `plain` or `S256`'
+                        'code_challenge_method', 'Code challenge method must be `plain` or `S256`'
                 );
             }
 
@@ -298,8 +272,7 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
             // @see: https://tools.ietf.org/html/rfc7636#section-4.2
             if (preg_match('/^[A-Za-z0-9-._~]{43,128}$/', $codeChallenge) !== 1) {
                 throw OAuthServerException::invalidRequest(
-                    'code_challenged',
-                    'Code challenge must follow the specifications of RFC-7636.'
+                        'code_challenged', 'Code challenge must follow the specifications of RFC-7636.'
                 );
             }
 
@@ -313,49 +286,42 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
     /**
      * {@inheritdoc}
      */
-    public function completeAuthorizationRequest(AuthorizationRequest $authorizationRequest)
-    {
+    public function completeAuthorizationRequest(AuthorizationRequest $authorizationRequest) {
         if ($authorizationRequest->getUser() instanceof UserEntityInterface === false) {
             throw new LogicException('An instance of UserEntityInterface should be set on the AuthorizationRequest');
         }
 
-        $finalRedirectUri = $authorizationRequest->getRedirectUri()
-                          ?? $this->getClientRedirectUri($authorizationRequest);
+        $finalRedirectUri = $authorizationRequest->getRedirectUri() != null ? $authorizationRequest->getRedirectUri() : $this->getClientRedirectUri($authorizationRequest);
 
         // The user approved the client, redirect them back with an auth code
         if ($authorizationRequest->isAuthorizationApproved() === true) {
             $authCode = $this->issueAuthCode(
-                $this->authCodeTTL,
-                $authorizationRequest->getClient(),
-                $authorizationRequest->getUser()->getIdentifier(),
-                $authorizationRequest->getRedirectUri(),
-                $authorizationRequest->getScopes()
+                    $this->authCodeTTL, $authorizationRequest->getClient(), $authorizationRequest->getUser()->getIdentifier(), $authorizationRequest->getRedirectUri(), $authorizationRequest->getScopes()
             );
 
             $payload = [
-                'client_id'             => $authCode->getClient()->getIdentifier(),
-                'redirect_uri'          => $authCode->getRedirectUri(),
-                'auth_code_id'          => $authCode->getIdentifier(),
-                'scopes'                => $authCode->getScopes(),
-                'user_id'               => $authCode->getUserIdentifier(),
-                'expire_time'           => (new DateTime())->add($this->authCodeTTL)->format('U'),
-                'code_challenge'        => $authorizationRequest->getCodeChallenge(),
+                'client_id' => $authCode->getClient()->getIdentifier(),
+                'redirect_uri' => $authCode->getRedirectUri(),
+                'auth_code_id' => $authCode->getIdentifier(),
+                'scopes' => $authCode->getScopes(),
+                'user_id' => $authCode->getUserIdentifier(),
+                'expire_time' => (new DateTime())->add($this->authCodeTTL)->format('U'),
+                'code_challenge' => $authorizationRequest->getCodeChallenge(),
                 'code_challenge_method' => $authorizationRequest->getCodeChallengeMethod(),
             ];
 
             $response = new RedirectResponse();
             $response->setRedirectUri(
-                $this->makeRedirectUri(
-                    $finalRedirectUri,
-                    [
-                        'code'  => $this->encrypt(
-                            json_encode(
-                                $payload
-                            )
+                    $this->makeRedirectUri(
+                            $finalRedirectUri, [
+                        'code' => $this->encrypt(
+                                json_encode(
+                                        $payload
+                                )
                         ),
                         'state' => $authorizationRequest->getState(),
-                    ]
-                )
+                            ]
+                    )
             );
 
             return $response;
@@ -363,13 +329,11 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
 
         // The user denied the client, redirect them back with an error
         throw OAuthServerException::accessDenied(
-            'The user denied the request',
-            $this->makeRedirectUri(
-                $finalRedirectUri,
-                [
+                'The user denied the request', $this->makeRedirectUri(
+                        $finalRedirectUri, [
                     'state' => $authorizationRequest->getState(),
-                ]
-            )
+                        ]
+                )
         );
     }
 
@@ -380,10 +344,8 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
      *
      * @return string
      */
-    private function getClientRedirectUri(AuthorizationRequest $authorizationRequest)
-    {
-        return \is_array($authorizationRequest->getClient()->getRedirectUri())
-                ? $authorizationRequest->getClient()->getRedirectUri()[0]
-                : $authorizationRequest->getClient()->getRedirectUri();
+    private function getClientRedirectUri(AuthorizationRequest $authorizationRequest) {
+        return \is_array($authorizationRequest->getClient()->getRedirectUri()) ? $authorizationRequest->getClient()->getRedirectUri()[0] : $authorizationRequest->getClient()->getRedirectUri();
     }
+
 }
