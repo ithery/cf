@@ -1,38 +1,5 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
 
-<style type="text/css">
-	.modal-dialog-select .dialog-select-item-list {
-		display: grid;
-		grid-template-columns: repeat(5, 1fr);
-		grid-template-rows: auto;
-		grid-gap: 10px;
-		min-height: 10vh;
-		max-height: 50vh;
-		overflow-y: scroll;
-	}
-
-	.modal-dialog-select .dialog-select-search {
-		margin-bottom: 20px;
-	}
-
-	.modal-dialog-select .dialog-select-item-list .ccard-item {
-		border: 2px solid green;
-		cursor: pointer;
-	}
-
-	.modal-dialog-select .dialog-select-item-list .ccard-item.selected {
-		border-color: blue;
-	}
-
-	.modal-dialog-select .dialog-select-load-more {
-		display: none;
-	}
-
-	.modal-dialog-select .dialog-select-load-more.processing {
-		display: block;
-	}
-</style>
-
 <div id="dialog-select-<?= $id ?>" class="dialog-select <?= ($value) ? 'dialog-select-exists' : 'dialog-select-new'; ?>">
 	<div class="dialog-select-new" style="width: <?= $width ?>px; height: <?= $height ?>px;">
 		<div class="dialog-select-image thumbnail">
@@ -78,7 +45,7 @@
     <div class="modal-dialog modal-dialog-select">
     	<div class="modal-content animated bounceInRight">
             <div class="modal-header">
-                <h3>Please choose an Item</h3>
+                <h3><?= $title ?></h3>
                 <a href="#" class="close">&times;</a><span class="loader"></span>
             </div>
             <div class="modal-body opened">
@@ -184,7 +151,11 @@
 
 	    		    var list = modalDialog.find('.dialog-select-item-list');
 	    		    list.empty();
-	    		    list.append(result);
+	    		    if (result) {
+	    		    	list.append(result);
+	    		    } else {
+	    		    	list.append($('<div class="alert alert-info">No Data Found</div>'));
+	    		    }
 	    		}).always(function() {
 	    			removeLoading(modalDialog, '.dialog-select-item-list');
 
