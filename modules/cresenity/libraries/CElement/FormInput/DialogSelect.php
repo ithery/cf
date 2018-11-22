@@ -124,7 +124,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 
 	public function setButtonLabel($label, $lang = true) {
 		if ($lang) {
-			$label = clang::__($lang);
+			$label = clang::__($label);
 		}
 		$this->buttonLabel = $label;
 		return $this;
