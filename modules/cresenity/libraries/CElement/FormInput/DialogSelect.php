@@ -40,8 +40,8 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		$this->imgSrc = CApp_Base::noImageUrl();
 		$this->width = '100';
 		$this->height = '100';
-		$this->buttonLabel = 'Select an Item';
-		$this->placeholder = 'Search Item';
+		$this->buttonLabel = clang::__('Select an Item');
+		$this->placeholder = clang::__('Search Item');
 		$this->delay = '1000';
 		$this->templateName = 'CElement/FormInput/DialogSelect';
 		$this->itemTemplateName = 'CElement/Card/Item';
@@ -122,12 +122,18 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	    return $this;
 	}
 
-	public function setButtonLabel($label) {
+	public function setButtonLabel($label, $lang = true) {
+		if ($lang) {
+			$label = clang::__($lang);
+		}
 		$this->buttonLabel = $label;
 		return $this;
 	}
 
-	public function setPlaceholder($placeholder) {
+	public function setPlaceholder($placeholder, $lang = true) {
+		if ($lang) {
+			$placeholder = clang::__($placeholder);
+		}
 		$this->placeholder = $placeholder;
 		return $this;
 	}
