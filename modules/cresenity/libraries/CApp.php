@@ -349,9 +349,13 @@ class CApp extends CObservable {
      * 
      * @param string $caption
      * @param string $url
+     * @param boolean $lang
      * @return CApp
      */
-    public function addBreadcrumb($caption, $url) {
+    public function addBreadcrumb($caption, $url = 'javascript:;', $lang=true) {
+        if ($lang) {
+            $caption = clang::__($caption);
+        }
         $this->breadcrumb[$caption] = $url;
         return $this;
     }

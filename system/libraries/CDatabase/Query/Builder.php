@@ -1964,6 +1964,16 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Get a new instance of the query builder.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function newQuery()
+    {
+        return new static($this->db, $this->grammar, $this->processor);
+    }
+
+    /**
      * Handle dynamic method calls into the method.
      *
      * @param  string  $method

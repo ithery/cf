@@ -52,7 +52,10 @@ class CObservable_Listener_Handler_Driver_Dialog extends CObservable_Listener_Ha
      * @param string $title
      * @return $this
      */
-    public function setTitle($title) {
+    public function setTitle($title, $lang = true) {
+        if ($lang) {
+            $title = clang::__($title);
+        }
         $this->title = $title;
         return $this;
     }

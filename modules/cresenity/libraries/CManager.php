@@ -123,7 +123,10 @@ final class CManager {
         if (!empty($data)) {
             CClientModules::instance()->defineModule($module, $data);
         }
-        return CClientModules::instance()->registerModule($module);
+        if(!CClientModules::instance()->isRegisteredModule($module)) {
+            return CClientModules::instance()->registerModule($module);
+        }
+        return false;
     }
 
     public static function registerThemeModule($module, $data = array()) {
