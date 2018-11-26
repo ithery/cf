@@ -15,7 +15,7 @@ trait CTrait_Element_Property_Title {
     public function setTitle($title, $lang = true) {
         $this->rawTitle = $title;
         if ($lang) {
-            $label = clang::__($title);
+            $title = clang::__($title);
         }
         $this->title = $title;
         return $this;
