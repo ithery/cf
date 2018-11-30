@@ -133,7 +133,7 @@ class CObservable_Listener {
                             $('body').addClass('modal-open');
 
                         }
-                    },250);
+                    },1000);
                 });
             ";
         }
