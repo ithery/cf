@@ -2,8 +2,10 @@
 
     class CFormInputRadio extends CFormInput {
 
+        use CTrait_Element_Property_Label;
+
         protected $checked;
-        protected $label;
+        // protected $label;
         protected $applyjs;
         protected $label_wrap;
         protected $inline;
@@ -37,8 +39,9 @@
             return $this;
         }
 
-        public function set_label($label) {
-            $this->label = $label;
+        public function set_label($label, $lang = true) {
+            $this->setLabel($label, $lang);
+            // $this->label = $label;
             return $this;
         }
 

@@ -596,9 +596,7 @@ div.dataTables_wrapper .ui-widget-header {
     position: relative;
     vertical-align: middle;
 } 
-body.modal-open .select2-container {
-    z-index: 1090;
-}
+
 .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple {
     border-color: #e7eaec;
 }
@@ -739,6 +737,26 @@ body.modal-open .select2-container {
 .fileupload.fileupload-exists .fileupload-new:not(.btn) {
     display: none;
 }
+
+/* dialog select */
+
+.btn-dialog-select {
+    padding: 6px 8px;
+    border: 1px solid #e5e6e7;
+}
+
+.dialog-select .dialog-select-exists:not(.btn), .dialog-select .dialog-select-new:not(.btn) {
+    display: inline-block;
+}
+
+.dialog-select.dialog-select-new .dialog-select-exists:not(.btn) {
+    display: none;
+}
+
+.dialog-select.dialog-select-exists .dialog-select-new:not(.btn) {
+    display: none;
+}
+
 /* timepicker */
 .bootstrap-timepicker-widget table td input {
     width: 35px!important;

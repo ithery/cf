@@ -30,7 +30,7 @@
             </div>
             <div class="modal-body opened">
                 <div class="cropper-image-container">
-                    <img class="img-responsive" src="/cresenity/noimage/800/500"/>
+                    <img class="img-responsive" src="/cresenity/noimage/800/500" height="auto" width="100%"/>
                 </div>
             </div>
             <div class="modal-footer">
@@ -78,7 +78,7 @@
         var container = modalCropper.find('.cropper-image-container');
         var image = container.find('img');
         $('.btn-zoom-in').click(function (event) {
-
+            
             image.cropper('zoom', 0.1);
             console.log(image.length);
         });

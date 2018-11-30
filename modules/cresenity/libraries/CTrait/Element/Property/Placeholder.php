@@ -16,12 +16,21 @@ trait CTrait_Element_Property_Placeholder {
     public $placeholder;
 
     /**
+     *
+     * @var string 
+     */
+    public $rawPlaceholder;
+
+    /**
      * 
      * @param string $placeholder
      * @return $this
      */
-    public function setPlaceholder($placeholder) {
-
+    public function setPlaceholder($placeholder, $lang = true) {
+        $this->rawPlaceholder = $placeholder;
+        if ($lang) {
+            $placeholder = clang::__($placeholder);
+        }
         $this->placeholder = $placeholder;
         return $this;
     }
@@ -31,7 +40,15 @@ trait CTrait_Element_Property_Placeholder {
      * @return string
      */
     public function getPlaceholder() {
-        return $this->placeholder;
+        return $this->rawPlaceholder;
     }
 
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getTranslationPlaceholder() {
+        return $this->placeholder;
+    }
 }

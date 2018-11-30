@@ -119,4 +119,16 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         return $this;
     }
 
+    public function hide() {
+        $this->jQueryStatement()->hide();
+        $this->resetJQueryStatement();
+        return $this;
+    }
+
+    public function show() {
+        $this->jQueryStatement()->show();
+        $this->resetJQueryStatement();
+        return $this;
+    }
+
 }

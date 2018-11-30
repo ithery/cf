@@ -25,12 +25,12 @@ abstract class CHandler_Driver {
         return $this;
     }
 
-    public function set_owner($owner) {
+    public function setOwner($owner) {
         $this->owner = $owner;
         return $this;
     }
 
-    public function set_url_param($url_param) {
+    public function setUrlParam($url_param) {
         if (!is_array($url_param)) {
             trigger_error('Invalid URL Param ' . cdbg::var_dump($url_param, true) . '');
         }
@@ -38,12 +38,12 @@ abstract class CHandler_Driver {
         return $this;
     }
 
-    public function add_url_param($k, $url_param) {
+    public function addUrlParam($k, $url_param) {
         $this->url_param[$k] = $url_param;
         return $this;
     }
 
-    public function generated_url() {
+    public function generatedUrl() {
         $link = $this->url;
 
         if (strlen($link) == 0) {

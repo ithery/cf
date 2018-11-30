@@ -114,8 +114,15 @@ class CVendor_GoSend {
 						throw new Exception("$value type data must be boolean");
 					}
 					break;
+				case 'insuranceFee':
+					if ($insurance) {
+						if (${$value} === null) {
+							throw new Exception("$value is required");
+						}
+					}
+					break;
 				default:
-					if (!${$value}) {
+					if (${$value} === null) {
 						throw new Exception("$value is required");
 					}
 					break;
@@ -170,7 +177,7 @@ class CVendor_GoSend {
 	 * @return JSON              responses
 	 */
 	public function getDetails($orderNo) {
-		$curl = CCurl::factory($this->url . '/gokilat/v10/booking/orderNo/' . $orderNo);
+		$curl = CCurl::factory($this->url . '/gokilat/v10/booking/orderno/' . $orderNo);
 		$curl->setHttpHeader([
 			'Content-Type: application/json',
 			'Client-ID: ' . $this->clientId,

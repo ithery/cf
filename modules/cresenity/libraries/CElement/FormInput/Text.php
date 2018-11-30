@@ -40,10 +40,7 @@ class CElement_FormInput_Text extends CElement_FormInput {
         return new CElement_FormInput_Text($id);
     }
 
-    public function set_name($name) {
-        $this->name = $name;
-        return $this;
-    }
+   
 
     function get_input_style() {
         return $this->input_style;

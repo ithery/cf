@@ -572,5 +572,8 @@ return array(
             "theme/theme-material/theme-material.css",
         ),
     ),
+    "auto-numeric" => array(
+        "js" => array("plugins/autonumeric/autonumeric.js"),
+    ),
 );
 ?>

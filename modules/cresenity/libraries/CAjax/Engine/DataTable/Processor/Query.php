@@ -84,7 +84,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
     }
 
     protected function getQueryOrderBy() {
-        
+
         if ($this->queryOrderBy === null) {
             $db = $this->db();
             $sOrder = "";
@@ -98,7 +98,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     if ($table->checkbox) {
                         $i2 = -1;
                     }
-                    $fieldName = carr::get($columns[intval($request['iSortCol_' . $i]) + $i2],'fieldname');
+                    $fieldName = carr::get($columns[intval($request['iSortCol_' . $i]) + $i2], 'fieldname');
                     if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
                         $sOrder .= "" . $db->escape_column($fieldName) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
                     }
@@ -143,20 +143,20 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
 
         if ($this->queryWhere === null) {
             $request = $this->engine->getInput();
-            $table=$this->table;
+            $table = $this->table;
             $db = $this->db();
             $qs_condition_str = "";
             $sWhere = '';
             $columns = $this->columns;
-            
+
             if (isset($request['sSearch']) && $request['sSearch'] != "") {
                 for ($i = 0; $i < count($columns); $i++) {
                     $i2 = 0;
                     if ($table->checkbox) {
-                        $i2 = -1;
+                        $i2 = 1;
                     }
                     $fieldName = carr::get($columns[$i ],'fieldname');
-                    if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
+                    if (isset($request['bSearchable_' . ($i + $i2)]) && $request['bSearchable_' . ($i + $i2)] == "true") {
                         $sWhere .= "`" . $fieldName . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                     }
                 }
@@ -392,16 +392,21 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 if (($table->filter_action_callback_func) != null) {
                     $actions = $rowActionList->childs();
 
-                    foreach ($actions as $action) {
+                    foreach ($actions as &$action) {
+                       
                         $visibility = CDynFunction::factory($table->filter_action_callback_func)
                                 ->add_param($table)
-                                ->add_param($col->get_fieldname())
+                                ->add_param($col->getFieldname())
                                 ->add_param($row)
                                 ->add_param($action)
                                 ->set_require($table->requires)
                                 ->execute();
-
-                        $action->set_visibility($visibility);
+                        
+                       
+                        if ($visibility == false) {
+                            $action->addClass('d-none');
+                        }
+                        $action->setVisibility($visibility);
                     }
 
 
