@@ -122,10 +122,12 @@ class CObservable_Listener {
                     }
                     var modalExists = $('.modal:visible').length > 0;
                     if (!modalExists) {
+                        console.log('a');
                         if($('body').hasClass('modal-open')) {
                             $('body').removeClass('modal-open');
                         }
                     } else {
+                        console.log('b');
                         if(!$('body').hasClass('modal-open')) {
                             $('body').addClass('modal-open');
                         }
