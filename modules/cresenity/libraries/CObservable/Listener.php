@@ -121,17 +121,11 @@ class CObservable_Listener {
                         thiselm.removeAttr('data-clicked');
                     }
                     setTimeout(function() {
-                    
                         var modalExists = $('.modal:visible').length > 0;
                         if (!modalExists) {
-                            console.log('a');
                             $('body').removeClass('modal-open');
-
                         } else {
-                            console.log('b');
-
                             $('body').addClass('modal-open');
-
                         }
                     },750);
                 });
