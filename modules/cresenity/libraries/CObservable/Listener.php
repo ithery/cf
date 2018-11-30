@@ -118,8 +118,16 @@ class CObservable_Listener {
 
             $confirmEndScript = "
                     } else {
-                            thiselm.removeAttr('data-clicked');
+                        thiselm.removeAttr('data-clicked');
                     }
+                    setTimeout(function() {
+                        var modalExists = $('.modal:visible').length > 0;
+                        if (!modalExists) {
+                            $('body').removeClass('modal-open');
+                        } else {
+                            $('body').addClass('modal-open');
+                        }
+                    },750);
                 });
             ";
         }
