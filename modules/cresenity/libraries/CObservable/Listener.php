@@ -109,7 +109,7 @@ class CObservable_Listener {
 
             $confirm_message = $this->confirm_message;
             if (strlen($confirm_message) == 0) {
-                $confirm_message = clang::__('Are you sure') . " ?";
+                $confirm_message = clang::__("Are you sure ?");
             }
             $confirmStartScript = "	
                 bootbox.confirm('" . $confirm_message . "', function(confirmed) {
