@@ -120,16 +120,14 @@ class CObservable_Listener {
                     } else {
                         thiselm.removeAttr('data-clicked');
                     }
-                    var modalExists = $('.modal:visible').length > 0;
-                    if (!modalExists) {
-                        if($('body').hasClass('modal-open')) {
+                    setTimeout(function() {
+                        var modalExists = $('.modal:visible').length > 0;
+                        if (!modalExists) {
                             $('body').removeClass('modal-open');
-                        }
-                    } else {
-                        if(!$('body').hasClass('modal-open')) {
+                        } else {
                             $('body').addClass('modal-open');
                         }
-                    }
+                    },750);
                 });
             ";
         }
