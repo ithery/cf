@@ -373,9 +373,9 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 }
                 $arr[] = $new_v;
             }
-            if ($rowActionList!=null && count($rowActionList) > 0) {
+            if ($rowActionList!=null && $rowActionList->childCount() > 0) {
                 $html = new CStringBuilder();
-                ;
+               
                 $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
