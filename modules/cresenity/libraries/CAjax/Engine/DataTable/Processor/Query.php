@@ -373,9 +373,9 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 }
                 $arr[] = $new_v;
             }
-            if (count($rowActionList) > 0) {
+            if ($rowActionList!=null && $rowActionList->childCount() > 0) {
                 $html = new CStringBuilder();
-                ;
+               
                 $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
@@ -393,7 +393,8 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     $actions = $rowActionList->childs();
 
                     foreach ($actions as &$action) {
-                       
+                        $action->removeClass('d-none');
+
                         $visibility = CDynFunction::factory($table->filter_action_callback_func)
                                 ->add_param($table)
                                 ->add_param($col->getFieldname())

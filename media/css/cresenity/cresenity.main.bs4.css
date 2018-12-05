@@ -757,6 +757,37 @@ div.dataTables_wrapper .ui-widget-header {
     display: none;
 }
 
+.modal-dialog-select .dialog-select-item-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: auto;
+    grid-gap: 10px;
+    min-height: 10vh;
+    max-height: 50vh;
+    overflow-y: scroll;
+}
+
+.modal-dialog-select .dialog-select-search {
+    margin-bottom: 20px;
+}
+
+.modal-dialog-select .dialog-select-item-list .ccard-item {
+    border: 2px solid green;
+    cursor: pointer;
+}
+
+.modal-dialog-select .dialog-select-item-list .ccard-item.selected {
+    border-color: blue;
+}
+
+.modal-dialog-select .dialog-select-load-more {
+    display: none;
+}
+
+.modal-dialog-select .dialog-select-load-more.processing {
+    display: block;
+}
+
 /* timepicker */
 .bootstrap-timepicker-widget table td input {
     width: 35px!important;
@@ -942,16 +973,28 @@ body.mini-navbar #page-wrapper {
     to {transform: rotate(360deg);}
 }
 
-@media (min-width: 768px) {
+@media (min-width: 319px) {
+    
+}
 
+@media (min-width: 479px) {
+    
+}
 
+@media (min-width: 575px) {
+    .modal-dialog {
+        max-width: initial;
+    }
+}
+
+@media (min-width: 767px) {
     .modal-dialog {
         width: 80%;
         margin: 30px auto;
     }
-
 }
-@media (min-width: 992px) {
+
+@media (min-width: 991px) {
     .layout-collapsed:not(.layout-offcanvas):not(.layout-fixed-offcanvas) .layout-sidenav:not(:hover) .brand-logo {
         margin-right: 20px;
         margin-left: 20px;
@@ -960,6 +1003,7 @@ body.mini-navbar #page-wrapper {
         padding: 0;
     }
 }
+
 @media (max-width:1200px) {
 
 }
@@ -967,6 +1011,12 @@ body.mini-navbar #page-wrapper {
 @media (max-width:968px) {
     .form-horizontal .form-actions {
         padding-left: 0px;
+    }
+}
+
+@media (max-width: 992px) {
+    .modal-dialog-select .dialog-select-item-list {
+        grid-template-columns: repeat(5, 135px);
     }
 }
 
@@ -979,6 +1029,28 @@ body.mini-navbar #page-wrapper {
     .dropdown-submenu:hover>a:after {
         border-left-color: #262626; 
         border-top-color: transparent;
+    }
+
+    .modal-dialog-select .dialog-select-item-list {
+        grid-template-columns: repeat(4, 125px);
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog-select .dialog-select-item-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-dialog-select .dialog-select-item-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 320px) {
+    .modal-dialog-select .dialog-select-item-list {
+        grid-template-columns: repeat(1, 1fr);
     }
 }
 
