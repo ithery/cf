@@ -93,6 +93,22 @@ abstract class CElement extends CObservable {
         return $this;
     }
 
+    public function removeClass($class) {
+        if (!is_array($class)) {
+            $class = array($class);
+        }
+
+        foreach ($class as $c) {
+            foreach ($this->classes as $key => $value) {
+                if ($c == $value) {
+                    unset($this->classes[$key]);
+                }
+            }
+        }
+        
+        return $this;
+    }
+
     public function deleteAttr($k) {
         if (isset($this->attr[$k])) {
             unset($this->attr[$k]);
