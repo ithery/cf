@@ -772,12 +772,12 @@ div.dataTables_wrapper .ui-widget-header {
 }
 
 .modal-dialog-select .dialog-select-item-list .ccard-item {
-    border: 2px solid green;
+    border: 2px solid #16987e;
     cursor: pointer;
 }
 
 .modal-dialog-select .dialog-select-item-list .ccard-item.selected {
-    border-color: blue;
+    border: 3px dashed #1872ab;
 }
 
 .modal-dialog-select .dialog-select-load-more {
