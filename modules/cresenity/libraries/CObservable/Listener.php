@@ -121,6 +121,7 @@ class CObservable_Listener {
                         thiselm.removeAttr('data-clicked');
                     }
                     setTimeout(function() {
+                        console.log('abc');
                         var modalExists = $('.modal:visible').length > 0;
                         if (!modalExists) {
                             $('body').removeClass('modal-open');
