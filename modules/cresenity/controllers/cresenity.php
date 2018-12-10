@@ -447,6 +447,8 @@ class Cresenity_Controller extends CController {
     public function logout() {
         $session = CSession::instance();
         $session->delete("user");
+        $session->delete("current_position");
+        $session->delete("completed_position");
         //$session->destroy();
         curl::redirect("");
     }

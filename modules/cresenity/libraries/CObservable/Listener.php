@@ -109,7 +109,7 @@ class CObservable_Listener {
 
             $confirm_message = $this->confirm_message;
             if (strlen($confirm_message) == 0) {
-                $confirm_message = clang::__('Are you sure') . " ?";
+                $confirm_message = clang::__("Are you sure ?");
             }
             $confirmStartScript = "	
                 bootbox.confirm('" . $confirm_message . "', function(confirmed) {
@@ -118,8 +118,16 @@ class CObservable_Listener {
 
             $confirmEndScript = "
                     } else {
-                            thiselm.removeAttr('data-clicked');
+                        thiselm.removeAttr('data-clicked');
                     }
+                    setTimeout(function() {
+                        var modalExists = $('.modal:visible').length > 0;
+                        if (!modalExists) {
+                            $('body').removeClass('modal-open');
+                        } else {
+                            $('body').addClass('modal-open');
+                        }
+                    },750);
                 });
             ";
         }

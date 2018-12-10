@@ -248,6 +248,8 @@
 	    });
 
 	    modalDialog.find('.close').click(function (e) {
+	    	e.preventDefault();
+	    	e.stopPropagation();
 	        modalDialog.modal('hide');
 	    });
 	})(jQuery);
