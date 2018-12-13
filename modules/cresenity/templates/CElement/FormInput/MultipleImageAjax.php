@@ -109,7 +109,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
-    <div id="<?php echo $id ?>_description" class="multi-image-ajax-description">Click or Drop Files On Box Below</div>
+    <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
     <div id="<?php echo $id ?>" class="row control-fileupload multi-image-ajax">
         <?php
         foreach ($files as $f) :
