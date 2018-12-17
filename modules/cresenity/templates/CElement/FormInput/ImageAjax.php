@@ -6,13 +6,27 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jan 13, 2018, 10:58:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+//sanitize maxWidth
+$suffixWidth = '';
+$lastMaxWidth = substr($maxWidth, -1);
+if (is_numeric($lastMaxWidth)) {
+    $suffixWidth = 'px';
+}
+
+$suffixHeight = '';
+$lastMaxHeight = substr($maxHeight, -1);
+if (is_numeric($lastMaxHeight)) {
+    $suffixHeight = 'px';
+}
+$maxWidth .= $suffixWidth;
+$maxHeight .= $suffixHeight;
 ?>
 
 <div id="container-<?php echo $id ?>" class="fileupload fileupload-new" >
     <div class="fileupload-new thumbnail" >
-        <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px;"  />
+        <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
     </div>
-    <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px; line-height: 20px;"></div>
+    <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>; line-height: 20px;"></div>
     <div>
         <?php if (!$disabledUpload): ?>
             <span class="btn btn-file btn-primary">
@@ -28,7 +42,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 
 <script>
-    
+
     var <?php echo $id ?>HaveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
     var <?= $id ?>maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
 
@@ -83,13 +97,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                 cropperModal.modal({backdrop: 'static', keyboard: false});
                                 cropperImg.cropper({
                                     aspectRatio: cropperWidth / cropperHeight,
-                                    zoomOnWheel : false,
+                                    zoomOnWheel: false,
 
                                     crop: function (e) {
 
                                     }
                                 });
-                              
+
                                 cropperModal.find('.btn-crop').click(function () {
 
                                     var mime = 'image/png';
@@ -98,7 +112,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                     }
 
 
-                                    imageData = cropperImg.cropper('getCroppedCanvas',{width:cropperWidth,height:cropperHeight}).toDataURL(mime);
+                                    imageData = cropperImg.cropper('getCroppedCanvas', {width: cropperWidth, height: cropperHeight}).toDataURL(mime);
 
                                     var img = "<img src=" + imageData + " /> ";
                                     $('#container-<?php echo $id ?> .fileupload-preview').html(img);
