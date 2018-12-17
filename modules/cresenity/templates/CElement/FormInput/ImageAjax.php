@@ -26,7 +26,9 @@ $maxHeight .= $suffixHeight;
     <div class="fileupload-new thumbnail" >
         <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
     </div>
-    <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>; line-height: 20px;"></div>
+    <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>; line-height: 20px;">
+      
+    </div>
     <div>
         <?php if (!$disabledUpload): ?>
             <span class="btn btn-file btn-primary">
@@ -119,8 +121,11 @@ $maxHeight .= $suffixHeight;
                                     $('#container-<?php echo $id ?>').removeClass('fileupload-new');
                                     $('#container-<?php echo $id ?>').addClass('fileupload-exists');
                                     $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
+                                    $('#container-<?php echo $id ?> .fileupload-preview').find('img').click(function () {
+                                        $('#input-temp-<?php echo $id; ?>').trigger('click');
+                                    });
                                     var data = new FormData();
-
+                                    
                                     data.append('<?php echo $ajaxName; ?>[]', imageData);
                                     data.append('<?php echo $ajaxName; ?>_filename[]', event.target.fileName);
                                     var xhr = new XMLHttpRequest();
@@ -150,6 +155,9 @@ $maxHeight .= $suffixHeight;
                             $('#container-<?php echo $id ?>').removeClass('fileupload-new');
                             $('#container-<?php echo $id ?>').addClass('fileupload-exists');
                             $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
+                            $('#container-<?php echo $id ?> .fileupload-preview').find('img').click(function () {
+                                $('#input-temp-<?php echo $id; ?>').trigger('click');
+                            });
                             var data = new FormData();
                             data.append('<?php echo $ajaxName; ?>[]', file);
                             var xhr = new XMLHttpRequest();
