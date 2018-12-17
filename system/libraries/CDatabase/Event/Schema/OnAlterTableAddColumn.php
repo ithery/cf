@@ -46,21 +46,21 @@ class CDatabase_Event_Schema_OnAlterTableAddColumnEventArgs extends CDatabase_Ev
     }
 
     /**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return CDatabase_Schema_Column
      */
     public function getColumn() {
         return $this->_column;
     }
 
     /**
-     * @return \Doctrine\DBAL\Schema\TableDiff
+     * @return CDatabase_Schema_Table_Diff
      */
     public function getTableDiff() {
         return $this->_tableDiff;
     }
 
     /**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @return CDatabase_Platform
      */
     public function getPlatform() {
         return $this->_platform;

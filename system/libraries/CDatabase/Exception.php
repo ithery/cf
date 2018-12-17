@@ -9,10 +9,10 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $method
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function notSupported($method) {
-        return new self("Operation '$method' is not supported by platform.");
+        return new self("Operation '" . $method . "' is not supported by platform.");
     }
 
     public static function invalidPlatformSpecified() {
@@ -58,7 +58,7 @@ class CDatabase_Exception extends CException {
     }
 
     /**
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function invalidPdoInstance() {
         return new self(
@@ -70,7 +70,7 @@ class CDatabase_Exception extends CException {
     /**
      * @param string|null $url The URL that was provided in the connection parameters (if any).
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function driverRequired($url = null) {
         if ($url) {
@@ -90,7 +90,7 @@ class CDatabase_Exception extends CException {
      * @param string $unknownDriverName
      * @param array  $knownDrivers
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function unknownDriver($unknownDriverName, array $knownDrivers) {
         return new self("The given 'driver' " . $unknownDriverName . " is unknown, " .
@@ -103,7 +103,7 @@ class CDatabase_Exception extends CException {
      * @param string                $sql
      * @param array                 $params
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function driverExceptionDuringQuery(Driver $driver, \Exception $driverEx, $sql, array $params = []) {
         $msg = "An exception occurred while executing '" . $sql . "'";
@@ -119,7 +119,7 @@ class CDatabase_Exception extends CException {
      * @param \Doctrine\DBAL\Driver $driver
      * @param \Exception            $driverEx
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function driverException(Driver $driver, \Exception $driverEx) {
         return static::wrapException($driver, $driverEx, "An exception occurred in driver: " . $driverEx->getMessage());
@@ -129,7 +129,7 @@ class CDatabase_Exception extends CException {
      * @param \Doctrine\DBAL\Driver $driver
      * @param \Exception            $driverEx
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     private static function wrapException(Driver $driver, \Exception $driverEx, $msg) {
         if ($driverEx instanceof Exception\DriverException) {
@@ -170,7 +170,7 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $wrapperClass
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function invalidWrapperClass($wrapperClass) {
         return new self("The given 'wrapperClass' " . $wrapperClass . " has to be a " .
@@ -180,7 +180,7 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $driverClass
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function invalidDriverClass($driverClass) {
         return new self("The given 'driverClass' " . $driverClass . " has to implement the " .
@@ -190,7 +190,7 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $tableName
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function invalidTableName($tableName) {
         return new self("Invalid table name specified: " . $tableName);
@@ -199,14 +199,14 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $tableName
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function noColumnsSpecifiedForTable($tableName) {
         return new self("No columns specified for table " . $tableName);
     }
 
     /**
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function limitOffsetInvalid() {
         return new self("Invalid Offset in Limit Query, it has to be larger than or equal to 0.");
@@ -215,7 +215,7 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $name
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function typeExists($name) {
         return new self('Type ' . $name . ' already exists.');
@@ -224,7 +224,7 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $name
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function unknownColumnType($name) {
         return new self('Unknown column type "' . $name . '" requested. Any Doctrine type that you use has ' .
@@ -240,7 +240,7 @@ class CDatabase_Exception extends CException {
     /**
      * @param string $name
      *
-     * @return \Doctrine\DBAL\DBALException
+     * @return CDatabase_Exception
      */
     public static function typeNotFound($name) {
         return new self('Type to be overwritten ' . $name . ' does not exist.');
