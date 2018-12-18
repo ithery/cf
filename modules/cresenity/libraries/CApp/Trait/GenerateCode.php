@@ -30,6 +30,15 @@ trait CApp_Trait_GenerateCode {
         }
         $db->query($cmd);
 
+        
+         $q = "select case when counter is null then 1 else counter end as next_counter from sys_counter where `key`=" . $db->escape($key_counter) . "";
+
+        $r = $db->query($q);
+
+        if ($r->count() > 0) {
+            $next_counter = $r[0]->next_counter;
+            $is_insert = 0;
+        }
         return $next_counter;
     }
 
