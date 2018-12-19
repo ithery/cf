@@ -407,7 +407,7 @@ class CHelper_File {
             return @mkdir($path, $mode, $recursive);
         }
 
-        return mkdir($path, $mode, $recursive);
+        return @mkdir($path, $mode, $recursive);
     }
 
     /**
