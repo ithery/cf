@@ -16,6 +16,7 @@
 class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea {
 
     protected $toolbarType = 'default';
+    protected $haveDragDrop = false;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -28,6 +29,11 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     public function setToolbarType($toolbarType) {
         $this->toolbarType = $toolbarType;
+        return $this;
+    }
+
+    public function setDragDrop($bool = true) {
+        $this->haveDragDrop = $bool;
         return $this;
     }
 
@@ -69,11 +75,14 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     public function js($indent = 0) {
 
-        $additionalOptions = '';
+
+        $additionalOptions = 'disableDragAndDrop: true,';
+        if ($this->haveDragDrop) {
+            $additionalOptions = 'disableDragAndDrop: false,';
+        }
         if ($this->toolbarType != 'default') {
             $additionalOptions .= 'toolbar:' . $this->getToolbarJson() . ',';
         }
-
         $js = "";
 
         $js .= "
