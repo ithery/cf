@@ -70,7 +70,7 @@
 			</span>
 			<input type="hidden" id="<?= $id ?>" name="<?= $name ?>" value="<?= $value ?>">
 		</span>
-		<a href="javascript:;" class="btn btn-danger dialog-select-remove dialog-select-exists" data-dismiss="dialog-select"><?= clang::__('Remove') ?></a>
+		<!--<a href="javascript:;" class="btn btn-danger dialog-select-remove dialog-select-exists" data-dismiss="dialog-select"><?= clang::__('Remove') ?></a>-->
 	</div>
 </div>
 
