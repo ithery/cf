@@ -1628,6 +1628,36 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Lock the selected rows in the table.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function lock($value = true)
+    {
+        $this->lock = $value;
+        return $this;
+    }
+    /**
+     * Lock the selected rows in the table for updating.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function lockForUpdate()
+    {
+        return $this->lock(true);
+    }
+    /**
+     * Share lock the selected rows in the table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function sharedLock()
+    {
+        return $this->lock(false);
+    }
+
+    /**
      * Retrieve the "count" result of the query.
      *
      * @param  string  $columns
