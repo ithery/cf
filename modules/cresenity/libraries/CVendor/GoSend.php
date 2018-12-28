@@ -76,6 +76,11 @@ class CVendor_GoSend {
 		]);
 
 		$curl->exec();
+
+		if ($curl->has_error()) {
+			throw new Exception($curl->has_error());
+		}
+		
 		return $curl->response();
 	}
 
@@ -164,6 +169,11 @@ class CVendor_GoSend {
 
 		$curl->setRawPost(json_encode($post));
 		$curl->exec();
+
+		if ($curl->has_error()) {
+			throw new Exception($curl->has_error());
+		}
+
 		return $curl->response();
 	}
 
@@ -185,6 +195,11 @@ class CVendor_GoSend {
 		]);
 
 		$curl->exec();
+
+		if ($curl->has_error()) {
+			throw new Exception($curl->has_error());
+		}
+
 		return $curl->response();
 	}
 
@@ -206,6 +221,11 @@ class CVendor_GoSend {
 		]);
 
 		$curl->exec();
+
+		if ($curl->has_error()) {
+			throw new Exception($curl->has_error());
+		}
+
 		return $curl->response();
 	}
 
@@ -230,6 +250,11 @@ class CVendor_GoSend {
 		$curl->setOpt(CURLOPT_POSTFIELDS, ['orderNo' => $orderNo]);
 
 		$curl->exec();
+
+		if ($curl->has_error()) {
+			throw new Exception($curl->has_error());
+		}
+
 		return $curl->response();
 	}
 

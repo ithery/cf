@@ -799,7 +799,6 @@ if (window.capp.have_clock) {
             if (typeof bootstrapVersion == 'undefined') {
                 bootstrapVersion = '2';
             }
-
             if (window.capp.bootstrap >= '3.3') {
 
                 if (!title)
@@ -935,6 +934,31 @@ if (window.capp.have_clock) {
                     var overlay = $('<div class="modal-backdrop"></div>').hide();
                     var parent = $(_dialog_html);
                     jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function (event) {
+                        event.preventDefault();
+                        if (dialog_is_remove) {
+                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                                handle.closest('.modal').remove();
+                            });
+                            handle.closest('.modal').prev(".modal-backdrop").hide(400, function () {
+                                handle.closest('.modal').prev(".modal-backdrop").remove();
+                                var modalExists = $('.modal:visible').length > 0;
+                                if (!modalExists) {
+                                    $('body').removeClass('modal-open');
+                                }
+
+                            });
+                        } else {
+                            handle.closest('.modal').prev(".modal-backdrop").hide(400);
+                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                                var modalExists = $('.modal:visible').length > 0;
+                                if (!modalExists) {
+                                    $('body').removeClass('modal-open');
+                                }
+
+                            });
+                        }
+                    });
+                    jQuery(document).on('click', '[data-dismiss="modal"]', function (event) {
                         event.preventDefault();
                         if (dialog_is_remove) {
                             jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
