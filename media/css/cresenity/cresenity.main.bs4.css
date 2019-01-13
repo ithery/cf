@@ -788,7 +788,7 @@ div.dataTables_wrapper .ui-widget-header {
     justify-content: center;
 }
 
-.modal-dialog-select .dialog-select-item-list .ccard-item .ccard-item__name:hover {
+.modal-dialog-select .dialog-select-item-list .ccard-item:hover .ccard-item__name {
     font-weight: bold;
     transition: all 0.4s;
 }
