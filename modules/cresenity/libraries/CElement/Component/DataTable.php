@@ -70,6 +70,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $callbackRequire = null;
     public $callbackOptions = null;
     protected $table_striped;
+    protected $table_bordered;
     protected $quick_search = FALSE;
     protected $tbody_id;
     protected $js_cell;
@@ -144,6 +145,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_filename = $this->id;
         $this->export_sheetname = $this->id;
         $this->table_striped = true;
+        $this->table_bordered = true;
 
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
@@ -187,6 +189,11 @@ class CElement_Component_DataTable extends CElement_Component {
 
     function setTableStriped($table_striped) {
         $this->table_striped = $table_striped;
+        return $this;
+    }
+    
+    function setTableBordered($bool) {
+        $this->table_bordered = $bool;
         return $this;
     }
 
@@ -508,8 +515,9 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setTitle($title, $lang = true) {
-        if ($lang)
+        if ($lang) {
             $title = clang::__($title);
+        }
         $this->title = $title;
         return $this;
     }
@@ -627,22 +635,42 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $fieldname
+     * @return CElement_Component_DataTable_Column
+     */
     public function addColumn($fieldname) {
         $col = CElement_Component_DataTable_Column::factory($fieldname);
         $this->columns[] = $col;
         return $col;
     }
 
+    /**
+     * 
+     * @param string $group_by
+     * @return $this
+     */
     public function setGroupBy($group_by) {
         $this->group_by = $group_by;
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
     public function setCheckbox($bool) {
         $this->checkbox = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * @param string $val
+     * @return $this
+     */
     public function setCheckboxValue($val) {
         if (!is_array($val)) {
             $val = array($val);
@@ -651,21 +679,40 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setHeaderSortable($bool) {
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setHeaderSortable($bool=true) {
         $this->header_sortable = $bool;
         return $this;
     }
 
-    public function setNumbering($bool) {
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setNumbering($bool=true) {
         $this->numbering = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * alias for setNumbering(true)
+     * @return $this
+     */
     public function enableNumbering() {
         $this->numbering = true;
         return $this;
     }
 
+    /**
+     * alias for setNumbering(false)
+     * @return $this
+     */
     public function disableNumbering() {
         $this->numbering = false;
         return $this;
@@ -686,6 +733,11 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $q
+     * @return $this
+     */
     public function setDataFromQuery($q) {
         if ($this->ajax == false) {
             $db = $this->db;
@@ -696,6 +748,12 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param CElastic_Search $el
+     * @param string $require
+     * @return $this
+     */
     public function setDataFromElastic($el, $require) {
         $this->query = $el;
         $this->isElastic = true;
@@ -706,6 +764,13 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param callable $callback
+     * @param array $callbackOptions
+     * @param string $require
+     * @return $this
+     */
     public function setDataFromCallback($callback, $callbackOptions = array(), $require = null) {
         $this->query = $callback;
         $this->isCallback = true;
@@ -715,8 +780,13 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setDataFromArray($a) {
-        $this->data = $a;
+    /**
+     * 
+     * @param array $a
+     * @return $this
+     */
+    public function setDataFromArray($arr) {
+        $this->data = $arr;
         return $this;
     }
 
@@ -1419,7 +1489,10 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($this->table_striped) {
             $classes .= " table-striped ";
         }
-        $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered  responsive ' . $classes . '" id="' . $this->id . '">')
+        if ($this->table_bordered) {
+            $classes .= " table-bordered ";
+        }
+        $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
                 ->incIndent()->br();
         if ($this->show_header) {
             $html->appendln('<thead>')
@@ -1587,16 +1660,18 @@ class CElement_Component_DataTable extends CElement_Component {
                     if (($this->filter_action_callback_func) != null) {
                         $actions = $this->rowActionList->childs();
 
-                        foreach ($actions as $action) {
+                        foreach ($actions as &$action) {
                             $visibility = CDynFunction::factory($this->filter_action_callback_func)
                                     ->add_param($this)
-                                    ->add_param($col->get_fieldname())
+                                    ->add_param($col->getFieldname())
                                     ->add_param($row)
                                     ->add_param($action)
                                     ->set_require($this->requires)
                                     ->execute();
-
-                            $action->set_visibility($visibility);
+                            if($visibility==false) {
+                                $action->addClass('d-none');
+                            }
+                            $action->setVisibility($visibility);
                         }
 
 

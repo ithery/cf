@@ -33,7 +33,7 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
     /**
      * {@inheritdoc}
      *
-     * @throws DBALException
+     * @throws CDatabase_Exception
      */
     public function createDatabasePlatformForVersion($version) {
         $mariadb = false !== stripos($version, 'mariadb');
@@ -78,7 +78,7 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
      * returned by Oracle MySQL servers.
      *
      * @param string $versionString Version string returned by the driver, i.e. '5.7.10'
-     * @throws DBALException
+     * @throws CDatabase_Exception
      */
     private function getOracleMysqlVersionNumber($versionString) {
         if (!preg_match(

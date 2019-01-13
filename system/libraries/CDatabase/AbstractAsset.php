@@ -167,7 +167,7 @@ abstract class CDatabase_AbstractAsset {
      * Gets the quoted representation of this asset but only if it was defined with one. Otherwise
      * return the plain unquoted value as inserted.
      *
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param CDatabase_Platform $platform
      *
      * @return string
      */

@@ -18,8 +18,22 @@ trait CObservable_Javascript_JQuery_Trait_AjaxTrait {
             }
         }
 
+        //error
+        $error = carr::get($options, 'error', null);
+        if($error != null) {
+             if ($error instanceof Closure) {
+                $jqXHR = new CJavascript_Mock_Variable('jqXhr');
+                $textStatus = new CJavascript_Mock_Variable('textStatus');
+                $errorThrown = new CJavascript_Mock_Variable('errorThrown');
+                $error = $this->javascript->runClosure($error, $jqXHR, $textStatus,$errorThrown);
+            }
+        }
+
+        
         $this->filterArgs($success);
+        $this->filterArgs($error);
         $options['success'] = $success;
+        $options['error'] = $error;
 
         $this->jQueryStatement()->ajax($options);
         $this->resetJQueryStatement();

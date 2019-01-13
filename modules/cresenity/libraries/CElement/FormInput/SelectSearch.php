@@ -342,7 +342,18 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }).change(function() {
                         " . $str_js_change . "
             });
-            
+            $('#" . $this->id . "').on('select2:open',function(event){
+                var modal = $('#" . $this->id . "').closest('.modal');
+                if(modal[0]){
+                    var modalZ=modal.css('z-index');
+                    var newZ=parseInt(modalZ)+1;
+                    $('#" . $this->id . "').data('select2').\$container.css('z-index',newZ);
+                    $('#" . $this->id . "').data('select2').\$dropdown.css('z-index',newZ);
+                    $('#" . $this->id . "').data('select2').\$element.css('z-index',newZ);
+                    $('#" . $this->id . "').data('select2').\$results.css('z-index',newZ);
+                    $('#" . $this->id . "').data('select2').\$selection.css('z-index',newZ);
+                }
+            });
         ";
 
 

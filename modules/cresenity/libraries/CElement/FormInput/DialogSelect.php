@@ -14,6 +14,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	protected $keyField;
 	protected $searchField;
 	protected $limit;
+	protected $title;
 	protected $itemName;
 	protected $imgSrc;
 	protected $width;
@@ -34,18 +35,20 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		$this->keyField = '';
 		$this->searchField = '';
 		$this->limit = 10;
+		$this->title = clang::__('Please choose an Item');
 		$this->itemName = '';
 		$this->imgSrc = CApp_Base::noImageUrl();
 		$this->width = '100';
 		$this->height = '100';
-		$this->buttonLabel = 'Select an Item';
-		$this->placeholder = 'Search Item';
+		$this->buttonLabel = clang::__('Select an Item');
+		$this->placeholder = clang::__('Search Item');
 		$this->delay = '1000';
 		$this->templateName = 'CElement/FormInput/DialogSelect';
 		$this->itemTemplateName = 'CElement/Card/Item';
 		$this->itemTemplateVariables = array('id', 'name', 'imageUrl');
 		$this->onBeforeParse(function() {
 		    $this->setVar('id', $this->id);
+		    $this->setVar('title', $this->title);
 		    $this->setVar('itemName', $this->itemName);
 		    $this->setVar('imgSrc', $this->imgSrc);
 		    $this->setVar('width', $this->width);
@@ -91,6 +94,14 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		return $this;
 	}
 
+	public function setTitle($title, $lang = true) {
+		if ($lang) {
+			$title = clang::__($title);
+		}
+		$this->title = $title;
+		return $this;
+	}
+
 	public function setItemName($itemName) {
 		$this->itemName = $itemName;
 		return $this;
@@ -111,12 +122,18 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	    return $this;
 	}
 
-	public function setButtonLabel($label) {
+	public function setButtonLabel($label, $lang = true) {
+		if ($lang) {
+			$label = clang::__($label);
+		}
 		$this->buttonLabel = $label;
 		return $this;
 	}
 
-	public function setPlaceholder($placeholder) {
+	public function setPlaceholder($placeholder, $lang = true) {
+		if ($lang) {
+			$placeholder = clang::__($placeholder);
+		}
 		$this->placeholder = $placeholder;
 		return $this;
 	}

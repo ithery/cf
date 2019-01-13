@@ -12,6 +12,8 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
     protected $imgSrc;
     protected $maxWidth;
     protected $maxHeight;
+    protected $maxUploadSize;
+    protected $limitFile;
     protected $disabledUpload;
     protected $cropper;
     protected $files;
@@ -28,6 +30,8 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->imgSrc = "";
         $this->maxWidth = "200";
         $this->maxHeight = "150";
+        $this->maxUploadSize = 0;
+        $this->limitFile = 10;
         $this->disabledUpload = false;
         $this->templateName = 'CElement/FormInput/MultipleImageAjax';
         $this->removeLink = true;
@@ -48,6 +52,8 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('maxWidth', $this->maxWidth);
             $this->setVar('maxHeight', $this->maxHeight);
+            $this->setVar('maxUploadSize', $this->maxUploadSize);
+            $this->setVar('limitFile', $this->limitFile);
             $this->setVar('disabledUpload', $this->disabledUpload);
             $this->setVar('preTag', $this->pretag());
             $this->setVar('postTag', $this->posttag());
@@ -80,6 +86,16 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
             $js .= $this->cropper->js();
         }
         return $js;
+    }
+
+    public function setMaxUploadSize($size) {
+        $this->maxUploadSize = $size;
+        return $this;
+    }
+
+    public function setLimitFile($limit) {
+        $this->limitFile = $limit;
+        return $this;
     }
 
     /**

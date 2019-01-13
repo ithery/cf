@@ -61,4 +61,20 @@ class CVendor {
         return new CVendor_Shipper($environment);
     }
 
+    public static function senangPay($options, $environment = 'production') {
+        return new CVendor_SenangPay($options, $environment);
+    }
+
+    public static function posMalaysia() {
+        return new CVendor_PosMalaysia();
+    }
+
+    public static function goSend($environment = 'production') {
+        return new CVendor_GoSend($environment);
+    }
+    
+    public static function namecheap($options) {
+        return new CVendor_Namecheap($options);
+    }
+
 }

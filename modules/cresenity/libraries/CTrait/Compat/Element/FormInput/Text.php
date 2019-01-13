@@ -15,8 +15,9 @@ trait CTrait_Compat_Element_FormInput_Text {
      * @param type $placeholder
      * @return type
      */
-    public function set_placeholder($placeholder) {
-        return $this->setPlaceholder($placeholder);
+    public function set_placeholder($placeholder, $lang = true) {
+        return $this->setPlaceholder($placeholder, $lang);
     }
 
+   
 }

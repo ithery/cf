@@ -109,7 +109,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
-    <div id="<?php echo $id ?>_description" class="multi-image-ajax-description">Click or Drop Files On Box Below</div>
+    <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
     <div id="<?php echo $id ?>" class="row control-fileupload multi-image-ajax">
         <?php
         foreach ($files as $f) :
@@ -120,7 +120,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             <div class="multi-image-ajax-file container-file-upload">
                 <div class="div-img">
                     <img src="<?php echo $file_url; ?>" />
-                    <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="<? echo $input_value; ?>">
+                    <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="<?php echo $input_value; ?>">
                 </div>
                 <?php
                 foreach ($customControl as $cc) :
@@ -154,6 +154,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     (function ($) {
         $(function () {
             var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
+            var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
 
 <?php if ($cropper != null) : ?>
                 var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
@@ -244,7 +245,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                     mime = 'image/jpeg';
                                 }
 
-                                imageData = cropperImg.cropper('getCroppedCanvas').toDataURL(mime);
+                                imageData = cropperImg.cropper('getCroppedCanvas', {width: cropperWidth, height: cropperHeight}).toDataURL(mime);
 
                                 addFile(fileRead, fileList, fileEvent, imageData);
                                 $(this).closest('.modal').modal('hide');
@@ -347,8 +348,18 @@ foreach ($customControl as $cc):
                                 reader.fileName = file.name;
 
                                 reader.onload = $.proxy(function (file, fileList, event) {
-                                    insertFile(reader, file, fileList, event);
-
+                                    var filesize = event.total;
+                                    var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+                                    var limitFile = <?= $limitFile ?>;
+                                    if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
+                                        $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Only ' + limitFile + ' image can be uploaded</div>', 'bootbox');
+                                    } else {
+                                        if (maxUploadSize && filesize > maxUploadSize) {
+                                            $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                                        } else {
+                                            insertFile(reader, file, fileList, event);
+                                        }
+                                    }
                                 }, this, file, $("#<?php echo $id; ?>"));
                                 reader.readAsDataURL(file);
                             });
@@ -375,8 +386,18 @@ foreach ($customControl as $cc):
 
                     reader.fileName = file.name;
                     reader.onload = $.proxy(function (file, fileList, event) {
-
-                        insertFile(reader, file, fileList, event);
+                        var filesize = event.total;
+                        var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+                        var limitFile = <?= $limitFile ?>;
+                        if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
+                            $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Only ' + limitFile + ' image can be uploaded</div>', 'bootbox');
+                        } else {
+                            if (maxUploadSize && filesize > maxUploadSize) {
+                                $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                            } else {
+                                insertFile(reader, file, fileList, event);
+                            }
+                        }
                     }, this, file, $("#<?php echo $id; ?>"));
                     reader.readAsDataURL(file);
                 })

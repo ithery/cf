@@ -109,6 +109,14 @@ class CManager_Asset {
         return array_merge($moduleThemeCss, $themeCss, $moduleRunTimeCss, $runTimeCss);
     }
 
+    public function getAllJsFileUrl() {
+        $themeJs = $this->themeContainer->getAllJsFileUrl();
+        $runTimeJs = $this->runTimeContainer->getAllJsFileUrl();
+        $moduleThemeJs = $this->module->getThemeContainer()->getAllJsFileUrl();
+        $moduleRunTimeJs = $this->module->getRunTimeContainer()->getAllJsFileUrl();
+        return array_merge($moduleThemeJs, $themeJs, $moduleRunTimeJs, $runTimeJs);
+    }
+
     public function renderJsRequire($js) {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
@@ -184,7 +192,7 @@ class CManager_Asset {
         $scriptArray = carr::merge($scriptArray, $themeScripts);
         $scriptArray = carr::merge($scriptArray, $moduleRunTimeScripts);
         $scriptArray = carr::merge($scriptArray, $runTimeScripts);
-      
+
         $script = '';
         $manager = CManager::instance();
         if ($type == null) {

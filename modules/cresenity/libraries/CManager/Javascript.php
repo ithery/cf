@@ -13,4 +13,8 @@ class CManager_Javascript {
         return CJavascript::jqueryStatement();
     }
 
+    public static function raw($js) {
+        return CJavascript::rawStatement($js);
+    }
+    
 }

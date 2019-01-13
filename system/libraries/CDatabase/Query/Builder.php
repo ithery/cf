@@ -1628,6 +1628,36 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Lock the selected rows in the table.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function lock($value = true)
+    {
+        $this->lock = $value;
+        return $this;
+    }
+    /**
+     * Lock the selected rows in the table for updating.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function lockForUpdate()
+    {
+        return $this->lock(true);
+    }
+    /**
+     * Share lock the selected rows in the table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function sharedLock()
+    {
+        return $this->lock(false);
+    }
+
+    /**
      * Retrieve the "count" result of the query.
      *
      * @param  string  $columns
@@ -1961,6 +1991,16 @@ class CDatabase_Query_Builder {
         foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
             $this->db->query($sql, $bindings);
         }
+    }
+
+    /**
+     * Get a new instance of the query builder.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function newQuery()
+    {
+        return new static($this->db, $this->grammar, $this->processor);
     }
 
     /**

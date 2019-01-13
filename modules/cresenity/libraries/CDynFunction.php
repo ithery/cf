@@ -56,6 +56,7 @@ class CDynFunction {
                     return call_user_func_array($this->func, $params);
                 } else {
                     $error++;
+                    
                 }
             }
         }
@@ -95,7 +96,17 @@ class CDynFunction {
         }
 
         if ($error > 0) {
-            throw new CException('function :function is not callable', array(':function' => $this->func));
+            $functionName = $this->func;
+            if(is_array($functionName)) {
+                $functionName = implode('::',$functionName);
+            }
+            if($functionName instanceof Closure) {
+                $functionName='Closure';
+            }
+            if(!is_string($functionName)) {
+                $functionName = 'Unknown';
+            }
+            throw new CException('function :function is not callable', array(':function' => $functionName));
         }
         //last return this name of function
         return $this->func;

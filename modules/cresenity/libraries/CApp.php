@@ -155,9 +155,7 @@ class CApp extends CObservable {
         if (isset($_COOKIE['capp-profiler'])) {
             new Profiler();
         }
-        if (isset($_COOKIE['capp-debugbar'])) {
-            CDebug::bar()->enable();
-        }
+
         $db = CDatabase::instance();
         if ($this->_org == null) {
             $org_id = cstg::get("org_id");
@@ -166,6 +164,9 @@ class CApp extends CObservable {
             }
         }
         $this->registerCoreModules();
+        if (isset($_COOKIE['capp-debugbar'])) {
+            CDebug::bar()->enable();
+        }
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
@@ -293,8 +294,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
-        
-        
+
+
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -317,8 +318,11 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function title($title) {
-        $this->title = clang::__($title);
+    public function title($title, $lang = true) {
+        if ($lang) {
+            $title = clang::__($title);
+        }
+        $this->title = $title;
         return $this;
     }
 
@@ -345,16 +349,20 @@ class CApp extends CObservable {
      * 
      * @param string $caption
      * @param string $url
+     * @param boolean $lang
      * @return CApp
      */
-    public function addBreadcrumb($caption, $url) {
+    public function addBreadcrumb($caption, $url = 'javascript:;', $lang=true) {
+        if ($lang) {
+            $caption = clang::__($caption);
+        }
         $this->breadcrumb[$caption] = $url;
         return $this;
     }
 
     public function registerCoreModules() {
-        
-       
+
+
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);

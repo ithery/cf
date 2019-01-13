@@ -515,9 +515,9 @@ final class CF {
      * @return string
      */
     public static function get_file($directory, $filename, $domain = null) {
-        return self::getFile($directory,$filename,$domain);
+        return self::getFile($directory, $filename, $domain);
     }
-    
+
     /**
      * 
      * @param string $directory
@@ -1099,8 +1099,12 @@ final class CF {
                     }
                     die;
                 } else {
-                    cdbg::var_dump($exception->getMessage());
-                    cdbg::var_dump($exception->getTraceAsString());
+                    cdbg::var_dump($exception);
+                    try {
+                        throw new Exception('testing');
+                    } catch (Exception $ex) {
+                        cdbg::var_dump($ex->getTraceAsString());
+                    }
                     die;
                 }
             }

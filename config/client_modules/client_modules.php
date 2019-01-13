@@ -572,5 +572,17 @@ return array(
             "theme/theme-material/theme-material.css",
         ),
     ),
+    "auto-numeric" => array(
+        "js" => array("plugins/autonumeric/autonumeric.js"),
+    ),
+    "fullcalendar-3" => array(
+        "css" => array(
+            "plugins/fullcalendar-3/fullcalendar.min.css",
+        ),
+        "js" => array(
+            "plugins/fullcalendar-3/fullcalendar.min.js",
+        ),
+        "requirements" => array("jquery-3.2.1", "moment"),
+    ),
 );
 ?>

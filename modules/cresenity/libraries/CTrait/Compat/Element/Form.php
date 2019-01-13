@@ -53,6 +53,16 @@ trait CTrait_Compat_Element_Form {
 
     /**
      * 
+     * @deprecated since version 1.2, please use setAjaxRedirect
+     * @param bool $bool
+     * @return CElement_Component_Form
+     */
+    public function set_ajax_redirect($bool) {
+        return $this->setAjaxRedirect($bool);
+    }
+
+    /**
+     * 
      * @deprecated since version 1.2, please use setEncType
      * @param string $enctype multipart/form-data
      * @return CElement_Component_Form
