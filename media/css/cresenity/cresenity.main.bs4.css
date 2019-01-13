@@ -780,6 +780,19 @@ div.dataTables_wrapper .ui-widget-header {
     border: 3px dashed #1872ab;
 }
 
+.modal-dialog-select .dialog-select-item-list .ccard-item .ccard-item__name {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-dialog-select .dialog-select-item-list .ccard-item .ccard-item__name:hover {
+    font-weight: bold;
+    transition: all 0.4s;
+}
+
 .modal-dialog-select .dialog-select-load-more {
     display: none;
 }
