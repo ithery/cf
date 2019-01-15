@@ -73,6 +73,14 @@ trait CElement_Trait_Template {
 
             return $this->htmlChild();
         });
+        $helpers->set('htmlContent', function () {
+
+            return $this->htmlChild();
+        });
+        $helpers->set('jsContent', function () {
+
+            return $this->jsChild();
+        });
         $helpers->set('element', function () {
             return $this;
         });

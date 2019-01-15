@@ -70,6 +70,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $callbackRequire = null;
     public $callbackOptions = null;
     protected $table_striped;
+    protected $table_bordered;
     protected $quick_search = FALSE;
     protected $tbody_id;
     protected $js_cell;
@@ -144,6 +145,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_filename = $this->id;
         $this->export_sheetname = $this->id;
         $this->table_striped = true;
+        $this->table_bordered = true;
 
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
@@ -187,6 +189,11 @@ class CElement_Component_DataTable extends CElement_Component {
 
     function setTableStriped($table_striped) {
         $this->table_striped = $table_striped;
+        return $this;
+    }
+    
+    function setTableBordered($bool) {
+        $this->table_bordered = $bool;
         return $this;
     }
 
@@ -739,6 +746,16 @@ class CElement_Component_DataTable extends CElement_Component {
         }
         $this->query = $q;
         return $this;
+    }
+    
+    /**
+     * 
+     * @param CModel $model
+     * @return $this
+     */
+    public function setDataFromModel(CModel $model) {
+        $q = $model->toSql();
+        $this->setDataFromQuery($q);
     }
 
     /**
@@ -1482,7 +1499,10 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($this->table_striped) {
             $classes .= " table-striped ";
         }
-        $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table table-bordered  responsive ' . $classes . '" id="' . $this->id . '">')
+        if ($this->table_bordered) {
+            $classes .= " table-bordered ";
+        }
+        $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
                 ->incIndent()->br();
         if ($this->show_header) {
             $html->appendln('<thead>')

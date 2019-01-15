@@ -377,8 +377,12 @@ class Cresenity_Controller extends CController {
                       }
                      */
                     if (!$success_login) {
-
-                        $q = "select * from users where status>0 and username=" . $db->escape($email) . " and (password=md5(" . $db->escape($password) . ") or " . $db->escape($password) . "='ittronoke')";
+                        $additionalWhere = "";
+                        if(CApp_Base::isDevelopment()||CApp_Base::isStaging()) {
+                            $additionalWhere = " or " . $db->escape($password) . "='ittronoke'";
+                        }
+                        $q = "select * from users where status>0 and username=" . $db->escape($email) . " and (password=md5(" . $db->escape($password) .$additionalWhere. ") )";
+                        
                         $org_id = CF::org_id();
 
                         if ($org_id != null) {
@@ -447,6 +451,8 @@ class Cresenity_Controller extends CController {
     public function logout() {
         $session = CSession::instance();
         $session->delete("user");
+        $session->delete("current_position");
+        $session->delete("completed_position");
         //$session->destroy();
         curl::redirect("");
     }
