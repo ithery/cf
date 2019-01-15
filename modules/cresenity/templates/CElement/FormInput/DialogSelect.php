@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
 
 <div id="dialog-select-<?= $id ?>" class="dialog-select <?= ($value) ? 'dialog-select-exists' : 'dialog-select-new'; ?>">
-	<div class="dialog-select-new" style="width: <?= $width ?>px; height: <?= $height ?>px;">
+	<div class="dialog-select-new" style="min-width: <?= $minWidth ?>px; min-height: <?= $minHeight ?>px;">
 		<div class="dialog-select-image thumbnail">
 			<div class="square">
 				<div class="square-content">
@@ -15,7 +15,7 @@
 			
 		</div>
 	</div>
-	<div class="dialog-select-preview dialog-select-exists" style="width: <?= $width ?>px; height: <?= $height ?>px;">
+	<div class="dialog-select-preview dialog-select-exists" style="min-width: <?= $minWidth ?>px; min-height: <?= $minHeight ?>px;">
 		<div class="dialog-select-image thumbnail">
 			<div class="square">
 				<div class="square-content">
