@@ -16,8 +16,8 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 	protected $limit;
 	protected $itemName;
 	protected $imgSrc;
-	protected $width;
-	protected $height;
+	protected $minWidth;
+	protected $minHeight;
 	protected $buttonLabel;
 	protected $placeholder;
 	protected $itemTemplateName;
@@ -36,8 +36,8 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		$this->limit = 10;
 		$this->itemName = '';
 		$this->imgSrc = CApp_Base::noImageUrl();
-		$this->width = '100';
-		$this->height = '100';
+		$this->minWidth = '100';
+		$this->minHeight = '100';
 		$this->buttonLabel = 'Select an Item';
 		$this->placeholder = 'Search Item';
 		$this->delay = '1000';
@@ -48,8 +48,8 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		    $this->setVar('id', $this->id);
 		    $this->setVar('itemName', $this->itemName);
 		    $this->setVar('imgSrc', $this->imgSrc);
-		    $this->setVar('width', $this->width);
-		    $this->setVar('height', $this->height);
+		    $this->setVar('minWidth', $this->minWidth);
+		    $this->setVar('minHeight', $this->minHeight);
 		    $this->setVar('buttonLabel', $this->buttonLabel);
 		    $this->setVar('placeholder', $this->placeholder);
 		    $this->setVar('delay', $this->delay);
@@ -101,13 +101,13 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 		return $this;
 	}
 
-	public function setMaxWidth($maxwidth) {
-	    $this->maxWidth = $maxwidth;
+	public function setMinWidth($minWidth) {
+	    $this->minWidth = $minWidth;
 	    return $this;
 	}
 
-	public function setMaxHeight($maxheight) {
-	    $this->maxHeight = $maxheight;
+	public function setMinHeight($minHeight) {
+	    $this->minHeight = $minHeight;
 	    return $this;
 	}
 
