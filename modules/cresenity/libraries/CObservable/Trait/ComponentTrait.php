@@ -23,6 +23,17 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * 
      * @param string $id
+     * @return CElement_Component_Nestable
+     */
+    public function addNestable($id = "") {
+        $nestable = CElement_Factory::createComponent('Nestable', $id);
+        $this->add($nestable);
+        return $nestable;
+    }
+
+    /**
+     * 
+     * @param string $id
      * @return CElement_Component_Terminal
      */
     public function addTerminal($id = "") {
