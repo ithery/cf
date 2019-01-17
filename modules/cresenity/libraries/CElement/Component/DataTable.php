@@ -1046,7 +1046,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         <body>';
         echo '<table class="data table table-bordered table-striped responsive" id="' . $this->id . '">';
         echo '<thead>';
-
+        
         $header_count = count($this->report_header);
         $total_column = count($this->columns);
         $addition_column = 0;
@@ -1073,13 +1073,18 @@ class CElement_Component_DataTable extends CElement_Component {
         echo '<tbody>';
         $no = 0;
         $data = $this->data;
-        if (is_object($data))
-            $data = $data->result_array(false);
-
+        
+        if (is_object($data)) {
+            if($data instanceof CDatabase_Driver_Mysqli_Result) {
+                $data->setFetchTypeArray();
+            } else {
+                $data = $data->result_array(false);
+            }
+        }
+        
         foreach ($data as $row) {
             $no++;
             $key = "";
-
             if (array_key_exists($this->key_field, $row)) {
 
                 $key = $row[$this->key_field];
