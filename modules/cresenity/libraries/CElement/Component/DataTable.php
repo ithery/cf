@@ -191,7 +191,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->table_striped = $table_striped;
         return $this;
     }
-    
+
     function setTableBordered($bool) {
         $this->table_bordered = $bool;
         return $this;
@@ -684,7 +684,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @param bool $bool
      * @return $this
      */
-    public function setHeaderSortable($bool=true) {
+    public function setHeaderSortable($bool = true) {
         $this->header_sortable = $bool;
         return $this;
     }
@@ -694,7 +694,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @param bool $bool
      * @return $this
      */
-    public function setNumbering($bool=true) {
+    public function setNumbering($bool = true) {
         $this->numbering = $bool;
         return $this;
     }
@@ -747,7 +747,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->query = $q;
         return $this;
     }
-    
+
     /**
      * 
      * @param CModel $model
@@ -764,7 +764,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @param string $require
      * @return $this
      */
-    public function setDataFromElastic($el, $require) {
+    public function setDataFromElastic($el, $require = null) {
         $this->query = $el;
         $this->isElastic = true;
         if ($el instanceof CElastic_Search) {
@@ -1046,7 +1046,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         <body>';
         echo '<table class="data table table-bordered table-striped responsive" id="' . $this->id . '">';
         echo '<thead>';
-        
+
         $header_count = count($this->report_header);
         $total_column = count($this->columns);
         $addition_column = 0;
@@ -1073,15 +1073,15 @@ class CElement_Component_DataTable extends CElement_Component {
         echo '<tbody>';
         $no = 0;
         $data = $this->data;
-        
+
         if (is_object($data)) {
-            if($data instanceof CDatabase_Driver_Mysqli_Result) {
+            if ($data instanceof CDatabase_Driver_Mysqli_Result) {
                 $data->setFetchTypeArray();
             } else {
                 $data = $data->result_array(false);
             }
         }
-        
+
         foreach ($data as $row) {
             $no++;
             $key = "";
@@ -1683,7 +1683,7 @@ class CElement_Component_DataTable extends CElement_Component {
                                     ->add_param($action)
                                     ->set_require($this->requires)
                                     ->execute();
-                            if($visibility==false) {
+                            if ($visibility == false) {
                                 $action->addClass('d-none');
                             }
                             $action->setVisibility($visibility);
