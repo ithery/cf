@@ -270,8 +270,6 @@ class CApp_Navigation_Helper {
                 $parent_role_id = $app_role->parent_id;
                 if ($parent_role_id != null) {
                     if (!self::haveAccess($nav, $appRoleId, $appId)) {
-                       
-                        die;
                         return false;
                     }
                 }
