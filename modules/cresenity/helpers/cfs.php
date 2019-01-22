@@ -93,7 +93,7 @@ class cfs {
      */
     public static function mkdir($dir) {
         // Test write-permissions for the folder and create/fix if necessary.
-        if ((is_dir($dir) && is_writable($dir)) || (!is_dir($dir) && mkdir($dir, 0755, true)) || chmod($dir, 0755)) {
+        if ((is_dir($dir) && is_writable($dir)) || (!is_dir($dir) && @mkdir($dir, 0755, true)) || chmod($dir, 0755)) {
             return true;
         }
         return false;
