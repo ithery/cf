@@ -34,12 +34,40 @@ class Google_Service_AndroidPublisher extends Google_Service
   const ANDROIDPUBLISHER =
       "https://www.googleapis.com/auth/androidpublisher";
 
+  /**
+   *
+   * @var Google_Service_AndroidPublisher_Resource_Edits
+   */
   public $edits;
+  /**
+   *
+   * @var Google_Service_AndroidPublisher_Resource_EditsApklistings
+   */
   public $edits_apklistings;
+  /**
+   *
+   * @var Google_Service_AndroidPublisher_Resource_EditsApks
+   */
   public $edits_apks;
+  /**
+   *
+   * @var Google_Service_AndroidPublisher_Resource_EditsDeobfuscationfiles
+   */
   public $edits_deobfuscationfiles;
+  /**
+   *
+   * @var Google_Service_AndroidPublisher_Resource_EditsDetails
+   */
   public $edits_details;
+  /**
+   *
+   * @var Google_Service_AndroidPublisher_Resource_EditsExpansionfiles
+   */
   public $edits_expansionfiles;
+  /**
+   *
+   * @var Google_Service_AndroidPublisher_Resource_EditsImages
+   */
   public $edits_images;
   public $edits_listings;
   public $edits_testers;
