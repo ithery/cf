@@ -93,7 +93,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             maximumImageFileSize:1024*1024, // 1 MB
             callbacks:{ 
                 onImageUploadError: function(msg){ 
-                    alert(msg + ' (1 MB)'); 
+                    alert('Oops, something went wrong with image url'); 
                 }
             }
 	});
