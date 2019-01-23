@@ -23,6 +23,7 @@ class CElement_Component_Form_Field extends CElement_Component {
     protected $control_class = array();
     protected $style_form_group;
     protected $inline_without_default;
+    protected $labelRequired = false;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -38,10 +39,16 @@ class CElement_Component_Form_Field extends CElement_Component {
         $this->style_form_group = null;
         $this->inline_without_default = '0';
         $this->inline_without_default = carr::get($this->theme_style, 'inline_without_default');
+        $this->labelRequired = false;
     }
 
     public static function factory($id = "") {
-        return new CFormField($id);
+        return new CElement_Component_Form_Field($id);
+    }
+
+    public function setLabelRequired($bool = true) {
+        $this->labelRequired = $bool;
+        return $this;
     }
 
     public function toArray() {
@@ -83,6 +90,11 @@ class CElement_Component_Form_Field extends CElement_Component {
         $group_attr = "";
         if (strlen($this->group_id) > 0) {
             $group_attr .= ' id="' . $this->group_id . '"';
+        }
+
+        $labelRequiredHtml = '';
+        if ($this->labelRequired) {
+            $labelRequiredHtml = '<span style="color: red;">*</span> ';
         }
 
         if ($this->bootstrap == '3.3') {
@@ -137,13 +149,7 @@ class CElement_Component_Form_Field extends CElement_Component {
                 $class_form_field = 'form-group';
                 if ($this->style_form_group == 'inline') {
                     $class_form_field .= ' row';
-                    //                    $label_class = 'col-md-' . $this->label_size;
-                    //                    $control_size = 12 - $this->label_size;
-                    //                    $control_class = 'col-md-' . $control_size;
-                    //                    if($this->label_size > 11) {
-                    //                        $control_class = 'col-md-' . 10;
-                    //                        $label_class = 'col-md-' . 2;
-                    //                    }
+
                     if ($this->label_size != 'none') {
                         $label_class = 'col-md-3';
                         $control_class = 'col-md-9';
@@ -164,7 +170,7 @@ class CElement_Component_Form_Field extends CElement_Component {
             $control_class .= ' ' . implode(' ', $this->control_class);
             $html->appendln('<div class="' . $class_form_field . ' ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
             if ($this->show_label) {
-                $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $this->label . '</label>')->br();
+                $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $labelRequiredHtml . $this->label . '</label>')->br();
             }
             $fullwidth = "";
             if ($this->fullwidth) {

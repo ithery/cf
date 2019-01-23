@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 1:22:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_Event extends CEvent {
+class CApp_Event extends CEvent_Dispatcher {
 
     const onRenderableAdded = 'CApp_Event_OnRenderableAdded';
 

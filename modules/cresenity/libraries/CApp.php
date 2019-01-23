@@ -352,7 +352,7 @@ class CApp extends CObservable {
      * @param boolean $lang
      * @return CApp
      */
-    public function addBreadcrumb($caption, $url = 'javascript:;', $lang=true) {
+    public function addBreadcrumb($caption, $url = 'javascript:;', $lang = true) {
         if ($lang) {
             $caption = clang::__($caption);
         }
@@ -659,10 +659,12 @@ class CApp extends CObservable {
         $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId);
         $childList = array();
 
-        $traverse = function ($childs, $level = 0) use (&$traverse, &$childList) {
+        $traverse = function ($childs) use (&$traverse, &$childList) {
             foreach ($childs as $child) {
-                $childList[$child["role_id"]] = cutils::indent($level, "&nbsp;&nbsp;&nbsp;&nbsp;") . $child["name"];
-                $traverse($child->getChildren, ++$level);
+
+                $depth = carr::get($child, 'depth');
+                $childList[$child["role_id"]] = cutils::indent($depth, "&nbsp;&nbsp;") . $child["name"];
+                $traverse($child->getChildren);
             }
         };
 

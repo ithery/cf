@@ -346,8 +346,6 @@ abstract class CObservable extends CRenderable {
         return $fieldset;
     }
 
-    
-
     public function addRow($row_id = '') {
         $row = CTableRow::factory($row_id);
         $this->add($row);
@@ -445,12 +443,6 @@ abstract class CObservable extends CRenderable {
         $code = CElement_Factory::createComponent('PrismCode', $id);
         $this->add($code);
         return $code;
-    }
-
-    public function addNestable($id = "") {
-        $nestable = CNestable::factory($id);
-        $this->add($nestable);
-        return $nestable;
     }
 
     /**

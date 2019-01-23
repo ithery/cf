@@ -40,4 +40,12 @@ trait CTrait_Compat_Element_Nestable {
         return $this->haveRowAction();
     }
 
+    public function display_callback_func($func, $require = "") {
+        return $this->displayCallbackFunc($func, $require);
+    }
+
+    public function filter_action_callback_func($func, $require = "") {
+        return $this->filterActionCallbackFunc($func, $require);
+    }
+
 }

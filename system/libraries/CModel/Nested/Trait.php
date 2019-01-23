@@ -39,6 +39,7 @@ trait CModel_Nested_Trait {
      * Sign on model events.
      */
     public static function bootTrait() {
+
         static::saving(function ($model) {
             return $model->callPendingAction();
         });
@@ -157,6 +158,7 @@ trait CModel_Nested_Trait {
     protected function setParent($value) {
         $this->setParentId($value ? $value->getKey() : null)
                 ->setRelation('parent', $value);
+        $this->setDepth($value ? $value->getDepth() + 1 : 0);
         return $this;
     }
 
@@ -371,6 +373,7 @@ trait CModel_Nested_Trait {
                 ->assertNotDescendant($parent)
                 ->assertSameScope($parent);
         $this->setParent($parent)->dirtyBounds();
+        
         return $this->setNodeAction('appendOrPrepend', $parent, $prepend);
     }
 
@@ -509,7 +512,11 @@ trait CModel_Nested_Trait {
      */
     protected function moveNode($position) {
         $updated = $this->newNestedSetQuery()
-                        ->moveNode($this->getKey(), $position) > 0;
+                ->moveNode($this->getKey(), $position);
+
+        if ($updated instanceof CDatabase_Driver_Mysqli_Result) {
+            $updated = $updated->count();
+        }
         if ($updated)
             $this->refreshNode();
         return $updated;
@@ -732,6 +739,14 @@ trait CModel_Nested_Trait {
     }
 
     /**
+     * Get the depth key name.
+     *
+     * @return  string
+     */
+    public function getDepthName() {
+        return CModel_Nested_NestedSet::DEPTH;
+    }
+    /**
      * Get the parent id key name.
      *
      * @return  string
@@ -758,6 +773,14 @@ trait CModel_Nested_Trait {
         return $this->getAttributeValue($this->getRgtName());
     }
 
+    /**
+     * Get the value of the model's deoth key.
+     *
+     * @return  integer
+     */
+    public function getDepth() {
+        return $this->getAttributeValue($this->getDepthName());
+    }
     /**
      * Get the value of the model's parent id key.
      *
@@ -978,6 +1001,16 @@ trait CModel_Nested_Trait {
         $this->attributes[$this->getRgtName()] = $value;
         return $this;
     }
+    
+    /**
+     * @param $value
+     *
+     * @return $this
+     */
+    public function setDepth($value) {
+        $this->attributes[$this->getDepthName()] = $value;
+        return $this;
+    }
 
     /**
      * @param $value
@@ -995,6 +1028,7 @@ trait CModel_Nested_Trait {
     protected function dirtyBounds() {
         $this->original[$this->getLftName()] = null;
         $this->original[$this->getRgtName()] = null;
+        $this->original[$this->getDepthName()] = null;
         return $this;
     }
 

@@ -10,6 +10,7 @@ application/*
 
 #ignore data domain or org
 /data/*
+/data/org/*
 
 #ignore
 /index.php
