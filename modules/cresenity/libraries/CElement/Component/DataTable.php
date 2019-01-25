@@ -755,7 +755,7 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function setDataFromModel(CModel $model) {
         $q = $model->toSql();
-        $this->setDataFromQuery($q);
+        return $this->setDataFromQuery($q);
     }
 
     /**
