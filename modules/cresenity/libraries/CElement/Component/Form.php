@@ -100,7 +100,13 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function set_target($target) {
+    /**
+     * Set target attribute value of form element
+     * 
+     * @param string $target target attribute of form
+     * @return CElement_Component_Form
+     */
+    public function setTarget($target) {
         $this->target = $target;
         return $this;
     }
@@ -116,12 +122,22 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function set_autocomplete($bool) {
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setAutoComplete($bool) {
         $this->autocomplete = $bool;
         return $this;
     }
 
-    public function set_validation($bool) {
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setValidation($bool) {
         $this->validation = $bool;
         return $this;
     }
