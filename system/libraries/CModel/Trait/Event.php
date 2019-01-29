@@ -293,7 +293,7 @@ trait CModel_Trait_Event {
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return CEvent_Dispatcher
      */
     public static function getEventDispatcher() {
         return static::$dispatcher;
@@ -302,10 +302,10 @@ trait CModel_Trait_Event {
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  CEvent_Dispatcher  $dispatcher
      * @return void
      */
-    public static function setEventDispatcher(Dispatcher $dispatcher) {
+    public static function setEventDispatcher(CEvent_Dispatcher $dispatcher) {
         static::$dispatcher = $dispatcher;
     }
 

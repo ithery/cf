@@ -16,6 +16,7 @@ class CObservable_Listener_Handler {
     const TYPE_EMPTY = 'empty';
     const TYPE_CUSTOM = 'custom';
     const TYPE_APPEND = 'append';
+    const TYPE_PREPEND = 'prepend';
 
     protected $name;
     protected $handlers;

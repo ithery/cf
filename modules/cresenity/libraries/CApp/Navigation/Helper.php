@@ -12,12 +12,15 @@ class CApp_Navigation_Helper {
     protected static $role_navs = array();
 
     public static function nav($nav = null, $controller = null, $method = null, $path = null) {
-        if ($controller == null)
-            $controller = crouter::controller();
-        if ($method == null)
-            $method = crouter::method();
-        if ($path == null)
+        if ($controller == null) {
+            $controller = CFRouter::$controller;
+        }
+        if ($method == null) {
+            $method = CFRouter::$method;
+        }
+        if ($path == null) {
             $path = CFRouter::$controller_dir;
+        }
 
 
         if ($nav == null) {
@@ -144,12 +147,12 @@ class CApp_Navigation_Helper {
         return $role->rolePermission()->where('name', '=', $action)->where('app_id', '=', $appId)->count() > 0;
     }
 
-    public static function appUserRightsArray($appId, $roleId, $app_role_id = "", $domain = null) {
+    public static function appUserRightsArray($appId, $roleId, $appRoleId = "", $domain = null) {
         $navs = CApp_Navigation_Data::get($domain);
-        return self::asUserRightsArray($appId, $roleId, $navs, $app_role_id, $domain);
+        return self::asUserRightsArray($appId, $roleId, $navs, $appRoleId, $domain);
     }
 
-    public static function asUserRightsArray($appId, $roleId, $navs = null, $app_role_id = "", $domain = "", $level = 0) {
+    public static function asUserRightsArray($appId, $roleId, $navs = null, $appRoleId = "", $domain = "", $level = 0) {
         if ($navs == null)
             $navs = CNavigation::instance()->navs();
 
@@ -161,7 +164,7 @@ class CApp_Navigation_Helper {
 
 
         foreach ($navs as $d) {
-            if (!self::accessAvailable($d, $appId, $domain, $app_role_id)) {
+            if (!self::accessAvailable($d, $appId, $domain, $appRoleId)) {
                 continue;
             }
 
@@ -172,7 +175,7 @@ class CApp_Navigation_Helper {
             $res["domain"] = $domain;
             $subnav = array();
             if (isset($d["subnav"]) && is_array($d["subnav"]) && count($d["subnav"]) > 0) {
-                $subnav = self::asUserRightsArray($appId, $roleId, $d["subnav"], $app_role_id, $domain, $level + 1);
+                $subnav = self::asUserRightsArray($appId, $roleId, $d["subnav"], $appRoleId, $domain, $level + 1);
             }
             if (count($subnav) == 0 && (!isset($d["controller"]) || strlen($d["controller"]) == 0 )) {
                 if (!isset($d["link"]) || strlen($d["link"]) == 0) {
@@ -240,32 +243,33 @@ class CApp_Navigation_Helper {
         return $url;
     }
 
-    public static function accessAvailable($nav = null, $appId = "", $domain = "", $app_role_id = "") {
-        if ($nav == null)
+    public static function accessAvailable($nav = null, $appId = "", $domain = "", $appRoleId = "") {
+        if ($nav == null) {
             $nav = self::nav();
-        if ($nav === false)
+        }
+        if ($nav === false) {
             return false;
-        $navname = $nav["name"];
+        }
+        $navname = carr::get($nav, "name");
         $app = CApp::instance();
 
-        if (strlen($app_role_id) == 0) {
+        if (strlen($appRoleId) == 0) {
             if ($app->user() != null) {
-                $app_role_id = cobj::get($app->user(), 'role_id');
+                $appRoleId = cobj::get($app->user(), 'role_id');
             }
         }
 
 
 
-        if (strlen($app_role_id) > 0) {
-            $app_role = crole::get($app_role_id);
+        if (strlen($appRoleId) > 0) {
+            $app_role = crole::get($appRoleId);
             if ($app_role != null && $app_role->parent_id == null)
                 return true;
             if ($app_role != null && (!isset($nav["subnav"]) || count($nav["subnav"]) == 0)) {
 
                 $parent_role_id = $app_role->parent_id;
                 if ($parent_role_id != null) {
-                    if (!self::haveAccess($nav, $app_role_id, $appId)) {
-
+                    if (!self::haveAccess($nav, $appRoleId, $appId)) {
                         return false;
                     }
                 }
@@ -276,8 +280,8 @@ class CApp_Navigation_Helper {
             $requirements = $nav["requirements"];
             foreach ($requirements as $k => $v) {
 
-                $config_value = ccfg::get($k, $domain);
-                if ($config_value != $v) {
+                $configValue = ccfg::get($k, $domain);
+                if ($configValue != $v) {
                     return false;
                 }
             }
@@ -286,14 +290,14 @@ class CApp_Navigation_Helper {
         return true;
     }
 
-    public static function permissionAvailable($action, $nav = null, $appId = "", $domain = "", $app_role_id = "") {
+    public static function permissionAvailable($action, $nav = null, $appId = "", $domain = "", $appRoleId = "") {
 
         if ($nav == null)
             $nav = self::nav();
         if ($nav === false)
             return false;
 
-        if (!self::accessAvailable($nav, $appId, $domain, $app_role_id))
+        if (!self::accessAvailable($nav, $appId, $domain, $appRoleId))
             return false;
 
         $navname = $nav["name"];

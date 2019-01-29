@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 12:19:51 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CDatabase_Event extends CEvent {
+class CDatabase_Event extends CEvent_Dispatcher {
     /* database */
 
     const onQueryExecuted = 'CDatabase_Event_OnQueryExecuted';

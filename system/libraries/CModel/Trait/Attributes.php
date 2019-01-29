@@ -497,7 +497,7 @@ trait CModel_Trait_Attributes {
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
-            $method = 'set' . Str::studly($key) . 'Attribute';
+            $method = 'set' . cstr::studly($key) . 'Attribute';
 
             return $this->{$method}($value);
         }

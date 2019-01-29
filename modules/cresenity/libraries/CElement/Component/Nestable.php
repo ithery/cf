@@ -8,6 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CElement_Component_Nestable extends CElement_Component {
+
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
 
@@ -17,8 +18,8 @@ class CElement_Component_Nestable extends CElement_Component {
     protected $applyjs;
     protected $input;
     protected $action_style;
-    protected $display_callback;
-    protected $filter_action_callback_func;
+    protected $displayCallbackFunc;
+    protected $filterActionCallbackFunc;
     protected $requires;
     protected $checkbox;
     protected $disable_dnd;
@@ -34,8 +35,8 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->action_style = 'btn-icon-group';
         $this->rowActionList->setStyle('btn-icon-group');
-        $this->display_callback = false;
-        $this->filter_action_callback_func = "";
+        $this->displayCallbackFunc = false;
+        $this->filterActionCallbackFunc = "";
         $this->checkbox = false;
         $this->requires = array();
         $this->js_cell = '';
@@ -45,24 +46,57 @@ class CElement_Component_Nestable extends CElement_Component {
         return new CElement_Component_Nestable($id);
     }
 
-    public function display_callback_func($func, $require = "") {
-        $this->display_callback = $func;
+    public function displayCallbackFunc($func, $require = "") {
+        $this->displayCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
         return $this;
     }
 
-    public function filter_action_callback_func($func, $require = "") {
-        $this->filter_action_callback_func = $func;
+    public function filterActionCallbackFunc($func, $require = "") {
+        $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
         return $this;
     }
 
-    public function setDataFromTreeDb($treedb, $parent_id = null) {
-        $this->data = $treedb->get_children_data($parent_id);
+    public function setDataFromTreeDb(CTreeDB $treedb, $parentId = null) {
+        $this->data = $treedb->getChildrenData($parentId);
+        return $this;
+    }
+
+    public function setDataFromModel(CModel $root) {
+
+
+        $orgId = CApp_Base::orgId();
+
+        $root = $root->descendants();
+        if (strlen($orgId) > 0) {
+            $root = $root->where(function($query) use ($orgId) {
+                $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
+            })->where('status', '>', 0);
+        }
+
+        $tree = $root->get()->toTree();
+        $childArray = array();
+      
+      
+        $traverse = function ($nodes) use (&$traverse, &$childArray) {
+            foreach ($nodes as $node) {
+                if($node->status==0) {
+                    continue;
+                }
+                $childArray[] = $node->toArray();
+                $traverse($node->getChildren);
+            }
+        };
+
+        $traverse($tree);
+
+       
+        $this->data = $childArray;
         return $this;
     }
 
@@ -111,6 +145,7 @@ class CElement_Component_Nestable extends CElement_Component {
             $depth_before = -1;
             $in = 0;
             foreach ($this->data as $d) {
+
                 $depth = $d['depth'];
                 if ($depth_before >= $depth) {
                     $html->dec_indent()->appendln('</li>');
@@ -134,8 +169,8 @@ class CElement_Component_Nestable extends CElement_Component {
                 }
                 $val = $d[$this->value_key];
                 $new_v = $val;
-                if ($this->display_callback !== false && is_callable($this->display_callback)) {
-                    $new_v = CDynFunction::factory($this->display_callback)
+                if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
+                    $new_v = CDynFunction::factory($this->displayCallbackFunc)
                             ->add_param($this)
                             ->add_param($d)
                             ->add_param($val)
@@ -158,11 +193,11 @@ class CElement_Component_Nestable extends CElement_Component {
                     $this->rowActionList->apply("jsparam", $jsparam);
                     $this->rowActionList->apply("set_handler_url_param", $jsparam);
 
-                    if (($this->filter_action_callback_func) != null) {
+                    if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as $action) {
-                            $visibility = CDynFunction::factory($this->filter_action_callback_func)
+                            $visibility = CDynFunction::factory($this->filterActionCallbackFunc)
                                     ->add_param($this)
                                     ->add_param($d)
                                     ->add_param($action)
