@@ -649,6 +649,53 @@ if (window.capp.have_clock) {
                 }
             }));
         },
+        prepend: function (id_target, url, method, data_addition) {
+
+            if (!method)
+                method = "get";
+            var xhr = jQuery('#' + id_target).data('xhr');
+            url = $.cresenity.url.replace_param(url);
+            if (typeof data_addition == 'undefined')
+                data_addition = {};
+            url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
+            if (window.capp.bootstrap >= '3.3') {
+
+                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').addClass('loading'));
+            } else {
+
+                jQuery('#' + id_target).addClass('loading');
+                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+
+            }
+
+
+
+            jQuery('#' + id_target).data('xhr', jQuery.ajax({
+                type: method,
+                url: url,
+                dataType: 'json',
+                data: data_addition,
+                success: function (data) {
+
+                    $.cresenity._handle_response(data, function () {
+                        jQuery('#' + id_target).prepend(data.html);
+                        jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
+                        var script = $.cresenity.base64.decode(data.js);
+                        eval(script);
+                        jQuery('#' + id_target).removeClass('loading');
+                        jQuery('#' + id_target).data('xhr', false);
+                        if (jQuery('#' + id_target).find('.prettyprint').length > 0) {
+                            window.prettyPrint && prettyPrint();
+                        }
+                    });
+                },
+                error: function (obj, t, msg) {
+                    if (msg != 'abort') {
+                        $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
+                    }
+                }
+            }));
+        },
         show_tooltip: function (id_target, url, method, text, toggle, position, title, data_addition) {
             if (typeof title == 'undefined')
                 title = '';
