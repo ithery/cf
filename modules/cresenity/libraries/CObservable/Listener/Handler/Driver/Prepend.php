@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_Driver_Prepend extends CObservable_Listener_Handler_Driver {
 
+    use CTrait_Compat_Handler_Driver_Prepend;
+
     protected $target;
     protected $method;
     protected $content;
