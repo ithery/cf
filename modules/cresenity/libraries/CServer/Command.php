@@ -641,13 +641,14 @@ class CServer_Command extends CServer_Base {
                     $process = $pipes[1] = popen($cmd . " 2>/dev/null", "r");
                 }
             } else {
-
+               
                 $process = proc_open($cmd, $descriptorspec, $pipes);
             }
         }
         if ($this->sshConfig == null) {
             if (is_resource($process)) {
                 $te = $this->timeoutfgets($pipes, $strBuffer, $strError, $timeout);
+                
                 if (defined("PSI_MODE_POPEN") && PSI_MODE_POPEN === true) {
                     $return_value = pclose($pipes[1]);
                 } else {
@@ -666,12 +667,13 @@ class CServer_Command extends CServer_Base {
             } else {
 
                 if ($booErrorRep) {
-                    $error->addError($strProgram, "\nOpen process error");
+                    $error->addError($cmd, "\nOpen process error");
                 }
 
                 return false;
             }
         }
+        
         $strError = trim($strError);
         $strBuffer = trim($strBuffer);
         if (defined('PSI_LOG') && is_string(PSI_LOG) && (strlen(PSI_LOG) > 0) && (substr(PSI_LOG, 0, 1) != "-") && (substr(PSI_LOG, 0, 1) != "+")) {
@@ -680,7 +682,7 @@ class CServer_Command extends CServer_Base {
 
         if (!empty($strError)) {
             if ($booErrorRep) {
-                $error->addError($strProgram, $strError . "\nReturn value: " . $return_value);
+                CServer::error()->addError($cmd, $strError . "\nReturn value: " . $return_value);
             }
 
             return $return_value == 0;

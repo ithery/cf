@@ -140,12 +140,17 @@ class CServer_Error {
         $arrTrace = array_reverse(debug_backtrace());
         $strFunc = '';
         $strBacktrace = htmlspecialchars($strMessage) . "\n\n";
+       
+             
         foreach ($arrTrace as $val) {
             // avoid the last line, which says the error is from the error class
             if ($val == $arrTrace[count($arrTrace) - 1]) {
                 break;
             }
-            $strBacktrace .= str_replace(APP_ROOT, ".", $val['file']) . ' on line ' . $val['line'];
+            if(!isset($val['file'])) {
+                continue;
+            }
+            $strBacktrace .= str_replace(DOCROOT, ".", carr::get($val, 'file')) . ' on line ' . $val['line'];
             if ($strFunc) {
                 $strBacktrace .= ' in function ' . $strFunc;
             }

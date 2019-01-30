@@ -33,6 +33,11 @@ class CServer {
         return CServer_Error::instance();
     }
 
+    /**
+     * 
+     * @param type $sshConfig | optional
+     * @return CServer_Command
+     */
     public static function command($sshConfig = null) {
         return CServer_Command::instance($sshConfig);
     }

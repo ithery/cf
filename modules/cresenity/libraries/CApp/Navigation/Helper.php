@@ -92,9 +92,9 @@ class CApp_Navigation_Helper {
         }
 
         $role = crole::get($roleId);
-        if ($role != null) {
-            if ($role->parent_id == null)
-                return true;
+        if ($role != null && $role->parent_id == null) {
+            //is is superadmin
+            return true;
         }
 
 
@@ -110,6 +110,8 @@ class CApp_Navigation_Helper {
                     $roleNavModel = CApp::model('RoleNav')->where('role_id', '=', $roleId);
                     //$q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
                 }
+                $result = $roleNavModel->where('app_id', '=', $appId)->get();
+
                 self::$role_navs[$appId][$roleId] = $roleNavModel->where('app_id', '=', $appId)->get()->pluck('nav')->toArray();
             }
         }
