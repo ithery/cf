@@ -416,7 +416,7 @@ trait CModel_Trait_Attributes {
      * @return mixed
      */
     protected function mutateAttribute($key, $value) {
-        return $this->{'get' . Str::studly($key) . 'Attribute'}($value);
+        return $this->{'get' . cstr::studly($key) . 'Attribute'}($value);
     }
 
     /**
