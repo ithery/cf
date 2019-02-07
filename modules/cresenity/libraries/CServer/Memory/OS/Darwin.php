@@ -9,23 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CServer_Memory_OS_Darwin extends CServer_Memory_OS_Linux {
 
-    /**
-     * get a value from sysctl command
-     *
-     * @param string $key key of the value to get
-     *
-     * @return string
-     */
-    protected function grabkey($key) {
-        $cmd = $this->createCommand();
-        if ($cmd->executeProgram('sysctl', $key, $s, PSI_DEBUG)) {
-            $s = preg_replace('/' . $key . ': /', '', $s);
-            $s = preg_replace('/' . $key . ' = /', '', $s);
-            return $s;
-        } else {
-            return '';
-        }
-    }
+    use CServer_Trait_OS_Darwin;
 
     /**
      * get memory and swap information
