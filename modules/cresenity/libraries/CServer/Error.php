@@ -196,7 +196,7 @@ class CServer_Error {
             $strResult = 'array( ';
             $strComma = '';
             foreach ($var as $key => $val) {
-                $strResult .= $strComma . $this->_printVar($key) . ' => ' . $this->_printVar($val);
+                $strResult .= $strComma . $this->printVar($key) . ' => ' . $this->printVar($val);
                 $strComma = ', ';
             }
             $strResult .= ' )';
