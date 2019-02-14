@@ -13,7 +13,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
 
     public function render($navs = null, $level = 0, &$child = 0) {
         $is_admin = CApp::instance()->isAdmin();
-        if ($navs == null) {
+        if ($navs == null && $level == 0) {
             $navs = $this->navs;
         }
         if ($navs == null) {
