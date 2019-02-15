@@ -38,8 +38,9 @@ class CImage_Avatar_Input_Initials {
         $this->request = $_GET;
         $this->name = $this->getRequest('name', 'John Doe');
         $this->size = (int) $this->getRequest('size', 64);
-        $this->background = $this->getRequest('background', '#ddd');
-        $this->color = $this->getRequest('color', '#222');
+
+        $this->background = $this->getRequest('background', CColor::random()->one(array('luminosity' => 'dark')));
+        $this->color = $this->getRequest('color', '#fff');
         $this->length = (int) $this->getRequest('length', 2);
         $this->fontSize = (double) $this->getRequest('font-size', 0.5);
         $this->rounded = $this->getRounded();

@@ -829,10 +829,12 @@ class Cresenity_Controller extends CController {
 
         $avatarApi = CImage::avatar()->api($engineName);
 
-        header('Content-type: image/png');
-        header('Pragma: public');
-        header('Cache-Control: max-age=172800');
-        header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
+        if (!isset($_GET['noheader'])) {
+            header('Content-type: image/png');
+            header('Pragma: public');
+            header('Cache-Control: max-age=172800');
+            header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
+        }
         $avatarApi->render();
     }
 
