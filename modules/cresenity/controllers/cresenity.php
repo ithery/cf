@@ -834,6 +834,8 @@ class Cresenity_Controller extends CController {
 
         header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
 
+        CImage::avatar()->generate();
+        
         $image = $avatar->name($input->name)
                 ->length($input->length)
                 ->fontSize($input->fontSize)
