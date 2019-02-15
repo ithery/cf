@@ -9,9 +9,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CImage {
 
+    /**
+     * Create CImage_Avatar Object
+     * 
+     * @param string $engineName
+     * @return \CImage_Avatar
+     */
     public static function avatar($engineName = 'Initials') {
 
-        return CImage_Avatar($engineName);
+        return new CImage_Avatar($engineName);
     }
 
 }
