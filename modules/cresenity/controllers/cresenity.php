@@ -820,9 +820,6 @@ class Cresenity_Controller extends CController {
     public function avatar($method = 'initials') {
         ob_start('ob_gzhandler');
 
-        //header('Content-type: image/png');
-        //header('Pragma: public');
-        //header('Cache-Control: max-age=172800');
         $engineName = 'Initials';
         switch ($method) {
             case 'initials':
@@ -830,13 +827,12 @@ class Cresenity_Controller extends CController {
                 break;
         }
 
-
-
-        header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
-
-
         $avatarApi = CImage::avatar()->api($engineName);
 
+        header('Content-type: image/png');
+        header('Pragma: public');
+        header('Cache-Control: max-age=172800');
+        header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
         $avatarApi->render();
     }
 
