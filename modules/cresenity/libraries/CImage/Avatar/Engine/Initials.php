@@ -28,7 +28,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     protected $smooth = false;
     protected $autofont = false;
     protected $keepCase = false;
-    protected $fontFile = '/fonts/OpenSans-Regular.ttf';
+    protected $fontFile = CConstant::CRESENITY_FONT_PATH . '/opensans/OpenSans-Regular.ttf';
     protected $generated_initials = 'JD';
 
     public function __construct() {
@@ -383,34 +383,34 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
 
     private function getFontByScript() {
         if (CString_Language::isArabic($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Arabic-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Arabic-Regular.ttf';
         }
         if (CString_Language::isArmenian($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Armenian-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Armenian-Regular.ttf';
         }
         if (CString_Language::isBengali($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Bengali-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Bengali-Regular.ttf';
         }
         if (CString_Language::isGeorgian($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Georgian-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Georgian-Regular.ttf';
         }
         if (CString_Language::isHebrew($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Hebrew-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Hebrew-Regular.ttf';
         }
         if (CString_Language::isMongolian($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Mongolian-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Mongolian-Regular.ttf';
         }
         if (CString_Language::isThai($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Thai-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Thai-Regular.ttf';
         }
         if (CString_Language::isTibetan($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-Tibetan-Regular.ttf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-Tibetan-Regular.ttf';
         }
         if (CString_Language::isChinese($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-CJKJP-Regular.otf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-CJKJP-Regular.otf';
         }
         if (CString_Language::isJapanese($this->getInitials())) {
-            return __DIR__ . '/fonts/script/Noto-CJKJP-Regular.otf';
+            return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-CJKJP-Regular.otf';
         }
         return $this->getFontFile();
     }
