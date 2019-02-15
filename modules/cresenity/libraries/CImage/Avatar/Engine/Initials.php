@@ -11,7 +11,7 @@ use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 
-class CImage_Avatar_Engine_Initials extends CImage_Avatar_Engine {
+class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
 
     /** @var ImageManager */
     protected $image;

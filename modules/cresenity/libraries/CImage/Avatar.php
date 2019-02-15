@@ -7,9 +7,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 16, 2019, 2:07:19 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 class CImage_Avatar {
-    public function generate() {
-        
+
+    public static function api($engineName = 'Initials') {
+        $className = 'CImage_Avatar_Api_' . $engineName;
+        return new $className();
     }
+
 }

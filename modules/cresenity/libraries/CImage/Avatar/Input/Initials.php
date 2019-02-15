@@ -4,10 +4,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 2:10:09 AM
+ * @since Feb 16, 2019, 2:25:18 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CImage_Api_Input_Avatar {
+class CImage_Avatar_Input_Initials {
 
     public $name;
     public $length;
