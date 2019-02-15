@@ -198,6 +198,10 @@ trait CApp_Trait_Base {
         return curl::base() . 'cresenity/noimage/' . $width . '/' . $height;
     }
 
+    public static function initialAvatarUrl($name, $size = 100) {
+        return curl::base() . 'cresenity/avatar/initials/?name=' . $name . '&size=' . $size;
+    }
+
     public static function havePermission($action) {
         return CApp_Navigation_Helper::havePermission($action);
     }
