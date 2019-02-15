@@ -382,34 +382,34 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     }
 
     private function getFontByScript() {
-        if (StringScript::isArabic($this->getInitials())) {
+        if (CString_Language::isArabic($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Arabic-Regular.ttf';
         }
-        if (StringScript::isArmenian($this->getInitials())) {
+        if (CString_Language::isArmenian($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Armenian-Regular.ttf';
         }
-        if (StringScript::isBengali($this->getInitials())) {
+        if (CString_Language::isBengali($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Bengali-Regular.ttf';
         }
-        if (StringScript::isGeorgian($this->getInitials())) {
+        if (CString_Language::isGeorgian($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Georgian-Regular.ttf';
         }
-        if (StringScript::isHebrew($this->getInitials())) {
+        if (CString_Language::isHebrew($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Hebrew-Regular.ttf';
         }
-        if (StringScript::isMongolian($this->getInitials())) {
+        if (CString_Language::isMongolian($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Mongolian-Regular.ttf';
         }
-        if (StringScript::isThai($this->getInitials())) {
+        if (CString_Language::isThai($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Thai-Regular.ttf';
         }
-        if (StringScript::isTibetan($this->getInitials())) {
+        if (CString_Language::isTibetan($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-Tibetan-Regular.ttf';
         }
-        if (StringScript::isChinese($this->getInitials())) {
+        if (CString_Language::isChinese($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-CJKJP-Regular.otf';
         }
-        if (StringScript::isJapanese($this->getInitials())) {
+        if (CString_Language::isJapanese($this->getInitials())) {
             return __DIR__ . '/fonts/script/Noto-CJKJP-Regular.otf';
         }
         return $this->getFontFile();

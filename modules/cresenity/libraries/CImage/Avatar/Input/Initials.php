@@ -58,7 +58,7 @@ class CImage_Avatar_Input_Initials {
     }
 
     private function getInitials() {
-        return ( new Initials)->length($this->length)->keepCase(!$this->uppercase)->generate($this->name);
+        return ( new CString_Initials)->length($this->length)->keepCase(!$this->uppercase)->generate($this->name);
     }
 
     private function generateCacheKey() {

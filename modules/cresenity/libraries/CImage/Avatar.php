@@ -19,7 +19,7 @@ class CImage_Avatar {
      * 
      * @return CImage_Avatar_ApiAbstract
      */
-    public static function api() {
+    public function api() {
         $className = 'CImage_Avatar_Api_' . $this->engineName;
         return new $className();
     }

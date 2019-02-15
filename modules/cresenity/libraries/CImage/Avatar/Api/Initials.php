@@ -15,7 +15,7 @@ class CImage_Avatar_Api_Initials {
 
         header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
 
-
+        $input = new CImage_Avatar_Input_Initials();
 
         $image = $avatarEngine->name($input->name)
                 ->length($input->length)
