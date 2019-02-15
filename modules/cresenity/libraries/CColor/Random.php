@@ -9,6 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CColor_Random {
 
+    protected $options = array();
     static public $dictionary = array(
         'monochrome' => array(
             'bounds' => array(array(0, 0), array(100, 0)),
@@ -52,50 +53,55 @@ class CColor_Random {
         )
     );
 
-    public function __construct() {
-        
+    public function __construct($options) {
+        $optionsDefault = array(
+            'format' => 'hex',
+        );
+        $this->options = array_merge($optionsDefault, $options);
     }
 
-    static public function one($options = array()) {
-        $h = self::_pickHue($options);
-        $s = self::_pickSaturation($h, $options);
-        $v = self::_pickBrightness($h, $s, $options);
+    public function one() {
+        $h = $this->pickHue();
+        $s = $this->pickSaturation($h);
+        $v = $this->pickBrightness($h, $s);
         return self::format(compact('h', 's', 'v'), @$options['format']);
     }
 
-    static public function many($count, $options = array()) {
+    static public function many($count) {
         $colors = array();
         for ($i = 0; $i < $count; $i++) {
-            $colors[] = self::one($options);
+            $colors[] = self::one();
         }
         return $colors;
     }
 
-    static public function format($hsv, $format = 'hex') {
+    public function formatType($hsvArray, $format = 'hex') {
+        $hsv = new CColor_Format_Type_Hsv($hsvArray);
         switch ($format) {
             case 'hsv':
                 return $hsv;
             case 'hsl':
-                return self::hsv2hsl($hsv);
+                return $hsv->toHsl();
             case 'hslCss':
-                $hsl = self::hsv2hsl($hsv);
+
+                $hslValue = $hsv->toHsl()->value;
                 return 'hsl(' . $hsl['h'] . ',' . $hsl['s'] . '%,' . $hsl['l'] . '%)';
             case 'rgb':
-                return self::hsv2rgb($hsv);
+                return $hsv->toRgb();
             case 'rgbCss':
-                return 'rgb(' . implode(',', self::hsv2rgb($hsv)) . ')';
+                return 'rgb(' . implode(',', $hsv->toRgb()) . ')';
             case 'hex':
             default:
-                return self::hsv2hex($hsv);
+                return $hsv->toHex();
         }
     }
 
-    static private function _pickHue($options) {
-        $range = self::_getHueRange($options);
+    static private function pickHue() {
+        $range = $this->getHueRange();
         if (empty($range)) {
             return 0;
         }
-        $hue = self::_rand($range, $options);
+        $hue = $this->rand($range);
         // Instead of storing red as two separate ranges,
         // we group them, using negative numbers
         if ($hue < 0) {
@@ -104,60 +110,62 @@ class CColor_Random {
         return $hue;
     }
 
-    static private function _pickSaturation($h, $options) {
-        if (@$options['hue'] === 'monochrome') {
+    static private function pickSaturation($h) {
+        if ($this->getOption('hue') === 'monochrome') {
             return 0;
         }
-        if (@$options['luminosity'] === 'random') {
-            return self::_rand(array(0, 100), $options);
+        if ($this->getOption('luminosity') === 'random') {
+            return $this->rand(array(0, 100));
         }
-        $colorInfo = self::_getColorInfo($h);
+        $colorInfo = $this->getColorInfo($h);
         $range = $colorInfo['s'];
-        switch (@$options['luminosity']) {
-            case 'bright':
-                $range[0] = 55;
-                break;
-            case 'dark':
-                $range[0] = $range[1] - 10;
-                break;
-            case 'light':
-                $range[1] = 55;
-                break;
-        }
-        return self::_rand($range, $options);
-    }
-
-    static private function _pickBrightness($h, $s, $options) {
-        if (@$options['luminosity'] === 'random') {
-            $range = array(0, 100);
-        } else {
-            $range = array(
-                self::_getMinimumBrightness($h, $s),
-                100
-            );
-            switch (@$options['luminosity']) {
+        if ($this->haveOption('luminosity')) {
+            switch ($this->getOption('luminosity')) {
+                case 'bright':
+                    $range[0] = 55;
+                    break;
                 case 'dark':
-                    $range[1] = $range[0] + 20;
+                    $range[0] = $range[1] - 10;
                     break;
                 case 'light':
-                    $range[0] = ($range[1] + $range[0]) / 2;
+                    $range[1] = 55;
                     break;
             }
         }
-        return self::_rand($range, $options);
+
+        return $this->rand($range);
     }
 
-    static private function _getHueRange($options) {
-        $ranges = array();
-        if (isset($options['hue'])) {
-            if (!is_array($options['hue'])) {
-                $options['hue'] = array($options['hue']);
+    private function pickBrightness($h, $s) {
+        if ($this->getOption('luminosity') === 'random') {
+            $range = array(0, 100);
+        } else {
+            $range = array($this->getMinimumBrightness($h, $s), 100);
+            if ($this->haveOption('luminosity')) {
+                switch ($this->getOption('luminosity')) {
+                    case 'dark':
+                        $range[1] = $range[0] + 20;
+                        break;
+                    case 'light':
+                        $range[0] = ($range[1] + $range[0]) / 2;
+                        break;
+                }
             }
-            foreach ($options['hue'] as $hue) {
+        }
+        return $this->rand($range);
+    }
+
+    private function getHueRange() {
+        $ranges = array();
+        if ($this->haveOption('hue')) {
+            if (!is_array($this->getOption('hue'))) {
+                $this->setOption('hue', array($this->getOption('hue')));
+            }
+            foreach ($this->getOption('hue') as $hue) {
                 if ($hue === 'random') {
                     $ranges[] = array(0, 360);
-                } else if (isset(self::$dictionary[$hue])) {
-                    $ranges[] = self::$dictionary[$hue]['h'];
+                } else if (isset($this->dictionary[$hue])) {
+                    $ranges[] = $this->dictionary[$hue]['h'];
                 } else if (is_numeric($hue)) {
                     $hue = intval($hue);
                     if ($hue <= 360 && $hue >= 0) {
@@ -171,12 +179,12 @@ class CColor_Random {
         } else if ($l === 1) {
             return $ranges[0];
         } else {
-            return $ranges[self::_rand(array(0, $l - 1), $options)];
+            return $ranges[$this->rand(array(0, $l - 1))];
         }
     }
 
-    static private function _getMinimumBrightness($h, $s) {
-        $colorInfo = self::_getColorInfo($h);
+    static private function getMinimumBrightness($h, $s) {
+        $colorInfo = $this->getColorInfo($h);
         $bounds = $colorInfo['bounds'];
         for ($i = 0, $l = count($bounds); $i < $l - 1; $i++) {
             $s1 = $bounds[$i][0];
@@ -192,86 +200,39 @@ class CColor_Random {
         return 0;
     }
 
-    static private function _getColorInfo($h) {
+    private function getColorInfo($h) {
         // Maps red colors to make picking hue easier
         if ($h >= 334 && $h <= 360) {
             $h -= 360;
         }
-        foreach (self::$dictionary as $color) {
+        foreach ($this->dictionary as $color) {
             if ($color['h'] !== null && $h >= $color['h'][0] && $h <= $color['h'][1]) {
                 return $color;
             }
         }
     }
 
-    static private function _rand($bounds, $options) {
-        if (isset($options['prng'])) {
-            return $options['prng']($bounds[0], $bounds[1]);
+    private function rand($bounds, $options) {
+
+        if ($this->haveOption('prng')) {
+            $prng = $this->getOption('prng');
+            return $prng($bounds[0], $bounds[1]);
         } else {
             return mt_rand($bounds[0], $bounds[1]);
         }
     }
 
-    static public function hsv2hex($hsv) {
-        $rgb = self::hsv2rgb($hsv);
-        $hex = '#';
-        foreach ($rgb as $c) {
-            $hex .= str_pad(dechex($c), 2, '0', STR_PAD_LEFT);
-        }
-        return $hex;
+    public function getOption($key) {
+        return carr::get($this->option, $key);
     }
 
-    static public function hsv2hsl($hsv) {
-        extract($hsv);
-        $s /= 100;
-        $v /= 100;
-        $k = (2 - $s) * $v;
-        return array(
-            'h' => $h,
-            's' => round($s * $v / ($k < 1 ? $k : 2 - $k), 4) * 100,
-            'l' => $k / 2 * 100,
-        );
+    public function setOption($key, $value) {
+        $this->option[$key] = $value;
+        return $this;
     }
 
-    static public function hsv2rgb($hsv) {
-        extract($hsv);
-        $h /= 360;
-        $s /= 100;
-        $v /= 100;
-        $i = floor($h * 6);
-        $f = $h * 6 - $i;
-        $m = $v * (1 - $s);
-        $n = $v * (1 - $s * $f);
-        $k = $v * (1 - $s * (1 - $f));
-        $r = 1;
-        $g = 1;
-        $b = 1;
-        switch ($i) {
-            case 0:
-                list($r, $g, $b) = array($v, $k, $m);
-                break;
-            case 1:
-                list($r, $g, $b) = array($n, $v, $m);
-                break;
-            case 2:
-                list($r, $g, $b) = array($m, $v, $k);
-                break;
-            case 3:
-                list($r, $g, $b) = array($m, $n, $v);
-                break;
-            case 4:
-                list($r, $g, $b) = array($k, $m, $v);
-                break;
-            case 5:
-            case 6:
-                list($r, $g, $b) = array($v, $m, $n);
-                break;
-        }
-        return array(
-            'r' => floor($r * 255),
-            'g' => floor($g * 255),
-            'b' => floor($b * 255),
-        );
+    public function haveOption($key) {
+        return $this->getOption($key) !== null;
     }
 
 }
