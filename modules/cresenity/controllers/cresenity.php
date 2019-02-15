@@ -829,27 +829,15 @@ class Cresenity_Controller extends CController {
                 $engineName = 'Initials';
                 break;
         }
-        $avatar = CImage::avatar($engineName);
+
 
 
         header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
 
-        
-        
-        $image = $avatar->name($input->name)
-                ->length($input->length)
-                ->fontSize($input->fontSize)
-                ->size($input->size)
-                ->background($input->background)
-                ->color($input->color)
-                ->smooth()
-                ->autoFont()
-                ->keepCase(!$input->uppercase)
-                ->rounded($input->rounded)
-                ->generate();
 
+        $avatarApi = CImage::avatar()->api($engineName);
 
-        echo $image->stream('png', 100);
+        $avatarApi->render();
     }
 
 }

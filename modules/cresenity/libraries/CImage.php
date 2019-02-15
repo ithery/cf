@@ -11,7 +11,7 @@ class CImage {
 
     public static function avatar($engineName = 'Initials') {
 
-        return CImage_Avatar_Factory::create($engineName);
+        return CImage_Avatar($engineName);
     }
 
 }
