@@ -820,9 +820,9 @@ class Cresenity_Controller extends CController {
     public function avatar($method = 'initials') {
         ob_start('ob_gzhandler');
 
-        header('Content-type: image/png');
-        header('Pragma: public');
-        header('Cache-Control: max-age=172800');
+        //header('Content-type: image/png');
+        //header('Pragma: public');
+        //header('Cache-Control: max-age=172800');
         $engineName = 'Initials';
         switch ($method) {
             case 'initials':
