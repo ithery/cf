@@ -19,4 +19,14 @@ class CColor {
         return new CColor_Random($options);
     }
 
+    /**
+     * 
+     * Create CColor_String object
+     * 
+     * @return CColor_String
+     */
+    public static function fromString($string, $options = array()) {
+        return new CColor_String($string, $options);
+    }
+
 }
