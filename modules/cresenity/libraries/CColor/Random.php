@@ -53,7 +53,7 @@ class CColor_Random {
         )
     );
 
-    public function __construct($options) {
+    public function __construct($options = array()) {
         $optionsDefault = array(
             'format' => 'hex',
         );
