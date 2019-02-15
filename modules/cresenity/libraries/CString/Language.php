@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 16, 2019, 1:35:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CHelper_StringScript {
+class CString_Language {
 
     const REGEX_COMMON = '/\p{Common}/u';
     const REGEX_ARABIC = '/\p{Arabic}/u';
