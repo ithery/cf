@@ -64,4 +64,21 @@ trait CColor_Trait_ColorInfoTrait {
         }
     }
 
+    private function getMinimumBrightness($h, $s) {
+        $colorInfo = $this->getColorInfo($h);
+        $bounds = $colorInfo['bounds'];
+        for ($i = 0, $l = count($bounds); $i < $l - 1; $i++) {
+            $s1 = $bounds[$i][0];
+            $v1 = $bounds[$i][1];
+            $s2 = $bounds[$i + 1][0];
+            $v2 = $bounds[$i + 1][1];
+            if ($s >= $s1 && $s <= $s2) {
+                $m = ($v2 - $v1) / ($s2 - $s1);
+                $b = $v1 - $m * $s1;
+                return $m * $s + $b;
+            }
+        }
+        return 0;
+    }
+
 }

@@ -23,7 +23,7 @@ class CColor_String {
 
     private function pickHue() {
 
-        return $this->int32 % 255;
+        return $this->getModulo(array(0, 255));
     }
 
     private function pickSaturation($h) {
@@ -31,7 +31,7 @@ class CColor_String {
             return 0;
         }
         if ($this->getOption('luminosity') === 'random') {
-            return $this->rand(array(0, 100));
+            return $this->getModulo(array(0, 100));
         }
         $colorInfo = $this->getColorInfo($h);
         $range = $colorInfo['s'];
@@ -49,7 +49,7 @@ class CColor_String {
             }
         }
 
-        return $this->rand($range);
+        return $this->getModulo($range);
     }
 
     private function pickBrightness($h, $s) {
@@ -68,7 +68,7 @@ class CColor_String {
                 }
             }
         }
-        return $this->rand($range);
+        return $this->getModulo($range);
     }
 
     /**
@@ -87,9 +87,13 @@ class CColor_String {
     public function toHsv() {
         $h = $this->pickHue();
         $s = $this->pickSaturation($h);
-        $v = $number % 100;
+        $v = $this->pickBrightness($h, $s);
 
         return new CColor_Format_Type_Hsv(compact('h', 's', 'v'));
+    }
+
+    public function getModulo($range) {
+        return $range[0] + ($this->int32 % ($range[1] - $range[0]));
     }
 
 }
