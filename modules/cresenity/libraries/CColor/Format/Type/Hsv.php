@@ -9,16 +9,24 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CColor_Format_Type_Hsv extends CColor_Format_TypeAbstract {
 
+    /**
+     * 
+     * @return \CColor_Format_Type_Hex
+     */
     public function toHex() {
-        $rgb = $this->toRgb($hsv);
+        $rgb = $this->toRgb();
         $hex = '#';
-        foreach ($rgb as $c) {
+        foreach ($rgb->value() as $c) {
             $hex .= str_pad(dechex($c), 2, '0', STR_PAD_LEFT);
         }
         return new CColor_Format_Type_Hex($hex);
     }
 
-    static public function toHsl() {
+    /**
+     * 
+     * @return \CColor_Format_Type_Hsl
+     */
+    public function toHsl() {
         extract($this->value);
         $s /= 100;
         $v /= 100;
@@ -32,7 +40,11 @@ class CColor_Format_Type_Hsv extends CColor_Format_TypeAbstract {
         return new CColor_Format_Type_Hsl($hslArray);
     }
 
-    static public function toRgb() {
+    /**
+     * 
+     * @return \CColor_Format_Type_Rgb
+     */
+    public function toRgb() {
         extract($this->value);
         $h /= 360;
         $s /= 100;

@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CColor_Format_Type_Hex extends CColor_Format_TypeAbstract {
 
     public function __toString() {
-        return $value;
+        return $this->value;
     }
 
 }

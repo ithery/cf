@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CColor_Random {
 
-    protected $options = array();
+    use CColor_Trait_OptionsTrait;
     static public $dictionary = array(
         'monochrome' => array(
             'bounds' => array(array(0, 0), array(100, 0)),
@@ -64,10 +64,10 @@ class CColor_Random {
         $h = $this->pickHue();
         $s = $this->pickSaturation($h);
         $v = $this->pickBrightness($h, $s);
-        return self::format(compact('h', 's', 'v'), @$options['format']);
+        return $this->formatType(compact('h', 's', 'v'), $this->getOption('format'));
     }
 
-    static public function many($count) {
+    public function many($count) {
         $colors = array();
         for ($i = 0; $i < $count; $i++) {
             $colors[] = self::one();
@@ -96,7 +96,7 @@ class CColor_Random {
         }
     }
 
-    static private function pickHue() {
+    private function pickHue() {
         $range = $this->getHueRange();
         if (empty($range)) {
             return 0;
@@ -110,7 +110,7 @@ class CColor_Random {
         return $hue;
     }
 
-    static private function pickSaturation($h) {
+    private function pickSaturation($h) {
         if ($this->getOption('hue') === 'monochrome') {
             return 0;
         }
@@ -164,8 +164,8 @@ class CColor_Random {
             foreach ($this->getOption('hue') as $hue) {
                 if ($hue === 'random') {
                     $ranges[] = array(0, 360);
-                } else if (isset($this->dictionary[$hue])) {
-                    $ranges[] = $this->dictionary[$hue]['h'];
+                } else if (isset(self::$dictionary[$hue])) {
+                    $ranges[] = self::$dictionary[$hue]['h'];
                 } else if (is_numeric($hue)) {
                     $hue = intval($hue);
                     if ($hue <= 360 && $hue >= 0) {
@@ -183,7 +183,7 @@ class CColor_Random {
         }
     }
 
-    static private function getMinimumBrightness($h, $s) {
+    private function getMinimumBrightness($h, $s) {
         $colorInfo = $this->getColorInfo($h);
         $bounds = $colorInfo['bounds'];
         for ($i = 0, $l = count($bounds); $i < $l - 1; $i++) {
@@ -205,14 +205,14 @@ class CColor_Random {
         if ($h >= 334 && $h <= 360) {
             $h -= 360;
         }
-        foreach ($this->dictionary as $color) {
+        foreach (self::$dictionary as $color) {
             if ($color['h'] !== null && $h >= $color['h'][0] && $h <= $color['h'][1]) {
                 return $color;
             }
         }
     }
 
-    private function rand($bounds, $options) {
+    private function rand($bounds) {
 
         if ($this->haveOption('prng')) {
             $prng = $this->getOption('prng');
@@ -222,17 +222,5 @@ class CColor_Random {
         }
     }
 
-    public function getOption($key) {
-        return carr::get($this->option, $key);
-    }
-
-    public function setOption($key, $value) {
-        $this->option[$key] = $value;
-        return $this;
-    }
-
-    public function haveOption($key) {
-        return $this->getOption($key) !== null;
-    }
-
+  
 }
