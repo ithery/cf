@@ -11,7 +11,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
     public function __construct($id) {
         parent::__construct($id);
-        CManager::instance()->registerModule('bootstrap-4-material-datetimepicker');
+        CManager::instance()->registerModule('bootstrap-material-datetimepicker');
     }
 
     public function build() {
