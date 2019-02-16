@@ -9,9 +9,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CCache_Driver_FileDriver extends CCache_DriverAbstract {
 
+    protected $engine;
+
     public function __construct($options) {
-        $this->engine = carr::get($options, 'engine');
-        $this->directory = carr::get($options, 'directory');
+        parent::__construct($options);
+        $driverOptions = $this->getOption('options', array());
+        $engineName = carr::get($driverOptions, 'engine');
+        $engineClass = 'CCache_Driver_FileDriver_Engine_' . $engineName . 'Engine';
+        $this->engine = new $engineClass($driverOptions);
     }
 
     /**

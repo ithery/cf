@@ -8,5 +8,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDriver_EngineAbstract {
-    
+
+    protected $tempDirectory;
+
+    public function __construct() {
+        $this->tempDirectory = CTemp::directory('cache');
+    }
+
 }
