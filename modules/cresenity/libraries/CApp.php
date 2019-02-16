@@ -469,7 +469,7 @@ class CApp extends CObservable {
 
         $css_urls = $asset->getAllCssFileUrl();
 
-        $js_urls = $asset->getAllCssFileUrl();
+        $js_urls = $asset->getAllJsFileUrl();
         $additional_js = "";
 
         foreach ($css_urls as $url) {
@@ -479,8 +479,6 @@ class CApp extends CObservable {
 				";
         }
         $js = "";
-        //$vjs = CView::factory('ccore/js');
-        //$js .= PHP_EOL . $vjs->render();
 
         $js .= PHP_EOL . $this->js . $additional_js;
 
