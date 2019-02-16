@@ -55,4 +55,10 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
         return $this->getTempFiles($key)->delete();
     }
 
+    public function deleteDirectory() {
+        $dir = rtrim(DOCROOT, '/') . '/temp/cache/' . trim($this->directory, '/');
+        $file = new CFile();
+        return $file->deleteDirectory($dir);
+    }
+
 }
