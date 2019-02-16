@@ -38,4 +38,8 @@ class CCache {
         $this->repository = new CCache_Repository($driver);
     }
 
+    public function __call($method, $args) {
+        return call_user_func_array(array($this->repository, $method), $args);
+    }
+
 }
