@@ -26,7 +26,7 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
             $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
             $path = 'cache' . '/' . implode('/', $parts) . '/';
             $filename = $hash . '.cache';
-            $this->tempFiles[$key] = CTemporary::createFile($path, $filename)->getPath();
+            $this->tempFiles[$key] = CTemporary::createFile($path, $filename);
         }
         return $this->tempFiles[$key];
     }
@@ -35,12 +35,12 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
         $this->getTempFiles($key)->getPath();
     }
 
-    public function get($key) {
-        $this->getTempFiles($key)->get();
+    public function get($key, $lock = false) {
+        $this->getTempFiles($key)->get($lock);
     }
 
-    public function put($key, $content) {
-        $this->getTempFiles($key)->put($content);
+    public function put($key, $content, $lock = false) {
+        $this->getTempFiles($key)->put($content, $lock);
     }
 
 }

@@ -23,6 +23,12 @@ class CTemporary_File {
 
     /**
      *
+     * @var CFile
+     */
+    protected $file;
+
+    /**
+     *
      * @var string
      */
     protected $filename;
@@ -34,14 +40,15 @@ class CTemporary_File {
         }
 
         $this->filename = $filename;
+        $this->file = new CFile();
     }
 
-    public function get() {
-        return CFile::get($this->getPath());
+    public function get($lock = false) {
+        return $this->file->get($this->getPath(), $lock);
     }
 
-    public function putContent($content) {
-        return CFile::putAtomic($this->getPath(), $content);
+    public function put($content, $lock = false) {
+        return $this->file->put($this->getPath(), $content, $lock);
     }
 
     public function getPath() {

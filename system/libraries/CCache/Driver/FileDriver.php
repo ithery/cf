@@ -113,10 +113,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return bool
      */
     public function put($key, $value, $seconds) {
-        $this->ensureCacheDirectoryExists($path = $this->path($key));
-        $result = $this->engine->put(
-                $path, $this->expiration($seconds) . serialize($value), true
-        );
+        $result = $this->engine->put($key, $this->expiration($seconds) . serialize($value), true);
         return $result !== false && $result > 0;
     }
 
