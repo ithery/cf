@@ -43,4 +43,10 @@ interface CCache_Driver_FileDriver_EngineInterface {
      * @return void
      */
     public function delete($key);
+
+    /**
+     * delete all files
+     *
+     */
+    public function deleteDirectory();
 }

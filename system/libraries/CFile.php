@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 16, 2019, 10:18:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Symfony\Component\Finder\Finder;
+
 class CFile {
 
     /**
@@ -284,6 +286,81 @@ class CFile {
      */
     public function mimeType($path) {
         return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
+    }
+
+    /**
+     * Get all of the directories within a given directory.
+     *
+     * @param  string  $directory
+     * @return array
+     */
+    public function directories($directory) {
+        $directories = [];
+        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+            $directories[] = $dir->getPathname();
+        }
+        return $directories;
+    }
+
+    /**
+     * Recursively delete a directory.
+     *
+     * The directory itself may be optionally preserved.
+     *
+     * @param  string  $directory
+     * @param  bool    $preserve
+     * @return bool
+     */
+    public function deleteDirectory($directory, $preserve = false) {
+        if (!$this->isDirectory($directory)) {
+            return false;
+        }
+        $items = new FilesystemIterator($directory);
+        foreach ($items as $item) {
+            // If the item is a directory, we can just recurse into the function and
+            // delete that sub-directory otherwise we'll just delete the file and
+            // keep iterating through each file until the directory is cleaned.
+            if ($item->isDir() && !$item->isLink()) {
+                $this->deleteDirectory($item->getPathname());
+            }
+            // If the item is just a file, we can go ahead and delete it since we're
+            // just looping through and waxing all of the files in this directory
+            // and calling directories recursively, so we delete the real path.
+            else {
+                $this->delete($item->getPathname());
+            }
+        }
+        if (!$preserve) {
+            @rmdir($directory);
+        }
+        return true;
+    }
+
+    /**
+     * Remove all of the directories within a given directory.
+     *
+     * @param  string  $directory
+     * @return bool
+     */
+    public function deleteDirectories($directory) {
+        $allDirectories = $this->directories($directory);
+        if (!empty($allDirectories)) {
+            foreach ($allDirectories as $directoryName) {
+                $this->deleteDirectory($directoryName);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Empty the specified directory of all files and folders.
+     *
+     * @param  string  $directory
+     * @return bool
+     */
+    public function cleanDirectory($directory) {
+        return $this->deleteDirectory($directory, true);
     }
 
 }

@@ -10,9 +10,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDriver_EngineAbstract {
 
     protected $tempFiles;
+    protected $directory;
 
     public function __construct($options) {
         parent::__construct($options);
+        $this->directory = $this->getOption('directory', 'default');
         $this->tempFiles = array();
     }
 
@@ -26,7 +28,7 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
         if (!isset($this->tempFiles[$key])) {
 
             $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
-            $path = 'cache' . '/' . implode('/', $parts) . '/' . $hash . '.cache';
+            $path = 'cache/' . trim($this->directory, '/') . '/' . implode('/', $parts) . '/' . $hash . '.cache';
             $this->tempFiles[$key] = CTemporary::createFile($path);
         }
         return $this->tempFiles[$key];
