@@ -10,30 +10,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
 interface CCache_Driver_FileDriver_EngineInterface {
 
     /**
-     * Get the full path of the given key
+     * Retrieve an item from the cache by key.
      *
-     * @param string $key
-     * @return string
+     * @param  string|array  $key
+     * @return mixed
      */
-    public function path($key);
+    public function get($key);
 
     /**
-     * Get the contents of a file.
+     * Store an item in the cache for a given number of minutes.
      *
-     * @param  string  $path
-     * @param  bool  $lock
-     * @return string
-     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @param  float|int  $minutes
+     * @return void
      */
-    public function get($path, $lock = false);
-
-    /**
-     * Write the contents of a file.
-     *
-     * @param  string  $path
-     * @param  string  $contents
-     * @param  bool  $lock
-     * @return int|bool
-     */
-    public function put($path, $contents, $lock = false);
+    public function put($key, $value, $minutes);
 }

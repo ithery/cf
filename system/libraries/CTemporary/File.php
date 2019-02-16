@@ -36,12 +36,12 @@ class CTemporary_File {
         $this->filename = $filename;
     }
 
-    public function getContent() {
-        return CFile::getContent($this->getPath());
+    public function get() {
+        return CFile::get($this->getPath());
     }
 
     public function putContent($content) {
-        return CFile::putContent($this->getPath(), $content);
+        return CFile::putAtomic($this->getPath(), $content);
     }
 
     public function getPath() {
