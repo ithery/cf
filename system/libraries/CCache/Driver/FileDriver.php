@@ -146,6 +146,9 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
         } catch (Exception $e) {
             return $this->emptyPayload();
         }
+
+
+
         // If the current time is greater than expiration timestamps we will delete
         // the file and return null. This helps clean up the old files and keeps
         // this directory much cleaner for us as old files aren't hanging out.
@@ -168,6 +171,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return int
      */
     protected function expiration($seconds) {
+
         $time = $this->availableAt($seconds);
         return $seconds === 0 || $time > 9999999999 ? 9999999999 : $time;
     }

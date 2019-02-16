@@ -22,13 +22,7 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
      * @return CTemporary_File
      */
     public function getTempFiles($key) {
-        if ($key === null) {
-            try {
-                throw new Exception('a');
-            } catch (Exception $ex) {
-                cdbg::var_dump($ex->getTraceAsString());
-            }
-        }
+
         if (!isset($this->tempFiles[$key])) {
 
             $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
@@ -39,23 +33,24 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
     }
 
     public function path($key) {
-        $this->getTempFiles($key)->getPath();
+        return $this->getTempFiles($key)->getPath();
     }
 
     public function get($key, $lock = false) {
-        $this->getTempFiles($key)->get($lock);
+
+        return $this->getTempFiles($key)->get($lock);
     }
 
     public function put($key, $content, $lock = false) {
-        $this->getTempFiles($key)->put($content, $lock);
+        return $this->getTempFiles($key)->put($content, $lock);
     }
 
     public function exists($key) {
-        $this->getTempFiles($key)->exists();
+        return $this->getTempFiles($key)->exists();
     }
 
     public function delete($key) {
-        $this->getTempFiles($key)->delete();
+        return $this->getTempFiles($key)->delete();
     }
 
 }
