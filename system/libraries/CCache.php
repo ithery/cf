@@ -11,6 +11,12 @@ class CCache {
 
     protected static $instance;
 
+    /**
+     *
+     * @var CCache_Repository
+     */
+    protected $repository;
+
     public static function instance($options = array()) {
         $defaultOptions = array(
             'driver' => 'array',
@@ -26,10 +32,10 @@ class CCache {
     }
 
     private function __construct($options) {
-        $driver = carr::get($options, 'driver', 'array');
-        switch ($driver) {
-            
-        }
+        $driverOption = carr::get($options, 'driver', 'Null');
+        $driverClass = 'CCache_Driver_' . $driverOption . 'Driver';
+        $driver = new $driverClass();
+        $this->repository = new CCache_Repository($driver);
     }
 
 }
