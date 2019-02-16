@@ -13,10 +13,10 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
 
     public function __construct($options) {
         parent::__construct($options);
-        $driverOptions = $this->getOption('options', array());
-        $engineName = carr::get($driverOptions, 'engine');
+        $engineName = $this->getOption('engine', 'Array');
+        $engineOptions = $this->getOption('options', array());
         $engineClass = 'CCache_Driver_FileDriver_Engine_' . $engineName . 'Engine';
-        $this->engine = new $engineClass($driverOptions);
+        $this->engine = new $engineClass($engineOptions);
     }
 
     /**
@@ -36,11 +36,11 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return bool
      */
     public function flush() {
-        if (!$this->files->isDirectory($this->directory)) {
+        if (!$this->engine->isDirectory($this->directory)) {
             return false;
         }
-        foreach ($this->files->directories($this->directory) as $directory) {
-            if (!$this->files->deleteDirectory($directory)) {
+        foreach ($this->engine->directories($this->directory) as $directory) {
+            if (!$this->engine->deleteDirectory($directory)) {
                 return false;
             }
         }
@@ -65,8 +65,8 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return bool
      */
     public function forget($key) {
-        if ($this->files->exists($file = $this->path($key))) {
-            return $this->files->delete($file);
+        if ($this->engine->exists($file = $this->path($key))) {
+            return $this->engine->delete($file);
         }
         return false;
     }
@@ -114,7 +114,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      */
     public function put($key, $value, $seconds) {
         $this->ensureCacheDirectoryExists($path = $this->path($key));
-        $result = $this->files->put(
+        $result = $this->engine->put(
                 $path, $this->expiration($seconds) . serialize($value), true
         );
         return $result !== false && $result > 0;
@@ -136,13 +136,13 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return array
      */
     protected function getPayload($key) {
-        $path = $this->path($key);
+        $path = $this->engine->path($key);
         // If the file doesn't exist, we obviously cannot return the cache so we will
         // just return null. Otherwise, we'll get the contents of the file and get
         // the expiration UNIX timestamps from the start of the file's contents.
         try {
             $expire = substr(
-                    $contents = $this->files->get($path, true), 0, 10
+                    $contents = $this->engine->get($path, true), 0, 10
             );
         } catch (Exception $e) {
             return $this->emptyPayload();

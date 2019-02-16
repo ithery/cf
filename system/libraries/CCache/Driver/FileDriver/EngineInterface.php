@@ -8,5 +8,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @licene Ittron Global Teknologi <ittron.co.id>
  */
 interface CCache_Driver_FileDriver_EngineInterface {
-    
+
+    /**
+     * Get the full path
+     *
+     * @return string
+     */
+    public function path();
 }

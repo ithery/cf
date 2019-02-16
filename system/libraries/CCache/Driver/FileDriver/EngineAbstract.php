@@ -8,5 +8,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 abstract class CCache_Driver_FileDriver_EngineAbstract implements CCache_Driver_FileDriver_EngineInterface {
-    
+
+    protected $key;
+
+    public function __construct($key) {
+        $this->filename = $key;
+    }
+
 }

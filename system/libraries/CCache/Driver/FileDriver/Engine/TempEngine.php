@@ -9,10 +9,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDriver_EngineAbstract {
 
-    protected $tempDirectory;
+    protected $tempFile;
 
-    public function __construct() {
-        $this->tempDirectory = CTemp::directory('cache');
+    public function __construct($key) {
+        parent::__construct($key);
+
+        //generate path
+        $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
+        $path = 'cache' . '/' . implode('/', $parts) . '/';
+        $filename = $hash . '.cache';
+        $this->tempFile = CTemp::createFile($path, $filename);
+    }
+
+    public function path() {
+        $this->tempFile->getPath();
     }
 
 }
