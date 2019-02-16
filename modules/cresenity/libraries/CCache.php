@@ -2,72 +2,34 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
+/**
+ * @author Hery Kurniawan
+ * @since Feb 16, 2019, 1:06:35 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 class CCache {
 
-    /**
-     * The cache instance
-     * 
-     * @var CCache
-     */
-    protected $instance;
-    
-    /**
-     * The array of resolved cache stores.
-     *
-     * @var array
-     */
-    protected $stores = [];
+    protected static $instance;
 
-    /**
-     * Get a cache store instance by name.
-     *
-     * @param  string|null  $name
-     * @return CCache_Repository
-     */
-    public function store($name = null) {
-        $name = $name ?: $this->getDefaultDriver();
+    public static function instance($options = array()) {
+        $defaultOptions = array(
+            'driver' => 'array',
+        );
 
-        return self::$stores[$name] = self::get($name);
-    }
+        $options = array_merge($defaultOptions, $options);
 
-    /**
-     * Dynamically call the default driver instance.
-     *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters) {
-        return $this->store()->$method(...$parameters);
-    }
-
-    /**
-     * Attempt to get the store from the local cache.
-     *
-     * @param  string  $name
-     * @return CCache_Repository
-     */
-    protected function get($name) {
-        return isset($this->stores[$name]) ? $this->stores[$name] : $this->resolve($name);
-    }
-
-    /**
-     * Handle dynamic, static calls to the object.
-     *
-     * @param  string  $method
-     * @param  array   $args
-     * @return mixed
-     *
-     * @throws \RuntimeException
-     */
-    public static function __callStatic($method, $args) {
-        $instance = static::instance();
-
-        if (!$instance) {
-            throw new RuntimeException('A facade root has not been set.');
+        $instanceKey = carr::hash($options);
+        if (!isset(self::$instance[$instanceKey])) {
+            self::$instance[$instanceKey] = new CCache($options);
         }
+        return self::$instance[$instanceKey];
+    }
 
-        call_user_func_array(array($instance, $method), $args);
+    private function __construct($options) {
+        $driver = carr::get($options, 'driver', 'array');
+        switch ($driver) {
+            
+        }
     }
 
 }
