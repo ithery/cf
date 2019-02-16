@@ -498,12 +498,12 @@ return array(
         "css" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
             "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css",
-            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.css",
+            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css",
         ),
         "js" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
             "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js",
-            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.js",
+            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.js",
         ),
         "requirements" => array("bootstrap-4-moment"),
     ),
