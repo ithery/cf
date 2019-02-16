@@ -15,7 +15,7 @@ class CFile {
      * @param string $file → path or file url
      * @return bool
      */
-    public static function exists($file) {
+    public function exists($file) {
         if (filter_var($file, FILTER_VALIDATE_URL)) {
             $stream = stream_context_create(['http' => ['method' => 'HEAD']]);
             if ($content = @fopen($file, 'r', null, $stream)) {
@@ -43,13 +43,13 @@ class CFile {
      *
      * @return mixed Number of bytes written on success, otherwise FALSE.
      */
-    public static function setContent($filename, $data, $atomicSuffix = 'atomictmp') {
+    public function putAtomic($path, $contents, $atomicSuffix = 'atomictmp') {
         // Perform an exclusive (locked) overwrite to a temporary file.
-        $filenameTmp = sprintf('%s.%s', $filename, $atomicSuffix);
-        $writeResult = @file_put_contents($filenameTmp, $data, LOCK_EX);
+        $pathTemp = sprintf('%s.%s', $path, $atomicSuffix);
+        $writeResult = @file_put_contents($pathTemp, $contents, LOCK_EX);
         if ($writeResult !== false) {
             // Now move the file to its real destination (replaced if exists).
-            $moveResult = @rename($filenameTmp, $filename);
+            $moveResult = @rename($pathTemp, $path);
             if ($moveResult === true) {
                 // Successful write and move. Return number of bytes written.
                 return $writeResult;
@@ -59,11 +59,32 @@ class CFile {
         return false; // Failed.
     }
 
-    public static function getContent($file) {
-        if (self::exists($file)) {
-            return @file_get_contents($file);
+    /**
+     * Write the contents of a file.
+     *
+     * @param  string  $path
+     * @param  string  $contents
+     * @param  bool  $lock
+     * @return int|bool
+     */
+    public function put($path, $contents, $lock = false) {
+        return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+    }
+
+    /**
+     * Get the contents of a file.
+     *
+     * @param  string  $path
+     * @param  bool  $lock
+     * @return string
+     *
+     * @throws CFile_Exception_FileNotFoundException
+     */
+    public function get($path, $lock = false) {
+        if ($this->isFile($path)) {
+            return $lock ? $this->sharedGet($path) : file_get_contents($path);
         }
-        return false;
+        throw new CFile_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
 
     /**
@@ -102,6 +123,39 @@ class CFile {
             $time = strtotime($time);
         }
         return $time - self::mtime($filename);
+    }
+
+    /**
+     * Determine if the given path is a file.
+     *
+     * @param  string  $file
+     * @return bool
+     */
+    public function isFile($file) {
+        return is_file($file);
+    }
+
+    /**
+     * Get contents of a file with shared access.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function sharedGet($path) {
+        $contents = '';
+        $handle = fopen($path, 'rb');
+        if ($handle) {
+            try {
+                if (flock($handle, LOCK_SH)) {
+                    clearstatcache(true, $path);
+                    $contents = fread($handle, $this->size($path) ?: 1);
+                    flock($handle, LOCK_UN);
+                }
+            } finally {
+                fclose($handle);
+            }
+        }
+        return $contents;
     }
 
 }

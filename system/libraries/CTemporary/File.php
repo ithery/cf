@@ -27,7 +27,7 @@ class CTemporary_File {
      */
     protected $filename;
 
-    public function __construct(CTemp_Directory $directory, $filename = null) {
+    public function __construct(CTemporary_Directory $directory, $filename = null) {
         $this->directory = $directory;
         if ($filename == null) {
             $filename = date('YmdHis') . md5(uniqid()) . '.tmp';
@@ -40,8 +40,8 @@ class CTemporary_File {
         return CFile::getContent($this->getPath());
     }
 
-    public function setContent($content) {
-        return CFile::setContent($this->getPath(), $content);
+    public function putContent($content) {
+        return CFile::putContent($this->getPath(), $content);
     }
 
     public function getPath() {

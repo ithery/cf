@@ -9,11 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CCache_Driver_FileDriver_EngineAbstract implements CCache_Driver_FileDriver_EngineInterface {
 
-    protected $key;
     protected $options;
 
-    public function __construct($key, $options) {
-        $this->key = $key;
+    public function __construct($options) {
+
         $this->options = $options;
     }
 
