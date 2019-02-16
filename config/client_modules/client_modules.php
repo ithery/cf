@@ -295,7 +295,6 @@ return array(
             "plugins" . DS . "terminal" . DS . "jquery.mousewheel-min.js",
             "plugins" . DS . "terminal" . DS . "jquery.terminal-min.js",
         ),
-        
     ),
     "elfinder" => array(
         "js" => array("plugins" . DS . "elfinder" . DS . "elfinder.min.js"),
@@ -583,6 +582,14 @@ return array(
             "plugins/fullcalendar-3/fullcalendar.min.js",
         ),
         "requirements" => array("jquery-3.2.1", "moment"),
+    ),
+    "bootstrap-material-datetimepicker" => array(
+        "css" => array(
+            "plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.css",
+        ),
+        "js" => array(
+            "plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.js",
+        ),
     ),
 );
 ?>
