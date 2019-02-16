@@ -90,7 +90,7 @@ class CCache_Repository implements ArrayAccess {
         if ($seconds <= 0) {
             return $this->forget($key);
         }
-        $result = $this->driver->set($this->itemKey($key), $value, $seconds);
+        $result = $this->driver->put($this->itemKey($key), $value, $seconds);
 
         return $result;
     }
