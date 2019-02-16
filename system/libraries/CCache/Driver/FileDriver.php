@@ -38,15 +38,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return bool
      */
     public function flush() {
-        if (!$this->engine->isDirectory($this->directory)) {
-            return false;
-        }
-        foreach ($this->engine->directories($this->directory) as $directory) {
-            if (!$this->engine->deleteDirectory($directory)) {
-                return false;
-            }
-        }
-        return true;
+        return $this->engine->deleteDirectory();
     }
 
     /**
