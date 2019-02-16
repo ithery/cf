@@ -9,9 +9,24 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_DateTime {
 
+    protected $dateTimeFormat;
+
     public function __construct($id) {
         parent::__construct($id);
         CManager::instance()->registerModule('bootstrap-4-material-datepicker');
+
+        $this->dateTimeFormat = "yyyy-mm-dd";
+        $dateTimeFormat = ccfg::get('long_date_formatted');
+        if ($dateTimeFormat != null) {
+            $dateTimeFormat = str_replace('Y', 'YYYY', $dateTimeFormat);
+            $dateTimeFormat = str_replace('m', 'MM', $dateTimeFormat);
+            $dateTimeFormat = str_replace('d', 'DD', $dateTimeFormat);
+            $dateTimeFormat = str_replace('H', 'HH', $dateTimeFormat);
+            $dateTimeFormat = str_replace('i', 'mm', $dateTimeFormat);
+            $dateTimeFormat = str_replace(':s', '', $dateTimeFormat);
+            $dateTimeFormat = str_replace('s', '', $dateTimeFormat);
+            $this->dateTimeFormat = $dateTimeFormat;
+        }
     }
 
     public function build() {
@@ -26,8 +41,8 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         $js->append(parent::js($indent))->br();
 
         $option = " weekStart: 1";
-        //$option .= " ,format : 'dddd DD MMMM YYYY - HH:mm'";
-        //$option .= " ,shortTime: true";
+        $option .= " ,format : '" . $this->dateTimeFormat . "'";
+        $option .= " ,shortTime: true";
         //$option .= " ,nowButton : true";
         //$option .= " ,minDate : new Date()";
 
