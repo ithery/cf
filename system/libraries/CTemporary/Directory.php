@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 16, 2019, 10:16:40 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CTemp_Directory {
+class CTemporary_Directory {
 
     protected $path;
 
@@ -25,7 +25,7 @@ class CTemp_Directory {
     }
 
     public function createFile($filename) {
-        return new CTemp_File($this, $filename);
+        return new CTemporary_File($this, $filename);
     }
 
 }

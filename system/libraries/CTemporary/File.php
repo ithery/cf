@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 16, 2019, 10:15:15 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CTemp_File {
+class CTemporary_File {
 
     /**
      *

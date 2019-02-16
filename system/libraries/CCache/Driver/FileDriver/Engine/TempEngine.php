@@ -11,18 +11,18 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
 
     protected $tempFile;
 
-    public function __construct($key) {
-        parent::__construct($key);
+    public function __construct($key, $options) {
+        parent::__construct($key, $options);
 
         //generate path
+        
+    }
+
+    public function path($key) {
         $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
         $path = 'cache' . '/' . implode('/', $parts) . '/';
         $filename = $hash . '.cache';
-        $this->tempFile = CTemp::createFile($path, $filename);
-    }
-
-    public function path() {
-        $this->tempFile->getPath();
+        return CTemp::createFile($path, $filename)->getPath();
     }
 
 }

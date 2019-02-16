@@ -7,12 +7,24 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 16, 2019, 10:02:03 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CTemp {
+class CTemporary {
 
-    const BASEPATH = DOCROOT . "temp" . DS;
+    /**
+     * 
+     * @param string $path
+     * @return \CTemporary_Directory
+     */
+    public static function createDirectory($path) {
+        return new CTemporary_Directory($path);
+    }
 
-    public static function directory($group) {
-        return new CTemp_Directory($group);
+    /**
+     * 
+     * @param string $filename
+     * @return \CTemporary_File
+     */
+    public static function createFile($filename) {
+        return new CTemporary_File(self::createDirectory(dirname($filename)), basename($filename));
     }
 
     /**
