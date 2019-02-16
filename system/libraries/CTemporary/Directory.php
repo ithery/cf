@@ -13,7 +13,7 @@ class CTemporary_Directory {
 
     public function __construct($path) {
         $this->path = 'temp/' . trim($path, '/');
-        CFile::createDir($this->getPath());
+        CFile::makeDirectory($this->getPath(), 0755, true, true);
     }
 
     public function getPath() {

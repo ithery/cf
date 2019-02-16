@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CCache_Driver_FileDriver extends CCache_DriverAbstract {
 
+    use CTrait_Helper_InteractsWithTime;
+
     protected $engine;
 
     public function __construct($options) {
@@ -65,8 +67,8 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return bool
      */
     public function forget($key) {
-        if ($this->engine->exists($file = $this->path($key))) {
-            return $this->engine->delete($file);
+        if ($this->engine->exists($key)) {
+            return $this->engine->delete($key);
         }
         return false;
     }
@@ -133,13 +135,13 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      * @return array
      */
     protected function getPayload($key) {
-        $path = $this->engine->path($key);
+
         // If the file doesn't exist, we obviously cannot return the cache so we will
         // just return null. Otherwise, we'll get the contents of the file and get
         // the expiration UNIX timestamps from the start of the file's contents.
         try {
             $expire = substr(
-                    $contents = $this->engine->get($path, true), 0, 10
+                    $contents = $this->engine->get($key, true), 0, 10
             );
         } catch (Exception $e) {
             return $this->emptyPayload();
@@ -157,6 +159,17 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
         // operation that may be performed on this cache on a later operation.
         $time = $expire - $this->currentTime();
         return compact('data', 'time');
+    }
+
+    /**
+     * Get the expiration time based on the given seconds.
+     *
+     * @param  int  $seconds
+     * @return int
+     */
+    protected function expiration($seconds) {
+        $time = $this->availableAt($seconds);
+        return $seconds === 0 || $time > 9999999999 ? 9999999999 : $time;
     }
 
 }

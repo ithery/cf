@@ -88,23 +88,50 @@ class CFile {
     }
 
     /**
-     * Create directory.
+     * Delete the file at a given path.
      *
-     * @param string $path → path where to create directory
-     *
+     * @param  string|array  $paths
      * @return bool
      */
-    public static function createDir($path) {
-        return !is_dir($path) && @mkdir($path, 0777, true);
+    public function delete($paths) {
+        $paths = is_array($paths) ? $paths : func_get_args();
+        $success = true;
+        foreach ($paths as $path) {
+            try {
+                if (!@unlink($path)) {
+                    $success = false;
+                }
+            } catch (ErrorException $e) {
+                $success = false;
+            }
+        }
+        return $success;
     }
 
     /**
-     * 
-     * @param string $filename
-     * @return type
+     * Create a directory.
+     *
+     * @param  string  $path
+     * @param  int     $mode
+     * @param  bool    $recursive
+     * @param  bool    $force
+     * @return bool
      */
-    public static function mtime($filename) {
-        return filemtime($filename);
+    public function makeDirectory($path, $mode = 0755, $recursive = false, $force = false) {
+        if ($force) {
+            return @mkdir($path, $mode, $recursive);
+        }
+        return mkdir($path, $mode, $recursive);
+    }
+
+    /**
+     * Get the file's last modification time.
+     *
+     * @param  string  $path
+     * @return int
+     */
+    public function lastModified($path) {
+        return filemtime($path);
     }
 
     /**
@@ -115,14 +142,14 @@ class CFile {
      * @param string|int $time 
      * @return int diff in second
      */
-    public static function mtimeDiff($filename, $time = null) {
+    public static function lastModifiedDiff($filename, $time = null) {
         if ($time == null) {
             $time = time();
         }
         if (is_string($time)) {
             $time = strtotime($time);
         }
-        return $time - self::mtime($filename);
+        return $time - self::lastModified($filename);
     }
 
     /**
@@ -156,6 +183,106 @@ class CFile {
             }
         }
         return $contents;
+    }
+
+    /**
+     * Get the file size of a given file.
+     *
+     * @param  string  $path
+     * @return int
+     */
+    public function size($path) {
+        return filesize($path);
+    }
+
+    /**
+     * Determine if the given path is a directory.
+     *
+     * @param  string  $directory
+     * @return bool
+     */
+    public function isDirectory($directory) {
+        return is_dir($directory);
+    }
+
+    /**
+     * Determine if the given path is readable.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function isReadable($path) {
+        return is_readable($path);
+    }
+
+    /**
+     * Determine if the given path is writable.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function isWritable($path) {
+        return is_writable($path);
+    }
+
+    /**
+     * Get the file type of a given file.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function type($path) {
+        return filetype($path);
+    }
+
+    /**
+     * Extract the file name from a file path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function name($path) {
+        return pathinfo($path, PATHINFO_FILENAME);
+    }
+
+    /**
+     * Extract the trailing name component from a file path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function basename($path) {
+        return pathinfo($path, PATHINFO_BASENAME);
+    }
+
+    /**
+     * Extract the parent directory from a file path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function dirname($path) {
+        return pathinfo($path, PATHINFO_DIRNAME);
+    }
+
+    /**
+     * Extract the file extension from a file path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function extension($path) {
+        return pathinfo($path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Get the mime-type of a given file.
+     *
+     * @param  string  $path
+     * @return string|false
+     */
+    public function mimeType($path) {
+        return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
     }
 
 }

@@ -30,7 +30,7 @@ trait CTrait_Helper_InteractsWithTime {
     protected function availableAt($delay = 0) {
         $delay = $this->parseDateInterval($delay);
 
-        return $delay instanceof DateTimeInterface ? $delay->getTimestamp() : Carbon::now()->addSeconds($delay)->getTimestamp();
+        return $delay instanceof DateTimeInterface ? $delay->getTimestamp() : CCarbon::now()->addSeconds($delay)->getTimestamp();
     }
 
     /**

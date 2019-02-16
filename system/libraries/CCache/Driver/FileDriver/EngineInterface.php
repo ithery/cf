@@ -27,4 +27,20 @@ interface CCache_Driver_FileDriver_EngineInterface {
      * @return void
      */
     public function put($key, $content, $lock = false);
+
+    /**
+     * check file exists by key
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function exists($key);
+
+    /**
+     * delete file exists by key
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function delete($key);
 }

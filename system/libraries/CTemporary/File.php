@@ -51,6 +51,14 @@ class CTemporary_File {
         return $this->file->put($this->getPath(), $content, $lock);
     }
 
+    public function exists() {
+        return $this->file->exists($this->getPath());
+    }
+    
+    public function delete() {
+        return $this->file->delete($this->getPath());
+    }
+
     public function getPath() {
         return $this->directory->getPath() . '/' . $this->filename;
     }
