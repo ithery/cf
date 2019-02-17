@@ -148,6 +148,10 @@ class SCP
             return false;
         }
 
+        if (empty($remote_file)) {
+            throw new \InvalidArgumentException('remote_file cannot be blank');
+        }
+
         if (!$this->ssh->exec('scp -t ' . escapeshellarg($remote_file), false)) { // -t = to
             return false;
         }
