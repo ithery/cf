@@ -27,11 +27,13 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Create a new cache repository instance.
      *
-     * @param  \CCache_DriverAbstract  $driver
+     * @param  array  $options
      * @return void
      */
-    public function __construct(CCache_DriverAbstract $driver) {
-        $this->driver = $driver;
+    public function __construct(array $options) {
+        $driverName = carr::get($options, 'driver', 'Null');
+        $driverOption = carr::get($options, 'options', array());
+        $this->driver = new $driverClass($driverOption);
     }
 
     /**

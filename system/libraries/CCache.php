@@ -9,22 +9,18 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CCache {
 
-    protected static $instance;
-
     /**
      *
-     * @var CCache_Repository
+     * @var CCache_Repository[]
      */
     protected $repository;
 
     /**
-     * options for this cache
      * 
-     * @var array
+     * @param array $options
+     * @return CCache_Repository
      */
-    protected $options;
-
-    public static function instance($options = array()) {
+    public static function repository($options = array()) {
         $defaultOptions = array(
             'driver' => 'array',
         );
@@ -32,23 +28,11 @@ class CCache {
         $options = array_merge($defaultOptions, $options);
 
         $instanceKey = carr::hash($options);
-        if (!isset(self::$instance[$instanceKey])) {
-            self::$instance[$instanceKey] = new CCache($options);
+        if (!isset(self::$repository[$instanceKey])) {
+
+            self::$repository[$instanceKey] = new CCache_Repository($options);
         }
-        return self::$instance[$instanceKey];
-    }
-
-    private function __construct($options) {
-        $this->options = $options;
-        $driverName = carr::get($options, 'driver', 'Null');
-        $driverOption = carr::get($options, 'options', array());
-        $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
-        $driver = new $driverClass($driverOption);
-        $this->repository = new CCache_Repository($driver);
-    }
-
-    public function __call($method, $args) {
-        return call_user_func_array(array($this->repository, $method), $args);
+        return self::$repository[$instanceKey];
     }
 
 }
