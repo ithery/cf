@@ -231,7 +231,7 @@ class CTreeDB {
 
         $r = $db->update($this->table_name, $data, array($this->pk_column => $id));
         if ($this->org_id != null) {
-            $this->rebuild_tree_all();
+            $this->rebuildTreeAll();
         }
     }
 
