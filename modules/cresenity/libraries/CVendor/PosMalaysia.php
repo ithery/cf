@@ -1,11 +1,22 @@
 <?php
 
 class CVendor_PosMalaysia {
-
+        protected $url;
+        protected $xUserKey;
 	public function __construct() {
 		# code...
 	}
 
+        public function setUrl($val){
+            $this->url=$val;
+            return $this;
+        }
+        
+        public function xUserKey($val){
+            $this->xUserKey=$val;
+            return $this;
+        }
+        
 	public function posLocationWebApi($state, $location, $stype = null) {
 		// $params = [
 		//     'state' => 'my-01',
@@ -56,16 +67,16 @@ class CVendor_PosMalaysia {
 			'Zone' => $zone,
 		];
 
-		$curl = CCurl::factory('http://stagingsds.pos.com.my/apigateway/as2corporate/api/poslajudomestic/v1?' . http_build_query($params));
-		$curl->setHttpHeader(['X-User-Key: dm1henBwdmNZdWZxd3g2TmkzTVJHeXpTRmVZUUpQdEs=']);
+		$curl = CCurl::factory($this->url.'?' . http_build_query($params));
+		$curl->setHttpHeader(['X-User-Key:'.$this->xUserKey]);
 
 		$curl->exec();
 		return $curl->response();
 	}
 
 	public function typeOfZone() {
-		$curl = CCurl::factory('http://stagingsds.pos.com.my/apigateway/as2corporate/api/typeofzone/v1');
-		$curl->setHttpHeader(['X-User-Key: cUpodnJIYnpjVmlOTjRJVHNabkNicU5jSjM1U3VwTng=']);
+		$curl = CCurl::factory($this->url);
+		$curl->setHttpHeader(['X-User-Key:'.$this->xUserKey]);
 
 		$curl->exec();
 		return $curl->response();
