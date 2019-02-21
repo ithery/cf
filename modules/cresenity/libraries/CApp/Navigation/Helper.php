@@ -171,6 +171,10 @@ class CApp_Navigation_Helper {
             }
 
             $res = $d;
+            if(!is_array($res)) {
+                throw new CException('Error on nav structure on navs: '.json_encode($navs));
+            }
+                
             $res["level"] = $level;
             $res["role_id"] = $roleId;
             $res["app_id"] = $appId;
