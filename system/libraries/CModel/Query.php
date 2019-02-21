@@ -308,7 +308,7 @@ class CModel_Query {
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(
+        throw (new CModel_Exception_ModelNotFound)->setModel(
                 get_class($this->model), $id
         );
     }
@@ -368,7 +368,7 @@ class CModel_Query {
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function updateOrCreate(array $attributes, array $values = []) {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return $this->tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values)->save();
         });
     }
@@ -386,7 +386,7 @@ class CModel_Query {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->model));
+        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->model));
     }
 
     /**
@@ -707,7 +707,7 @@ class CModel_Query {
      * @return CModel|$this
      */
     public function create(array $attributes = []) {
-        return tap($this->newModelInstance($attributes), function ($instance) {
+        return $this->tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
         });
     }
