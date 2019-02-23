@@ -750,7 +750,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     /**
      * 
-     * @param CModel $model
+     * @param CModel|CModel_Query $model
      * @return $this
      */
     public function setDataFromModel($model) {
@@ -758,7 +758,7 @@ class CElement_Component_DataTable extends CElement_Component {
         if($modelQuery instanceof CModel) {
             $modelQuery = $modelQuery->get();
         }
-        $sql = str_replace_array('?', $model->getBindings(), $model->toSql());
+        $sql = $this->db->compileBinds($modelQuery->getBindings(), $modelQuery->toSql());
         return $this->setDataFromQuery($sql);
     }
 
