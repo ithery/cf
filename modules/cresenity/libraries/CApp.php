@@ -4,9 +4,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CApp extends CObservable {
 
-    use CTrait_Compat_App;
+    use CTrait_Compat_App,
+        CTrait_Element_Property_Title;
 
-    private $title = "";
     private $content = "";
     private $js = "";
     private $custom_js = "";
@@ -315,14 +315,6 @@ class CApp extends CObservable {
 
     public function activation($bool = true) {
         $this->activation = $bool;
-        return $this;
-    }
-
-    public function title($title, $lang = true) {
-        if ($lang) {
-            $title = clang::__($title);
-        }
-        $this->title = $title;
         return $this;
     }
 
