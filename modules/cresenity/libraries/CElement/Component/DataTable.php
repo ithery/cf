@@ -755,10 +755,10 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function setDataFromModel($model) {
         $modelQuery = $model;
-        if($modelQuery instanceof CModel) {
+        if ($modelQuery instanceof CModel) {
             $modelQuery = $modelQuery->get();
         }
-        $sql = $this->db->compileBinds($modelQuery->getBindings(), $modelQuery->toSql());
+        $sql = $this->db->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
         return $this->setDataFromQuery($sql);
     }
 
