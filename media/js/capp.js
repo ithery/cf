@@ -337,6 +337,9 @@ if (window.capp.have_clock) {
         message: function (type, message, alert_type, callback) {
             alert_type = typeof alert_type !== 'undefined' ? alert_type : 'notify';
             var container = $('#container');
+            if(!container) {
+                container = $('body');
+            }
             if (alert_type == 'bootbox') {
 
                 if (typeof callback == 'undefined') {
