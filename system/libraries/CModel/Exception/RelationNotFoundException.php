@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CModel_Exception_RelationNotFoundException extends RuntimeException {
+class CModel_Exception_RelationNotFoundException extends CModel_Exception {
 
     /**
      * The name of the affected Eloquent model.

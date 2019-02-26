@@ -5,7 +5,7 @@
 //use RuntimeException;
 //use Illuminate\Support\Arr;
 
-class CModel_Exception_ModelNotFound extends RuntimeException {
+class CModel_Exception_ModelNotFound extends CModel_Exception {
 
     /**
      * Name of the affected Eloquent model.

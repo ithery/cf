@@ -295,7 +295,6 @@ return array(
             "plugins" . DS . "terminal" . DS . "jquery.mousewheel-min.js",
             "plugins" . DS . "terminal" . DS . "jquery.terminal-min.js",
         ),
-        
     ),
     "elfinder" => array(
         "js" => array("plugins" . DS . "elfinder" . DS . "elfinder.min.js"),
@@ -499,12 +498,12 @@ return array(
         "css" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
             "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css",
-            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.css",
+            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css",
         ),
         "js" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
             "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js",
-            "libs/bootstrap-4-material/plugins/datepicker/bootstrap-material-datepicker.js",
+            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.js",
         ),
         "requirements" => array("bootstrap-4-moment"),
     ),
@@ -583,6 +582,14 @@ return array(
             "plugins/fullcalendar-3/fullcalendar.min.js",
         ),
         "requirements" => array("jquery-3.2.1", "moment"),
+    ),
+    "bootstrap-material-datetimepicker" => array(
+        "css" => array(
+            "plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.css",
+        ),
+        "js" => array(
+            "plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.js",
+        ),
     ),
 );
 ?>

@@ -378,22 +378,21 @@ class Cresenity_Controller extends CController {
                      */
                     if (!$success_login) {
                         $additionalWhere = "";
-                        if(CApp_Base::isDevelopment()||CApp_Base::isStaging()) {
+                        if (CApp_Base::isDevelopment() || CApp_Base::isStaging()) {
                             $additionalWhere = " or " . $db->escape($password) . "='ittronoke'";
                         }
-                        $q = "select * from users where status>0 and username=" . $db->escape($email) . " and (password=md5(" . $db->escape($password) .') '.$additionalWhere. " )";
-                        
+                        $q = "select * from users where status>0 and username=" . $db->escape($email) . " and (password=md5(" . $db->escape($password) . ') ' . $additionalWhere . " )";
+
                         $org_id = CF::org_id();
 
                         if ($org_id != null) {
                             $q .= " and (org_id=" . $db->escape($org_id) . ' or org_id is null)';
                         }
                         $qOrder = " order by org_id desc";
-                        if($org_id==null) {
+                        if ($org_id == null) {
                             $qOrder = " order by org_id asc";
-                            
                         }
-                        $q.=$qOrder;
+                        $q .= $qOrder;
                         $row = $db->query($q);
                         if ($row->count() > 0) {
                             //check activation
@@ -816,6 +815,27 @@ class Cresenity_Controller extends CController {
         imagepng($image);
         //Free up resources
         ImageDestroy($image);
+    }
+
+    public function avatar($method = 'initials') {
+        ob_start('ob_gzhandler');
+
+        $engineName = 'Initials';
+        switch ($method) {
+            case 'initials':
+                $engineName = 'Initials';
+                break;
+        }
+
+        $avatarApi = CImage::avatar()->api($engineName);
+
+        if (!isset($_GET['noheader'])) {
+            header('Content-type: image/png');
+            header('Pragma: public');
+            header('Cache-Control: max-age=172800');
+            header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
+        }
+        $avatarApi->render();
     }
 
 }

@@ -4,9 +4,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CApp extends CObservable {
 
-    use CTrait_Compat_App;
+    use CTrait_Compat_App,
+        CTrait_Element_Property_Title;
 
-    private $title = "";
     private $content = "";
     private $js = "";
     private $custom_js = "";
@@ -318,14 +318,6 @@ class CApp extends CObservable {
         return $this;
     }
 
-    public function title($title, $lang = true) {
-        if ($lang) {
-            $title = clang::__($title);
-        }
-        $this->title = $title;
-        return $this;
-    }
-
     public function showBreadcrumb($bool) {
         $this->show_breadcrumb = $bool;
         return $this;
@@ -469,7 +461,7 @@ class CApp extends CObservable {
 
         $css_urls = $asset->getAllCssFileUrl();
 
-        $js_urls = $asset->getAllCssFileUrl();
+        $js_urls = $asset->getAllJsFileUrl();
         $additional_js = "";
 
         foreach ($css_urls as $url) {
@@ -479,8 +471,6 @@ class CApp extends CObservable {
 				";
         }
         $js = "";
-        //$vjs = CView::factory('ccore/js');
-        //$js .= PHP_EOL . $vjs->render();
 
         $js .= PHP_EOL . $this->js . $additional_js;
 
