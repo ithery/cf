@@ -103,24 +103,24 @@ jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
             if (ahref) {
                 window.location.href = ahref;
             } else {
-				if(btn.attr('type')=='submit') {
-					btn.closest('form').submit();
-				} else {
-					btn.on('click');
-				}
+                if (btn.attr('type') == 'submit') {
+                    btn.closest('form').submit();
+                } else {
+                    btn.on('click');
+                }
 
             }
         } else {
             btn.removeAttr('data-clicked');
         }
-        setTimeout(function() {
+        setTimeout(function () {
             var modalExists = $('.modal:visible').length > 0;
             if (!modalExists) {
                 $('body').removeClass('modal-open');
             } else {
                 $('body').addClass('modal-open');
             }
-        },750);
+        }, 750);
     });
     return false;
 });
@@ -337,7 +337,7 @@ if (window.capp.have_clock) {
         message: function (type, message, alert_type, callback) {
             alert_type = typeof alert_type !== 'undefined' ? alert_type : 'notify';
             var container = $('#container');
-            if(!container) {
+            if (container.length == 0) {
                 container = $('body');
             }
             if (alert_type == 'bootbox') {
@@ -350,13 +350,14 @@ if (window.capp.have_clock) {
             }
 
             if (alert_type == 'notify') {
+                console.log(container);
                 obj = $('<div>');
                 container.prepend(obj);
                 obj.addClass('notifications');
                 obj.addClass('top-right');
                 obj.notify({
-                    'message': {text: message},
-                    'type': type
+                    message: {text: message},
+                    type: type
                 }).show();
             }
 
