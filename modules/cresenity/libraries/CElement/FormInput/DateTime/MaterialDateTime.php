@@ -29,9 +29,10 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         }
     }
 
-    public function build() {
+    protected function build() {
         parent::build();
         $this->addClass('form-control');
+     
     }
 
     public function js($indent = 0) {
