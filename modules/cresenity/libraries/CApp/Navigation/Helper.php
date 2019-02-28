@@ -138,11 +138,13 @@ class CApp_Navigation_Helper {
 
         /* @var $role CApp_Model */
         $role = CApp::model('Roles')->find($roleId);
-
+        if($role==null) {
+            return false;
+        }
+        
         if ($role != null && $role->parent_id == null) {
             return true;
         }
-
 
         $db = CDatabase::instance($domain);
 
@@ -155,15 +157,11 @@ class CApp_Navigation_Helper {
     }
 
     public static function asUserRightsArray($appId, $roleId, $navs = null, $appRoleId = "", $domain = "", $level = 0) {
-        if ($navs == null)
+        if ($navs == null) {
             $navs = CNavigation::instance()->navs();
-
-
+        }
 
         $result = array();
-
-
-
 
         foreach ($navs as $d) {
             if (!self::accessAvailable($d, $appId, $domain, $appRoleId)) {

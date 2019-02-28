@@ -67,7 +67,7 @@ trait CApp_Trait_Base {
         $db = CDatabase::instance();
 
         if ($org_id == null) {
-            $org_id = self::org_id();
+            $org_id = self::orgId();
         }
         if (self::$org == null) {
             self::$org = array();
