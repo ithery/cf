@@ -480,7 +480,7 @@ table.responsive {
     -o-transition: all 0.4s;
     transition: all 0.4s;
 }
-.widget-box:not(.widget-table) .widget-content.nopadding {
+.widget-box .widget-content.nopadding:not(.widget-table) {
     padding:0;
 }
 /* table */
