@@ -12,6 +12,42 @@ trait CApp_Trait_Base {
     private static $org = null;
 
     /**
+     * alias of array_merge($_GET,$_POST)
+     * 
+     * @return array
+     */
+    public static function getRequest() {
+        return array_merge(self::getRequestGet(), self::getRequestPost());
+    }
+
+    /**
+     * alias of $_GET
+     * 
+     * @return type
+     */
+    public static function getRequestGet() {
+        return $_GET;
+    }
+
+    /**
+     * alias of $_POST
+     * 
+     * @return type
+     */
+    public static function getRequestPost() {
+        return $_POST;
+    }
+
+    /**
+     * alias of $_FILES
+     * 
+     * @return type
+     */
+    public static function getRequestFiles() {
+        return $_FILES;
+    }
+
+    /**
      * 
      * @return int
      */
