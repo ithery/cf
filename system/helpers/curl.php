@@ -61,7 +61,11 @@ class curl {
     }
 
     public static function url_full() {
-        return curl::base() . curl::current() . CFRouter::$query_string;
+        $requestUri = carr::get($_SERVER,'REQUEST_URI');
+        if(strlen($requestUri)>0) {
+            return trim(curl::httpbase(),'/').$requestUri;
+        }
+        return curl::httpbase() . curl::current() . CFRouter::$query_string;
     }
 
     /**
