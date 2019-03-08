@@ -54,7 +54,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
-    public function setAutoSelect($bool) {
+    public function setAutoSelect($bool = true) {
         $this->autoSelect = $bool;
         return $this;
     }
