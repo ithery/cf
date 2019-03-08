@@ -22,6 +22,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     protected $minInputLength;
     protected $dropdownClasses;
     protected $delay;
+    protected $valueCallback;
+    protected $requires;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -38,10 +40,20 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->autoSelect = false;
         $this->minInputLength = 0;
         $this->delay = 100;
+        $this->requires=array();
+        $this->valueCallback = null;
     }
 
     public static function factory($id) {
         return new CElement_FormInput_SelectSearch($id);
+    }
+
+    public function setValueCallback(callable $callback, $require = "") {
+        $this->valueCallback = $callback;
+        if (strlen($require) > 0) {
+            $this->requires[] = $require;
+        }
+        return $this;
     }
 
     public function setMultiple($bool = true) {
@@ -160,17 +172,17 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $r = $db->query($q)->result_array(false);
             if (count($r) > 0) {
                 $r = $r[0];
-                $str_selection = $this->formatSelection;
-                $str_selection = str_replace("'", "\'", $str_selection);
-                preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+                $strSelection = $this->formatSelection;
+                $strSelection = str_replace("'", "\'", $strSelection);
+                preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
 
                 foreach ($matches as $val) {
                     $str = $val[1]; //matches str without bracket {}
                     $b_str = $val[0]; //matches str with bracket {}
-                    $str_selection = str_replace($b_str, $r[$str], $str_selection);
+                    $strSelection = str_replace($b_str, $r[$str], $strSelection);
                 }
 
-                $html->appendln('<option value="' . $this->value . '">' . $str_selection . '</option>');
+                $html->appendln('<option value="' . $this->value . '">' . $strSelection . '</option>');
             }
         }
         $html->appendln('</select>');
@@ -185,26 +197,25 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         ->set_data('query', $this->query)
                         ->set_data('keyField', $this->keyField)
                         ->set_data('searchField', $this->searchField)
+                        ->set_data('valueCallback', $this->valueCallback)
                         ->makeurl();
     }
 
     public function js($indent = 0) {
         $ajax_url = $this->createAjaxUrl();
 
-        $str_selection = $this->formatSelection;
+        $strSelection = $this->formatSelection;
         $str_result = $this->formatResult;
 
-        $str_selection = str_replace("'", "\'", $str_selection);
+        $strSelection = str_replace("'", "\'", $strSelection);
         $str_result = str_replace("'", "\'", $str_result);
-        preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+        preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $val) {
-            $thousand_separator_pre = '';
-            $thousand_separator_post = '';
             $str = $val[1]; //matches str without bracket {}
             $b_str = $val[0]; //matches str with bracket {}
             if (strlen($str) > 0) {
-                $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
+                $strSelection = str_replace($b_str, "'+item." . $str . "+'", $strSelection);
             }
         }
 
@@ -226,10 +237,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 $str_result = "'+item." . $searchFieldText . "+'";
             }
         }
-        if (strlen($str_selection) == 0) {
+        if (strlen($strSelection) == 0) {
             $searchFieldText = CF::value($this->searchField);
             if (strlen($searchFieldText) > 0) {
-                $str_selection = "'+item." . $searchFieldText . "+'";
+                $strSelection = "'+item." . $searchFieldText . "+'";
             }
         }
 
@@ -334,7 +345,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         return item.text;
                     }
                     else {
-                        return $('<div>" . $str_selection . "</div>');
+                        return $('<div>" . $strSelection . "</div>');
                     }
                 },  // omitted for brevity, see the source of this page
                 dropdownCssClass: '" . $dropdownClasses . "', // apply css that makes the dropdown taller

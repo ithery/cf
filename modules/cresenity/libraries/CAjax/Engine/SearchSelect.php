@@ -23,26 +23,18 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
 
         $db = CDatabase::instance();
 
-        $callback = "";
         $term = "";
         $limit = "";
         $page = "";
 
-        if (isset($input["callback"])) {
-            $callback = $input["callback"];
-        }
-        if (isset($input["term"])) {
-            $term = $input["term"];
-        }
-        if (isset($input["q"])) {
-            $term = $input["q"];
-        }
-        if (isset($input["limit"])) {
-            $limit = $input["limit"];
-        }
-        if (isset($input["page"])) {
-            $page = $input["page"];
-        }
+        $callback = carr::get($input, 'callback', '');
+        $term = carr::get($input, 'q', carr::get($input, 'term', ''));
+        $limit = carr::get($input, 'limit', '');
+        $page = carr::get($input, 'page', '');
+
+        $valueCallbackFunction = carr::get($data, "valueCallback", null);
+
+
         $base_q = $q;
         $pos_order_by = strpos(strtolower($base_q), "order by", strpos(strtolower($base_q), 'from'));
 
@@ -148,6 +140,9 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
         foreach ($r as $row) {
             $p = array();
             foreach ($row as $k => $v) {
+                if ($valueCallbackFunction != null && is_callable($valueCallbackFunction)) {
+                    $v = call_user_func($valueCallbackFunction, $row, $k, $v);
+                }
                 $p[$k] = ($v == null) ? "" : $v;
             }
             $p["id"] = $row[$key_field];

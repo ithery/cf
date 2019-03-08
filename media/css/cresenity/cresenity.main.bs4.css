@@ -625,6 +625,9 @@ div.dataTables_wrapper .ui-widget-header {
     background-image: none;
 }
 
+.material-style .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    display:flex;
+}
 
 .select2-drop-active {
     border: 1px solid #e7eaec;
