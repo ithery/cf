@@ -44,7 +44,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return new CElement_FormInput_SelectSearch($id);
     }
 
-    public function setMultiple($bool) {
+    public function setMultiple($bool = true) {
         $this->multiple = $bool;
         return $this;
     }
