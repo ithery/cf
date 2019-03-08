@@ -2,24 +2,21 @@
 
 class cuser {
 
-    protected static $users = array();
-
-    /**
-     * 
-     * @param int $userId
-     * @return CApp_Model_Users
-     * @deprecated
-     */
-    public static function get($userId) {
-        if (!isset(self::$users[$userId])) {
-            self::$users[$userId] = CApp_Model::createModel('Users')->find($userId);
-        }
-        return self::$users[$userId];
+    public static function get($id) {
+        $db = CDatabase::instance();
+        $query = "select * " .
+                "from users " .
+                "where status > 0 and user_id = " . $db->escape($id) . "";
+        $result = $db->query($query);
+        $value = null;
+        if ($result->count() > 0)
+            $value = $result[0];
+        return $value;
     }
 
-    public static function hitCount($userId) {
+    public static function hit_count($user_id) {
         $db = CDatabase::instance();
-        return cdbutils::get_value("select count(*) from log_request where user_id=" . $db->escape($userId));
+        return cdbutils::get_value("select count(*) from log_request where user_id=" . $db->escape($user_id));
     }
 
 }

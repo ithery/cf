@@ -2,19 +2,63 @@
 
 class corg {
 
-    protected static $org = array();
+    public static function get($id) {
+        $default_data = array(
+            "org_id" => "",
+            "org_code" => "",
+            "org_name" => "",
+            "abbr" => "",
+        );
 
-    /**
-     * 
-     * @param int $orgId
-     * @return CApp_Model_Org
-     * @deprecated
-     */
-    public static function get($orgId) {
-        if (!isset(self::$org[$orgId])) {
-            self::$org[$orgId] = CApp_Model::createModel('Org')->find($orgId);
+        $data = cdata::get($id, 'org');
+        if ($data == null)
+            return null;
+        foreach ($default_data as $k => $v) {
+
+            if (!isset($data[$k])) {
+                $data[$k] = $v;
+            }
         }
-        return self::$org[$orgId];
+        //$data = array_merge($default_data,$data);
+
+        if ($data != null) {
+            $data = carr::to_object($data);
+        }
+        if (isset($data->org_code))
+            $data->code = $data->org_code;
+        if (isset($data->org_code))
+            $data->name = $data->org_name;
+
+        return $data;
+
+        /*
+          $db = CJDB::instance();
+          $result = $db->get("org",array("org_id"=>$id));
+
+          $value = null;
+          if ($result->count() > 0)
+          $value = $result[0];
+          return $value;
+         */
+    }
+
+    public static function data($org_id, $data = null) {
+        $org = corg::get($org_id);
+        $org_data = cdata::get($org->code, 'org_data');
+        if (!is_array($org_data))
+            $org_data = array();
+        if (is_array($data)) {
+            $org_data = array_merge($org_data, $data);
+            cdata::set($org->code, $org_data, 'org_data');
+        }
+        return $org_data;
+    }
+
+    public static function get_stores($org_id) {
+        $db = CJDB::instance();
+        $result = $db->get("store", array("org_id" => $org_id));
+
+        return $result;
     }
 
 }
