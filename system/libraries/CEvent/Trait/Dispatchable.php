@@ -7,7 +7,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 10, 2019, 1:01:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait Dispatchable {
+trait CEvent_Trait_Dispatchable {
+
+    protected static $dispatcher;
+
+    protected static function getDispatcher() {
+        if (self::$dispatcher == null) {
+            self::$dispatcher = new CEvent_Dispatcher();
+        }
+        return self::$dispatcher;
+    }
 
     /**
      * Dispatch the event with the given arguments.
@@ -15,8 +24,18 @@ trait Dispatchable {
      * @return void
      */
     public static function dispatch() {
-        CContainer::getInstance()->make($abstract, $parameters);
-        return event(new static(...func_get_args()));
+        $dispatcher = self::getDispatcher();
+        return call_user_func_array(array($dispatcher, 'dispatch'), func_get_args());
+    }
+
+    /**
+     * Listen the event with the given arguments.
+     *
+     * @return void
+     */
+    public static function listen() {
+        $dispatcher = self::getDispatcher();
+        return call_user_func_array(array($dispatcher, 'listen'), func_get_args());
     }
 
     /**

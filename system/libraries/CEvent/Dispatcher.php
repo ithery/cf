@@ -12,7 +12,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var CContainer_ContainerInterface
      */
     protected $container;
 
@@ -47,11 +47,11 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     /**
      * Create a new event dispatcher instance.
      *
-     * @param  CContainer_Contract_ContainerInterface|null  $container
+     * @param  CContainer_ContainerInterface|null  $container
      * @return void
      */
-    public function __construct(CContainer_Contract_ContainerInterface $container = null) {
-        $this->container = $container ?: new CContainer;
+    public function __construct(CContainer_ContainerInterface $container = null) {
+        $this->container = $container ?: CContainer::createContainer();
     }
 
     /**
@@ -80,7 +80,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function setupWildcardListen($event, $listener) {
         $this->wildcards[$event][] = $this->makeListener($listener, true);
-
         $this->wildcardsCache = [];
     }
 
@@ -125,7 +124,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function subscribe($subscriber) {
         $subscriber = $this->resolveSubscriber($subscriber);
-
         $subscriber->subscribe($this);
     }
 
@@ -139,7 +137,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (is_string($subscriber)) {
             return $this->container->make($subscriber);
         }
-
         return $subscriber;
     }
 
@@ -162,52 +159,31 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @param  bool  $halt
      * @return array|null
      */
-    public function fire($event, $payload = [], $halt = false) {
-        return $this->dispatch($event, $payload, $halt);
-    }
-
-    /**
-     * Fire an event and call the listeners.
-     *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @param  bool  $halt
-     * @return array|null
-     */
     public function dispatch($event, $payload = [], $halt = false) {
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        list($event, $payload) = $this->parseEventAndPayload(
-                $event, $payload
-        );
-
+        list($event, $payload) = $this->parseEventAndPayload($event, $payload);
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
-
         $responses = [];
-
         foreach ($this->getListeners($event) as $listener) {
             $response = $listener($event, $payload);
-
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
             if ($halt && !is_null($response)) {
                 return $response;
             }
-
             // If a boolean false is returned from a listener, we will stop propagating
             // the event to any further listeners down in the chain, else we keep on
             // looping through the listeners and firing every one in our sequence.
             if ($response === false) {
                 break;
             }
-
             $responses[] = $response;
         }
-
         return $halt ? null : $responses;
     }
 
@@ -222,7 +198,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (is_object($event)) {
             list($payload, $event) = [[$event], get_class($event)];
         }
-
         return [$event, carr::wrap($payload)];
     }
 
@@ -265,12 +240,14 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @return array
      */
     public function getListeners($eventName) {
+        if (is_array($eventName) || strlen($eventName) == 0) {
+            cdbg::var_dump(cdbg::trace());
+            die;
+        }
         $listeners = isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [];
-
         $listeners = array_merge(
                 $listeners, isset($this->wildcardsCache[$eventName]) ? $this->wildcardsCache[$eventName] : $this->getWildcardListeners($eventName)
         );
-
         return class_exists($eventName, false) ? $this->addInterfaceListeners($eventName, $listeners) : $listeners;
     }
 
@@ -282,13 +259,11 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function getWildcardListeners($eventName) {
         $wildcards = [];
-
         foreach ($this->wildcards as $key => $listeners) {
             if (cstr::is($key, $eventName)) {
                 $wildcards = array_merge($wildcards, $listeners);
             }
         }
-
         return $this->wildcardsCache[$eventName] = $wildcards;
     }
 
@@ -307,7 +282,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
                 }
             }
         }
-
         return $listeners;
     }
 
@@ -322,13 +296,11 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (is_string($listener)) {
             return $this->createClassListener($listener, $wildcard);
         }
-
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
             }
-
-            return $listener(...array_values($payload));
+            return call_user_func_array($listener,array_values($payload));
         };
     }
 
@@ -344,7 +316,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             if ($wildcard) {
                 return call_user_func($this->createClassCallable($listener), $event, $payload);
             }
-
             return call_user_func_array(
                     $this->createClassCallable($listener), $payload
             );
@@ -359,11 +330,9 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function createClassCallable($listener) {
         list($class, $method) = $this->parseClassCallable($listener);
-
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         }
-
         return [$this->container->make($class), $method];
     }
 
@@ -405,7 +374,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             $arguments = array_map(function ($a) {
                 return is_object($a) ? clone $a : $a;
             }, func_get_args());
-
             if ($this->handlerWantsToBeQueued($class, $arguments)) {
                 $this->queueHandler($class, $method, $arguments);
             }
@@ -423,7 +391,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (method_exists($class, 'shouldQueue')) {
             return $this->container->make($class)->shouldQueue($arguments[0]);
         }
-
         return true;
     }
 
@@ -437,13 +404,10 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function queueHandler($class, $method, $arguments) {
         list($listener, $job) = $this->createListenerAndJob($class, $method, $arguments);
-
         $connection = $this->resolveQueue()->connection(
                 isset($listener->connection) ? $listener->connection : null
         );
-
         $queue = isset($listener->queue) ? $listener->queue : null;
-
         isset($listener->delay) ? $connection->laterOn($queue, $listener->delay, $job) : $connection->pushOn($queue, $job);
     }
 
@@ -457,7 +421,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function createListenerAndJob($class, $method, $arguments) {
         $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
-
         return [$listener, $this->propagateListenerOptions(
                     $listener, new CallQueuedListener($class, $method, $arguments)
         )];
@@ -522,7 +485,6 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function setQueueResolver(callable $resolver) {
         $this->queueResolver = $resolver;
-
         return $this;
     }
 

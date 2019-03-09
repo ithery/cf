@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 10, 2019, 1:08:53 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CContainer_Container implements ArrayAccess, CContainer_Contract_ContainerInterface {
+class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface {
 
     /**
      * The current globally available container (if any).
@@ -132,10 +132,10 @@ class CContainer_Container implements ArrayAccess, CContainer_Contract_Container
      * Define a contextual binding.
      *
      * @param  string  $concrete
-     * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
+     * @return CContainer_ContextualBindingBuilderInterface
      */
     public function when($concrete) {
-        return new ContextualBindingBuilder($this, $this->getAlias($concrete));
+        return new CContainer_ContextualBindingBuilder($this, $this->getAlias($concrete));
     }
 
     /**
@@ -574,6 +574,7 @@ class CContainer_Container implements ArrayAccess, CContainer_Contract_Container
         }
         $this->with[] = $parameters;
         $concrete = $this->getConcrete($abstract);
+
         // We're ready to instantiate an instance of the concrete type registered for
         // the binding. This will instantiate the types, as well as resolve any of
         // its "nested" dependencies recursively until all have gotten resolved.
@@ -582,6 +583,8 @@ class CContainer_Container implements ArrayAccess, CContainer_Contract_Container
         } else {
             $object = $this->make($concrete);
         }
+
+
         // If we defined any extenders for this type, we'll need to spin through them
         // and apply them to the object being built. This allows for the extension
         // of services, such as changing configuration or decorating the object.
@@ -594,6 +597,7 @@ class CContainer_Container implements ArrayAccess, CContainer_Contract_Container
         if ($this->isShared($abstract) && !$needsContextualBuild) {
             $this->instances[$abstract] = $object;
         }
+
         $this->fireResolvingCallbacks($abstract, $object);
         // Before returning, we will also set the resolved flag to "true" and pop off
         // the parameter overrides for this build. After those two things are done
@@ -1042,10 +1046,10 @@ class CContainer_Container implements ArrayAccess, CContainer_Contract_Container
     /**
      * Set the shared instance of the container.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
-     * @return \Illuminate\Contracts\Container\Container|static
+     * @param  CContainer_ContainerInterface|null  $container
+     * @return CContainer_ContainerInterface|static
      */
-    public static function setInstance(ContainerContract $container = null) {
+    public static function setInstance(CContainer_ContainerInterface $container = null) {
         return static::$instance = $container;
     }
 

@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CContainer {
 
+    public static function getInstance() {
+        return CContainer_Container::getInstance();
+    }
+
     public static function createContainer() {
         return new CContainer_Container();
     }
