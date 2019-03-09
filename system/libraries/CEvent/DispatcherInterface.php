@@ -4,10 +4,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 7, 2018, 11:46:52 PM
+ * @since Mar 10, 2019, 1:07:02 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-interface CEvent_Contract_DispatcherInterface {
+interface CEvent_DispatcherInterface {
 
     /**
      * Register an event listener with the dispatcher.
