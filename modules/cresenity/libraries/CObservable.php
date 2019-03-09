@@ -294,6 +294,29 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
+     * Add Table Row Element &lt;tr&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Tr  Table Row Element
+     */
+    public function addTr($id = "") {
+        $element = CElement_Factory::createElement('tr', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
+    /**
+     * Add Table Cell Element &lt;td&gt
+     *
+     * @param string $id optional
+     * @return  CElement_Element_Td  Table Cell Element
+     */
+    public function addTd($id = "") {
+        $element = CElement_Factory::createElement('td', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    /**
      * Add Code Element &lt;ul&gt
      *
      * @param string $id optional
