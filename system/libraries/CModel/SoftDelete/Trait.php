@@ -41,6 +41,7 @@ trait CModel_SoftDelete_Trait {
      * @return mixed
      */
     protected function performDeleteOnModel() {
+
         if ($this->forceDeleting) {
             $this->exists = false;
 
@@ -69,7 +70,7 @@ trait CModel_SoftDelete_Trait {
 
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
         }
-
+        
         $query->update($columns);
     }
 
