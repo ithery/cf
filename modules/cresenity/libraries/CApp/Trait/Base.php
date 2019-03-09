@@ -51,6 +51,14 @@ trait CApp_Trait_Base {
      * 
      * @return int
      */
+    public static function appId() {
+        return CF::appId();
+    }
+
+    /**
+     * 
+     * @return int
+     */
     public static function orgId() {
         $org_id = CF::org_id();
         $app = CApp::instance();
@@ -82,7 +90,7 @@ trait CApp_Trait_Base {
 
     /**
      * 
-     * @param int $org_id optional, default using return values of SM::org_id()
+     * @param int $org_id optional, default using return values of static::orgId()
      * @return string Name of org
      */
     public static function orgName($orgId = null) {
