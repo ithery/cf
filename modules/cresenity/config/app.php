@@ -2,8 +2,20 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-
 return array(
+    "title" => "CRESENITY",
+    "theme" => "cresenity",
+    "lang" => "id",
+    "admin_email" => "contact@cresenitytech.com",
+    "set_timezone" => true,
+    "default_timezone" => 'Asia/Jakarta',
+    "multilang" => true,
+    "update_last_request" => true,
+    "require_js" => true,
+    "merge_js" => false,
+    "minify_js" => false,
+    "merge_css" => false,
+    "minify_css" => false,
     "have_user_login" => true,
     "have_user_access" => true,
     "have_user_permission" => true,
