@@ -625,6 +625,11 @@ div.dataTables_wrapper .ui-widget-header {
     background-image: none;
 }
 
+.material-style .select2-container--default .select2-selection--single {
+    height: auto;
+    display:flex;
+}
+
 .material-style .select2-container--default .select2-selection--multiple .select2-selection__choice {
     display:flex;
 }
