@@ -15,7 +15,6 @@ return array(
         "method" => "index",
         "icon" => "fas fa-home",
     ),
-    
     array(
         "name" => "administrator.database",
         "label" => "Database",
@@ -46,7 +45,12 @@ return array(
                 "controller" => "administrator/stats/phpinfo",
                 "method" => "index",
             ),
-           
         ),
+    ),
+    array(
+        "name" => "administrator.cloud",
+        "label" => "Dev Cloud",
+        "icon" => " fas fa-cloud",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Cloud" . EXT,
     ),
 );

@@ -57,6 +57,14 @@ trait CApp_Trait_Base {
 
     /**
      * 
+     * @return string
+     */
+    public static function appCode() {
+        return CF::appCode();
+    }
+
+    /**
+     * 
      * @return int
      */
     public static function orgId() {

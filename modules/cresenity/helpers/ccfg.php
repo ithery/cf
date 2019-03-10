@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @deprecated
+ */
 class ccfg {
 
     public static function get_data($name, $appCode = null) {
