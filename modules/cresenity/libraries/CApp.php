@@ -264,6 +264,10 @@ class CApp extends CObservable {
     public function code() {
         return CF::appCode();
     }
+    
+    public function message($type,$message) {
+        return CApp_Message::add($type, $message);
+    }
 
     public function controller() {
         return CF::instance();

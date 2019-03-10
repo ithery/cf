@@ -1,11 +1,9 @@
 <?php
 namespace GuzzleHttp\Exception;
-
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\UriInterface;
-
 /**
  * HTTP Request exception
  */
@@ -13,13 +11,10 @@ class RequestException extends TransferException
 {
     /** @var RequestInterface */
     private $request;
-
     /** @var ResponseInterface */
     private $response;
-
     /** @var array */
     private $handlerContext;
-
     public function __construct(
         $message,
         RequestInterface $request,
@@ -36,7 +31,6 @@ class RequestException extends TransferException
         $this->response = $response;
         $this->handlerContext = $handlerContext;
     }
-
     /**
      * Wrap non-RequestExceptions with a RequestException
      *
@@ -51,7 +45,6 @@ class RequestException extends TransferException
             ? $e
             : new RequestException($e->getMessage(), $request, null, $e);
     }
-
     /**
      * Factory method to create a new exception with a normalized error message
      *
@@ -77,7 +70,6 @@ class RequestException extends TransferException
                 $ctx
             );
         }
-
         $level = (int) floor($response->getStatusCode() / 100);
         if ($level === 4) {
             $label = 'Client error';
@@ -89,10 +81,8 @@ class RequestException extends TransferException
             $label = 'Unsuccessful request';
             $className = __CLASS__;
         }
-
         $uri = $request->getUri();
         $uri = static::obfuscateUri($uri);
-
         // Client Error: `GET /` resulted in a `404 Not Found` response:
         // <html> ... (truncated)
         $message = sprintf(
@@ -103,16 +93,12 @@ class RequestException extends TransferException
             $response->getStatusCode(),
             $response->getReasonPhrase()
         );
-
         $summary = static::getResponseBodySummary($response);
-
         if ($summary !== null) {
             $message .= ":\n{$summary}\n";
         }
-
         return new $className($message, $request, $response, $previous, $ctx);
     }
-
     /**
      * Get a short summary of the response
      *
@@ -125,33 +111,25 @@ class RequestException extends TransferException
     public static function getResponseBodySummary(ResponseInterface $response)
     {
         $body = $response->getBody();
-
-        if (!$body->isSeekable()) {
+        if (!$body->isSeekable() || !$body->isReadable()) {
             return null;
         }
-
         $size = $body->getSize();
-
         if ($size === 0) {
             return null;
         }
-
         $summary = $body->read(120);
         $body->rewind();
-
         if ($size > 120) {
             $summary .= ' (truncated...)';
         }
-
         // Matches any printable character, including unicode characters:
         // letters, marks, numbers, punctuation, spacing, and separators.
         if (preg_match('/[^\pL\pM\pN\pP\pS\pZ\n\r\t]/', $summary)) {
             return null;
         }
-
         return $summary;
     }
-
     /**
      * Obfuscates URI if there is an username and a password present
      *
@@ -162,14 +140,11 @@ class RequestException extends TransferException
     private static function obfuscateUri($uri)
     {
         $userInfo = $uri->getUserInfo();
-
         if (false !== ($pos = strpos($userInfo, ':'))) {
             return $uri->withUserInfo(substr($userInfo, 0, $pos), '***');
         }
-
         return $uri;
     }
-
     /**
      * Get the request that caused the exception
      *
@@ -179,7 +154,6 @@ class RequestException extends TransferException
     {
         return $this->request;
     }
-
     /**
      * Get the associated response
      *
@@ -189,7 +163,6 @@ class RequestException extends TransferException
     {
         return $this->response;
     }
-
     /**
      * Check if a response was received
      *
@@ -199,7 +172,6 @@ class RequestException extends TransferException
     {
         return $this->response !== null;
     }
-
     /**
      * Get contextual information about the error from the underlying handler.
      *

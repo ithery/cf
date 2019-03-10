@@ -7,12 +7,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 10, 2019, 7:07:06 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-use Guzzle\Http\Client;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Exception\RequestException;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Response;
 
-class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_Adapter {
+class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
 
     /**
      * @var ClientInterface
@@ -29,6 +29,7 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_Adapter {
      * @param ClientInterface|null $client
      */
     public function __construct(ClientInterface $client = null) {
+
         $this->client = $client ?: new Client();
     }
 
@@ -37,13 +38,12 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_Adapter {
      */
     public function get($url) {
         try {
-            $this->response = $this->client->get($url)->send();
+            $this->response = $this->client->get($url);
         } catch (RequestException $e) {
             $this->response = $e->getResponse();
-            $this->handleError();
+            $this->handleError($e);
         }
-
-        return $this->response->getBody(true);
+        return (string) $this->response->getBody();
     }
 
     /**
@@ -51,57 +51,42 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_Adapter {
      */
     public function delete($url) {
         try {
-            $this->response = $this->client->delete($url)->send();
+            $this->response = $this->client->delete($url);
         } catch (RequestException $e) {
             $this->response = $e->getResponse();
-            $this->handleError();
+            $this->handleError($e);
         }
-
-        return $this->response->getBody(true);
+        return (string) $this->response->getBody();
     }
 
     /**
      * {@inheritdoc}
      */
     public function put($url, $content = '') {
-        $request = $this->client->put($url);
-
-        if (is_array($content)) {
-            $request->setBody(json_encode($content), 'application/json');
-        } else {
-            $request->setBody($content);
-        }
-
+        $options = [];
+        $options[is_array($content) ? 'json' : 'body'] = $content;
         try {
-            $this->response = $request->send();
+            $this->response = $this->client->put($url, $options);
         } catch (RequestException $e) {
             $this->response = $e->getResponse();
-            $this->handleError();
+            $this->handleError($e);
         }
-
-        return $this->response->getBody(true);
+        return (string) $this->response->getBody();
     }
 
     /**
      * {@inheritdoc}
      */
     public function post($url, $content = '') {
-        $request = $this->client->post($url);
-
-        if (is_array($content)) {
-            $request->setBody(json_encode($content), 'application/json');
-        } else {
-            $request->setBody($content);
-        }
-
+        $options = [];
+        $options[is_array($content) ? 'json' : 'body'] = $content;
         try {
-            $this->response = $request->send();
+            $this->response = $this->client->post($url, $options);
         } catch (RequestException $e) {
             $this->response = $e->getResponse();
-            $this->handleError();
+            $this->handleError($e);
         }
-
-        return $this->response->getBody(true);
+        return (string) $this->response->getBody();
     }
 
     /**
@@ -109,9 +94,8 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_Adapter {
      */
     public function getLatestResponseHeaders() {
         if (null === $this->response) {
-            return;
+            return null;
         }
-
         return [
             'reset' => (int) (string) $this->response->getHeader('RateLimit-Reset'),
             'remaining' => (int) (string) $this->response->getHeader('RateLimit-Remaining'),
@@ -122,13 +106,14 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_Adapter {
     /**
      * @throws HttpException
      */
-    protected function handleError() {
-        $body = (string) $this->response->getBody(true);
+    protected function handleError($e) {
+        if ($this->response == null) {
+            throw $e;
+        }
+        $body = (string) $this->response->getBody();
         $code = (int) $this->response->getStatusCode();
-
         $content = json_decode($body);
-
-        throw new CApp_Cloud_Exception_HttpException(isset($content->message) ? $content->message : 'Request not processed.', $code);
+        throw new CApp_Cloud_Exception_HttpException(isset($content->message) ? $content->message : 'Request not processed.', array(), $code);
     }
 
 }

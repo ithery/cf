@@ -11,7 +11,21 @@ class Controller_Administrator_Cloud_Info extends CApp_Administrator_Controller_
 
     public function index() {
         $app = CApp::instance();
+        $errCode = 0;
+        $errMessage = '';
+        $cloudData=array();
+        $app->title('Dev Cloud Information');
+        try {
+            $cloudData = CApp_Cloud::instance()->api('Development/GetInfo');
+        } catch (Exception $ex) {
+            $errCode++;
+            $errMessage = $ex->getMessage();
+        }
+        if ($errCode > 0) {
+            $app->message('error', $errMessage);
+        }
         
+        $app->add($cloudData);
         echo $app->render();
     }
 
