@@ -247,11 +247,11 @@ trait CApp_Trait_Base {
     }
 
     public static function noImageUrl($width = 100, $height = 100) {
-        return curl::base() . 'cresenity/noimage/' . $width . '/' . $height;
+        return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height;
     }
 
     public static function initialAvatarUrl($name, $size = 100) {
-        return curl::base() . 'cresenity/avatar/initials/?name=' . $name . '&size=' . $size;
+        return curl::httpbase() . 'cresenity/avatar/initials/?name=' . $name . '&size=' . $size;
     }
 
     public static function havePermission($action) {
