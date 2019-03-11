@@ -4,7 +4,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 return array(
     "title" => "CRESENITY",
-    "theme" => "cresenity",
     "lang" => "id",
     "admin_email" => "contact@cresenitytech.com",
     "set_timezone" => true,
