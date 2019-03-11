@@ -144,7 +144,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $classes = $classes . " form-control ";
 
         $html->setIndent($indent);
-        $value = $this->value;
+        $value = null;
         if ($this->autoSelect) {
             $db = CDatabase::instance();
             $rjson = 'false';
@@ -155,7 +155,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if (strlen($this->value) > 0) {
             $value = $this->value;
         }
-
 
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . '">');
 
@@ -169,17 +168,17 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             } else {
                 $q = "select * from (" . $this->query . ") as a where `" . $this->keyField . "`=" . $db->escape($this->value);
             }
-            $r = $db->query($q)->result_array(false);
+            $r = cdbutils::get_row($q);
             if (count($r) > 0) {
                 $r = $r[0];
                 $strSelection = $this->formatSelection;
                 $strSelection = str_replace("'", "\'", $strSelection);
-                preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
+                preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
 
                 foreach ($matches as $val) {
                     $str = $val[1]; //matches str without bracket {}
                     $b_str = $val[0]; //matches str with bracket {}
-                    $strSelection = str_replace($b_str, $r[$str], $strSelection);
+                    $strSelection = str_replace($b_str, $r->$str, $strSelection);
                 }
 
                 $html->appendln('<option value="' . $this->value . '">' . $strSelection . '</option>');
