@@ -170,7 +170,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
             $r = cdbutils::get_row($q);
             if (count($r) > 0) {
-                $r = $r[0];
                 $strSelection = $this->formatSelection;
                 $strSelection = str_replace("'", "\'", $strSelection);
                 preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
