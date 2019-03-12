@@ -41,7 +41,7 @@ class CDaemon {
         }
      
 
-        $service = $cls::createInstance($serviceName, $config);
+        $service = new $cls($serviceName, $config);
 
         switch ($cmd) {
             case 'start':
@@ -162,4 +162,6 @@ class CDaemon {
         return $executableFinder->find();
     }
 
+    
+    
 }

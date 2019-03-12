@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 12, 2019, 6:02:29 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CDaemon_Plugin_ProcessManager implements CDaemon_PluginAbstract {
+class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
 
     /**
      * The length (in seconds) of the rolling window used to detect process churn
@@ -56,7 +56,7 @@ class CDaemon_Plugin_ProcessManager implements CDaemon_PluginAbstract {
      * @return void
      */
     public function teardown() {
-        if (!$this->service->is('parent'))
+        if (!$this->service->isParent())
             return;
         while ($this->count() > 0) {
             foreach ($this->processes() as $pid => $process)
