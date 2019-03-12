@@ -16,6 +16,12 @@ class CDaemon {
      */
     protected $config = [];
 
+    /**
+     *
+     * @var CDaemon_Helper
+     */
+    protected $helper;
+
     public static function cliRunner($parameter = null) {
 
         $argv = carr::get($_SERVER, 'argv');
@@ -25,12 +31,18 @@ class CDaemon {
         parse_str($parameter, $config);
         $cls = carr::get($config, 'serviceClass');
         /** @var CJob_Exception $job */
-        $serviceName = carr::get($config, 'serviceName');
-        $command = carr::get($config, 'command');
+        $serviceName = carr::get($config, 'serviceName', $cls);
+        $cmd = carr::get($config, 'command');
+        $pidFile = carr::get($config, 'pidFile');
+        $dirPidFile = dirname($pidFile);
+        $file = new CFile();
+        if (!$file->isDirectory($dirPidFile)) {
+            $file->makeDirectory($dirPidFile, 0755, true);
+        }
+     
 
         $service = new $cls($serviceName, $config);
 
-        $cmd = strtolower(end($_SERVER['argv']));
         switch ($cmd) {
             case 'start':
             case 'stop':
@@ -54,7 +66,7 @@ class CDaemon {
         $this->setConfig($config);
 
         $this->script = carr::get($config, 'script', DOCROOT . 'index.php');
-        $this->uri = carr::get($config, 'uri', 'cresenity/service');
+        $this->uri = carr::get($config, 'uri', 'cresenity/daemon');
     }
 
     /**
@@ -95,14 +107,14 @@ class CDaemon {
     }
 
     public function run() {
-        $isUnix = ($this->helper->getPlatform() === CJob_Helper::UNIX);
+        $isUnix = ($this->getHelper()->getPlatform() === CJob_Helper::UNIX);
         if ($isUnix && !extension_loaded('posix')) {
             throw new Exception('posix extension is required');
         }
         if ($isUnix) {
-            $this->runUnix();
+            return $this->runUnix();
         } else {
-            $this->runWindows();
+            return $this->runWindows();
         }
     }
 
@@ -110,11 +122,11 @@ class CDaemon {
      * @param string $job
      * @param array  $config
      */
-    protected function runUnix($job, array $config) {
-        $command = $this->getExecutableCommand($job, $config);
+    protected function runUnix() {
+        $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
-        $output = $config['debug'] ? 'debug.log' : '/dev/null';
-        exec("$binary $command 1> $output 2>&1 &");
+        $output = shell_exec("$binary $command");
+        return $output;
     }
 
     // @codeCoverageIgnoreStart
@@ -122,11 +134,11 @@ class CDaemon {
      * @param string $job
      * @param array  $config
      */
-    protected function runWindows($job, array $config) {
+    protected function runWindows() {
         // Run in background (non-blocking). From
         // http://us3.php.net/manual/en/function.exec.php#43834
         $binary = $this->getPhpBinary();
-        $command = $this->getExecutableCommand($job, $config);
+        $command = $this->getExecutableCommand();
         pclose(popen("start \"blah\" /B \"$binary\" $command", "r"));
     }
 
@@ -137,9 +149,9 @@ class CDaemon {
      *
      * @return string
      */
-    protected function getExecutableCommand($job, array $config) {
-        $domain = carr::get($config, 'domain', CF::domain());
-        return sprintf('"%s" "%s" "%s" "%s"', $this->script, $this->uri, $domain, http_build_query($config));
+    protected function getExecutableCommand() {
+        $domain = carr::get($this->config, 'domain', CF::domain());
+        return sprintf('"%s" "%s" "%s" "%s"', $this->script, $this->uri, $domain, http_build_query($this->config));
     }
 
     /**
