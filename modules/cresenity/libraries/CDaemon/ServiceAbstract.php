@@ -494,10 +494,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * Log the $message to the filename returned by CDaemon_ServiceAbstract::log_file() and/or optionally print to stdout.
+     * Log the $message to the filename returned by CDaemon_ServiceAbstract::logFile() and/or optionally print to stdout.
      * Multi-Line messages will be handled nicely.
      *
-     * Note: Your log_file() method will be called every 5 minutes (at even increments, eg 00:05, 00:10, 00:15, etc) to
+     * Note: Your logFile() method will be called every 5 minutes (at even increments, eg 00:05, 00:10, 00:15, etc) to
      * allow you to rotate the filename based on time (one log file per month, day, hour, whatever) if you wish.
      *
      * Note: You may find value in overloading this method in your app in favor of a more fully-featured logging tool
@@ -508,30 +508,30 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @param string $label Truncated at 12 chars
      */
     public function log($message, $label = '', $indent = 0) {
-        static $log_file = '';
-        static $log_file_check_at = 0;
-        static $log_file_error = false;
+        static $logFile = '';
+        static $logFile_check_at = 0;
+        static $logFile_error = false;
         $header = "\nDate                  PID   Label         Message\n";
         $date = date("Y-m-d H:i:s");
         $pid = str_pad($this->pid, 5, " ", STR_PAD_LEFT);
         $label = str_pad(substr($label, 0, 12), 13, " ", STR_PAD_RIGHT);
         $prefix = "[$date] $pid $label" . str_repeat("\t", $indent);
-        if (time() >= $log_file_check_at && $this->log_file() != $log_file) {
-            $log_file = $this->log_file();
-            $log_file_check_at = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
+        if (time() >= $logFile_check_at && $this->logFile() != $logFile) {
+            $logFile = $this->logFile();
+            $logFile_check_at = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
             @fclose(self::$log_handle);
-            self::$log_handle = $log_file_error = false;
+            self::$log_handle = $logFile_error = false;
         }
         if (self::$log_handle === false) {
-            if (strlen($log_file) > 0 && self::$log_handle = @fopen($log_file, 'a+')) {
+            if (strlen($logFile) > 0 && self::$log_handle = @fopen($logFile, 'a+')) {
                 if ($this->parent) {
                     fwrite(self::$log_handle, $header);
                     if ($this->stdout)
                         echo $header;
                 }
-            } elseif (!$log_file_error) {
-                $log_file_error = true;
-                trigger_error(__CLASS__ . "Error: Could not write to logfile " . $log_file, E_USER_WARNING);
+            } elseif (!$logFile_error) {
+                $logFile_error = true;
+                trigger_error(__CLASS__ . "Error: Could not write to logfile " . $logFile, E_USER_WARNING);
             }
         }
         $message = $prefix . ' ' . str_replace("\n", "\n$prefix ", trim($message)) . "\n";
@@ -543,7 +543,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
     }
 
-    public function log_file() {
+    public function logFile() {
         return carr::get($this->config, 'logFile');
     }
 
@@ -691,7 +691,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $out[] = "Restart Interval:     " . $this->autoRestartInterval;
         $out[] = sprintf("Start Time:           %s (%s)", $this->startTime, date('Y-m-d H:i:s', $this->startTime));
         $out[] = sprintf("Duration:             %s (%s)", $this->runtime(), $pretty_duration($this->runtime()));
-        $out[] = "Log File:             " . $this->log_file();
+        $out[] = "Log File:             " . $this->logFile();
         $out[] = "Shutdown Signal:      " . $pretty_bool($this->shutdown);
         $out[] = "Process Type:         " . ($this->parent ? 'Application Process' : 'Background Process');
         $out[] = "Plugins:              " . implode(', ', $this->plugins);

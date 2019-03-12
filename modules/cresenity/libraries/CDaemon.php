@@ -34,12 +34,21 @@ class CDaemon {
         $serviceName = carr::get($config, 'serviceName', $cls);
         $cmd = carr::get($config, 'command');
         $pidFile = carr::get($config, 'pidFile');
-        $dirPidFile = dirname($pidFile);
+        $logFile = carr::get($config, 'logFile');
         $file = new CFile();
-        if (!$file->isDirectory($dirPidFile)) {
-            $file->makeDirectory($dirPidFile, 0755, true);
+        try {
+            $dirPidFile = dirname($pidFile);
+            if (!$file->isDirectory($dirPidFile)) {
+                $file->makeDirectory($dirPidFile, 0755, true);
+            }
+            $dirLogFile = dirname($logFile);
+            if (!$file->isDirectory($dirLogFile)) {
+                $file->makeDirectory($dirLogFile, 0755, true);
+            }
+        } catch (Exception $ex) {
+            throw new Exception('error on create dir ' . $dirLogFile);
         }
-     
+
 
         $service = new $cls($serviceName, $config);
 
@@ -111,6 +120,20 @@ class CDaemon {
         if ($isUnix && !extension_loaded('posix')) {
             throw new Exception('posix extension is required');
         }
+        
+        $command = carr::get($this->config,'command');
+        $isRunning = $this->isRunning();
+        if($command=='start') {
+            if($isRunning) {
+                throw new Exception('daemon is running');
+            }
+        }
+        if($command=='stop') {
+            if(!$isRunning) {
+                throw new Exception('daemon is stopped');
+            }
+        }
+        
         if ($isUnix) {
             return $this->runUnix();
         } else {
@@ -125,8 +148,9 @@ class CDaemon {
     protected function runUnix() {
         $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
-        $output = shell_exec("$binary $command");
-        return $output;
+        $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
+        exec("$binary $command 1> $output 2>&1 &");
+        
     }
 
     // @codeCoverageIgnoreStart
@@ -139,6 +163,7 @@ class CDaemon {
         // http://us3.php.net/manual/en/function.exec.php#43834
         $binary = $this->getPhpBinary();
         $command = $this->getExecutableCommand();
+
         pclose(popen("start \"blah\" /B \"$binary\" $command", "r"));
     }
 
@@ -151,7 +176,8 @@ class CDaemon {
      */
     protected function getExecutableCommand() {
         $domain = carr::get($this->config, 'domain', CF::domain());
-        return sprintf('"%s" "%s" "%s" "%s"', $this->script, $this->uri, $domain, http_build_query($this->config));
+        $cmd = sprintf('"%s" "%s" "%s" "%s"', $this->script, $this->uri, $domain, http_build_query($this->config));
+        return $cmd;
     }
 
     /**
@@ -162,6 +188,22 @@ class CDaemon {
         return $executableFinder->find();
     }
 
-    
-    
+    public function getPid() {
+        $pidFile = carr::get($this->config, 'pidFile');
+        if ($pidFile && file_exists($pidFile)) {
+            return file_get_contents($pidFile);
+        }
+        return false;
+    }
+
+    public function isRunning() {
+        $result = '';
+        if ($pid = $this->getPid()) {
+            $pid = trim($pid);
+            $result = shell_exec('ps x | grep "' . $pid . '" | grep "' . carr::get($this->config, 'serviceName') . '" | grep -v "grep"');
+        }
+
+        return strlen(trim($result)) > 0;
+    }
+
 }
