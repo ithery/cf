@@ -41,7 +41,7 @@ class CDaemon {
         }
      
 
-        $service = new $cls($serviceName, $config);
+        $service = $cls::createInstance($serviceName, $config);
 
         switch ($cmd) {
             case 'start':
