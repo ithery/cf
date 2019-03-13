@@ -216,12 +216,15 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             SIGCONT, SIGTSTP, SIGTTIN, SIGTTOU, SIGURG, SIGXCPU, SIGXFSZ, SIGVTALRM, SIGPROF,
             SIGWINCH, SIGIO, SIGSYS, SIGBABY
         );
-        if (defined('SIGPOLL'))
+        if (defined('SIGPOLL')) {
             $signals[] = SIGPOLL;
-        if (defined('SIGPWR'))
+        }
+        if (defined('SIGPWR')) {
             $signals[] = SIGPWR;
-        if (defined('SIGSTKFLT'))
+        }
+        if (defined('SIGSTKFLT')) {
             $signals[] = SIGSTKFLT;
+        }
         foreach (array_unique($signals) as $signal) {
             pcntl_signal($signal, array($this, 'signal'));
         }
@@ -255,7 +258,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         $this->callbacks = array();
         if ($this->parent && $this->pidFile && file_exists($this->pidFile) && file_get_contents($this->pidFile) == $this->pid) {
-            $this->log('Unlink PID:'.$this->pidFile);
+            $this->log('Unlink PID:' . $this->pidFile);
             unlink($this->pidFile);
         }
         if ($this->parent && $this->stdout)
@@ -300,20 +303,15 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             if (pcntl_fork() > 0) {
                 exit();
             }
-            $this->log('on Child');
             $this->pid(getmypid()); // We have a new pid now
             $pidFile = $this->pidFile;
-            if (file_exists($pidFile)) {
-                $this->fatalError('Could not lock the pidfile. This daemon may already running');
-            }
+           
             $handle = @fopen($pidFile, 'w');
             if (!$handle) {
                 $this->showHelp('Unable to write PID to ' . $this->pidFile);
             }
             fwrite($handle, $this->pid);
             fclose($handle);
-            $this->log('Parent:' . ($this->parent ? 'true' : 'false'));
-            $this->log('shutdown:' . ($this->shutdown ? 'true' : 'false'));
             $this->setupPlugins();
             $this->setupWorkers();
             $this->checkEnvironment();
@@ -326,9 +324,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
             while ($this->parent && !$this->shutdown) {
                 $this->timer(true);
-                $this->auto_restart();
+                $this->autoRestart();
                 $this->dispatch(array(self::ON_PREEXECUTE));
                 $this->execute();
+                if (version_compare(PHP_VERSION, "5.3.0", '>=')) {
+                    pcntl_signal_dispatch();
+                }
+
                 $this->dispatch(array(self::ON_POSTEXECUTE));
                 $this->timer();
             }
@@ -645,8 +647,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     private function dump() {
         $workers = '';
-        foreach ($this->workers as $worker)
+        foreach ($this->workers as $worker) {
             $workers .= sprintf('%s %s [%s], ', $worker, $this->{$worker}->guid, $this->{$worker}->is_idle() ? 'AVAILABLE' : 'BUFFERING');
+        }
         $pretty_memory = function($bytes) {
             $kb = 1024;
             $mb = $kb * 1024;
@@ -748,8 +751,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             // There is no time to sleep between intervals -- but we still need to give the CPU a break
             // Sleep for 1/100 a second.
             usleep(10000);
-            if ($this->loopInterval > 0)
+            if ($this->loopInterval > 0) {
                 $this->error('Run Loop Taking Too Long. Duration: ' . number_format($stats['duration'], 3) . ' Interval: ' . $this->loopInterval);
+            }
         }
         $this->stats[] = $stats;
         return $stats;
@@ -760,11 +764,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * This is designed to allow us to get a fresh stack, fresh memory allocation, etc.
      * @return boolean|void
      */
-    private function auto_restart() {
+    private function autoRestart() {
         if (!$this->parent)
             return;
-        if ($this->runtime() < $this->autoRestartInterval || $this->autoRestartInterval < self::MIN_RESTART_SECONDS)
+        if ($this->runtime() < $this->autoRestartInterval || $this->autoRestartInterval < self::MIN_RESTART_SECONDS) {
             return false;
+        }
         $this->restart();
     }
 
@@ -774,13 +779,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->fatalError('No PID file found');
         }
         $pid = $this->getPidFromPidFile();
-        
-        $result = shell_exec('kill -9 '.$pid);
+
+        $result = shell_exec('kill -9 ' . $pid);
         //unlink pid file
-        if($this->pidFile && file_exists($this->pidFile)) {
+        if ($this->pidFile && file_exists($this->pidFile)) {
             unlink($this->pidFile);
         }
-        
     }
 
     /**
@@ -808,7 +812,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         // Close the static log handle to prevent it being inherrited by the new process.
         if (is_resource(self::$log_handle))
             fclose(self::$log_handle);
-        exec($this->command());
+
+        $daemonConfig = $this->config;
+        $daemonConfig['command'] = 'start';
+
+        $daemon = new CDaemon($daemonConfig);
+        $daemon->run();
+
         // A new daemon process has been created. This one will stick around just long enough to clean up the worker processes.
         exit();
     }
@@ -1136,7 +1146,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $labelStatus = $this->isRunning() ? 'Running' : 'Stopped';
         $this->log($labelStatus);
         return $labelStatus;
-        
     }
 
     public function getPidFromPidFile() {
