@@ -64,7 +64,7 @@ class CDatabase {
     /**
      * The event dispatcher instance.
      *
-     * @var CDatabase_Event
+     * @var CEvent_Dispatcher
      */
     protected $events;
 
