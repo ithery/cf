@@ -19,7 +19,7 @@ trait CModel_LogActivity_Trait
 
 	public static function logEnd()
 	{
-		$this->log();
+		static::log();
 		unset($_SESSION['CModel_LogActivity']);
 	}
 
@@ -38,7 +38,7 @@ trait CModel_LogActivity_Trait
 		array_push($_SESSION['CModel_LogActivity'], $model);
 	}
 
-	public function log()
+	public static function log()
 	{
 		cdbg::dd(LogActivity::activity());
 	}
