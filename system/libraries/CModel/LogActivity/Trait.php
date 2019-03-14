@@ -7,9 +7,9 @@ use CModel_LogActivity_Observer as Observer;
  */
 trait CModel_LogActivity_Trait
 {
-	public static function bootLogActivity()
+	public static function bootLogActivity(CModel $model = null)
 	{
-		static::observe(Observer::class);
+		($model) ? $model->observe(Observer::class) : static::observe(Observer::class);
 	}
 
 	public static function logStart()
