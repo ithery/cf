@@ -19,7 +19,9 @@ class CModel_LogActivity_Observer
 		$after = [];
 		$attributes = $model->getAttributes();
 
-		cdbg::dd($model->properties->only('attributes', 'old'));
+		$collection = $model->castAttribute('collection', $model->toJson());
+
+		cdbg::dd($collection->properties->only('attributes', 'old'));
 
 		foreach ($attributes as $attr) {
 			$before[$attr] = $model->getOriginal($attr);
