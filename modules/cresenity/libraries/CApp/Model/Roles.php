@@ -9,8 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CApp_Model_Roles extends CApp_Model {
 
-    use CApp_Model_Trait_Roles;
-        
+    use CApp_Model_Trait_Roles,
+        CModel_Nested_Trait;
 
     
 

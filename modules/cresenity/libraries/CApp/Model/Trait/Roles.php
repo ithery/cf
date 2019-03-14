@@ -9,9 +9,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CApp_Model_Trait_Roles {
 
-    use CModel_Nested_NestedTrait,
-        CModel_SoftDelete_Trait;
-
     public function __construct(array $attributes = array()) {
         parent::__construct($attributes);
         $this->primaryKey = 'role_id';
@@ -42,11 +39,10 @@ trait CApp_Model_Trait_Roles {
         }
 
         $root = $root->descendants();
-
         if (strlen($orgId) > 0) {
             $root = $root->where(function($query) use ($orgId) {
-                        $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
-                    })->where('status', '>', 0);
+                $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
+            })->where('status', '>', 0);
         }
 
         $tree = $root->get()->toTree();
