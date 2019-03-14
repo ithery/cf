@@ -12,7 +12,7 @@ class CModel_LogActivity_Observer
 
 	public function updated(CModel $model)
 	{
-		# code...
+		cdbg::dd($model);
 	}
 
 	public function deleted(CModel $model)
