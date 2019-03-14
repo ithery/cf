@@ -1,12 +1,17 @@
 <?php
 
-use CModel_LogActivity_Logger as LogActivity;
+use CModel_LogActivity_Observer as Observer;
 
 /**
  * 
  */
 trait CModel_LogActivity_Trait
 {
+	public static function bootLogActivity()
+	{
+		static::observe(Observer::class);
+	}
+
 	public static function logStart()
 	{
 		if (session_status() == PHP_SESSION_NONE) {
@@ -40,6 +45,6 @@ trait CModel_LogActivity_Trait
 
 	public static function log()
 	{
-		cdbg::dd(LogActivity::activity());
+		cdbg::dd(static::getActivities());
 	}
 }

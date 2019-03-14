@@ -119,11 +119,11 @@ class CModel_LogActivity_Logger
      * @method replacePlaceholders
      *
      * @param  string              $description [description]
-     * @param  ActivityContract    $activity    [description]
+     * @param  CModel_LogActivity_ContractInterface    $activity    [description]
      *
      * @return string                           [description]
      */
-    protected function replacePlaceholders(string $description, ActivityContract $activity)
+    protected function replacePlaceholders(string $description, CModel_LogActivity_ContractInterface $activity)
     {
         return preg_replace_callback('/:[a-z0-9._-]+/i', function ($match) use ($activity) {
             $match = $match[0];
@@ -171,7 +171,7 @@ class CModel_LogActivity_Logger
     /**
      * [activity description]
      *
-     * @method   
+     * @method activity
      *
      * @param  string|null $logName [description]
      *
