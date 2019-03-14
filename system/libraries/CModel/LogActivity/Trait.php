@@ -28,7 +28,7 @@ trait CModel_LogActivity_Trait
 		return carr::get($GLOBALS, 'CModel_LogActivity', []);
 	}
 
-	public static function addActivity(CModel $model)
+	public static function addActivity($model)
 	{
 		array_push($GLOBALS['CModel_LogActivity'], $model);
 	}
