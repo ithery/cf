@@ -19,14 +19,14 @@ class CModel_LogActivity_Observer
 		$after = [];
 		$attributes = $model->getAttributes();
 
-		$collection = $model->castAttribute('collection', $model->toJson());
-
-		cdbg::dd($collection->properties->only('attributes', 'old'));
-
 		foreach ($attributes as $attr) {
 			$before[$attr] = $model->getOriginal($attr);
 			$after[$attr] = $model->{$attr};
 		}
+
+		$logActivity
+			->before($before)
+			->after($after);
 
 		cdbg::dd($model);
 	}

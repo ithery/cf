@@ -26,6 +26,7 @@ trait CModel_LogActivity_Trait
 	{
 		static::log();
 		unset($_SESSION['CModel_LogActivity']);
+		session_destroy();
 	}
 
 	public static function onLog()
