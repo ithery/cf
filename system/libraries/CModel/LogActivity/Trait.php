@@ -7,30 +7,33 @@ trait CModel_LogActivity_Trait
 {
 	public static function logStart()
 	{
-		if (! isset($GLOBALS['CModel_LogActivity'])) {
-			$GLOBALS['CModel_LogActivity'] = [];
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start();
+		}
+		if (! isset($_SESSION['CModel_LogActivity'])) {
+			$_SESSION['CModel_LogActivity'] = [];
 		}
 	}
 
 	public static function logEnd()
 	{
 		$this->log();
-		unset($GLOBALS['CModel_LogActivity']);
+		unset($_SESSION['CModel_LogActivity']);
 	}
 
 	public static function onLog()
 	{
-		return isset($GLOBALS['CModel_LogActivity']);
+		return isset($_SESSION['CModel_LogActivity']);
 	}
 
 	public static function getActivities()
 	{
-		return carr::get($GLOBALS, 'CModel_LogActivity', []);
+		return carr::get($_SESSION, 'CModel_LogActivity', []);
 	}
 
 	public static function addActivity($model)
 	{
-		array_push($GLOBALS['CModel_LogActivity'], $model);
+		array_push($_SESSION['CModel_LogActivity'], $model);
 	}
 
 	public function log()
