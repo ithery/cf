@@ -1,5 +1,7 @@
 <?php
 
+use CModel_LogActivity_Logger as LogActivity;
+
 /**
  * 
  */
@@ -38,6 +40,6 @@ trait CModel_LogActivity_Trait
 
 	public function log()
 	{
-		
+		cdbg::dd(LogActivity::activity());
 	}
 }
