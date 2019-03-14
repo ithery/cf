@@ -9,6 +9,7 @@ trait CModel_LogActivity_Trait
 {
 	public static function bootLogActivity()
 	{
+		cdbg::dd(Observer::class);
 		static::observe(Observer::class);
 	}
 
