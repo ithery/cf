@@ -7,6 +7,10 @@ use CModel_LogActivity_Observer as Observer;
  */
 trait CModel_LogActivity_Trait
 {
+	protected $casts = [
+	    'properties' => 'collection',
+	];
+
 	public static function bootLogActivity(CModel $model = null)
 	{
 		($model) ? $model->observe(Observer::class) : static::observe(Observer::class);
