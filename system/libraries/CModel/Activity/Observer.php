@@ -11,11 +11,12 @@ class CModel_Activity_Observer {
 
     public function created(CModel $model) {
         if (CModel_Activity::instance()->isStarted()) {
-
             $before = [];
             $after = $model->getAttributes();
             $changes = [];
-            CModel_Activity::instance()->dispatch('OnActivity', 'create', $before, $after, $changes);
+            $table = $model->getTable();
+            $key = $model->getKey();
+            CModel_Activity::instance()->addData($table,$key,'create', $before, $after, $changes);
         }
     }
 
@@ -24,25 +25,28 @@ class CModel_Activity_Observer {
             $before = [];
             $after = $model->getAttributes();
             $changes = $model->getDirty();
-
+            $table = $model->getTable();
+            $key = $model->getKey();
+            
             foreach ($after as $key => $value) {
                 $before[$key] = $model->getOriginal($key);
             }
-            CModel_Activity::instance()->dispatch('OnActivity', 'update', $before, $after, $changes);
+            CModel_Activity::instance()->addData($table,$key,'update', $before, $after, $changes);
         }
     }
 
     public function deleted(CModel $model) {
         if (CModel_Activity::instance()->isStarted()) {
-
             $before = [];
             $after = $model->getAttributes();
             $changes = $model->getDirty();
+            $table = $model->getTable();
+            $key = $model->getKey();
 
             foreach ($after as $key => $value) {
                 $before[$key] = $model->getOriginal($key);
             }
-            CModel_Activity::instance()->dispatch('OnActivity', 'delete', $before, $after, $changes);
+            CModel_Activity::instance()->addData($table,$key,'delete', $before, $after, $changes);
         }
     }
 

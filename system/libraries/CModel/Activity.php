@@ -12,10 +12,9 @@ final class CModel_Activity {
     use CEvent_Trait_Dispatchable;
 
     private $isStarted;
-    private $userId;
     private $message;
-    private $modelLogActivity;
     private static $instance;
+    private $data;
 
     /**
      * 
@@ -29,15 +28,7 @@ final class CModel_Activity {
     }
 
     private function __construct() {
-        
-    }
-
-    public function setUserId($userId) {
-        $this->userId = $userId;
-    }
-
-    public function setModel($model) {
-        $this->modelLogActivity = $model;
+        $this->data = array();
     }
 
     public function setMessage($message) {
@@ -51,10 +42,22 @@ final class CModel_Activity {
 
     public function start() {
         $this->isStarted = true;
+        $this->data = array();
     }
 
     public function stop() {
+        $this->dispatch('OnActivity', array($this->message, $this->data));
         $this->isStarted = false;
+    }
+
+    public function addData($table, $key, $type, $before, $after, $changes) {
+        $d['table'] = $table;
+        $d['key'] = $key;
+        $d['type'] = $type;
+        $d['before'] = $before;
+        $d['after'] = $after;
+        $d['changes'] = $changes;
+        $this->data[] = $d;
     }
 
     public function isStarted() {

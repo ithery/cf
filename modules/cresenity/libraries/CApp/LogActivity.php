@@ -31,21 +31,15 @@ class CApp_LogActivity {
         return static::$instance;
     }
 
-    public function start($message, $model, $observer = null) {
-        if (!$model) {
-            $model = new CApp_Model_LogActivity();
-        } elseif (!$model instanceof CModel && is_string($model)) {
-            $model = new $model();
-        }
-        if (!$model instanceof CModel) {
-            throw new CApp_Exception('instance for start is not a model');
+    public function start($message, $listener = null) {
+      
+        if($listener==null) {
+            $listener = array($this,'onActivity');
         }
         $userId = CApp_Base::userId();
         $activity = CModel_Activity::instance();
-        $activity->setModel($model);
         $activity->setMessage($message);
-        $activity->setObserver($observer);
-        $activity->setUserId($userId);
+        $activity->setListener($listener);
         $activity->start();
     }
 
@@ -53,5 +47,55 @@ class CApp_LogActivity {
         $activity = CModel_Activity::instance();
         $activity->stop();
     }
+    
+    public function onActivity($message,$data) {
+        $model = new CApp_Model_LogActivity();
+        $nav = cnav::nav();
+        $navName = '';
+        $navLabel = '';
+        $actionName = '';
+        $actionLabel = '';
+        if (! $nav) {
+            $navName = $nav["name"];
+            $navLabel = $nav["label"];
+            if (isset($nav["action"])) {
+                foreach ($nav["action"] as $act) {
+                    if (isset($act["controller"]) && isset($act["method"]) && $act["controller"] == $controller && $act["method"] == $method) {
+                        $actionName = $act["name"];
+                        $actionLabel = $act["label"];
+                    }
+                }
+            }
+        }
 
+        $model->fill([
+            'org_id' => CF::orgId(),
+            'app_id' => CF::appId(),
+            'session_id' => CSession::instance()->id(),
+            'remote_addr' => crequest::remote_address(),
+            'user_agent' => CF::user_agent(),
+            'platform_version' => crequest::platform_version(),
+            'platform' => crequest::platform(),
+            'browser_version' => crequest::browser_version(),
+            'browser' => crequest::browser(),
+            'uri' => crouter::complete_uri(),
+            'routed_uri' => crouter::routed_uri(),
+            'controller' => crouter::controller(),
+            'method' => crouter::method(),
+            'query_string' => crouter::query_string(),
+            'nav' => $navName,
+            'nav_label' => $navLabel,
+            'action' => $actionName,
+            'action_label' => $actionLabel,
+        ]);
+     
+        $model->data=json_encode($data);
+        $model->user_id=CApp_Base::userId();
+        
+        $model->activity_date = CApp_Base::now();
+        $model->description = $message;
+        $model->save();
+
+     
+    }
 }
