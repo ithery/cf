@@ -264,8 +264,8 @@ class CApp extends CObservable {
     public function code() {
         return CF::appCode();
     }
-    
-    public function message($type,$message) {
+
+    public function message($type, $message) {
         return CApp_Message::add($type, $message);
     }
 
@@ -820,19 +820,17 @@ class CApp extends CObservable {
         }
     }
 
-    public function startActivity($userId, string $message, CModel $logActivityModel = null, $observer = null)
-    {
-        if (! $logActivityModel) {
+    public function startActivity($message, $logActivityModel = null, $observer = null) {
+        if (!$logActivityModel) {
             $logActivityModel = static::model('LogActivity');
-        } elseif (! $logActivityModel instanceof CModel) {
+        } elseif (!$logActivityModel instanceof CModel) {
             $logActivityModel = static::model($logActivityModel);
         }
 
-        CApp_LogActivity::instance()->start($userId, $message, $logActivityModel, $observer);
+        CApp_LogActivity::instance()->start($message, $logActivityModel, $observer);
     }
 
-    public function stopActivity()
-    {
+    public function stopActivity() {
         CApp_LogActivity::instance()->stop();
     }
 

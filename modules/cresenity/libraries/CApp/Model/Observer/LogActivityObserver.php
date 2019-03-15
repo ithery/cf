@@ -1,11 +1,18 @@
 <?php
 
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Mar 15, 2019, 6:54:16 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
 use CModel_Activity_Logger as Logger;
 
 /**
  * 
  */
-class CApp_Model_Observer_LogActivity implements CModel_Activity_ObserverInterface {
+class CApp_Model_Observer_LogActivityObserver implements CModel_Activity_ObserverInterface {
 
     private $isStarted;
     private $userId;
