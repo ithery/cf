@@ -21,9 +21,8 @@ class CModel_LogActivity_Observer
 		$logActivity
 			->type('create')
 			->before($before)
-			->after($after);
-
-		cdbg::dd($model);
+			->after($after)
+			->log($model->getTable() . ' [' . $model->getKey() . '] Created');
 	}
 
 	public function updated(CModel $model)
@@ -41,9 +40,8 @@ class CModel_LogActivity_Observer
 		$logActivity
 			->type('update')
 			->before($before)
-			->after($after);
-
-		cdbg::dd(get_class_methods($model));
+			->after($after)
+			->log($model->getTable() . ' [' . $model->getKey() . '] Updated');
 	}
 
 	public function deleted(CModel $model)
@@ -61,8 +59,7 @@ class CModel_LogActivity_Observer
 		$logActivity
 			->type('delete')
 			->before($before)
-			->after($after);
-
-		cdbg::dd(get_class_methods($model));
+			->after($after)
+			->log($model->getTable() . ' [' . $model->getKey() . '] Deleted');
 	}
 }
