@@ -16,5 +16,5 @@ class CApp_Log {
     public static function activity($description, $data) {
         return CApp_Log_Activity::populate($description, $data);
     }
-   
+
 }
