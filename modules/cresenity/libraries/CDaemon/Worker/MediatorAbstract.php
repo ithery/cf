@@ -69,12 +69,12 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @var int
      * @todo improve the intelligence behind the strategy selection to vary strategy by idle time in the daemon event loop, not the duration of the loop itself.
      */
-    protected $forking_strategy = self::MIXED;
+    protected $forkingStrategy = self::MIXED;
 
     /**
      * @var Core_Daemon
      */
-    public $daemon;
+    public $service;
 
     /**
      * @var Core_IWorkerVia
@@ -210,27 +210,27 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      */
     protected abstract function getCallback($method);
 
-    public function __construct($alias, CDaemon_ServiceAbstract $daemon, Core_IWorkerVia $via) {
+    public function __construct($alias, CDaemon_ServiceAbstract $service, Core_IWorkerVia $via) {
         $this->alias = $alias;
-        $this->daemon = $daemon;
+        $this->service = $service;
         $this->via = $via;
         $this->via->mediator = $this;
-        $interval = $this->daemon->loop_interval();
+        $interval = $this->service->loopInterval();
         switch (true) {
             case $interval > 2 || $interval === 0:
-                $this->forking_strategy = self::LAZY;
+                $this->forkingStrategy = self::LAZY;
                 break;
             case $interval > 1:
-                $this->forking_strategy = self::MIXED;
+                $this->forkingStrategy = self::MIXED;
                 break;
             default:
-                $this->forking_strategy = self::AGGRESSIVE;
+                $this->forkingStrategy = self::AGGRESSIVE;
                 break;
         }
     }
 
     public function __destruct() {
-        if (!$this->daemon->isParent())
+        if (!$this->service->isParent())
             return;
         // If there are no pending messages, release all shared resources.
         // If there are, then we want to preserve them so we can allow for daemon restarts without losing the call buffer
@@ -240,7 +240,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
                 $this->via->release();
         }
         unset($this->via);
-        unset($this->daemon);
+        unset($this->service);
     }
 
     /**
@@ -271,7 +271,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
         ## Wrap the current $via object in a DebugShell mediator
         ##
         $this->via = new Core_Lib_DebugShell($this->via);
-        $this->via->daemon = $this->daemon;
+        $this->via->service = $this->service;
         $this->via->setup_shell();
         ## We'll use these in the many closures below..
         $that = $this;
@@ -467,7 +467,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
             // This is a bit ugly but ftok needs a filesystem path so we give it one using the daemon filename and
             // current worker alias.
             $tmp = sys_get_temp_dir();
-            $ftok = sprintf($tmp . '/%s_%s', str_replace('/', '_', $this->daemon->get('filename')), $this->alias);
+            $ftok = sprintf($tmp . '/%s_%s', str_replace('/', '_', $this->service->get('filename')), $this->alias);
             if (!touch($ftok))
                 $this->fatal_error("Unable to create Worker ID. ftok() failed. Could not write to {$tmp} directory at {$ftok}");
             $this->guid = ftok($ftok, $this->alias[0]);
@@ -476,11 +476,11 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
                 $this->fatal_error("Unable to create Worker ID. ftok() failed. Unexpected return value: $this->guid");
             $this->via->setup();
             $this->via->purge();
-            if ($this->daemon->get('debug_workers'))
+            if ($this->service->get('debug_workers'))
                 $this->debug();
-            $this->daemon->on(Core_Daemon::ON_PREEXECUTE, array($this, 'run'));
-            $this->daemon->on(Core_Daemon::ON_IDLE, array($this, 'garbage_collector'), ceil(120 / ($this->workers * 0.5)));  // Throttle the garbage collector
-            $this->daemon->on(Core_Daemon::ON_SIGNAL, array($this, 'dump'), null, function($args) {
+            $this->service->on(Core_Daemon::ON_PREEXECUTE, array($this, 'run'));
+            $this->service->on(Core_Daemon::ON_IDLE, array($this, 'garbage_collector'), ceil(120 / ($this->workers * 0.5)));  // Throttle the garbage collector
+            $this->service->on(Core_Daemon::ON_SIGNAL, array($this, 'dump'), null, function($args) {
                 return $args[0] == SIGUSR1;
             });
             $this->fork();
@@ -491,7 +491,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
             $event_restart = function() use($that) {
                 $that->log('Restarting Worker Process...');
             };
-            $this->daemon->on(Core_Daemon::ON_SIGNAL, $event_restart, null, function($args) {
+            $this->service->on(Core_Daemon::ON_SIGNAL, $event_restart, null, function($args) {
                 return $args[0] == SIGUSR1;
             });
             call_user_func($this->getCallback('setup'));
@@ -521,7 +521,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
         $processes = $this->process_count();
         if ($this->workers <= $processes)
             return;
-        switch ($this->forking_strategy) {
+        switch ($this->forkingStrategy) {
             case self::LAZY:
                 $state = $this->via->state();
                 if ($processes > count($this->runningCalls))
@@ -552,7 +552,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
         for ($i = 0; $i < $forks; $i++) {
             // A Core_Lib_Process object will be returned from the task() method.
             // Set correct min_ttl and timeout values so the ProcessManager can do its job.
-            if ($process = $this->daemon->task($this)) {
+            if ($process = $this->service->task($this)) {
                 $process->timeout = $this->timeout;
                 $process->min_ttl = 30;
                 $errors = 0;
@@ -661,8 +661,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
             usleep(50000);
             if ($this->auto_restart) {
                 $max_jobs = $this->callCount++ >= (25 + $entropy);
-                $min_runtime = $this->daemon->runtime() >= (60 * 5);
-                $max_runtime = $this->daemon->runtime() >= (60 * 30 + $entropy * 10);
+                $min_runtime = $this->service->runtime() >= (60 * 5);
+                $max_runtime = $this->service->runtime() >= (60 * 30 + $entropy * 10);
                 $recycle = ($max_runtime || $min_runtime && $max_jobs);
             }
             if (mt_rand(1, 5) == 1)
@@ -841,8 +841,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @return Core_Lib_Process
      */
     public function process($pid) {
-        if (isset($this->daemon->ProcessManager))
-            return $this->daemon->ProcessManager->process($pid);
+        if (isset($this->service->ProcessManager))
+            return $this->service->ProcessManager->process($pid);
         return null;
     }
 
@@ -851,8 +851,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @return Core_Lib_Process[]
      */
     public function processes() {
-        if (isset($this->daemon->ProcessManager))
-            return $this->daemon->ProcessManager->processes($this->alias);
+        if (isset($this->service->ProcessManager))
+            return $this->service->ProcessManager->processes($this->alias);
         return array();
     }
 
@@ -861,8 +861,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @return mixed
      */
     public function process_count() {
-        if (isset($this->daemon->ProcessManager))
-            return $this->daemon->ProcessManager->count($this->alias);
+        if (isset($this->service->ProcessManager))
+            return $this->service->ProcessManager->count($this->alias);
         return 0;
     }
 
@@ -941,7 +941,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @return void
      */
     public function log($message, $indent = 0) {
-        $this->daemon->log("$message", $this->alias, $indent);
+        $this->service->log("$message", $this->alias, $indent);
     }
 
     /**
@@ -953,7 +953,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @return void
      */
     public function error($message) {
-        $this->daemon->error("$message", $this->alias);
+        $this->service->error("$message", $this->alias);
     }
 
     /**
@@ -965,10 +965,10 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @return void
      */
     public function fatal_error($message) {
-        if ($this->daemon->is('parent'))
-            $this->daemon->fatal_error("Fatal Error: $message", $this->alias);
+        if ($this->service->is('parent'))
+            $this->service->fatal_error("Fatal Error: $message", $this->alias);
         else
-            $this->daemon->fatal_error("Fatal Error: $message\nWorker process will restart", $this->alias);
+            $this->service->fatal_error("Fatal Error: $message\nWorker process will restart", $this->alias);
     }
 
     /**
@@ -976,14 +976,14 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      *
      * Part of the Worker API - Use from your worker to access data set on your Daemon class
      *
-     * @example [inside a worker class] $this->mediator->daemon('dbconn');
-     * @example [inside a worker class] $ini = $this->mediator->daemon('ini'); $ini['database']['password']
+     * @example [inside a worker class] $this->mediator->service('dbconn');
+     * @example [inside a worker class] $ini = $this->mediator->service('ini'); $ini['database']['password']
      * @param $property
      * @return mixed
      */
     public function daemon($property) {
-        if (isset($this->daemon->{$property}) && !is_callable($this->daemon->{$property}))
-            return $this->daemon->{$property};
+        if (isset($this->service->{$property}) && !is_callable($this->service->{$property}))
+            return $this->service->{$property};
         return null;
     }
 
