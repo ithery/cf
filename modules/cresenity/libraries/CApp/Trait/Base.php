@@ -302,4 +302,8 @@ trait CApp_Trait_Base {
         return $pos !== false;
     }
 
+    
+    public static function isLogin() {
+        return static::userId()!=null;
+    }
 }
