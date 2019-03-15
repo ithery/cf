@@ -7,10 +7,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 16, 2019, 5:03:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-final class Core_Worker_FunctionMediator extends Core_Worker_Mediator {
+final class CDaemon_Worker_MediatorFunction extends CDaemon_Worker_MediatorAbstract {
 
     /**
-     * @var Core_IWorker
+     * @var callable
      */
     protected $function;
 
@@ -27,7 +27,7 @@ final class Core_Worker_FunctionMediator extends Core_Worker_Mediator {
         $this->methods = array('execute');
     }
 
-    protected function get_callback($method) {
+    protected function getCallback($method) {
         switch ($method) {
             case 'execute':
                 return $this->function;

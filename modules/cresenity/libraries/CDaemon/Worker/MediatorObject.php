@@ -41,7 +41,7 @@ final class CDaemon_Worker_MediatorObject extends CDaemon_Worker_MediatorAbstrac
         if (!is_object($this->object) || !$this->object instanceof CDaemon_WorkerAbstract) {
             $errors[] = 'Invalid worker object. Workers must extends CDaemon_WorkerAbstract';
         }
-        $object_errors = $this->object->check_environment();
+        $object_errors = $this->object->checkEnvironment();
         if (is_array($object_errors))
             $errors = array_merge($errors, $object_errors);
         return parent::checkEnvironment($errors);
