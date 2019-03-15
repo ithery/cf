@@ -64,7 +64,7 @@ class CModel_LogActivity_Logger
         }
 
         $this->activity->data_before = $data;
-        return $this->activity;
+        return $this;
     }
 
     public function after(array $data)
@@ -74,13 +74,13 @@ class CModel_LogActivity_Logger
         }
 
         $this->activity->data_after = $data;
-        return $this->activity;
+        return $this;
     }
 
     public function type($type)
     {
         $this->activity->activity_type = $type;
-        return $this->activity;
+        return $this;
     }
 
     public function log(string $description)
