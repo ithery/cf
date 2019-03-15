@@ -9,13 +9,18 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 final class CModel_Activity {
 
+    use CEvent_Trait_Dispatchable;
+
     private $isStarted;
     private $userId;
     private $message;
     private $modelLogActivity;
-    private $observer;
     private static $instance;
 
+    /**
+     * 
+     * @return CModel_Activity
+     */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new static();
@@ -39,8 +44,9 @@ final class CModel_Activity {
         $this->message = $message;
     }
 
-    public function setObserver($observer) {
-        $this->observer = $observer;
+    public function setListener($callback) {
+
+        $this->listen('OnActivity', $callback);
     }
 
     public function start() {
@@ -51,8 +57,8 @@ final class CModel_Activity {
         $this->isStarted = false;
     }
 
-    
     public function isStarted() {
         return $this->isStarted;
     }
+
 }
