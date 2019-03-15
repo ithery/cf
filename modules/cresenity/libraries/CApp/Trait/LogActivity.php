@@ -10,11 +10,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CApp_Trait_LogActivity {
 
     public static function start($message, $listener = null) {
-        CApp_LogActivity::instance()->start($message, $listener);
+
+        if ($listener == null) {
+            $listener = array(CApp_Log_Activity::class, 'populate');
+        }
+        $activity = CModel_Activity::instance();
+        $activity->setMessage($message);
+        $activity->setListener($listener);
+        $activity->start();
     }
 
     public static function stop() {
-        CApp_LogActivity::instance()->stop();
+        $activity = CModel_Activity::instance();
+        $activity->stop();
     }
 
 }

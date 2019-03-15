@@ -1,61 +1,22 @@
 <?php
 
-use CApp_Model_Observer_LogActivity as Observer;
+defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * 
+ * @author Hery Kurniawan
+ * @since Mar 16, 2019, 2:40:46 AM
+ * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_LogActivity {
+class CApp_Log_Activity {
 
-    private static $instance;
-    private $isStarted;
-    private $model;
-    private $observer;
-    private $message;
-
-    private function __construct() {
-        $this->isStarted = false;
-        $this->model = null;
-        $this->observer = Observer::class;
-    }
-
-    /**
-     * 
-     * @return CApp_LogActivity
-     */
-    public static function instance() {
-        if (!static::$instance) {
-            static::$instance = new static;
-        }
-
-        return static::$instance;
-    }
-
-    public function start($message, $listener = null) {
-      
-        if($listener==null) {
-            $listener = array($this,'onActivity');
-        }
-        $userId = CApp_Base::userId();
-        $activity = CModel_Activity::instance();
-        $activity->setMessage($message);
-        $activity->setListener($listener);
-        $activity->start();
-    }
-
-    public function stop() {
-        $activity = CModel_Activity::instance();
-        $activity->stop();
-    }
-    
-    public function onActivity($message,$data) {
+    public static function populate($description, $data) {
         $model = new CApp_Model_LogActivity();
         $nav = cnav::nav();
         $navName = '';
         $navLabel = '';
         $actionName = '';
         $actionLabel = '';
-        if (! $nav) {
+        if (!$nav) {
             $navName = $nav["name"];
             $navLabel = $nav["label"];
             if (isset($nav["action"])) {
@@ -88,14 +49,13 @@ class CApp_LogActivity {
             'action' => $actionName,
             'action_label' => $actionLabel,
         ]);
-     
-        $model->data=json_encode($data);
-        $model->user_id=CApp_Base::userId();
-        
-        $model->activity_date = CApp_Base::now();
-        $model->description = $message;
-        $model->save();
 
-     
+        $model->data = json_encode($data);
+        $model->user_id = CApp_Base::userId();
+
+        $model->activity_date = CApp_Base::now();
+        $model->description = $description;
+        $model->save();
     }
+
 }

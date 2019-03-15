@@ -11,7 +11,7 @@ use CApp_Base as Base;
 
 class CApp_Log_Request {
 
-    public static function populate() {
+    public static function populate($data = array()) {
         $app = CApp::instance();
         $db = CDatabase::instance();
         $appId = Base::appId();
