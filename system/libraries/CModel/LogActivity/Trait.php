@@ -12,40 +12,44 @@ trait CModel_LogActivity_Trait
 		($model) ? $model->observe(Observer::class) : static::observe(Observer::class);
 	}
 
-	public static function logStart()
+	public static function logStart($session = null)
 	{
-		if (session_status() == PHP_SESSION_NONE) {
-			session_start();
-		}
-		if (! isset($_SESSION['CModel_LogActivity'])) {
-			$_SESSION['CModel_LogActivity'] = [];
+		if (! $session) {
+			$session = CSession::instance();
+			if (! $session->get('CModel_LogActivity')) {
+				$session->set('CModel_LogActivity', []);
+			}
 		}
 	}
 
 	public static function logEnd()
 	{
-		static::log();
-		unset($_SESSION['CModel_LogActivity']);
-		session_destroy();
+		$session = CSession::instance();
+		$session->delete('CModel_LogActivity');
 	}
 
 	public static function onLog()
 	{
-		return isset($_SESSION['CModel_LogActivity']);
+		$session = CSession::instance();
+		return $session->get('CModel_LogActivity') !== false;
 	}
 
 	public static function getActivities()
 	{
-		return carr::get($_SESSION, 'CModel_LogActivity', []);
+		$session = CSession::instance();
+		return $session->get('CModel_LogActivity');
 	}
 
 	public static function addActivity($model)
 	{
-		array_push($_SESSION['CModel_LogActivity'], $model);
+		$session = CSession::instance();
+		$s = $session->get('CModel_LogActivity');
+		array_push($s, $model);
+		$session->set('CModel_LogActivity', $s);
 	}
 
 	public static function log()
 	{
-		cdbg::dd(static::getActivities());
+		// cdbg::dd(static::getActivities());
 	}
 }

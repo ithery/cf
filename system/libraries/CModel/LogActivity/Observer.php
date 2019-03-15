@@ -9,6 +9,20 @@ class CModel_LogActivity_Observer
 {
 	public function created(CModel $model)
 	{
+		$logActivity = Logger::activity();
+		$before = [];
+		$after = [];
+		$attributes = $model->getAttributes();
+
+		foreach ($attributes as $attr) {
+			$after[$attr] = $model->{$attr};
+		}
+
+		$logActivity
+			->type('create')
+			->before($before)
+			->after($after);
+
 		cdbg::dd($model);
 	}
 
@@ -25,14 +39,30 @@ class CModel_LogActivity_Observer
 		}
 
 		$logActivity
+			->type('update')
 			->before($before)
 			->after($after);
 
-		cdbg::dd($model);
+		cdbg::dd(get_class_methods($model));
 	}
 
 	public function deleted(CModel $model)
 	{
-		# code...
+		$logActivity = Logger::activity();
+		$before = [];
+		$after = [];
+		$attributes = $model->getAttributes();
+
+		foreach ($attributes as $attr) {
+			$before[$attr] = $model->getOriginal($attr);
+			$after[$attr] = $model->{$attr};
+		}
+
+		$logActivity
+			->type('delete')
+			->before($before)
+			->after($after);
+
+		cdbg::dd(get_class_methods($model));
 	}
 }
