@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CApp_Model extends CModel {
 
-    use CModel_SoftDelete_Trait;
+    use CModel_SoftDelete_SoftDeleteTrait;
 
     public static function createModel($modelName) {
         $modelClass = 'CApp_Model_' . $modelName;
