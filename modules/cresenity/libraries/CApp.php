@@ -820,4 +820,20 @@ class CApp extends CObservable {
         }
     }
 
+    public function startActivity($userId, string $message, CModel $logActivityModel = null, $observer = null)
+    {
+        if (! $logActivityModel) {
+            $logActivityModel = $this->model('LogActivity');
+        } elseif (! $logActivityModel instanceof CModel) {
+            $logActivityModel = $this->model($logActivityModel);
+        }
+
+        CApp_LogActivity::instance()->start($userId, $message, $data, $logActivityModel, $observer);
+    }
+
+    public function stopActivity()
+    {
+        CApp_LogActivity::instance()->stop();
+    }
+
 }
