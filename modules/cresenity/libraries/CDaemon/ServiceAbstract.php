@@ -910,7 +910,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                 // be a collision between worker methods and public methods on the Mediator class
                 // Exclude any methods required by the Core_IWorker interface from the check.
                 $intersection = array_intersect(get_class_methods($worker), get_class_methods($mediator));
-                $intersection = array_diff($intersection, get_class_methods('Core_IWorker'));
+                $intersection = array_diff($intersection, get_class_methods(CDaemon_WorkerInterface::class));
                 if (!empty($intersection)) {
                     throw new Exception(sprintf('%s Failed. Your worker class "%s" contains restricted method names: %s.', __METHOD__, get_class($worker), implode(', ', $intersection)));
                 }
