@@ -12,7 +12,7 @@ class CApp_Model_Observer_LogActivity implements CModel_Activity_ObserverInterfa
 	private $message;
 	private $logActivity;
 
-	public function start($userId, $message, $logActivity)
+	public function start($userId, string $message, CModel $logActivity)
 	{
 		$this->isStarted = true;
 		$this->usedId = $userId;

@@ -5,7 +5,7 @@
  */
 interface CModel_Activity_ObserverInterface
 {
-	public function start($message = '');
+	public function start($userId, string $message, CModel $logActivity);
 
 	public function stop();
 
