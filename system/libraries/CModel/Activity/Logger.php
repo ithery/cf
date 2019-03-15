@@ -13,9 +13,9 @@ class CModel_Activity_Logger
         $this->autoFill();
     }
 
-    public static function activity()
+    public static function activity($activity)
     {
-        return new static;
+        return new static($activity);
     }
 
     private function autoFill()
