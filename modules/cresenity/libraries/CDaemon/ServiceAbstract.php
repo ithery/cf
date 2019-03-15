@@ -305,7 +305,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             }
             $this->pid(getmypid()); // We have a new pid now
             $pidFile = $this->pidFile;
-           
+
             $handle = @fopen($pidFile, 'w');
             if (!$handle) {
                 $this->showHelp('Unable to write PID to ' . $this->pidFile);
@@ -906,7 +906,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         if ($via === null)
             $via = new Core_Worker_Via_SysV();
-        $this->check_alias($alias);
+        $this->checkWorkerAlias($alias);
         switch (true) {
             case is_object($worker) && !is_a($worker, 'Closure'):
                 $mediator = new Core_Worker_ObjectMediator($alias, $this, $via);
@@ -936,11 +936,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @param $alias
      * @throws Exception
      */
-    private function check_alias($alias) {
-        if (empty($alias) || !is_scalar($alias))
+    private function checkWorkerAlias($alias) {
+        if (empty($alias) || !is_scalar($alias)) {
             throw new Exception("Invalid Alias. Identifiers must be scalar.");
-        if (isset($this->{$alias}))
+        }
+        if (isset($this->workers[$alias])) {
             throw new Exception("Invalid Alias. The identifier `{$alias}` is already in use or is reserved");
+        }
     }
 
     /**
