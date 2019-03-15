@@ -38,6 +38,8 @@ class CApp_LogActivity
 		$this->model = $model;
 		$this->observer = $observer ?: $this->observer;
 
+		cdbg::dd($this->observer);
+
 		if (is_string($this->observer)) {
 			$this->observer = new $this->observer;
 		}
