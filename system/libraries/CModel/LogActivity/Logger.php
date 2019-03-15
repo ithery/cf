@@ -63,8 +63,8 @@ class CModel_LogActivity_Logger
             $data = json_encode($data);
         }
 
-        $this->activity->before = $data;
-        return $this;
+        $this->activity->data_before = $data;
+        return $this->activity;
     }
 
     public function after(array $data)
@@ -73,8 +73,8 @@ class CModel_LogActivity_Logger
             $data = json_encode($data);
         }
 
-        $this->activity->after = $data;
-        return $this;
+        $this->activity->data_after = $data;
+        return $this->activity;
     }
 
     public function type($type)
