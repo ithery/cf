@@ -48,15 +48,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     const ON_SHUTDOWN = 10;   // called at the top of the destructor
 
     /**
-     * An array of instructions that's displayed when the -i param is passed to the application.
-     * Helps sysadmins and users of your daemons get installation correct. Guide them to set
-     * correct permissions, supervisor/monit setup, crontab entries, init.d scripts, etc
-     * @var Array
-     */
-
-    protected $install_instructions = array();
-
-    /**
      * The frequency of the event loop. In seconds.
      *
      * In timer-based applications your execute() method will be called every $loopInterval seconds. Any remaining time
@@ -69,6 +60,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var float The interval in Seconds
      */
+
     protected $loopInterval = null;
 
     /**
@@ -161,8 +153,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->stdout = carr::get($config, 'stdout', false);
         $this->pidFile = $this->getConfig('pidFile');
 
-        // We have to set any installation instructions before we call getopt()
-        $this->install_instructions[] = "Add to Supervisor or Monit, or add a Crontab Entry:\n   * * * * * " . $this->command();
         CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
@@ -236,7 +226,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->{$worker}->setup();
         $this->loopInterval($this->loopInterval);
         // Queue any housekeeping tasks we want performed periodically
-        $this->on(self::ON_IDLE, array($this, 'stats_trim'), (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
+        $this->on(self::ON_IDLE, array($this, 'statsTrim'), (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
         $this->setup();
         $this->log('Application Startup Complete. Starting Event Loop.');
     }
@@ -703,7 +693,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $out[] = sprintf("Peak Memory:          %s (%s)", memory_get_peak_usage(true), $pretty_memory(memory_get_peak_usage(true)));
         $out[] = "Current User:         " . get_current_user();
         $out[] = "Priority:             " . pcntl_getpriority();
-        $out[] = "Loop: duration, idle: " . implode(', ', $this->stats_mean()) . ' (Mean Seconds)';
+        $out[] = "Loop: duration, idle: " . implode(', ', $this->statsMean()) . ' (Mean Seconds)';
         $out[] = "Stats sample size:    " . count($this->stats);
         $this->log(implode("\n", $out));
     }
@@ -946,95 +936,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * Handle command line arguments. To easily extend, just add parent::getopt at the TOP of your overloading method.
-     * @return void
-     */
-    protected function getopt() {
-        $opts = getopt('hHiI:o:dp:', array('install', 'recoverworkers', 'debugworkers', 'verbose'));
-        if (isset($opts['H']) || isset($opts['h']))
-            $this->showHelp();
-        if (isset($opts['i']))
-            $this->showInstallInstructions();
-        if (isset($opts['I']))
-            $this->createInitScript($opts['I'], isset($opts['install']));
-    }
-
-    /**
-     * Print a Help Block and Exit. Optionally Print $msg along with it.
-     * @param string $msg
-     * @return void
-     */
-    protected function showHelp($msg = '') {
-        $out = array('');
-        if ($msg) {
-            $out[] = '';
-            $out[] = 'ERROR:';
-            $out[] = ' ' . wordwrap($msg, 72, "\n ");
-        }
-        echo get_class($this);
-        $out[] = 'USAGE:';
-        $out[] = ' $ index.php cresenity/daemon';
-        $out[] = '';
-        $out[] = '';
-        echo implode("\n", $out);
-        exit();
-    }
-
-    /**
-     * Print any install instructions and Exit.
-     * Could be anything from copying init.d scripts, setting crontab entries, creating executable or writable directories, etc.
-     * Add instructions from your daemon by adding them one by one: $this->install_instructions[] = 'Do foo'
-     * @return void
-     */
-    protected function showInstallInstructions() {
-        echo get_class($this) . " Installation Instructions:\n\n - ";
-        echo implode("\n - ", $this->install_instructions);
-        echo "\n";
-        exit();
-    }
-
-    /**
-     * Create and output an init script for this daemon to provide start/stop/restart functionality.
-     * Uses templates in the /Templates directory to produce scripts for different process managers and linux distros.
-     * When you create an init script, you should chmod it to 0755.
-     *
-     * @param string $template The name of a template from the /Templates directory
-     * @param bool $install When true, the script will be created in the init.d directory and final setup instructions will be printed to stdout
-     * @return void
-     */
-    protected function createInitScript($template_name, $install = false) {
-        $template = dirname(__FILE__) . '/Templates/' . $template_name;
-        if (!file_exists($template))
-            $this->showHelp("Invalid Template Name '{$template_name}'");
-        $daemon = get_class($this);
-        $script = sprintf(
-                file_get_contents($template), $daemon, $this->command("-d -p /var/run/{$daemon}.pid")
-        );
-        if (!$install) {
-            echo $script;
-            echo "\n\n";
-            exit;
-        }
-        // Print out template-specific setup instructions
-        switch ($template_name) {
-            case 'init_ubuntu':
-                $filename = '/etc/init.d/' . $daemon;
-                $instructions = "\n - To run on startup on RedHat/CentOS:  sudo chkconfig --add {$filename}";
-                break;
-            default:
-                $instructions = '';
-        }
-        @file_put_contents($filename, $script);
-        @chmod($filename, 0755);
-        if (file_exists($filename) == false || is_executable($filename) == false)
-            $this->showHelp("* Must Be Run as Sudo\n * Could Not Write Config File");
-        echo "Init Scripts Created Successfully!";
-        echo $instructions;
-        echo "\n\n";
-        exit();
-    }
-
-    /**
      * Return the running time in Seconds
      * @return integer
      */
@@ -1048,7 +949,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @param int $last  Limit the working set to the last n iteration
      * @return Array A list as array(duration, idle) averages.
      */
-    public function stats_mean($last = 100) {
+    public function statsMean($last = 100) {
         if (count($this->stats) < $last) {
             $data = $this->stats;
         } else {
@@ -1081,7 +982,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * A method to periodically trim older items from the stats array
      * @return void
      */
-    public function stats_trim() {
+    public function statsTrim() {
         $this->stats = array_slice($this->stats, -100, 100);
     }
 
