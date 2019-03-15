@@ -828,7 +828,7 @@ class CApp extends CObservable {
             $logActivityModel = static::model($logActivityModel);
         }
 
-        CApp_LogActivity::instance()->start($userId, $message, $data, $logActivityModel, $observer);
+        CApp_LogActivity::instance()->start($userId, $message, $logActivityModel, $observer);
     }
 
     public function stopActivity()
