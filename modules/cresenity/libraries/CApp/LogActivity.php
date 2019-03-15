@@ -7,7 +7,7 @@ use CApp_Model_Observer_LogActivity as Observer;
  */
 class CApp_LogActivity
 {
-	use CModel_Activity_Trait;
+	use CModel_Activity_ActivityTrait;
 
 	private static $instance;
 	private $isStarted;
