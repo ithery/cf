@@ -226,7 +226,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         foreach ($this->workers as $worker) {
             $worker->setup();
         }
-        $this->loopInterval($this->loopInterval);
+        $this->setLoopInterval($this->loopInterval);
         // Queue any housekeeping tasks we want performed periodically
         $this->on(self::ON_IDLE, array($this, 'statsTrim'), (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
         $this->setup();
@@ -693,7 +693,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         // Otherwise apply the $idleProbability factor
         $endTime = $probability = null;
         if ($this->loopInterval)
-            $endTime = ($startTime + $this->loopInterval() - 0.01);
+            $endTime = ($startTime + $this->getLoopInterval() - 0.01);
         if ($this->idleProbability)
             $probability = (1 / $this->idleProbability);
         $is_idle = function() use($endTime, $probability) {
@@ -1006,21 +1006,30 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * Combination getter/setter for the $loopInterval property.
-     * @param boolean $set_value
+     * getter for the $loopInterval property.
      * @return int|null
      */
-    protected function loopInterval($set_value = null) {
-        if ($set_value === null)
-            return $this->loopInterval;
-        if (!is_numeric($set_value))
-            throw new Exception(__METHOD__ . ' Failed. Could not set loop interval. Number Expected. Given: ' . $set_value);
-        $this->loopInterval = $set_value;
+    public function getLoopInterval() {
+        return $this->loopInterval;
+    }
+
+    /**
+     * setter for the $loopInterval property.
+     * @param boolean $setValue
+     * @return int|null
+     */
+    protected function setLoopInterval($setValue = null) {
+
+        if (!is_numeric($setValue))
+            throw new Exception(__METHOD__ . ' Failed. Could not set loop interval. Number Expected. Given: ' . $setValue);
+        $this->loopInterval = $setValue;
         $priority = -1;
-        if ($set_value >= 5.0 || $set_value <= 0.0)
+        if ($setValue >= 5.0 || $setValue <= 0.0) {
             $priority = 0;
-        if ($priority == pcntl_getpriority())
+        }
+        if ($priority == pcntl_getpriority()) {
             return;
+        }
         @pcntl_setpriority($priority);
         if (pcntl_getpriority() == $priority) {
             $this->log('Adjusting Process Priority to ' . $priority);
@@ -1034,7 +1043,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     /**
      * Combination getter/setter for the $pid property.
-     * @param boolean $set_value
+     * @param boolean $setValue
      * @return int
      */
     protected function pid($setValue = null) {

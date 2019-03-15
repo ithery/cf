@@ -215,7 +215,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         $this->service = $service;
         $this->via = $via;
         $this->via->mediator = $this;
-        $interval = $this->service->loopInterval();
+        $interval = $this->service->getLoopInterval();
         switch (true) {
             case $interval > 2 || $interval === 0:
                 $this->forkingStrategy = self::LAZY;
