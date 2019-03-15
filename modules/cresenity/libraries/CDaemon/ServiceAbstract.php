@@ -865,7 +865,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @throws Exception
      */
     protected function plugin($alias, Core_IPlugin $instance = null) {
-        $this->check_alias($alias);
+        //$this->checkAlias($alias);
         if ($instance === null) {
             // This if wouldn't be necessary if /Lock lived inside /Plugin.
             // Now that Locks are plugins in every other way, maybe it should be moved. OTOH, do we really need 4
