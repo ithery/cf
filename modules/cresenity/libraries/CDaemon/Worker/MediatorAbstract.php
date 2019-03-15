@@ -99,7 +99,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * Note: Start at 1 because the 0 key is reserved for via classes to use as needed for metadata.
      * @var int
      */
-    protected $call_count = 1;
+    protected $callCount = 1;
 
     /**
      * Array of Call ID's of calls currently running on one of the worker processes.
@@ -107,7 +107,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * or when the $timeout is reached.
      * @var array
      */
-    protected $running_calls = array();
+    protected $runningCalls = array();
 
     /**
      * What is the alias this worker is set to on the Daemon?
@@ -137,7 +137,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      *
      * Note: There may be deviation in enforcement up to the length of your loop_interval. So if you set this ot "5" and
      * your loop interval is 2.5 second, workers may be allowed to run for up to 7.5 seconds before timing out. This
-     * happens because timeouts and the on_return and on_timeout calls are all handled inside the run() loop just before
+     * happens because timeouts and the onReturn and onTimeout calls are all handled inside the run() loop just before
      * your execute() method is called.
      *
      * @example set a Timeout using $this->timeout();
@@ -150,14 +150,14 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @example set a Return Handler using $this->onReturn();
      * @var callable
      */
-    protected $on_return;
+    protected $onReturn;
 
     /**
      * Callback that's called when a worker timeout is reached. See phpdoc comments on the $timeout property
      * @example set a Timeout Handler using $this->onTimeout();
      * @var callable
      */
-    protected $on_timeout;
+    protected $onTimeout;
 
     /**
      * The ID of this worker pool -- used to address shared IPC resources
@@ -197,7 +197,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      *
      * @var array
      */
-    public $error_thresholds = array(
+    public $errorThresholds = array(
         'communication' => array(10, 50),
         'corruption' => array(10, 25),
         'catchall' => array(10, 25),
@@ -208,7 +208,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @abstract
      * @param $method
      */
-    protected abstract function get_callback($method);
+    protected abstract function getCallback($method);
 
     public function __construct($alias, CDaemon_ServiceAbstract $daemon, Core_IWorkerVia $via) {
         $this->alias = $alias;
@@ -403,7 +403,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
                     $out[] = 'IPC ID: ' . $that->guid;
                     $out[] = 'Workers: ' . count($processes);
                     $out[] = 'Max Workers: ' . $that->workers;
-                    $out[] = 'Running Jobs: ' . count($that->running_calls);
+                    $out[] = 'Running Jobs: ' . count($that->runningCalls);
                     $out[] = '';
                     $out[] = 'Processes:';
                     if ($processes)
@@ -485,8 +485,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
             });
             $this->fork();
         } else {
-            unset($this->calls, $this->running_calls, $this->on_return, $this->on_timeout, $this->call_count);
-            $this->calls = $this->call_count = $this->running_calls = array();
+            unset($this->calls, $this->runningCalls, $this->onReturn, $this->onTimeout, $this->callCount);
+            $this->calls = $this->callCount = $this->runningCalls = array();
             $this->via->setup();
             $event_restart = function() use($that) {
                 $that->log('Restarting Worker Process...');
@@ -494,7 +494,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
             $this->daemon->on(Core_Daemon::ON_SIGNAL, $event_restart, null, function($args) {
                 return $args[0] == SIGUSR1;
             });
-            call_user_func($this->get_callback('setup'));
+            call_user_func($this->getCallback('setup'));
             $this->log('Worker Process Started');
         }
     }
@@ -524,13 +524,13 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
         switch ($this->forking_strategy) {
             case self::LAZY:
                 $state = $this->via->state();
-                if ($processes > count($this->running_calls))
+                if ($processes > count($this->runningCalls))
                     $forks = 0;
                 else
                     $forks = 1;
                 break;
             case self::MIXED:
-                if ($this->call_count == 0) {
+                if ($this->callCount == 0) {
                     $forks = 0;
                     break;
                 }
@@ -543,7 +543,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
         if ($forks == 0) {
             if (!isset($state))
                 $state = $this->via->state();
-            if ($this->call_count == 0 && $state['messages'] > 0)
+            if ($this->callCount == 0 && $state['messages'] > 0)
                 $forks = 1;
         }
         if ($forks && !$this->breakpoint("Forking {$forks} New Worker Processes"))
@@ -590,7 +590,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
                     $this->log("         Consider purging any pending messages using whatever process exists for your selected queue provider");
                     continue;
                 }
-                $this->running_calls[$call->id] = true;
+                $this->runningCalls[$call->id] = true;
                 // It's possible the process exited after sending this ack, ensure it's still valid.
                 if ($this->process($call->pid))
                     $this->process($call->pid)->job = $call->id;
@@ -602,12 +602,12 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
                     $this->log("         Consider purging any pending messages using whatever process exists for your selected queue provider");
                     continue;
                 }
-                unset($this->running_calls[$call->id]);
+                unset($this->runningCalls[$call->id]);
                 if ($this->process($call->pid))
                     $this->process($call->pid)->job = $call->id;
-                $on_return = $this->on_return;
-                if (is_callable($on_return))
-                    call_user_func($on_return, $call, $logger);
+                $onReturn = $this->onReturn;
+                if (is_callable($onReturn))
+                    call_user_func($onReturn, $call, $logger);
                 else
                     $this->log('No onReturn Callback Available');
                 $this->log('Job ' . $call->id . ' Is Complete');
@@ -616,7 +616,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
             // Timeouts will either be simply that the worker is taking longer than expected to return the call,
             // or the worker actually fatal-errored and killed itself.
             if ($this->timeout > 0) {
-                foreach (array_keys($this->running_calls) as $call_id) {
+                foreach (array_keys($this->runningCalls) as $call_id) {
                     $call = $this->calls[$call_id];
                     if ($call->runtime() > $this->timeout) {
                         if (!$this->breakpoint("[{$this->alias} Call {$call_id}] Enforcing timeout at runtime: " . $call->runtime(), $call_id - 1))
@@ -626,10 +626,10 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
                             $this->process($call->pid)->kill();
                         }
                         $call->timeout();
-                        unset($this->running_calls[$call_id]);
-                        $on_timeout = $this->on_timeout;
-                        if (is_callable($on_timeout))
-                            call_user_func($on_timeout, $call, $logger);
+                        unset($this->runningCalls[$call_id]);
+                        $onTimeout = $this->onTimeout;
+                        if (is_callable($onTimeout))
+                            call_user_func($onTimeout, $call, $logger);
                     }
                 }
             }
@@ -660,7 +660,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
             // Give the CPU a break - Sleep for 1/20 a second.
             usleep(50000);
             if ($this->auto_restart) {
-                $max_jobs = $this->call_count++ >= (25 + $entropy);
+                $max_jobs = $this->callCount++ >= (25 + $entropy);
                 $min_runtime = $this->daemon->runtime() >= (60 * 5);
                 $max_runtime = $this->daemon->runtime() >= (60 * 30 + $entropy * 10);
                 $recycle = ($max_runtime || $min_runtime && $max_jobs);
@@ -682,7 +682,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
                     $call->running();
                     if (!$this->via->put($call))
                         $this->log("Call {$call->id} Could Not Ack Running.");
-                    $call->returned(call_user_func_array($this->get_callback($call->method), $call->args));
+                    $call->returned(call_user_func_array($this->getCallback($call->method), $call->args));
                     if (!$this->via->put($call))
                         $this->log("Call {$call->id} Could Not Ack Complete.");
                 } catch (Exception $e) {
@@ -731,8 +731,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
     public function __call($method, $args) {
         if (!in_array($method, $this->methods))
             throw new Exception(__METHOD__ . " Failed. Method `{$method}` is not callable.");
-        $this->call_count++;
-        return $this->call(new Core_Worker_Call($this->call_count, $method, $args));
+        $this->callCount++;
+        return $this->call(new Core_Worker_Call($this->callCount, $method, $args));
     }
 
     /**
@@ -782,7 +782,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
         // 3) A worker received the message but a message queue failure prevented the acks being sent.
         // Look at all the jobs recently acked and determine which of them was called first. Get the time of that call as the $cutoff.
         // Any Calls in CALLED status that were called prior to that $cutoff have apparently been dropped and will be requeued.
-        $cutoff = $this->calls[$this->call_count]->time[self::CALLED];
+        $cutoff = $this->calls[$this->callCount]->time[self::CALLED];
         foreach ($this->processes() as $process) {
             if ($process->job === null && time() - $process->microtime < 30)
                 return; // Give processes time to ack their first job
@@ -814,7 +814,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      */
     public function count_error($type) {
         $this->error_counts[$type] ++;
-        if ($this->error_counts[$type] > $this->error_thresholds[$type][(int) Core_Daemon::is('parent')])
+        if ($this->error_counts[$type] > $this->errorThresholds[$type][(int) Core_Daemon::is('parent')])
             $this->fatal_error("IPC '$type' Error Threshold Reached");
     }
 
@@ -871,8 +871,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      *
      * @return number
      */
-    public function running_count() {
-        return count($this->running_calls);
+    public function runningCount() {
+        return count($this->runningCalls);
     }
 
     /**
@@ -1029,13 +1029,13 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      *
      * Part of the Daemon API - Use from your daemon to set a Timeout handler
      *
-     * @param callable $on_timeout
+     * @param callable $onTimeout
      * @throws Exception
      */
-    public function onTimeout($on_timeout) {
-        if (!is_callable($on_timeout))
+    public function onTimeout($onTimeout) {
+        if (!is_callable($onTimeout))
             throw new Exception(__METHOD__ . " Failed. Callback or Closure expected.");
-        $this->on_timeout = $on_timeout;
+        $this->onTimeout = $onTimeout;
     }
 
     /**
@@ -1044,13 +1044,13 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      *
      * Part of the Daemon API - Use from your daemon to set a Return handler
      *
-     * @param callable $on_return
+     * @param callable $onReturn
      * @throws Exception
      */
-    public function onReturn($on_return) {
-        if (!is_callable($on_return))
+    public function onReturn($onReturn) {
+        if (!is_callable($onReturn))
             throw new Exception(__METHOD__ . " Failed. Callback or Closure expected.");
-        $this->on_return = $on_return;
+        $this->onReturn = $onReturn;
     }
 
     /**
@@ -1062,8 +1062,9 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @throws Exception
      */
     public function timeout($timeout) {
-        if (!is_numeric($timeout))
+        if (!is_numeric($timeout)) {
             throw new Exception(__METHOD__ . " Failed. Numeric value expected.");
+        }
         $this->timeout = $timeout;
     }
 
@@ -1083,8 +1084,9 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @return void
      */
     public function workers($workers) {
-        if (!ctype_digit((string) $workers))
+        if (!ctype_digit((string) $workers)) {
             throw new Exception(__METHOD__ . " Failed. Numeric value expected.");
+        }
         $this->workers = (int) $workers;
     }
 
@@ -1098,10 +1100,11 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      * @throws Exception
      * @return void
      */
-    public function auto_restart($restart) {
-        if (!is_bool($restart))
+    public function setAutoRestart($bool = true) {
+        if (!is_bool($bool)) {
             throw new Exception(__METHOD__ . " Failed. Boolean value expected.");
-        $this->auto_restart = $restart;
+        }
+        $this->autoRestart = $bool;
     }
 
     /**
@@ -1115,8 +1118,8 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      *
      * @return bool
      */
-    public function is_idle() {
-        return $this->workers > count($this->running_calls);
+    public function isIdle() {
+        return $this->workers > count($this->runningCalls);
     }
 
 }

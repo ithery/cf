@@ -43,7 +43,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     const ON_POSTEXECUTE = 4;    // and right after
     const ON_FORK = 5;    // in a background process right after it has been forked from the daemon
     const ON_PIDCHANGE = 6;    // whenever the pid changes -- in a background process for example
-    const ON_IDLE = 7;    // called when there is idle time at the end of a loopInterval, or at the idle_probability when loopInterval isn't used
+    const ON_IDLE = 7;    // called when there is idle time at the end of a loopInterval, or at the idleProbability when loopInterval isn't used
     const ON_REAP = 8;    // notification from the OS that a child process of this application has exited
     const ON_SHUTDOWN = 10;   // called at the top of the destructor
 
@@ -80,7 +80,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var float The probability, from 0.0 to 1.0.
      */
-    protected $idle_probability = 0.50;
+    protected $idleProbability = 0.50;
 
     /**
      * The frequency of your application restarting itself. In seconds.
@@ -165,7 +165,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @return void
      * @throws Exception
      */
-    protected function checkEnvironment(Array $errors = array()) {
+    protected function checkEnvironment(array $errors = array()) {
         if (is_numeric($this->loopInterval) == false)
             $errors[] = "Invalid Loop Interval: $this->loopInterval";
         if (is_numeric($this->autoRestartInterval) == false)
@@ -343,10 +343,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @throws Exception
      */
     public function on($event, $callback, $throttle = null, $criteria = null) {
-        if (!is_scalar($event))
+        if (!is_scalar($event)) {
             throw new Exception(__METHOD__ . ' Failed. Event type must be Scalar. Given: ' . gettype($event));
-        if (!isset($this->callbacks[$event]))
+        }
+        if (!isset($this->callbacks[$event])) {
             $this->callbacks[$event] = array();
+        }
         $this->callbacks[$event][] = array(
             'callback' => $callback,
             'criteria' => $criteria,
@@ -362,7 +364,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @param array $event  Should be the array returned when you called on()
      * @return callback|closure|null returns the registered event handler assuming $event is valid
      */
-    public function off(Array $event) {
+    public function off(array $event) {
         if (isset($event[0]) && isset($event[1])) {
             $cb = $this->callbacks[$event[0]][$event[1]];
             unset($this->callbacks[$event[0]][$event[1]]);
@@ -378,7 +380,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *                      items (an event type, and a callback ID for that event type)
      * @param array $args   Array of arguments passed to the event listener
      */
-    public function dispatch(Array $event, Array $args = array()) {
+    public function dispatch(array $event, array $args = array()) {
         if (!isset($event[0]) || !isset($this->callbacks[$event[0]]))
             return;
         // A specific callback is being dispatched...
@@ -680,7 +682,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $out[] = "---------------------------------------------------------------------------------------------------";
         $out[] = "Command:              " . ($this->parent ? $this->serviceName : 'Forked Process from pid ' . $this->parentPid);
         $out[] = "Loop Interval:        " . $this->loopInterval;
-        $out[] = "Idle Probability      " . $this->idle_probability;
+        $out[] = "Idle Probability      " . $this->idleProbability;
         $out[] = "Restart Interval:     " . $this->autoRestartInterval;
         $out[] = sprintf("Start Time:           %s (%s)", $this->startTime, date('Y-m-d H:i:s', $this->startTime));
         $out[] = sprintf("Duration:             %s (%s)", $this->runtime(), $pretty_duration($this->runtime()));
@@ -704,22 +706,23 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @return mixed
      */
     private function timer($start = false) {
-        static $start_time = null;
+        static $startTime = null;
         // Start the Stop Watch and Return
-        if ($start)
-            return $start_time = microtime(true);
+        if ($start) {
+            return $startTime = microtime(true);
+        }
         // End the Stop Watch
         // Determine if we should run the ON_IDLE tasks.
         // In timer based applications, determine if we have remaining time.
-        // Otherwise apply the $idle_probability factor
-        $end_time = $probability = null;
+        // Otherwise apply the $idleProbability factor
+        $endTime = $probability = null;
         if ($this->loopInterval)
-            $end_time = ($start_time + $this->loopInterval() - 0.01);
-        if ($this->idle_probability)
-            $probability = (1 / $this->idle_probability);
-        $is_idle = function() use($end_time, $probability) {
-            if ($end_time)
-                return microtime(true) < $end_time;
+            $endTime = ($startTime + $this->loopInterval() - 0.01);
+        if ($this->idleProbability)
+            $probability = (1 / $this->idleProbability);
+        $is_idle = function() use($endTime, $probability) {
+            if ($endTime)
+                return microtime(true) < $endTime;
             if ($probability)
                 return mt_rand(1, $probability) == 1;
             return false;
@@ -729,7 +732,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->dispatch(array(CDaemon_ServiceAbstract::ON_IDLE), array($is_idle));
         }
         $stats = array();
-        $stats['duration'] = microtime(true) - $start_time;
+        $stats['duration'] = microtime(true) - $startTime;
         $stats['idle'] = $this->loopInterval - $stats['duration'];
         // Suppress child signals during sleep to stop exiting forks/workers from interrupting the timer.
         // Note: SIGCONT (-18) signals are not suppressed and can be used to "wake up" the daemon.
@@ -888,14 +891,15 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @return Core_Worker_ObjectMediator Returns a Core_Worker class that can be used to interact with the Worker
      * @todo Use 'callable' type hinting if/when we move to a php 5.4 requirement.
      */
-    protected function worker($alias, $worker, Core_IWorkerVia $via = null) {
+    protected function addWorker($alias, $worker, Core_IWorkerVia $via = null) {
         if (!$this->parent) {
             // While in theory there is nothing preventing you from creating workers in child processes, supporting it
             // would require changing a lot of error handling and process management code and I don't really see the value in it.
             throw new Exception(__METHOD__ . ' Failed. You cannot create workers in a background processes.');
         }
-        if ($via === null)
+        if ($via === null) {
             $via = new Core_Worker_Via_SysV();
+        }
         $this->checkWorkerAlias($alias);
         switch (true) {
             case is_object($worker) && !is_a($worker, 'Closure'):
@@ -905,8 +909,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                 // Exclude any methods required by the Core_IWorker interface from the check.
                 $intersection = array_intersect(get_class_methods($worker), get_class_methods($mediator));
                 $intersection = array_diff($intersection, get_class_methods('Core_IWorker'));
-                if (!empty($intersection))
+                if (!empty($intersection)) {
                     throw new Exception(sprintf('%s Failed. Your worker class "%s" contains restricted method names: %s.', __METHOD__, get_class($worker), implode(', ', $intersection)));
+                }
                 $mediator->setObject($worker);
                 break;
             case is_callable($worker):
