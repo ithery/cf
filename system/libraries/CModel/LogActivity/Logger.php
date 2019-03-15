@@ -77,6 +77,16 @@ class CModel_LogActivity_Logger
         return $this;
     }
 
+    public function changes(array $data)
+    {
+        if (is_array($data)) {
+            $data = json_encode($data);
+        }
+
+        $this->activity->data_changed = $data;
+        return $this;
+    }
+
     public function type($type)
     {
         $this->activity->activity_type = $type;

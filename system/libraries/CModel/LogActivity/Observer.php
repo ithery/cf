@@ -11,17 +11,14 @@ class CModel_LogActivity_Observer
 	{
 		$logActivity = Logger::activity();
 		$before = [];
-		$after = [];
-		$attributes = $model->getAttributes();
-
-		foreach ($attributes as $attr) {
-			$after[$attr] = $model->{$attr};
-		}
+		$after = $model->getAttributes();
+		$changes = [];
 
 		$logActivity
 			->type('create')
 			->before($before)
 			->after($after)
+			->changes($changes)
 			->log($model->getTable() . ' [' . $model->getKey() . '] Created');
 	}
 
@@ -29,20 +26,18 @@ class CModel_LogActivity_Observer
 	{
 		$logActivity = Logger::activity();
 		$before = [];
-		$after = [];
-		$attributes = $model->getAttributes();
+		$after = $model->getAttributes();
+		$changes = $model->getDirty();
 
-		foreach ($attributes as $attr) {
-			$before[$attr] = $model->getOriginal($attr);
-			$after[$attr] = $model->{$attr};
+		foreach ($after as $key => $value) {
+			$before[$key] = $model->getOriginal($key);
 		}
-
-		cdbg::dd($attributes, $before, $after, $model->getDirty());
 
 		$logActivity
 			->type('update')
 			->before($before)
 			->after($after)
+			->changes($changes)
 			->log($model->getTable() . ' [' . $model->getKey() . '] Updated');
 	}
 
@@ -50,18 +45,18 @@ class CModel_LogActivity_Observer
 	{
 		$logActivity = Logger::activity();
 		$before = [];
-		$after = [];
-		$attributes = $model->getAttributes();
+		$after = $model->getAttributes();
+		$changes = $model->getDirty();
 
-		foreach ($attributes as $attr) {
-			$before[$attr] = $model->getOriginal($attr);
-			$after[$attr] = $model->{$attr};
+		foreach ($after as $key => $value) {
+			$before[$key] = $model->getOriginal($key);
 		}
 
 		$logActivity
 			->type('delete')
 			->before($before)
 			->after($after)
+			->changes($changes)
 			->log($model->getTable() . ' [' . $model->getKey() . '] Deleted');
 	}
 }
