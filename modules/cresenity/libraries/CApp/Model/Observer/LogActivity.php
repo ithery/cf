@@ -49,6 +49,7 @@ class CApp_Model_Observer_LogActivity implements CModel_Activity_ObserverInterfa
 
 	public function updated(CModel $model)
 	{
+		cdbg::dd($this->isStarted());
 		if ($this->isStarted()) {
 			$before = [];
 			$after = $model->getAttributes();
