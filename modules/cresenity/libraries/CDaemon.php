@@ -26,7 +26,7 @@ class CDaemon {
      *
      * @var CDaemon_ServiceAbstract
      */
-    protected $runningService = null;
+    protected static $runningService = null;
 
     public static function cliRunner($parameter = null) {
 

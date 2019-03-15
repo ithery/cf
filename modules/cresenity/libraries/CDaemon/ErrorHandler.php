@@ -46,16 +46,7 @@ class CDaemon_ErrorHandler {
         // Respect the error_reporting Level
         if (($errNo & error_reporting()) == 0)
             return true;
-        if ($runonce) {
-            if (ini_get('log_errors')) {
-                $error_log = ini_get('error_log');
-                if ($error_log != 'syslog' && !is_writable($error_log)) {
-                    $is_writable = false;
-                    error_log("\nNote: The PHP error_log at {$error_log} is not writable! Errors will be written to STDERR. Fix the permissions problem or correct the error_log path.");
-                }
-            }
-            $runonce = false;
-        }
+
         $is_fatal = false;
         switch ($errNo) {
             case -1:

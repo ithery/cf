@@ -163,7 +163,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
         // We have to set any installation instructions before we call getopt()
         $this->install_instructions[] = "Add to Supervisor or Monit, or add a Crontab Entry:\n   * * * * * " . $this->command();
-
+        CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
 
