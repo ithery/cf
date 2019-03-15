@@ -31,22 +31,27 @@ class CApp_LogActivity {
         return static::$instance;
     }
 
-    public function start($message, CModel $model, $observer = null) {
-        $this->isStarted = true;
-        $this->message = $message;
-        $this->model = $model;
-        $this->observer = $observer ?: $this->observer;
-
-        if (is_string($this->observer)) {
-            $this->observer = new $this->observer;
+    public function start($message, $model, $observer = null) {
+        if (!$model) {
+            $model = new CApp_Model_LogActivity();
+        } elseif (!$model instanceof CModel && is_string($model)) {
+            $model = new $model();
+        }
+        if (!$model instanceof CModel) {
+            throw new CApp_Exception('instance for start is not a model');
         }
         $userId = CApp_Base::userId();
-        static::bootLog($userId, $this->message, $this->model, $this->observer);
+        $activity = CModel_Activity::instance();
+        $activity->setModel($model);
+        $activity->setMessage($message);
+        $activity->setObserver($observer);
+        $activity->setUserId($userId);
+        $activity->start();
     }
 
     public function stop() {
-        $this->isStarted = false;
-        $this->observer->stop();
+        $activity = CModel_Activity::instance();
+        $activity->stop();
     }
 
 }

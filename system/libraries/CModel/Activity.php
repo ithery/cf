@@ -28,27 +28,31 @@ final class CModel_Activity {
     }
 
     public function setUserId($userId) {
-        self::$userId = $userId;
+        $this->userId = $userId;
     }
 
     public function setModel($model) {
-        self::$modelLogActivity = $model;
+        $this->modelLogActivity = $model;
     }
 
     public function setMessage($message) {
-        self::$message = $message;
+        $this->message = $message;
     }
 
     public function setObserver($observer) {
-        self::$observer = $observer;
+        $this->observer = $observer;
     }
 
     public function start() {
-        self::$isStarted = true;
+        $this->isStarted = true;
     }
 
     public function stop() {
-        self::$isStarted = false;
+        $this->isStarted = false;
     }
 
+    
+    public function isStarted() {
+        return $this->isStarted;
+    }
 }

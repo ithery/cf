@@ -821,12 +821,6 @@ class CApp extends CObservable {
     }
 
     public function startActivity($message, $logActivityModel = null, $observer = null) {
-        if (!$logActivityModel) {
-            $logActivityModel = static::model('LogActivity');
-        } elseif (!$logActivityModel instanceof CModel) {
-            $logActivityModel = static::model($logActivityModel);
-        }
-
         CApp_LogActivity::instance()->start($message, $logActivityModel, $observer);
     }
 
