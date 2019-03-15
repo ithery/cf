@@ -905,7 +905,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->checkWorkerAlias($alias);
         switch (true) {
             case is_object($worker) && !is_a($worker, 'Closure'):
-                $mediator = new CDaemon_Worker_Mediator($alias, $this, $via);
+                $mediator = new CDaemon_Worker_MediatorObject($alias, $this, $via);
                 // Ensure that there are no reserved method names in the worker object -- Determine if there will
                 // be a collision between worker methods and public methods on the Mediator class
                 // Exclude any methods required by the Core_IWorker interface from the check.
@@ -917,7 +917,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                 $mediator->setObject($worker);
                 break;
             case is_callable($worker):
-                $mediator = new Core_Worker_FunctionMediator($alias, $this, $via);
+                $mediator = new CDaemon_Worker_MediatorFunction($alias, $this, $via);
                 $mediator->setFunction($worker);
                 break;
             default:

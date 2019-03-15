@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 15, 2019, 12:12:16 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
+abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
 
     /**
      * The version is used in case formats change in the future.
