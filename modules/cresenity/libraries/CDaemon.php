@@ -22,6 +22,12 @@ class CDaemon {
      */
     protected $helper;
 
+    /**
+     *
+     * @var CDaemon_ServiceAbstract
+     */
+    protected $runningService = null;
+
     public static function cliRunner($parameter = null) {
 
         $argv = carr::get($_SERVER, 'argv');
@@ -50,7 +56,7 @@ class CDaemon {
         }
 
 
-        $service = new $cls($serviceName, $config);
+        self::$runningService = new $cls($serviceName, $config);
 
         switch ($cmd) {
             case 'start':
@@ -59,12 +65,20 @@ class CDaemon {
             case 'reload':
             case 'status':
             case 'kill':
-                call_user_func(array($service, $cmd));
+                call_user_func(array(self::$runningService, $cmd));
                 break;
             default:
                 $service->showHelp();
                 break;
         }
+    }
+
+    /**
+     * 
+     * @return CDaemon_ServiceAbstract
+     */
+    public static function getRunningService() {
+        return self::$runningService;
     }
 
     /**
@@ -120,20 +134,20 @@ class CDaemon {
         if ($isUnix && !extension_loaded('posix')) {
             throw new Exception('posix extension is required');
         }
-        
-        $command = carr::get($this->config,'command');
+
+        $command = carr::get($this->config, 'command');
         $isRunning = $this->isRunning();
-        if($command=='start') {
-            if($isRunning) {
+        if ($command == 'start') {
+            if ($isRunning) {
                 throw new Exception('daemon is running');
             }
         }
-        if($command=='stop') {
-            if(!$isRunning) {
+        if ($command == 'stop') {
+            if (!$isRunning) {
                 throw new Exception('daemon is stopped');
             }
         }
-        
+
         if ($isUnix) {
             return $this->runUnix();
         } else {
@@ -150,7 +164,6 @@ class CDaemon {
         $binary = $this->getPhpBinary();
         $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
         exec("$binary $command 1> $output 2>&1 &");
-        
     }
 
     // @codeCoverageIgnoreStart
