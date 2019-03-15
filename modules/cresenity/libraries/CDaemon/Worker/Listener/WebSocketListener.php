@@ -9,4 +9,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CDaemon_Worker_Listener_WebSocketListener extends CDaemon_Worker_ListenerAbstract {
     
+    public function checkEnvironment(array $errors = array()) {
+        
+    }
+
+    public function setup() {
+        
+    }
+
+    public function teardown() {
+        
+    }
+
 }

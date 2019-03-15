@@ -177,12 +177,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if (version_compare(PHP_VERSION, '5.3.0') < 0)
             $errors[] = "PHP 5.3 or higher is required";
         foreach ($this->plugins as $plugin) {
-            foreach ($this->{$plugin}->checkEnvironment() as $error) {
+            foreach ($plugin->checkEnvironment() as $error) {
                 $errors[] = "[$plugin] $error";
             }
         }
         foreach ($this->workers as $worker) {
-            foreach ($this->{$worker}->checkEnvironment() as $error) {
+            foreach ($worker->checkEnvironment() as $error) {
                 $errors[] = "[$worker] $error";
             }
         }
@@ -218,12 +218,14 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         foreach (array_unique($signals) as $signal) {
             pcntl_signal($signal, array($this, 'signal'));
         }
-        $this->plugin('ProcessManager');
-        foreach ($this->plugins as $plugin)
-            $this->{$plugin}->setup();
+        $this->addPlugin('ProcessManager');
+        foreach ($this->plugins as $plugin) {
+            $plugin->setup();
+        }
         $this->dispatch(array(self::ON_INIT));
-        foreach ($this->workers as $worker)
-            $this->{$worker}->setup();
+        foreach ($this->workers as $worker) {
+            $worker->setup();
+        }
         $this->loopInterval($this->loopInterval);
         // Queue any housekeeping tasks we want performed periodically
         $this->on(self::ON_IDLE, array($this, 'statsTrim'), (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
@@ -240,8 +242,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->shutdown = true;
             $this->dispatch(array(self::ON_SHUTDOWN));
             foreach (array_merge($this->workers, $this->plugins) as $object) {
-                $this->{$object}->teardown();
-                unset($this->{$object});
+                $object->teardown();
+                unset($object);
             }
         } catch (Exception $e) {
             $this->fatalError(sprintf('Exception Thrown in Shutdown: %s [file] %s [line] %s%s%s', $e->getMessage(), $e->getFile(), $e->getLine(), PHP_EOL, $e->getTraceAsString()));
@@ -251,35 +253,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->log('Unlink PID:' . $this->pidFile);
             unlink($this->pidFile);
         }
-        if ($this->parent && $this->stdout)
+        if ($this->parent && $this->stdout) {
             echo PHP_EOL;
-    }
-
-    /**
-     * Some accessors are available as setters only within their defined scope, but can be
-     * used as getters universally. Filter out setter arguments and proxy the call to the accessor.
-     * Note: A warning will be raised if the accessor is used as a setter out of scope.
-     * @example $someDaemon->loopInterval()
-     *
-     * @param $method
-     * @param $args
-     * @return mixed
-     */
-    public function __call($method, $args) {
-        $deprecated = array('shutdown', 'verbose', 'is_daemon', 'filename');
-        if (in_array($method, $deprecated)) {
-            throw new Exception("Deprecated method call: $method(). Update your code to use the v2.1 get(), set() and is() methods.");
         }
-        $accessors = array('loopInterval', 'pid');
-        if (in_array($method, $accessors)) {
-            if ($args)
-                trigger_error("The '$method' accessor can not be used as a setter in this context. Supplied arguments ignored.", E_USER_WARNING);
-            return call_user_func_array(array($this, $method), array());
-        }
-        // Handle any calls to __invoke()able objects
-        if (in_array($method, $this->workers))
-            return call_user_func_array($this->$method, $args);
-        throw new Exception("Invalid Method Call '$method'");
     }
 
     /**
@@ -853,12 +829,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @example $this->plugin('Lock_File'); // Instantiated at $this->Lock_File
      *
      * @param string $alias
-     * @param Core_IPlugin|null $instance
-     * @return Core_IPlugin Returns an instance of the plugin
+     * @param CDaemon_PluginAbstract|null $instance
+     * @return CDaemon_PluginAbstract Returns an instance of the plugin
      * @throws Exception
      */
-    protected function plugin($alias, Core_IPlugin $instance = null) {
-        //$this->checkAlias($alias);
+    protected function addPlugin($alias, CDaemon_PluginAbstract $instance = null) {
+        $this->checkPluginAlias($alias);
         if ($instance === null) {
             // This if wouldn't be necessary if /Lock lived inside /Plugin.
             // Now that Locks are plugins in every other way, maybe it should be moved. OTOH, do we really need 4
@@ -877,33 +853,59 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if (!is_object($instance)) {
             throw new Exception(__METHOD__ . " Failed. Could Not Load Plugin '{$alias}'");
         }
-        $this->{$alias} = $instance;
-        $this->plugins[] = $alias;
-        return $instance;
+        $this->plugins[$alias] = $instance;
+        return $this->plugins[$alias];
+    }
+
+    /**
+     * 
+     * @param type $alias
+     * @return CDaemon_Plugin
+     * @throws Exception
+     */
+    protected function getPlugin($alias) {
+        if (!isset($this->plugins[$alias])) {
+            throw new Exception("Plugin alias not found. The identifier `{$alias}` is not found");
+        }
+        return $this->plugins[$alias];
+    }
+
+    /**
+     * Simple function to validate that alises for Plugins won't interfere with each other or with existing daemon properties.
+     * @param $alias
+     * @throws Exception
+     */
+    private function checkPluginAlias($alias) {
+        if (empty($alias) || !is_scalar($alias)) {
+            throw new Exception("Invalid Plugin Alias. Identifiers must be scalar.");
+        }
+        if (isset($this->plugins[$alias])) {
+            throw new Exception("Invalid Plugin Alias. The identifier `{$alias}` is already in use or is reserved");
+        }
     }
 
     /**
      * Create a persistent Worker process. This is an object loader similar to CDaemon_ServiceAbstract::plugin().
      *
      * @param String $alias  The name of the worker -- Will be instantiated at $this->{$alias}
-     * @param callable|Core_IWorker $worker An object of type Core_Worker OR a callable (function, callback, closure)
-     * @param Core_IWorkerVia $via  A Core_IWorkerVia object that defines the medium for IPC (In theory could be any message queue, redis, memcache, etc)
-     * @return Core_Worker_ObjectMediator Returns a Core_Worker class that can be used to interact with the Worker
+     * @param callable|CDaemon_WorkerInterface $worker An object of type Core_Worker OR a callable (function, callback, closure)
+     * @param CDaemon_Worker_ViaInterface $via  A Core_IWorkerVia object that defines the medium for IPC (In theory could be any message queue, redis, memcache, etc)
+     * @return CDaemon_Worker_Mediator Returns a Core_Worker class that can be used to interact with the Worker
      * @todo Use 'callable' type hinting if/when we move to a php 5.4 requirement.
      */
-    protected function addWorker($alias, $worker, Core_IWorkerVia $via = null) {
+    protected function addWorker($alias, $worker, CDaemon_Worker_ViaInterface $via = null) {
         if (!$this->parent) {
             // While in theory there is nothing preventing you from creating workers in child processes, supporting it
             // would require changing a lot of error handling and process management code and I don't really see the value in it.
             throw new Exception(__METHOD__ . ' Failed. You cannot create workers in a background processes.');
         }
         if ($via === null) {
-            $via = new Core_Worker_Via_SysV();
+            $via = new CDaemon_Worker_Via_SysV();
         }
         $this->checkWorkerAlias($alias);
         switch (true) {
             case is_object($worker) && !is_a($worker, 'Closure'):
-                $mediator = new Core_Worker_ObjectMediator($alias, $this, $via);
+                $mediator = new CDaemon_Worker_Mediator($alias, $this, $via);
                 // Ensure that there are no reserved method names in the worker object -- Determine if there will
                 // be a collision between worker methods and public methods on the Mediator class
                 // Exclude any methods required by the Core_IWorker interface from the check.
@@ -921,9 +923,21 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             default:
                 throw new Exception(__METHOD__ . ' Failed. Could Not Load Worker: ' . $alias);
         }
-        $this->workers[] = $alias;
-        $this->{$alias} = $mediator;
-        return $this->{$alias};
+        $this->workers[$alias] = $mediator;
+        return $this->workers[$alias];
+    }
+
+    /**
+     * 
+     * @param type $alias
+     * @return type
+     * @throws Exception
+     */
+    protected function getWorker($alias) {
+        if (!isset($this->workers[$alias])) {
+            throw new Exception("Alias not found. The identifier `{$alias}` is not found");
+        }
+        return $this->workers[$alias];
     }
 
     /**
@@ -933,10 +947,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     private function checkWorkerAlias($alias) {
         if (empty($alias) || !is_scalar($alias)) {
-            throw new Exception("Invalid Alias. Identifiers must be scalar.");
+            throw new Exception("Invalid Worker Alias. Identifiers must be scalar.");
         }
         if (isset($this->workers[$alias])) {
-            throw new Exception("Invalid Alias. The identifier `{$alias}` is already in use or is reserved");
+            throw new Exception("Invalid Worker Alias. The identifier `{$alias}` is already in use or is reserved");
         }
     }
 

@@ -20,7 +20,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     const ERROR_UNKNOWN = -1;
 
     /**
-     * @var Core_Worker_Mediator
+     * @var CDaemon_Worker_MediatorAbstract
      */
     public $mediator;
 
@@ -119,7 +119,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         // Write a header to the shared memory block
         if (!shm_has_var($this->shm, self::HEADER_ADDRESS)) {
             $header = array(
-                'version' => Core_Worker_Mediator::VERSION,
+                'version' => CDaemon_Worker_MediatorAbstract::VERSION,
                 'memoryAllocation' => $this->memoryAllocation,
             );
             if (!shm_put_var($this->shm, self::HEADER_ADDRESS, $header))
@@ -131,7 +131,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             $this->mediator->log('Warning: Seems you\'ve using --recoverworkers after making a change to the worker malloc memory limit. To apply this change you will have to restart the daemon without the --recoverworkers option.' .
                     PHP_EOL . 'The existing memory_limit is ' . $header['memoryAllocation'] . ' bytes.');
         // If we're trying to recover previous messages/shm, scan the shared memory block for call structs and import them
-        // @todo if we keep this functionality, we need to at least remove it as a CLI option implemented by Core_Daemon because this will not apply to other Via conveyances
+        // @todo if we keep this functionality, we need to at least remove it as a CLI option implemented by CDaemon_ServiceAbstract because this will not apply to other Via conveyances
         if ($this->mediator->service->isParent() && $this->mediator->service->get('recover_workers')) {
             $max_id = $this->callCount;
             for ($i = 0; $i < 100000; $i++) {
@@ -189,11 +189,11 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * @param $message
      * @return boolean
      */
-    public function put(Core_Worker_Call $call) {
+    public function put(CDaemon_Worker_Call $call) {
         $that = $this;
         switch ($call->status) {
-            case Core_Worker_Mediator::UNCALLED:
-            case Core_Worker_Mediator::RETURNED:
+            case CDaemon_Worker_MediatorAbstract::UNCALLED:
+            case CDaemon_Worker_MediatorAbstract::RETURNED:
                 $encoder = function($call) use ($that) {
                     shm_put_var($that->shm, $call->id, $call);
                     return shm_has_var($that->shm, $call->id);
@@ -221,7 +221,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     /**
      * Retrieves a message from the queue
      * @param $desired_type
-     * @return Core_Worker_Call
+     * @return CDaemon_Worker_Call
      */
     public function get($desired_type, $blocking = false) {
         $blocking = $blocking ? 0 : MSG_IPC_NOWAIT;
@@ -233,15 +233,15 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         }
         $that = $this;
         switch ($message['status']) {
-            case Core_Worker_Mediator::UNCALLED:
+            case CDaemon_Worker_MediatorAbstract::UNCALLED:
                 $decoder = function($message) use($that) {
                     $call = shm_get_var($that->shm, $message['call_id']);
-                    if ($message['microtime'] < $call->time[Core_Worker_Mediator::UNCALLED])    // Has been requeued - Cancel this call
+                    if ($message['microtime'] < $call->time[CDaemon_Worker_MediatorAbstract::UNCALLED])    // Has been requeued - Cancel this call
                         $call->cancelled();
                     return $call;
                 };
                 break;
-            case Core_Worker_Mediator::RETURNED:
+            case CDaemon_Worker_MediatorAbstract::RETURNED:
                 $decoder = function($message) use($that) {
                     $call = shm_get_var($that->shm, $message['call_id']);
                     if ($call && $call->status == $message['status'])
@@ -377,10 +377,11 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 // Identifier Removed
                 // A message queue was re-created at this address but the resource identifier we have needs to be re-created
                 $this->mediator->count_error('communication');
-                if (Core_Daemon::is('parent'))
+                if ($this->mediator->service->isParent()) {
                     usleep($this->mediator->backoff(20000, $try));
-                else
+                } else {
                     sleep($this->mediator->backoff(2, $try));
+                }
                 $this->setupIpc();
                 return true;
                 break;
@@ -390,7 +391,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 $this->mediator->count_error('corruption');
                 // If this is a worker, all we can do is try to re-attach the shared memory.
                 // Any corruption or OOM errors will be handled by the parent exclusively.
-                if (!Core_Daemon::is('parent')) {
+                if (!$this->mediator->service->isParent()) {
                     sleep($this->mediator->backoff(3, $try));
                     $this->setupIpc();
                     return true;
@@ -418,11 +419,13 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                         continue;
                     }
                     $cached = $this->mediator->getStruct($i);
-                    if (!is_object($cached))
+                    if (!is_object($cached)) {
                         continue;
-                    if ($cached->status == Core_Worker_Mediator::TIMEOUT)
+                    }
+                    if ($cached->status == CDaemon_Worker_MediatorAbstract::TIMEOUT) {
                         continue;
-                    if ($cached->status == Core_Worker_Mediator::UNCALLED) {
+                    }
+                    if ($cached->status == CDaemon_Worker_MediatorAbstract::UNCALLED) {
                         $itemsToCall[$i] = $call;
                         continue;
                     }
