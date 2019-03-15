@@ -67,6 +67,7 @@ class CApp_Log_Request {
 
         $data = array(
             "request_date" => date("Y-m-d H:i:s"),
+            "app_id" => $appId,
             "org_id" => $orgId,
             "session_id" => CSession::instance()->id(),
             "user_agent" => $browser->getUserAgent(),
@@ -86,7 +87,6 @@ class CApp_Log_Request {
             "action" => $action_name,
             "action_label" => $action_label,
             "description" => $description,
-            "app_id" => $appId,
         );
         $db->insert("log_request", $data);
     }
