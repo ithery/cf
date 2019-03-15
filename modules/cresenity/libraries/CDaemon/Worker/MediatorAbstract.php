@@ -72,12 +72,12 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
     protected $forkingStrategy = self::MIXED;
 
     /**
-     * @var Core_Daemon
+     * @var CDaemon_ServiceAbstract
      */
     public $service;
 
     /**
-     * @var Core_IWorkerVia
+     * @var CDaemon_Worker_ViaInterface
      */
     protected $via;
 
@@ -90,7 +90,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
     /**
      * All Calls
      * A periodic garbage collection routine unsets ->args, ->return, leaving just the lightweight call meta-data behind
-     * @var Core_Worker_Call[]
+     * @var CDaemon_Worker_Call[]
      */
     protected $calls = array();
 
@@ -210,7 +210,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
      */
     protected abstract function getCallback($method);
 
-    public function __construct($alias, CDaemon_ServiceAbstract $service, Core_IWorkerVia $via) {
+    public function __construct($alias, CDaemon_ServiceAbstract $service, CDaemon_Worker_ViaInterface $via) {
         $this->alias = $alias;
         $this->service = $service;
         $this->via = $via;
@@ -261,7 +261,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
     }
 
     /**
-     * Create an instance of Core_Lib_DebugShell and pass in the current via object. Add appropriate closures and settings
+     * Create an instance of CDaemon_DebugShell and pass in the current via object. Add appropriate closures and settings
      * for the desired commands, prompts, etc.
      *
      * @return void
@@ -270,7 +270,7 @@ abstract class CDaemon_Worker_MediatorAbstract implements CDaemon_TaskAbstract {
         ##
         ## Wrap the current $via object in a DebugShell mediator
         ##
-        $this->via = new Core_Lib_DebugShell($this->via);
+        $this->via = new CDaemon_DebugShell($this->via);
         $this->via->service = $this->service;
         $this->via->setup_shell();
         ## We'll use these in the many closures below..
