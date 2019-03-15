@@ -9,11 +9,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CApp_Trait_LogActivity {
 
-    public function startActivity($message, $listener = null) {
+    public function start($message, $listener = null) {
         CApp_LogActivity::instance()->start($message, $listener);
     }
 
-    public function stopActivity() {
+    public function stop() {
         CApp_LogActivity::instance()->stop();
     }
 
