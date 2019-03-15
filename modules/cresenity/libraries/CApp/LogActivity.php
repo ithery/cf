@@ -44,6 +44,8 @@ class CApp_LogActivity
 			$this->observer = new $this->observer;
 		}
 
+		cdbg::dd($this->observer);
+
 		static::bootLog($userId, $this->message, $this->model, $this->observer);
 	}
 
