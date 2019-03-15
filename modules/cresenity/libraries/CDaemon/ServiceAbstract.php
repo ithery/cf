@@ -888,10 +888,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Create a persistent Worker process. This is an object loader similar to CDaemon_ServiceAbstract::plugin().
      *
      * @param String $alias  The name of the worker -- Will be instantiated at $this->{$alias}
-     * @param callable|CDaemon_WorkerInterface $worker An object of type Core_Worker OR a callable (function, callback, closure)
+     * @param callable|CDaemon_WorkerInterface $worker An object of type CDaemon_WorkerInterface OR a callable (function, callback, closure)
      * @param CDaemon_Worker_ViaInterface $via  A Core_IWorkerVia object that defines the medium for IPC (In theory could be any message queue, redis, memcache, etc)
      * @return CDaemon_Worker_Mediator Returns a Core_Worker class that can be used to interact with the Worker
-     * @todo Use 'callable' type hinting if/when we move to a php 5.4 requirement.
      */
     protected function addWorker($alias, $worker, CDaemon_Worker_ViaInterface $via = null) {
         if (!$this->parent) {
@@ -915,6 +914,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                     throw new Exception(sprintf('%s Failed. Your worker class "%s" contains restricted method names: %s.', __METHOD__, get_class($worker), implode(', ', $intersection)));
                 }
                 $mediator->setObject($worker);
+
                 break;
             case is_callable($worker):
                 $mediator = new CDaemon_Worker_MediatorFunction($alias, $this, $via);

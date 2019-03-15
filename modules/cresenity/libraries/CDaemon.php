@@ -227,4 +227,16 @@ class CDaemon {
         return CDaemon_Factory::instance();
     }
 
+    /**
+     * Shortcut function to log the current running service
+     * 
+     * @param string $msg
+     */
+    public static function log($msg) {
+        $runningService = self::getRunningService();
+        if ($runningService != null) {
+            $runningService->log($msg);
+        }
+    }
+
 }

@@ -26,8 +26,14 @@ class CDaemon_Factory {
         return self::$instance;
     }
 
-    public static function createWebSocketListenerWorker() {
-        return new CDaemon_Worker_Listener_WebSocketListener();
+    /**
+     * 
+     * @param string $socketName
+     * @param array $contextOption
+     * @return \CDaemon_Worker_Listener_WebSocketListener
+     */
+    public static function createWebSocketListenerWorker($socketName = '', $contextOption = array()) {
+        return new CDaemon_Worker_Listener_WebSocketListener($socketName, $contextOption);
     }
 
 }

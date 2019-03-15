@@ -8,5 +8,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 abstract class CDaemon_WorkerAbstract implements CDaemon_WorkerInterface {
-    
+
+    /**
+     *
+     * @var CDaemon_Worker_MediatorAbstract 
+     */
+    protected $mediator;
+
+    /**
+     * 
+     * @param CDaemon_Worker_MediatorAbstract $mediator
+     */
+    public function setMediator(CDaemon_Worker_MediatorAbstract $mediator) {
+        $this->mediator = $this->mediator;
+    }
+
 }

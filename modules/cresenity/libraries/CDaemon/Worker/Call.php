@@ -136,7 +136,7 @@ class CDaemon_Worker_Call {
      * @return int
      */
     public function queue() {
-        return CDaemon_Worker_MediatorAbstract::$queue_map[$this->status];
+        return CDaemon_Worker_MediatorAbstract::$queueMap[$this->status];
     }
 
     public function status($status, $microtime = null) {

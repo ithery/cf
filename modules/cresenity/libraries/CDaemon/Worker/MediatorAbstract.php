@@ -43,7 +43,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @example When a call is in UNCALLED status, it should be written to the WORKER_CALL queue.
      * @var array
      */
-    public static $queue_map = array(
+    public static $queueMap = array(
         self::UNCALLED => self::WORKER_CALL,
         self::RUNNING => self::WORKER_RUNNING,
         self::RETURNED => self::WORKER_RETURN
@@ -234,10 +234,11 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             return;
         // If there are no pending messages, release all shared resources.
         // If there are, then we want to preserve them so we can allow for daemon restarts without losing the call buffer
-        if ($this->process_count() == 0) {
+        if ($this->processCount() == 0) {
             $state = $this->via->state();
-            if ($state['messages'] == 0)
+            if ($state['messages'] == 0) {
                 $this->via->release();
+            }
         }
         unset($this->via);
         unset($this->service);
@@ -248,8 +249,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * Primarily for access within the debugshell during mediator development
      */
     public function __get($k) {
-        if (array_key_exists($k, get_object_vars($this)))
+        if (array_key_exists($k, get_object_vars($this))) {
             return $this->{$k};
+        }
         return null;
     }
 
@@ -272,7 +274,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         ##
         $this->via = new CDaemon_DebugShell($this->via);
         $this->via->service = $this->service;
-        $this->via->setup_shell();
+        $this->via->setupShell();
         ## We'll use these in the many closures below..
         $that = $this;
         $shell = $this->via;
@@ -281,18 +283,20 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         ## Set callbacks to empower the indentation feature (for easy visual grouping)
         ## and the prompt-prefix (for prompt pid/alias/status identification)
         ##
-        $this->via->indent_callback = function($method, $args) use($shell, $alias) {
-            $call_id = null;
+        $this->via->indentCallback = function($method, $args) use($shell, $alias) {
+            $callId = null;
             switch ($method) {
                 case 'drop':
-                    $call_id = $args[0];
+                    $callId = $args[0];
                     break;
                 default:
-                    if (isset($args[0]) && $args[0] instanceof Core_Worker_Call)
-                        $call_id = $args[0]->id;
+                    if (isset($args[0]) && $args[0] instanceof CDaemon_Worker_Call) {
+                        $callId = $args[0]->id;
+                    }
             }
-            if ($call_id)
-                return $shell->increment_indent($alias . $call_id);
+            if ($callId) {
+                return $shell->incrementIndent($alias . $callId);
+            }
             return 0;
         };
         $this->via->prompt_prefix_callback = function($method, $args) use($alias) {
@@ -518,7 +522,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return mixed
      */
     protected function fork() {
-        $processes = $this->process_count();
+        $processes = $this->processCount();
         if ($this->workers <= $processes)
             return;
         switch ($this->forkingStrategy) {
@@ -616,17 +620,17 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             // Timeouts will either be simply that the worker is taking longer than expected to return the call,
             // or the worker actually fatal-errored and killed itself.
             if ($this->timeout > 0) {
-                foreach (array_keys($this->runningCalls) as $call_id) {
-                    $call = $this->calls[$call_id];
+                foreach (array_keys($this->runningCalls) as $callId) {
+                    $call = $this->calls[$callId];
                     if ($call->runtime() > $this->timeout) {
-                        if (!$this->breakpoint("[{$this->alias} Call {$call_id}] Enforcing timeout at runtime: " . $call->runtime(), $call_id - 1))
+                        if (!$this->breakpoint("[{$this->alias} Call {$callId}] Enforcing timeout at runtime: " . $call->runtime(), $callId - 1))
                             continue;
-                        $this->log("Enforcing Timeout on Call $call_id in pid " . $call->pid);
+                        $this->log("Enforcing Timeout on Call $callId in pid " . $call->pid);
                         if ($this->process($call->pid) instanceof Core_Lib_Process) {
                             $this->process($call->pid)->kill();
                         }
                         $call->timeout();
-                        unset($this->runningCalls[$call_id]);
+                        unset($this->runningCalls[$callId]);
                         $onTimeout = $this->onTimeout;
                         if (is_callable($onTimeout))
                             call_user_func($onTimeout, $call, $logger);
@@ -635,7 +639,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             }
             // If we've killed all our processes -- either timeouts or maybe they fatal-errored -- and we have pending
             // calls in the queue, fork()
-            if ($this->process_count() == 0) {
+            if ($this->processCount() == 0) {
                 $state = $this->via->state();
                 if ($state['messages'] > 0) {
                     $this->fork();
@@ -739,9 +743,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * Return the requested call from the local call cache if it exists
      * @return Core_Worker_Call
      */
-    public function get_struct($call_id) {
-        if (isset($this->calls[$call_id]))
-            return $this->calls[$call_id];
+    public function get_struct($callId) {
+        if (isset($this->calls[$callId]))
+            return $this->calls[$callId];
         return null;
     }
 
@@ -767,11 +771,11 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (!$this->breakpoint('Run Garbage Collector'))
             return;
         $called = array();
-        foreach ($this->calls as $call_id => &$call) {
+        foreach ($this->calls as $callId => &$call) {
             if ($call->gc() && Core_Daemon::is('parent'))
-                $this->via->drop($call_id);
+                $this->via->drop($callId);
             if ($call->status == self::CALLED)
-                $called[] = $call_id;
+                $called[] = $callId;
         }
         unset($call);
         if (!Core_Daemon::is('parent') || count($called) == 0)
@@ -789,8 +793,8 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             if ($process->job !== null)
                 $cutoff = min($cutoff, $this->calls[$process->job]->time[self::CALLED]);
         }
-        foreach ($called as $call_id) {
-            $call = $this->calls[$call_id];
+        foreach ($called as $callId) {
+            $call = $this->calls[$callId];
             if ($call->time[self::CALLED] > $cutoff)
                 continue;
             // If there's a retry count above our threshold log and skip to avoid endless requeueing
@@ -860,7 +864,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * Helper function to retrieve the process count from the ProcessManager for this worker
      * @return mixed
      */
-    public function process_count() {
+    public function processCount() {
         if (isset($this->service->ProcessManager))
             return $this->service->ProcessManager->count($this->alias);
         return 0;
@@ -1013,12 +1017,12 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      *
      * Part of the Daemon API - Use from your daemon to determine the status of a given call
      *
-     * @param integer $call_id
+     * @param integer $callId
      * @return int  Return a status int - See status constants in this class
      */
-    public function status($call_id) {
-        if (isset($this->calls[$call_id]))
-            return $this->calls[$call_id]->status;
+    public function status($callId) {
+        if (isset($this->calls[$callId]))
+            return $this->calls[$callId]->status;
         return null;
     }
 

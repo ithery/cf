@@ -26,12 +26,12 @@ final class CDaemon_Worker_MediatorObject extends CDaemon_Worker_MediatorAbstrac
         }
     }
 
-    public function setObject($o) {
+    public function setObject(CDaemon_WorkerAbstract $o) {
         if (!($o instanceof CDaemon_WorkerAbstract)) {
             throw new Exception(__METHOD__ . " Failed. Worker objects must extends CDaemon_WorkerAbstract");
         }
         $this->object = $o;
-        $this->object->mediator = $this;
+        $this->object->setMediator($this);
         $this->class = get_class($o);
         $this->methods = get_class_methods($this->class);
     }
