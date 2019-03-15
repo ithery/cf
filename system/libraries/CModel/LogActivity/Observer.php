@@ -37,6 +37,8 @@ class CModel_LogActivity_Observer
 			$after[$attr] = $model->{$attr};
 		}
 
+		cdbg::dd($attributes, $before, $after, $model->getDirty());
+
 		$logActivity
 			->type('update')
 			->before($before)
