@@ -49,39 +49,43 @@ class CApp_Model_Observer_LogActivity implements CModel_Activity_ObserverInterfa
 
 	public function updated(CModel $model)
 	{
-		$before = [];
-		$after = $model->getAttributes();
-		$changes = $model->getDirty();
+		if ($this->isStarted()) {
+			$before = [];
+			$after = $model->getAttributes();
+			$changes = $model->getDirty();
 
-		foreach ($after as $key => $value) {
-			$before[$key] = $model->getOriginal($key);
+			foreach ($after as $key => $value) {
+				$before[$key] = $model->getOriginal($key);
+			}
+
+			$this->logActivity
+				->user($this->userId)
+				->type('update')
+				->before($before)
+				->after($after)
+				->changes($changes)
+				->log($this->message);
 		}
-
-		$this->logActivity
-			->user($this->userId)
-			->type('update')
-			->before($before)
-			->after($after)
-			->changes($changes)
-			->log($this->message);
 	}
 
 	public function deleted(CModel $model)
 	{
-		$before = [];
-		$after = $model->getAttributes();
-		$changes = $model->getDirty();
+		if ($this->isStarted()) {
+			$before = [];
+			$after = $model->getAttributes();
+			$changes = $model->getDirty();
 
-		foreach ($after as $key => $value) {
-			$before[$key] = $model->getOriginal($key);
+			foreach ($after as $key => $value) {
+				$before[$key] = $model->getOriginal($key);
+			}
+
+			$this->logActivity
+				->user($this->userId)
+				->type('delete')
+				->before($before)
+				->after($after)
+				->changes($changes)
+				->log($this->message);
 		}
-
-		$this->logActivity
-			->user($this->userId)
-			->type('delete')
-			->before($before)
-			->after($after)
-			->changes($changes)
-			->log($this->message);
 	}
 }
