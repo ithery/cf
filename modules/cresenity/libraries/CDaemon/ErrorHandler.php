@@ -44,8 +44,9 @@ class CDaemon_ErrorHandler {
         $runningService = CDaemon::getRunningService();
 
         // Respect the error_reporting Level
-        if (($errNo & error_reporting()) == 0)
+        if (($errNo & error_reporting()) == 0) {
             return true;
+        }
 
         $is_fatal = false;
         switch ($errNo) {
@@ -73,6 +74,7 @@ class CDaemon_ErrorHandler {
         }
         $message = sprintf('PHP %s: %s in %s on line %d pid %s', $errors, $errStr, $errFile, $errLine, getmypid());
 
+
         $runningService->log($message);
         if ($is_fatal) {
             if (!$e) {
@@ -93,8 +95,17 @@ class CDaemon_ErrorHandler {
      * @param Exception $e
      *
      */
-    public static function daemonException(Exception $e) {
-        self::daemonError(-1, $e->getMessage(), $e->getFile(), $e->getLine(), null, $e);
+    public static function daemonException($e) {
+        if ($e instanceof Exception) {
+            return self::daemonError(-1, $e->getMessage(), $e->getFile(), $e->getLine(), null, $e);
+        }
+        if ($e instanceof \Error) {
+            /**
+             * var Error $e
+             */
+            return self::daemonError(-1, $e->getMessage(), $e->getFile(), $e->getLine(), null, null);
+        }
+        return false;
     }
 
     /**

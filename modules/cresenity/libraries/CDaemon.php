@@ -219,6 +219,10 @@ class CDaemon {
         return strlen(trim($result)) > 0;
     }
 
+    /**
+     * 
+     * @return CDaemon_Factory
+     */
     public static function factory() {
         return CDaemon_Factory::instance();
     }
