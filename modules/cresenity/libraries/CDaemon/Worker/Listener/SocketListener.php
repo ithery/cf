@@ -14,7 +14,9 @@ class CDaemon_Worker_Listener_SocketListener extends CDaemon_Worker_ListenerAbst
     }
 
     public function setup() {
-        
+        $this->user = $this->getCurrentUser();
+        $this->event = new CDaemon_Worker_Event();
+        $this->listen();
     }
 
     public function teardown() {

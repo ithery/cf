@@ -175,7 +175,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
             // Keep track of process churn -- failures within a processes min_ttl
             // If too many failures of new processes occur inside a given interval, that's a problem.
             // Raise a fatal error to prevent runaway process forking which can be very damaging to a server
-            if ($this->service->is('shutdown') || $process->runtime() >= $process->min_ttl)
+            if ($this->service->isShutdown() || $process->runtime() >= $process->min_ttl)
                 continue;
             foreach ($this->failures as $key => $failure_time)
                 if ($failure_time + self::CHURN_WINDOW < time())

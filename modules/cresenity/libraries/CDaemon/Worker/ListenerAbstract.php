@@ -163,7 +163,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
                 $contextOption['socket']['backlog'] = static::DEFAULT_BACKLOG;
             }
             $this->context = stream_context_create($contextOption);
-            $this->init();
+         
         }
     }
 
@@ -216,11 +216,11 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      */
     public function resumeAccept() {
         // Register a listener to be notified when server socket is ready to read.
-        if (static::$globalEvent && true === $this->pauseAccept && $this->mainSocket) {
+        if ($this->event && true === $this->pauseAccept && $this->mainSocket) {
             if ($this->transport !== 'udp') {
-                static::$globalEvent->add($this->mainSocket, EventInterface::EV_READ, array($this, 'acceptConnection'));
+                $this->event->listen(CDaemon_Worker_Constant::EV_LISTENER_READ, array($this, 'acceptConnection'));
             } else {
-                static::$globalEvent->add($this->mainSocket, EventInterface::EV_READ, array($this, 'acceptUdpConnection'));
+                $this->event->listen(CDaemon_Worker_Constant::EV_LISTENER_READ, array($this, 'acceptUdpConnection'));
             }
             $this->_pauseAccept = false;
         }
@@ -260,6 +260,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
         if (!$this->mainSocket) {
             // Get the application layer communication protocol and listening address.
             list($scheme, $address) = explode(':', $this->socketName, 2);
+            
             // Check application layer protocol class.
             if (!isset(static::$builtinTransports[$scheme])) {
                 $scheme = ucfirst($scheme);
@@ -306,7 +307,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
                 set_error_handler(function() {
                     
                 });
-                $socket = socket_import_stream($this->_mainSocket);
+                $socket = socket_import_stream($this->mainSocket);
                 socket_set_option($socket, SOL_SOCKET, SO_KEEPALIVE, 1);
                 socket_set_option($socket, SOL_TCP, TCP_NODELAY, 1);
                 restore_error_handler();
@@ -317,10 +318,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
         $this->resumeAccept();
     }
 
-    public function init() {
-        $this->user = $this->getCurrentUser();
-        $this->listen();
-    }
+    
 
     /**
      * Get unix user of current porcess.

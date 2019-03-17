@@ -170,7 +170,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      *
      * @var bool
      */
-    protected $auto_restart = true;
+    protected $autoRestart = true;
 
     /**
      * Array of accumulated error counts. Error thresholds are localized and when reached will
@@ -178,7 +178,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @var array
      * @todo should we move error counts to the mediator? And the Via object needs to report errors to the mediator? I think probably yes.
      */
-    public $error_counts = array(
+    public $errorCounts = array(
         'communication' => 0,
         'corruption' => 0,
         'catchall' => 0,
@@ -440,24 +440,28 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return bool
      */
     public function breakpoint($prompt = '', $indent = 0) {
-        if (!Core_Daemon::get('debug_workers'))
+        $this->log($prompt);
+        if (!$this->service->isDebugWorkers()) {
             return true;
+        }
         $call = debug_backtrace();
         $call = $call[1];
         $method = sprintf('%s::%s', $call['class'], $call['function']);
         $this->via->prompts[$method] = $prompt;
         if ($indent) {
-            $indent = $this->via->increment_indent($this->alias . $indent);
+            $indent = $this->via->incrementIndent($this->alias . $indent);
             $tmp = $this->via->indent_callback;
             $this->via->indent_callback = function() use($indent) {
                 return $indent;
             };
         }
         $return = true;
-        if ($this->via instanceof Core_Lib_DebugShell)
+        if ($this->via instanceof CDaemon_DebugShell) {
             $return = $this->via->prompt($method, $call['args']);
-        if (isset($tmp))
-            $this->via->indent_callback = $tmp;
+        }
+        if (isset($tmp)) {
+            $this->via->indentCallback = $tmp;
+        }
         return $return;
     }
 
@@ -471,19 +475,22 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             // This is a bit ugly but ftok needs a filesystem path so we give it one using the daemon filename and
             // current worker alias.
             $tmp = sys_get_temp_dir();
-            $ftok = sprintf($tmp . '/%s_%s', str_replace('/', '_', $this->service->get('filename')), $this->alias);
-            if (!touch($ftok))
-                $this->fatal_error("Unable to create Worker ID. ftok() failed. Could not write to {$tmp} directory at {$ftok}");
+            $ftok = sprintf($tmp . '/%s_%s', str_replace('/', '_', $this->service->getServiceName()), $this->alias);
+            if (!touch($ftok)) {
+                $this->fatalError("Unable to create Worker ID. ftok() failed. Could not write to {$tmp} directory at {$ftok}");
+            }
             $this->guid = ftok($ftok, $this->alias[0]);
             @unlink($ftok);
-            if ($this->guid == -1)
-                $this->fatal_error("Unable to create Worker ID. ftok() failed. Unexpected return value: $this->guid");
+            if ($this->guid == -1) {
+                $this->fatalError("Unable to create Worker ID. ftok() failed. Unexpected return value: $this->guid");
+            }
             $this->via->setup();
             $this->via->purge();
-            if ($this->service->get('debug_workers'))
+            if ($this->service->isDebugWorkers()) {
                 $this->debug();
+            }
             $this->service->on(CDaemon_ServiceAbstract::ON_PREEXECUTE, array($this, 'run'));
-            $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, array($this, 'garbage_collector'), ceil(120 / ($this->workers * 0.5)));  // Throttle the garbage collector
+            $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, array($this, 'garbageCollector'), ceil(120 / ($this->workers * 0.5)));  // Throttle the garbage collector
             $this->service->on(CDaemon_ServiceAbstract::ON_SIGNAL, array($this, 'dump'), null, function($args) {
                 return $args[0] == SIGUSR1;
             });
@@ -495,7 +502,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             $event_restart = function() use($that) {
                 $that->log('Restarting Worker Process...');
             };
-            $this->service->on(Core_Daemon::ON_SIGNAL, $event_restart, null, function($args) {
+            $this->service->on(CDaemon_ServiceAbstract::ON_SIGNAL, $event_restart, null, function($args) {
                 return $args[0] == SIGUSR1;
             });
             call_user_func($this->getCallback('setup'));
@@ -523,8 +530,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      */
     protected function fork() {
         $processes = $this->processCount();
-        if ($this->workers <= $processes)
+        if ($this->workers <= $processes) {
             return;
+        }
         switch ($this->forkingStrategy) {
             case self::LAZY:
                 $state = $this->via->state();
@@ -550,8 +558,10 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             if ($this->callCount == 0 && $state['messages'] > 0)
                 $forks = 1;
         }
-        if ($forks && !$this->breakpoint("Forking {$forks} New Worker Processes"))
+        if ($forks && !$this->breakpoint("Forking {$forks} New Worker Processes")) {
             return false;
+        }
+        $this->breakpoint('Forking success');
         $errors = 0;
         for ($i = 0; $i < $forks; $i++) {
             // A Core_Lib_Process object will be returned from the task() method.
@@ -568,7 +578,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $i--;
                 continue;
             }
-            $this->fatal_error("Could Not Fork: See PHP error log for an error code and more information.");
+            $this->fatalError("Could Not Fork: See PHP error log for an error code and more information.");
         }
     }
 
@@ -579,8 +589,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function run() {
-        if (empty($this->calls))
+        if (empty($this->calls)) {
             return;
+        }
         try {
             // If there are any callbacks registered (onReturn, onTimeout, etc), we will pass
             // the call object and this $logger closure to them
@@ -614,8 +625,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $onReturn = $this->onReturn;
                 if (is_callable($onReturn)) {
                     call_user_func($onReturn, $call, $logger);
-                }
-                else {
+                } else {
                     $this->log('No onReturn Callback Available');
                 }
                 $this->log('Job ' . $call->id . ' Is Complete');
@@ -665,17 +675,18 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         // in a pool restart at the same time. Use a very crude technique to create a random number along a normal distribution.
         $entropy = round((mt_rand(-1000, 1000) + mt_rand(-1000, 1000) + mt_rand(-1000, 1000)) / 100, 0);
         $recycle = false;
-        while (!Core_Daemon::is('parent') && !Core_Daemon::is('shutdown') && !$recycle) {
+        while (!$this->service->isParent() && !$this->service->isParent() && !$recycle) {
             // Give the CPU a break - Sleep for 1/20 a second.
             usleep(50000);
-            if ($this->auto_restart) {
+            if ($this->autoRestart) {
                 $max_jobs = $this->callCount++ >= (25 + $entropy);
                 $min_runtime = $this->service->runtime() >= (60 * 5);
                 $max_runtime = $this->service->runtime() >= (60 * 30 + $entropy * 10);
                 $recycle = ($max_runtime || $min_runtime && $max_jobs);
             }
-            if (mt_rand(1, 5) == 1)
-                $this->garbage_collector();
+            if (mt_rand(1, 5) == 1) {
+                $this->garbageCollector();
+            }
             if ($call = $this->via->get(self::WORKER_CALL, true)) {
                 try {
                     // If the current via supports it, calls can be cancelled while they are enqueued
@@ -689,8 +700,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                         continue;
                     }
                     $call->running();
-                    if (!$this->via->put($call))
+                    if (!$this->via->put($call)) {
                         $this->log("Call {$call->id} Could Not Ack Running.");
+                    }
                     $call->returned(call_user_func_array($this->getCallback($call->method), $call->args));
                     if (!$this->via->put($call))
                         $this->log("Call {$call->id} Could Not Ack Complete.");
@@ -738,8 +750,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @throws Exception
      */
     public function __call($method, $args) {
-        if (!in_array($method, $this->methods))
+        if (!in_array($method, $this->methods)) {
             throw new Exception(__METHOD__ . " Failed. Method `{$method}` is not callable.");
+        }
         $this->callCount++;
         return $this->call(new Core_Worker_Call($this->callCount, $method, $args));
     }
@@ -772,7 +785,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * and attempts to retry them when appropriate.
      * @return void
      */
-    public function garbage_collector() {
+    public function garbageCollector() {
         if (!$this->breakpoint('Run Garbage Collector'))
             return;
         $called = array();
@@ -783,8 +796,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $called[] = $callId;
         }
         unset($call);
-        if (!Core_Daemon::is('parent') || count($called) == 0)
+        if (!$this->service->isParent() || count($called) == 0) {
             return;
+        }
         // We need to determine if we have any "dropped calls" in CALLED status. This could happen in a few scenarios:
         // 1) There was a silent message-queue failure and the item was never presented to workers.
         // 2) A worker received the message but fatal-errored before acking.
@@ -821,10 +835,10 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @param $type
      * @return void
      */
-    public function count_error($type) {
-        $this->error_counts[$type] ++;
-        if ($this->error_counts[$type] > $this->errorThresholds[$type][(int) Core_Daemon::is('parent')])
-            $this->fatal_error("IPC '$type' Error Threshold Reached");
+    public function countError($type) {
+        $this->errorCounts[$type] ++;
+        if ($this->errorCounts[$type] > $this->errorThresholds[$type][(int) Core_Daemon::is('parent')])
+            $this->fatalError("IPC '$type' Error Threshold Reached");
     }
 
     /**
@@ -933,7 +947,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         $out[] = '';
         $out[] = 'Error Type      Count';
         $out[] = '=====================';
-        foreach ($this->error_counts as $type => $count) {
+        foreach ($this->errorCounts as $type => $count) {
             $out[] = sprintf('%s %s', str_pad(ucfirst($type), 15), str_pad(number_format($count, 0), 5, ' ', STR_PAD_LEFT)
             );
         }
@@ -973,11 +987,11 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @param $message
      * @return void
      */
-    public function fatal_error($message) {
-        if ($this->service->is('parent'))
-            $this->service->fatal_error("Fatal Error: $message", $this->alias);
+    public function fatalError($message) {
+        if ($this->service->isParent())
+            $this->service->fatalError("Fatal Error: $message", $this->alias);
         else
-            $this->service->fatal_error("Fatal Error: $message\nWorker process will restart", $this->alias);
+            $this->service->fatalError("Fatal Error: $message\nWorker process will restart", $this->alias);
     }
 
     /**

@@ -15,6 +15,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     protected $shutdown = false;
     protected $parent = true;
     protected $parentPid = null;
+    protected $isRecoverWorkers = false;
+    protected $isDebugWorkers = false;
 
     /**
      *
@@ -165,16 +167,21 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @throws Exception
      */
     protected function checkEnvironment(array $errors = array()) {
-        if (is_numeric($this->loopInterval) == false)
+        if (is_numeric($this->loopInterval) == false) {
             $errors[] = "Invalid Loop Interval: $this->loopInterval";
-        if (is_numeric($this->autoRestartInterval) == false)
+        }
+        if (is_numeric($this->autoRestartInterval) == false) {
             $errors[] = "Invalid auto-restart interval: $this->autoRestartInterval";
-        if (is_numeric($this->autoRestartInterval) && $this->autoRestartInterval < self::MIN_RESTART_SECONDS)
+        }
+        if (is_numeric($this->autoRestartInterval) && $this->autoRestartInterval < self::MIN_RESTART_SECONDS) {
             $errors[] = 'Auto-restart inteval is too low. Minimum value: ' . self::MIN_RESTART_SECONDS;
-        if (function_exists('pcntl_fork') == false)
+        }
+        if (function_exists('pcntl_fork') == false) {
             $errors[] = "The PCNTL Extension is not installed";
-        if (version_compare(PHP_VERSION, '5.3.0') < 0)
+        }
+        if (version_compare(PHP_VERSION, '5.3.0') < 0) {
             $errors[] = "PHP 5.3 or higher is required";
+        }
         foreach ($this->plugins as $plugin) {
             foreach ($plugin->checkEnvironment() as $error) {
                 $errors[] = "[$plugin] $error";
@@ -417,7 +424,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         // If a Core_ITask was passed in, wrap it in a closure
         // If no group is provided, add the process to an adhoc "tasks" group. A group identifier is required.
         // @todo this group thing is not elegant. Improve it.
-        if ($task instanceof Core_ITask) {
+        if ($task instanceof CDaemon_TaskAbstract) {
             $group = $task->group();
             $callable = function() use($task) {
                 $task->setup();
@@ -428,7 +435,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $group = 'tasks';
             $callable = $task;
         }
-        $proc = $this->ProcessManager->fork($group);
+        $proc = $this->getPlugin('ProcessManager')->fork($group);
         if ($proc === false) {
             // Parent Process - Fork Failed
             $e = new Exception();
@@ -443,9 +450,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->parentPid == $this->pid;
             $this->pid(getmypid());
             // Remove unused worker objects. They can be memory hogs.
-            foreach ($this->workers as $worker)
-                if (!is_array($callable) || $callable[0] != $this->{$worker})
-                    unset($this->{$worker});
+            foreach ($this->workers as $workerKey => $worker) {
+                if (!is_array($callable) || $callable[0] != $workerKey) {
+                    unset($this->workers[$workerKey]);
+                }
+            }
             $this->workers = $this->stats = array();
             try {
                 call_user_func_array($callable, array_slice(func_get_args(), 1));
@@ -1085,4 +1094,22 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return false;
     }
 
+    public function getServiceName() {
+        return $this->serviceName;
+    }
+
+    public function isRecoverWorkers() {
+        return $this->isRecoverWorkers;
+    }
+    public function isDebugWorkers() {
+        return $this->isDebugWorkers;
+    }
+
+    public function getParentPid() {
+        return $this->parentPid;
+    }
+    
+    public function isShutdown() {
+        return $this->shutdown;
+    }
 }

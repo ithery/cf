@@ -132,7 +132,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     PHP_EOL . 'The existing memory_limit is ' . $header['memoryAllocation'] . ' bytes.');
         // If we're trying to recover previous messages/shm, scan the shared memory block for call structs and import them
         // @todo if we keep this functionality, we need to at least remove it as a CLI option implemented by CDaemon_ServiceAbstract because this will not apply to other Via conveyances
-        if ($this->mediator->service->isParent() && $this->mediator->service->get('recover_workers')) {
+        if ($this->mediator->service->isParent() && $this->mediator->service->isRecoverWorkers()) {
             $max_id = $this->callCount;
             for ($i = 0; $i < 100000; $i++) {
                 if (shm_has_var($this->shm, $i)) {

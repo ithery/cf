@@ -174,7 +174,7 @@ class CDaemon_DebugShell {
      */
     public function setupShell() {
         ini_set('display_errors', 0); // Displayed errors won't break the debug console but it will make it more difficult to use. Tail a log file in another shell instead.
-        $this->ftok = ftok(Core_Daemon::get('filename'), 'D');
+        $this->ftok = ftok(CDaemon::getRunningService()->getServiceName(), 'D');
         $this->mutex = sem_get($this->ftok, 1, 0666, 1);
         $this->shm = shm_attach($this->ftok, 64 * 1024, 0666);
         $shell = $this;
@@ -204,7 +204,7 @@ class CDaemon_DebugShell {
             'command' => 'skipfor [n]',
             'description' => 'Run the daemon (and skip ALL breakpoints) for N seconds, then return to normal break point operation.',
             'closure' => function($matches, $printer) {
-                posix_kill(Core_Daemon::get('parent_pid'), $matches[1]);
+                posix_kill(CDaemon::getRunningService()->getParentPid(), $matches[1]);
                 $printer("Signal Sent");
             }
         );
@@ -309,7 +309,7 @@ class CDaemon_DebugShell {
     public function debugState($key, $value = null, $default = null) {
         static $state = false;
         $defaults = array(
-            'parent' => Core_Daemon::get('parent_pid'),
+            'parent' => $this->service()->getParentPid(),
             'enabled' => true,
             'indent' => true,
             'last' => '',
@@ -322,7 +322,7 @@ class CDaemon_DebugShell {
             $state = $defaults;
         }
         // If the process was kill -9'd we might have settings from last debug session hanging around.. wipe em
-        if ($state['parent'] != Core_Daemon::get('parent_pid')) {
+        if ($state['parent'] != $this->service()->getParentPid()) {
             $state = $defaults;
             shm_put_var($this->shm, 1, $state);
         }
@@ -381,7 +381,7 @@ class CDaemon_DebugShell {
      * @param $args
      * @return string
      */
-    private function get_text_prompt($method, $args) {
+    private function getTextPrompt($method, $args) {
         if (isset($this->prompts[$method])) {
             if (is_callable($this->prompts[$method])) {
                 $prompt = $this->prompts[$method]($method, $args);
@@ -425,7 +425,7 @@ class CDaemon_DebugShell {
      * Multiple processes share a single command prompt by accessing a semaphore identified by the current application.
      * This method will block the process while it waits for the mutex, and then again while it waits for input on STDIN.
      *
-     * The text of the prompt itself will be written when get_text_prompt() is called. Custom prompts for a given $method
+     * The text of the prompt itself will be written when getTextPrompt() is called. Custom prompts for a given $method
      * can be added to the $prompts array.
      *
      * Several commands are built-in, and additional commands can be added with addParser().
@@ -441,8 +441,9 @@ class CDaemon_DebugShell {
      * @throws Exception
      */
     public function prompt($method, $args) {
-        if (!is_resource($this->shm))
+        if (!is_resource($this->shm)) {
             return true;
+        }
         // The single debug shell is shared across the parent and all worker processes. Use a mutex to serialize
         // access to the shell. If the mutex isn't owned by this process, this will block until this process acquires it.
         $this->mutexAcquire();
@@ -464,13 +465,14 @@ class CDaemon_DebugShell {
         try {
             $this->printBanner();
             $pid = getmypid();
-            $prompt = $this->get_text_prompt($method, $args);
+            $prompt = $this->getTextPrompt($method, $args);
             $break = false;
             // We have to clear the buffer of any input that occurred in the terminal in the space after they submitted their last
             // command and before this new prompt. Otherwise it'll be read from fgets below and probably ruin everything.
             stream_set_blocking(STDIN, 0);
-            while (fgets(STDIN))
+            while (fgets(STDIN)) {
                 continue;
+            }
             stream_set_blocking(STDIN, 1);
             // Commands that set $break=true will continue forward from the command prompt.
             // Otherwise it will just do the action (or display an error) and then repeat the prompt
@@ -558,7 +560,7 @@ class CDaemon_DebugShell {
                     case 'kill':
                         @fclose(STDOUT);
                         @fclose(STDERR);
-                        @exec('ps -C "php ' . Core_Daemon::get('filename') . '" -o pid= | xargs kill -9 ');
+                        @exec('ps -C "php ' . $this->service()->getServiceName() . '" -o pid= | xargs kill -9 ');
                         break;
                     case 'capture':
                         $backtrace = debug_backtrace();
@@ -590,4 +592,11 @@ class CDaemon_DebugShell {
         return $input;
     }
 
+    /**
+     * 
+     * @return CDaemon_ServiceAbstract
+     */
+    public function service() {
+        return CDaemon::getRunningService();
+    }
 }
