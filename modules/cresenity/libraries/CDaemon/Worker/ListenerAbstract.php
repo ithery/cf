@@ -50,6 +50,20 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
     protected $socketName = '';
 
     /**
+     * reuse port.
+     *
+     * @var bool
+     */
+    public $reusePort = false;
+
+    /**
+     * reloadable.
+     *
+     * @var bool
+     */
+    public $reloadable = true;
+
+    /**
      * Context of socket.
      *
      * @var resource
@@ -202,11 +216,11 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      */
     public function resumeAccept() {
         // Register a listener to be notified when server socket is ready to read.
-        if (static::$globalEvent && true === $this->_pauseAccept && $this->_mainSocket) {
+        if (static::$globalEvent && true === $this->pauseAccept && $this->mainSocket) {
             if ($this->transport !== 'udp') {
-                static::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ, array($this, 'acceptConnection'));
+                static::$globalEvent->add($this->mainSocket, EventInterface::EV_READ, array($this, 'acceptConnection'));
             } else {
-                static::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ, array($this, 'acceptUdpConnection'));
+                static::$globalEvent->add($this->mainSocket, EventInterface::EV_READ, array($this, 'acceptUdpConnection'));
             }
             $this->_pauseAccept = false;
         }
@@ -251,12 +265,12 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
                 $scheme = ucfirst($scheme);
                 $this->protocol = substr($scheme, 0, 1) === '\\' ? $scheme : '\\Protocols\\' . $scheme;
                 if (!class_exists($this->protocol)) {
-                    $this->protocol = "CDaemon_Worker_Protocol_".$scheme;
+                    $this->protocol = "CDaemon_Worker_Protocol_" . $scheme;
                     if (!class_exists($this->protocol)) {
-                        throw new Exception("class ".$this->protocol." not exist");
+                        throw new Exception("class " . $this->protocol . " not exist");
                     }
                 }
-                if (!isset(static::$_builtinTransports[$this->transport])) {
+                if (!isset(static::$builtinTransports[$this->transport])) {
                     throw new \Exception('Bad worker->transport ' . var_export($this->transport, true));
                 }
             } else {
@@ -288,7 +302,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
                 }
             }
             // Try to open keepalive for tcp and disable Nagle algorithm.
-            if (function_exists('socket_import_stream') && static::$_builtinTransports[$this->transport] === 'tcp') {
+            if (function_exists('socket_import_stream') && static::$builtinTransports[$this->transport] === 'tcp') {
                 set_error_handler(function() {
                     
                 });
