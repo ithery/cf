@@ -482,9 +482,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             $this->via->purge();
             if ($this->service->get('debug_workers'))
                 $this->debug();
-            $this->service->on(Core_Daemon::ON_PREEXECUTE, array($this, 'run'));
-            $this->service->on(Core_Daemon::ON_IDLE, array($this, 'garbage_collector'), ceil(120 / ($this->workers * 0.5)));  // Throttle the garbage collector
-            $this->service->on(Core_Daemon::ON_SIGNAL, array($this, 'dump'), null, function($args) {
+            $this->service->on(CDaemon_ServiceAbstract::ON_PREEXECUTE, array($this, 'run'));
+            $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, array($this, 'garbage_collector'), ceil(120 / ($this->workers * 0.5)));  // Throttle the garbage collector
+            $this->service->on(CDaemon_ServiceAbstract::ON_SIGNAL, array($this, 'dump'), null, function($args) {
                 return $args[0] == SIGUSR1;
             });
             $this->fork();
@@ -596,8 +596,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 }
                 $this->runningCalls[$call->id] = true;
                 // It's possible the process exited after sending this ack, ensure it's still valid.
-                if ($this->process($call->pid))
+                if ($this->process($call->pid)) {
                     $this->process($call->pid)->job = $call->id;
+                }
                 $this->log('Job ' . $call->id . ' Is Running');
             }
             while ($call = $this->via->get(self::WORKER_RETURN)) {
@@ -607,13 +608,16 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                     continue;
                 }
                 unset($this->runningCalls[$call->id]);
-                if ($this->process($call->pid))
+                if ($this->process($call->pid)) {
                     $this->process($call->pid)->job = $call->id;
+                }
                 $onReturn = $this->onReturn;
-                if (is_callable($onReturn))
+                if (is_callable($onReturn)) {
                     call_user_func($onReturn, $call, $logger);
-                else
+                }
+                else {
                     $this->log('No onReturn Callback Available');
+                }
                 $this->log('Job ' . $call->id . ' Is Complete');
             }
             // Enforce Timeouts
@@ -632,8 +636,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                         $call->timeout();
                         unset($this->runningCalls[$callId]);
                         $onTimeout = $this->onTimeout;
-                        if (is_callable($onTimeout))
+                        if (is_callable($onTimeout)) {
                             call_user_func($onTimeout, $call, $logger);
+                        }
                     }
                 }
             }
