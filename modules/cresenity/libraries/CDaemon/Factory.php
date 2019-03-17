@@ -33,8 +33,8 @@ class CDaemon_Factory {
      * @return \CDaemon_Worker_Listener_WebSocketListener
      */
     public static function createSocketListenerWorker($socketName = '', $contextOption = array()) {
-        $worker = CDaemon_Worker_Listener_SocketListener();
-        $worker->setSocketName($socketName, $contextOption);
+        $worker = new CDaemon_Worker_Listener_SocketListener();
+        $worker->setSocket($socketName, $contextOption);
         return $worker;
     }
 

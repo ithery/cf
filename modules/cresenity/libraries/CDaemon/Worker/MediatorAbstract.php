@@ -466,7 +466,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         // called in the parent process during application init. And like tasks, this setup() method will be called right
         // after the process is forked.
         $that = $this;
-        if (Core_Daemon::is('parent')) {
+        if ($this->service->isParent()) {
             // Use the ftok() method to create a deterministic memory address.
             // This is a bit ugly but ftok needs a filesystem path so we give it one using the daemon filename and
             // current worker alias.
