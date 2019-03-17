@@ -731,17 +731,18 @@ class CApp extends CObservable {
             }
 
 
+            if(!($exception instanceof CF_404_Exception)) {
+                $v = CView::factory('cmail/error_mail');
+                $v->error = $error;
+                $v->description = $description;
+                $v->file = $file;
+                $v->line = $line;
+                $v->trace = $trace;
+                $v->message = $message;
+                $html = $v->render();
 
-            $v = CView::factory('cmail/error_mail');
-            $v->error = $error;
-            $v->description = $description;
-            $v->file = $file;
-            $v->line = $line;
-            $v->trace = $trace;
-            $v->message = $message;
-            $html = $v->render();
-
-            cmail::error_mail($html);
+                cmail::error_mail($html);
+            }
 
 
             if ($PHP_ERROR) {
