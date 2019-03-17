@@ -126,7 +126,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      */
     protected $mainSocket = null;
 
-    public function __construct($socketName = '', $contextOption = array()) {
+    public function setSocket($socketName = '', $contextOption = array()) {
 
         // Context for socket.
         if (strlen($socketName) > 0) {
@@ -180,12 +180,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
         }
     }
 
-    public function log($msg) {
-        $msg = $msg . "\n";
-        if ($this->mediator != null) {
-            $this->mediator->service->log($msg);
-        }
-    }
+   
 
     /**
      * Resume accept new connections.

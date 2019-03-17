@@ -32,8 +32,10 @@ class CDaemon_Factory {
      * @param array $contextOption
      * @return \CDaemon_Worker_Listener_WebSocketListener
      */
-    public static function createWebSocketListenerWorker($socketName = '', $contextOption = array()) {
-        return new CDaemon_Worker_Listener_WebSocketListener($socketName, $contextOption);
+    public static function createSocketListenerWorker($socketName = '', $contextOption = array()) {
+        $worker = CDaemon_Worker_Listener_SocketListener();
+        $worker->setSocketName($socketName, $contextOption);
+        return $worker;
     }
 
 }
