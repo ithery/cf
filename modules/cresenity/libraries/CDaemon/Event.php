@@ -8,6 +8,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CDaemon_Event {
+
+    use CEvent_Trait_Dispatchable;
+
     /**
      * Events can be attached to each state using the on() method
      * @var integer
@@ -22,4 +25,5 @@ class CDaemon_Event {
     const ON_IDLE = 'CDaemon.OnIdle';    // called when there is idle time at the end of a loopInterval, or at the idleProbability when loopInterval isn't used
     const ON_REAP = 'CDaemon.OnReap';    // notification from the OS that a child process of this application has exited
     const ON_SHUTDOWN = 'CDaemon.OnShutdown';   // called at the top of the destructor
+
 }

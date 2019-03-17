@@ -32,8 +32,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     const MIN_RESTART_SECONDS = 10;
 
-    
-
     /**
      * The frequency of the event loop. In seconds.
      *
@@ -47,7 +45,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var float The interval in Seconds
      */
-
     protected $loopInterval = null;
 
     /**
@@ -139,7 +136,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->config = $config;
         $this->stdout = carr::get($config, 'stdout', false);
         $this->pidFile = $this->getConfig('pidFile');
-
+        $this->event = 
         CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
@@ -215,7 +212,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         $this->setLoopInterval($this->loopInterval);
         // Queue any housekeeping tasks we want performed periodically
-        $this->on(self::ON_IDLE, array($this, 'statsTrim'), (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
+        $this->event->listen(self::ON_IDLE, array($this, 'statsTrim'), (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
         $this->setup();
         $this->log('Application Startup Complete. Starting Event Loop.');
     }
