@@ -34,14 +34,14 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      * @var string
      */
     public $group = '';
-    
+
     /**
      * Unix user of processes, needs appropriate privileges (usually root).
      *
      * @var string
      */
     public $user = '';
-    
+
     /**
      * Socket name. The format is like this http://0.0.0.0:80 .
      *
@@ -251,9 +251,9 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
                 $scheme = ucfirst($scheme);
                 $this->protocol = substr($scheme, 0, 1) === '\\' ? $scheme : '\\Protocols\\' . $scheme;
                 if (!class_exists($this->protocol)) {
-                    $this->protocol = "\\Workerman\\Protocols\\$scheme";
+                    $this->protocol = "CDaemon_Worker_Protocol_".$scheme;
                     if (!class_exists($this->protocol)) {
-                        throw new Exception("class \\Protocols\\$scheme not exist");
+                        throw new Exception("class ".$this->protocol." not exist");
                     }
                 }
                 if (!isset(static::$_builtinTransports[$this->transport])) {
@@ -323,8 +323,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      *
      * @return void
      */
-    public function setUserAndGroup()
-    {
+    public function setUserAndGroup() {
         // Get uid.
         $user_info = posix_getpwnam($this->user);
         if (!$user_info) {
@@ -350,4 +349,5 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
             }
         }
     }
+
 }
