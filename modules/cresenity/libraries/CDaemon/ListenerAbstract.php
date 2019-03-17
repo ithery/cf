@@ -4,12 +4,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 4:41:23 AM
+ * @since Mar 17, 2019, 8:53:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
+abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
 
-    /**
+     /**
      * Default backlog. Backlog is the maximum length of the queue of pending connections.
      *
      * @var int
@@ -185,7 +185,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
             return;
         }
         
-        $this->workerLog('Accepted new Connection');
+        $this->log('Accepted new Connection');
         // TcpConnection.
         $connection = new CDaemon_Worker_Connection_TcpConnection($newSocket, $remoteAddress);
         $this->connections[$connection->id] = $connection;
@@ -219,7 +219,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
     public function resumeAccept() {
         // Register a listener to be notified when server socket is ready to read.
         if ($this->event && true === $this->pauseAccept && $this->mainSocket) {
-            $this->workerLog('Listen acceptConnection');
+            $this->log('Listen acceptConnection');
             if ($this->transport !== 'udp') {
                 $this->event->listen(CDaemon_Worker_Constant::EV_LISTENER_READ, array($this, 'acceptConnection'));
             } else {
@@ -293,14 +293,11 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
             
             $this->mainSocket = stream_socket_server($localSocket, $errno, $errmsg, $flags, $this->context);
             if (!$this->mainSocket) {
-                try {
-                    throw new Exception($errmsg);
-                } catch(Exception $ex) {
-                    $this->workerLog($ex->getTraceAsString());
-                    throw $ex;
-                }
+                
+                throw new Exception($errmsg);
+               
             }
-            $this->workerLog('Start listening '.$localSocket);
+            $this->log('Start listening '.$localSocket);
             
             if ($this->transport === 'ssl') {
                 stream_socket_enable_crypto($this->mainSocket, false);
@@ -358,7 +355,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
         if ($this->group) {
             $group_info = posix_getgrnam($this->group);
             if (!$group_info) {
-                static::log("Warning: Group {$this->group} not exsits");
+                $this->log("Warning: Group {$this->group} not exsits");
                 return;
             }
             $gid = $group_info['gid'];
@@ -368,7 +365,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
         // Set uid and gid.
         if ($uid != posix_getuid() || $gid != posix_getgid()) {
             if (!posix_setgid($gid) || !posix_initgroups($user_info['name'], $gid) || !posix_setuid($uid)) {
-                static::log("Warning: change gid or uid fail.");
+                $this->log("Warning: change gid or uid fail.");
             }
         }
     }
@@ -388,7 +385,6 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
         }
     }
     
-    public function workerLog($message) {
-        CDaemon::getRunningService()->log($message);
-    }
+   
+
 }

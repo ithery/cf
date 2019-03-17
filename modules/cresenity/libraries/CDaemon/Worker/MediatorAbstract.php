@@ -499,10 +499,10 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             unset($this->calls, $this->runningCalls, $this->onReturn, $this->onTimeout, $this->callCount);
             $this->calls = $this->callCount = $this->runningCalls = array();
             $this->via->setup();
-            $event_restart = function() use($that) {
+            $eventRestart = function() use($that) {
                 $that->log('Restarting Worker Process...');
             };
-            $this->service->on(CDaemon_ServiceAbstract::ON_SIGNAL, $event_restart, null, function($args) {
+            $this->service->on(CDaemon_ServiceAbstract::ON_SIGNAL, $eventRestart, null, function($args) {
                 return $args[0] == SIGUSR1;
             });
             call_user_func($this->getCallback('setup'));
@@ -687,6 +687,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             if (mt_rand(1, 5) == 1) {
                 $this->garbageCollector();
             }
+
             if ($call = $this->via->get(self::WORKER_CALL, true)) {
                 try {
                     // If the current via supports it, calls can be cancelled while they are enqueued
@@ -720,7 +721,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return integer   A unique-per-process identifier for the call OR false on error. That ID can be used to interact
      *                   with the call, eg checking the call status.
      */
-    protected function call(Core_Worker_Call $call) {
+    protected function call(CDaemon_Worker_Call $call) {
         $this->calls[$call->id] = $call;
         $alias = ($this instanceof Core_Worker_ObjectMediator) ? $call->method : $this->alias;
         if (!$this->breakpoint(sprintf('[Call %s] Call to %s()', $call->id, $alias), $call->id)) {
@@ -754,16 +755,17 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             throw new Exception(__METHOD__ . " Failed. Method `{$method}` is not callable.");
         }
         $this->callCount++;
-        return $this->call(new Core_Worker_Call($this->callCount, $method, $args));
+        return $this->call(new CDaemon_Worker_Call($this->callCount, $method, $args));
     }
 
     /**
      * Return the requested call from the local call cache if it exists
      * @return Core_Worker_Call
      */
-    public function get_struct($callId) {
-        if (isset($this->calls[$callId]))
+    public function getStruct($callId) {
+        if (isset($this->calls[$callId])) {
             return $this->calls[$callId];
+        }
         return null;
     }
 

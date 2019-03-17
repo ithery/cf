@@ -292,25 +292,36 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->fatalError($e->getMessage());
         }
         try {
-
-
-            while ($this->parent && !$this->shutdown) {
-                $this->timer(true);
-                $this->autoRestart();
-                $this->dispatch(array(self::ON_PREEXECUTE));
-                $this->execute();
-                if (version_compare(PHP_VERSION, "5.3.0", '>=')) {
-                    pcntl_signal_dispatch();
-                }
-
-                $this->dispatch(array(self::ON_POSTEXECUTE));
-                $this->timer();
-            }
+            $this->loop();
         } catch (Exception $e) {
             $this->fatalError(sprintf('Uncaught Exception in Event Loop: %s [file] %s [line] %s%s%s', $e->getMessage(), $e->getFile(), $e->getLine(), PHP_EOL, $e->getTraceAsString()));
         }
     }
 
+    /**
+     * standar loop routines for service process
+     */
+    private function loop() {
+        while ($this->parent && !$this->shutdown) {
+            $this->timer(true);
+            $this->autoRestart();
+            $this->dispatch(array(self::ON_PREEXECUTE));
+            $this->loopProcess();
+            if (version_compare(PHP_VERSION, "5.3.0", '>=')) {
+                pcntl_signal_dispatch();
+            }
+
+            $this->dispatch(array(self::ON_POSTEXECUTE));
+            $this->timer();
+        }
+    }
+
+    /**
+     * Call execute in, can be override with inherit service
+     */
+    protected function loopProcess() {
+        $this->execute();
+    }
     /**
      * Register a callback for the given $event. Use the event class constants for built-in events. Add and dispatch
      * your own events however you want.
@@ -1101,6 +1112,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     public function isRecoverWorkers() {
         return $this->isRecoverWorkers;
     }
+
     public function isDebugWorkers() {
         return $this->isDebugWorkers;
     }
@@ -1108,8 +1120,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     public function getParentPid() {
         return $this->parentPid;
     }
-    
+
     public function isShutdown() {
         return $this->shutdown;
     }
+
 }

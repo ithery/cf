@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  *
  * TcpConnection.
  */
-class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionAbstract {
+class CDaemon_Listener_Connection_TcpConnection extends CDaemon_Listener_ConnectionAbstract {
 
     /**
      * Read buffer size.
@@ -710,7 +710,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
             $this->destroy();
             return false;
         }
-        $async = $this instanceof CDaemon_Worker_Connection_AsyncTcpConnection;
+        $async = $this instanceof CDaemon_Listener_Connection_AsyncTcpConnection;
 
         /**
          *  We disabled ssl3 because https://blog.qualys.com/ssllabs/2014/10/15/ssl-3-is-dead-killed-by-the-poodle-attack.
@@ -761,7 +761,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
     /**
      * This method pulls all the data out of a readable stream, and writes it to the supplied destination.
      *
-     * @param CDaemon_Worker_Connection_TcpConnection $dest
+     * @param CDaemon_Listener_Connection_TcpConnection $dest
      * @return void
      */
     public function pipe($dest) {

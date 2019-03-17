@@ -244,8 +244,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             case CDaemon_Worker_MediatorAbstract::RETURNED:
                 $decoder = function($message) use($that) {
                     $call = shm_get_var($that->shm, $message['call_id']);
-                    if ($call && $call->status == $message['status'])
+                    if ($call && $call->status == $message['status']) {
                         @shm_remove_var($that->shm, $message['call_id']);
+                    }
                     return $call;
                 };
                 break;
@@ -287,11 +288,13 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             'memoryAllocation' => null,
         );
         $stat = @msg_stat_queue($this->queue);
-        if (is_array($stat))
+        if (is_array($stat)) {
             $out['messages'] = $stat['msg_qnum'];
+        }
         $header = @shm_get_var($this->shm, 1);
-        if (is_array($header))
+        if (is_array($header)) {
             $out['memoryAllocation'] = $header['memoryAllocation'];
+        }
         return $out;
     }
 
@@ -324,8 +327,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * @return void
      */
     private function purge_mq() {
-        if (!is_resource($this->queue))
+        if (!is_resource($this->queue)) {
             $this->setupIpc();
+        }
         @msg_remove_queue($this->queue);
         $this->queue = null;
     }
@@ -360,7 +364,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 break;
             case 13:
                 // Permission Denied
-                $this->mediator->count_error('communication');
+                $this->mediator->countError('communication');
                 $this->mediator->log('Permission Denied: Cannot connect to message queue');
                 $this->purge_mq();
                 if ($this->mediator->service->isParent())
@@ -470,8 +474,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * @return void
      */
     public function drop($call_id) {
-        if (shm_has_var($this->shm, $call_id))
+        if (shm_has_var($this->shm, $call_id)) {
             shm_remove_var($this->shm, $call_id);
+        }
     }
 
     /**

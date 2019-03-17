@@ -11,7 +11,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * WebSocket protocol.
  */
-class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract {
+class CDaemon_Listener_Protocol_Websocket extends CDaemon_Listener_ProtocolAbstract {
 
     /**
      * Websocket blob type.
@@ -312,7 +312,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
      * Websocket handshake.
      *
      * @param string                              $buffer
-     * @param CDaemon_Worker_Connection_TcpConnection $connection
+     * @param CDaemon_Listener_Connection_TcpConnection $connection
      * @return int
      */
     protected static function dealHandshake($buffer, $connection) {
