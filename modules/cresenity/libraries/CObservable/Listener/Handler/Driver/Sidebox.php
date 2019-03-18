@@ -7,9 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 18, 2019, 11:52:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Handler_Driver {
-
-    use CTrait_Compat_Handler_Driver_Reload;
+class CObservable_Listener_Handler_Driver_Sidebox extends CObservable_Listener_Handler_Driver {
 
     protected $method;
     protected $content;
