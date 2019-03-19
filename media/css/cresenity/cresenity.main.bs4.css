@@ -1013,6 +1013,79 @@ body.mini-navbar #page-wrapper {
     right: 5px;
 }
 
+
+
+/* modal-cart */
+.modal.sidebar{
+    padding-right:0!important
+}
+.modal.sidebar .modal-dialog{
+    max-width:400px;
+    margin:0;
+    margin-left:auto
+}
+.modal.sidebar .modal-content,.modal.sidebar .modal-dialog{
+    height:100%
+}
+.modal.sidebar .modal-content{
+    border:0;
+    border-radius:0
+}
+.modal.sidebar .modal-header{
+    border-top-left-radius:0;
+    border-top-right-radius:0
+}
+.modal.sidebar .modal-body{
+    padding:.5rem
+}
+.modal.sidebar .modal-footer,.modal.sidebar .modal-header{
+    -ms-flex-negative:0;
+    flex-shrink:0
+}
+.modal.sidebar .modal-body,.modal.sidebar .modal-footer{
+    background-color:#fff
+}
+.modal.sidebar .media{
+    border-bottom:1px solid #dee2e6;
+    padding:.25rem 0
+}
+.modal.sidebar .media:first-child{
+    padding-top:0
+}
+.modal.sidebar .media-body{
+    position:relative;
+    padding-right:1rem
+}
+.modal.sidebar .media-body>div:first-child{
+    overflow:hidden;
+    max-height:42px;
+    margin-bottom:5px;
+    font-size:.9375rem
+}
+.modal.sidebar .media-body>div:first-child>a{
+    display:block
+}
+.modal.sidebar .media-body .close{
+    position:absolute;
+    top:20px;
+    right:0
+}
+.modal.sidebar.fade .modal-dialog{
+    -webkit-transform:translate3d(20px,0,0);
+    transform:translate3d(20px,0,0);
+    -webkit-transition:-webkit-transform .25s;
+    transition:-webkit-transform .25s;
+    transition:transform .25s;
+    transition:transform .25s,-webkit-transform .25s
+}
+.modal.sidebar.show .modal-dialog{
+    -webkit-transform:translate3d(0,0,0);
+    transform:translate3d(0,0,0)
+}
+
+
+
+
 @media (min-width: 319px) {
 
 }
