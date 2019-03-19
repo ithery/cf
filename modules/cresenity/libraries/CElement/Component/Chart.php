@@ -5,14 +5,14 @@
  */
 abstract class CElement_Component_Chart extends CElement_Component
 {
-    private $type;
-    private $data;
-    private $animation;
-    private $padding;
-    private $legend;
-    private $title;
-    private $tooltip;
-    private $pointStyle;
+    protected $type;
+    protected $data;
+    protected $animation;
+    protected $padding;
+    protected $legend;
+    protected $title;
+    protected $tooltip;
+    protected $pointStyle;
 
     public function __construct($id = "")
     {
