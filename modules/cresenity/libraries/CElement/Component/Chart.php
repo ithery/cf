@@ -38,8 +38,17 @@ abstract class CElement_Component_Chart extends CElement_Component
         return $this;
     }
 
-    public function setData(array $data)
+    public function setData(array $val)
     {
+        $data = [];
+        $data['datasets'] = [];
+        $data['datasets']['label'] = '# of Votes';
+        $data['datasets']['data'] = [];
+
+        foreach ($val as $k => $v) {
+            $data['datasets']['data'][] = $v;
+        }
+
         $this->data = json_encode($data);
         return $this;
     }
