@@ -47,7 +47,7 @@ abstract class CElement_Component_Chart extends CElement_Component
         $data['datasets'][0]['data'] = [];
 
         foreach ($val as $k => $v) {
-            $data['datasets']['data'][0][] = $v;
+            $data['datasets'][0]['data'][] = $v;
         }
 
         $this->data = json_encode($data);
