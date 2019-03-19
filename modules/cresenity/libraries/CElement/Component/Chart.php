@@ -17,7 +17,7 @@ abstract class CElement_Component_Chart extends CElement_Component
     public function __construct($id = "")
     {
         parent::__construct($id);
-
+        $this->setTag('canvas');
         $this->type = 'line';
         $this->data = '{}';
     }
