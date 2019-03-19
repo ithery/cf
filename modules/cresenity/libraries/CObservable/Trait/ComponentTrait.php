@@ -42,4 +42,19 @@ trait CObservable_Trait_ComponentTrait {
         return $terminal;
     }
 
+    /**
+     *
+     * @method addChart
+     *
+     * @param  string   $type
+     * @param  string   $id
+     * @return CElement_Component_Chart
+     */
+    public function addChart($type, $id = "")
+    {   
+        $chart = CElement_Component_Chart::factory($type, $id);
+        $this->add($chart);
+        return $chart;
+    }
+
 }
