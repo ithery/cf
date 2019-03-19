@@ -45,7 +45,7 @@ abstract class CElement_Component_Chart extends CElement_Component
         $data['datasets'] = [];
         $data['datasets'][0] = [];
         $data['datasets'][0]['label'] = '# of Votes';
-        $data['datasets'][0]['data'] = [12, 19, 3, 5, 2, 3];
+        $data['datasets'][0]['data'] = [];
         $data['datasets'][0]['backgroundColor'] = [
             'rgba(255, 99, 132, 0.2)',
             'rgba(54, 162, 235, 0.2)',
@@ -64,9 +64,9 @@ abstract class CElement_Component_Chart extends CElement_Component
         ];
         $data['datasets'][0]['borderWidth'] = 1;
 
-        // foreach ($val as $k => $v) {
-        //     $data['datasets'][0]['data'][] = $v;
-        // }
+        foreach ($val as $k => $v) {
+            $data['datasets'][0]['data'][] = $v;
+        }
 
         $this->data = json_encode($data);
         return $this;
