@@ -19,7 +19,7 @@ abstract class CElement_Component_Chart extends CElement_Component
         parent::__construct($id);
 
         $this->type = 'line';
-        $this->data = [];
+        $this->data = '{}';
     }
 
     public static function factory($type, $id = "")
