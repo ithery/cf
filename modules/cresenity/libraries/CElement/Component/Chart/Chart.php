@@ -14,8 +14,8 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	protected function build() {
 	    parent::build();
 	    $this->addClass('cchart cchart-chart');
-	    $this->setAttr('width', $this->width);
-	    $this->setAttr('height', $this->height);
+	    // $this->setAttr('width', $this->width);
+	    // $this->setAttr('height', $this->height);
 	}
 
 	public function js($indent = 0) {
