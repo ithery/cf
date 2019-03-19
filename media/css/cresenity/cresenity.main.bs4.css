@@ -1022,7 +1022,8 @@ body.mini-navbar #page-wrapper {
 .modal.sidebar .modal-dialog{
     max-width:400px;
     margin:0;
-    margin-left:auto
+    margin-left:auto;
+    padding: 0;
 }
 .modal.sidebar .modal-content,.modal.sidebar .modal-dialog{
     height:100%
