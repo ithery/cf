@@ -1,13 +1,14 @@
 <?php
 
 class CResources_Engine_Image extends CResources_Engine {
-
+    use CTrait_Compat_Resources_Engine_Image;
     public function __construct($type, $options) {
         parent::__construct('Image', $type, $options);
     }
 
-    public function add_size($size_name, $options) {
+    public function addSize($size_name, $options) {
         $this->_sizes[$size_name] = $options;
+        return $this;
     }
 
     public function resizeAndSave($fullfilename, $sizeName, $sizeOptions) {
