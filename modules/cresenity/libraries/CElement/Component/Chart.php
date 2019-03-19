@@ -13,6 +13,8 @@ abstract class CElement_Component_Chart extends CElement_Component
     protected $title;
     protected $tooltip;
     protected $pointStyle;
+    protected $width;
+    protected $height;
 
     public function __construct($id = "")
     {
@@ -20,6 +22,8 @@ abstract class CElement_Component_Chart extends CElement_Component
         $this->setTag('canvas');
         $this->type = 'line';
         $this->data = '{}';
+        $this->width = 500;
+        $this->height = 500;
     }
 
     public static function factory($type, $id = "")
@@ -43,6 +47,18 @@ abstract class CElement_Component_Chart extends CElement_Component
     public function setAnimation($animation)
     {
         $this->animation = $animation;
+        return $this;
+    }
+
+    public function setWidth($width)
+    {
+        $this->width = $width;
+        return $this;
+    }
+
+    public function setHeight($height)
+    {
+        $this->height = $height;
         return $this;
     }
 }
