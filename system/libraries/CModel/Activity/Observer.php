@@ -15,8 +15,8 @@ class CModel_Activity_Observer {
             $after = $model->getAttributes();
             $changes = [];
             $table = $model->getTable();
-            $key = $model->getKey();
-            CModel_Activity::instance()->addData($table, $key, 'create', $before, $after, $changes);
+            $tableKey = $model->getKey();
+            CModel_Activity::instance()->addData($table, $tableKey, 'create', $before, $after, $changes);
         }
     }
 
@@ -26,12 +26,12 @@ class CModel_Activity_Observer {
             $after = $model->getAttributes();
             $changes = $model->getDirty();
             $table = $model->getTable();
-            $key = $model->getKey();
+            $tableKey = $model->getKey();
 
             foreach ($after as $key => $value) {
                 $before[$key] = $model->getOriginal($key);
             }
-            CModel_Activity::instance()->addData($table, $key, 'update', $before, $after, $changes);
+            CModel_Activity::instance()->addData($table, $tableKey, 'update', $before, $after, $changes);
         }
     }
 
@@ -41,12 +41,12 @@ class CModel_Activity_Observer {
             $after = $model->getAttributes();
             $changes = $model->getDirty();
             $table = $model->getTable();
-            $key = $model->getKey();
+            $tableKey = $model->getKey();
 
             foreach ($after as $key => $value) {
                 $before[$key] = $model->getOriginal($key);
             }
-            CModel_Activity::instance()->addData($table, $key, 'delete', $before, $after, $changes);
+            CModel_Activity::instance()->addData($table, $tableKey, 'delete', $before, $after, $changes);
         }
     }
 
