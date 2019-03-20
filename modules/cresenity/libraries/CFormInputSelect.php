@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CFormInputSelect extends CFormInput {
 
+    use CTrait_Compat_Element_FormInput_Select;
+    
     protected $group_list = array();
     protected $multiple;
     protected $applyjs;
@@ -39,7 +41,7 @@ class CFormInputSelect extends CFormInput {
         return $this;
     }
 
-    public function set_applyjs($applyjs) {
+    public function setApplyjs($applyjs) {
         $this->applyjs = $applyjs;
         return $this;
     }
@@ -248,7 +250,7 @@ class CFormInputSelect extends CFormInput {
         return $this->hide_search;
     }
 
-    public function set_hide_search($hide_search) {
+    public function setHideSearch($hide_search) {
         $this->hide_search = $hide_search;
         return $this;
     }
