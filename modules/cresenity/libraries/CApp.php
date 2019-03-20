@@ -35,6 +35,7 @@ class CApp extends CObservable {
     private $renderMessage = true;
     private $keepMessage = false;
     private $viewName = 'cpage';
+    private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
 
     public function setViewCallback(callable $viewCallback) {
@@ -436,7 +437,7 @@ class CApp extends CObservable {
         } else if ($this->activation) {
             $viewName = 'ccore/activation';
         } else if (!$this->is_user_login() && ccfg::get("have_user_login") && $this->login_required) {
-            $viewName = 'ccore/login';
+            $viewName = $this->viewLoginName;
         } else if (!$this->is_user_login() && ccfg::get("have_static_login") && $this->login_required) {
             $viewName = 'ccore/static_login';
         }
@@ -809,6 +810,9 @@ class CApp extends CObservable {
 
     public function setViewName($viewName) {
         $this->viewName = $viewName;
+    }
+    public function setViewLoginName($viewLoginName) {
+        $this->viewLoginName = $viewLoginName;
     }
 
     /**
