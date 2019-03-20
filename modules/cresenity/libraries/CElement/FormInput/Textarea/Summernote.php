@@ -68,6 +68,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['misc', ['fullscreen', 'codeview', 'help']]
                     ]
                 ";
+                break;
             case 'text-only':
                 $json = "
                     [
