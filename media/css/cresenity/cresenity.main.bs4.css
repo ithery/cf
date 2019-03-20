@@ -982,17 +982,33 @@ body.mini-navbar #page-wrapper {
 }
 
 
-
 @keyframes spinner {
     to {transform: rotate(360deg);}
 }
 
+/* notification */
+.notifications .fade {
+    opacity:1;
+}
+
+.notifications > div.alert {
+    position: relative;
+    z-index: 9999;
+    margin: 5px 0px;
+    padding: 10px 40px 10px 20px;
+}
+.notifications > div.alert .close {
+    position: absolute;
+    top: 0px;
+    right: 5px;
+}
+
 @media (min-width: 319px) {
-    
+
 }
 
 @media (min-width: 479px) {
-    
+
 }
 
 @media (min-width: 575px) {

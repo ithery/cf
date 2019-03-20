@@ -67,7 +67,7 @@ trait CApp_Trait_Base {
         $db = CDatabase::instance();
 
         if ($org_id == null) {
-            $org_id = self::org_id();
+            $org_id = self::orgId();
         }
         if (self::$org == null) {
             self::$org = array();
@@ -196,6 +196,10 @@ trait CApp_Trait_Base {
 
     public static function noImageUrl($width = 100, $height = 100) {
         return curl::base() . 'cresenity/noimage/' . $width . '/' . $height;
+    }
+
+    public static function initialAvatarUrl($name, $size = 100) {
+        return curl::base() . 'cresenity/avatar/initials/?name=' . $name . '&size=' . $size;
     }
 
     public static function havePermission($action) {

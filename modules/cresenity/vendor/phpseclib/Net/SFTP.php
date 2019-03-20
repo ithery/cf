@@ -55,8 +55,8 @@ class SFTP extends SSH2
      *
      * \phpseclib\Net\SSH2::exec() uses 0 and \phpseclib\Net\SSH2::read() / \phpseclib\Net\SSH2::write() use 1.
      *
-     * @see \phpseclib\Net\SSH2::_send_channel_packet()
-     * @see \phpseclib\Net\SSH2::_get_channel_packet()
+     * @see \phpseclib\Net\SSH2::send_channel_packet()
+     * @see \phpseclib\Net\SSH2::get_channel_packet()
      * @access private
      */
     const CHANNEL = 0x100;
@@ -866,7 +866,17 @@ class SFTP extends SSH2
                 unset($files[$key]);
                 continue;
             }
-            if ($key != '.' && $key != '..' && is_array($this->query_stat_cache($this->realpath($dir . '/' . $key)))) {
+            $is_directory = false;
+            if ($key != '.' && $key != '..') {
+                if ($this->use_stat_cache) {
+                    $is_directory = is_array($this->query_stat_cache($this->realpath($dir . '/' . $key)));
+                } else {
+                    $stat = $this->lstat($dir . '/' . $key);
+                    $is_directory = $stat && $stat['type'] === NET_SFTP_TYPE_DIRECTORY;
+                }
+            }
+
+            if ($is_directory) {
                 $depth++;
                 $files[$key] = $this->rawlist($dir . '/' . $key, true);
                 $depth--;
@@ -2975,7 +2985,7 @@ class SFTP extends SSH2
      * @param int $type
      * @param string $data
      * @see self::_get_sftp_packet()
-     * @see self::_send_channel_packet()
+     * @see self::send_channel_packet()
      * @return bool
      * @access private
      */

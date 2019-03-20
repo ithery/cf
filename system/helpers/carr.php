@@ -858,6 +858,11 @@ class carr {
         return $results;
     }
 
+    public static function hash(array $array) {
+        array_multisort($array);
+        return md5(json_encode($array));
+    }
+
 }
 
 // End carr

@@ -664,19 +664,19 @@ class cajax {
         $return = array();
         $data = $obj->data;
         $input_name = $data->input_name;
-
+        $fileId = '';
         if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
             for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
                 $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
                 if (strtolower($extension) == 'php') {
                     die('fatal error');
                 }
-                $file_id = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("imgupload", $file_id);
+                $fileId = date('Ymd') . cutils::randmd5() . $extension;
+                $fullfilename = ctemp::makepath("imgupload", $fileId);
                 if (!move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename)) {
                     die('fail upload from ' . $_FILES[$input_name]['tmp_name'][$i] . ' to ' . $fullfilename);
                 }
-                $return[] = $file_id;
+                $return[] = $fileId;
             }
         }
 
@@ -700,15 +700,15 @@ class cajax {
 
                 $filteredData = substr($imageData, strpos($imageData, ",") + 1);
                 $unencodedData = base64_decode($filteredData);
-                $file_id = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("imgupload", $file_id);
+                $fileId = date('Ymd') . cutils::randmd5() . $extension;
+                $fullfilename = ctemp::makepath("imgupload", $fileId);
                 cfs::atomic_write($fullfilename, $unencodedData);
-                $return[] = $file_id;
+                $return[] = $fileId;
             }
         }
         $return = array(
-            'file_id' => $file_id,
-            'url' => ctemp::get_url('imgupload', $file_id),
+            'file_id' => $fileId,
+            'url' => ctemp::get_url('imgupload', $fileId),
         );
         return json_encode($return);
     }

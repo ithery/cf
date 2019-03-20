@@ -750,12 +750,16 @@ class CElement_Component_DataTable extends CElement_Component {
 
     /**
      * 
-     * @param CModel $model
+     * @param CModel|CModel_Query $model
      * @return $this
      */
-    public function setDataFromModel(CModel $model) {
-        $q = $model->toSql();
-        $this->setDataFromQuery($q);
+    public function setDataFromModel($model) {
+        $modelQuery = $model;
+        if ($modelQuery instanceof CModel_Collection) {
+            throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
+        }
+        $sql = $this->db->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
+        return $this->setDataFromQuery($sql);
     }
 
     /**

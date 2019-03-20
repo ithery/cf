@@ -333,6 +333,9 @@ abstract class ASN1
                 $remainingLength = $length;
                 while ($remainingLength > 0) {
                     $temp = self::decode_ber($content, $start, $content_pos);
+                    if ($temp === false) {
+                        break;
+                    }
                     $length = $temp['length'];
                     // end-of-content octets - see paragraph 8.1.5
                     if (substr($content, $content_pos + $length, 2) == "\0\0") {
@@ -384,6 +387,9 @@ abstract class ASN1
                     $current['content'] = substr($content, $content_pos);
                 } else {
                     $temp = self::decode_ber($content, $start, $content_pos);
+                    if ($temp === false) {
+                        return false;
+                    }
                     $length-= (strlen($content) - $content_pos);
                     $last = count($temp) - 1;
                     for ($i = 0; $i < $last; $i++) {
@@ -408,6 +414,9 @@ abstract class ASN1
                     $length = 0;
                     while (substr($content, $content_pos, 2) != "\0\0") {
                         $temp = self::decode_ber($content, $length + $start, $content_pos);
+                        if ($temp === false) {
+                            return false;
+                        }
                         $content_pos += $temp['length'];
                         // all subtags should be octet strings
                         //if ($temp['type'] != self::TYPE_OCTET_STRING) {
@@ -440,6 +449,9 @@ abstract class ASN1
                         break 2;
                     }
                     $temp = self::decode_ber($content, $start + $offset, $content_pos);
+                    if ($temp === false) {
+                        return false;
+                    }
                     $content_pos += $temp['length'];
                     $current['content'][] = $temp;
                     $offset+= $temp['length'];
@@ -804,6 +816,27 @@ abstract class ASN1
                 }
                 return $temp;
         }
+    }
+
+    /**
+     * DER-decode the length
+     *
+     * DER supports lengths up to (2**8)**127, however, we'll only support lengths up to (2**8)**4.  See
+     * {@link http://itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf#p=13 X.690 paragraph 8.1.3} for more information.
+     *
+     * @access public
+     * @param string $string
+     * @return int
+     */
+    public static function decodeLength(&$string)
+    {
+        $length = ord(Strings::shift($string));
+        if ($length & 0x80) { // definite length, long form
+            $length&= 0x7F;
+            $temp = Strings::shift($string, $length);
+            list(, $length) = unpack('N', substr(str_pad($temp, 4, chr(0), STR_PAD_LEFT), -4));
+        }
+        return $length;
     }
 
     /**
@@ -1207,8 +1240,8 @@ abstract class ASN1
      */
     public static function loadOIDs($oids)
     {
-        self::$oids+= $oids;
-        self::$reverseOIDs = array_flip(self::$oids);
+        self::$reverseOIDs+= $oids;
+        self::$oids = array_flip(self::$reverseOIDs);
     }
 
     /**

@@ -92,9 +92,9 @@ class CApp_Navigation_Helper {
         }
 
         $role = crole::get($roleId);
-        if ($role != null) {
-            if ($role->parent_id == null)
-                return true;
+        if ($role != null && $role->parent_id == null) {
+            //is is superadmin
+            return true;
         }
 
 
@@ -110,6 +110,8 @@ class CApp_Navigation_Helper {
                     $roleNavModel = CApp::model('RoleNav')->where('role_id', '=', $roleId);
                     //$q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
                 }
+                $result = $roleNavModel->where('app_id', '=', $appId)->get();
+
                 self::$role_navs[$appId][$roleId] = $roleNavModel->where('app_id', '=', $appId)->get()->pluck('nav')->toArray();
             }
         }
@@ -136,11 +138,13 @@ class CApp_Navigation_Helper {
 
         /* @var $role CApp_Model */
         $role = CApp::model('Roles')->find($roleId);
-
+        if($role==null) {
+            return false;
+        }
+        
         if ($role != null && $role->parent_id == null) {
             return true;
         }
-
 
         $db = CDatabase::instance($domain);
 
@@ -153,15 +157,11 @@ class CApp_Navigation_Helper {
     }
 
     public static function asUserRightsArray($appId, $roleId, $navs = null, $appRoleId = "", $domain = "", $level = 0) {
-        if ($navs == null)
+        if ($navs == null) {
             $navs = CNavigation::instance()->navs();
-
-
+        }
 
         $result = array();
-
-
-
 
         foreach ($navs as $d) {
             if (!self::accessAvailable($d, $appId, $domain, $appRoleId)) {
@@ -169,6 +169,10 @@ class CApp_Navigation_Helper {
             }
 
             $res = $d;
+            if(!is_array($res)) {
+                throw new CException('Error on nav structure on navs: '.json_encode($navs));
+            }
+                
             $res["level"] = $level;
             $res["role_id"] = $roleId;
             $res["app_id"] = $appId;

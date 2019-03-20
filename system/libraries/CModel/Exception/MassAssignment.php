@@ -1,5 +1,5 @@
 <?php
 
-class CModel_Exception_MassAssignment extends RuntimeException {
+class CModel_Exception_MassAssignment extends CModel_Exception {
     
 }
