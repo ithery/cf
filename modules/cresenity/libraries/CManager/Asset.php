@@ -69,6 +69,12 @@ class CManager_Asset {
         $this->module = new CManager_Asset_Module();
     }
 
+    public function reset() {
+        $this->runTimeContainer->reset();
+        $this->themeContainer->reset();
+        $this->module->reset();
+    }
+
     public static function allAvailablePos() {
         return array(self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY);
     }
