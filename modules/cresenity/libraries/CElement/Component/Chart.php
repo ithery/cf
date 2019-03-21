@@ -54,7 +54,7 @@ abstract class CElement_Component_Chart extends CElement_Component
         return $this;
     }
 
-    public function addDataset(array $data, $label = null, $borderColor = null, $fill = false)
+    public function addDataset(array $data, $label = null, $fill = false, $borderColor = null)
     {
         if (! isset($this->data['datasets'])) {
             $this->data['datasets'] = [];
