@@ -1084,8 +1084,11 @@ body.mini-navbar #page-wrapper {
     transform:translate3d(0,0,0)
 }
 
-
-
+/*chart*/
+.cchart-container {
+    position: relative;
+    margin: auto;
+}
 
 @media (min-width: 319px) {
 

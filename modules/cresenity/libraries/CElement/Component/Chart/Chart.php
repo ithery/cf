@@ -14,8 +14,6 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	protected function build() {
 	    parent::build();
 	    $this->addClass('cchart cchart-chart');
-	    $this->setAttr('width', $this->width);
-	    $this->setAttr('height', $this->height);
 	}
 
 	public function js($indent = 0) {
@@ -23,15 +21,26 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	    $js->setIndent($indent);
 	    $js->append(parent::js($indent))->br();
 
+	    $options = [];
+
+	    if ($this->width || $this->height) {
+	    	$options['maintainAspectRatio'] = false;
+	    }
+
 	    $js->append("
-	    	new Chart($('#" . $this->id . "'), {
+	    	var chart" . $this->id . " = new Chart($('#" . $this->id . "'), {
 	    		type: '" . $this->type . "',
 	    		data: $.parseJSON('" . json_encode($this->data) . "'),
-	    		options: {
-
-	    		},
-    		})
+	    		options: $.parseJSON('" . json_encode($options) . "'),
+    		});
 	    ")->br();
+
+	    if ($this->width) {
+		    $js->append("chart" . $this->id . ".canvas.parentNode.style.width = '" . $this->width . "px';")->br();
+	    }
+	    if ($this->height) {
+		    $js->append("chart" . $this->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
+	    }
 	    
 	    return $js->text();
 	}

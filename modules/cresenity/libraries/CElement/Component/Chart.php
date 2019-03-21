@@ -22,14 +22,16 @@ abstract class CElement_Component_Chart extends CElement_Component
         $this->setTag('canvas');
         $this->type = 'line';
         $this->data = [];
-        $this->width = 500;
-        $this->height = 500;
     }
 
     public static function factory($type, $id = "")
     {
         $className = 'CElement_Component_Chart_' . ucfirst(strtolower($type));
         return new $className($id);
+    }
+
+    public function pretag() {
+        return '<div class="cchart-container"><' . $this->tag . ' ' . $this->htmlAttr() . ' ></div>';
     }
 
     public function setType($type)
