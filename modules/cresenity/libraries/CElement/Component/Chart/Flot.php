@@ -42,8 +42,6 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    $js->append(parent::js($indent))->br();
 
 	    $options = [];
-	    $options['shadowSize'] = 0;
-
 	    $options['grid'] = [
 	    	'color' => '#aaaaaa',
 	    	'borderColor' => '#eeeeee',
@@ -57,9 +55,14 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    	$options['colors'][] = $this->getColor();
 	    }
 
+	    $options['tooltip'] = [
+	    	'show' => true,
+	    ];
+
 	    switch ($this->type) {
 	    	case 'line':
 	    		$options['series'] = [
+	    			'shadowSize' => 0,
 	    			'lines' => [
 	    				'show' => true,
 	    			],
@@ -68,13 +71,22 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    				'radius' => 4,
 	    			],
 	    		];
-
-	    		$options['tooltip'] = [
-	    			'show' => true,
-	    		];
 	    		break;
 	    	case 'bar':
-
+	    		$options['series'] = [
+	    			'shadowSize' => 0,
+	    			'bars' => [
+	    				'show' => true,
+	    				'barWidth' => .6,
+	    				'align' => 'center',
+	    				'lineWidth' => 1,
+	    				'fill' => 0.25,
+	    			],
+	    			'points' => [
+	    				'show' => true,
+	    				'radius' => 4,
+	    			],
+	    		];
 	    		break;
 	    }
 
