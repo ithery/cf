@@ -70,7 +70,7 @@ abstract class CElement_Component_Chart extends CElement_Component
 
         $randColor = $this->getColor();
         $dataset['borderColor'] = $color ?: $randColor;
-        $dataset['backgroundColor'] = $this->getColor($randColor, 0.5);
+        $dataset['backgroundColor'] = $this->getColor($randColor, 0.2);
 
         $this->data['datasets'][] = $dataset;
         return $this;
