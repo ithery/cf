@@ -28,7 +28,11 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	    		type: '" . $this->type . "',
 	    		data: $.parseJSON('" . $this->data . "'),
 	    		options: {
-	    			
+	    			elements: {
+	    				line: {
+	    					tension: 0
+	    				}
+	    			}
 	    		},
     		})
 	    ")->br();
