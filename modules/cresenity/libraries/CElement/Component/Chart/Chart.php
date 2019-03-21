@@ -26,9 +26,9 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	    $js->append("
 	    	new Chart($('#" . $this->id . "'), {
 	    		type: '" . $this->type . "',
-	    		data: $.parseJSON('" . $this->data . "'),
+	    		data: $.parseJSON('" . json_encode($this->data) . "'),
 	    		options: {
-	    			
+
 	    		},
     		})
 	    ")->br();
