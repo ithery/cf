@@ -54,20 +54,21 @@ abstract class CElement_Component_Chart extends CElement_Component
         return $this;
     }
 
-    public function addDataset(array $dataset)
+    public function addDataset(array $data, $label = null, $borderColor = null, $fill = false)
     {
         if (! isset($this->data['datasets'])) {
             $this->data['datasets'] = [];
         }
 
-        foreach ($dataset as $value) {
-            if (is_array($value)) {
-                $this->addDataset($value);
-            } else {
-                $this->data['datasets'][] = $dataset;
-            }
+        $dataset = [];
+        $dataset['data'] = $data;
+        $dataset['borderColor'] = $borderColor ?: str_pad(dechex(mt_rand(0x0, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+        $dataset['fill'] = $fill;
+        if ($label) {
+            $dataset['label'] = $label;
         }
 
+        $this->data['datasets'][] = $dataset;
         return $this;
     }
 
