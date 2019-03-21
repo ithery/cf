@@ -599,5 +599,10 @@ return array(
             "plugins/flotjs/flot.js",
         ),
     ),
+    "sparkline" => array(
+        "js" => array(
+            "plugins/sparklines/sparkline.js"
+        ),
+    ),
 );
 ?>

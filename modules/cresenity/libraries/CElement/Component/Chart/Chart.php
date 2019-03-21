@@ -8,6 +8,7 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	public function __construct()
 	{
 		parent::__construct();
+		$this->setTag('canvas');
 		CManager::instance()->registerModule('chartjs');
 	}
 
