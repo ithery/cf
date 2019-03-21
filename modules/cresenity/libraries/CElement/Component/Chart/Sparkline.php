@@ -36,13 +36,19 @@ class CElement_Component_Chart_Sparkline extends CElement_Component_Chart
 
 	    $options = [];
 	    $options['type'] = $this->type;
+    	$options['width'] = '100%';
+	    $options['height'] = '300px';
+	    $options['spotRadius'] = 3;
+
+	    $randColor = $this->getColor();
+	    $options['lineColor'] = $randColor;
+	    $options['fillColor'] = $this->getColor($randColor, 0.2);
+
 	    if ($this->width) {
 	    	$options['width'] = $this->width;
-	    	$options['width'] = '100%';
 	    }
 	    if ($this->height) {
 		    $options['height'] = $this->height;
-		    $options['height'] = '100px';
 	    }
 
 	    $js->append("
