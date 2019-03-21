@@ -21,7 +21,7 @@ abstract class CElement_Component_Chart extends CElement_Component
         parent::__construct($id);
         $this->setTag('canvas');
         $this->type = 'line';
-        $this->data = '{}';
+        $this->data = [];
         $this->width = 500;
         $this->height = 500;
     }
@@ -67,7 +67,7 @@ abstract class CElement_Component_Chart extends CElement_Component
                 $this->data['datasets'][] = $dataset;
             }
         }
-        
+
         return $this;
     }
 
