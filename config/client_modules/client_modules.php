@@ -591,5 +591,13 @@ return array(
             "plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.js",
         ),
     ),
+    "flot" => array(
+        "css" => array(
+            "plugins/flotjs/flot.css",
+        ),
+        "js" => array(
+            "plugins/flotjs/flot.js",
+        ),
+    ),
 );
 ?>

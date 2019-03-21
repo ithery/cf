@@ -14,6 +14,34 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	protected function build() {
 	    parent::build();
 	    $this->addClass('cchart cchart-chart');
+	    $this->buildData();
+	}
+
+	public function buildData()
+	{
+		$temp = $this->data;
+		$this->data = [];
+
+		$this->data['labels'] = $this->labels;
+		$this->data['datasets'] = [];
+
+		foreach ($temp as $value) {
+			$label = carr::get($value, 'label');
+
+			$dataset = [];
+			$dataset['data'] = carr::get($value, 'data', []);
+			$dataset['fill'] = carr::get($value, 'fill', false);
+
+			if ($label) {
+			    $dataset['label'] = $label;
+			}
+
+			$randColor = $this->getColor();
+			$dataset['borderColor'] = carr::get($value, 'color') ?: $randColor;
+			$dataset['backgroundColor'] = $this->getColor($randColor, 0.2);
+
+			$this->data['datasets'][] = $dataset;
+		}
 	}
 
 	public function js($indent = 0) {

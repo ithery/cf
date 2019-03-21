@@ -6,13 +6,8 @@
 abstract class CElement_Component_Chart extends CElement_Component
 {
     protected $type;
+    protected $labels;
     protected $data;
-    protected $animation;
-    protected $padding;
-    protected $legend;
-    protected $title;
-    protected $tooltip;
-    protected $pointStyle;
     protected $width;
     protected $height;
 
@@ -40,47 +35,18 @@ abstract class CElement_Component_Chart extends CElement_Component
         return $this;
     }
 
-    public function setData(array $data)
-    {
-        $this->data = $data;
-        return $this;
-    }
-
     public function setLabels(array $labels)
     {
-        if (! isset($this->data['labels'])) {
-            $this->data['labels'] = [];
-        }
-
-        $this->data['labels'] = $labels;
+        $this->labels = $labels;
         return $this;
     }
 
-    public function addDataset(array $data, $label = null, $fill = false, $color = null)
+    public function addData(array $data, $label = null)
     {
-        if (! isset($this->data['datasets'])) {
-            $this->data['datasets'] = [];
-        }
-
-        $dataset = [];
-        $dataset['data'] = $data;
-        $dataset['fill'] = $fill;
-
-        if ($label) {
-            $dataset['label'] = $label;
-        }
-
-        $randColor = $this->getColor();
-        $dataset['borderColor'] = $color ?: $randColor;
-        $dataset['backgroundColor'] = $this->getColor($randColor, 0.2);
-
-        $this->data['datasets'][] = $dataset;
-        return $this;
-    }
-
-    public function setAnimation($animation)
-    {
-        $this->animation = $animation;
+        $this->data[] = [
+            'data' => $data,
+            'label' => $label,
+        ];
         return $this;
     }
 
@@ -96,7 +62,7 @@ abstract class CElement_Component_Chart extends CElement_Component
         return $this;
     }
 
-    private function getColor($color = null, $opacity = 1.0)
+    protected function getColor($color = null, $opacity = 1.0)
     {
         if (! $color) {
             return 'rgba(' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . $opacity . ')';
