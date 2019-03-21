@@ -62,7 +62,7 @@ abstract class CElement_Component_Chart extends CElement_Component
 
         $dataset = [];
         $dataset['data'] = $data;
-        $dataset['borderColor'] = $borderColor ?: str_pad(dechex(mt_rand(0x0, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+        $dataset['borderColor'] = $borderColor ?: '#' . str_pad(dechex(mt_rand(0x0, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
         $dataset['fill'] = $fill;
         if ($label) {
             $dataset['label'] = $label;
