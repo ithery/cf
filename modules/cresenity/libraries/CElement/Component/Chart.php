@@ -54,7 +54,7 @@ abstract class CElement_Component_Chart extends CElement_Component
         return $this;
     }
 
-    public function addDataset(array $data, $label = null, $fill = false, $borderColor = null)
+    public function addDataset(array $data, $label = null, $fill = false, $color = null)
     {
         if (! isset($this->data['datasets'])) {
             $this->data['datasets'] = [];
@@ -62,11 +62,15 @@ abstract class CElement_Component_Chart extends CElement_Component
 
         $dataset = [];
         $dataset['data'] = $data;
-        $dataset['borderColor'] = $borderColor ?: '#' . str_pad(dechex(mt_rand(0x0, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
         $dataset['fill'] = $fill;
+
         if ($label) {
             $dataset['label'] = $label;
         }
+
+        $randColor = $this->getColor();
+        $dataset['borderColor'] = $color ?: $randColor;
+        $dataset['backgroundColor'] = $this->getColor($randColor);
 
         $this->data['datasets'][] = $dataset;
         return $this;
@@ -88,5 +92,18 @@ abstract class CElement_Component_Chart extends CElement_Component
     {
         $this->height = $height;
         return $this;
+    }
+
+    private function getColor($color = null, $opacity = 1.0)
+    {
+        if (! $color) {
+            return 'rgba(' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . $opacity . ')';
+        } else {
+            preg_match_all("([\d\.]+)", $color, $matches);
+            if (! $opacity) {
+                $opacity = $matches[0][3] * 0.5;
+            }
+            return 'rgba(' . $matches[0][0] . ', ' . $matches[0][1] . ', ' . $matches[0][2] . ', ' . $opacity . ')';
+        }
     }
 }
