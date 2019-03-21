@@ -1090,6 +1090,10 @@ body.mini-navbar #page-wrapper {
     margin: auto;
 }
 
+.cchart.cchart-flot {
+    margin: auto;
+}
+
 @media (min-width: 319px) {
 
 }

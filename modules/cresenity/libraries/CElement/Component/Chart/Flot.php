@@ -42,6 +42,20 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    $js->append(parent::js($indent))->br();
 
 	    $options = [];
+	    $options['shadowSize'] = 0;
+
+	    $options['grid'] = [
+	    	'color' => '#aaaaaa',
+	    	'borderColor' => '#eeeeee',
+	    	'borderWidth' => 1,
+	    	'hoverable' => true,
+	    	'clickable' => true,
+	    ];
+
+	    $options['colors'] = [];
+	    foreach ($this->data as $value) {
+	    	$options['colors'][] = $this->getColor();
+	    }
 
 	    switch ($this->type) {
 	    	case 'line':
@@ -64,30 +78,10 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    		break;
 	    }
 
-	    $data = [
-	    	[
-	    		'label' => 'Foo',
-	    		'data' => [
-	    			[10, 1],
-	    			[17, -14],
-	    			[30, 5],
-	    		],
-	    	],
-	    	[
-	    		'label' => 'Bar',
-	    		'data' => [
-	    			[11, 13],
-	    			[19, 11],
-	    			[30, -7],
-	    		],
-	    	]
-	    ];
-
 	    $js->append("
 	    	var chart" . $this->id . " = $.plot($('#" . $this->id . "'),
-	    		[ { label: 'Foo', data: [ [10, 1], [17, -14], [30, 5] ] },
-	    		  { label: 'Bar', data: [ [11, 13], [19, 11], [30, -7] ] }
-	    		]
+	    		$.parseJSON('" . json_encode($this->data) . "'),
+	    		$.parseJSON('" . json_encode($options) . "')
 	    	);
 	    ")->br();
 
