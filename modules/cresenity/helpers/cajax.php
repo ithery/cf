@@ -195,14 +195,14 @@ class cajax {
         $q = $obj->data->query;
         $key_field = $obj->data->key_field;
         $search_field = $obj->data->search_field;
-        $callbackFunction = "";
+        $valueCallbackFunction = "";
         $callback = "";
         $term = "";
         $limit = "";
         $page = "";
 
-        if (isset($input["callbackFunction"])) {
-            $callbackFunction = $input["callbackFunction"];
+        if (isset($input["valueCallback"])) {
+            $callbackFunction = $input["valueCallback"];
         }
         if (isset($input["callback"])) {
             $callback = $input["callback"];
@@ -326,8 +326,9 @@ class cajax {
             $p = array();
             foreach ($row as $k => $v) {
                 $v = ($v == null) ? "" : $v;
-                if ($callbackFunction != null && is_callable($callbackFunction)) {
-                    $v = call_user_func($callbackFunction, $row, $k, $v);
+                if ($valueCallbackFunction != null && is_callable($valueCallbackFunction)) {
+                   
+                    $v = call_user_func($valueCallbackFunction, $row, $k, $v);
                 }
                 $p[$k] = $v;
             }

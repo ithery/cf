@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 24, 2018, 1:21:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-interface CContainer_Contract_ContextualBindingBuilderInterface {
+interface CContainer_ContextualBindingBuilderInterface {
 
     /**
      * Define the abstract target that depends on the context.

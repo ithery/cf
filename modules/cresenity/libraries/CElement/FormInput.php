@@ -53,12 +53,12 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function setAjax($bool) {
+    public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
     }
 
-    public function setDisabled($bool) {
+    public function setDisabled($bool = true) {
         $this->disabled = $bool;
         return $this;
     }
@@ -161,10 +161,10 @@ class CElement_FormInput extends CElement_Element {
     protected function build() {
         parent::build();
         $this->setAttr('value', $this->value);
-        if($this->readonly) {
+        if ($this->readonly) {
             $this->setAttr('readonly', "readonly");
         }
-        if($this->disabled) {
+        if ($this->disabled) {
             $this->setAttr('disabled', "disabled");
         }
     }

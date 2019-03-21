@@ -844,19 +844,38 @@ if (window.capp.have_clock) {
                 }
             }));
         },
-        show_dialog: function (id_target, url, method, title, data_addition) {
-
+        show_dialog: function (id_target, url, method, options, data_addition) {
+            var title = options;
+            if(typeof options !='object') {
+                options = {};
+                options.title = title;
+            }
+            var settings = $.extend({
+                // These are the defaults.
+                title: 'Data',
+                isSidebar: false,
+                haveFooter: false,
+                onComplete: false
+            }, options);
+            
+           
+            title = settings.title;
+            if(title) {
+                settings.haveHeader=true;
+           
+            }
             var bootstrapVersion = $.fn.tooltip.Constructor.VERSION;
             if (typeof bootstrapVersion == 'undefined') {
                 bootstrapVersion = '2';
             }
+               
             if (window.capp.bootstrap >= '3.3') {
 
-                if (!title)
+                if (!title) {
                     title = 'Dialog';
+                }
                 if (typeof data_addition == 'undefined')
                     data_addition = {};
-
                 var _dialog_html = "<div class='modal fade'>"
                         + "<div class='modal-dialog'>"
                         + "<div class='modal-content'>"
@@ -870,6 +889,8 @@ if (window.capp.have_clock) {
                         + "</div>"
                         + "</div>"
                         + "</div>";
+                
+                
                 var selection = jQuery('#' + id_target);
 
                 var handle;
@@ -880,7 +901,7 @@ if (window.capp.have_clock) {
                 }
                 url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
                 if (!selection.is(".modal-body")) {
-                    var parent = $(_dialog_html);
+                    var parent = modalContainer;
                     parent.attr('id', id_target + '_modal');
                     jQuery(".modal-header .close[data-dismiss='modal']", parent).click(function (event) {
                         event.preventDefault();
@@ -956,18 +977,33 @@ if (window.capp.have_clock) {
                 if (typeof data_addition == 'undefined')
                     data_addition = {};
 
-                var _dialog_html = "<div class='modal' style=\"display: none;\" ><div class='modal-dialog modal-lg' ><div class='modal-content animated bounceInRight' >" +
-                        "<div class='modal-header'>" +
-                        "<a href='#' class='close'></a>" +
-                        "<h3></h3><span class='loader'></span>" +
-                        "</div>" +
-                        "<div class='modal-body'>" +
-                        "</div>" +
-                        "<div class='modal-footer'>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>";
+
+                var modalContainer = jQuery('<div>').addClass('modal capp-modal ').css('display','none');
+                if(settings.isSidebar) {
+                    modalContainer.addClass('sidebar');
+                 
+                }
+                var modalDialog = jQuery('<div>').addClass('modal-dialog');
+                var modalContent = jQuery('<div>').addClass('modal-content animated bounceInRight');
+
+                var modalHeader = jQuery('<div>').addClass('modal-header');
+                var modalTitle = jQuery('<h3>').addClass('modal-title');
+                var modalButtonClose = '<a class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></a>';
+                var modalBody = jQuery('<div>').addClass('modal-body loading');
+                var modalFooter = jQuery('<div>').addClass('modal-footer');
+                modalDialog.append(modalContent);
+                modalContainer.append(modalDialog);
+                if (settings.haveHeader) {
+                    modalTitle.html(title);
+                    modalHeader.append(modalTitle).append(modalButtonClose);
+                    modalContent.append(modalHeader);
+                }
+                modalDialog.append(modalContent);
+                if (settings.haveFooter) {
+                    modalContent.append(modalFooter);
+                }
+                modalContent.append(modalBody);
+               
 
 
                 var selection = jQuery('#' + id_target);
@@ -983,7 +1019,7 @@ if (window.capp.have_clock) {
                 url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
                 if (!selection.is(".modal-body")) {
                     var overlay = $('<div class="modal-backdrop"></div>').hide();
-                    var parent = $(_dialog_html);
+                    var parent = modalContainer;
                     jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function (event) {
                         event.preventDefault();
                         if (dialog_is_remove) {

@@ -12,6 +12,58 @@ trait CApp_Trait_Base {
     private static $org = null;
 
     /**
+     * alias of array_merge($_GET,$_POST)
+     * 
+     * @return array
+     */
+    public static function getRequest() {
+        return array_merge(self::getRequestGet(), self::getRequestPost());
+    }
+
+    /**
+     * alias of $_GET
+     * 
+     * @return type
+     */
+    public static function getRequestGet() {
+        return $_GET;
+    }
+
+    /**
+     * alias of $_POST
+     * 
+     * @return type
+     */
+    public static function getRequestPost() {
+        return $_POST;
+    }
+
+    /**
+     * alias of $_FILES
+     * 
+     * @return type
+     */
+    public static function getRequestFiles() {
+        return $_FILES;
+    }
+
+    /**
+     * 
+     * @return int
+     */
+    public static function appId() {
+        return CF::appId();
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    public static function appCode() {
+        return CF::appCode();
+    }
+
+    /**
      * 
      * @return int
      */
@@ -46,7 +98,7 @@ trait CApp_Trait_Base {
 
     /**
      * 
-     * @param int $org_id optional, default using return values of SM::org_id()
+     * @param int $org_id optional, default using return values of static::orgId()
      * @return string Name of org
      */
     public static function orgName($orgId = null) {
@@ -195,11 +247,11 @@ trait CApp_Trait_Base {
     }
 
     public static function noImageUrl($width = 100, $height = 100) {
-        return curl::base() . 'cresenity/noimage/' . $width . '/' . $height;
+        return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height;
     }
 
     public static function initialAvatarUrl($name, $size = 100) {
-        return curl::base() . 'cresenity/avatar/initials/?name=' . $name . '&size=' . $size;
+        return curl::httpbase() . 'cresenity/avatar/initials/?name=' . $name . '&size=' . $size;
     }
 
     public static function havePermission($action) {
@@ -250,4 +302,8 @@ trait CApp_Trait_Base {
         return $pos !== false;
     }
 
+    
+    public static function isLogin() {
+        return static::userId()!=null;
+    }
 }

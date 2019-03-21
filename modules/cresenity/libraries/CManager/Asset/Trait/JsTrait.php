@@ -10,6 +10,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CManager_Asset_Trait_JsTrait {
 
     public function fullpathJsFile($file) {
+        foreach ($this->mediaPaths as $dir) {
+            $path = $dir . 'js' . DS . $file;
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
         $dirs = CF::getDirs('media');
 
         foreach ($dirs as $dir) {
@@ -57,7 +63,7 @@ trait CManager_Asset_Trait_JsTrait {
         } else {
             $js_file = $this->fullpathJsFile($dir_file);
             if (!file_exists($js_file)) {
-                trigger_error('JS File not exists, ' . $file);
+                throw new Exception('JS File not exists, ' . $file);
             }
             if (strlen($js_version) > 0) {
                 $js_file .= $js_version;

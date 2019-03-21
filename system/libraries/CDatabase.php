@@ -64,7 +64,7 @@ class CDatabase {
     /**
      * The event dispatcher instance.
      *
-     * @var CDatabase_Event
+     * @var CEvent_Dispatcher
      */
     protected $events;
 
@@ -257,7 +257,7 @@ class CDatabase {
 
 
 
-        $this->events = new CDatabase_Event();
+        $this->events = CDatabase_Dispatcher::instance();
         CModel::setEventDispatcher($this->events);
         $this->configuration = new CDatabase_Configuration();
 

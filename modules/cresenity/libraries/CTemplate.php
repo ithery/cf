@@ -9,6 +9,21 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTemplate {
 
+    /**
+     * The stack of section names currently being captured.
+     * @var array
+     */
+    private $capture;
+
+    /**
+     * A collection point for section content.
+     * @var array
+     */
+    private $section;
+    /**
+     * Default folder for templates view
+     * @var string
+     */
     protected $templateFolder = 'templates';
 
     /**
@@ -38,9 +53,9 @@ class CTemplate {
     }
 
     public static function factory($name, $data = array()) {
-        return new CTemplate($name,$data);
+        return new CTemplate($name, $data);
     }
-    
+
     public function block($name, $data = array()) {
         $filename = CF::find_file($this->templateFolder, $name, TRUE);
         $this->registry->set($name, $filename);
@@ -137,6 +152,65 @@ class CTemplate {
         ob_start();
         $this->getRegistry($this->name)->__invoke($this->data);
         return ob_get_clean();
+    }
+
+    /**
+     *
+     * Is a particular named section available?
+     *
+     * @param string $name The section name.
+     * @return bool
+     */
+    protected function hasSection($name) {
+        return isset($this->section[$name]);
+    }
+
+    /**
+     *
+     * Sets the body of a named section directly, as opposed to buffering and
+     * capturing output.
+     *
+     * @param string $name The section name.
+     * @param string $body The section body.
+     * @return null
+     */
+    protected function setSection($name, $body) {
+        $this->section[$name] = $body;
+    }
+
+    /**
+     *
+     * Gets the body of a named section.
+     *
+     * @param string $name The section name.
+     * @return string
+     */
+    protected function getSection($name) {
+        return $this->section[$name];
+    }
+
+    /**
+     *
+     * Begins output buffering for a named section.
+     *
+     * @param string $name The section name.
+     * @return null
+     *
+     */
+    protected function beginSection($name) {
+        $this->capture[] = $name;
+        ob_start();
+    }
+
+    /**
+     *
+     * Ends buffering and retains output for the most-recent section.
+     * @return null
+     */
+    protected function endSection() {
+        $body = ob_get_clean();
+        $name = array_pop($this->capture);
+        $this->setSection($name, $body);
     }
 
 }

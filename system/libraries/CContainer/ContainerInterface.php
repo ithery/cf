@@ -4,12 +4,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 7, 2018, 11:48:05 PM
+ * @since Mar 10, 2019, 3:51:05 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Psr\Container\ContainerInterface;
 
-interface CContainer_Contract_ContainerInterface extends ContainerInterface {
+interface CContainer_ContainerInterface extends ContainerInterface {
 
     /**
      * Determine if the given abstract type has been bound.
@@ -98,7 +98,7 @@ interface CContainer_Contract_ContainerInterface extends ContainerInterface {
      * Define a contextual binding.
      *
      * @param  string  $concrete
-     * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
+     * @return CContainer_ContextualBindingBuilderInterface
      */
     public function when($concrete);
 

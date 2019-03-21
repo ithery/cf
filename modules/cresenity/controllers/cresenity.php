@@ -12,6 +12,10 @@ class Cresenity_Controller extends CController {
         CJob::cliRunner();
     }
 
+    public function daemon() {
+        CDaemon::cliRunner();
+    }
+    
     public function ajax($method) {
         $app = CApp::instance();
         $file = CApp::temp()->makePath("ajax", $method . ".tmp");

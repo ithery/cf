@@ -35,6 +35,7 @@ class CApp extends CObservable {
     private $renderMessage = true;
     private $keepMessage = false;
     private $viewName = 'cpage';
+    private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
 
     public function setViewCallback(callable $viewCallback) {
@@ -265,6 +266,10 @@ class CApp extends CObservable {
         return CF::appCode();
     }
 
+    public function message($type, $message) {
+        return CApp_Message::add($type, $message);
+    }
+
     public function controller() {
         return CF::instance();
     }
@@ -432,7 +437,7 @@ class CApp extends CObservable {
         } else if ($this->activation) {
             $viewName = 'ccore/activation';
         } else if (!$this->is_user_login() && ccfg::get("have_user_login") && $this->login_required) {
-            $viewName = 'ccore/login';
+            $viewName = $this->viewLoginName;
         } else if (!$this->is_user_login() && ccfg::get("have_static_login") && $this->login_required) {
             $viewName = 'ccore/static_login';
         }
@@ -727,17 +732,18 @@ class CApp extends CObservable {
             }
 
 
+            if(!($exception instanceof CF_404_Exception)) {
+                $v = CView::factory('cmail/error_mail');
+                $v->error = $error;
+                $v->description = $description;
+                $v->file = $file;
+                $v->line = $line;
+                $v->trace = $trace;
+                $v->message = $message;
+                $html = $v->render();
 
-            $v = CView::factory('cmail/error_mail');
-            $v->error = $error;
-            $v->description = $description;
-            $v->file = $file;
-            $v->line = $line;
-            $v->trace = $trace;
-            $v->message = $message;
-            $html = $v->render();
-
-            cmail::error_mail($html);
+                cmail::error_mail($html);
+            }
 
 
             if ($PHP_ERROR) {
@@ -805,6 +811,9 @@ class CApp extends CObservable {
     public function setViewName($viewName) {
         $this->viewName = $viewName;
     }
+    public function setViewLoginName($viewLoginName) {
+        $this->viewLoginName = $viewLoginName;
+    }
 
     /**
      * 
@@ -816,4 +825,5 @@ class CApp extends CObservable {
         }
     }
 
+   
 }
