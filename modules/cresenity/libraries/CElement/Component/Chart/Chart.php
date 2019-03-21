@@ -27,7 +27,13 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	    	new Chart($('#" . $this->id . "'), {
 	    		type: '" . $this->type . "',
 	    		data: $.parseJSON('" . $this->data . "'),
-	    		options: {},
+	    		options: {
+	    			scales: {
+	    				yAxes: [{
+	    					stacked: true
+	    				}]
+	    			}
+	    		},
     		})
 	    ")->br();
 	    
