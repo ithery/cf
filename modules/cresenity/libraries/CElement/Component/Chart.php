@@ -70,7 +70,7 @@ abstract class CElement_Component_Chart extends CElement_Component
 
         $randColor = $this->getColor();
         $dataset['borderColor'] = $color ?: $randColor;
-        $dataset['backgroundColor'] = $this->getColor($randColor);
+        $dataset['backgroundColor'] = $this->getColor($randColor, 0.5);
 
         $this->data['datasets'][] = $dataset;
         return $this;
@@ -100,9 +100,7 @@ abstract class CElement_Component_Chart extends CElement_Component
             return 'rgba(' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . $opacity . ')';
         } else {
             preg_match_all("([\d\.]+)", $color, $matches);
-            if (! $opacity) {
-                $opacity = $matches[0][3] * 0.5;
-            }
+            $opacity = $opacity ?: $matches[0][3];
             return 'rgba(' . $matches[0][0] . ', ' . $matches[0][1] . ', ' . $matches[0][2] . ', ' . $opacity . ')';
         }
     }
