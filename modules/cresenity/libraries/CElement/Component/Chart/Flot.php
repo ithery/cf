@@ -91,7 +91,7 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    	);
 	    ")->br();
 
-	    $js->append("console.log(':', chart" . $this->id . ");")->br();
+	    $js->append("console.log('chart" . $this->id . ":', chart" . $this->id . ");")->br();
 	    
 	    return $js->text();
 	}
