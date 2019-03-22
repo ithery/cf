@@ -14,8 +14,13 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	protected function build() {
 	    parent::build();
 	    $this->addClass('cchart cchart-flot');
-	    $this->customCss('width', '500px');
-	    $this->customCss('height', '500px');
+	    $this->customCss('height', '250px');
+	    if ($this->width) {
+	    	$this->customCss('width', $this->width);
+	    }
+	    if ($this->height) {
+	    	$this->customCss('height', $this->height);
+	    }
 	    $this->buildData();
 	}
 
