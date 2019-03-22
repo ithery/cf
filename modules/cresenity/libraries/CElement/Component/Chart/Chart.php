@@ -8,14 +8,13 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	public function __construct()
 	{
 		parent::__construct();
-		$this->wrapper = $this->addDiv()->addClass('cchart-container');
-		$this->setTag('canvas');
+		$this->wrapper = $this->addCanvas()->addClass('cchart cchart-chart');
 		CManager::instance()->registerModule('chartjs');
 	}
 
 	protected function build() {
 	    parent::build();
-	    $this->addClass('cchart cchart-chart');
+	    $this->addClass('cchart-container');
 	    $this->buildData();
 	}
 
