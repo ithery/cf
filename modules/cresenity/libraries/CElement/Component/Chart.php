@@ -24,10 +24,6 @@ abstract class CElement_Component_Chart extends CElement_Component
         return new $className($id);
     }
 
-    public function pretag() {
-        return '<div class="cchart-container"><' . $this->tag . ' ' . $this->htmlAttr() . ' ></div>';
-    }
-
     public function setType($type)
     {
         $this->type = $type;

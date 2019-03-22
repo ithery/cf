@@ -353,6 +353,18 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
+     * Add Canvas Element &lt;canvas&gt
+     * 
+     * @param string $id
+     * @return CElement_Element_Canvas Canvas Element
+     */
+    public function addCanvas($id = "") {
+        $element = CElement_Factory::createElement('canvas', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
      * Add Form Field
      *
      * @param   string id
