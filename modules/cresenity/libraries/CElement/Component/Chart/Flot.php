@@ -92,8 +92,6 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    		$.parseJSON('" . json_encode($options) . "')
 	    	);
 	    ")->br();
-
-	    $js->append("console.log('chart" . $this->id . ":', chart" . $this->id . ");")->br();
 	    
 	    return $js->text();
 	}
