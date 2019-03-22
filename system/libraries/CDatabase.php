@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CDatabase {
 
+    use CTrait_Compat_Database;
+    
     // Database instances
     public static $instances = array();
     // Global benchmark
