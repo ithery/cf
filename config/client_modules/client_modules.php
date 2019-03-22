@@ -609,7 +609,7 @@ return array(
             "plugins/c3/c3.css",
         ),
         "js" => array(
-            "plugins/d3/d3/js",
+            "plugins/d3/d3.js",
             "plugins/c3/c3.js",
         ),
     ),

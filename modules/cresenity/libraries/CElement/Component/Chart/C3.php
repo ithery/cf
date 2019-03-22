@@ -41,7 +41,7 @@ class CElement_Component_Chart_C3 extends CElement_Component_Chart
 
 	    $js->append("
 	    	c3.generate({
-	    		bindto: '#" . $this->id . "',
+	    		bindto: $('#" . $this->id . "'),
 	    		color: $.parseJSON('" . json_encode($color) . "'),
 	    		data: $.parseJSON('" . json_encode($this->data) . "')
 	    	});
