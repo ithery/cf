@@ -8,7 +8,7 @@ class CElement_Component_Chart_C3 extends CElement_Component_Chart
 	public function __construct()
 	{
 		parent::__construct();
-		CManager::instance()->registerModule('chartc3js');
+		CManager::instance()->registerModule('c3');
 	}
 
 	protected function build() {

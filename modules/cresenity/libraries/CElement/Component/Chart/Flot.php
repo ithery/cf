@@ -82,10 +82,6 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart
 	    				'lineWidth' => 1,
 	    				'fill' => 0.25,
 	    			],
-	    			'points' => [
-	    				'show' => true,
-	    				'radius' => 4,
-	    			],
 	    		];
 	    		break;
 	    }

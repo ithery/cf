@@ -604,5 +604,40 @@ return array(
             "plugins/sparklines/sparkline.js"
         ),
     ),
+    "c3" => array(
+        "css" => array(
+            "plugins/c3/c3.css",
+        ),
+        "js" => array(
+            "plugins/d3/d3/js",
+            "plugins/c3/c3.js",
+        ),
+    ),
+    "chartist" => array(
+        "css" => array(
+            "plugins/chartist/chartist.css",
+        ),
+        "js" => array(
+            "plugins/chartist/chartist.js",
+        ),
+    ),
+    "morris" => array(
+        "css" => array(
+            "plugins/morris/morris.css",
+        ),
+        "js" => array(
+            "plugins/morris/morris.js",
+        ),
+    ),
+    "eve" => array(
+        "js" => array(
+            "plugins/eve/eve.js",
+        ),
+    ),
+    "raphael" => array(
+        "js" => array(
+            "plugins/raphael/raphael.js",
+        ),
+    ),
 );
 ?>

@@ -8,7 +8,7 @@ class CElement_Component_Chart_Chartist extends CElement_Component_Chart
 	public function __construct()
 	{
 		parent::__construct();
-		CManager::instance()->registerModule('chartistjs');
+		CManager::instance()->registerModule('chartist');
 	}
 
 	protected function build() {
