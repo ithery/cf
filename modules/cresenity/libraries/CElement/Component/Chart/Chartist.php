@@ -21,12 +21,13 @@ class CElement_Component_Chart_Chartist extends CElement_Component_Chart
 	    $js->setIndent($indent);
 	    $js->append(parent::js($indent))->br();
 
+	    $options = [];
+
 	    $js->append("
-	    	new Chart($('#" . $this->id . "'), {
-	    		type: '" . $this->type . "',
-	    		data: " . $this->data . ",
-	    		options: {},
-    		})
+	    	new Chartist." . ucfirst(strtolower($this->type)) . "($('#" . $this->id . "'), {
+	    		labels: $.parseJSON('" . json_encode($this->labels) . "'),
+	    		series: $.parseJSON('" .  json_encode($this->data) . "')
+	    	}, $.parseJSON('" . json_encode($options) . "'));
 	    ")->br();
 	    
 	    return $js->text();
