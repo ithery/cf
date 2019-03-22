@@ -57,7 +57,7 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	    }
 
 	    $js->append("
-	    	var chart" . $this->id . " = new Chart($('#" . $this->id . "'), {
+	    	var chart" . $this->wrapper->id . " = new Chart($('#" . $this->wrapper->id . "'), {
 	    		type: '" . $this->type . "',
 	    		data: $.parseJSON('" . json_encode($this->data) . "'),
 	    		options: $.parseJSON('" . json_encode($options) . "'),
@@ -65,10 +65,10 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
 	    ")->br();
 
 	    if ($this->width) {
-		    $js->append("chart" . $this->id . ".canvas.parentNode.style.width = '" . $this->width . "px';")->br();
+		    $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.width = '" . $this->width . "px';")->br();
 	    }
 	    if ($this->height) {
-		    $js->append("chart" . $this->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
+		    $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
 	    }
 	    
 	    return $js->text();
