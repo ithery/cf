@@ -40,7 +40,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->autoSelect = false;
         $this->minInputLength = 0;
         $this->delay = 100;
-        $this->requires=array();
+        $this->requires = array();
         $this->valueCallback = null;
     }
 
@@ -168,8 +168,17 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             } else {
                 $q = "select * from (" . $this->query . ") as a where `" . $this->keyField . "`=" . $db->escape($this->value);
             }
-            $r = cdbutils::get_row($q);
+            $r = $db->query($q)->result_array();
             if (count($r) > 0) {
+                $row = $r[0];
+                if (is_object($row)) {
+                    $row = (array) $row;
+                }
+                if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                    foreach ($row as $k => $v) {
+                        $row[$k] = $this->valueCallback($row, $k, $v);
+                    }
+                }
                 $strSelection = $this->formatSelection;
                 $strSelection = str_replace("'", "\'", $strSelection);
                 preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
@@ -177,7 +186,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 foreach ($matches as $val) {
                     $str = $val[1]; //matches str without bracket {}
                     $b_str = $val[0]; //matches str with bracket {}
-                    $strSelection = str_replace($b_str, $r->$str, $strSelection);
+
+                    $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
                 }
 
                 $html->appendln('<option value="' . $this->value . '">' . $strSelection . '</option>');
@@ -261,6 +271,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $r = $db->query($q)->result_array(false);
             if (count($r) > 0) {
                 $r = $r[0];
+                if ($this->valueCallback != null && is_callable($this->valueCallback)) {
+                    foreach ($r as $k => $val) {
+                        $r[$k] = $this->valueCallback($r, $k, $val);
+                    }
+                }
             }
             $rjson = json_encode($r);
 
@@ -364,7 +379,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 }
             });
         ";
-
+        if ($this->valueCallback != null && is_callable($this->valueCallback)) {
+            $str .= "
+                $('#" . $this->id . "').trigger('change');
+                
+                ";
+        }
 
         $js = new CStringBuilder();
         $js->append(parent::jsChild($indent))->br();
