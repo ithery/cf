@@ -155,8 +155,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if (strlen($this->value) > 0) {
             $value = $this->value;
         }
-
-        $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . '">');
+        $additionAttribute = "";
+        foreach ($this->attr as $k => $v) {
+            $additionAttribute .= " " . $k . '="' . $v . '"';
+        }
+        $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
         // select2 4.0 using option to set default value
         if (strlen($this->value) > 0 || $this->autoSelect) {
@@ -168,7 +171,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             } else {
                 $q = "select * from (" . $this->query . ") as a where `" . $this->keyField . "`=" . $db->escape($this->value);
             }
-            $r = $db->query($q)->result_array();
+            $r = $db->query($q)->result_array(false);
             if (count($r) > 0) {
                 $row = $r[0];
                 if (is_object($row)) {
@@ -209,40 +212,35 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         ->makeurl();
     }
 
+    private function generateSelect2Template($template) {
+        //escape the character
+        $template = str_replace("'", "\'", $template);
+        preg_match_all("/{([\w]*)}/", $template, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $val) {
+            $str = carr::get($val, 1); //matches str without bracket {}
+            $bracketStr = carr::get($val, 0); //matches str with bracket {}
+            if (strlen($str) > 0) {
+                $template = str_replace($bracketStr, "'+item." . $str . "+'", $template);
+            }
+        }
+        return $template;
+    }
+
     public function js($indent = 0) {
-        $ajax_url = $this->createAjaxUrl();
+        $ajaxUrl = $this->createAjaxUrl();
 
         $strSelection = $this->formatSelection;
-        $str_result = $this->formatResult;
-
-        $strSelection = str_replace("'", "\'", $strSelection);
-        $str_result = str_replace("'", "\'", $str_result);
-        preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $val) {
-            $str = $val[1]; //matches str without bracket {}
-            $b_str = $val[0]; //matches str with bracket {}
-            if (strlen($str) > 0) {
-                $strSelection = str_replace($b_str, "'+item." . $str . "+'", $strSelection);
-            }
-        }
-
-        preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
+        $strResult = $this->formatResult;
 
 
-        foreach ($matches as $val) {
-            $thousand_separator_pre = '';
-            $thousand_separator_post = '';
-            $str = $val[1]; //matches str without bracket {}
-            $b_str = $val[0]; //matches str with bracket {}
-            if (strlen($str) > 0) {
-                $str_result = str_replace($b_str, "'+item." . $str . "+'", $str_result);
-            }
-        }
-        if (strlen($str_result) == 0) {
+        $strSelection = $this->generateSelect2Template($strSelection);
+        $strResult = $this->generateSelect2Template($strResult);
+
+        if (strlen($strResult) == 0) {
             $searchFieldText = CF::value($this->searchField);
             if (strlen($searchFieldText) > 0) {
-                $str_result = "'+item." . $searchFieldText . "+'";
+                $strResult = "'+item." . $searchFieldText . "+'";
             }
         }
         if (strlen($strSelection) == 0) {
@@ -252,7 +250,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
         }
 
-        $str_result = preg_replace("/[\r\n]+/", "", $str_result);
+        $strResult = preg_replace("/[\r\n]+/", "", $strResult);
         $placeholder = "Search for a item";
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
@@ -318,7 +316,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 placeholder: '" . $placeholder . "',
                 minimumInputLength: '" . $this->minInputLength . "',
                 ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
-                        url: '" . $ajax_url . "',
+                        url: '" . $ajaxUrl . "',
                         dataType: 'jsonp',
                         quietMillis: " . $this->delay . ", 
                         delay: " . $this->delay . ", 
@@ -351,7 +349,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     if (typeof item.loading !== 'undefined') {
                         return item.text;
                     }
-                    return $('<div>" . $str_result . "</div>');
+                    return $('<div>" . $strResult . "</div>');
                 }, // omitted for brevity, see the source of this page
                 templateSelection: function(item) {
                     if (item.id === '' || item.selected) {
