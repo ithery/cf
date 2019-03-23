@@ -624,27 +624,30 @@ class CElement_Component_DataTable extends CElement_Component {
                     $new_v = $col_v;
 
                     if (($this->cell_callback_func) != null) {
-                        $new_v = CDynFunction::factory($this->cell_callback_func)
-                                ->add_param($this)
-                                ->add_param($col->get_fieldname())
-                                ->add_param($row)
-                                ->add_param($new_v)
-                                ->set_require($this->requires)
+                        $new_v = CFunction::factory($this->cell_callback_func)
+                                ->addArg($this)
+                                ->addArg($col->getFieldname())
+                                ->addArg($row)
+                                ->addArg($new_v)
+                                ->setRequire($this->requires)
                                 ->execute();
 
 
                         //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                     }
                     $class = "";
-                    switch ($col->get_align()) {
-                        case "left": $class .= " align-left";
+                    switch ($col->getAlign()) {
+                        case CConstant::ALIGN_LEFT:
+                            $class .= " align-left";
                             break;
-                        case "right": $class .= " align-right";
+                        case CConstant::ALIGN_RIGHT:
+                            $class .= " align-right";
                             break;
-                        case "center": $class .= " align-center";
+                        case CConstant::ALIGN_CENTER:
+                            $class .= " align-center";
                             break;
                     }
-                    if ($col->get_no_line_break()) {
+                    if ($col->getNoLineBreak()) {
                         $class .= " no-line-break";
                     }
                     if ($col->hidden_phone)
