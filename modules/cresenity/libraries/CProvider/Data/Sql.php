@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 24, 2019, 12:55:10 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CData_Provider_Sql extends CData_ProviderAbstract {
+class CProvider_Data_Sql extends CProvider_DataAbstract {
 
     protected $sql;
 
