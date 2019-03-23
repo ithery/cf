@@ -28,4 +28,11 @@ class CConstant {
     const CRESENITY_FONT_PATH = DOCROOT . '/modules/cresenity/media/font';
     const CRESENITY_IMAGE_PATH = DOCROOT . '/modules/cresenity/media/img';
 
+    /**
+     * Align Constant
+     */
+    const ALIGN_LEFT = 'left';
+    const ALIGN_RIGHT = 'right';
+    const ALIGN_CENTER = 'center';
+
 }

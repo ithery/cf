@@ -6,7 +6,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CTrait_Element_ActionList_Row,
         CTrait_Element_ActionList_Header;
 
-    public $default_paging_list = array(
+    public $defaultPagingList = array(
         "10" => "10",
         "25" => "25",
         "50" => "50",
@@ -20,11 +20,10 @@ class CElement_Component_DataTable extends CElement_Component {
      * @var CDatabase
      */
     public $db;
-    public $db_config;
+    public $dbConfig;
     public $columns;
     public $footer;
     public $footer_field;
-    public $row_action_list;
     public $requires = array();
     public $data;
     public $key_field;
@@ -76,17 +75,17 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $js_cell;
     protected $dom = null;
     protected $widget_title;
+    protected $haveColRowView;
 
     public function __construct($id = "") {
         parent::__construct($id);
-        $this->row_action_list = &$this->rowActionList;
-        $this->default_paging_list["-1"] = clang::__("ALL");
+        $this->defaultPagingList["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
         $this->db = CDatabase::instance($this->domain);
-        $this->db_config = $this->db->config();
+        $this->dbConfig = $this->db->config();
         $this->display_length = "10";
-        $this->paging_list = $this->default_paging_list;
+        $this->paging_list = $this->defaultPagingList;
         $this->options = CElement_Component_DataTable_Options::factory();
         $this->data = array();
         $this->key_field = "";
@@ -146,6 +145,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_sheetname = $this->id;
         $this->table_striped = true;
         $this->table_bordered = true;
+        $this->haveColRowView = true;
 
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
@@ -177,12 +177,13 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setDomain($domain) {
         parent::setDomain($domain);
-        $this->db = CDatabase::instance($domain);
+        $this->setDatabase(CDatabase::instance($domain));
+        return $this;
     }
 
     public function setDatabase($db) {
         $this->db = $db;
-        $this->db_config = $db->config();
+        $this->dbConfig = $db->config();
 
         return $this;
     }
@@ -1815,7 +1816,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajaxMethod->setData('row_action_list', $this->rowActionList);
             $ajaxMethod->setData('key_field', $this->key_field);
             $ajaxMethod->setData('table', serialize($this));
-            $ajaxMethod->setData('dbConfig', $this->db_config);
+            $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('domain', $this->domain);
             $ajaxMethod->setData('checkbox', $this->checkbox);
             $ajaxMethod->setData('is_elastic', $this->isElastic);

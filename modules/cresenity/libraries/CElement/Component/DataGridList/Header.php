@@ -32,12 +32,32 @@ class CElement_Component_DataGridList_Header extends CElement_Element {
         $divActionSecondaryInner = $divActionSecondary->addDiv()->addClass('btn-group btn-group-toggle')->setAttr('data-toggle', 'buttons');
 
         $colButtonLabel = $divActionSecondaryInner->addlabel()->addClass('btn btn-default icon-btn md-btn-flat')->addClass('active');
-        $colButtonLabel->addControl($this->id . '_radio_col_view', 'radio')->setName($this->id . '-radio-col-view')->setValue('data-grid-col-view')->setChecked();
+        $colButtonLabel->addControl($this->id . '_radio_col_view', 'radio')->setName($this->id . '-view')->addClass('data-grid-list-radio-view')->setValue('data-grid-list-col-view')->setChecked();
         $colButtonLabel->addSpan()->addClass('ion ion-md-apps');
 
         $rowButtonLabel = $divActionSecondaryInner->addlabel()->addClass('btn btn-default icon-btn md-btn-flat');
-        $rowButtonLabel->addControl($this->id . '_radio_row_view', 'radio')->setName($this->id . '-radio-row-view')->setValue('data-grid-row-view')->setChecked();
+        $rowButtonLabel->addControl($this->id . '_radio_row_view', 'radio')->setName($this->id . '-view')->addClass('data-grid-list-radio-view')->setValue('data-grid-list-row-view');
         $rowButtonLabel->addSpan()->addClass('ion ion-md-menu');
+    }
+
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+
+        $js->append("
+            // Change view
+            $('#".$this->id()." [name=\"".$this->id()."-view\"]').on('change', function() {
+                $('#".$this->getParent()->id()." .data-grid-list-container')
+                    .removeClass('data-grid-list-col-view data-grid-list-row-view')
+                    .addClass(this.value);
+            });
+
+            
+            ");
+
+
+
+        $js->append($this->jsChild($indent))->br();
+        return $js->text();
     }
 
 }
