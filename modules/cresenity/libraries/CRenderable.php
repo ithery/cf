@@ -231,4 +231,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $this->getEvent()->listen($event, $callback);
     }
 
+    public function getParent() {
+        return $this->parent;
+    }
+
 }
