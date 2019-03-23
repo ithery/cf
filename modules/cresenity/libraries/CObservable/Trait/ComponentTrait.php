@@ -19,6 +19,17 @@ trait CObservable_Trait_ComponentTrait {
         $this->add($table);
         return $table;
     }
+    
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_DataGridList
+     */
+    public function addDataGridList($id = "") {
+        $dataGridList = CElement_Factory::createComponent('DataGridList', $id);
+        $this->add($dataGridList);
+        return $dataGridList;
+    }
 
     /**
      * 
