@@ -64,11 +64,12 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
-    protected $tbody_id;
+    protected $tbodyId;
     protected $js_cell;
     protected $dom = null;
     protected $widget_title;
     protected $haveColRowView;
+    protected $colViewCount;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -125,7 +126,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->requires = array();
         $this->js_cell = '';
         $this->quick_search = FALSE;
-        $this->tbody_id = '';
+        $this->tbodyId = '';
 
         $this->report_header = array();
 
@@ -138,7 +139,8 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_sheetname = $this->id;
         $this->tableStriped = true;
         $this->tableBordered = true;
-        $this->haveColRowView = true;
+        $this->haveColRowView = false;
+        $this->colViewCount = 5;
 
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
@@ -247,7 +249,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setTbodyId($id) {
-        $this->tbody_id = $id;
+        $this->tbodyId = $id;
         return $this;
     }
 
@@ -498,68 +500,13 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function rawHtml($indent = 0) {
+    protected function rawTBody($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
-        $thClass = "";
-        if ($this->headerNoLineBreak) {
-            $thClass = " no-line-break";
-        }
-        $htmlResponsiveOpen = '<div class="table-responsive">';
-        $htmlResponsiveClose = '</div>';
-        if ($this->responsive) {
-            $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
-            $htmlResponsiveClose = '</div>';
-        }
+        $tbodyId = (strlen($this->tbodyId) > 0 ? "id='" . $this->tbodyId . "' " : "");
 
-        $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0) {
-            $classes = " " . $classes;
-        }
-        if ($this->tableStriped) {
-            $classes .= " table-striped ";
-        }
-        if ($this->tableBordered) {
-            $classes .= " table-bordered ";
-        }
-
-        $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
-                ->incIndent()->br();
-        if ($this->show_header) {
-            $html->appendln('<thead>')
-                    ->incIndent()->br();
-            if (strlen($this->custom_column_header) > 0) {
-                $html->appendln($this->custom_column_header);
-            } else {
-                $html->appendln('<tr>')
-                        ->incIndent()->br();
-
-                if ($this->numbering) {
-                    $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
-                }
-                if ($this->checkbox) {
-                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
-                }
-                foreach ($this->columns as $col) {
-                    $html->appendln($col->render_header_html($this->export_pdf, $thClass, $html->getIndent()))->br();
-                }
-                if ($this->haveRowAction()) {
-                    $action_width = 31 * $this->action_count() + 5;
-                    if ($this->getRowActionStyle() == "btn-dropdown") {
-                        $action_width = 70;
-                    }
-                    $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
-                }
-                $html->decIndent()->appendln("</tr>")->br();
-            }
-            $html->decIndent()->appendln("</thead>")->br();
-        }
-
-        $tbody_id = (strlen($this->tbody_id) > 0 ? "id='" . $this->tbody_id . "' " : "");
-
-        $html->appendln("<tbody " . $tbody_id . " >")->incIndent()->br();
+        $html->appendln('<tbody ' . $tbodyId . '>')->incIndent()->br();
         //render body;
         $html->appendln($this->htmlChild($indent));
         $no = 0;
@@ -631,9 +578,6 @@ class CElement_Component_DataTable extends CElement_Component {
                                 ->addArg($new_v)
                                 ->setRequire($this->requires)
                                 ->execute();
-
-
-                        //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                     }
                     $class = "";
                     switch ($col->getAlign()) {
@@ -659,14 +603,14 @@ class CElement_Component_DataTable extends CElement_Component {
                     if ($col->hidden_desktop)
                         $class .= " hidden-desktop";
 
-                    $pdf_tbody_td_current_attr = $this->getPdfTBodyTdAttr();
+                    $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
                     if ($this->export_pdf) {
                         switch ($col->get_align()) {
-                            case "left": $pdf_tbody_td_current_attr .= ' align="left"';
+                            case "left": $pdfTBodyTdCurrentAttr .= ' align="left"';
                                 break;
-                            case "right": $pdf_tbody_td_current_attr .= ' align="right"';
+                            case "right": $pdfTBodyTdCurrentAttr .= ' align="right"';
                                 break;
-                            case "center": $pdf_tbody_td_current_attr .= ' align="center"';
+                            case "center": $pdfTBodyTdCurrentAttr .= ' align="center"';
                                 break;
                         }
                     }
@@ -675,7 +619,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         $new_v = carr::get($new_v, 'html', '');
                     }
 
-                    $html->appendln('<td' . $pdf_tbody_td_current_attr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
+                    $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
                     $col_found = true;
                 }
 
@@ -687,7 +631,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $jsparam["param1"] = $key;
                     if ($this->getRowActionStyle() == "btn-dropdown") {
-                        $this->rowActionList->add_class("pull-right");
+                        $this->rowActionList->addClass("pull-right");
                     }
                     $this->rowActionList->regenerateId(true);
                     $this->rowActionList->apply("jsparam", $jsparam);
@@ -697,12 +641,12 @@ class CElement_Component_DataTable extends CElement_Component {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as &$action) {
-                            $visibility = CDynFunction::factory($this->filter_action_callback_func)
-                                    ->add_param($this)
-                                    ->add_param($col->getFieldname())
-                                    ->add_param($row)
-                                    ->add_param($action)
-                                    ->set_require($this->requires)
+                            $visibility = CFunction::factory($this->filter_action_callback_func)
+                                    ->addArg($this)
+                                    ->addArg($col->getFieldname())
+                                    ->addArg($row)
+                                    ->addArg($action)
+                                    ->setRequire($this->requires)
                                     ->execute();
                             if ($visibility == false) {
                                 $action->addClass('d-none');
@@ -729,6 +673,71 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
         $html->decIndent()->appendln('</tbody>')->br();
+        return $html->text();
+    }
+
+    protected function rawHtml($indent = 0) {
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+
+        $thClass = "";
+        if ($this->headerNoLineBreak) {
+            $thClass = " no-line-break";
+        }
+        $htmlResponsiveOpen = '<div class="table-responsive">';
+        $htmlResponsiveClose = '</div>';
+        if ($this->responsive) {
+            $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
+            $htmlResponsiveClose = '</div>';
+        }
+
+        $classes = $this->classes;
+        $classes = implode(" ", $classes);
+        if (strlen($classes) > 0) {
+            $classes = " " . $classes;
+        }
+        if ($this->tableStriped) {
+            $classes .= " table-striped ";
+        }
+        if ($this->tableBordered) {
+            $classes .= " table-bordered ";
+        }
+
+        $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
+                ->incIndent()->br();
+        if ($this->show_header) {
+            $html->appendln('<thead>')
+                    ->incIndent()->br();
+            if (strlen($this->custom_column_header) > 0) {
+                $html->appendln($this->custom_column_header);
+            } else {
+                $html->appendln('<tr>')
+                        ->incIndent()->br();
+
+                if ($this->numbering) {
+                    $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
+                }
+                if ($this->checkbox) {
+                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
+                }
+                foreach ($this->columns as $col) {
+                    $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
+                }
+                if ($this->haveRowAction()) {
+                    $action_width = 31 * $this->action_count() + 5;
+                    if ($this->getRowActionStyle() == "btn-dropdown") {
+                        $action_width = 70;
+                    }
+                    $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
+                }
+                $html->decIndent()->appendln("</tr>")->br();
+            }
+            $html->decIndent()->appendln("</thead>")->br();
+        }
+
+        $html->append($this->rawTBody($html->getIndent()));
+
+
         //footer
         if ($this->footer) {
             $html->incIndent()->appendln('<tfoot>')->br();
@@ -814,25 +823,27 @@ class CElement_Component_DataTable extends CElement_Component {
         $wrapped = ($this->apply_data_table > 0) || $this->have_header_action();
         if ($wrapped) {
 
-            $main_class = ' widget-box ';
-            $main_class_title = ' widget-title ';
-            $main_class_content = ' widget-content ';
+            $mainClass = ' widget-box ';
+            $mainClassTitle = ' widget-title ';
+            $mainClassContent = ' widget-content data-table-row-view col-view-count-'.$this->colViewCount;
             if ($this->bootstrap == '3.3') {
-                $main_class = ' box box-info';
-                $main_class_title = ' box-header with-border ';
-                $main_class_content = ' box-body ';
+                $mainClass = ' box box-info';
+                $mainClassTitle = ' box-header with-border ';
+                $mainClassContent = ' box-body data-table-row-view';
             }
             if ($this->widget_title == false) {
-                $main_class_title = ' ';
+                $mainClassTitle = ' ';
             }
-
-            $html->appendln('<div class="' . $main_class . ' widget-table">')->incIndent();
-            $show_title = true;
+            if( $this->haveColRowView) {
+                $mainClassTitle.=' with-elements';
+            }
+            $html->appendln('<div id="'.$this->id().'-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
+            $showTitle = true;
             if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
-                $show_title = false;
+                $showTitle = false;
             }
-            if ($show_title) {
-                $html->appendln('<div class="' . $main_class_title . '">')->incIndent();
+            if ($showTitle) {
+                $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
                 if (strlen($this->icon > 0)) {
                     $html->appendln('<span class="icon">')->incIndent();
                     $html->appendln('<i class="icon-' . $this->icon . '"></i>');
@@ -844,9 +855,27 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $this->js_cell .= $this->headerActionList->js();
                 }
+                
+                 if ($this->haveColRowView) {
+                    $html->appendln('
+                        <div class="btn-group btn-group-toggle ml-auto" data-toggle="buttons">
+                            <label class="btn btn-default icon-btn md-btn-flat">
+                                <input type="radio" name="'.$this->id().'-data-table-view" value="data-table-col-view" >
+                                <span class="ion ion-md-apps"></span>
+                            </label>
+                            <label class="btn btn-default icon-btn md-btn-flat active">
+                                <input type="radio" name="'.$this->id().'-data-table-view" value="data-table-row-view checked=""">
+                                <span class="ion ion-md-menu"></span>
+                            </label>
+                        </div>
+                    ');
+                }
                 $html->decIndent()->appendln('</div>');
+
+
+               
             }
-            $html->appendln('<div class="' . $main_class_content . ' nopadding">')->incIndent();
+            $html->appendln('<div class="' . $mainClassContent . ' nopadding">')->incIndent();
         }
 
         $html->append($this->rawHtml($html->getIndent()));
@@ -1298,8 +1327,19 @@ class CElement_Component_DataTable extends CElement_Component {
             }
         }
 
-//            echo '<textarea>' . $js->text() . '</textarea>';
-//            clog::write($js->text());
+        if($this->haveColRowView) {
+            $js->append("
+                $('#".$this->id()."-widget-box [name=\"".$this->id()."-data-table-view\"]').on('change', function() {
+                    console.log('ASCDD');
+                    $('#".$this->id()."-widget-box > .widget-content')
+                        .removeClass('data-table-col-view data-table-row-view')
+                        .addClass(this.value);
+                });
+            ");
+
+            
+        }
+        
         return $js->text();
     }
 

@@ -334,9 +334,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 if (strlen($col->getFormat()) > 0) {
                     $temp_v = $col->getFormat();
                     foreach ($row as $k2 => $v2) {
-
                         if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
                             $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
                         }
                         $col_v = $temp_v;
@@ -376,7 +374,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
             if ($rowActionList != null && $rowActionList->childCount() > 0) {
                 $html = new CStringBuilder();
 
-                $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
+                $html->appendln('<td class="low-padding align-center cell-action td-action ">')->inc_indent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
                 }

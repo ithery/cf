@@ -446,6 +446,17 @@ table.responsive {
     padding:0;
     opacity: 1;
 }
+.widget-box .widget-title.with-elements {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
 
 .widget-box .widget-title h5 {
     display: inline-block;
@@ -483,6 +494,8 @@ table.responsive {
 .widget-box:not(.widget-table) > .widget-content.nopadding {
     padding:0;
 }
+
+
 /* table */
 .table th {
     background-image:none;
@@ -576,6 +589,73 @@ div.dataTables_filter input {
 
 div.dataTables_wrapper .ui-widget-header {
     border: 1px solid #D5D5D5;
+}
+
+
+.widget-box.widget-table .widget-content.data-table-col-view thead {
+    display:none;
+
+}
+
+.widget-box.widget-table .widget-content.data-table-col-view .table-striped tbody tr:nth-of-type(odd) {
+    background-color: inherit;
+}
+
+.widget-box.widget-table .widget-content.data-table-col-view .table-bordered td {
+    border: 1px solid transparent;
+}
+
+.widget-box.widget-table .widget-content.data-table-col-view table {
+    border:0;
+    overflow:hidden;
+}
+.widget-box.widget-table .widget-content.data-table-col-view tbody {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+
+}
+
+.widget-box.widget-table .widget-content.data-table-col-view tr {
+
+    position: relative;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    border: 1px solid transparent;
+    cursor: pointer;
+
+    margin: 0 .75rem .75rem 0;
+    padding: 0;
+    border:1px solid #ccc;
+}
+
+
+.widget-box.widget-table .widget-content.data-table-col-view.col-view-count-5 tr {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 calc(20% - 0.75rem);
+    flex: 0 0 calc(20% - 0.75rem);
+    max-width: calc(20% - 0.75rem);
+}
+.widget-box.widget-table .widget-content.data-table-col-view tr > td {
+    display:block;
+    overflow: auto;
+    width:100%;
+    box-sizing: border-box;
+}
+.widget-box.widget-table .widget-content.data-table-col-view tr > td.cell-action {
+    overflow:visible;
+}
+.widget-box.widget-table .widget-content.data-table-col-view tr > td.cell-action::after {
+    display: block;
+    clear: both;
+    content: "";
+}
+
+.widget-box.widget-table .widget-content.data-table-col-view tr > td.cell-action .dropdown-menu {
+    background: #fff;
 }
 
 /* summernote */
