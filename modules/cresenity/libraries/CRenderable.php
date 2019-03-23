@@ -42,7 +42,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     public function apply($key, $value, $class_name = '') {
         foreach ($this->renderable as $r) {
 
-            if ($class_name == '' || $r->class_name() == $class_name) {
+            if ($class_name == '' || $r->className() == $class_name) {
                 if (method_exists($r, $key)) {
                     $r->$key($value);
                 } else {
