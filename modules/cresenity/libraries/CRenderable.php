@@ -129,12 +129,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             return '';
         }
         $css = new CStringBuilder();
-        $css->set_indent($indent);
-        $css->inc_indent();
+        $css->setIndent($indent);
+        $css->incIndent();
         foreach ($this->renderable as $r) {
-            if (CRenderable::is_instanceof($r)) {
+            if ($r instanceof CRenderable) {
                 if ($r->visibility) {
-                    $html->append($r->css($html->get_indent()));
+                    $html->append($r->css($html->getIndent()));
                 }
             } else {
                 if (is_object($r) || is_array($r)) {
@@ -144,7 +144,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 }
             }
         }
-        $html->dec_indent();
+        $html->decIndent();
         return $html->text();
     }
 

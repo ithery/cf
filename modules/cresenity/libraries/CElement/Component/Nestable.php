@@ -75,17 +75,17 @@ class CElement_Component_Nestable extends CElement_Component {
         $root = $root->descendants();
         if (strlen($orgId) > 0) {
             $root = $root->where(function($query) use ($orgId) {
-                $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
-            })->where('status', '>', 0);
+                        $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
+                    })->where('status', '>', 0);
         }
 
         $tree = $root->get()->toTree();
         $childArray = array();
-      
-      
+
+
         $traverse = function ($nodes) use (&$traverse, &$childArray) {
             foreach ($nodes as $node) {
-                if($node->status==0) {
+                if ($node->status == 0) {
                     continue;
                 }
                 $childArray[] = $node->toArray();
@@ -95,7 +95,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
         $traverse($tree);
 
-       
+
         $this->data = $childArray;
         return $this;
     }
@@ -105,28 +105,28 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
-    public function set_id_key($id_key) {
-        $this->id_key = $id_key;
+    public function setIdKey($idKey) {
+        $this->id_key = $idKey;
         return $this;
     }
 
-    public function set_disable_dnd($disable_dnd) {
-        $this->disable_dnd = $disable_dnd;
+    public function setDisableDnd($disableDnd) {
+        $this->disable_dnd = $disableDnd;
         return $this;
     }
 
-    public function set_have_checkbox($checkbox) {
+    public function setHaveCheckbox($checkbox) {
         $this->checkbox = $checkbox;
         return $this;
     }
 
-    public function set_input($input) {
+    public function setInput($input) {
         $this->input = $input;
         return $this;
     }
 
-    public function set_value_key($value_key) {
-        $this->value_key = $value_key;
+    public function setValueKey($valueKey) {
+        $this->value_key = $valueKey;
         return $this;
     }
 

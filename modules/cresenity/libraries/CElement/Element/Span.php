@@ -14,5 +14,9 @@ class CElement_Element_Span extends CElement_Element {
         parent::__construct($id);
         $this->tag = "span";
     }
+    
+    public function set_col($col=null) {
+        
+    }
 
 }
