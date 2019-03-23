@@ -498,56 +498,19 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function html($indent = 0) {
+    public function rawHtml($indent = 0) {
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
 
         $thClass = "";
         if ($this->headerNoLineBreak) {
             $thClass = " no-line-break";
         }
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
-        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action();
-        if ($wrapped) {
-
-            $main_class = ' widget-box ';
-            $main_class_title = ' widget-title ';
-            $main_class_content = ' widget-content ';
-            if ($this->bootstrap == '3.3') {
-                $main_class = ' box box-info';
-                $main_class_title = ' box-header with-border ';
-                $main_class_content = ' box-body ';
-            }
-            if ($this->widget_title == false) {
-                $main_class_title = ' ';
-            }
-
-            $html->appendln('<div class="' . $main_class . ' widget-table">')->incIndent();
-            $show_title = true;
-            if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
-                $show_title = false;
-            }
-            if ($show_title) {
-                $html->appendln('<div class="' . $main_class_title . '">')->incIndent();
-                if (strlen($this->icon > 0)) {
-                    $html->appendln('<span class="icon">')->incIndent();
-                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
-                    $html->decIndent()->appendln('</span');
-                }
-                $html->appendln('<h5>' . $this->title . '</h5>');
-                if ($this->haveHeaderAction()) {
-                    $html->appendln($this->headerActionList->html($html->getIndent()));
-
-                    $this->js_cell .= $this->headerActionList->js();
-                }
-                $html->decIndent()->appendln('</div>');
-            }
-            $html->appendln('<div class="' . $main_class_content . ' nopadding">')->incIndent();
-        }
-        $data_responsive_open = '<div class="table-responsive">';
-        $data_responsive_close = '</div>';
+        $htmlResponsiveOpen = '<div class="table-responsive">';
+        $htmlResponsiveClose = '</div>';
         if ($this->responsive) {
-            $data_responsive_open = '<div class="span12" style="overflow: auto;margin-left: 0;">';
-            $data_responsive_close = '</div>';
+            $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
+            $htmlResponsiveClose = '</div>';
         }
 
         $classes = $this->classes;
@@ -561,7 +524,8 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($this->tableBordered) {
             $classes .= " table-bordered ";
         }
-        $html->appendln($data_responsive_open . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
+
+        $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
                 ->incIndent()->br();
         if ($this->show_header) {
             $html->appendln('<thead>')
@@ -834,7 +798,55 @@ class CElement_Component_DataTable extends CElement_Component {
             }
             $html->decIndent()->appendln('</tfoot>')->br();
         }
-        $html->decIndent()->appendln('</table>' . $data_responsive_close);
+        $html->decIndent()->appendln('</table>' . $htmlResponsiveClose);
+
+        return $html->text();
+    }
+
+    public function html($indent = 0) {
+
+
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action();
+        if ($wrapped) {
+
+            $main_class = ' widget-box ';
+            $main_class_title = ' widget-title ';
+            $main_class_content = ' widget-content ';
+            if ($this->bootstrap == '3.3') {
+                $main_class = ' box box-info';
+                $main_class_title = ' box-header with-border ';
+                $main_class_content = ' box-body ';
+            }
+            if ($this->widget_title == false) {
+                $main_class_title = ' ';
+            }
+
+            $html->appendln('<div class="' . $main_class . ' widget-table">')->incIndent();
+            $show_title = true;
+            if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
+                $show_title = false;
+            }
+            if ($show_title) {
+                $html->appendln('<div class="' . $main_class_title . '">')->incIndent();
+                if (strlen($this->icon > 0)) {
+                    $html->appendln('<span class="icon">')->incIndent();
+                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
+                    $html->decIndent()->appendln('</span');
+                }
+                $html->appendln('<h5>' . $this->title . '</h5>');
+                if ($this->haveHeaderAction()) {
+                    $html->appendln($this->headerActionList->html($html->getIndent()));
+
+                    $this->js_cell .= $this->headerActionList->js();
+                }
+                $html->decIndent()->appendln('</div>');
+            }
+            $html->appendln('<div class="' . $main_class_content . ' nopadding">')->incIndent();
+        }
+
+        $html->append($this->rawHtml($html->getIndent()));
         if ($wrapped > 0) {
             $html->decIndent()->appendln('</div>');
             $html->decIndent()->appendln('</div>');
