@@ -12,5 +12,5 @@ interface CProvider_DataInterface {
     /**
      * @return array[] array2d
      */
-    public function data();
+    public function getData();
 }

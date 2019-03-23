@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTrait_Element_DataProvider {
 
+    /**
+     *
+     * @var CProvider_DataAbstract
+     */
     protected $dataProvider;
 
     /**
@@ -21,6 +25,10 @@ trait CTrait_Element_DataProvider {
         $this->dataProvider->setSql($q);
 
         return $this;
+    }
+    
+    public function getData() {
+        return $this->dataProvider->getData();
     }
 
 }

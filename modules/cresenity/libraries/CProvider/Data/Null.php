@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CProvider_Data_Null extends CProvider_DataAbstract {
 
-    public function data() {
+    public function getData() {
         return array();
     }
 
