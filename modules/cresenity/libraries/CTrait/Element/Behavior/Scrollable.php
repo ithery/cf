@@ -29,7 +29,7 @@ trait CTrait_Element_Behavior_Scrollable {
      * 
      * @return bool
      */
-    public function getEditble() {
+    public function getScrollable() {
         return $this->scrollable;
     }
 

@@ -13,7 +13,7 @@ trait CTrait_Element_Transform {
      *
      * @var array
      */
-    protected $transform = array();
+    protected $transforms = array();
 
     public function addTransform($name, $args = array()) {
         $func = CFunction::factory($name);
