@@ -954,4 +954,25 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         return $this;
     }
 
+    public function getPdfTableAttr() {
+        if ($this->export_pdf) {
+            return ' border="1" width="100%"';
+        }
+        return '';
+    }
+
+    public function getPdfTHeadTdAttr() {
+        if ($this->export_pdf) {
+            return ' bgcolor="#9f9f9f" color="#000" style="color:#000" ';
+        }
+        return '';
+    }
+
+    public function getPdfTBodyTdAttr() {
+        if ($this->export_pdf) {
+            return ' valign="middle"';
+        }
+        return '';
+    }
+
 }

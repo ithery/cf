@@ -360,7 +360,6 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     }
 
 
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                 }
                 $class = "";
                 switch ($col->get_align()) {
@@ -416,7 +415,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
 
                 $html->appendln($table->getRowActionList()->html($html->get_indent()));
                 $js .= $table->getRowActionList()->js();
-                $html->dec_indent()->appendln('</td>')->br();
+                $html->decIndent()->appendln('</td>')->br();
                 //$arr[] = '';
                 $arr[] = $html->text();
                 $arr["DT_RowId"] = $key;
