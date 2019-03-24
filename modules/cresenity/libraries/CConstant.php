@@ -34,5 +34,11 @@ class CConstant {
     const ALIGN_LEFT = 'left';
     const ALIGN_RIGHT = 'right';
     const ALIGN_CENTER = 'center';
-
+    
+     /**
+     * Table View Constant
+     */
+    const TABLE_VIEW_COL = 'col';
+    const TABLE_VIEW_ROW = 'row';
+   
 }

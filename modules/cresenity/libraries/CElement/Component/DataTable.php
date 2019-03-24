@@ -68,8 +68,9 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $js_cell;
     protected $dom = null;
     protected $widget_title;
-    protected $haveColRowView;
-    protected $colViewCount;
+    protected $haveDataTableViewAction;
+    protected $dataTableViewColCount;
+    protected $dataTableView;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -139,8 +140,9 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_sheetname = $this->id;
         $this->tableStriped = true;
         $this->tableBordered = true;
-        $this->haveColRowView = false;
-        $this->colViewCount = 5;
+        $this->haveDataTableViewAction = false;
+        $this->dataTableView = CConstant::TABLE_VIEW_ROW;
+        $this->dataTableViewColCount = 5;
 
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
@@ -278,6 +280,20 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->options->get_by_name($key);
     }
 
+    public function setHaveDataTableViewAction($bool=true) {
+        $this->haveDataTableViewAction=$bool;
+        return $this;
+    }
+    
+     public function setDataTableViewCol() {
+        $this->dataTableView=CConstant::TABLE_VIEW_COL;
+        return $this;
+    }
+     public function setDataTableViewRow() {
+        $this->dataTableView=CConstant::TABLE_VIEW_ROW;
+        return $this;
+    }
+    
     public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
@@ -505,7 +521,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $html->setIndent($indent);
 
         $tbodyId = (strlen($this->tbodyId) > 0 ? "id='" . $this->tbodyId . "' " : "");
-
+        $js = "";
         $html->appendln('<tbody ' . $tbodyId . '>')->incIndent()->br();
         //render body;
         $html->appendln($this->htmlChild($indent));
@@ -578,6 +594,10 @@ class CElement_Component_DataTable extends CElement_Component {
                                 ->addArg($new_v)
                                 ->setRequire($this->requires)
                                 ->execute();
+                        if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
+                            $js .= $new_v['js'];
+                            $new_v = $new_v['html'];
+                        }
                     }
                     $class = "";
                     switch ($col->getAlign()) {
@@ -659,7 +679,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     }
 
 
-                    $this->js_cell .= $this->rowActionList->js();
+                    $js .= $this->rowActionList->js();
 
                     $html->appendln($this->rowActionList->html($html->getIndent()));
                     $html->decIndent()->appendln('</td>')->br();
@@ -670,7 +690,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 $html->decIndent()->appendln('</tr>')->br();
             }
         }
-
+        $this->js_cell .= $js;
 
         $html->decIndent()->appendln('</tbody>')->br();
         return $html->text();
@@ -820,12 +840,13 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action();
+        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action() || strlen($this->title) > 0;
         if ($wrapped) {
 
             $mainClass = ' widget-box ';
             $mainClassTitle = ' widget-title ';
-            $mainClassContent = ' widget-content data-table-row-view col-view-count-'.$this->colViewCount;
+            $tableViewClass = $this->dataTableView==CConstant::TABLE_VIEW_COL?' data-table-col-view':' data-table-row-view';
+            $mainClassContent = ' widget-content '.$tableViewClass.' col-view-count-' . $this->dataTableViewColCount;
             if ($this->bootstrap == '3.3') {
                 $mainClass = ' box box-info';
                 $mainClassTitle = ' box-header with-border ';
@@ -834,10 +855,10 @@ class CElement_Component_DataTable extends CElement_Component {
             if ($this->widget_title == false) {
                 $mainClassTitle = ' ';
             }
-            if( $this->haveColRowView) {
-                $mainClassTitle.=' with-elements';
+            if ($this->haveDataTableViewAction) {
+                $mainClassTitle .= ' with-elements';
             }
-            $html->appendln('<div id="'.$this->id().'-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
+            $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
             $showTitle = true;
             if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
                 $showTitle = false;
@@ -855,25 +876,26 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $this->js_cell .= $this->headerActionList->js();
                 }
-                
-                 if ($this->haveColRowView) {
+
+                if ($this->haveDataTableViewAction) {
+                    $colViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' active':'';
+                    $rowViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' active':'';
+                    $colViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_COL? ' checked="checked"':'';
+                    $rowViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' checked="checked"':'';
                     $html->appendln('
                         <div class="btn-group btn-group-toggle ml-auto" data-toggle="buttons">
-                            <label class="btn btn-default icon-btn md-btn-flat">
-                                <input type="radio" name="'.$this->id().'-data-table-view" value="data-table-col-view" >
+                            <label class="btn btn-default icon-btn md-btn-flat '.$colViewActionActive.'">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-col-view" '.$colViewActionChecked.' />
                                 <span class="ion ion-md-apps"></span>
                             </label>
-                            <label class="btn btn-default icon-btn md-btn-flat active">
-                                <input type="radio" name="'.$this->id().'-data-table-view" value="data-table-row-view checked=""">
+                            <label class="btn btn-default icon-btn md-btn-flat '.$rowViewActionActive.'">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-row-view" '.$rowViewActionChecked.'" />
                                 <span class="ion ion-md-menu"></span>
                             </label>
                         </div>
                     ');
                 }
                 $html->decIndent()->appendln('</div>');
-
-
-               
             }
             $html->appendln('<div class="' . $mainClassContent . ' nopadding">')->incIndent();
         }
@@ -1327,19 +1349,16 @@ class CElement_Component_DataTable extends CElement_Component {
             }
         }
 
-        if($this->haveColRowView) {
+        if ($this->haveDataTableViewAction) {
             $js->append("
-                $('#".$this->id()."-widget-box [name=\"".$this->id()."-data-table-view\"]').on('change', function() {
-                    console.log('ASCDD');
-                    $('#".$this->id()."-widget-box > .widget-content')
+                $('#" . $this->id() . "-widget-box [name=\"" . $this->id() . "-data-table-view\"]').on('change', function() {
+                    $('#" . $this->id() . "-widget-box > .widget-content')
                         .removeClass('data-table-col-view data-table-row-view')
                         .addClass(this.value);
                 });
             ");
-
-            
         }
-        
+
         return $js->text();
     }
 
