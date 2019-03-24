@@ -226,12 +226,6 @@ abstract class CObservable extends CRenderable {
         return $span;
     }
 
-    public function addImg($id = "") {
-        $img = CImgElement::factory($id);
-        $this->add($img);
-        return $img;
-    }
-
     public function addBasicSpan($id = "") {
         $span = CBasicSpan::factory($id);
         $this->add($span);

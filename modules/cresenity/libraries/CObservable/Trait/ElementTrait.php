@@ -225,5 +225,19 @@ trait CObservable_Trait_ElementTrait {
         $this->wrapper->add($element);
         return $element;
     }
+    
+    
+    /**
+     * Add Canvas Element &lt;canvas&gt
+     * 
+     * @param string $id
+     * @return CElement_Element_Canvas Canvas Element
+     */
+    public function addImg($id = "") {
+        $element = CElement_Factory::createElement('img', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+    
 
 }
