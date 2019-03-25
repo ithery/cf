@@ -83,6 +83,16 @@ class CFunction {
             }
         }
         if ($error == 0) {
+            if ($this->func instanceof Closure) {
+                return call_user_func_array($this->func, $args);
+            }
+        }
+        if ($error == 0) {
+            if (is_callable($this->func)) {
+                return call_user_func_array($this->func, $args);
+            }
+        }
+        if ($error == 0) {
             //not array let check if it is a function name
             if (function_exists($this->func)) {
                 return call_user_func_array($this->func, $args);
