@@ -21,5 +21,6 @@ class CElement_Element_Img extends CElement_Element {
     
     public function setSrc($src) {
         $this->setAttr('src',$src);
+        return $this;
     }
 }
