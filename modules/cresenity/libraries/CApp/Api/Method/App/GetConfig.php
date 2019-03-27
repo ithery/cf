@@ -5,7 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * 
  */
-class CApp_Api_Method_Server_GetConfig extends CApp_Api_Method_App {
+class CApp_Api_Method_App_GetConfig extends CApp_Api_Method_App {
 
     public function execute() {
         $errCode = 0;
