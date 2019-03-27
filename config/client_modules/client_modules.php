@@ -298,9 +298,16 @@ return array(
     ),
     "elfinder" => array(
         "js" => array(
-            "plugins" . DS . "elfinder" . DS . "elfinder.full.js"
+            "plugins" . DS . "elfinder" . DS . "elfinder.min.js?v=1"
         ),
-        "css" => array("plugins" . DS . "elfinder" . DS . "elfinder.min.css"),
+        "css" => array(
+            "plugins" . DS . "elfinder" . DS . "elfinder.min.css",
+            "plugins" . DS . "elfinder" . DS . "theme-bootstrap-libreicons-svg.css",
+        ),
+    ),
+    "jquery.filemanager" => array(
+        "js" => array("plugins" . DS . "jquery" . DS . "fileManager" . DS . "jquery.fileManager.js"),
+        "css" => array("plugins" . DS . "jquery" . DS . "fileManager" . DS . "jquery.fileManager.css"),
     ),
     "prettify" => array(
         "js" => array("plugins" . DS . "google-code-prettify" . DS . "prettify.js"),

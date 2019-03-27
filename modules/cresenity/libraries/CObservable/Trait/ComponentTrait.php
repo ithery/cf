@@ -76,9 +76,15 @@ trait CObservable_Trait_ComponentTrait {
      * @return CElement_Component_ElFinder
      */
     public function addElFinder($id = "") {
-        $chart = CElement_Component_ElFinder::factory($id);
-        $this->add($chart);
-        return $chart;
+        $elFinder = CElement_Component_ElFinder::factory($id);
+        $this->add($elFinder);
+        return $elFinder;
+    }
+
+    public function addFileManager($id = "") {
+        $fileManager = CElement_Component_FileManager::factory($id);
+        $this->add($fileManager);
+        return $fileManager;
     }
 
 }

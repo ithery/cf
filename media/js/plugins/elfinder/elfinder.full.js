@@ -7,10 +7,18 @@
  * Licensed under a 3-clauses BSD license
  */
 (function(root, factory) {
-	
+	if (typeof exports !== 'undefined') {
+		// CommonJS
+		var $, ui;
+		try {
+			$ = require('jquery');
+			ui = require('jquery-ui');
+		} catch (e) {}
+		module.exports = factory($, ui);
+	} else {
 		// Browser globals (Note: root is window)
 		factory(root.jQuery, root.jQuery.ui, true);
-	
+	}
 }(this, function($, _ui, toGlobal) {
 toGlobal = toGlobal || false;
 

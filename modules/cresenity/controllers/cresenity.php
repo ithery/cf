@@ -980,4 +980,17 @@ class Cresenity_Controller extends CController {
         $connector->run();
     }
 
+    public function connector($engine) {
+        $engineName = 'FileManager';
+        switch ($engine) {
+            case 'elfinder':
+                $engineName = 'ElFinder';
+                break;
+        }
+        $options = array();
+        $options['path'] = DOCROOT . 'temp/files';
+        $connector = CManager_File::createConnector($engineName, $options);
+        $connector->run();
+    }
+
 }
