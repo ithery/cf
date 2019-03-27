@@ -577,7 +577,9 @@ if (window.capp.have_clock) {
                 jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
             }
 
-            $.cresenity.blockElement(jQuery('#' + id_target));
+            if (typeof $.blockUI !== undefined) {
+                $.cresenity.blockElement(jQuery('#' + id_target));
+            }
 
             jQuery('#' + id_target).data('xhr', jQuery.ajax({
                 type: method,
@@ -607,7 +609,9 @@ if (window.capp.have_clock) {
 
                 },
                 complete: function() {
-                    $.cresenity.unblockElement(jQuery('#' + id_target));
+                    if (typeof $.blockUI !== undefined) {
+                        $.cresenity.unblockElement(jQuery('#' + id_target));
+                    }
                 }
             }));
         },
@@ -630,7 +634,9 @@ if (window.capp.have_clock) {
 
             }
 
-            $.cresenity.blockElement(jQuery('#' + id_target));
+            if (typeof $.blockUI !== undefined) {
+                $.cresenity.blockElement(jQuery('#' + id_target));
+            }
 
             jQuery('#' + id_target).data('xhr', jQuery.ajax({
                 type: method,
@@ -657,7 +663,9 @@ if (window.capp.have_clock) {
                     }
                 },
                 complete: function() {
-                    $.cresenity.unblockElement(jQuery('#' + id_target));
+                    if (typeof $.blockUI !== undefined) {
+                        $.cresenity.unblockElement(jQuery('#' + id_target));
+                    }
                 }
             }));
         },
@@ -680,7 +688,9 @@ if (window.capp.have_clock) {
 
             }
 
-            $.cresenity.blockElement(jQuery('#' + id_target));
+            if (typeof $.blockUI !== undefined) {
+                $.cresenity.blockElement(jQuery('#' + id_target));
+            }
 
             jQuery('#' + id_target).data('xhr', jQuery.ajax({
                 type: method,
@@ -707,7 +717,9 @@ if (window.capp.have_clock) {
                     }
                 },
                 complete: function() {
-                    $.cresenity.unblockElement(jQuery('#' + id_target));
+                    if (typeof $.blockUI !== undefined) {
+                        $.cresenity.unblockElement(jQuery('#' + id_target));
+                    }
                 }
             }));
         },
