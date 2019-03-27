@@ -19,7 +19,7 @@ trait CObservable_Trait_ComponentTrait {
         $this->add($table);
         return $table;
     }
-    
+
     /**
      * 
      * @param string $id
@@ -61,9 +61,22 @@ trait CObservable_Trait_ComponentTrait {
      * @param  string   $id
      * @return CElement_Component_Chart
      */
-    public function addChart($type, $id = "")
-    {   
+    public function addChart($type, $id = "") {
         $chart = CElement_Component_Chart::factory($type, $id);
+        $this->add($chart);
+        return $chart;
+    }
+
+    /**
+     *
+     * @method addElFinder
+     *
+     * @param  string   $type
+     * @param  string   $id
+     * @return CElement_Component_ElFinder
+     */
+    public function addElFinder($type, $id = "") {
+        $chart = CElement_Component_ElFinder::factory($type, $id);
         $this->add($chart);
         return $chart;
     }
