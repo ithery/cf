@@ -193,3 +193,11 @@
 .data-grid-list-item.hide {
     display:none;
 }
+
+.blockUI.blockMsg.blockElement {
+    width: 100% !important;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+}
