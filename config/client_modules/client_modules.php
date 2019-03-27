@@ -297,7 +297,9 @@ return array(
         ),
     ),
     "elfinder" => array(
-        "js" => array("plugins" . DS . "elfinder" . DS . "elfinder.min.js"),
+        "js" => array(
+            "plugins" . DS . "elfinder" . DS . "elfinder.full.js"
+        ),
         "css" => array("plugins" . DS . "elfinder" . DS . "elfinder.min.css"),
     ),
     "prettify" => array(
