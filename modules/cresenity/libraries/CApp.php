@@ -229,6 +229,8 @@ class CApp extends CObservable {
             set_exception_handler(array('CApp', 'exception_handler'));
         }
 
+        CManager::registerModule('block-ui');
+
         $this->run = true;
     }
 
