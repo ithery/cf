@@ -639,5 +639,13 @@ return array(
             "plugins/raphael/raphael.js",
         ),
     ),
+    "vis" => array(
+        "js" => array(
+            "plugins/vis/vis.min.js",
+        ),
+        "css" => array(
+            "plugins/vis/vis.min.css",
+        ),
+    ),
 );
 ?>
