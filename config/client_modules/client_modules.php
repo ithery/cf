@@ -553,7 +553,7 @@ return array(
     ),
     "block-ui" => array(
         "css" => array('spinkit.css'),
-        "js" => array("plugins/block-ui/block-ui.js?v=1"),
+        "js" => array("plugins/block-ui/block-ui.js"),
     ),
     "layout-helpers" => array(
         "js" => array("plugins/layout-helpers/layout-helpers.js"),
