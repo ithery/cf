@@ -10,13 +10,13 @@ class CApp_Api_Method_App_GetConfig extends CApp_Api_Method_App {
     public function execute() {
         $errCode = 0;
         $errMessage = '';
-        $domain = $this->domain;
+        $domain = carr::get($this->request(), 'domain');
 
         $data = array();
 
         try {
-            $config = CConfig::instance();
-            $data = $config->get();
+            $config = CF::getFile('config', 'app', $domain);
+            $data = include $config;
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();

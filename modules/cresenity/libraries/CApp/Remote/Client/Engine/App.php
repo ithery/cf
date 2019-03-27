@@ -12,9 +12,11 @@ class CApp_Remote_Client_Engine_App extends CApp_Remote_Client_Engine {
         $this->baseUrl .= 'App/';
     }
 
-    public function getConfig()
+    public function getConfig($domain)
     {
-        $data = $this->request($this->baseUrl . 'GetConfig');
+    	$post = [];
+    	$post['domain'] = $domain;
+        $data = $this->request($this->baseUrl . 'GetConfig', $post);
         return $data;
     }
 

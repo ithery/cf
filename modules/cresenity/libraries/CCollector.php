@@ -40,21 +40,25 @@ class CCollector
 			}
 
 			$tempPath = $path . $type . static::EXT;
-			if (file_exists($tempPath)) {
-				$content = file($tempPath);
-				$data = $content;
-			}
+			$data = static::getContent($tempPath);
 		} else {
 			foreach (static::TYPE as $type) {
 				$tempPath = $path . $type . static::EXT;
-				if (file_exists($tempPath)) {
-					$content = file_get_contents($tempPath);
-					$content = preg_split('/\r\n/', $content);
-					$data[$type] = $content;
-				}
+				$data[$type] = static::getContent($tempPath);
 			}
 		}
 
+		return $data;
+	}
+
+	private static function getContent($path) {
+		$data = [];
+		if (file_exists($path)) {
+			$content = file($path);
+			$data = array_map(function($data) {
+				return json_decode($data);
+			}, $content);
+		}
 		return $data;
 	}
 
