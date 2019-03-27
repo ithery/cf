@@ -219,15 +219,14 @@ class CApp extends CObservable {
             }
         }
 
-
-        if (ccfg::get('mail_error')) {
+        // if (ccfg::get('mail_error')) {
 
             // Set error handler
             set_error_handler(array('CApp', 'exception_handler'));
 
             // Set exception handler
             set_exception_handler(array('CApp', 'exception_handler'));
-        }
+        // }
 
         CManager::registerModule('block-ui');
 
@@ -573,7 +572,7 @@ class CApp extends CObservable {
                 $member = null;
             $this->_member = $member;
         }
-        return $this->_admin;
+        return $this->_member;
     }
 
     public function user() {
@@ -733,7 +732,6 @@ class CApp extends CObservable {
                 $trace = CF::backtrace($trace);
             }
 
-
             if (!($exception instanceof CF_404_Exception)) {
                 $v = CView::factory('cmail/error_mail');
                 $v->error = $error;
@@ -744,7 +742,26 @@ class CApp extends CObservable {
                 $v->message = $message;
                 $html = $v->render();
 
-                cmail::error_mail($html);
+                // cmail::error_mail($html);
+
+                $data = [];
+                $data['datetime'] = date('Y-m-d H:i:s');
+                $data['appId'] = $app->appId();
+                $data['appCode'] = $app->code();
+                $data['admin'] = $app->admin();
+                $data['member'] = $app->member();
+                $data['user'] = $app->user();
+                $data['role'] = $app->role();
+                $data['org'] = $app->org();
+                $data['orgId'] = $app->orgId();
+                $data['error'] = $error;
+                $data['description'] = $description;
+                $data['file'] = $file;
+                $data['line'] = $line;
+                $data['trace'] = $trace;
+                $data['message'] = $message;
+
+                CCollector::put('exception', json_encode($data));
             }
 
 
