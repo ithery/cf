@@ -30,8 +30,9 @@ class CCollector
 
 	public static function get($type = null, $dateStart = null, $dateEnd = null)
 	{
-		$dateStart = $dateStart ? new DateTime($dateStart) : new DateTime('000000');
-		$dateEnd = $dateEnd ? new DateTime($dateEnd) : new DateTime('000000');
+		$dateStart = $dateStart ? new DateTime($dateStart) : new DateTime();
+		$start = new DateTime($dateStart->format('Ymd'));
+		$dateEnd = $dateEnd ? new DateTime($dateEnd) : new DateTime();
 		$path = static::getDirectory();
 		$data = [];
 
@@ -44,8 +45,8 @@ class CCollector
 			foreach (glob($tempPath . '*' . static::EXT) as $file) {
 				$date = pathinfo($file)['filename'];
 				$dateTime = new DateTime($date);
-				if ($dateTime >= $dateStart && $dateTime <= $dateEnd) {
-					$data[$date] = static::getContent($file);
+				if ($dateTime >= $start && $dateTime <= $dateEnd) {
+					$data = static::getContent($file, $dateStart, $dateEnd);
 				}
 			}
 		} else {
@@ -55,8 +56,8 @@ class CCollector
 				foreach (glob($tempPath . '*' . static::EXT) as $file) {
 					$date = pathinfo($file)['filename'];
 					$dateTime = new DateTime($date);
-					if ($dateTime >= $dateStart && $dateTime <= $dateEnd) {
-						$data[$type][$date] = static::getContent($file);
+					if ($dateTime >= $start && $dateTime <= $dateEnd) {
+						$data[$type] = static::getContent($file, $dateStart, $dateEnd);
 					}
 				}
 			}
@@ -65,13 +66,17 @@ class CCollector
 		return $data;
 	}
 
-	private static function getContent($path) {
+	private static function getContent($path, $dateStart, $dateEnd) {
 		$data = [];
 		if (file_exists($path)) {
 			$content = file($path);
 			$data = array_map(function($data) {
 				return json_decode($data);
 			}, $content);
+			$data = array_filter($data, function($data) use ($dateStart, $dateEnd) {
+				$date = new DateTime($data->datetime);
+				return ($date >= $dateStart && $date <= $dateEnd);
+			});
 		}
 		return $data;
 	}
@@ -82,9 +87,13 @@ class CCollector
 			throw new CException("Type $type is not found");
 		}
 
+		if (! is_string($data)) {
+			$data = json_encode($data);
+		}
+
 		json_decode($data);
 		if (json_last_error() !== JSON_ERROR_NONE) {
-			$data = json_encode($data);
+			throw new CException(json_last_error_msg());
 		}
 
 		$path = static::getDirectory();
@@ -96,6 +105,21 @@ class CCollector
 		file_put_contents($path, $data . PHP_EOL, FILE_APPEND | LOCK_EX);
 
 		return true;
+	}
+
+	public static function getElasticServer()
+	{
+		$serverElasticId = 2; // Dev Elastic
+		try {
+		    $serverElasticModel = DModel::make('ServerElastic')->findOrFail($serverElasticId);
+		    $elastic = DElastic::getElasticFromModel($serverElasticModel);
+		    $client = $elastic->createClient();
+		    $elasticType = $client->getIndex('collector')->getType('collector');
+
+		    return $elasticType;
+		} catch (Exception $e) {
+		    return false;
+		}
 	}
 
 	public static function deprecated(Exception $exception)
@@ -124,6 +148,7 @@ class CCollector
 		$file = $exception->getFile();
 		$line = $exception->getLine();
 		$trace = $exception->getTrace();
+		$trace = CF::backtrace($trace);
 
 		$data = [];
 		$data['datetime'] = date('Y-m-d H:i:s');
@@ -142,6 +167,6 @@ class CCollector
 		$data['trace'] = $trace;
 		$data['description'] = '';
 
-		return $data;
+		return json_encode($data);
 	}
 }
