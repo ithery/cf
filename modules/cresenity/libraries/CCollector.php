@@ -39,12 +39,19 @@ class CCollector
 				throw new CException("Type $type is not found");
 			}
 
-			$tempPath = $path . $type . static::EXT;
-			$data = static::getContent($tempPath);
+			$tempPath = $path . DS . $type . DS;
+			foreach (glob($tempPath . '*' . static::EXT) as $file) {
+				$date = pathinfo($file)['filename'];
+				$data[$date] = static::getContent($file);
+			}
 		} else {
 			foreach (static::TYPE as $type) {
-				$tempPath = $path . $type . static::EXT;
-				$data[$type] = static::getContent($tempPath);
+				$tempPath = $path . DS . $type . DS;
+				$data[$type] = [];
+				foreach (glob($tempPath . '*' . static::EXT) as $file) {
+					$date = pathinfo($file)['filename'];
+					$data[$type][$date] = static::getContent($file);
+				}
 			}
 		}
 
@@ -68,9 +75,24 @@ class CCollector
 			throw new CException("Type $type is not found");
 		}
 
-		$path = static::getDirectory() . $type . static::EXT;
+		json_decode($data);
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			$data = json_encode($data);
+		}
+
+		$path = static::getDirectory();
+		$path .= $type . DS;
+		if (! is_dir($path)) {
+			mkdir($path, 0777, true);
+		}
+		$path .= date('Ymd') . static::EXT;
 		file_put_contents($path, $data . PHP_EOL, FILE_APPEND | LOCK_EX);
 
 		return true;
+	}
+
+	public static function deprecated(Exception $exception)
+	{
+		static::put('deprecated', $data);
 	}
 }
