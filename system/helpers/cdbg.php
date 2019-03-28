@@ -62,6 +62,20 @@ class cdbg {
      * @param  mixed
      * @return void
      */
+    function d()
+    {
+        $args = func_get_args();
+        foreach ($args as $x) {
+            (new Illuminate\Support\Debug\Dumper)->dump($x);
+        }
+    }
+
+    /**
+     * Dump the passed variables and end the script.
+     *
+     * @param  mixed
+     * @return void
+     */
     function dd()
     {
         $args = func_get_args();

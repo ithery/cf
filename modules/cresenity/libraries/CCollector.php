@@ -8,11 +8,10 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CCollector
 {
 	const EXT = '.txt';
-	const TYPE = [
-		'deprecated',
-		'exception',
-		'profiler',
-	];
+	const DEPRECATED = 'deprecated';
+	const EXCEPTION = 'exception';
+	const PROFILER = 'profiler';
+	const TYPE = ['deprecated', 'exception', 'profiler'];
 
 	public static function getDirectory()
 	{
@@ -29,12 +28,14 @@ class CCollector
 		return $path;
 	}
 
-	public static function get($type = null)
+	public static function get($type = null, $dateStart = null, $dateEnd = null)
 	{
+		$dateStart = $dateStart ? new DateTime($dateStart) : new DateTime('000000');
+		$dateEnd = $dateEnd ? new DateTime($dateEnd) : new DateTime('000000');
 		$path = static::getDirectory();
 		$data = [];
 
-		if ($type) {
+		if ($type && strtolower($type) != 'all') {
 			if (! in_array($type, static::TYPE)) {
 				throw new CException("Type $type is not found");
 			}
@@ -42,7 +43,10 @@ class CCollector
 			$tempPath = $path . DS . $type . DS;
 			foreach (glob($tempPath . '*' . static::EXT) as $file) {
 				$date = pathinfo($file)['filename'];
-				$data[$date] = static::getContent($file);
+				$dateTime = new DateTime($date);
+				if ($dateTime >= $dateStart && $dateTime <= $dateEnd) {
+					$data[$date] = static::getContent($file);
+				}
 			}
 		} else {
 			foreach (static::TYPE as $type) {
@@ -50,7 +54,10 @@ class CCollector
 				$data[$type] = [];
 				foreach (glob($tempPath . '*' . static::EXT) as $file) {
 					$date = pathinfo($file)['filename'];
-					$data[$type][$date] = static::getContent($file);
+					$dateTime = new DateTime($date);
+					if ($dateTime >= $dateStart && $dateTime <= $dateEnd) {
+						$data[$type][$date] = static::getContent($file);
+					}
 				}
 			}
 		}
@@ -93,6 +100,48 @@ class CCollector
 
 	public static function deprecated(Exception $exception)
 	{
-		static::put('deprecated', $data);
+		$data = static::getDataFromException($exception);
+		static::put(static::DEPRECATED, $data);
+	}
+
+	public static function exception(Exception $exception)
+	{
+		$data = static::getDataFromException($exception);
+		static::put(static::EXCEPTION, $data);
+	}
+
+	public static function profiler()
+	{
+		static::put(static::PROFILER, $data);
+	}
+
+	private static function getDataFromException(Exception $exception)
+	{
+		$app = CApp::instance();
+
+		$error = get_class($exception);
+		$message = $exception->getMessage();
+		$file = $exception->getFile();
+		$line = $exception->getLine();
+		$trace = $exception->getTrace();
+
+		$data = [];
+		$data['datetime'] = date('Y-m-d H:i:s');
+		$data['appId'] = $app->appId();
+		$data['appCode'] = $app->code();
+		$data['admin'] = $app->admin();
+		$data['member'] = $app->member();
+		$data['user'] = $app->user();
+		$data['role'] = $app->role();
+		$data['org'] = $app->org();
+		$data['orgId'] = $app->orgId();
+		$data['error'] = $error;
+		$data['message'] = $message;
+		$data['file'] = $file;
+		$data['line'] = $line;
+		$data['trace'] = $trace;
+		$data['description'] = '';
+
+		return $data;
 	}
 }

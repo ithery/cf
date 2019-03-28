@@ -755,11 +755,11 @@ class CApp extends CObservable {
                 $data['org'] = $app->org();
                 $data['orgId'] = $app->orgId();
                 $data['error'] = $error;
-                $data['description'] = $description;
+                $data['message'] = $message;
                 $data['file'] = $file;
                 $data['line'] = $line;
                 $data['trace'] = $trace;
-                $data['message'] = $message;
+                $data['description'] = $description;
 
                 CCollector::put('exception', json_encode($data));
             }
