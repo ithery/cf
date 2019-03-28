@@ -358,7 +358,6 @@ class CApp extends CObservable {
 
     public function registerCoreModules() {
         $manager = CManager::instance();
-        $manager->registerModule('block-ui');
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
         if (file_exists($themeFile)) {
@@ -386,6 +385,8 @@ class CApp extends CObservable {
                 }
             }
         }
+
+        $manager->registerThemeModule('block-ui');
     }
 
     public function set_additional_head($str) {
