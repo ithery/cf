@@ -228,8 +228,6 @@ class CApp extends CObservable {
             set_exception_handler(array('CApp', 'exception_handler'));
         // }
 
-        CManager::registerModule('block-ui');
-
         $this->run = true;
     }
 
@@ -359,9 +357,8 @@ class CApp extends CObservable {
     }
 
     public function registerCoreModules() {
-
-
         $manager = CManager::instance();
+        $manager->registerModule('block-ui');
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
         if (file_exists($themeFile)) {
