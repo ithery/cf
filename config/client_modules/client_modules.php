@@ -186,11 +186,9 @@ return array(
     ),
     "form" => array(
         "js" => array("plugins" . DS . "form" . DS . "jquery.form.js"),
-        "requirements" => array("jquery"),
     ),
     "controls" => array(
         "js" => array("plugins" . DS . "controls" . DS . "jquery.controls.js"),
-        "requirements" => array("jquery"),
     ),
     "event" => array(
         "js" => array(
