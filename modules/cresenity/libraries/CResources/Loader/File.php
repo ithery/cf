@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CResources_Loader_File {
+class CResources_Loader_File extends CResources_LoaderAbstract {
 
     protected $appCode = '';
     protected $orgCode = '';
@@ -85,19 +85,10 @@ class CResources_Loader_File {
         return $path;
     }
 
-    public function delete() {
-        $fullPath = $this->getBasePath();
-        if (@unlink($fullPath)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public function getPath() {
         return $this->getBasePath();
     }
-    
+
     public function rename($oldFile, $newFile) {
         $old = CResources::getPath($oldFile);
         $new = CResources::getPath($newFile);
