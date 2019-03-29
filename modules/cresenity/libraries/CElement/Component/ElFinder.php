@@ -34,7 +34,7 @@ class CElement_Component_ElFinder extends CElement_Component {
         $options = array();
         $contextMenu = array(
             'cwd' => ['reload', 'upload', 'sort'],
-            'files' => [ 'download', '|', 'copy', 'cut', 'paste', 'duplicate', '|', 'rm', '|', 'edit', 'rename', 'resize', '|', 'archive', 'extract', '|', 'info'],
+            'files' => [ 'download', '|', 'copy', 'cut', 'paste', 'duplicate', '|', 'rm', '|', 'edit', 'rename', '|', 'info'],
         );
         $options['requesttype'] = 'post';
         $options['url'] = $this->connectorUrl;
