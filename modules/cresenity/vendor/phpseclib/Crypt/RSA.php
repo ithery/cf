@@ -1236,17 +1236,25 @@ class RSA extends AsymmetricKey
         $db = $maskedDB ^ $dbMask;
         $lHash2 = substr($db, 0, $this->hLen);
         $m = substr($db, $this->hLen);
-        if (!Strings::equals($lHash, $lHash2)) {
-            return false;
+        $hashesMatch = hash_equals($lHash, $lHash2);
+        $leadingZeros = 1;
+        $patternMatch = 0;
+        $offset = 0;
+        for ($i = 0; $i < strlen($m); $i++) {
+            $patternMatch|= $leadingZeros & ($m[$i] === "\1");
+            $leadingZeros&= $m[$i] === "\0";
+            $offset+= $patternMatch ? 0 : 1;
         }
-        $m = ltrim($m, chr(0));
-        if (ord($m[0]) != 1) {
+
+        // we do & instead of && to avoid https://en.wikipedia.org/wiki/Short-circuit_evaluation
+        // to protect against timing attacks
+        if (!$hashesMatch & !$patternMatch) {
             return false;
         }
 
         // Output the message M
 
-        return substr($m, 1);
+        return substr($m, $offset + 1);
     }
 
     /**
@@ -1455,7 +1463,7 @@ class RSA extends AsymmetricKey
         $salt = substr($db, $temp + 1); // should be $sLen long
         $m2 = "\0\0\0\0\0\0\0\0" . $mHash . $salt;
         $h2 = $this->hash->hash($m2);
-        return Strings::equals($h, $h2);
+        return hash_equals($h, $h2);
     }
 
     /**
@@ -1649,7 +1657,7 @@ class RSA extends AsymmetricKey
         }
 
         // Compare
-        return Strings::equals($em, $em2);
+        return hash_equals($em, $em2);
     }
 
     /**
@@ -1739,7 +1747,7 @@ class RSA extends AsymmetricKey
         $em = $hash->hash($m);
         $em2 = $decoded['digest'];
 
-        return Strings::equals($em, $em2);
+        return hash_equals($em, $em2);
     }
 
     /**
