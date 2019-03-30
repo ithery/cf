@@ -8,5 +8,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CHelper_Transform {
-    
+
+    public static function formatSize($bytes) {
+        return CHelper_Formatter::formatSize($bytes);
+    }
+
 }
