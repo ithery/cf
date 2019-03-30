@@ -233,8 +233,10 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      *
      * @param int $timeout
      */
-    protected function setTimeout($timeout) {
+    public function setTimeout($timeout) {
         $this->timeout = (int) $timeout;
+        $this->connection = null;
+        $this->getConnection();
     }
 
     /**
