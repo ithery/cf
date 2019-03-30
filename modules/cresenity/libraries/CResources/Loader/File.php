@@ -49,7 +49,7 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
         }
 
         $temp .= $filename;
-        $dir = '/application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
+        $dir = DOCROOT.'/application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
         $basepath = $dir . $temp;
         return $basepath;
     }
@@ -65,21 +65,21 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
             $arr_name = explode("_", $this->resourceName);
             //org_code
             if (isset($arr_name[0])) {
-                $temp .= urlencode($arr_name[0]) . '/';
+                $temp .= rawurlencode($arr_name[0]) . '/';
             }
             //resource_type
             if (isset($arr_name[1])) {
-                $temp .= urlencode($arr_name[1]) . '/';
+                $temp .= rawurlencode($arr_name[1]) . '/';
             }
             //name
             if (isset($arr_name[2])) {
-                $temp .= urlencode($arr_name[2]) . '/';
+                $temp .= rawurlencode($arr_name[2]) . '/';
             }
             //date
             if (isset($arr_name[3])) {
-                $temp .= urlencode($arr_name[3]) . '/';
+                $temp .= rawurlencode($arr_name[3]) . '/';
             }
-            $temp .= urlencode($this->resourceName);
+            $temp .= rawurlencode($this->resourceName);
             $path .= $temp;
         }
         return $path;

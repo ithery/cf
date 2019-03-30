@@ -21,7 +21,9 @@ abstract class CResources_LoaderAbstract implements CResources_LoaderInterface {
     public function getFileSize() {
         $filePath = $this->getPath();
         $file = new CFile();
+        
         if ($file->exists($filePath)) {
+          
             return $file->size($filePath);
         }
         return false;
