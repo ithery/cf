@@ -316,4 +316,22 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
         return $this->gateway->status();
     }
 
+    /**
+     * Set the time out of current gateway.
+     *
+     * @return int|bool
+     */
+    public function setTimeout($second) {
+        return $this->gateway->setTimeout($second);
+    }
+
+    /**
+     * Get the time out of current gateway.
+     *
+     * @return int
+     */
+    public function getTimeout() {
+        return $this->gateway->getTimeout();
+    }
+
 }
