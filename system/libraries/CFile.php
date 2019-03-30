@@ -195,6 +195,7 @@ class CFile {
      * @return int
      */
     public function size($path) {
+        clearstatcache();
         $filesize= filesize($path);
         if($filesize==0 && $this->exists($path)) {
             //try to get another method
