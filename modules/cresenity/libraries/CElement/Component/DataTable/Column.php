@@ -112,12 +112,12 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     public function addTransform($name, $args = array()) {
-        $func = CDynFunction::factory($name);
+        $func = CFunction::factory($name);
         if (!is_array($args)) {
             $args = array($args);
         }
         foreach ($args as $arg) {
-            $func->add_param($arg);
+            $func->addArg($arg);
         }
 
 

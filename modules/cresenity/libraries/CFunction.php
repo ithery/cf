@@ -105,6 +105,13 @@ class CFunction {
             }
         }
         if ($error == 0) {
+            //not the function name, let check it if it is function from CHelper_Transform class
+            $transform = CHelper::transform();
+            if (is_callable(array($transform, $this->func))) {
+                return call_user_func_array(array($transform, $this->func), $args);
+            }
+        }
+        if ($error == 0) {
             //it is not method from ctransform class, try the other class if it is found ::
             if (strpos($this->func, "::") !== false) {
                 return call_user_func_array(explode("::", $this->func), $args);
