@@ -2204,7 +2204,7 @@ final class CF {
             } elseif (is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};
             } else {
-                return value($default);
+                return CF::value($default);
             }
         }
         return $target;
