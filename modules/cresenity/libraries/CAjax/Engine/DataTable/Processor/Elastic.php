@@ -182,6 +182,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
             "aaData" => array(),
         );
         $no = carr::get($request, 'iDisplayStart', 0);
+      
         foreach ($data as $row) {
             $arr = array();
             $no++;
