@@ -18,13 +18,12 @@ class CApp_Api_Method_Server_GetFileList extends CApp_Api_Method_Server {
         $request = $this->request();
         $directory = carr::get($request, 'directory');
         $allFiles = cfs::list_files(DOCROOT . $directory);
-
+        $files = array();
         foreach ($allFiles as $filename) {
-            $domain = basename($filename);
 
 
             $file = array(
-                'domain' => $domain,
+                'filename' => $filename,
                 'created' => date('Y-m-d H:i:s', filemtime($filename)),
             );
             $files[] = $file;

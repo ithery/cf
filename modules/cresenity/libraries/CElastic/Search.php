@@ -223,6 +223,8 @@ class CElastic_Search {
         $data['index'] = $this->index;
         $data['document_type'] = $this->document_type;
         $data['config'] = $this->elastic->config();
+        $data['name'] = $this->elastic->getName();
+        $data['domain'] = $this->elastic->getDomain();
         $data['must'] = $this->must;
         $data['must_not'] = $this->must_not;
         $data['should'] = $this->should;

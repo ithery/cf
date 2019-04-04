@@ -714,12 +714,13 @@ class CApp extends CObservable {
 
             // Test if display_errors is on
             $trace = false;
+            $traceArray = false;
             if ($line != FALSE) {
                 // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
+                $traceArray = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
 
                 // Beautify backtrace
-                $trace = CF::backtrace($trace);
+                $trace = CF::backtrace($traceArray);
             }
 
             if (!($exception instanceof CF_404_Exception)) {
@@ -748,7 +749,7 @@ class CApp extends CObservable {
                 $data['message'] = $message;
                 $data['file'] = $file;
                 $data['line'] = $line;
-                $data['trace'] = $trace;
+                $data['trace'] = json_encode($traceArray);
                 $data['description'] = $description;
 
                 CCollector::put('exception', json_encode($data));

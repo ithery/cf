@@ -11,7 +11,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
     public function process() {
         $data = $this->data;
-        $ajax_data = carr::get($data, 'query');
+        $ajaxData = carr::get($data, 'query');
 
         $js = "";
 
@@ -19,11 +19,17 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         $table = unserialize(carr::get($data, 'table'));
         //$db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
         $domain = carr::get($data, 'domain');
-
+        $ajaxDataDomain = carr::get($ajaxData, 'domain');
+        if(strlen($ajaxDataDomain)>0) {
+            $domain = $ajaxDataDomain;
+        }
+        $instanceName = carr::get($ajaxData,'name');
+        $instanceConfig = carr::get($ajaxData,'config');
+        
         /*
          * @var CElastic
          */
-        $el = CElastic::instance();
+        $el = CElastic::instance($domain,$instanceName,$instanceConfig);
 
         $request = $this->input;
 
@@ -32,26 +38,25 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         $row_action_list = $table->getRowActionList();
         $key = carr::get($data, 'key_field');
 
-        $elastic_index = carr::get($ajax_data, 'index');
-        $elastic_document_type = carr::get($ajax_data, 'document_type');
-
+        $elastic_index = carr::get($ajaxData, 'index');
+        $elastic_document_type = carr::get($ajaxData, 'document_type');
+        
 
         $search = $el->search($elastic_index, $elastic_document_type);
-
         $mapping = $search->indices()->get_mapping();
         $properties = carr::path($mapping, $elastic_index . '.mappings.' . $elastic_document_type . '.properties');
 
 
-        $must = carr::get($ajax_data, 'must');
+        $must = carr::get($ajaxData, 'must');
         foreach ($must as $m) {
             $search->must((array) $m);
         }
-        $must_not = carr::get($ajax_data, 'must_not');
+        $must_not = carr::get($ajaxData, 'must_not');
         foreach ($must_not as $mn) {
             $search->must_not((array) $mn);
         }
 
-        $select_raw = (array) carr::get($ajax_data, 'select');
+        $select_raw = (array) carr::get($ajaxData, 'select');
 
         foreach ($select_raw as $k => $v) {
             $v = (array) $v;
@@ -68,9 +73,9 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
             $search->select(carr::get($v, 'field'), carr::get($v, 'alias'));
         }
 
-        $sort = (array) carr::get($ajax_data, 'sort', array());
-        $from = carr::get($ajax_data, 'from', 0);
-        $size = carr::get($ajax_data, 'size', 10);
+        $sort = (array) carr::get($ajaxData, 'sort', array());
+        $from = carr::get($ajaxData, 'from', 0);
+        $size = carr::get($ajaxData, 'size', 10);
 
 
 
@@ -157,10 +162,10 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         }
 
         if (isset($_GET['debug'])) {
-            cdbg::var_dump($search->buildParams());
+            cdbg::dd($search->buildParams());
             die;
         }
-
+        
         $r = $search->exec();
 
 
