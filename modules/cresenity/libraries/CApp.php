@@ -219,15 +219,7 @@ class CApp extends CObservable {
             }
         }
 
-        // if (ccfg::get('mail_error')) {
-
-            // Set error handler
-            set_error_handler(array('CApp', 'exception_handler'));
-
-            // Set exception handler
-            set_exception_handler(array('CApp', 'exception_handler'));
-        // }
-
+       
         $this->run = true;
     }
 
@@ -667,7 +659,7 @@ class CApp extends CObservable {
         return $childList;
     }
 
-    public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
+    public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
 
         try {
             $app = CApp::instance();

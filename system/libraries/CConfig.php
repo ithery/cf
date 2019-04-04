@@ -44,6 +44,12 @@ class CConfig {
         }
     }
 
+    /**
+     * 
+     * @param string $group
+     * @return CConfig
+     * @throws CException
+     */
     public static function & instance($group = 'app') {
         if (!is_string($group)) {
             throw new CException("Config group must be a string");

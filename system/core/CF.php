@@ -214,12 +214,12 @@ final class CF {
 
         CFBenchmark::start('system.cf.bootstrap');
         //try to locate bootstrap files for modules 
-//        foreach (CF::modules() as $module) {
-//            $bootstrap_path = DOCROOT . 'modules' . DS . $module;
-//            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-//                include $bootstrap_path . 'bootstrap' . EXT;
-//            }
-//        }
+        foreach (CF::modules() as $module) {
+            $bootstrap_path = DOCROOT . 'modules' . DS . $module. DS;
+            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+                include $bootstrap_path . 'bootstrap' . EXT;
+            }
+        }
         //try to locate bootstrap files for application 
         $bootstrap_path = DOCROOT . 'application' . DS . CF::app_code() . DS;
         if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
