@@ -734,25 +734,8 @@ class CApp extends CObservable {
                 $html = $v->render();
 
                 // cmail::error_mail($html);
-
-                $data = [];
-                $data['datetime'] = date('Y-m-d H:i:s');
-                $data['appId'] = $app->appId();
-                $data['appCode'] = $app->code();
-                $data['admin'] = $app->admin();
-                $data['member'] = $app->member();
-                $data['user'] = $app->user();
-                $data['role'] = $app->role();
-                $data['org'] = $app->org();
-                $data['orgId'] = $app->orgId();
-                $data['error'] = $error;
-                $data['message'] = $message;
-                $data['file'] = $file;
-                $data['line'] = $line;
-                $data['trace'] = json_encode($traceArray);
-                $data['description'] = $description;
-
-                CCollector::put('exception', json_encode($data));
+                
+                CCollector::exception($exception);
             }
 
 
