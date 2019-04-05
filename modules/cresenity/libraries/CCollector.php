@@ -116,20 +116,21 @@ class CCollector {
         $trace = $exception->getTrace();
         $browser = new CBrowser();
         $data = [];
+        $rawPost = file_get_contents('php://input');
         $data['datetime'] = date('Y-m-d H:i:s');
         $data['appId'] = $app->appId();
         $data['appCode'] = $app->code();
         $data['user'] = CApp_Base::username();
         $data['role'] = CApp_Base::roleName();
-        $data['org'] = $app->org();
-        $data['orgId'] = $app->orgId();
+        $data['orgId'] = CApp_Base::orgId();
+        $data['orgCode'] = CApp_Base::orgCode();
         $data['error'] = $error;
         $data['message'] = $message;
         $data['file'] = $file;
         $data['line'] = $line;
-        $data['trace'] = $trace;
+        $data['trace'] = json_encode($trace);
         $data['browser'] = $browser->getBrowser();
-        $data['browser_version'] = $browser->getVersion();
+        $data['browserVersion'] = $browser->getVersion();
         $data['platform'] = $browser->getPlatform();
         $data['domain'] = CF::domain();
         $data['controller'] = $controllerClass;
@@ -138,7 +139,10 @@ class CCollector {
         $data['httpReferer'] = carr::get($_SERVER, 'HTTP_REFERER');
         $data['remoteAddress'] = CApp_Base::remoteAddress();
         $data['fullUrl'] = curl::current();
+        $data['protocol'] = CApp_Base::protocol();
         $data['CFVersion'] = CF_VERSION;
+        $data['postData'] = $rawPost;
+        $data['fileData'] = json_encode($_FILES);
 
         return json_encode($data);
     }
