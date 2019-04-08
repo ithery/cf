@@ -95,15 +95,15 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                 }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
 
-                    $field = $columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname;
+                    $fieldName = carr::get($columns[intval($request['iSortCol_' . $i]) + $i2], 'fieldname');
 
                     $sort_mode = $request['sSortDir_' . $i];
-                    if (strlen($field) > 0) {
-                        if (isset($select_flip[$field])) {
-                            $field = $select_flip[$field];
+                    if (strlen($fieldName) > 0) {
+                        if (isset($select_flip[$fieldName])) {
+                            $fieldName = $select_flip[$fieldName];
                         }
 
-                        $search->sort($field, $sort_mode);
+                        $search->sort($fieldName, $sort_mode);
                     }
                 }
             }

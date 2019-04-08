@@ -71,6 +71,7 @@ class CObject {
     }
 
     static public function isInstanceof($value) {
+        CCollector::deprecated();
         if (is_object($value)) {
             return ($value instanceof CObject);
         }

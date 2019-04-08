@@ -219,7 +219,7 @@ class CApp extends CObservable {
             }
         }
 
-       
+
         $this->run = true;
     }
 
@@ -263,6 +263,10 @@ class CApp extends CObservable {
 
     public function controller() {
         return CF::instance();
+    }
+
+    public static function config($path, $domain = null) {
+        return CApp_Config::get($path, $domain);
     }
 
     public function set_header_body($header_body) {
@@ -734,7 +738,7 @@ class CApp extends CObservable {
                 $html = $v->render();
 
                 // cmail::error_mail($html);
-                
+
                 CCollector::exception($exception);
             }
 

@@ -18,7 +18,7 @@ class CJDB {
     protected $offset = FALSE;
 
     private function __construct($path) {
-        cdbg::deprecated('CJDB is deprecated');
+        CCollector::deprecated();
         $this->path = $path;
     }
 
