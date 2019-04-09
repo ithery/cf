@@ -6,6 +6,7 @@ final class CF {
 
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
+
     // The singleton instance of the controller
     public static $instance;
     // Output buffering level
@@ -214,7 +215,7 @@ final class CF {
         CFBenchmark::start('system.cf.bootstrap');
         //try to locate bootstrap files for modules 
         foreach (CF::modules() as $module) {
-            $bootstrap_path = DOCROOT . 'modules' . DS . $module. DS;
+            $bootstrap_path = DOCROOT . 'modules' . DS . $module . DS;
             if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
                 include $bootstrap_path . 'bootstrap' . EXT;
             }
@@ -763,7 +764,9 @@ final class CF {
             $level = CLogger::EMERGENCY;
         }
         if ($level <= CF::$log_threshold) {
-            CLogger::instance()->add($level, $message);
+            if (class_exists(CLogger)) {
+                CLogger::instance()->add($level, $message);
+            }
         }
     }
 
