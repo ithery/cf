@@ -1173,7 +1173,7 @@ final class CF {
                     }
                 }
                 if ($need_to_log) {
-                    self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
+                    self::log(LOG_ERR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
                 }
             }
 
