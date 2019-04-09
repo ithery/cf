@@ -764,7 +764,7 @@ final class CF {
             $level = CLogger::EMERGENCY;
         }
         if ($level <= CF::$log_threshold) {
-            if (class_exists(CLogger)) {
+            if (class_exists('CLogger')) {
                 CLogger::instance()->add($level, $message);
             }
         }
