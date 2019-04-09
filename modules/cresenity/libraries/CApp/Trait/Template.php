@@ -122,12 +122,9 @@ trait CApp_Trait_Template {
         if ($this->templateHeaderName != null) {
             $resultHeader = $this->parseTemplate($this->templateHeaderName);
         }
-
-
         $resultContent = $this->parseTemplate($this->templateName);
-
         if ($this->templateFooterName != null) {
-            $resultHeader = $this->parseTemplate($this->templateFooterName);
+            $resultFooter = $this->parseTemplate($this->templateFooterName);
         }
 
         $this->htmlOutput = carr::get($resultHeader, 'html', '') . carr::get($resultContent, 'html', '') . carr::get($resultFooter, 'html', '');
