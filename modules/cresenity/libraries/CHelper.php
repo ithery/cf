@@ -48,5 +48,14 @@ final class CHelper {
     public static function request() {
         return new CHelper_Request();
     }
+    
+    
+    /**
+     * 
+     * @return \CHelper_Transform
+     */
+    public static function transform() {
+        return new CHelper_Transform();
+    }
 
 }

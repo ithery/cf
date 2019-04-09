@@ -4,9 +4,10 @@ class CElement_Component_DataTable extends CElement_Component {
 
     use CTrait_Compat_Element_DataTable,
         CTrait_Element_ActionList_Row,
-        CTrait_Element_ActionList_Header;
+        CTrait_Element_ActionList_Header,
+        CElement_Component_DataTable_Trait_ExportTrait;
 
-    public $default_paging_list = array(
+    public $defaultPagingList = array(
         "10" => "10",
         "25" => "25",
         "50" => "50",
@@ -20,11 +21,10 @@ class CElement_Component_DataTable extends CElement_Component {
      * @var CDatabase
      */
     public $db;
-    public $db_config;
+    public $dbConfig;
     public $columns;
     public $footer;
     public $footer_field;
-    public $row_action_list;
     public $requires = array();
     public $data;
     public $key_field;
@@ -51,42 +51,36 @@ class CElement_Component_DataTable extends CElement_Component {
     public $can_add;
     public $can_delete;
     public $can_view;
-    public $header_no_line_break;
-    public $export_xml;
-    public $export_excel;
-    public $export_excelxml;
-    public $export_excelcsv;
-    public $export_pdf;
+    public $headerNoLineBreak;
     public $pdf_font_size;
     public $pdf_orientation;
     public $show_header;
-    public $report_header = array();
     public $footer_action_list = array();
     public $footer_action_style;
-    public $export_filename = '';
-    public $export_sheetname = '';
     public $isElastic = false;
     public $isCallback = false;
     public $callbackRequire = null;
     public $callbackOptions = null;
-    protected $table_striped;
-    protected $table_bordered;
+    protected $tableStriped;
+    protected $tableBordered;
     protected $quick_search = FALSE;
-    protected $tbody_id;
+    protected $tbodyId;
     protected $js_cell;
     protected $dom = null;
     protected $widget_title;
+    protected $haveDataTableViewAction;
+    protected $dataTableViewColCount;
+    protected $dataTableView;
 
     public function __construct($id = "") {
         parent::__construct($id);
-        $this->row_action_list = &$this->rowActionList;
-        $this->default_paging_list["-1"] = clang::__("ALL");
+        $this->defaultPagingList["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
         $this->db = CDatabase::instance($this->domain);
-        $this->db_config = $this->db->config();
+        $this->dbConfig = $this->db->config();
         $this->display_length = "10";
-        $this->paging_list = $this->default_paging_list;
+        $this->paging_list = $this->defaultPagingList;
         $this->options = CElement_Component_DataTable_Options::factory();
         $this->data = array();
         $this->key_field = "";
@@ -121,7 +115,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_excelcsv = false;
         $this->export_xml = false;
         $this->export_excel = false;
-        $this->header_no_line_break = false;
+        $this->headerNoLineBreak = false;
 
         $this->custom_column_header = "";
         $this->show_header = true;
@@ -133,7 +127,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->requires = array();
         $this->js_cell = '';
         $this->quick_search = FALSE;
-        $this->tbody_id = '';
+        $this->tbodyId = '';
 
         $this->report_header = array();
 
@@ -144,8 +138,11 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $this->export_filename = $this->id;
         $this->export_sheetname = $this->id;
-        $this->table_striped = true;
-        $this->table_bordered = true;
+        $this->tableStriped = true;
+        $this->tableBordered = true;
+        $this->haveDataTableViewAction = false;
+        $this->dataTableView = CConstant::TABLE_VIEW_ROW;
+        $this->dataTableViewColCount = 5;
 
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
@@ -165,35 +162,26 @@ class CElement_Component_DataTable extends CElement_Component {
         return new CElement_Component_DataTable($id);
     }
 
-    public function setExportFilename($filename) {
-        $this->export_filename = $filename;
-        return $this;
-    }
-
-    public function setExportSheetname($sheetname) {
-        $this->export_sheetname = $sheetname;
-        return $this;
-    }
-
     public function setDomain($domain) {
         parent::setDomain($domain);
-        $this->db = CDatabase::instance($domain);
+        $this->setDatabase(CDatabase::instance($domain));
+        return $this;
     }
 
     public function setDatabase($db) {
         $this->db = $db;
-        $this->db_config = $db->config();
+        $this->dbConfig = $db->config();
 
         return $this;
     }
 
-    function setTableStriped($table_striped) {
-        $this->table_striped = $table_striped;
+    function setTableStriped($tableStriped) {
+        $this->tableStriped = $tableStriped;
         return $this;
     }
 
     function setTableBordered($bool) {
-        $this->table_bordered = $bool;
+        $this->tableBordered = $bool;
         return $this;
     }
 
@@ -219,299 +207,9 @@ class CElement_Component_DataTable extends CElement_Component {
         return $row_act;
     }
 
-    private static function exportExcelxmlStatic($filename, $sheet_name = null, $table) {
-
-
-        header("Cache-Control: no-cache, no-store, must-revalidate");
-        header("Content-Type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=" . $filename);
-        echo '
-                <html xmlns:o="urn:schemas-microsoft-com:office:office"
-                        xmlns:x="urn:schemas-microsoft-com:office:excel"
-                        xmlns="http://www.w3.org/TR/REC-html40">
-                        <head>
-                        <meta http-equiv=Content-Type content="text/html; charset=us-ascii">
-                        </meta><meta name=ProgId content=Excel.Sheet>
-                        </meta><meta name=Generator content="Microsoft Excel 11">
-                        <link rel=File-List href="data.xls_files/filelist.xml">
-                        </link><link rel=Edit-Time-Data href="data.xls_files/editdata.mso">
-                        </link><link rel=OLE-Object-Data href="data.xls_files/oledata.mso">
-                        </link></meta>
-                        <style>
-
-                        table {
-                            mso-displayed-decimal-separator:"\.";
-                            mso-displayed-thousand-separator:"\,";
-                        }
-                        col{
-                            mso-width-source:auto;
-                        }
-                        td{
-                                font-size:8pt;
-                                font-family:Arial;
-
-                        }
-                        th{
-                            font-size:8pt;font-family:Arial;
-                        }
-                        table thead th {
-                             background:#000;
-                            border-top:.5pt solid #545454;
-                            border-left:.5pt solid #545454;
-                            border-right:.5pt solid #545454;
-                            border-bottom:.5pt solid #545454;
-                            color:#fff;
-                        }
-                        @Page{
-                            mso-header-data:"&L&BInternational&B&C&BAsia Pacific&B&R&BPage &P&B";
-                            mso-footer-data:"&L&022Arial022Asia Pacific&R2011-09-08";
-                            margin:1.0in .75in 1.0in .75in;
-                            mso-header-margin:.5in;
-                            mso-footer-margin:.5in;
-                        }
-                        table.data th.thead{
-                          background:#000;
-                          border-top:.5pt solid #545454;
-                          border-left:.5pt solid #545454;
-                          border-right:.5pt solid #545454;
-                          border-bottom:.5pt solid #545454;
-                          color:#fff;
-                        }
-
-                        .tfoot{
-                          background:#000;
-                          border-top:.5pt solid #545454;
-                          border-left:.5pt solid #545454;
-                          border-right:.5pt solid #545454;
-                          border-bottom:.5pt solid #545454;
-                          color:#fff;
-                          font-weight:bold;
-                        }
-
-
-
-                        .odd{background:#f7f7f7;}
-                        .even{background:#e7e7e7;}
-
-                        table.data td {
-                                border-top:.5pt solid #545454;
-                                border-left:.5pt solid #545454;
-                                border-right:.5pt solid #545454;
-                                border-bottom:.5pt solid #545454;
-                        }
-
-
-
-                        .align-left {text-align:left;}
-                        .align-right {text-align:right;}
-                        .align-center {text-align:center;}
-
-                        </style>
-                        </head>
-                        <body>';
-        echo '<table class="data table table-responsive table-bordered table-striped responsive" id="' . $table->id . '">';
-        echo '<thead>';
-
-        $header_count = count($table->report_header);
-        $total_column = count($table->columns);
-        $addition_column = 0;
-        if ($table->numbering)
-            $addition_column++;
-        for ($ii = 1; $ii <= $header_count; $ii++) {
-            echo '<tr><td colspan="' . ($total_column + $addition_column) . '">' . $table->report_header[$ii - 1] . '</td></tr>';
-        }
-        if (strlen($table->custom_column_header) > 0) {
-            echo $table->custom_column_header;
-        } else {
-            echo '<tr>';
-
-            if ($table->numbering) {
-                echo '<th class="align-right thead" data-align="align-right" width="20" scope="col">No</th>';
-            }
-
-            foreach ($table->columns as $col) {
-                echo $col->render_header_html($table->export_pdf, '', 0);
-            }
-            echo '</tr>';
-        }
-        echo '</thead>';
-        echo '<tbody>';
-        $no = 0;
-        $data = $table->data;
-        if (!is_resource($data)) {
-            $data = CDatabase::instance()->query($table->query);
-        }
-        if (!is_resource($data)) {
-            if (is_object($data))
-                $data = $data->result_array(false);
-        }
-        foreach ($data as $row) {
-            $no++;
-            $key = "";
-
-            if (array_key_exists($table->key_field, $row)) {
-
-                $key = $row[$table->key_field];
-            }
-            $class = "";
-            if ($no % 2 == 0) {
-                $class .= " even";
-            } else {
-                $class .= " odd";
-            }
-            echo '<tr class="' . $class . '" id="tr-' . $key . '">';
-
-
-            if ($table->numbering) {
-                echo '<td scope="row" class="align-right">' . $no . '</td>';
-            }
-
-            $jsparam = array();
-            foreach ($table->columns as $col) {
-                $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
-                //do print from query
-                foreach ($row as $k => $v) {
-                    if ($k == $col->get_fieldname()) {
-                        $col_v = $v;
-                        $ori_v = $col_v;
-                        foreach ($col->transforms as $trans) {
-                            $col_v = $trans->execute($col_v);
-                        }
-                    }
-                }
-                //if formatted
-                if (strlen($col->format) > 0) {
-                    $temp_v = $col->format;
-                    foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
-                        }
-                        $col_v = $temp_v;
-                    }
-                }
-
-                $new_v = $col_v;
-
-                if (($table->cell_callback_func) != null) {
-                    $new_v = CDynFunction::factory($table->cell_callback_func)
-                            ->add_param($table)
-                            ->add_param($col->get_fieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($table->requires)
-                            ->execute();
-
-                    if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
-                        $new_v = carr::get($new_v, 'html');
-                        $js .= carr::get($new_v, 'js');
-                    }
-                    //call_user_func($table->cell_callback_func,$table,$col->get_fieldname(),$row,$v);
-                }
-                $class = "";
-                switch ($col->get_align()) {
-                    case "left": $class .= " align-left";
-                        break;
-                    case "right": $class .= " align-right";
-                        break;
-                    case "center": $class .= " align-center";
-                        break;
-                }
-                if ($no % 2 == 0) {
-                    $class .= " even";
-                } else {
-                    $class .= " odd";
-                }
-                echo '<td class="' . $class . '" data-column="' . $col->get_fieldname() . '">' . $new_v . '</td>';
-
-                $col_found = true;
-            }
-            echo '</tr>';
-        }
-        echo '</tbody>';
-        if ($table->footer) {
-            echo '<tfoot>';
-
-            $total_column = count($table->columns);
-            $addition_column = 0;
-            if ($table->numbering)
-                $addition_column++;
-
-            foreach ($table->footer_field as $f) {
-                echo '<tr>';
-
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
-                    $colspan = $total_column + $addition_column - 1;
-                echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f["label"];
-                echo '</td>';
-                $class = "";
-                switch ($f["align"]) {
-                    case "left": $class .= " align-left";
-                        break;
-                    case "right": $class .= " align-right";
-                        break;
-                    case "center": $class .= " align-center";
-                        break;
-                }
-
-                $fval = $f["value"];
-
-                if (is_array($fval)) {
-                    $skip_column = 0;
-
-                    foreach ($table->columns as $col) {
-                        $is_skipped = false;
-                        if ($skip_column < $colspan) {
-                            $skip_column++;
-                            $is_skipped = true;
-                        }
-                        if (!$is_skipped) {
-                            $fcolval = "";
-                            if (isset($fval[$col->get_fieldname()])) {
-                                $fcolval = $fval[$col->get_fieldname()];
-                            }
-
-                            switch ($col->get_align()) {
-                                case "left": $class .= " align-left";
-                                    break;
-                                case "right": $class .= " align-right";
-                                    break;
-                                case "center": $class .= " align-center";
-                                    break;
-                            }
-                            echo '<td class="tfoot ' . $class . '">';
-                            echo $fcolval;
-                            echo '</td>';
-                        }
-                    }
-                } else {
-                    echo '<td class="tfoot ' . $class . '">';
-                    echo $fval;
-                    echo '</td>';
-                }
-                echo '</tr>';
-            }
-            echo '</tfoot>';
-        }
-        echo '</table>';
-        echo '</body>';
-        echo '</html>';
-        exit;
-    }
-
     public function haveFooterAction() {
         //return $this->can_edit||$this->can_delete||$this->can_view;
         return $this->footer_action_list->child_count() > 0;
-    }
-
-    public function isExported() {
-        return $this->export_excel || $this->export_excelxml || $this->export_excelcsv || $this->export_pdf;
     }
 
     public function setTitle($title, $lang = true) {
@@ -553,7 +251,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setTbodyId($id) {
-        $this->tbody_id = $id;
+        $this->tbodyId = $id;
         return $this;
     }
 
@@ -569,7 +267,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setHeaderNoLineBreak($bool) {
-        $this->header_no_line_break = $bool;
+        $this->headerNoLineBreak = $bool;
         return $this;
     }
 
@@ -582,6 +280,20 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->options->get_by_name($key);
     }
 
+    public function setHaveDataTableViewAction($bool=true) {
+        $this->haveDataTableViewAction=$bool;
+        return $this;
+    }
+    
+     public function setDataTableViewCol() {
+        $this->dataTableView=CConstant::TABLE_VIEW_COL;
+        return $this;
+    }
+     public function setDataTableViewRow() {
+        $this->dataTableView=CConstant::TABLE_VIEW_ROW;
+        return $this;
+    }
+    
     public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
@@ -804,748 +516,13 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setPdfFontSize($size) {
-        $this->pdf_font_size = $size;
-        return $this;
-    }
-
-    public function setPdfOrientation($orientation) {
-
-        if (strtoupper($orientation) == "PORTRAIT")
-            $orientation = "P";
-        if (strtoupper($orientation) == "LANDSCAPE")
-            $orientation = "L";
-        if (!in_array($orientation, array("L", "P")))
-            $orientation = "P";
-
-        $this->pdf_orientation = $orientation;
-        return $this;
-    }
-
-    public function exportPdf($filename) {
-        $this->export_pdf = true;
-        $html = $this->html();
-        $p = new CPDFTable($this->pdf_orientation);
-        $p->setfont('times', '', $this->pdf_font_size);
-        $p->htmltable($html, 1);
-
-        $p->output('', 'I');
-
-        die();
-    }
-
-    public function exportExcelcsv($filename) {
-        $this->export_excelcsv = true;
-        $csv_field_terminated = ",";
-        $csv_field_enclosed = "\"";
-        $csv_field_escaped = "\"\"";
-        $csv_line_terminated = "\r\n";
-        $csv_header = true;
-        $csv_header_uppercase = true;
-        $csv_header_field_terminated = ",";
-        $csv_header_line_terminated = "\r\n";
-        header("Cache-Control: no-cache, no-store, must-revalidate");
-        header("Content-Type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=" . $filename);
-        if ($csv_header) {
-            $line_header = "";
-            if ($this->numbering) {
-                if (strlen($line_header) > 0)
-                    $line_header .= $csv_header_field_terminated;
-                $field = 'No';
-                if ($csv_header_uppercase)
-                    $field = strtoupper($field);
-                $line_header .= $field;
-            }
-            foreach ($this->columns as $col) {
-                if (strlen($line_header) > 0)
-                    $line_header .= $csv_header_field_terminated;
-                $field = $col->get_label();
-                if ($csv_header_uppercase)
-                    $field = strtoupper($field);
-                $line_header .= $field;
-            }
-            echo $line_header . $csv_header_line_terminated;
-        }
-        $data = $this->data;
-        $no = 0;
-        if (is_object($data))
-            $data = $data->result_array(false);
-        foreach ($data as $row) {
-            $no++;
-            $key = "";
-            $line = "";
-            if (array_key_exists($this->key_field, $row)) {
-
-                $key = $row[$this->key_field];
-            }
-            $class = "";
-            if ($this->numbering) {
-                if (strlen($line) > 0)
-                    $line .= $csv_field_terminated;
-                $field = $no;
-                if (strlen($csv_field_escaped) > 0) {
-                    $field = str_replace($csv_field_enclosed, $csv_field_escaped, $field);
-                }
-                if (strlen($csv_field_enclosed) > 0) {
-                    $field = $csv_field_enclosed . $field . $csv_field_enclosed;
-                }
-                $line .= $field;
-            }
-
-            $jsparam = array();
-            foreach ($this->columns as $col) {
-                $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
-                //do print from query
-                foreach ($row as $k => $v) {
-                    if ($k == $col->get_fieldname()) {
-                        $col_v = $v;
-                        $ori_v = $col_v;
-                        foreach ($col->transforms as $trans) {
-                            $col_v = $trans->execute($col_v);
-                        }
-                    }
-                }
-                //if formatted
-                if (strlen($col->format) > 0) {
-                    $temp_v = $col->format;
-                    foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
-                        }
-                        $col_v = $temp_v;
-                    }
-                }
-
-                $new_v = $col_v;
-
-                if (($this->cell_callback_func) != null) {
-                    $new_v = CDynFunction::factory($this->cell_callback_func)
-                            ->add_param($this)
-                            ->add_param($col->get_fieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($this->requires)
-                            ->execute();
-
-
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
-                }
-                $class = "";
-                if (strlen($line) > 0)
-                    $line .= $csv_field_terminated;
-                $field = $new_v;
-                if (strlen($csv_field_escaped) > 0) {
-                    $field = str_replace($csv_field_enclosed, $csv_field_escaped, $field);
-                }
-                if (strlen($csv_field_enclosed) > 0) {
-                    $field = $csv_field_enclosed . $field . $csv_field_enclosed;
-                }
-                $line .= $field;
-
-
-
-                $col_found = true;
-            }
-
-
-            echo $line . $csv_line_terminated;
-        }
-        exit;
-    }
-
-    public function exportExcelxml($filename, $sheet_name = null) {
-        $this->export_excelxml = true;
-        header("Cache-Control: no-cache, no-store, must-revalidate");
-        header("Content-Type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=" . $filename);
-        echo '
-                <html xmlns:o="urn:schemas-microsoft-com:office:office"
-                        xmlns:x="urn:schemas-microsoft-com:office:excel"
-                        xmlns="http://www.w3.org/TR/REC-html40">
-                        <head>
-                        <meta http-equiv=Content-Type content="text/html; charset=us-ascii">
-                        </meta><meta name=ProgId content=Excel.Sheet>
-                        </meta><meta name=Generator content="Microsoft Excel 11">
-                        <link rel=File-List href="data.xls_files/filelist.xml">
-                        </link><link rel=Edit-Time-Data href="data.xls_files/editdata.mso">
-                        </link><link rel=OLE-Object-Data href="data.xls_files/oledata.mso">
-                        </link></meta>
-                        <style>
-
-                        table {
-                            mso-displayed-decimal-separator:"\.";
-                            mso-displayed-thousand-separator:"\,";
-                        }
-                        col{
-                            mso-width-source:auto;
-                        }
-                        td{
-                                font-size:8pt;
-                                font-family:Arial;
-
-                        }
-                        th{
-                            font-size:8pt;font-family:Arial;
-                        }
-                        table thead th {
-                             background:#000;
-                            border-top:.5pt solid #545454;
-                            border-left:.5pt solid #545454;
-                            border-right:.5pt solid #545454;
-                            border-bottom:.5pt solid #545454;
-                            color:#fff;
-                        }
-                        @Page{
-                            mso-header-data:"&L&BInternational&B&C&BAsia Pacific&B&R&BPage &P&B";
-                            mso-footer-data:"&L&022Arial022Asia Pacific&R2011-09-08";
-                            margin:1.0in .75in 1.0in .75in;
-                            mso-header-margin:.5in;
-                            mso-footer-margin:.5in;
-                        }
-                        table.data th.thead{
-                          background:#000;
-                          border-top:.5pt solid #545454;
-                          border-left:.5pt solid #545454;
-                          border-right:.5pt solid #545454;
-                          border-bottom:.5pt solid #545454;
-                          color:#fff;
-                        }
-
-                        .tfoot{
-                          background:#000;
-                          border-top:.5pt solid #545454;
-                          border-left:.5pt solid #545454;
-                          border-right:.5pt solid #545454;
-                          border-bottom:.5pt solid #545454;
-                          color:#fff;
-                          font-weight:bold;
-                        }
-
-
-
-                        .odd{background:#f7f7f7;}
-                        .even{background:#e7e7e7;}
-
-                        table.data td {
-                                border-top:.5pt solid #545454;
-                                border-left:.5pt solid #545454;
-                                border-right:.5pt solid #545454;
-                                border-bottom:.5pt solid #545454;
-                        }
-
-
-
-                        .align-left {text-align:left;}
-                        .align-right {text-align:right;}
-                        .align-center {text-align:center;}
-
-                        </style>
-                        </head>
-                        <body>';
-        echo '<table class="data table table-bordered table-striped responsive" id="' . $this->id . '">';
-        echo '<thead>';
-
-        $header_count = count($this->report_header);
-        $total_column = count($this->columns);
-        $addition_column = 0;
-        if ($this->numbering)
-            $addition_column++;
-        for ($ii = 1; $ii <= $header_count; $ii++) {
-            echo '<tr><td colspan="' . ($total_column + $addition_column) . '">' . $this->report_header[$ii - 1] . '</td></tr>';
-        }
-        if (strlen($this->custom_column_header) > 0) {
-            echo $this->custom_column_header;
-        } else {
-            echo '<tr>';
-
-            if ($this->numbering) {
-                echo '<th class="align-right thead" data-align="align-right" width="20" scope="col">No</th>';
-            }
-
-            foreach ($this->columns as $col) {
-                echo $col->render_header_html($this->export_pdf, '', 0);
-            }
-            echo '</tr>';
-        }
-        echo '</thead>';
-        echo '<tbody>';
-        $no = 0;
-        $data = $this->data;
-
-        if (is_object($data)) {
-            if ($data instanceof CDatabase_Driver_Mysqli_Result) {
-                $data->setFetchTypeArray();
-            } else {
-                $data = $data->result_array(false);
-            }
-        }
-
-        foreach ($data as $row) {
-            $no++;
-            $key = "";
-            if (array_key_exists($this->key_field, $row)) {
-
-                $key = $row[$this->key_field];
-            }
-            $class = "";
-            if ($no % 2 == 0) {
-                $class .= " even";
-            } else {
-                $class .= " odd";
-            }
-            echo '<tr class="' . $class . '" id="tr-' . $key . '">';
-
-
-            if ($this->numbering) {
-                echo '<td scope="row" class="align-right">' . $no . '</td>';
-            }
-
-            $jsparam = array();
-            foreach ($this->columns as $col) {
-                $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
-                //do print from query
-                foreach ($row as $k => $v) {
-                    if ($k == $col->get_fieldname()) {
-                        $col_v = $v;
-                        $ori_v = $col_v;
-                        foreach ($col->transforms as $trans) {
-                            if ($trans->get_function() != 'format_currency') {
-                                $col_v = $trans->execute($col_v);
-                            }
-//                                $col_v = $trans->execute($col_v);
-                        }
-                    }
-                }
-                //if formatted
-                if (strlen($col->format) > 0) {
-                    $temp_v = $col->format;
-                    foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
-                        }
-                        $col_v = $temp_v;
-                    }
-                }
-
-                $new_v = $col_v;
-
-                if (($this->cell_callback_func) != null) {
-                    $new_v = CDynFunction::factory($this->cell_callback_func)
-                            ->add_param($this)
-                            ->add_param($col->get_fieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($this->requires)
-                            ->execute();
-
-
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
-                }
-                $class = "";
-                switch ($col->get_align()) {
-                    case "left": $class .= " align-left";
-                        break;
-                    case "right": $class .= " align-right";
-                        break;
-                    case "center": $class .= " align-center";
-                        break;
-                }
-                if ($no % 2 == 0) {
-                    $class .= " even";
-                } else {
-                    $class .= " odd";
-                }
-                echo '<td class="' . $class . '" data-column="' . $col->get_fieldname() . '">' . $new_v . '</td>';
-
-                $col_found = true;
-            }
-            echo '</tr>';
-        }
-        echo '</tbody>';
-        if ($this->footer) {
-            echo '<tfoot>';
-
-            $total_column = count($this->columns);
-            $addition_column = 0;
-            if ($this->numbering)
-                $addition_column++;
-
-            foreach ($this->footer_field as $f) {
-                echo '<tr>';
-
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
-                    $colspan = $total_column + $addition_column - 1;
-                echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f["label"];
-                echo '</td>';
-                $class = "";
-                switch ($f["align"]) {
-                    case "left": $class .= " align-left";
-                        break;
-                    case "right": $class .= " align-right";
-                        break;
-                    case "center": $class .= " align-center";
-                        break;
-                }
-
-                $fval = $f["value"];
-
-                if (is_array($fval)) {
-                    $skip_column = 0;
-
-                    foreach ($this->columns as $col) {
-                        $is_skipped = false;
-                        if ($skip_column < $colspan) {
-                            $skip_column++;
-                            $is_skipped = true;
-                        }
-                        if (!$is_skipped) {
-                            $fcolval = "";
-                            if (isset($fval[$col->get_fieldname()])) {
-                                $fcolval = $fval[$col->get_fieldname()];
-                            }
-
-                            switch ($col->get_align()) {
-                                case "left": $class .= " align-left";
-                                    break;
-                                case "right": $class .= " align-right";
-                                    break;
-                                case "center": $class .= " align-center";
-                                    break;
-                            }
-                            echo '<td class="tfoot ' . $class . '">';
-                            echo $fcolval;
-                            echo '</td>';
-                        }
-                    }
-                } else {
-                    echo '<td class="tfoot ' . $class . '">';
-                    echo $fval;
-                    echo '</td>';
-                }
-                echo '</tr>';
-            }
-            echo '</tfoot>';
-        }
-        echo '</table>';
-        echo '</body>';
-        echo '</html>';
-        exit;
-    }
-
-    public function addReportHeader($line) {
-        $this->report_header[] = $line;
-        return $this;
-    }
-
-    public function exportExcel($filename, $sheet_name) {
-        $this->export_excel = true;
-        $excel = CExcel::factory()->set_creator("cresenity_system")->set_subject("Cresenity Report");
-        $excel->set_active_sheet_name($sheet_name);
-        $header_count = count($this->report_header);
-
-        $total_column = count($this->columns);
-        $addition_column = 0;
-        if ($this->numbering)
-            $addition_column++;
-        if ($total_column < 2)
-            $total_column = 2;
-
-
-
-        $total_column += $addition_column - 1;
-
-
-        for ($ii = 1; $ii <= $header_count; $ii++) {
-
-            $excel->write_by_index(0, $ii, $this->report_header[$ii - 1]);
-            $excel->merge_cell(0, $ii, $total_column, $ii);
-        }
-
-        $i = 0;
-        if ($this->numbering) {
-            $excel->write_by_index($i, $header_count + 1, "No");
-            $i++;
-        }
-        foreach ($this->columns as $col) {
-            $excel->write_by_index($i, $header_count + 1, $col->getLabel());
-            $i++;
-        }
-
-
-
-
-        $i = 0;
-        $j = 2 + $header_count;
-        $no = 0;
-        foreach ($this->data as $row) {
-            $i = 0;
-            $no++;
-            $key = $row[$this->key_field];
-
-            if ($this->numbering) {
-                $excel->write_by_index($i, $j, $no);
-                $i++;
-            }
-
-
-            foreach ($this->columns as $col) {
-                $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                //do print from query
-                foreach ($row as $k => $v) {
-                    if ($k == $col->get_fieldname()) {
-                        $col_v = $v;
-
-                        foreach ($col->transforms as $trans) {
-                            $col_v = $trans->execute($col_v);
-                        }
-                    }
-                }
-                //if formatted
-                if (strlen($col->format) > 0) {
-                    $temp_v = $col->format;
-                    foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
-                        }
-                        $col_v = $temp_v;
-                    }
-                }
-
-                $new_v = $col_v;
-
-                if (($this->cell_callback_func) != null) {
-                    $new_v = CDynFunction::factory($this->cell_callback_func)
-                            ->add_param($this)
-                            ->add_param($col->get_fieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($this->requires)
-                            ->execute();
-
-
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
-                }
-                $class = "";
-                switch ($col->get_align()) {
-
-                    case "left": $class .= " align-left";
-                        break;
-                    case "right": $class .= " align-right";
-                        break;
-                    case "center": $class .= " align-center";
-                        break;
-                }
-                //parse new_v
-                $ss = array();
-                while (preg_match('/<a.+?>(.+?)<\/a>/', $new_v, $ss)) {
-                    $new_v = str_replace($ss[0], $ss[1], $new_v);
-                }
-
-
-                $excel->write_by_index($i, $j, $new_v);
-                $excel->set_align_by_index($i, $j, $col->get_align());
-
-                $i++;
-                $col_found = true;
-            }
-            $j++;
-        }
-        //footer
-
-
-        if ($this->footer) {
-            $total_column = count($this->columns);
-            $addition_column = 0;
-            if ($this->numbering)
-                $addition_column++;
-            if ($total_column < 2)
-                $total_column = 2;
-            foreach ($this->footer_field as $f) {
-
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
-                    $colspan = $total_column + $addition_column - 1;
-
-                $excel->write_by_index(0, $j, $f["label"] . $colspan);
-                $excel->set_align_by_index(0, $j, "left");
-                $fval = $f["value"];
-
-                if (is_array($fval)) {
-                    $skip_column = 0;
-                    $i = 0;
-
-                    foreach ($this->columns as $col) {
-                        $is_skipped = false;
-
-                        if ($skip_column < $colspan) {
-                            $skip_column++;
-                            $is_skipped = true;
-                        }
-                        if (!$is_skipped) {
-                            $fcolval = "";
-                            if (isset($fval[$col->get_fieldname()])) {
-                                $fcolval = $fval[$col->get_fieldname()];
-                            }
-
-                            switch ($col->get_align()) {
-                                case "left": $class .= " align-left";
-                                    break;
-                                case "right": $class .= " align-right";
-                                    break;
-                                case "center": $class .= " align-center";
-                                    break;
-                            }
-                            $excel->write_by_index($i, $j, $fcolval);
-                            $excel->set_align_by_index($i, $j, $col->get_align());
-                        }
-                        $i++;
-                    }
-                } else {
-                    $excel->write_by_index($total_column - 1, $j, $fval);
-                    $excel->set_align_by_index($total_column - 1, $j, $f["align"]);
-                }
-                if ($colspan > 1) {
-                    $excel->merge_cell(0, $j, $colspan - 1, $j);
-                }
-                $excel->set_row_style($j);
-
-                $j++;
-            }
-        }
-        $excel->set_auto_width();
-        $excel->set_header_style($header_count + 1);
-        $sfn = cstr::sanitize($filename, true);
-
-        $fn = cexport::makepath("excel", $sfn);
-        $excel->save($fn);
-        //echo $fn;
-
-        cdownload::force($fn, null, $sfn);
-    }
-
-    public function html($indent = 0) {
-        $pdf_table_attr = '';
-        $pdf_tbody_td_attr = '';
-        $pdf_thead_td_attr = '';
-
-        if ($this->export_pdf) {
-            $pdf_table_attr = ' border="1" width="100%"';
-            $pdf_thead_td_attr = ' bgcolor="#9f9f9f" color="#000" style="color:#000" ';
-            $pdf_tbody_td_attr = ' valign="middle"';
-        }
-        $th_class = "";
-        if ($this->header_no_line_break) {
-            $th_class = " no-line-break";
-        }
+    protected function rawTBody($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action();
-        if ($wrapped) {
 
-            $main_class = ' widget-box ';
-            $main_class_title = ' widget-title ';
-            $main_class_content = ' widget-content ';
-            if ($this->bootstrap == '3.3') {
-                $main_class = ' box box-info';
-                $main_class_title = ' box-header with-border ';
-                $main_class_content = ' box-body ';
-            }
-            if ($this->widget_title == false) {
-                $main_class_title = ' ';
-            }
-
-            $html->appendln('<div class="' . $main_class . ' widget-table">')->incIndent();
-            $show_title = true;
-            if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
-                $show_title = false;
-            }
-            if ($show_title) {
-                $html->appendln('<div class="' . $main_class_title . '">')->incIndent();
-                if (strlen($this->icon > 0)) {
-                    $html->appendln('<span class="icon">')->incIndent();
-                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
-                    $html->decIndent()->appendln('</span');
-                }
-                $html->appendln('<h5>' . $this->title . '</h5>');
-                if ($this->haveHeaderAction()) {
-                    $html->appendln($this->headerActionList->html($html->getIndent()));
-
-                    $this->js_cell .= $this->headerActionList->js();
-                }
-                $html->decIndent()->appendln('</div>');
-            }
-            $html->appendln('<div class="' . $main_class_content . ' nopadding">')->incIndent();
-        }
-        $data_responsive_open = '<div class="table-responsive">';
-        $data_responsive_close = '</div>';
-        if ($this->responsive) {
-            $data_responsive_open = '<div class="span12" style="overflow: auto;margin-left: 0;">';
-            $data_responsive_close = '</div>';
-        }
-
-        $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0) {
-            $classes = " " . $classes;
-        }
-        if ($this->table_striped) {
-            $classes .= " table-striped ";
-        }
-        if ($this->table_bordered) {
-            $classes .= " table-bordered ";
-        }
-        $html->appendln($data_responsive_open . '<table ' . $pdf_table_attr . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
-                ->incIndent()->br();
-        if ($this->show_header) {
-            $html->appendln('<thead>')
-                    ->incIndent()->br();
-            if (strlen($this->custom_column_header) > 0) {
-                $html->appendln($this->custom_column_header);
-            } else {
-                $html->appendln('<tr>')
-                        ->incIndent()->br();
-
-                if ($this->numbering) {
-                    $html->appendln('<th data-align="align-right" class="' . $th_class . '" width="20" scope="col">No</th>')->br();
-                }
-                if ($this->checkbox) {
-                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $th_class . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
-                }
-                foreach ($this->columns as $col) {
-                    $html->appendln($col->render_header_html($this->export_pdf, $th_class, $html->getIndent()))->br();
-                }
-                if ($this->haveRowAction()) {
-                    $action_width = 31 * $this->action_count() + 5;
-                    if ($this->getRowActionStyle() == "btn-dropdown") {
-                        $action_width = 70;
-                    }
-                    $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $th_class . '">' . clang::__('Actions') . '</th>')->br();
-                }
-                $html->decIndent()->appendln("</tr>")->br();
-            }
-            $html->decIndent()->appendln("</thead>")->br();
-        }
-
-        $tbody_id = (strlen($this->tbody_id) > 0 ? "id='" . $this->tbody_id . "' " : "");
-
-        $html->appendln("<tbody " . $tbody_id . " >")->incIndent()->br();
+        $tbodyId = (strlen($this->tbodyId) > 0 ? "id='" . $this->tbodyId . "' " : "");
+        $js = "";
+        $html->appendln('<tbody ' . $tbodyId . '>')->incIndent()->br();
         //render body;
         $html->appendln($this->htmlChild($indent));
         $no = 0;
@@ -1610,27 +587,31 @@ class CElement_Component_DataTable extends CElement_Component {
                     $new_v = $col_v;
 
                     if (($this->cell_callback_func) != null) {
-                        $new_v = CDynFunction::factory($this->cell_callback_func)
-                                ->add_param($this)
-                                ->add_param($col->get_fieldname())
-                                ->add_param($row)
-                                ->add_param($new_v)
-                                ->set_require($this->requires)
+                        $new_v = CFunction::factory($this->cell_callback_func)
+                                ->addArg($this)
+                                ->addArg($col->getFieldname())
+                                ->addArg($row)
+                                ->addArg($new_v)
+                                ->setRequire($this->requires)
                                 ->execute();
-
-
-                        //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                        if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
+                            $js .= $new_v['js'];
+                            $new_v = $new_v['html'];
+                        }
                     }
                     $class = "";
-                    switch ($col->get_align()) {
-                        case "left": $class .= " align-left";
+                    switch ($col->getAlign()) {
+                        case CConstant::ALIGN_LEFT:
+                            $class .= " align-left";
                             break;
-                        case "right": $class .= " align-right";
+                        case CConstant::ALIGN_RIGHT:
+                            $class .= " align-right";
                             break;
-                        case "center": $class .= " align-center";
+                        case CConstant::ALIGN_CENTER:
+                            $class .= " align-center";
                             break;
                     }
-                    if ($col->get_no_line_break()) {
+                    if ($col->getNoLineBreak()) {
                         $class .= " no-line-break";
                     }
                     if ($col->hidden_phone)
@@ -1642,14 +623,14 @@ class CElement_Component_DataTable extends CElement_Component {
                     if ($col->hidden_desktop)
                         $class .= " hidden-desktop";
 
-                    $pdf_tbody_td_current_attr = $pdf_tbody_td_attr;
+                    $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
                     if ($this->export_pdf) {
                         switch ($col->get_align()) {
-                            case "left": $pdf_tbody_td_current_attr .= ' align="left"';
+                            case "left": $pdfTBodyTdCurrentAttr .= ' align="left"';
                                 break;
-                            case "right": $pdf_tbody_td_current_attr .= ' align="right"';
+                            case "right": $pdfTBodyTdCurrentAttr .= ' align="right"';
                                 break;
-                            case "center": $pdf_tbody_td_current_attr .= ' align="center"';
+                            case "center": $pdfTBodyTdCurrentAttr .= ' align="center"';
                                 break;
                         }
                     }
@@ -1658,7 +639,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         $new_v = carr::get($new_v, 'html', '');
                     }
 
-                    $html->appendln('<td' . $pdf_tbody_td_current_attr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
+                    $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
                     $col_found = true;
                 }
 
@@ -1670,7 +651,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $jsparam["param1"] = $key;
                     if ($this->getRowActionStyle() == "btn-dropdown") {
-                        $this->rowActionList->add_class("pull-right");
+                        $this->rowActionList->addClass("pull-right");
                     }
                     $this->rowActionList->regenerateId(true);
                     $this->rowActionList->apply("jsparam", $jsparam);
@@ -1680,12 +661,12 @@ class CElement_Component_DataTable extends CElement_Component {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as &$action) {
-                            $visibility = CDynFunction::factory($this->filter_action_callback_func)
-                                    ->add_param($this)
-                                    ->add_param($col->getFieldname())
-                                    ->add_param($row)
-                                    ->add_param($action)
-                                    ->set_require($this->requires)
+                            $visibility = CFunction::factory($this->filter_action_callback_func)
+                                    ->addArg($this)
+                                    ->addArg($col->getFieldname())
+                                    ->addArg($row)
+                                    ->addArg($action)
+                                    ->setRequire($this->requires)
                                     ->execute();
                             if ($visibility == false) {
                                 $action->addClass('d-none');
@@ -1698,7 +679,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     }
 
 
-                    $this->js_cell .= $this->rowActionList->js();
+                    $js .= $this->rowActionList->js();
 
                     $html->appendln($this->rowActionList->html($html->getIndent()));
                     $html->decIndent()->appendln('</td>')->br();
@@ -1709,9 +690,74 @@ class CElement_Component_DataTable extends CElement_Component {
                 $html->decIndent()->appendln('</tr>')->br();
             }
         }
-
+        $this->js_cell .= $js;
 
         $html->decIndent()->appendln('</tbody>')->br();
+        return $html->text();
+    }
+
+    protected function rawHtml($indent = 0) {
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+
+        $thClass = "";
+        if ($this->headerNoLineBreak) {
+            $thClass = " no-line-break";
+        }
+        $htmlResponsiveOpen = '<div class="table-responsive">';
+        $htmlResponsiveClose = '</div>';
+        if ($this->responsive) {
+            $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
+            $htmlResponsiveClose = '</div>';
+        }
+
+        $classes = $this->classes;
+        $classes = implode(" ", $classes);
+        if (strlen($classes) > 0) {
+            $classes = " " . $classes;
+        }
+        if ($this->tableStriped) {
+            $classes .= " table-striped ";
+        }
+        if ($this->tableBordered) {
+            $classes .= " table-bordered ";
+        }
+
+        $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
+                ->incIndent()->br();
+        if ($this->show_header) {
+            $html->appendln('<thead>')
+                    ->incIndent()->br();
+            if (strlen($this->custom_column_header) > 0) {
+                $html->appendln($this->custom_column_header);
+            } else {
+                $html->appendln('<tr>')
+                        ->incIndent()->br();
+
+                if ($this->numbering) {
+                    $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
+                }
+                if ($this->checkbox) {
+                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
+                }
+                foreach ($this->columns as $col) {
+                    $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
+                }
+                if ($this->haveRowAction()) {
+                    $action_width = 31 * $this->action_count() + 5;
+                    if ($this->getRowActionStyle() == "btn-dropdown") {
+                        $action_width = 70;
+                    }
+                    $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
+                }
+                $html->decIndent()->appendln("</tr>")->br();
+            }
+            $html->decIndent()->appendln("</thead>")->br();
+        }
+
+        $html->append($this->rawTBody($html->getIndent()));
+
+
         //footer
         if ($this->footer) {
             $html->incIndent()->appendln('<tfoot>')->br();
@@ -1784,7 +830,77 @@ class CElement_Component_DataTable extends CElement_Component {
             }
             $html->decIndent()->appendln('</tfoot>')->br();
         }
-        $html->decIndent()->appendln('</table>' . $data_responsive_close);
+        $html->decIndent()->appendln('</table>' . $htmlResponsiveClose);
+
+        return $html->text();
+    }
+
+    public function html($indent = 0) {
+
+
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action() || strlen($this->title) > 0;
+        if ($wrapped) {
+
+            $mainClass = ' widget-box ';
+            $mainClassTitle = ' widget-title ';
+            $tableViewClass = $this->dataTableView==CConstant::TABLE_VIEW_COL?' data-table-col-view':' data-table-row-view';
+            $mainClassContent = ' widget-content '.$tableViewClass.' col-view-count-' . $this->dataTableViewColCount;
+            if ($this->bootstrap == '3.3') {
+                $mainClass = ' box box-info';
+                $mainClassTitle = ' box-header with-border ';
+                $mainClassContent = ' box-body data-table-row-view';
+            }
+            if ($this->widget_title == false) {
+                $mainClassTitle = ' ';
+            }
+            if ($this->haveDataTableViewAction) {
+                $mainClassTitle .= ' with-elements';
+            }
+            $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
+            $showTitle = true;
+            if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
+                $showTitle = false;
+            }
+            if ($showTitle) {
+                $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
+                if (strlen($this->icon > 0)) {
+                    $html->appendln('<span class="icon">')->incIndent();
+                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
+                    $html->decIndent()->appendln('</span');
+                }
+                $html->appendln('<h5>' . $this->title . '</h5>');
+                if ($this->haveHeaderAction()) {
+                    $html->appendln($this->headerActionList->html($html->getIndent()));
+
+                    $this->js_cell .= $this->headerActionList->js();
+                }
+
+                if ($this->haveDataTableViewAction) {
+                    $colViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' active':'';
+                    $rowViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' active':'';
+                    $colViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_COL? ' checked="checked"':'';
+                    $rowViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' checked="checked"':'';
+                    $html->appendln('
+                        <div class="btn-group btn-group-toggle ml-auto" data-toggle="buttons">
+                            <label class="btn btn-default icon-btn md-btn-flat '.$colViewActionActive.'">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-col-view" '.$colViewActionChecked.' />
+                                <span class="ion ion-md-apps"></span>
+                            </label>
+                            <label class="btn btn-default icon-btn md-btn-flat '.$rowViewActionActive.'">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-row-view" '.$rowViewActionChecked.'" />
+                                <span class="ion ion-md-menu"></span>
+                            </label>
+                        </div>
+                    ');
+                }
+                $html->decIndent()->appendln('</div>');
+            }
+            $html->appendln('<div class="' . $mainClassContent . ' nopadding">')->incIndent();
+        }
+
+        $html->append($this->rawHtml($html->getIndent()));
         if ($wrapped > 0) {
             $html->decIndent()->appendln('</div>');
             $html->decIndent()->appendln('</div>');
@@ -1815,7 +931,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajaxMethod->setData('row_action_list', $this->rowActionList);
             $ajaxMethod->setData('key_field', $this->key_field);
             $ajaxMethod->setData('table', serialize($this));
-            $ajaxMethod->setData('dbConfig', $this->db_config);
+            $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('domain', $this->domain);
             $ajaxMethod->setData('checkbox', $this->checkbox);
             $ajaxMethod->setData('is_elastic', $this->isElastic);
@@ -2233,8 +1349,16 @@ class CElement_Component_DataTable extends CElement_Component {
             }
         }
 
-//            echo '<textarea>' . $js->text() . '</textarea>';
-//            clog::write($js->text());
+        if ($this->haveDataTableViewAction) {
+            $js->append("
+                $('#" . $this->id() . "-widget-box [name=\"" . $this->id() . "-data-table-view\"]').on('change', function() {
+                    $('#" . $this->id() . "-widget-box > .widget-content')
+                        .removeClass('data-table-col-view data-table-row-view')
+                        .addClass(this.value);
+                });
+            ");
+        }
+
         return $js->text();
     }
 

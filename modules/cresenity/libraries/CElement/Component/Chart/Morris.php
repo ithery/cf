@@ -8,7 +8,9 @@ class CElement_Component_Chart_Morris extends CElement_Component_Chart
 	public function __construct()
 	{
 		parent::__construct();
-		CManager::instance()->registerModule('morrisjs');
+		CManager::instance()->registerModule('eve');
+		CManager::instance()->registerModule('raphael');
+		CManager::instance()->registerModule('morris');
 	}
 
 	protected function build() {

@@ -577,6 +577,7 @@ if (window.capp.have_clock) {
                 jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
             }
 
+            $.cresenity.blockElement(jQuery('#' + id_target));
 
             jQuery('#' + id_target).data('xhr', jQuery.ajax({
                 type: method,
@@ -585,7 +586,8 @@ if (window.capp.have_clock) {
                 data: data_addition,
                 success: function (data) {
                     $.cresenity._handle_response(data, function () {
-                        jQuery('#' + id_target).html(data.html);
+                        jQuery('#' + id_target).append(data.html);
+                        jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
                         if (data.js && data.js.length > 0) {
                             var script = $.cresenity.base64.decode(data.js);
                             eval(script);
@@ -603,6 +605,9 @@ if (window.capp.have_clock) {
                         $.cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
                     }
 
+                },
+                complete: function() {
+                    $.cresenity.unblockElement(jQuery('#' + id_target));
                 }
             }));
         },
@@ -625,7 +630,7 @@ if (window.capp.have_clock) {
 
             }
 
-
+            $.cresenity.blockElement(jQuery('#' + id_target));
 
             jQuery('#' + id_target).data('xhr', jQuery.ajax({
                 type: method,
@@ -650,6 +655,9 @@ if (window.capp.have_clock) {
                     if (msg != 'abort') {
                         $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                     }
+                },
+                complete: function() {
+                    $.cresenity.unblockElement(jQuery('#' + id_target));
                 }
             }));
         },
@@ -672,7 +680,7 @@ if (window.capp.have_clock) {
 
             }
 
-
+            $.cresenity.blockElement(jQuery('#' + id_target));
 
             jQuery('#' + id_target).data('xhr', jQuery.ajax({
                 type: method,
@@ -697,6 +705,9 @@ if (window.capp.have_clock) {
                     if (msg != 'abort') {
                         $.cresenity.message('error', 'Error, please call administrator... (' + msg + ')');
                     }
+                },
+                complete: function() {
+                    $.cresenity.unblockElement(jQuery('#' + id_target));
                 }
             }));
         },
@@ -1203,7 +1214,42 @@ if (window.capp.have_clock) {
 
             }
 
-        }
+        },
+        blockPage: function () {
+            $.blockUI({
+                message: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+                css: {
+                    backgroundColor: 'transparent',
+                    border: '0',
+                    zIndex: 9999999
+                },
+                overlayCSS: {
+                    backgroundColor: '#fff',
+                    opacity: 0.8,
+                    zIndex: 9999990
+                }
+            });
+        },
+        unblockPage: function () {
+            $.unblockUI();
+        },
+        blockElement: function (selector) {
+            $(selector).block({
+                message: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+                css: {
+                    backgroundColor: 'transparent',
+                    border: '0'
+                },
+                overlayCSS: {
+                    backgroundColor: '#fff',
+                    opacity: 0.8
+                }
+            });
+
+        },
+        unblockElement: function (selector) {
+            $(selector).unblock();
+        },
     }
     String.prototype.format_currency = function () {
         return $.cresenity.format_currency(this)

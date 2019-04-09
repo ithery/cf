@@ -61,34 +61,6 @@ abstract class Strings
     }
 
     /**
-     * Performs blinded equality testing on strings
-     *
-     * Protects against a particular type of timing attack described.
-     *
-     * See {@link http://codahale.com/a-lesson-in-timing-attacks/ A Lesson In Timing Attacks (or, Don't use MessageDigest.isEquals)}
-     *
-     * Thanks for the heads up singpolyma!
-     *
-     * @access public
-     * @param string $x
-     * @param string $y
-     * @return bool
-     */
-    public static function equals($x, $y)
-    {
-        if (strlen($x) != strlen($y)) {
-            return false;
-        }
-
-        $result = 0;
-        for ($i = 0; $i < strlen($x); $i++) {
-            $result |= ord($x[$i]) ^ ord($y[$i]);
-        }
-
-        return $result == 0;
-    }
-
-    /**
      * Parse SSH2-style string
      *
      * Returns either an array or a boolean if $data is malformed.

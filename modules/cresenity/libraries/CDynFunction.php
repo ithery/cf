@@ -10,6 +10,7 @@ class CDynFunction {
     public $type = "defined"; //defined,class,
 
     private function __construct($func) {
+        CCollector::deprecated();
         $this->func = $func;
     }
 

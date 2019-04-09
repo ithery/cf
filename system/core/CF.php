@@ -214,12 +214,12 @@ final class CF {
 
         CFBenchmark::start('system.cf.bootstrap');
         //try to locate bootstrap files for modules 
-//        foreach (CF::modules() as $module) {
-//            $bootstrap_path = DOCROOT . 'modules' . DS . $module;
-//            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-//                include $bootstrap_path . 'bootstrap' . EXT;
-//            }
-//        }
+        foreach (CF::modules() as $module) {
+            $bootstrap_path = DOCROOT . 'modules' . DS . $module . DS;
+            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
+                include $bootstrap_path . 'bootstrap' . EXT;
+            }
+        }
         //try to locate bootstrap files for application 
         $bootstrap_path = DOCROOT . 'application' . DS . CF::app_code() . DS;
         if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
@@ -764,7 +764,9 @@ final class CF {
             $level = CLogger::EMERGENCY;
         }
         if ($level <= CF::$log_threshold) {
-            CLogger::instance()->add($level, $message);
+            if (class_exists('CLogger')) {
+                CLogger::instance()->add($level, $message);
+            }
         }
     }
 
@@ -1174,7 +1176,7 @@ final class CF {
                     }
                 }
                 if ($need_to_log) {
-                    self::log(CLogger::ERROR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
+                    self::log(LOG_ERR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
                 }
             }
 
@@ -2204,7 +2206,7 @@ final class CF {
             } elseif (is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};
             } else {
-                return value($default);
+                return CF::value($default);
             }
         }
         return $target;

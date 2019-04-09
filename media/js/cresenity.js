@@ -100,13 +100,14 @@ jQuery(document).ready(function () {
 
 
 
-// === Tooltips === //
+    // === Tooltips === //
+    /*
     $('.tip').tooltip();
     $('.tip-left').tooltip({placement: 'left'});
     $('.tip-right').tooltip({placement: 'right'});
     $('.tip-top').tooltip({placement: 'top'});
     $('.tip-bottom').tooltip({placement: 'bottom'});
-
+    */
     
 
     // === Fixes the position of buttons group in content header and top user navigation === //

@@ -19,17 +19,19 @@ class CElement_Component_Widget_Header extends CElement_Element {
     protected $actions;
     protected $switcher;
     protected $switcherWrapper;
+    protected $titleWrapper;
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
         $this->icon = "";
         $this->title = "";
+        $this->titleWrapper = $this->addDiv()->addClass('widget-title-wrapper');
     }
 
     public function actions() {
         if ($this->actions == null) {
             $this->actions = CElement_Factory::createList('ActionList', $this->parent->id . '_header');
-            $this->actions->setStyle('widget-action');
+            $this->actions->setStyle('widget-action')->addClass('ml-auto');
             $this->add($this->actions);
         }
         return $this->actions;
@@ -43,10 +45,13 @@ class CElement_Component_Widget_Header extends CElement_Element {
 
     public function build() {
         $this->addClass('widget-title clearfix');
-        if (strlen($this->icon) > 0) {
-            $this->addSpan()->addClass('icon')->addIcon()->setIcon($this->icon);
+        if ($this->actions != null) {
+            $this->addClass('with-elements');
         }
-        $this->addH5()->add($this->title);
+        if (strlen($this->icon) > 0) {
+            $this->titleWrapper->addSpan()->addClass('icon')->addIcon()->setIcon($this->icon);
+        }
+        $this->titleWrapper->addH5()->add($this->title);
     }
 
     public function addSwitcher($id = null) {

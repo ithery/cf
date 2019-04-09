@@ -195,7 +195,16 @@ class CFile {
      * @return int
      */
     public function size($path) {
-        return filesize($path);
+        clearstatcache();
+        $filesize= filesize($path);
+        if($filesize==0 && $this->exists($path)) {
+            //try to get another method
+            $fp = fopen($path, "rb");
+            fseek($fp, 0, SEEK_END);
+            $filesize = ftell($fp);
+            fclose($fp);
+        }
+        return $filesize;
     }
 
     /**

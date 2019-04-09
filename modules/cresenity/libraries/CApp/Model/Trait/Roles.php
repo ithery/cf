@@ -9,8 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CApp_Model_Trait_Roles {
 
-    use CModel_Nested_NestedTrait,
-        CModel_SoftDelete_SoftDeleteTrait;
+    use CModel_Nested_NestedTrait;
 
     public function __construct(array $attributes = array()) {
         parent::__construct($attributes);

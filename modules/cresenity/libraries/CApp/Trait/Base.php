@@ -182,6 +182,15 @@ trait CApp_Trait_Base {
         return 'system';
     }
 
+    public static function roleName() {
+        $app = CApp::instance();
+        $role = $app->role();
+        if ($role != null) {
+            return $role->name;
+        }
+        return '';
+    }
+
     /**
      * Current Date Y-m-d H:i:s format
      * 
@@ -302,8 +311,8 @@ trait CApp_Trait_Base {
         return $pos !== false;
     }
 
-    
     public static function isLogin() {
-        return static::userId()!=null;
+        return static::userId() != null;
     }
+
 }

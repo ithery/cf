@@ -50,7 +50,6 @@ class CElement_List_ActionList extends CElement_List {
             //die($this->style);
         }
         //apply render style to child before render
-
         if (count($this->btn_dropdown_classes) == 0) {
             if ($this->bootstrap >= '3') {
                 $this->btn_dropdown_classes[] = 'btn-primary';
@@ -112,7 +111,7 @@ class CElement_List_ActionList extends CElement_List {
                             ' . $this->label . '
                             <span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu align-left ' . $classes . '">
+                    <ul class="dropdown-menu dropdown-menu-right align-left ' . $classes . '">
 
             ');
         }
