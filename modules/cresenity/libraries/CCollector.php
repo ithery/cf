@@ -120,8 +120,7 @@ class CCollector {
         }
     }
 
-    public static function error($errNo, $errStr, $errFile, $errLine, $errContext = null)
-    {
+    public static function error($errNo, $errStr, $errFile, $errLine, $errContext = null) {
         $data = static::getDataFromError($errNo, $errStr, $errFile, $errLine, $errContext);
         static::put(static::EXCEPTION, $data);
     }
@@ -136,7 +135,7 @@ class CCollector {
         // Start validation of the controller
         $controllerClass = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
         $controllerClass = 'Controller_' . $controllerClass . ucfirst(CFRouter::$controller);
-        $error = get_class($exception);
+        $error = $isDeprecated ? 'Deprecated' : get_class($exception);
         $message = $exception->getMessage();
         $file = $exception->getFile();
         $line = $exception->getLine();
