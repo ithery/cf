@@ -68,7 +68,9 @@ class CElement_Component_Nestable extends CElement_Component {
     }
 
     public function setDataFromModel(CModel $root) {
-
+        /**
+         * NOT DONE
+         */
 
         $orgId = CApp_Base::orgId();
 
@@ -237,14 +239,14 @@ class CElement_Component_Nestable extends CElement_Component {
                         /* config options */
                         maxDepth:0
                     });
-                ")->inc_indent();
+                ")->incIndent();
             } else {
                 $js->appendln("
                     jQuery('#" . $this->id . "').nestable({
                         /* config options */
                         maxDepth:100
                     });
-                ")->inc_indent();
+                ")->incIndent();
             }
             if (strlen($this->input) > 0) {
                 $js->appendln("
@@ -270,7 +272,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
         $js->append($this->js_cell)->br();
 
-        $js->append($this->js_child($indent))->br();
+        $js->append($this->jsChild($indent))->br();
         return $js->text();
     }
 
