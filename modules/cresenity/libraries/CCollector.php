@@ -102,7 +102,9 @@ class CCollector {
                 } catch (Exception $ex) {
                     $data = static::getDataFromException($ex, $isDeprecated = true);
                     if (strlen($message) > 0) {
-                        carr::set_path($data, 'message', carr::path($data, 'message') . ', ' . $message);
+                        $dataArray = json_decode($data, true);
+                        carr::set_path($dataArray, 'message', carr::get($dataArray, 'message') . ', ' . $message);
+                        $data = json_encode($dataArray);
                     }
                     static::put(static::DEPRECATED, $data);
                     unset($ex);
@@ -186,7 +188,7 @@ class CCollector {
         $data['postData'] = $rawPost;
         $data['fileData'] = json_encode($_FILES);
 
-        return json_encode($data);
+        return $data;
     }
 
     private static function getDataFromError($errNo, $errStr, $errFile, $errLine, $errContext = null) {
@@ -229,7 +231,7 @@ class CCollector {
         $data['postData'] = $rawPost;
         $data['fileData'] = json_encode($_FILES);
 
-        return json_encode($data);
+        return $data;
     }
 
 }
