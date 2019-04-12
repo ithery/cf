@@ -6,260 +6,1087 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * CValidation library.
  *
  */
-class CValidation implements ArrayAccess {
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+class CValidation {
+
+    use CValidation_Trait_ValidateAttributeTrait,
+        CValidation_Trait_FormatMessageTrait;
 
     /**
-     * Creates a new CValidation instance.
+     * The Translator implementation.
      *
-     * @param   array   $array  array to use for validation
-     * @return  Validation
+     * @var \Illuminate\Contracts\Translation\Translator
      */
-    public static function factory(array $array) {
-        return new CValidation($array);
-    }
-
-    // Field rules
-    protected $_rules = array();
-    // Rules that are executed even when the value is empty
-    protected $_empty_rules = array('not_empty', 'matches');
-    // Error list, field => rule
-    protected $_errors = array();
-    // Array to validate
-    protected $_data = array();
-    // Bound values
-    protected $_bound = array();
+    protected $translator;
 
     /**
-     * Sets the unique "any field" key and creates an ArrayObject from the
-     * passed array.
+     * The container instance.
      *
-     * @param   array   $array  array to validate
-     * @return  void
+     * @var \Illuminate\Contracts\Container\Container
      */
-    public function __construct(array $array) {
-        $this->_data = $array;
+    protected $container;
+
+    /**
+     * The Presence Verifier implementation.
+     *
+     * @var \Illuminate\Validation\PresenceVerifierInterface
+     */
+    protected $presenceVerifier;
+
+    /**
+     * The failed validation rules.
+     *
+     * @var array
+     */
+    protected $failedRules = [];
+
+    /**
+     * The message bag instance.
+     *
+     * @var \Illuminate\Support\MessageBag
+     */
+    protected $messages;
+
+    /**
+     * The data under validation.
+     *
+     * @var array
+     */
+    protected $data;
+
+    /**
+     * The initial rules provided.
+     *
+     * @var array
+     */
+    protected $initialRules;
+
+    /**
+     * The rules to be applied to the data.
+     *
+     * @var array
+     */
+    protected $rules;
+
+    /**
+     * The current rule that is validating.
+     *
+     * @var string
+     */
+    protected $currentRule;
+
+    /**
+     * The array of wildcard attributes with their asterisks expanded.
+     *
+     * @var array
+     */
+    protected $implicitAttributes = [];
+
+    /**
+     * All of the registered "after" callbacks.
+     *
+     * @var array
+     */
+    protected $after = [];
+
+    /**
+     * The array of custom error messages.
+     *
+     * @var array
+     */
+    public $customMessages = [];
+
+    /**
+     * The array of fallback error messages.
+     *
+     * @var array
+     */
+    public $fallbackMessages = [];
+
+    /**
+     * The array of custom attribute names.
+     *
+     * @var array
+     */
+    public $customAttributes = [];
+
+    /**
+     * The array of custom displayable values.
+     *
+     * @var array
+     */
+    public $customValues = [];
+
+    /**
+     * All of the custom validator extensions.
+     *
+     * @var array
+     */
+    public $extensions = [];
+
+    /**
+     * All of the custom replacer extensions.
+     *
+     * @var array
+     */
+    public $replacers = [];
+
+    /**
+     * The validation rules that may be applied to files.
+     *
+     * @var array
+     */
+    protected $fileRules = [
+        'File', 'Image', 'Mimes', 'Mimetypes', 'Min',
+        'Max', 'Size', 'Between', 'Dimensions',
+    ];
+
+    /**
+     * The validation rules that imply the field is required.
+     *
+     * @var array
+     */
+    protected $implicitRules = [
+        'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout',
+        'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
+    ];
+
+    /**
+     * The validation rules which depend on other fields as parameters.
+     *
+     * @var array
+     */
+    protected $dependentRules = [
+        'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
+        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
+        'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual', 'Gt', 'Lt', 'Gte', 'Lte',
+    ];
+
+    /**
+     * The size related validation rules.
+     *
+     * @var array
+     */
+    protected $sizeRules = ['Size', 'Between', 'Min', 'Max', 'Gt', 'Lt', 'Gte', 'Lte'];
+
+    /**
+     * The numeric related validation rules.
+     *
+     * @var array
+     */
+    protected $numericRules = ['Numeric', 'Integer'];
+
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return void
+     */
+    public function __construct(array $data, array $rules, array $messages = [], array $customAttributes = []) {
+        $this->initialRules = $rules;
+        $this->customMessages = $messages;
+        $this->data = $this->parseData($data);
+        $this->customAttributes = $customAttributes;
+
+        $this->setRules($rules);
+    }
+
+    public static function factory(array $data, array $rules, array $messages = [], array $customAttributes = []) {
+        return new CValidation($data, $rules, $messages, $customAttributes);
     }
 
     /**
-     * Throws an exception because Validation is read-only.
-     * Implements ArrayAccess method.
+     * Parse the data array, converting dots to ->.
      *
-     * @throws  Kohana_Exception
-     * @param   string   $offset    key to set
-     * @param   mixed    $value     value to set
-     * @return  void
+     * @param  array  $data
+     * @return array
      */
-    public function offsetSet($offset, $value) {
-        throw new CF_Exception('Validation objects are read-only.');
-    }
+    public function parseData(array $data) {
+        $newData = [];
 
-    /**
-     * Checks if key is set in array data.
-     * Implements ArrayAccess method.
-     *
-     * @param   string  $offset key to check
-     * @return  bool    whether the key is set
-     */
-    public function offsetExists($offset) {
-        return isset($this->_data[$offset]);
-    }
-
-    /**
-     * Throws an exception because Validation is read-only.
-     * Implements ArrayAccess method.
-     *
-     * @throws  Kohana_Exception
-     * @param   string  $offset key to unset
-     * @return  void
-     */
-    public function offsetUnset($offset) {
-        throw new CF_Exception('Validation objects are read-only.');
-    }
-
-    /**
-     * Gets a value from the array data.
-     * Implements ArrayAccess method.
-     *
-     * @param   string  $offset key to return
-     * @return  mixed   value from array
-     */
-    public function offsetGet($offset) {
-        return $this->_data[$offset];
-    }
-
-    public function rule($field, $rule, array $params = null, $error_message) {
-        if ($params === NULL) {
-            // Default to array(':value')
-            $params = array(':value');
-        }
-        // Store the rule and params for this rule
-        $this->_rules[$field][] = array($rule, $params, $error_message);
-
-        return $this;
-    }
-
-    /**
-     * Add rules using an array.
-     *
-     * @param   string  $field  field name
-     * @param   array   $rules  list of callbacks
-     * @return  $this
-     */
-    public function rules($field, array $rules) {
-        foreach ($rules as $rule) {
-            $this->rule($field, $rule[0], carr::get($rule, 1));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Bind a value to a parameter definition.
-     *
-     *     // This allows you to use :model in the parameter definition of rules
-     *     $validation->bind(':model', $model)
-     *         ->rule('status', 'valid_status', array(':model'));
-     *
-     * @param   string  $key    variable name or an array of variables
-     * @param   mixed   $value  value
-     * @return  $this
-     */
-    public function bind($key, $value = NULL) {
-        if (is_array($key)) {
-            foreach ($key as $name => $value) {
-                $this->_bound[$name] = $value;
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->parseData($value);
             }
-        } else {
-            $this->_bound[$key] = $value;
+
+            // If the data key contains a dot, we will replace it with another character
+            // sequence so it doesn't interfere with dot processing when working with
+            // array based validation rules and array_dot later in the validations.
+            if (cstr::contains($key, '.')) {
+                $newData[str_replace('.', '->', $key)] = $value;
+            } else {
+                $newData[$key] = $value;
+            }
         }
+
+        return $newData;
+    }
+
+    /**
+     * Add an after validation callback.
+     *
+     * @param  callable|string  $callback
+     * @return $this
+     */
+    public function after($callback) {
+        $this->after[] = function () use ($callback) {
+            return call_user_func_array($callback, [$this]);
+        };
 
         return $this;
     }
 
+    /**
+     * Determine if the data passes the validation rules.
+     *
+     * @return bool
+     */
+    public function passes() {
+        $this->messages = new CValidation_MessageBag;
+
+        // We'll spin through each rule, validating the attributes attached to that
+        // rule. Any error messages will be added to the containers with each of
+        // the other error messages, returning true if we don't have messages.
+        foreach ($this->rules as $attribute => $rules) {
+            $attribute = str_replace('\.', '->', $attribute);
+
+            foreach ($rules as $rule) {
+                $this->validateAttribute($attribute, $rule);
+
+                if ($this->shouldStopValidating($attribute)) {
+                    break;
+                }
+            }
+        }
+
+        // Here we will spin through all of the "after" hooks on this validator and
+        // fire them off. This gives the callbacks a chance to perform all kinds
+        // of other validation that needs to get wrapped up in this operation.
+        foreach ($this->after as $after) {
+            call_user_func($after);
+        }
+
+        return $this->messages->isEmpty();
+    }
+
+    /**
+     * Determine if the data fails the validation rules.
+     *
+     * @return bool
+     */
+    public function fails() {
+        return !$this->passes();
+    }
+
+    /**
+     * Run the validator's rules against its data.
+     *
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validate() {
+        if ($this->fails()) {
+            throw new CValidation_Exception($this);
+        }
+
+        $data = CF::collect($this->getData());
+
+        return $data->only(CF::collect($this->getRules())->keys()->map(function ($rule) {
+                            return explode('.', $rule)[0];
+                        })->unique())->toArray();
+    }
+
+    /**
+     * alias of method validate
+     * 
+     * @return array
+     */
     public function check() {
-        // New data set
-        $data = $this->_errors = array();
-
-        // Store the original data because this class should not modify it post-validation
-        $original = $this->_data;
-
-        // Get a list of the expected fields
-        $expected = array_keys($original);
-
-        // Import the rules locally
-        $rules = $this->_rules;
-
-        foreach ($expected as $field) {
-            // Use the submitted value or NULL if no data exists
-            $data[$field] = carr::get($this, $field);
-
-            if (isset($rules[TRUE])) {
-                if (!isset($rules[$field])) {
-                    // Initialize the rules for this field
-                    $rules[$field] = array();
-                }
-
-                // Append the rules
-                $rules[$field] = array_merge($rules[$field], $rules[TRUE]);
-            }
-        }
-
-        // Overload the current array with the new one
-        $this->_data = $data;
-
-        // Remove the rules that apply to every field
-        unset($rules[TRUE]);
-
-        // Bind the validation object to :validation
-        $this->bind(':validation', $this);
-        // Bind the data to :data
-        $this->bind(':data', $this->_data);
-
-        // Execute the rules
-        foreach ($rules as $field => $set) {
-            // Get the field value
-            $value = carr::path($this->_data,$field);
-
-            // Bind the field name and value to :field and :value respectively
-            $this->bind(array
-                (
-                ':field' => $field,
-                ':value' => $value,
-            ));
-
-            foreach ($set as $array) {
-                // Rules are defined as array($rule, $params)
-                list($rule, $params, $error_message) = $array;
-
-                foreach ($params as $key => $param) {
-                    if (is_string($param) AND array_key_exists($param, $this->_bound)) {
-                        // Replace with bound value
-                        $params[$key] = $this->_bound[$param];
-                    }
-                }
-                
-                if(is_callable($rule)) {
-                    $passed = call_user_func_array($rule, $params);
-                } elseif (method_exists('CValidator', $rule)) {
-                    // Use a method in this object
-                    $method = new ReflectionMethod('CValidator', $rule);
-
-                    // Call static::$rule($this[$field], $param, ...) with Reflection
-                    $passed = $method->invokeArgs(NULL, $params);
-                } elseif (strpos($rule, '::') === FALSE) {
-                    // Use a function call
-                    $function = new ReflectionFunction($rule);
-
-                    // Call $function($this[$field], $param, ...) with Reflection
-                    $passed = $function->invokeArgs($params);
-                } else {
-                    // Split the class and method of the rule
-                    list($class, $method) = explode('::', $rule, 2);
-
-                    // Use a static method call
-                    $method = new ReflectionMethod($class, $method);
-
-                    // Call $Class::$method($this[$field], $param, ...) with Reflection
-                    $passed = $method->invokeArgs(NULL, $params);
-                }
-
-                // Ignore return values from rules when the field is empty
-                if (!in_array($rule, $this->_empty_rules) AND ! CValidator::not_empty($value))
-                    continue;
-
-                if ($passed === FALSE AND $error_message !== FALSE) {
-                    // Add the error_message to the errors 
-                    
-                    $this->_errors[$field] = $error_message;
-
-                    // This field has an error, stop executing rules
-                    break;
-                } elseif (isset($this->_errors[$field])) {
-                    // The callback added the error manually, stop checking rules
-                    break;
-                }
-            }
-        }
-
-        // Restore the data to its original form
-        $this->_data = $original;
-
-
-        return empty($this->_errors);
+        return $this->validate();
     }
 
     /**
-     * Returns the error messages.
-     * @return  array
+     * Validate a given attribute against a rule.
+     *
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @return void
+     */
+    protected function validateAttribute($attribute, $rule) {
+        $this->currentRule = $rule;
+
+        list($rule, $parameters) = CValidation_RuleParser::parse($rule);
+
+        if ($rule == '') {
+            return;
+        }
+
+        // First we will get the correct keys for the given attribute in case the field is nested in
+        // an array. Then we determine if the given rule accepts other field names as parameters.
+        // If so, we will replace any asterisks found in the parameters with the correct keys.
+        if (($keys = $this->getExplicitKeys($attribute)) &&
+                $this->dependsOnOtherFields($rule)) {
+            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+        }
+
+        $value = $this->getValue($attribute);
+
+        // If the attribute is a file, we will verify that the file upload was actually successful
+        // and if it wasn't we will add a failure for the attribute. Files may not successfully
+        // upload if they are too large based on PHP's settings so we will bail in this case.
+        if ($value instanceof UploadedFile && !$value->isValid() &&
+                $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
+        ) {
+            return $this->addFailure($attribute, 'uploaded', []);
+        }
+
+        // If we have made it this far we will make sure the attribute is validatable and if it is
+        // we will call the validation method with the attribute. If a method returns false the
+        // attribute is invalid and we will add a failure message for this failing attribute.
+        $validatable = $this->isValidatable($rule, $attribute, $value);
+
+        if ($rule instanceof RuleContract) {
+            return $validatable ? $this->validateUsingCustomRule($attribute, $value, $rule) : null;
+        }
+
+        $method = "validate{$rule}";
+
+        if ($validatable && !$this->$method($attribute, $value, $parameters, $this)) {
+            $this->addFailure($attribute, $rule, $parameters);
+        }
+    }
+
+    /**
+     * Determine if the given rule depends on other fields.
+     *
+     * @param  string  $rule
+     * @return bool
+     */
+    protected function dependsOnOtherFields($rule) {
+        return in_array($rule, $this->dependentRules);
+    }
+
+    /**
+     * Get the explicit keys from an attribute flattened with dot notation.
+     *
+     * E.g. 'foo.1.bar.spark.baz' -> [1, 'spark'] for 'foo.*.bar.*.baz'
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function getExplicitKeys($attribute) {
+        $pattern = str_replace('\*', '([^\.]+)', preg_quote($this->getPrimaryAttribute($attribute), '/'));
+
+        if (preg_match('/^' . $pattern . '/', $attribute, $keys)) {
+            array_shift($keys);
+
+            return $keys;
+        }
+
+        return [];
+    }
+
+    /**
+     * Get the primary attribute name.
+     *
+     * For example, if "name.0" is given, "name.*" will be returned.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function getPrimaryAttribute($attribute) {
+        foreach ($this->implicitAttributes as $unparsed => $parsed) {
+            if (in_array($attribute, $parsed)) {
+                return $unparsed;
+            }
+        }
+
+        return $attribute;
+    }
+
+    /**
+     * Replace each field parameter which has asterisks with the given keys.
+     *
+     * @param  array  $parameters
+     * @param  array  $keys
+     * @return array
+     */
+    protected function replaceAsterisksInParameters(array $parameters, array $keys) {
+        return array_map(function ($field) use ($keys) {
+            return vsprintf(str_replace('*', '%s', $field), $keys);
+        }, $parameters);
+    }
+
+    /**
+     * Determine if the attribute is validatable.
+     *
+     * @param  object|string  $rule
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function isValidatable($rule, $attribute, $value) {
+        return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
+                $this->passesOptionalCheck($attribute) &&
+                $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
+                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
+    }
+
+    /**
+     * Determine if the field is present, or the rule implies required.
+     *
+     * @param  object|string  $rule
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function presentOrRuleIsImplicit($rule, $attribute, $value) {
+        if (is_string($value) && trim($value) === '') {
+            return $this->isImplicit($rule);
+        }
+
+        return $this->validatePresent($attribute, $value) ||
+                $this->isImplicit($rule);
+    }
+
+    /**
+     * Determine if a given rule implies the attribute is required.
+     *
+     * @param  object|string  $rule
+     * @return bool
+     */
+    protected function isImplicit($rule) {
+        return $rule instanceof ImplicitRule ||
+                in_array($rule, $this->implicitRules);
+    }
+
+    /**
+     * Determine if the attribute passes any optional check.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function passesOptionalCheck($attribute) {
+        if (!$this->hasRule($attribute, ['Sometimes'])) {
+            return true;
+        }
+
+        $data = ValidationData::initializeAndGatherData($attribute, $this->data);
+
+        return array_key_exists($attribute, $data) || array_key_exists($attribute, $this->data);
+    }
+
+    /**
+     * Determine if the attribute fails the nullable check.
+     *
+     * @param  string  $rule
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function isNotNullIfMarkedAsNullable($rule, $attribute) {
+        if ($this->isImplicit($rule) || !$this->hasRule($attribute, ['Nullable'])) {
+            return true;
+        }
+
+        return !is_null(Arr::get($this->data, $attribute, 0));
+    }
+
+    /**
+     * Determine if it's a necessary presence validation.
+     *
+     * This is to avoid possible database type comparison errors.
+     *
+     * @param  string  $rule
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute) {
+        return in_array($rule, ['Unique', 'Exists']) ? !$this->messages->has($attribute) : true;
+    }
+
+    /**
+     * Validate an attribute using a custom rule object.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  \Illuminate\Contracts\Validation\Rule  $rule
+     * @return void
+     */
+    protected function validateUsingCustomRule($attribute, $value, $rule) {
+        if (!$rule->passes($attribute, $value)) {
+            $this->failedRules[$attribute][get_class($rule)] = [];
+
+            $this->messages->add($attribute, $this->makeReplacements(
+                            $rule->message(), $attribute, get_class($rule), []
+            ));
+        }
+    }
+
+    /**
+     * Check if we should stop further validations on a given attribute.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function shouldStopValidating($attribute) {
+        if ($this->hasRule($attribute, ['Bail'])) {
+            return $this->messages->has($attribute);
+        }
+
+        if (isset($this->failedRules[$attribute]) &&
+                array_key_exists('uploaded', $this->failedRules[$attribute])) {
+            return true;
+        }
+
+        // In case the attribute has any rule that indicates that the field is required
+        // and that rule already failed then we should stop validation at this point
+        // as now there is no point in calling other rules with this field empty.
+        return $this->hasRule($attribute, $this->implicitRules) &&
+                isset($this->failedRules[$attribute]) &&
+                array_intersect(array_keys($this->failedRules[$attribute]), $this->implicitRules);
+    }
+
+    /**
+     * Add a failed rule and error message to the collection.
+     *
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return void
+     */
+    protected function addFailure($attribute, $rule, $parameters) {
+        $this->messages->add($attribute, $this->makeReplacements(
+                        $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
+        ));
+
+        $this->failedRules[$attribute][$rule] = $parameters;
+    }
+
+    /**
+     * Returns the data which was valid.
+     *
+     * @return array
+     */
+    public function valid() {
+        if (!$this->messages) {
+            $this->passes();
+        }
+
+        return array_diff_key(
+                $this->data, $this->attributesThatHaveMessages()
+        );
+    }
+
+    /**
+     * Returns the data which was invalid.
+     *
+     * @return array
+     */
+    public function invalid() {
+        if (!$this->messages) {
+            $this->passes();
+        }
+
+        return array_intersect_key(
+                $this->data, $this->attributesThatHaveMessages()
+        );
+    }
+
+    /**
+     * Generate an array of all attributes that have messages.
+     *
+     * @return array
+     */
+    protected function attributesThatHaveMessages() {
+        return collect($this->messages()->toArray())->map(function ($message, $key) {
+                    return explode('.', $key)[0];
+                })->unique()->flip()->all();
+    }
+
+    /**
+     * Get the failed validation rules.
+     *
+     * @return array
+     */
+    public function failed() {
+        return $this->failedRules;
+    }
+
+    /**
+     * Get the message container for the validator.
+     *
+     * @return \Illuminate\Support\MessageBag
+     */
+    public function messages() {
+        if (!$this->messages) {
+            $this->passes();
+        }
+
+        return $this->messages;
+    }
+
+    /**
+     * An alternative more semantic shortcut to the message container.
+     *
+     * @return \Illuminate\Support\MessageBag
      */
     public function errors() {
-
-        // Return the error list
-        return $this->_errors;
+        return $this->messages();
     }
 
-    public function first_error() {
-        return array_shift($this->_errors);
+    /**
+     * Get the messages for the instance.
+     *
+     * @return \Illuminate\Support\MessageBag
+     */
+    public function getMessageBag() {
+        return $this->messages();
+    }
+
+    /**
+     * Determine if the given attribute has a rule in the given set.
+     *
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @return bool
+     */
+    public function hasRule($attribute, $rules) {
+        return !is_null($this->getRule($attribute, $rules));
+    }
+
+    /**
+     * Get a rule and its parameters for a given attribute.
+     *
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @return array|null
+     */
+    protected function getRule($attribute, $rules) {
+        if (!array_key_exists($attribute, $this->rules)) {
+            return;
+        }
+
+        $rules = (array) $rules;
+
+        foreach ($this->rules[$attribute] as $rule) {
+            list($rule, $parameters) = CValidation_RuleParser::parse($rule);
+
+            if (in_array($rule, $rules)) {
+                return [$rule, $parameters];
+            }
+        }
+    }
+
+    /**
+     * Get the data under validation.
+     *
+     * @return array
+     */
+    public function attributes() {
+        return $this->getData();
+    }
+
+    /**
+     * Get the data under validation.
+     *
+     * @return array
+     */
+    public function getData() {
+        return $this->data;
+    }
+
+    /**
+     * Set the data under validation.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function setData(array $data) {
+        $this->data = $this->parseData($data);
+
+        $this->setRules($this->initialRules);
+
+        return $this;
+    }
+
+    /**
+     * Get the value of a given attribute.
+     *
+     * @param  string  $attribute
+     * @return mixed
+     */
+    protected function getValue($attribute) {
+        return carr::get($this->data, $attribute);
+    }
+
+    /**
+     * Get the validation rules.
+     *
+     * @return array
+     */
+    public function getRules() {
+        return $this->rules;
+    }
+
+    /**
+     * Set the validation rules.
+     *
+     * @param  array  $rules
+     * @return $this
+     */
+    public function setRules(array $rules) {
+        $this->initialRules = $rules;
+
+        $this->rules = [];
+
+        $this->addRules($rules);
+
+        return $this;
+    }
+
+    /**
+     * Parse the given rules and merge them into current rules.
+     *
+     * @param  array  $rules
+     * @return void
+     */
+    public function addRules($rules) {
+        // The primary purpose of this parser is to expand any "*" rules to the all
+        // of the explicit rules needed for the given data. For example the rule
+        // names.* would get expanded to names.0, names.1, etc. for this data.
+        $response = (new CValidation_RuleParser($this->data))
+                ->explode($rules);
+
+        $this->rules = array_merge_recursive(
+                $this->rules, $response->rules
+        );
+
+        $this->implicitAttributes = array_merge(
+                $this->implicitAttributes, $response->implicitAttributes
+        );
+    }
+
+    /**
+     * Add conditions to a given field based on a Closure.
+     *
+     * @param  string|array  $attribute
+     * @param  string|array  $rules
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function sometimes($attribute, $rules, callable $callback) {
+        $payload = new Fluent($this->getData());
+
+        if (call_user_func($callback, $payload)) {
+            foreach ((array) $attribute as $key) {
+                $this->addRules([$key => $rules]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Register an array of custom validator extensions.
+     *
+     * @param  array  $extensions
+     * @return void
+     */
+    public function addExtensions(array $extensions) {
+        if ($extensions) {
+            $keys = array_map('cstr::snake', array_keys($extensions));
+
+            $extensions = array_combine($keys, array_values($extensions));
+        }
+
+        $this->extensions = array_merge($this->extensions, $extensions);
+    }
+
+    /**
+     * Register an array of custom implicit validator extensions.
+     *
+     * @param  array  $extensions
+     * @return void
+     */
+    public function addImplicitExtensions(array $extensions) {
+        $this->addExtensions($extensions);
+
+        foreach ($extensions as $rule => $extension) {
+            $this->implicitRules[] = cstr::studly($rule);
+        }
+    }
+
+    /**
+     * Register an array of custom implicit validator extensions.
+     *
+     * @param  array  $extensions
+     * @return void
+     */
+    public function addDependentExtensions(array $extensions) {
+        $this->addExtensions($extensions);
+
+        foreach ($extensions as $rule => $extension) {
+            $this->dependentRules[] = cstr::studly($rule);
+        }
+    }
+
+    /**
+     * Register a custom validator extension.
+     *
+     * @param  string  $rule
+     * @param  \Closure|string  $extension
+     * @return void
+     */
+    public function addExtension($rule, $extension) {
+        $this->extensions[cstr::snake($rule)] = $extension;
+    }
+
+    /**
+     * Register a custom implicit validator extension.
+     *
+     * @param  string   $rule
+     * @param  \Closure|string  $extension
+     * @return void
+     */
+    public function addImplicitExtension($rule, $extension) {
+        $this->addExtension($rule, $extension);
+
+        $this->implicitRules[] = Str::studly($rule);
+    }
+
+    /**
+     * Register a custom dependent validator extension.
+     *
+     * @param  string   $rule
+     * @param  \Closure|string  $extension
+     * @return void
+     */
+    public function addDependentExtension($rule, $extension) {
+        $this->addExtension($rule, $extension);
+
+        $this->dependentRules[] = Str::studly($rule);
+    }
+
+    /**
+     * Register an array of custom validator message replacers.
+     *
+     * @param  array  $replacers
+     * @return void
+     */
+    public function addReplacers(array $replacers) {
+        if ($replacers) {
+            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
+
+            $replacers = array_combine($keys, array_values($replacers));
+        }
+
+        $this->replacers = array_merge($this->replacers, $replacers);
+    }
+
+    /**
+     * Register a custom validator message replacer.
+     *
+     * @param  string  $rule
+     * @param  \Closure|string  $replacer
+     * @return void
+     */
+    public function addReplacer($rule, $replacer) {
+        $this->replacers[Str::snake($rule)] = $replacer;
+    }
+
+    /**
+     * Set the custom messages for the validator.
+     *
+     * @param  array  $messages
+     * @return $this
+     */
+    public function setCustomMessages(array $messages) {
+        $this->customMessages = array_merge($this->customMessages, $messages);
+
+        return $this;
+    }
+
+    /**
+     * Set the custom attributes on the validator.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function setAttributeNames(array $attributes) {
+        $this->customAttributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Add custom attributes to the validator.
+     *
+     * @param  array  $customAttributes
+     * @return $this
+     */
+    public function addCustomAttributes(array $customAttributes) {
+        $this->customAttributes = array_merge($this->customAttributes, $customAttributes);
+
+        return $this;
+    }
+
+    /**
+     * Set the custom values on the validator.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function setValueNames(array $values) {
+        $this->customValues = $values;
+
+        return $this;
+    }
+
+    /**
+     * Add the custom values for the validator.
+     *
+     * @param  array  $customValues
+     * @return $this
+     */
+    public function addCustomValues(array $customValues) {
+        $this->customValues = array_merge($this->customValues, $customValues);
+
+        return $this;
+    }
+
+    /**
+     * Set the fallback messages for the validator.
+     *
+     * @param  array  $messages
+     * @return void
+     */
+    public function setFallbackMessages(array $messages) {
+        $this->fallbackMessages = $messages;
+    }
+
+    /**
+     * Get the Presence Verifier implementation.
+     *
+     * @return \Illuminate\Validation\PresenceVerifierInterface
+     *
+     * @throws \RuntimeException
+     */
+    public function getPresenceVerifier() {
+        if (!isset($this->presenceVerifier)) {
+            throw new RuntimeException('Presence verifier has not been set.');
+        }
+
+        return $this->presenceVerifier;
+    }
+
+    /**
+     * Get the Presence Verifier implementation.
+     *
+     * @param  string  $connection
+     * @return \Illuminate\Validation\PresenceVerifierInterface
+     *
+     * @throws \RuntimeException
+     */
+    protected function getPresenceVerifierFor($connection) {
+        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
+            $verifier->setConnection($connection);
+        });
+    }
+
+    /**
+     * Set the Presence Verifier implementation.
+     *
+     * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+     * @return void
+     */
+    public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier) {
+        $this->presenceVerifier = $presenceVerifier;
+    }
+
+    /**
+     * Get the Translator implementation.
+     *
+     * @return \Illuminate\Contracts\Translation\Translator
+     */
+    public function getTranslator() {
+        return $this->translator;
+    }
+
+    /**
+     * Set the Translator implementation.
+     *
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @return void
+     */
+    public function setTranslator(Translator $translator) {
+        $this->translator = $translator;
+    }
+
+    /**
+     * Set the IoC container instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return void
+     */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
+    /**
+     * Call a custom validator extension.
+     *
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return bool|null
+     */
+    protected function callExtension($rule, $parameters) {
+        $callback = $this->extensions[$rule];
+
+        if (is_callable($callback)) {
+            return call_user_func_array($callback, $parameters);
+        } elseif (is_string($callback)) {
+            return $this->callClassBasedExtension($callback, $parameters);
+        }
+    }
+
+    /**
+     * Call a class based validator extension.
+     *
+     * @param  string  $callback
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function callClassBasedExtension($callback, $parameters) {
+        list($class, $method) = cstr::parseCallback($callback, 'validate');
+
+        return call_user_func_array([$this->container->make($class), $method], $parameters);
+    }
+
+    /**
+     * Handle dynamic calls to class methods.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters) {
+        $rule = cstr::snake(substr($method, 8));
+
+        if (isset($this->extensions[$rule])) {
+            return $this->callExtension($rule, $parameters);
+        }
+
+        throw new BadMethodCallException(sprintf(
+                'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 
 }
