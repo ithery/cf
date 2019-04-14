@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 12, 2019, 6:02:29 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CDaemon_Job_Plugin_ProcessManager extends CDaemon_Job_PluginAbstract {
+class CDaemon_Service_Job_Plugin_ProcessManager extends CDaemon_Service_Job_PluginAbstract {
 
     /**
      * The length (in seconds) of the rolling window used to detect process churn

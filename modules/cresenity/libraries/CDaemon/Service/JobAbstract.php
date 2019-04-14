@@ -853,19 +853,19 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
      * @return CDaemon_PluginAbstract Returns an instance of the plugin
      * @throws Exception
      */
-    protected function addPlugin($alias, CDaemon_PluginAbstract $instance = null) {
+    protected function addPlugin($alias, CDaemon_Service_Job_PluginAbstract $instance = null) {
         $this->checkPluginAlias($alias);
         if ($instance === null) {
             // This if wouldn't be necessary if /Lock lived inside /Plugin.
             // Now that Locks are plugins in every other way, maybe it should be moved. OTOH, do we really need 4
             // levels of directory depth in a project with like 10 files...?
             if (substr(strtolower($alias), 0, 5) == 'lock_')
-                $class = 'CDaemon_' . ucfirst($alias);
+                $class = 'CDaemon_Service_Job_' . ucfirst($alias);
             else
-                $class = 'CDaemon_Plugin_' . ucfirst($alias);
+                $class = 'CDaemon_Service_Job_Plugin_' . ucfirst($alias);
             if (class_exists($class, true)) {
                 $interfaces = class_implements($class, true);
-                if (is_array($interfaces) && isset($interfaces['CDaemon_PluginInterface'])) {
+                if (is_array($interfaces) && isset($interfaces['CDaemon_Service_Job_PluginInterface'])) {
                     $instance = new $class($this);
                 }
             }
