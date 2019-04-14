@@ -138,9 +138,9 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     public function first($key = null, $format = null) {
         $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
-        $firstMessage = Arr::first($messages, null, '');
+        $firstMessage = carr::first($messages, null, '');
 
-        return is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
+        return is_array($firstMessage) ? carr::first($firstMessage) : $firstMessage;
     }
 
     /**
@@ -160,7 +160,7 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
             );
         }
 
-        if (Str::contains($key, '*')) {
+        if (cstr::contains($key, '*')) {
             return $this->getMessagesForWildcardKey($key, $format);
         }
 
@@ -175,9 +175,9 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
      * @return array
      */
     protected function getMessagesForWildcardKey($key, $format) {
-        return collect($this->messages)
+        return CF::collect($this->messages)
                         ->filter(function ($messages, $messageKey) use ($key) {
-                            return Str::is($key, $messageKey);
+                            return cstr::is($key, $messageKey);
                         })
                         ->map(function ($messages, $messageKey) use ($format) {
                             return $this->transform(
@@ -223,7 +223,7 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
      * @return array
      */
     protected function transform($messages, $format, $messageKey) {
-        return collect((array) $messages)
+        return CF::collect((array) $messages)
                         ->map(function ($message) use ($format, $messageKey) {
                             // We will simply spin through the given messages and transform each one
                             // replacing the :message place holder with the real message allowing

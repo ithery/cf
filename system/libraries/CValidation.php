@@ -30,7 +30,7 @@ class CValidation {
     /**
      * The Presence Verifier implementation.
      *
-     * @var \Illuminate\Validation\PresenceVerifierInterface
+     * @var CValidation_PresenceVerifierInterface
      */
     protected $presenceVerifier;
 
@@ -288,7 +288,7 @@ class CValidation {
      *
      * @return array
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws CValidation_Exception
      */
     public function validate() {
         if ($this->fails()) {
@@ -308,7 +308,10 @@ class CValidation {
      * @return array
      */
     public function check() {
-        return $this->validate();
+        $pass = true;
+        if ($this->fails()) {
+            $pass = false;
+        }
     }
 
     /**
@@ -462,7 +465,7 @@ class CValidation {
      * @return bool
      */
     protected function isImplicit($rule) {
-        return $rule instanceof ImplicitRule ||
+        return $rule instanceof CValidation_RuleImplicitInterface ||
                 in_array($rule, $this->implicitRules);
     }
 
@@ -477,7 +480,7 @@ class CValidation {
             return true;
         }
 
-        $data = ValidationData::initializeAndGatherData($attribute, $this->data);
+        $data = CValidation_Data::initializeAndGatherData($attribute, $this->data);
 
         return array_key_exists($attribute, $data) || array_key_exists($attribute, $this->data);
     }
@@ -973,13 +976,14 @@ class CValidation {
     /**
      * Get the Presence Verifier implementation.
      *
-     * @return \Illuminate\Validation\PresenceVerifierInterface
+     * @return CValdation_PresenceVerifierInterface
      *
      * @throws \RuntimeException
      */
     public function getPresenceVerifier() {
         if (!isset($this->presenceVerifier)) {
-            throw new RuntimeException('Presence verifier has not been set.');
+            $this->presenceVerifier = new CValidation_PresenceVerifier_Database(CDatabase::instance());
+            //throw new RuntimeException('Presence verifier has not been set.');
         }
 
         return $this->presenceVerifier;
@@ -994,18 +998,18 @@ class CValidation {
      * @throws \RuntimeException
      */
     protected function getPresenceVerifierFor($connection) {
-        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
-            $verifier->setConnection($connection);
-        });
+        return CF::tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
+                    $verifier->setConnection($connection);
+                });
     }
 
     /**
      * Set the Presence Verifier implementation.
      *
-     * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+     * @param  CValidation_PresenceVerifierInterface  $presenceVerifier
      * @return void
      */
-    public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier) {
+    public function setPresenceVerifier(CValidation_PresenceVerifierInterface $presenceVerifier) {
         $this->presenceVerifier = $presenceVerifier;
     }
 

@@ -398,7 +398,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
         $this->requireParameterCount(1, $parameters, 'different');
 
         foreach ($parameters as $parameter) {
-            $other = Arr::get($this->data, $parameter);
+            $other = carr::get($this->data, $parameter);
 
             if (is_null($other) || $value === $other) {
                 return false;
@@ -525,7 +525,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
 
         $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
 
-        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $pattern) {
+        $data = carr::where(carr::dot($attributeData), function ($value, $key) use ($attribute, $pattern) {
                     return $key != $attribute && (bool) preg_match('#^' . $pattern . '\z#u', $key);
                 });
 
@@ -697,7 +697,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
      * @return array
      */
     protected function parseTable($table) {
-        return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
+        return cstr::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
     }
 
     /**
@@ -718,7 +718,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
      * @return string
      */
     public function guessColumnForQuery($attribute) {
-        if (in_array($attribute, Arr::collapse($this->implicitAttributes)) && !is_numeric($last = last(explode('.', $attribute)))) {
+        if (in_array($attribute, carr::collapse($this->implicitAttributes)) && !is_numeric($last = last(explode('.', $attribute)))) {
             return $last;
         }
 
@@ -762,7 +762,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
      * @return bool
      */
     public function validateFilled($attribute, $value) {
-        if (Arr::has($this->data, $attribute)) {
+        if (carr::has($this->data, $attribute)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -909,12 +909,12 @@ trait CValidation_Trait_ValidateAttributeTrait {
     public function validateInArray($attribute, $value, $parameters) {
         $this->requireParameterCount(1, $parameters, 'in_array');
 
-        $explicitPath = ValidationData::getLeadingExplicitAttributePath($parameters[0]);
+        $explicitPath = CValidation_Data::getLeadingExplicitAttributePath($parameters[0]);
 
-        $attributeData = ValidationData::extractDataFromPath($explicitPath, $this->data);
+        $attributeData = CValidation_Data::extractDataFromPath($explicitPath, $this->data);
 
-        $otherValues = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($parameters) {
-                    return Str::is($parameters[0], $key);
+        $otherValues = carr::where(carr::dot($attributeData), function ($value, $key) use ($parameters) {
+                    return cstr::is($parameters[0], $key);
                 });
 
         return in_array($value, $otherValues);
@@ -1116,7 +1116,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
      * @return bool
      */
     public function validatePresent($attribute, $value) {
-        return Arr::has($this->data, $attribute);
+        return carr::has($this->data, $attribute);
     }
 
     /**
@@ -1187,7 +1187,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
     public function validateRequiredIf($attribute, $value, $parameters) {
         $this->requireParameterCount(2, $parameters, 'required_if');
 
-        $other = Arr::get($this->data, $parameters[0]);
+        $other = carr::get($this->data, $parameters[0]);
 
         $values = array_slice($parameters, 1);
 
@@ -1231,7 +1231,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
     public function validateRequiredUnless($attribute, $value, $parameters) {
         $this->requireParameterCount(2, $parameters, 'required_unless');
 
-        $data = Arr::get($this->data, $parameters[0]);
+        $data = carr::get($this->data, $parameters[0]);
 
         $values = array_slice($parameters, 1);
 
@@ -1349,7 +1349,7 @@ trait CValidation_Trait_ValidateAttributeTrait {
     public function validateSame($attribute, $value, $parameters) {
         $this->requireParameterCount(1, $parameters, 'same');
 
-        $other = Arr::get($this->data, $parameters[0]);
+        $other = carr::get($this->data, $parameters[0]);
 
         return $value === $other;
     }
