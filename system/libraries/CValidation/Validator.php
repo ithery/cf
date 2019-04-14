@@ -46,7 +46,7 @@ class CValidation_Validator {
     /**
      * The message bag instance.
      *
-     * @var \Illuminate\Support\MessageBag
+     * @var CValidation_MessageBag
      */
     protected $messages;
 
@@ -194,7 +194,7 @@ class CValidation_Validator {
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
-        $this->translator = new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(),DOCROOT.'system/i18n'));
+        $this->translator = new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), DOCROOT . 'system/i18n'));
         $this->setRules($rules);
     }
 
@@ -1091,5 +1091,7 @@ class CValidation_Validator {
                 'Method %s::%s does not exist.', static::class, $method
         ));
     }
+
+    
 
 }

@@ -13,4 +13,19 @@ trait CTrait_Compat_Validation_Validator {
         return $this->errors()->first();
     }
 
+    public function rule($attributeName, $rule, $bind = null, $customMessage = null) {
+        $rules = $this->getRules();
+        if ($rule == 'not_empty') {
+            $rule = 'required';
+        }
+        if (isset($rules[$attributeName])) {
+            $rules[$attributeName] .= '|' . $rule;
+        } else {
+            $rules[$attributeName] = $rule;
+        }
+        $this->setRules($rules);
+        $this->customMessages[$attributeName . '.' . $rule] = $customMessage;
+        return $this;
+    }
+
 }
