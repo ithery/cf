@@ -11,8 +11,7 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
 
     protected $startTime;
     protected $shutdown = false;
-    protected $parent = true;
-    protected $parentPid = null;
+   
     protected $isRecoverWorkers = false;
     protected $isDebugWorkers = false;
     protected $terminateLimit = 20;
@@ -85,17 +84,8 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
      */
     protected $autoRestartInterval = 43200;
 
-    /**
-     * Process ID
-     * @var integer
-     */
-    private $pid;
-
-    /**
-     * Array of worker aliases
-     * @var Array
-     */
-    private $workers = array();
+   
+ 
 
     /**
      * Array of plugin aliases
@@ -130,8 +120,6 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
     protected function setupWorkers() {
         
     }
-
-    
 
     /**
      * Ensure that essential runtime conditions are met.
@@ -452,17 +440,6 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
         }
         // Parent Process - Return the newly created Core_Lib_Process object
         return $proc;
-    }
-
-    public function getConfig($key) {
-        return carr::get($this->config, $key);
-    }
-
-    public function debug($message, $label = '') {
-        if ($this->debug) {
-            return;
-        }
-        $this->log($message, $label);
     }
 
     /**

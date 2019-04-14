@@ -246,20 +246,6 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
     public static $stdoutFile = '/dev/null';
 
     /**
-     * The file to store master process PID.
-     *
-     * @var string
-     */
-    public static $pidFile = '';
-
-    /**
-     * Log file.
-     *
-     * @var mixed
-     */
-    public static $logFile = '';
-
-    /**
      * Global event loop.
      *
      * @var Events\EventInterface
@@ -287,12 +273,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
      */
     public static $eventLoopClass = '';
 
-    /**
-     * The PID of master process.
-     *
-     * @var int
-     */
-    protected static $_masterPid = 0;
+  
 
     /**
      * Listening socket.
@@ -315,20 +296,8 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
      */
     protected $_context = null;
 
-    /**
-     * All worker instances.
-     *
-     * @var Worker[]
-     */
-    protected static $_workers = array();
-
-    /**
-     * All worker processes pid.
-     * The format is like this [worker_id=>[pid=>pid, pid=>pid, ..], ..]
-     *
-     * @var array
-     */
-    protected static $_pidMap = array();
+   
+    
 
     /**
      * All worker processes waiting for restart.
@@ -518,9 +487,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
      * @return void
      */
     protected static function init() {
-        $this->workerId = spl_object_hash($this);
-        static::$_workers[$this->workerId] = $this;
-        static::$_pidMap[$this->workerId] = array();
+       
 
         // Start file.
         $backtrace = debug_backtrace();
@@ -933,22 +900,32 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             return;
         }
         umask(0);
+        $this->pid = getmypid();
         $pid = pcntl_fork();
         if (-1 === $pid) {
             throw new Exception('fork fail');
         } elseif ($pid > 0) {
             exit(0);
         }
+        $this->pid = getmypid(); // We have a new pid now
+        $pidFile = $this->pidFile;
+
+        $handle = @fopen($pidFile, 'w');
+        if (!$handle) {
+            $this->showHelp('Unable to write PID to ' . $this->pidFile);
+        }
+        fwrite($handle, $this->pid);
+        fclose($handle);
         if (-1 === posix_setsid()) {
             throw new Exception("setsid fail");
         }
-        // Fork again avoid SVR4 system regain the control of terminal.
-        $pid = pcntl_fork();
-        if (-1 === $pid) {
-            throw new Exception("fork fail");
-        } elseif (0 !== $pid) {
-            exit(0);
-        }
+//        // Fork again avoid SVR4 system regain the control of terminal.
+//        $pid = pcntl_fork();
+//        if (-1 === $pid) {
+//            throw new Exception("fork fail");
+//        } elseif (0 !== $pid) {
+//            exit(0);
+//        }
     }
 
     /**
@@ -992,7 +969,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             return;
         }
         static::$_masterPid = posix_getpid();
-        if (false === file_put_contents(static::$pidFile, static::$_masterPid)) {
+        if (false === file_put_contents(static::$pidFile, static::$parentPid)) {
             throw new Exception('can not save pid to ' . static::$pidFile);
         }
     }
@@ -1507,11 +1484,13 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
                     Timer::add(static::KILL_WORKER_TIMER_TIME, 'posix_kill', array($worker_pid, SIGKILL), false);
                 }
             }
-            Timer::add(1, "\\Workerman\\static::checkIfChildRunning");
+            CDaemon_Service_Listener_Timer::add(1, "CDaemon_Service_ListenerAbstract::checkIfChildRunning");
             // Remove statistics file.
             if (is_file(static::$_statisticsFile)) {
                 @unlink(static::$_statisticsFile);
             }
+            $this->log('Unlink PID:' . $this->pidFile);
+            unlink($this->pidFile);
         } // For child processes.
         else {
             // Execute exit.
