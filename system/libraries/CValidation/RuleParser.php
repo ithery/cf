@@ -94,13 +94,13 @@ class CValidation_RuleParser {
      */
     protected function prepareRule($rule) {
         if ($rule instanceof Closure) {
-            $rule = new ClosureValidationRule($rule);
+            $rule = new CValidation_ClosureValidationRule($rule);
         }
 
         if (!is_object($rule) ||
-                $rule instanceof RuleContract ||
-                ($rule instanceof Exists && $rule->queryCallbacks()) ||
-                ($rule instanceof Unique && $rule->queryCallbacks())) {
+                $rule instanceof CValidation_RuleInterface ||
+                ($rule instanceof CValidation_Rule_Exists && $rule->queryCallbacks()) ||
+                ($rule instanceof CValidation_Rule_Unique && $rule->queryCallbacks())) {
             return $rule;
         }
 
@@ -118,7 +118,7 @@ class CValidation_RuleParser {
     protected function explodeWildcardRules($results, $attribute, $rules) {
         $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute));
 
-        $data = ValidationData::initializeAndGatherData($attribute, $this->data);
+        $data = CValidation_Data::initializeAndGatherData($attribute, $this->data);
 
         foreach ($data as $key => $value) {
             if (cstr::startsWith($key, $attribute) || (bool) preg_match('/^' . $pattern . '\z/', $key)) {
@@ -180,7 +180,7 @@ class CValidation_RuleParser {
      * @return array
      */
     public static function parse($rules) {
-        if ($rules instanceof RuleContract) {
+        if ($rules instanceof CValidation_RuleInterface) {
             return [$rules, []];
         }
 

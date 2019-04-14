@@ -52,13 +52,11 @@ trait CValidation_Trait_FormatMessageTrait {
         // special messages apply for this rule, we will just pull the default
         // messages out of the translator service for this validation rule.
         $key = "validation.{$lowerRule}";
-        if ($this->translator == null) {
-            return $key;
-        } else {
-            if ($key != ($value = $this->translator->trans($key))) {
-                return $value;
-            }
+       
+        if ($key != ($value = $this->translator->trans($key))) {
+            return $value;
         }
+
 
         return $this->getFromLocalArray(
                         $attribute, $lowerRule, $this->fallbackMessages
@@ -110,9 +108,6 @@ trait CValidation_Trait_FormatMessageTrait {
      * @return string
      */
     protected function getCustomMessageFromTranslator($key) {
-        if ($this->translator == null) {
-            return $key;
-        }
         if (($message = $this->translator->trans($key)) !== $key) {
             return $message;
         }
@@ -124,7 +119,7 @@ trait CValidation_Trait_FormatMessageTrait {
                 '/^validation\.custom\./', '', $key
         );
 
-        return $this->getWildcardCustomMessages(arr::dot(
+        return $this->getWildcardCustomMessages(carr::dot(
                                 (array) $this->translator->trans('validation.custom')
                         ), $shortKey, $key);
     }
@@ -257,9 +252,7 @@ trait CValidation_Trait_FormatMessageTrait {
      * @return string
      */
     protected function getAttributeFromTranslations($name) {
-        if($this->translator==null) {
-            return $name;
-        }
+       
         return carr::get($this->translator->trans('validation.attributes'), $name);
     }
 

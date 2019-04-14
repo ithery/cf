@@ -13,10 +13,10 @@ class CValidation_Rule {
      * Get a dimensions constraint builder instance.
      *
      * @param  array  $constraints
-     * @return CValidation_Rules_Dimensions
+     * @return CValidation_Rule_Dimension
      */
     public static function dimensions(array $constraints = []) {
-        return new Rules\Dimensions($constraints);
+        return new CValidation_Rule_Dimension($constraints);
     }
 
     /**
@@ -24,48 +24,48 @@ class CValidation_Rule {
      *
      * @param  string  $table
      * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Exists
+     * @return CValidation_Rule_Exists
      */
     public static function exists($table, $column = 'NULL') {
-        return new Rules\Exists($table, $column);
+        return new CValidation_Rule_Exists($table, $column);
     }
 
     /**
      * Get an in constraint builder instance.
      *
-     * @param  array|string|\Illuminate\Support\Collection  $values
-     * @return \Illuminate\Validation\Rules\In
+     * @param  array|string|CCollection  $values
+     * @return CValidation_Rule_In
      */
     public static function in($values) {
-        if ($values instanceof Collection) {
+        if ($values instanceof CCollection) {
             $values = $values->toArray();
         }
 
-        return new Rules\In(is_array($values) ? $values : func_get_args());
+        return new CValidation_Rule_In(is_array($values) ? $values : func_get_args());
     }
 
     /**
      * Get a not_in constraint builder instance.
      *
-     * @param  array|string|\Illuminate\Support\Collection  $values
-     * @return \Illuminate\Validation\Rules\NotIn
+     * @param  array|string|CCollection  $values
+     * @return CValidation_Rule_NotIn
      */
     public static function notIn($values) {
-        if ($values instanceof Collection) {
+        if ($values instanceof CCollection) {
             $values = $values->toArray();
         }
 
-        return new Rules\NotIn(is_array($values) ? $values : func_get_args());
+        return new CValidation_Rule_NotIn(is_array($values) ? $values : func_get_args());
     }
 
     /**
      * Get a required_if constraint builder instance.
      *
      * @param  callable  $callback
-     * @return \Illuminate\Validation\Rules\RequiredIf
+     * @return CValidation_Rule_RequiredIf
      */
     public static function requiredIf($callback) {
-        return new Rules\RequiredIf($callback);
+        return new CValidation_Rule_RequiredIf($callback);
     }
 
     /**
@@ -73,10 +73,10 @@ class CValidation_Rule {
      *
      * @param  string  $table
      * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Unique
+     * @return CValidation_Rule_Unique
      */
     public static function unique($table, $column = 'NULL') {
-        return new Rules\Unique($table, $column);
+        return new CValidation_Rule_Unique($table, $column);
     }
 
 }

@@ -645,11 +645,8 @@ trait CValidation_Trait_ValidateAttributeTrait {
      * @return array
      */
     protected function getUniqueIds($parameters) {
-        /**
-         * TODO debug parameters,id is laravel primary key default, our primary key is {table}_id
-         */
-        cdbg::var_dump($parameters);
-        $idColumn = isset($parameters[3]) ? $parameters[3] : 'id';
+
+        $idColumn = isset($parameters[3]) ? $parameters[3] : $parameters[0] . '_id';
 
         return [$idColumn, $this->prepareUniqueId($parameters[2])];
     }

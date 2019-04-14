@@ -31,7 +31,7 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
      */
     public function __construct(array $messages = []) {
         foreach ($messages as $key => $value) {
-            $this->messages[$key] = $value instanceof Arrayable ? $value->toArray() : (array) $value;
+            $this->messages[$key] = $value instanceof CInterface_Arrayable ? $value->toArray() : (array) $value;
         }
     }
 

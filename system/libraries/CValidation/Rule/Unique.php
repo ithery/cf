@@ -7,10 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 12, 2019, 8:02:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+class Unique {
 
-
-class Unique
-{
     use DatabaseRule;
 
     /**
@@ -34,14 +32,13 @@ class Unique
      * @param  string|null  $idColumn
      * @return $this
      */
-    public function ignore($id, $idColumn = null)
-    {
-        if ($id instanceof Model) {
+    public function ignore($id, $idColumn = null) {
+        if ($id instanceof CModel) {
             return $this->ignoreModel($id, $idColumn);
         }
 
         $this->ignore = $id;
-        $this->idColumn = $idColumn ?? 'id';
+        $this->idColumn = $idColumn == null ? 'id' : $idColumn;
 
         return $this;
     }
@@ -53,9 +50,8 @@ class Unique
      * @param  string|null  $idColumn
      * @return $this
      */
-    public function ignoreModel($model, $idColumn = null)
-    {
-        $this->idColumn = $idColumn ?? $model->getKeyName();
+    public function ignoreModel($model, $idColumn = null) {
+        $this->idColumn = $idColumn == null ? $model->getKeyName() : $idColumn;
         $this->ignore = $model->{$this->idColumn};
 
         return $this;
@@ -66,14 +62,9 @@ class Unique
      *
      * @return string
      */
-    public function __toString()
-    {
-        return rtrim(sprintf('unique:%s,%s,%s,%s,%s',
-            $this->table,
-            $this->column,
-            $this->ignore ? '"'.$this->ignore.'"' : 'NULL',
-            $this->idColumn,
-            $this->formatWheres()
-        ), ',');
+    public function __toString() {
+        return rtrim(sprintf('unique:%s,%s,%s,%s,%s', $this->table, $this->column, $this->ignore ? '"' . $this->ignore . '"' : 'NULL', $this->idColumn, $this->formatWheres()
+                ), ',');
     }
+
 }
