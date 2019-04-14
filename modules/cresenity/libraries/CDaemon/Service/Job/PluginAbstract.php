@@ -7,6 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 12, 2019, 6:02:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CDaemon_PluginAbstract implements CDaemon_PluginInterface {
+abstract class CDaemon_Job_PluginAbstract implements CDaemon_Job_PluginInterface {
     
 }

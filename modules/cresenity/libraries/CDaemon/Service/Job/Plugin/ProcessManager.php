@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 12, 2019, 6:02:29 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
+class CDaemon_Job_Plugin_ProcessManager extends CDaemon_Job_PluginAbstract {
 
     /**
      * The length (in seconds) of the rolling window used to detect process churn
@@ -20,7 +20,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     const CHURN_LIMIT = 5;
 
     /**
-     * @var CDaemon_ServiceAbstract
+     * @var CDaemon_Service_JobAbstract
      */
     public $service;
 
@@ -35,7 +35,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
      */
     private $failures = array();
 
-    public function __construct(CDaemon_ServiceAbstract $service) {
+    public function __construct(CDaemon_Service_JobAbstract $service) {
         $this->service = $service;
     }
 
@@ -48,7 +48,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
      * @return void
      */
     public function setup() {
-        $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, array($this, 'reap'), 30);
+        $this->service->on(CDaemon_Service_JobAbstract::ON_IDLE, array($this, 'reap'), 30);
     }
 
     /**
@@ -74,7 +74,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
      * @return Array  Return array of error messages (Think stuff like "GD Library Extension Required" or "Cannot open /tmp for Writing") or an empty array
      */
     public function checkEnvironment(Array $errors = array()) {
-        if (!$this->service instanceof CDaemon_ServiceAbstract)
+        if (!$this->service instanceof CDaemon_Service_JobAbstract)
             $errors[] = "Invalid reference to Application Object";
         return $errors;
     }
@@ -143,7 +143,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
             case 0:
                 // Child Process
                 @ pcntl_setpriority(1);
-                $this->service->dispatch(array(CDaemon_ServiceAbstract::ON_FORK));
+                $this->service->dispatch(array(CDaemon_Service_JobAbstract::ON_FORK));
                 return true;
             default:
                 // Parent Process - Return the pid of the newly created Task
@@ -170,7 +170,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
                 break;
             $alias = $map[$pid]->group;
             $process = $this->processes[$alias][$pid];
-            $this->service->dispatch(array(CDaemon_ServiceAbstract::ON_REAP), array($process, $status));
+            $this->service->dispatch(array(CDaemon_Service_JobAbstract::ON_REAP), array($process, $status));
             unset($this->processes[$alias][$pid]);
             // Keep track of process churn -- failures within a processes min_ttl
             // If too many failures of new processes occur inside a given interval, that's a problem.
