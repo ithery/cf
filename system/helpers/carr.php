@@ -61,31 +61,44 @@ class carr {
     }
 
     /**
-     * Retrieve a single key from an array. If the key does not exist in the
-     * array, the default value will be returned instead.
+     * Get an item from an array using "dot" notation.
      *
-     *     // Get the value "username" from $_POST, if it exists
-     *     $username = carr::get($_POST, 'username');
-     *
-     *     // Get the value "sorting" from $_GET, if it exists
-     *     $sorting = carr::get($_GET, 'sorting');
-     *
-     * @param   array   $array      array to extract from
-     * @param   string  $key        key name
-     * @param   mixed   $default    default value
-     * @return  mixed
+     * @param  \ArrayAccess|array  $array
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
      */
     public static function get($array, $key, $default = NULL) {
         if ($array instanceof ArrayObject) {
             // This is a workaround for inconsistent implementation of isset between PHP and HHVM
             // See https://github.com/facebook/hhvm/issues/3437
             return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
-        } else {
-            if (is_object($array) && !($array instanceof ArrayAccess)) {
-                throw new CException('error passing variable object as array');
-            }
-            return isset($array[$key]) ? $array[$key] : $default;
         }
+        if (!static::accessible($array)) {
+            return CF::value($default);
+        }
+
+        if (is_null($key)) {
+            return $array;
+        }
+
+        if (static::exists($array, $key)) {
+            return $array[$key];
+        }
+
+        if (strpos($key, '.') === false) {
+            return isset($array[$key]) ? $array[$key] : CF::value($default);
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (static::accessible($array) && static::exists($array, $segment)) {
+                $array = $array[$segment];
+            } else {
+                return CF::value($default);
+            }
+        }
+
+        return $array;
     }
 
     /**
