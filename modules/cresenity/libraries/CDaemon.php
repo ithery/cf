@@ -163,7 +163,7 @@ class CDaemon {
         $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
         $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
-
+       
         exec("$binary $command 1> $output 2>&1 &");
     }
 

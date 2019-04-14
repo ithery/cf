@@ -9,6 +9,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CDaemon_Constant {
 
+    const OS_TYPE_LINUX = 'linux';
+    const OS_TYPE_WINDOWS = 'windows';
+
     /**
      * Events can be attached to each state using the on() method
      * @var string
