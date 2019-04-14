@@ -12,7 +12,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Registered validator instance.
      *
-     * @var \Proengsoft\JsValidation\Javascript\ValidatorHandler
+     * @var CJavascript_Validation_ValidatorHandler
      */
     protected $validator;
 
@@ -36,6 +36,20 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * @var bool
      */
     protected $remote;
+
+    /**
+     * Enable or disable focusOnError.
+     *
+     * @var bool
+     */
+    protected $focusOnError;
+
+    /**
+     * Duration for animate scroll when focusOnError is enabled.
+     *
+     * @var bool
+     */
+    protected $animateDuration;
 
     /**
      * 'ignore' option for jQuery Validation Plugin.
@@ -63,6 +77,8 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
         $this->selector = empty($options['selector']) ? 'form' : $options['selector'];
         $this->template = empty($options['template']) ? 'CJavascript/Validation/Validate' : $options['template'];
         $this->remote = isset($options['remote']) ? $options['remote'] : true;
+        $this->focusOnError = isset($options['focus_on_error']) ? $options['focus_on_error'] : true;
+        $this->animateDuration = isset($options['animate_duration']) ? $options['animate_duration'] : 1000;
     }
 
     /**
@@ -135,6 +151,8 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
         if (!is_null($this->ignore)) {
             $data['ignore'] = $this->ignore;
         }
+        $data['focus_on_error'] = $this->focusOnError;
+        $data['animate_duration'] = $this->animateDuration;
         return $data;
     }
 

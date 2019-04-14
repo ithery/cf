@@ -37,13 +37,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
             $(element).closest('.form-control').removeClass('is-invalid').addClass('is-valid'); // remove the Boostrap error class from the control group
             },
             focusInvalid: false, // do not focus the last invalid input
-<?php if (CConfig::get('jsvalidation.focus_on_error')): ?>
+<?php if (isset($validator['focus_on_error']) && $validator['focus_on_error']): ?>
         invalidHandler: function (form, validator) {
         if (!validator.numberOfInvalids())
                 return;
         $('html, body').animate({
         scrollTop: $(validator.errorList[0].element).offset().top
-        }, <?= CConfig::get('jsvalidation.duration_animate') ?>);
+        }, <?= $validator['animate_duration']; ?>);
         $(validator.errorList[0].element).focus();
         },
 <?php endif; ?>

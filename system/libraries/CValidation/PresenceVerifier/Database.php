@@ -96,7 +96,7 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
             $query->whereNull($key);
         } elseif ($extraValue === 'NOT_NULL') {
             $query->whereNotNull($key);
-        } elseif (Str::startsWith($extraValue, '!')) {
+        } elseif (cstr::startsWith($extraValue, '!')) {
             $query->where($key, '!=', mb_substr($extraValue, 1));
         } else {
             $query->where($key, $extraValue);
