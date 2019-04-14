@@ -17,6 +17,7 @@ class CElement_Component_Form extends CElement_Component {
      * @var CElement_Component_Form_Validation
      */
     protected $validation;
+    protected $remoteValidationUrl;
     protected $trigger_submit;
     protected $ajax_submit;
     protected $ajax_success_script_callback;
@@ -148,6 +149,14 @@ class CElement_Component_Form extends CElement_Component {
         if (is_array($validationData)) {
             CManager::asset()->module()->registerRunTimeModules('validate');
             $this->validation = new CElement_Component_Form_Validation($validationData);
+
+            $ajaxMethod = CAjax::createMethod();
+            $ajaxMethod->setType('Validation');
+            $ajaxMethod->setData('dataValidation', $validationData);
+            $ajaxMethod->setData('formId', $this->id());
+            $ajaxUrl = $ajaxMethod->makeUrl();
+
+            $this->remoteValidationUrl = $ajaxUrl;
             return $this;
         }
 
@@ -286,7 +295,7 @@ class CElement_Component_Form extends CElement_Component {
             if (strlen($this->layout) > 0) {
                 $form_style_layout = 'form-' . $this->layout;
             }
-            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
+            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . ' remote-validation-url="' . $this->remoteValidationUrl . '" ' . $addition_str . ' ' . $custom_css . '>')
                     ->incIndent()
                     ->br();
 //                $html->appendln("<div class='box-body'>");
@@ -295,7 +304,7 @@ class CElement_Component_Form extends CElement_Component {
             if (strlen($this->layout) > 0) {
                 $form_style_layout = 'form-' . $this->layout;
             }
-            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
+            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"'. ' remote-validation-url="' . $this->remoteValidationUrl . '" '. $addition_str . ' ' . $custom_css . '>')
                     ->incIndent()
                     ->br();
         }

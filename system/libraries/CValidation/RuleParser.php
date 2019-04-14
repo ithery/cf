@@ -202,7 +202,7 @@ class CValidation_RuleParser {
      * @return array
      */
     protected static function parseArrayRule(array $rules) {
-        return [cstr::studly(trim(Arr::get($rules, 0))), array_slice($rules, 1)];
+        return [cstr::studly(trim(carr::get($rules, 0))), array_slice($rules, 1)];
     }
 
     /**
