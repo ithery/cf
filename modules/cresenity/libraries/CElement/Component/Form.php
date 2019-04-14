@@ -11,6 +11,11 @@ class CElement_Component_Form extends CElement_Component {
     protected $action;
     protected $target;
     protected $enctype;
+
+    /**
+     *
+     * @var CElement_Component_Form_Validation
+     */
     protected $validation;
     protected $trigger_submit;
     protected $ajax_submit;
@@ -134,11 +139,20 @@ class CElement_Component_Form extends CElement_Component {
 
     /**
      * 
-     * @param bool $bool
+     * @param mixed $validation
      * @return $this
      */
-    public function setValidation($bool) {
-        $this->validation = $bool;
+    public function setValidation($validationData = true) {
+
+
+        if (is_array($validationData)) {
+            CManager::asset()->module()->registerRunTimeModules('validate');
+            $this->validation = new CElement_Component_Form_Validation($validationData);
+            return $this;
+        }
+
+
+        $this->validation = $validationData;
         return $this;
     }
 
@@ -300,10 +314,16 @@ class CElement_Component_Form extends CElement_Component {
     }
 
     public function js($indent = 0) {
-        if ($this->disable_js)
+        if ($this->disable_js) {
             return parent::js($indent);
+        }
+
+
         $js = new CStringBuilder();
         $js->setIndent($indent);
+        if ($this->validation instanceof CElement_Component_Form_Validation) {
+            $js->append($this->validation->validator()->selector('#' . $this->id()));
+        }
         if ($this->ajax_submit) {
             $ajax_url = "";
             $ajax_process_script = "";

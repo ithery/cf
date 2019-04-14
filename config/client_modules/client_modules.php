@@ -206,6 +206,11 @@ return array(
         ),
         "css" => array("plugins" . DS . "validation-engine" . DS . "jquery.validationEngine.css"),
     ),
+    "validate" => array(
+        "js" => array(
+            "plugins" . DS . "validate" . DS . "validate.js?v=1",
+        ),
+    ),
     "ckeditor" => array(
         "js" => array("plugins" . DS . "ckeditor" . DS . "ckeditor.js"),
     ),
