@@ -9,22 +9,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract implements CDaemon_Service_JobInterface {
 
-    protected $serviceName;
-    protected $config;
     protected $startTime;
     protected $shutdown = false;
     protected $parent = true;
     protected $parentPid = null;
     protected $isRecoverWorkers = false;
     protected $isDebugWorkers = false;
-
-    /**
-     *
-     * @var string
-     */
-    protected $pidFile = null;
-    protected $stdout = false;
-    protected $debug = true;
     protected $terminateLimit = 20;
 
     /**
@@ -141,14 +131,7 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
         
     }
 
-    public function __construct($serviceName, $config) {
-        $this->serviceName = $serviceName;
-        $this->config = $config;
-        $this->stdout = carr::get($config, 'stdout', false);
-        $this->pidFile = $this->getConfig('pidFile');
-        CDaemon_ErrorHandler::init();
-        //$this->getopt();
-    }
+    
 
     /**
      * Ensure that essential runtime conditions are met.

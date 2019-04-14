@@ -9,6 +9,17 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
+    protected $serviceName;
+    protected $config;
+    protected $stdout = false;
+    protected $debug = true;
+
+    /**
+     *
+     * @var string
+     */
+    protected $pidFile = null;
+
     /**
      * Handle for log() method,
      * @see static::log()
@@ -19,6 +30,15 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     public function logFile() {
         return carr::get($this->config, 'logFile');
+    }
+
+    public function __construct($serviceName, $config) {
+        $this->serviceName = $serviceName;
+        $this->config = $config;
+        $this->stdout = carr::get($config, 'stdout', false);
+        $this->pidFile = $this->getConfig('pidFile');
+        CDaemon_ErrorHandler::init();
+        //$this->getopt();
     }
 
     /**

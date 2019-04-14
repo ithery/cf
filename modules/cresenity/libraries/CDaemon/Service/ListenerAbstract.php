@@ -483,6 +483,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
      */
     public static function start() {
         static::checkSapiEnv();
+        static::setup();
         static::init();
         static::lock();
         static::daemonize();
@@ -517,26 +518,15 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
      * @return void
      */
     protected static function init() {
-        set_error_handler(function($code, $msg, $file, $line) {
-            static::safeEcho("$msg in file $file on line $line\n");
-        });
+        $this->workerId = spl_object_hash($this);
+        static::$_workers[$this->workerId] = $this;
+        static::$_pidMap[$this->workerId] = array();
+
         // Start file.
         $backtrace = debug_backtrace();
         static::$_startFile = $backtrace[count($backtrace) - 1]['file'];
         $unique_prefix = str_replace('/', '_', static::$_startFile);
-        // Pid file.
-        if (empty(static::$pidFile)) {
-            static::$pidFile = __DIR__ . "/../$unique_prefix.pid";
-        }
-        // Log file.
-        if (empty(static::$logFile)) {
-            static::$logFile = __DIR__ . '/../workerman.log';
-        }
-        $log_file = (string) static::$logFile;
-        if (!is_file($log_file)) {
-            touch($log_file);
-            chmod($log_file, 0622);
-        }
+
         // State.
         static::$_status = static::STATUS_STARTING;
         // For statistics.
@@ -1819,27 +1809,15 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         return static::$_outputStream = $stream;
     }
 
-    /**
-     * Construct.
-     *
-     * @param string $socket_name
-     * @param array  $context_option
-     */
-    public function __construct($socket_name = '', $context_option = array()) {
-        // Save all worker instances.
-        $this->workerId = spl_object_hash($this);
-        static::$_workers[$this->workerId] = $this;
-        static::$_pidMap[$this->workerId] = array();
-        // Get autoload root path.
-        $backtrace = debug_backtrace();
-        $this->_autoloadRootPath = dirname($backtrace[0]['file']);
+    public function setSocket($socketName = '', $contextOption = array()) {
+
         // Context for socket.
-        if ($socket_name) {
-            $this->_socketName = $socket_name;
-            if (!isset($context_option['socket']['backlog'])) {
-                $context_option['socket']['backlog'] = static::DEFAULT_BACKLOG;
+        if (strlen($socketName) > 0) {
+            $this->socketName = $socketName;
+            if (!isset($contextOption['socket']['backlog'])) {
+                $contextOption['socket']['backlog'] = static::DEFAULT_BACKLOG;
             }
-            $this->_context = stream_context_create($context_option);
+            $this->context = stream_context_create($contextOption);
         }
     }
 
