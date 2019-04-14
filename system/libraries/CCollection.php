@@ -1091,7 +1091,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return mixed
      */
     public function pull($key, $default = null) {
-        return Arr::pull($this->items, $key, $default);
+        return carr::pull($this->items, $key, $default);
     }
 
     /**
@@ -1117,10 +1117,10 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      */
     public function random($number = null) {
         if (is_null($number)) {
-            return Arr::random($this->items);
+            return carr::random($this->items);
         }
 
-        return new static(Arr::random($this->items, $number));
+        return new static(carr::random($this->items, $number));
     }
 
     /**

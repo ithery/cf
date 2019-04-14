@@ -493,7 +493,7 @@ class CValidation_Validator {
             return true;
         }
 
-        return !is_null(Arr::get($this->data, $attribute, 0));
+        return !is_null(carr::get($this->data, $attribute, 0));
     }
 
     /**
@@ -1091,7 +1091,5 @@ class CValidation_Validator {
                 'Method %s::%s does not exist.', static::class, $method
         ));
     }
-
-    
 
 }

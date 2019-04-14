@@ -60,7 +60,7 @@ class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindin
      * @return void
      */
     public function give($implementation) {
-        foreach (Arr::wrap($this->concrete) as $concrete) {
+        foreach (carr::wrap($this->concrete) as $concrete) {
             $this->container->addContextualBinding($concrete, $this->needs, $implementation);
         }
     }
