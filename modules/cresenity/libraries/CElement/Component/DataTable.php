@@ -34,8 +34,8 @@ class CElement_Component_DataTable extends CElement_Component {
     public $query;
     public $custom_column_header;
     public $header_sortable;
-    public $cell_callback_func;
-    public $filter_action_callback_func;
+    public $cellCallbackFunc;
+    public $filterActionCallbackFunc;
     public $display_length;
     public $paging_list;
     public $responsive;
@@ -99,8 +99,8 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->header_sortable = true;
         $this->footer = false;
         $this->footer_field = array();
-        $this->cell_callback_func = "";
-        $this->filter_action_callback_func = "";
+        $this->cellCallbackFunc = "";
+        $this->filterActionCallbackFunc = "";
         $this->display_length = "10";
         $this->ajax = false;
         $this->ajax_method = "get";
@@ -280,20 +280,21 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->options->get_by_name($key);
     }
 
-    public function setHaveDataTableViewAction($bool=true) {
-        $this->haveDataTableViewAction=$bool;
+    public function setHaveDataTableViewAction($bool = true) {
+        $this->haveDataTableViewAction = $bool;
         return $this;
     }
-    
-     public function setDataTableViewCol() {
-        $this->dataTableView=CConstant::TABLE_VIEW_COL;
+
+    public function setDataTableViewCol() {
+        $this->dataTableView = CConstant::TABLE_VIEW_COL;
         return $this;
     }
-     public function setDataTableViewRow() {
-        $this->dataTableView=CConstant::TABLE_VIEW_ROW;
+
+    public function setDataTableViewRow() {
+        $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         return $this;
     }
-    
+
     public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
@@ -327,7 +328,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function cellCallbackFunc($func, $require = "") {
-        $this->cell_callback_func = $func;
+        $this->cellCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -335,7 +336,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function filterActionCallbackFunc($func, $require = "") {
-        $this->filter_action_callback_func = $func;
+        $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -586,8 +587,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $new_v = $col_v;
 
-                    if (($this->cell_callback_func) != null) {
-                        $new_v = CFunction::factory($this->cell_callback_func)
+                    if (($this->cellCallbackFunc) != null) {
+                        $new_v = CFunction::factory($this->cellCallbackFunc)
                                 ->addArg($this)
                                 ->addArg($col->getFieldname())
                                 ->addArg($row)
@@ -657,11 +658,11 @@ class CElement_Component_DataTable extends CElement_Component {
                     $this->rowActionList->apply("jsparam", $jsparam);
                     $this->rowActionList->apply("set_handler_url_param", $jsparam);
 
-                    if (($this->filter_action_callback_func) != null) {
+                    if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as &$action) {
-                            $visibility = CFunction::factory($this->filter_action_callback_func)
+                            $visibility = CFunction::factory($this->filterActionCallbackFunc)
                                     ->addArg($this)
                                     ->addArg($col->getFieldname())
                                     ->addArg($row)
@@ -675,7 +676,7 @@ class CElement_Component_DataTable extends CElement_Component {
                         }
 
 
-                        //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                        //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                     }
 
 
@@ -845,8 +846,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
             $mainClass = ' widget-box ';
             $mainClassTitle = ' widget-title ';
-            $tableViewClass = $this->dataTableView==CConstant::TABLE_VIEW_COL?' data-table-col-view':' data-table-row-view';
-            $mainClassContent = ' widget-content '.$tableViewClass.' col-view-count-' . $this->dataTableViewColCount;
+            $tableViewClass = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' data-table-col-view' : ' data-table-row-view';
+            $mainClassContent = ' widget-content ' . $tableViewClass . ' col-view-count-' . $this->dataTableViewColCount;
             if ($this->bootstrap == '3.3') {
                 $mainClass = ' box box-info';
                 $mainClassTitle = ' box-header with-border ';
@@ -878,18 +879,18 @@ class CElement_Component_DataTable extends CElement_Component {
                 }
 
                 if ($this->haveDataTableViewAction) {
-                    $colViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' active':'';
-                    $rowViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' active':'';
-                    $colViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_COL? ' checked="checked"':'';
-                    $rowViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' checked="checked"':'';
+                    $colViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' active' : '';
+                    $rowViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_ROW ? ' active' : '';
+                    $colViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' checked="checked"' : '';
+                    $rowViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_ROW ? ' checked="checked"' : '';
                     $html->appendln('
                         <div class="btn-group btn-group-toggle ml-auto" data-toggle="buttons">
-                            <label class="btn btn-default icon-btn md-btn-flat '.$colViewActionActive.'">
-                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-col-view" '.$colViewActionChecked.' />
+                            <label class="btn btn-default icon-btn md-btn-flat ' . $colViewActionActive . '">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-col-view" ' . $colViewActionChecked . ' />
                                 <span class="ion ion-md-apps"></span>
                             </label>
-                            <label class="btn btn-default icon-btn md-btn-flat '.$rowViewActionActive.'">
-                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-row-view" '.$rowViewActionChecked.'" />
+                            <label class="btn btn-default icon-btn md-btn-flat ' . $rowViewActionActive . '">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-row-view" ' . $rowViewActionChecked . '" />
                                 <span class="ion ion-md-menu"></span>
                             </label>
                         </div>
