@@ -1121,7 +1121,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
             $jqueryui = "'bJQueryUI': false,";
-            if (CClientModules::instance()->is_registered_module('jquery.ui') || CClientModules::instance()->is_registered_module('jquery-ui-1.12.1.custom')) {
+            if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
 
@@ -1156,11 +1156,11 @@ class CElement_Component_DataTable extends CElement_Component {
 						sEmptyTable  : '" . clang::__('No data available in table') . "',
 						sInfoThousands   : '" . clang::__('') . "',
 					},")->br()
-                    ->appendln("'bDeferRender': " . ($this->get_option("defer_render") ? "true" : "false") . ",")->br()
-                    ->appendln("'bFilter': " . ($this->get_option("filter") ? "true" : "false") . ",")->br()
-                    ->appendln("'bInfo': " . ($this->get_option("info") ? "true" : "false") . ",")->br()
-                    ->appendln("'bPaginate': " . ($this->get_option("pagination") ? "true" : "false") . ",")->br()
-                    ->appendln("'bLengthChange': " . ($this->get_option("length_change") ? "true" : "false") . ",")->br()
+                    ->appendln("'bDeferRender': " . ($this->getOption("defer_render") ? "true" : "false") . ",")->br()
+                    ->appendln("'bFilter': " . ($this->getOption("filter") ? "true" : "false") . ",")->br()
+                    ->appendln("'bInfo': " . ($this->getOption("info") ? "true" : "false") . ",")->br()
+                    ->appendln("'bPaginate': " . ($this->getOption("pagination") ? "true" : "false") . ",")->br()
+                    ->appendln("'bLengthChange': " . ($this->getOption("length_change") ? "true" : "false") . ",")->br()
                     ->appendln("'aoColumns': vaoColumns,")->br()
                     ->appendln("'autoWidth': false,")->br()
                     ->appendln("'aLengthMenu': [
