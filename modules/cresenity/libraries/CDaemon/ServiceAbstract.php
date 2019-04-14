@@ -10,6 +10,18 @@ defined('SYSPATH') OR die('No direct access allowed.');
 abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     /**
+     * Handle for log() method,
+     * @see static::log()
+     * @see static::restart();
+     * @var stream
+     */
+    private static $log_handle = false;
+
+    public function logFile() {
+        return carr::get($this->config, 'logFile');
+    }
+
+    /**
      * Log the $message to the filename returned by static::logFile() and/or optionally print to stdout.
      * Multi-Line messages will be handled nicely.
      *

@@ -558,7 +558,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
     protected static function lock() {
         $fd = fopen(static::$_startFile, 'r');
         if (!$fd || !flock($fd, LOCK_EX)) {
-            static::log("Workerman[" . static::$_startFile . "] already running");
+            CDaemon::log("Workerman[" . static::$_startFile . "] already running");
             exit;
         }
     }
@@ -592,7 +592,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
                 $worker->user = static::getCurrentUser();
             } else {
                 if (posix_getuid() !== 0 && $worker->user != static::getCurrentUser()) {
-                    static::log('Warning: You must have the root privileges to change uid and gid.');
+                    CDaemon::log('Warning: You must have the root privileges to change uid and gid.');
                 }
             }
             // Socket name.
@@ -1233,13 +1233,13 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
                     unset(static::$_workers[$key]);
                 }
             }
-            Timer::delAll();
+            CDaemon_Service_Listener_Timer::delAll();
             static::setProcessTitle('WorkerMan: worker process  ' . $worker->name . ' ' . $worker->getSocketName());
             $worker->setUserAndGroup();
             $worker->id = $id;
             $worker->run();
             $err = new Exception('event-loop exited');
-            static::log($err);
+            CDaemon::log($err);
             exit(250);
         } else {
             throw new Exception("forkOneWorker fail");
@@ -1267,7 +1267,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         // Get uid.
         $user_info = posix_getpwnam($this->user);
         if (!$user_info) {
-            static::log("Warning: User {$this->user} not exsits");
+            CDaemon::log("Warning: User {$this->user} not exsits");
             return;
         }
         $uid = $user_info['uid'];
@@ -1275,7 +1275,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         if ($this->group) {
             $group_info = posix_getgrnam($this->group);
             if (!$group_info) {
-                static::log("Warning: Group {$this->group} not exsits");
+                CDaemon::log("Warning: Group {$this->group} not exsits");
                 return;
             }
             $gid = $group_info['gid'];
@@ -1285,7 +1285,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         // Set uid and gid.
         if ($uid != posix_getuid() || $gid != posix_getgid()) {
             if (!posix_setgid($gid) || !posix_initgroups($user_info['name'], $gid) || !posix_setuid($uid)) {
-                static::log("Warning: change gid or uid fail.");
+                CDaemon::log("Warning: change gid or uid fail.");
             }
         }
     }
@@ -1346,7 +1346,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
                         $worker = static::$_workers[$worker_id];
                         // Exit status.
                         if ($status !== 0) {
-                            static::log("worker[" . $worker->name . ":$pid] exit with status $status");
+                            CDaemon::log("worker[" . $worker->name . ":$pid] exit with status $status");
                         }
                         // For Statistics.
                         if (!isset(static::$_globalStatistics['worker_exit_info'][$worker_id][$status])) {
@@ -1402,7 +1402,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             }
         }
         @unlink(static::$pidFile);
-        static::log("Workerman[" . basename(static::$_startFile) . "] has been stopped");
+        CDaemon::log("Workerman[" . basename(static::$_startFile) . "] has been stopped");
         if (static::$onMasterStop) {
             call_user_func(static::$onMasterStop);
         }
@@ -1419,17 +1419,17 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         if (static::$_masterPid === posix_getpid()) {
             // Set reloading state.
             if (static::$_status !== static::STATUS_RELOADING && static::$_status !== static::STATUS_SHUTDOWN) {
-                static::log("Workerman[" . basename(static::$_startFile) . "] reloading");
+                CDaemon::log("Workerman[" . basename(static::$_startFile) . "] reloading");
                 static::$_status = static::STATUS_RELOADING;
                 // Try to emit onMasterReload callback.
                 if (static::$onMasterReload) {
                     try {
                         call_user_func(static::$onMasterReload);
                     } catch (\Exception $e) {
-                        static::log($e);
+                        CDaemon::log($e);
                         exit(250);
                     } catch (\Error $e) {
-                        static::log($e);
+                        CDaemon::log($e);
                         exit(250);
                     }
                     static::initId();
@@ -1481,10 +1481,10 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
                 try {
                     call_user_func($worker->onWorkerReload, $worker);
                 } catch (\Exception $e) {
-                    static::log($e);
+                    CDaemon::log($e);
                     exit(250);
                 } catch (\Error $e) {
-                    static::log($e);
+                    CDaemon::log($e);
                     exit(250);
                 }
             }
@@ -1503,7 +1503,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         static::$_status = static::STATUS_SHUTDOWN;
         // For master process.
         if (static::$_masterPid === posix_getpid()) {
-            static::log("Workerman[" . basename(static::$_startFile) . "] stopping ...");
+            CDaemon::log("Workerman[" . basename(static::$_startFile) . "] stopping ...");
             $worker_pid_array = static::getAllWorkerPids();
             // Send stop signal to all child processes.
             if (static::$_gracefulStop) {
@@ -1721,7 +1721,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             ) {
                 $error_msg .= ' with ERROR: ' . static::getErrorType($errors['type']) . " \"{$errors['message']} in {$errors['file']} on line {$errors['line']}\"";
             }
-            static::log($error_msg);
+            CDaemon::log($error_msg);
         }
     }
 
@@ -1853,18 +1853,15 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             return;
         }
         // Autoload.
-         if (!$this->_mainSocket) {
+        if (!$this->_mainSocket) {
             // Get the application layer communication protocol and listening address.
             list($scheme, $address) = explode(':', $this->_socketName, 2);
             // Check application layer protocol class.
             if (!isset(static::$_builtinTransports[$scheme])) {
                 $scheme = ucfirst($scheme);
-                $this->protocol = substr($scheme, 0, 1) === '\\' ? $scheme : '\\Protocols\\' . $scheme;
+                $this->protocol = "CDaemon_Service_Listener_Protocol_" . $scheme;
                 if (!class_exists($this->protocol)) {
-                    $this->protocol = "\\Workerman\\Protocols\\$scheme";
-                    if (!class_exists($this->protocol)) {
-                        throw new Exception("class \\Protocols\\$scheme not exist");
-                    }
+                    throw new Exception("class CDaemon_Service_Listener_Protocol_" . $scheme . " not exist");
                 }
                 if (!isset(static::$_builtinTransports[$this->transport])) {
                     throw new \Exception('Bad worker->transport ' . var_export($this->transport, true));
@@ -1977,9 +1974,8 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         //Update process state.
         static::$_status = static::STATUS_RUNNING;
         // Register shutdown function for checking errors.
-        register_shutdown_function(array("\\Workerman\\Worker", 'checkErrors'));
+        register_shutdown_function(array("CDaemon_Service_ListenerAbstract", 'checkErrors'));
         // Set autoload root path.
-        Autoloader::setRootPath($this->_autoloadRootPath);
         // Create a global event loop.
         if (!static::$globalEvent) {
             $event_loop_class = static::getEventLoopName();
@@ -1989,7 +1985,7 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
         // Reinstall signal.
         static::reinstallSignal();
         // Init Timer.
-        Timer::init(static::$globalEvent);
+        CDaemon_Service_Listener_Timer::init(static::$globalEvent);
         // Set an empty onMessage callback.
         if (empty($this->onMessage)) {
             $this->onMessage = function () {
@@ -2003,12 +1999,12 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             try {
                 call_user_func($this->onWorkerStart, $this);
             } catch (\Exception $e) {
-                static::log($e);
+                CDaemon::log($e);
                 // Avoid rapid infinite loop exit.
                 sleep(1);
                 exit(250);
             } catch (\Error $e) {
-                static::log($e);
+                CDaemon::log($e);
                 // Avoid rapid infinite loop exit.
                 sleep(1);
                 exit(250);
@@ -2029,10 +2025,10 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             try {
                 call_user_func($this->onWorkerStop, $this);
             } catch (\Exception $e) {
-                static::log($e);
+                CDaemon::log($e);
                 exit(250);
             } catch (\Error $e) {
-                static::log($e);
+                CDaemon::log($e);
                 exit(250);
             }
         }
@@ -2081,10 +2077,10 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
             try {
                 call_user_func($this->onConnect, $connection);
             } catch (\Exception $e) {
-                static::log($e);
+                CDaemon::log($e);
                 exit(250);
             } catch (\Error $e) {
-                static::log($e);
+                CDaemon::log($e);
                 exit(250);
             }
         }
@@ -2137,10 +2133,10 @@ class CDaemon_Service_ListenerAbstract extends CDaemon_ServiceAbstract implement
                 }
                 ConnectionInterface::$statistics['total_request'] ++;
             } catch (\Exception $e) {
-                static::log($e);
+                CDaemon::log($e);
                 exit(250);
             } catch (\Error $e) {
-                static::log($e);
+                CDaemon::log($e);
                 exit(250);
             }
         }

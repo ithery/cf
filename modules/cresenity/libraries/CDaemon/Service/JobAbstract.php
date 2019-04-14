@@ -126,14 +126,6 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
     private $stats = array();
 
     /**
-     * Handle for log() method,
-     * @see static::log()
-     * @see static::restart();
-     * @var stream
-     */
-    private static $log_handle = false;
-
-    /**
      * Implement this method to define plugins
      * @return void
      */
@@ -481,12 +473,6 @@ abstract class CDaemon_Service_JobAbstract extends CDaemon_ServiceAbstract imple
 
     public function getConfig($key) {
         return carr::get($this->config, $key);
-    }
-
-    
-
-    public function logFile() {
-        return carr::get($this->config, 'logFile');
     }
 
     public function debug($message, $label = '') {
