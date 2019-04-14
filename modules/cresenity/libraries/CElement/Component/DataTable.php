@@ -615,18 +615,18 @@ class CElement_Component_DataTable extends CElement_Component {
                     if ($col->getNoLineBreak()) {
                         $class .= " no-line-break";
                     }
-                    if ($col->hidden_phone)
+                    if ($col->getHiddenPhone())
                         $class .= " hidden-phone";
 
-                    if ($col->hidden_tablet)
+                    if ($col->getHiddenTablet())
                         $class .= " hidden-tablet";
 
-                    if ($col->hidden_desktop)
+                    if ($col->getHiddenDesktop())
                         $class .= " hidden-desktop";
 
                     $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
                     if ($this->export_pdf) {
-                        switch ($col->get_align()) {
+                        switch ($col->getAlign()) {
                             case "left": $pdfTBodyTdCurrentAttr .= ' align="left"';
                                 break;
                             case "right": $pdfTBodyTdCurrentAttr .= ' align="right"';
