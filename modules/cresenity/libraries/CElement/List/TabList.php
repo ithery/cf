@@ -4,75 +4,69 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:56:50 AM
+ * @since Apr 14, 2019, 7:10:42 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CElement_Component_TabList extends CElement_Component {
+class CElement_List_TabList extends CElement_List {
 
     use CTrait_Compat_Element_TabList;
 
     protected $tabs;
-    protected $scrollspy;
-    protected $tab_position;
-    protected $active_tab;
+    protected $tabPosition;
+    protected $activeTab;
     protected $ajax;
-    protected $have_icon;
-    protected $widget_class;
+    protected $haveIcon;
+    protected $widgetClass;
 
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->tab_position = "left";
-        $this->active_tab = "";
+        $this->tabPosition = "left";
+        $this->activeTab = "";
         $this->ajax = true;
-        $this->have_icon = false;
-        $this->scrollspy = true;
+        $this->haveIcon = false;
         $this->tabs = array();
-        $this->widget_class = array();
+        $this->widgetClass = array();
     }
 
     public static function factory($id) {
-        return new CElement_Component_TabList($id);
+        return new CElement_List_TabList($id);
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_List_TabList_Tab
+     */
     public function addTab($id = "") {
-        $tab = CTab::factory($id);
-        if (strlen($this->active_tab) == 0)
-            $this->active_tab = $tab->id;
+        $tab = CElement_List_TabList_Tab::factory($id);
+        if (strlen($this->activeTab) == 0) {
+            $this->activeTab = $tab->id();
+        }
         $this->tabs[] = $tab;
         return $tab;
     }
 
-    public function active_tab($tab_id) {
-        $this->set_active_tab($tab_id);
+    public function setActiveTab($tabId) {
+        $this->activeTab = $tabId;
         return $this;
     }
 
-    public function set_active_tab($tab_id) {
-        $this->active_tab = $tab_id;
-        return $this;
-    }
-
-    public function set_scrollspy($bool) {
-        $this->scrollspy = $bool;
-        return $this;
-    }
-
-    public function set_ajax($bool) {
+    public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
     }
 
-    public function set_tab_position($tab_position) {
-        $this->tab_position = $tab_position;
+    public function setTabPosition($tabPosition) {
+        $this->tabPosition = $tabPosition;
         return $this;
     }
 
-    public function add_widget_class($class) {
+    public function addWidgetClass($class) {
         if (is_array($class)) {
-            $this->widget_class = array_merge($class, $this->widget_class);
+            $this->widgetClass = array_merge($class, $this->widgetClass);
         } else {
-            $this->widget_class[] = $class;
+            $this->widgetClass[] = $class;
         }
         return $this;
     }
@@ -80,31 +74,6 @@ class CElement_Component_TabList extends CElement_Component {
     public function html($indent = 0) {
 
 
-        /*
-          $html = new CStringBuilder();
-          $html->setIndent($indent);
-          $add_class="";
-          if($this->tab_position=="left") {
-          $add_class.=" tabs-left";
-          }
-          $html->appendln('<div class="tabbable '.$add_class.'">');
-          $html->appendln('<ul class="nav nav-tabs ">');
-          foreach($this->tabs as $tab) {
-
-          if($tab->id==$this->active_tab) {
-          $tab->set_active(true);
-          }
-          $html->appendln($tab->header_html($html->get_indent()));
-          }
-          $html->appendln('</ul>');
-          $html->appendln('<div class="tab-content">');
-          foreach($this->tabs as $tab) {
-          $html->appendln($tab->html($html->get_indent()));
-          }
-          $html->appendln('</div>');
-          $html->appendln('</div>');
-          ;
-         */
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $ajax_class = "";
@@ -124,17 +93,17 @@ class CElement_Component_TabList extends CElement_Component {
         }
         $classes .= ' ' . $ajax_class;
 
-        $widget_classes = $this->widget_class;
-        $widget_classes = implode(" ", $widget_classes);
-        if (strlen($widget_classes) > 0) {
-            $widget_classes = " " . $widget_classes;
+        $widgetClasses = $this->widgetClass;
+        $widgetClasses = implode(" ", $widgetClasses);
+        if (strlen($widgetClasses) > 0) {
+            $widgetClasses = " " . $widgetClasses;
         }
         if ($this->bootstrap >= '3') {
             $html->appendln('<div class="row tab-list' . $classes . '" id="' . $this->id . '">');
             $html->appendln('   <div class="col-md-12">');
 
             $html->appendln('       <div class="row">');
-            if ($this->tab_position == 'top') {
+            if ($this->tabPosition == 'top') {
                 $html->appendln('           <div class="row-tab-menu">');
             } else {
                 $html->appendln('           <div class="col-md-2">');
@@ -144,13 +113,13 @@ class CElement_Component_TabList extends CElement_Component {
             $html->appendln('	<div class="span12">');
 
             $html->appendln('		<div class="row-fluid">');
-            if ($this->tab_position == 'top') {
+            if ($this->tabPosition == 'top') {
                 $html->appendln('           <div class="row-tab-menu">');
             } else {
                 $html->appendln('			<div class="span2">');
             }
         }
-        if ($this->tab_position == 'top') {
+        if ($this->tabPosition == 'top') {
             $html->appendln('               <div class="top-nav-container">');
         } else {
             $html->appendln('				<div class="side-nav-container affix-top">');
@@ -162,28 +131,28 @@ class CElement_Component_TabList extends CElement_Component {
             $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
         }
 
-        $active_tab = null;
+        $activeTab = null;
         foreach ($this->tabs as $tab) {
-            if (strlen($this->active_tab) == 0) {
-                $this->active_tab($tab->id);
+            if (strlen($this->activeTab) == 0) {
+                $this->activeTab($tab->id);
             }
-            if ($tab->id == $this->active_tab) {
-                $tab->set_active(true);
-                $active_tab = $tab;
+            if ($tab->id == $this->activeTab) {
+                $tab->setActive(true);
+                $activeTab = $tab;
             }
-            $tab->set_target('' . $this->id . '-ajax-tab-content');
+            $tab->setTarget('' . $this->id . '-ajax-tab-content');
 
-            $html->appendln($tab->header_html($html->get_indent()));
+            $html->appendln($tab->headerHtml($html->get_indent()));
         }
-        $active_tab_icon = "";
-        $active_tab_label = "";
+        $activeTab_icon = "";
+        $activeTab_label = "";
 
-        if ($active_tab != null) {
-            $active_tab_icon = $active_tab->getIcon();
-            $active_tab_label = $active_tab->getLabel();
+        if ($activeTab != null) {
+            $activeTab_icon = $activeTab->getIcon();
+            $activeTab_label = $activeTab->getLabel();
 
-            if (strlen($active_tab->getAjaxUrl()) > 0) {
-                $tab_ajax_url = $active_tab->getAjaxUrl();
+            if (strlen($activeTab->getAjaxUrl()) > 0) {
+                $tab_ajax_url = $activeTab->getAjaxUrl();
 
                 /*
                   $url_base = curl::base();
@@ -192,42 +161,42 @@ class CElement_Component_TabList extends CElement_Component {
                   }
                   $tab_ajax_url = curl::base(true,'http').$tab_ajax_url;
                  */
-                //$active_tab_content = CCurl::factory($tab_ajax_url)->exec()->response();
+                //$activeTab_content = CCurl::factory($tab_ajax_url)->exec()->response();
             }
         }
         $html->appendln('					</ul>');
         $html->appendln('				</div>');
         $html->appendln('			</div>');
         if ($this->bootstrap >= '3') {
-            if ($this->tab_position == 'top') {
+            if ($this->tabPosition == 'top') {
                 $html->appendln('           <div class="row-tab-content">');
             } else {
                 $html->appendln('			<div class="col-md-10">');
             }
         } else {
-            if ($this->tab_position == 'top') {
+            if ($this->tabPosition == 'top') {
                 $html->appendln('           <div class="row-tab-content">');
             } else {
                 $html->appendln('           <div class="span10">');
             }
         }
         if ($this->bootstrap >= '3') {
-            $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' . $widget_classes . '">');
+            $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' . $widgetClasses . '">');
             $html->appendln('                   <div class="box-header with-border">');
         } else {
-            $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widget_classes . '">');
-            if ($this->tab_position != 'top') {
+            $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widgetClasses . '">');
+            if ($this->tabPosition != 'top') {
                 $html->appendln('					<div class="widget-title">');
             }
         }
 
-        if ($this->tab_position != 'top') {
-            if ($this->have_icon) {
+        if ($this->tabPosition != 'top') {
+            if ($this->haveIcon) {
                 $html->appendln('						<span class="icon">');
-                $html->appendln('							<i class="icon-' . $active_tab_icon . '"></i>');
+                $html->appendln('							<i class="icon-' . $activeTab_icon . '"></i>');
                 $html->appendln('						</span>');
             }
-            //$html->appendln('						<h5>' . $active_tab_label . '</h5>');
+            //$html->appendln('						<h5>' . $activeTab_label . '</h5>');
             $html->appendln('					</div>');
         }
 
@@ -256,7 +225,7 @@ class CElement_Component_TabList extends CElement_Component {
         $html->appendln('	</div>');
         $html->appendln('</div>');
 
-        if ($this->tab_position == 'top') {
+        if ($this->tabPosition == 'top') {
             $html->appendln('
                     <style>
                         .top-nav-container ul {
@@ -330,11 +299,17 @@ class CElement_Component_TabList extends CElement_Component {
 				var pare = jQuery(this).parent();
 		
 				if(pare.prop('tagName')=='LI') {
+                                       
 					pare.parent().children().removeClass('active');
 					pare.addClass('active');
+                                        pare.parent().find('> li > a').removeClass('active');
+					pare.find('> a').addClass('active');
 				}
 				jQuery(this).parent().children().removeClass('active');
 				jQuery(this).addClass('active');
+                               
+                                jQuery(this).parent().find('> li > a').removeClass('active');
+                                jQuery(this).find('> a').addClass('active');
 				var widget_tab = jQuery('#" . $this->id . "-tab-widget');
 				if(widget_tab.length>0) {
 					

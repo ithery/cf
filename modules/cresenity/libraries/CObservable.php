@@ -10,6 +10,7 @@ abstract class CObservable extends CRenderable {
     use CTrait_Compat_Observable,
         CObservable_Trait_ElementTrait,
         CObservable_Trait_ComponentTrait,
+        CObservable_Trait_ListTrait,
         CObservable_Trait_EventsTrait;
 
     /**
@@ -179,17 +180,7 @@ abstract class CObservable extends CRenderable {
         return $calendar;
     }
 
-    /**
-     * 
-     * @param string $tabs_id
-     * @return CTabList
-     */
-    public function addTabList($tabs_id = "") {
-        $tabs = CTabList::factory($tabs_id);
-        $this->add($tabs);
-        return $tabs;
-    }
-
+    
     public function addTabStaticList($tabs_id = "") {
         $tabs = CTabStaticList::factory($tabs_id);
         $this->add($tabs);
@@ -297,21 +288,6 @@ abstract class CObservable extends CRenderable {
         $this->add($element);
 
         return $element;
-    }
-
-    /**
-     * 
-     * 
-     * @param string $id
-     * @return CElement_List_ActionList
-     */
-    public function addActionList($id = "") {
-        $actlist = CElement_Factory::createList('ActionList', $id);
-        $this->add($actlist);
-        if ($this instanceof CElement_Component_Form) {
-            $actlist->setStyle('form-action');
-        }
-        return $actlist;
     }
 
     /**
