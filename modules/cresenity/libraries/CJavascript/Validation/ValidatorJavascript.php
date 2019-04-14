@@ -24,9 +24,9 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     protected $selector;
 
     /**
-     * View that renders Javascript.
+     * Template that renders Javascript.
      *
-     * @var
+     * @var string
      */
     protected $view;
 
@@ -61,7 +61,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      */
     protected function setDefaults($options) {
         $this->selector = empty($options['selector']) ? 'form' : $options['selector'];
-        $this->view = empty($options['view']) ? 'jsvalidation::bootstrap' : $options['view'];
+        $this->template = empty($options['template']) ? 'CJavascript/Validation/Validate' : $options['template'];
         $this->remote = isset($options['remote']) ? $options['remote'] : true;
     }
 
@@ -72,10 +72,10 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * @param null|string $selector
      * @return string
      */
-    public function render($view = null, $selector = null) {
-        $this->view($view);
+    public function render($template = null, $selector = null) {
+        $this->template($template);
         $this->selector($selector);
-        $template = new CTemplate('CJavascript/Validation/Validate', array('validator' => $this->getViewData()));
+        $template = new CTemplate($this->template, array('validator' => $this->getTemplateData()));
         $output = $template->render();
         preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
         $outputJs = '';
@@ -86,12 +86,12 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     }
 
     /**
-     * Get the view data as an array.
+     * Get the template data as an array.
      *
      * @return array
      */
     public function toArray() {
-        return $this->getViewData();
+        return $this->getTemplateData();
     }
 
     /**
@@ -116,7 +116,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * @throws \Proengsoft\JsValidation\Exceptions\PropertyNotFoundException
      */
     public function __get($name) {
-        $data = $this->getViewData();
+        $data = $this->getTemplateData();
         if (!array_key_exists($name, $data)) {
             throw new PropertyNotFoundException($name, get_class());
         }
@@ -128,7 +128,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      *
      * @return array
      */
-    protected function getViewData() {
+    protected function getTemplateData() {
         $this->validator->setRemote($this->remote);
         $data = $this->validator->validationData();
         $data['selector'] = $this->selector;
@@ -176,8 +176,8 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * @param null|\Illuminate\Contracts\View\View|string $view
      * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
      */
-    public function view($view) {
-        $this->view = is_null($view) ? $this->view : $view;
+    public function template($template) {
+        $this->view = is_null($template) ? $this->template : $template;
         return $this;
     }
 
