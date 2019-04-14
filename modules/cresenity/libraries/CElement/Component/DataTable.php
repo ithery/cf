@@ -32,7 +32,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $checkbox_value;
     public $numbering;
     public $query;
-    public $custom_column_header;
+    public $customColumnHeader;
     public $header_sortable;
     public $cellCallbackFunc;
     public $filterActionCallbackFunc;
@@ -117,7 +117,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_excel = false;
         $this->headerNoLineBreak = false;
 
-        $this->custom_column_header = "";
+        $this->customColumnHeader = "";
         $this->show_header = true;
         $this->apply_data_table = true;
         $this->group_by = "";
@@ -226,7 +226,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setCustomColumnHeader($html) {
-        $this->custom_column_header = $html;
+        $this->customColumnHeader = $html;
         return $this;
     }
 
@@ -655,8 +655,8 @@ class CElement_Component_DataTable extends CElement_Component {
                         $this->rowActionList->addClass("pull-right");
                     }
                     $this->rowActionList->regenerateId(true);
-                    $this->rowActionList->apply("jsparam", $jsparam);
-                    $this->rowActionList->apply("set_handler_url_param", $jsparam);
+                    $this->rowActionList->apply("setJsParam", $jsparam);
+                    $this->rowActionList->apply("setHandlerUrlParam", $jsparam);
 
                     if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
@@ -674,9 +674,6 @@ class CElement_Component_DataTable extends CElement_Component {
                             }
                             $action->setVisibility($visibility);
                         }
-
-
-                        //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                     }
 
 
@@ -729,8 +726,8 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($this->show_header) {
             $html->appendln('<thead>')
                     ->incIndent()->br();
-            if (strlen($this->custom_column_header) > 0) {
-                $html->appendln($this->custom_column_header);
+            if (strlen($this->customColumnHeader) > 0) {
+                $html->appendln($this->customColumnHeader);
             } else {
                 $html->appendln('<tr>')
                         ->incIndent()->br();
