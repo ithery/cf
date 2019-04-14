@@ -249,7 +249,7 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
 
         foreach ($replace as $key => $value) {
             $line = str_replace(
-                    [':' . $key, ':' . Str::upper($key), ':' . Str::ucfirst($key)], [$value, Str::upper($value), Str::ucfirst($value)], $line
+                    [':' . $key, ':' . cstr::upper($key), ':' . cstr::ucfirst($key)], [$value, cstr::upper($value), cstr::ucfirst($value)], $line
             );
         }
 

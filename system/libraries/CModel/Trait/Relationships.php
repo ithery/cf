@@ -125,7 +125,7 @@ trait CModel_Trait_Relationships {
         $name = $name ?: $this->guessBelongsToRelation();
 
         list($type, $id) = $this->getMorphs(
-                Str::snake($name), $type, $id
+                cstr::snake($name), $type, $id
         );
 
         // If the type value is null it is probably safe to assume we're eager loading

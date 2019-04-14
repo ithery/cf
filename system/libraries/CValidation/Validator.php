@@ -856,7 +856,7 @@ class CValidation_Validator {
     public function addImplicitExtension($rule, $extension) {
         $this->addExtension($rule, $extension);
 
-        $this->implicitRules[] = Str::studly($rule);
+        $this->implicitRules[] = cstr::studly($rule);
     }
 
     /**
@@ -869,7 +869,7 @@ class CValidation_Validator {
     public function addDependentExtension($rule, $extension) {
         $this->addExtension($rule, $extension);
 
-        $this->dependentRules[] = Str::studly($rule);
+        $this->dependentRules[] = cstr::studly($rule);
     }
 
     /**
@@ -880,7 +880,7 @@ class CValidation_Validator {
      */
     public function addReplacers(array $replacers) {
         if ($replacers) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
+            $keys = array_map('cstr::snake', array_keys($replacers));
 
             $replacers = array_combine($keys, array_values($replacers));
         }

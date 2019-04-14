@@ -68,7 +68,7 @@ class CTranslation_MessageSelector {
 
         $value = $matches[2];
 
-        if (Str::contains($condition, ',')) {
+        if (cstr::contains($condition, ',')) {
             list($from, $to) = explode(',', $condition, 2);
 
             if ($to == '*' && $number >= $from) {
