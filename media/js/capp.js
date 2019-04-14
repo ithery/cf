@@ -1335,17 +1335,18 @@ appValidation = {
      * Initialize app validations.
      */
     init: function () {
+        if ($.validator) {
+            // Disable class rules and attribute rules
+            $.validator.classRuleSettings = {};
+            $.validator.attributeRules = function () {
+                this.rules = {}
+            };
 
-        // Disable class rules and attribute rules
-        $.validator.classRuleSettings = {};
-        $.validator.attributeRules = function () {
-            this.rules = {}
-        };
-
-        $.validator.dataRules = this.arrayRules;
-        $.validator.prototype.arrayRulesCache = {};
-        // Register validations methods
-        this.setupValidations();
+            $.validator.dataRules = this.arrayRules;
+            $.validator.prototype.arrayRulesCache = {};
+            // Register validations methods
+            this.setupValidations();
+        }
     },
 
     arrayRules: function (element) {
