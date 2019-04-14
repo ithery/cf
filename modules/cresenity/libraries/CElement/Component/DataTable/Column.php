@@ -157,11 +157,11 @@ class CElement_Component_DataTable_Column extends CObject {
         }
         if ($this->sortable)
             $class .= " sortable";
-        if ($this->hidden_phone)
+        if ($this->hiddenPhone)
             $class .= " hidden-phone";
-        if ($this->hidden_tablet)
+        if ($this->hiddenTablet)
             $class .= " hidden-tablet";
-        if ($this->hidden_desktop)
+        if ($this->hiddenDesktop)
             $class .= " hidden-desktop";
         if ($export_pdf) {
             $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldname . '" align="center" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
