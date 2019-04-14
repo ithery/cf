@@ -286,7 +286,7 @@ class CElement_List_TabList extends CElement_List {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         foreach ($this->tabs as $tab) {
-            $js->appendln($tab->js($js->get_indent()));
+            $js->appendln($tab->js($js->getIndent()));
         }
         $js->appendln("
 			
