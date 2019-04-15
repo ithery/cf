@@ -628,20 +628,22 @@ trait CValidation_Trait_ValidateAttributeTrait {
         $verifier = $this->getPresenceVerifierFor($connection);
 
         $extra = $this->getUniqueExtra($parameters);
-        
+
         $data = $this->getData();
-        foreach($extra as $k=>$v) {
-            preg_match_all("/{(\w*)}/", $v, $matches);
-            foreach ($matches[1] as $key => $match) {
-                $extra[$k] = str_replace("{" . $match . "}", $data[$k], $extra[$k]);
+        foreach ($extra as $k => $v) {
+            if (isset($data[$k])) {
+                preg_match_all("/{(\w*)}/", $v, $matches);
+                foreach ($matches[1] as $key => $match) {
+                    $extra[$k] = str_replace("{" . $match . "}", $data[$k], $extra[$k]);
+                }
             }
         }
-        
-      
+
+
         if ($this->currentRule instanceof CValidation_Rule_Unique) {
             $extra = array_merge($extra, $this->currentRule->queryCallbacks());
         }
-        
+
         return $verifier->getCount(
                         $table, $column, $value, $id, $idColumn, $extra
                 ) == 0;
