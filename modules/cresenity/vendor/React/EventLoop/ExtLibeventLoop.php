@@ -5,23 +5,39 @@ namespace React\EventLoop;
 use BadMethodCallException;
 use Event;
 use EventBase;
-use EventConfig as EventBaseConfig;
 use React\EventLoop\Tick\FutureTickQueue;
 use React\EventLoop\Timer\Timer;
 use SplObjectStorage;
 
 /**
- * An `ext-event` based event loop.
+ * An `ext-libevent` based event loop.
  *
- * This uses the [`event` PECL extension](https://pecl.php.net/package/event).
- * It supports the same backends as libevent.
+ * This uses the [`libevent` PECL extension](https://pecl.php.net/package/libevent).
+ * `libevent` itself supports a number of system-specific backends (epoll, kqueue).
  *
- * This loop is known to work with PHP 5.4 through PHP 7+.
+ * This event loop does only work with PHP 5.
+ * An [unofficial update](https://github.com/php/pecl-event-libevent/pull/2) for
+ * PHP 7 does exist, but it is known to cause regular crashes due to `SEGFAULT`s.
+ * To reiterate: Using this event loop on PHP 7 is not recommended.
+ * Accordingly, the [`Factory`](#factory) will not try to use this event loop on
+ * PHP 7.
  *
- * @link https://pecl.php.net/package/event
+ * This event loop is known to trigger a readable listener only if
+ * the stream *becomes* readable (edge-triggered) and may not trigger if the
+ * stream has already been readable from the beginning.
+ * This also implies that a stream may not be recognized as readable when data
+ * is still left in PHP's internal stream buffers.
+ * As such, it's recommended to use `stream_set_read_buffer($stream, 0);`
+ * to disable PHP's internal read buffer in this case.
+ * See also [`addReadStream()`](#addreadstream) for more details.
+ *
+ * @link https://pecl.php.net/package/libevent
  */
-final class ExtEventLoop implements LoopInterface
+final class ExtLibeventLoop implements LoopInterface
 {
+    /** @internal */
+    const MICROSECONDS_PER_SECOND = 1000000;
+
     private $eventBase;
     private $futureTickQueue;
     private $timerCallback;
@@ -31,22 +47,17 @@ final class ExtEventLoop implements LoopInterface
     private $writeEvents = array();
     private $readListeners = array();
     private $writeListeners = array();
-    private $readRefs = array();
-    private $writeRefs = array();
     private $running;
     private $signals;
     private $signalEvents = array();
 
     public function __construct()
     {
-        if (!\class_exists('EventBase', false)) {
-            throw new BadMethodCallException('Cannot create ExtEventLoop, ext-event extension missing');
+        if (!\function_exists('event_base_new')) {
+            throw new BadMethodCallException('Cannot create ExtLibeventLoop, ext-libevent extension missing');
         }
 
-        $config = new EventBaseConfig();
-        $config->requireFeatures(EventBaseConfig::FEATURE_FDS);
-
-        $this->eventBase = new EventBase($config);
+        $this->eventBase = \event_base_new();
         $this->futureTickQueue = new FutureTickQueue();
         $this->timerEvents = new SplObjectStorage();
         $this->signals = new SignalsHandler();
@@ -62,16 +73,13 @@ final class ExtEventLoop implements LoopInterface
             return;
         }
 
-        $event = new Event($this->eventBase, $stream, Event::PERSIST | Event::READ, $this->streamCallback);
-        $event->add();
+        $event = \event_new();
+        \event_set($event, $stream, \EV_PERSIST | \EV_READ, $this->streamCallback);
+        \event_base_set($event, $this->eventBase);
+        \event_add($event);
+
         $this->readEvents[$key] = $event;
         $this->readListeners[$key] = $listener;
-
-        // ext-event does not increase refcount on stream resources for PHP 7+
-        // manually keep track of stream resource to prevent premature garbage collection
-        if (\PHP_VERSION_ID >= 70000) {
-            $this->readRefs[$key] = $stream;
-        }
     }
 
     public function addWriteStream($stream, $listener)
@@ -81,28 +89,27 @@ final class ExtEventLoop implements LoopInterface
             return;
         }
 
-        $event = new Event($this->eventBase, $stream, Event::PERSIST | Event::WRITE, $this->streamCallback);
-        $event->add();
+        $event = \event_new();
+        \event_set($event, $stream, \EV_PERSIST | \EV_WRITE, $this->streamCallback);
+        \event_base_set($event, $this->eventBase);
+        \event_add($event);
+
         $this->writeEvents[$key] = $event;
         $this->writeListeners[$key] = $listener;
-
-        // ext-event does not increase refcount on stream resources for PHP 7+
-        // manually keep track of stream resource to prevent premature garbage collection
-        if (\PHP_VERSION_ID >= 70000) {
-            $this->writeRefs[$key] = $stream;
-        }
     }
 
     public function removeReadStream($stream)
     {
         $key = (int) $stream;
 
-        if (isset($this->readEvents[$key])) {
-            $this->readEvents[$key]->free();
+        if (isset($this->readListeners[$key])) {
+            $event = $this->readEvents[$key];
+            \event_del($event);
+            \event_free($event);
+
             unset(
                 $this->readEvents[$key],
-                $this->readListeners[$key],
-                $this->readRefs[$key]
+                $this->readListeners[$key]
             );
         }
     }
@@ -111,12 +118,14 @@ final class ExtEventLoop implements LoopInterface
     {
         $key = (int) $stream;
 
-        if (isset($this->writeEvents[$key])) {
-            $this->writeEvents[$key]->free();
+        if (isset($this->writeListeners[$key])) {
+            $event = $this->writeEvents[$key];
+            \event_del($event);
+            \event_free($event);
+
             unset(
                 $this->writeEvents[$key],
-                $this->writeListeners[$key],
-                $this->writeRefs[$key]
+                $this->writeListeners[$key]
             );
         }
     }
@@ -142,7 +151,10 @@ final class ExtEventLoop implements LoopInterface
     public function cancelTimer(TimerInterface $timer)
     {
         if ($this->timerEvents->contains($timer)) {
-            $this->timerEvents[$timer]->free();
+            $event = $this->timerEvents[$timer];
+            \event_del($event);
+            \event_free($event);
+
             $this->timerEvents->detach($timer);
         }
     }
@@ -157,8 +169,10 @@ final class ExtEventLoop implements LoopInterface
         $this->signals->add($signal, $listener);
 
         if (!isset($this->signalEvents[$signal])) {
-            $this->signalEvents[$signal] = Event::signal($this->eventBase, $signal, array($this->signals, 'call'));
-            $this->signalEvents[$signal]->add();
+            $this->signalEvents[$signal] = \event_new();
+            \event_set($this->signalEvents[$signal], $signal, \EV_PERSIST | \EV_SIGNAL, array($this->signals, 'call'));
+            \event_base_set($this->signalEvents[$signal], $this->eventBase);
+            \event_add($this->signalEvents[$signal]);
         }
     }
 
@@ -167,7 +181,8 @@ final class ExtEventLoop implements LoopInterface
         $this->signals->remove($signal, $listener);
 
         if (isset($this->signalEvents[$signal]) && $this->signals->count($signal) === 0) {
-            $this->signalEvents[$signal]->free();
+            \event_del($this->signalEvents[$signal]);
+            \event_free($this->signalEvents[$signal]);
             unset($this->signalEvents[$signal]);
         }
     }
@@ -179,14 +194,14 @@ final class ExtEventLoop implements LoopInterface
         while ($this->running) {
             $this->futureTickQueue->tick();
 
-            $flags = EventBase::LOOP_ONCE;
+            $flags = \EVLOOP_ONCE;
             if (!$this->running || !$this->futureTickQueue->isEmpty()) {
-                $flags |= EventBase::LOOP_NONBLOCK;
+                $flags |= \EVLOOP_NONBLOCK;
             } elseif (!$this->readEvents && !$this->writeEvents && !$this->timerEvents->count() && $this->signals->isEmpty()) {
                 break;
             }
 
-            $this->eventBase->loop($flags);
+            \event_base_loop($this->eventBase, $flags);
         }
     }
 
@@ -202,16 +217,11 @@ final class ExtEventLoop implements LoopInterface
      */
     private function scheduleTimer(TimerInterface $timer)
     {
-        $flags = Event::TIMEOUT;
+        $this->timerEvents[$timer] = $event = \event_timer_new();
 
-        if ($timer->isPeriodic()) {
-            $flags |= Event::PERSIST;
-        }
-
-        $event = new Event($this->eventBase, -1, $flags, $this->timerCallback, $timer);
-        $this->timerEvents[$timer] = $event;
-
-        $event->add($timer->getInterval());
+        \event_timer_set($event, $this->timerCallback, $timer);
+        \event_base_set($event, $this->eventBase);
+        \event_add($event, $timer->getInterval() * self::MICROSECONDS_PER_SECOND);
     }
 
     /**
@@ -223,12 +233,26 @@ final class ExtEventLoop implements LoopInterface
      */
     private function createTimerCallback()
     {
+        $that = $this;
         $timers = $this->timerEvents;
-        $this->timerCallback = function ($_, $__, $timer) use ($timers) {
+        $this->timerCallback = function ($_, $__, $timer) use ($timers, $that) {
             \call_user_func($timer->getCallback(), $timer);
 
-            if (!$timer->isPeriodic() && $timers->contains($timer)) {
-                $this->cancelTimer($timer);
+            // Timer already cancelled ...
+            if (!$timers->contains($timer)) {
+                return;
+            }
+
+            // Reschedule periodic timers ...
+            if ($timer->isPeriodic()) {
+                \event_add(
+                    $timers[$timer],
+                    $timer->getInterval() * ExtLibeventLoop::MICROSECONDS_PER_SECOND
+                );
+
+            // Clean-up one shot timers ...
+            } else {
+                $that->cancelTimer($timer);
             }
         };
     }
@@ -247,11 +271,11 @@ final class ExtEventLoop implements LoopInterface
         $this->streamCallback = function ($stream, $flags) use (&$read, &$write) {
             $key = (int) $stream;
 
-            if (Event::READ === (Event::READ & $flags) && isset($read[$key])) {
+            if (\EV_READ === (\EV_READ & $flags) && isset($read[$key])) {
                 \call_user_func($read[$key], $stream);
             }
 
-            if (Event::WRITE === (Event::WRITE & $flags) && isset($write[$key])) {
+            if (\EV_WRITE === (\EV_WRITE & $flags) && isset($write[$key])) {
                 \call_user_func($write[$key], $stream);
             }
         };
