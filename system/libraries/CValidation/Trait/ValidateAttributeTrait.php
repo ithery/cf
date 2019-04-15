@@ -628,11 +628,11 @@ trait CValidation_Trait_ValidateAttributeTrait {
         $verifier = $this->getPresenceVerifierFor($connection);
 
         $extra = $this->getUniqueExtra($parameters);
-
-        if ($this->currentRule instanceof Unique) {
+    
+        if ($this->currentRule instanceof CValidation_Rule_Unique) {
             $extra = array_merge($extra, $this->currentRule->queryCallbacks());
         }
-
+        
         return $verifier->getCount(
                         $table, $column, $value, $id, $idColumn, $extra
                 ) == 0;

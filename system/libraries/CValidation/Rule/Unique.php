@@ -7,9 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 12, 2019, 8:02:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class Unique {
+class CValidation_Rule_Unique {
 
-    use DatabaseRule;
+    use CValidation_Rule_Trait_DatabaseTrait;
 
     /**
      * The ID that should be ignored.
