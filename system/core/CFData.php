@@ -13,7 +13,7 @@ final class CFData {
         return CFData::get($domain, 'domain');
     }
 
-    public static function get($data_name, $folder = "") {
+    public static function get($dataName, $folder = "") {
         $file = self::path();
         if (strlen($folder) > 0) {
             $folder = explode('/', $folder);
@@ -24,7 +24,16 @@ final class CFData {
                 $file .= $row . DIRECTORY_SEPARATOR;
             }
         }
-        $file .= $data_name;
+        $file .= $dataName;
+        $dataNameExploded = explode('.', $dataName);
+        if (count($dataNameExploded) > 0) {
+            $fileWildcard = '$.' . implode('.', array_slice($dataNameExploded, 1));
+            
+            if (file_exists($fileWildcard . EXT)) {
+                return self::load_value($fileWildcard . EXT);
+            }
+        }
+
         if (!file_exists($file . EXT))
             return null;
 
