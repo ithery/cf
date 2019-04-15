@@ -322,6 +322,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     protected function loopProcess() {
         $this->execute();
     }
+
     /**
      * Register a callback for the given $event. Use the event class constants for built-in events. Add and dispatch
      * your own events however you want.

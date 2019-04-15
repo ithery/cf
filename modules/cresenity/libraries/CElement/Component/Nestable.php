@@ -68,7 +68,9 @@ class CElement_Component_Nestable extends CElement_Component {
     }
 
     public function setDataFromModel(CModel $root) {
-
+        /**
+         * NOT DONE
+         */
 
         $orgId = CApp_Base::orgId();
 
@@ -137,7 +139,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
 
         $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->inc_indent();
         if (count($this->data) > 0) {
@@ -148,46 +150,46 @@ class CElement_Component_Nestable extends CElement_Component {
 
                 $depth = $d['depth'];
                 if ($depth_before >= $depth) {
-                    $html->dec_indent()->appendln('</li>');
+                    $html->decIndent()->appendln('</li>');
                 }
                 if ($depth_before > $depth) {
                     $range_depth = $depth_before - $depth;
                     for ($i = 0; $i < $range_depth; $i++) {
                         $in--;
-                        $html->dec_indent()->appendln('</ol>');
+                        $html->decIndent()->appendln('</ol>');
                     }
                 }
                 if ($depth_before < $depth) {
                     $in++;
-                    $html->appendln('<ol class="dd-list">')->inc_indent();
+                    $html->appendln('<ol class="dd-list">')->incIndent();
                 }
                 $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->inc_indent();
 
-                $html->appendln('<div class="dd-handle">')->inc_indent();
+                $html->appendln('<div class="dd-handle">')->incIndent();
                 if ($this->checkbox) {
                     $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d["parent_id"] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->inc_indent();
                 }
-                $val = $d[$this->value_key];
-                $new_v = $val;
+                $val = carr::get($d, $this->value_key);
+                $newV = $val;
                 if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
-                    $new_v = CDynFunction::factory($this->displayCallbackFunc)
-                            ->add_param($this)
-                            ->add_param($d)
-                            ->add_param($val)
-                            ->set_require($this->requires)
+                    $newV = CFunction::factory($this->displayCallbackFunc)
+                            ->addArg($this)
+                            ->addArg($d)
+                            ->addArg($val)
+                            ->setRequire($this->requires)
                             ->execute();
                 }
-                $html->appendln($new_v);
-                $html->dec_indent()->appendln('</div>');
-                if ($this->have_action()) {
+                $html->appendln($newV);
+                $html->decIndent()->appendln('</div>');
+                if ($this->haveRowAction()) {
 
                     foreach ($d as $k => $v) {
                         $jsparam[$k] = $v;
                     }
-                    $jsparam["param1"] = $d[$this->id_key];
-                    $this->rowActionList->add_class("pull-right");
+                    $jsparam["param1"] = carr::get($d,$this->id_key);
+                    $this->rowActionList->addClass("pull-right");
                     if ($this->action_style == "btn-dropdown") {
-                        $this->rowActionList->add_class("pull-right");
+                        $this->rowActionList->addClass("pull-right");
                     }
                     $this->rowActionList->regenerateId(true);
                     $this->rowActionList->apply("jsparam", $jsparam);
@@ -197,14 +199,14 @@ class CElement_Component_Nestable extends CElement_Component {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as $action) {
-                            $visibility = CDynFunction::factory($this->filterActionCallbackFunc)
-                                    ->add_param($this)
-                                    ->add_param($d)
-                                    ->add_param($action)
-                                    ->set_require($this->requires)
+                            $visibility = CFunction::factory($this->filterActionCallbackFunc)
+                                    ->addArg($this)
+                                    ->addArg($d)
+                                    ->addArg($action)
+                                    ->setRequire($this->requires)
                                     ->execute();
 
-                            $action->set_visibility($visibility);
+                            $action->setVisibility($visibility);
                         }
                     }
 
@@ -216,35 +218,13 @@ class CElement_Component_Nestable extends CElement_Component {
                 $depth_before = $depth;
             }
             for ($i = 0; $i < $in; $i++) {
-                $html->dec_indent()->appendln('</li>');
-                $html->dec_indent()->appendln('</ol>');
+                $html->decIndent()->appendln('</li>');
+                $html->decIndent()->appendln('</ol>');
             }
         }
-        $html->dec_indent()->appendln('</div>');
+        $html->decIndent()->appendln('</div>');
         return $html->text();
-        /*
-          <div class="dd">
-          <ol class="dd-list">
-          <li class="dd-item" data-id="1">
-          <div class="dd-handle">Item 1</div>
-          </li>
-          <li class="dd-item" data-id="2">
-          <div class="dd-handle">Item 2</div>
-          </li>
-          <li class="dd-item" data-id="3">
-          <div class="dd-handle">Item 3</div>
-          <ol class="dd-list">
-          <li class="dd-item" data-id="4">
-          <div class="dd-handle">Item 4</div>
-          </li>
-          <li class="dd-item" data-id="5">
-          <div class="dd-handle">Item 5</div>
-          </li>
-          </ol>
-          </li>
-          </ol>
-          </div>
-         */
+      
     }
 
     public function js($indent = 0) {
@@ -259,14 +239,14 @@ class CElement_Component_Nestable extends CElement_Component {
                         /* config options */
                         maxDepth:0
                     });
-                ")->inc_indent();
+                ")->incIndent();
             } else {
                 $js->appendln("
                     jQuery('#" . $this->id . "').nestable({
                         /* config options */
                         maxDepth:100
                     });
-                ")->inc_indent();
+                ")->incIndent();
             }
             if (strlen($this->input) > 0) {
                 $js->appendln("
@@ -292,7 +272,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
         $js->append($this->js_cell)->br();
 
-        $js->append($this->js_child($indent))->br();
+        $js->append($this->jsChild($indent))->br();
         return $js->text();
     }
 

@@ -103,7 +103,7 @@ class CManager_Asset {
      * 
      * @return CManager_Asset_Module
      */
-    public function module() {
+    public function & module() {
         return $this->module;
     }
 
@@ -132,7 +132,6 @@ class CManager_Asset {
         $themejsFiles = $this->themeContainer->jsFiles();
         $moduleRunTimejsFiles = $this->module->getRunTimeContainer()->jsFiles();
         $runTimejsFiles = $this->runTimeContainer->jsFiles();
-
 
 
         $jsFiles = array_merge($moduleThemejsFiles, $themejsFiles, $moduleRunTimejsFiles, $runTimejsFiles);

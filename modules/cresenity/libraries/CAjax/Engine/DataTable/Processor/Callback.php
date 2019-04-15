@@ -44,30 +44,30 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
                     $table->getRowActionList()->add_class("pull-right");
                 }
                 $rowActionList->regenerateId(true);
-                $rowActionList->apply("jsparam", $jsparam);
+                $rowActionList->apply("setJsParam", $jsparam);
 
-                $rowActionList->apply("set_handler_url_param", $jsparam);
+                $rowActionList->apply("setHandlerUrlParam", $jsparam);
 
-                if (($table->filter_action_callback_func) != null) {
+                if (($table->filterActionCallbackFunc) != null) {
                     $actions = $rowActionList->childs();
 
                     foreach ($actions as $action) {
-                        $visibility = CDynFunction::factory($table->filter_action_callback_func)
-                                ->add_param($table)
-                                ->add_param($col->get_fieldname())
-                                ->add_param($row)
-                                ->add_param($action)
-                                ->set_require($table->requires)
+                        $visibility = CFunction::factory($table->filterActionCallbackFunc)
+                                ->addArg($table)
+                                ->addArg($col->getFieldname())
+                                ->addArg($row)
+                                ->addArg($action)
+                                ->setRequire($table->requires)
                                 ->execute();
 
-                        $action->set_visibility($visibility);
+                        $action->setVisibility($visibility);
                     }
                 }
 
                 $html->appendln($table->getRowActionList()->html($html->get_indent()));
                 $js .= $table->getRowActionList()->js();
                 $html->decIndent()->appendln('</td>')->br();
-                //$arr[] = '';
+
                 $tableData[$kRow][] = $html->text();
                 $tableData[$kRow]["DT_RowId"] = $key;
             }

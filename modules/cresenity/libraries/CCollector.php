@@ -89,7 +89,7 @@ class CCollector {
         return true;
     }
 
-    public static function deprecated() {
+    public static function deprecated($message = '') {
         $configCollector = CConfig::instance('collector');
 
         if ($configCollector->get('deprecated')) {
@@ -101,6 +101,11 @@ class CCollector {
                     throw new Exception('Deprecated');
                 } catch (Exception $ex) {
                     $data = static::getDataFromException($ex, $isDeprecated = true);
+                    if (strlen($message) > 0) {
+                        $dataArray = json_decode($data, true);
+                        carr::set_path($dataArray, 'message', carr::get($dataArray, 'message') . ', ' . $message);
+                        $data = json_encode($dataArray);
+                    }
                     static::put(static::DEPRECATED, $data);
                     unset($ex);
                 }
@@ -108,8 +113,15 @@ class CCollector {
         }
     }
 
-    public static function exception(Exception $exception) {
-        $data = static::getDataFromException($exception);
+    public static function exception($exception) {
+        if ($exception instanceof Exception) {
+            $data = static::getDataFromException($exception);
+            static::put(static::EXCEPTION, $data);
+        }
+    }
+
+    public static function error($errNo, $errStr, $errFile, $errLine, $errContext = null) {
+        $data = static::getDataFromError($errNo, $errStr, $errFile, $errLine, $errContext);
         static::put(static::EXCEPTION, $data);
     }
 
@@ -123,7 +135,7 @@ class CCollector {
         // Start validation of the controller
         $controllerClass = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
         $controllerClass = 'Controller_' . $controllerClass . ucfirst(CFRouter::$controller);
-        $error = get_class($exception);
+        $error = $isDeprecated ? 'Deprecated' : get_class($exception);
         $message = $exception->getMessage();
         $file = $exception->getFile();
         $line = $exception->getLine();
@@ -175,79 +187,50 @@ class CCollector {
         $data['postData'] = $rawPost;
         $data['fileData'] = json_encode($_FILES);
 
-        return json_encode($data);
+        return $data;
     }
 
-    private function getBrowser() {
-        $u_agent = $_SERVER['HTTP_USER_AGENT'];
-        $bname = 'Unknown';
-        $platform = 'Unknown';
-        $version = "";
+    private static function getDataFromError($errNo, $errStr, $errFile, $errLine, $errContext = null) {
+        // Start validation of the controller
+        $controllerClass = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
+        $controllerClass = 'Controller_' . $controllerClass . ucfirst(CFRouter::$controller);
+        $error = $errNo;
+        $message = $errStr;
+        $file = $errFile;
+        $line = $errLine;
+        $trace = debug_backtrace();
 
-        //First get the platform?
-        if (preg_match('/linux/i', $u_agent)) {
-            $platform = 'linux';
-        } elseif (preg_match('/macintosh|mac os x/i', $u_agent)) {
-            $platform = 'mac';
-        } elseif (preg_match('/windows|win32/i', $u_agent)) {
-            $platform = 'windows';
-        }
+        $browser = new CBrowser();
+        $data = [];
+        $rawPost = file_get_contents('php://input');
+        $data['datetime'] = date('Y-m-d H:i:s');
+        $data['appId'] = CApp_Base::appId();
+        $data['appCode'] = CApp_Base::appCode();
+        $data['user'] = CApp_Base::username();
+        $data['role'] = CApp_Base::roleName();
+        $data['orgId'] = CApp_Base::orgId();
+        $data['orgCode'] = CApp_Base::orgCode();
+        $data['error'] = $error;
+        $data['message'] = $message;
+        $data['file'] = $file;
+        $data['line'] = $line;
+        $data['trace'] = json_encode($trace);
+        $data['browser'] = $browser->getBrowser();
+        $data['browserVersion'] = $browser->getVersion();
+        $data['platform'] = $browser->getPlatform();
+        $data['domain'] = CF::domain();
+        $data['controller'] = $controllerClass;
+        $data['method'] = CFRouter::$method;
+        $data['userAgent'] = carr::get($_SERVER, 'HTTP_USER_AGENT');
+        $data['httpReferer'] = carr::get($_SERVER, 'HTTP_REFERER');
+        $data['remoteAddress'] = CApp_Base::remoteAddress();
+        $data['fullUrl'] = curl::current();
+        $data['protocol'] = CApp_Base::protocol();
+        $data['CFVersion'] = CF_VERSION;
+        $data['postData'] = $rawPost;
+        $data['fileData'] = json_encode($_FILES);
 
-        // Next get the name of the useragent yes seperately and for good reason
-        if (preg_match('/MSIE/i', $u_agent) && !preg_match('/Opera/i', $u_agent)) {
-            $bname = 'Internet Explorer';
-            $ub = "MSIE";
-        } elseif (preg_match('/Firefox/i', $u_agent)) {
-            $bname = 'Mozilla Firefox';
-            $ub = "Firefox";
-        } elseif (preg_match('/Chrome/i', $u_agent)) {
-            $bname = 'Google Chrome';
-            $ub = "Chrome";
-        } elseif (preg_match('/Safari/i', $u_agent)) {
-            $bname = 'Apple Safari';
-            $ub = "Safari";
-        } elseif (preg_match('/Opera/i', $u_agent)) {
-            $bname = 'Opera';
-            $ub = "Opera";
-        } elseif (preg_match('/Netscape/i', $u_agent)) {
-            $bname = 'Netscape';
-            $ub = "Netscape";
-        }
-
-        // finally get the correct version number
-        $known = array('Version', $ub, 'other');
-        $pattern = '#(?<browser>' . join('|', $known) .
-                ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
-        if (!preg_match_all($pattern, $u_agent, $matches)) {
-            // we have no matching number just continue
-        }
-
-        // see how many we have
-        $i = count($matches['browser']);
-        if ($i != 1) {
-            //we will have two since we are not using 'other' argument yet
-            //see if version is before or after the name
-            if (strripos($u_agent, "Version") < strripos($u_agent, $ub)) {
-                $version = $matches['version'][0];
-            } else {
-                $version = $matches['version'][1];
-            }
-        } else {
-            $version = $matches['version'][0];
-        }
-
-        // check if we have a number
-        if ($version == null || $version == "") {
-            $version = "?";
-        }
-
-        return array(
-            'userAgent' => $u_agent,
-            'name' => $bname,
-            'version' => $version,
-            'platform' => $platform,
-            'pattern' => $pattern
-        );
+        return $data;
     }
 
 }

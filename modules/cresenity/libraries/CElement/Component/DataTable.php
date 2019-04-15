@@ -32,10 +32,10 @@ class CElement_Component_DataTable extends CElement_Component {
     public $checkbox_value;
     public $numbering;
     public $query;
-    public $custom_column_header;
+    public $customColumnHeader;
     public $header_sortable;
-    public $cell_callback_func;
-    public $filter_action_callback_func;
+    public $cellCallbackFunc;
+    public $filterActionCallbackFunc;
     public $display_length;
     public $paging_list;
     public $responsive;
@@ -99,8 +99,8 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->header_sortable = true;
         $this->footer = false;
         $this->footer_field = array();
-        $this->cell_callback_func = "";
-        $this->filter_action_callback_func = "";
+        $this->cellCallbackFunc = "";
+        $this->filterActionCallbackFunc = "";
         $this->display_length = "10";
         $this->ajax = false;
         $this->ajax_method = "get";
@@ -117,7 +117,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->export_excel = false;
         $this->headerNoLineBreak = false;
 
-        $this->custom_column_header = "";
+        $this->customColumnHeader = "";
         $this->show_header = true;
         $this->apply_data_table = true;
         $this->group_by = "";
@@ -226,7 +226,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setCustomColumnHeader($html) {
-        $this->custom_column_header = $html;
+        $this->customColumnHeader = $html;
         return $this;
     }
 
@@ -280,20 +280,21 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->options->get_by_name($key);
     }
 
-    public function setHaveDataTableViewAction($bool=true) {
-        $this->haveDataTableViewAction=$bool;
+    public function setHaveDataTableViewAction($bool = true) {
+        $this->haveDataTableViewAction = $bool;
         return $this;
     }
-    
-     public function setDataTableViewCol() {
-        $this->dataTableView=CConstant::TABLE_VIEW_COL;
+
+    public function setDataTableViewCol() {
+        $this->dataTableView = CConstant::TABLE_VIEW_COL;
         return $this;
     }
-     public function setDataTableViewRow() {
-        $this->dataTableView=CConstant::TABLE_VIEW_ROW;
+
+    public function setDataTableViewRow() {
+        $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         return $this;
     }
-    
+
     public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
@@ -327,7 +328,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function cellCallbackFunc($func, $require = "") {
-        $this->cell_callback_func = $func;
+        $this->cellCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -335,7 +336,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function filterActionCallbackFunc($func, $require = "") {
-        $this->filter_action_callback_func = $func;
+        $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -586,8 +587,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
                     $new_v = $col_v;
 
-                    if (($this->cell_callback_func) != null) {
-                        $new_v = CFunction::factory($this->cell_callback_func)
+                    if (($this->cellCallbackFunc) != null) {
+                        $new_v = CFunction::factory($this->cellCallbackFunc)
                                 ->addArg($this)
                                 ->addArg($col->getFieldname())
                                 ->addArg($row)
@@ -614,18 +615,18 @@ class CElement_Component_DataTable extends CElement_Component {
                     if ($col->getNoLineBreak()) {
                         $class .= " no-line-break";
                     }
-                    if ($col->hidden_phone)
+                    if ($col->getHiddenPhone())
                         $class .= " hidden-phone";
 
-                    if ($col->hidden_tablet)
+                    if ($col->getHiddenTablet())
                         $class .= " hidden-tablet";
 
-                    if ($col->hidden_desktop)
+                    if ($col->getHiddenDesktop())
                         $class .= " hidden-desktop";
 
                     $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
                     if ($this->export_pdf) {
-                        switch ($col->get_align()) {
+                        switch ($col->getAlign()) {
                             case "left": $pdfTBodyTdCurrentAttr .= ' align="left"';
                                 break;
                             case "right": $pdfTBodyTdCurrentAttr .= ' align="right"';
@@ -654,14 +655,14 @@ class CElement_Component_DataTable extends CElement_Component {
                         $this->rowActionList->addClass("pull-right");
                     }
                     $this->rowActionList->regenerateId(true);
-                    $this->rowActionList->apply("jsparam", $jsparam);
-                    $this->rowActionList->apply("set_handler_url_param", $jsparam);
+                    $this->rowActionList->apply("setJsParam", $jsparam);
+                    $this->rowActionList->apply("setHandlerUrlParam", $jsparam);
 
-                    if (($this->filter_action_callback_func) != null) {
+                    if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as &$action) {
-                            $visibility = CFunction::factory($this->filter_action_callback_func)
+                            $visibility = CFunction::factory($this->filterActionCallbackFunc)
                                     ->addArg($this)
                                     ->addArg($col->getFieldname())
                                     ->addArg($row)
@@ -673,9 +674,6 @@ class CElement_Component_DataTable extends CElement_Component {
                             }
                             $action->setVisibility($visibility);
                         }
-
-
-                        //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                     }
 
 
@@ -728,8 +726,8 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($this->show_header) {
             $html->appendln('<thead>')
                     ->incIndent()->br();
-            if (strlen($this->custom_column_header) > 0) {
-                $html->appendln($this->custom_column_header);
+            if (strlen($this->customColumnHeader) > 0) {
+                $html->appendln($this->customColumnHeader);
             } else {
                 $html->appendln('<tr>')
                         ->incIndent()->br();
@@ -845,8 +843,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
             $mainClass = ' widget-box ';
             $mainClassTitle = ' widget-title ';
-            $tableViewClass = $this->dataTableView==CConstant::TABLE_VIEW_COL?' data-table-col-view':' data-table-row-view';
-            $mainClassContent = ' widget-content '.$tableViewClass.' col-view-count-' . $this->dataTableViewColCount;
+            $tableViewClass = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' data-table-col-view' : ' data-table-row-view';
+            $mainClassContent = ' widget-content ' . $tableViewClass . ' col-view-count-' . $this->dataTableViewColCount;
             if ($this->bootstrap == '3.3') {
                 $mainClass = ' box box-info';
                 $mainClassTitle = ' box-header with-border ';
@@ -878,18 +876,18 @@ class CElement_Component_DataTable extends CElement_Component {
                 }
 
                 if ($this->haveDataTableViewAction) {
-                    $colViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' active':'';
-                    $rowViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' active':'';
-                    $colViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_COL? ' checked="checked"':'';
-                    $rowViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_ROW? ' checked="checked"':'';
+                    $colViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' active' : '';
+                    $rowViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_ROW ? ' active' : '';
+                    $colViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' checked="checked"' : '';
+                    $rowViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_ROW ? ' checked="checked"' : '';
                     $html->appendln('
                         <div class="btn-group btn-group-toggle ml-auto" data-toggle="buttons">
-                            <label class="btn btn-default icon-btn md-btn-flat '.$colViewActionActive.'">
-                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-col-view" '.$colViewActionChecked.' />
+                            <label class="btn btn-default icon-btn md-btn-flat ' . $colViewActionActive . '">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-col-view" ' . $colViewActionChecked . ' />
                                 <span class="ion ion-md-apps"></span>
                             </label>
-                            <label class="btn btn-default icon-btn md-btn-flat '.$rowViewActionActive.'">
-                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-row-view" '.$rowViewActionChecked.'" />
+                            <label class="btn btn-default icon-btn md-btn-flat ' . $rowViewActionActive . '">
+                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-row-view" ' . $rowViewActionChecked . '" />
                                 <span class="ion ion-md-menu"></span>
                             </label>
                         </div>
@@ -1121,7 +1119,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
             $jqueryui = "'bJQueryUI': false,";
-            if (CClientModules::instance()->is_registered_module('jquery.ui') || CClientModules::instance()->is_registered_module('jquery-ui-1.12.1.custom')) {
+            if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
 
@@ -1156,11 +1154,11 @@ class CElement_Component_DataTable extends CElement_Component {
 						sEmptyTable  : '" . clang::__('No data available in table') . "',
 						sInfoThousands   : '" . clang::__('') . "',
 					},")->br()
-                    ->appendln("'bDeferRender': " . ($this->get_option("defer_render") ? "true" : "false") . ",")->br()
-                    ->appendln("'bFilter': " . ($this->get_option("filter") ? "true" : "false") . ",")->br()
-                    ->appendln("'bInfo': " . ($this->get_option("info") ? "true" : "false") . ",")->br()
-                    ->appendln("'bPaginate': " . ($this->get_option("pagination") ? "true" : "false") . ",")->br()
-                    ->appendln("'bLengthChange': " . ($this->get_option("length_change") ? "true" : "false") . ",")->br()
+                    ->appendln("'bDeferRender': " . ($this->getOption("defer_render") ? "true" : "false") . ",")->br()
+                    ->appendln("'bFilter': " . ($this->getOption("filter") ? "true" : "false") . ",")->br()
+                    ->appendln("'bInfo': " . ($this->getOption("info") ? "true" : "false") . ",")->br()
+                    ->appendln("'bPaginate': " . ($this->getOption("pagination") ? "true" : "false") . ",")->br()
+                    ->appendln("'bLengthChange': " . ($this->getOption("length_change") ? "true" : "false") . ",")->br()
                     ->appendln("'aoColumns': vaoColumns,")->br()
                     ->appendln("'autoWidth': false,")->br()
                     ->appendln("'aLengthMenu': [

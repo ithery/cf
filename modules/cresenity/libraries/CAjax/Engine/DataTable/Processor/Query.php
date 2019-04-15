@@ -343,8 +343,8 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
 
                 $new_v = $col_v;
 
-                if (($table->cell_callback_func) != null) {
-                    $new_v = CFunction::factory($table->cell_callback_func)
+                if (($table->cellCallbackFunc) != null) {
+                    $new_v = CFunction::factory($table->cellCallbackFunc)
                             ->addArg($table)
                             ->addArg($col->getFieldname())
                             ->addArg($row)
@@ -387,13 +387,13 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
 
                 $rowActionList->apply("setHandlerUrlParam", $jsparam);
 
-                if (($table->filter_action_callback_func) != null) {
+                if (($table->filterActionCallbackFunc) != null) {
                     $actions = $rowActionList->childs();
 
                     foreach ($actions as &$action) {
                         $action->removeClass('d-none');
 
-                        $visibility = CFunction::factory($table->filter_action_callback_func)
+                        $visibility = CFunction::factory($table->filterActionCallbackFunc)
                                 ->addArg($table)
                                 ->addArg($col->getFieldname())
                                 ->addArg($row)
@@ -409,13 +409,13 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     }
 
 
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                    //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
 
-                $html->appendln($table->getRowActionList()->html($html->get_indent()));
+                $html->appendln($table->getRowActionList()->html($html->getIndent()));
                 $js .= $table->getRowActionList()->js();
                 $html->decIndent()->appendln('</td>')->br();
-                //$arr[] = '';
+
                 $arr[] = $html->text();
                 $arr["DT_RowId"] = $key;
             }

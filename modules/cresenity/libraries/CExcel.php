@@ -1,18 +1,13 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-/**
- * PHP Excel library. Helper class to make spreadsheet creation easier.
- *
- * @package    Spreadsheet
- * @author     Flynsarmy
- * @website    http://www.flynsarmy.com/
- * @license    TEH FREEZ
- */
-require_once dirname(__FILE__) . "/Lib/phpexcel/PHPExcel.php";
-require_once dirname(__FILE__) . "/Lib/phpexcel/PHPExcel/IOFactory.php";
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class CExcel {
+
+    use CTrait_Compat_Excel;
 
     private $phpexcel;
 
@@ -30,7 +25,7 @@ class CExcel {
             'author' => 'Cresenity',
                 ), $headers);
 
-        $this->phpexcel = new PHPExcel();
+        $this->phpexcel = new Spreadsheet();
         // Set properties
         $this->phpexcel->getProperties()
                 ->setCreator($headers['author'])
@@ -47,8 +42,9 @@ class CExcel {
     }
 
     public static function num2alpha($n) {
-        for ($r = ""; $n >= 0; $n = intval($n / 26) - 1)
+        for ($r = ""; $n >= 0; $n = intval($n / 26) - 1) {
             $r = chr($n % 26 + 0x41) . $r;
+        }
         return $r;
     }
 
@@ -81,11 +77,11 @@ class CExcel {
         return $this->phpexcel;
     }
 
-    public function get_active_sheet() {
+    public function getActiveSheet() {
         return $this->phpexcel->getActiveSheet();
     }
 
-    public function set_active_sheet_name($name) {
+    public function setActiveSheetName($name) {
         $this->phpexcel->getActiveSheet()->setTitle($name);
         return $this;
     }
@@ -98,105 +94,112 @@ class CExcel {
         return $this->phpexcel->getActiveSheet()->getTitle();
     }
 
-    function set_auto_width($col_start = "", $col_end = "") {
+    function setAutoWidth($colStart = "", $colEnd = "") {
         $sheet = $this->phpexcel->getActiveSheet();
-        if (empty($col_end)) {//not defined the last column, set it the max one
-            $col_end = $sheet->getColumnDimension($sheet->getHighestColumn())->getColumnIndex();
+        if (empty($colEnd)) {//not defined the last column, set it the max one
+            $colEnd = $sheet->getColumnDimension($sheet->getHighestColumn())->getColumnIndex();
         }
-        if ($col_start == "")
-            $col_start = "A";
-        if (is_numeric($col_start))
-            $col_start = $this->num2alpha($col_start);
-
-        $col_end++;
-        for ($i = $col_start; $i !== $col_end; $i++) {
+        if ($colStart == "") {
+            $colStart = "A";
+        }
+        if (is_numeric($colStart)) {
+            $colStart = $this->num2alpha($colStart);
+        }
+        $colEnd++;
+        for ($i = $colStart; $i !== $colEnd; $i++) {
             $sheet->getColumnDimension($i)->setAutoSize(true);
         }
         $sheet->calculateColumnWidths();
     }
 
-    public function set_align_by_index($col, $row, $align) {
+    public function setAlignByIndex($col, $row, $align) {
         $sheet = $this->phpexcel->getActiveSheet();
         if (is_numeric($col))
             $col = $this->num2alpha($col);
 
         if ($align == "left") {
-            $sheet->getStyle($col . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle($col . $row)->getAlignment()->setHorizontal(PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
         }
         if ($align == "right") {
-            $sheet->getStyle($col . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle($col . $row)->getAlignment()->setHorizontal(PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
         }
         if ($align == "center") {
-            $sheet->getStyle($col . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle($col . $row)->getAlignment()->setHorizontal(PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         }
     }
 
-    public function merge_cell($col1, $row1, $col2, $row2) {
+    public function mergeCell($col1, $row1, $col2, $row2) {
         $sheet = $this->phpexcel->getActiveSheet();
-        if (is_numeric($col1))
+        if (is_numeric($col1)) {
             $col1 = $this->num2alpha($col1);
-        if (is_numeric($col2))
+        }
+        if (is_numeric($col2)) {
             $col2 = $this->num2alpha($col2);
+        }
         $sheet->mergeCells($col1 . $row1 . ":" . $col2 . $row2);
     }
 
-    public function set_header_style($row = null, $style = array(), $col_start = "", $col_end = "") {
-        if ($row == null)
+    public function setHeaderStyle($row = null, $style = array(), $colStart = "", $colEnd = "") {
+        if ($row == null) {
             $row = '1';
+        }
         $sheet = $this->phpexcel->getActiveSheet();
         if (empty($style)) {
             $style = array(
                 'fill' => array(
-                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
-                    'color' => array('rgb' => '333333'),
+                    'fillType' => PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'color' => array('argb' => 'FF333333'),
                 ),
                 'font' => array(
                     'bold' => true,
-                    'color' => array('rgb' => 'FFFFFF'),
+                    'color' => array('argb' => 'FFFFFFFF'),
                 ),
             );
         }
-        if (empty($col_end)) {//not defined the last column, set it the max one
-            $col_end = $sheet->getColumnDimension($sheet->getHighestColumn())->getColumnIndex();
+        if (empty($colEnd)) {//not defined the last column, set it the max one
+            $colEnd = $sheet->getColumnDimension($sheet->getHighestColumn())->getColumnIndex();
         }
-        if ($col_start == "")
-            $col_start = "A";
-        if (is_numeric($col_start))
-            $col_start = $this->num2alpha($col_start);
-        if (is_numeric($col_end))
-            $col_end = $this->num2alpha($col_end);
+        if ($colStart == "") {
+            $colStart = "A";
+        }
+        if (is_numeric($colStart)) {
+            $colStart = $this->num2alpha($colStart);
+        }
+        if (is_numeric($colEnd)) {
+            $colEnd = $this->num2alpha($colEnd);
+        }
 
-        $sheet->getStyle($col_start . $row . ':' . $col_end . $row)->applyFromArray($style);
+        $sheet->getStyle($colStart . $row . ':' . $colEnd . $row)->applyFromArray($style);
     }
 
-    public function set_row_style($row, $style = array(), $col_start = "", $col_end = "") {
+    public function setRowStyle($row, $style = array(), $colStart = "", $colEnd = "") {
         $sheet = $this->phpexcel->getActiveSheet();
         if (empty($style)) {
             $style = array(
                 'fill' => array(
-                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
-                    'color' => array('rgb' => '333333'),
+                    'fillType' => PPhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'color' => array('argb' => 'FF333333'),
                 ),
                 'font' => array(
                     'bold' => true,
-                    'color' => array('rgb' => 'FFFFFF'),
+                    'color' => array('argb' => 'FFFFFFFF'),
                 ),
             );
         }
-        if (empty($col_end)) {//not defined the last column, set it the max one
-            $col_end = $sheet->getColumnDimension($sheet->getHighestColumn())->getColumnIndex();
+        if (empty($colEnd)) {//not defined the last column, set it the max one
+            $colEnd = $sheet->getColumnDimension($sheet->getHighestColumn())->getColumnIndex();
         }
-        if ($col_start == "")
-            $col_start = "A";
-        if (is_numeric($col_start))
-            $col_start = $this->num2alpha($col_start);
-        if (is_numeric($col_end))
-            $col_end = $this->num2alpha($col_end);
+        if ($colStart == "")
+            $colStart = "A";
+        if (is_numeric($colStart))
+            $colStart = $this->num2alpha($colStart);
+        if (is_numeric($colEnd))
+            $colEnd = $this->num2alpha($colEnd);
 
-        $sheet->getStyle($col_start . $row . ':' . $col_end . $row)->applyFromArray($style);
+        $sheet->getStyle($colStart . $row . ':' . $colEnd . $row)->applyFromArray($style);
     }
 
-    public function add_sheet() {
+    public function addSheet() {
         return $this->phpexcel->addSheet();
     }
 
@@ -212,10 +215,9 @@ class CExcel {
         return $this;
     }
 
-    public function write_by_index($column, $row, $value) {
+    public function writeByIndex($column, $row, $value) {
 
         $this->phpexcel->getActiveSheet()->setCellValueByColumnAndRow($column, $row, $value);
-        //->setCellValueExplicit('A1', '0029', PHPExcel_Cell_DataType::TYPE_STRING);
         return $this;
     }
 
@@ -236,15 +238,15 @@ class CExcel {
 
     public function set_column_width($index, $width) {
         $sheet = $this->phpexcel->getActiveSheet();
-        $col = $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($index));
+        $col = $sheet->getColumnDimension(PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index));
         $col->setWidth($width);
     }
 
-    public function set_list_validation($cell, $source) {
+    public function setListValidation($cell, $source) {
 
         $objValidation = $this->phpexcel->getActiveSheet()->getCell($cell)->getDataValidation();
-        $objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
-        $objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+        $objValidation->setType(PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $objValidation->setErrorStyle(PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
         $objValidation->setAllowBlank(false);
         $objValidation->setShowInputMessage(true);
         $objValidation->setShowErrorMessage(true);
@@ -257,14 +259,15 @@ class CExcel {
         $objValidation->setFormula2($source);
     }
 
-    public function setData(array $data, $multi_sheet = false) {
-        if (empty($this->phpexcel))
+    public function setData(array $data, $multiSheet = false) {
+        if (empty($this->phpexcel)) {
             $this->create();
+        }
 
         //Single sheet ones can just dump everything to the current sheet
-        if (!$multi_sheet) {
-            $Sheet = $this->phpexcel->getActiveSheet();
-            $this->setSheetData($data, $Sheet);
+        if (!$multiSheet) {
+            $sheet = $this->phpexcel->getActiveSheet();
+            $this->setSheetData($data, $sheet);
         }
         //Hvae to do a little more work with multi-sheet
         else {
@@ -302,7 +305,9 @@ class CExcel {
         if (empty($this->phpexcel))
             $this->create();
 
-        $Writer = PHPExcel_IOFactory::createWriter($this->phpexcel, 'Excel5');
+
+
+        $Writer = PhpOffice\PhpSpreadsheet\IOFactory::createWriter($this->phpexcel, 'Xls');
         // If you want to output e.g. a PDF file, simply do:
         //$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
         $Writer->save($name);
@@ -311,10 +316,11 @@ class CExcel {
     }
 
     public function savepdf($name) {
-        if (empty($this->phpexcel))
+        if (empty($this->phpexcel)) {
             $this->create();
+        }
 
-        $Writer = PHPExcel_IOFactory::createWriter($this->phpexcel, 'PDF');
+        $Writer = PhpOffice\PhpSpreadsheet\IOFactory::createWriter($this->phpexcel, 'PDF');
         // If you want to output e.g. a PDF file, simply do:
         //$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
         $Writer->save($name);
@@ -324,17 +330,17 @@ class CExcel {
 
     public function load($name) {
         /** Load $inputFileName to a PHPExcel Object  * */
-        $this->phpexcel = PHPExcel_IOFactory::load($name);
+        $this->phpexcel = PhpOffice\PhpSpreadsheet\IOFactory::load($name);
         return $this;
     }
 
-    public function set_read_data_only($read_data) {
-        $this->phpexcel->setReadDataOnly($read_data);
+    public function setReadDataOnly($readData) {
+        $this->phpexcel->setReadDataOnly($readData);
         return $this;
     }
 
-    public static function column_index($column_char) {
-        $colIndex = PHPExcel_Cell::columnIndexFromString($column_char);
+    public static function columnIndex($column_char) {
+        $colIndex = PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($column_char);
     }
 
 }

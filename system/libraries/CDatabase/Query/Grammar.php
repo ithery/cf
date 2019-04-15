@@ -719,7 +719,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return array
      */
     public function prepareBindingsForDelete(array $bindings) {
-        return Arr::flatten($bindings);
+        return carr::flatten($bindings);
     }
 
     /**

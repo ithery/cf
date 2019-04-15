@@ -86,7 +86,7 @@ class CTemplate {
      * @return mixed   variable value if the key is found
      * @return void    if the key is not found
      */
-    public function &__get($key) {
+    public function __get($key) {
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }

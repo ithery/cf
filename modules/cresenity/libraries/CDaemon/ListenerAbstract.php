@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
 
-     /**
+    /**
      * Default backlog. Backlog is the maximum length of the queue of pending connections.
      *
      * @var int
@@ -163,7 +163,6 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
                 $contextOption['socket']['backlog'] = static::DEFAULT_BACKLOG;
             }
             $this->context = stream_context_create($contextOption);
-         
         }
     }
 
@@ -184,7 +183,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
         if (!$newSocket) {
             return;
         }
-        
+
         $this->log('Accepted new Connection');
         // TcpConnection.
         $connection = new CDaemon_Worker_Connection_TcpConnection($newSocket, $remoteAddress);
@@ -263,7 +262,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
         if (!$this->mainSocket) {
             // Get the application layer communication protocol and listening address.
             list($scheme, $address) = explode(':', $this->socketName, 2);
-            
+
             // Check application layer protocol class.
             if (!isset(static::$builtinTransports[$scheme])) {
                 $scheme = ucfirst($scheme);
@@ -290,15 +289,14 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
                 stream_context_set_option($this->context, 'socket', 'so_reuseport', 1);
             }
             // Create an Internet or Unix domain server socket.
-            
+
             $this->mainSocket = stream_socket_server($localSocket, $errno, $errmsg, $flags, $this->context);
             if (!$this->mainSocket) {
-                
+
                 throw new Exception($errmsg);
-               
             }
-            $this->log('Start listening '.$localSocket);
-            
+            $this->log('Start listening ' . $localSocket);
+
             if ($this->transport === 'ssl') {
                 stream_socket_enable_crypto($this->mainSocket, false);
             } elseif ($this->transport === 'unix') {
@@ -325,8 +323,6 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
         }
         $this->resumeAccept();
     }
-
-    
 
     /**
      * Get unix user of current porcess.
@@ -370,7 +366,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
         }
     }
 
-     /**
+    /**
      * Unlisten.
      *
      * @return void
@@ -378,13 +374,13 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
     public function unlisten() {
         $this->pauseAccept();
         if ($this->mainSocket) {
-            set_error_handler(function(){});
+            set_error_handler(function() {
+                
+            });
             fclose($this->mainSocket);
             restore_error_handler();
             $this->mainSocket = null;
         }
     }
-    
-   
 
 }

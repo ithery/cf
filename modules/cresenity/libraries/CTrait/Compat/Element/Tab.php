@@ -42,4 +42,8 @@ trait CTrait_Compat_Element_Tab {
         return $this->setIcon($icon);
     }
 
+    public function header_html($indent = 0) {
+        return $this->headerHtml($indent);
+    }
+
 }

@@ -1018,7 +1018,7 @@ abstract class CModel implements ArrayAccess {
             $this->getUpdatedAtColumn(),
         ];
 
-        $attributes = Arr::except(
+        $attributes = carr::except(
                         $this->attributes, $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 

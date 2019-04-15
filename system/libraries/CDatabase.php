@@ -5,7 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CDatabase {
 
     use CTrait_Compat_Database;
-    
+
     // Database instances
     public static $instances = array();
     // Global benchmark
@@ -1728,6 +1728,15 @@ class CDatabase {
             $res[$arr_key] = $arr_val;
         }
         return $res;
+    }
+
+    /**
+     * Get a new query builder instance.
+     *
+     * @return CDatabase_Query_Builder
+     */
+    public function createQueryBuilder() {
+        return new CDatabase_Query_Builder($this);
     }
 
 }

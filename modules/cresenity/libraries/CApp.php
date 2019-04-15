@@ -736,10 +736,19 @@ class CApp extends CObservable {
                 $v->trace = $trace;
                 $v->message = $message;
                 $html = $v->render();
+                $configCollector = CConfig::instance('collector');
+                if ($configCollector->get('exception')) {
+                    if ($PHP_ERROR) {
+                        CCollector::error($exception, $message, $file, $line, '');
+                    } else {
+                        CCollector::exception($exception);
+                    }
+                } else {
+                    cmail::error_mail($html);
+                }
+                
 
-                // cmail::error_mail($html);
-
-                CCollector::exception($exception);
+                
             }
 
 

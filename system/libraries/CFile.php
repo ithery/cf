@@ -196,8 +196,8 @@ class CFile {
      */
     public function size($path) {
         clearstatcache();
-        $filesize= filesize($path);
-        if($filesize==0 && $this->exists($path)) {
+        $filesize = filesize($path);
+        if ($filesize == 0 && $this->exists($path)) {
             //try to get another method
             $fp = fopen($path, "rb");
             fseek($fp, 0, SEEK_END);
@@ -370,6 +370,22 @@ class CFile {
      */
     public function cleanDirectory($directory) {
         return $this->deleteDirectory($directory, true);
+    }
+
+    /**
+     * Get the returned value of a file.
+     *
+     * @param  string  $path
+     * @return mixed
+     *
+     * @throws CFile_Exception_FileNotFoundException
+     */
+    public function getRequire($path) {
+        if ($this->isFile($path)) {
+            return require $path;
+        }
+
+        throw new CFile_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
 
 }
