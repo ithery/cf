@@ -14,6 +14,10 @@ class CValidation {
         return new CValidation_Validator($data, $rules, $messages, $customAttributes);
     }
 
+    
+    public static function createRule() {
+        return new CValidation_Rule();
+    }
 }
 
 // End CValidation

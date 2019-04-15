@@ -10,15 +10,21 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 <script>
     jQuery(document).ready(function(){
-    $("<?= $validator['selector']; ?>").each(function() {
+    var selectorValidator = "<?= $validator['selector']; ?>";
+    var validateOptions = {
+    errorElement: 'span',
+            errorClass: 'invalid-feedback',
+    };
+    $(selectorValidator).each(function() {
     $(this).validate({
     errorElement: 'span',
             errorClass: 'invalid-feedback',
             errorPlacement: function (error, element) {
-            if (element.parent('.input-group').length ||
-                    element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+            if (element.parent('.input-group').length || element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
             error.insertAfter(element.parent());
             // else just place the validation message immediately after the input
+            } else if ((element.hasClass('select2') || element.hasClass('select2-hidden-accessible')) && element.next('.select2-container').length) {
+            error.insertAfter(element.next('.select2-container'));
             } else {
             error.insertAfter(element);
             }
