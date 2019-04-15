@@ -216,6 +216,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         $this->via = $via;
         $this->via->mediator = $this;
         $interval = $this->service->getLoopInterval();
+        CDaemon::Log('Mediator Construct:Interval:' . $interval);
         switch (true) {
             case $interval > 2 || $interval === 0:
                 $this->forkingStrategy = self::LAZY;
@@ -227,6 +228,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $this->forkingStrategy = self::AGGRESSIVE;
                 break;
         }
+        $this->forkingStrategy = self::LAZY;
     }
 
     public function __destruct() {
@@ -300,19 +302,20 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             return 0;
         };
         $this->via->prompt_prefix_callback = function($method, $args) use($alias) {
-            return sprintf('%s %s %s', $alias, getmypid(), (Core_Daemon::is('parent')) ? 'D' : 'W');
+            return sprintf('%s %s %s', $alias, getmypid(), (CDaemon::getRunningService()->isParent()) ? 'D' : 'W');
         };
         ##
         ## Set more specific and informative prompts for certain methods
         ##
         $this->via->prompts['put'] = function($method, $args) use($alias) {
             $statuses = array(
-                Core_Worker_Mediator::UNCALLED => 'Daemon sending Call message to Worker',
-                Core_Worker_Mediator::RUNNING => 'Worker sending "running" ack message to Daemon',
-                Core_Worker_Mediator::RETURNED => 'Worker sending "return" ack message to Daemon',
+                CDaemon_Worker_MediatorAbstract::UNCALLED => 'Daemon sending Call message to Worker',
+                CDaemon_Worker_MediatorAbstract::RUNNING => 'Worker sending "running" ack message to Daemon',
+                CDaemon_Worker_MediatorAbstract::RETURNED => 'Worker sending "return" ack message to Daemon',
             );
-            if (!$args[0] instanceof Core_Worker_Call)
+            if (!$args[0] instanceof CDaemon_Worker_Call) {
                 return false;
+            }
             return "[Call {$args[0]->id}] " . $statuses[$args[0]->status];
         };
         $this->via->prompts['drop'] = function($method, $args) use($alias) {
@@ -533,13 +536,14 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if ($this->workers <= $processes) {
             return;
         }
+        $forks=0;
         switch ($this->forkingStrategy) {
             case self::LAZY:
                 $state = $this->via->state();
-                if ($processes > count($this->runningCalls))
+                $forks = 1;
+                if ($processes > count($this->runningCalls)) {
                     $forks = 0;
-                else
-                    $forks = 1;
+                }
                 break;
             case self::MIXED:
                 if ($this->callCount == 0) {
@@ -553,8 +557,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         }
         // Handle a case where we have a new process in a LAZY or MIXED strategy with pending messages on the queue
         if ($forks == 0) {
-            if (!isset($state))
+            if (!isset($state)) {
                 $state = $this->via->state();
+            }
             if ($this->callCount == 0 && $state['messages'] > 0)
                 $forks = 1;
         }
@@ -886,8 +891,10 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return mixed
      */
     public function processCount() {
-        if (isset($this->service->ProcessManager))
-            return $this->service->ProcessManager->count($this->alias);
+        $processManager = $this->service->getPlugin('ProcessManager');
+        if ($processManager != null) {
+            return $processManager->count($this->alias);
+        }
         return 0;
     }
 
@@ -917,10 +924,12 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             if (!isset($durations[$call->method]))
                 $durations[$call->method] = array();
             foreach (array(self::CALLED, self::RUNNING) as $status) {
-                if (!isset($durations[$call->method][$status]))
+                if (!isset($durations[$call->method][$status])) {
                     $durations[$call->method][$status] = array();
-                if (isset($call->time[$status + 1]))
+                }
+                if (isset($call->time[$status + 1])) {
                     $durations[$call->method][$status][] = max(round($call->time[$status + 1] - $call->time[$status], 5), 0);
+                }
             }
         }
         // Write out the header
@@ -990,10 +999,11 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function fatalError($message) {
-        if ($this->service->isParent())
+        if ($this->service->isParent()) {
             $this->service->fatalError("Fatal Error: $message", $this->alias);
-        else
+        } else {
             $this->service->fatalError("Fatal Error: $message\nWorker process will restart", $this->alias);
+        }
     }
 
     /**
@@ -1024,9 +1034,10 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @param stdClass $call
      * @return bool
      */
-    public function retry(Core_Worker_Call $call) {
-        if (empty($call->method))
+    public function retry(CDaemon_Worker_Call $call) {
+        if (empty($call->method)) {
             throw new Exception(__METHOD__ . " Failed. A valid call struct is required.");
+        }
         $this->log("Retrying Call {$call->id} To `{$call->method}`");
         $call->retry();
         return $this->call($call);
@@ -1042,8 +1053,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return int  Return a status int - See status constants in this class
      */
     public function status($callId) {
-        if (isset($this->calls[$callId]))
+        if (isset($this->calls[$callId])) {
             return $this->calls[$callId]->status;
+        }
         return null;
     }
 
@@ -1058,8 +1070,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @throws Exception
      */
     public function onTimeout($onTimeout) {
-        if (!is_callable($onTimeout))
+        if (!is_callable($onTimeout)) {
             throw new Exception(__METHOD__ . " Failed. Callback or Closure expected.");
+        }
         $this->onTimeout = $onTimeout;
     }
 
@@ -1073,8 +1086,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @throws Exception
      */
     public function onReturn($onReturn) {
-        if (!is_callable($onReturn))
+        if (!is_callable($onReturn)) {
             throw new Exception(__METHOD__ . " Failed. Callback or Closure expected.");
+        }
         $this->onReturn = $onReturn;
     }
 

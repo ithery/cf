@@ -246,7 +246,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
      * @return string
      */
     public function getSocketName() {
-        return $this - socketName ? lcfirst($this->socketName) : 'none';
+        return $this->socketName ? lcfirst($this->socketName) : 'none';
     }
 
     /**

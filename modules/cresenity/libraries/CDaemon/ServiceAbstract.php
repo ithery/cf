@@ -883,7 +883,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @return CDaemon_Plugin
      * @throws Exception
      */
-    protected function getPlugin($alias) {
+    public function getPlugin($alias) {
         if (!isset($this->plugins[$alias])) {
             throw new Exception("Plugin alias not found. The identifier `{$alias}` is not found");
         }
