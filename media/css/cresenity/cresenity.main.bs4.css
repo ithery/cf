@@ -1021,6 +1021,11 @@ form
     display:none;
 }
 
+.row-fluid.tab-list .top-nav-container .nav-item.w-100.p-1 {
+    width:auto !important;
+    padding: 0!important;
+
+}
 
 .hr-line-dashed {
     border-top: 1px dashed #e7eaec;
