@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 12, 2019, 3:23:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CDaemon_ServiceAbstract {
+class CDaemon_Service {
 
     /**
      *
@@ -235,6 +235,10 @@ abstract class CDaemon_ServiceAbstract {
 
     public function isParent() {
         return $this->isParent;
+    }
+
+    public function run() {
+        $this->setup();
     }
 
 }
