@@ -31,7 +31,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     public function setParent($parent) {
-        $this->parent = $parent;
+        $this->parent = & $parent;
         return $this;
     }
 
@@ -238,7 +238,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $this->getEvent()->listen($event, $callback);
     }
 
-    public function getParent() {
+    public function &getParent() {
         return $this->parent;
     }
 
