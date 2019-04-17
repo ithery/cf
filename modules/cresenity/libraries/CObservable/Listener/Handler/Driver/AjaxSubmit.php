@@ -16,7 +16,7 @@ class CObservable_Listener_Handler_Driver_AjaxSubmit extends CObservable_Listene
         $optionsJson = json_encode($optionsArray);
         $js = '';
         $js .= "
-            $.cresenity.ajaxSubmit('#" . $this->owner . "','" . $this->generatedUrl() . "'," . $optionsJson . ");;
+            $.cresenity.ajaxSubmit('#" . $this->owner . "'," . $optionsJson . ");;
          ";
         return $js;
     }
