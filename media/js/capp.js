@@ -624,6 +624,28 @@ if (window.capp.have_clock) {
                 return url;
             }
         },
+        ajaxSubmit: function(selector,options) {
+            var settings = $.extends({},options);
+            $(selector).each(function(){
+                //don't do it again if still loading
+                if($(this).hasClass('loading')) {
+                    return false;
+                }
+                $(this).addClass('loading');
+                $(this).find('*').addClass('disabled');
+                var formAjaxUrl = $(this).attr('action') || '';
+                var formMethod = $(this).attr('method') || 'get';
+                
+                var ajaxOptions = {
+                    url: formAjaxUrl,
+                    dataType: 'json',
+                    type: formMethod,
+                };
+                $(this).ajaxSubmit(ajaxOptions); 
+                
+            });
+            
+        },
         reload: function (id_target, url, method, data_addition) {
 
             if (!method)
