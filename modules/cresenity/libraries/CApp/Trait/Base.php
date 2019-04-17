@@ -259,8 +259,16 @@ trait CApp_Trait_Base {
         return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height;
     }
 
+    public static function gravatarImageUrl($email, $s = 100, $default = 'mp') {
+        if ($default == null) {
+            $default = static::noImageUrl();
+        }
+        $hash = md5(strtolower(trim($email)));
+        return 'https://www.gravatar.com/avatar/' . $hash . '?s=' . $s . '&d=' . rawurlencode($default);
+    }
+
     public static function initialAvatarUrl($name, $size = 100) {
-        return curl::httpbase() . 'cresenity/avatar/initials/?name=' . $name . '&size=' . $size;
+        return curl::httpbase() . 'cresenity/avatar/initials/?name=' . cstr::lower($name) . '&size=' . $size;
     }
 
     public static function havePermission($action) {
