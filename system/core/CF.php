@@ -1286,28 +1286,24 @@ final class CF {
      * @return  bool
      */
     public static function auto_load($class, $directory = 'libraries') {
-        if (class_exists($class, FALSE)) {
+        if (class_exists($class, FALSE))
             return TRUE;
-        }
-        $prefix = false;
-        $suffix = false;
+
         if (($suffix = strrpos($class, '_')) > 0) {
-            // Find the class suffix and prefix
+            // Find the class suffix
             $suffix = substr($class, $suffix + 1);
-            $prefix = explode('_', $class)[0];
+        } else {
+            // No suffix
+            $suffix = FALSE;
         }
 
         if ($suffix === 'Core') {
             $type = 'libraries';
             $file = substr($class, 0, -5);
-        } elseif ($suffix === 'Controller' || $prefix == 'Controller') {
+        } elseif ($suffix === 'Controller') {
             $type = 'controllers';
             // Lowercase filename
-            $file = strtolower(str_replace('_', '/', substr($class, 11)));
-            if ($suffix === 'Controller') {
-                $file = strtolower(substr($class, 0, -11));
-            }
-            
+            $file = strtolower(substr($class, 0, -11));
         } elseif ($suffix === 'Model') {
             $type = 'models';
             // Lowercase filename
@@ -1329,7 +1325,7 @@ final class CF {
 
         $class_not_found = FALSE;
 
-        if ($filename = static::findFile($type, $file)) {
+        if ($filename = self::find_file($type, $file)) {
             require $filename;
             $class_not_found = TRUE;
             return TRUE;
