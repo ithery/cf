@@ -10,7 +10,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CElement_List_ActionList extends CElement_List {
 
     use CTrait_Compat_Element_ActionList,
-        CTrait_Element_Property_Label;
+        CTrait_Element_Property_Label,
+        CTrait_Element_Property_Icon;
 
     public $actions = array();
     protected $style;
@@ -22,6 +23,7 @@ class CElement_List_ActionList extends CElement_List {
         $this->label = clang::__("Action");
         $this->btn_dropdown_classes = array();
         $this->label_size = 2;
+        $this->icon='';
     }
 
     public static function factory($list_id = "") {
@@ -105,10 +107,13 @@ class CElement_List_ActionList extends CElement_List {
         }
         $html->appendln($pretag)->incIndent()->br();
         if ($this->style == "btn-dropdown") {
-
+            $iconHtml='';
+            if(strlen($this->icon)>0) {
+                $iconHtml='<i class="'.$this->icon.'"></i> ';
+            }
             $html->appendln('
                     <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle" data-toggle="dropdown" href="#">
-                            ' . $this->label . '
+                            ' . $iconHtml.$this->label . '
                             <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-right align-left ' . $classes . '">
