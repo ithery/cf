@@ -21,7 +21,7 @@ trait CTrait_Element_Property_Icon {
         if (strpos($icon, 'fa-') === false && strpos($icon, 'ion-') === false) {
             $icon = $icon.' icon-' . $icon;
         }
-       
+        
         $this->icon = $icon;
         return $this;
     }

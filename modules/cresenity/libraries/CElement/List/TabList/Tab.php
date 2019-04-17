@@ -81,7 +81,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
         }
         $tab_icon = "";
         if (strlen($this->icon) > 0) {
-            $tab_icon = ' data-icon="icon-' . $this->icon . '"';
+            $tab_icon = ' data-icon="' . $this->icon . '"';
         }
 
         $tab_class = "";
@@ -122,7 +122,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
 
         $html = '<li class="nav-item w-100 p-1 ' . $classActive . '"><a href="javascript:;" ' . $tab_class . $tab_icon . $tab_tab . $tab_target . $tab_responsive . $tab_url . ' class="nav-link ' . $classActive . ' tab-ajax-load">';
         if ($this->icon) {
-            $html .= '<span class="icon"><i class="icon-' . $this->icon . '"></i></span> ';
+            $html .= '<span class="icon"><i class="' . $this->icon . '"></i></span> ';
         }
         $html .= $tab_label;
         $html .= '</a></li>';
