@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class Cresenity_Controller extends CController {
+class Controller_Cresenity extends CController {
 
     public function index() {
         curl::redirect('');
