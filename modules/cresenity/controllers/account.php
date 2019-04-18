@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class Account_Controller extends CController {
+class Controller_Account extends CController {
 
     public function index() {
         $this->profile();

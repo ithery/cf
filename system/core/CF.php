@@ -1451,7 +1451,7 @@ final class CF {
      * @return  string   if the file is found
      * @return  FALSE    if the file is not found
      */
-    public static function find_file($directory, $filename, $required = FALSE, $ext = FALSE) {
+    public static function findFile($directory, $filename, $required = FALSE, $ext = FALSE) {
         // NOTE: This test MUST be not be a strict comparison (===), or empty
         // extensions will be allowed!
         if ($ext == '') {
@@ -1516,6 +1516,18 @@ final class CF {
         }
 
         return self::$internal_cache['find_file_paths'][$search] = $found;
+    }
+
+    /**
+     * @deprecated
+     * @param type $directory
+     * @param type $filename
+     * @param type $required
+     * @param type $ext
+     * @return type
+     */
+    public static function find_file($directory, $filename, $required = FALSE, $ext = FALSE) {
+        return static::findFile($directory, $filename, $required, $ext);
     }
 
     /**

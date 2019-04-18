@@ -56,7 +56,7 @@ div#framework_error .backtrace li { list-style-type:none; margin:0; padding:0;}
 					<?php endif ?>
 					<?php if($user!=null): ?>
 					<p><strong>Username</strong>:<?php echo $user->username; ?></p>
-					<p><strong>Role name</strong>:<?php echo $role->name; ?></p>
+					<p><strong>Role name</strong>:<?php echo $role==null?'':$role->name; ?></p>
 					<?php endif ?>
 					<p><strong>Browser</strong>:<?php echo crequest::browser(); ?></p>
 					<p><strong>Browser Version</strong>:<?php echo crequest::browser_version(); ?></p>

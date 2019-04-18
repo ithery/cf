@@ -28,7 +28,7 @@ final class FutureTickQueue
      *
      * @param callable $listener The callback to invoke.
      */
-    public function add(callable $listener)
+    public function add($listener)
     {
         $this->queue->enqueue($listener);
     }
@@ -42,7 +42,7 @@ final class FutureTickQueue
         $count = $this->queue->count();
 
         while ($count--) {
-            call_user_func(
+            \call_user_func(
                 $this->queue->dequeue()
             );
         }

@@ -103,7 +103,7 @@ class CElement_Component_Form_Validation {
         $rules = new CJavascript_Validation_RuleParser($delegated, $this->getSessionToken());
         $messages = new CJavascript_Validation_MessageParser($delegated);
         $jsValidator = new CJavascript_Validation_ValidatorHandler($rules, $messages);
-        $manager = new CJavascript_Validation_ValidatorJavascript($jsValidator, compact('view', 'selector', 'remote'));
+        $manager = new CJavascript_Validation_ValidatorJavascript($jsValidator, compact( 'selector', 'remote'));
         return $manager;
     }
 

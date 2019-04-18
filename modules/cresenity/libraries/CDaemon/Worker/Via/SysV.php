@@ -232,6 +232,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             return false;
         }
         $that = $this;
+        CDaemon::log('SysV Get Message:'.json_encode($message));
         switch ($message['status']) {
             case CDaemon_Worker_MediatorAbstract::UNCALLED:
                 $decoder = function($message) use($that) {
@@ -255,8 +256,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     $call = $that->mediator->getStruct($message['call_id']);
                     // If we don't have a local copy of $call the most likely scenario is a --recoverworkers situation.
                     // Create a placeholder. We'll get a full copy of the struct when it's returned from the worker
-                    if (!$call)
+                    if (!$call) {
                         $call = new CDaemon_Worker_Call($message['call_id']);
+                    }
                     $call->status($message['status']);
                     $call->pid = $message['pid'];
                     return $call;

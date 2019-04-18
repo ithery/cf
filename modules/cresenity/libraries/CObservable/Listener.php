@@ -7,20 +7,18 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 3:43:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CObservable_Listener {
+class CObservable_Listener extends CObservable_ListenerAbstract {
 
     use CTrait_Compat_Listener;
 
     protected $event;
-    protected $handlers;
-    protected $owner;
+
     protected $confirm;
     protected $confirm_message;
     protected $no_double;
 
     public function __construct($owner, $event) {
-        $this->owner = $owner;
-        $this->handlers = array();
+        parent::__construct($owner);
         $this->confirm = false;
         $this->confirm_message = "";
         $this->no_double = false;
@@ -47,41 +45,8 @@ class CObservable_Listener {
         return $this;
     }
 
-    public function owner() {
-        return $this->owner;
-    }
-
-    public function setOwner($owner) {
-        $this->owner = $owner;
-        //we set all handler owner too
-        foreach ($this->handlers as $handler) {
-            $handler->set_owner($owner);
-        }
-        return $this;
-    }
-
-    public function handlers() {
-        return $this->handlers;
-    }
-
-    public function setHandlerUrlParam($param) {
-
-        foreach ($this->handlers as $handler) {
-            $handler->set_url_param($param);
-        }
-    }
-
-    /**
-     * 
-     * @param string $handlerName
-     * @return CObservable_Listener_Handler
-     */
-    public function addHandler($handlerName) {
-        $handler = new CObservable_Listener_Handler($this->owner, $this->event, $handlerName);
-        $this->handlers[] = $handler;
-        return $handler;
-    }
-
+    
+    
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

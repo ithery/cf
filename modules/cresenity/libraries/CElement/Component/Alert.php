@@ -29,6 +29,9 @@ class CElement_Component_Alert extends CElement_Component {
     }
 
     public function build() {
+        if(strlen($this->title)==0) {
+            $this->header->setVisibility(false);
+        }
         $this->header->add($this->getTranslationTitle());
         switch ($this->type) {
             case 'error':

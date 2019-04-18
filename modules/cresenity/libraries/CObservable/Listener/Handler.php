@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler {
 
+    use CTrait_Compat_Handler;
+
     const TYPE_REMOVE = 'remove';
     const TYPE_RELOAD = 'reload';
     const TYPE_SUBMIT = 'submit';
@@ -46,10 +48,10 @@ class CObservable_Listener_Handler {
     /**
      * 
      * @param string $param
-     * @return CHandler
+     * @return CObservable_Listener_Handler
      */
-    public function set_url_param($param) {
-        $this->driver->set_url_param($param);
+    public function setUrlParam($param) {
+        $this->driver->setUrlParam($param);
         return $this;
     }
 
@@ -57,7 +59,7 @@ class CObservable_Listener_Handler {
      * 
      * @param type $method
      * @param type $args
-     * @return \CHandler
+     * @return \CObservable_Listener_Handler
      */
     public function __call($method, $args) {
         if (!count($args)) {

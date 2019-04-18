@@ -5,8 +5,9 @@
  */
 class CObject {
 
-    use CTrait_Compat_Object;
-    
+    use CTrait_Compat_Object,
+        CTrait_Macroable;
+
     protected $id;
     protected $valid_prop = array();
     protected $prop = array();
@@ -78,4 +79,5 @@ class CObject {
         return false;
     }
 
+    
 }
