@@ -1957,8 +1957,8 @@ final class CF {
             self::$data[$domain] = CFData::domain($domain);
             if (self::$data[$domain] == null) {
                 //try to locate wildcard subdomain
-                $wildcard_domain = implode('.', array('_') + array_slice(explode('.', $domain), 0));
-                self::$data[$domain] = CFData::domain($wildcard_domain);
+                $wildcardDomain = implode('.', array('$') + array_slice(explode('.', $domain), 0));
+                self::$data[$domain] = CFData::domain($wildcardDomain);
             }
         }
         return self::$data[$domain];
