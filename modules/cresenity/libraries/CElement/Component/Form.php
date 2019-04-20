@@ -306,6 +306,9 @@ class CElement_Component_Form extends CElement_Component {
         if (strlen($this->action) > 0) {
             $this->setAttr('action', $this->action);
         }
+        if (strlen($this->remoteValidationUrl) > 0) {
+            $this->setAttr('remote-validation-url', $this->remoteValidationUrl);
+        }
         if (strlen($this->layout) > 0) {
             $this->addClass('form-' . $this->layout);
         }
