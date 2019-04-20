@@ -17,11 +17,15 @@ class CObservable_Listener_Handler_AjaxSubmitHandler extends CObservable_Listene
     }
 
     public function js() {
-        $optionsArray = array();
-        $optionsJson = json_encode($optionsArray);
+        $optionsJson = "{";
+        $optionsJson .= "selector:'#" . $this->owner . "',";
+        if ($this->haveCompleteListener()) {
+            $optionsJson .= "onComplete: " . $this->getCompleteListener()->js() . ",";
+        }
+        $optionsJson .= "}";
         $js = '';
         $js .= "
-            $.cresenity.ajaxSubmit('#" . $this->owner . "'," . $optionsJson . ");;
+            cresenity.ajaxSubmit(" . $optionsJson . ");;
          ";
         return $js;
     }

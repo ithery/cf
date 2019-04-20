@@ -22,7 +22,6 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
      * @var string $urlParam
      */
     protected $urlParam = array();
-    protected $listeners = array();
 
     public function setUrl($url) {
         $this->url = $url;
@@ -66,10 +65,49 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
     }
 
     public function onSuccessListener() {
-        if (!isset($this->listeners['ajaxSuccess'])) {
-            $this->listeners['ajaxSuccess'] = new CObservable_Listener_Ajax_SuccessListener($this);
+        if (!isset($this->handlerListeners['ajaxSuccess'])) {
+            $this->handlerListeners['ajaxSuccess'] = new CObservable_Listener_Pseudo_SuccessListener($this);
         }
-        return $this->listeners['ajaxSuccess'];
+        return $this->handlerListeners['ajaxSuccess'];
+    }
+
+    public function onErrorListener() {
+        if (!isset($this->handlerListeners['ajaxError'])) {
+            $this->handlerListeners['ajaxError'] = new CObservable_Listener_Pseudo_ErrorListener($this);
+        }
+        return $this->handlerListeners['ajaxError'];
+    }
+
+    public function onCompleteListener() {
+        if (!isset($this->handlerListeners['ajaxComplete'])) {
+            $this->handlerListeners['ajaxComplete'] = new CObservable_Listener_Pseudo_CompleteListener($this);
+        }
+        return $this->handlerListeners['ajaxComplete'];
+    }
+
+    public function haveSuccessListener() {
+        return $this->haveListener('ajaxSuccess');
+    }
+
+    public function haveErrorListener() {
+        return $this->haveListener('ajaxError');
+        return isset($this->handlerListeners['ajaxError']);
+    }
+
+    public function haveCompleteListener() {
+        return $this->haveListener('ajaxComplete');
+    }
+
+    public function getCompleteListener() {
+        return $this->getListener('ajaxComplete');
+    }
+
+    public function getSuccessListener() {
+        return $this->getListener('ajaxSuccess');
+    }
+
+    public function getErrorListener() {
+        return $this->getListener('ajaxError');
     }
 
 }

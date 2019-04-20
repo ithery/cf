@@ -19,9 +19,11 @@ class CObservable_PseudoListener extends CObservable_ListenerAbstract {
         foreach ($this->handlers as $handler) {
             $handlersScript .= $handler->js();
         }
+        $eventParameterImploded = implode(',', $this->eventParameters);
 
-        $compiledJs = $handlersScript;
-
+        $startScript = "function(" . $eventParameterImploded . ") {";
+        $endScript = "}";
+        $compiledJs = $startScript . $handlersScript . $endScript;
         $js->append($compiledJs);
 
         return $js->text();

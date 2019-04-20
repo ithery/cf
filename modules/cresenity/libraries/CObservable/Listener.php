@@ -97,6 +97,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
             ";
         }
         $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;
+        $eventParameterImploded = implode(',', $this->eventParameters);
         if ($this->event == 'lazyload') {
             $js->append("
                     jQuery(window).ready(function() {
@@ -111,11 +112,11 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
                     });
                 ");
         } else {
-            $js->append('
-                    jQuery("#' . $this->owner . '").' . $this->event . '(function() {
-                        ' . $compiledJs . '
+            $js->append("
+                    jQuery('#" . $this->owner . "')." . $this->event . "(function(" . $eventParameterImploded . ") {
+                        " . $compiledJs . "
                     });
-                ');
+                ");
         }
 
         return $js->text();

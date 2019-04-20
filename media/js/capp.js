@@ -584,6 +584,7 @@ var Cresenity = function () {
         });
 
     };
+
     this.modal = function (options) {
 
         var settings = $.extend({
@@ -591,7 +592,7 @@ var Cresenity = function () {
             haveHeader: false,
             haveFooter: false,
             headerText: '',
-            onComplete: false,
+            onClose: false,
             footerAction: {}
         }, options);
 
@@ -630,6 +631,9 @@ var Cresenity = function () {
 
         modalContainer.on('hidden.bs.modal', function (e) {
             modalContainer.remove();
+            if (typeof settings.onClose == 'function') {
+                settings.onClose(e);
+            }
         });
 
         if (settings.message) {
@@ -643,6 +647,63 @@ var Cresenity = function () {
 
         modalContainer.modal();
 
+
+    };
+    this.ajaxSubmit = function (options) {
+        var settings = $.extend({}, options);
+        var selector = settings.selector;
+        $(selector).each(function () {
+            //don't do it again if still loading
+
+            var formAjaxUrl = $(this).attr('action') || '';
+            var formMethod = $(this).attr('method') || 'get';
+            (function (element) {
+                cresenity.blockElement($(element));
+                var ajaxOptions = {
+                    url: formAjaxUrl,
+                    dataType: 'json',
+                    type: formMethod,
+                    complete: function () {
+                        cresenity.unblockElement($(element));
+                        if (typeof settings.onComplete == 'function') {
+                            settings.onComplete();
+                        }
+                    },
+                };
+                $(element).ajaxSubmit(ajaxOptions);
+            })(this);
+
+        });
+        //always return false to prevent submit
+        return false;
+    };
+    this.message = function (type, message, alertType, callback) {
+        alert_type = typeof alert_type !== 'undefined' ? alertType : 'notify';
+        var container = $('#container');
+        if (container.length == 0) {
+            container = $('body');
+        }
+        if (alertType == 'bootbox') {
+
+            if (typeof callback == 'undefined') {
+                bootbox.alert(message);
+            } else {
+                bootbox.alert(message, callback);
+            }
+        }
+
+        if (alertType == 'notify') {
+            obj = $('<div>');
+            container.prepend(obj);
+            obj.addClass('notifications');
+            obj.addClass('top-right');
+            obj.notify({
+                message: {
+                    text: message
+                },
+                type: type
+            }).show();
+        }
 
     };
 
@@ -1071,29 +1132,6 @@ if (!window.cresenity) {
                 }
                 return url;
             }
-        },
-        ajaxSubmit: function (selector, options) {
-            var settings = $.extend({}, options);
-            $(selector).each(function () {
-                //don't do it again if still loading
-                if ($(this).hasClass('loading')) {
-                    return false;
-                }
-                $(this).addClass('loading');
-                $(this).find('.form-control').addClass('disabled');
-                var formAjaxUrl = $(this).attr('action') || '';
-                var formMethod = $(this).attr('method') || 'get';
-
-                var ajaxOptions = {
-                    url: formAjaxUrl,
-                    dataType: 'json',
-                    type: formMethod,
-                };
-                $(this).ajaxSubmit(ajaxOptions);
-
-            });
-            //always return false to prevent submit
-            return false;
         },
 
         reload: function (id_target, url, method, data_addition) {

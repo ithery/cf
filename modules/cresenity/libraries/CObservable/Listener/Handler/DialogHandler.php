@@ -12,6 +12,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
     use CTrait_Compat_Handler_Driver_Dialog,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
+        CObservable_Listener_Handler_Trait_CloseHandlerTrait,
         CTrait_Element_Property_Title;
 
     protected $target;
@@ -105,6 +106,9 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         $jsOptions .= "selector:'#" . $this->target . "',";
         $jsOptions .= "title:'" . $this->title . "',";
         $jsOptions .= "reload:" . $reloadOptions . ",";
+        if ($this->haveCloseListener()) {
+            $jsOptions .= "onClose:" . $this->getCloseListener()->js() . ",";
+        }
         $jsOptions .= "isSidebar:" . ($this->isSidebar ? 'true' : 'false') . ",";
 
         $jsOptions .= "}";

@@ -14,6 +14,7 @@ abstract class CObservable_ListenerAbstract {
     protected $owner;
     protected $handlers;
     protected $event;
+    protected $eventParameters = array();
 
     public function __construct($owner) {
         $this->owner = $owner;

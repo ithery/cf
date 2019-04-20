@@ -24,6 +24,7 @@ abstract class CObservable_Listener_Handler {
     protected $handlers;
     protected $driver;
     protected $listener;
+    protected $handlerListeners = array();
 
     /**
      * event from listener
@@ -48,6 +49,16 @@ abstract class CObservable_Listener_Handler {
         return $this;
     }
 
-    abstract function js();
+    public function haveListener($event) {
+        return isset($this->handlerListeners[$event]);
+    }
 
+    public function getListener($event) {
+        if ($this->haveListener($event)) {
+            return $this->handlerListeners[$event];
+        }
+        return null;
+    }
+
+    abstract function js();
 }
