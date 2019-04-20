@@ -21,10 +21,11 @@ abstract class CObservable_ListenerAbstract {
     public function getEvent() {
         return $this->event;
     }
+
     public function owner() {
         return $this->getOwner();
     }
-    
+
     public function getOwner() {
         return $this->owner;
     }
@@ -37,7 +38,6 @@ abstract class CObservable_ListenerAbstract {
         }
         return $this;
     }
-    
 
     public function handlers() {
         return $this->handlers;
@@ -63,6 +63,15 @@ abstract class CObservable_ListenerAbstract {
         switch ($handlerName) {
             case 'reload':
                 $handler = new CObservable_Listener_Handler_ReloadHandler($this);
+                break;
+            case 'dialog':
+                $handler = new CObservable_Listener_Handler_DialogHandler($this);
+                break;
+            case 'append':
+                $handler = new CObservable_Listener_Handler_AppendHandler($this);
+                break;
+            case 'prepend':
+                $handler = new CObservable_Listener_Handler_PrependHandler($this);
                 break;
             default:
                 $handler = new CObservable_Listener_Handler_CustomHandler($this);

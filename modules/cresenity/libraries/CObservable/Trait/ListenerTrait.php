@@ -64,5 +64,16 @@ trait CObservable_Trait_ListenerTrait {
         }
         return $this->listeners['click'];
     }
+    
+     /**
+     * 
+     * @return CObservable_Listener_ClickListener
+     */
+    public function onChangeListener() {
+        if (!isset($this->listeners['change'])) {
+            $this->listeners['change'] = new CObservable_Listener_ChangeListener($this->id);
+        }
+        return $this->listeners['change'];
+    }
 
 }
