@@ -15,4 +15,22 @@ trait CObservable_Listener_Trait_HandlerTrait {
         return $handler;
     }
 
+    public function addAppendHandler() {
+        $handler = new CObservable_Listener_Handler_AppendHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
+    public function addPrependHandler() {
+        $handler = new CObservable_Listener_Handler_PrependHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
+    public function addDialogHandler() {
+        $handler = new CObservable_Listener_Handler_DialogHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
 }
