@@ -39,6 +39,14 @@ abstract class CObservable extends CRenderable {
     public function jquery() {
         return $this->javascript->jquery();
     }
+    
+    /**
+     * 
+     * @return CObservable_Javascript_Handler
+     */
+    public function handler() {
+        return $this->javascript->handler();
+    }
 
     
 

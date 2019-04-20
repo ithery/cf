@@ -75,6 +75,10 @@ class CElement_Component_Form extends CElement_Component {
         return new CElement_Component_Form($id);
     }
 
+    public function onSubmit() {
+        return $this->addListener('submit');
+    }
+    
     /**
      * 
      * @param string $event

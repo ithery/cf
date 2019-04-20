@@ -779,7 +779,7 @@ window.cresenity = new Cresenity();
                     return false;
                 }
                 $(this).addClass('loading');
-                $(this).find('*').addClass('disabled');
+                $(this).find('.form-control').addClass('disabled');
                 var formAjaxUrl = $(this).attr('action') || '';
                 var formMethod = $(this).attr('method') || 'get';
 
