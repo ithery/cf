@@ -22,6 +22,7 @@ class CObservable_Listener_Handler_SubmitHandler extends CObservable_Listener_Ha
 
     public function setForm($formId) {
         $this->formId = $formId;
+        return $this;
     }
 
     public function js() {
