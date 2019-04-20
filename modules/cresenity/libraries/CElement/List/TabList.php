@@ -126,15 +126,15 @@ class CElement_List_TabList extends CElement_List {
         }
 
         if ($this->bootstrap >= '3') {
-            $html->appendln('                                       <ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
+            $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
         } else {
-            $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
+            $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
         }
 
         $activeTab = null;
         foreach ($this->tabs as $tab) {
             if (strlen($this->activeTab) == 0) {
-                $this->activeTab($tab->id);
+                $this->setActiveTab($tab->id);
             }
             if ($tab->id == $this->activeTab) {
                 $tab->setActive(true);
