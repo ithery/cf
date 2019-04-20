@@ -95,7 +95,8 @@ var scrolltotop = {
     scrollup: function () {
         if (!this.cssfixedsupport) //if control is positioned using JavaScript
             this.$control.css({
-                opacity: 0
+                opacity: 0,
+                zIndex: -1,
             }) //hide control immediately after clicking it
         var dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto)
         if (typeof dest == "string" && jQuery('#' + dest).length == 1) {
@@ -126,12 +127,14 @@ var scrolltotop = {
         this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false
         if (this.state.shouldvisible && !this.state.isvisible) {
             this.$control.stop().animate({
-                opacity: 1
+                opacity: 1,
+                zIndex: 99999,
             }, this.setting.fadeduration[0])
             this.state.isvisible = true
         } else if (this.state.shouldvisible == false && this.state.isvisible) {
             this.$control.stop().animate({
-                opacity: 0
+                opacity: 0,
+                zIndex: -1
             }, this.setting.fadeduration[1])
             this.state.isvisible = false
         }
@@ -457,6 +460,7 @@ var Cresenity = function () {
     this.base64 = new Base64(this);
 
     this.filesAdded = "";
+    this.modalElements = [];
     this.loadJsCss = function (filename, filetype, callback) {
         if (filetype == "js") { //if filename is a external JavaScript file
             var fileref = document.createElement('script')
@@ -630,10 +634,15 @@ var Cresenity = function () {
         $('body').append(modalContainer);
 
         modalContainer.on('hidden.bs.modal', function (e) {
-            modalContainer.remove();
+            $(this).remove();
+            cresenity.modalElements.pop();
             if (typeof settings.onClose == 'function') {
                 settings.onClose(e);
             }
+        });
+
+        modalContainer.on('shown.bs.modal', function (e) {
+            cresenity.modalElements.push($(this));
         });
 
         if (settings.message) {
@@ -649,6 +658,10 @@ var Cresenity = function () {
 
 
     };
+    this.closeDialog = function (options) {
+        var modal = cresenity.modalElements.pop();
+        modal.modal('hide');
+    }
     this.ajaxSubmit = function (options) {
         var settings = $.extend({}, options);
         var selector = settings.selector;

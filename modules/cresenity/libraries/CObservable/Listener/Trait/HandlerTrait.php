@@ -33,7 +33,12 @@ trait CObservable_Listener_Trait_HandlerTrait {
         return $handler;
     }
 
-    
+    public function addCloseDialogHandler() {
+        $handler = new CObservable_Listener_Handler_CloseDialogHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
     public function addAjaxSubmitHandler() {
         $handler = new CObservable_Listener_Handler_AjaxSubmitHandler($this);
         $this->handlers[] = $handler;
