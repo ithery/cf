@@ -39,4 +39,14 @@ trait CObservable_Trait_ListenerTrait {
         return false;
     }
 
+    public function getListenersByEvent($event) {
+        $return = [];
+        foreach ($this->listeners as $listener) {
+            if ($listener->getEvent() == $event) {
+                $return[] = $listener;
+            }
+        }
+        return $return;
+    }
+
 }
