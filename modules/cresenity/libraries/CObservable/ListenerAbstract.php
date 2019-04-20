@@ -51,7 +51,13 @@ abstract class CObservable_ListenerAbstract {
      * @return CObservable_Listener_Handler
      */
     public function addHandler($handlerName) {
-        $handler = new CObservable_Listener_Handler($this->owner, $this->event, $handlerName);
+        switch ($handlerName) {
+            case 'reload':
+                $handler = new CObservable_Listener_Handler_ReloadHandler($this);
+                break;
+            default:
+                $handler = new CObservable_Listener_Handler_CustomHandler($this);
+        }
         $this->handlers[] = $handler;
         return $handler;
     }

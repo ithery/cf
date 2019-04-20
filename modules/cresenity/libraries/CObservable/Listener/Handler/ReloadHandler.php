@@ -18,8 +18,8 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
     protected $param_inputs_by_name;
     protected $paramRequest;
 
-    public function __construct($owner, $event, $name) {
-        parent::__construct($owner, $event, $name);
+    public function __construct($listener) {
+        parent::__construct($listener);
         $this->method = "get";
         $this->target = "";
         $this->content = CHandlerElement::factory();
