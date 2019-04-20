@@ -7,11 +7,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 20, 2019, 3:06:27 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Handler {
 
-     use CTrait_Compat_Handler_Driver_Append,
-              CObservable_Listener_Handler_Trait_TargetHandlerTrait,
+    use CTrait_Compat_Handler_Driver_Append,
+        CObservable_Listener_Handler_Trait_TargetHandlerTrait,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
 
     protected $target;
@@ -21,8 +20,9 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
     protected $param_inputs;
     protected $check_duplicate_selector;
 
-    public function __construct($owner, $event, $name) {
-        parent::__construct($owner, $event, $name);
+    public function __construct($listener) {
+        parent::__construct($listener);
+        $this->name = "Append";
         $this->method = "get";
         $this->target = "";
         $this->content = CHandlerElement::factory();
@@ -77,4 +77,5 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
 
         return $js;
     }
+
 }

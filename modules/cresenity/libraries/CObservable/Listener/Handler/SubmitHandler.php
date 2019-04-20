@@ -28,13 +28,9 @@ class CObservable_Listener_Handler_SubmitHandler extends CObservable_Listener_Ha
     public function js() {
         $js = '';
         if (strlen($this->formId) == 0) {
-            $js .= "
-				$('#" . $this->owner . "').closest('form').submit();;
-			";
+            $js .= "$('#" . $this->owner . "').closest('form').submit();";
         } else {
-            $js .= "
-				$('#" . $this->form_id . "').submit();;
-			";
+            $js .= "$('#" . $this->form_id . "').submit();";
         }
 
         return $js;

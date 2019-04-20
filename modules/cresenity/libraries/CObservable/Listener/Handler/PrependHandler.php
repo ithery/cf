@@ -20,8 +20,9 @@ class CObservable_Listener_Handler_PrependHandler extends CObservable_Listener_H
     protected $param_inputs;
     protected $check_duplicate_selector;
 
-    public function __construct($owner, $event, $name) {
-        parent::__construct($owner, $event, $name);
+     public function __construct($listener) {
+        parent::__construct($listener);
+        $this->name = "Prepend";
         $this->method = "get";
         $this->target = "";
         $this->content = CHandlerElement::factory();
