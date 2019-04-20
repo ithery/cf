@@ -22,6 +22,7 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
      * @var string $urlParam
      */
     protected $urlParam = array();
+    protected $listeners = array();
 
     public function setUrl($url) {
         $this->url = $url;
@@ -62,6 +63,13 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
             }
         }
         return $link;
+    }
+
+    public function onSuccessListener() {
+        if (!isset($this->listeners['ajaxSuccess'])) {
+            $this->listeners['ajaxSuccess'] = new CObservable_Listener_Ajax_SuccessListener($this);
+        }
+        return $this->listeners['ajaxSuccess'];
     }
 
 }

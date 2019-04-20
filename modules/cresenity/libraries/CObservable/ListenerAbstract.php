@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CObservable_ListenerAbstract {
 
+    use CObservable_Listener_Trait_HandlerTrait;
+
     protected $owner;
     protected $handlers;
     protected $event;

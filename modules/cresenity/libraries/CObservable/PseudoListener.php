@@ -8,5 +8,23 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CObservable_PseudoListener extends CObservable_ListenerAbstract {
-    
+
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
+
+
+
+        $handlersScript = "";
+        foreach ($this->handlers as $handler) {
+            $handlersScript .= $handler->js();
+        }
+
+        $compiledJs = $handlersScript;
+
+        $js->append($compiledJs);
+
+        return $js->text();
+    }
+
 }
