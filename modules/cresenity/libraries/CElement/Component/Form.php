@@ -84,9 +84,10 @@ class CElement_Component_Form extends CElement_Component {
         if ($event != 'submit') {
             return parent::addListener($event);
         }
-
-        $this->submitListener = new CObservable_Listener($this->id, $event);
-        $this->submitListener;
+        if ($this->submitListener == null) {
+            $this->submitListener = new CObservable_Listener($this->id, $event);
+        }
+        return $this->submitListener;
     }
 
     public function setName($name) {
@@ -279,38 +280,35 @@ class CElement_Component_Form extends CElement_Component {
         }
         return $data;
     }
-    
+
     public function build() {
-        if($this->autocomplete) {
-            $this->setAttr('autocomplete','on');
+        if ($this->autocomplete) {
+            $this->setAttr('autocomplete', 'on');
         } else {
-            $this->setAttr('autocomplete','off');
-            
+            $this->setAttr('autocomplete', 'off');
         }
         if (strlen($this->enctype) > 0) {
-           $this->setAttr('enctype',$this->enctype);
+            $this->setAttr('enctype', $this->enctype);
         }
         if (strlen($this->name) > 0) {
-           $this->setAttr('name',$this->name);
+            $this->setAttr('name', $this->name);
         }
         if (strlen($this->target) > 0) {
-           $this->setAttr('target',$this->target);
+            $this->setAttr('target', $this->target);
         }
         if (strlen($this->method) > 0) {
-           $this->setAttr('method',$this->method);
+            $this->setAttr('method', $this->method);
         }
         if (strlen($this->action) > 0) {
-           $this->setAttr('action',$this->action);
+            $this->setAttr('action', $this->action);
         }
         if (strlen($this->layout) > 0) {
-            $this->addClass('form-'.$this->layout);
+            $this->addClass('form-' . $this->layout);
         }
         if ($this->ajax_process_progress) {
             $this->add('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
         }
-        
     }
-
 
     public function js($indent = 0) {
         if ($this->disable_js) {
@@ -322,6 +320,15 @@ class CElement_Component_Form extends CElement_Component {
         $js->setIndent($indent);
         if ($this->validation instanceof CElement_Component_Form_Validation) {
             $js->append($this->validation->validator()->selector('#' . $this->id()));
+        }
+
+        $jsSubmitHandlers = '';
+        $jsSubmitReturn = 'return true;';
+        if ($this->submitListener != null) {
+            foreach ($this->submitListener->handlers() as $handler) {
+                $jsSubmitHandlers .= $handler->js();
+                $jsSubmitReturn = 'return false;';
+            }
         }
         if ($this->ajax_submit) {
             $ajax_url = "";
@@ -718,7 +725,8 @@ class CElement_Component_Form extends CElement_Component {
                         }
                         
 
-                        
+                        " . $jsSubmitHandlers . "
+                        " . $jsSubmitReturn . "
                     });
                 ");
 
