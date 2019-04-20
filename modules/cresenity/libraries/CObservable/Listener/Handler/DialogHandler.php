@@ -94,16 +94,21 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
         $generatedUrl = $this->generatedUrl();
 
+        $reloadOptions = "{";
+        $reloadOptions .= "url:'" . $generatedUrl . "',";
+        $reloadOptions .= "method:'" . $this->method . "',";
+        $reloadOptions .= "dataAddition:" . $dataAddition . ",";
+        $reloadOptions .= "}";
+
+
         $jsOptions = "{";
         $jsOptions .= "selector:'#" . $this->target . "',";
         $jsOptions .= "title:'" . $this->title . "',";
+        $jsOptions .= "reload:" . $reloadOptions . ",";
         $jsOptions .= "isSidebar:" . ($this->isSidebar ? 'true' : 'false') . ",";
-        $jsOptions .= "url:'" . $generatedUrl . "',";
-        $jsOptions .= "method:'" . $this->method . "',";
-        $jsOptions .= "dataAddition:" . $dataAddition . ",";
 
         $jsOptions .= "}";
-      
+
         $js_class = ccfg::get('js_class');
         if (strlen($js_class) > 0) {
             $this->js_class = $js_class;
@@ -126,9 +131,14 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
                 $." . $this->js_class . ".show_dialog('" . $this->target . "','" . $this->title . "','" . $content . "');
             ";
         } else {
+
             $js .= "
-                $.cresenity.show_dialog('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $jsOptions . "," . $dataAddition . ");
-            ";
+            if(cresenity) {
+                cresenity.modal(" . $jsOptions . ");
+            } else {
+                 $.cresenity.show_dialog('" . $this->target . "','" . $generatedUrl . "','" . $this->method . "'," . $jsOptions . "," . $dataAddition . ");
+            }
+         ";
         }
         return $js;
     }
