@@ -25,9 +25,14 @@ trait CObservable_Trait_ListenerTrait {
      * @return CObservable_Listener
      */
     public function addListener($event) {
-        $listener = new CObservable_Listener($this->id, $event);
-        $this->listeners[] = $listener;
-        return $listener;
+        if (!isset($this->listeners[$event])) {
+            switch ($event) {
+                default:
+                    $listener = new CObservable_Listener($this->id, $event);
+            }
+            $this->listeners[$event] = $listener;
+        }
+        return $this->listeners[$event];
     }
 
     public function haveListener($event) {
@@ -49,8 +54,15 @@ trait CObservable_Trait_ListenerTrait {
         return $return;
     }
 
+    /**
+     * 
+     * @return CObservable_Listener_ClickListener
+     */
     public function onClickListener() {
-        return new CObservable_Listener_ClickListener($this->id);
+        if (!isset($this->listeners['click'])) {
+            $this->listeners['click'] = new CObservable_Listener_ClickListener($this->id);
+        }
+        return $this->listeners['click'];
     }
 
 }

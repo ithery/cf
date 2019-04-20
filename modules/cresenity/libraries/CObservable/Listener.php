@@ -16,7 +16,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
     protected $confirm_message;
     protected $no_double;
 
-    public function __construct($owner, $event) {
+    public function __construct($owner, $event = 'click') {
         parent::__construct($owner);
         $this->confirm = false;
         $this->confirm_message = "";
