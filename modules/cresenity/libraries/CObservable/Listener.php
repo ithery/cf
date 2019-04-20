@@ -12,7 +12,6 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
     use CTrait_Compat_Listener;
 
     protected $event;
-
     protected $confirm;
     protected $confirm_message;
     protected $no_double;
@@ -40,13 +39,15 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         return $this;
     }
 
+    public function getEvent() {
+        return $this->event;
+    }
+
     public function setConfirmMessage($message) {
         $this->confirm_message = $message;
         return $this;
     }
 
-    
-    
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
