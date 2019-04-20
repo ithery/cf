@@ -18,23 +18,22 @@ function strlen(string) {
     var str = string + ''
     var i = 0,
             chr = '',
-            lgth = 0
+            lgth = 0;
 
-    if (!this.php_js || !this.php_js.ini || !this.php_js.ini['unicode.semantics'] || this.php_js.ini[
-            'unicode.semantics'].local_value.toLowerCase() !== 'on') {
+    if (!this.php_js || !this.php_js.ini || !this.php_js.ini['unicode.semantics'] || this.php_js.ini['unicode.semantics'].local_value.toLowerCase() !== 'on') {
         return string.length
     }
 
     var getWholeChar = function (str, i) {
-        var code = str.charCodeAt(i)
-        var next = '',
-                prev = ''
+        var code = str.charCodeAt(i);
+        var next = '';
+        var prev = '';
         if (0xD800 <= code && code <= 0xDBFF) {
             // High surrogate (could change last hex to 0xDB7F to treat high private surrogates as single characters)
             if (str.length <= (i + 1)) {
                 throw 'High surrogate without following low surrogate'
             }
-            next = str.charCodeAt(i + 1)
+            next = str.charCodeAt(i + 1);
             if (0xDC00 > next || next > 0xDFFF) {
                 throw 'High surrogate without following low surrogate'
             }
@@ -44,7 +43,7 @@ function strlen(string) {
             if (i === 0) {
                 throw 'Low surrogate without preceding high surrogate'
             }
-            prev = str.charCodeAt(i - 1)
+            prev = str.charCodeAt(i - 1);
             if (0xD800 > prev || prev > 0xDBFF) {
                 // (could change last hex to 0xDB7F to treat high private surrogates as single characters)
                 throw 'Low surrogate without preceding high surrogate'
@@ -57,9 +56,10 @@ function strlen(string) {
 
     for (i = 0, lgth = 0; i < str.length; i++) {
         if ((chr = getWholeChar(str, i)) === false) {
-            continue
-        } // Adapt this line at the top of any loop, passing in the whole string and the current iteration and returning a variable to represent the individual character; purpose is to treat the first part of a surrogate pair as the whole character and then ignore the second part
-        lgth++
+            continue;
+        }
+        // Adapt this line at the top of any loop, passing in the whole string and the current iteration and returning a variable to represent the individual character; purpose is to treat the first part of a surrogate pair as the whole character and then ignore the second part
+        lgth++;
     }
     return lgth
 }
@@ -68,65 +68,103 @@ function strlen(string) {
 //** Available/ usage terms at http://www.dynamicdrive.com (March 30th, 09')
 //** v1.1 (April 7th, 09'):
 //** 1) Adds ability to scroll to an absolute position (from top of page) or specific element on the page instead.
-//** 2) Fixes scroll animation not working in Opera. 
-
+//** 2) Fixes scroll animation not working in Opera.
 
 
 var capp_started_event_initialized = false;
 var scrolltotop = {
-//startline: Integer. Number of pixels from top of doc scrollbar is scrolled before showing control
-//scrollto: Keyword (Integer, or "Scroll_to_Element_ID"). How far to scroll document up when control is clicked on (0=top).
-    setting: {startline: 100, scrollto: 0, scrollduration: 1000, fadeduration: [500, 100]},
+    //startline: Integer. Number of pixels from top of doc scrollbar is scrolled before showing control
+    //scrollto: Keyword (Integer, or "Scroll_to_Element_ID"). How far to scroll document up when control is clicked on (0=top).
+    setting: {
+        startline: 100,
+        scrollto: 0,
+        scrollduration: 1000,
+        fadeduration: [500, 100]
+    },
     controlHTML: '<img src="' + window.capp.base_url + 'media/img/up.png" style="width:51px; height:42px" />', //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
-    controlattrs: {offsetx: 5, offsety: 5}, //offset of control relative to right/ bottom of window corner
+    controlattrs: {
+        offsetx: 5,
+        offsety: 5
+    }, //offset of control relative to right/ bottom of window corner
     anchorkeyword: '#top', //Enter href value of HTML anchors on the page that should also act as "Scroll Up" links
 
-    state: {isvisible: false, shouldvisible: false},
+    state: {
+        isvisible: false,
+        shouldvisible: false
+    },
     scrollup: function () {
         if (!this.cssfixedsupport) //if control is positioned using JavaScript
-            this.$control.css({opacity: 0}) //hide control immediately after clicking it
+            this.$control.css({
+                opacity: 0
+            }) //hide control immediately after clicking it
         var dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto)
-        if (typeof dest == "string" && jQuery('#' + dest).length == 1) //check element set by string exists
-            dest = jQuery('#' + dest).offset().top
-        else
-            dest = 0
-        this.$body.animate({scrollTop: dest}, this.setting.scrollduration);
+        if (typeof dest == "string" && jQuery('#' + dest).length == 1) {
+            //check element set by string exists
+            dest = jQuery('#' + dest).offset().top;
+        } else {
+            dest = 0;
+        }
+
+        this.$body.animate({
+            scrollTop: dest
+        }, this.setting.scrollduration);
     },
     keepfixed: function () {
         var $window = jQuery(window)
         var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx
         var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety
-        this.$control.css({left: controlx + 'px', top: controly + 'px'})
+        this.$control.css({
+            left: controlx + 'px',
+            top: controly + 'px'
+        })
     },
     togglecontrol: function () {
         var scrolltop = jQuery(window).scrollTop()
-        if (!this.cssfixedsupport)
-            this.keepfixed()
+        if (!this.cssfixedsupport) {
+            this.keepfixed();
+        }
         this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false
         if (this.state.shouldvisible && !this.state.isvisible) {
-            this.$control.stop().animate({opacity: 1}, this.setting.fadeduration[0])
+            this.$control.stop().animate({
+                opacity: 1
+            }, this.setting.fadeduration[0])
             this.state.isvisible = true
         } else if (this.state.shouldvisible == false && this.state.isvisible) {
-            this.$control.stop().animate({opacity: 0}, this.setting.fadeduration[1])
+            this.$control.stop().animate({
+                opacity: 0
+            }, this.setting.fadeduration[1])
             this.state.isvisible = false
         }
     },
     init: function () {
         jQuery(document).ready(function ($) {
-            var mainobj = scrolltotop
-            var iebrws = document.all
-            mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode == "CSS1Compat" && window.XMLHttpRequest //not IE or IE7+ browsers in standards mode
-            mainobj.$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body')
+            var mainobj = scrolltotop;
+            var iebrws = document.all;
+            mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode == "CSS1Compat" && window.XMLHttpRequest;
+            //not IE or IE7+ browsers in standards mode
+            mainobj.$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
             mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>')
-                    .css({position: mainobj.cssfixedsupport ? 'fixed' : 'absolute', bottom: mainobj.controlattrs.offsety, right: mainobj.controlattrs.offsetx, opacity: 0, cursor: 'pointer', zIndex: 99999})
-                    .attr({title: 'Scroll Back to Top'})
+                    .css({
+                        position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
+                        bottom: mainobj.controlattrs.offsety,
+                        right: mainobj.controlattrs.offsetx,
+                        opacity: 0,
+                        cursor: 'pointer',
+                        zIndex: 99999
+                    })
+                    .attr({
+                        title: 'Scroll Back to Top'
+                    })
                     .click(function () {
                         mainobj.scrollup();
                         return false
                     })
                     .appendTo('body')
-            if (document.all && !window.XMLHttpRequest && mainobj.$control.text() != '') //loose check for IE6 and below, plus whether control contains any text
-                mainobj.$control.css({width: mainobj.$control.width()}) //IE6- seems to require an explicit width on a DIV containing text
+            if (document.all && !window.XMLHttpRequest && mainobj.$control.text() != '') { //loose check for IE6 and below, plus whether control contains any text
+                mainobj.$control.css({
+                    width: mainobj.$control.width()
+                }); //IE6- seems to require an explicit width on a DIV containing text
+            }
             mainobj.togglecontrol()
             $('a[href="' + mainobj.anchorkeyword + '"]').click(function () {
                 mainobj.scrollup()
@@ -204,7 +242,6 @@ jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
         message = $.cresenity.base64.decode(message);
     }
 
-
     str_confirm = window.capp.label_ok;
     str_cancel = window.capp.label_cancel;
     bootbox.confirm(message, str_cancel, str_confirm, function (confirmed) {
@@ -234,7 +271,6 @@ jQuery(document).ready(function () {
 });
 if (window.capp.have_clock) {
 
-
     $(document).ready(function () {
         $('#servertime').serverTime({
             ajaxFile: window.capp.base_url + 'cresenity/server_time',
@@ -245,13 +281,111 @@ if (window.capp.have_clock) {
 /*
  cresenity.func.js
  */
-
 ;
+var Cresenity = function () {
+    this.showModal = function (message, options) {
+        var settings = $.extend({
+            // These are the defaults.
+            haveHeader: false,
+            haveFooter: false,
+            headerText: '',
+            onComplete: false,
+            footerAction: {}
+        }, options);
 
-(function ($, window, document, undefined)
-{
+        var modalContainer = jQuery('<div>').addClass('modal');
+
+        var modalHeader = jQuery('<div>').addClass('modal-header');
+        var modalContent = jQuery('<div>').addClass('modal-content');
+        var modalFooter = jQuery('<div>').addClass('modal-footer');
+        modalContent.append(message);
+        if (settings.haveHeader) {
+            modalHeader.html(settings.headerText);
+            modalContainer.append(modalHeader);
+        }
+        modalContainer.append(modalContent);
+        if (settings.haveFooter) {
+            modalContainer.append(modalFooter);
+        }
+
+        $('body').append(modalContainer);
+        var modalOptions = {
+            complete: function () {
+                modalContainer.remove();
+                if (typeof settings.onComplete == 'function') {
+                    settings.onComplete();
+                }
+            }
+        };
+        modalContainer.modal(modalOptions);
+        modalContainer.modal('open');
+
+    };
+    this.reloadSection = function (selector, options) {
+        var settings = $.extend({
+            // These are the defaults.
+            method: 'get',
+            dataAddition: {},
+            url: '/',
+            onComplete: false,
+        }, options);
+
+        var method = settings.method;
+        var element = jQuery(selector);
+        var xhr = element.data('xhr');
+        if (xhr) {
+            xhr.abort();
+        }
+
+        if (!dataAddition) {
+            dataAddition = {};
+        }
+
+        element.empty();
+        //        element.append('<div class="preloader loading valign-wrapper center-align" style="height:' + elementHeight + 'px; width:' + elementWidth + 'px;"><div class="progress"><div class="indeterminate"></div></div></div>');
+        element.append('<div class="preloader loading valign-wrapper center-align" style="margin-top:20px; height:200px; width:auto;"><div class="progress"><div class="indeterminate"></div></div></div>');
+        element.addClass('loading');
+        element.data('xhr', jQuery.ajax({
+            type: method,
+            url: url,
+            dataType: 'json',
+            data: dataAddition,
+            success: function (data) {
+                $.cresenity._handle_response(data, function () {
+                    if (data.ajaxData && data.ajaxData.redirectTo) {
+                        window.location.href = data.ajaxData.redirectTo;
+                        return;
+                    }
+                    jQuery(selector).html(data.html);
+                    if (data.js && data.js.length > 0) {
+                        var script = $.cresenity.base64.decode(data.js);
+                        eval(script);
+                    }
+
+                    element.removeClass('loading');
+                    element.data('xhr', false);
+
+                    if (typeof settings.onComplete === "function") {
+                        // Call it, since we have confirmed it is callable?
+                        settings.onComplete(data);
+                    }
+
+                });
+            }.bind(this),
+            error: function (obj, t, msg) {
+                if (msg != 'abort') {
+                    this.showToast('error', 'Error, please call administrator... (' + msg + ')');
+                }
+            }.bind(this),
+        }));
+    }
+};
+
+window.cresenity = new Cresenity();
+
+(function ($, window, document, undefined) {
     $.cresenity = {
-        _filesadded: "",
+        _filesAdded: "",
         _loadjscss: function (filename, filetype, callback) {
             if (filetype == "js") { //if filename is a external JavaScript file
                 var fileref = document.createElement('script')
@@ -290,8 +424,6 @@ if (window.capp.have_clock) {
         },
         _handle_response: function (data, callback) {
 
-
-
             if (data.css_require && data.css_require.length > 0) {
                 for (var i = 0; i < data.css_require.length; i++) {
                     $.cresenity.require(data.css_require[i], 'css');
@@ -326,9 +458,9 @@ if (window.capp.have_clock) {
             }
         },
         require: function (filename, filetype, callback) {
-            if ($.cresenity._filesadded.indexOf("[" + filename + "]") == -1) {
+            if ($.cresenity._filesAdded.indexOf("[" + filename + "]") == -1) {
                 $.cresenity._loadjscss(filename, filetype, callback);
-                $.cresenity._filesadded += "[" + filename + "]" //List of files added in the form "[filename1],[filename2],etc"
+                $.cresenity._filesAdded += "[" + filename + "]" //List of files added in the form "[filename1],[filename2],etc"
             } else {
                 $.cresenity._filesloaded++;
                 if ($.cresenity._filesloaded == $.cresenity._filesneeded) {
@@ -423,14 +555,15 @@ if (window.capp.have_clock) {
                 obj.addClass('notifications');
                 obj.addClass('top-right');
                 obj.notify({
-                    message: {text: message},
+                    message: {
+                        text: message
+                    },
                     type: type
                 }).show();
             }
 
         },
         thousand_separator: function (rp) {
-
             rp = "" + rp;
             var rupiah = "";
             var vfloat = "";
@@ -480,14 +613,20 @@ if (window.capp.have_clock) {
                 rp = this.replace_all(rp, ts, '');
             }
 
-
-
             rp = rp.replace(ds, ".");
             return rp;
         },
-        base64: {_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) {
+        base64: {
+            _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+            encode: function (e) {
                 var t = "";
-                var n, r, i, s, o, u, a;
+                var n,
+                        r,
+                        i,
+                        s,
+                        o,
+                        u,
+                        a;
                 var f = 0;
                 e = this._utf8_encode(e);
                 while (f < e.length) {
@@ -506,10 +645,16 @@ if (window.capp.have_clock) {
                     t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a)
                 }
                 return t
-            }, decode: function (e) {
+            },
+            decode: function (e) {
                 var t = "";
-                var n, r, i;
-                var s, o, u, a;
+                var n,
+                        r,
+                        i;
+                var s,
+                        o,
+                        u,
+                        a;
                 var f = 0;
                 e = e.replace(/[^A-Za-z0-9+/=]/g, "");
                 while (f < e.length) {
@@ -530,7 +675,8 @@ if (window.capp.have_clock) {
                 }
                 t = this._utf8_decode(t);
                 return t
-            }, _utf8_encode: function (e) {
+            },
+            _utf8_encode: function (e) {
                 e = e.replace(/rn/g, "n");
                 var t = "";
                 for (var n = 0; n < e.length; n++) {
@@ -547,7 +693,8 @@ if (window.capp.have_clock) {
                     }
                 }
                 return t
-            }, _utf8_decode: function (e) {
+            },
+            _utf8_decode: function (e) {
                 var t = "";
                 var n = 0;
                 var r = c1 = c2 = 0;
@@ -568,7 +715,8 @@ if (window.capp.have_clock) {
                     }
                 }
                 return t
-            }},
+            }
+        },
         url: {
             add_query_string: function (url, key, value) {
                 key = encodeURI(key);
@@ -593,7 +741,6 @@ if (window.capp.have_clock) {
                 if (i < 0) {
                     kvp[kvp.length] = [key, value].join('=');
                 }
-
 
                 query_string = kvp.join('&');
                 if (query_string.substr(0, 1) == '&')
@@ -624,28 +771,30 @@ if (window.capp.have_clock) {
                 return url;
             }
         },
-        ajaxSubmit: function(selector,options) {
-            var settings = $.extends({},options);
-            $(selector).each(function(){
+        ajaxSubmit: function (selector, options) {
+            var settings = $.extend({}, options);
+            $(selector).each(function () {
                 //don't do it again if still loading
-                if($(this).hasClass('loading')) {
+                if ($(this).hasClass('loading')) {
                     return false;
                 }
                 $(this).addClass('loading');
                 $(this).find('*').addClass('disabled');
                 var formAjaxUrl = $(this).attr('action') || '';
                 var formMethod = $(this).attr('method') || 'get';
-                
+
                 var ajaxOptions = {
                     url: formAjaxUrl,
                     dataType: 'json',
                     type: formMethod,
                 };
-                $(this).ajaxSubmit(ajaxOptions); 
-                
+                $(this).ajaxSubmit(ajaxOptions);
+
             });
-            
+            //always return false to prevent submit
+            return false;
         },
+        
         reload: function (id_target, url, method, data_addition) {
 
             if (!method)
@@ -958,7 +1107,6 @@ if (window.capp.have_clock) {
                 onComplete: false
             }, options);
 
-
             title = settings.title;
             if (title) {
                 settings.haveHeader = true;
@@ -980,7 +1128,7 @@ if (window.capp.have_clock) {
                         + "<div class='modal-dialog'>"
                         + "<div class='modal-content'>"
                         + "<div class='modal-header'>"
-                        + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>×</span></button>"
+                        + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>�</span></button>"
                         + "<h4 class='modal-title'></h4>"
                         + "</div>"
                         + "<div class='modal-body loading'>"
@@ -989,7 +1137,6 @@ if (window.capp.have_clock) {
                         + "</div>"
                         + "</div>"
                         + "</div>";
-
 
                 var selection = jQuery('#' + id_target);
 
@@ -1020,7 +1167,7 @@ if (window.capp.have_clock) {
                         selection.addClass("modal-body").show();
                         handle = selection;
                     }
-// If not, append current selection to dialog body
+                    // If not, append current selection to dialog body
                     else {
                         handle.append(selection);
                     }
@@ -1077,7 +1224,6 @@ if (window.capp.have_clock) {
                 if (typeof data_addition == 'undefined')
                     data_addition = {};
 
-
                 var modalContainer = jQuery('<div>').addClass('modal capp-modal ').css('display', 'none');
                 if (settings.isSidebar) {
                     modalContainer.addClass('sidebar');
@@ -1104,8 +1250,6 @@ if (window.capp.have_clock) {
                 }
                 modalContent.append(modalBody);
 
-
-
                 var selection = jQuery('#' + id_target);
                 var handle;
                 var dialog_is_remove = false;
@@ -1113,8 +1257,6 @@ if (window.capp.have_clock) {
                     selection = jQuery('<div/>').attr('id', id_target);
                     dialog_is_remove = true;
                 }
-
-
 
                 url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
                 if (!selection.is(".modal-body")) {
@@ -1173,17 +1315,17 @@ if (window.capp.have_clock) {
                     jQuery("body").append(overlay).append(parent);
                     jQuery(".modal-header h3", parent).html(title);
                     handle = $(".modal-body", parent);
-// Create dialog body from current jquery selection
-// If specified body is a div element and only one element is 
-// specified, make it the new modal dialog body
-// Allows us to do something like this 
-// $('<div id="foo"></div>').dialog2(); $("#foo").dialog2("open");
+                    // Create dialog body from current jquery selection
+                    // If specified body is a div element and only one element is
+                    // specified, make it the new modal dialog body
+                    // Allows us to do something like this
+                    // $('<div id="foo"></div>').dialog2(); $("#foo").dialog2("open");
                     if (selection.is("div") && selection.length == 1) {
                         handle.replaceWith(selection);
                         selection.addClass("modal-body").show();
                         handle = selection;
                     }
-// If not, append current selection to dialog body
+                    // If not, append current selection to dialog body
                     else {
                         handle.append(selection);
                     }
@@ -1203,7 +1345,6 @@ if (window.capp.have_clock) {
                     $('body').addClass('modal-open');
                     handle.addClass("opened").closest('.modal').show();
                     if (!$.fn.modal.Constructor.VERSION) {
-
                     }
                 }
                 handle.data('xhr', jQuery.ajax({
@@ -1253,7 +1394,6 @@ if (window.capp.have_clock) {
             }
             if (elm.attr('value') != 'undefined') {
 
-
                 return elm.attr('value');
             }
             return elm.html();
@@ -1275,7 +1415,6 @@ if (window.capp.have_clock) {
         },
 
         fullscreen: function (element) {
-
 
             if (!$('body').hasClass("full-screen")) {
 
@@ -1424,7 +1563,6 @@ appValidation = {
                 }
             });
 
-
             $.each(rules, function (i, param) {
                 var implicit = param[3] || appValidation.implicitRules.indexOf(param[0]) !== -1;
                 var rule = param[0];
@@ -1437,18 +1575,18 @@ appValidation = {
 
                 if (appValidation.methods[rule] !== undefined) {
                     validated = appValidation.methods[rule].call(validator, value, element, param[1], function (valid) {
-                        validator.settings.messages[ element.name ].appValidationRemote = previous.originalMessage;
+                        validator.settings.messages[element.name].appValidationRemote = previous.originalMessage;
                         if (valid) {
                             var submitted = validator.formSubmitted;
                             validator.prepareElement(element);
                             validator.formSubmitted = submitted;
                             validator.successList.push(element);
-                            delete validator.invalid[ element.name ];
+                            delete validator.invalid[element.name];
                             validator.showErrors();
                         } else {
                             var errors = {};
-                            errors[ element.name ] = previous.message = $.isFunction(message) ? message(value) : message;
-                            validator.invalid[ element.name ] = true;
+                            errors[element.name] = previous.message = $.isFunction(message) ? message(value) : message;
+                            validator.invalid[element.name] = true;
                             validator.showErrors(errors);
                         }
                         validator.showErrors(validator.errorMap);
@@ -1459,8 +1597,8 @@ appValidation = {
                 }
 
                 if (validated !== true) {
-                    if (!validator.settings.messages[ element.name ]) {
-                        validator.settings.messages[ element.name ] = {};
+                    if (!validator.settings.messages[element.name]) {
+                        validator.settings.messages[element.name] = {};
                     }
                     validator.settings.messages[element.name].appValidation = message;
                     return false;
@@ -1470,7 +1608,6 @@ appValidation = {
             return validated;
 
         }, '');
-
 
         /**
          * Create JQueryValidation check to validate Remote Laravel rules.
@@ -1486,21 +1623,24 @@ appValidation = {
                 implicit = implicit || parameters[3];
             });
 
-
             if (!implicit && this.optional(element)) {
                 return "dependency-mismatch";
             }
 
             var previous = this.previousValue(element),
-                    validator, data;
+                    validator,
+                    data;
 
-            if (!this.settings.messages[ element.name ]) {
-                this.settings.messages[ element.name ] = {};
+            if (!this.settings.messages[element.name]) {
+                this.settings.messages[element.name] = {};
             }
-            previous.originalMessage = this.settings.messages[ element.name ].appValidationRemote;
-            this.settings.messages[ element.name ].appValidationRemote = previous.message;
+            previous.originalMessage = this.settings.messages[element.name].appValidationRemote;
+            this.settings.messages[element.name].appValidationRemote = previous.message;
 
-            var param = typeof param === "string" && {url: param} || param;
+            var param = typeof param === "string" && {
+                url: param
+            }
+            || param;
 
             if (appValidation.helpers.arrayEquals(previous.old, value) || previous.old === value) {
                 return previous.valid;
@@ -1542,9 +1682,11 @@ appValidation = {
                         return xhr.setRequestHeader('X-XSRF-TOKEN', token);
                     }
                 }
-            }, param)
-                    ).always(function (response, textStatus) {
-                var errors, message, submitted, valid;
+            }, param)).always(function (response, textStatus) {
+                var errors,
+                        message,
+                        submitted,
+                        valid;
 
                 if (textStatus === 'error') {
                     valid = false;
@@ -1555,27 +1697,26 @@ appValidation = {
                     return;
                 }
 
-                validator.settings.messages[ element.name ].appValidationRemote = previous.originalMessage;
+                validator.settings.messages[element.name].appValidationRemote = previous.originalMessage;
 
                 if (valid) {
                     submitted = validator.formSubmitted;
                     validator.prepareElement(element);
                     validator.formSubmitted = submitted;
                     validator.successList.push(element);
-                    delete validator.invalid[ element.name ];
+                    delete validator.invalid[element.name];
                     validator.showErrors();
                 } else {
                     errors = {};
                     message = response || validator.defaultMessage(element, "remote");
-                    errors[ element.name ] = previous.message = $.isFunction(message) ? message(value) : message[0];
-                    validator.invalid[ element.name ] = true;
+                    errors[element.name] = previous.message = $.isFunction(message) ? message(value) : message[0];
+                    validator.invalid[element.name] = true;
                     validator.showErrors(errors);
                 }
                 validator.showErrors(validator.errorMap);
                 previous.valid = valid;
                 validator.stopRequest(element, valid);
-            }
-            );
+            });
             return "pending";
         }, '');
     }
@@ -1584,7 +1725,6 @@ appValidation = {
 $(function () {
     appValidation.init();
 });
-
 
 /*!
  * CApp Javascript Validation
@@ -1866,8 +2006,7 @@ $.extend(true, appValidation, {
                 if (el[0].tagName === 'SELECT' ||
                         el[0].tagName === 'OPTION' ||
                         el[0].type === 'checkbox' ||
-                        el[0].type === 'radio'
-                        ) {
+                        el[0].type === 'radio') {
                     event = 'click';
                 }
 
@@ -2463,7 +2602,7 @@ $.extend(true, appValidation, {
          * Validate that a required attribute exists.
          */
         Required: function (value, element) {
-            return  $.validator.methods.required.call(this, value, element);
+            return $.validator.methods.required.call(this, value, element);
         },
 
         /**
@@ -2478,19 +2617,17 @@ $.extend(true, appValidation, {
 
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param
-                        );
+                        currentObject, element, param);
                 required = required || (
                         target !== undefined &&
                         $.validator.methods.required.call(
                                 validator,
                                 currentObject.elementValue(target),
-                                target, true
-                                ));
+                                target, true));
             });
 
             if (required) {
-                return  $.validator.methods.required.call(this, value, element, true);
+                return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
@@ -2507,19 +2644,17 @@ $.extend(true, appValidation, {
 
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param
-                        );
+                        currentObject, element, param);
                 required = required && (
                         target !== undefined &&
                         $.validator.methods.required.call(
                                 validator,
                                 currentObject.elementValue(target),
-                                target, true
-                                ));
+                                target, true));
             });
 
             if (required) {
-                return  $.validator.methods.required.call(this, value, element, true);
+                return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
@@ -2536,19 +2671,17 @@ $.extend(true, appValidation, {
 
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param
-                        );
+                        currentObject, element, param);
                 required = required ||
                         target === undefined ||
                         !$.validator.methods.required.call(
                                 validator,
                                 currentObject.elementValue(target),
-                                target, true
-                                );
+                                target, true);
             });
 
             if (required) {
-                return  $.validator.methods.required.call(this, value, element, true);
+                return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
@@ -2565,19 +2698,17 @@ $.extend(true, appValidation, {
 
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param
-                        );
+                        currentObject, element, param);
                 required = required && (
                         target === undefined ||
                         !$.validator.methods.required.call(
                                 validator,
                                 currentObject.elementValue(target),
-                                target, true
-                                ));
+                                target, true));
             });
 
             if (required) {
-                return  $.validator.methods.required.call(this, value, element, true);
+                return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
@@ -2590,8 +2721,7 @@ $.extend(true, appValidation, {
         RequiredIf: function (value, element, params) {
 
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]
-                    );
+                    this, element, params[0]);
 
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
@@ -2599,8 +2729,7 @@ $.extend(true, appValidation, {
                     var data = params.slice(1);
                     if ($.inArray(val, data) !== -1) {
                         return $.validator.methods.required.call(
-                                this, value, element, true
-                                );
+                                this, value, element, true);
                     }
                 }
             }
@@ -2617,8 +2746,7 @@ $.extend(true, appValidation, {
         RequiredUnless: function (value, element, params) {
 
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]
-                    );
+                    this, element, params[0]);
 
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
@@ -2631,8 +2759,7 @@ $.extend(true, appValidation, {
             }
 
             return $.validator.methods.required.call(
-                    this, value, element, true
-                    );
+                    this, value, element, true);
 
         },
 
@@ -2653,8 +2780,7 @@ $.extend(true, appValidation, {
         Same: function (value, element, params) {
 
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]
-                    );
+                    this, element, params[0]);
 
             if (target !== undefined) {
                 return String(value) === String(this.elementValue(target));
@@ -2759,7 +2885,7 @@ $.extend(true, appValidation, {
          */
         Boolean: function (value) {
             var regex = new RegExp("^(?:(true|false|1|0))$", 'i');
-            return  regex.test(value);
+            return regex.test(value);
         },
 
         /**
@@ -2769,7 +2895,7 @@ $.extend(true, appValidation, {
          */
         Integer: function (value) {
             var regex = new RegExp("^(?:-?\\d+)$", 'i');
-            return  regex.test(value);
+            return regex.test(value);
         },
 
         /**
@@ -2794,8 +2920,7 @@ $.extend(true, appValidation, {
         Digits: function (value, element, params) {
             return (
                     $.validator.methods.number.call(this, value, element, true) &&
-                    value.length === parseInt(params, 10)
-                    );
+                    value.length === parseInt(params, 10));
         },
 
         /**
@@ -2977,8 +3102,7 @@ $.extend(true, appValidation, {
                             ((params['height']) && parseFloat(params['height']) !== height) ||
                             ((params['min_height']) && parseFloat(params['min_height']) > height) ||
                             ((params['max_height']) && parseFloat(params['max_height']) < height) ||
-                            ((params['ratio']) && ratio !== parseFloat(eval(params['ratio']))
-                                    );
+                            ((params['ratio']) && ratio !== parseFloat(eval(params['ratio'])));
                     callback(!notValid);
                 };
                 img.onerror = function () {
@@ -3002,7 +3126,7 @@ $.extend(true, appValidation, {
             }
 
             var regex = new RegExp("^(?:^[a-z\u00E0-\u00FC]+$)$", 'i');
-            return  regex.test(value);
+            return regex.test(value);
 
         },
 
@@ -3056,7 +3180,7 @@ $.extend(true, appValidation, {
                 }
             }
             var regex = new RegExp("^(?:" + matches[1] + ")$", php_modifiers.join());
-            return   regex.test(value);
+            return regex.test(value);
         },
 
         /**
@@ -3094,7 +3218,7 @@ $.extend(true, appValidation, {
             }
 
             var timeValue = appValidation.helpers.parseTime(value, element);
-            return  (timeValue !== false && timeValue < timeCompare);
+            return (timeValue !== false && timeValue < timeCompare);
 
         },
 
@@ -3114,7 +3238,7 @@ $.extend(true, appValidation, {
             }
 
             var timeValue = appValidation.helpers.parseTime(value, element);
-            return  (timeValue !== false && timeValue > timeCompare);
+            return (timeValue !== false && timeValue > timeCompare);
 
         },
 
@@ -3122,7 +3246,7 @@ $.extend(true, appValidation, {
          * Validate that an attribute is a valid date.
          */
         Timezone: function (value) {
-            return  appValidation.helpers.isTimezone(value);
+            return appValidation.helpers.isTimezone(value);
         },
 
         /**
