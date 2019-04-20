@@ -177,82 +177,99 @@ var scrolltotop = {
     }
 }
 if (typeof window.capp.have_scroll_to_top != 'undefined' && window.capp.have_scroll_to_top) {
-    scrolltotop.init();
+    if (!document.getElementById('topcontrol')) {
+        scrolltotop.init();
+    }
 }
-jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
-    var ahref = $(this).attr('href');
-    var message = $(this).attr('data-confirm-message');
-    var no_double = $(this).attr('data-no-double');
-    var clicked = $(this).attr('data-clicked');
-    var btn = jQuery(this);
-    btn.attr('data-clicked', '1');
-    if (no_double) {
-        if (clicked == 1)
-            return false;
-    }
+var confirmInitialized = $('body').attr('data-confirm-initialized');
+if (!confirmInitialized) {
+    jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
+        var ahref = $(this).attr('href');
+        var message = $(this).attr('data-confirm-message');
+        var no_double = $(this).attr('data-no-double');
+        var clicked = $(this).attr('data-clicked');
 
-    if (!message) {
-        message = window.capp.label_confirm;
-    } else {
-        message = $.cresenity.base64.decode(message);
-    }
 
-    str_confirm = window.capp.label_ok;
-    str_cancel = window.capp.label_cancel;
-    e.preventDefault();
-    e.stopPropagation();
-    btn.off('click');
-    bootbox.confirm(message, function (confirmed) {
-        if (confirmed) {
-            if (ahref) {
-                window.location.href = ahref;
-            } else {
-                if (btn.attr('type') == 'submit') {
-                    btn.closest('form').submit();
+        var btn = jQuery(this);
+        btn.attr('data-clicked', '1');
+        if (no_double) {
+            if (clicked == 1)
+                return false;
+        }
+
+        if (!message) {
+            message = window.capp.label_confirm;
+        } else {
+            message = $.cresenity.base64.decode(message);
+        }
+
+        str_confirm = window.capp.label_ok;
+        str_cancel = window.capp.label_cancel;
+        e.preventDefault();
+        e.stopPropagation();
+        btn.off('click');
+        bootbox.confirm(message, function (confirmed) {
+            if (confirmed) {
+                if (ahref) {
+                    window.location.href = ahref;
                 } else {
-                    btn.on('click');
+                    if (btn.attr('type') == 'submit') {
+                        btn.closest('form').submit();
+                    } else {
+                        btn.on('click');
+                    }
+
                 }
-
-            }
-        } else {
-            btn.removeAttr('data-clicked');
-        }
-        setTimeout(function () {
-            var modalExists = $('.modal:visible').length > 0;
-            if (!modalExists) {
-                $('body').removeClass('modal-open');
             } else {
-                $('body').addClass('modal-open');
+                btn.removeAttr('data-clicked');
             }
-        }, 750);
-    });
-    return false;
-});
-jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
+            setTimeout(function () {
+                var modalExists = $('.modal:visible').length > 0;
+                if (!modalExists) {
+                    $('body').removeClass('modal-open');
+                } else {
+                    $('body').addClass('modal-open');
+                }
+            }, 750);
+        });
 
-    var submitted = $(this).attr('data-submitted');
-    var btn = jQuery(this);
-    if (submitted == '1')
+
         return false;
-    btn.attr('data-submitted', '1');
-    var message = $(this).attr('data-confirm-message');
-    if (!message) {
-        message = window.capp.label_confirm;
-    } else {
-        message = $.cresenity.base64.decode(message);
-    }
-
-    str_confirm = window.capp.label_ok;
-    str_cancel = window.capp.label_cancel;
-    bootbox.confirm(message, str_cancel, str_confirm, function (confirmed) {
-        if (confirmed) {
-            jQuery(e.target).closest('form').submit();
-        } else {
-            btn.removeAttr('data-submitted');
-        }
     });
-    return false;
-});
+    $('body').attr('data-confirm-initialized', '1');
+}
+var confirmSubmitInitialized = $('body').attr('data-confirm-submit-initialized');
+if (!confirmSubmitInitialized) {
+    jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
+
+        var submitted = $(this).attr('data-submitted');
+        var btn = jQuery(this);
+        if (submitted == '1')
+            return false;
+        btn.attr('data-submitted', '1');
+
+        var message = $(this).attr('data-confirm-message');
+        if (!message) {
+            message = window.capp.label_confirm;
+        } else {
+            message = $.cresenity.base64.decode(message);
+        }
+
+        str_confirm = window.capp.label_ok;
+        str_cancel = window.capp.label_cancel;
+        bootbox.confirm(message, str_cancel, str_confirm, function (confirmed) {
+            if (confirmed) {
+                jQuery(e.target).closest('form').submit();
+            } else {
+                btn.removeAttr('data-submitted');
+            }
+        });
+
+
+        return false;
+    });
+    $('body').attr('data-confirm-submit-initialized', '1');
+}
 jQuery(document).ready(function () {
     jQuery("#toggle-subnavbar").click(function () {
         var cmd = jQuery("#toggle-subnavbar span").html();
@@ -568,7 +585,7 @@ var Cresenity = function () {
 
     };
     this.modal = function (options) {
-        
+
         var settings = $.extend({
             // These are the defaults.
             haveHeader: false,
@@ -578,14 +595,14 @@ var Cresenity = function () {
             footerAction: {}
         }, options);
 
-        if(settings.title) {
-            settings.haveHeader=true;
-            settings.headerText=settings.title;
+        if (settings.title) {
+            settings.haveHeader = true;
+            settings.headerText = settings.title;
         }
-        
+
         var modalContainer = jQuery('<div>').addClass('modal');
-        
-        if(settings.isSidebar) {
+
+        if (settings.isSidebar) {
             modalContainer.addClass('sidebar');
             modalContainer.addClass(settings.sidebarMode);
         }
@@ -610,23 +627,23 @@ var Cresenity = function () {
         }
         modalContent.append(modalBody);
         $('body').append(modalContainer);
-     
+
         modalContainer.on('hidden.bs.modal', function (e) {
-           modalContainer.remove();
+            modalContainer.remove();
         });
-        
-        if(settings.message) {
+
+        if (settings.message) {
             modalBody.append(settings.message);
         }
-        if(settings.reload) {
+        if (settings.reload) {
             var reloadOptions = settings.reload;
-            reloadOptions.selector=modalBody;
+            reloadOptions.selector = modalBody;
             cresenity.reload(reloadOptions);
         }
-        
+
         modalContainer.modal();
-        
-       
+
+
     };
 
     this.blockPage = function () {
@@ -1392,10 +1409,10 @@ if (!window.cresenity) {
             } else {
                 options.selector = '#' + id_target;
                 options.reload = {};
-                options.reload.method=method;
-                options.reload.dataAddition=data_addition;
-                options.reload.url=url;
-                
+                options.reload.method = method;
+                options.reload.dataAddition = data_addition;
+                options.reload.url = url;
+
                 return cresenity.modal(options);
             }
             var title = options;
