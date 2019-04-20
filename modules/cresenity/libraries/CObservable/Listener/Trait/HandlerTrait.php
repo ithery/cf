@@ -8,5 +8,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CObservable_Listener_Trait_HandlerTrait {
-    
+
+    public function addReloadHandler() {
+        $handler = new CObservable_Listener_Handler_ReloadHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
 }

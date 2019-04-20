@@ -9,7 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener extends CObservable_ListenerAbstract {
 
-    use CTrait_Compat_Listener;
+    use CTrait_Compat_Listener,
+        CObservable_Listener_Trait_HandlerTrait;
 
     protected $event;
     protected $confirm;
