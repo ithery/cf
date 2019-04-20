@@ -12,7 +12,6 @@ trait CObservable_Trait_EventsTrait {
 
     public function onClick(Closure $event=null, $options = array()) {
         $compiledJs = '';
-        
         if ($event instanceof Closure) {
             $this->javascript->startDeferred();
             $event($this->javascript);

@@ -49,4 +49,8 @@ trait CObservable_Trait_ListenerTrait {
         return $return;
     }
 
+    public function onClickListener() {
+        return new CObservable_Listener_ClickListener($this->id);
+    }
+
 }
