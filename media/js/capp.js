@@ -282,46 +282,228 @@ if (window.capp.have_clock) {
  cresenity.func.js
  */
 ;
+
 var Cresenity = function () {
-    this.showModal = function (message, options) {
-        var settings = $.extend({
-            // These are the defaults.
-            haveHeader: false,
-            haveFooter: false,
-            headerText: '',
-            onComplete: false,
-            footerAction: {}
-        }, options);
 
-        var modalContainer = jQuery('<div>').addClass('modal');
-
-        var modalHeader = jQuery('<div>').addClass('modal-header');
-        var modalContent = jQuery('<div>').addClass('modal-content');
-        var modalFooter = jQuery('<div>').addClass('modal-footer');
-        modalContent.append(message);
-        if (settings.haveHeader) {
-            modalHeader.html(settings.headerText);
-            modalContainer.append(modalHeader);
-        }
-        modalContainer.append(modalContent);
-        if (settings.haveFooter) {
-            modalContainer.append(modalFooter);
-        }
-
-        $('body').append(modalContainer);
-        var modalOptions = {
-            complete: function () {
-                modalContainer.remove();
-                if (typeof settings.onComplete == 'function') {
-                    settings.onComplete();
+    var Base64 = function (cresenity) {
+        this.cresenity = cresenity;
+        this._keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        this._utf8_encode = function (e) {
+            e = e.replace(/rn/g, "n");
+            var t = "";
+            for (var n = 0; n < e.length; n++) {
+                var r = e.charCodeAt(n);
+                if (r < 128) {
+                    t += String.fromCharCode(r)
+                } else if (r > 127 && r < 2048) {
+                    t += String.fromCharCode(r >> 6 | 192);
+                    t += String.fromCharCode(r & 63 | 128)
+                } else {
+                    t += String.fromCharCode(r >> 12 | 224);
+                    t += String.fromCharCode(r >> 6 & 63 | 128);
+                    t += String.fromCharCode(r & 63 | 128)
                 }
             }
+            return t
         };
-        modalContainer.modal(modalOptions);
-        modalContainer.modal('open');
+        this._utf8_decode = function (e) {
+            var t = "";
+            var n = 0;
+            var r = c1 = c2 = 0;
+            while (n < e.length) {
+                r = e.charCodeAt(n);
+                if (r < 128) {
+                    t += String.fromCharCode(r);
+                    n++
+                } else if (r > 191 && r < 224) {
+                    c2 = e.charCodeAt(n + 1);
+                    t += String.fromCharCode((r & 31) << 6 | c2 & 63);
+                    n += 2
+                } else {
+                    c2 = e.charCodeAt(n + 1);
+                    c3 = e.charCodeAt(n + 2);
+                    t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+                    n += 3
+                }
+            }
+            return t
+        };
+        this.encode = function (e) {
+            var t = "";
+            var n, r, i, s, o, u, a;
+            var f = 0;
+            e = this._utf8_encode(e);
+            while (f < e.length) {
+                n = e.charCodeAt(f++);
+                r = e.charCodeAt(f++);
+                i = e.charCodeAt(f++);
+                s = n >> 2;
+                o = (n & 3) << 4 | r >> 4;
+                u = (r & 15) << 2 | i >> 6;
+                a = i & 63;
+                if (isNaN(r)) {
+                    u = a = 64
+                } else if (isNaN(i)) {
+                    a = 64
+                }
+                t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a)
+            }
+            return t
+        };
+
+        this.decode = function (e) {
+            var t = "";
+            var n, r, i;
+            var s, o, u, a;
+            var f = 0;
+            e = e.replace(/[^A-Za-z0-9+/=]/g, "");
+            while (f < e.length) {
+                s = this._keyStr.indexOf(e.charAt(f++));
+                o = this._keyStr.indexOf(e.charAt(f++));
+                u = this._keyStr.indexOf(e.charAt(f++));
+                a = this._keyStr.indexOf(e.charAt(f++));
+                n = s << 2 | o >> 4;
+                r = (o & 15) << 4 | u >> 2;
+                i = (u & 3) << 6 | a;
+                t = t + String.fromCharCode(n);
+                if (u != 64) {
+                    t = t + String.fromCharCode(r)
+                }
+                if (a != 64) {
+                    t = t + String.fromCharCode(i)
+                }
+            }
+            t = this._utf8_decode(t);
+            return t
+        };
+
+    }
+
+    var Url = function (cresenity) {
+        this.cresenity = cresenity;
+        this.addQueryString = function (url, key, value) {
+            key = encodeURI(key);
+            value = encodeURI(value);
+            var urlArray = url.split('?');
+            var queryString = '';
+            var baseUrl = urlArray[0];
+            if (urlArray.length > 1) {
+                queryString = urlArray[1];
+            }
+            var kvp = queryString.split('&');
+            var i = kvp.length;
+            var x;
+            while (i--) {
+                x = kvp[i].split('=');
+                if (x[0] == key) {
+                    x[1] = value;
+                    kvp[i] = x.join('=');
+                    break;
+                }
+            }
+
+            if (i < 0) {
+                kvp[kvp.length] = [key, value].join('=');
+            }
+
+            queryString = kvp.join('&');
+            if (queryString.substr(0, 1) == '&')
+                queryString = queryString.substr(1);
+            return baseUrl + '?' + queryString;
+        };
+        this.replaceParam = function (url) {
+            var available = true;
+            while (available) {
+                var matches = url.match(/{([\w]*)}/);
+                if (matches != null) {
+                    var key = matches[1];
+                    var val = null;
+                    if ($('#' + key).length > 0) {
+                        var val = cresenity.value('#' + key);
+                    }
+
+                    if (val == null) {
+                        val = key;
+                    }
+
+                    url = url.replace('{' + key + '}', val);
+                } else {
+                    available = false;
+                }
+
+            }
+            return url;
+        }
+    }
+
+    this.url = new Url(this);
+    this.base64 = new Base64(this);
+
+    this.filesAdded = "";
+    this.loadJsCss = function (filename, filetype, callback) {
+        if (filetype == "js") { //if filename is a external JavaScript file
+            var fileref = document.createElement('script')
+            fileref.setAttribute("type", "text/javascript")
+            fileref.setAttribute("src", filename)
+        } else if (filetype == "css") { //if filename is an external CSS file
+            var fileref = document.createElement("link")
+            fileref.setAttribute("rel", "stylesheet")
+            fileref.setAttribute("type", "text/css")
+            fileref.setAttribute("href", filename)
+        }
+        if (typeof fileref != "undefined") {
+            //fileref.onload = callback;
+            // IE 6 & 7
+            if (typeof (callback) === 'function') {
+                fileref.onload = cresenity.handleResponseCallback(callback);
+                fileref.onreadystatechange = function () {
+                    if (this.readyState == 'complete') {
+                        cresenity.handleResponseCallback(callback);
+                    }
+                }
+            }
+            document.getElementsByTagName("head")[0].appendChild(fileref);
+        }
+    };
+    this.removeJsCss = function (filename, filetype) {
+        var targetelement = (filetype == "js") ? "script" : (filetype == "css") ? "link" : "none"; //determine element type to create nodelist from
+        var targetattr = (filetype == "js") ? "src" : (filetype == "css") ? "href" : "none"; //determine corresponding attribute to test for
+        var allsuspects = document.getElementsByTagName(targetelement);
+        for (var i = allsuspects.length; i >= 0; i--) { //search backwards within nodelist for matching elements to remove
+            if (allsuspects[i] && allsuspects[i].getAttribute(targetattr) != null && allsuspects[i].getAttribute(targetattr).indexOf(filename) != -1) {
+                allsuspects[i].parentNode.removeChild(allsuspects[i]) //remove element by calling parentNode.removeChild()
+            }
+        }
+    };
+    this.handleResponse = function (data, callback) {
+        if (data.css_require && data.css_require.length > 0) {
+            for (var i = 0; i < data.css_require.length; i++) {
+                cresenity.require(data.css_require[i], 'css');
+            }
+        }
+        require(data.js_require, callback);
+
 
     };
-    this.reloadSection = function (selector, options) {
+    this.handleResponseCallback = function (callback) {
+        cresenity.filesLoaded++;
+        if (cresenity.filesLoaded == $.cresenity.filesNeeded) {
+            callback();
+        }
+    };
+    this.require = function (filename, filetype, callback) {
+        if (cresenity.filesAdded.indexOf("[" + filename + "]") == -1) {
+            cresenity.loadJsCss(filename, filetype, callback);
+            cresenity.filesAdded += "[" + filename + "]" //List of files added in the form "[filename1],[filename2],etc"
+        } else {
+            cresenity.filesLoaded++;
+
+            if (cresenity.filesLoaded == cresenity.filesNeeded) {
+                callback();
+            }
+        }
+    };
+    this.reload = function (options) {
         var settings = $.extend({
             // These are the defaults.
             method: 'get',
@@ -330,59 +512,102 @@ var Cresenity = function () {
             onComplete: false,
         }, options);
 
+
         var method = settings.method;
-        var element = jQuery(selector);
-        var xhr = element.data('xhr');
+        var selector = settings.selector;
+        var xhr = jQuery(selector).data('xhr');
         if (xhr) {
             xhr.abort();
         }
-
-        if (!dataAddition) {
+        var dataAddition = settings.dataAddition;
+        var url = settings.url;
+        url = this.url.replaceParam(url);
+        if (typeof dataAddition == 'undefined') {
             dataAddition = {};
         }
 
-        element.empty();
-        //        element.append('<div class="preloader loading valign-wrapper center-align" style="height:' + elementHeight + 'px; width:' + elementWidth + 'px;"><div class="progress"><div class="indeterminate"></div></div></div>');
-        element.append('<div class="preloader loading valign-wrapper center-align" style="margin-top:20px; height:200px; width:auto;"><div class="progress"><div class="indeterminate"></div></div></div>');
-        element.addClass('loading');
-        element.data('xhr', jQuery.ajax({
-            type: method,
-            url: url,
-            dataType: 'json',
-            data: dataAddition,
-            success: function (data) {
-                $.cresenity._handle_response(data, function () {
-                    if (data.ajaxData && data.ajaxData.redirectTo) {
-                        window.location.href = data.ajaxData.redirectTo;
-                        return;
-                    }
-                    jQuery(selector).html(data.html);
-                    if (data.js && data.js.length > 0) {
-                        var script = $.cresenity.base64.decode(data.js);
-                        eval(script);
-                    }
+        $(selector).each(function () {
+            var idTarget = $(this).attr('id');
+            url = cresenity.url.addQueryString(url, 'capp_current_container_id', idTarget);
 
-                    element.removeClass('loading');
-                    element.data('xhr', false);
 
-                    if (typeof settings.onComplete === "function") {
-                        // Call it, since we have confirmed it is callable?
-                        settings.onComplete(data);
+            (function (element) {
+                cresenity.blockElement($(element));
+                $(this).data('xhr', $.ajax({
+                    type: method,
+                    url: url,
+                    dataType: 'json',
+                    data: dataAddition,
+                    success: function (data) {
+                        cresenity.handleResponse(data, function () {
+                            $(element).html(data.html);
+                            if (data.js && data.js.length > 0) {
+                                var script = cresenity.base64.decode(data.js);
+                                eval(script);
+                            }
+
+
+                            if ($(element).find('.prettyprint').length > 0) {
+                                window.prettyPrint && prettyPrint();
+                            }
+                        });
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError != 'abort') {
+                            cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
+                        }
+
+                    },
+                    complete: function () {
+                        $(element).data('xhr', false);
+                        cresenity.unblockElement($(element));
                     }
+                }));
+            })(this);
+        });
 
-                });
-            }.bind(this),
-            error: function (obj, t, msg) {
-                if (msg != 'abort') {
-                    this.showToast('error', 'Error, please call administrator... (' + msg + ')');
-                }
-            }.bind(this),
-        }));
-    }
+    };
+
+
+    this.blockPage = function () {
+        $.blockUI({
+            message: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+            css: {
+                backgroundColor: 'transparent',
+                border: '0',
+                zIndex: 9999999
+            },
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8,
+                zIndex: 9999990
+            }
+        });
+    };
+    this.unblockPage = function () {
+        $.unblockUI();
+    };
+    this.blockElement = function (selector) {
+        $(selector).block({
+            message: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+            css: {
+                backgroundColor: 'transparent',
+                border: '0'
+            },
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8
+            }
+        });
+
+    };
+    this.unblockElement = function (selector) {
+        $(selector).unblock();
+    };
 };
-
-window.cresenity = new Cresenity();
-
+if (!window.cresenity) {
+    window.cresenity = new Cresenity();
+}
 (function ($, window, document, undefined) {
     $.cresenity = {
         _filesAdded: "",
@@ -549,7 +774,6 @@ window.cresenity = new Cresenity();
             }
 
             if (alert_type == 'notify') {
-                console.log(container);
                 obj = $('<div>');
                 container.prepend(obj);
                 obj.addClass('notifications');
@@ -794,9 +1018,18 @@ window.cresenity = new Cresenity();
             //always return false to prevent submit
             return false;
         },
-        
-        reload: function (id_target, url, method, data_addition) {
 
+        reload: function (id_target, url, method, data_addition) {
+            if (typeof id_target == 'object') {
+                return cresenity.reload(id_target);
+            } else {
+                var options = {};
+                options.selector = '#' + id_target;
+                options.url = url;
+                options.method = method;
+                options.dataAddition = data_addition;
+                return cresenity.reload(options);
+            }
             if (!method)
                 method = "get";
             var xhr = jQuery('#' + id_target).data('xhr');
@@ -1666,7 +1899,6 @@ appValidation = {
             if ($(validator.currentForm).find('input[name="_method"]').length) {
                 formMethod = $(validator.currentForm).find('input[name="_method"]').val();
             }
-            console.log($(validator.currentForm).attr('remote-validation-url'));
 
             $.ajax($.extend(true, {
                 mode: "abort",
@@ -2558,9 +2790,7 @@ $.extend(true, appValidation, {
     methods: {
 
         helpers: appValidation.helpers,
-
         jsRemoteTimer: 0,
-
         /**
          * "Validate" optional attributes.
          * Always returns true, just lets us put sometimes in rules.
@@ -2570,7 +2800,6 @@ $.extend(true, appValidation, {
         Sometimes: function () {
             return true;
         },
-
         /**
          * Bail This is the default behaivour os JSValidation.
          * Always returns true, just lets us put sometimes in rules.
@@ -2580,7 +2809,6 @@ $.extend(true, appValidation, {
         Bail: function () {
             return true;
         },
-
         /**
          * "Indicate" validation should pass if value is null.
          * Always returns true, just lets us put "nullable" in rules.
@@ -2590,21 +2818,18 @@ $.extend(true, appValidation, {
         Nullable: function () {
             return true;
         },
-
         /**
          * Validate the given attribute is filled if it is present.
          */
         Filled: function (value, element) {
             return $.validator.methods.required.call(this, value, element, true);
         },
-
         /**
          * Validate that a required attribute exists.
          */
         Required: function (value, element) {
             return $.validator.methods.required.call(this, value, element);
         },
-
         /**
          * Validate that an attribute exists when any other attribute exists.
          *
@@ -2614,7 +2839,6 @@ $.extend(true, appValidation, {
             var validator = this,
                     required = false;
             var currentObject = this;
-
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
                         currentObject, element, param);
@@ -2625,13 +2849,11 @@ $.extend(true, appValidation, {
                                 currentObject.elementValue(target),
                                 target, true));
             });
-
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
-
         /**
          * Validate that an attribute exists when all other attribute exists.
          *
@@ -2641,7 +2863,6 @@ $.extend(true, appValidation, {
             var validator = this,
                     required = true;
             var currentObject = this;
-
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
                         currentObject, element, param);
@@ -2652,13 +2873,11 @@ $.extend(true, appValidation, {
                                 currentObject.elementValue(target),
                                 target, true));
             });
-
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
-
         /**
          * Validate that an attribute exists when any other attribute does not exists.
          *
@@ -2668,7 +2887,6 @@ $.extend(true, appValidation, {
             var validator = this,
                     required = false;
             var currentObject = this;
-
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
                         currentObject, element, param);
@@ -2679,13 +2897,11 @@ $.extend(true, appValidation, {
                                 currentObject.elementValue(target),
                                 target, true);
             });
-
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
-
         /**
          * Validate that an attribute exists when all other attribute does not exists.
          *
@@ -2695,7 +2911,6 @@ $.extend(true, appValidation, {
             var validator = this,
                     required = true,
                     currentObject = this;
-
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
                         currentObject, element, param);
@@ -2706,13 +2921,11 @@ $.extend(true, appValidation, {
                                 currentObject.elementValue(target),
                                 target, true));
             });
-
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
             }
             return true;
         },
-
         /**
          * Validate that an attribute exists when another attribute has a given value.
          *
@@ -2722,7 +2935,6 @@ $.extend(true, appValidation, {
 
             var target = appValidation.helpers.dependentElement(
                     this, element, params[0]);
-
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
                 if (typeof val !== 'undefined') {
@@ -2736,7 +2948,6 @@ $.extend(true, appValidation, {
 
             return true;
         },
-
         /**
          * Validate that an attribute exists when another
          * attribute does not have a given value.
@@ -2747,7 +2958,6 @@ $.extend(true, appValidation, {
 
             var target = appValidation.helpers.dependentElement(
                     this, element, params[0]);
-
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
                 if (typeof val !== 'undefined') {
@@ -2760,9 +2970,7 @@ $.extend(true, appValidation, {
 
             return $.validator.methods.required.call(
                     this, value, element, true);
-
         },
-
         /**
          * Validate that an attribute has a matching confirmation.
          *
@@ -2771,7 +2979,6 @@ $.extend(true, appValidation, {
         Confirmed: function (value, element, params) {
             return appValidation.methods.Same.call(this, value, element, params);
         },
-
         /**
          * Validate that two attributes match.
          *
@@ -2781,13 +2988,11 @@ $.extend(true, appValidation, {
 
             var target = appValidation.helpers.dependentElement(
                     this, element, params[0]);
-
             if (target !== undefined) {
                 return String(value) === String(this.elementValue(target));
             }
             return false;
         },
-
         /**
          * Validate that the values of an attribute is in another attribute.
          *
@@ -2804,7 +3009,6 @@ $.extend(true, appValidation, {
             var elements = this.elements();
             var found = false;
             var nameRegExp = appValidation.helpers.regexFromWildcard(params[0]);
-
             for (var i = 0; i < elements.length; i++) {
                 var targetName = elements[i].name;
                 if (targetName.match(nameRegExp)) {
@@ -2815,7 +3019,6 @@ $.extend(true, appValidation, {
 
             return found;
         },
-
         /**
          * Validate an attribute is unique among other values.
          *
@@ -2832,7 +3035,6 @@ $.extend(true, appValidation, {
             var elements = this.elements();
             var found = false;
             var nameRegExp = appValidation.helpers.regexFromWildcard(params[0]);
-
             for (var i = 0; i < elements.length; i++) {
                 var targetName = elements[i].name;
                 if (targetName !== element.name && targetName.match(nameRegExp)) {
@@ -2843,7 +3045,6 @@ $.extend(true, appValidation, {
 
             return !found;
         },
-
         /**
          * Validate that an attribute is different from another attribute.
          *
@@ -2852,7 +3053,6 @@ $.extend(true, appValidation, {
         Different: function (value, element, params) {
             return !appValidation.methods.Same.call(this, value, element, params);
         },
-
         /**
          * Validate that an attribute was "accepted".
          * This validation rule implies the attribute is "required".
@@ -2863,7 +3063,6 @@ $.extend(true, appValidation, {
             var regex = new RegExp("^(?:(yes|on|1|true))$", 'i');
             return regex.test(value);
         },
-
         /**
          * Validate that an attribute is an array.
          *
@@ -2877,7 +3076,6 @@ $.extend(true, appValidation, {
 
             return $.isArray(value);
         },
-
         /**
          * Validate that an attribute is a boolean.
          *
@@ -2887,7 +3085,6 @@ $.extend(true, appValidation, {
             var regex = new RegExp("^(?:(true|false|1|0))$", 'i');
             return regex.test(value);
         },
-
         /**
          * Validate that an attribute is an integer.
          *
@@ -2897,14 +3094,12 @@ $.extend(true, appValidation, {
             var regex = new RegExp("^(?:-?\\d+)$", 'i');
             return regex.test(value);
         },
-
         /**
          * Validate that an attribute is numeric.
          */
         Numeric: function (value, element) {
             return $.validator.methods.number.call(this, value, element, true);
         },
-
         /**
          * Validate that an attribute is a string.
          *
@@ -2913,7 +3108,6 @@ $.extend(true, appValidation, {
         String: function (value) {
             return typeof value === 'string';
         },
-
         /**
          * The field under validation must be numeric and must have an exact length of value.
          */
@@ -2922,7 +3116,6 @@ $.extend(true, appValidation, {
                     $.validator.methods.number.call(this, value, element, true) &&
                     value.length === parseInt(params, 10));
         },
-
         /**
          * The field under validation must have a length between the given min and max.
          */
@@ -2930,7 +3123,6 @@ $.extend(true, appValidation, {
             return ($.validator.methods.number.call(this, value, element, true)
                     && value.length >= parseFloat(params[0]) && value.length <= parseFloat(params[1]));
         },
-
         /**
          * Validate the size of an attribute.
          *
@@ -2939,7 +3131,6 @@ $.extend(true, appValidation, {
         Size: function (value, element, params) {
             return appValidation.helpers.getSize(this, element, value) === parseFloat(params[0]);
         },
-
         /**
          * Validate the size of an attribute is between a set of values.
          *
@@ -2949,7 +3140,6 @@ $.extend(true, appValidation, {
             return (appValidation.helpers.getSize(this, element, value) >= parseFloat(params[0]) &&
                     appValidation.helpers.getSize(this, element, value) <= parseFloat(params[1]));
         },
-
         /**
          * Validate the size of an attribute is greater than a minimum value.
          *
@@ -2958,7 +3148,6 @@ $.extend(true, appValidation, {
         Min: function (value, element, params) {
             return appValidation.helpers.getSize(this, element, value) >= parseFloat(params[0]);
         },
-
         /**
          * Validate the size of an attribute is less than a maximum value.
          *
@@ -2967,7 +3156,6 @@ $.extend(true, appValidation, {
         Max: function (value, element, params) {
             return appValidation.helpers.getSize(this, element, value) <= parseFloat(params[0]);
         },
-
         /**
          * Validate an attribute is contained within a list of values.
          *
@@ -2980,7 +3168,6 @@ $.extend(true, appValidation, {
             }
             return params.indexOf(value.toString()) !== -1;
         },
-
         /**
          * Validate an attribute is not contained within a list of values.
          *
@@ -2989,7 +3176,6 @@ $.extend(true, appValidation, {
         NotIn: function (value, element, params) {
             return params.indexOf(value.toString()) === -1;
         },
-
         /**
          * Validate that an attribute is a valid IP.
          *
@@ -2999,21 +3185,18 @@ $.extend(true, appValidation, {
             return /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)$/i.test(value) ||
                     /^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(([0-9A-Fa-f]{1,4}:){0,5}:((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(::([0-9A-Fa-f]{1,4}:){0,5}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))$/i.test(value);
         },
-
         /**
          * Validate that an attribute is a valid e-mail address.
          */
         Email: function (value, element) {
             return $.validator.methods.email.call(this, value, element, true);
         },
-
         /**
          * Validate that an attribute is a valid URL.
          */
         Url: function (value, element) {
             return $.validator.methods.url.call(this, value, element, true);
         },
-
         /**
          * The field under validation must be a successfully uploaded file.
          *
@@ -3028,7 +3211,6 @@ $.extend(true, appValidation, {
             }
             return false;
         },
-
         /**
          * Validate the MIME type of a file upload attribute is in a set of MIME types.
          *
@@ -3041,11 +3223,9 @@ $.extend(true, appValidation, {
             var lowerParams = $.map(params, function (item) {
                 return item.toLowerCase();
             });
-
             var fileinfo = appValidation.helpers.fileinfo(element);
             return (fileinfo !== false && lowerParams.indexOf(fileinfo.extension.toLowerCase()) !== -1);
         },
-
         /**
          * The file under validation must match one of the given MIME types.
          *
@@ -3058,15 +3238,12 @@ $.extend(true, appValidation, {
             var lowerParams = $.map(params, function (item) {
                 return item.toLowerCase();
             });
-
             var fileinfo = appValidation.helpers.fileinfo(element);
-
             if (fileinfo === false) {
                 return false;
             }
             return (lowerParams.indexOf(fileinfo.type.toLowerCase()) !== -1);
         },
-
         /**
          * Validate the MIME type of a file upload attribute is in a set of MIME types.
          */
@@ -3075,7 +3252,6 @@ $.extend(true, appValidation, {
                 'jpg', 'png', 'gif', 'bmp', 'svg', 'jpeg'
             ]);
         },
-
         /**
          * Validate dimensions of Image.
          *
@@ -3111,10 +3287,8 @@ $.extend(true, appValidation, {
                 img.src = fr.result;
             };
             fr.readAsDataURL(element.files[0]);
-
             return 'pending';
         },
-
         /**
          * Validate that an attribute contains only alphabetic characters.
          *
@@ -3127,9 +3301,7 @@ $.extend(true, appValidation, {
 
             var regex = new RegExp("^(?:^[a-z\u00E0-\u00FC]+$)$", 'i');
             return regex.test(value);
-
         },
-
         /**
          * Validate that an attribute contains only alpha-numeric characters.
          *
@@ -3142,7 +3314,6 @@ $.extend(true, appValidation, {
             var regex = new RegExp("^(?:^[a-z0-9\u00E0-\u00FC]+$)$", 'i');
             return regex.test(value);
         },
-
         /**
          * Validate that an attribute contains only alphabetic characters.
          *
@@ -3155,7 +3326,6 @@ $.extend(true, appValidation, {
             var regex = new RegExp("^(?:^[a-z0-9\u00E0-\u00FC_-]+$)$", 'i');
             return regex.test(value);
         },
-
         /**
          * Validate that an attribute passes a regular expression check.
          *
@@ -3182,7 +3352,6 @@ $.extend(true, appValidation, {
             var regex = new RegExp("^(?:" + matches[1] + ")$", php_modifiers.join());
             return regex.test(value);
         },
-
         /**
          * Validate that an attribute is a valid date.
          *
@@ -3191,7 +3360,6 @@ $.extend(true, appValidation, {
         Date: function (value) {
             return (appValidation.helpers.strtotime(value) !== false);
         },
-
         /**
          * Validate that an attribute matches a date format.
          *
@@ -3200,7 +3368,6 @@ $.extend(true, appValidation, {
         DateFormat: function (value, element, params) {
             return appValidation.helpers.parseTime(value, params[0]) !== false;
         },
-
         /**
          * Validate the date is before a given date.
          *
@@ -3219,9 +3386,7 @@ $.extend(true, appValidation, {
 
             var timeValue = appValidation.helpers.parseTime(value, element);
             return (timeValue !== false && timeValue < timeCompare);
-
         },
-
         /**
          * Validate the date is after a given date.
          *
@@ -3239,16 +3404,13 @@ $.extend(true, appValidation, {
 
             var timeValue = appValidation.helpers.parseTime(value, element);
             return (timeValue !== false && timeValue > timeCompare);
-
         },
-
         /**
          * Validate that an attribute is a valid date.
          */
         Timezone: function (value) {
             return appValidation.helpers.isTimezone(value);
         },
-
         /**
          * Validate the attribute is a valid JSON string.
          *

@@ -25,12 +25,29 @@ abstract class CObservable_Listener_Handler {
     protected $driver;
     protected $listener;
 
-    public function __construct($listener) {
+    /**
+     * event from listener
+     * @var string
+     */
+    protected $event;
+
+    /**
+     * id element of owner this event listener
+     * @var string
+     */
+    protected $owner;
+
+    public function __construct(CObservable_ListenerAbstract $listener) {
         $this->listener = $listener;
+        $this->owner = $this->listener->getOwner();
+        $this->event = $this->listener->getEvent();
     }
 
-    public function js() {
-        return $this->driver->script();
+    protected function setOwner($owner) {
+        $this->owner = $owner;
+        return $this;
     }
+
+    abstract function js();
 
 }

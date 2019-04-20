@@ -9,7 +9,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Handler {
 
-    use CTrait_Compat_Handler_Driver_Reload;
+    use CTrait_Compat_Handler_Driver_Reload,
+        CObservable_Listener_Handler_Trait_TargetHandlerTrait,
+        CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
 
     protected $method;
     protected $content;
@@ -26,6 +28,10 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         $this->param_inputs = array();
         $this->param_inputs_by_name = array();
         $this->paramRequest = array();
+        $this->name = 'Reload';
+        $this->url = "";
+        $this->urlParam = array();
+        
     }
 
     public function addParamInput($inputs) {
@@ -66,7 +72,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         return $this->content;
     }
 
-    public function script() {
+    public function js() {
         $js = '';
         $dataAddition = '';
         foreach ($this->paramRequest as $reqK => $reqV) {

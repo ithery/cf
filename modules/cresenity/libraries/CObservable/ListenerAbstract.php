@@ -11,13 +11,21 @@ abstract class CObservable_ListenerAbstract {
 
     protected $owner;
     protected $handlers;
+    protected $event;
 
     public function __construct($owner) {
         $this->owner = $owner;
         $this->handlers = array();
     }
 
+    public function getEvent() {
+        return $this->event;
+    }
     public function owner() {
+        return $this->getOwner();
+    }
+    
+    public function getOwner() {
         return $this->owner;
     }
 
@@ -29,6 +37,7 @@ abstract class CObservable_ListenerAbstract {
         }
         return $this;
     }
+    
 
     public function handlers() {
         return $this->handlers;

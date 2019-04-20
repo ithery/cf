@@ -8,5 +8,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CObservable_Listener_Handler_Trait_TargetHandlerTrait {
-    
+
+    /**
+     * id of handler targeted renderable
+     * @var string
+     */
+    protected $target;
+
+    public function setTarget($target) {
+        if ($target instanceof CRenderable) {
+            $target = $target->id();
+        }
+        $this->target = $target;
+
+        return $this;
+    }
+
 }

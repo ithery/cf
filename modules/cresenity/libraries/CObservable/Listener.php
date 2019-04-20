@@ -12,7 +12,6 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
     use CTrait_Compat_Listener,
         CObservable_Listener_Trait_HandlerTrait;
 
-    protected $event;
     protected $confirm;
     protected $confirm_message;
     protected $no_double;
