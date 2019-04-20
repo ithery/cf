@@ -43,7 +43,7 @@ abstract class CObservable_Listener_Handler {
         $this->event = $this->listener->getEvent();
     }
 
-    protected function setOwner($owner) {
+    public function setOwner($owner) {
         $this->owner = $owner;
         return $this;
     }

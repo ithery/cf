@@ -64,16 +64,38 @@ trait CObservable_Trait_ListenerTrait {
         }
         return $this->listeners['click'];
     }
-    
-     /**
+
+    /**
      * 
-     * @return CObservable_Listener_ClickListener
+     * @return CObservable_Listener_ChangeListener
      */
     public function onChangeListener() {
         if (!isset($this->listeners['change'])) {
             $this->listeners['change'] = new CObservable_Listener_ChangeListener($this->id);
         }
         return $this->listeners['change'];
+    }
+
+    /**
+     * 
+     * @return CObservable_Listener_MouseUpListener
+     */
+    public function onMouseUpListener() {
+        if (!isset($this->listeners['mouseUp'])) {
+            $this->listeners['mouseUp'] = new CObservable_Listener_ChangeListener($this->id);
+        }
+        return $this->listeners['mouseUp'];
+    }
+    
+    /**
+     * 
+     * @return CObservable_Listener_MouseUpListener
+     */
+    public function onMouseDownListener() {
+        if (!isset($this->listeners['mouseDown'])) {
+            $this->listeners['mouseDown'] = new CObservable_Listener_ChangeListener($this->id);
+        }
+        return $this->listeners['mouseDown'];
     }
 
 }

@@ -73,8 +73,15 @@ abstract class CObservable_ListenerAbstract {
             case 'prepend':
                 $handler = new CObservable_Listener_Handler_PrependHandler($this);
                 break;
-            default:
+            case 'submit':
+                $handler = new CObservable_Listener_Handler_SubmitHandler($this);
+                break;
+            case 'custom':
                 $handler = new CObservable_Listener_Handler_CustomHandler($this);
+                break;
+            default:
+                throw new Exception('Handler : ' . $handlerName . ' not defined');
+                break;
         }
         $this->handlers[] = $handler;
         return $handler;

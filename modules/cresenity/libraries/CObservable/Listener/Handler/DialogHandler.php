@@ -7,10 +7,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 20, 2019, 3:09:11 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Handler {
 
- use CTrait_Compat_Handler_Driver_Dialog,
+    use CTrait_Compat_Handler_Driver_Dialog,
+        CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
+        CObservable_Listener_Handler_Trait_TargetHandlerTrait,
         CTrait_Element_Property_Title;
 
     protected $target;
@@ -24,8 +25,9 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
     protected $js_class_manual;
     protected $isSidebar;
 
-    public function __construct($owner, $event, $name) {
-        parent::__construct($owner, $event, $name);
+    public function __construct($listener) {
+        parent::__construct($listener);
+        $this->name = "Dialog";
         $this->method = "get";
         $this->target = "";
         $this->content = CHandlerElement::factory();
@@ -81,7 +83,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         return $this->content;
     }
 
-    public function script() {
+    public function js() {
         $js = '';
         if (strlen($this->target) == 0) {
             $this->target = "modal_opt_" . $this->event . "_" . $this->owner . "_dialog";
@@ -135,4 +137,5 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         }
         return $js;
     }
+
 }
