@@ -71,7 +71,7 @@ class CObservable_Listener_Handler_PrependHandler extends CObservable_Listener_H
                         }
                     }
                     if (is_duplicate==0) {
-			$.cresenity.prepend('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
+			$.cresenity.prepend('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $data_addition . ");
                     }
 		";
 

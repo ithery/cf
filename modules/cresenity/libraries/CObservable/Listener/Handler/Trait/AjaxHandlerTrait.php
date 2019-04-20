@@ -10,6 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
 
     protected $method;
+
     /**
      * url for ajax handler type
      * @var string $url
@@ -20,7 +21,8 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
      *
      * @var string $urlParam
      */
-    protected $urlParam;
+    protected $urlParam = array();
+
     public function setUrl($url) {
         $this->url = $url;
         return $this;

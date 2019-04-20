@@ -567,7 +567,50 @@ var Cresenity = function () {
         });
 
     };
+    this.modal = function (options) {
+        var settings = $.extend({
+            // These are the defaults.
+            haveHeader: false,
+            haveFooter: false,
+            headerText: '',
+            content: '',
+            onComplete: false,
+            footerAction: {}
+        }, options);
 
+        var modalContainer = jQuery('<div>').addClass('modal');
+
+        var modalHeader = jQuery('<div>').addClass('modal-header');
+        var modalContent = jQuery('<div>').addClass('modal-content');
+        var modalFooter = jQuery('<div>').addClass('modal-footer');
+        var content = settings.content;
+        var reloadOptions = settings.reload;
+        modalContent.append(content);
+        if (reloadOptions) {
+            reloadOptions.selector = modalContent;
+            cresenity.reload(reloadOptions);
+        }
+        if (settings.haveHeader) {
+            modalHeader.html(settings.headerText);
+            modalContainer.append(modalHeader);
+        }
+        modalContainer.append(modalContent);
+        if (settings.haveFooter) {
+            modalContainer.append(modalFooter);
+        }
+
+        $('body').append(modalContainer);
+        var modalOptions = {
+            complete: function () {
+                modalContainer.remove();
+                if (typeof settings.onComplete == 'function') {
+                    settings.onComplete();
+                }
+            }
+        };
+        modalContainer.modal(modalOptions);
+        modalContainer.modal('open');
+    };
 
     this.blockPage = function () {
         $.blockUI({

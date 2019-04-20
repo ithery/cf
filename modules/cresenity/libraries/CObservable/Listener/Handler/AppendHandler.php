@@ -71,7 +71,7 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
                         }
                     }
                     if (is_duplicate==0) {
-			$.cresenity.append('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
+			$.cresenity.append('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $data_addition . ");
                     }
 		";
 
