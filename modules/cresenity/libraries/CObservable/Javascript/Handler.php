@@ -19,10 +19,25 @@ class CObservable_Javascript_Handler {
         $this->javascript = $javascript;
     }
 
-    public function reload($options) {
-        $variableStatement = CJavascript::rawStatement($js);
+    public function jquery() {
+        return $this->javascript->jquery();
+    }
 
-        $this->javascript->addStatement($variableStatement);
+    public function reload($options) {
+
+        $ajaxOptions = array();
+        $ajaxOptions['url'] = carr::get($options, 'url');
+        $ajaxOptions['dataType'] = 'json';
+        $ajaxOptions['data'] = array();
+        $ajaxOptions['success'] = function($data) {
+            $this->jquery()->html($data->html);
+            $this->javascript->raw('eval($.cresenity.base64.decode(data.js));');
+        };
+        $ajaxOptions['error'] = function($jqXhr, $textStatus, $errorThrown) {
+            $this->jquery()->html($jqXhr->statusText);
+        };
+        $this->javascript->raw('cresenity.reload(#'.$this->javascript->owner.',);');
+
         return $this;
     }
 

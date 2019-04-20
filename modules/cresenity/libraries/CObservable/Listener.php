@@ -97,47 +97,27 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
                 });
             ";
         }
-
+        $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;
         if ($this->event == 'lazyload') {
             $js->append("
                     jQuery(window).ready(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $startScript . "
-                                " . $confirmStartScript . "
-                                " . $handlersScript . "
-                                " . $confirmEndScript . "
+                                " . $compiledJs . "
                             }
                     });
                     jQuery(window).scroll(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $startScript . "
-                                " . $confirmStartScript . "
-                                " . $handlersScript . "
-                                " . $confirmEndScript . "
+                                " . $compiledJs . "
                             }
                     });
                 ");
         } else {
             $js->append('
                     jQuery("#' . $this->owner . '").' . $this->event . '(function() {
-
-                        ' . $startScript . '
-                        ' . $confirmStartScript . '
-                        ' . $handlersScript . '
-                        ' . $confirmEndScript . '
-
+                        ' . $compiledJs . '
                     });
                 ');
         }
-
-        //           $js->append("
-        // 	jQuery('#" . $this->owner . "')." . $this->event . "(function() {				
-        // 		" . $startScript . "
-        // 		" . $confirmStartScript . "
-        // 		" . $handlersScript . "
-        // 		" . $confirmEndScript . "
-        // 	});
-        // ");
 
         return $js->text();
     }
