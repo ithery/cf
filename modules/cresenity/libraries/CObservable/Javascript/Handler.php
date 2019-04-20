@@ -19,7 +19,7 @@ class CObservable_Javascript_Handler {
         $this->javascript = $javascript;
     }
 
-    public function reload($selector, $options) {
+    public function reload($options) {
         $variableStatement = CJavascript::rawStatement($js);
 
         $this->javascript->addStatement($variableStatement);

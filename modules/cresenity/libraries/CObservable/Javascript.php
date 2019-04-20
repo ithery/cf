@@ -133,6 +133,15 @@ class CObservable_Javascript {
     public function jquery() {
         return $this->jQueryObject;
     }
+    
+    
+    /**
+     * 
+     * @return CObservable_Javascript_Handler
+     */
+    public function handler() {
+        return $this->handlerObject;
+    }
 
     public function __call($method, $arguments) {
         if (method_exists($this->nativeObject, $method)) {
