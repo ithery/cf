@@ -21,8 +21,6 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
     protected $actions;
     protected $param_inputs;
     protected $param_request;
-    protected $js_class;
-    protected $js_class_manual;
     protected $isSidebar;
 
     public function __construct($listener) {
@@ -41,17 +39,6 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
     public function setSidebar($bool = true) {
         $this->isSidebar = $bool;
-        return $this;
-    }
-
-    /**
-     * @deprecated since version 1.2
-     * @param type $js_class
-     * @return $this
-     */
-    public function set_js_class($js_class) {
-        //set js class manual
-        $this->js_class_manual = $js_class;
         return $this;
     }
 
@@ -89,26 +76,34 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
             $this->target = "modal_opt_" . $this->event . "_" . $this->owner . "_dialog";
         }
 
-        $data_addition = '';
+        $dataAddition = '';
 
         foreach ($this->param_inputs as $inp) {
-            if (strlen($data_addition) > 0) {
-                $data_addition .= ',';
+            if (strlen($dataAddition) > 0) {
+                $dataAddition .= ',';
             }
-            $data_addition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
+            $dataAddition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
         }
         foreach ($this->param_request as $req_k => $req_v) {
-            if (strlen($data_addition) > 0) {
-                $data_addition .= ',';
+            if (strlen($dataAddition) > 0) {
+                $dataAddition .= ',';
             }
-            $data_addition .= "'" . $req_k . "':'" . $req_v . "'";
+            $dataAddition .= "'" . $req_k . "':'" . $req_v . "'";
         }
-        $data_addition = '{' . $data_addition . '}';
+        $dataAddition = '{' . $dataAddition . '}';
 
-        $optionsArray = array();
-        $optionsArray['title'] = $this->title;
-        $optionsArray['isSidebar'] = $this->isSidebar;
-        $optionsJson = json_encode($optionsArray);
+        $generatedUrl = $this->generatedUrl();
+
+        $jsOptions = "{";
+        $jsOptions .= "selector:'#" . $this->target . "',";
+        $jsOptions .= "title:'" . $this->title . "',";
+        $jsOptions .= "isSidebar:" . ($this->isSidebar ? 'true' : 'false') . ",";
+        $jsOptions .= "url:'" . $generatedUrl . "',";
+        $jsOptions .= "method:'" . $this->method . "',";
+        $jsOptions .= "dataAddition:" . $dataAddition . ",";
+
+        $jsOptions .= "}";
+      
         $js_class = ccfg::get('js_class');
         if (strlen($js_class) > 0) {
             $this->js_class = $js_class;
@@ -132,7 +127,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
             ";
         } else {
             $js .= "
-                $.cresenity.show_dialog('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $optionsJson . "," . $data_addition . ");
+                $.cresenity.show_dialog('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $jsOptions . "," . $dataAddition . ");
             ";
         }
         return $js;

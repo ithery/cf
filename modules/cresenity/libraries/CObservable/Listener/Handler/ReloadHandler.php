@@ -31,7 +31,6 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         $this->name = 'Reload';
         $this->url = "";
         $this->urlParam = array();
-        
     }
 
     public function addParamInput($inputs) {
@@ -95,9 +94,24 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
             $dataAddition .= "'" . $k . "':$.cresenity.value('" . $inp . "')";
         }
         $dataAddition = '{' . $dataAddition . '}';
+        $generatedUrl = $this->generatedUrl();
+        $jsOptions = "{";
+        $jsOptions .= "selector:'#" . $this->target . "',";
+        $jsOptions .= "url:'" . $generatedUrl . "',";
+        $jsOptions .= "method:'" . $this->method . "',";
+        $jsOptions .= "dataAddition:" . $dataAddition . ",";
+
+        $jsOptions .= "}";
+
+
+
 
         $js .= "
-            $.cresenity.reload('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $dataAddition . ");
+            if(cresenity) {
+                cresenity.reload(" . $jsOptions . ");
+            } else {
+                $.cresenity.reload('" . $this->target . "','" . $generatedUrl . "','" . $this->method . "'," . $dataAddition . ");
+            }
          ";
 
         return $js;

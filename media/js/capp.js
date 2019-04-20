@@ -568,48 +568,65 @@ var Cresenity = function () {
 
     };
     this.modal = function (options) {
+        
         var settings = $.extend({
             // These are the defaults.
             haveHeader: false,
             haveFooter: false,
             headerText: '',
-            content: '',
             onComplete: false,
             footerAction: {}
         }, options);
 
+        if(settings.title) {
+            settings.haveHeader=true;
+            settings.headerText=settings.title;
+        }
+        
         var modalContainer = jQuery('<div>').addClass('modal');
+        
+        if(settings.isSidebar) {
+            modalContainer.addClass('sidebar');
+            modalContainer.addClass(settings.sidebarMode);
+        }
+        var modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
+        var modalContent = jQuery('<div>').addClass('modal-content');
 
         var modalHeader = jQuery('<div>').addClass('modal-header');
-        var modalContent = jQuery('<div>').addClass('modal-content');
+        var modalTitle = jQuery('<div>').addClass('modal-title');
+        var modalButtonClose = '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+        var modalBody = jQuery('<div>').addClass('modal-body');
         var modalFooter = jQuery('<div>').addClass('modal-footer');
-        var content = settings.content;
-        var reloadOptions = settings.reload;
-        modalContent.append(content);
-        if (reloadOptions) {
-            reloadOptions.selector = modalContent;
+        modalDialog.append(modalContent);
+        modalContainer.append(modalDialog);
+        if (settings.haveHeader) {
+            modalTitle.html(settings.headerText);
+            modalHeader.append(modalTitle).append(modalButtonClose);
+            modalContent.append(modalHeader);
+        }
+        modalDialog.append(modalContent);
+        if (settings.haveFooter) {
+            modalContent.append(modalFooter);
+        }
+        modalContent.append(modalBody);
+        $('body').append(modalContainer);
+     
+        modalContainer.on('hidden.bs.modal', function (e) {
+           modalContainer.remove();
+        });
+        
+        if(settings.message) {
+            modalBody.append(settings.message);
+        }
+        if(settings.reload) {
+            var reloadOptions = settings.reload;
+            reloadOptions.selector=modalBody;
             cresenity.reload(reloadOptions);
         }
-        if (settings.haveHeader) {
-            modalHeader.html(settings.headerText);
-            modalContainer.append(modalHeader);
-        }
-        modalContainer.append(modalContent);
-        if (settings.haveFooter) {
-            modalContainer.append(modalFooter);
-        }
-
-        $('body').append(modalContainer);
-        var modalOptions = {
-            complete: function () {
-                modalContainer.remove();
-                if (typeof settings.onComplete == 'function') {
-                    settings.onComplete();
-                }
-            }
-        };
-        modalContainer.modal(modalOptions);
-        modalContainer.modal('open');
+        
+        modalContainer.modal();
+        
+       
     };
 
     this.blockPage = function () {
@@ -1370,6 +1387,17 @@ if (!window.cresenity) {
             }));
         },
         show_dialog: function (id_target, url, method, options, data_addition) {
+            if (typeof id_target == 'object') {
+                return cresenity.modal(id_target);
+            } else {
+                options.selector = '#' + id_target;
+                options.reload = {};
+                options.reload.method=method;
+                options.reload.dataAddition=data_addition;
+                options.reload.url=url;
+                
+                return cresenity.modal(options);
+            }
             var title = options;
             if (typeof options != 'object') {
                 options = {};
