@@ -596,6 +596,7 @@ var Cresenity = function () {
             haveHeader: false,
             haveFooter: false,
             headerText: '',
+            backdrop: 'static',
             onClose: false,
             footerAction: {}
         }, options);
@@ -654,7 +655,9 @@ var Cresenity = function () {
             cresenity.reload(reloadOptions);
         }
 
-        modalContainer.modal();
+        modalContainer.modal({
+            backdrop:settings.backdrop
+        });
 
 
     };
@@ -672,13 +675,22 @@ var Cresenity = function () {
             var formMethod = $(this).attr('method') || 'get';
             (function (element) {
                 cresenity.blockElement($(element));
+                var validationIsValid = true;
                 var ajaxOptions = {
                     url: formAjaxUrl,
                     dataType: 'json',
                     type: formMethod,
+                    beforeSubmit:function() {
+                        if(typeof $(element).validate=='function') {
+                            validationIsValid = $(element).validate().form();
+                           
+                        }
+                        return true;
+                    },
                     complete: function () {
                         cresenity.unblockElement($(element));
-                        if (typeof settings.onComplete == 'function') {
+                        
+                        if (typeof settings.onComplete == 'function' && validationIsValid) {
                             settings.onComplete();
                         }
                     },
