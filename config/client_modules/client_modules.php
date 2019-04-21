@@ -631,5 +631,13 @@ return array(
             "plugins/vis/vis.min.css",
         ),
     ),
+    "minicolors" => array(
+        "js" => array(
+            "plugins/minicolors/minicolors.js",
+        ),
+        "css" => array(
+            "plugins/minicolors/minicolors.css",
+        ),
+    ),
 );
 ?>
