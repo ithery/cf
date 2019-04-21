@@ -588,7 +588,17 @@ var Cresenity = function () {
         });
 
     };
+    this.confirm = function (options) {
+        var settings = $.extend({
+            // These are the defaults.
+            method: 'get',
+            dataAddition: {},
+            message: 'Are you sure?',
+            onConfirmed: false,
+        }, options);
+        bootbox.confirm(settings.message, settings.onConfirmed);
 
+    };
     this.modal = function (options) {
 
         var settings = $.extend({
@@ -656,7 +666,7 @@ var Cresenity = function () {
         }
 
         modalContainer.modal({
-            backdrop:settings.backdrop
+            backdrop: settings.backdrop
         });
 
 
@@ -680,16 +690,16 @@ var Cresenity = function () {
                     url: formAjaxUrl,
                     dataType: 'json',
                     type: formMethod,
-                    beforeSubmit:function() {
-                        if(typeof $(element).validate=='function') {
+                    beforeSubmit: function () {
+                        if (typeof $(element).validate == 'function') {
                             validationIsValid = $(element).validate().form();
-                           
+
                         }
                         return true;
                     },
                     complete: function () {
                         cresenity.unblockElement($(element));
-                        
+
                         if (typeof settings.onComplete == 'function' && validationIsValid) {
                             settings.onComplete();
                         }
