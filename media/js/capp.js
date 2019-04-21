@@ -648,6 +648,7 @@ var Cresenity = function () {
         $('body').append(modalContainer);
 
         modalContainer.on('hidden.bs.modal', function (e) {
+            console.log(cresenity.modalElements);
             if (cresenity.modalElements.length > 0) {
                 var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
                 if (lastModal && lastModal.get(0) === $(e.target).get(0)) {
@@ -681,8 +682,11 @@ var Cresenity = function () {
 
     };
     this.closeDialog = function (options) {
-        var modal = cresenity.modalElements.pop();
-        modal.modal('hide');
+        if (cresenity.modalElements.length > 0) {
+            var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
+
+            lastModal.modal('hide');
+        }
     }
     this.ajaxSubmit = function (options) {
         var settings = $.extend({}, options);
