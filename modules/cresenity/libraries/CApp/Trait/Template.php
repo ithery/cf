@@ -71,7 +71,7 @@ trait CApp_Trait_Template {
         return $this;
     }
 
-    private function getTemplatePath($templateName) {
+    public function getTemplatePath($templateName) {
         $viewPath = $templateName;
         return $viewPath;
     }
@@ -95,6 +95,7 @@ trait CApp_Trait_Template {
         $templateJs = '';
         $viewPath = $this->getTemplatePath($templateName);
         $view = new CTemplate($viewPath);
+        $view->setBlockRoutingCallback(array($this, 'getTemplatePath'));
         $helpers = $view->getHelpers();
         if ($isSkeleton) {
             $helpers->set('template', function () use ($templateJs) {
@@ -102,10 +103,11 @@ trait CApp_Trait_Template {
                 $result = $this->parseTemplate(true);
                 $html = carr::get($result, 'html');
                 $js = carr::get($result, 'js');
-                $templateJs .= $js;
-                return $html;
+
+                return $html . '<script>' . $js . '</script>';
             });
         }
+
         $helpers->set('content', function () {
 
             return $this->htmlChild();
@@ -148,7 +150,7 @@ trait CApp_Trait_Template {
             $outputJs .= $value;
         }
         $outputHtml = preg_replace('#<script>(.*?)</script>#is', '', $output);
-      
+
         return array(
             'html' => $outputHtml,
             'js' => $outputJs,
