@@ -627,7 +627,10 @@ var Cresenity = function () {
 
         var modalHeader = jQuery('<div>').addClass('modal-header');
         var modalTitle = jQuery('<div>').addClass('modal-title');
-        var modalButtonClose = '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+        var modalButtonClose = jQuery('<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+        modalButtonClose.click(function (e) {
+            modalButtonClose.closest('.modal').modal('hide');
+        });
         var modalBody = jQuery('<div>').addClass('modal-body');
         var modalFooter = jQuery('<div>').addClass('modal-footer');
         modalDialog.append(modalContent);
@@ -645,11 +648,17 @@ var Cresenity = function () {
         $('body').append(modalContainer);
 
         modalContainer.on('hidden.bs.modal', function (e) {
-            $(this).remove();
-            cresenity.modalElements.pop();
-            if (typeof settings.onClose == 'function') {
-                settings.onClose(e);
+            if (cresenity.modalElements.length > 0) {
+                var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
+                if (lastModal && lastModal.get(0) === $(e.target).get(0)) {
+                    $(lastModal).remove();
+                    cresenity.modalElements.pop();
+                    if (typeof settings.onClose == 'function') {
+                        settings.onClose(e);
+                    }
+                }
             }
+
         });
 
         modalContainer.on('shown.bs.modal', function (e) {

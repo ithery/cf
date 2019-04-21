@@ -5,7 +5,7 @@
  * @author Hery
  */
 ?>
-<div id="modal-cropper-<?php echo $id ?>" class="modal " >
+<div id="modal-cropper-<?php echo $id ?>" class="modal modal-cropper" >
     <div class="modal-dialog"><div class="modal-content animated bounceInRight">
             <div class="modal-header">
 
@@ -78,9 +78,7 @@
         var container = modalCropper.find('.cropper-image-container');
         var image = container.find('img');
         $('.btn-zoom-in').click(function (event) {
-            
             image.cropper('zoom', 0.1);
-            console.log(image.length);
         });
         $('.btn-zoom-out').click(function (event) {
             image.cropper('zoom', -0.1);
