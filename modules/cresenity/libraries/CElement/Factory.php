@@ -36,6 +36,8 @@ class CElement_Factory {
             case 'iframe':
             case 'blockquote':
             case 'label':
+            case 'canvas':
+            case 'img':
                 $class_name = 'CElement_Element_' . ucfirst($tag);
                 return new $class_name($id);
                 break;

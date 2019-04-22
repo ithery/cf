@@ -284,7 +284,7 @@ class CModel_Collection extends CCollection {
      *
      * @param  string  $value
      * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function pluck($value, $key = null) {
         return $this->toBase()->pluck($value, $key);
@@ -293,7 +293,7 @@ class CModel_Collection extends CCollection {
     /**
      * Get the keys of the collection items.
      *
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function keys() {
         return $this->toBase()->keys();
@@ -303,7 +303,7 @@ class CModel_Collection extends CCollection {
      * Zip the collection together with one or more arrays.
      *
      * @param  mixed ...$items
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function zip($items) {
         return call_user_func_array([$this->toBase(), 'zip'], func_get_args());
@@ -312,7 +312,7 @@ class CModel_Collection extends CCollection {
     /**
      * Collapse the collection of items into a single array.
      *
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function collapse() {
         return $this->toBase()->collapse();
@@ -322,7 +322,7 @@ class CModel_Collection extends CCollection {
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function flatten($depth = INF) {
         return $this->toBase()->flatten($depth);
@@ -331,7 +331,7 @@ class CModel_Collection extends CCollection {
     /**
      * Flip the items in the collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function flip() {
         return $this->toBase()->flip();

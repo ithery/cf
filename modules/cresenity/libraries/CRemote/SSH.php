@@ -50,7 +50,7 @@ class CRemote_SSH {
      * @param string $name
      * @param array  $config
      *
-     * @return \Collective\Remote\Connection
+     * @return CRemote_SSH_Connection
      */
     protected function makeConnection($name, array $config) {
         $timeout = isset($config['timeout']) ? $config['timeout'] : 10;
@@ -120,6 +120,14 @@ class CRemote_SSH {
     public function run($commands, Closure $callback = null) {
         $this->connection->run($commands, $callback);
         return $this;
+    }
+
+    /**
+     * Get log ssh with defined NET_SSH2_LOGGING
+     * @return string
+     */
+    public function getLog() {
+        return $this->connection->getGateway()->getLog();
     }
 
     /**

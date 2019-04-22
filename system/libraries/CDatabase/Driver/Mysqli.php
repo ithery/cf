@@ -48,17 +48,20 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
         // Build the connection info
         $host = isset($host) ? $host : $socket;
+        try {
+            // Make the connection and select the database
+            if ($this->link = new mysqli($host, $user, $pass, $database, $port)) {
+                if ($charset = $this->db_config['character_set']) {
+                    $this->set_charset($charset);
+                }
 
-        // Make the connection and select the database
-        if ($this->link = new mysqli($host, $user, $pass, $database, $port)) {
-            if ($charset = $this->db_config['character_set']) {
-                $this->set_charset($charset);
+                // Clear password after successful connect
+                $this->db_config['connection']['pass'] = NULL;
+
+                return $this->link;
             }
-
-            // Clear password after successful connect
-            $this->db_config['connection']['pass'] = NULL;
-
-            return $this->link;
+        } catch (Exception $ex) {
+            throw new CDatabase_Exception($ex->getMessage() . ', Host:' . $host);
         }
 
         return FALSE;
@@ -308,8 +311,6 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
         return $majorVersion . '.' . $minorVersion . '.' . $patchVersion;
     }
-
-    
 
     /**
      * {@inheritdoc}

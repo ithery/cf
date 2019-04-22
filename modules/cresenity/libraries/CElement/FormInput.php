@@ -53,12 +53,12 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function setAjax($bool) {
+    public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
     }
 
-    public function setDisabled($bool) {
+    public function setDisabled($bool = true) {
         $this->disabled = $bool;
         return $this;
     }
@@ -156,6 +156,17 @@ class CElement_FormInput extends CElement_Element {
         }
         $data = array_merge_recursive($data, parent::toarray());
         return $data;
+    }
+
+    protected function build() {
+        parent::build();
+        $this->setAttr('value', $this->value);
+        if ($this->readonly) {
+            $this->setAttr('readonly', "readonly");
+        }
+        if ($this->disabled) {
+            $this->setAttr('disabled', "disabled");
+        }
     }
 
     public function js($indent = 0) {

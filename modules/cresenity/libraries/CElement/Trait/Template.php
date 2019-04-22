@@ -14,6 +14,8 @@ trait CElement_Trait_Template {
     protected $htmlOutput = '';
     protected $jsOutput = '';
     protected $onBeforeParse = null;
+    protected $sections = array();
+    private $sectionJs = '';
 
     /**
      *
@@ -33,6 +35,13 @@ trait CElement_Trait_Template {
 
     public function getData() {
         return $this->templateData;
+    }
+
+    public function section($sectionName) {
+        if (!isset($this->sections[$sectionName])) {
+            $this->sections[$sectionName] = new CElement_PseudoElement();
+        }
+        return $this->sections[$sectionName];
     }
 
     public function setData($data) {
@@ -85,6 +94,12 @@ trait CElement_Trait_Template {
             return $this;
         });
 
+        $helpers->set('section', function ($sectionName) {
+            $section = $this->section($sectionName);
+            $this->sectionJs .= $section->jsChild();
+            return $section->htmlChild();
+        });
+
         foreach ($this->helpers as $helperName => $callback) {
             $helpers->set($helperName, $callback);
         }
@@ -125,7 +140,7 @@ trait CElement_Trait_Template {
         $this->jsOutput = carr::get($resultHeader, 'js', '') . carr::get($resultContent, 'js', '') . carr::get($resultFooter, 'js', '');
 
         //htmlChild will concat in helper template content, we need to concat the js here
-        $this->jsOutput .= parent::jsChild();
+        $this->jsOutput .= $this->sectionJs . parent::jsChild();
 
         return true;
     }
@@ -145,5 +160,4 @@ trait CElement_Trait_Template {
         return $this->jsOutput;
     }
 
-    
 }

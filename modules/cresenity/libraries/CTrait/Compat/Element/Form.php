@@ -32,6 +32,17 @@ trait CTrait_Compat_Element_Form {
     }
 
     /**
+     * Set target attribute value of form element
+     * 
+     * @deprecated since version 1.2, please use setTarget
+     * @param string $target target attribute of form
+     * @return CElement_Component_Form
+     */
+    public function set_target($target) {
+        return $this->setTarget($target);
+    }
+    
+    /**
      * 
      * @deprecated since version 1.2, please use setAjaxSubmit
      * @param bool $bool
@@ -69,6 +80,26 @@ trait CTrait_Compat_Element_Form {
      */
     public function set_enctype($enctype = 'multipart/form-data') {
         return $this->setEncType($enctype);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use setValidation
+     * @param bool $bool
+     * @return CElement_Component_Form
+     */
+    public function set_validation($bool) {
+        return $this->setValidation($bool);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2, please use setAutoComplete
+     * @param bool $bool
+     * @return CElement_Component_Form
+     */
+    public function set_autocomplete($bool) {
+        return $this->setAutoComplete($bool);
     }
 
 }

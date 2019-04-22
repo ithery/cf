@@ -3,7 +3,8 @@
 class CElement_Component_DataTable_Column extends CObject {
 
     use CTrait_Compat_Element_DataTable_Column,
-        CTrait_Element_Property_Label;
+        CTrait_Element_Property_Label,
+        CTrait_Element_Responsive;
 
     public $transforms = array();
     public $fieldname;
@@ -16,9 +17,6 @@ class CElement_Component_DataTable_Column extends CObject {
     public $visible;
     public $input_type;
     public $no_line_break;
-    public $hidden_phone;
-    public $hidden_tablet;
-    public $hidden_desktop;
 
     public function __construct($fieldname) {
         parent::__construct();
@@ -35,9 +33,9 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->input_type = "text";
         $this->editable = true;
         $this->no_line_break = false;
-        $this->hidden_phone = false;
-        $this->hidden_tablet = false;
-        $this->hidden_desktop = false;
+        $this->hiddenPhone = false;
+        $this->hiddenTablet = false;
+        $this->hiddenDesktop = false;
     }
 
     public static function factory($fieldname) {
@@ -50,21 +48,6 @@ class CElement_Component_DataTable_Column extends CObject {
 
     public function getAlign() {
         return $this->align;
-    }
-
-    public function setHiddenPhone($bool) {
-        $this->hidden_phone = $bool;
-        return $this;
-    }
-
-    public function setHiddenTablet($bool) {
-        $this->hidden_tablet = $bool;
-        return $this;
-    }
-
-    public function setHiddenDesktop($bool) {
-        $this->hidden_desktop = $bool;
-        return $this;
     }
 
     public function setInputType($type) {
@@ -112,12 +95,12 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     public function addTransform($name, $args = array()) {
-        $func = CDynFunction::factory($name);
+        $func = CFunction::factory($name);
         if (!is_array($args)) {
             $args = array($args);
         }
         foreach ($args as $arg) {
-            $func->add_param($arg);
+            $func->addArg($arg);
         }
 
 
@@ -174,11 +157,11 @@ class CElement_Component_DataTable_Column extends CObject {
         }
         if ($this->sortable)
             $class .= " sortable";
-        if ($this->hidden_phone)
+        if ($this->hiddenPhone)
             $class .= " hidden-phone";
-        if ($this->hidden_tablet)
+        if ($this->hiddenTablet)
             $class .= " hidden-tablet";
-        if ($this->hidden_desktop)
+        if ($this->hiddenDesktop)
             $class .= " hidden-desktop";
         if ($export_pdf) {
             $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldname . '" align="center" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');

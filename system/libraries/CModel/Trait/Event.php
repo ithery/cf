@@ -129,7 +129,7 @@ trait CModel_Trait_Event {
         // First, we will get the proper method to call on the event dispatcher, and then we
         // will attempt to fire a custom, object based event for the given event. If that
         // returns a result we can return that result, or we'll call the string events.
-        $method = $halt ? 'until' : 'fire';
+        $method = $halt ? 'until' : 'dispatch';
 
         $result = $this->filterModelEventResults(
                 $this->fireCustomModelEvent($event, $method)
@@ -293,7 +293,7 @@ trait CModel_Trait_Event {
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return CEvent_Dispatcher
      */
     public static function getEventDispatcher() {
         return static::$dispatcher;
@@ -302,10 +302,10 @@ trait CModel_Trait_Event {
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  CEvent_Dispatcher  $dispatcher
      * @return void
      */
-    public static function setEventDispatcher(Dispatcher $dispatcher) {
+    public static function setEventDispatcher(CEvent_Dispatcher $dispatcher) {
         static::$dispatcher = $dispatcher;
     }
 

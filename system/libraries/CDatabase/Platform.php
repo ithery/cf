@@ -122,9 +122,9 @@ abstract class CDatabase_Platform {
     /**
      * Sets the EventManager used by the Platform.
      *
-     * @param CDatabase_Event $eventManager
+     * @param CEvent_Dispatcher $eventManager
      */
-    public function setEventManager(CDatabase_Event $eventManager) {
+    public function setEventManager(CEvent_Dispatcher $eventManager) {
         $this->_eventManager = $eventManager;
     }
 

@@ -233,8 +233,10 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      *
      * @param int $timeout
      */
-    protected function setTimeout($timeout) {
+    public function setTimeout($timeout) {
         $this->timeout = (int) $timeout;
+        $this->connection = null;
+        $this->getConnection();
     }
 
     /**
@@ -255,6 +257,23 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      */
     public function run($command, $callback = false) {
         return $this->getConnection()->exec($command, $callback);
+    }
+
+    /**
+     * Run a command against the server (blocking).
+     *
+     * @param string $command
+     * @param int $timeout timeout in second
+     *
+     * @return string
+     */
+    public function runBlocking($commands, $timeout = 2) {
+        $connection = $this->getConnection();
+        $connection->write($commands);
+
+        $connection->setTimeout($timeout);
+
+        return $connection->read();
     }
 
     /**
@@ -363,6 +382,14 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      */
     public function getPort() {
         return $this->port;
+    }
+
+    /**
+     * Get log ssh with defined NET_SSH2_LOGGING
+     * @return string
+     */
+    public function getLog() {
+        return $this->getConnection()->getLog();
     }
 
 }

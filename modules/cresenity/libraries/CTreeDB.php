@@ -43,6 +43,14 @@ class CTreeDB {
         $this->delete_child = false;
     }
 
+    /**
+     * 
+     * @param string $table_name
+     * @param string $domain
+     * @param CDatabase $db
+     * @param type $prefix
+     * @return \CTreeDB
+     */
     public static function factory($table_name, $domain = null, $db = null, $prefix = '') {
         return new CTreeDB($table_name, $domain, $db, $prefix);
     }
@@ -104,7 +112,7 @@ class CTreeDB {
             $q .= " and org_id=" . $db->escape($this->org_id) . "";
         }
         $q .= "
-			" . $this->filter_where() . "
+			" . $this->filterWhere() . "
 			ORDER BY node.lft
 		";
         return cdbutils::get_list($q);
@@ -201,7 +209,7 @@ class CTreeDB {
         $db->query($q);
 
         if ($this->delete_child == true) {
-            $child_list = $this->get_children_list($id);
+            $child_list = $this->getChildrenList($id);
             if (is_array($child_list) && count($child_list) > 0) {
                 foreach ($child_list as $child_list_k => $child_list_v) {
                     $q = "update " . $db->escape_table($this->table_name) . " set status=0, updated=" . $db->escape(date('Y-m-d H:i:s')) . ",updatedby=" . $db->escape($user->username) . " where " . $this->pk_column . "=" . $db->escape($child_list_k);
@@ -231,7 +239,7 @@ class CTreeDB {
 
         $r = $db->update($this->table_name, $data, array($this->pk_column => $id));
         if ($this->org_id != null) {
-            $this->rebuild_tree_all();
+            $this->rebuildTreeAll();
         }
     }
 
@@ -422,7 +430,7 @@ class CTreeDB {
 
         foreach ($r as $row) {
             $pk = $this->pk_column;
-            $this->rebuild_tree($row[$pk], $left);
+            $this->rebuildTree($row[$pk], $left);
             //$qleft="select rgt from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
             $qleft = "select rgt from " . $db->escape_table($this->table_name) . " where status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
             if (strlen($this->org_id) > 0) {
@@ -492,7 +500,7 @@ class CTreeDB {
             // $right is the current right value, which is   
             // incremented by the rebuild_tree function   
             $pk = $this->pk_column;
-            $right = $this->rebuild_tree($row[$pk], $right, $depth + 1);
+            $right = $this->rebuildTree($row[$pk], $right, $depth + 1);
         }
 
         // we've got the left value, and now that we've processed   
@@ -536,7 +544,7 @@ class CTreeDB {
             // $right is the current right value, which is   
             // incremented by the rebuild_tree function   
             $pk = $this->pk_column;
-            $right = $this->rebuild_tree($row[$pk], $right, $depth + 1);
+            $right = $this->rebuildTree($row[$pk], $right, $depth + 1);
         }
 
         // we've got the left value, and now that we've processed   

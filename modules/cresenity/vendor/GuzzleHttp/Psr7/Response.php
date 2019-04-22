@@ -3,14 +3,12 @@ namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-
 /**
  * PSR-7 response implementation.
  */
 class Response implements ResponseInterface
 {
     use MessageTrait;
-
     /** @var array Map of standard HTTP status code/reason phrases */
     private static $phrases = [
         100 => 'Continue',
@@ -72,13 +70,10 @@ class Response implements ResponseInterface
         508 => 'Loop Detected',
         511 => 'Network Authentication Required',
     ];
-
     /** @var string */
     private $reasonPhrase = '';
-
     /** @var int */
     private $statusCode = 200;
-
     /**
      * @param int                                  $status  Status code
      * @param array                                $headers Response headers
@@ -93,32 +88,29 @@ class Response implements ResponseInterface
         $version = '1.1',
         $reason = null
     ) {
+        if (filter_var($status, FILTER_VALIDATE_INT) === false) {
+            throw new \InvalidArgumentException('Status code must be an integer value.');
+        }
         $this->statusCode = (int) $status;
-
         if ($body !== '' && $body !== null) {
             $this->stream = stream_for($body);
         }
-
         $this->setHeaders($headers);
         if ($reason == '' && isset(self::$phrases[$this->statusCode])) {
             $this->reasonPhrase = self::$phrases[$this->statusCode];
         } else {
             $this->reasonPhrase = (string) $reason;
         }
-
         $this->protocol = $version;
     }
-
     public function getStatusCode()
     {
         return $this->statusCode;
     }
-
     public function getReasonPhrase()
     {
         return $this->reasonPhrase;
     }
-
     public function withStatus($code, $reasonPhrase = '')
     {
         $new = clone $this;

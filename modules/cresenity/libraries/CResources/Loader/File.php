@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CResources_Loader_File {
+class CResources_Loader_File extends CResources_LoaderAbstract {
 
     protected $appCode = '';
     protected $orgCode = '';
@@ -49,7 +49,7 @@ class CResources_Loader_File {
         }
 
         $temp .= $filename;
-        $dir = '/application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
+        $dir = DOCROOT.'/application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
         $basepath = $dir . $temp;
         return $basepath;
     }
@@ -65,39 +65,30 @@ class CResources_Loader_File {
             $arr_name = explode("_", $this->resourceName);
             //org_code
             if (isset($arr_name[0])) {
-                $temp .= urlencode($arr_name[0]) . '/';
+                $temp .= rawurlencode($arr_name[0]) . '/';
             }
             //resource_type
             if (isset($arr_name[1])) {
-                $temp .= urlencode($arr_name[1]) . '/';
+                $temp .= rawurlencode($arr_name[1]) . '/';
             }
             //name
             if (isset($arr_name[2])) {
-                $temp .= urlencode($arr_name[2]) . '/';
+                $temp .= rawurlencode($arr_name[2]) . '/';
             }
             //date
             if (isset($arr_name[3])) {
-                $temp .= urlencode($arr_name[3]) . '/';
+                $temp .= rawurlencode($arr_name[3]) . '/';
             }
-            $temp .= urlencode($this->resourceName);
+            $temp .= rawurlencode($this->resourceName);
             $path .= $temp;
         }
         return $path;
     }
 
-    public function delete() {
-        $fullPath = $this->getBasePath();
-        if (@unlink($fullPath)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public function getPath() {
         return $this->getBasePath();
     }
-    
+
     public function rename($oldFile, $newFile) {
         $old = CResources::getPath($oldFile);
         $new = CResources::getPath($newFile);

@@ -15,6 +15,11 @@ class CModel_Nested_NestedSet {
     const LFT = 'lft';
 
     /**
+     * The name of default depth column.
+     */
+    const DEPTH = 'depth';
+
+    /**
      * The name of default rgt column.
      */
     const RGT = 'rgt';
@@ -42,6 +47,7 @@ class CModel_Nested_NestedSet {
     public static function columns(Blueprint $table) {
         $table->unsignedInteger(self::LFT)->default(0);
         $table->unsignedInteger(self::RGT)->default(0);
+        $table->unsignedInteger(self::DEPTH)->default(0);
         $table->unsignedInteger(self::PARENT_ID)->nullable();
         $table->index(static::getDefaultColumns());
     }
@@ -63,7 +69,7 @@ class CModel_Nested_NestedSet {
      * @return array
      */
     public static function getDefaultColumns() {
-        return [static::LFT, static::RGT, static::PARENT_ID];
+        return [static::LFT, static::RGT, static::DEPTH, static::PARENT_ID];
     }
 
     /**

@@ -134,7 +134,7 @@ class CModel_Relation_Pivot extends CModel {
     public function getTable() {
         if (!isset($this->table)) {
             $this->setTable(str_replace(
-                            '\\', '', Str::snake(Str::singular(class_basename($this)))
+                            '\\', '', cstr::snake(cstr::singular(class_basename($this)))
             ));
         }
 

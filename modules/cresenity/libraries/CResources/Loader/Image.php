@@ -6,7 +6,7 @@
  * @author Hery
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CResources_Loader_Image {
+class CResources_Loader_Image extends CResources_LoaderAbstract {
 
     protected $appCode = '';
     protected $orgCode = '';

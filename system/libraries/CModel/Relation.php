@@ -295,7 +295,7 @@ abstract class CModel_Relation {
      * @return array|null
      */
     protected static function buildMorphMapFromModels(array $models = null) {
-        if (is_null($models) || Arr::isAssoc($models)) {
+        if (is_null($models) || carr::isAssoc($models)) {
             return $models;
         }
 

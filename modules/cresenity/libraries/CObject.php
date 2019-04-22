@@ -5,8 +5,9 @@
  */
 class CObject {
 
-    use CTrait_Compat_Object;
-    
+    use CTrait_Compat_Object,
+        CTrait_Macroable;
+
     protected $id;
     protected $valid_prop = array();
     protected $prop = array();
@@ -71,10 +72,12 @@ class CObject {
     }
 
     static public function isInstanceof($value) {
+        CCollector::deprecated();
         if (is_object($value)) {
             return ($value instanceof CObject);
         }
         return false;
     }
 
+    
 }

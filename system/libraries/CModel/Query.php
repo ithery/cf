@@ -369,8 +369,8 @@ class CModel_Query {
      */
     public function updateOrCreate(array $attributes, array $values = []) {
         return $this->tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values)->save();
-        });
+                    $instance->fill($values)->save();
+                });
     }
 
     /**
@@ -666,7 +666,7 @@ class CModel_Query {
         $page = $page ?: Illuminate\Pagination\Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
-        
+
         $results = ($total = $this->toBase()->getCountForPagination()) ? $this->forPage($page, $perPage)->get($columns) : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
@@ -708,8 +708,8 @@ class CModel_Query {
      */
     public function create(array $attributes = []) {
         return $this->tap($this->newModelInstance($attributes), function ($instance) {
-            $instance->save();
-        });
+                    $instance->save();
+                });
     }
 
     /**

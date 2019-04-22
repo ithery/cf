@@ -56,6 +56,7 @@ class CJob_BackgroundJob {
             'enabled' => null,
             'haltDir' => null,
             'debug' => null,
+            'lock' => true,
         ];
         $this->helper = $helper ?: new CJob_Helper();
         $this->tmpDir = $this->helper->getTempDir();
@@ -160,7 +161,7 @@ class CJob_BackgroundJob {
         }
         $logfile = $this->config['output'];
         $logs = dirname($logfile);
-        if (!file_exists($logs)) {
+        if (!is_dir($logs)) {
             mkdir($logs, 0755, true);
         }
         return $logfile;
@@ -203,9 +204,11 @@ class CJob_BackgroundJob {
      * @param string $message
      */
     protected function log($message) {
-        $now = date($this->config['dateFormat'], $_SERVER['REQUEST_TIME']);
+
+        //$now = date($this->config['dateFormat'] ? $this->config['dateFormat'] : 'Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
+        $now = date('Y-m-d H:i:s');
         if ($logfile = $this->getLogfile()) {
-            file_put_contents($logfile, "[$now] $message\n", FILE_APPEND);
+            file_put_contents($logfile, "[" . $now . "] " . $message . "\n", FILE_APPEND);
         }
     }
 
@@ -213,21 +216,22 @@ class CJob_BackgroundJob {
         $command = $this->getSerializer()->unserialize($this->config['closure']);
         ob_start();
 
-
+        $retval = false;
         try {
+
             $retval = $command();
         } catch (\Throwable $e) {
-            echo "Error! " . $e->getMessage() . "\n";
+            echo "Error! " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n";
         }
         $content = ob_get_contents();
         if ($logfile = $this->getLogfile()) {
-            file_put_contents($this->getLogfile(), $content, FILE_APPEND);
+            file_put_contents($logfile, $content, FILE_APPEND);
         }
         ob_end_clean();
 
 
         if ($retval === false) {
-            throw new Exception("Closure did not return false Returned:\n" . print_r($retval, true));
+            throw new Exception("Closure did not return false Returned:\n" . print_r($retval, true) . ' content:' . $content);
         }
         return $retval;
     }
@@ -246,7 +250,7 @@ class CJob_BackgroundJob {
         }
         // Start execution. Run in foreground (will block).
         $command = $this->config['command'];
-        $logfile = $this->getLogfile() ?: $this->helper->getSystemNullDevice();
+        $logfile = $this->getLogfile() ? $this->getLogfile() : $this->helper->getSystemNullDevice();
         exec("$useSudo $command 1>> \"$logfile\" 2>&1", $dummy, $retval);
         if ($retval !== 0) {
             throw new Exception("Job exited with status '$retval'.");

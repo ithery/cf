@@ -26,19 +26,10 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
             $child = 0;
             $pass = 0;
             $active_class = "";
-            $controller = "";
-            $method = "";
-            $label = "";
-            $icon = "";
-
-            if (isset($d["controller"]))
-                $controller = $d["controller"];
-            if (isset($d["method"]))
-                $method = $d["method"];
-            if (isset($d["label"]))
-                $label = $d["label"];
-            if (isset($d["icon"]))
-                $icon = $d["icon"];
+            $controller = carr::get($d, 'controller');
+            $method = carr::get($d, 'method');
+            $label = carr::get($d, 'label');
+            $icon = carr::get($d, 'icon');
 
 
             $child_html = "";

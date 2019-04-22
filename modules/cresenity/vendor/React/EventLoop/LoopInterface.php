@@ -2,8 +2,6 @@
 
 namespace React\EventLoop;
 
-use React\EventLoop\Timer\TimerInterface;
-
 interface LoopInterface
 {
     /**
@@ -19,7 +17,8 @@ interface LoopInterface
      * A single stream resource MUST NOT be added more than once.
      * Instead, either call [`removeReadStream()`](#removereadstream) first or
      * react to this event with a single listener and then dispatch from this
-     * listener.
+     * listener. This method MAY throw an `Exception` if the given resource type
+     * is not supported by this loop implementation.
      *
      * The listener callback function MUST be able to accept a single parameter,
      * the stream resource added by this method or you MAY use a function which
@@ -49,9 +48,10 @@ interface LoopInterface
      *
      * @param resource $stream   The PHP stream resource to check.
      * @param callable $listener Invoked when the stream is ready.
+     * @throws \Exception if the given resource type is not supported by this loop implementation
      * @see self::removeReadStream()
      */
-    public function addReadStream($stream, callable $listener);
+    public function addReadStream($stream, $listener);
 
     /**
      * [Advanced] Register a listener to be notified when a stream is ready to write.
@@ -66,7 +66,8 @@ interface LoopInterface
      * A single stream resource MUST NOT be added more than once.
      * Instead, either call [`removeWriteStream()`](#removewritestream) first or
      * react to this event with a single listener and then dispatch from this
-     * listener.
+     * listener. This method MAY throw an `Exception` if the given resource type
+     * is not supported by this loop implementation.
      *
      * The listener callback function MUST be able to accept a single parameter,
      * the stream resource added by this method or you MAY use a function which
@@ -94,11 +95,20 @@ interface LoopInterface
      * The execution order of listeners when multiple streams become ready at
      * the same time is not guaranteed.
      *
+     * Some event loop implementations are known to only trigger the listener if
+     * the stream *becomes* readable (edge-triggered) and may not trigger if the
+     * stream has already been readable from the beginning.
+     * This also implies that a stream may not be recognized as readable when data
+     * is still left in PHP's internal stream buffers.
+     * As such, it's recommended to use `stream_set_read_buffer($stream, 0);`
+     * to disable PHP's internal read buffer in this case.
+     *
      * @param resource $stream   The PHP stream resource to check.
      * @param callable $listener Invoked when the stream is ready.
+     * @throws \Exception if the given resource type is not supported by this loop implementation
      * @see self::removeWriteStream()
      */
-    public function addWriteStream($stream, callable $listener);
+    public function addWriteStream($stream, $listener);
 
     /**
      * Remove the read event listener for the given stream.
@@ -119,16 +129,6 @@ interface LoopInterface
      * @param resource $stream The PHP stream resource.
      */
     public function removeWriteStream($stream);
-
-    /**
-     * Remove all listeners for the given stream.
-     *
-     * Removing a stream from the loop that has already been removed or trying
-     * to remove a stream that was never added or is invalid has no effect.
-     *
-     * @param resource $stream The PHP stream resource.
-     */
-    public function removeStream($stream);
 
     /**
      * Enqueue a callback to be invoked once after the given interval.
@@ -162,25 +162,44 @@ interface LoopInterface
      * can bind arbitrary data to a callback closure like this:
      *
      * ```php
-     * function hello(LoopInterface $loop, $name)
+     * function hello($name, LoopInterface $loop)
      * {
      *     $loop->addTimer(1.0, function () use ($name) {
      *         echo "hello $name\n";
      *     });
      * }
      *
-     * hello('Tester');
+     * hello('Tester', $loop);
      * ```
      *
-     * The execution order of timers scheduled to execute at the same time is
-     * not guaranteed.
+     * This interface does not enforce any particular timer resolution, so
+     * special care may have to be taken if you rely on very high precision with
+     * millisecond accuracy or below. Event loop implementations SHOULD work on
+     * a best effort basis and SHOULD provide at least millisecond accuracy
+     * unless otherwise noted. Many existing event loop implementations are
+     * known to provide microsecond accuracy, but it's generally not recommended
+     * to rely on this high precision.
+     *
+     * Similarly, the execution order of timers scheduled to execute at the
+     * same time (within its possible accuracy) is not guaranteed.
+     *
+     * This interface suggests that event loop implementations SHOULD use a
+     * monotonic time source if available. Given that a monotonic time source is
+     * only available as of PHP 7.3 by default, event loop implementations MAY
+     * fall back to using wall-clock time.
+     * While this does not affect many common use cases, this is an important
+     * distinction for programs that rely on a high time precision or on systems
+     * that are subject to discontinuous time adjustments (time jumps).
+     * This means that if you schedule a timer to trigger in 30s and then adjust
+     * your system time forward by 20s, the timer SHOULD still trigger in 30s.
+     * See also [event loop implementations](#loop-implementations) for more details.
      *
      * @param int|float $interval The number of seconds to wait before execution.
      * @param callable  $callback The callback to invoke.
      *
      * @return TimerInterface
      */
-    public function addTimer($interval, callable $callback);
+    public function addTimer($interval, $callback);
 
     /**
      * Enqueue a callback to be invoked repeatedly after the given interval.
@@ -215,7 +234,7 @@ interface LoopInterface
      * arbitrary data to a callback closure like this:
      *
      * ```php
-     * function hello(LoopInterface $loop, $name)
+     * function hello($name, LoopInterface $loop)
      * {
      *     $n = 3;
      *     $loop->addPeriodicTimer(1.0, function ($timer) use ($name, $loop, &$n) {
@@ -228,51 +247,56 @@ interface LoopInterface
      *     });
      * }
      *
-     * hello('Tester');
+     * hello('Tester', $loop);
      * ```
      *
-     * The execution order of timers scheduled to execute at the same time is
-     * not guaranteed.
+     * This interface does not enforce any particular timer resolution, so
+     * special care may have to be taken if you rely on very high precision with
+     * millisecond accuracy or below. Event loop implementations SHOULD work on
+     * a best effort basis and SHOULD provide at least millisecond accuracy
+     * unless otherwise noted. Many existing event loop implementations are
+     * known to provide microsecond accuracy, but it's generally not recommended
+     * to rely on this high precision.
+     *
+     * Similarly, the execution order of timers scheduled to execute at the
+     * same time (within its possible accuracy) is not guaranteed.
+     *
+     * This interface suggests that event loop implementations SHOULD use a
+     * monotonic time source if available. Given that a monotonic time source is
+     * only available as of PHP 7.3 by default, event loop implementations MAY
+     * fall back to using wall-clock time.
+     * While this does not affect many common use cases, this is an important
+     * distinction for programs that rely on a high time precision or on systems
+     * that are subject to discontinuous time adjustments (time jumps).
+     * This means that if you schedule a timer to trigger in 30s and then adjust
+     * your system time forward by 20s, the timer SHOULD still trigger in 30s.
+     * See also [event loop implementations](#loop-implementations) for more details.
+     *
+     * Additionally, periodic timers may be subject to timer drift due to
+     * re-scheduling after each invocation. As such, it's generally not
+     * recommended to rely on this for high precision intervals with millisecond
+     * accuracy or below.
      *
      * @param int|float $interval The number of seconds to wait before execution.
      * @param callable  $callback The callback to invoke.
      *
      * @return TimerInterface
      */
-    public function addPeriodicTimer($interval, callable $callback);
+    public function addPeriodicTimer($interval, $callback);
 
     /**
      * Cancel a pending timer.
      *
      * See also [`addPeriodicTimer()`](#addperiodictimer) and [example #2](examples).
      *
-     * You can use the [`isTimerActive()`](#istimeractive) method to check if
-     * this timer is still "active". After a timer is successfully canceled,
-     * it is no longer considered "active".
-     *
      * Calling this method on a timer instance that has not been added to this
-     * loop instance or on a timer that is not "active" (or has already been
-     * canceled) has no effect.
+     * loop instance or on a timer that has already been cancelled has no effect.
      *
      * @param TimerInterface $timer The timer to cancel.
      *
      * @return void
      */
     public function cancelTimer(TimerInterface $timer);
-
-    /**
-     * Check if a given timer is active.
-     *
-     * A timer is considered "active" if it has been added to this loop instance
-     * via [`addTimer()`](#addtimer) or [`addPeriodicTimer()`](#addperiodictimer)
-     * and has not been canceled via [`cancelTimer()`](#canceltimer) and is not
-     * a non-periodic timer that has already been triggered after its interval.
-     *
-     * @param TimerInterface $timer The timer to check.
-     *
-     * @return boolean True if the timer is still enqueued for execution.
-     */
-    public function isTimerActive(TimerInterface $timer);
 
     /**
      * Schedule a callback to be invoked on a future tick of the event loop.
@@ -291,14 +315,14 @@ interface LoopInterface
      * can bind arbitrary data to a callback closure like this:
      *
      * ```php
-     * function hello(LoopInterface $loop, $name)
+     * function hello($name, LoopInterface $loop)
      * {
      *     $loop->futureTick(function () use ($name) {
      *         echo "hello $name\n";
      *     });
      * }
      *
-     * hello('Tester');
+     * hello('Tester', $loop);
      * ```
      *
      * Unlike timers, tick callbacks are guaranteed to be executed in the order
@@ -324,15 +348,116 @@ interface LoopInterface
      *
      * @return void
      */
-    public function futureTick(callable $listener);
+    public function futureTick($listener);
+
+    /**
+     * Register a listener to be notified when a signal has been caught by this process.
+     *
+     * This is useful to catch user interrupt signals or shutdown signals from
+     * tools like `supervisor` or `systemd`.
+     *
+     * The listener callback function MUST be able to accept a single parameter,
+     * the signal added by this method or you MAY use a function which
+     * has no parameters at all.
+     *
+     * The listener callback function MUST NOT throw an `Exception`.
+     * The return value of the listener callback function will be ignored and has
+     * no effect, so for performance reasons you're recommended to not return
+     * any excessive data structures.
+     *
+     * ```php
+     * $loop->addSignal(SIGINT, function (int $signal) {
+     *     echo 'Caught user interrupt signal' . PHP_EOL;
+     * });
+     * ```
+     *
+     * See also [example #4](examples).
+     *
+     * Signaling is only available on Unix-like platform, Windows isn't
+     * supported due to operating system limitations.
+     * This method may throw a `BadMethodCallException` if signals aren't
+     * supported on this platform, for example when required extensions are
+     * missing.
+     *
+     * **Note: A listener can only be added once to the same signal, any
+     * attempts to add it more then once will be ignored.**
+     *
+     * @param int $signal
+     * @param callable $listener
+     *
+     * @throws \BadMethodCallException when signals aren't supported on this
+     *     platform, for example when required extensions are missing.
+     *
+     * @return void
+     */
+    public function addSignal($signal, $listener);
+
+    /**
+     * Removes a previously added signal listener.
+     *
+     * ```php
+     * $loop->removeSignal(SIGINT, $listener);
+     * ```
+     *
+     * Any attempts to remove listeners that aren't registered will be ignored.
+     *
+     * @param int $signal
+     * @param callable $listener
+     *
+     * @return void
+     */
+    public function removeSignal($signal, $listener);
 
     /**
      * Run the event loop until there are no more tasks to perform.
+     *
+     * For many applications, this method is the only directly visible
+     * invocation on the event loop.
+     * As a rule of thumb, it is usally recommended to attach everything to the
+     * same loop instance and then run the loop once at the bottom end of the
+     * application.
+     *
+     * ```php
+     * $loop->run();
+     * ```
+     *
+     * This method will keep the loop running until there are no more tasks
+     * to perform. In other words: This method will block until the last
+     * timer, stream and/or signal has been removed.
+     *
+     * Likewise, it is imperative to ensure the application actually invokes
+     * this method once. Adding listeners to the loop and missing to actually
+     * run it will result in the application exiting without actually waiting
+     * for any of the attached listeners.
+     *
+     * This method MUST NOT be called while the loop is already running.
+     * This method MAY be called more than once after it has explicity been
+     * [`stop()`ped](#stop) or after it automatically stopped because it
+     * previously did no longer have anything to do.
+     *
+     * @return void
      */
     public function run();
 
     /**
      * Instruct a running event loop to stop.
+     *
+     * This method is considered advanced usage and should be used with care.
+     * As a rule of thumb, it is usually recommended to let the loop stop
+     * only automatically when it no longer has anything to do.
+     *
+     * This method can be used to explicitly instruct the event loop to stop:
+     *
+     * ```php
+     * $loop->addTimer(3.0, function () use ($loop) {
+     *     $loop->stop();
+     * });
+     * ```
+     *
+     * Calling this method on a loop instance that is not currently running or
+     * on a loop instance that has already been stopped has no effect.
+     *
+     * @return void
      */
     public function stop();
 }

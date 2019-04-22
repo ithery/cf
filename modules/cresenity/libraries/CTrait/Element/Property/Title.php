@@ -33,4 +33,19 @@ trait CTrait_Element_Property_Title {
         return strlen($this->title) > 0;
     }
 
+    /**
+     * call getTitle if parameter title is not passed
+     * call setTitle if parameter title is passed
+     * 
+     * @param string $title
+     * @param bool $lang
+     * @return mixed 
+     */
+    public function title($title = null, $lang = true) {
+        if ($title != null) {
+            return $this->setTitle($title, $lang);
+        }
+        return $this->getTitle();
+    }
+
 }

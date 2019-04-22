@@ -13,13 +13,25 @@ return array(
         "label" => "Dashboard",
         "controller" => "administrator/home",
         "method" => "index",
-        "icon" => "fas fa-home",
+        "icon" => " lnr lnr-home",
     ),
-    
+    array(
+        "name" => "administrator.app",
+        "label" => "Application",
+        "icon" => " lnr lnr-dice",
+        "subnav" => array(
+            array(
+                "name" => "administrator.app.info",
+                "label" => "Information",
+                "controller" => "administrator/app/info",
+                "method" => "index",
+            ),
+        ),
+    ),
     array(
         "name" => "administrator.database",
         "label" => "Database",
-        "icon" => " fas fa-database",
+        "icon" => " lnr lnr-database",
         "subnav" => array(
             array(
                 "name" => "administrator.database.console",
@@ -38,7 +50,7 @@ return array(
     array(
         "name" => "administrator.stats",
         "label" => "Stats",
-        "icon" => " fas fa-chart-bar",
+        "icon" => " lnr lnr-chart-bars",
         "subnav" => array(
             array(
                 "name" => "administrator.stats.phpinfo",
@@ -46,7 +58,12 @@ return array(
                 "controller" => "administrator/stats/phpinfo",
                 "method" => "index",
             ),
-           
         ),
+    ),
+    array(
+        "name" => "administrator.cloud",
+        "label" => "Dev Cloud",
+        "icon" => " lnr lnr-cloud",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Cloud" . EXT,
     ),
 );
