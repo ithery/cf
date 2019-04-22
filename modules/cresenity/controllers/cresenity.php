@@ -825,8 +825,8 @@ class Controller_Cresenity extends CController {
         ImageDestroy($image);
     }
 
-    public function transparent($width = 100, $width = 100) {
-        $img = imagecreatetruecolor($width, $width);
+    public function transparent($width = 100, $height = 100) {
+        $img = imagecreatetruecolor($width, $height);
         imagesavealpha($img, true);
         $color = imagecolorallocatealpha($img, 0, 0, 0, 127);
         imagefill($img, 0, 0, $color);
