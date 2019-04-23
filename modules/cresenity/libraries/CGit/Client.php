@@ -27,7 +27,7 @@ class CGit_Client {
      *
      * @param  string     $path Path where the new repository will be created
      *
-     * @return Repository Instance of Repository
+     * @return CGit_Repository Instance of Repository
      */
     public function createRepository($path, $bare = null) {
         if (file_exists($path . '/.git/HEAD') && !file_exists($path . '/HEAD')) {
@@ -42,7 +42,7 @@ class CGit_Client {
      *
      * @param  string     $path Path where the repository is located
      *
-     * @return Repository Instance of Repository
+     * @return CGit_Repository Instance of Repository
      */
     public function getRepository($path) {
         if (!file_exists($path) || !file_exists($path . '/.git/HEAD') && !file_exists($path . '/HEAD')) {
