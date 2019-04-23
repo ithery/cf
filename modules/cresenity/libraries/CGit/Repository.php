@@ -545,7 +545,7 @@ class CGit_Repository {
     /**
      * Get the current Client instance.
      *
-     * @return Client Client instance
+     * @return CGit_Client Client instance
      */
     public function getClient() {
         return $this->client;
@@ -554,9 +554,9 @@ class CGit_Repository {
     /**
      * Set the Client.
      *
-     * @param Client $path Client instance
+     * @param CGit_Client $path Client instance
      */
-    public function setClient(Client $client) {
+    public function setClient(CGit_Client $client) {
         $this->client = $client;
         return $this;
     }
