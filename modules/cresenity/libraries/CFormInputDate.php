@@ -7,6 +7,7 @@ class CFormInputDate extends CFormInput {
     protected $date_format;
     protected $have_button;
     protected $start_date;
+    protected $end_date;
     protected $disable_day;
     protected $inline;
 
@@ -30,6 +31,7 @@ class CFormInputDate extends CFormInput {
 
         $this->have_button = false;
         $this->start_date = "";
+        $this->end_date = "";
         $this->disable_day = array();
         $this->inline = false;
     }
@@ -45,6 +47,11 @@ class CFormInputDate extends CFormInput {
 
     public function set_start_date($str) {
         $this->start_date = $str;
+        return $this;
+    }
+    
+    public function set_end_date($str) {
+        $this->end_date = $str;
         return $this;
     }
 
@@ -129,6 +136,11 @@ class CFormInputDate extends CFormInput {
             if (strlen($option) > 0)
                 $option .= ",";
             $option .= "startDate: '" . $this->start_date . "'";
+        }
+        if (strlen($this->end_date) > 0) {
+            if (strlen($option) > 0)
+                $option .= ",";
+            $option .= "endDate: '" . $this->end_date . "'";
         }
         if (strlen($disable_day_str)) {
             if (strlen($option) > 0)

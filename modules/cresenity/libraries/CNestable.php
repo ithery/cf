@@ -11,8 +11,8 @@ class CNestable extends CElement_Element {
     protected $applyjs;
     protected $input;
     protected $action_style;
-    protected $display_callback;
-    protected $filter_action_callback_func;
+    protected $displayCallbackFunc;
+    protected $filterActionCallbackFunc;
     protected $requires;
     protected $checkbox;
     protected $disable_dnd;
@@ -28,8 +28,8 @@ class CNestable extends CElement_Element {
         $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->action_style = 'btn-icon-group';
         $this->rowActionList->setStyle('btn-icon-group');
-        $this->display_callback = false;
-        $this->filter_action_callback_func = "";
+        $this->displayCallbackFunc = false;
+        $this->filterActionCallbackFunc = "";
         $this->checkbox = false;
         $this->requires = array();
         $this->js_cell = '';
@@ -39,16 +39,16 @@ class CNestable extends CElement_Element {
         return new CNestable($id);
     }
 
-    public function display_callback_func($func, $require = "") {
-        $this->display_callback = $func;
+    public function displayCallbackFunc($func, $require = "") {
+        $this->displayCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
         return $this;
     }
 
-    public function filter_action_callback_func($func, $require = "") {
-        $this->filter_action_callback_func = $func;
+    public function filterActionCallbackFunc($func, $require = "") {
+        $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -128,8 +128,8 @@ class CNestable extends CElement_Element {
                 }
                 $val = $d[$this->value_key];
                 $new_v = $val;
-                if ($this->display_callback !== false && is_callable($this->display_callback)) {
-                    $new_v = CDynFunction::factory($this->display_callback)
+                if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
+                    $new_v = CDynFunction::factory($this->displayCallbackFunc)
                             ->add_param($this)
                             ->add_param($d)
                             ->add_param($val)
@@ -152,11 +152,11 @@ class CNestable extends CElement_Element {
                     $this->rowActionList->apply("jsparam", $jsparam);
                     $this->rowActionList->apply("set_handler_url_param", $jsparam);
 
-                    if (($this->filter_action_callback_func) != null) {
+                    if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as $action) {
-                            $visibility = CDynFunction::factory($this->filter_action_callback_func)
+                            $visibility = CDynFunction::factory($this->filterActionCallbackFunc)
                                     ->add_param($this)
                                     ->add_param($d)
                                     ->add_param($action)

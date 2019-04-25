@@ -83,6 +83,16 @@ class CFunction {
             }
         }
         if ($error == 0) {
+            if ($this->func instanceof Closure) {
+                return call_user_func_array($this->func, $args);
+            }
+        }
+        if ($error == 0) {
+            if (is_callable($this->func)) {
+                return call_user_func_array($this->func, $args);
+            }
+        }
+        if ($error == 0) {
             //not array let check if it is a function name
             if (function_exists($this->func)) {
                 return call_user_func_array($this->func, $args);
@@ -92,6 +102,13 @@ class CFunction {
             //not the function name, let check it if it is function from ctransform class
             if (is_callable(array('ctransform', $this->func))) {
                 return call_user_func_array(array('ctransform', $this->func), $args);
+            }
+        }
+        if ($error == 0) {
+            //not the function name, let check it if it is function from CHelper_Transform class
+            $transform = CHelper::transform();
+            if (is_callable(array($transform, $this->func))) {
+                return call_user_func_array(array($transform, $this->func), $args);
             }
         }
         if ($error == 0) {

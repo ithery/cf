@@ -127,6 +127,24 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
+     * Run a set of commands against the connection (blocking).
+     *
+     * @param string|array $commands
+     * @param \Closure     $callback
+     *
+     * @return $this
+     */
+    public function runBlocking($commands, $timeout = 2) {
+        // First, we will initialize the SSH gateway, and then format the commands so
+        // they can be run. Once we have the commands formatted and the server is
+        // ready to go we will just fire off these commands against the server.
+        $gateway = $this->getGateway();
+
+
+        return $gateway->runBlocking($this->formatCommands($commands), $timeout);
+    }
+
+    /**
      * Get the gateway implementation.
      *
      * @throws \RuntimeException
@@ -296,6 +314,24 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      */
     public function status() {
         return $this->gateway->status();
+    }
+
+    /**
+     * Set the time out of current gateway.
+     *
+     * @return int|bool
+     */
+    public function setTimeout($second) {
+        return $this->gateway->setTimeout($second);
+    }
+
+    /**
+     * Get the time out of current gateway.
+     *
+     * @return int
+     */
+    public function getTimeout() {
+        return $this->gateway->getTimeout();
     }
 
 }

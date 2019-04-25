@@ -95,6 +95,8 @@ class CResources {
         if (is_array($options)) {
             $orgCode = carr::get($options, 'org_code');
             $appCode = carr::get($options, 'app_code');
+        } else {
+            CCollector::deprecated('Resources options must passed as array');
         }
         if (!is_array($orgCode)) {
             if (strlen($orgCode) == 0) {

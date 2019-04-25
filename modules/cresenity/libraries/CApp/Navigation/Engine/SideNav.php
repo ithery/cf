@@ -25,26 +25,19 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
 
             $child = 0;
             $pass = 0;
-            $active_class = "";
-            $controller = "";
-            $method = "";
-            $label = "";
-            $icon = "";
-
-            if (isset($d["controller"]))
-                $controller = $d["controller"];
-            if (isset($d["method"]))
-                $method = $d["method"];
-            if (isset($d["label"]))
-                $label = $d["label"];
-            if (isset($d["icon"]))
-                $icon = $d["icon"];
+            $activeClass = "";
+            $controller = carr::get($d, 'controller');
+            $method = carr::get($d, 'method');
+            $label = carr::get($d, 'label');
+            $icon = carr::get($d, 'icon');
 
 
-            $child_html = "";
 
-            if (isset($d["subnav"])) {
-                $child_html .= self::render($d["subnav"], $level + 1, $child);
+
+            $childHtml = "";
+
+            if (isset($d["subnav"]) && is_array($d["subnav"])) {
+                $childHtml .= self::render(carr::get($d, 'subnav', array()), $level + 1, $child);
             }
 
             $url = Helper::url($d);
@@ -52,8 +45,10 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             if (!isset($url) || $url == null)
                 $url = "";
 
-            if (strlen($child_html) > 0 || strlen($url) > 0) {
+            if (strlen($childHtml) > 0 || strlen($url) > 0) {
+                
                 if (!Helper::accessAvailable($d, CF::appId(), CF::domain())) {
+
                     continue;
                 }
                 if (isset($d["controller"]) && $d["controller"] != "") {
@@ -72,7 +67,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                 $find_nav = Helper::nav($d);
 
                 if ($find_nav !== false) {
-                    $active_class = " active open";
+                    $activeClass = " active open";
                 }
 
                 $li_class = "sidenav-item ";
@@ -85,7 +80,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     $addition_style = ' style="border-bottom:1px solid #bbb"';
                 }
 
-                $html .= '<li class="' . $li_class . $active_class . '" ' . $addition_style . '>';
+                $html .= '<li class="' . $li_class . $activeClass . '" ' . $addition_style . '>';
 
                 $iconClass = carr::get($d, 'icon');
                 if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
@@ -101,7 +96,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                         $caret = '<b class="caret">';
                     }
 
-                    $elem = '<a class="' . $active_class . ' sidenav-link sidenav-toggle" href="javascript:;" >' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
+                    $elem = '<a class="' . $activeClass . ' sidenav-link sidenav-toggle" href="javascript:;" >' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -124,10 +119,10 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     if ($notif != null && $notif > 0) {
                         $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
+                    $elem = '<a class="' . $activeClass . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
                 }
                 $html .= $elem;
-                $html .= $child_html;
+                $html .= $childHtml;
                 $html .= '</li>';
             }
         }

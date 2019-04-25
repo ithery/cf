@@ -46,4 +46,28 @@ class CApp_Navigation_Data {
         self::$navigationCallback[$domain] = $navigationCallback;
     }
 
+    /**
+     * 
+     * @param string $domain optional
+     */
+    public static function removeNavigationCallback($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+
+        self::$navigationCallback[$domain] = null;
+    }
+
+    /**
+     * 
+     * @param string $domain optional
+     */
+    public static function getNavigationCallback($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+
+        return self::$navigationCallback[$domain];
+    }
+
 }

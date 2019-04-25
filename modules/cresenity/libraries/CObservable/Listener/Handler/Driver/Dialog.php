@@ -9,20 +9,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_Driver_Dialog extends CObservable_Listener_Handler_Driver {
 
-    use CTrait_Compat_Handler_Driver_Dialog;
+    use CTrait_Compat_Handler_Driver_Dialog,
+        CTrait_Element_Property_Title;
 
     protected $target;
     protected $method;
     protected $content;
     protected $param;
-    protected $title;
     protected $actions;
     protected $param_inputs;
     protected $param_request;
-    protected $reload_page;
-    protected $callback;
     protected $js_class;
     protected $js_class_manual;
+    protected $isSidebar;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
@@ -37,34 +36,16 @@ class CObservable_Listener_Handler_Driver_Dialog extends CObservable_Listener_Ha
         $this->js_class_manual = null;
     }
 
-    public function set_reload_page($reload_page) {
-        $this->reload_page = $reload_page;
-        return $this;
-    }
-
-    public function set_callback(callable $callback) {
-        $this->callback = $callback;
+    public function setSidebar($bool = true) {
+        $this->isSidebar = $bool;
         return $this;
     }
 
     /**
-     * 
-     * @param string $title
+     * @deprecated since version 1.2
+     * @param type $js_class
      * @return $this
      */
-    public function setTitle($title, $lang = true) {
-        if ($lang) {
-            $title = clang::__($title);
-        }
-        $this->title = $title;
-        return $this;
-    }
-
-    public function set_target($target) {
-        $this->target = $target;
-        return $this;
-    }
-
     public function set_js_class($js_class) {
         //set js class manual
         $this->js_class_manual = $js_class;
@@ -108,35 +89,23 @@ class CObservable_Listener_Handler_Driver_Dialog extends CObservable_Listener_Ha
         $data_addition = '';
 
         foreach ($this->param_inputs as $inp) {
-            if (strlen($data_addition) > 0)
+            if (strlen($data_addition) > 0) {
                 $data_addition .= ',';
+            }
             $data_addition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
         }
         foreach ($this->param_request as $req_k => $req_v) {
-            if (strlen($data_addition) > 0)
+            if (strlen($data_addition) > 0) {
                 $data_addition .= ',';
+            }
             $data_addition .= "'" . $req_k . "':'" . $req_v . "'";
         }
         $data_addition = '{' . $data_addition . '}';
-        /*
-          $js.= "
-          var modal_opt_".$this->event."_".$this->owner." = {
-          id: 'modal_opt_".$this->event."_".$this->owner."_dialog', // id which (if specified) will be added to the dialog to make it accessible later
-          autoOpen: true , // Should the dialog be automatically opened?
-          title: '".$this->title."',
-          content: '".$this->generated_url()."',
-          buttons: {
 
-          },
-          closeOnOverlayClick: true , // Should the dialog be closed on overlay click?
-          closeOnEscape: true , // Should the dialog be closed if [ESCAPE] key is pressed?
-          removeOnClose: true , // Should the dialog be removed from the document when it is closed?
-          showCloseHandle: true , // Should a close handle be shown?
-          initialLoadText: '' // Text to be displayed when the dialogs contents are loaded
-          }
-          jQuery('<div/>').dialog2(modal_opt_".$this->event."_".$this->owner.");
-          ";
-         */
+        $optionsArray = array();
+        $optionsArray['title'] = $this->title;
+        $optionsArray['isSidebar'] = $this->isSidebar;
+        $optionsJson = json_encode($optionsArray);
         $js_class = ccfg::get('js_class');
         if (strlen($js_class) > 0) {
             $this->js_class = $js_class;
@@ -153,14 +122,14 @@ class CObservable_Listener_Handler_Driver_Dialog extends CObservable_Listener_Ha
             $content = addslashes($content);
             $content = str_replace("\r\n", "", $content);
             if (strlen(trim($content)) == 0) {
-                $content = $this->generated_url();
+                $content = $this->generatedUrl();
             }
             $js .= "
                 $." . $this->js_class . ".show_dialog('" . $this->target . "','" . $this->title . "','" . $content . "');
             ";
         } else {
             $js .= "
-                $.cresenity.show_dialog('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "','" . $this->title . "'," . $data_addition . ");
+                $.cresenity.show_dialog('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $optionsJson . "," . $data_addition . ");
             ";
         }
         return $js;

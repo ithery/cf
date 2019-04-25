@@ -123,7 +123,7 @@ final class CManager {
         if (!empty($data)) {
             CClientModules::instance()->defineModule($module, $data);
         }
-        if(!CClientModules::instance()->isRegisteredModule($module)) {
+        if (!CClientModules::instance()->isRegisteredModule($module)) {
             return CClientModules::instance()->registerModule($module);
         }
         return false;
@@ -143,6 +143,7 @@ final class CManager {
     public static function getRegisteredModule() {
         return CClientModules::instance()->getRegisteredModule();
     }
+
     /**
      * 
      * @param string $module

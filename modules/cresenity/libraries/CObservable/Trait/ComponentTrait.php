@@ -23,12 +23,68 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * 
      * @param string $id
+     * @return CElement_Component_DataGridList
+     */
+    public function addDataGridList($id = "") {
+        $dataGridList = CElement_Factory::createComponent('DataGridList', $id);
+        $this->add($dataGridList);
+        return $dataGridList;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Nestable
+     */
+    public function addNestable($id = "") {
+        $nestable = CElement_Factory::createComponent('Nestable', $id);
+        $this->add($nestable);
+        return $nestable;
+    }
+
+    /**
+     * 
+     * @param string $id
      * @return CElement_Component_Terminal
      */
     public function addTerminal($id = "") {
         $terminal = CElement_Factory::createComponent('Terminal', $id);
         $this->add($terminal);
         return $terminal;
+    }
+
+    /**
+     *
+     * @method addChart
+     *
+     * @param  string   $type
+     * @param  string   $id
+     * @return CElement_Component_Chart
+     */
+    public function addChart($type, $id = "") {
+        $chart = CElement_Component_Chart::factory($type, $id);
+        $this->add($chart);
+        return $chart;
+    }
+
+    /**
+     *
+     * @method addElFinder
+     *
+     * @param  string   $type
+     * @param  string   $id
+     * @return CElement_Component_ElFinder
+     */
+    public function addElFinder($id = "") {
+        $elFinder = CElement_Component_ElFinder::factory($id);
+        $this->add($elFinder);
+        return $elFinder;
+    }
+
+    public function addFileManager($id = "") {
+        $fileManager = CElement_Component_FileManager::factory($id);
+        $this->add($fileManager);
+        return $fileManager;
     }
 
 }

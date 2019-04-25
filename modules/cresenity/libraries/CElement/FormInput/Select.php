@@ -30,7 +30,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->maximumSelectionLength = false;
     }
 
-    public function setMultiple($bool) {
+    public function setMultiple($bool = true) {
         $this->multiple = $bool;
         return $this;
     }
@@ -114,12 +114,14 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $multiple = ' multiple="multiple"';
         }
         $name = $this->name;
-        if ($this->multiple)
+        if ($this->multiple) {
             $name = $name . "[]";
+        }
         $classes = $this->classes;
         $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
+        if (strlen($classes) > 0) {
             $classes = " " . $classes;
+        }
 
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
@@ -156,11 +158,13 @@ class CElement_FormInput_Select extends CElement_FormInput {
             foreach ($this->list as $k => $v) {
                 $selected = "";
                 if (is_array($this->value)) {
-                    if (in_array($k, $this->value))
+                    if (in_array($k, $this->value)) {
                         $selected = ' selected="selected"';
+                    }
                 } else {
-                    if ($this->value == (string) $k)
+                    if ($this->value == (string) $k) {
                         $selected = ' selected="selected"';
+                    }
                 }
                 $value = $v;
                 $addition_attribute = ' ';

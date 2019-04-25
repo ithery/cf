@@ -12,13 +12,16 @@ class CManager_Asset_Module {
     protected static $instance;
     protected $runTimeModules = array();
     protected $themeModules = array();
-    protected $allModules = array();
+    private $allModules = null;
 
     public function __construct() {
+        $this->allModules = null;
+        $this->reset();
+    }
 
+    public function reset() {
         $this->runTimeModules = array();
         $this->themeModules = array();
-        $this->allModules = null;
     }
 
     public function allModules() {
@@ -198,11 +201,11 @@ class CManager_Asset_Module {
     public function getRunTimeContainer() {
         $runTimeContainer = new CManager_Asset_Container_RunTime();
         $allModules = $this->allModules();
-      
-           
+
+        
         foreach ($this->runTimeModules as $runTimeModule) {
             $mod = carr::get($allModules, $runTimeModule, array());
-           
+          
             if (isset($mod["js"])) {
                 $runTimeContainer->registerJsFiles($mod['js']);
             }

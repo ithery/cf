@@ -16,6 +16,7 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
     protected $param;
     protected $param_inputs;
     protected $param_inputs_by_name;
+    protected $paramRequest;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
@@ -24,6 +25,7 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
         $this->content = CHandlerElement::factory();
         $this->param_inputs = array();
         $this->param_inputs_by_name = array();
+        $this->paramRequest = array();
     }
 
     public function addParamInput($inputs) {
@@ -32,6 +34,16 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
         }
         foreach ($inputs as $inp) {
             $this->param_inputs[] = $inp;
+        }
+        return $this;
+    }
+
+    public function addParamRequest($paramRequest) {
+        if (!is_array($paramRequest)) {
+            $paramRequest = array($paramRequest);
+        }
+        foreach ($paramRequest as $reqK => $reqV) {
+            $this->paramRequest[$reqK] = $reqV;
         }
         return $this;
     }
@@ -57,6 +69,12 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
     public function script() {
         $js = '';
         $dataAddition = '';
+        foreach ($this->paramRequest as $reqK => $reqV) {
+            if (strlen($dataAddition) > 0) {
+                $dataAddition .= ',';
+            }
+            $dataAddition .= "'" . $reqK . "':'" . $reqV . "'";
+        }
 
         foreach ($this->param_inputs as $inp) {
             if (strlen($dataAddition) > 0) {
@@ -71,8 +89,9 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
             $dataAddition .= "'" . $k . "':$.cresenity.value('" . $inp . "')";
         }
         $dataAddition = '{' . $dataAddition . '}';
+
         $js .= "
-            $.cresenity.reload('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $dataAddition . ");
+            $.cresenity.reload('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $dataAddition . ");
          ";
 
         return $js;

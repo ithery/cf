@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CDatabase {
 
+    use CTrait_Compat_Database;
+
     // Database instances
     public static $instances = array();
     // Global benchmark
@@ -64,7 +66,7 @@ class CDatabase {
     /**
      * The event dispatcher instance.
      *
-     * @var CDatabase_Event
+     * @var CEvent_Dispatcher
      */
     protected $events;
 
@@ -90,11 +92,15 @@ class CDatabase {
             //get current domain
             $domain = CF::domain();
         }
+        if ($name == null) {
+            $name = 'default';
+        }
         if (!isset(CDatabase::$instances[$domain])) {
             CDatabase::$instances[$domain] = array();
         }
         if (!isset(CDatabase::$instances[$domain][$name])) {
             // Create a new instance
+
             CDatabase::$instances[$domain][$name] = new CDatabase($config === NULL ? $name : $config, $domain);
         }
 
@@ -253,8 +259,8 @@ class CDatabase {
 
 
 
-        $this->events = new CDatabase_Event();
-
+        $this->events = CDatabase_Dispatcher::instance();
+        CModel::setEventDispatcher($this->events);
         $this->configuration = new CDatabase_Configuration();
 
         // Validate the driver
@@ -1722,6 +1728,15 @@ class CDatabase {
             $res[$arr_key] = $arr_val;
         }
         return $res;
+    }
+
+    /**
+     * Get a new query builder instance.
+     *
+     * @return CDatabase_Query_Builder
+     */
+    public function createQueryBuilder() {
+        return new CDatabase_Query_Builder($this);
     }
 
 }

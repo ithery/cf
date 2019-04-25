@@ -86,7 +86,7 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function set_jsparam($jsparam) {
+    public function setJsParam($jsparam) {
         $this->jsparam = $jsparam;
         return $this;
     }

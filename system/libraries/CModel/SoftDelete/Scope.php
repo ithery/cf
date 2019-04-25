@@ -33,12 +33,14 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
         }
         $builder->onDelete(function (CModel_Query $builder) {
             $column = $this->getStatusColumn($builder);
-
+            
             return $builder->update([
-                        $column => $builder->getModel()->freshTimestampString(),
+                        $column => 0,
             ]);
         });
     }
+    
+    
 
     /**
      * Get the "deleted at" column for the builder.
@@ -50,7 +52,6 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
         if (count((array) $builder->getQuery()->joins) > 0) {
             return $builder->getModel()->getQualifiedStatusColumn();
         }
-
         return $builder->getModel()->getStatusColumn();
     }
 

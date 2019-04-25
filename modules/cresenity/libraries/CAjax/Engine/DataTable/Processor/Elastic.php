@@ -11,7 +11,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
     public function process() {
         $data = $this->data;
-        $ajax_data = carr::get($data, 'query');
+        $ajaxData = carr::get($data, 'query');
 
         $js = "";
 
@@ -19,39 +19,44 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         $table = unserialize(carr::get($data, 'table'));
         //$db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
         $domain = carr::get($data, 'domain');
+        $ajaxDataDomain = carr::get($ajaxData, 'domain');
+        if (strlen($ajaxDataDomain) > 0) {
+            $domain = $ajaxDataDomain;
+        }
+        $instanceName = carr::get($ajaxData, 'name');
+        $instanceConfig = carr::get($ajaxData, 'config');
 
         /*
          * @var CElastic
          */
-        $el = CElastic::instance();
+        $el = CElastic::instance($domain, $instanceName, $instanceConfig);
 
         $request = $this->input;
 
 
         $columns = carr::get($data, 'columns');
-        $row_action_list = $table->getRowActionList();
+        $rowActionList = $table->getRowActionList();
         $key = carr::get($data, 'key_field');
 
-        $elastic_index = carr::get($ajax_data, 'index');
-        $elastic_document_type = carr::get($ajax_data, 'document_type');
+        $elastic_index = carr::get($ajaxData, 'index');
+        $elastic_document_type = carr::get($ajaxData, 'document_type');
 
 
         $search = $el->search($elastic_index, $elastic_document_type);
-
         $mapping = $search->indices()->get_mapping();
         $properties = carr::path($mapping, $elastic_index . '.mappings.' . $elastic_document_type . '.properties');
 
 
-        $must = carr::get($ajax_data, 'must');
+        $must = carr::get($ajaxData, 'must');
         foreach ($must as $m) {
             $search->must((array) $m);
         }
-        $must_not = carr::get($ajax_data, 'must_not');
+        $must_not = carr::get($ajaxData, 'must_not');
         foreach ($must_not as $mn) {
             $search->must_not((array) $mn);
         }
 
-        $select_raw = (array) carr::get($ajax_data, 'select');
+        $select_raw = (array) carr::get($ajaxData, 'select');
 
         foreach ($select_raw as $k => $v) {
             $v = (array) $v;
@@ -68,9 +73,9 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
             $search->select(carr::get($v, 'field'), carr::get($v, 'alias'));
         }
 
-        $sort = (array) carr::get($ajax_data, 'sort', array());
-        $from = carr::get($ajax_data, 'from', 0);
-        $size = carr::get($ajax_data, 'size', 10);
+        $sort = (array) carr::get($ajaxData, 'sort', array());
+        $from = carr::get($ajaxData, 'from', 0);
+        $size = carr::get($ajaxData, 'size', 10);
 
 
 
@@ -90,15 +95,15 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                 }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
 
-                    $field = $columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname;
+                    $fieldName = carr::get($columns[intval($request['iSortCol_' . $i]) + $i2], 'fieldname');
 
                     $sort_mode = $request['sSortDir_' . $i];
-                    if (strlen($field) > 0) {
-                        if (isset($select_flip[$field])) {
-                            $field = $select_flip[$field];
+                    if (strlen($fieldName) > 0) {
+                        if (isset($select_flip[$fieldName])) {
+                            $fieldName = $select_flip[$fieldName];
                         }
 
-                        $search->sort($field, $sort_mode);
+                        $search->sort($fieldName, $sort_mode);
                     }
                 }
             }
@@ -157,7 +162,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         }
 
         if (isset($_GET['debug'])) {
-            cdbg::var_dump($search->buildParams());
+            cdbg::dd($search->buildParams());
             die;
         }
 
@@ -177,6 +182,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
             "aaData" => array(),
         );
         $no = carr::get($request, 'iDisplayStart', 0);
+
         foreach ($data as $row) {
             $arr = array();
             $no++;
@@ -200,7 +206,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                 $ori_v = "";
                 //do print from query
                 foreach ($row as $k => $v) {
-                    if ($k == $col->get_fieldname()) {
+                    if ($k == $col->getFieldname()) {
                         $col_v = $v;
                         $ori_v = $col_v;
                         foreach ($col->transforms as $trans) {
@@ -223,13 +229,13 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
                 $new_v = $col_v;
 
-                if (($table->cell_callback_func) != null) {
-                    $new_v = CDynFunction::factory($table->cell_callback_func)
-                            ->add_param($table)
-                            ->add_param($col->get_fieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($table->requires)
+                if (($table->cellCallbackFunc) != null) {
+                    $new_v = CFunction::factory($table->cellCallbackFunc)
+                            ->addArg($table)
+                            ->addArg($col->getFieldname())
+                            ->addArg($row)
+                            ->addArg($new_v)
+                            ->setRequire($table->requires)
                             ->execute();
 
                     if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
@@ -238,22 +244,27 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                     }
 
 
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                    //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
                 $class = "";
-                switch ($col->get_align()) {
-                    case "left": $class .= " align-left";
+                switch ($col->getAlign()) {
+                    case CConstant::ALIGN_LEFT:
+                        $class .= " align-left";
                         break;
-                    case "right": $class .= " align-right";
+                    case CConstant::ALIGN_RIGHT:
+                        $class .= " align-right";
                         break;
-                    case "center": $class .= " align-center";
+                    case CConstant::ALIGN_CENTER:
+                        $class .= " align-center";
                         break;
                 }
+
                 $arr[] = $new_v;
             }
-            if (count($row_action_list) > 0) {
+            if ($rowActionList != null && $rowActionList->childCount() > 0) {
+
                 $html = new CStringBuilder();
-                ;
+
                 $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
@@ -263,34 +274,34 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                     $table->getRowActionList()->add_class("pull-right");
                 }
 
-                $row_action_list->regenerateId(true);
-                $row_action_list->apply("jsparam", $jsparam);
+                $rowActionList->regenerateId(true);
+                $rowActionList->apply("setJsParam", $jsparam);
 
-                $row_action_list->apply("set_handler_url_param", $jsparam);
+                $rowActionList->apply("setHandlerUrlParam", $jsparam);
 
-                if (($table->filter_action_callback_func) != null) {
-                    $actions = $row_action_list->childs();
+                if (($table->filterActionCallbackFunc) != null) {
+                    $actions = $rowActionList->childs();
 
                     foreach ($actions as $action) {
-                        $visibility = CDynFunction::factory($table->filter_action_callback_func)
-                                ->add_param($table)
-                                ->add_param($col->get_fieldname())
-                                ->add_param($row)
-                                ->add_param($action)
-                                ->set_require($table->requires)
+                        $visibility = CFunction::factory($table->filterActionCallbackFunc)
+                                ->addArg($table)
+                                ->addArg($col->getFieldname())
+                                ->addArg($row)
+                                ->addArg($action)
+                                ->setRequire($table->requires)
                                 ->execute();
 
-                        $action->set_visibility($visibility);
+                        $action->setVisibility($visibility);
                     }
 
 
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
+                    //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
 
-                $html->appendln($row_action_list->html($html->get_indent()));
-                $js .= $row_action_list->js();
+                $html->appendln($rowActionList->html($html->get_indent()));
+                $js .= $rowActionList->js();
                 $html->dec_indent()->appendln('</td>')->br();
-                //$arr[] = '';
+
                 $arr[] = $html->text();
                 $arr["DT_RowId"] = $key;
             }

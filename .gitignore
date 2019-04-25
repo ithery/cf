@@ -10,6 +10,7 @@ application/*
 
 #ignore data domain or org
 /data/*
+/data/org/*
 
 #ignore
 /index.php
@@ -24,6 +25,8 @@ application/*
 /modules/cresenity/vendor/lib/fonts/Helvetica-Bold.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-Oblique.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-BoldOblique.afm.php
+
+/system/vendor/Cresenity
 
 #ignore folder logs
 /application/logs
@@ -53,4 +56,5 @@ __sublime_sftp_offset
 
 #SEO
 robots.txt
+botlog.log
 

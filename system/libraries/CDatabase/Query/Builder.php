@@ -1533,7 +1533,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function latest($column = 'created_at') {
+    public function latest($column = 'created') {
         return $this->orderBy($column, 'desc');
     }
 
@@ -1543,7 +1543,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function oldest($column = 'created_at') {
+    public function oldest($column = 'created') {
         return $this->orderBy($column, 'asc');
     }
 

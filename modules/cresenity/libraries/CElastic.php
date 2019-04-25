@@ -25,7 +25,7 @@ class CElastic {
     protected $hosts;
     //Client of instance
     protected $client;
-
+   
     /**
      * @var CElastic_Manager_Indices
      */
@@ -54,7 +54,7 @@ class CElastic {
         }
         if (!isset(CElastic::$instances[$domain][$name])) {
             // Create a new instance
-            CElastic::$instances[$domain][$name] = new CElastic($config === NULL ? $name : $config, $domain);
+            CElastic::$instances[$domain][$name] = new CElastic($config === NULL ? $name : $config, $name, $domain);
         }
 
         return CElastic::$instances[$domain][$name];
@@ -63,19 +63,28 @@ class CElastic {
     public function config() {
         return $this->config;
     }
+    public function getName() {
+        return $this->name;
+    }
+    public function getDomain() {
+        return $this->domain;
+    }
 
     /**
      * Sets up the elastic configuration.
      *
      * @throws  CElastic_Exception
      */
-    public function __construct($config = array(), $domain = null) {
+    public function __construct($config = array(), $name, $domain = null) {
 
         if ($domain == null) {
             $domain = CF::domain();
         }
         $load_config = true;
-
+        $this->domain = $domain;
+        $this->name = $name;
+        
+        
         if (!empty($config)) {
             if (is_array($config) AND count($config) > 0) {
                 if (!array_key_exists('connection', $config)) {

@@ -18,7 +18,7 @@ class CJob_ScheduleChecker {
         }
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $schedule);
         if ($dateTime !== false) {
-            return $dateTime->format('Y-m-d H:i') == (date('Y-m-d H:i'));
+            return strtotime($dateTime->format('Y-m-d H:i')) <= strtotime((date('Y-m-d H:i')));
         }
         return CJob_CronExpression::factory((string) $schedule)->isDue();
     }

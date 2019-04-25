@@ -95,7 +95,7 @@ class MorphToMany extends BelongsToMany
      */
     protected function baseAttachRecord($id, $timed)
     {
-        return Arr::add(
+        return carr::add(
             parent::baseAttachRecord($id, $timed), $this->morphType, $this->morphClass
         );
     }

@@ -14,8 +14,20 @@ abstract class CManager_Asset_Container implements CManager_Asset_ContainerInter
 
     protected $scripts;
 
+    /**
+     *
+     * @var array
+     */
+    protected $mediaPaths;
+
     public function __construct() {
+        
         $this->reset();
+    }
+
+    public function addMediaPath($mediaPath) {
+        $this->mediaPaths[] = $mediaPath;
+        return $this;
     }
 
     public function reset() {
@@ -28,6 +40,7 @@ abstract class CManager_Asset_Container implements CManager_Asset_ContainerInter
                 $this->scripts[$pos][$type] = array();
             }
         }
+        $this->mediaPaths = array();
     }
 
     public function registerJsInlines($jsArray, $pos = self::POS_HEAD) {
@@ -67,7 +80,7 @@ abstract class CManager_Asset_Container implements CManager_Asset_ContainerInter
         if ($pos == null) {
             return $this->scripts;
         }
-      
+
         return carr::get($this->scripts, $pos, array());
     }
 

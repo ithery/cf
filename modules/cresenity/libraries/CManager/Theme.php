@@ -34,6 +34,7 @@ class CManager_Theme {
                 $theme = 'cresenity';
             }
         }
+        
         if (self::$themeCallback != null && is_callable(self::$themeCallback)) {
             $theme = call_user_func(self::$themeCallback, $theme);
         }

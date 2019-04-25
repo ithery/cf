@@ -61,31 +61,79 @@ class carr {
     }
 
     /**
-     * Retrieve a single key from an array. If the key does not exist in the
-     * array, the default value will be returned instead.
+     * Get an item from an array using "dot" notation.
      *
-     *     // Get the value "username" from $_POST, if it exists
-     *     $username = carr::get($_POST, 'username');
-     *
-     *     // Get the value "sorting" from $_GET, if it exists
-     *     $sorting = carr::get($_GET, 'sorting');
-     *
-     * @param   array   $array      array to extract from
-     * @param   string  $key        key name
-     * @param   mixed   $default    default value
-     * @return  mixed
+     * @param  \ArrayAccess|array  $array
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
      */
     public static function get($array, $key, $default = NULL) {
         if ($array instanceof ArrayObject) {
             // This is a workaround for inconsistent implementation of isset between PHP and HHVM
             // See https://github.com/facebook/hhvm/issues/3437
             return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
-        } else {
-            if (is_object($array) && !($array instanceof ArrayAccess)) {
-                throw new CException('error passing variable object as array');
-            }
-            return isset($array[$key]) ? $array[$key] : $default;
         }
+        if (!static::accessible($array)) {
+            return CF::value($default);
+        }
+
+        if (is_null($key)) {
+            return $array;
+        }
+
+        if (static::exists($array, $key)) {
+            return $array[$key];
+        }
+
+        if (strpos($key, '.') === false) {
+            return isset($array[$key]) ? $array[$key] : CF::value($default);
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (static::accessible($array) && static::exists($array, $segment)) {
+                $array = $array[$segment];
+            } else {
+                return CF::value($default);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Set an array item to a given value using "dot" notation.
+     *
+     * If no key is given to the method, the entire array will be replaced.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return array
+     */
+    public static function set(&$array, $key, $value) {
+        if (is_null($key)) {
+            return $array = $value;
+        }
+
+        $keys = explode('.', $key);
+
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+
+            // If the key doesn't exist at this depth, we will just create an empty array
+            // to hold the next value, allowing us to create the arrays to hold final
+            // values at the correct depth. Then we'll keep digging into the array.
+            if (!isset($array[$key]) || !is_array($array[$key])) {
+                $array[$key] = [];
+            }
+
+            $array = &$array[$key];
+        }
+
+        $array[array_shift($keys)] = $value;
+
+        return $array;
     }
 
     /**
@@ -856,6 +904,11 @@ class carr {
         }
 
         return $results;
+    }
+
+    public static function hash(array $array) {
+        array_multisort($array);
+        return md5(json_encode($array));
     }
 
 }

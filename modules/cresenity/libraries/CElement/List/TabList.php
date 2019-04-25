@@ -1,0 +1,308 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Apr 14, 2019, 7:10:42 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+class CElement_List_TabList extends CElement_List {
+
+    use CTrait_Compat_Element_TabList;
+
+    protected $tabs;
+    protected $tabPosition;
+    protected $activeTab;
+    protected $ajax;
+    protected $haveIcon;
+    protected $widgetClass;
+
+    public function __construct($id) {
+        parent::__construct($id);
+
+        $this->tabPosition = "left";
+        $this->activeTab = "";
+        $this->ajax = true;
+        $this->haveIcon = false;
+        $this->tabs = array();
+        $this->widgetClass = array();
+    }
+
+    public static function factory($id) {
+        return new CElement_List_TabList($id);
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_List_TabList_Tab
+     */
+    public function addTab($id = "") {
+        $tab = CElement_List_TabList_Tab::factory($id);
+        if (strlen($this->activeTab) == 0) {
+            $this->activeTab = $tab->id();
+        }
+        $this->tabs[] = $tab;
+        return $tab;
+    }
+
+    public function setActiveTab($tabId) {
+        $this->activeTab = $tabId;
+        return $this;
+    }
+
+    public function setAjax($bool = true) {
+        $this->ajax = $bool;
+        return $this;
+    }
+
+    public function setTabPosition($tabPosition) {
+        $this->tabPosition = $tabPosition;
+        return $this;
+    }
+
+    public function addWidgetClass($class) {
+        if (is_array($class)) {
+            $this->widgetClass = array_merge($class, $this->widgetClass);
+        } else {
+            $this->widgetClass[] = $class;
+        }
+        return $this;
+    }
+
+    public function html($indent = 0) {
+
+
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+        $ajax_class = "";
+        if ($this->ajax) {
+            $ajax_class = "ajax";
+            //we create the ajax url if there are no url on tab
+        } else {
+            foreach ($this->tabs as $tab) {
+                $tab->set_ajax(false);
+            }
+        }
+
+        $classes = $this->classes;
+        $classes = implode(" ", $classes);
+        if (strlen($classes) > 0) {
+            $classes = " " . $classes;
+        }
+        $classes .= ' ' . $ajax_class;
+
+        $widgetClasses = $this->widgetClass;
+        $widgetClasses = implode(" ", $widgetClasses);
+        if (strlen($widgetClasses) > 0) {
+            $widgetClasses = " " . $widgetClasses;
+        }
+        if ($this->bootstrap >= '3') {
+            $html->appendln('<div class="row tab-list' . $classes . '" id="' . $this->id . '">');
+            $html->appendln('   <div class="col-md-12">');
+
+            $html->appendln('       <div class="row">');
+            if ($this->tabPosition == 'top') {
+                $html->appendln('           <div class="row-tab-menu">');
+            } else {
+                $html->appendln('           <div class="col-md-2">');
+            }
+        } else {
+            $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
+            $html->appendln('	<div class="span12">');
+
+            $html->appendln('		<div class="row-fluid">');
+            if ($this->tabPosition == 'top') {
+                $html->appendln('           <div class="row-tab-menu">');
+            } else {
+                $html->appendln('			<div class="span2">');
+            }
+        }
+        if ($this->tabPosition == 'top') {
+            $html->appendln('               <div class="top-nav-container">');
+        } else {
+            $html->appendln('				<div class="side-nav-container affix-top">');
+        }
+
+        if ($this->bootstrap >= '3') {
+            $html->appendln('                                       <ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
+        } else {
+            $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
+        }
+
+        $activeTab = null;
+        foreach ($this->tabs as $tab) {
+            if (strlen($this->activeTab) == 0) {
+                $this->activeTab($tab->id);
+            }
+            if ($tab->id == $this->activeTab) {
+                $tab->setActive(true);
+                $activeTab = $tab;
+            }
+            $tab->setTarget('' . $this->id . '-ajax-tab-content');
+
+            $html->appendln($tab->headerHtml($html->get_indent()));
+        }
+        $activeTab_icon = "";
+        $activeTab_label = "";
+
+        if ($activeTab != null) {
+            $activeTab_icon = $activeTab->getIcon();
+            $activeTab_label = $activeTab->getLabel();
+
+            if (strlen($activeTab->getAjaxUrl()) > 0) {
+                $tab_ajax_url = $activeTab->getAjaxUrl();
+
+                /*
+                  $url_base = curl::base();
+                  if(substr($tab_ajax_url,0,strlen($url_base)) == $url_base) {
+                  $tab_ajax_url = substr($tab_ajax_url,strlen($url_base));
+                  }
+                  $tab_ajax_url = curl::base(true,'http').$tab_ajax_url;
+                 */
+                //$activeTab_content = CCurl::factory($tab_ajax_url)->exec()->response();
+            }
+        }
+        $html->appendln('					</ul>');
+        $html->appendln('				</div>');
+        $html->appendln('			</div>');
+        if ($this->bootstrap >= '3') {
+            if ($this->tabPosition == 'top') {
+                $html->appendln('           <div class="row-tab-content">');
+            } else {
+                $html->appendln('			<div class="col-md-10">');
+            }
+        } else {
+            if ($this->tabPosition == 'top') {
+                $html->appendln('           <div class="row-tab-content">');
+            } else {
+                $html->appendln('           <div class="span10">');
+            }
+        }
+        if ($this->bootstrap >= '3') {
+            $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' . $widgetClasses . '">');
+            $html->appendln('                   <div class="box-header with-border">');
+        } else {
+            $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widgetClasses . '">');
+            if ($this->tabPosition != 'top') {
+                $html->appendln('					<div class="widget-title">');
+            }
+        }
+
+        if ($this->tabPosition != 'top') {
+            if ($this->haveIcon) {
+                $html->appendln('						<span class="icon">');
+                $html->appendln('							<i class="icon-' . $activeTab_icon . '"></i>');
+                $html->appendln('						</span>');
+            }
+            //$html->appendln('						<h5>' . $activeTab_label . '</h5>');
+            $html->appendln('					</div>');
+        }
+
+        if ($this->bootstrap >= '3') {
+            $html->appendln('                                       <div class="box-body">');
+        } else {
+            $html->appendln('					<div class="widget-content">');
+        }
+
+        if ($this->ajax) {
+            $html->appendln('						<div id="' . $this->id . '-ajax-tab-content">');
+            $html->appendln('						</div>');
+        } else {
+            foreach ($this->tabs as $tab) {
+                $html->appendln($tab->html($html->get_indent()));
+            }
+        }
+
+        if ($this->bootstrap >= '3') {
+            $html->appendln('					</div>');
+        }
+        $html->appendln('					</div>');
+        $html->appendln('				</div>');
+        $html->appendln('			</div>');
+        $html->appendln('		</div>');
+        $html->appendln('	</div>');
+        $html->appendln('</div>');
+
+        return $html->text();
+    }
+
+    public function js($indent = 0) {
+
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
+        foreach ($this->tabs as $tab) {
+            $js->appendln($tab->js($js->getIndent()));
+        }
+        $js->appendln("
+			
+			jQuery('#" . $this->id . " #" . $this->id . "-tab-nav > li > a.tab-ajax-load').click(function(event) {
+				event.preventDefault();
+				var target = jQuery(this).attr('data-target');
+				var url = jQuery(this).attr('data-url');
+				var method = jQuery(this).attr('data-method');
+				if(!method) method='get';
+				var pare = jQuery(this).parent();
+		
+				if(pare.prop('tagName')=='LI') {
+                                       
+					pare.parent().children().removeClass('active');
+					pare.addClass('active');
+                                        pare.parent().find('> li > a').removeClass('active');
+					pare.find('> a').addClass('active');
+				}
+				jQuery(this).parent().children().removeClass('active');
+				jQuery(this).addClass('active');
+                               
+                                jQuery(this).parent().find('> li > a').removeClass('active');
+                                jQuery(this).find('> a').addClass('active');
+				var widget_tab = jQuery('#" . $this->id . "-tab-widget');
+				if(widget_tab.length>0) {
+					
+					
+					
+					var data_icon = jQuery(this).attr('data-icon');
+					var data_class = jQuery(this).attr('data-class');
+					var data_text = jQuery(this).text();
+					if(data_icon) widget_tab.find('.widget-title .icon i').first().attr('class',data_icon);
+					
+					if(data_text) widget_tab.find('.widget-title h5').first().html(data_text);
+					var widget_content = widget_tab.find('.widget-content').first();
+					widget_content.removeAttr('class').addClass('widget-content');
+					
+					if(data_class) widget_content.addClass(data_class);
+				}
+				
+				if(jQuery('#" . $this->id . "').hasClass('ajax')) {
+					$.cresenity.reload(target,url,method);
+				} 
+                                else {
+					var tab_id = jQuery(this).attr('data-tab');
+					jQuery('#'+tab_id).parent().children().hide();
+					jQuery('#'+tab_id).show();
+				}
+				
+			});
+		
+		");
+
+
+        $js->appendln("
+                        //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
+			jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
+                        if(!jQuery('#" . $this->id . "').hasClass('ajax')) {
+                            setTimeout(function() {
+                                //console.log('BB');
+                                //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
+
+                                jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
+                            },500);
+                        }
+			
+		");
+
+        return $js->text();
+    }
+
+}

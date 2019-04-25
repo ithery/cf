@@ -8,6 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CElement_Component_Nestable extends CElement_Component {
+
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
 
@@ -17,8 +18,8 @@ class CElement_Component_Nestable extends CElement_Component {
     protected $applyjs;
     protected $input;
     protected $action_style;
-    protected $display_callback;
-    protected $filter_action_callback_func;
+    protected $displayCallbackFunc;
+    protected $filterActionCallbackFunc;
     protected $requires;
     protected $checkbox;
     protected $disable_dnd;
@@ -34,8 +35,8 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->action_style = 'btn-icon-group';
         $this->rowActionList->setStyle('btn-icon-group');
-        $this->display_callback = false;
-        $this->filter_action_callback_func = "";
+        $this->displayCallbackFunc = false;
+        $this->filterActionCallbackFunc = "";
         $this->checkbox = false;
         $this->requires = array();
         $this->js_cell = '';
@@ -45,24 +46,59 @@ class CElement_Component_Nestable extends CElement_Component {
         return new CElement_Component_Nestable($id);
     }
 
-    public function display_callback_func($func, $require = "") {
-        $this->display_callback = $func;
+    public function displayCallbackFunc($func, $require = "") {
+        $this->displayCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
         return $this;
     }
 
-    public function filter_action_callback_func($func, $require = "") {
-        $this->filter_action_callback_func = $func;
+    public function filterActionCallbackFunc($func, $require = "") {
+        $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
         return $this;
     }
 
-    public function setDataFromTreeDb($treedb, $parent_id = null) {
-        $this->data = $treedb->get_children_data($parent_id);
+    public function setDataFromTreeDb(CTreeDB $treedb, $parentId = null) {
+        $this->data = $treedb->getChildrenData($parentId);
+        return $this;
+    }
+
+    public function setDataFromModel(CModel $root) {
+        /**
+         * NOT DONE
+         */
+
+        $orgId = CApp_Base::orgId();
+
+        $root = $root->descendants();
+        if (strlen($orgId) > 0) {
+            $root = $root->where(function($query) use ($orgId) {
+                        $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
+                    })->where('status', '>', 0);
+        }
+
+        $tree = $root->get()->toTree();
+        $childArray = array();
+
+
+        $traverse = function ($nodes) use (&$traverse, &$childArray) {
+            foreach ($nodes as $node) {
+                if ($node->status == 0) {
+                    continue;
+                }
+                $childArray[] = $node->toArray();
+                $traverse($node->getChildren);
+            }
+        };
+
+        $traverse($tree);
+
+
+        $this->data = $childArray;
         return $this;
     }
 
@@ -71,28 +107,28 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
-    public function set_id_key($id_key) {
-        $this->id_key = $id_key;
+    public function setIdKey($idKey) {
+        $this->id_key = $idKey;
         return $this;
     }
 
-    public function set_disable_dnd($disable_dnd) {
-        $this->disable_dnd = $disable_dnd;
+    public function setDisableDnd($disableDnd) {
+        $this->disable_dnd = $disableDnd;
         return $this;
     }
 
-    public function set_have_checkbox($checkbox) {
+    public function setHaveCheckbox($checkbox) {
         $this->checkbox = $checkbox;
         return $this;
     }
 
-    public function set_input($input) {
+    public function setInput($input) {
         $this->input = $input;
         return $this;
     }
 
-    public function set_value_key($value_key) {
-        $this->value_key = $value_key;
+    public function setValueKey($valueKey) {
+        $this->value_key = $valueKey;
         return $this;
     }
 
@@ -103,7 +139,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
 
         $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->inc_indent();
         if (count($this->data) > 0) {
@@ -111,65 +147,66 @@ class CElement_Component_Nestable extends CElement_Component {
             $depth_before = -1;
             $in = 0;
             foreach ($this->data as $d) {
+
                 $depth = $d['depth'];
                 if ($depth_before >= $depth) {
-                    $html->dec_indent()->appendln('</li>');
+                    $html->decIndent()->appendln('</li>');
                 }
                 if ($depth_before > $depth) {
                     $range_depth = $depth_before - $depth;
                     for ($i = 0; $i < $range_depth; $i++) {
                         $in--;
-                        $html->dec_indent()->appendln('</ol>');
+                        $html->decIndent()->appendln('</ol>');
                     }
                 }
                 if ($depth_before < $depth) {
                     $in++;
-                    $html->appendln('<ol class="dd-list">')->inc_indent();
+                    $html->appendln('<ol class="dd-list">')->incIndent();
                 }
                 $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->inc_indent();
 
-                $html->appendln('<div class="dd-handle">')->inc_indent();
+                $html->appendln('<div class="dd-handle">')->incIndent();
                 if ($this->checkbox) {
                     $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d["parent_id"] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->inc_indent();
                 }
-                $val = $d[$this->value_key];
-                $new_v = $val;
-                if ($this->display_callback !== false && is_callable($this->display_callback)) {
-                    $new_v = CDynFunction::factory($this->display_callback)
-                            ->add_param($this)
-                            ->add_param($d)
-                            ->add_param($val)
-                            ->set_require($this->requires)
+                $val = carr::get($d, $this->value_key);
+                $newV = $val;
+                if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
+                    $newV = CFunction::factory($this->displayCallbackFunc)
+                            ->addArg($this)
+                            ->addArg($d)
+                            ->addArg($val)
+                            ->setRequire($this->requires)
                             ->execute();
                 }
-                $html->appendln($new_v);
-                $html->dec_indent()->appendln('</div>');
-                if ($this->have_action()) {
+                $html->appendln($newV);
+                $html->decIndent()->appendln('</div>');
+                if ($this->haveRowAction()) {
 
                     foreach ($d as $k => $v) {
                         $jsparam[$k] = $v;
                     }
-                    $jsparam["param1"] = $d[$this->id_key];
-                    $this->rowActionList->add_class("pull-right");
+                    $jsparam["param1"] = carr::get($d,$this->id_key);
+                    $this->rowActionList->addClass("pull-right");
                     if ($this->action_style == "btn-dropdown") {
-                        $this->rowActionList->add_class("pull-right");
+                        $this->rowActionList->addClass("pull-right");
                     }
                     $this->rowActionList->regenerateId(true);
                     $this->rowActionList->apply("jsparam", $jsparam);
                     $this->rowActionList->apply("set_handler_url_param", $jsparam);
 
-                    if (($this->filter_action_callback_func) != null) {
+                    if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
 
                         foreach ($actions as $action) {
-                            $visibility = CDynFunction::factory($this->filter_action_callback_func)
-                                    ->add_param($this)
-                                    ->add_param($d)
-                                    ->add_param($action)
-                                    ->set_require($this->requires)
+                            $visibility = CFunction::factory($this->filterActionCallbackFunc)
+                                    ->addArg($this)
+                                    ->addArg($d)
+                                    ->addArg($action)
+                                    ->setRequire($this->requires)
                                     ->execute();
 
-                            $action->set_visibility($visibility);
+                            $action->setVisibility($visibility);
                         }
                     }
 
@@ -181,35 +218,13 @@ class CElement_Component_Nestable extends CElement_Component {
                 $depth_before = $depth;
             }
             for ($i = 0; $i < $in; $i++) {
-                $html->dec_indent()->appendln('</li>');
-                $html->dec_indent()->appendln('</ol>');
+                $html->decIndent()->appendln('</li>');
+                $html->decIndent()->appendln('</ol>');
             }
         }
-        $html->dec_indent()->appendln('</div>');
+        $html->decIndent()->appendln('</div>');
         return $html->text();
-        /*
-          <div class="dd">
-          <ol class="dd-list">
-          <li class="dd-item" data-id="1">
-          <div class="dd-handle">Item 1</div>
-          </li>
-          <li class="dd-item" data-id="2">
-          <div class="dd-handle">Item 2</div>
-          </li>
-          <li class="dd-item" data-id="3">
-          <div class="dd-handle">Item 3</div>
-          <ol class="dd-list">
-          <li class="dd-item" data-id="4">
-          <div class="dd-handle">Item 4</div>
-          </li>
-          <li class="dd-item" data-id="5">
-          <div class="dd-handle">Item 5</div>
-          </li>
-          </ol>
-          </li>
-          </ol>
-          </div>
-         */
+      
     }
 
     public function js($indent = 0) {
@@ -224,14 +239,14 @@ class CElement_Component_Nestable extends CElement_Component {
                         /* config options */
                         maxDepth:0
                     });
-                ")->inc_indent();
+                ")->incIndent();
             } else {
                 $js->appendln("
                     jQuery('#" . $this->id . "').nestable({
                         /* config options */
                         maxDepth:100
                     });
-                ")->inc_indent();
+                ")->incIndent();
             }
             if (strlen($this->input) > 0) {
                 $js->appendln("
@@ -257,7 +272,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
         $js->append($this->js_cell)->br();
 
-        $js->append($this->js_child($indent))->br();
+        $js->append($this->jsChild($indent))->br();
         return $js->text();
     }
 
