@@ -286,6 +286,9 @@ class CFRouter {
             }
         } elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'] AND $_SERVER['ORIG_PATH_INFO'] != '/403.shtml') {
             $current_uri = $_SERVER['ORIG_PATH_INFO'];
+        } elseif (isset($_SERVER['REQUEST_URI']) AND $_SERVER['REQUEST_URI']) {
+            $current_uri = $_SERVER['REQUEST_URI'];
+            $current_uri=strtok($current_uri,'?');
         } elseif (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF']) {
             $current_uri = $_SERVER['PHP_SELF'];
         }
