@@ -56,9 +56,12 @@ trait CApp_Trait_Template {
     }
 
     public function setData($data) {
-        foreach ($data as $k => $v) {
-            $this->setVar($k, $v);
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                $this->setVar($k, $v);
+            }
         }
+
         return $this;
     }
 
