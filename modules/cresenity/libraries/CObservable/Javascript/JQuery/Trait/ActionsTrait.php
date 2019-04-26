@@ -130,5 +130,11 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         $this->resetJQueryStatement();
         return $this;
     }
+    
+    public function toggle() {
+        $this->jQueryStatement()->toggle();
+        $this->resetJQueryStatement();
+        return $this;
+    }
 
 }
