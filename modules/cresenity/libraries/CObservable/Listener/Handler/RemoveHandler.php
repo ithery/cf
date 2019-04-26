@@ -9,13 +9,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_RemoveHandler extends CObservable_Listener_Handler {
 
-    use CObservable_Listener_Handler_Trait_TargetHandlerTrait;
+    use CTrait_Compat_Handler_Driver_Remove,
+        CObservable_Listener_Handler_Trait_TargetHandlerTrait;
 
     protected $parent;
 
     public function __construct($listener) {
         parent::__construct($listener);
-
+        $this->target = $this->owner;
         $this->name = 'Remove';
         $this->parent = '';
     }

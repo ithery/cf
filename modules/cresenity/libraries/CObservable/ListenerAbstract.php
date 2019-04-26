@@ -82,6 +82,9 @@ abstract class CObservable_ListenerAbstract {
             case 'ajaxSubmit':
                 $handler = new CObservable_Listener_Handler_AjaxSubmitHandler($this);
                 break;
+            case 'remove':
+                $handler = new CObservable_Listener_Handler_RemoveHandler($this);
+                break;
             case 'custom':
                 $handler = new CObservable_Listener_Handler_CustomHandler($this);
                 break;

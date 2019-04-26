@@ -45,4 +45,9 @@ trait CObservable_Listener_Trait_HandlerTrait {
         return $handler;
     }
 
+    public function addRemoveHandler() {
+        $handler = new CObservable_Listener_Handler_RemoveHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
 }
