@@ -432,7 +432,7 @@ trait CModel_HasResource_HasResourceTrait {
         }
     }
 
-    public function registerResourceConversions(Resource $resource = null) {
+    public function registerResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null) {
         
     }
 
@@ -440,9 +440,9 @@ trait CModel_HasResource_HasResourceTrait {
         
     }
 
-    public function registerAllResourceConversions(Resource $resource = null) {
+    public function registerAllResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null) {
         $this->registerResourceCollections();
-        collect($this->resourceCollections)->each(function (ResourceCollection $resourceCollection) use ($resource) {
+        CF::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
             $actualResourceConversions = $this->resourceConversions;
             $this->resourceConversions = [];
             call_user_func_array(array($resourceCollection, 'resourceConversionRegistrations'), array($resource));

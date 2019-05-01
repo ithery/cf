@@ -8,7 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
-/** @mixin \Spatie\Image\Manipulations */
+/** @mixin CImage_Manipulations */
 class CResources_Conversion {
 
     /** @var string */
@@ -17,7 +17,7 @@ class CResources_Conversion {
     /** @var int */
     protected $extractVideoFrameAtSecond = 0;
 
-    /** @var \Spatie\Image\Manipulations */
+    /** @var CImage_Manipulations */
     protected $manipulations;
 
     /** @var array */
@@ -70,6 +70,10 @@ class CResources_Conversion {
         return $this->keepOriginalImageFormat;
     }
 
+    /**
+     * 
+     * @return CImage_Manipulations
+     */
     public function getManipulations() {
         return $this->manipulations;
     }
@@ -95,7 +99,7 @@ class CResources_Conversion {
     /**
      * Set the manipulations for this conversion.
      *
-     * @param \Spatie\Image\Manipulations|closure $manipulations
+     * @param CImage_Manipulations|closure $manipulations
      *
      * @return $this
      */
@@ -116,7 +120,7 @@ class CResources_Conversion {
      *
      * @return $this
      */
-    public function addAsFirstManipulations(Manipulations $manipulations) {
+    public function addAsFirstManipulations(CImage_Manipulations $manipulations) {
         $manipulationSequence = $manipulations->getManipulationSequence()->toArray();
         $this->manipulations
                 ->getManipulationSequence()

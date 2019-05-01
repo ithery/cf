@@ -99,7 +99,7 @@ interface CModel_HasResourceInterface {
      * Register the resource conversions.
      */
 
-    public function registerResourceConversions(Resource $resource = null);
+    public function registerResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null);
     /*
      * Register the resource collections.
      */

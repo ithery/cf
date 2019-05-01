@@ -17,7 +17,7 @@ class CResources_FileManipulator {
      * @param bool $onlyIfMissing
      */
     public function createDerivedFiles(CApp_Model_Interface_ResourceInterface $resource, array $only = [], $onlyIfMissing = false) {
-        $profileCollection = ConversionCollection::createForResource($resource);
+        $profileCollection = CResources_ConversionCollection::createForResource($resource);
         if (!empty($only)) {
             $profileCollection = $profileCollection->filter(function ($collection) use ($only) {
                 return in_array($collection->getName(), $only);
@@ -36,10 +36,10 @@ class CResources_FileManipulator {
      * Perform the given conversions for the given resource.
      *
      * @param \Spatie\ResourceLibrary\Conversion\ConversionCollection $conversions
-     * @param \Spatie\ResourceLibrary\Models\Resource $resource
+     * @param CApp_Model_Interface_ResourceInterface $resource
      * @param bool $onlyIfMissing
      */
-    public function performConversions(ConversionCollection $conversions, Resource $resource, $onlyIfMissing = false) {
+    public function performConversions(ConversionCollection $conversions, CApp_Model_Interface_ResourceInterface $resource, $onlyIfMissing = false) {
         if ($conversions->isEmpty()) {
             return;
         }
@@ -80,7 +80,7 @@ class CResources_FileManipulator {
         $temporaryDirectory->delete();
     }
 
-    public function performManipulations(Resource $resource, Conversion $conversion, string $imageFile): string {
+    public function performManipulations(CApp_Model_Interface_ResourceInterface $resource, Conversion $conversion, $imageFile) {
         if ($conversion->getManipulations()->isEmpty()) {
             return $imageFile;
         }
@@ -109,13 +109,13 @@ class CResources_FileManipulator {
     }
 
     /**
-     * @param \Spatie\ResourceLibrary\Models\Resource $resource
+     * @param CApp_Model_Interface_ResourceInterface $resource
      *
      * @return \Spatie\ResourceLibrary\ImageGenerators\ImageGenerator|null
      */
-    public function determineImageGenerator(Resource $resource) {
+    public function determineImageGenerator(CApp_Model_Interface_ResourceInterface $resource) {
         return $resource->getImageGenerators()
-                        ->map(function (string $imageGeneratorClassName) {
+                        ->map(function ( $imageGeneratorClassName) {
                             return app($imageGeneratorClassName);
                         })
                         ->first(function (ImageGenerator $imageGenerator) use ($resource) {
