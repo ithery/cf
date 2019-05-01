@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CResources_Factory {
 
+    /**
+     * 
+     * @return CResources_PathGenerator
+     */
     public static function createPathGenerator() {
         $pathGeneratorClass = CResources_PathGenerator::class;
         $customPathClass = CF::config('resource.path_generator');
@@ -19,6 +23,19 @@ class CResources_Factory {
         return new $pathGeneratorClass();
     }
 
+    /**
+     * 
+     * @return \CResources_FileManipulator
+     */
+    public static function createFileManipulator() {
+        return new CResources_FileManipulator();
+    }
+
+    /**
+     * 
+     * @param string $pathGeneratorClass
+     * @throws CResources_Exception_InvalidPathGenerator
+     */
     protected static function guardAgainstInvalidPathGenerator($pathGeneratorClass) {
         if (!class_exists($pathGeneratorClass)) {
             throw CResources_Exception_InvalidPathGenerator::doesntExist($pathGeneratorClass);
