@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since May 1, 2019, 11:37:14 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_Model_Resource extends CApp_Model implements CInterface_Responsable, CInterface_Htmlable {
+class CApp_Model_Resource extends CApp_Model implements CApp_Model_Interface_ResourceInterface {
 
     use CApp_Model_Trait_Resource;
 
