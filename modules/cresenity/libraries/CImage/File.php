@@ -24,7 +24,7 @@ class CImage_File {
      *
      * @return static
      */
-    public static function load(string $pathToImage) {
+    public static function load($pathToImage) {
         return new static($pathToImage);
     }
 
@@ -33,7 +33,7 @@ class CImage_File {
         return $this;
     }
 
-    public function __construct(string $pathToImage) {
+    public function __construct($pathToImage) {
         $this->pathToImage = $pathToImage;
         $this->manipulations = new Manipulations();
     }
@@ -45,7 +45,7 @@ class CImage_File {
      *
      * @throws InvalidImageDriver
      */
-    public function useImageDriver(string $imageDriver) {
+    public function useImageDriver($imageDriver) {
         if (!in_array($imageDriver, ['gd', 'imagick'])) {
             throw InvalidImageDriver::driver($imageDriver);
         }
@@ -116,7 +116,7 @@ class CImage_File {
     protected function performOptimization($path, array $optimizerChainConfiguration) {
         $optimizerChain = OptimizerChainFactory::create();
         if (count($optimizerChainConfiguration)) {
-            $optimizers = array_map(function (array $optimizerOptions,  $optimizerClassName) {
+            $optimizers = array_map(function (array $optimizerOptions, $optimizerClassName) {
                 return (new $optimizerClassName)->setOptions($optimizerOptions);
             }, $optimizerChainConfiguration, array_keys($optimizerChainConfiguration));
             $optimizerChain->setOptimizers($optimizers);

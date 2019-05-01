@@ -20,4 +20,5 @@ class CImage {
         return new CImage_Avatar($engineName);
     }
 
+    
 }
