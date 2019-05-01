@@ -12,6 +12,15 @@ class COptional {
     use CTrait_Macroable {
         __call as macroCall;
     }
+    
+    /**
+     * 
+     * @param mixed $value
+     * @return COptional
+     */
+    public static function create($value) {
+        return new static($value);
+    }
 
     /**
      * The underlying object.
