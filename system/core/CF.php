@@ -1958,7 +1958,7 @@ final class CF {
             if (self::$data[$domain] == null) {
                 //try to locate wildcard subdomain
                 $wildcardDomain = implode('.', array('$') + array_slice(explode('.', $domain), 0));
-               
+
                 self::$data[$domain] = CFData::domain($wildcardDomain);
             }
         }
@@ -2434,6 +2434,42 @@ class CF_404_Exception extends CF_Exception {
     public function send_headers() {
         // Send the 404 header
         header('HTTP/1.1 404 File Not Found');
+    }
+
+    /**
+     * Determine if a value is "filled".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function filled($value) {
+        return !static::blank($value);
+    }
+
+    /**
+     * Determine if the given value is "blank".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function blank($value) {
+        if (is_null($value)) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Countable) {
+            return count($value) === 0;
+        }
+
+        return empty($value);
     }
 
 }
