@@ -65,7 +65,7 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      * @param  CModel  $model
      * @return CModel
      */
-    public function save(Model $model) {
+    public function save(CModel $model) {
         $model->setAttribute($this->getMorphType(), $this->morphClass);
 
         return parent::save($model);
@@ -77,7 +77,7 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      * @param  CModel  $model
      * @return void
      */
-    protected function setForeignAttributesForCreate(Model $model) {
+    protected function setForeignAttributesForCreate(CModel $model) {
         $model->{$this->getForeignKeyName()} = $this->getParentKey();
 
         $model->{$this->getMorphType()} = $this->morphClass;
@@ -112,7 +112,7 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      * @return string
      */
     public function getMorphType() {
-        return last(explode('.', $this->morphType));
+        return carr::last(explode('.', $this->morphType));
     }
 
     /**
