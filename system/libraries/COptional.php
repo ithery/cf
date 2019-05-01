@@ -68,4 +68,21 @@ class COptional {
         }
     }
 
+    /**
+     * Dynamically pass a method to the underlying object.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public static function __callStatic($method, $parameters) {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        if (is_object($this->value)) {
+            return $this->value->{$method}(...$parameters);
+        }
+    }
+
 }

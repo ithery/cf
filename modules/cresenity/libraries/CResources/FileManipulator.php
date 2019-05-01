@@ -35,11 +35,11 @@ class CResources_FileManipulator {
     /**
      * Perform the given conversions for the given resource.
      *
-     * @param \Spatie\ResourceLibrary\Conversion\ConversionCollection $conversions
+     * @param CResources_ConversionCollection $conversions
      * @param CApp_Model_Interface_ResourceInterface $resource
      * @param bool $onlyIfMissing
      */
-    public function performConversions(ConversionCollection $conversions, CApp_Model_Interface_ResourceInterface $resource, $onlyIfMissing = false) {
+    public function performConversions(CResources_ConversionCollection $conversions, CApp_Model_Interface_ResourceInterface $resource, $onlyIfMissing = false) {
         if ($conversions->isEmpty()) {
             return;
         }

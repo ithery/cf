@@ -37,7 +37,7 @@ class CResources_PathGenerator implements CResources_PathGeneratorInterface {
      */
 
     protected function getBasePath(CApp_Model_Interface_ResourceInterface $resource) {
-        return $resource->getKey();
+        return $resource->model_type.'/'.$resource->getKey();
     }
 
 }

@@ -165,8 +165,9 @@ class CModel_HasResource_FileAdder_FileAdder {
     }
 
     public function toResourceCollection($collectionName = 'default', $diskName = '') {
+       
         if (!is_file($this->pathToFile)) {
-            throw FileDoesNotExist::create($this->pathToFile);
+            throw CResources_Exception_FileCannotBeAdded_FileDoesNotExist::create($this->pathToFile);
         }
         $maxFileSize = CF::config('resource.max_file_size');
         if ($maxFileSize !== null) {
@@ -251,7 +252,7 @@ class CModel_HasResource_FileAdder_FileAdder {
             }
             dispatch($job);
         }
-        if (optional($this->getResourceCollection($resource->collection_name))->singleFile) {
+        if (COptional::create($this->getResourceCollection($resource->collection_name))->singleFile) {
             $model->clearResourceCollectionExcept($resource->collection_name, $resource);
         }
     }
@@ -259,7 +260,7 @@ class CModel_HasResource_FileAdder_FileAdder {
     protected function getResourceCollection($collectionName) {
         $this->subject->registerResourceCollections();
         return CF::collect($this->subject->resourceCollections)
-                        ->first(function (ResourceCollection $collection) use ($collectionName) {
+                        ->first(function (CResources_ResourceCollection $collection) use ($collectionName) {
                             return $collection->name === $collectionName;
                         });
     }
