@@ -97,6 +97,9 @@ class CApp_Model_Resource extends CApp_Model implements CApp_Model_Interface_Res
     }
 
     public function getDiskDriverName() {
+        if(strlen($this->disk)==0) {
+            return 'local';
+        }
         return strtolower(config("filesystems.disks.{$this->disk}.driver"));
     }
 
