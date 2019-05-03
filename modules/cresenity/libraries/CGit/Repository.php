@@ -476,10 +476,10 @@ class CGit_Repository {
      *
      * @param  string $tree Folder that will be parsed
      *
-     * @return Tree   Instance of Tree for the provided folder
+     * @return CGit_Model_Tree   Instance of Tree for the provided folder
      */
     public function getTree($tree) {
-        $tree = new Tree($tree, $this);
+        $tree = new CGit_Model_Tree($tree, $this);
         $tree->parse();
         return $tree;
     }
@@ -489,10 +489,10 @@ class CGit_Repository {
      *
      * @param  string $blob File that will be parsed
      *
-     * @return Blob   Instance of Blob for the provided file
+     * @return CGit_Model_Blob   Instance of Blob for the provided file
      */
     public function getBlob($blob) {
-        return new Blob($blob, $this);
+        return new CGit_Model_Blob($blob, $this);
     }
 
     /**
