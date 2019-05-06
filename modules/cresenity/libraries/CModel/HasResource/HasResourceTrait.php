@@ -186,7 +186,9 @@ trait CModel_HasResource_HasResourceTrait {
      * @return CCollection
      */
     public function getResource($collectionName = 'default', $filters = []) {
-        return app(ResourceRepository::class)->getCollection($this, $collectionName, $filters);
+        $repository = new CResources_Repository();
+        
+        return $repository->getCollection($this, $collectionName, $filters);
     }
 
     public function getFirstResource($collectionName = 'default', array $filters = []) {
@@ -302,15 +304,15 @@ trait CModel_HasResource_HasResourceTrait {
      * @return $this
      */
     public function clearResourceCollectionExcept($collectionName = 'default', $excludedResource = []) {
-        if ($excludedResource instanceof Resource) {
-            $excludedResource = collect()->push($excludedResource);
+        if ($excludedResource instanceof CApp_Model_Interface_ResourceInterface) {
+            $excludedResource = CF::collect()->push($excludedResource);
         }
-        $excludedResource = collect($excludedResource);
+        $excludedResource = CF::collect($excludedResource);
         if ($excludedResource->isEmpty()) {
             return $this->clearResourceCollection($collectionName);
         }
         $this->getResource($collectionName)
-                ->reject(function (Resource $resource) use ($excludedResource) {
+                ->reject(function (CApp_Model_Interface_ResourceInterface $resource) use ($excludedResource) {
                     return $excludedResource->where('id', $resource->id)->count();
                 })
         ->each->delete();
@@ -329,7 +331,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @throws \Spatie\ResourceLibrary\Exceptions\ResourceCannotBeDeleted
      */
     public function deleteResource($resourceId) {
-        if ($resourceId instanceof Resource) {
+        if ($resourceId instanceof CApp_Model_Interface_ResourceInterface) {
             $resourceId = $resourceId->id;
         }
         $resource = $this->resource->find($resourceId);
@@ -386,9 +388,9 @@ trait CModel_HasResource_HasResourceTrait {
      * @return mixed
      */
     public function loadResource($collectionName) {
-        $collection = $this->exists ? $this->resource : collect($this->unAttachedResourceLibraryItems)->pluck('resource');
+        $collection = $this->exists ? $this->resource : CF::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
         return $collection
-                        ->filter(function (Resource $resourceItem) use ($collectionName) {
+                        ->filter(function (CApp_Model_Interface_ResourceInterface $resourceItem) use ($collectionName) {
                             if ($collectionName == '') {
                                 return true;
                             }
