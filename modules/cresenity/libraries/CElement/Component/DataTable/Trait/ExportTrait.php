@@ -583,7 +583,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
         if (is_object($data)) {
             if ($data instanceof CDatabase_Driver_Mysqli_Result) {
-                $data->setFetchTypeArray();
+                $data = $data->result_array(false);
             } else {
                 $data = $data->result_array(false);
             }
@@ -617,11 +617,11 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 $ori_v = "";
                 //do print from query
                 foreach ($row as $k => $v) {
-                    if ($k == $col->get_fieldname()) {
+                    if ($k == $col->getFieldname()) {
                         $col_v = $v;
                         $ori_v = $col_v;
                         foreach ($col->transforms as $trans) {
-                            if ($trans->get_function() != 'format_currency') {
+                            if ($trans->getFunction() != 'format_currency') {
                                 $col_v = $trans->execute($col_v);
                             }
 //                                $col_v = $trans->execute($col_v);
@@ -646,7 +646,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 if (($this->cellCallbackFunc) != null) {
                     $new_v = CDynFunction::factory($this->cellCallbackFunc)
                             ->add_param($this)
-                            ->add_param($col->get_fieldname())
+                            ->add_param($col->getFieldname())
                             ->add_param($row)
                             ->add_param($new_v)
                             ->set_require($this->requires)
