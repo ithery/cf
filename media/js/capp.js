@@ -607,6 +607,7 @@ var Cresenity = function () {
             haveFooter: false,
             headerText: '',
             backdrop: 'static',
+            modalClass: false,
             onClose: false,
             footerAction: {}
         }, options);
@@ -618,13 +619,17 @@ var Cresenity = function () {
 
         var modalContainer = jQuery('<div>').addClass('modal');
 
+        if(settings.modalClass) {
+            modalContainer.addClass(settings.modalClass);
+        }
+
         if (settings.isSidebar) {
             modalContainer.addClass('sidebar');
             modalContainer.addClass(settings.sidebarMode);
         }
         var modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
         var modalContent = jQuery('<div>').addClass('modal-content');
-
+       
         var modalHeader = jQuery('<div>').addClass('modal-header');
         var modalTitle = jQuery('<div>').addClass('modal-title');
         var modalButtonClose = jQuery('<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
