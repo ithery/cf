@@ -165,8 +165,8 @@ class CDaemon {
         $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
        
         
-        cdbg::var_dump("$binary $command 1> $output 2>&1 &");
-        die;
+        //cdbg::var_dump("$binary $command 1> $output 2>&1 &");
+        //die;
         exec("$binary $command 1> $output 2>&1 &");
     }
 
