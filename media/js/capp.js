@@ -715,6 +715,11 @@ var Cresenity = function () {
                         }
                         return true;
                     },
+                    success: function (data) {
+                        if (typeof settings.onSuccess == 'function' && validationIsValid) {
+                            settings.onSuccess();
+                        }
+                    },
                     complete: function () {
                         cresenity.unblockElement($(element));
 
