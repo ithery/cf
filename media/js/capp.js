@@ -717,7 +717,7 @@ var Cresenity = function () {
                     },
                     success: function (data) {
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
-                            settings.onSuccess();
+                            settings.onSuccess(data);
                         }
                     },
                     complete: function () {
