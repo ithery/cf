@@ -4,6 +4,8 @@ use Ratchet\MessageInterface;
 use Ratchet\ConnectionInterface;
 use GuzzleHttp\Psr7 as gPsr;
 
+
+require_once dirname(__FILE__) . '/../../GuzzleHttp/Psr7/functions_include.php';
 /**
  * This class receives streaming data from a client request
  * and parses HTTP headers, returning a PSR-7 Request object
