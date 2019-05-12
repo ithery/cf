@@ -619,7 +619,7 @@ var Cresenity = function () {
 
         var modalContainer = jQuery('<div>').addClass('modal');
 
-        if(settings.modalClass) {
+        if (settings.modalClass) {
             modalContainer.addClass(settings.modalClass);
         }
 
@@ -629,7 +629,7 @@ var Cresenity = function () {
         }
         var modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
         var modalContent = jQuery('<div>').addClass('modal-content');
-       
+
         var modalHeader = jQuery('<div>').addClass('modal-header');
         var modalTitle = jQuery('<div>').addClass('modal-title');
         var modalButtonClose = jQuery('<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
@@ -686,12 +686,15 @@ var Cresenity = function () {
 
 
     };
-    this.closeDialog = function (options) {
+    this.closeLastModal = function (options) {
         if (cresenity.modalElements.length > 0) {
             var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
 
             lastModal.modal('hide');
         }
+    }
+    this.closeDialog = function (options) {
+        this.closeLastModal(options);
     }
     this.ajaxSubmit = function (options) {
         var settings = $.extend({}, options);
