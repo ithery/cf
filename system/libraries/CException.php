@@ -36,7 +36,7 @@ class CException extends Exception {
             $message = strtr($message, $variables);
         }
         // Pass the message and integer code to the parent
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, (int) $code, $previous);
     }
 
     /**
