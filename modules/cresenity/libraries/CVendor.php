@@ -77,4 +77,8 @@ class CVendor {
         return new CVendor_Namecheap($options);
     }
 
+    
+    public static function letsEncrypt($options) {
+        return new CVendor_LetsEncrypt($options);
+    }
 }
