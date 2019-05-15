@@ -53,7 +53,7 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
             $colRight->addField()->setLabel('Expires')->addControl('certificateExpires', 'label')->setValue(carr::get($orderData, 'expires'));
 
             $colRight->addHr();
-            $colRight->addAction()->setLabel('Renew Certificate')->addClass('btn-primary')->setIcon(' lnr lnr-plus-circle')->setLink(curl::base() . 'administrator/vendor/letsencrypt/renew');
+            $colRight->addAction()->setLabel('Renew Certificate')->addClass('btn-primary')->setIcon(' lnr lnr-plus-circle')->setLink(curl::base() . 'administrator/vendor/letsencrypt/renew')->setConfirm();
         }
 
 
