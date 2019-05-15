@@ -61,6 +61,12 @@ return array(
         ),
     ),
     array(
+        "name" => "administrator.vendor",
+        "label" => "Vendor",
+        "icon" => " lnr lnr-license",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Vendor" . EXT,
+    ),
+    array(
         "name" => "administrator.cloud",
         "label" => "Dev Cloud",
         "icon" => " lnr lnr-cloud",
