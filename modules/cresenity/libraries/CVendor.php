@@ -72,13 +72,13 @@ class CVendor {
     public static function goSend($environment = 'production') {
         return new CVendor_GoSend($environment);
     }
-    
+
     public static function namecheap($options) {
         return new CVendor_Namecheap($options);
     }
 
-    
     public static function letsEncrypt($options) {
-        return new CVendor_LetsEncrypt($options);
+        return CVendor_LetsEncrypt::instance($options);
     }
+
 }
