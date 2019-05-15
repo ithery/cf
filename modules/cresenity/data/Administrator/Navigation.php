@@ -66,4 +66,10 @@ return array(
         "icon" => " lnr lnr-cloud",
         "subnav" => include dirname(__FILE__) . "/Navigation/Cloud" . EXT,
     ),
+    array(
+        "name" => "administrator.documentation",
+        "label" => "Documentation",
+        "icon" => " lnr lnr-question-circle",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Documentation" . EXT,
+    ),
 );
