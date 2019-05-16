@@ -12,6 +12,8 @@ abstract class CController {
     // Allow all controllers to run in production by default
     const ALLOW_PRODUCTION = TRUE;
 
+    protected $baseUri;
+
     /**
      * Loads URI, and Input into this controller.
      *
@@ -28,6 +30,8 @@ abstract class CController {
 
         // Input should always be available
         $this->input = Input::instance();
+
+        $this->baseUri = CFRouter::controllerUri();
     }
 
     /**
@@ -42,7 +46,6 @@ abstract class CController {
         CFEvent::run('system.404');
     }
 
-    
 }
 
 // End Controller Class

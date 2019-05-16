@@ -382,6 +382,18 @@ class CFRouter {
         return static::$current_uri;
     }
 
+    public static function controllerDir() {
+        return static::$controller_dir;
+    }
+
+    public static function controllerName() {
+        return static::$controller;
+    }
+
+    public static function controllerUri() {
+        return curl::base() . static::controllerDir() . static::controllerName();
+    }
+
 }
 
 // End CFRouter
