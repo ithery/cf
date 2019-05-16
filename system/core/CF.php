@@ -200,14 +200,14 @@ final class CF {
         }
 
         // Enable CF routing
-        CFEvent::add('system.routing', array('CFRouter', 'find_uri'));
+        CFEvent::add('system.routing', array('CFRouter', 'findUri'));
         CFEvent::add('system.routing', array('CFRouter', 'setup'));
 
         // Enable CF controller initialization
         CFEvent::add('system.execute', array('CF', 'instance'));
 
         // Enable CF 404 pages
-        CFEvent::add('system.404', array('CF', 'show_404'));
+        CFEvent::add('system.404', array('CF', 'show404'));
 
         // Enable CF output handling
         CFEvent::add('system.shutdown', array('CF', 'shutdown'));
@@ -240,7 +240,7 @@ final class CF {
     }
 
     public static function invoke($uri) {
-        $routerData = CFRouter::get_route_data($uri);
+        $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
         $query_string = carr::get($routerData, 'query_string');
@@ -326,8 +326,10 @@ final class CF {
      */
     public static function & instance() {
         $null = NULL;
+
         if (self::$instance === NULL) {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
+
             if (empty(CFRouter::$controller_path)) {
                 CF::show_404();
             }
@@ -1061,7 +1063,7 @@ final class CF {
      * @param   string  custom template
      * @return  void
      */
-    public static function show_404($page = FALSE, $template = FALSE) {
+    public static function show404($page = FALSE, $template = FALSE) {
         if (CFRouter::$current_uri == 'favicon.ico') {
             return false;
         }
@@ -1073,6 +1075,10 @@ final class CF {
             }
         }
         throw new CF_404_Exception($page, $template);
+    }
+
+    public static function show_404($page = FALSE, $template = FALSE) {
+        return self::show404($page, $template);
     }
 
     /**
