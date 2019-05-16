@@ -73,6 +73,10 @@ class CVendor_LetsEncrypt {
     public function getCertificatePath() {
         return $this->certificateKeys . 'certificate.crt';
     }
+    
+    public function getPrivateKeyPath() {
+        return $this->certificateKeys . 'private.pem';
+    }
 
     public function getChainPath() {
         return $this->certificateKeys . 'fullchain.crt';

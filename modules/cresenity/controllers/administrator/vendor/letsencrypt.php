@@ -42,6 +42,7 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
         $colLeft->addField()->setLabel('Contact')->addControl('accountContact', 'label')->setValue(implode(",", $acct->contact));
         $colLeft->addField()->setLabel('Initial IP')->addControl('accountInitialIp', 'label')->setValue($acct->initialIp);
         $colLeft->addField()->setLabel('Account Status')->addControl('accountStatus', 'label')->setValue($acct->status);
+        $colRight->addField()->setLabel('Private Key')->addControl('privateKey', 'text')->setValue($letsEncrypt->getPrivateKeyPath())->setReadOnly();;
         if (!$haveCertificate) {
             $colRight->addField()->setLabel('Certificate')->addControl('certificate', 'label')->setValue($haveCertificate ? 'YES' : 'NO');
         } else {
