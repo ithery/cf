@@ -2335,6 +2335,10 @@ final class CF {
         return empty($value);
     }
 
+    public static function version() {
+        return CF_VERSION;
+    }
+
 }
 
 // End C
