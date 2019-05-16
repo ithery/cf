@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types = 1);
 
 /*
  * This file is part of Evenement.
@@ -13,15 +15,14 @@ namespace Evenement;
 
 use InvalidArgumentException;
 
-trait EventEmitterTrait
-{
+trait EventEmitterTrait {
+
     protected $listeners = [];
     protected $beforeOnceListeners = [];
     protected $onceListeners = [];
     protected $children = [];
 
-    public function on($event, callable $listener)
-    {
+    public function on($event, callable $listener) {
         if ($event === null) {
             throw new InvalidArgumentException('event name must not be null');
         }
@@ -35,8 +36,7 @@ trait EventEmitterTrait
         return $this;
     }
 
-    public function onceBefore($event, callable $listener)
-    {
+    public function onceBefore($event, callable $listener) {
         if ($event === null) {
             throw new InvalidArgumentException('event name must not be null');
         }
@@ -50,8 +50,7 @@ trait EventEmitterTrait
         return $this;
     }
 
-    public function once($event, callable $listener)
-    {
+    public function once($event, callable $listener) {
         if ($event === null) {
             throw new InvalidArgumentException('event name must not be null');
         }
@@ -65,8 +64,7 @@ trait EventEmitterTrait
         return $this;
     }
 
-    public function off($event, callable $listener = null)
-    {
+    public function off($event, callable $listener = null) {
         if ($listener !== null) {
             return $this->removeListener($event, $listener);
         }
@@ -74,8 +72,7 @@ trait EventEmitterTrait
         return $this->removeAllListeners($event);
     }
 
-    public function removeListener($event, callable $listener)
-    {
+    public function removeListener($event, callable $listener) {
         if ($event === null) {
             throw new InvalidArgumentException('event name must not be null');
         }
@@ -111,8 +108,7 @@ trait EventEmitterTrait
         }
     }
 
-    public function removeAllListeners($event = null)
-    {
+    public function removeAllListeners($event = null) {
         if ($event !== null) {
             unset($this->listeners[$event]);
         } else {
@@ -132,32 +128,26 @@ trait EventEmitterTrait
         }
     }
 
-    public function listeners($event = null): array
-    {
+    public function listeners($event = null) {
         if ($event === null) {
             $events = [];
             $eventNames = \array_unique(
-                \array_merge(\array_keys($this->listeners), \array_keys($this->onceListeners), \array_keys($this->beforeOnceListeners))
+                    \array_merge(\array_keys($this->listeners), \array_keys($this->onceListeners), \array_keys($this->beforeOnceListeners))
             );
             foreach ($eventNames as $eventName) {
                 $events[$eventName] = \array_merge(
-                    isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [],
-                    isset($this->onceListeners[$eventName]) ? $this->onceListeners[$eventName] : [],
-                    isset($this->beforeOnceListeners[$eventName]) ? $this->beforeOnceListeners[$eventName] : []
+                        isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [], isset($this->onceListeners[$eventName]) ? $this->onceListeners[$eventName] : [], isset($this->beforeOnceListeners[$eventName]) ? $this->beforeOnceListeners[$eventName] : []
                 );
             }
             return $events;
         }
 
         return \array_merge(
-            isset($this->listeners[$event]) ? $this->listeners[$event] : [],
-            isset($this->onceListeners[$event]) ? $this->onceListeners[$event] : [],
-            isset($this->beforeOnceListeners[$event]) ? $this->beforeOnceListeners[$event] : []
+                isset($this->listeners[$event]) ? $this->listeners[$event] : [], isset($this->onceListeners[$event]) ? $this->onceListeners[$event] : [], isset($this->beforeOnceListeners[$event]) ? $this->beforeOnceListeners[$event] : []
         );
     }
 
-    public function emit($event, array $arguments = [])
-    {
+    public function emit($event, array $arguments = []) {
         if ($event === null) {
             throw new InvalidArgumentException('event name must not be null');
         }
@@ -189,8 +179,8 @@ trait EventEmitterTrait
         }
     }
 
-    public function forward(EventEmitterInterface $emitter)
-    {
+    public function forward(EventEmitterInterface $emitter) {
         $this->children[] = $emitter;
     }
+
 }
