@@ -21,7 +21,7 @@ return [
       | Default: false
       |
      */
-    'bypass' => env('CDN_Bypass', false),
+    'bypass' => false,
     /*
       |--------------------------------------------------------------------------
       | Default CDN provider
@@ -170,8 +170,8 @@ return [
                   |
                  */
                 'cloudfront' => [
-                    'use' => env('CDN_UseCloudFront', false),
-                    'cdn_url' => env('CDN_CloudFrontUrl', ''),
+                    'use' => false,
+                    'cdn_url' => '',
                 ],
                 /*
                   |--------------------------------------------------------------------------
@@ -215,7 +215,7 @@ return [
       |
      */
     'include' => [
-        'directories' => ['public'],
+        'directories' => ['media'],
         'extensions' => [],
         'patterns' => [],
     ],
