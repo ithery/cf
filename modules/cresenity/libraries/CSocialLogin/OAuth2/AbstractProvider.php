@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 
-abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_AbstractProviderInterface {
+abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_AbstractProvider {
 
     /**
      * The HTTP Client instance.
@@ -143,10 +143,6 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
         curl::redirect($this->getAuthUrl($state));
     }
 
-    public function session() {
-        return CSession::instance();
-    }
-
     /**
      * Get the authentication URL for the provider.
      *
@@ -225,7 +221,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
             return false;
         }
         $state = $this->session()->get('state');
-        
+
         return !(strlen($state) > 0 && $this->input('state') === $state);
     }
 
@@ -236,7 +232,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
      * @return array
      */
     public function getAccessTokenResponse($code) {
-       
+
         $postKey = (version_compare(ClientInterface::VERSION, '6') === 1) ? 'form_params' : 'body';
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'headers' => ['Accept' => 'application/json'],
@@ -393,9 +389,4 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
         return $this;
     }
 
-    
-    public function input($key = null, $default = null) {
-        $request = CApp_Base::getRequestGet() + CApp_Base::getRequestPost();
-        return carr::get($request,$key,$default);
-    }
 }

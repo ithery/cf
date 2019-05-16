@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since May 15, 2019, 8:13:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use League\OAuth1\Client\Server\Twitter as TwitterServer;
+
 class CSocialLogin_DriverManager {
 
     use CTrait_Manager_DriverManager;
@@ -31,7 +33,7 @@ class CSocialLogin_DriverManager {
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\Two\AbstractProvider
+     * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createGithubDriver() {
         $this->config;
@@ -43,7 +45,7 @@ class CSocialLogin_DriverManager {
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\Two\AbstractProvider
+     * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createFacebookDriver() {
         $config = $this->app['config']['services.facebook'];
@@ -55,7 +57,7 @@ class CSocialLogin_DriverManager {
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\Two\AbstractProvider
+     * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createGoogleDriver() {
         return $this->buildProvider(CSocialLogin_OAuth2_Provider_GoogleProvider::class, $this->config);
@@ -64,7 +66,7 @@ class CSocialLogin_DriverManager {
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\Two\AbstractProvider
+     * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createLinkedinDriver() {
         $config = $this->app['config']['services.linkedin'];
@@ -76,7 +78,7 @@ class CSocialLogin_DriverManager {
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\Two\AbstractProvider
+     * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createBitbucketDriver() {
         $config = $this->app['config']['services.bitbucket'];
@@ -88,7 +90,7 @@ class CSocialLogin_DriverManager {
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\Two\AbstractProvider
+     * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createGitlabDriver() {
         $config = $this->app['config']['services.gitlab'];
@@ -102,7 +104,7 @@ class CSocialLogin_DriverManager {
      *
      * @param  string  $provider
      * @param  array  $config
-     * @return \Laravel\Socialite\Two\AbstractProvider
+     * @return CSocialLogin_OAuth2_AbstractProvider
      */
     public function buildProvider($provider, $config) {
         return new $provider($config['client_id'], $config['client_secret'], $this->formatRedirectUrl($config), carr::get($config, 'guzzle', [])
@@ -112,13 +114,10 @@ class CSocialLogin_DriverManager {
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\One\AbstractProvider
+     * @return CSocialLogin_OAuth1_AbstractProvider
      */
     protected function createTwitterDriver() {
-        $config = $this->app['config']['services.twitter'];
-        return new TwitterProvider(
-                $this->app['request'], new TwitterServer($this->formatConfig($config))
-        );
+        return new CSocialLogin_OAuth1_Provider_TwitterProvider(new TwitterServer($this->formatConfig($this->config)));
     }
 
     /**
