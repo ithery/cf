@@ -32,20 +32,7 @@ return array(
         "name" => "administrator.database",
         "label" => "Database",
         "icon" => " lnr lnr-database",
-        "subnav" => array(
-            array(
-                "name" => "administrator.database.console",
-                "label" => "DB Console",
-                "controller" => "administrator/database/console",
-                "method" => "index",
-            ),
-            array(
-                "name" => "administrator.database.generator",
-                "label" => "DB Generator",
-                "controller" => "administrator/database/generator",
-                "method" => "index",
-            ),
-        ),
+        "subnav" => include dirname(__FILE__) . "/Navigation/Database" . EXT,
     ),
     array(
         "name" => "administrator.stats",
