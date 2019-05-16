@@ -13,11 +13,27 @@ return array(
         "label" => "App",
         "controller" => "administrator/setting/app",
         "method" => "index",
+        "action" => array(
+            array(
+                "name" => "administrator.setting.app.edit",
+                "label" => "Edit",
+                "controller" => "administrator/setting/app",
+                "method" => "edit",
+            )
+        ),
     ),
     array(
         "name" => "administrator.setting.cdn",
         "label" => "CDN",
         "controller" => "administrator/setting/cdn",
         "method" => "index",
+        "action" => array(
+            array(
+                "name" => "administrator.setting.cdn.edit",
+                "label" => "Edit",
+                "controller" => "administrator/setting/cdn",
+                "method" => "edit",
+            )
+        ),
     ),
 );
