@@ -121,7 +121,7 @@ class CConfig {
 
         //we will flatten the array of result Data
         $result = array();
-        $addToResult = function($key, $value, &$result) use($resultFiles) {
+        $addToResult = function($key, $value, &$result) use($resultFiles,$files) {
             $keyParts = explode('.', $key);
             $resultData = array();
             $resultData['key'] = $key;
@@ -129,10 +129,14 @@ class CConfig {
             $resultData['type'] = gettype($value);
             $file = carr::get($resultFiles, carr::first($keyParts));
             $resultData['file'] = $file;
-
             $parser = new CConfig_Parser();
-            $comment = $parser->getComment($file,$key);
-            $resultData['comment']=$comment;
+            foreach ($files as $fileToParse) {
+                $comment = $parser->getComment($fileToParse, $key);
+                if (strlen($comment) > 0) {
+                    break;
+                }
+            }
+            $resultData['comment'] = $comment;
             $result[] = $resultData;
         };
         $flatten = function($array, $keyPath = '') use (&$flatten, $addToResult, &$result) {
@@ -151,9 +155,7 @@ class CConfig {
             }
         };
         $flatten($resultData);
-        
-        cdbg::var_dump($result);
-        die;
+
         return $result;
     }
 

@@ -91,6 +91,7 @@ trait CTrait_Controller_Application_Config_Editor {
 
         $value = carr::get($configRecord, 'value');
         $file = carr::get($configRecord, 'file');
+        $comment = carr::get($configRecord, 'comment');
         $originalValue = $value;
         $type = carr::get($configRecord, 'type');
         $post = CApp_Base::getRequestPost();
@@ -146,7 +147,9 @@ trait CTrait_Controller_Application_Config_Editor {
         if ($valueControlType == 'select') {
             $valueControl->setList($controlList);
         }
-
+        if(strlen($comment)>0) {
+            $form->addDiv()->setHaveIndent(false)->addClass('console')->add(trim($comment));
+        }
         $form->addActionList()->addAction()->setLabel('Submit')->setSubmit()->setConfirm();
         echo $app->render();
     }
