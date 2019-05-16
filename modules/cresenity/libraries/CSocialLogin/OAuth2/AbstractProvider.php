@@ -126,14 +126,14 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      * Map the raw user array to a Socialite User instance.
      *
      * @param  array  $user
-     * @return \Laravel\Socialite\Two\User
+     * @return CSocialLogin_OAuth2_User
      */
     abstract protected function mapUserToObject(array $user);
 
     /**
      * Redirect the user of the application to the provider's authentication screen.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return void
      */
     public function redirect() {
         $state = null;

@@ -36,10 +36,7 @@ class CSocialLogin_DriverManager {
      * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createGithubDriver() {
-        $this->config;
-        return $this->buildProvider(
-                        GithubProvider::class, $config
-        );
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_GithubProvider::class, $this->config);
     }
 
     /**
@@ -48,10 +45,7 @@ class CSocialLogin_DriverManager {
      * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createFacebookDriver() {
-        $config = $this->app['config']['services.facebook'];
-        return $this->buildProvider(
-                        FacebookProvider::class, $config
-        );
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_FacebookProvider::class, $this->config);
     }
 
     /**
@@ -69,10 +63,7 @@ class CSocialLogin_DriverManager {
      * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createLinkedinDriver() {
-        $config = $this->app['config']['services.linkedin'];
-        return $this->buildProvider(
-                        LinkedInProvider::class, $config
-        );
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_LinkedInProvider::class, $this->config);
     }
 
     /**
@@ -81,10 +72,7 @@ class CSocialLogin_DriverManager {
      * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createBitbucketDriver() {
-        $config = $this->app['config']['services.bitbucket'];
-        return $this->buildProvider(
-                        BitbucketProvider::class, $config
-        );
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_BitbucketProvider::class, $this->config);
     }
 
     /**
@@ -93,10 +81,7 @@ class CSocialLogin_DriverManager {
      * @return CSocialLogin_OAuth2_AbstractProvider
      */
     protected function createGitlabDriver() {
-        $config = $this->app['config']['services.gitlab'];
-        return $this->buildProvider(
-                        GitlabProvider::class, $config
-        );
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_GitlabProvider::class, $this->config);
     }
 
     /**
