@@ -215,20 +215,20 @@ final class CF {
         CFBenchmark::start('system.cf.bootstrap');
         //try to locate bootstrap files for modules 
         foreach (CF::modules() as $module) {
-            $bootstrap_path = DOCROOT . 'modules' . DS . $module . DS;
-            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-                include $bootstrap_path . 'bootstrap' . EXT;
+            $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;
+            if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+                include $bootstrapPath . 'bootstrap' . EXT;
             }
         }
         //try to locate bootstrap files for application 
-        $bootstrap_path = DOCROOT . 'application' . DS . CF::app_code() . DS;
-        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-            include $bootstrap_path . 'bootstrap' . EXT;
+        $bootstrapPath = DOCROOT . 'application' . DS . CF::app_code() . DS;
+        if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+            include $bootstrapPath . 'bootstrap' . EXT;
         }
         //try to locate bootstrap files for org
-        $bootstrap_path .= CF::org_code() . DS;
-        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-            include $bootstrap_path . 'bootstrap' . EXT;
+        $bootstrapPath .= CF::org_code() . DS;
+        if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+            include $bootstrapPath . 'bootstrap' . EXT;
         }
         CFBenchmark::stop('system.cf.bootstrap');
 
