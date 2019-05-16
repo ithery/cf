@@ -112,8 +112,12 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
         }
         $body = (string) $this->response->getBody();
         $code = (int) $this->response->getStatusCode();
+        if ($code != 200) {
+            throw new CApp_Cloud_Exception_HttpException(isset($body) ? $body : 'Request not processed.', array(), $code);
+        }
         $content = json_decode($body);
-        throw new CApp_Cloud_Exception_HttpException(isset($content->message) ? $content->message : 'Request not processed.', array(), $code);
+
+        throw new CApp_Cloud_Exception_ApiException(isset($content->errMessage) ? $content->errMessage : 'Request not processed.', array(), $code);
     }
 
 }
