@@ -44,7 +44,7 @@ return array(
         "uikit.css",
         "spinkit.css",
         "cresenity/cresenity.main.bs4.css?v=" . uniqid(),
-        "theme-material/theme-material.css?v=" . uniqid(),
+        "administrator/theme-material/theme-material.css?v=" . uniqid(),
         "cresenity/administrator.css?v=" . uniqid(),
     ),
     "scss" => array(
