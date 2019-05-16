@@ -130,8 +130,9 @@ class CConfig {
             $file = carr::get($resultFiles, carr::first($keyParts));
             $resultData['file'] = $file;
 
-
-
+            $parser = new CConfig_Parser();
+            $comment = $parser->getComment($file,$key);
+            $resultData['comment']=$comment;
             $result[] = $resultData;
         };
         $flatten = function($array, $keyPath = '') use (&$flatten, $addToResult, &$result) {
@@ -150,6 +151,9 @@ class CConfig {
             }
         };
         $flatten($resultData);
+        
+        cdbg::var_dump($result);
+        die;
         return $result;
     }
 
