@@ -54,10 +54,22 @@ return array(
         "subnav" => include dirname(__FILE__) . "/Navigation/Vendor" . EXT,
     ),
     array(
+        "name" => "administrator.cdn",
+        "label" => "CDN",
+        "icon" => " lnr lnr-earth",
+        "subnav" => include dirname(__FILE__) . "/Navigation/CDN" . EXT,
+    ),
+    array(
         "name" => "administrator.cloud",
         "label" => "Dev Cloud",
         "icon" => " lnr lnr-cloud",
         "subnav" => include dirname(__FILE__) . "/Navigation/Cloud" . EXT,
+    ),
+    array(
+        "name" => "administrator.setting",
+        "label" => "Setting",
+        "icon" => " lnr lnr-cog",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Setting" . EXT,
     ),
     array(
         "name" => "administrator.documentation",

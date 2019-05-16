@@ -11,7 +11,7 @@ class Controller_Administrator_Home extends CApp_Administrator_Controller_User {
 
     public function index() {
         $app = CApp::instance();
-        $app->title(clang::__("Dashboard"));
+        $app->title("Dashboard");
 
 
         echo $app->render();

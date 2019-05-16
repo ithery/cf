@@ -42,7 +42,7 @@ return [
       | Set your CDN url, [without the bucket name]
       |
      */
-    'url' => env('CDN_Url', 'https://s3.amazonaws.com'),
+    'url' => 'https://s3.amazonaws.com',
     /*
       |--------------------------------------------------------------------------
       | Threshold
@@ -145,7 +145,7 @@ return [
                   | NOTE: YOUR FOLDER NAME PREFIX MUST END WITH A TRAILING SLASH, e.g. 'folder/'
                   |
                  */
-                'upload_folder' => env('AWS_CDN_ASSET_UPLOAD_FOLDER', ''),
+                'upload_folder' => '',
                 /*
                   |--------------------------------------------------------------------------
                   | Access Control Lists (ACL)
