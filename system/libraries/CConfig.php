@@ -126,12 +126,12 @@ class CConfig {
             $resultData = array();
             $resultData['key'] = $key;
             $resultData['value'] = $value;
+            $resultData['type'] = gettype($value);
             $file = carr::get($resultFiles, carr::first($keyParts));
             $resultData['file'] = $file;
 
-            $source = file_get_contents($file);
 
-            
+
             $result[] = $resultData;
         };
         $flatten = function($array, $keyPath = '') use (&$flatten, $addToResult, &$result) {

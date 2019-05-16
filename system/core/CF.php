@@ -2345,6 +2345,13 @@ final class CF {
         return CF_VERSION;
     }
 
+    public static function appPath($domain = null) {
+
+        $appCode = static::appCode($domain);
+
+        return DOCROOT . 'application/' . $appCode . '/';
+    }
+
 }
 
 // End C

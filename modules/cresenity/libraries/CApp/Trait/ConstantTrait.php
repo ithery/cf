@@ -13,4 +13,12 @@ trait CApp_Trait_ConstantTrait {
         return array(self::NO_LABEL, self::YES_LABEL);
     }
 
+    public static function arrayAll() {
+        return array(self::ALL => self::ALL);
+    }
+
+    public static function arrayNone() {
+        return array(self::NONE => self::NONE);
+    }
+
 }
