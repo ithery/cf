@@ -189,7 +189,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      */
     public function user() {
         if ($this->hasInvalidState()) {
-            throw new InvalidStateException;
+            throw new CSocialLogin_OAuth2_Exception_InvalidStateException;
         }
         $response = $this->getAccessTokenResponse($this->getCode());
         $user = $this->mapUserToObject($this->getUserByToken(
