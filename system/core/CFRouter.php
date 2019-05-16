@@ -268,7 +268,7 @@ class CFRouter {
             $_SERVER['QUERY_STRING'] = preg_replace('~\cfUri\b[^&]*+&?~', '', $_SERVER['QUERY_STRING']);
         } elseif (isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO']) {
             $currentUri = $_SERVER['PATH_INFO'];
-            if ($currentUri == '/404.shtml'||$currentUri == '404.shtml') {
+            if ($currentUri == '/404.shtml' || $currentUri == '404.shtml') {
                 $currentUri = $_SERVER['REQUEST_URI'];
             }
             if ($currentUri == '/403.shtml') {
@@ -314,7 +314,7 @@ class CFRouter {
             // Reduce multiple slashes into single slashes
             $currentUri = preg_replace('#//+#', '/', $currentUri);
         }
-       
+
         return $currentUri;
     }
 
@@ -378,6 +378,10 @@ class CFRouter {
         return trim($routed_uri, '/');
     }
 
+    public static function currentUri() {
+        return static::$current_uri;
+    }
+
 }
 
-// End CRouter
+// End CFRouter
