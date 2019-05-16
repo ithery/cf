@@ -18,8 +18,6 @@ class CDatabase_Dispatcher extends CEvent_Dispatcher {
         return self::$instance;
     }
 
-    public function __construct() {
-        
-    }
+ 
 
 }
