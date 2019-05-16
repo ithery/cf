@@ -165,4 +165,8 @@ class CEmoji_Adapter_TwemojiAdapter extends CEmoji_AbstractAdapter {
         }
     }
 
+    public function getEmojiList() {
+        
+    }
+
 }
