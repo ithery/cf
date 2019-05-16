@@ -9,12 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CEmoji_Adapter_TwemojiAdapter extends CEmoji_AbstractAdapter {
 
-    /**
-     * Base for twemoji url.
-     *
-     * @var string
-     */
-    const TWEMOJI_URL = '//twemoji.maxcdn.com/%1$sx%1$s/%2$s.png';
+    protected $baseUrl = '//twemoji.maxcdn.com/';
 
     /**
      * Regular expression for finding twemoji names (surrounded by double colon)
@@ -29,13 +24,6 @@ class CEmoji_Adapter_TwemojiAdapter extends CEmoji_AbstractAdapter {
     const IMAGE_TAG = '<img src="%s" alt="%s" class="%s">';
 
     /**
-     * Icon size of twemoji image.
-     *
-     * @var int
-     */
-    protected $iconSize;
-
-    /**
      * Supported icon sizes for twemoji.
      *
      * @var array
@@ -43,11 +31,11 @@ class CEmoji_Adapter_TwemojiAdapter extends CEmoji_AbstractAdapter {
     protected $supportedIconSizes = [16, 36, 72];
 
     /**
-     * Array of mappings twemoji name to unicode representation and description of twemoji
+     * Object of mappings twemoji name to unicode representation and description of twemoji
      *
-     * @var
+     * @var CEmoji_Adapter_Twemoji_TwemojiIndex
      */
-    protected $twemojiIndex;
+    protected $index;
 
     /**
      * @param int $iconSize
@@ -55,7 +43,48 @@ class CEmoji_Adapter_TwemojiAdapter extends CEmoji_AbstractAdapter {
     public function __construct($iconSize = 16) {
         $this->iconSize = $iconSize;
         $this->validateIconSize();
-        $this->obtainTwemojiIndex();
+        $this->index = new CEmoji_Adapter_Twemoji_TwemojiIndex();
+    }
+
+    /**
+     * @param string $string
+     * @param string $imageHtmlTemplate
+     *
+     * @return string
+     */
+    public function replaceEmojiWithImages($string, $imageHtmlTemplate = null) {
+        // NB: Named emoji should be replaced first as the string will then contain them in the image alt tags
+        // Replace named emoji, e.g. ":smile:"
+        $string = preg_replace_callback($this->getIndex()->getEmojiNameRegex(), function ($matches) use ($imageHtmlTemplate) {
+            return $this->getEmojiImageByName($matches[1], $imageHtmlTemplate);
+        }, $string);
+        // Replace unicode emoji
+        $string = preg_replace_callback($this->getIndex()->getEmojiUnicodeRegex(), function ($matches) use ($imageHtmlTemplate) {
+            return $this->getEmojiImageByUnicode($matches[0], $imageHtmlTemplate);
+        }, $string);
+        return $string;
+    }
+
+    /**
+     * @param string $name
+     * @param string $imageHtmlTemplate
+     *
+     * @return string
+     */
+    public function getEmojiImageByUnicode($unicode, $imageHtmlTemplate = null) {
+        $emoji = $this->index->findByUnicode($unicode);
+        return $this->renderTemplate($emoji, $imageHtmlTemplate);
+    }
+
+    /**
+     * @param string $name
+     * @param string $imageHtmlTemplate
+     *
+     * @return string
+     */
+    public function getEmojiImageByName($name, $imageHtmlTemplate = null) {
+        $emoji = $this->index->findByName($name);
+        return $this->renderTemplate($emoji, $imageHtmlTemplate);
     }
 
     /**
@@ -124,23 +153,6 @@ class CEmoji_Adapter_TwemojiAdapter extends CEmoji_AbstractAdapter {
     }
 
     /**
-     * Loads twemoji index json file into array.
-     *
-     * @see https://github.com/heyupdate/Emoji/tree/master/config
-     */
-    private function obtainTwemojiIndex() {
-        $twemojiIndex = CF::findFile('data', 'emoji/twemoji.json');
-        $twemojiIndex = json_decode($twemojiIndex, true);
-        $this->twemojiIndex = [];
-        foreach ($twemojiIndex as $twemoji) {
-            $this->twemojiIndex[':' . $twemoji['name'] . ':'] = [
-                'unicode' => $twemoji['unicode'],
-                'description' => $twemoji['description'],
-            ];
-        }
-    }
-
-    /**
      * Returns formatted text of image html tag for given twemoji name (surrounded by double colon)
      * with optional classes applied to it.
      *
@@ -152,21 +164,6 @@ class CEmoji_Adapter_TwemojiAdapter extends CEmoji_AbstractAdapter {
         return sprintf(
                 self::IMAGE_TAG, $this->getUrl($twemojiName), $this->getDescription($twemojiName), is_array($classNames) ? implode(' ', $classNames) : $classNames
         );
-    }
-
-    /**
-     * Throws an exception if icon size is not valid/supported.
-     *
-     * @throws Exception
-     */
-    private function validateIconSize() {
-        if (!in_array($this->iconSize, $this->supportedIconSizes)) {
-            throw new Exception('Icon must be of size 16, 36 or 72');
-        }
-    }
-
-    public function getEmojiList() {
-        
     }
 
 }
