@@ -53,7 +53,7 @@ class CVendor_LetsEncrypt {
         $email = carr::get($this->config, 'email');
         $acmeURL = carr::get($this->config, 'acmeURL', LEClient::LE_PRODUCTION);
         $log = carr::get($this->config, 'log', LEClient::LOG_OFF);
-        $defaultCertificateDirectory = DOCROOT . 'application/' . CF::appCode() . '/default/data/certificate/' . CF::domain() . '/';
+        $defaultCertificateDirectory = DOCROOT . 'certificate/letsencrypt/' . CF::domain() . '/';
         $defaultAccountDirectory = 'account/';
         $certificateKeys = carr::get($this->config, 'certificateKeys', $defaultCertificateDirectory);
         $accountKeys = carr::get($this->config, 'accountKeys', $defaultAccountDirectory);
@@ -73,7 +73,7 @@ class CVendor_LetsEncrypt {
     public function getCertificatePath() {
         return $this->certificateKeys . 'certificate.crt';
     }
-    
+
     public function getPrivateKeyPath() {
         return $this->certificateKeys . 'private.pem';
     }
