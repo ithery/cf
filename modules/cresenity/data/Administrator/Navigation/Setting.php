@@ -23,6 +23,20 @@ return array(
         ),
     ),
     array(
+        "name" => "administrator.setting.database",
+        "label" => "Database",
+        "controller" => "administrator/setting/database",
+        "method" => "index",
+        "action" => array(
+            array(
+                "name" => "administrator.setting.database.edit",
+                "label" => "Edit",
+                "controller" => "administrator/setting/database",
+                "method" => "edit",
+            )
+        ),
+    ),
+    array(
         "name" => "administrator.setting.cdn",
         "label" => "CDN",
         "controller" => "administrator/setting/cdn",
