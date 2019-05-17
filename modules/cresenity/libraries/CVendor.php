@@ -69,16 +69,40 @@ class CVendor {
         return new CVendor_PosMalaysia();
     }
 
+    /**
+     * 
+     * @param array $environment
+     * @return \CVendor_GoSend
+     */
     public static function goSend($environment = 'production') {
         return new CVendor_GoSend($environment);
     }
 
+    /**
+     * 
+     * @param array $options
+     * @return \CVendor_Namecheap
+     */
     public static function namecheap($options) {
         return new CVendor_Namecheap($options);
     }
 
+    /**
+     * 
+     * @param array $options
+     * @return CVendor_LetsEncrypt
+     */
     public static function letsEncrypt($options) {
         return CVendor_LetsEncrypt::instance($options);
+    }
+
+    /**
+     * 
+     * @param type $options
+     * @return \CVendor_Xendit
+     */
+    public static function xendit($options) {
+        return new CVendor_Xendit($options);
     }
 
 }
