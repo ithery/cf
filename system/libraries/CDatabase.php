@@ -1656,6 +1656,17 @@ class CDatabase {
     }
 
     /**
+     * Get a new raw query expression.
+     *
+     * @param  mixed  $value
+     * @return CDatabase_Query_Expression
+     */
+    public function raw($value)
+    {
+        return new CDatabase_Query_Expression($value);
+    }
+
+    /**
      * Get the name of the connected database.
      *
      * @return string

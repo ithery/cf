@@ -141,7 +141,7 @@ abstract class CDatabase_Grammar {
      * @return bool
      */
     public function isExpression($value) {
-        return $value instanceof Expression;
+        return $value instanceof CDatabase_Query_Expression;
     }
 
     /**

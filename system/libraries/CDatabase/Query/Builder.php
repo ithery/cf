@@ -206,7 +206,7 @@ class CDatabase_Query_Builder {
      */
     public function selectRaw($expression, array $bindings = [])
     {
-        $this->addSelect(new Expression($expression));
+        $this->addSelect(new CDatabase_Query_Expression($expression));
 
         if ($bindings) {
             $this->addBinding($bindings, 'select');
@@ -586,7 +586,7 @@ class CDatabase_Query_Builder {
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
         if (cstr::contains($column, '->') && is_bool($value)) {
-            $value = new Expression($value ? 'true' : 'false');
+            $value = new CDatabase_Query_Expression($value ? 'true' : 'false');
         }
 
         // Now that we are working with just a simple query we can put the elements
@@ -598,7 +598,7 @@ class CDatabase_Query_Builder {
                 'type', 'column', 'operator', 'value', 'boolean'
         );
 
-        if (!$value instanceof Expression) {
+        if (!$value instanceof CDatabase_Query_Expression) {
             $this->addBinding($value, 'where');
         }
 
@@ -737,7 +737,7 @@ class CDatabase_Query_Builder {
         // in which case we will just skip over it since it will be the query as a raw
         // string and not as a parameterized place-holder to be replaced by the PDO.
         foreach ($values as $value) {
-            if (!$value instanceof Expression) {
+            if (!$value instanceof CDatabase_Query_Expression) {
                 $this->addBinding($value, 'where');
             }
         }
@@ -1370,7 +1370,7 @@ class CDatabase_Query_Builder {
      */
     protected function cleanBindings(array $bindings) {
         return array_values(array_filter($bindings, function ($binding) {
-                    return !$binding instanceof Expression;
+                    return !$binding instanceof CDatabase_Query_Expression;
                 }));
     }
 
@@ -1520,7 +1520,7 @@ class CDatabase_Query_Builder {
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (!$value instanceof Expression) {
+        if (!$value instanceof CDatabase_Query_Expression) {
             $this->addBinding($value, 'having');
         }
 
