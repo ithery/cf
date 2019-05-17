@@ -37,6 +37,20 @@ return array(
         ),
     ),
     array(
+        "name" => "administrator.setting.cookie",
+        "label" => "Cookie",
+        "controller" => "administrator/setting/cookie",
+        "method" => "index",
+        "action" => array(
+            array(
+                "name" => "administrator.setting.cookie.edit",
+                "label" => "Edit",
+                "controller" => "administrator/setting/cookie",
+                "method" => "edit",
+            )
+        ),
+    ),
+    array(
         "name" => "administrator.setting.cdn",
         "label" => "CDN",
         "controller" => "administrator/setting/cdn",
