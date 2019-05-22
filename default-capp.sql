@@ -292,7 +292,9 @@ CREATE TABLE `resource` (
   `is_active` int(11) DEFAULT '1',
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`resource_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 /*!40000 ALTER TABLE `var_user` DISABLE KEYS */;
 /*!40000 ALTER TABLE `var_user` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
