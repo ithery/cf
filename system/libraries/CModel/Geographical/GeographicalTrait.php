@@ -18,6 +18,7 @@ trait CModel_Geographical_GeographicalTrait {
     public function scopeDistance($query, $latitude, $longitude) {
         $latName = $this->getQualifiedLatitudeColumn();
         $lonName = $this->getQualifiedLongitudeColumn();
+
         $query->select($this->getTable() . '.*');
         $sql = "((ACOS(SIN(? * PI() / 180) * SIN(" . $latName . " * PI() / 180) + COS(? * PI() / 180) * COS(" .
                 $latName . " * PI() / 180) * COS((? - " . $lonName . ") * PI() / 180)) * 180 / PI()) * 60 * ?) as distance";

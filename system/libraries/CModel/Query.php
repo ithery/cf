@@ -1190,6 +1190,7 @@ class CModel_Query {
         }
 
         if (method_exists($this->model, $scope = 'scope' . ucfirst($method))) {
+
             return $this->callScope([$this->model, $scope], $parameters);
         }
 
