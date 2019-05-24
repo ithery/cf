@@ -1661,7 +1661,7 @@ class CDatabase {
      * @param  mixed  $value
      * @return CDatabase_Query_Expression
      */
-    public function raw($value)
+    public static function raw($value)
     {
         return new CDatabase_Query_Expression($value);
     }
