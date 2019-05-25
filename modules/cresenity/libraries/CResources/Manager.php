@@ -128,7 +128,7 @@ class CResources_Manager {
         $permissions = isset($config['permissions']) ? $config['permissions'] : [];
 
         $links = (isset($config['links']) ? $config['links'] : null) === 'skip' ? LocalAdapter::SKIP_LINKS : LocalAdapter::DISALLOW_LINKS;
-        $root = carr::get($config, 'root', 'resources');
+        $root = carr::get($config, 'root', DOCROOT);
         return $this->adapt($this->createFlysystem(new LocalAdapter(
                                 $root, LOCK_EX, $links, $permissions
                                 ), $config));
@@ -141,7 +141,7 @@ class CResources_Manager {
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function createFtpDriver(array $config) {
-        $ftpConfig = Arr::only($config, [
+        $ftpConfig = carr::only($config, [
                     'host', 'username', 'password', 'port', 'root', 'passive', 'ssl', 'timeout',
         ]);
 
@@ -178,7 +178,7 @@ class CResources_Manager {
         $config += ['version' => 'latest'];
 
         if ($config['key'] && $config['secret']) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret']);
+            $config['credentials'] = carr::only($config, ['key', 'secret']);
         }
 
         return $config;

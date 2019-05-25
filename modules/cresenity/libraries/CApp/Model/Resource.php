@@ -30,7 +30,7 @@ class CApp_Model_Resource extends CApp_Model implements CApp_Model_Interface_Res
      */
 
     public function getFullUrl($conversionName = '') {
-        return url($this->getUrl($conversionName));
+        return rtrim(curl::httpbase(),'/').$this->getUrl($conversionName);
     }
 
     /*
@@ -38,12 +38,12 @@ class CApp_Model_Resource extends CApp_Model implements CApp_Model_Interface_Res
      */
 
     public function getUrl($conversionName = '') {
-        $urlGenerator = UrlGeneratorFactory::createForMedia($this, $conversionName);
+        $urlGenerator = CResources_Factory::createUrlGeneratorForResource($this, $conversionName);
         return $urlGenerator->getUrl();
     }
 
     public function getTemporaryUrl(DateTimeInterface $expiration, $conversionName = '', array $options = []) {
-        $urlGenerator = UrlGeneratorFactory::createForMedia($this, $conversionName);
+        $urlGenerator = CResources_Factory::createUrlGeneratorForResource($this, $conversionName);
         return $urlGenerator->getTemporaryUrl($expiration, $options);
     }
 
@@ -52,14 +52,13 @@ class CApp_Model_Resource extends CApp_Model implements CApp_Model_Interface_Res
      */
 
     public function getPath($conversionName = '') {
-        $urlGenerator = UrlGeneratorFactory::createForMedia($this, $conversionName);
+        $urlGenerator = CResources_Factory::createUrlGeneratorForResource($this, $conversionName);
         return $urlGenerator->getPath();
     }
 
     public function getImageGenerators() {
-        $imageGenerators = CConfig::instance('resource', 'image_generators');
 
-        return collect(config('medialibrary.image_generators'));
+        return CF::collect(CF::config('resource')->get('image_generators'));
     }
 
     public function getTypeAttribute() {

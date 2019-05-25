@@ -169,14 +169,14 @@ class CModel_HasResource_FileAdder_FileAdder {
         if (!is_file($this->pathToFile)) {
             throw CResources_Exception_FileCannotBeAdded_FileDoesNotExist::create($this->pathToFile);
         }
-        $maxFileSize = CF::config('resource.max_file_size');
+        $maxFileSize = CF::config('resource')->get('max_file_size');
         if ($maxFileSize !== null) {
             if (filesize($this->pathToFile) > CF::config('resource.max_file_size')) {
                 throw CResources_Exception_FileCannotBeAdded_FileIsTooBig::create($this->pathToFile);
             }
         }
 
-        $resourceClass = CF::config('resource.resource_model');
+        $resourceClass = CF::config('resource')->get('resource_model');
         if ($resourceClass == null) {
             $resourceClass = 'CApp_Model_Resource';
         }

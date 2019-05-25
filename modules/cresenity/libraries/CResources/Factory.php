@@ -25,6 +25,35 @@ class CResources_Factory {
 
     /**
      * 
+     * @return CResources_PathGenerator
+     */
+    public static function createUrlGeneratorForResource(CApp_Model_Interface_ResourceInterface $resource, $conversionName = '') {
+        $urlGeneratorClass = CF::config('resource.url_generator') != null ?
+                CF::config('resource.url_generator') : 'CResources_UrlGenerator_' . ucfirst($resource->getDiskDriverName()) . 'UrlGenerator';
+        static::guardAgainstInvalidUrlGenerator($urlGeneratorClass);
+        $urlGenerator = new $urlGeneratorClass();
+        $pathGenerator = static::createPathGenerator();
+        $urlGenerator
+                ->setResource($resource)
+                ->setPathGenerator($pathGenerator);
+        if ($conversionName !== '') {
+            $conversion = ConversionCollection::createForResource($resource)->getByName($conversionName);
+            $urlGenerator->setConversion($conversion);
+        }
+        return $urlGenerator;
+    }
+
+    public static function guardAgainstInvalidUrlGenerator($urlGeneratorClass) {
+        if (!class_exists($urlGeneratorClass)) {
+            throw CResources_Exception_InvalidUrlGenerator::doesntExist($urlGeneratorClass);
+        }
+        if (!is_subclass_of($urlGeneratorClass, CResources_UrlGeneratorInterface::class)) {
+            throw CResources_Exception_InvalidUrlGenerator::isntAUrlGenerator($urlGeneratorClass);
+        }
+    }
+
+    /**
+     * 
      * @return \CResources_FileManipulator
      */
     public static function createFileManipulator() {
