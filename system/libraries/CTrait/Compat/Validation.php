@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTrait_Compat_Validation {
 
-    public static function factory(array $data, array $rules, array $messages = [], array $customAttributes = []) {
+    public static function factory(array $data, array $rules = [], array $messages = [], array $customAttributes = []) {
         return static::createValidator($data, $rules, $messages, $customAttributes);
     }
 

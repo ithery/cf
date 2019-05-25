@@ -18,8 +18,14 @@ trait CTrait_Compat_Validation_Validator {
         if ($rule == 'not_empty') {
             $rule = 'required';
         }
+
         if (isset($rules[$attributeName])) {
-            $rules[$attributeName] .= '|' . $rule;
+
+            if (is_array($rules[$attributeName])) {
+                $rules[$attributeName][] = $rule;
+            } else {
+                $rules[$attributeName] .= '|' . $rule;
+            }
         } else {
             $rules[$attributeName] = $rule;
         }
