@@ -530,7 +530,9 @@ var Cresenity = function () {
             method: 'get',
             dataAddition: {},
             url: '/',
+            reloadType: 'reload',
             onComplete: false,
+            onSuccess:false,
         }, options);
 
 
@@ -552,7 +554,7 @@ var Cresenity = function () {
             url = cresenity.url.addQueryString(url, 'capp_current_container_id', idTarget);
 
 
-            (function (element) {
+            (function (element, settings) {
                 cresenity.blockElement($(element));
                 $(this).data('xhr', $.ajax({
                     type: method,
@@ -561,7 +563,24 @@ var Cresenity = function () {
                     data: dataAddition,
                     success: function (data) {
                         cresenity.handleResponse(data, function () {
-                            $(element).html(data.html);
+                            switch (settings.reloadType) {
+                                case 'after':
+                                    $(element).after(data.html);
+                                    break;
+                                case 'before':
+                                    $(element).before(data.html);
+                                    break;
+                                case 'append':
+                                    $(element).append(data.html);
+                                    break;
+                                case 'prepend':
+                                    $(element).prepend(data.html);
+                                    break;
+                                default:
+                                    $(element).html(data.html);
+                                    break;
+                            }
+
                             if (data.js && data.js.length > 0) {
                                 var script = cresenity.base64.decode(data.js);
                                 eval(script);
@@ -570,6 +589,9 @@ var Cresenity = function () {
 
                             if ($(element).find('.prettyprint').length > 0) {
                                 window.prettyPrint && prettyPrint();
+                            }
+                            if(typeof settings.onSuccess=='function') {
+                                settings.onSuccess(data);
                             }
                         });
                     },
@@ -582,11 +604,30 @@ var Cresenity = function () {
                     complete: function () {
                         $(element).data('xhr', false);
                         cresenity.unblockElement($(element));
+                        if(typeof settings.onComplete=='function') {
+                            settings.onComplete();
+                        }
                     }
                 }));
-            })(this);
+            })(this, settings);
         });
 
+    };
+    this.append = function (options) {
+        options.reloadType='append';
+        this.reload(options);
+    };
+    this.prepend = function (options) {
+        options.reloadType='prepend';
+        this.reload(options);
+    };
+    this.after = function (options) {
+        options.reloadType='after';
+        this.reload(options);
+    };
+    this.before = function (options) {
+        options.reloadType='before';
+        this.reload(options);
     };
     this.confirm = function (options) {
         var settings = $.extend({
