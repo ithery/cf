@@ -198,6 +198,125 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a subselect expression to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  string  $as
+     * @return \Illuminate\Database\Query\Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function selectSub($query, $as)
+    {
+        list($query, $bindings) = $this->createSub($query);
+        return $this->selectRaw(
+            '('.$query.') as '.$this->grammar->wrap($as), $bindings
+        );
+    }
+
+    /**
+     * Add a new "raw" select expression to the query.
+     *
+     * @param  string  $expression
+     * @param  array   $bindings
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function selectRaw($expression, array $bindings = [])
+    {
+        $this->addSelect(new CDatabase_Query_Expression($expression));
+
+        if ($bindings) {
+            $this->addBinding($bindings, 'select');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Makes "from" fetch from a subquery.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  string  $as
+     * @return \Illuminate\Database\Query\Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function fromSub($query, $as)
+    {
+        list($query, $bindings) = $this->createSub($query);
+        
+        return $this->fromRaw('('.$query.') as '.$this->grammar->wrap($as), $bindings);
+    }
+
+    /**
+     * Add a raw from clause to the query.
+     *
+     * @param  string  $expression
+     * @param  mixed   $bindings
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function fromRaw($expression, $bindings = [])
+    {
+        $this->from = new CDatabase_Query_Expression($expression);
+        $this->addBinding($bindings, 'from');
+        return $this;
+    }
+
+    /**
+     * Creates a subquery and parse it.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @return array
+     */
+    protected function createSub($query)
+    {
+        // If the given query is a Closure, we will execute it while passing in a new
+        // query instance to the Closure. This will give the developer a chance to
+        // format and work with the query before we cast it to a raw SQL string.
+        if ($query instanceof Closure) {
+            $callback = $query;
+            $callback($query = $this->forSubQuery());
+        }
+        return $this->parseSub($query);
+    }
+
+    /**
+     * Parse the subquery into SQL and bindings.
+     *
+     * @param  mixed  $query
+     * @return array
+     */
+    protected function parseSub($query)
+    {
+        if ($query instanceof self || $query instanceof CModel_Query) {
+            return [$query->toSql(), $query->getBindings()];
+        } elseif (is_string($query)) {
+            return [$query, []];
+        } else {
+            throw new InvalidArgumentException;
+        }
+    }
+
+    /**
+     * Parse the sub-select query into SQL and bindings.
+     *
+     * @param  mixed  $query
+     * @return array
+     */
+    protected function parseSubSelect($query)
+    {
+        if ($query instanceof self) {
+            $query->columns = [$query->columns[0]];
+
+            return [$query->toSql(), $query->getBindings()];
+        } elseif (is_string($query)) {
+            return [$query, []];
+        } else {
+            throw new InvalidArgumentException;
+        }
+    }
+
+    /**
      * Add a new select column to the query.
      *
      * @param  array|mixed  $column
@@ -288,6 +407,28 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a subquery join clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  string  $as
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $type
+     * @param  bool    $where
+     * @return \Illuminate\Database\Query\Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    {
+        list($query, $bindings) = $this->createSub($query);
+        $expression = '('.$query.') as '.$this->grammar->wrap($as);
+        $this->addBinding($bindings, 'join');
+        return $this->join(new CDatabase_Query_Expression($expression), $first, $operator, $second, $type, $where);
+    }
+
+    /**
      * Add a left join to the query.
      *
      * @param  string  $table
@@ -314,6 +455,21 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a subquery left join to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  string  $as
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'left');
+    }
+
+    /**
      * Add a right join to the query.
      *
      * @param  string  $table
@@ -337,6 +493,21 @@ class CDatabase_Query_Builder {
      */
     public function rightJoinWhere($table, $first, $operator, $second) {
         return $this->joinWhere($table, $first, $operator, $second, 'right');
+    }
+
+    /**
+     * Add a subquery right join to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  string  $as
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'right');
     }
 
     /**
@@ -519,7 +690,7 @@ class CDatabase_Query_Builder {
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
         if (cstr::contains($column, '->') && is_bool($value)) {
-            $value = new Expression($value ? 'true' : 'false');
+            $value = new CDatabase_Query_Expression($value ? 'true' : 'false');
         }
 
         // Now that we are working with just a simple query we can put the elements
@@ -531,7 +702,7 @@ class CDatabase_Query_Builder {
                 'type', 'column', 'operator', 'value', 'boolean'
         );
 
-        if (!$value instanceof Expression) {
+        if (!$value instanceof CDatabase_Query_Expression) {
             $this->addBinding($value, 'where');
         }
 
@@ -670,7 +841,7 @@ class CDatabase_Query_Builder {
         // in which case we will just skip over it since it will be the query as a raw
         // string and not as a parameterized place-holder to be replaced by the PDO.
         foreach ($values as $value) {
-            if (!$value instanceof Expression) {
+            if (!$value instanceof CDatabase_Query_Expression) {
                 $this->addBinding($value, 'where');
             }
         }
@@ -1303,7 +1474,7 @@ class CDatabase_Query_Builder {
      */
     protected function cleanBindings(array $bindings) {
         return array_values(array_filter($bindings, function ($binding) {
-                    return !$binding instanceof Expression;
+                    return !$binding instanceof CDatabase_Query_Expression;
                 }));
     }
 
@@ -1453,7 +1624,7 @@ class CDatabase_Query_Builder {
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (!$value instanceof Expression) {
+        if (!$value instanceof CDatabase_Query_Expression) {
             $this->addBinding($value, 'having');
         }
 

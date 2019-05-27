@@ -1658,8 +1658,8 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         if (!in_array($key, static::$proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
-
-        return new HigherOrderCollectionProxy($this, $key);
+        
+        return new CProxy_HigherOrderCollectionProxy($this, $key);
     }
 
 }

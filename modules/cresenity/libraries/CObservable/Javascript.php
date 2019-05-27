@@ -27,10 +27,17 @@ class CObservable_Javascript {
      */
     private $nativeObject;
 
+    /**
+     *
+     * @var CObservable_Javascript_Handler
+     */
+    private $handlerObject;
+
     public function __construct($owner = null) {
         $this->owner = $owner;
         $this->jQueryObject = new CObservable_Javascript_JQuery($this);
         $this->nativeObject = new CObservable_Javascript_Native($this);
+        $this->handlerObject = new CObservable_Javascript_Handler($this);
     }
 
     /**
@@ -125,6 +132,15 @@ class CObservable_Javascript {
      */
     public function jquery() {
         return $this->jQueryObject;
+    }
+    
+    
+    /**
+     * 
+     * @return CObservable_Javascript_Handler
+     */
+    public function handler() {
+        return $this->handlerObject;
     }
 
     public function __call($method, $arguments) {

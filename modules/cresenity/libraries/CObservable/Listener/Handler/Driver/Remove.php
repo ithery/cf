@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_Driver_Remove extends CObservable_Listener_Handler_Driver {
 
+    use CTrait_Compat_Handler_Driver_Remove;
+
     protected $target;
     protected $method;
     protected $content;
@@ -24,8 +26,9 @@ class CObservable_Listener_Handler_Driver_Remove extends CObservable_Listener_Ha
         $this->param_inputs = array();
     }
 
-    public function set_parent($parent) {
+    public function setParent($parent) {
         $this->parent = $parent;
+        return $this;
     }
 
     public function script() {

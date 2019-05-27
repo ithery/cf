@@ -10,7 +10,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CObservable_Listener_Handler_Driver_Dialog extends CObservable_Listener_Handler_Driver {
 
     use CTrait_Compat_Handler_Driver_Dialog,
-        CTrait_Element_Property_Title;
+        CTrait_Element_Property_Title,
+        CObservable_Listener_Handler_Trait_TargetHandlerTrait,
+        CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
 
     protected $target;
     protected $method;

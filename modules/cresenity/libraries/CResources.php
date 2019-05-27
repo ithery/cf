@@ -229,5 +229,20 @@ class CResources {
         }
         return $results;
     }
+    
+    public static function saveFromTemp($type, $resourceName, $tempPath, $resourceOptions = array()) {
+        if (!is_array($resourceOptions)) {
+            $resourceOptions = array();
+        }
+        
+        if (!isset($resourceOptions['app_code'])) {
+            $resourceOptions['app_code'] = CF::appCode();
+        }
+        
+        $resource = CResources::factory($type, $resourceName, $resourceOptions);
+        $filename = basename($tempPath);
+        $imageName = $resource->saveFromTemp($filename, $tempPath);
+        return $imageName;
+    }
 
 }

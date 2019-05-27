@@ -300,7 +300,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             if ($wildcard) {
                 return $listener($event, $payload);
             }
-            return call_user_func_array($listener,array_values($payload));
+            return call_user_func_array($listener, array_values($payload));
         };
     }
 

@@ -9,17 +9,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Handler_Driver {
 
+    use CTrait_Compat_Handler_Driver_Submit;
+
     protected $target;
     protected $method;
     protected $content;
     protected $param;
+    protected $formId;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
         $this->method = "get";
         $this->target = "";
         $this->content = CHandlerElement::factory();
-        $this->form_id = "";
+        $this->formId = "";
     }
 
     public function set_target($target) {
@@ -33,8 +36,8 @@ class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Ha
         $this->method = $method;
     }
 
-    public function set_form($form_id) {
-        $this->form_id = $form_id;
+    public function setForm($form_id) {
+        $this->formId = $form_id;
         return $this;
     }
 
@@ -44,13 +47,13 @@ class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Ha
 
     public function script() {
         $js = '';
-        if (strlen($this->form_id) == 0) {
+        if (strlen($this->formId) == 0) {
             $js .= "
 				$('#" . $this->owner . "').closest('form').submit();;
 			";
         } else {
             $js .= "
-				$('#" . $this->form_id . "').submit();;
+				$('#" . $this->formId . "').submit();;
 			";
         }
 

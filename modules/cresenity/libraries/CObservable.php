@@ -11,13 +11,9 @@ abstract class CObservable extends CRenderable {
         CObservable_Trait_ElementTrait,
         CObservable_Trait_ComponentTrait,
         CObservable_Trait_ListTrait,
-        CObservable_Trait_EventsTrait;
+        CObservable_Trait_EventsTrait,
+        CObservable_Trait_ListenerTrait;
 
-    /**
-     *
-     * @var CRenderable_Listener[]
-     */
-    protected $listeners;
     protected $manager;
 
     /**
@@ -26,9 +22,7 @@ abstract class CObservable extends CRenderable {
      */
     protected $javascript;
 
-    public function getListeners() {
-        return $this->listeners;
-    }
+   
 
     /**
      * 
@@ -45,17 +39,16 @@ abstract class CObservable extends CRenderable {
     public function jquery() {
         return $this->javascript->jquery();
     }
-
+    
     /**
      * 
-     * @param string $event
-     * @return CObservable_Listener
+     * @return CObservable_Javascript_Handler
      */
-    public function addListener($event) {
-        $listener = new CObservable_Listener($this->id, $event);
-        $this->listeners[] = $listener;
-        return $listener;
+    public function handler() {
+        return $this->javascript->handler();
     }
+
+    
 
     protected function __construct($id = "") {
 
@@ -83,6 +76,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('password', 'CElement_FormInput_Password');
         $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
         $this->manager->registerControl('select', 'CElement_FormInput_Select');
+        $this->manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
 
         $this->manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
         //$this->manager->registerControl('select-tag', 'CFormInputSelectTag');
@@ -180,7 +174,6 @@ abstract class CObservable extends CRenderable {
         return $calendar;
     }
 
-    
     public function addTabStaticList($tabs_id = "") {
         $tabs = CTabStaticList::factory($tabs_id);
         $this->add($tabs);
@@ -223,28 +216,7 @@ abstract class CObservable extends CRenderable {
         return $span;
     }
 
-    /**
-     * 
-     * @param string $id
-     * @return CElement_Component_Widget
-     */
-    public function addWidget($id = "") {
-        $widget = CElement_Factory::createComponent('Widget', $id);
-        $this->add($widget);
-        return $widget;
-    }
-
-    /**
-     * 
-     * @param string $id
-     * @return CElement_Component_Form
-     */
-    public function addForm($id = "") {
-        $form = CElement_Factory::createComponent('Form', $id);
-        $this->add($form);
-        return $form;
-    }
-
+   
     public function addPrismCode($id = "") {
         $code = CElement_Factory::createComponent('PrismCode', $id);
         $this->add($code);

@@ -696,4 +696,14 @@ class cdbg {
         return $c;
     }
 
+    public static function getTraceString() {
+        $trace = null;
+        try {
+            throw new Exception('test');
+        } catch (Exception $ex) {
+            $trace = $ex->getTraceAsString();
+        }
+        return $trace;
+    }
+
 }

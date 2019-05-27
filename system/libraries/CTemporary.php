@@ -119,4 +119,18 @@ class CTemporary {
         return $url . $filename;
     }
 
+    
+    /**
+     * 
+     * @param string $folder
+     * @param string $filename
+     * @return string
+     */
+    public static function delete($folder, $filename) {
+        
+
+        $path= static::makePath($folder, $filename);
+        return @unlink($path);
+        
+    }
 }

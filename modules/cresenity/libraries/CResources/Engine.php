@@ -92,6 +92,38 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         $this->_filename = $temp_file_name;
         return $temp_file_name;
     }
+    
+    public function saveFromTemp($file_name, $tempPath) {
+        $date_now = date("Y-m-d H:i:s");
+
+        $dir = $this->_root_directory . DS;
+
+        $org_code = $this->_org_code;
+        if ($org_code == null)
+            $org_code = 'default';
+        $dir .= $org_code . DS;
+
+
+        $dir .= $this->_resource_type . DS;
+
+
+        $dir .= $this->_type . DS;
+
+
+        $dir .= date('YmdHis', strtotime($date_now)) . DS;
+
+        cfs::mkdir($dir);
+
+        $temp_file_name = $org_code . '_' . $this->_resource_type . "_" . $this->_type . "_" . date('YmdHis', strtotime($date_now)) . "_" . $file_name;
+        $path = $dir . $temp_file_name;
+        $written = copy($tempPath, $path);
+
+        if ($written === false) {
+            throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
+        }
+        $this->_filename = $temp_file_name;
+        return $temp_file_name;
+    }
 
     
     public function saveFile($file_name, $file_request) {

@@ -18,21 +18,31 @@ class carr {
      * Tests if an array is associative or not.
      *
      *     // Returns TRUE
-     *     carr::is_assoc(array('username' => 'john.doe'));
+     *     carr::isAssoc(array('username' => 'john.doe'));
      *
      *     // Returns FALSE
-     *     carr::is_assoc('foo', 'bar');
+     *     carr::isAssoc('foo', 'bar');
      *
      * @param   array   $array  array to check
      * @return  boolean
      */
-    public static function is_assoc(array $array) {
+    public static function isAssoc(array $array) {
         // Keys of the array
         $keys = array_keys($array);
 
         // If the array keys of the keys match the keys, then the array must
         // not be associative (e.g. the keys array looked like {0:0, 1:1...}).
         return array_keys($keys) !== $keys;
+    }
+    /**
+     * Alias of isAssoc
+     * 
+     * @deprecated
+     * @param array $value array to check
+     * @return boolean
+     */
+    public static function is_assoc(array $array) {
+        return static::isAssoc($array);
     }
 
     /**
@@ -50,7 +60,7 @@ class carr {
      * @param   mixed   $value  value to check
      * @return  boolean
      */
-    public static function is_array($value) {
+    public static function isArray($value) {
         if (is_array($value)) {
             // Definitely an array
             return TRUE;
@@ -58,6 +68,17 @@ class carr {
             // Possibly a Traversable object, functionally the same as an array
             return (is_object($value) AND $value instanceof Traversable);
         }
+    }
+
+    /**
+     * Alias of isArray
+     * 
+     * @deprecated
+     * @param mixed $value value to check
+     * @return boolean
+     */
+    public static function is_array($value) {
+        return static::isArray($value);
     }
 
     /**
@@ -157,7 +178,7 @@ class carr {
      * @return  mixed
      */
     public static function path($array, $path, $default = NULL, $delimiter = NULL) {
-        if (!carr::is_array($array)) {
+        if (!carr::isArray($array)) {
             // This is not an array!
             return $default;
         }
@@ -196,7 +217,7 @@ class carr {
 
             if (isset($array[$key])) {
                 if ($keys) {
-                    if (carr::is_array($array[$key])) {
+                    if (carr::isArray($array[$key])) {
                         // Dig down into the next part of the path
                         $array = $array[$key];
                     } else {
@@ -387,7 +408,7 @@ class carr {
      * @return  array
      */
     public static function merge($array1, $array2) {
-        if (carr::is_assoc($array2)) {
+        if (carr::isAssoc($array2)) {
             foreach ($array2 as $key => $value) {
                 if (is_array($value)
                         AND isset($array1[$key])
@@ -909,6 +930,33 @@ class carr {
     public static function hash(array $array) {
         array_multisort($array);
         return md5(json_encode($array));
+    }
+
+    /**
+     * Get a value from the array, and remove it.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    public static function pull(&$array, $key, $default = null) {
+        $value = static::get($array, $key, $default);
+
+        static::forget($array, $key);
+
+        return $value;
+    }
+
+    /**
+     * Get a subset of the items from the given array.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return array
+     */
+    public static function only($array, $keys) {
+        return array_intersect_key($array, array_flip((array) $keys));
     }
 
 }

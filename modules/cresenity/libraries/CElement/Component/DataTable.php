@@ -86,7 +86,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->key_field = "";
         $this->columns = array();
         $this->rowActionList = CElement_Factory::createList('ActionList');
-        $this->rowActionList->setStyle('btn-icon-group');
+        $this->rowActionList->setStyle('btn-icon-group')->addClass('btn-table-action');
         $this->headerActionList = CElement_Factory::createList('ActionList');
         $this->headerActionList->setStyle('widget-action');
         $this->footer_action_list = CElement_List_ActionList::factory();
