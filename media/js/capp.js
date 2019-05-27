@@ -525,16 +525,16 @@ var Cresenity = function () {
         }
     };
     this.reload = function (options) {
-        var settings = $.extend({
+        let settings = $.extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
             url: '/',
             reloadType: 'reload',
             onComplete: false,
-            onSuccess:false,
-            onBlock:false,
-            onUnblock:false,
+            onSuccess: false,
+            onBlock: false,
+            onUnblock: false,
         }, options);
 
 
@@ -551,94 +551,96 @@ var Cresenity = function () {
             dataAddition = {};
         }
 
-        $(selector).each(function () {
-            var idTarget = $(this).attr('id');
-            url = cresenity.url.addQueryString(url, 'capp_current_container_id', idTarget);
+        (function (settings) {
+            $(selector).each(function () {
+                var idTarget = $(this).attr('id');
+                url = cresenity.url.addQueryString(url, 'capp_current_container_id', idTarget);
 
 
-            (function (element, settings) {
-                if(typeof settings.onBlock=='function') {
-                    settings.onBlock();
-                } else {
-                    cresenity.blockElement($(element));
-                }
-                
-                $(element).data('xhr', $.ajax({
-                    type: method,
-                    url: url,
-                    dataType: 'json',
-                    data: dataAddition,
-                    success: function (data) {
-                        cresenity.handleResponse(data, function () {
-                            switch (settings.reloadType) {
-                                case 'after':
-                                    $(element).after(data.html);
-                                    break;
-                                case 'before':
-                                    $(element).before(data.html);
-                                    break;
-                                case 'append':
-                                    $(element).append(data.html);
-                                    break;
-                                case 'prepend':
-                                    $(element).prepend(data.html);
-                                    break;
-                                default:
-                                    $(element).html(data.html);
-                                    break;
-                            }
-
-                            if (data.js && data.js.length > 0) {
-                                var script = cresenity.base64.decode(data.js);
-                                eval(script);
-                            }
-
-
-                            if ($(element).find('.prettyprint').length > 0) {
-                                window.prettyPrint && prettyPrint();
-                            }
-                            if(typeof settings.onSuccess=='function') {
-                                settings.onSuccess(data);
-                            }
-                        });
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        if (thrownError != 'abort') {
-                            cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
-                        }
-
-                    },
-                    complete: function () {
-                        $(element).data('xhr', false);
-                        if(typeof settings.onBlock=='function') {
-                            settings.onUnblock();
-                        } else {
-                            cresenity.unblockElement($(element));
-                        }
-                        
-                        if(typeof settings.onComplete=='function') {
-                            settings.onComplete();
-                        }
+                (function (element) {
+                    if (typeof settings.onBlock == 'function') {
+                        settings.onBlock();
+                    } else {
+                        cresenity.blockElement($(element));
                     }
-                }));
-            })(this, settings);
-        });
+
+                    $(element).data('xhr', $.ajax({
+                        type: method,
+                        url: url,
+                        dataType: 'json',
+                        data: dataAddition,
+                        success: function (data) {
+                            cresenity.handleResponse(data, function () {
+                                switch (settings.reloadType) {
+                                    case 'after':
+                                        $(element).after(data.html);
+                                        break;
+                                    case 'before':
+                                        $(element).before(data.html);
+                                        break;
+                                    case 'append':
+                                        $(element).append(data.html);
+                                        break;
+                                    case 'prepend':
+                                        $(element).prepend(data.html);
+                                        break;
+                                    default:
+                                        $(element).html(data.html);
+                                        break;
+                                }
+
+                                if (data.js && data.js.length > 0) {
+                                    var script = cresenity.base64.decode(data.js);
+                                    eval(script);
+                                }
+
+
+                                if ($(element).find('.prettyprint').length > 0) {
+                                    window.prettyPrint && prettyPrint();
+                                }
+                                if (typeof settings.onSuccess == 'function') {
+                                    settings.onSuccess(data);
+                                }
+                            });
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (thrownError != 'abort') {
+                                cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
+                            }
+
+                        },
+                        complete: function () {
+                            $(element).data('xhr', false);
+                            if (typeof settings.onBlock == 'function') {
+                                settings.onUnblock();
+                            } else {
+                                cresenity.unblockElement($(element));
+                            }
+
+                            if (typeof settings.onComplete == 'function') {
+                                settings.onComplete();
+                            }
+                        }
+                    }));
+                })(this);
+            });
+        })(settings);
 
     };
     this.append = function (options) {
-        options.reloadType='append';
+        options.reloadType = 'append';
         this.reload(options);
     };
     this.prepend = function (options) {
-        options.reloadType='prepend';
+        options.reloadType = 'prepend';
         this.reload(options);
     };
     this.after = function (options) {
-        options.reloadType='after';
+        options.reloadType = 'after';
         this.reload(options);
     };
     this.before = function (options) {
-        options.reloadType='before';
+        options.reloadType = 'before';
         this.reload(options);
     };
     this.confirm = function (options) {
