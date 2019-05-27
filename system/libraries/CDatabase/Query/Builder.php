@@ -288,7 +288,7 @@ class CDatabase_Query_Builder {
      */
     protected function parseSub($query)
     {
-        if ($query instanceof self) {
+        if ($query instanceof self || $query instanceof CModel_Query) {
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
