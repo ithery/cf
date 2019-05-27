@@ -11,6 +11,9 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
 
     /** @var CModel */
     protected $model;
+    
+    /** @var callable */
+    protected $callback;
 
     /** @var array */
     protected $attributes = [];
@@ -27,7 +30,9 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
      * @param array|\Closure $attributes
      *
      */
-    public function __construct($model, $attributes = []) {
+    public function __construct($model, $attributes = [], $callback = null) {
+        $this->callback = $callback;
+        
         if (!is_subclass_of($model, CModel::class)) {
             throw CModel_Search_Exception_InvalidSearchableModelException::notAModel($model);
         }
@@ -73,6 +78,9 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
             throw CModel_Search_Exception_InvalidModelSearchAspectException::noSearchableAttributes($this->model);
         }
         $query = call_user_func(array($this->model, 'query'));
+        if(is_callable($this->callback)) {
+            $query = call_user_func_array($this->callback, array($query));
+        }
         $this->addSearchConditions($query, $term);
 
         return $query->get();

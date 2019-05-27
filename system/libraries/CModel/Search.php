@@ -22,17 +22,14 @@ class CModel_Search {
         return $this;
     }
 
-    public function registerModel(/* string $modelClass, ...$attributes */) {
-        $args = func_get_args();
-        $modelClass = $args[0];
-        $attributes = array_slice($args, 1);
+    public function registerModel($modelClass, $attributes, $callback=null) {
         if (isset($attributes[0]) && is_callable($attributes[0])) {
             $attributes = $attributes[0];
         }
         if (is_array(carr::get($attributes, 0))) {
             $attributes = $attributes[0];
         }
-        $searchAspect = new CModel_Search_ModelSearchAspect($modelClass, $attributes);
+        $searchAspect = new CModel_Search_ModelSearchAspect($modelClass, $attributes, $callback);
         $this->registerAspect($searchAspect);
         return $this;
     }
