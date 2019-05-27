@@ -533,6 +533,8 @@ var Cresenity = function () {
             reloadType: 'reload',
             onComplete: false,
             onSuccess:false,
+            onBlock:false,
+            onUnblock:false,
         }, options);
 
 
@@ -555,8 +557,13 @@ var Cresenity = function () {
 
 
             (function (element, settings) {
-                cresenity.blockElement($(element));
-                $(this).data('xhr', $.ajax({
+                if(typeof settings.onBlock=='function') {
+                    settings.onBlock();
+                } else {
+                    cresenity.blockElement($(element));
+                }
+                
+                $(element).data('xhr', $.ajax({
                     type: method,
                     url: url,
                     dataType: 'json',
@@ -603,7 +610,12 @@ var Cresenity = function () {
                     },
                     complete: function () {
                         $(element).data('xhr', false);
-                        cresenity.unblockElement($(element));
+                        if(typeof settings.onBlock=='function') {
+                            settings.onUnblock();
+                        } else {
+                            cresenity.unblockElement($(element));
+                        }
+                        
                         if(typeof settings.onComplete=='function') {
                             settings.onComplete();
                         }
