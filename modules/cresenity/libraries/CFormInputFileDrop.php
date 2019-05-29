@@ -70,7 +70,7 @@ class CFormInputFileDrop extends CFormInput {
 
         $temp_path = 'temp/document/';
         foreach($_FILES as $f) {
-            move_uploaded_file($f['tmp_name'], $temp_path.DIRECTORY_SEPARATOR.str_replace(' ','_',$f['name']));
+            move_uploaded_file(basename($f['tmp_name']), $temp_path.DIRECTORY_SEPARATOR.str_replace(' ','_',$f['name']));
 			$f['tmp_name'] 	= $temp_path;
             $files[] = $f;
 		}
