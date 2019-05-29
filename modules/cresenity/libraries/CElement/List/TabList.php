@@ -265,9 +265,9 @@ class CElement_List_TabList extends CElement_List {
 					var data_icon = jQuery(this).attr('data-icon');
 					var data_class = jQuery(this).attr('data-class');
 					var data_text = jQuery(this).text();
-					if(data_icon) widget_tab.find('.widget-title .icon i').first().attr('class',data_icon);
+					if(data_icon) widget_tab.find('> .widget-title .icon i').first().attr('class',data_icon);
 					
-					if(data_text) widget_tab.find('.widget-title h5').first().html(data_text);
+					if(data_text) widget_tab.find('> .widget-title h5').first().html(data_text);
 					var widget_content = widget_tab.find('.widget-content').first();
 					widget_content.removeAttr('class').addClass('widget-content');
 					
