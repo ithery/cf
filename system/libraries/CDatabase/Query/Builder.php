@@ -1395,6 +1395,17 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Create a raw database expression.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Expression
+     */
+    public function raw($value)
+    {
+        return CDatabase::raw($value);
+    }
+
+    /**
      * Get the current query value bindings in a flattened array.
      *
      * @return array
