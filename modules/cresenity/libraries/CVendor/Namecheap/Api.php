@@ -8,6 +8,8 @@
 
 class CVendor_Namecheap_Api {
 
+    use CVendor_Namecheap_Trait_CommandTrait;
+    
     public $endPoint = 'https://api.namecheap.com/xml.response';
     public $apiUser;
     public $apiKey;
