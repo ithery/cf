@@ -7,7 +7,11 @@
  */
 
 trait CVendor_Namecheap_Trait_CommandTrait {
-    public function domain() {
+    /**
+     * 
+     * @return \CVendor_Namecheap_Command_Domains
+     */
+    public function domains() {
         return new CVendor_Namecheap_Command_Domains($this);
         
     }
