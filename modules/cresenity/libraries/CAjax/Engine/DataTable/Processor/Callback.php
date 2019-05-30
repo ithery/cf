@@ -35,7 +35,7 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
             "sEcho" => intval(carr::get($request, 'sEcho')),
             "iTotalRecords" => $totalRecord,
             "iTotalDisplayRecords" => $totalFilteredRecord,
-            "aaData" => $this->populateAAData($data,$table,$request),
+            "aaData" => $this->populateAAData($data,$table,$request,$js),
         );
         
 
