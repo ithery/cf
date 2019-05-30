@@ -7,7 +7,7 @@
  */
 
 trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
-    public function populateAAData($table) {
+    public function populateAAData($table,$request) {
         $aaData=array();
         $rowActionList = $table->getRowActionList();
         $no = carr::get($request, 'iDisplayStart', 0);
