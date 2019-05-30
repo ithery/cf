@@ -26,8 +26,8 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
         $resultCallback = call_user_func_array($callback, $params);
 
         $data = carr::get($resultCallback, 'data', array());
-        $totalRecord = carr::get($resultCallback, 'total_record', count($tableData));
-        $totalFilteredRecord = carr::get($resultCallback, 'total_filtered_record', count($tableData));
+        $totalRecord = carr::get($resultCallback, 'total_record', count($data));
+        $totalFilteredRecord = carr::get($resultCallback, 'total_filtered_record', count($data));
 
         
         $js = '';
