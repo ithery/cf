@@ -24,7 +24,7 @@ class CVendor_Namecheap_Api {
         $this->username = carr::get($options, 'username');
         $this->clientIp = carr::get($options, 'clientIp');
         $this->returnType = carr::get($options, 'returnType','json');
-        $environment = carr::get($options, 'environment', 'sandbox');
+        $environment = carr::get($options, 'environment', 'production');
         if($environment=='sandbox') {
             $this->enableSandbox();
         }

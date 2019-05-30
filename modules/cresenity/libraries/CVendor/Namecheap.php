@@ -8,7 +8,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CVendor_Namecheap {
-
+    
+    /**
+     * 
+     * @param type $options
+     * @return \CVendor_Namecheap_Api
+     */
     public static function api($options) {
         return new CVendor_Namecheap_Api($options);
     }
