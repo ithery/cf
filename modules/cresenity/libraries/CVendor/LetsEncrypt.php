@@ -62,6 +62,11 @@ class CVendor_LetsEncrypt {
         $this->client = $client;
     }
 
+    public function removeCertificate() {
+        $certificatePath = $this->certificateKeys;
+        CHelper::file()->deleteDirectory($certificatePath);
+    }
+
     public function haveCertificate() {
         return file_exists($this->getCertificatePath());
     }
@@ -94,16 +99,28 @@ class CVendor_LetsEncrypt {
         if (!$this->haveCertificate()) {
             return false;
         }
-        $orderFile = $this->certificateKeys . 'order';
-        if (!file_exists($orderFile)) {
-            return false;
-        }
-        $orderUrl = trim(file_get_contents($orderFile));
-        $curl = CCurl::factory($orderUrl);
-        $response = $curl->exec()->response();
-        $data = json_decode($response, true);
-        if (!is_array($data)) {
-            return false;
+        $data = array();
+        $orderDataFile = $this->certificateKeys . 'orderData';
+        if (!file_exists($orderDataFile)) {
+            $orderFile = $this->certificateKeys . 'order';
+            if (!file_exists($orderFile)) {
+                return false;
+            }
+            $orderUrl = trim(file_get_contents($orderFile));
+            $curl = CCurl::factory($orderUrl);
+            $response = $curl->exec()->response();
+
+            $data = json_decode($response, true);
+            if (!is_array($data)) {
+                return false;
+            }
+            file_put_contents($orderDataFile, $response);
+        } else {
+            $response = trim(file_get_contents($orderDataFile));
+            $data = json_decode($response, true);
+            if (!is_array($data)) {
+                return false;
+            }
         }
         return $data;
     }
