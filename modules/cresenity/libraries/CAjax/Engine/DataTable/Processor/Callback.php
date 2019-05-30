@@ -23,6 +23,7 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
         $callback = carr::get($data, 'query');
         $params = array();
         $params['options'] = carr::get($data, 'callback_options');
+        
         $resultCallback = call_user_func_array($callback, $params);
 
         $data = carr::get($resultCallback, 'data', array());

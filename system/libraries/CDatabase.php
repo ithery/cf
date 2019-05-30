@@ -62,6 +62,8 @@ class CDatabase {
     protected $last_query = '';
     // Stack of queries for push/pop
     protected $query_history = array();
+    
+    protected $in_trans = false;
 
     /**
      * The event dispatcher instance.
@@ -1099,7 +1101,7 @@ class CDatabase {
      *
      * @return  string SQL
      */
-    public function last_query() {
+    public function lastQuery() {
         return $this->last_query;
     }
 
@@ -1385,13 +1387,13 @@ class CDatabase {
         return FALSE;
     }
 
-    protected $in_trans = false;
+    
 
     public function __destruct() {
         self::rollback();
     }
 
-    public function in_transaction() {
+    public function inTransaction() {
         return $this->in_trans;
     }
 
@@ -1413,13 +1415,13 @@ class CDatabase {
         $this->in_trans = false;
     }
 
-    public function escape_like($str) {
+    public function escapeLike($str) {
         //$str = str_replace(array($e, '_', '%'), array($e.$e, $e.'_', $e.'%'), $s);
         $str = $this->escape_str($str);
         return $str;
     }
 
-    public function driver_name() {
+    public function driverName() {
         return ucfirst($this->config['connection']['type']);
     }
 
