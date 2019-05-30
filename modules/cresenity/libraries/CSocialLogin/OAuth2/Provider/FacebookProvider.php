@@ -76,7 +76,7 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
             $postKey => $this->getTokenFields($code),
         ]);
         $data = json_decode($response->getBody(), true);
-        return Arr::add($data, 'expires_in', Arr::pull($data, 'expires'));
+        return carr::add($data, 'expires_in', carr::pull($data, 'expires'));
     }
 
     /**
