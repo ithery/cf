@@ -160,13 +160,6 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
 
 
 
-
-        $output = array(
-            "sEcho" => intval(carr::get($request, 'sEcho')),
-            "iTotalRecords" => $totalRecord,
-            "iTotalDisplayRecords" => $totalFilteredRecord,
-            "aaData" => $tableData,
-        );
         $data = array(
             "datatable" => $output,
             "js" => cbase64::encode($js),
