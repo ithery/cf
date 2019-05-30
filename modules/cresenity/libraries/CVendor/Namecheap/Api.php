@@ -21,7 +21,7 @@ class CVendor_Namecheap_Api {
     public function __construct($options) {
         $this->apiUser = carr::get($options, 'apiUser');
         $this->apiKey = carr::get($options, 'apiKey');
-        $this->username = carr::get($options, 'username');
+        $this->userName = carr::get($options, 'username');
         $this->clientIp = carr::get($options, 'clientIp');
         $this->returnType = carr::get($options, 'returnType','json');
         $environment = carr::get($options, 'environment', 'production');
