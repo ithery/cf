@@ -130,5 +130,6 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             }
             $aaData[] = $arr;
         }
+        return $aaData;
     }
 }
