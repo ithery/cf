@@ -38,6 +38,7 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
             "aaData" => array(),
         );
         $no = carr::get($request, 'iDisplayStart', 0);
+        $rowActionList = $table->getRowActionList();
         foreach ($data as $row) {
             $arr = array();
             $no++;
