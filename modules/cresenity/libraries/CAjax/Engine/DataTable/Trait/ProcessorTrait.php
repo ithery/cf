@@ -10,6 +10,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
     public function populateAAData($table) {
         $aaData=array();
         $rowActionList = $table->getRowActionList();
+        $no = carr::get($request, 'iDisplayStart', 0);
         foreach ($data as $row) {
             $arr = array();
             $no++;
