@@ -38,14 +38,7 @@ return array(
         "name" => "administrator.stats",
         "label" => "Stats",
         "icon" => " lnr lnr-chart-bars",
-        "subnav" => array(
-            array(
-                "name" => "administrator.stats.phpinfo",
-                "label" => "PHP Info",
-                "controller" => "administrator/stats/phpinfo",
-                "method" => "index",
-            ),
-        ),
+        "subnav" => include dirname(__FILE__) . "/Navigation/Stats" . EXT,
     ),
     array(
         "name" => "administrator.vendor",

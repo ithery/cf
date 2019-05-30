@@ -30,7 +30,8 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
         $widget = $app->addWidget()->setTitle('Info');
         if (!$haveCertificate) {
             //generate button create certificate
-            $widget->header()->addAction()->setLabel('Create Certificate')->addClass('btn-primary')->setLink(curl::base() . 'administrator/vendor/letsencrypt/order');
+            $widget->header()->addAction()->setLabel('Create Certificate')->addClass('btn-primary')->setLink(curl::base() . 'administrator/vendor/letsencrypt/order/single');
+            $widget->header()->addAction()->setLabel('Create Wildcard Certificate')->addClass('btn-primary')->setLink(curl::base() . 'administrator/vendor/letsencrypt/order/wildcard');
         }
         $form = $widget->addForm();
         $divRow = $form->addDiv()->addClass('row');
@@ -61,7 +62,7 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
         echo $app->render();
     }
 
-    public function order() {
+    public function order($type='single') {
         $options = array();
         $options['email'] = array('hery@ittron.co.id');
 
@@ -69,7 +70,9 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
         $basename = CHelper_Domain::getTopLevelDomain($domain);
         $domains = array($domain);
 
-
+        if($type=='wildcard') {
+            $domain = '*.'.$domain;
+        }
         //$options['log'] = LEClient\LEClient::LOG_DEBUG;
         $letsEncrypt = CVendor::letsEncrypt($options);
         $haveCertificate = $letsEncrypt->haveCertificate();
