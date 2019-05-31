@@ -22,7 +22,7 @@ class CModel_Search {
         return $this;
     }
 
-    public function registerModel($modelClass, $attributes, $callback=null) {
+    public function registerModel($modelClass, $attributes, $callback = null) {
         if (isset($attributes[0]) && is_callable($attributes[0])) {
             $attributes = $attributes[0];
         }
@@ -38,15 +38,15 @@ class CModel_Search {
         return $this->aspects;
     }
 
-    public function search($query, $user = null) {
-        return $this->perform($query, $user);
+    public function search($query, $user = null, $page = null, $perPage = null) {
+        return $this->perform($query, $user, $page, $perPage);
     }
 
-    public function perform($query, $user = null) {
+    public function perform($query, $user = null, $page = null, $perPage = null) {
         $searchResults = new CModel_Search_SearchResultCollection();
         CF::collect($this->getSearchAspects())
-                ->each(function (CModel_Search_SearchAspect $aspect) use ($query, $user, $searchResults) {
-                    $searchResults->addResults($aspect->getType(), $aspect->getResults($query, $user));
+                ->each(function (CModel_Search_SearchAspect $aspect) use ($query, $user, $page, $perPage, $searchResults) {
+                    $searchResults->addResults($aspect->getType(), $aspect->getResults($query, $user, $page, $perPage));
                 });
         return $searchResults;
     }

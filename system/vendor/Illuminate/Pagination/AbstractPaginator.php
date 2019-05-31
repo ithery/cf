@@ -562,6 +562,13 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function __call($method, $parameters)
     {
+        if($method=='get') {
+            try {
+                throw new \Exception('a');
+            } catch(\Exception $ex) {
+                \cdbg::var_dump($ex->getTraceAsString());
+            }
+        }
         return $this->getCollection()->$method(...$parameters);
     }
 

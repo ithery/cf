@@ -65,6 +65,14 @@ class cdbg {
             return $html;
         }
     }
+    
+    public static function varDumpTrace($message='dump',$return = FALSE) {
+        try {
+            throw new Exception($message);
+        } catch (Exception $ex) {
+            cdbg::varDump($ex->getTraceAsString(),$return);
+        }
+    }
 
     /**
      * Dump the passed variables and end the script.
