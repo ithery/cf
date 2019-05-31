@@ -481,7 +481,7 @@ return array(
         "css" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
             "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css",
-            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css",
+            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css?v=1",
         ),
         "js" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
@@ -629,6 +629,14 @@ return array(
         ),
         "css" => array(
             "plugins/vis/vis.min.css",
+        ),
+    ),
+    "minicolors" => array(
+        "js" => array(
+            "plugins/minicolors/minicolors.js",
+        ),
+        "css" => array(
+            "plugins/minicolors/minicolors.css",
         ),
     ),
 );

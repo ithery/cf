@@ -32,38 +32,42 @@ return array(
         "name" => "administrator.database",
         "label" => "Database",
         "icon" => " lnr lnr-database",
-        "subnav" => array(
-            array(
-                "name" => "administrator.database.console",
-                "label" => "DB Console",
-                "controller" => "administrator/database/console",
-                "method" => "index",
-            ),
-            array(
-                "name" => "administrator.database.generator",
-                "label" => "DB Generator",
-                "controller" => "administrator/database/generator",
-                "method" => "index",
-            ),
-        ),
+        "subnav" => include dirname(__FILE__) . "/Navigation/Database" . EXT,
     ),
     array(
         "name" => "administrator.stats",
         "label" => "Stats",
         "icon" => " lnr lnr-chart-bars",
-        "subnav" => array(
-            array(
-                "name" => "administrator.stats.phpinfo",
-                "label" => "PHP Info",
-                "controller" => "administrator/stats/phpinfo",
-                "method" => "index",
-            ),
-        ),
+        "subnav" => include dirname(__FILE__) . "/Navigation/Stats" . EXT,
+    ),
+    array(
+        "name" => "administrator.vendor",
+        "label" => "Vendor",
+        "icon" => " lnr lnr-license",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Vendor" . EXT,
+    ),
+    array(
+        "name" => "administrator.cdn",
+        "label" => "CDN",
+        "icon" => " lnr lnr-earth",
+        "subnav" => include dirname(__FILE__) . "/Navigation/CDN" . EXT,
     ),
     array(
         "name" => "administrator.cloud",
         "label" => "Dev Cloud",
         "icon" => " lnr lnr-cloud",
         "subnav" => include dirname(__FILE__) . "/Navigation/Cloud" . EXT,
+    ),
+    array(
+        "name" => "administrator.setting",
+        "label" => "Setting",
+        "icon" => " lnr lnr-cog",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Setting" . EXT,
+    ),
+    array(
+        "name" => "administrator.documentation",
+        "label" => "Documentation",
+        "icon" => " lnr lnr-question-circle",
+        "subnav" => include dirname(__FILE__) . "/Navigation/Documentation" . EXT,
     ),
 );

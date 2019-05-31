@@ -13,13 +13,11 @@ class CDatabase_Dispatcher extends CEvent_Dispatcher {
 
     public static function instance() {
         if (self::$instance == null) {
-            self::$instance = new CEvent_Dispatcher();
+            self::$instance = new CDatabase_Dispatcher();
         }
         return self::$instance;
     }
 
-    public function __construct() {
-        
-    }
+ 
 
 }

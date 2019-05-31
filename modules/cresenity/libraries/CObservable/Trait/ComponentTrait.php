@@ -87,4 +87,26 @@ trait CObservable_Trait_ComponentTrait {
         return $fileManager;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Widget
+     */
+    public function addWidget($id = "") {
+        $widget = CElement_Factory::createComponent('Widget', $id);
+        $this->add($widget);
+        return $widget;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Form
+     */
+    public function addForm($id = "") {
+        $form = CElement_Factory::createComponent('Form', $id);
+        $this->add($form);
+        return $form;
+    }
+
 }

@@ -258,6 +258,10 @@ trait CApp_Trait_Base {
     public static function noImageUrl($width = 100, $height = 100) {
         return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height;
     }
+    
+    public static function transparentImageUrl($width = 100, $height = 100) {
+        return curl::httpbase() . 'cresenity/transparent/' . $width . '/' . $height;
+    }
 
     public static function gravatarImageUrl($email, $s = 100, $default = 'mp') {
         if ($default == null) {

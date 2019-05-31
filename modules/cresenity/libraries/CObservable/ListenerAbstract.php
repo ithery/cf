@@ -9,15 +9,27 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class CObservable_ListenerAbstract {
 
+    use CObservable_Listener_Trait_HandlerTrait;
+
     protected $owner;
     protected $handlers;
+    protected $event;
+    protected $eventParameters = array();
 
     public function __construct($owner) {
         $this->owner = $owner;
         $this->handlers = array();
     }
 
+    public function getEvent() {
+        return $this->event;
+    }
+
     public function owner() {
+        return $this->getOwner();
+    }
+
+    public function getOwner() {
         return $this->owner;
     }
 
@@ -51,7 +63,35 @@ abstract class CObservable_ListenerAbstract {
      * @return CObservable_Listener_Handler
      */
     public function addHandler($handlerName) {
-        $handler = new CObservable_Listener_Handler($this->owner, $this->event, $handlerName);
+        switch ($handlerName) {
+            case 'reload':
+                $handler = new CObservable_Listener_Handler_ReloadHandler($this);
+                break;
+            case 'dialog':
+                $handler = new CObservable_Listener_Handler_DialogHandler($this);
+                break;
+            case 'append':
+                $handler = new CObservable_Listener_Handler_AppendHandler($this);
+                break;
+            case 'prepend':
+                $handler = new CObservable_Listener_Handler_PrependHandler($this);
+                break;
+            case 'submit':
+                $handler = new CObservable_Listener_Handler_SubmitHandler($this);
+                break;
+            case 'ajaxSubmit':
+                $handler = new CObservable_Listener_Handler_AjaxSubmitHandler($this);
+                break;
+            case 'remove':
+                $handler = new CObservable_Listener_Handler_RemoveHandler($this);
+                break;
+            case 'custom':
+                $handler = new CObservable_Listener_Handler_CustomHandler($this);
+                break;
+            default:
+                throw new Exception('Handler : ' . $handlerName . ' not defined');
+                break;
+        }
         $this->handlers[] = $handler;
         return $handler;
     }

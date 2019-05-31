@@ -106,8 +106,8 @@ $maxHeight .= $suffixHeight;
                                     }
                                 });
 
-                                cropperModal.find('.btn-crop').click(function () {
-
+                                cropperModal.find('.btn-crop').click(function (e) {
+                                    e.stopPropagation();
                                     var mime = 'image/png';
                                     if (cropperImg.attr('src').indexOf('image/jpeg') >= 0) {
                                         mime = 'image/jpeg';

@@ -11,11 +11,12 @@ trait CApp_Trait_Template {
 
     protected $templateName;
     protected $templateData;
-    protected $templateHeaderName = null;
-    protected $templateFooterName = null;
     protected $htmlOutput = '';
     protected $jsOutput = '';
     protected $onBeforeParse = null;
+    protected $sections = array();
+    private $sectionJs = '';
+    protected $skeleton = '';
 
     /**
      *
@@ -33,14 +34,34 @@ trait CApp_Trait_Template {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $name
+     * @return $this
+     */
+    public function setSkeleton($name) {
+        $this->skeleton = $name;
+        return $this;
+    }
+
     public function getData() {
         return $this->templateData;
     }
 
-    public function setData($data) {
-        foreach ($data as $k => $v) {
-            $this->setVar($k, $v);
+    public function section($sectionName) {
+        if (!isset($this->sections[$sectionName])) {
+            $this->sections[$sectionName] = new CElement_PseudoElement();
         }
+        return $this->sections[$sectionName];
+    }
+
+    public function setData($data) {
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                $this->setVar($k, $v);
+            }
+        }
+
         return $this;
     }
 
@@ -53,7 +74,7 @@ trait CApp_Trait_Template {
         return $this;
     }
 
-    private function getTemplatePath($templateName) {
+    public function getTemplatePath($templateName) {
         $viewPath = $templateName;
         return $viewPath;
     }
@@ -62,29 +83,62 @@ trait CApp_Trait_Template {
         $this->helpers[$helperName] = $callable;
     }
 
-    private function parseTemplate($templateName) {
+    private function parseTemplate($noSkeleton = false) {
         if ($this->onBeforeParse != null) {
             $callable = $this->onBeforeParse;
             $callable();
         }
-
+        $templateName = $this->templateName;
+        $isSkeleton = false;
+        if (strlen($this->skeleton) > 0 && !$noSkeleton) {
+            $isSkeleton = true;
+            $templateName = $this->skeleton;
+        }
+        $outputJs = "";
+        $templateJs = '';
         $viewPath = $this->getTemplatePath($templateName);
         $view = new CTemplate($viewPath);
+        $view->setBlockRoutingCallback(array($this, 'getTemplatePath'));
         $helpers = $view->getHelpers();
+        if ($isSkeleton) {
+            $helpers->set('template', function () use ($templateJs) {
+
+                $result = $this->parseTemplate(true);
+                $html = carr::get($result, 'html');
+                $js = carr::get($result, 'js');
+
+                return $html . '<script>' . $js . '</script>';
+            });
+        }
+
         $helpers->set('content', function () {
 
             return $this->htmlChild();
         });
         $helpers->set('htmlContent', function () {
-
-            return $this->htmlChild();
+            if ($this instanceof CElement) {
+                return $this->htmlChild();
+            }
+            return $this->html();
         });
         $helpers->set('jsContent', function () {
-
-            return $this->jsChild();
+            if ($this instanceof CElement) {
+                return $this->jsChild();
+            }
+            return $this->js();
         });
         $helpers->set('element', function () {
             return $this;
+        });
+
+        $helpers->set('section', function ($sectionName) {
+            $section = $this->section($sectionName);
+            if ($this instanceof CElement) {
+                $this->sectionJs .= $section->jsChild();
+                return $section->htmlChild();
+            }
+            $this->sectionJs .= $section->js();
+            return $section->html();
         });
 
         foreach ($this->helpers as $helperName => $callback) {
@@ -92,17 +146,17 @@ trait CApp_Trait_Template {
         }
         $view->set($this->templateData);
         $output = $view->render();
-        $output_js = "";
+
         preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
 
         foreach ($matches[1] as $value) {
-            $output_js .= $value;
+            $outputJs .= $value;
         }
-        $output_html = preg_replace('#<script>(.*?)</script>#is', '', $output);
+        $outputHtml = preg_replace('#<script>(.*?)</script>#is', '', $output);
 
         return array(
-            'html' => $output_html,
-            'js' => $output_js,
+            'html' => $outputHtml,
+            'js' => $outputJs,
         );
     }
 
@@ -115,24 +169,20 @@ trait CApp_Trait_Template {
 
     protected function collectHtmlJs() {
 
-        $resultHeader = array();
-        $resultContent = array();
-        $resultFooter = array();
 
-        if ($this->templateHeaderName != null) {
-            $resultHeader = $this->parseTemplate($this->templateHeaderName);
-        }
-        $resultContent = $this->parseTemplate($this->templateName);
-        if ($this->templateFooterName != null) {
-            $resultFooter = $this->parseTemplate($this->templateFooterName);
-        }
+        $resultContent = $this->parseTemplate();
 
-        $this->htmlOutput = carr::get($resultHeader, 'html', '') . carr::get($resultContent, 'html', '') . carr::get($resultFooter, 'html', '');
-        $this->jsOutput = carr::get($resultHeader, 'js', '') . carr::get($resultContent, 'js', '') . carr::get($resultFooter, 'js', '');
+
+        $this->htmlOutput = carr::get($resultContent, 'html', '');
+        $this->jsOutput = carr::get($resultContent, 'js', '');
 
         //htmlChild will concat in helper template content, we need to concat the js here
-        $this->jsOutput .= parent::js();
-
+        $this->jsOutput .= $this->sectionJs;
+        if ($this instanceof CElement) {
+            $this->jsOutput .= parent::jsChild();
+        } else if ($this instanceof CRenderable) {
+            $this->jsOutput .= parent::js();
+        }
         return true;
     }
 

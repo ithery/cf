@@ -49,6 +49,9 @@ class CApp_Cloud_Api {
             $response = $this->adapter->post(sprintf('%s/%s', $this->endPoint, $query), $post);
         } catch (CApp_Cloud_Exception_HttpException $ex) {
             $errCode++;
+            $errMessage = 'Api error with message:' . $ex->getMessage() . ', status code:' . $ex->getCode();
+        } catch (CApp_Cloud_Exception_HttpException $ex) {
+            $errCode++;
             $errMessage = 'HTTP error with message:' . $ex->getMessage() . ', status code:' . $ex->getCode();
         } catch (Exception $ex) {
             $errCode++;

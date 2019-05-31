@@ -300,6 +300,9 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      * @link https://jira.mariadb.org/browse/MDEV-4088
      */
     public function getServerVersion() {
+        if(!$this->link) {
+            $this->connect();
+        }
         $serverInfos = $this->link->get_server_info();
         if (false !== stripos($serverInfos, 'mariadb')) {
             return $serverInfos;

@@ -1,18 +1,13 @@
 <?php
 
-namespace Illuminate\Database\Eloquent\Relations;
+class CModel_Relation_MorphMany extends CModel_Relation_MorphOneOrMany {
 
-use Illuminate\Database\Eloquent\Collection;
-
-class MorphMany extends MorphOneOrMany
-{
     /**
      * Get the results of the relationship.
      *
      * @return mixed
      */
-    public function getResults()
-    {
+    public function getResults() {
         return $this->query->get();
     }
 
@@ -23,8 +18,7 @@ class MorphMany extends MorphOneOrMany
      * @param  string  $relation
      * @return array
      */
-    public function initRelation(array $models, $relation)
-    {
+    public function initRelation(array $models, $relation) {
         foreach ($models as $model) {
             $model->setRelation($relation, $this->related->newCollection());
         }
@@ -36,12 +30,12 @@ class MorphMany extends MorphOneOrMany
      * Match the eagerly loaded results to their parents.
      *
      * @param  array   $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection $results, $relation)
-    {
+    public function match(array $models, CModel_Collection $results, $relation) {
         return $this->matchMany($models, $results, $relation);
     }
+
 }

@@ -2,8 +2,6 @@
 
 namespace React\Socket;
 
-use React\Socket\ConnectorInterface;
-
 /**
  * Decorates an existing Connector to always use a fixed, preconfigured URI
  *
@@ -12,9 +10,9 @@ use React\Socket\ConnectorInterface;
  * instead of connecting to a default address assumed by an higher-level API:
  *
  * ```php
- * $connector = new FixedUriConnector(
+ * $connector = new React\Socket\FixedUriConnector(
  *     'unix:///var/run/docker.sock',
- *     new UnixConnector($loop)
+ *     new React\Socket\UnixConnector($loop)
  * );
  *
  * // destination will be ignored, actually connects to Unix domain socket

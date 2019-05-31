@@ -8,3 +8,10 @@ and open the template in the editor.
     Author     : Hery Kurniawan
 */
 
+
+.console {
+    background: #000;
+    color: #ccc;
+    white-space: pre-wrap;
+    font-family: monospace
+}
