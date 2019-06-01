@@ -2,6 +2,8 @@
 
 namespace React\Promise;
 
+require_once dirname(__FILE__) . '/functions_include.php';
+
 final class Promise implements PromiseInterface
 {
     private $canceller;
