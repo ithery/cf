@@ -1,14 +1,15 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
 trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
-    public function populateAAData($data,$table,$request, &$js) {
-        $aaData=array();
+
+    public function populateAAData($data, $table, $request, &$js) {
+        $aaData = array();
         $rowActionList = $table->getRowActionList();
         $no = carr::get($request, 'iDisplayStart', 0);
         foreach ($data as $row) {
@@ -27,18 +28,13 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             foreach ($table->columns as $col) {
                 $col_found = false;
                 $new_v = "";
-                $col_v = "";
-                $ori_v = "";
-                //do print from query
-                foreach ($row as $k => $v) {
-                    if ($k == $col->getFieldname()) {
-                        $col_v = $v;
-                        $ori_v = $col_v;
-                        foreach ($col->transforms as $trans) {
-                            $col_v = $trans->execute($col_v);
-                        }
-                    }
+                $col_v = carr::get($row, $col->getFieldname());
+                $ori_v = $col_v;
+                //do transform
+                foreach ($col->transforms as $trans) {
+                    $col_v = $trans->execute($col_v);
                 }
+
                 //if formatted
                 if (strlen($col->getFormat()) > 0) {
                     $temp_v = $col->getFormat();
@@ -49,7 +45,15 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                         $col_v = $temp_v;
                     }
                 }
-
+                //if have callback
+                if ($col->callback != null) {
+                    $col_v = CFunction::factory($col->callback)
+                            ->addArg($table)
+                            ->addArg($row)
+                            ->addArg($col_v)
+                            ->setRequire($col->callbackRequire)
+                            ->execute();
+                }
                 $new_v = $col_v;
 
                 if (($table->cellCallbackFunc) != null) {
@@ -132,4 +136,5 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
         }
         return $aaData;
     }
+
 }

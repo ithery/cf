@@ -101,10 +101,8 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     public function setCallback($callback, $require = '') {
-        if ($callback instanceof \Closure) {
-            $callback = new SerializableClosure($callback);
-        }
-        $this->callback = $callback;
+
+        $this->callback = CHelper::closure()->serializeClosure($callback);
         $this->callbackRequire = $this->callbackRequire;
         return $this;
     }

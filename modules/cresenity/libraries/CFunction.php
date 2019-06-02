@@ -26,7 +26,8 @@ class CFunction {
     public $type = "defined"; //defined,class,
 
     private function __construct($func) {
-        $this->func = $func;
+        
+        $this->func = CHelper::closure()->deserializeClosure($func);
     }
 
     public static function factory($func) {
