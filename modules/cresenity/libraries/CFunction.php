@@ -58,6 +58,13 @@ class CFunction {
     }
 
     public function setRequire($p) {
+        if ($p == null) {
+            $p = array();
+        }
+        if (is_string($p)) {
+            $p = array($p);
+        }
+
         $this->requires = $p;
         return $this;
     }
