@@ -79,5 +79,9 @@ class CObject {
         return false;
     }
 
-    
+    public function isUseTrait($trait) {
+        $traits = CF::class_uses_recursive(get_class($this));
+        return $traits[$trait];
+    }
+
 }
