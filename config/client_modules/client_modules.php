@@ -639,5 +639,14 @@ return array(
             "plugins/minicolors/minicolors.css",
         ),
     ),
+    
+    "dragula" => array(
+        "js" => array(
+            "plugins/dragula/dragula.js",
+        ),
+        "css" => array(
+            "plugins/dragula/dragula.css",
+        ),
+    ),
 );
 ?>
