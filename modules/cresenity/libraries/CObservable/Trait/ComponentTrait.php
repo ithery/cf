@@ -23,6 +23,17 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * 
      * @param string $id
+     * @return CElement_Component_ListGroup
+     */
+    public function addListGroup($id = "") {
+        $listGroup = CElement_Factory::createComponent('ListGroup', $id);
+        $this->add($listGroup);
+        return $listGroup;
+    }
+
+    /**
+     * 
+     * @param string $id
      * @return CElement_Component_DataGridList
      */
     public function addDataGridList($id = "") {
