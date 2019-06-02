@@ -1,5 +1,7 @@
 <?php
 
+use SuperClosure\SerializableClosure;
+
 class CElement_Component_DataTable_Column extends CObject {
 
     use CTrait_Compat_Element_DataTable_Column,
@@ -16,7 +18,9 @@ class CElement_Component_DataTable_Column extends CObject {
     public $editable;
     public $visible;
     public $input_type;
-    public $no_line_break;
+    public $noLineBreak;
+    public $callback;
+    public $callbackRequire;
 
     public function __construct($fieldname) {
         parent::__construct();
@@ -32,10 +36,12 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->visible = true;
         $this->input_type = "text";
         $this->editable = true;
-        $this->no_line_break = false;
+        $this->noLineBreak = false;
         $this->hiddenPhone = false;
         $this->hiddenTablet = false;
         $this->hiddenDesktop = false;
+        $this->callback = null;
+        $this->callbackRequire = null;
     }
 
     public static function factory($fieldname) {
@@ -56,11 +62,11 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     public function getNoLineBreak() {
-        return $this->no_line_break;
+        return $this->noLineBreak;
     }
 
     public function setNoLineBreak($bool) {
-        $this->no_line_break = $bool;
+        $this->noLineBreak = $bool;
         return $this;
     }
 
@@ -94,6 +100,15 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    public function setCallback($callback, $require = '') {
+        if ($callback instanceof \Closure) {
+            $callback = new SerializableClosure($callback);
+        }
+        $this->callback = $callback;
+        $this->callbackRequire = $this->callbackRequire;
+        return $this;
+    }
+
     public function addTransform($name, $args = array()) {
         $func = CFunction::factory($name);
         if (!is_array($args)) {
@@ -117,13 +132,13 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this->format;
     }
 
-    public function renderHeaderHtml($export_pdf, $th_class = "", $indent = 0) {
+    public function renderHeaderHtml($exportPdf, $thClass = "", $indent = 0) {
 
-        $pdf_thead_td_attr = '';
-        if ($export_pdf) {
+        $pdfTHeadTdAttr = '';
+        if ($exportPdf) {
 
 
-            $pdf_thead_td_attr = ' bgcolor="#9f9f9f" color="#000"  ';
+            $pdfTHeadTdAttr = ' bgcolor="#9f9f9f" color="#000"  ';
         }
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -141,32 +156,36 @@ class CElement_Component_DataTable_Column extends CObject {
             case "center": $data_align .= "align-center";
                 break;
         }
-        $data_no_line_break = "";
+        $dataNoLineBreak = "";
         if ($this->getNoLineBreak()) {
-            $data_no_line_break = "no-line-break";
+            $dataNoLineBreak = "no-line-break";
         }
-        if ($export_pdf) {
+        if ($exportPdf) {
             switch ($this->getAlign()) {
-                case "left": $pdf_thead_td_attr .= ' align="left"';
+                case "left": $pdfTHeadTdAttr .= ' align="left"';
                     break;
-                case "right": $pdf_thead_td_attr .= ' align="right"';
+                case "right": $pdfTHeadTdAttr .= ' align="right"';
                     break;
-                case "center": $pdf_thead_td_attr .= ' align="center"';
+                case "center": $pdfTHeadTdAttr .= ' align="center"';
                     break;
             }
         }
-        if ($this->sortable)
+        if ($this->sortable) {
             $class .= " sortable";
-        if ($this->hiddenPhone)
+        }
+        if ($this->hiddenPhone) {
             $class .= " hidden-phone";
-        if ($this->hiddenTablet)
+        }
+        if ($this->hiddenTablet) {
             $class .= " hidden-tablet";
-        if ($this->hiddenDesktop)
+        }
+        if ($this->hiddenDesktop) {
             $class .= " hidden-desktop";
-        if ($export_pdf) {
-            $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldname . '" align="center" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
+        }
+        if ($exportPdf) {
+            $html->appendln('<th ' . $pdfTHeadTdAttr . ' field_name = "' . $this->fieldname . '" align="center" class="thead ' . $thClass . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
         } else {
-            $html->appendln('<th ' . $pdf_thead_td_attr . ' field_name = "' . $this->fieldname . '" data-no-line-break="' . $data_no_line_break . '" data-align="' . $data_align . '" class="thead ' . $th_class . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
+            $html->appendln('<th ' . $pdfTHeadTdAttr . ' field_name = "' . $this->fieldname . '" data-no-line-break="' . $dataNoLineBreak . '" data-align="' . $data_align . '" class="thead ' . $thClass . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
         }
         return $html->text();
     }
