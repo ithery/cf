@@ -584,7 +584,15 @@ class CElement_Component_DataTable extends CElement_Component {
                             $col_v = $temp_v;
                         }
                     }
-
+                    //if have callback
+                    if ($col->callback != null) {
+                        $col_v = CFunction::factory($col->callback)
+                                ->addArg($table)
+                                ->addArg($row)
+                                ->addArg($col_v)
+                                ->setRequire($col->callbackRequire)
+                                ->execute();
+                    }
                     $new_v = $col_v;
 
                     if (($this->cellCallbackFunc) != null) {
