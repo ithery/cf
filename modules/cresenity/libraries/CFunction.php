@@ -26,7 +26,7 @@ class CFunction {
     public $type = "defined"; //defined,class,
 
     private function __construct($func) {
-        
+
         $this->func = CHelper::closure()->deserializeClosure($func);
     }
 
@@ -75,7 +75,9 @@ class CFunction {
             $args = array($args);
         }
         foreach ($this->requires as $r) {
-            require_once $r;
+            if (strlen($r) > 0 && file_exists($r)) {
+                require_once $r;
+            }
         }
         $args = array_merge($args, $this->args);
 
