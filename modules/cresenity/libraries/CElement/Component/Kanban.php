@@ -133,13 +133,18 @@ class CElement_Component_Kanban extends CElement_Component {
                 // Drag&Drop
 
                 var drake = dragula(
-                    Array.prototype.slice.call(document.querySelectorAll('.kanban-box'))
+                    Array.prototype.slice.call(document.querySelectorAll('.kanban-box')),{
+                        invalid: function (el, handle) {
+                            return el.tagName === 'A';
+                        }
+                    }
                 );
                 (function(drake) {
                 " . $saveJs . "
                 })(drake)
             });
         ";
+        $js.=parent::jsChild($indent);
         return $js;
     }
 

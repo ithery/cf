@@ -80,7 +80,7 @@ class CElement_Component_ListGroup extends CElement_Component {
             $ajaxOptions['selector'] = '#'.$this->id;
             $js = 'cresenity.reload(' . json_encode($ajaxOptions) . ')';
         }
-       
+        $js.=parent::jsChild($indent);
         return $js;
     }
 
