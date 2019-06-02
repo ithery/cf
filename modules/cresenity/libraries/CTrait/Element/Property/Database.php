@@ -15,8 +15,25 @@ trait CTrait_Element_Property_Database {
      */
     protected $db;
 
+    /**
+     * 
+     * @param CDatabase $db
+     * @return $this
+     */
     public function setDatabase(CDatabase $db) {
         $this->db = $db;
+        return $this;
+    }
+
+    /**
+     * 
+     * @return CDatabase
+     */
+    public function db() {
+        if ($this->db == null) {
+            return CDatabase::instance();
+        }
+        return $this->db;
     }
 
 }

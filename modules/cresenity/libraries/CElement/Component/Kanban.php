@@ -11,6 +11,15 @@ class CElement_Component_Kanban extends CElement_Component {
 
     public function __construct($id) {
         parent::__construct($id);
+        $this->addClass('kanban form-row');
+    }
+
+    public function addList($id = "") {
+        $wrapperList = $this->addDiv()->addClass('col-md');
+        $list = CElement_Factory::createComponent('Kanban_List', $id);
+        $list->addClass('mb-3');
+        $wrapperList->add($list);
+        return $list;
     }
 
     public function build() {

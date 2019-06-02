@@ -22,6 +22,13 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
      * @var array
      */
     protected $data;
+    
+    /**
+     * Index for this item
+     * 
+     * @var int
+     */
+    protected $index;
 
     /**
      *  path of file to need to be require manually
@@ -42,6 +49,11 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
         return $this;
     }
 
+    public function setIndex($index) {
+        $this->index = $index;
+        return $this;
+    }
+    
     public function setData($data) {
         $this->data = $data;
         return $this;

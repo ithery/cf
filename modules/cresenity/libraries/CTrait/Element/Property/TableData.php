@@ -28,21 +28,33 @@ trait CTrait_Element_Property_TableData {
     protected $tableDataQuery;
 
     /**
+     *
+     * @var array
+     */
+    protected $tableDataCallbackOptions;
+
+    /**
+     *
+     * @var string
+     */
+    protected $tableDataCallbackRequire;
+
+    /**
+     *
+     * @var string
+     */
+    protected $tableDataType;
+
+    /**
      * 
      * @param string $q
      * @return $this
      */
     public function setDataFromQuery($q) {
-        $db = CDatabase::instance();
-        if ($this->isUseTrait('CTrait_Element_Property_Database')) {
-            $db = $this->db();
-        }
-        if ($this->ajax == false) {
 
-            $r = $db->query($q);
-            $this->tableData = $r->resultArray();
-        }
-        $this->query = $q;
+
+        $this->tableDataQuery = $q;
+        $this->tableDataType = 'query';
         return $this;
     }
 
@@ -57,6 +69,7 @@ trait CTrait_Element_Property_TableData {
             throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
         $sql = $this->db->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
+        $this->tableDataType = 'model';
         return $this->setDataFromQuery($sql);
     }
 
@@ -69,6 +82,7 @@ trait CTrait_Element_Property_TableData {
     public function setDataFromElastic($el, $require = null) {
         $this->query = $el;
         $this->isElastic = true;
+        $this->tableDataType = 'elastic';
         if ($el instanceof CElastic_Search) {
 
             $this->query = $el->ajax_data();
@@ -84,11 +98,11 @@ trait CTrait_Element_Property_TableData {
      * @return $this
      */
     public function setDataFromCallback($callback, $callbackOptions = array(), $require = null) {
-        $this->query = $callback;
-        $this->isCallback = true;
-        $this->callbackOptions = $callbackOptions;
-        $this->callbackRequire = $require;
-
+        $this->tableDataQuery = CHelper::closure()->serializeClosure($callback);
+        $this->tableDataCallbackOptions = $callbackOptions;
+        $this->tableDataCallbackRequire = $require;
+        $this->tableDataIsAjax = true;
+        $this->tableDataType = 'callback';
         return $this;
     }
 
@@ -99,12 +113,49 @@ trait CTrait_Element_Property_TableData {
      */
     public function setDataFromArray($array) {
         $this->tableData = $array;
+        $this->tableDataIsAjax = false;
         return $this;
     }
 
     public function setTableDataIsAjax($bool = true) {
         $this->tableDataIsAjax = $bool;
         return $this;
+    }
+
+    public function populateTableData($data) {
+        $this->tableData = carr::get($data, 'tableData');
+        $this->tableDataCallbackOptions = carr::get($data, 'tableDataCallbackOptions');
+        $this->tableDataCallbackRequire = carr::get($data, 'tableDataCallbackRequire');
+        $this->tableDataIsAjax = carr::get($data, 'tableDataIsAjax');
+        $this->tableDataQuery = carr::get($data, 'tableDataQuery');
+        $this->tableDataType = carr::get($data, 'tableDataType');
+        return $this;
+    }
+
+    public function getTableDataArray() {
+        $data = array();
+        $data['tableData'] = $this->tableData;
+        $data['tableDataCallbackOptions'] = $this->tableDataCallbackOptions;
+        $data['tableDataCallbackRequire'] = $this->tableDataCallbackRequire;
+        $data['tableDataIsAjax'] = $this->tableDataIsAjax;
+        $data['tableDataQuery'] = $this->tableDataQuery;
+        $data['tableDataType'] = $this->tableDataType;
+        return $data;
+    }
+
+    public function getTableData() {
+        switch ($this->tableDataType) {
+            case 'query':
+                $db = CDatabase::instance();
+                if ($this->isUseTrait('CTrait_Element_Property_Database')) {
+                    $db = $this->db();
+                }
+                $r = $db->query($this->tableDataQuery);
+                return $r->result_array(false);
+                break;
+            default:
+                return $this->tableData;
+        }
     }
 
 }

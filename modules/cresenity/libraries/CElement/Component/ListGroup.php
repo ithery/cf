@@ -23,8 +23,8 @@ class CElement_Component_ListGroup extends CElement_Component {
      * 
      * @return CElement_Component_ListGroup_Item
      */
-    public function addItem() {
-        $item = CElement_Factory::createComponent('ListGroup_Item');
+    public function addItem($id = "") {
+        $item = CElement_Factory::createComponent('ListGroup_Item', $id);
         $this->add($item);
         return $item;
     }
@@ -34,18 +34,49 @@ class CElement_Component_ListGroup extends CElement_Component {
         $this->itemCallbackRequire = $require;
         return $this;
     }
+    
+    public function setAjax($boolean=true) {
+        $this->setTableDataIsAjax(true);
+    }
 
     public function build() {
         $this->addClass('list-group');
         $this->setAttr('role', 'tablist');
-        if (is_array($this->tableData)) {
-            foreach ($this->tableData as $rowData) {
-                $item = $this->addItem()->setData($rowData);
-                if ($this->itemCallback != null) {
-                    $item->setCallback($this->itemCallback, $this->itemCallbackRequire);
+        if (!$this->tableDataIsAjax) {
+            $tableData= $this->getTableData();
+            if (is_array($tableData)) {
+                $index=0;
+                foreach ($tableData as $rowData) {
+                    $item = $this->addItem()->setData($rowData)->setIndex($index);
+                    if ($this->itemCallback != null) {
+                        $item->setCallback($this->itemCallback, $this->itemCallbackRequire);
+                    }
+                    $index++;
                 }
             }
         }
+    }
+
+    public function js($indent = 0) {
+        $js = '';
+        if ($this->tableDataIsAjax) {
+
+            $ajaxMethod = CAjax::createMethod();
+            $ajaxMethod->setType('ListGroup');
+            $ajaxMethod->setData('owner', $this);
+            $ajaxMethod->setData('callback', serialize($this->tableDataQuery));
+
+            $ajaxMethod->setData('domain', $this->domain);
+
+            $ajaxUrl = $ajaxMethod->makeUrl();
+
+            $ajaxOptions = array();
+            $ajaxOptions['url'] = $ajaxUrl;
+            $ajaxOptions['selector'] = '#'.$this->id;
+            $js = 'cresenity.reload(' . json_encode($ajaxOptions) . ')';
+        }
+       
+        return $js;
     }
 
 }
