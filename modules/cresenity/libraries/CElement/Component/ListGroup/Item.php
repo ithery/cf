@@ -42,7 +42,7 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
     }
 
     public function setCallback($callback, $require = "") {
-        $this->callback = $callback;
+        $this->callback = CHelper::closure()->serializeClosure($callback);
         if (strlen($require) > 0) {
             $this->callbackRequire = $require;
         }

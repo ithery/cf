@@ -30,13 +30,21 @@ class CElement_Component_ListGroup extends CElement_Component {
     }
 
     public function setItemCallback($callback, $require = '') {
-        $this->itemCallback = $callback;
+        $this->itemCallback = CHelper::closure()->serializeClosure($callback);
         $this->itemCallbackRequire = $require;
         return $this;
     }
     
+    public function getItemCallback() {
+        return $this->itemCallback;
+    }
+    public function getItemCallbackRequire() {
+        return $this->itemCallbackRequire;
+    }
+    
     public function setAjax($boolean=true) {
         $this->setTableDataIsAjax(true);
+        return $this;
     }
 
     public function build() {
@@ -63,10 +71,7 @@ class CElement_Component_ListGroup extends CElement_Component {
 
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('ListGroup');
-            $ajaxMethod->setData('owner', $this);
-            $ajaxMethod->setData('callback', serialize($this->tableDataQuery));
-
-            $ajaxMethod->setData('domain', $this->domain);
+            $ajaxMethod->setData('owner', serialize($this));
 
             $ajaxUrl = $ajaxMethod->makeUrl();
 
