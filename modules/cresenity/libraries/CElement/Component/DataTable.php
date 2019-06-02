@@ -750,7 +750,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
                 }
                 if ($this->haveRowAction()) {
-                    $action_width = 31 * $this->action_count() + 5;
+                    $action_width = 31 * $this->rowActionCount() + 5;
                     if ($this->getRowActionStyle() == "btn-dropdown") {
                         $action_width = 70;
                     }
