@@ -120,4 +120,14 @@ trait CObservable_Trait_ComponentTrait {
         return $form;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Form
+     */
+    public function addKanban($id = "") {
+        $kanban = CElement_Factory::createComponent('Kanban', $id);
+        $this->add($kanban);
+        return $kanban;
+    }
 }
