@@ -1634,6 +1634,10 @@ body.modal-open {
     top: 0;
 }
 
+.kanban .kanban-box {
+    min-height:100px;
+}
+
 @media (min-width: 768px) {
 
     .modal-dialog {

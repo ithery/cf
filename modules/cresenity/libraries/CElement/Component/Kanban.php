@@ -11,7 +11,8 @@ class CElement_Component_Kanban extends CElement_Component {
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->addClass('kanban form-row');
+        $this->addClass('form-row')->addClass('kanban');
+        CManager::registerModule('dragula');
     }
 
     public function addList($id = "") {
@@ -24,6 +25,26 @@ class CElement_Component_Kanban extends CElement_Component {
 
     public function build() {
         
+    }
+
+    public function js($indent = 0) {
+        
+        
+        
+        $js = "
+            $(function() {
+
+                // Drag&Drop
+
+                var drake = dragula(
+                    Array.prototype.slice.call(document.querySelectorAll('.kanban-box'))
+                );
+                drake.on('drop',function(e){
+                
+                });
+            });
+        ";
+        return $js;
     }
 
 }
