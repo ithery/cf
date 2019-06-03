@@ -135,7 +135,8 @@ class CElement_Component_Kanban extends CElement_Component {
                 var drake = dragula(
                     Array.prototype.slice.call(document.querySelectorAll('.kanban-box')),{
                         invalid: function (el, handle) {
-                            return el.tagName === 'A';
+                            //return el.tagName === 'A';
+                            return false;
                         }
                     }
                 );
