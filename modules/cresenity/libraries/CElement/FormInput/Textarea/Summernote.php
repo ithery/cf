@@ -24,7 +24,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
     }
 
     public function build() {
-        $this->add_class('summernote-control');
+        $this->addClass('summernote-control');
     }
 
     public function setToolbarType($toolbarType) {
