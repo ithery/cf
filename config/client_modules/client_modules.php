@@ -648,5 +648,13 @@ return array(
             "plugins/dragula/dragula.css",
         ),
     ),
+    "quill" => array(
+        "js" => array(
+            "plugins/quill/quill.js",
+        ),
+        "css" => array(
+            "plugins/quill/quill.snow.css",
+        ),
+    ),
 );
 ?>
