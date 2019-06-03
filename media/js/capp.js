@@ -672,7 +672,7 @@ var Cresenity = function () {
             settings.headerText = settings.title;
         }
 
-        var modalContainer = jQuery('<div>').addClass('modal');
+        let modalContainer = jQuery('<div>').addClass('modal');
 
         if (settings.modalClass) {
             modalContainer.addClass(settings.modalClass);
