@@ -653,7 +653,7 @@ return array(
             "plugins/quill/quill.js",
         ),
         "css" => array(
-            "plugins/quill/quill.snow.css",
+            "plugins/quill/quill.core.css",
         ),
     ),
 );

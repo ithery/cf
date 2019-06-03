@@ -79,7 +79,6 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
 
         $this->manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
-        //$this->manager->registerControl('select-tag', 'CFormInputSelectTag');
 
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');
@@ -87,6 +86,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
         $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
         $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
+        $this->manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
         $this->manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
         $this->manager->registerControl('ckeditor', 'CFormInputCKEditor');
         $this->manager->registerControl('hidden', 'CFormInputHidden');
