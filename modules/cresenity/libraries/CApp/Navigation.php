@@ -45,7 +45,7 @@ class CApp_Navigation {
      * @param array $options 
      * @return html of the element
      */
-    public function render($options = array()) {
+    public static function render($options = array()) {
 
         $engine = carr::get($options, 'engine', 'Bootstrap');
         $layout = carr::get($options, 'layout', 'horizontal');
