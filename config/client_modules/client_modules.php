@@ -656,5 +656,13 @@ return array(
             "plugins/quill/quill.core.css",
         ),
     ),
+    "bootstrap-daterangepicker" => array(
+        "js" => array(
+            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.js",
+        ),
+        "css" => array(
+            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css",
+        ),
+    ),
 );
 ?>
