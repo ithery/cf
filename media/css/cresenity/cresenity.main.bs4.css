@@ -1222,6 +1222,11 @@ body.mini-navbar #page-wrapper {
     margin: auto;
 }
 
+.kanban .kanban-box {
+    min-height:100px;
+}
+
+
 @media (min-width: 319px) {
 
 }

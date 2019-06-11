@@ -672,7 +672,7 @@ var Cresenity = function () {
             settings.headerText = settings.title;
         }
 
-        var modalContainer = jQuery('<div>').addClass('modal');
+        let modalContainer = jQuery('<div>').addClass('modal');
 
         if (settings.modalClass) {
             modalContainer.addClass(settings.modalClass);
@@ -708,15 +708,38 @@ var Cresenity = function () {
         $('body').append(modalContainer);
 
         modalContainer.on('hidden.bs.modal', function (e) {
-            console.log(cresenity.modalElements);
             if (cresenity.modalElements.length > 0) {
                 var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
                 if (lastModal && lastModal.get(0) === $(e.target).get(0)) {
-                    $(lastModal).remove();
-                    cresenity.modalElements.pop();
-                    if (typeof settings.onClose == 'function') {
-                        settings.onClose(e);
-                    }
+                    (function (modal) {
+                        var Next = function () {
+                            this.isRunning = false;
+                            this.callback = (delay) => {
+                                if(typeof delay =='undefined') {
+                                    delay=0;
+                                }
+                                if(typeof parseInt(delay) == 'NaN') {
+                                    delay=0;
+                                }
+                                
+                                setTimeout(function(){
+                                    console.log('removed');
+                                    $(modal).remove();
+                                    cresenity.modalElements.pop();
+                                    
+                                },delay);
+                                this.isRunning = true;
+                            }
+                        }
+                        next = new Next();
+                        if (typeof settings.onClose == 'function') {
+                            settings.onClose(e, next.callback);
+                        }
+                        if (!next.isRunning) {
+                            console.log('next is not running');
+                            next.callback();
+                        }
+                    })(lastModal);
                 }
             }
 
@@ -739,7 +762,7 @@ var Cresenity = function () {
             backdrop: settings.backdrop
         });
 
-
+        return modalContainer;
     };
     this.closeLastModal = function (options) {
         if (cresenity.modalElements.length > 0) {

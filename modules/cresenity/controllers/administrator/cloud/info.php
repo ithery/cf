@@ -13,8 +13,23 @@ class Controller_Administrator_Cloud_Info extends CApp_Administrator_Controller_
         $app = CApp::instance();
         $errCode = 0;
         $errMessage = '';
-        $cloudData=array();
+        $cloudData = array();
         $app->title('Dev Cloud Information');
+        
+        $tabActive = 'info';
+        if (isset($_GET['tab'])) {
+            $tabActive = $_GET['tab'];
+        }
+        $tabProjectActive = $tabActive == 'project';
+        $tabAppActive = $tabActive == 'app';
+
+        $tabList = $app->addTabList();
+        $tabList->addTab()->setLabel('Project')->setAjaxUrl(curl::base() . 'administrator/cloud/info/project/tab')
+                ->setActive($tabProjectActive);
+
+        $tabList->addTab()->setLabel('Application')->setAjaxUrl(curl::base() . 'administrator/cloud/info/app/tab')
+                ->setActive($tabAppActive)->setNoPadding();
+        
         try {
             $cloudData = CApp_Cloud::instance()->api('Development/GetInfo');
         } catch (Exception $ex) {
@@ -24,8 +39,10 @@ class Controller_Administrator_Cloud_Info extends CApp_Administrator_Controller_
         if ($errCode > 0) {
             $app->message('error', $errMessage);
         }
-        
+
         $app->add($cloudData);
+
+        
         echo $app->render();
     }
 

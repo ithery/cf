@@ -23,6 +23,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
     protected $param_inputs;
     protected $param_request;
     protected $isSidebar;
+    protected $modalClass;
 
     public function __construct($listener) {
         parent::__construct($listener);
@@ -40,6 +41,11 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
     public function setSidebar($bool = true) {
         $this->isSidebar = $bool;
+        return $this;
+    }
+    
+    public function setModalClass($class) {
+        $this->modalClass = $class;
         return $this;
     }
 
@@ -105,6 +111,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         $jsOptions = "{";
         $jsOptions .= "selector:'#" . $this->target . "',";
         $jsOptions .= "title:'" . $this->title . "',";
+        $jsOptions .= "modalClass:'" . $this->modalClass . "',";
         $jsOptions .= "reload:" . $reloadOptions . ",";
         if ($this->haveCloseListener()) {
             $jsOptions .= "onClose:" . $this->getCloseListener()->js() . ",";

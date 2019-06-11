@@ -63,6 +63,8 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('date', 'CElement_FormInput_Date');
         $this->manager->registerControl('material-datetime', 'CElement_FormInput_DateTime_MaterialDateTime');
         $this->manager->registerControl('daterange-picker', 'CElement_FormInput_DateRange');
+        $this->manager->registerControl('daterange-dropdown', 'CElement_FormInput_DateRangeDropdown');
+        $this->manager->registerControl('daterange-button', 'CElement_FormInput_DateRangeDropdownButton');
         $this->manager->registerControl('currency', 'CElement_FormInput_Currency');
         $this->manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
         $this->manager->registerControl('time', 'CElement_FormInput_Time');
@@ -79,7 +81,6 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
 
         $this->manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
-        //$this->manager->registerControl('select-tag', 'CFormInputSelectTag');
 
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');
@@ -87,6 +88,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
         $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
         $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
+        $this->manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
         $this->manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
         $this->manager->registerControl('ckeditor', 'CFormInputCKEditor');
         $this->manager->registerControl('hidden', 'CFormInputHidden');

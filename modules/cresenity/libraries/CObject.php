@@ -63,6 +63,16 @@ class CObject {
         return $this->id;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return $this
+     */
+    public function setId($id) {
+        $this->id = $id;
+        return $this;
+    }
+
     public function className() {
         return get_class($this);
     }
@@ -79,5 +89,9 @@ class CObject {
         return false;
     }
 
-    
+    public function isUseTrait($trait) {
+        $traits = CF::class_uses_recursive(get_class($this));
+        return $traits[$trait];
+    }
+
 }
