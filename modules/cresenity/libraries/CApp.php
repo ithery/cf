@@ -356,13 +356,15 @@ class CApp extends CObservable {
     public function getBreadcrumb() {
         $breadcrumb = $this->breadcrumb;
         if($this->breadcrumbCallback!=null) {
-            $breadcrumb = call_user_func_array($this->breadcrumbCallback, array($this->breadcrumb));
+            
+            
+            $breadcrumb = CFunction::factory($this->breadcrumbCallback)->addArg($this->breadcrumb)->execute();
         }
         return $breadcrumb;
     }
     
     public function setBreadcrumbCallback($callback) {
-        $this->breadcrumbCallback = $callback;
+        $this->breadcrumbCallback = CHelper::closure()->serializeClosure($callback);
         return $this;
     }
 
