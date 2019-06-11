@@ -16,6 +16,7 @@ class CApp extends CObservable {
     private $show_breadcrumb = true;
     private $show_title = true;
     private $breadcrumb = array();
+    private $breadcrumbCallback = null;
     private $signup = false;
     private $activation = false;
     private $resend = false;
@@ -351,6 +352,19 @@ class CApp extends CObservable {
         $this->breadcrumb[$caption] = $url;
         return $this;
     }
+    
+    public function getBreadcrumb() {
+        $breadcrumb = $this->breadcrumb;
+        if($this->breadcrumbCallback!=null) {
+            $breadcrumb = call_user_func_array($this->breadcrumbCallback, array($this->breadcrumb));
+        }
+        return $breadcrumb;
+    }
+    
+    public function setBreadcrumbCallback($callback) {
+        $this->breadcrumbCallback = $callback;
+        return $this;
+    }
 
     public function registerCoreModules() {
         $manager = CManager::instance();
@@ -513,7 +527,7 @@ class CApp extends CObservable {
         $v->custom_footer = $this->custom_footer;
         $v->show_breadcrumb = $this->show_breadcrumb;
         $v->show_title = $this->show_title;
-        $v->breadcrumb = $this->breadcrumb;
+        $v->breadcrumb = $this->getBreadcrumb();
         $v->additional_head = $this->additional_head;
         $v->custom_data = $this->custom_data;
         $v->login_required = $this->login_required;
