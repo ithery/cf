@@ -17,9 +17,9 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
             return $this->searchSelectElastic($obj, $input);
         }
         $q = carr::get($data, 'query');
-        $key_field = carr::get($data, 'key_field');
+        $key_field = carr::get($data, 'keyField',carr::get($data,'key_field'));
 
-        $search_field = carr::get($data, 'search_field');
+        $search_field = carr::get($data, 'searchField',carr::get($data,'search_field'));
 
         $db = CDatabase::instance();
 
@@ -40,7 +40,7 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
 
         $pos_last_kurung = strrpos(strtolower($base_q), ")");
         if (isset($_GET['bdebug'])) {
-            cdbg::var_dump($pos_order_by);
+            cdbg::var_dump($data);
             cdbg::var_dump($pos_last_kurung);
             die();
         }

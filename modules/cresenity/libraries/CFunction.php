@@ -131,7 +131,7 @@ class CFunction {
         if ($error == 0) {
             return $this->func;
         }
-        return "ERROR";
+        return "ERROR ON CFUNCTION";
     }
 
 }

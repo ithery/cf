@@ -203,13 +203,21 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     public function createAjaxUrl() {
-        return CAjaxMethod::factory()
-                        ->set_type('searchselect')
-                        ->set_data('query', $this->query)
-                        ->set_data('keyField', $this->keyField)
-                        ->set_data('searchField', $this->searchField)
-                        ->set_data('valueCallback', $this->valueCallback)
-                        ->makeurl();
+
+        $ajaxMethod = CAjax::createMethod();
+        $ajaxMethod->setType('SearchSelect');
+        $ajaxMethod->setData('query', $this->query);
+        $ajaxMethod->setData('keyField', $this->keyField);
+        $ajaxMethod->setData('searchField', $this->searchField);
+        $ajaxMethod->setData('valueCallback', $this->valueCallback);
+
+        $ajaxUrl = $ajaxMethod->makeUrl();
+
+        if (isset($_GET['bdebug'])) {
+            cdbg::var_dump($ajaxUrl);
+            die();
+        }
+        return $ajaxUrl;
     }
 
     private function generateSelect2Template($template) {
