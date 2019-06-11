@@ -145,7 +145,9 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
                 }
                 $p[$k] = ($v == null) ? "" : $v;
             }
-            $p["id"] = $row[$key_field];
+            if (strlen($key_field) > 0) {
+                $p["id"] = carr::get($row, $key_field);
+            }
             //$p["id"]=$row["item_id"];
             $data[] = $p;
         }
