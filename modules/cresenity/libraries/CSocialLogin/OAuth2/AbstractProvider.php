@@ -204,7 +204,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      * Get a Social User instance from a known access token.
      *
      * @param  string  $token
-     * @return \Laravel\Socialite\Two\User
+     * @return CSocialLogin_OAuth2_User
      */
     public function userFromToken($token) {
         $user = $this->mapUserToObject($this->getUserByToken($token));
@@ -220,8 +220,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
         if ($this->isStateless()) {
             return false;
         }
+        
         $state = $this->session()->get('state');
-
         return !(strlen($state) > 0 && $this->input('state') === $state);
     }
 

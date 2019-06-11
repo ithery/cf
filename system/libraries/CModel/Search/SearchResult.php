@@ -21,7 +21,8 @@ class CModel_Search_SearchResult {
     /** @var string */
     public $type;
 
-    public function __construct(CModel_SearchableInterface $searchable, $title, $url = null) {
+    public function __construct($searchable, $title, $url = null) {
+
         $this->searchable = $searchable;
         $this->title = $title;
         $this->url = $url;

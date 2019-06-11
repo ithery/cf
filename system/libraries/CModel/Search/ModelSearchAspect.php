@@ -11,7 +11,7 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
 
     /** @var CModel */
     protected $model;
-    
+
     /** @var callable */
     protected $callback;
 
@@ -32,7 +32,7 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
      */
     public function __construct($model, $attributes = [], $callback = null) {
         $this->callback = $callback;
-        
+
         if (!is_subclass_of($model, CModel::class)) {
             throw CModel_Search_Exception_InvalidSearchableModelException::notAModel($model);
         }
@@ -73,16 +73,20 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
         return $model->getTable();
     }
 
-    public function getResults($term, $user = null) {
+    public function getResults($term, $user = null, $page = null, $perPage = null) {
         if (empty($this->attributes)) {
             throw CModel_Search_Exception_InvalidModelSearchAspectException::noSearchableAttributes($this->model);
         }
         $query = call_user_func(array($this->model, 'query'));
-        if(is_callable($this->callback)) {
+
+        $this->addSearchConditions($query, $term);
+        if (is_callable($this->callback)) {
             $query = call_user_func_array($this->callback, array($query));
         }
-        $this->addSearchConditions($query, $term);
-
+       
+        if ($page != null && $perPage != null) {
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        }
         return $query->get();
     }
 

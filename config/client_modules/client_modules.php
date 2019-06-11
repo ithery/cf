@@ -639,5 +639,30 @@ return array(
             "plugins/minicolors/minicolors.css",
         ),
     ),
+    
+    "dragula" => array(
+        "js" => array(
+            "plugins/dragula/dragula.js",
+        ),
+        "css" => array(
+            "plugins/dragula/dragula.css",
+        ),
+    ),
+    "quill" => array(
+        "js" => array(
+            "plugins/quill/quill.js",
+        ),
+        "css" => array(
+            "plugins/quill/quill.core.css",
+        ),
+    ),
+    "bootstrap-daterangepicker" => array(
+        "js" => array(
+            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.js",
+        ),
+        "css" => array(
+            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css",
+        ),
+    ),
 );
 ?>

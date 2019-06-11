@@ -11,13 +11,17 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
     protected $dateTimeFormat;
     protected $disableYesterday;
+    protected $disableDate;
+    protected $disableTime;
 
     public function __construct($id) {
         parent::__construct($id);
         CManager::instance()->registerModule('bootstrap-4-material-datepicker');
 
-        $this->dateTimeFormat = "yyyy-mm-dd";
+        $this->dateTimeFormat = "YYYY-MM-DD";
         $this->disableYesterday = false;
+        $this->disableDate = false;
+        $this->disableTime = false;
         
         $dateTimeFormat = ccfg::get('long_date_formatted');
         if ($dateTimeFormat != null) {
@@ -31,9 +35,27 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
             $this->dateTimeFormat = $dateTimeFormat;
         }
     }
+
+    public function setDateTimeFormat($format)
+    {
+        $this->dateTimeFormat = $format;
+        return $this;
+    }
     
-    public function setDisableYesterday($bool) {
+    public function setDisableYesterday($bool = true) {
         $this->disableYesterday = $bool;
+        return $this;
+    }
+
+    public function setDisableDate($bool = true)
+    {
+        $this->disableDate = $bool;
+        return $this;
+    }
+
+    public function setDisableTime($bool = true)
+    {
+        $this->disableTime = $bool;
         return $this;
     }
 
@@ -52,6 +74,15 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         $option = " weekStart: 1";
         $option .= " ,format : '" . $this->dateTimeFormat . "'";
         $option .= " ,shortTime: true";
+
+        if ($this->disableDate) {
+            $option .= " ,date: false";
+        }
+
+        if ($this->disableTime) {
+            $option .= " ,time: false";
+        }
+        
         if ($this->disableYesterday) {
             if (strlen($option) > 0)
             $option .= ",minDate: new Date()";

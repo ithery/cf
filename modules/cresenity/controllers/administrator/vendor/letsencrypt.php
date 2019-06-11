@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since May 16, 2019, 12:10:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use phpseclib\File\X509;
 class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Controller_User {
 
     public function index() {
@@ -30,7 +32,8 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
         $widget = $app->addWidget()->setTitle('Info');
         if (!$haveCertificate) {
             //generate button create certificate
-            $widget->header()->addAction()->setLabel('Create Certificate')->addClass('btn-primary')->setLink(curl::base() . 'administrator/vendor/letsencrypt/order');
+            $widget->header()->addAction()->setLabel('Create Certificate')->addClass('btn-primary')->setLink(curl::base() . 'administrator/vendor/letsencrypt/order/single');
+            $widget->header()->addAction()->setLabel('Create Wildcard Certificate')->addClass('btn-primary')->setLink(curl::base() . 'administrator/vendor/letsencrypt/order/wildcard');
         }
         $form = $widget->addForm();
         $divRow = $form->addDiv()->addClass('row');
@@ -42,7 +45,8 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
         $colLeft->addField()->setLabel('Contact')->addControl('accountContact', 'label')->setValue(implode(",", $acct->contact));
         $colLeft->addField()->setLabel('Initial IP')->addControl('accountInitialIp', 'label')->setValue($acct->initialIp);
         $colLeft->addField()->setLabel('Account Status')->addControl('accountStatus', 'label')->setValue($acct->status);
-        $colRight->addField()->setLabel('Private Key')->addControl('privateKey', 'text')->setValue($letsEncrypt->getPrivateKeyPath())->setReadOnly();;
+        $colRight->addField()->setLabel('Private Key')->addControl('privateKey', 'text')->setValue($letsEncrypt->getPrivateKeyPath())->setReadOnly();
+        ;
         if (!$haveCertificate) {
             $colRight->addField()->setLabel('Certificate')->addControl('certificate', 'label')->setValue($haveCertificate ? 'YES' : 'NO');
         } else {
@@ -54,26 +58,39 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
             $colRight->addField()->setLabel('Expires')->addControl('certificateExpires', 'label')->setValue(carr::get($orderData, 'expires'));
 
             $colRight->addHr();
-            $colRight->addAction()->setLabel('Renew Certificate')->addClass('btn-primary')->setIcon(' lnr lnr-plus-circle')->setLink(curl::base() . 'administrator/vendor/letsencrypt/renew')->setConfirm();
+            $colRight->addAction()->setLabel('Remove Certificate')->addClass('btn-danger mb-3')->setIcon(' lnr lnr-trash')->setLink(curl::base() . 'administrator/vendor/letsencrypt/delete')->setConfirm();
+            $colRight->addAction()->setLabel('Renew Certificate')->addClass('btn-primary mb-3')->setIcon(' lnr lnr-plus-circle')->setLink(curl::base() . 'administrator/vendor/letsencrypt/renew')->setConfirm();
+            $colRight->addAction()->setLabel('Order Data')->addClass('btn-primary mb-3')->setIcon(' lnr lnr-info')->onClickListener()->addDialogHandler()->setUrl(curl::base() . 'administrator/vendor/letsencrypt/data');
         }
 
 
         echo $app->render();
     }
 
-    public function order() {
-        $options = array();
-        $options['email'] = array('hery@ittron.co.id');
+    public function data() {
+        
+        $letsEncrypt = $this->letsEncrypt();
+        $orderData = $letsEncrypt->getOrderData();
+        
+        cdbg::var_dump($orderData);
+        $x509 = new X509();
+        $certificateData = $x509->loadX509(file_get_contents($letsEncrypt->getCertificatePath()));
+        cdbg::var_dump($x509->getSubjectDN());
+        //$certificateData = openssl_x509_parse($letsEncrypt->getCertificatePath());
+        cdbg::var_dump($certificateData);
+    }
 
-        $domain = CF::domain();
-        $basename = CHelper_Domain::getTopLevelDomain($domain);
-        $domains = array($domain);
+    public function delete() {
+        $letsEncrypt = $this->letsEncrypt();
+        $letsEncrypt->removeCertificate();
+        cmsg::add('success', 'Successfully remove certificate');
 
+        curl::redirect('administrator/vendor/letsencrypt');
+    }
 
-        //$options['log'] = LEClient\LEClient::LOG_DEBUG;
-        $letsEncrypt = CVendor::letsEncrypt($options);
-        $haveCertificate = $letsEncrypt->haveCertificate();
-        $order = $letsEncrypt->client()->getOrCreateOrder($basename, $domains);
+    public function order($type = 'single') {
+        
+        $order = $this->getOrder($type);
 
         $valid = $order->allAuthorizationsValid();
         if (!$valid) {
@@ -118,7 +135,33 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
     }
 
     public function renew() {
-        $this->order();
+        $this->order('renew');
+        
+    }
+
+    private function letsEncrypt() {
+        $options = array();
+        $options['email'] = array('hery@ittron.co.id');
+
+        return $letsEncrypt = CVendor::letsEncrypt($options);
+    }
+    
+    private function getOrder($type='single') {
+       
+        $domain = CF::domain();
+        $basename = CHelper_Domain::getTopLevelDomain($domain);
+        $domains = array($domain);
+
+        $letsEncrypt = $this->letsEncrypt();
+        
+        if($type=='renew') {
+            $domain=array();
+            $orderData=$letsEncrypt->getOrderData();
+        }
+        
+        
+        $order = $letsEncrypt->client()->getOrCreateOrder($basename, $domains);
+        return $order;
     }
 
 }

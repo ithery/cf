@@ -93,6 +93,9 @@ class CColor_String {
     }
 
     public function getModulo($range) {
+        if($range[1] - $range[0] == 0) {
+            return 0;
+        }
         return $range[0] + ($this->int32 % ($range[1] - $range[0]));
     }
 

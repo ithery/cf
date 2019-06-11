@@ -9,8 +9,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CModel_Search_SearchResultCollection extends CCollection {
 
-    public function addResults($type, CCollection $results) {
-        $results->each(function ($result) use ($type) {
+    /**
+     * The total number of items before slicing.
+     *
+     * @var int
+     */
+    protected $paginator;
+
+
+    public function addResults($type, $results) {
+        
+        $this->paginator[$type]=$results;
+        
+        CF::collect($results->items())->each(function ($result) use ($type) {
+            
             $this->items[] = $result->getSearchResult()->setType($type);
         });
         return $this;
@@ -24,6 +36,13 @@ class CModel_Search_SearchResultCollection extends CCollection {
 
     public function aspect($aspectName) {
         return $this->groupByType()->get($aspectName);
+    }
+
+    public function paginator($type=null) {
+        if($type==null) {
+            return $this->paginator;
+        }
+        return carr::get($this->paginator,$type);
     }
 
 }

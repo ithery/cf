@@ -9,10 +9,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CManager_Navigation {
 
-    protected static $navigationCallback;
-
     public static function setNavigationCallback(callable $navigationCallback) {
         CApp_Navigation_Data::setNavigationCallback($navigationCallback);
+    }
+
+    public static function setAccessCallback(callable $accessCallback) {
+        CApp_Navigation::setAccessCallback($accessCallback);
     }
 
 }

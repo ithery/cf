@@ -23,6 +23,17 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * 
      * @param string $id
+     * @return CElement_Component_ListGroup
+     */
+    public function addListGroup($id = "") {
+        $listGroup = CElement_Factory::createComponent('ListGroup', $id);
+        $this->add($listGroup);
+        return $listGroup;
+    }
+
+    /**
+     * 
+     * @param string $id
      * @return CElement_Component_DataGridList
      */
     public function addDataGridList($id = "") {
@@ -109,4 +120,14 @@ trait CObservable_Trait_ComponentTrait {
         return $form;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Form
+     */
+    public function addKanban($id = "") {
+        $kanban = CElement_Factory::createComponent('Kanban', $id);
+        $this->add($kanban);
+        return $kanban;
+    }
 }

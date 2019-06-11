@@ -584,7 +584,15 @@ class CElement_Component_DataTable extends CElement_Component {
                             $col_v = $temp_v;
                         }
                     }
-
+                    //if have callback
+                    if ($col->callback != null) {
+                        $col_v = CFunction::factory($col->callback)
+                                ->addArg($table)
+                                ->addArg($row)
+                                ->addArg($col_v)
+                                ->setRequire($col->callbackRequire)
+                                ->execute();
+                    }
                     $new_v = $col_v;
 
                     if (($this->cellCallbackFunc) != null) {
@@ -742,7 +750,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
                 }
                 if ($this->haveRowAction()) {
-                    $action_width = 31 * $this->action_count() + 5;
+                    $action_width = 31 * $this->rowActionCount() + 5;
                     if ($this->getRowActionStyle() == "btn-dropdown") {
                         $action_width = 70;
                     }

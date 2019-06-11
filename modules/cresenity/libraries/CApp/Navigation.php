@@ -10,6 +10,32 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CApp_Navigation {
 
     public static $instance = array();
+    protected static $accessCallback = array();
+
+    /**
+     * 
+     * @param callable $navigationCallback
+     * @param string $domain optional
+     */
+    public static function getAccessCallback($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+        return carr::get(self::$accessCallback, $domain);
+    }
+
+    /**
+     * 
+     * @param callable $navigationCallback
+     * @param string $domain optional
+     */
+    public static function setAccessCallback(callable $navigationAccessCallback, $domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+
+        self::$accessCallback[$domain] = $navigationAccessCallback;
+    }
 
     /**
      * 
@@ -45,7 +71,7 @@ class CApp_Navigation {
      * @param array $options 
      * @return html of the element
      */
-    public function render($options = array()) {
+    public static function render($options = array()) {
 
         $engine = carr::get($options, 'engine', 'Bootstrap');
         $layout = carr::get($options, 'layout', 'horizontal');
