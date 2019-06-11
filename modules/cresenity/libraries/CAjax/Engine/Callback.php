@@ -13,13 +13,7 @@ class CAjax_Engine_Callback extends CAjax_Engine {
         $data = $this->ajaxMethod->getData();
         $callable = carr::get($data, 'callable');
         $requires = carr::get($data, 'requires');
-       
-
-
-
-        $result = CFunction::factory($callable)->setArgs($data)->setRequire($requires)->execute();
-
-
+        $result = CFunction::factory($callable)->addArg($data)->setRequire($requires)->execute();
         return $result;
     }
 
