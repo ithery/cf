@@ -41,6 +41,41 @@ trait CModel_Geographical_GeographicalTrait {
         $query = $this->scopeDistance($query, $latitude, $longitude);
         return $query->havingRaw('distance BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
     }
+    
+    public function scopeOrderByDistanceRuntime($query, $latitude, $longitude ,$direction = 'asc') {
+        $latName = $this->getQualifiedLatitudeColumn();
+        $lonName = $this->getQualifiedLongitudeColumn();
+        $sql= "((ACOS(SIN(? * PI() / 180) * SIN(" . $latName . " * PI() / 180) + COS(? * PI() / 180) * COS(" .
+                $latName . " * PI() / 180) * COS((? - " . $lonName . ") * PI() / 180)) * 180 / PI()) * 60 * ?) ";
+        $kilometers = false;
+        if (property_exists(static::class, 'kilometers')) {
+            $kilometers = static::$kilometers;
+        }
+        if ($kilometers) {
+            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+        } else {
+            // miles
+            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+        }
+        return $query->orderByRaw($sql.' '.$direction);
+    }
+    public function scopeGeofenceRuntime($query, $latitude, $longitude, $inner_radius, $outer_radius) {
+        $latName = $this->getQualifiedLatitudeColumn();
+        $lonName = $this->getQualifiedLongitudeColumn();
+        $sql= "((ACOS(SIN(? * PI() / 180) * SIN(" . $latName . " * PI() / 180) + COS(? * PI() / 180) * COS(" .
+                $latName . " * PI() / 180) * COS((? - " . $lonName . ") * PI() / 180)) * 180 / PI()) * 60 * ?) ";
+        $kilometers = false;
+        if (property_exists(static::class, 'kilometers')) {
+            $kilometers = static::$kilometers;
+        }
+        if ($kilometers) {
+            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+        } else {
+            // miles
+            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+        }
+        return $query->whereRaw($sql.' BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
+    }
 
     protected function getQualifiedLatitudeColumn() {
         return $this->getTable() . '.' . $this->getLatitudeColumn();
