@@ -48,6 +48,12 @@ trait CApp_Trait_Template {
         return $this->templateData;
     }
 
+    /**
+     * Retrieve section which declared on this template as CApp Element
+     * 
+     * @param string $sectionName
+     * @return CElement_PseudoElement
+     */
     public function section($sectionName) {
         if (!isset($this->sections[$sectionName])) {
             $this->sections[$sectionName] = new CElement_PseudoElement();
