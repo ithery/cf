@@ -9,6 +9,7 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         parent::__construct();
         $this->wrapper = $this->addCanvas()->addClass('cchart cchart-chart');
         CManager::instance()->registerModule('chartjs');
+        $this->options = array();
     }
 
     protected function build() {
@@ -36,11 +37,32 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
             }
 
             $randColor = $this->getColor();
-            $dataset['borderColor'] = carr::get($value, 'color') ?: $randColor;
-            $dataset['backgroundColor'] = $this->getColor($randColor, 0.2);
+            $color = carr::get($value, 'color') ?: $randColor;
+            $backgroundColor = carr::get($value, 'backgroundColor') ?: $this->getColor($randColor, 0.2);
+            //$backgroundColor = $this->getColor($color, 0.2);
+            if (is_array($dataset['data'])) {
+                $color=[];
+                $backgroundColor=[];
+                foreach ($dataset['data'] as $k => $v) {
+                    $randColor = $this->getColor();
+                    $colorTemp = carr::get($value, 'color');
+                    if(is_array($colorTemp)) {
+                        $colorTemp = carr::get($colorTemp,$k);
+                    }
+                    
+                    $color[] = $colorTemp;
+                    $backgroundColor[] = $this->getColor($colorTemp, 0.2);
+                }
+            }
+            $dataset['borderColor'] = $color;
+            $dataset['backgroundColor'] = $backgroundColor;
 
             $this->data['datasets'][] = $dataset;
         }
+    }
+
+    public function buildOptions() {
+        return $this->options;
     }
 
     public function js($indent = 0) {
@@ -48,7 +70,7 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
 
-        $options = [];
+        $options = $this->buildOptions();
 
         if ($this->width || $this->height) {
             $options['maintainAspectRatio'] = false;

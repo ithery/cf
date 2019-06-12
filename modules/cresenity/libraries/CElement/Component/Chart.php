@@ -10,6 +10,7 @@ abstract class CElement_Component_Chart extends CElement_Component {
     protected $data;
     protected $width;
     protected $height;
+    protected $options;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -29,6 +30,11 @@ abstract class CElement_Component_Chart extends CElement_Component {
 
     public function setLabels(array $labels) {
         $this->labels = $labels;
+        return $this;
+    }
+
+    public function addRawData(array $data) {
+        $this->data[] = $data;
         return $this;
     }
 
@@ -58,6 +64,16 @@ abstract class CElement_Component_Chart extends CElement_Component {
             $opacity = $opacity ?: $matches[0][3];
             return 'rgba(' . $matches[0][0] . ', ' . $matches[0][1] . ', ' . $matches[0][2] . ', ' . $opacity . ')';
         }
+    }
+
+    public function setOptions(array $options) {
+        $this->options = $options;
+        return $this;
+    }
+
+    public function setOption($key, $value) {
+        carr::set($this->options, $key, $value);
+        return $this;
     }
 
 }
