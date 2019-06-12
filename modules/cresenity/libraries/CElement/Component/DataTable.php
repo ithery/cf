@@ -1151,6 +1151,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     ->appendln("'aaSorting': [],")->br()
                     ->appendln("'oLanguage': { 
 						sSearch : '" . clang::__('Search') . "',
+						sSearchPlaceholder : '" . clang::__('Search Here') . "',
 						sProcessing : '" . clang::__('Processing') . "',
 						sLengthMenu  : '" . clang::__('Show') . " _MENU_ " . clang::__('Entries') . "',
 						oPaginate  : {'sFirst' : '" . clang::__('First') . "',
