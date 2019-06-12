@@ -56,12 +56,14 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
     public function setDisableDate($bool = true)
     {
+        $this->dateTimeFormat = "HH:mm";
         $this->disableDate = $bool;
         return $this;
     }
 
     public function setDisableTime($bool = true)
     {
+        $this->dateTimeFormat = "YYYY-MM-DD";
         $this->disableTime = $bool;
         return $this;
     }
