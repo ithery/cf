@@ -3,60 +3,58 @@
 /**
  * 
  */
-class CElement_Component_Chart_Chart extends CElement_Component_Chart
-{
-	public function __construct()
-	{
-		parent::__construct();
-		$this->wrapper = $this->addCanvas()->addClass('cchart cchart-chart');
-		CManager::instance()->registerModule('chartjs');
-	}
+class CElement_Component_Chart_Chart extends CElement_Component_Chart {
 
-	protected function build() {
-	    parent::build();
-	    $this->addClass('cchart-container');
-	    $this->buildData();
-	}
+    public function __construct() {
+        parent::__construct();
+        $this->wrapper = $this->addCanvas()->addClass('cchart cchart-chart');
+        CManager::instance()->registerModule('chartjs');
+    }
 
-	public function buildData()
-	{
-		$temp = $this->data;
-		$this->data = [];
+    protected function build() {
+        parent::build();
+        $this->addClass('cchart-container');
+        $this->buildData();
+    }
 
-		$this->data['labels'] = $this->labels;
-		$this->data['datasets'] = [];
+    public function buildData() {
+        $temp = $this->data;
+        $this->data = [];
 
-		foreach ($temp as $value) {
-			$label = carr::get($value, 'label');
+        $this->data['labels'] = $this->labels;
+        $this->data['datasets'] = [];
 
-			$dataset = [];
-			$dataset['data'] = carr::get($value, 'data', []);
-			$dataset['fill'] = carr::get($value, 'fill', false);
+        foreach ($temp as $value) {
+            $label = carr::get($value, 'label');
 
-			if ($label) {
-			    $dataset['label'] = $label;
-			}
+            $dataset = [];
+            $dataset['data'] = carr::get($value, 'data', []);
+            $dataset['fill'] = carr::get($value, 'fill', false);
 
-			$randColor = $this->getColor();
-			$dataset['borderColor'] = carr::get($value, 'color') ?: $randColor;
-			$dataset['backgroundColor'] = $this->getColor($randColor, 0.2);
+            if ($label) {
+                $dataset['label'] = $label;
+            }
 
-			$this->data['datasets'][] = $dataset;
-		}
-	}
+            $randColor = $this->getColor();
+            $dataset['borderColor'] = carr::get($value, 'color') ?: $randColor;
+            $dataset['backgroundColor'] = $this->getColor($randColor, 0.2);
 
-	public function js($indent = 0) {
-	    $js = new CStringBuilder();
-	    $js->setIndent($indent);
-	    $js->append(parent::js($indent))->br();
+            $this->data['datasets'][] = $dataset;
+        }
+    }
 
-	    $options = [];
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
+        $js->append(parent::js($indent))->br();
 
-	    if ($this->width || $this->height) {
-	    	$options['maintainAspectRatio'] = false;
-	    }
+        $options = [];
 
-	    $js->append("
+        if ($this->width || $this->height) {
+            $options['maintainAspectRatio'] = false;
+        }
+
+        $js->append("
 	    	var chart" . $this->wrapper->id . " = new Chart($('#" . $this->wrapper->id . "'), {
 	    		type: '" . $this->type . "',
 	    		data: $.parseJSON('" . json_encode($this->data) . "'),
@@ -64,13 +62,14 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart
     		});
 	    ")->br();
 
-	    if ($this->width) {
-		    $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.width = '" . $this->width . "px';")->br();
-	    }
-	    if ($this->height) {
-		    $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
-	    }
-	    
-	    return $js->text();
-	}
+        if ($this->width) {
+            $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.width = '" . $this->width . "px';")->br();
+        }
+        if ($this->height) {
+            $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
+        }
+
+        return $js->text();
+    }
+
 }

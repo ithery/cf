@@ -597,6 +597,12 @@ return array(
             "plugins/c3/c3.js",
         ),
     ),
+    "chartjs" => array(
+       
+        "js" => array(
+            "plugins/chartjs/chartjs.js",
+        ),
+    ),
     "chartist" => array(
         "css" => array(
             "plugins/chartist/chartist.css",
