@@ -46,12 +46,19 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
                 foreach ($dataset['data'] as $k => $v) {
                     $randColor = $this->getColor();
                     $colorTemp = carr::get($value, 'color');
+                    $backgroundColorTemp = carr::get($value, 'backgroundColor');
                     if(is_array($colorTemp)) {
                         $colorTemp = carr::get($colorTemp,$k);
                     }
+                    if(is_array($backgroundColorTemp)) {
+                        $backgroundColorTemp = carr::get($backgroundColorTemp,$k);
+                    }
                     
                     $color[] = $colorTemp;
-                    $backgroundColor[] = $this->getColor($colorTemp, 0.2);
+                    if(strlen($backgroundColorTemp)==0) {
+                        $backgroundColorTemp=$this->getColor($colorTemp, 0.2);
+                    }
+                    $backgroundColor[] = $backgroundColorTemp;
                 }
             }
             $dataset['borderColor'] = $color;
