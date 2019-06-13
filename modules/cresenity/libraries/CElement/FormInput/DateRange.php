@@ -10,8 +10,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CElement_FormInput_DateRange extends CElement_FormInput {
 
     protected $dateFormat;
-    protected $start;
-    protected $end;
+    protected $dateStart;
+    protected $dateEnd;
 
     public function __construct($id) {
         parent::__construct($id);
