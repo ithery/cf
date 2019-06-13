@@ -61,6 +61,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $isCallback = false;
     public $callbackRequire = null;
     public $callbackOptions = null;
+    public $searchPlaceholder = '';
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
@@ -171,6 +172,12 @@ class CElement_Component_DataTable extends CElement_Component {
     public function setDatabase($db) {
         $this->db = $db;
         $this->dbConfig = $db->config();
+
+        return $this;
+    }
+    
+    public function setSearchPlaceholder($placeholder) {
+        $this->searchPlaceholder = $placeholder;
 
         return $this;
     }
@@ -1151,7 +1158,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     ->appendln("'aaSorting': [],")->br()
                     ->appendln("'oLanguage': { 
 						sSearch : '" . clang::__('Search') . "',
-						sSearchPlaceholder : '" . clang::__('Search Here') . "',
+						sSearchPlaceholder : '" . clang::__($this->searchPlaceholder) . "',
 						sProcessing : '" . clang::__('Processing') . "',
 						sLengthMenu  : '" . clang::__('Show') . " _MENU_ " . clang::__('Entries') . "',
 						oPaginate  : {'sFirst' : '" . clang::__('First') . "',
