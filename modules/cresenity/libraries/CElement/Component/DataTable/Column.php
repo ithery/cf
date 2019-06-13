@@ -146,7 +146,7 @@ class CElement_Component_DataTable_Column extends CObject {
         if (strlen($this->width) > 0) {
             $addition_attr .= ' width="' . $this->width . '"';
         }
-        $class = "";
+        $class = implode(" ",$this->class);
         $data_align = "";
         switch ($this->getAlign()) {
             case "left": $data_align .= "align-left";
@@ -170,6 +170,7 @@ class CElement_Component_DataTable_Column extends CObject {
                     break;
             }
         }
+        
         if ($this->sortable) {
             $class .= " sortable";
         }
