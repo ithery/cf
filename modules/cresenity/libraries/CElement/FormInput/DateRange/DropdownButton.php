@@ -11,92 +11,27 @@ use Carbon\Carbon;
 
 class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_DateRange_Dropdown {
 
+    use CElement_FormInput_Trait_PredefinedDateRangeTrait;
+
     protected $dateFormat;
     protected $start;
     protected $end;
-    protected $predefinedRanges;
 
     public function __construct($id) {
         parent::__construct($id);
         $this->tag = 'button';
+        $this->setAttr('capp-input', 'daterange-dropdownbutton');
         $this->resetRange();
-    }
-
-    public function resetRange() {
-        $this->predefinedRanges = array();
-        return $this;
-    }
-
-    public function addRange($label, $dateStart, $dateEnd) {
-        $this->predefinedRanges[] = array(
-            "label" => $label,
-            "dateStart" => $dateStart,
-            "dateEnd" => $dateEnd,
-        );
-        return $this;
-    }
-
-    public function addToday($label='Today') {
-        $dateStart = Carbon::now();
-        $dateEnd = Carbon::now();
-        $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
-        return $this;
-    }
-    
-    public function addYesterday($label='Yesterday') {
-        $dateStart = Carbon::yesterday();
-        $dateEnd = Carbon::now();
-        $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
-        return $this;
-    }
-    public function addRange7Days($label='Last 7 Days') {
-        $dateStart = Carbon::now()->subDay(7);
-        $dateEnd = Carbon::now();
-        $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
-        return $this;
-    }
-    
-    public function addRange14Days($label='Last 14 Days') {
-        $dateStart = Carbon::now()->subDay(14);
-        $dateEnd = Carbon::now();
-        $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
-        return $this;
-    }
-    
-    public function addRange30Days($label='Last 30 Days') {
-        $dateStart = Carbon::now()->subDay(30);
-        $dateEnd = Carbon::now();
-        $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
-        return $this;
-    }
-    
-    public function addRangeThisWeek($label='This Week') {
-        $dateStart = Carbon::now()->weekday(0);
-        $dateEnd = Carbon::now()->weekday(7);
-        $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
-        return $this;
-    }
-    
-    public function addDefaultRange() {
-        $this->resetRange();
-        $this->addToday();
-        $this->addYesterday();
-        $this->addRange7Days();
-        $this->addRange14Days();
-        $this->addRange30Days();
-        $this->addRangeThisWeek();
-        return $this;
     }
 
     public function build() {
 
-        $this->addClass('btn dropdown-toggle md-btn-flat');
-        $this->add($this->dateStart . ' ' . $this->dateEnd);
-        
-        if(is_array($this->predefinedRanges) && count($this->predefinedRanges)==0) {
-          
+        $this->addClass('btn dropdown-toggle md-btn-flat daterange-dropdownbutton');
+        $this->add($this->dateStart . ' - ' . $this->dateEnd);
+        $this->after()->addControl($this->id . '-start', 'hidden')->setName($this->name . '[start]')->setValue($this->dateStart);
+        $this->after()->addControl($this->id . '-end', 'hidden')->setName($this->name . '[end]')->setValue($this->dateEnd);
+        if (is_array($this->predefinedRanges) && count($this->predefinedRanges) == 0) {
             $this->addDefaultRange();
-             
         }
     }
 
@@ -104,15 +39,31 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         $js = '';
         //make sure this element is builded
         $this->buildOnce();
-        
+
+        $jsChange = '';
+        foreach ($this->listeners as $listener) {
+            if ($listener->getEvent() == 'change') {
+                $jsChange = $listener->getBodyJs();
+            }
+        }
+
+
         $jsRange = '';
         foreach ($this->predefinedRanges as $range) {
             $label = carr::get($range, 'label');
             $dateStart = carr::get($range, 'dateStart');
             $dateEnd = carr::get($range, 'dateEnd');
-            $jsRange .= "'" . $label . "': [moment('" . $dateStart . "'), moment('" . $dateEnd . "')],";
+            $dateStartJs = "null";
+            if (strlen($dateStart > 0)) {
+                $dateStartJs = "moment('" . $dateStart . "')";
+            }
+            $dateEndJs = "null";
+            if (strlen($dateStart > 0)) {
+                $dateEndJs = "moment('" . $dateEnd . "')";
+            }
+            $jsRange .= "'" . $label . "': [" . $dateStartJs . ", " . $dateEndJs . "],";
         }
-       
+
         $js .= "
            
           
@@ -124,8 +75,20 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
                 locale: {
                     format: '" . $this->momentFormat . "'
                 },
+                isInvalidDate: function() {
+                    
+                }
             }, function (start, end) {
-                $('#" . $this->id . "').html(start.format('" . $this->momentFormat . "') + ' - ' + end.format('" . $this->momentFormat . "'));
+                
+                  
+                  
+                    $('#" . $this->id . "').html(start.format('" . $this->momentFormat . "') + ' - ' + end.format('" . $this->momentFormat . "'));
+                    $('#" . $this->id . "-start').val(start.format('" . $this->momentFormat . "'));
+                    $('#" . $this->id . "-end').val(end.format('" . $this->momentFormat . "'));
+                    if(start.format('" . $this->momentFormat . "')=='1970-01-01') { 
+                        $('#" . $this->id . "').html('Until ' + end.format('" . $this->momentFormat . "'));
+                    }
+                " . $jsChange . "
             });
 
             $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
