@@ -17,6 +17,8 @@ class CElement_List_TabList extends CElement_List {
     protected $ajax;
     protected $haveIcon;
     protected $widgetClass;
+    protected $header;
+    protected $jsHeader;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -27,10 +29,19 @@ class CElement_List_TabList extends CElement_List {
         $this->haveIcon = false;
         $this->tabs = array();
         $this->widgetClass = array();
+        $this->header = null;
+        $this->jsHeader = '';
     }
 
     public static function factory($id) {
         return new CElement_List_TabList($id);
+    }
+
+    public function header() {
+        if ($this->header == null) {
+            $this->header = CElement_Factory::createElement('div')->addClass('ml-auto');
+        }
+        return $this->header;
     }
 
     /**
@@ -76,13 +87,13 @@ class CElement_List_TabList extends CElement_List {
 
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $ajax_class = "";
+        $ajaxClass = "";
         if ($this->ajax) {
-            $ajax_class = "ajax";
+            $ajaxClass = "ajax";
             //we create the ajax url if there are no url on tab
         } else {
             foreach ($this->tabs as $tab) {
-                $tab->set_ajax(false);
+                $tab->setAjax(false);
             }
         }
 
@@ -91,7 +102,7 @@ class CElement_List_TabList extends CElement_List {
         if (strlen($classes) > 0) {
             $classes = " " . $classes;
         }
-        $classes .= ' ' . $ajax_class;
+        $classes .= ' ' . $ajaxClass;
 
         $widgetClasses = $this->widgetClass;
         $widgetClasses = implode(" ", $widgetClasses);
@@ -120,7 +131,7 @@ class CElement_List_TabList extends CElement_List {
             }
         }
         if ($this->tabPosition == 'top') {
-            $html->appendln('               <div class="top-nav-container">');
+            $html->appendln('               <div class="top-nav-container d-flex align-items-center">');
         } else {
             $html->appendln('				<div class="side-nav-container affix-top">');
         }
@@ -142,29 +153,28 @@ class CElement_List_TabList extends CElement_List {
             }
             $tab->setTarget('' . $this->id . '-ajax-tab-content');
 
-            $html->appendln($tab->headerHtml($html->get_indent()));
+            $html->appendln($tab->headerHtml($html->getIndent()));
         }
-        $activeTab_icon = "";
-        $activeTab_label = "";
+
+
+        $activeTabIcon = "";
+        $activeTabLabel = "";
 
         if ($activeTab != null) {
-            $activeTab_icon = $activeTab->getIcon();
-            $activeTab_label = $activeTab->getLabel();
+            $activeTabIcon = $activeTab->getIcon();
+            $activeTabLabel = $activeTab->getLabel();
 
             if (strlen($activeTab->getAjaxUrl()) > 0) {
-                $tab_ajax_url = $activeTab->getAjaxUrl();
-
-                /*
-                  $url_base = curl::base();
-                  if(substr($tab_ajax_url,0,strlen($url_base)) == $url_base) {
-                  $tab_ajax_url = substr($tab_ajax_url,strlen($url_base));
-                  }
-                  $tab_ajax_url = curl::base(true,'http').$tab_ajax_url;
-                 */
-                //$activeTab_content = CCurl::factory($tab_ajax_url)->exec()->response();
+                $tabAjaxUrl = $activeTab->getAjaxUrl();
             }
         }
         $html->appendln('					</ul>');
+
+        if ($this->header != null) {
+            $html->appendln($this->header->html($html->getIndent()));
+            $this->jsHeader = $this->header->js();
+        }
+
         $html->appendln('				</div>');
         $html->appendln('			</div>');
         if ($this->bootstrap >= '3') {
@@ -193,10 +203,10 @@ class CElement_List_TabList extends CElement_List {
         if ($this->tabPosition != 'top') {
             if ($this->haveIcon) {
                 $html->appendln('						<span class="icon">');
-                $html->appendln('							<i class="icon-' . $activeTab_icon . '"></i>');
+                $html->appendln('							<i class="icon-' . $activeTabIcon . '"></i>');
                 $html->appendln('						</span>');
             }
-            //$html->appendln('						<h5>' . $activeTab_label . '</h5>');
+            //$html->appendln('						<h5>' . $activeTabLabel . '</h5>');
             $html->appendln('					</div>');
         }
 
@@ -232,6 +242,7 @@ class CElement_List_TabList extends CElement_List {
 
         $js = new CStringBuilder();
         $js->setIndent($indent);
+        $js->appendln($this->jsHeader);
         foreach ($this->tabs as $tab) {
             $js->appendln($tab->js($js->getIndent()));
         }
