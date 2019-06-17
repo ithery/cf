@@ -597,6 +597,11 @@ return array(
             "plugins/c3/c3.js",
         ),
     ),
+    "chartjs" => array(
+        "js" => array(
+            "plugins/chartjs/chartjs.js",
+        ),
+    ),
     "chartist" => array(
         "css" => array(
             "plugins/chartist/chartist.css",
@@ -631,6 +636,10 @@ return array(
             "plugins/vis/vis.min.css",
         ),
     ),
+    "toastr" => array(
+        "css" => array("plugins/toastr/toastr.css"),
+        "js" => array("plugins/toastr/toastr.js")
+    ),
     "minicolors" => array(
         "js" => array(
             "plugins/minicolors/minicolors.js",
@@ -639,7 +648,6 @@ return array(
             "plugins/minicolors/minicolors.css",
         ),
     ),
-    
     "dragula" => array(
         "js" => array(
             "plugins/dragula/dragula.js",
@@ -647,6 +655,11 @@ return array(
         "css" => array(
             "plugins/dragula/dragula.css",
         ),
+    ),
+    "clipboard" => array(
+        "js" => array(
+            "plugins/clipboard/clipboard.js",
+        )
     ),
     "quill" => array(
         "js" => array(

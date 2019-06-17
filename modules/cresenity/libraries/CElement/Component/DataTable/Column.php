@@ -21,6 +21,7 @@ class CElement_Component_DataTable_Column extends CObject {
     public $noLineBreak;
     public $callback;
     public $callbackRequire;
+    public $class;
 
     public function __construct($fieldname) {
         parent::__construct();
@@ -42,6 +43,7 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->hiddenDesktop = false;
         $this->callback = null;
         $this->callbackRequire = null;
+        $this->class = array();
     }
 
     public static function factory($fieldname) {
@@ -144,7 +146,7 @@ class CElement_Component_DataTable_Column extends CObject {
         if (strlen($this->width) > 0) {
             $addition_attr .= ' width="' . $this->width . '"';
         }
-        $class = "";
+        $class = implode(" ",$this->class);
         $data_align = "";
         switch ($this->getAlign()) {
             case "left": $data_align .= "align-left";
@@ -168,6 +170,7 @@ class CElement_Component_DataTable_Column extends CObject {
                     break;
             }
         }
+        
         if ($this->sortable) {
             $class .= " sortable";
         }
@@ -186,6 +189,11 @@ class CElement_Component_DataTable_Column extends CObject {
             $html->appendln('<th ' . $pdfTHeadTdAttr . ' field_name = "' . $this->fieldname . '" data-no-line-break="' . $dataNoLineBreak . '" data-align="' . $data_align . '" class="thead ' . $thClass . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
         }
         return $html->text();
+    }
+
+    public function addClass($class) {
+        $this->class[] = $class;
+        return $this;
     }
 
 }

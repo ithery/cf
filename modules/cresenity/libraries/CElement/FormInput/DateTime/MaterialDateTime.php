@@ -11,6 +11,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
     protected $dateTimeFormat;
     protected $disableYesterday;
+    protected $disableTomorrow;
     protected $disableDate;
     protected $disableTime;
 
@@ -20,6 +21,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
         $this->dateTimeFormat = "YYYY-MM-DD";
         $this->disableYesterday = false;
+        $this->disableTomorrow = false;
         $this->disableDate = false;
         $this->disableTime = false;
         
@@ -47,14 +49,21 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         return $this;
     }
 
+    public function setDisableTomorrow($bool = true) {
+        $this->disableTomorrow = $bool;
+        return $this;
+    }
+
     public function setDisableDate($bool = true)
     {
+        $this->dateTimeFormat = "HH:mm";
         $this->disableDate = $bool;
         return $this;
     }
 
     public function setDisableTime($bool = true)
     {
+        $this->dateTimeFormat = "YYYY-MM-DD";
         $this->disableTime = $bool;
         return $this;
     }
@@ -86,6 +95,12 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         if ($this->disableYesterday) {
             if (strlen($option) > 0)
             $option .= ",minDate: new Date()";
+        }
+
+        if ($this->disableTomorrow) {
+            if (strlen($option) > 0) {
+                $option .= ",maxDate: new Date()";
+            }
         }
         //$option .= " ,nowButton : true";
         //$option .= " ,minDate : new Date()";

@@ -238,15 +238,17 @@ INSERT INTO `users` (`user_id`, `role_id`, `org_id`, `store_id`, `username`, `us
 DROP TABLE IF EXISTS `var`;
 CREATE TABLE IF NOT EXISTS `var` (
   `var_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `org_id` bigint(20) NOT NULL,
+  `org_id` bigint(20) NULL,
   `key` varchar(32) NOT NULL,
   `caption` varchar(255) NOT NULL,
   `value` longtext,
   `is_var_user` tinyint(1) NOT NULL DEFAULT '0',
-  `data_type` varchar(255) NOT NULL,
+  `data_type` varchar(255) NOT NULL DEFAULT 'text',
   `description` varchar(255) DEFAULT NULL,
   `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_id`),
   UNIQUE KEY `var_id` (`var_id`)
@@ -264,7 +266,9 @@ CREATE TABLE IF NOT EXISTS `var_user` (
   `key` varchar(32) NOT NULL,
   `value` longtext,
   `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_user_id`),
   UNIQUE KEY `var_user_id` (`var_user_id`)
