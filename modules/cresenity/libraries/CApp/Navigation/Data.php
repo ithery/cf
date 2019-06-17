@@ -28,7 +28,7 @@ class CApp_Navigation_Data {
         }
 
         if (isset(self::$navigationCallback[$domain]) && self::$navigationCallback[$domain] != null && is_callable(self::$navigationCallback[$domain])) {
-            $data = call_user_func(self::$navigationCallback[$domain], $data);
+            $data = CFunction::factory(self::$navigationCallback[$domain])->addArg($data)->execute();
         }
         return $data;
     }

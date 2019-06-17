@@ -47,11 +47,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         return $this;
     }
 
-    public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->setIndent($indent);
-
-
+    public function getBodyJs() {
         $startScript = "
             var thiselm=jQuery(this);
             var clicked = thiselm.attr('data-clicked');
@@ -97,6 +93,15 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
             ";
         }
         $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;
+        return $compiledJs;
+    }
+    
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
+
+        $compiledJs = $this->getBodyJs();
+        
         $eventParameterImploded = implode(',', $this->eventParameters);
         if ($this->event == 'lazyload') {
             $js->append("
