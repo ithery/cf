@@ -377,7 +377,10 @@ class CFRouter {
                         $key = str_replace($bStr, '(.+?)', $key);
                     }
                     $matchesBracket = false;
-                    if (preg_match('#^' . $key . '$#u', $uri, $matches)) {
+                    $key = str_replace("/","\/",$key);
+                   
+                    if (preg_match('#' . $key . '#u', $uri, $matches)) {
+                        
                         $matchesBracket = array_slice($matches, 1);
                     }
                     $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
