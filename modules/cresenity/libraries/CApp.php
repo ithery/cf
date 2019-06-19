@@ -165,7 +165,6 @@ class CApp extends CObservable {
                 $this->_org = cstg::get($org_id);
             }
         }
-        $this->registerCoreModules();
         if (isset($_COOKIE['capp-debugbar'])) {
             CDebug::bar()->enable();
         }
@@ -295,8 +294,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
-
-
+        
+      
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -416,7 +415,8 @@ class CApp extends CObservable {
         }
         $this->rendered = true;
 
-
+        $this->registerCoreModules();
+        
 
         CFEvent::run('CApp.beforeRender');
 

@@ -2,6 +2,8 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
+use Symfony\Component\Routing\Route as SymfonyRoute;
+
 class CFRouter {
 
     protected static $routesRuntime = array();
@@ -356,6 +358,8 @@ class CFRouter {
             $routes = self::getRoutes();
         }
 
+
+
         // Prepare variables
         $routedUri = $uri = trim($uri, '/');
 
@@ -376,15 +380,17 @@ class CFRouter {
                         $bracketKeys[] = null;
                         $key = str_replace($bStr, '(.+?)', $key);
                     }
+                    
+                    
                     $matchesBracket = false;
-                    $key = str_replace("/","\/",$key);
-                   
+                    $key = str_replace("/", "\/", $key);
                     if (preg_match('#' . $key . '#u', $uri, $matches)) {
-                        
+
                         $matchesBracket = array_slice($matches, 1);
                     }
                     $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
                     $val = call_user_func_array($val, $callbackArgs);
+                   
                     if ($val == null) {
                         continue;
                     }
@@ -393,8 +399,9 @@ class CFRouter {
                 // Trim slashes
                 $key = trim($key, '/');
                 $val = trim($val, '/');
-
-                if (preg_match('#^' . $key . '$#u', $uri)) {
+                
+                if (preg_match('#' . $key . '#u', $uri)) {
+                   
                     if (strpos($val, '$') !== FALSE) {
                         // Use regex routing
                         $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);

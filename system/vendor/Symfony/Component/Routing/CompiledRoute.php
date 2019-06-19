@@ -16,8 +16,8 @@ namespace Symfony\Component\Routing;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CompiledRoute implements \Serializable
-{
+class CompiledRoute implements \Serializable {
+
     private $variables;
     private $tokens;
     private $staticPrefix;
@@ -37,8 +37,7 @@ class CompiledRoute implements \Serializable
      * @param array       $hostVariables An array of host variables
      * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
      */
-    public function __construct(string $staticPrefix, string $regex, array $tokens, array $pathVariables, string $hostRegex = null, array $hostTokens = [], array $hostVariables = [], array $variables = [])
-    {
+    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = [], array $hostVariables = [], array $variables = []) {
         $this->staticPrefix = $staticPrefix;
         $this->regex = $regex;
         $this->tokens = $tokens;
@@ -49,8 +48,7 @@ class CompiledRoute implements \Serializable
         $this->variables = $variables;
     }
 
-    public function __serialize(): array
-    {
+    public function __serialize() {
         return [
             'vars' => $this->variables,
             'path_prefix' => $this->staticPrefix,
@@ -66,13 +64,11 @@ class CompiledRoute implements \Serializable
     /**
      * @internal
      */
-    final public function serialize()
-    {
+    final public function serialize() {
         return serialize($this->__serialize());
     }
 
-    public function __unserialize(array $data): void
-    {
+    public function __unserialize(array $data) {
         $this->variables = $data['vars'];
         $this->staticPrefix = $data['path_prefix'];
         $this->regex = $data['path_regex'];
@@ -86,8 +82,7 @@ class CompiledRoute implements \Serializable
     /**
      * @internal
      */
-    final public function unserialize($serialized)
-    {
+    final public function unserialize($serialized) {
         $this->__unserialize(unserialize($serialized, ['allowed_classes' => false]));
     }
 
@@ -96,8 +91,7 @@ class CompiledRoute implements \Serializable
      *
      * @return string The static prefix
      */
-    public function getStaticPrefix()
-    {
+    public function getStaticPrefix() {
         return $this->staticPrefix;
     }
 
@@ -106,8 +100,7 @@ class CompiledRoute implements \Serializable
      *
      * @return string The regex
      */
-    public function getRegex()
-    {
+    public function getRegex() {
         return $this->regex;
     }
 
@@ -116,8 +109,7 @@ class CompiledRoute implements \Serializable
      *
      * @return string|null The host regex or null
      */
-    public function getHostRegex()
-    {
+    public function getHostRegex() {
         return $this->hostRegex;
     }
 
@@ -126,8 +118,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The tokens
      */
-    public function getTokens()
-    {
+    public function getTokens() {
         return $this->tokens;
     }
 
@@ -136,8 +127,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The tokens
      */
-    public function getHostTokens()
-    {
+    public function getHostTokens() {
         return $this->hostTokens;
     }
 
@@ -146,8 +136,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The variables
      */
-    public function getVariables()
-    {
+    public function getVariables() {
         return $this->variables;
     }
 
@@ -156,8 +145,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The variables
      */
-    public function getPathVariables()
-    {
+    public function getPathVariables() {
         return $this->pathVariables;
     }
 
@@ -166,8 +154,8 @@ class CompiledRoute implements \Serializable
      *
      * @return array The variables
      */
-    public function getHostVariables()
-    {
+    public function getHostVariables() {
         return $this->hostVariables;
     }
+
 }
