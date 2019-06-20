@@ -387,12 +387,12 @@ class CApp extends CObservable {
             }
             if ($cssArray != null) {
                 foreach ($cssArray as $css) {
-                    $cs->registerCssFiles($css);
+                    $manager->asset()->theme()->registerCssFile($css);
                 }
             }
             if ($jsArray != null) {
                 foreach ($jsArray as $js) {
-                    $cs->registerJsFiles($js);
+                    $manager->asset()->theme()->registerJsFiles($js);
                 }
             }
         }
