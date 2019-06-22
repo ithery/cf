@@ -20,11 +20,15 @@ class CTracker_Config {
         return static::$instance;
     }
 
-    public static function get($key) {
+    public function get($key) {
         return CConfig::instance('tracker')->get($key);
     }
 
-    public static function isLogDevice() {
+    public function isLogDevice() {
+        return true;
+    }
+
+    public function isCacheEnabled() {
         return true;
     }
 

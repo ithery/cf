@@ -4,10 +4,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 6, 2018, 10:31:51 PM
+ * @since Jun 23, 2019, 4:18:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_Mobile_Detector {
+class CDetector_Mobile {
 
     /**
      * Mobile detection type.

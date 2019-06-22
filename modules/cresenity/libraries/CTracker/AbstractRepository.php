@@ -55,6 +55,9 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
 
     public function create($attributes, $model = null) {
         $model = $model && !$model->exists() ? $model : $this->newModel($model);
+        if (!is_array($attributes)) {
+            throw new CTracker_Exception('attributes must array');
+        }
         foreach ($attributes as $attribute => $value) {
             if (in_array($attribute, $model->getFillable())) {
                 $model->{$attribute} = $value;
