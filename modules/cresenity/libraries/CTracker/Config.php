@@ -29,7 +29,7 @@ class CTracker_Config {
     }
 
     public function isCacheEnabled() {
-        return true;
+        return false;
     }
 
 }

@@ -9,8 +9,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CHTTP {
 
+    protected static $request;
+
     public static function request() {
-        return CHTTP_Request::instance();
+        if (self::$request == null) {
+            self::$request = CHTTP_Request::capture();
+        }
+        return self::$request;
     }
 
 }

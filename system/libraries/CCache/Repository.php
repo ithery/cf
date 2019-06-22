@@ -233,4 +233,17 @@ class CCache_Repository implements ArrayAccess {
         $this->driver = clone $this->driver;
     }
 
+    /**
+     * Store an item in the cache indefinitely.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    public function forever($key, $value) {
+        $this->driver->forever($this->itemKey($key), $value);
+
+        //$this->event(new KeyWritten($key, $value, 0));
+    }
+
 }

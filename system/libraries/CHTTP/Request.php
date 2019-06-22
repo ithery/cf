@@ -11,17 +11,31 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
 
-    protected static $instance;
+    use CHTTP_Trait_InteractsWithInput,
+        CHTTP_Trait_InteractsWithContentTypes;
 
-    public static function instance() {
-        if (self::$instance == null) {
-            self::$instance = new CHTTP_Request();
+    /**
+     * Create an object request from a Symfony instance.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @return CHTTP_Request
+     */
+    public static function createFromBase(SymfonyRequest $request) {
+        if ($request instanceof static) {
+            return $request;
         }
-        return self::$instance;
-    }
 
-    public function __construct() {
-        
+        $content = $request->content;
+
+        $request = (new static)->duplicate(
+                $request->query->all(), $request->request->all(), $request->attributes->all(), $request->cookies->all(), $request->files->all(), $request->server->all()
+        );
+
+        $request->content = $content;
+
+        $request->request = $request->getInputSource();
+
+        return $request;
     }
 
     /**
@@ -35,6 +49,17 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         }
 
         return $this->getRealMethod() == 'GET' ? $this->query : $this->request;
+    }
+
+    /**
+     * Create a new Illuminate HTTP request from server variables.
+     *
+     * @return static
+     */
+    public static function capture() {
+        static::enableHttpMethodParameterOverride();
+
+        return static::createFromBase(SymfonyRequest::createFromGlobals());
     }
 
     /**

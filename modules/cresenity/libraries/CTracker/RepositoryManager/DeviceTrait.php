@@ -14,11 +14,23 @@ trait CTracker_RepositoryManager_DeviceTrait {
      * @var CTracker_Repository_Device
      */
     protected $deviceRepository;
+
+    /**
+     *
+     * @var type 
+     */
     protected $mobileDetect;
+
+    /**
+     *
+     * @var type 
+     */
+    protected $userAgentParser;
 
     protected function bootDeviceTrait() {
         $this->deviceRepository = new CTracker_Repository_Device();
         $this->mobileDetect = new CTracker_Detect_MobileDetect();
+        $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT);
     }
 
     public function findOrCreateDevice($data) {
@@ -47,6 +59,17 @@ trait CTracker_RepositoryManager_DeviceTrait {
     private function getOperatingSystemFamily() {
         try {
             return $this->userAgentParser->operatingSystem->family;
+        } catch (\Exception $e) {
+            return;
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getOperatingSystemVersion() {
+        try {
+            return $this->userAgentParser->getOperatingSystemVersion();
         } catch (\Exception $e) {
             return;
         }

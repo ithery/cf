@@ -93,4 +93,10 @@ class CTracker_Cache extends CCache_Repository {
         return sha1($cacheKey);
     }
 
+    public function cachePut($cacheKey, $model) {
+        if ($this->config->isCacheEnabled()) {
+            return $this->set($cacheKey, $model);
+        }
+    }
+
 }
