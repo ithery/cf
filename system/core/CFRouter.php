@@ -384,7 +384,9 @@ class CFRouter {
                     
                     $matchesBracket = false;
                     $key = str_replace("/", "\/", $key);
-                    if (preg_match('#' . $key . '#u', $uri, $matches)) {
+                    preg_match('#' . $key . '#ims', $uri, $matches);
+                    
+                    if (preg_match('#' . $key . '#ims', $uri, $matches)) {
 
                         $matchesBracket = array_slice($matches, 1);
                     }
@@ -400,16 +402,18 @@ class CFRouter {
                 $key = trim($key, '/');
                 $val = trim($val, '/');
                 
-                if (preg_match('#' . $key . '#u', $uri)) {
+                
+                if (preg_match('#^' . $key . '#u', $uri)) {
                    
                     if (strpos($val, '$') !== FALSE) {
                         // Use regex routing
+                        
                         $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);
                     } else {
                         // Standard routing
                         $routedUri = $val;
                     }
-
+                    
                     // A valid route has been found
                     break;
                 }
