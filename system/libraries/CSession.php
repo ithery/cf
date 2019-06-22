@@ -17,15 +17,18 @@ class CSession {
     protected $input;
 
     /**
+     * 
      * Singleton instance of Session.
+     *
+     * @return CSession
      */
     public static function instance() {
-        if (CSession::$instance == NULL) {
+        if (self::$instance == NULL) {
             // Create a new instance
-            new CSession;
+            self::$instance = new CSession();
         }
 
-        return CSession::$instance;
+        return self::$instance;
     }
 
     /**
@@ -102,12 +105,12 @@ class CSession {
                 // Initialize the driver
                 CSession::$driver = $class->newInstance();
             } catch (ReflectionException $ex) {
-                throw new CException('The :driver driver for the :class library could not be found', array(':driver' => CSession::$config['driver'],':class' => get_class($this)));
+                throw new CException('The :driver driver for the :class library could not be found', array(':driver' => CSession::$config['driver'], ':class' => get_class($this)));
             }
 
             // Validate the driver
             if (!(CSession::$driver instanceof CSession_Driver)) {
-                throw new CFException('The :driver driver for the :class library must implement the :interface interface', array(':driver' => CSession::$config['driver'],':class' => get_class($this), ':interface'=> 'Session_Driver'));
+                throw new CFException('The :driver driver for the :class library must implement the :interface interface', array(':driver' => CSession::$config['driver'], ':class' => get_class($this), ':interface' => 'Session_Driver'));
             }
 
             // Register non-native driver as the session handler
@@ -116,7 +119,7 @@ class CSession {
 
         // Validate the session name
         if (!preg_match('~^(?=.*[a-z])[a-z0-9_]++$~iD', CSession::$config['name'])) {
-            throw new CFException('The session_name, :name, is invalid. It must contain only alphanumeric characters and underscores. Also at least one letter must be present.', array(':name',CSession::$config['name']));
+            throw new CFException('The session_name, :name, is invalid. It must contain only alphanumeric characters and underscores. Also at least one letter must be present.', array(':name', CSession::$config['name']));
         }
 
         // Name the session, this will also be the name of the cookie
