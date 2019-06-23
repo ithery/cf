@@ -109,6 +109,22 @@ CREATE TABLE `log_referer` (
 
 
 
+
+DROP TABLE IF EXISTS `log_referer_search_term`;
+CREATE TABLE `log_referer_search_term` (
+  `log_referer_search_term_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `log_referer_id` bigint(20) unsigned DEFAULT NULL,
+  `search_term` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_referer_search_term_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
 DROP TABLE IF EXISTS `log_cookie`;
 CREATE TABLE `log_cookie` (
   `log_cookie_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -143,7 +159,7 @@ CREATE TABLE `log_session` (
   `log_session_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
   `uuid` varchar(255) DEFAULT NULL,
-  `log_user_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
   `log_device_id` bigint(20) unsigned DEFAULT NULL,
   `log_agent_id` bigint(20) unsigned DEFAULT NULL,
   `log_referer_id` bigint(20) unsigned DEFAULT NULL,
@@ -176,6 +192,146 @@ CREATE TABLE `log_path` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
+DROP TABLE IF EXISTS `log_query`;
+CREATE TABLE `log_query` (
+  `log_query_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `query` varchar(1000) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_query_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+DROP TABLE IF EXISTS `log_query_argument`;
+CREATE TABLE `log_query_argument` (
+  `log_query_argument_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `log_query_id` bigint(20) unsigned DEFAULT NULL,
+  `argument` varchar(500) DEFAULT NULL,
+  `value` varchar(500) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_query_argument_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+
+DROP TABLE IF EXISTS `log_route`;
+CREATE TABLE `log_route` (
+  `log_route_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `action` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_route_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `log_route_path`;
+CREATE TABLE `log_route_path` (
+  `log_route_path_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `log_route_id` bigint(20) unsigned DEFAULT NULL,
+  `path` varchar(500) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_route_path_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `log_route_path_parameter`;
+CREATE TABLE `log_route_path_parameter` (
+  `log_route_path_parameter_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `log_route_path_id` bigint(20) unsigned DEFAULT NULL,
+  `parameter` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_route_path_parameter_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+DROP TABLE IF EXISTS `log_connection`;
+CREATE TABLE `log_connection` (
+  `log_connection_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_connection_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `log_sql_query`;
+CREATE TABLE `log_sql_query` (
+  `log_sql_query_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `sha1` varchar(40) DEFAULT NULL,
+  `statement` text DEFAULT NULL,
+  `time` double DEFAULT NULL,
+  `log_connection_id` bigint(20) unsigned DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_sql_query_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+
+DROP TABLE IF EXISTS `log_sql_query_binding`;
+CREATE TABLE `log_sql_query_binding` (
+  `log_sql_query_binding_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `sha1` varchar(40) DEFAULT NULL,
+  `serialized` text DEFAULT NULL,
+  `log_sql_query_id` bigint(20) unsigned DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_sql_query_binding_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+
+
+DROP TABLE IF EXISTS `log_sql_query_binding_parameter`;
+CREATE TABLE `log_sql_query_binding_parameter` (
+  `log_sql_query_binding_parameter_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `log_sql_query_binding_id` bigint(20) unsigned DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_sql_query_binding_parameter_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
 DROP TABLE IF EXISTS `log_log`;
 CREATE TABLE `log_log` (
   `log_log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -199,6 +355,19 @@ CREATE TABLE `log_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
   
 
+DROP TABLE IF EXISTS `log_sql_query_log`;
+CREATE TABLE `log_sql_query_log` (
+  `log_sql_query_log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `log_log_id` bigint(20) unsigned DEFAULT NULL,
+  `log_sql_query_id` bigint(20) unsigned DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_sql_query_log_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

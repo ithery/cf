@@ -17,7 +17,11 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
         CTracker_RepositoryManager_DomainTrait,
         CTracker_RepositoryManager_LanguageTrait,
         CTracker_RepositoryManager_SessionTrait,
-        CTracker_RepositoryManager_PathTrait;
+        CTracker_RepositoryManager_PathTrait,
+        CTracker_RepositoryManager_QueryTrait,
+        CTracker_RepositoryManager_SqlQueryTrait,
+        CTracker_RepositoryManager_RouteTrait,
+        CTracker_RepositoryManager_LogTrait;
 
     protected static $instance;
 
@@ -60,6 +64,10 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
 
     public function isRobot() {
         return $this->crawlerDetector->isRobot();
+    }
+
+    public function parserIsAvailable() {
+        return !empty($this->userAgentParser);
     }
 
 }

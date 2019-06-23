@@ -19,7 +19,8 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     const SESSION_KEY = 'CTrackerSession';
 
     public function __construct() {
-        $this->className = 'CTracker_Model_Session';
+        $this->config = CTracker::config();
+        $this->className = CTracker::config()->get('sessionModel', 'CTracker_Model_Session');
         $this->createModel();
         $this->session = new CTracker_Session();
         parent::__construct();
@@ -102,7 +103,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     private function ensureSessionDataIsComplete() {
         $sessionData = $this->getSessionData();
         $wasComplete = true;
-       
+
         foreach ($this->sessionInfo as $key => $value) {
             if ($sessionData[$key] !== $value) {
                 if (!isset($model)) {
@@ -119,6 +120,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     private function sessionGetId() {
+        
         return $this->sessionInfo['id'];
     }
 
@@ -153,12 +155,12 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
      */
     private function getSessionData($variable = null) {
         $data = $this->session->get(self::SESSION_KEY);
-        
+
         return $variable ? (isset($data[$variable]) ? $data[$variable] : null) : $data;
     }
 
     private function putSessionData($data) {
-    
+
         $this->session->put(self::SESSION_KEY, $data);
     }
 

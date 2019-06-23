@@ -22,6 +22,7 @@ trait CTracker_RepositoryManager_LanguageTrait {
     }
 
     public function findOrCreateLanguage($data) {
+       
         return $this->languageRepository->findOrCreate($data, ['preference', 'language-range']);
     }
 
@@ -34,6 +35,7 @@ trait CTracker_RepositoryManager_LanguageTrait {
     }
 
     private function getLanguage() {
+         
         try {
             return $this->languageDetect->detectLanguage();
         } catch (\Exception $e) {

@@ -23,6 +23,10 @@ class CTracker {
         }
     }
 
+    /**
+     * 
+     * @return CTracker_Config
+     */
     public static function config() {
         return CTracker_Config::instance();
     }

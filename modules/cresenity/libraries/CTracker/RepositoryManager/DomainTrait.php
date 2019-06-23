@@ -7,7 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 23, 2019, 3:28:33 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 trait CTracker_RepositoryManager_DomainTrait {
 
     /**
@@ -20,8 +19,11 @@ trait CTracker_RepositoryManager_DomainTrait {
         $this->domainRepository = new CTracker_Repository_Domain();
     }
 
-    public function getDomainId() {
-        return $this->domainRepository->getId();
+    public function getDomainId($domain) {
+        return $this->domainRepository->findOrCreate(
+                        ['name' => $domain], ['name']
+        );
     }
 
+   
 }

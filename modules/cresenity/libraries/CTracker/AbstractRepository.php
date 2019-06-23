@@ -94,12 +94,12 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
 
         if (!$model) {
             $model = $this->newQuery($otherModel);
-            
+
             $keys = $keys ?: array_keys($attributes);
             foreach ($keys as $key) {
                 $model = $model->where($key, $attributes[$key]);
             }
-            
+
             if (!$model = $model->first()) {
                 $model = $this->create($attributes, $otherModel);
                 $created = true;
@@ -107,7 +107,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
             $this->cache->cachePut($cacheKey, $model);
         }
         $this->model = $model;
-        
+
         return $model->getKey();
     }
 
@@ -124,7 +124,8 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         return $this->model;
     }
 
-    public function createModel() {
+    public function createModel($modelClass = null) {
+
         $className = $this->className;
 
         $this->model = new $className();
@@ -136,6 +137,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         if ($model) {
             $className = get_class($model);
         }
+       
         $this->model = new $className();
         return $this->getModel();
     }
