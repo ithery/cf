@@ -87,4 +87,8 @@ class CTracker_Bootstrap {
                 ) : null;
     }
 
+    protected function getGeoIpId() {
+        return $this->config->isLogGeoIp() ? $this->repositoryManager->getGeoIpId($this->request->getClientIp()) : null;
+    }
+
 }

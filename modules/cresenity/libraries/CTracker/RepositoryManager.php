@@ -9,7 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface {
 
-    use CTracker_RepositoryManager_DeviceTrait;
+    use CTracker_RepositoryManager_DeviceTrait,
+        CTracker_RepositoryManager_GeoIpTrait;
 
     protected static $instance;
 

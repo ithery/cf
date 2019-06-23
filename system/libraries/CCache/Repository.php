@@ -246,4 +246,27 @@ class CCache_Repository implements ArrayAccess {
         //$this->event(new KeyWritten($key, $value, 0));
     }
 
+    /**
+     * Get an item from the cache, or store the default value.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function remember($key, $minutes, Closure $callback) {
+        $value = $this->get($key);
+
+        // If the item exists in the cache we will just return this immediately and if
+        // not we will execute the given Closure and cache the result of that for a
+        // given number of minutes so it's available for all subsequent requests.
+        if (!is_null($value)) {
+            return $value;
+        }
+
+        $this->put($key, $value = $callback(), $minutes);
+
+        return $value;
+    }
+
 }

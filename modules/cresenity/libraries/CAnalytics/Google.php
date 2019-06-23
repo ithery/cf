@@ -4,10 +4,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 24, 2019, 1:27:13 AM
+ * @since Jun 23, 2019, 12:42:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CAnalytics_Google_Analytics {
+class CAnalytics_Google {
 
     use CTrait_Macroable;
 
@@ -18,12 +18,15 @@ class CAnalytics_Google_Analytics {
     protected $viewId;
 
     /**
-     * @param CAnalytics_Google_Client $client
-     * @param string                            $viewId
+     * @param array $viewId
      */
-    public function __construct(CAnalytics_Google_Client $client, $viewId) {
+    public function __construct($options) {
+        $googleServiceAnalytics = new Google_Service_Analytics(CAnalytics_Google_ClientFactory::createAuthenticatedGoogleClient($options));
+        $cache = new CAnalytics_Google_Cache(carr::get($options, 'cache'));
+        $client = new CAnalytics_Google_Client($googleServiceAnalytics, $cache);
+        $client->setCacheLifeTimeInMinutes(carr::get($options, 'cacheLifetime', 60));
         $this->client = $client;
-        $this->viewId = $viewId;
+        $this->viewId = carr::get($options, 'viewId');
     }
 
     /**
@@ -36,13 +39,13 @@ class CAnalytics_Google_Analytics {
         return $this;
     }
 
-    public function fetchVisitorsAndPageViews(CAnalytics_Period $period) {
+    public function fetchVisitorsAndPageViews(CPeriod $period) {
         $response = $this->performQuery(
                 $period, 'ga:users,ga:pageviews', ['dimensions' => 'ga:date,ga:pageTitle']
         );
         return CF::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $dateRow) {
                     return [
-                        'date' => Carbon::createFromFormat('Ymd', $dateRow[0]),
+                        'date' => CCarbon::createFromFormat('Ymd', $dateRow[0]),
                         'pageTitle' => $dateRow[1],
                         'visitors' => (int) $dateRow[2],
                         'pageViews' => (int) $dateRow[3],
@@ -50,20 +53,20 @@ class CAnalytics_Google_Analytics {
                 });
     }
 
-    public function fetchTotalVisitorsAndPageViews(Period $period) {
+    public function fetchTotalVisitorsAndPageViews(CPeriod $period) {
         $response = $this->performQuery(
                 $period, 'ga:users,ga:pageviews', ['dimensions' => 'ga:date']
         );
         return CF::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $dateRow) {
                     return [
-                        'date' => Carbon::createFromFormat('Ymd', $dateRow[0]),
+                        'date' => CCarbon::createFromFormat('Ymd', $dateRow[0]),
                         'visitors' => (int) $dateRow[1],
                         'pageViews' => (int) $dateRow[2],
                     ];
                 });
     }
 
-    public function fetchMostVisitedPages(Period $period, $maxResults = 20) {
+    public function fetchMostVisitedPages(CPeriod $period, $maxResults = 20) {
         $response = $this->performQuery(
                 $period, 'ga:pageviews', [
             'dimensions' => 'ga:pagePath,ga:pageTitle',
@@ -81,7 +84,7 @@ class CAnalytics_Google_Analytics {
                         });
     }
 
-    public function fetchTopReferrers(Period $period, $maxResults = 20) {
+    public function fetchTopReferrers(CPeriod $period, $maxResults = 20) {
         $response = $this->performQuery($period, 'ga:pageviews', [
             'dimensions' => 'ga:fullReferrer',
             'sort' => '-ga:pageviews',
@@ -96,7 +99,7 @@ class CAnalytics_Google_Analytics {
                 });
     }
 
-    public function fetchUserTypes(Period $period) {
+    public function fetchUserTypes(CPeriod $period) {
         $response = $this->performQuery(
                 $period, 'ga:sessions', [
             'dimensions' => 'ga:userType',
@@ -110,11 +113,12 @@ class CAnalytics_Google_Analytics {
                 });
     }
 
-    public function fetchTopBrowsers(Period $period, $maxResults = 10) {
+    public function fetchTopBrowsers(CPeriod $period, $maxResults = 10) {
         $response = $this->performQuery(
                 $period, 'ga:sessions', [
             'dimensions' => 'ga:browser',
             'sort' => '-ga:sessions',
+            'max-results' => $maxResults,
                 ]
         );
         $topBrowsers = CF::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $browserRow) {
@@ -138,6 +142,67 @@ class CAnalytics_Google_Analytics {
         ]);
     }
 
+    public function fetchActiveUsers() {
+        $response = $this->performRealtime(
+                'rt:activeVisitors', [
+            'dimensions' => 'rt:userType',
+            'sort' => '-rt:userType',
+                ]
+        );
+
+        return $response->totalsForAllResults['rt:activeVisitors'];
+    }
+
+    public function fetchActiveUsersByBrowser($maxResults = 20) {
+        $response = $this->performRealtime(
+                'rt:activeVisitors', [
+            'dimensions' => 'rt:browser',
+            'sort' => 'rt:browser',
+            'max-results' => $maxResults,
+                ]
+        );
+
+        $topBrowsers = CF::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $browserRow) {
+            return [
+                'browser' => $browserRow[0],
+                'sessions' => (int) $browserRow[1],
+            ];
+        });
+         if ($topBrowsers->count() <= $maxResults) {
+            return $topBrowsers;
+        }
+        return $this->summarizeTopBrowsers($topBrowsers, $maxResults);
+    }
+
+    /**
+     * Get the top keywords.
+     *
+     * @param CPeriod $period
+     * @param int $maxResults
+     *
+     * @return CCollection
+     */
+    public function fetchTopKeywords(CPeriod $period, $maxResults = 30) {
+        $answer = $this->performQuery($period, 'ga:sessions', array(
+            'dimensions' => 'ga:keyword',
+            'sort' => '-ga:sessions',
+            'max-results' => $maxResults,
+            'filters' => 'ga:keyword!=(not set);ga:keyword!=(not provided)'
+                )
+        );
+        if (is_null($answer->rows)) {
+            return array();
+        }
+        $keywordData = array();
+        foreach ($answer->rows as $pageRow) {
+            $keywordData[] = array(
+                'keyword' => $pageRow[0],
+                'sessions' => $pageRow[1]
+            );
+        }
+        return $keywordData;
+    }
+
     /**
      * Call the query method on the authenticated client.
      *
@@ -147,9 +212,23 @@ class CAnalytics_Google_Analytics {
      *
      * @return array|null
      */
-    public function performQuery(Period $period, $metrics, array $others = []) {
+    public function performQuery(CPeriod $period, $metrics, array $others = []) {
         return $this->client->performQuery(
                         $this->viewId, $period->startDate, $period->endDate, $metrics, $others
+        );
+    }
+
+    /**
+     * Call the query method on the authenticated client.
+     *
+     * @param string $metrics
+     * @param array  $others
+     *
+     * @return array|null
+     */
+    public function performRealtime($metrics, array $others = []) {
+        return $this->client->performRealtime(
+                        $this->viewId, $metrics, $others
         );
     }
 

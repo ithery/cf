@@ -28,6 +28,10 @@ class CTracker_Config {
         return true;
     }
 
+    public function isLogGeoIp() {
+        return true;
+    }
+
     public function isCacheEnabled() {
         return false;
     }

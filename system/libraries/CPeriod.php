@@ -4,12 +4,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 24, 2019, 1:23:46 AM
+ * @since Jun 23, 2019, 12:50:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-use Carbon\Carbon;
-
-class Period {
+class CPeriod {
 
     /** @var \DateTime */
     public $startDate;
@@ -17,31 +15,37 @@ class Period {
     /** @var \DateTime */
     public $endDate;
 
-    public static function create(DateTime $startDate, $endDate) {
+    public static function create(DateTime $startDate, DateTime $endDate) {
+        return new static($startDate, $endDate);
+    }
+
+    public static function lifetime($minimumDate = null) {
+        $endDate = CCarbon::today();
+        $startDate = CCarbon::createFromTimestamp(0);
         return new static($startDate, $endDate);
     }
 
     public static function days($numberOfDays) {
-        $endDate = Carbon::today();
-        $startDate = Carbon::today()->subDays($numberOfDays)->startOfDay();
+        $endDate = CCarbon::today();
+        $startDate = CCarbon::today()->subDays($numberOfDays)->startOfDay();
         return new static($startDate, $endDate);
     }
 
     public static function months($numberOfMonths) {
-        $endDate = Carbon::today();
-        $startDate = Carbon::today()->subMonths($numberOfMonths)->startOfDay();
+        $endDate = CCarbon::today();
+        $startDate = CCarbon::today()->subMonths($numberOfMonths)->startOfDay();
         return new static($startDate, $endDate);
     }
 
     public static function years($numberOfYears) {
-        $endDate = Carbon::today();
-        $startDate = Carbon::today()->subYears($numberOfYears)->startOfDay();
+        $endDate = CCarbon::today();
+        $startDate = CCarbon::today()->subYears($numberOfYears)->startOfDay();
         return new static($startDate, $endDate);
     }
 
     public function __construct(DateTime $startDate, DateTime $endDate) {
         if ($startDate > $endDate) {
-            throw CAnalytics_Exception_InvalidPeriodException::startDateCannotBeAfterEndDate($startDate, $endDate);
+            throw CPeriod_Exception_InvalidPeriod::startDateCannotBeAfterEndDate($startDate, $endDate);
         }
         $this->startDate = $startDate;
         $this->endDate = $endDate;
