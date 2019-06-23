@@ -34,7 +34,7 @@ class CTracker_Cache extends CCache_Repository {
         if (is_string($attributes) || is_numeric($attributes)) {
             return (array) $attributes;
         }
-        if ($attributes instanceof Model) {
+        if ($attributes instanceof CModel) {
             return $attributes->getAttributes();
         }
     }
@@ -97,6 +97,11 @@ class CTracker_Cache extends CCache_Repository {
         if ($this->config->isCacheEnabled()) {
             return $this->set($cacheKey, $model);
         }
+    }
+
+    public function makeKeyAndPut($model, $key) {
+        $key = $this->makeCacheKey($model, $key, get_class($model));
+        $this->cachePut($key, $model);
     }
 
 }

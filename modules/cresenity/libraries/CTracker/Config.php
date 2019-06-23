@@ -32,8 +32,36 @@ class CTracker_Config {
         return true;
     }
 
+    public function isLogAgent() {
+        return true;
+    }
+
+    public function isLogReferer() {
+        return true;
+    }
+
+    public function isLogCookie() {
+        return true;
+    }
+
+    public function isLogLanguage() {
+        return true;
+    }
+
+    public function isLogPath() {
+        return true;
+    }
+    
+    public function isLogQuery() {
+        return true;
+    }
+
     public function isCacheEnabled() {
         return false;
+    }
+
+    public function cookieNamespace() {
+        return 'CTrackerCookie';
     }
 
 }

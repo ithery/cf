@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 23, 2019, 1:39:20 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Ramsey\Uuid\Uuid as UUID;
+
 class CTracker_Repository_Session extends CTracker_AbstractRepository {
 
     private $config;
@@ -24,7 +26,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     public function findByUuid($uuid) {
-        list($model, $cacheKey) = $this->cache->findCached($uuid, 'uuid', 'PragmaRX\Tracker\Vendor\Laravel\Models\Session');
+        list($model, $cacheKey) = $this->cache->findCached($uuid, 'uuid', 'CTracker_Model_Session');
         if (!$model) {
             $model = $this->newQuery()->where('uuid', $uuid)->with($this->relations)->first();
             $this->cache->cachePut($cacheKey, $model);
@@ -77,7 +79,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
             $this->sessionSetId($this->findOrCreate($this->sessionInfo, ['uuid']));
         } else {
             $session = $this->find($this->getSessionData('id'));
-            $session->updated_at = CCarbon::now();
+            $session->updated = CCarbon::now();
             $session->save();
             $this->sessionInfo['id'] = $this->getSessionData('id');
         }
@@ -100,6 +102,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     private function ensureSessionDataIsComplete() {
         $sessionData = $this->getSessionData();
         $wasComplete = true;
+       
         foreach ($this->sessionInfo as $key => $value) {
             if ($sessionData[$key] !== $value) {
                 if (!isset($model)) {
@@ -150,10 +153,12 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
      */
     private function getSessionData($variable = null) {
         $data = $this->session->get(self::SESSION_KEY);
+        
         return $variable ? (isset($data[$variable]) ? $data[$variable] : null) : $data;
     }
 
     private function putSessionData($data) {
+    
         $this->session->put(self::SESSION_KEY, $data);
     }
 

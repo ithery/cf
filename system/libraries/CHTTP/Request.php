@@ -63,6 +63,35 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
+     * Get the request method.
+     *
+     * @return string
+     */
+    public function method() {
+        return $this->getMethod();
+    }
+
+    /**
+     * Get the current path info for the request.
+     *
+     * @return string
+     */
+    public function path() {
+        $pattern = trim($this->getPathInfo(), '/');
+
+        return $pattern == '' ? '/' : $pattern;
+    }
+
+    /**
+     * Determine if the request is the result of an AJAX call.
+     *
+     * @return bool
+     */
+    public function ajax() {
+        return $this->isXmlHttpRequest();
+    }
+
+    /**
      * Get all of the input and files for the request.
      *
      * @return array

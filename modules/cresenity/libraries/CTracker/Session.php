@@ -11,20 +11,35 @@ class CTracker_Session {
 
     const SESSION_NAMESPACE = 'CTracker';
 
-    public function get($key, $namespace = null) {
-        $session = $this->getNamespaceData($namespace);
+    public function get($key) {
+        $session = $this->getNamespaceData();
         return carr::get($session, $key);
     }
 
-    public function has($key, $namespace = null) {
-        $session = $this->getNamespaceData($namespace);
+    public function has($key) {
+        $session = $this->getNamespaceData();
         return isset($session[$key]);
     }
 
     public function set($key, $value) {
         $session = $this->getNamespaceData();
+        if (!is_array($session)) {
+            $session = array();
+        }
+
         $session[$key] = $value;
-        $this->setNamespaceData($namespace, $session);
+        $this->setNamespaceData($session);
+    }
+
+    /**
+     * Alias of function set
+     * 
+     * @param string $key
+     * @param mixed $value
+     * @return mixed
+     */
+    public function put($key, $value) {
+        return $this->set($key, $value);
     }
 
     private function getNamespaceData() {
@@ -32,6 +47,7 @@ class CTracker_Session {
     }
 
     private function setNamespaceData($value) {
+        
         return CSession::instance()->set(self::SESSION_NAMESPACE, $value);
     }
 

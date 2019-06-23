@@ -20,6 +20,7 @@ class CTracker_Bootstrap {
      * @var CTracker_RepositoryManager 
      */
     protected $repositoryManager;
+    protected $sessionData;
 
     public function __construct() {
         $this->request = CHTTP::request();
@@ -60,20 +61,21 @@ class CTracker_Bootstrap {
      */
     protected function makeSessionData() {
         $sessionData = [
-            'user_id' => $this->getUserId(),
-            'device_id' => $this->getDeviceId(),
+            'log_user_id' => $this->getUserId(),
+            'log_device_id' => $this->getDeviceId(),
             'client_ip' => $this->request->getClientIp(),
-            'geoip_id' => $this->getGeoIpId(),
-            'agent_id' => $this->getAgentId(),
-            'referer_id' => $this->getRefererId(),
-            'cookie_id' => $this->getCookieId(),
-            'language_id' => $this->getLanguageId(),
+            'log_geoip_id' => $this->getGeoIpId(),
+            'log_agent_id' => $this->getAgentId(),
+            'log_referer_id' => $this->getRefererId(),
+            'log_cookie_id' => $this->getCookieId(),
+            'log_language_id' => $this->getLanguageId(),
             'is_robot' => $this->isRobot(),
             // The key user_agent is not present in the sessions table, but
             // it's internally used to check if the user agent changed
             // during a session.
             'user_agent' => $this->repositoryManager->getCurrentUserAgent(),
         ];
+        
         return $this->sessionData = $this->repositoryManager->checkSessionData($sessionData, $this->sessionData);
     }
 
@@ -89,6 +91,49 @@ class CTracker_Bootstrap {
 
     protected function getGeoIpId() {
         return $this->config->isLogGeoIp() ? $this->repositoryManager->getGeoIpId($this->request->getClientIp()) : null;
+    }
+
+    protected function getAgentId() {
+        return $this->config->isLogAgent() ? $this->repositoryManager->getAgentId() : null;
+    }
+
+    protected function getRefererId() {
+        return $this->config->isLogReferer() ? $this->repositoryManager->getRefererId(
+                        $this->request->headers->get('referer')
+                ) : null;
+    }
+
+    public function getCookieId() {
+        return $this->config->isLogCookie() ? $this->repositoryManager->getCookieId() : null;
+    }
+
+    public function getLanguageId() {
+        return $this->config->isLoglanguage() ? $this->repositoryManager->findOrCreateLanguage($this->repositoryManager->getCurrentLanguage()) : null;
+    }
+
+    public function getPathId() {
+        return $this->config->isLogPath() ? $this->repositoryManager->findOrCreatePath(
+                        [
+                            'path' => $this->request->path(),
+                        ]
+                ) : null;
+    }
+
+    public function getQueryId() {
+        if ($this->config->isLogQuery()) {
+            if (count($arguments = $this->request->query())) {
+                return $this->repositoryManager->getQueryId(
+                                [
+                                    'query' => array_implode('=', '|', $arguments),
+                                    'arguments' => $arguments,
+                                ]
+                );
+            }
+        }
+    }
+
+    public function isRobot() {
+        return $this->repositoryManager->isRobot();
     }
 
 }

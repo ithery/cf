@@ -17,7 +17,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
     protected $relations;
 
     /**
-     * @var \PragmaRX\Tracker\Support\Cache
+     * @var CTracker_Cache
      */
     protected $cache;
 
@@ -68,7 +68,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
     }
 
     public function getId() {
-        return $this->getAttribute('id');
+        return $this->model->getKey();
     }
 
     /**
@@ -91,12 +91,15 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
      */
     public function findOrCreate($attributes, $keys = null, &$created = false, $otherModel = null) {
         list($model, $cacheKey) = $this->cache->findCached($attributes, $keys, $this->className);
+
         if (!$model) {
             $model = $this->newQuery($otherModel);
+            
             $keys = $keys ?: array_keys($attributes);
             foreach ($keys as $key) {
                 $model = $model->where($key, $attributes[$key]);
             }
+            
             if (!$model = $model->first()) {
                 $model = $this->create($attributes, $otherModel);
                 $created = true;
@@ -104,7 +107,8 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
             $this->cache->cachePut($cacheKey, $model);
         }
         $this->model = $model;
-        return $model->id;
+        
+        return $model->getKey();
     }
 
     public function getModel() {

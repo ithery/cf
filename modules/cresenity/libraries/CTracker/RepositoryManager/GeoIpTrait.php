@@ -9,12 +9,26 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTracker_RepositoryManager_GeoIpTrait {
 
-    protected function bootDeviceTrait() {
+    /**
+     *
+     * @var CTracker_Repository_GeoIp
+     */
+    protected $geoIpRepository;
+
+    /**
+     *
+     * @var CTracker_GeoIp 
+     */
+    protected $geoIp;
+
+    protected function bootGeoIpTrait() {
         $this->geoIpRepository = new CTracker_Repository_GeoIp();
-        $this->geoIp = new CTracker_Detect_MobileDetect();
+        $this->geoIp = new CTracker_GeoIp();
     }
 
     public function getGeoIpId($clientIp) {
+        
+     
         $id = null;
         if ($geoIpData = $this->geoIp->searchAddr($clientIp)) {
             $id = $this->geoIpRepository->findOrCreate(

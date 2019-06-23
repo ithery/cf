@@ -959,6 +959,16 @@ class carr {
         return array_intersect_key($array, array_flip((array) $keys));
     }
 
+    
+    /**
+     * Alias of array reset
+     * 
+     * @param array $array
+     * @return mixed the value of the first array element, or <b>FALSE</b> if the array is
+     */
+    public static function head($array) {
+        return reset($array);
+    }
 }
 
 // End carr

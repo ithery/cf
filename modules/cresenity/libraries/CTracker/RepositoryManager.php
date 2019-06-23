@@ -10,16 +10,33 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface {
 
     use CTracker_RepositoryManager_DeviceTrait,
-        CTracker_RepositoryManager_GeoIpTrait;
+        CTracker_RepositoryManager_GeoIpTrait,
+        CTracker_RepositoryManager_AgentTrait,
+        CTracker_RepositoryManager_RefererTrait,
+        CTracker_RepositoryManager_CookieTrait,
+        CTracker_RepositoryManager_DomainTrait,
+        CTracker_RepositoryManager_LanguageTrait,
+        CTracker_RepositoryManager_SessionTrait,
+        CTracker_RepositoryManager_PathTrait;
 
     protected static $instance;
 
     /**
      *
-     * @var CTracker_Repository_Session
+     * @var CTracker_Parser_UserAgentParser 
      */
-    public $sessionRepository;
+    protected $userAgentParser;
 
+    /**
+     *
+     * @var CTracker_Detect_CrawlerDetect
+     */
+    protected $crawlerDetector;
+
+    /**
+     * 
+     * @return CTracker_RepositoryManager
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new CTracker_RepositoryManager();
@@ -28,7 +45,8 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
     }
 
     protected function __construct() {
-        $this->sessionRepository = new CTracker_Repository_Session();
+        $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT);
+        $this->crawlerDetector = new CTracker_Detect_CrawlerDetect(CHTTP::request()->headers->all(), CHTTP::request()->server('HTTP_USER_AGENT'));
         $classArray = CF::class_uses_recursive(get_class());
         foreach ($classArray as $class) {
             $methodName = 'boot' . carr::last(explode('_', $class));
@@ -36,12 +54,12 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
         }
     }
 
-    public function getSessionId($sessionData, $updateLastActivity) {
-        return $this->sessionRepository->getCurrentId($sessionData, $updateLastActivity);
-    }
-
     public function getCurrentUserId() {
         return CApp_Base::userId();
+    }
+
+    public function isRobot() {
+        return $this->crawlerDetector->isRobot();
     }
 
 }

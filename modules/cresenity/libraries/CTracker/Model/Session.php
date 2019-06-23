@@ -9,22 +9,23 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_Session extends CTracker_Model {
 
-    protected $table = 'tracker_session';
+    protected $table = 'log_session';
     protected $fillable = [
+        'org_id',
         'uuid',
-        'user_id',
-        'device_id',
-        'language_id',
-        'agent_id',
+        'log_user_id',
+        'log_device_id',
+        'log_language_id',
+        'log_agent_id',
         'client_ip',
-        'cookie_id',
-        'referer_id',
-        'geoip_id',
+        'log_cookie_id',
+        'log_referer_id',
+        'log_geoip_id',
         'is_robot',
     ];
 
     public function user() {
-        return $this->belongsTo('CApp_Model_User');
+        return $this->belongsTo('CApp_Model_Users');
     }
 
     public function device() {
@@ -32,27 +33,27 @@ class CTracker_Model_Session extends CTracker_Model {
     }
 
     public function language() {
-        return $this->belongsTo($this->getConfig()->get('language_model'));
+        return $this->belongsTo('CTracker_Model_Language');
     }
 
     public function agent() {
-        return $this->belongsTo($this->getConfig()->get('agent_model'));
+        return $this->belongsTo('CTracker_Model_Agent');
     }
 
     public function referer() {
-        return $this->belongsTo($this->getConfig()->get('referer_model'));
+        return $this->belongsTo('CTracker_Model_Referer');
     }
 
     public function geoIp() {
-        return $this->belongsTo($this->getConfig()->get('geoip_model'), 'geoip_id');
+        return $this->belongsTo('CTracker_Model_GeoIp');
     }
 
     public function cookie() {
-        return $this->belongsTo($this->getConfig()->get('cookie_model'), 'cookie_id');
+        return $this->belongsTo('CTracker_Model_Cookie');
     }
 
     public function log() {
-        return $this->hasMany($this->getConfig()->get('log_model'));
+        return $this->hasMany('CTracker_Model_Log');
     }
 
     public function getPageViewsAttribute() {
@@ -62,13 +63,13 @@ class CTracker_Model_Session extends CTracker_Model {
     public function users($minutes, $result) {
         $query = $this
                 ->select(
-                        'user_id', $this->getConnection()->raw('max(updated) as updated_at')
+                        'user_id', $this->getConnection()->raw('max(updated) as updated')
                 )
                 ->groupBy('user_id')
-                ->from('tracker_sessions')
+                ->from('log_session')
                 ->period($minutes)
                 ->whereNotNull('user_id')
-                ->orderBy($this->getConnection()->raw('max(updated_at)'), 'desc');
+                ->orderBy($this->getConnection()->raw('max(updated)'), 'desc');
         if ($result) {
             return $query->get();
         }
@@ -78,13 +79,13 @@ class CTracker_Model_Session extends CTracker_Model {
     public function userDevices($minutes, $result, $user_id) {
         $query = $this
                 ->select(
-                        'user_id', $this->getConnection()->raw('max(updated_at) as updated_at')
+                        'user_id', $this->getConnection()->raw('max(updated) as updated')
                 )
                 ->groupBy('user_id')
-                ->from('tracker_sessions')
+                ->from('log_sessions')
                 ->period($minutes)
                 ->whereNotNull('user_id')
-                ->orderBy($this->getConnection()->raw('max(updated_at)'), 'desc');
+                ->orderBy($this->getConnection()->raw('max(updated)'), 'desc');
         if ($result) {
             return $query->get();
         }

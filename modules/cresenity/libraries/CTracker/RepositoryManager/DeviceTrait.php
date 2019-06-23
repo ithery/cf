@@ -21,19 +21,13 @@ trait CTracker_RepositoryManager_DeviceTrait {
      */
     protected $mobileDetect;
 
-    /**
-     *
-     * @var type 
-     */
-    protected $userAgentParser;
-
     protected function bootDeviceTrait() {
         $this->deviceRepository = new CTracker_Repository_Device();
         $this->mobileDetect = new CTracker_Detect_MobileDetect();
-        $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT);
     }
 
     public function findOrCreateDevice($data) {
+       
         return $this->deviceRepository->findOrCreate($data, ['kind', 'model', 'platform', 'platform_version']);
     }
 

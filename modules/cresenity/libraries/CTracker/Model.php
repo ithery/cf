@@ -14,15 +14,20 @@ class CTracker_Model extends CModel {
     }
 
     public function save(array $options = []) {
+        if ($this->org_id == null) {
+            if (CApp_Base::orgId() != null) {
+                $this->org_id = CApp_Base::orgId();
+            }
+        }
         parent::save($options);
         $this->cache()->makeKeyAndPut($this, $this->getKeyName());
     }
 
-    public function scopePeriod($query, $minutes, $alias = '') {
+    public function scopePeriod($query, CPeriod $minutes, $alias = '') {
         $alias = $alias ? "$alias." : '';
         return $query
-                        ->where($alias . 'updated', '>=', $minutes->getStart() ? $minutes->getStart() : 1)
-                        ->where($alias . 'updated', '<=', $minutes->getEnd() ? $minutes->getEnd() : 1);
+                        ->where($alias . 'updated', '>=', (string) ($minutes->startDate ? $minutes->startDate : 1))
+                        ->where($alias . 'updated', '<=', (string) ($minutes->endDate ? $minutes->endDate : 1));
     }
 
 }

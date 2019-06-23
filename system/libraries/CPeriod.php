@@ -43,6 +43,12 @@ class CPeriod {
         return new static($startDate, $endDate);
     }
 
+    public static function minutes($numberOfMinutes) {
+        $endDate = CCarbon::now();
+        $startDate = CCarbon::now()->subMinutes($numberOfMinutes);
+        return new static($startDate, $endDate);
+    }
+
     public function __construct(DateTime $startDate, DateTime $endDate) {
         if ($startDate > $endDate) {
             throw CPeriod_Exception_InvalidPeriod::startDateCannotBeAfterEndDate($startDate, $endDate);

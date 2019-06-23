@@ -9,13 +9,31 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker {
 
+    protected static $bootstrap;
+    protected static $isBooted = false;
+
     public static function visitor() {
         return CTracker_RepositoryManager::instance()->sessionRepository->getCurrent();
     }
 
     public static function boot() {
-        $bootstrap = new CTracker_Bootstrap();
-        $bootstrap->execute();
+        if (!self::$isBooted) {
+            self::$bootstrap = new CTracker_Bootstrap();
+            self::$bootstrap->execute();
+        }
     }
 
+    public static function config() {
+        return CTracker_Config::instance();
+    }
+
+    public static function onlineUsers($minutes = 3, $results = true) {
+        return self::sessions(3);
+    }
+
+    public static function sessions($minutes = 1440, $results = true) {
+        return CTracker_RepositoryManager::instance()->getLastSessions(CPeriod::minutes($minutes), $results);
+    }
+
+    
 }
