@@ -341,6 +341,7 @@ CREATE TABLE `log_log` (
   `log_path_id` bigint(20) unsigned DEFAULT NULL,
   `log_query_id` bigint(20) unsigned DEFAULT NULL,
   `method` varchar(10) DEFAULT NULL,
+  `log_referer_id` bigint(20) unsigned DEFAULT NULL,
   `log_route_path_id` bigint(20) unsigned DEFAULT NULL,
   `is_ajax` tinyint(4) NOT NULL DEFAULT '1',
   `is_secure` tinyint(4) NOT NULL DEFAULT '1',

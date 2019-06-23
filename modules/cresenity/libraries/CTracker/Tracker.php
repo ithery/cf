@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 23, 2019, 11:16:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Psr\Log\NullLogger;
+
 class CTracker_Tracker {
 
     use CTracker_Trait_TrackableTrait;
@@ -47,18 +49,20 @@ class CTracker_Tracker {
         $this->repositoryManager = CTracker_RepositoryManager::instance();
         $this->config = CTracker_Config::instance();
         $this->route = CFRouter::routedUri(CFRouter::currentUri());
+        $this->logger = $this->config->getLogger() ? $this->config->getLogger() : new NullLogger();
     }
 
     /**
      * @return array
      */
     protected function getLogData() {
+        
         return [
-            'session_id' => $this->getSessionId(true),
+            'log_session_id' => $this->getSessionId(true),
             'method' => $this->request->method(),
-            'path_id' => $this->getPathId(),
-            'query_id' => $this->getQueryId(),
-            'referer_id' => $this->getRefererId(),
+            'log_path_id' => $this->getPathId(),
+            'log_query_id' => $this->getQueryId(),
+            'log_referer_id' => $this->getRefererId(),
             'is_ajax' => $this->request->ajax(),
             'is_secure' => $this->request->isSecure(),
             'is_json' => $this->request->isJson(),
@@ -170,11 +174,6 @@ class CTracker_Tracker {
         $this->booted = true;
         if ($this->isTrackable()) {
             $this->track();
-        }
-       
-        $logData = $this->getLogData();
-        if ($this->config->isLogEnabled()) {
-            $this->repositoryManager->createLog($logData);
         }
     }
 

@@ -24,8 +24,8 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
             $this->routePathId = $routePathId;
         }
         $model = $this->getModel();
-        if ($model->id && $this->routePathId && !$model->route_path_id) {
-            $model->route_path_id = $this->routePathId;
+        if ($model->log_log_id && $this->routePathId && !$model->log_route_path_id) {
+            $model->log_route_path_id = $this->routePathId;
             $model->save();
         }
         return $model;
@@ -33,7 +33,7 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
 
     public function updateError($error_id) {
         $model = $this->getModel();
-        if ($model->id) {
+        if ($model->log_log_id) {
             $model->log_error_id = $error_id;
             $model->save();
         }
@@ -67,6 +67,7 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
     }
 
     public function createLog($data) {
+
         $log = $this->create($data);
         $this->updateRoute();
         return $this->setCurrentLogId($log->log_log_id);

@@ -19,19 +19,19 @@ class CTracker_Repository_Route extends CTracker_AbstractRepository {
     }
 
     public function isTrackable($route) {
-        $forbidden = $this->config->get('do_not_track_routes');
+        $forbidden = $this->config->getExcludeRoute();
         return
                 !$forbidden ||
                 !$route->currentRouteName() ||
-                !in_array_wildcard($route->currentRouteName(), $forbidden);
+                !carr::inArrayWildcard($route->currentRouteName(), $forbidden);
     }
 
     public function pathIsTrackable($path) {
-        $forbidden = $this->config->get('do_not_track_paths');
+        $forbidden = $this->config->getExcludePath();
         return
                 !$forbidden ||
                 empty($path) ||
-                !in_array_wildcard($path, $forbidden);
+                !carr::inArrayWildcard($path, $forbidden);
     }
 
 }

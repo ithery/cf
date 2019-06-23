@@ -63,16 +63,16 @@ class CTracker_Repository_Referer extends CTracker_AbstractRepository {
         if ($parsed->isKnown()) {
             $this->storeSearchTerms($referer, $parsed);
         }
-        return $referer->id;
+        return $referer->log_referer_id;
     }
 
     private function storeSearchTerms($referer, $parsed) {
         foreach (explode(' ', $parsed->getSearchTerm()) as $term) {
             $this->findOrCreate(
                     [
-                'referer_id' => $referer->id,
+                'log_referer_id' => $referer->log_referer_id,
                 'search_term' => $term,
-                    ], ['referer_id', 'search_term'], $created, $this->searchTermModel
+                    ], ['log_referer_id', 'search_term'], $created, $this->searchTermModel
             );
         }
     }

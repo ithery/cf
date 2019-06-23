@@ -52,11 +52,30 @@ class CTracker_Config {
         $default['trackEnabled'] = true;
         $default['robotEnabled'] = false;
         $default['consoleEnabled'] = false;
+        $default['logger'] = null;
         $default['logEnabled'] = true;
         $default['cookieNamespace'] = 'CTrackerCookie';
         $default['excludeConnection'] = [];
         $default['excludeIpAddress'] = [];
         $default['excludeEnvironment'] = [];
+        $default['excludePath'] = [
+            'favicon.ico',
+            'cresenity/ajax/*',
+            'cresenity/noimage',
+            'cresenity/noimage/*',
+//            'unittest/*',
+            'unit_test/*',
+            'test/*',
+            'ccore/*',
+            '*.js',
+            '*.js.map',
+            '*.css',
+            '*.css.map',
+            '*.jpg',
+            '*.jpeg',
+            '*.png',
+        ];
+        $default['excludeRoute'] = [];
         $this->data = CConfig::instance('tracker')->get();
         if (!is_array($this->data)) {
             $this->data = array();
@@ -154,8 +173,26 @@ class CTracker_Config {
         return $this->get('excludeConnection', []);
     }
 
+    public function getExcludePath() {
+        return $this->get('excludePath', []);
+    }
+
+    public function getExcludeRoute() {
+        return $this->get('excludeRoute', []);
+    }
+
     public function cookieNamespace() {
         return $this->get('cookieNamespace');
+    }
+
+    public function getLogger() {
+        $logger = $this->get('logger');
+        if ($logger != null && is_string($logger)) {
+            $logger = new $logger();
+        }
+        if ($logger != null && !($logger instanceof \Psr\Log\LoggerInterface)) {
+            return null;
+        }
     }
 
 }

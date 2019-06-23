@@ -12,7 +12,7 @@ class CTracker_Model_Log extends CTracker_Model {
     protected $table = 'log_log';
     protected $fillable = [
         'log_session_id',
-        'log_method',
+        'method',
         'log_path_id',
         'log_query_id',
         'log_route_path_id',
