@@ -1000,6 +1000,15 @@ class carr {
         return $ret;
     }
 
+    public static function inArrayWildcard($what, $array) {
+        foreach ($array as $pattern) {
+            if (cstr::is($pattern, $what)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
 
 // End carr
