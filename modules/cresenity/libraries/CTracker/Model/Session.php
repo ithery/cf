@@ -15,7 +15,7 @@ class CTracker_Model_Session extends CTracker_Model {
     protected $fillable = [
         'org_id',
         'uuid',
-        'log_user_id',
+        'user_id',
         'log_device_id',
         'log_language_id',
         'log_agent_id',

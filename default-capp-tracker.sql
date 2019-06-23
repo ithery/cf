@@ -160,6 +160,7 @@ CREATE TABLE `log_session` (
   `org_id` bigint(20) unsigned DEFAULT NULL,
   `uuid` varchar(255) DEFAULT NULL,
   `user_id` bigint(20) unsigned DEFAULT NULL,
+  `user_type` varchar(50) DEFAULT 'user',
   `log_device_id` bigint(20) unsigned DEFAULT NULL,
   `log_agent_id` bigint(20) unsigned DEFAULT NULL,
   `log_referer_id` bigint(20) unsigned DEFAULT NULL,

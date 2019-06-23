@@ -70,4 +70,12 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
         return !empty($this->userAgentParser);
     }
 
+    public function pageViews(CPeriod $minutes, $results) {
+        return $this->logRepository->pageViews($minutes, $results);
+    }
+
+    public function pageViewsByCountry(CPeriod $minutes, $results) {
+        return $this->logRepository->pageViewsByCountry($minutes, $results);
+    }
+
 }

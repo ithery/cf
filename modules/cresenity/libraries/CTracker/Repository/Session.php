@@ -79,10 +79,10 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         if (!$known = $this->sessionIsKnown()) {
             $this->sessionSetId($this->findOrCreate($this->sessionInfo, ['uuid']));
         } else {
-            $session = $this->find($this->getSessionData('id'));
+            $session = $this->find($this->getSessionData('log_session_id'));
             $session->updated = CCarbon::now();
             $session->save();
-            $this->sessionInfo['id'] = $this->getSessionData('id');
+            $this->sessionInfo['log_session_id'] = $this->getSessionData('log_session_id');
         }
         return $known;
     }
@@ -103,11 +103,11 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     private function ensureSessionDataIsComplete() {
         $sessionData = $this->getSessionData();
         $wasComplete = true;
-
+    
         foreach ($this->sessionInfo as $key => $value) {
             if ($sessionData[$key] !== $value) {
                 if (!isset($model)) {
-                    $model = $this->find($this->sessionInfo['id']);
+                    $model = $this->find($this->sessionInfo['log_session_id']);
                 }
                 $model->setAttribute($key, $value);
                 $model->save();
@@ -120,12 +120,11 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     private function sessionGetId() {
-        
-        return $this->sessionInfo['id'];
+        return $this->sessionInfo['log_session_id'];
     }
 
     private function sessionSetId($id) {
-        $this->sessionInfo['id'] = $id;
+        $this->sessionInfo['log_session_id'] = $id;
         $this->storeSession();
     }
 
@@ -165,7 +164,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     private function getSessionKey() {
-        return $this->config->get('tracker_session_name');
+        return $this->config->get('sessionKey');
     }
 
     private function getSessions() {
@@ -219,9 +218,9 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     public function updateSessionData($data) {
-        $session = $this->checkIfUserChanged($data, $this->find($this->getSessionData('id')));
+        $session = $this->checkIfUserChanged($data, $this->find($this->getSessionData('log_session_id')));
         foreach ($session->getAttributes() as $name => $value) {
-            if (isset($data[$name]) && $name !== 'id' && $name !== 'uuid') {
+            if (isset($data[$name]) && $name !== 'log_session_id' && $name !== 'uuid') {
                 $session->{$name} = $data[$name];
             }
         }
@@ -230,6 +229,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     private function checkIfUserChanged($data, $model) {
+          
         if (!is_null($model->user_id) && !is_null($data['user_id']) && $data['user_id'] !== $model->user_id) {
             $newSession = $this->regenerateSystemSession($data);
             $model = $this->findByUuid($newSession['uuid']);

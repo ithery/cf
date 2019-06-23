@@ -77,7 +77,7 @@ class CTracker_Tracker {
      */
     protected function makeSessionData() {
         $sessionData = [
-            'log_user_id' => $this->getUserId(),
+            'user_id' => $this->getUserId(),
             'log_device_id' => $this->getDeviceId(),
             'client_ip' => $this->request->getClientIp(),
             'log_geoip_id' => $this->getGeoIpId(),
@@ -171,7 +171,7 @@ class CTracker_Tracker {
         if ($this->isTrackable()) {
             $this->track();
         }
-        return true;
+       
         $logData = $this->getLogData();
         if ($this->config->isLogEnabled()) {
             $this->repositoryManager->createLog($logData);

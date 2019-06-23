@@ -35,4 +35,8 @@ trait CTracker_RepositoryManager_SessionTrait {
         return $this->sessionRepository->last($minutes, $results);
     }
 
+    public function updateSessionData($data) {
+        return $this->sessionRepository->updateSessionData($data);
+    }
+
 }

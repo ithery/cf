@@ -39,5 +39,12 @@ class CTracker {
         return CTracker_RepositoryManager::instance()->getLastSessions(CPeriod::minutes($minutes), $results);
     }
 
-    
+    public function pageViews($minutes, $results = true) {
+        return CTracker_RepositoryManager::instance()->pageViews(CPeriod::minutes($minutes), $results);
+    }
+
+    public function pageViewsByCountry($minutes, $results = true) {
+        return CTracker_RepositoryManager::instance()->pageViewsByCountry(CPeriod::minutes($minutes), $results);
+    }
+
 }

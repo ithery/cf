@@ -72,11 +72,11 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
         return $this->setCurrentLogId($log->log_log_id);
     }
 
-    public function pageViews($minutes, $results) {
+    public function pageViews(CPeriod $minutes, $results) {
         return $this->getModel()->pageViews($minutes, $results);
     }
 
-    public function pageViewsByCountry($minutes, $results) {
+    public function pageViewsByCountry(CPeriod $minutes, $results) {
         return $this->getModel()->pageViewsByCountry($minutes, $results);
     }
 
