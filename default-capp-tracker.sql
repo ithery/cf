@@ -333,6 +333,50 @@ CREATE TABLE `log_sql_query_binding_parameter` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
+DROP TABLE IF EXISTS `log_error`;
+CREATE TABLE `log_error` (
+  `log_error_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_error_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+
+
+DROP TABLE IF EXISTS `log_event`;
+CREATE TABLE `log_event` (
+  `log_event_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_event_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+DROP TABLE IF EXISTS `log_system_class`;
+CREATE TABLE `log_system_class` (
+  `log_system_class_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_system_class_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
 DROP TABLE IF EXISTS `log_log`;
 CREATE TABLE `log_log` (
   `log_log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -369,6 +413,23 @@ CREATE TABLE `log_sql_query_log` (
   `updatedby` varchar(50) DEFAULT NULL,
   `status` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`log_sql_query_log_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+
+DROP TABLE IF EXISTS `log_event_log`;
+CREATE TABLE `log_event_log` (
+  `log_event_log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `log_log_id` bigint(20) unsigned DEFAULT NULL,
+  `log_event_id` bigint(20) unsigned DEFAULT NULL,
+  `log_system_class_id` bigint(20) unsigned DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_event_log_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
