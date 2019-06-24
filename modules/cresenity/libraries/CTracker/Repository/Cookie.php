@@ -47,6 +47,14 @@ class CTracker_Repository_Cookie extends CTracker_AbstractRepository {
             $cookie = (string) UUID::uuid4();
 
             $this->cookieJar->queue($this->config->cookieNamespace(), $cookie, 0);
+
+            /**
+             * directly send cookie, TODO send queued cookies when try to render response
+             */
+            foreach ($this->cookieJar->getQueuedCookies() as $cookieItem) {
+                $cookiesString = 'Set-Cookie: ' . $cookieItem . "\r\n";
+                header($cookiesString);
+            }
         }
         return $this->findOrCreate(['uuid' => $cookie]);
     }
