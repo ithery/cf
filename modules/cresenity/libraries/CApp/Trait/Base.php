@@ -338,7 +338,7 @@ trait CApp_Trait_Base {
         if (strpos($domain, 'staging.ittron.co.id') !== false) {
             return 'staging';
         }
-        return CF::config('environment')->get('environment', 'production');
+        return carr::get(CF::config('environment'), 'environment', 'production');
     }
 
 }
