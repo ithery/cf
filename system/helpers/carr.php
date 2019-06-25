@@ -1009,6 +1009,10 @@ class carr {
         return false;
     }
 
+    public static function isIterable($var) {
+        return is_array($var) || $var instanceof \Traversable;
+    }
+
 }
 
 // End carr
