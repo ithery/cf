@@ -38,7 +38,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      */
     public function get($key, $default = null) {
         // Since we are running under laravel, use laravel's helper.
-        return data_get($this->data, $key, $default);
+        return carr::get($this->data, $key, $default);
     }
 
     public function __get($name) {
@@ -67,7 +67,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      * Supports ArrayAccess
      */
     public function offsetSet($offset, $value) {
-        data_set($this->data, $offset, $value);
+        carr::set($this->data, $offset, $value);
     }
 
     /**

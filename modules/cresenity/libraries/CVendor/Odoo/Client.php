@@ -196,7 +196,7 @@ class CVendor_Odoo_Client {
         return $this->value($data, static::TYPE_STRING);
     }
 
-    public function arrayValue( $data) {
+    public function arrayValue($data) {
         return $this->value($data, static::TYPE_ARRAY);
     }
 
@@ -229,7 +229,7 @@ class CVendor_Odoo_Client {
      * @param int $offset
      * @param int $limit
      * @param string $order comma-separated list of fields
-     * @return mixed
+     * @return CCollection
      */
     public function search($modelName, array $criteria = [], $offset = 0, $limit = self::DEFAULT_LIMIT, $order = '') {
         $msg = $this->getBaseObjectRequest($modelName, 'search');
@@ -238,7 +238,7 @@ class CVendor_Odoo_Client {
         $msg->addParam($this->intValue($limit));
         $msg->addParam($this->stringValue($order));
         $this->response = $this->getXmlRpcClient(static::API_TYPE_OBJECT)->send($msg);
-        
+
         return CF::collect($this->responseAsNative());
     }
 
@@ -288,7 +288,7 @@ class CVendor_Odoo_Client {
      * @param string $modelName example res.partner
      * @param array $instanceIds list of model instance IDs to read and return
      * @param array $options varies with API versions see documentation
-     * @return Collection of ModelInterface
+     * @return CCollection of ModelInterface
      */
     public function read($modelName, $instanceIds = [], array $options = []) {
         $msg = $this->getBaseObjectRequest($modelName, 'read');
@@ -768,7 +768,7 @@ class CVendor_Odoo_Client {
      * @return mixed a null, an array, a scalar, and may be nested
      */
     public function valueToNative(Value $value) {
-        
+
         switch ($value->kindOf()) {
             case 'array':
                 $result = [];
