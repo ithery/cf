@@ -7,12 +7,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 2, 2019, 10:24:00 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
 
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes;
+
+    /**
+     * The decoded JSON content for the request.
+     *
+     * @var \Symfony\Component\HttpFoundation\ParameterBag|null
+     */
+    protected $json;
 
     /**
      * Create an object request from a Symfony instance.
@@ -80,6 +88,23 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         $pattern = trim($this->getPathInfo(), '/');
 
         return $pattern == '' ? '/' : $pattern;
+    }
+
+    /**
+     * Get the JSON payload for the request.
+     *
+     * @param  string|null  $key
+     * @param  mixed   $default
+     * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
+     */
+    public function json($key = null, $default = null) {
+        if (!isset($this->json)) {
+            $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+        }
+        if (is_null($key)) {
+            return $this->json;
+        }
+        return carr::get($this->json->all(), $key, $default);
     }
 
     /**
