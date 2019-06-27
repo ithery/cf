@@ -18,6 +18,7 @@ class CFormInputSelect extends CFormInput {
     protected $hide_search;
     protected $readonly;
     protected $maximumSelectionLength;
+    protected $placeholder;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -26,6 +27,7 @@ class CFormInputSelect extends CFormInput {
         $this->tag = "select";
         $this->multiple = false;
         $this->type = "select";
+        $this->placeholder = "";
         $this->applyjs = "false";
         $this->hide_search = false;
         $this->readonly = false;
@@ -77,7 +79,10 @@ class CFormInputSelect extends CFormInput {
         $this->readonly = $bool;
         return $this;
     }
-
+    public function setPlaceholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
     public function toarray() {
         $data = array();
         $data = array_merge_recursive($data, parent::toarray());
@@ -205,6 +210,10 @@ class CFormInputSelect extends CFormInput {
         $js = new CStringBuilder();
         $js->set_indent($indent);
         $js->append(parent::js($indent))->br();
+        $placeholder = "";
+        if (strlen($this->placeholder) > 0) {
+            $placeholder = $this->placeholder;
+        }
         if ($this->applyjs == "select2") {
             if ($this->select2 == '4') {
                 CManager::instance()->register_module('select2-4.0');
@@ -233,7 +242,8 @@ class CFormInputSelect extends CFormInput {
             if ($this->maximumSelectionLength !== false) {
                 $js->append("maximumSelectionLength: " . $this->maximumSelectionLength . ",");
             }
-            $js->append("containerCssClass : 'tpx-select2-container " . $classes . "'");
+            $js->append("containerCssClass : 'tpx-select2-container " . $classes . "',");
+            $js->append("placeholder : '" . $placeholder . "'");
             $js->append("});")->br();
         }
         if ($this->applyjs == "chosen") {
