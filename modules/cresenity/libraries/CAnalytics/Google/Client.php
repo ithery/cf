@@ -7,10 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since May 24, 2019, 1:25:25 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-use DateTime;
-use Google_Service_Analytics;
-use CCache_Repository;
-
 class CAnalytics_Google_Client {
 
     /** @var \Google_Service_Analytics */
@@ -20,9 +16,11 @@ class CAnalytics_Google_Client {
     protected $cache;
 
     /** @var int */
-    protected $cacheLifeTimeInMinutes = 0;
+    protected $cacheQueryLifeTimeInMinutes = 60;
+    protected $cacheRealtimeLifeTimeInMinutes = 1;
 
     public function __construct(Google_Service_Analytics $service, CCache_Repository $cache) {
+
         $this->service = $service;
         $this->cache = $cache;
     }
@@ -75,6 +73,31 @@ class CAnalytics_Google_Client {
                 });
     }
 
+    /**
+     * Query the Google Analytics Service with given parameters.
+     *
+     * @param string $viewId
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     * @param string $metrics
+     * @param array $others
+     *
+     * @return array|null
+     */
+    public function performRealtime($viewId, $metrics, array $others = []) {
+        $cacheName = $this->determineCacheName(func_get_args(), 'Realtime');
+        if ($this->cacheRealtimeLifeTimeInMinutes == 0) {
+            $this->cache->forget($cacheName);
+        }
+        return $this->cache->remember($cacheName, $this->cacheRealtimeLifeTimeInMinutes, function () use ($viewId,  $metrics, $others) {
+                    $result = $this->service->data_realtime->get(
+                            "ga:{$viewId}", $metrics, $others
+                    );
+                    
+                    return $result;
+                });
+    }
+
     public function getAnalyticsService() {
         return $this->service;
     }
@@ -83,8 +106,8 @@ class CAnalytics_Google_Client {
      * Determine the cache name for the set of query properties given.
      */
 
-    protected function determineCacheName(array $properties) {
-        return 'spatie.laravel-analytics.' . md5(serialize($properties));
+    protected function determineCacheName(array $properties, $key = 'Query') {
+        return 'CAnalytics/Google/' . $key . '/.' . md5(serialize($properties));
     }
 
 }

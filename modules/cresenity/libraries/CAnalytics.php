@@ -8,7 +8,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CAnalytics {
+
     public static function createPeriod() {
         return new CAnalytics_Period();
     }
+
+    public static function google($options) {
+        return new CAnalytics_Google($options);
+    }
+
 }

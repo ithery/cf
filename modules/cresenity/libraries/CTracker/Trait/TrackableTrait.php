@@ -1,0 +1,114 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 23, 2019, 11:26:11 PM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+use CHelper_IpAddress as IpAddress;
+
+trait CTracker_Trait_TrackableTrait {
+
+    protected function isTrackable() {
+        return $this->config->isTrackEnabled() &&
+                $this->logIsEnabled() &&
+                $this->allowConsole() &&
+                $this->parserIsAvailable() &&
+                $this->isTrackableIp() &&
+                $this->isTrackableEnvironment() &&
+                //$this->routeIsTrackable() &&
+                $this->pathIsTrackable() &&
+                $this->notRobotOrTrackable();
+    }
+
+    protected function logIsEnabled() {
+        $enabled = $this->config->get('logEnabled') ||
+                $this->config->get('logSqlQuery') ||
+                $this->config->get('logSqlQueryBinding') ||
+                $this->config->get('logEvent') ||
+                $this->config->get('logGeoIp') ||
+                $this->config->get('logAgent') ||
+                $this->config->get('logUser') ||
+                $this->config->get('logDevices') ||
+                $this->config->get('logLanguage') ||
+                $this->config->get('logReferer') ||
+                $this->config->get('logPath') ||
+                $this->config->get('logQuery') ||
+                $this->config->get('logRoute') ||
+                $this->config->get('logError');
+        if (!$enabled) {
+            $this->logUntrackable('there are no log items enabled.');
+        }
+        return $enabled;
+    }
+
+    private function logUntrackable($item) {
+        if ($this->config->isLogUntrackable() && !isset($this->loggedItems[$item])) {
+            $this->getLogger()->warning('TRACKER (unable to track item): ' . $item);
+            $this->loggedItems[$item] = $item;
+        }
+    }
+
+    public function allowConsole() {
+        return (!$this->isRunningInConsole()) || $this->config->isConsoleEnabled();
+    }
+
+    public function isRunningInConsole() {
+        return PHP_SAPI === 'cli';
+    }
+
+    public function parserIsAvailable() {
+        if (!$this->repositoryManager->parserIsAvailable()) {
+            $this->logger->error(trans('tracker::tracker.regex_file_not_available'));
+            return false;
+        }
+        return true;
+    }
+
+    protected function isTrackableIp() {
+        $trackable = !IpAddress::ipv4InRange(
+                        $ipAddress = $this->request->getClientIp(), $this->config->get('excludeIpAddress')
+        );
+        if (!$trackable) {
+            $this->logUntrackable($ipAddress . ' is not trackable.');
+        }
+        return $trackable;
+    }
+
+    protected function isTrackableEnvironment() {
+        $trackable = !in_array(CApp_Base::environment(), $this->config->getExcludeEnvironment());
+        if (!$trackable) {
+            $this->logUntrackable('environment ' . CApp_Base::environment() . ' is not trackable.');
+        }
+        return $trackable;
+    }
+
+    private function routeIsTrackable() {
+        if (!$this->route) {
+            return false;
+        }
+        if (!$trackable = $this->repositoryManager->routeIsTrackable($this->route)) {
+            $this->logUntrackable('route ' . $this->route->getCurrentRoute()->getName() . ' is not trackable.');
+        }
+        return $trackable;
+    }
+
+    private function pathIsTrackable() {
+        if (!$trackable = $this->repositoryManager->pathIsTrackable($this->request->path())) {
+            $this->logUntrackable('path ' . $this->request->path() . ' is not trackable.');
+        }
+        return $trackable;
+    }
+
+    protected function notRobotOrTrackable() {
+        $trackable = !$this->isRobot() ||
+                $this->config->isRobotEnabled();
+        if (!$trackable) {
+            $this->logUntrackable('tracking of robots is disabled.');
+        }
+        return $trackable;
+    }
+
+}

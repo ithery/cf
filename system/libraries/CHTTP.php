@@ -8,5 +8,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CHTTP {
-    
+
+    protected static $request;
+
+    public static function request() {
+        if (self::$request == null) {
+            self::$request = CHTTP_Request::capture();
+        }
+        return self::$request;
+    }
+
 }
