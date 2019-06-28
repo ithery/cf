@@ -41,6 +41,7 @@ class CObservable_Listener_Handler_PrependHandler extends CObservable_Listener_H
 
     public function setMethod($method) {
         $this->method = $method;
+        return $this;
     }
 
     public function content() {
