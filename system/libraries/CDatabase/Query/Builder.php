@@ -2198,7 +2198,7 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     public function exists() {
-        $results = $this->connection->select(
+        $results = $this->db->select(
                 $this->grammar->compileExists($this), $this->getBindings(), !$this->useWritePdo
         );
 
