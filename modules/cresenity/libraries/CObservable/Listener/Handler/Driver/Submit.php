@@ -25,14 +25,14 @@ class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Ha
         $this->formId = "";
     }
 
-    public function set_target($target) {
+    public function setTarget($target) {
 
         $this->target = $target;
 
         return $this;
     }
 
-    public function set_method($method) {
+    public function setMethod($method) {
         $this->method = $method;
     }
 
