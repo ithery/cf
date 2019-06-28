@@ -38,7 +38,7 @@ class Controller_Administrator_Auth extends CApp_Administrator_Controller {
                 $json["message"] = "Login success";
             } else {
                 $json["result"] = "ERROR";
-                $json["message"] = $error_message;
+                $json["message"] = $errMessage;
             }
             echo json_encode($json);
         } else {

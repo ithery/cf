@@ -153,7 +153,7 @@ abstract class AbstractPaginator implements Htmlable
         }
 
         return $this->path
-                        .(Str::contains($this->path, '?') ? '&' : '?')
+                        .(\cstr::contains($this->path, '?') ? '&' : '?')
                         .http_build_query($parameters, '', '&')
                         .$this->buildFragment();
     }
@@ -562,6 +562,13 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function __call($method, $parameters)
     {
+        if($method=='get') {
+            try {
+                throw new \Exception('a');
+            } catch(\Exception $ex) {
+                \cdbg::var_dump($ex->getTraceAsString());
+            }
+        }
         return $this->getCollection()->$method(...$parameters);
     }
 

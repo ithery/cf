@@ -26,6 +26,7 @@ class CElastic_Result extends CElasticResult {
         $result = array();
         foreach ($hits as $k => $node) {
             $row = carr::get($node, '_source');
+            $row['_id']=carr::get($node, '_id');
             foreach ($this->select as $k => $v) {
                 $field = carr::get($v, 'field');
                 $alias = carr::get($v, 'alias');

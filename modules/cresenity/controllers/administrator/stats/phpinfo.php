@@ -11,8 +11,7 @@ class Controller_Administrator_Stats_Phpinfo extends CApp_Administrator_Controll
 
     public function index() {
         $app = CApp::instance();
-        $app->set_login_required(false);
-        $app = CApp::instance();
+        
         $app->title(clang::__("PHP Info"));
 
         $html = CView::factory('admin/page/phpinfo/html');
@@ -20,7 +19,7 @@ class Controller_Administrator_Stats_Phpinfo extends CApp_Administrator_Controll
         $js = CView::factory('admin/page/phpinfo/js');
         $js = $js->render();
         $app->add($html);
-        $app->add_js($js);
+        $app->addJs($js);
 
         echo $app->render();
     }

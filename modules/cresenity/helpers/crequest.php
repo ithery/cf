@@ -109,7 +109,7 @@ class crequest {
     public static function remote_address() {
         // Server keys that could contain the client IP address
         $keys = array('HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'REMOTE_ADDR');
-
+        $ip_address = "";
         foreach ($keys as $key) {
             if (isset($_SERVER[$key])) {
                 $ip_address = $_SERVER[$key];

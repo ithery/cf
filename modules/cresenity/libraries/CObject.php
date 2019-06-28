@@ -5,8 +5,9 @@
  */
 class CObject {
 
-    use CTrait_Compat_Object;
-    
+    use CTrait_Compat_Object,
+        CTrait_Macroable;
+
     protected $id;
     protected $valid_prop = array();
     protected $prop = array();
@@ -62,6 +63,16 @@ class CObject {
         return $this->id;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return $this
+     */
+    public function setId($id) {
+        $this->id = $id;
+        return $this;
+    }
+
     public function className() {
         return get_class($this);
     }
@@ -71,10 +82,16 @@ class CObject {
     }
 
     static public function isInstanceof($value) {
+        CCollector::deprecated();
         if (is_object($value)) {
             return ($value instanceof CObject);
         }
         return false;
+    }
+
+    public function isUseTrait($trait) {
+        $traits = CF::class_uses_recursive(get_class($this));
+        return $traits[$trait];
     }
 
 }

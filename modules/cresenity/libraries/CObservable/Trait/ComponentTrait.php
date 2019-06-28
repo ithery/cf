@@ -23,6 +23,28 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * 
      * @param string $id
+     * @return CElement_Component_ListGroup
+     */
+    public function addListGroup($id = "") {
+        $listGroup = CElement_Factory::createComponent('ListGroup', $id);
+        $this->add($listGroup);
+        return $listGroup;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_DataGridList
+     */
+    public function addDataGridList($id = "") {
+        $dataGridList = CElement_Factory::createComponent('DataGridList', $id);
+        $this->add($dataGridList);
+        return $dataGridList;
+    }
+
+    /**
+     * 
+     * @param string $id
      * @return CElement_Component_Nestable
      */
     public function addNestable($id = "") {
@@ -40,6 +62,73 @@ trait CObservable_Trait_ComponentTrait {
         $terminal = CElement_Factory::createComponent('Terminal', $id);
         $this->add($terminal);
         return $terminal;
+    }
+
+    /**
+     *
+     * @method addChart
+     *
+     * @param  string   $type
+     * @param  string   $id
+     * @return CElement_Component_Chart
+     */
+    public function addChart($type = 'Chart', $id = "") {
+        $chart = CElement_Component_Chart::factory($type, $id);
+        $this->add($chart);
+        return $chart;
+    }
+
+    /**
+     *
+     * @method addElFinder
+     *
+     * @param  string   $type
+     * @param  string   $id
+     * @return CElement_Component_ElFinder
+     */
+    public function addElFinder($id = "") {
+        $elFinder = CElement_Component_ElFinder::factory($id);
+        $this->add($elFinder);
+        return $elFinder;
+    }
+
+    public function addFileManager($id = "") {
+        $fileManager = CElement_Component_FileManager::factory($id);
+        $this->add($fileManager);
+        return $fileManager;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Widget
+     */
+    public function addWidget($id = "") {
+        $widget = CElement_Factory::createComponent('Widget', $id);
+        $this->add($widget);
+        return $widget;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Form
+     */
+    public function addForm($id = "") {
+        $form = CElement_Factory::createComponent('Form', $id);
+        $this->add($form);
+        return $form;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Form
+     */
+    public function addKanban($id = "") {
+        $kanban = CElement_Factory::createComponent('Kanban', $id);
+        $this->add($kanban);
+        return $kanban;
     }
 
 }

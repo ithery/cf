@@ -8,14 +8,12 @@
 abstract class CObservable extends CRenderable {
 
     use CTrait_Compat_Observable,
+        CObservable_Trait_ElementTrait,
         CObservable_Trait_ComponentTrait,
-        CObservable_Trait_EventsTrait;
+        CObservable_Trait_ListTrait,
+        CObservable_Trait_EventsTrait,
+        CObservable_Trait_ListenerTrait;
 
-    /**
-     *
-     * @var CRenderable_Listener[]
-     */
-    protected $listeners;
     protected $manager;
 
     /**
@@ -24,9 +22,7 @@ abstract class CObservable extends CRenderable {
      */
     protected $javascript;
 
-    public function getListeners() {
-        return $this->listeners;
-    }
+   
 
     /**
      * 
@@ -43,17 +39,16 @@ abstract class CObservable extends CRenderable {
     public function jquery() {
         return $this->javascript->jquery();
     }
-
+    
     /**
      * 
-     * @param string $event
-     * @return CObservable_Listener
+     * @return CObservable_Javascript_Handler
      */
-    public function addListener($event) {
-        $listener = new CObservable_Listener($this->id, $event);
-        $this->listeners[] = $listener;
-        return $listener;
+    public function handler() {
+        return $this->javascript->handler();
     }
+
+    
 
     protected function __construct($id = "") {
 
@@ -68,6 +63,8 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('date', 'CElement_FormInput_Date');
         $this->manager->registerControl('material-datetime', 'CElement_FormInput_DateTime_MaterialDateTime');
         $this->manager->registerControl('daterange-picker', 'CElement_FormInput_DateRange');
+        $this->manager->registerControl('daterange-dropdown', 'CElement_FormInput_DateRange_Dropdown');
+        $this->manager->registerControl('daterange-button', 'CElement_FormInput_DateRange_DropdownButton');
         $this->manager->registerControl('currency', 'CElement_FormInput_Currency');
         $this->manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
         $this->manager->registerControl('time', 'CElement_FormInput_Time');
@@ -81,9 +78,9 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('password', 'CElement_FormInput_Password');
         $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
         $this->manager->registerControl('select', 'CElement_FormInput_Select');
+        $this->manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
 
         $this->manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
-        //$this->manager->registerControl('select-tag', 'CFormInputSelectTag');
 
         $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
         $this->manager->registerControl('label', 'CFormInputLabel');
@@ -91,6 +88,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
         $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
         $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
+        $this->manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
         $this->manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
         $this->manager->registerControl('ckeditor', 'CFormInputCKEditor');
         $this->manager->registerControl('hidden', 'CFormInputHidden');
@@ -149,187 +147,6 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * Add Div &lt;div&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_Div  Div Element
-     */
-    public function addDiv($id = "") {
-        $element = CElement_Factory::createElement('div', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Label &lt;label&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_Label  Label Element
-     */
-    public function addLabel($id = "") {
-        $element = CElement_Factory::createElement('label', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Anchor Element &lt;a&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_A  Anchor Element
-     */
-    public function addA($id = "") {
-        $element = CElement_Factory::createElement('a', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Heading 1 Element &lt;h1&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_H1  Heading 1 Element
-     */
-    public function addH1($id = "") {
-        $element = CElement_Factory::createElement('h1', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Heading 2 Element &lt;h2&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_H2  Heading 2 Element
-     */
-    public function addH2($id = "") {
-        $element = CElement_Factory::createElement('h2', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Heading 3 Element &lt;h3&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_H3  Heading 3 Element
-     */
-    public function addH3($id = "") {
-        $element = CElement_Factory::createElement('h3', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Heading 4 Element &lt;h4&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_H4  Heading 4 Element
-     */
-    public function addH4($id = "") {
-        $element = CElement_Factory::createElement('h4', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Heading 5 Element &lt;h5&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_H5  Heading 5 Element
-     */
-    public function addH5($id = "") {
-        $element = CElement_Factory::createElement('h5', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Heading 6 Element &lt;h6&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_H6  Heading 6 Element
-     */
-    public function addH6($id = "") {
-        $element = CElement_Factory::createElement('h6', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Paragraph Element &lt;p&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_P  Paragraph Element
-     */
-    public function addP($id = "") {
-        $element = CElement_Factory::createElement('p', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Ordered List Element &lt;ol&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_Ol  Ordered List Element
-     */
-    public function addOl($id = "") {
-        $element = CElement_Factory::createElement('ol', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Unordered List Element &lt;ul&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_Ul  Unordered List Element
-     */
-    public function addUl($id = "") {
-        $element = CElement_Factory::createElement('ul', $id);
-        //$element = CUlElement::factory($id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Code Element &lt;ul&gt
-     *
-     * @param string $id optional
-     * @return  CElement_Element_Code  Code Element
-     */
-    public function addCode($id = "") {
-        $element = CElement_Factory::createElement('code', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add List Item Element &lt;li&gt
-     * 
-     * @param string $id
-     * @return CElement_Element_Ol List Item Element
-     */
-    public function addLi($id = "") {
-        $element = CElement_Factory::createElement('li', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
-     * Add Iframe Element &lt;iframe&gt
-     * 
-     * @param string $id
-     * @return CElement_Element_Iframe Iframe Element
-     */
-    public function addIframe($id = "") {
-        $element = CElement_Factory::createElement('iframe', $id);
-        $this->wrapper->add($element);
-        return $element;
-    }
-
-    /**
      * Add Form Field
      *
      * @param   string id
@@ -357,17 +174,6 @@ abstract class CObservable extends CRenderable {
         $calendar = CCalendar::factory($calendar_id);
         $this->add($calendar);
         return $calendar;
-    }
-
-    /**
-     * 
-     * @param string $tabs_id
-     * @return CTabList
-     */
-    public function addTabList($tabs_id = "") {
-        $tabs = CTabList::factory($tabs_id);
-        $this->add($tabs);
-        return $tabs;
     }
 
     public function addTabStaticList($tabs_id = "") {
@@ -406,40 +212,13 @@ abstract class CObservable extends CRenderable {
         return $span;
     }
 
-    public function addImg($id = "") {
-        $img = CImgElement::factory($id);
-        $this->add($img);
-        return $img;
-    }
-
     public function addBasicSpan($id = "") {
         $span = CBasicSpan::factory($id);
         $this->add($span);
         return $span;
     }
 
-    /**
-     * 
-     * @param string $id
-     * @return CElement_Component_Widget
-     */
-    public function addWidget($id = "") {
-        $widget = CElement_Factory::createComponent('Widget', $id);
-        $this->add($widget);
-        return $widget;
-    }
-
-    /**
-     * 
-     * @param string $id
-     * @return CElement_Component_Form
-     */
-    public function addForm($id = "") {
-        $form = CElement_Factory::createComponent('Form', $id);
-        $this->add($form);
-        return $form;
-    }
-
+   
     public function addPrismCode($id = "") {
         $code = CElement_Factory::createComponent('PrismCode', $id);
         $this->add($code);
@@ -483,21 +262,6 @@ abstract class CObservable extends CRenderable {
         $this->add($element);
 
         return $element;
-    }
-
-    /**
-     * 
-     * 
-     * @param string $id
-     * @return CElement_List_ActionList
-     */
-    public function addActionList($id = "") {
-        $actlist = CElement_Factory::createList('ActionList', $id);
-        $this->add($actlist);
-        if ($this instanceof CElement_Component_Form) {
-            $actlist->setStyle('form-action');
-        }
-        return $actlist;
     }
 
     /**
@@ -577,24 +341,24 @@ abstract class CObservable extends CRenderable {
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         foreach ($this->listeners as $listener) {
-            $js->appendln($listener->js($js->get_indent()));
+            $js->appendln($listener->js($js->getIndent()));
         }
 
 
-        $js->appendln(parent::js($js->get_indent()))->br();
+        $js->appendln(parent::js($js->getIndent()))->br();
 
         return $js->text();
     }
 
     public function regenerateId($recursive = false) {
-        $before_id = $this->id;
+        $beforeId = $this->id;
 
         parent::regenerateId($recursive);
         //we change the owner of listener
         foreach ($this->listeners as $listener) {
-            if ($listener->owner() == $before_id) {
+            if ($listener->owner() == $beforeId) {
                 $listener->setOwner($this->id);
             }
         }

@@ -198,6 +198,118 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a subselect expression to the query.
+     *
+     * @param  \Closure|\CDatabase_Query_Builder|string $query
+     * @param  string  $as
+     * @return \CDatabase_Query_Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function selectSub($query, $as) {
+        list($query, $bindings) = $this->createSub($query);
+        return $this->selectRaw(
+                        '(' . $query . ') as ' . $this->grammar->wrap($as), $bindings
+        );
+    }
+
+    /**
+     * Add a new "raw" select expression to the query.
+     *
+     * @param  string  $expression
+     * @param  array   $bindings
+     * @return \CDatabase_Query_Builder|static
+     */
+    public function selectRaw($expression, array $bindings = []) {
+        $this->addSelect(new CDatabase_Query_Expression($expression));
+
+        if ($bindings) {
+            $this->addBinding($bindings, 'select');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Makes "from" fetch from a subquery.
+     *
+     * @param  \Closure|\CDatabase_Query_Builder|string $query
+     * @param  string  $as
+     * @return \CDatabase_Query_Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function fromSub($query, $as) {
+        list($query, $bindings) = $this->createSub($query);
+
+        return $this->fromRaw('(' . $query . ') as ' . $this->grammar->wrap($as), $bindings);
+    }
+
+    /**
+     * Add a raw from clause to the query.
+     *
+     * @param  string  $expression
+     * @param  mixed   $bindings
+     * @return \CDatabase_Query_Builder|static
+     */
+    public function fromRaw($expression, $bindings = []) {
+        $this->from = new CDatabase_Query_Expression($expression);
+        $this->addBinding($bindings, 'from');
+        return $this;
+    }
+
+    /**
+     * Creates a subquery and parse it.
+     *
+     * @param  \Closure|\CDatabase_Query_Builder|string $query
+     * @return array
+     */
+    protected function createSub($query) {
+        // If the given query is a Closure, we will execute it while passing in a new
+        // query instance to the Closure. This will give the developer a chance to
+        // format and work with the query before we cast it to a raw SQL string.
+        if ($query instanceof Closure) {
+            $callback = $query;
+            $callback($query = $this->forSubQuery());
+        }
+        return $this->parseSub($query);
+    }
+
+    /**
+     * Parse the subquery into SQL and bindings.
+     *
+     * @param  mixed  $query
+     * @return array
+     */
+    protected function parseSub($query) {
+        if ($query instanceof self || $query instanceof CModel_Query) {
+            return [$query->toSql(), $query->getBindings()];
+        } elseif (is_string($query)) {
+            return [$query, []];
+        } else {
+            throw new InvalidArgumentException;
+        }
+    }
+
+    /**
+     * Parse the sub-select query into SQL and bindings.
+     *
+     * @param  mixed  $query
+     * @return array
+     */
+    protected function parseSubSelect($query) {
+        if ($query instanceof self) {
+            $query->columns = [$query->columns[0]];
+
+            return [$query->toSql(), $query->getBindings()];
+        } elseif (is_string($query)) {
+            return [$query, []];
+        } else {
+            throw new InvalidArgumentException;
+        }
+    }
+
+    /**
      * Add a new select column to the query.
      *
      * @param  array|mixed  $column
@@ -281,10 +393,31 @@ class CDatabase_Query_Builder {
      * @param  string  $operator
      * @param  string  $second
      * @param  string  $type
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function joinWhere($table, $first, $operator, $second, $type = 'inner') {
         return $this->join($table, $first, $operator, $second, $type, true);
+    }
+
+    /**
+     * Add a subquery join clause to the query.
+     *
+     * @param  \Closure|\CDatabase_Query_Builder|string $query
+     * @param  string  $as
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $type
+     * @param  bool    $where
+     * @return \CDatabase_Query_Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false) {
+        list($query, $bindings) = $this->createSub($query);
+        $expression = '(' . $query . ') as ' . $this->grammar->wrap($as);
+        $this->addBinding($bindings, 'join');
+        return $this->join(new CDatabase_Query_Expression($expression), $first, $operator, $second, $type, $where);
     }
 
     /**
@@ -294,7 +427,7 @@ class CDatabase_Query_Builder {
      * @param  string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function leftJoin($table, $first, $operator = null, $second = null) {
         return $this->join($table, $first, $operator, $second, 'left');
@@ -307,10 +440,24 @@ class CDatabase_Query_Builder {
      * @param  string  $first
      * @param  string  $operator
      * @param  string  $second
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function leftJoinWhere($table, $first, $operator, $second) {
         return $this->joinWhere($table, $first, $operator, $second, 'left');
+    }
+
+    /**
+     * Add a subquery left join to the query.
+     *
+     * @param  \Closure|\CDatabase_Query_Builder|string $query
+     * @param  string  $as
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \CDatabase_Query_Builder|static
+     */
+    public function leftJoinSub($query, $as, $first, $operator = null, $second = null) {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'left');
     }
 
     /**
@@ -320,7 +467,7 @@ class CDatabase_Query_Builder {
      * @param  string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function rightJoin($table, $first, $operator = null, $second = null) {
         return $this->join($table, $first, $operator, $second, 'right');
@@ -333,10 +480,24 @@ class CDatabase_Query_Builder {
      * @param  string  $first
      * @param  string  $operator
      * @param  string  $second
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function rightJoinWhere($table, $first, $operator, $second) {
         return $this->joinWhere($table, $first, $operator, $second, 'right');
+    }
+
+    /**
+     * Add a subquery right join to the query.
+     *
+     * @param  \Closure|\CDatabase_Query_Builder|string $query
+     * @param  string  $as
+     * @param  string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \CDatabase_Query_Builder|static
+     */
+    public function rightJoinSub($query, $as, $first, $operator = null, $second = null) {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'right');
     }
 
     /**
@@ -346,7 +507,7 @@ class CDatabase_Query_Builder {
      * @param  string|null  $first
      * @param  string|null  $operator
      * @param  string|null  $second
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null) {
         if ($first) {
@@ -394,15 +555,14 @@ class CDatabase_Query_Builder {
      * @param  array  $columns
      * @return int
      */
-    public function getCountForPagination($columns = ['*'])
-    {
+    public function getCountForPagination($columns = ['*']) {
         $results = $this->runPaginationCountQuery($columns);
         // Once we have run the pagination count query, we will get the resulting count and
         // take into account what type of query it was. When there is a group by we will
         // just return the count of the entire results set since that will be correct.
         if (isset($this->groups)) {
             return count($results);
-        } elseif (! isset($results[0])) {
+        } elseif (!isset($results[0])) {
             return 0;
         } elseif (is_object($results[0])) {
             return (int) $results[0]->aggregate;
@@ -417,12 +577,11 @@ class CDatabase_Query_Builder {
      * @param  array  $columns
      * @return array
      */
-    protected function runPaginationCountQuery($columns = ['*'])
-    {
+    protected function runPaginationCountQuery($columns = ['*']) {
         return $this->cloneWithout(['columns', 'orders', 'limit', 'offset'])
-                    ->cloneWithoutBindings(['select', 'order'])
-                    ->setAggregate('count', $this->withoutSelectAliases($columns))
-                    ->get()->all();
+                        ->cloneWithoutBindings(['select', 'order'])
+                        ->setAggregate('count', $this->withoutSelectAliases($columns))
+                        ->get()->all();
     }
 
     /**
@@ -431,11 +590,9 @@ class CDatabase_Query_Builder {
      * @param  array  $columns
      * @return array
      */
-    protected function withoutSelectAliases(array $columns)
-    {
+    protected function withoutSelectAliases(array $columns) {
         return array_map(function ($column) {
-            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
-                    ? substr($column, 0, $aliasPosition) : $column;
+            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
     }
 
@@ -519,7 +676,7 @@ class CDatabase_Query_Builder {
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
         if (cstr::contains($column, '->') && is_bool($value)) {
-            $value = new Expression($value ? 'true' : 'false');
+            $value = new CDatabase_Query_Expression($value ? 'true' : 'false');
         }
 
         // Now that we are working with just a simple query we can put the elements
@@ -531,7 +688,7 @@ class CDatabase_Query_Builder {
                 'type', 'column', 'operator', 'value', 'boolean'
         );
 
-        if (!$value instanceof Expression) {
+        if (!$value instanceof CDatabase_Query_Expression) {
             $this->addBinding($value, 'where');
         }
 
@@ -544,7 +701,7 @@ class CDatabase_Query_Builder {
      * @param  string|array|\Closure  $column
      * @param  string|null  $operator
      * @param  mixed   $value
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhere($column, $operator = null, $value = null) {
         return $this->where($column, $operator, $value, 'or');
@@ -557,7 +714,7 @@ class CDatabase_Query_Builder {
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string|null  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereColumn($first, $operator = null, $second = null, $boolean = 'and') {
         // If the column is an array, we will assume it is an array of key-value pairs
@@ -592,7 +749,7 @@ class CDatabase_Query_Builder {
      * @param  string|array  $first
      * @param  string|null  $operator
      * @param  string|null  $second
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereColumn($first, $operator = null, $second = null) {
         return $this->whereColumn($first, $operator, $second, 'or');
@@ -619,7 +776,7 @@ class CDatabase_Query_Builder {
      *
      * @param  string  $sql
      * @param  mixed   $bindings
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereRaw($sql, $bindings = []) {
         return $this->whereRaw($sql, $bindings, 'or');
@@ -670,7 +827,7 @@ class CDatabase_Query_Builder {
         // in which case we will just skip over it since it will be the query as a raw
         // string and not as a parameterized place-holder to be replaced by the PDO.
         foreach ($values as $value) {
-            if (!$value instanceof Expression) {
+            if (!$value instanceof CDatabase_Query_Expression) {
                 $this->addBinding($value, 'where');
             }
         }
@@ -683,7 +840,7 @@ class CDatabase_Query_Builder {
      *
      * @param  string  $column
      * @param  mixed   $values
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereIn($column, $values) {
         return $this->whereIn($column, $values, 'or');
@@ -695,7 +852,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @param  mixed   $values
      * @param  string  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereNotIn($column, $values, $boolean = 'and') {
         return $this->whereIn($column, $values, $boolean, true);
@@ -706,7 +863,7 @@ class CDatabase_Query_Builder {
      *
      * @param  string  $column
      * @param  mixed   $values
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereNotIn($column, $values) {
         return $this->whereNotIn($column, $values, 'or');
@@ -740,7 +897,7 @@ class CDatabase_Query_Builder {
      * Add an external sub-select to the query.
      *
      * @param  string   $column
-     * @param  \Illuminate\Database\Query\Builder|static  $query
+     * @param  \CDatabase_Query_Builder|static  $query
      * @param  string   $boolean
      * @param  bool     $not
      * @return $this
@@ -775,7 +932,7 @@ class CDatabase_Query_Builder {
      * Add an "or where null" clause to the query.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereNull($column) {
         return $this->whereNull($column, 'or');
@@ -786,7 +943,7 @@ class CDatabase_Query_Builder {
      *
      * @param  string  $column
      * @param  string  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereNotNull($column, $boolean = 'and') {
         return $this->whereNull($column, $boolean, true);
@@ -816,7 +973,7 @@ class CDatabase_Query_Builder {
      *
      * @param  string  $column
      * @param  array   $values
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereBetween($column, array $values) {
         return $this->whereBetween($column, $values, 'or');
@@ -828,7 +985,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @param  array   $values
      * @param  string  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereNotBetween($column, array $values, $boolean = 'and') {
         return $this->whereBetween($column, $values, $boolean, true);
@@ -839,7 +996,7 @@ class CDatabase_Query_Builder {
      *
      * @param  string  $column
      * @param  array   $values
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereNotBetween($column, array $values) {
         return $this->whereNotBetween($column, $values, 'or');
@@ -849,7 +1006,7 @@ class CDatabase_Query_Builder {
      * Add an "or where not null" clause to the query.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereNotNull($column) {
         return $this->whereNotNull($column, 'or');
@@ -862,7 +1019,7 @@ class CDatabase_Query_Builder {
      * @param  string  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and') {
         list($value, $operator) = $this->prepareValueAndOperator(
@@ -878,7 +1035,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @param  string  $operator
      * @param  string  $value
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereDate($column, $operator, $value) {
         return $this->whereDate($column, $operator, $value, 'or');
@@ -891,7 +1048,7 @@ class CDatabase_Query_Builder {
      * @param  string   $operator
      * @param  string   $value
      * @param  string   $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and') {
         list($value, $operator) = $this->prepareValueAndOperator(
@@ -907,7 +1064,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @param  string   $operator
      * @param  int   $value
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereTime($column, $operator, $value) {
         return $this->whereTime($column, $operator, $value, 'or');
@@ -920,7 +1077,7 @@ class CDatabase_Query_Builder {
      * @param  string  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and') {
         list($value, $operator) = $this->prepareValueAndOperator(
@@ -937,7 +1094,7 @@ class CDatabase_Query_Builder {
      * @param  string  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and') {
         list($value, $operator) = $this->prepareValueAndOperator(
@@ -954,7 +1111,7 @@ class CDatabase_Query_Builder {
      * @param  string  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and') {
         list($value, $operator) = $this->prepareValueAndOperator(
@@ -987,7 +1144,7 @@ class CDatabase_Query_Builder {
      *
      * @param  \Closure $callback
      * @param  string   $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereNested(Closure $callback, $boolean = 'and') {
         call_user_func($callback, $query = $this->forNestedWhere());
@@ -998,7 +1155,7 @@ class CDatabase_Query_Builder {
     /**
      * Create a new query instance for nested where condition.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
     public function forNestedWhere() {
         return $this->newQuery()->from($this->from);
@@ -1007,7 +1164,7 @@ class CDatabase_Query_Builder {
     /**
      * Add another query builder as a nested where to the query builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|static $query
+     * @param  \CDatabase_Query_Builder|static $query
      * @param  string  $boolean
      * @return $this
      */
@@ -1073,7 +1230,7 @@ class CDatabase_Query_Builder {
      *
      * @param  \Closure $callback
      * @param  bool     $not
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereExists(Closure $callback, $not = false) {
         return $this->whereExists($callback, 'or', $not);
@@ -1084,7 +1241,7 @@ class CDatabase_Query_Builder {
      *
      * @param  \Closure $callback
      * @param  string   $boolean
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function whereNotExists(Closure $callback, $boolean = 'and') {
         return $this->whereExists($callback, $boolean, true);
@@ -1094,7 +1251,7 @@ class CDatabase_Query_Builder {
      * Add a where not exists clause to the query.
      *
      * @param  \Closure  $callback
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orWhereNotExists(Closure $callback) {
         return $this->orWhereExists($callback, true);
@@ -1103,7 +1260,7 @@ class CDatabase_Query_Builder {
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  \CDatabase_Query_Builder $query
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1224,6 +1381,16 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Create a raw database expression.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Expression
+     */
+    public function raw($value) {
+        return CDatabase::raw($value);
+    }
+
+    /**
      * Get the current query value bindings in a flattened array.
      *
      * @return array
@@ -1303,7 +1470,7 @@ class CDatabase_Query_Builder {
      */
     protected function cleanBindings(array $bindings) {
         return array_values(array_filter($bindings, function ($binding) {
-                    return !$binding instanceof Expression;
+                    return !$binding instanceof CDatabase_Query_Expression;
                 }));
     }
 
@@ -1453,7 +1620,7 @@ class CDatabase_Query_Builder {
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (!$value instanceof Expression) {
+        if (!$value instanceof CDatabase_Query_Expression) {
             $this->addBinding($value, 'having');
         }
 
@@ -1466,7 +1633,7 @@ class CDatabase_Query_Builder {
      * @param  string  $column
      * @param  string|null  $operator
      * @param  string|null  $value
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orHaving($column, $operator = null, $value = null) {
         return $this->having($column, $operator, $value, 'or');
@@ -1495,7 +1662,7 @@ class CDatabase_Query_Builder {
      *
      * @param  string  $sql
      * @param  array   $bindings
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function orHavingRaw($sql, array $bindings = []) {
         return $this->havingRaw($sql, $bindings, 'or');
@@ -1531,9 +1698,9 @@ class CDatabase_Query_Builder {
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
-    public function latest($column = 'created_at') {
+    public function latest($column = 'created') {
         return $this->orderBy($column, 'desc');
     }
 
@@ -1541,9 +1708,9 @@ class CDatabase_Query_Builder {
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
-    public function oldest($column = 'created_at') {
+    public function oldest($column = 'created') {
         return $this->orderBy($column, 'asc');
     }
 
@@ -1578,7 +1745,7 @@ class CDatabase_Query_Builder {
      * Alias to set the "offset" value of the query.
      *
      * @param  int  $value
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function skip($value) {
         return $this->offset($value);
@@ -1601,9 +1768,9 @@ class CDatabase_Query_Builder {
     /**
      * Add a union statement to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
+     * @param  \CDatabase_Query_Builder|\Closure  $query
      * @param  bool  $all
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \CDatabase_Query_Builder|static
      */
     public function union($query, $all = false) {
         if ($query instanceof Closure) {
@@ -1620,8 +1787,8 @@ class CDatabase_Query_Builder {
     /**
      * Add a union all statement to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
-     * @return \Illuminate\Database\Query\Builder|static
+     * @param  \CDatabase_Query_Builder|\Closure  $query
+     * @return \CDatabase_Query_Builder|static
      */
     public function unionAll($query) {
         return $this->union($query, true);
@@ -1633,27 +1800,26 @@ class CDatabase_Query_Builder {
      * @param  bool  $value
      * @return $this
      */
-    public function lock($value = true)
-    {
+    public function lock($value = true) {
         $this->lock = $value;
         return $this;
     }
+
     /**
      * Lock the selected rows in the table for updating.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
-    public function lockForUpdate()
-    {
+    public function lockForUpdate() {
         return $this->lock(true);
     }
+
     /**
      * Share lock the selected rows in the table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
-    public function sharedLock()
-    {
+    public function sharedLock() {
         return $this->lock(false);
     }
 
@@ -1996,10 +2162,9 @@ class CDatabase_Query_Builder {
     /**
      * Get a new instance of the query builder.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
-    public function newQuery()
-    {
+    public function newQuery() {
         return new static($this->db, $this->grammar, $this->processor);
     }
 
@@ -2025,6 +2190,28 @@ class CDatabase_Query_Builder {
         throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
         ));
+    }
+
+    /**
+     * Determine if any rows exist for the current query.
+     *
+     * @return bool
+     */
+    public function exists() {
+        $results = $this->db->select(
+                $this->grammar->compileExists($this), $this->getBindings(), !$this->useWritePdo
+        );
+
+        // If the results has rows, we will get the row and see if the exists column is a
+        // boolean true. If there is no results for this query we will return false as
+        // there are no rows for this query at all and we can return that info here.
+        if (isset($results[0])) {
+            $results = (array) $results[0];
+
+            return (bool) $results['exists'];
+        }
+
+        return false;
     }
 
 }

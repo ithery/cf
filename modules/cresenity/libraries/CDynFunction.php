@@ -2,12 +2,15 @@
 
 class CDynFunction {
 
+    use CTrait_Compat_DynFunction;
+
     public $func = "";
     public $params = array();
     public $requires = array();
     public $type = "defined"; //defined,class,
 
     private function __construct($func) {
+        CCollector::deprecated();
         $this->func = $func;
     }
 
@@ -15,26 +18,26 @@ class CDynFunction {
         return new CDynFunction($func);
     }
 
-    public function set_function($cfunc) {
+    public function setFunction($cfunc) {
         $this->func = $cfunc;
         return $this;
     }
 
-    public function get_function() {
+    public function getFunction() {
         return $this->func;
     }
 
-    public function add_param($p) {
+    public function addParam($p) {
         $this->params[] = $p;
         return $this;
     }
 
-    public function add_require($p) {
+    public function addRequire($p) {
         $this->requires[] = $p;
         return $this;
     }
 
-    public function set_require($p) {
+    public function setRequire($p) {
         $this->requires = $p;
         return $this;
     }
@@ -56,7 +59,6 @@ class CDynFunction {
                     return call_user_func_array($this->func, $params);
                 } else {
                     $error++;
-                    
                 }
             }
         }
@@ -97,13 +99,13 @@ class CDynFunction {
 
         if ($error > 0) {
             $functionName = $this->func;
-            if(is_array($functionName)) {
-                $functionName = implode('::',$functionName);
+            if (is_array($functionName)) {
+                $functionName = implode('::', $functionName);
             }
-            if($functionName instanceof Closure) {
-                $functionName='Closure';
+            if ($functionName instanceof Closure) {
+                $functionName = 'Closure';
             }
-            if(!is_string($functionName)) {
+            if (!is_string($functionName)) {
                 $functionName = 'Unknown';
             }
             throw new CException('function :function is not callable', array(':function' => $functionName));

@@ -1497,9 +1497,44 @@ border-top: 1px solid #bbb;
     background: none repeat scroll 0 0 #F9F9F9;
 }
 
+.top-nav-container ul {
+    margin-bottom: 0px;
+}
 
+.top-nav-container .nav-stacked > li {
+    display: inline-block
+}
 
+.top-nav-container .nav-stacked li  a {
+    border-radius: 0px;
+    background-color: #fff;
+    color: #333;
 
+    border-bottom: 1px solid #d4d4d6;
+}
+
+.top-nav-container .nav-stacked li.active a {
+    color: #2095f2;
+    background-color: #fff;
+    border-top: 1px solid #d4d4d6;
+    border-left: 1px solid #d4d4d6;
+    border-right: 1px solid #d4d4d6;
+    border-bottom: 1px solid #fff;
+    font-weight: bold;
+}
+
+.row-tab-content .widget-box .widget-content {
+    background-color: #fff;
+}
+
+.row-tab-menu {
+    z-index: 2;
+    position: relative;
+}
+.row-tab-content {
+    z-index: 1;
+    position: relative;
+}  
 .DataTables_sort_wrapper {
     display:inline;
 }
@@ -1597,6 +1632,10 @@ body.modal-open {
 }
 .modal.fade.in {
     top: 0;
+}
+
+.kanban .kanban-box {
+    min-height:100px;
 }
 
 @media (min-width: 768px) {

@@ -18,21 +18,32 @@ class carr {
      * Tests if an array is associative or not.
      *
      *     // Returns TRUE
-     *     carr::is_assoc(array('username' => 'john.doe'));
+     *     carr::isAssoc(array('username' => 'john.doe'));
      *
      *     // Returns FALSE
-     *     carr::is_assoc('foo', 'bar');
+     *     carr::isAssoc('foo', 'bar');
      *
      * @param   array   $array  array to check
      * @return  boolean
      */
-    public static function is_assoc(array $array) {
+    public static function isAssoc(array $array) {
         // Keys of the array
         $keys = array_keys($array);
 
         // If the array keys of the keys match the keys, then the array must
         // not be associative (e.g. the keys array looked like {0:0, 1:1...}).
         return array_keys($keys) !== $keys;
+    }
+
+    /**
+     * Alias of isAssoc
+     * 
+     * @deprecated
+     * @param array $value array to check
+     * @return boolean
+     */
+    public static function is_assoc(array $array) {
+        return static::isAssoc($array);
     }
 
     /**
@@ -50,7 +61,7 @@ class carr {
      * @param   mixed   $value  value to check
      * @return  boolean
      */
-    public static function is_array($value) {
+    public static function isArray($value) {
         if (is_array($value)) {
             // Definitely an array
             return TRUE;
@@ -61,31 +72,90 @@ class carr {
     }
 
     /**
-     * Retrieve a single key from an array. If the key does not exist in the
-     * array, the default value will be returned instead.
+     * Alias of isArray
+     * 
+     * @deprecated
+     * @param mixed $value value to check
+     * @return boolean
+     */
+    public static function is_array($value) {
+        return static::isArray($value);
+    }
+
+    /**
+     * Get an item from an array using "dot" notation.
      *
-     *     // Get the value "username" from $_POST, if it exists
-     *     $username = carr::get($_POST, 'username');
-     *
-     *     // Get the value "sorting" from $_GET, if it exists
-     *     $sorting = carr::get($_GET, 'sorting');
-     *
-     * @param   array   $array      array to extract from
-     * @param   string  $key        key name
-     * @param   mixed   $default    default value
-     * @return  mixed
+     * @param  \ArrayAccess|array  $array
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
      */
     public static function get($array, $key, $default = NULL) {
         if ($array instanceof ArrayObject) {
             // This is a workaround for inconsistent implementation of isset between PHP and HHVM
             // See https://github.com/facebook/hhvm/issues/3437
             return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
-        } else {
-            if (is_object($array) && !($array instanceof ArrayAccess)) {
-                throw new CException('error passing variable object as array');
-            }
-            return isset($array[$key]) ? $array[$key] : $default;
         }
+        if (!static::accessible($array)) {
+            return CF::value($default);
+        }
+
+        if (is_null($key)) {
+            return $array;
+        }
+
+        if (static::exists($array, $key)) {
+            return $array[$key];
+        }
+
+        if (strpos($key, '.') === false) {
+            return isset($array[$key]) ? $array[$key] : CF::value($default);
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (static::accessible($array) && static::exists($array, $segment)) {
+                $array = $array[$segment];
+            } else {
+                return CF::value($default);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Set an array item to a given value using "dot" notation.
+     *
+     * If no key is given to the method, the entire array will be replaced.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return array
+     */
+    public static function set(&$array, $key, $value) {
+        if (is_null($key)) {
+            return $array = $value;
+        }
+
+        $keys = explode('.', $key);
+
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+
+            // If the key doesn't exist at this depth, we will just create an empty array
+            // to hold the next value, allowing us to create the arrays to hold final
+            // values at the correct depth. Then we'll keep digging into the array.
+            if (!isset($array[$key]) || !is_array($array[$key])) {
+                $array[$key] = [];
+            }
+
+            $array = &$array[$key];
+        }
+
+        $array[array_shift($keys)] = $value;
+
+        return $array;
     }
 
     /**
@@ -109,7 +179,7 @@ class carr {
      * @return  mixed
      */
     public static function path($array, $path, $default = NULL, $delimiter = NULL) {
-        if (!carr::is_array($array)) {
+        if (!carr::isArray($array)) {
             // This is not an array!
             return $default;
         }
@@ -148,7 +218,7 @@ class carr {
 
             if (isset($array[$key])) {
                 if ($keys) {
-                    if (carr::is_array($array[$key])) {
+                    if (carr::isArray($array[$key])) {
                         // Dig down into the next part of the path
                         $array = $array[$key];
                     } else {
@@ -339,7 +409,7 @@ class carr {
      * @return  array
      */
     public static function merge($array1, $array2) {
-        if (carr::is_assoc($array2)) {
+        if (carr::isAssoc($array2)) {
             foreach ($array2 as $key => $value) {
                 if (is_array($value)
                         AND isset($array1[$key])
@@ -861,6 +931,86 @@ class carr {
     public static function hash(array $array) {
         array_multisort($array);
         return md5(json_encode($array));
+    }
+
+    /**
+     * Get a value from the array, and remove it.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    public static function pull(&$array, $key, $default = null) {
+        $value = static::get($array, $key, $default);
+
+        static::forget($array, $key);
+
+        return $value;
+    }
+
+    /**
+     * Get a subset of the items from the given array.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return array
+     */
+    public static function only($array, $keys) {
+        return array_intersect_key($array, array_flip((array) $keys));
+    }
+
+    /**
+     * Alias of array reset
+     * 
+     * @param array $array
+     * @return mixed the value of the first array element, or <b>FALSE</b> if the array is
+     */
+    public static function head($array) {
+        return reset($array);
+    }
+
+    public static function implode($glue, $separator, $array) {
+        if (!is_array($array)) {
+            return $array;
+        }
+        $string = array();
+        foreach ($array as $key => $val) {
+            if (is_array($val)) {
+                $val = carr::implodes(',', $val);
+            }
+            $string[] = "{$key}{$glue}{$val}";
+        }
+        return implode($separator, $string);
+    }
+
+    public static function implodes($glue, $array) {
+        if (!is_array($array)) {
+            return $array;
+        }
+        $ret = '';
+        foreach ($array as $item) {
+            if (is_array($item)) {
+                $ret .= self::implodes($item, $glue) . $glue;
+            } else {
+                $ret .= $item . $glue;
+            }
+        }
+        $ret = substr($ret, 0, 0 - strlen($glue));
+        return $ret;
+    }
+
+    public static function inArrayWildcard($what, $array) {
+        foreach ($array as $pattern) {
+            if (cstr::is($pattern, $what)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function isIterable($var) {
+        return is_array($var) || $var instanceof \Traversable;
     }
 
 }

@@ -13,7 +13,7 @@ abstract class CElement_Element extends CElement {
     protected $after;
     protected $isBuilded = false;
     protected $isOneTag = false;
-    protected $isIndent = true;
+    protected $haveIndent = true;
     protected $is_show = true;
     private $isBuild = false;
 
@@ -46,6 +46,16 @@ abstract class CElement_Element extends CElement {
 
     public function posttag() {
         return '</' . $this->tag . '>';
+    }
+
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
+    public function setHaveIndent($bool = true) {
+        $this->haveIndent = $bool;
+        return $this;
     }
 
     protected function htmlAttr() {
@@ -119,36 +129,36 @@ abstract class CElement_Element extends CElement {
     public function html($indent = 0) {
         $html = new CStringBuilder();
 
-        if (!$this->isIndent) {
+        if (!$this->haveIndent) {
             $indent = 0;
         }
         $html->setIndent($indent);
         $this->buildOnce();
-        $appendMethod = $this->isIndent ? 'appendln' : 'append';
+        $appendMethod = $this->haveIndent ? 'appendln' : 'append';
         $html->appendln($this->beforeHtml($indent));
         if ($this->isOneTag) {
             $html->$appendMethod($this->onetag());
         } else {
             if ($this->is_show) {
                 $html->$appendMethod($this->pretag());
-                if ($this->isIndent) {
+                if ($this->haveIndent) {
                     $html->br();
                 }
-                if ($this->isIndent) {
+                if ($this->haveIndent) {
                     $html->incIndent();
                 }
             }
 
             $html->$appendMethod($this->htmlChild($html->getIndent()));
-            if ($this->isIndent) {
+            if ($this->haveIndent) {
                 $html->br();
             }
             if ($this->is_show) {
-                if ($this->isIndent) {
+                if ($this->haveIndent) {
                     $html->decIndent();
                 }
                 $html->$appendMethod($this->posttag());
-                if ($this->isIndent) {
+                if ($this->haveIndent) {
                     $html->br();
                 }
             }

@@ -166,7 +166,7 @@ abstract class CModel_Relation {
      */
     public function getRelationExistenceCountQuery(CModel_Query $query, CModel_Query $parentQuery) {
         return $this->getRelationExistenceQuery(
-                        $query, $parentQuery, new Expression('count(*)')
+                        $query, $parentQuery, new CDatabase_Query_Expression('count(*)')
                 )->setBindings([], 'select');
     }
 
@@ -295,7 +295,7 @@ abstract class CModel_Relation {
      * @return array|null
      */
     protected static function buildMorphMapFromModels(array $models = null) {
-        if (is_null($models) || Arr::isAssoc($models)) {
+        if (is_null($models) || carr::isAssoc($models)) {
             return $models;
         }
 

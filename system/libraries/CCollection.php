@@ -1091,7 +1091,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return mixed
      */
     public function pull($key, $default = null) {
-        return Arr::pull($this->items, $key, $default);
+        return carr::pull($this->items, $key, $default);
     }
 
     /**
@@ -1117,10 +1117,10 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      */
     public function random($number = null) {
         if (is_null($number)) {
-            return Arr::random($this->items);
+            return carr::random($this->items);
         }
 
-        return new static(Arr::random($this->items, $number));
+        return new static(carr::random($this->items, $number));
     }
 
     /**
@@ -1658,8 +1658,8 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         if (!in_array($key, static::$proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
-
-        return new HigherOrderCollectionProxy($this, $key);
+        
+        return new CProxy_HigherOrderCollectionProxy($this, $key);
     }
 
 }

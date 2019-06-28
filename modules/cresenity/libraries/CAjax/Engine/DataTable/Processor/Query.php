@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Processor {
 
+    use CAjax_Engine_DataTable_Trait_ProcessorTrait;
+
     private $queryWhere;
     private $queryOrderBy;
     private $queryLimit;
@@ -155,7 +157,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                     if ($table->checkbox) {
                         $i2 = 1;
                     }
-                    $fieldName = carr::get($columns[$i ],'fieldname');
+                    $fieldName = carr::get($columns[$i], 'fieldname');
                     if (isset($request['bSearchable_' . ($i + $i2)]) && $request['bSearchable_' . ($i + $i2)] == "true") {
                         $sWhere .= "`" . $fieldName . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                     }
@@ -299,130 +301,9 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
             "sEcho" => intval(carr::get($request, 'sEcho')),
             "iTotalRecords" => $totalRecord,
             "iTotalDisplayRecords" => $totalFilteredRecord,
-            "aaData" => array(),
+            "aaData" => $this->populateAAData($data, $table, $request, $js),
         );
-        $no = carr::get($request, 'iDisplayStart', 0);
-        foreach ($data as $row) {
-            $arr = array();
-            $no++;
-            $key = carr::get($row, $table->key_field, '');
 
-
-            if ($table->numbering) {
-                $arr[] = $no;
-            }
-
-            if ($table->checkbox) {
-                $arr[] = '<input type="checkbox" name="' . $table->id() . '-check[]" id="' . $table->id() . '-' . $key . '" value="' . $key . '" class="checkbox-' . $table->id() . '">';
-            }
-            foreach ($table->columns as $col) {
-                $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
-                //do print from query
-                foreach ($row as $k => $v) {
-                    if ($k == $col->getFieldname()) {
-                        $col_v = $v;
-                        $ori_v = $col_v;
-                        foreach ($col->transforms as $trans) {
-                            $col_v = $trans->execute($col_v);
-                        }
-                    }
-                }
-                //if formatted
-                if (strlen($col->getFormat()) > 0) {
-                    $temp_v = $col->getFormat();
-                    foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
-                        }
-                        $col_v = $temp_v;
-                    }
-                }
-
-                $new_v = $col_v;
-
-                if (($table->cell_callback_func) != null) {
-                    $new_v = CDynFunction::factory($table->cell_callback_func)
-                            ->add_param($table)
-                            ->add_param($col->get_fieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($table->requires)
-                            ->execute();
-
-                    if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
-                        $js .= $new_v['js'];
-                        $new_v = $new_v['html'];
-                    }
-
-
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
-                }
-                $class = "";
-                switch ($col->get_align()) {
-                    case "left": $class .= " align-left";
-                        break;
-                    case "right": $class .= " align-right";
-                        break;
-                    case "center": $class .= " align-center";
-                        break;
-                }
-                $arr[] = $new_v;
-            }
-            if ($rowActionList!=null && $rowActionList->childCount() > 0) {
-                $html = new CStringBuilder();
-               
-                $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
-                foreach ($row as $k => $v) {
-                    $jsparam[$k] = $v;
-                }
-                $jsparam["param1"] = $key;
-                if ($table->getRowActionList()->getStyle() == "btn-dropdown") {
-                    $table->getRowActionList()->add_class("pull-right");
-                }
-                $rowActionList->regenerateId(true);
-                $rowActionList->apply("jsparam", $jsparam);
-
-                $rowActionList->apply("set_handler_url_param", $jsparam);
-
-                if (($table->filter_action_callback_func) != null) {
-                    $actions = $rowActionList->childs();
-
-                    foreach ($actions as &$action) {
-                        $action->removeClass('d-none');
-
-                        $visibility = CDynFunction::factory($table->filter_action_callback_func)
-                                ->add_param($table)
-                                ->add_param($col->getFieldname())
-                                ->add_param($row)
-                                ->add_param($action)
-                                ->set_require($table->requires)
-                                ->execute();
-                        
-                       
-                        if ($visibility == false) {
-                            $action->addClass('d-none');
-                        }
-                        $action->setVisibility($visibility);
-                    }
-
-
-                    //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
-                }
-
-                $html->appendln($table->getRowActionList()->html($html->get_indent()));
-                $js .= $table->getRowActionList()->js();
-                $html->dec_indent()->appendln('</td>')->br();
-                //$arr[] = '';
-                $arr[] = $html->text();
-                $arr["DT_RowId"] = $key;
-            }
-            $output["aaData"][] = $arr;
-        }
 
 
         $data = array(

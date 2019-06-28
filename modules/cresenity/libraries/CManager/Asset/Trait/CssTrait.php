@@ -10,8 +10,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CManager_Asset_Trait_CssTrait {
 
     public function fullpathCssFile($file) {
+        foreach ($this->mediaPaths as $dir) {
+            $path = $dir . 'css' . DS . $file;
+            
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
         $dirs = CF::getDirs('media');
-
+        
         foreach ($dirs as $dir) {
             $path = $dir . 'css' . DS . $file;
 
@@ -43,7 +50,7 @@ trait CManager_Asset_Trait_CssTrait {
     public function registerCssFile($file, $pos = "head") {
         $dir_file = $file;
         $css_version = '';
-     
+
         if (strpos($file, '?') !== false) {
             $dir_file = substr($file, 0, strpos($file, '?'));
             $css_version = substr($file, strpos($file, '?'), strlen($file) - 1);
@@ -54,7 +61,7 @@ trait CManager_Asset_Trait_CssTrait {
         } else {
             $css_file = $this->fullpathCssFile($dir_file);
             if (!file_exists($css_file)) {
-                trigger_error('CSS File not exists, ' . $file);
+                throw new Exception('CSS File not exists, ' . $file);
             }
             if (strlen($css_version) > 0) {
                 $css_file .= $css_version;

@@ -49,4 +49,20 @@ final class CHelper {
         return new CHelper_Request();
     }
 
+    /**
+     * 
+     * @return \CHelper_Transform
+     */
+    public static function transform() {
+        return new CHelper_Transform();
+    }
+
+    /**
+     * 
+     * @return \CHelper_Closure
+     */
+    public static function closure() {
+        return new CHelper_Closure();
+    }
+
 }

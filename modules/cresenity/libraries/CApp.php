@@ -16,6 +16,7 @@ class CApp extends CObservable {
     private $show_breadcrumb = true;
     private $show_title = true;
     private $breadcrumb = array();
+    private $breadcrumbCallback = null;
     private $signup = false;
     private $activation = false;
     private $resend = false;
@@ -35,6 +36,7 @@ class CApp extends CObservable {
     private $renderMessage = true;
     private $keepMessage = false;
     private $viewName = 'cpage';
+    private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
 
     public function setViewCallback(callable $viewCallback) {
@@ -163,7 +165,6 @@ class CApp extends CObservable {
                 $this->_org = cstg::get($org_id);
             }
         }
-        $this->registerCoreModules();
         if (isset($_COOKIE['capp-debugbar'])) {
             CDebug::bar()->enable();
         }
@@ -219,15 +220,6 @@ class CApp extends CObservable {
         }
 
 
-        if (ccfg::get('mail_error')) {
-
-            // Set error handler
-            set_error_handler(array('CApp', 'exception_handler'));
-
-            // Set exception handler
-            set_exception_handler(array('CApp', 'exception_handler'));
-        }
-
         $this->run = true;
     }
 
@@ -265,8 +257,16 @@ class CApp extends CObservable {
         return CF::appCode();
     }
 
+    public function message($type, $message) {
+        return CApp_Message::add($type, $message);
+    }
+
     public function controller() {
         return CF::instance();
+    }
+
+    public static function config($path, $domain = null) {
+        return CApp_Config::get($path, $domain);
     }
 
     public function set_header_body($header_body) {
@@ -294,8 +294,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
-
-
+        
+      
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -351,10 +351,23 @@ class CApp extends CObservable {
         $this->breadcrumb[$caption] = $url;
         return $this;
     }
+    
+    public function getBreadcrumb() {
+        $breadcrumb = $this->breadcrumb;
+        if($this->breadcrumbCallback!=null) {
+            
+            
+            $breadcrumb = CFunction::factory($this->breadcrumbCallback)->addArg($this->breadcrumb)->execute();
+        }
+        return $breadcrumb;
+    }
+    
+    public function setBreadcrumbCallback($callback) {
+        $this->breadcrumbCallback = CHelper::closure()->serializeClosure($callback);
+        return $this;
+    }
 
     public function registerCoreModules() {
-
-
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
@@ -374,15 +387,17 @@ class CApp extends CObservable {
             }
             if ($cssArray != null) {
                 foreach ($cssArray as $css) {
-                    $cs->registerCssFiles($css);
+                    $manager->asset()->theme()->registerCssFile($css);
                 }
             }
             if ($jsArray != null) {
                 foreach ($jsArray as $js) {
-                    $cs->registerJsFiles($js);
+                    $manager->asset()->theme()->registerJsFiles($js);
                 }
             }
         }
+
+        $manager->registerThemeModule('block-ui');
     }
 
     public function set_additional_head($str) {
@@ -400,7 +415,8 @@ class CApp extends CObservable {
         }
         $this->rendered = true;
 
-
+        $this->registerCoreModules();
+        
 
         CFEvent::run('CApp.beforeRender');
 
@@ -432,7 +448,7 @@ class CApp extends CObservable {
         } else if ($this->activation) {
             $viewName = 'ccore/activation';
         } else if (!$this->is_user_login() && ccfg::get("have_user_login") && $this->login_required) {
-            $viewName = 'ccore/login';
+            $viewName = $this->viewLoginName;
         } else if (!$this->is_user_login() && ccfg::get("have_static_login") && $this->login_required) {
             $viewName = 'ccore/static_login';
         }
@@ -513,7 +529,7 @@ class CApp extends CObservable {
         $v->custom_footer = $this->custom_footer;
         $v->show_breadcrumb = $this->show_breadcrumb;
         $v->show_title = $this->show_title;
-        $v->breadcrumb = $this->breadcrumb;
+        $v->breadcrumb = $this->getBreadcrumb();
         $v->additional_head = $this->additional_head;
         $v->custom_data = $this->custom_data;
         $v->login_required = $this->login_required;
@@ -566,7 +582,7 @@ class CApp extends CObservable {
                 $member = null;
             $this->_member = $member;
         }
-        return $this->_admin;
+        return $this->_member;
     }
 
     public function user() {
@@ -663,7 +679,7 @@ class CApp extends CObservable {
         return $childList;
     }
 
-    public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
+    public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
 
         try {
             $app = CApp::instance();
@@ -718,26 +734,38 @@ class CApp extends CObservable {
 
             // Test if display_errors is on
             $trace = false;
+            $traceArray = false;
             if ($line != FALSE) {
                 // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
+                $traceArray = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
 
                 // Beautify backtrace
-                $trace = CF::backtrace($trace);
+                $trace = CF::backtrace($traceArray);
             }
 
+            if (!($exception instanceof CF_404_Exception)) {
+                $v = CView::factory('cmail/error_mail');
+                $v->error = $error;
+                $v->description = $description;
+                $v->file = $file;
+                $v->line = $line;
+                $v->trace = $trace;
+                $v->message = $message;
+                $html = $v->render();
+                $configCollector = CConfig::instance('collector');
+                if ($configCollector->get('exception')) {
+                    if ($PHP_ERROR) {
+                        CCollector::error($exception, $message, $file, $line, '');
+                    } else {
+                        CCollector::exception($exception);
+                    }
+                } else {
+                    cmail::error_mail($html);
+                }
+                
 
-
-            $v = CView::factory('cmail/error_mail');
-            $v->error = $error;
-            $v->description = $description;
-            $v->file = $file;
-            $v->line = $line;
-            $v->trace = $trace;
-            $v->message = $message;
-            $html = $v->render();
-
-            cmail::error_mail($html);
+                
+            }
 
 
             if ($PHP_ERROR) {
@@ -779,10 +807,15 @@ class CApp extends CObservable {
     public static function variables() {
         $variables = array();
         $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
+        $variables['decimalSeparator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
         $variables['thousand_separator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
+        $variables['thousandSeparator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
         $variables['decimal_digit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
+        $variables['decimalDigit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
         $variables['have_clock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
+        $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
         $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+        $variables['haveScrollToTop'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
 
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->get_theme_data();
@@ -796,14 +829,22 @@ class CApp extends CObservable {
         $variables['bootstrap'] = $bootstrap;
 
         $variables['base_url'] = curl::base();
+        $variables['baseUrl'] = curl::base();
         $variables['label_confirm'] = clang::__("Are you sure ?");
+        $variables['labelConfirm'] = clang::__("Are you sure ?");
         $variables['label_ok'] = clang::__("OK");
+        $variables['labelOk'] = clang::__("OK");
         $variables['label_cancel'] = clang::__("Cancel");
+        $variables['labelCancel'] = clang::__("Cancel");
         return $variables;
     }
 
     public function setViewName($viewName) {
         $this->viewName = $viewName;
+    }
+
+    public function setViewLoginName($viewLoginName) {
+        $this->viewLoginName = $viewLoginName;
     }
 
     /**

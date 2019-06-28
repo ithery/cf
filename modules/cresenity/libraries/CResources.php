@@ -95,6 +95,8 @@ class CResources {
         if (is_array($options)) {
             $orgCode = carr::get($options, 'org_code');
             $appCode = carr::get($options, 'app_code');
+        } else {
+            CCollector::deprecated('Resources options must passed as array');
         }
         if (!is_array($orgCode)) {
             if (strlen($orgCode) == 0) {
@@ -226,6 +228,21 @@ class CResources {
             }
         }
         return $results;
+    }
+    
+    public static function saveFromTemp($type, $resourceName, $tempPath, $resourceOptions = array()) {
+        if (!is_array($resourceOptions)) {
+            $resourceOptions = array();
+        }
+        
+        if (!isset($resourceOptions['app_code'])) {
+            $resourceOptions['app_code'] = CF::appCode();
+        }
+        
+        $resource = CResources::factory($type, $resourceName, $resourceOptions);
+        $filename = basename($tempPath);
+        $imageName = $resource->saveFromTemp($filename, $tempPath);
+        return $imageName;
     }
 
 }

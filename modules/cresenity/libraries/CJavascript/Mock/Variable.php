@@ -21,7 +21,6 @@ class CJavascript_Mock_Variable {
         return $cloned->addProp($name);
        
     }
-
     public function addProp($name) {
         $this->propStack[] = $name;
         return $this;

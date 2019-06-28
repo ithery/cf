@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CDatabase {
 
+    use CTrait_Compat_Database;
+
     // Database instances
     public static $instances = array();
     // Global benchmark
@@ -60,11 +62,13 @@ class CDatabase {
     protected $last_query = '';
     // Stack of queries for push/pop
     protected $query_history = array();
+    
+    protected $in_trans = false;
 
     /**
      * The event dispatcher instance.
      *
-     * @var CDatabase_Event
+     * @var CEvent_Dispatcher
      */
     protected $events;
 
@@ -257,7 +261,7 @@ class CDatabase {
 
 
 
-        $this->events = new CDatabase_Event();
+        $this->events = CDatabase_Dispatcher::instance();
         CModel::setEventDispatcher($this->events);
         $this->configuration = new CDatabase_Configuration();
 
@@ -1097,7 +1101,7 @@ class CDatabase {
      *
      * @return  string SQL
      */
-    public function last_query() {
+    public function lastQuery() {
         return $this->last_query;
     }
 
@@ -1383,13 +1387,13 @@ class CDatabase {
         return FALSE;
     }
 
-    protected $in_trans = false;
+    
 
     public function __destruct() {
         self::rollback();
     }
 
-    public function in_transaction() {
+    public function inTransaction() {
         return $this->in_trans;
     }
 
@@ -1411,13 +1415,13 @@ class CDatabase {
         $this->in_trans = false;
     }
 
-    public function escape_like($str) {
+    public function escapeLike($str) {
         //$str = str_replace(array($e, '_', '%'), array($e.$e, $e.'_', $e.'%'), $s);
         $str = $this->escape_str($str);
         return $str;
     }
 
-    public function driver_name() {
+    public function driverName() {
         return ucfirst($this->config['connection']['type']);
     }
 
@@ -1654,6 +1658,17 @@ class CDatabase {
     }
 
     /**
+     * Get a new raw query expression.
+     *
+     * @param  mixed  $value
+     * @return CDatabase_Query_Expression
+     */
+    public static function raw($value)
+    {
+        return new CDatabase_Query_Expression($value);
+    }
+
+    /**
      * Get the name of the connected database.
      *
      * @return string
@@ -1726,6 +1741,15 @@ class CDatabase {
             $res[$arr_key] = $arr_val;
         }
         return $res;
+    }
+
+    /**
+     * Get a new query builder instance.
+     *
+     * @return CDatabase_Query_Builder
+     */
+    public function createQueryBuilder() {
+        return new CDatabase_Query_Builder($this);
     }
 
 }

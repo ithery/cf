@@ -9,6 +9,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTrait_Compat_Handler_Driver_Dialog {
 
+    protected $js_class;
+    protected $js_class_manual;
+
+    /**
+     * @deprecated since version 1.2
+     * @param type $js_class
+     * @return $this
+     */
+    public function set_js_class($js_class) {
+        //set js class manual
+        $this->js_class_manual = $js_class;
+        return $this;
+    }
+
     /**
      * 
      * @deprecated, please use setTitle
@@ -22,4 +36,5 @@ trait CTrait_Compat_Handler_Driver_Dialog {
     public function add_param_input($inputs) {
         return $this->addParamInput($inputs);
     }
+
 }

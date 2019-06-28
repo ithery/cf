@@ -19,4 +19,14 @@ trait CTrait_Compat_Element_FormInput_Date {
         return $this->setPlaceholder($placeholder);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2
+     * @param type $placeholder
+     * @return type
+     */
+    public function set_start_date($str) {
+    	return $this->setStartDate($str);
+    }
+
 }

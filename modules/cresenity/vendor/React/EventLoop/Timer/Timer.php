@@ -2,6 +2,8 @@
 
 namespace React\EventLoop\Timer;
 
+use React\EventLoop\TimerInterface;
+
 /**
  * The actual connection implementation for TimerInterface
  *
@@ -25,7 +27,7 @@ final class Timer implements TimerInterface
      * @param callable      $callback The callback that will be executed when this timer elapses
      * @param bool          $periodic Whether the time is periodic
      */
-    public function __construct($interval, callable $callback, $periodic = false)
+    public function __construct($interval, $callback, $periodic = false)
     {
         if ($interval < self::MIN_INTERVAL) {
             $interval = self::MIN_INTERVAL;
@@ -36,25 +38,16 @@ final class Timer implements TimerInterface
         $this->periodic = (bool) $periodic;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInterval()
     {
         return $this->interval;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCallback()
     {
         return $this->callback;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPeriodic()
     {
         return $this->periodic;

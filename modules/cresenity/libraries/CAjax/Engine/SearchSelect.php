@@ -17,38 +17,30 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
             return $this->searchSelectElastic($obj, $input);
         }
         $q = carr::get($data, 'query');
-        $key_field = carr::get($data, 'key_field');
+        $key_field = carr::get($data, 'keyField',carr::get($data,'key_field'));
 
-        $search_field = carr::get($data, 'search_field');
+        $search_field = carr::get($data, 'searchField',carr::get($data,'search_field'));
 
         $db = CDatabase::instance();
 
-        $callback = "";
         $term = "";
         $limit = "";
         $page = "";
 
-        if (isset($input["callback"])) {
-            $callback = $input["callback"];
-        }
-        if (isset($input["term"])) {
-            $term = $input["term"];
-        }
-        if (isset($input["q"])) {
-            $term = $input["q"];
-        }
-        if (isset($input["limit"])) {
-            $limit = $input["limit"];
-        }
-        if (isset($input["page"])) {
-            $page = $input["page"];
-        }
+        $callback = carr::get($input, 'callback', '');
+        $term = carr::get($input, 'q', carr::get($input, 'term', ''));
+        $limit = carr::get($input, 'limit', '');
+        $page = carr::get($input, 'page', '');
+
+        $valueCallbackFunction = carr::get($data, "valueCallback", null);
+
+
         $base_q = $q;
         $pos_order_by = strpos(strtolower($base_q), "order by", strpos(strtolower($base_q), 'from'));
 
         $pos_last_kurung = strrpos(strtolower($base_q), ")");
         if (isset($_GET['bdebug'])) {
-            cdbg::var_dump($pos_order_by);
+            cdbg::var_dump($data);
             cdbg::var_dump($pos_last_kurung);
             die();
         }
@@ -148,9 +140,14 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
         foreach ($r as $row) {
             $p = array();
             foreach ($row as $k => $v) {
+                if ($valueCallbackFunction != null && is_callable($valueCallbackFunction)) {
+                    $v = call_user_func($valueCallbackFunction, $row, $k, $v);
+                }
                 $p[$k] = ($v == null) ? "" : $v;
             }
-            $p["id"] = $row[$key_field];
+            if (strlen($key_field) > 0) {
+                $p["id"] = carr::get($row, $key_field);
+            }
             //$p["id"]=$row["item_id"];
             $data[] = $p;
         }

@@ -423,7 +423,7 @@ abstract class CModel implements ArrayAccess {
      * @param  array  $extra
      * @return int
      */
-    protected function increment($column, $amount = 1, array $extra = []) {
+    public function increment($column, $amount = 1, array $extra = []) {
         return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
     }
 
@@ -435,7 +435,7 @@ abstract class CModel implements ArrayAccess {
      * @param  array  $extra
      * @return int
      */
-    protected function decrement($column, $amount = 1, array $extra = []) {
+    public function decrement($column, $amount = 1, array $extra = []) {
         return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
     }
 
@@ -1018,7 +1018,7 @@ abstract class CModel implements ArrayAccess {
             $this->getUpdatedAtColumn(),
         ];
 
-        $attributes = Arr::except(
+        $attributes = carr::except(
                         $this->attributes, $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 

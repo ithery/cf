@@ -11,7 +11,13 @@ class CElement_Component_Form extends CElement_Component {
     protected $action;
     protected $target;
     protected $enctype;
+
+    /**
+     *
+     * @var CElement_Component_Form_Validation
+     */
     protected $validation;
+    protected $remoteValidationUrl;
     protected $trigger_submit;
     protected $ajax_submit;
     protected $ajax_success_script_callback;
@@ -28,6 +34,7 @@ class CElement_Component_Form extends CElement_Component {
     protected $auto_set_focus;
     protected $action_before_submit;
     protected $disable_js;
+    protected $submitListener;
 
     public function __construct($form_id = "") {
         parent::__construct($form_id);
@@ -68,12 +75,31 @@ class CElement_Component_Form extends CElement_Component {
         return new CElement_Component_Form($id);
     }
 
-    public function set_name($name) {
+    public function onSubmitListener() {
+        return $this->addListener('submit');
+    }
+    
+    /**
+     * 
+     * @param string $event
+     * @return CObservable_Listener
+     */
+    public function addListener($event) {
+        if ($event != 'submit') {
+            return parent::addListener($event);
+        }
+        if ($this->submitListener == null) {
+            $this->submitListener = new CObservable_Listener($this->id, $event);
+        }
+        return $this->submitListener;
+    }
+
+    public function setName($name) {
         $this->name = $name;
         return $this;
     }
 
-    public function set_layout($layout) {
+    public function setLayout($layout) {
         $this->layout = $layout;
         return $this;
     }
@@ -134,11 +160,28 @@ class CElement_Component_Form extends CElement_Component {
 
     /**
      * 
-     * @param bool $bool
+     * @param mixed $validation
      * @return $this
      */
-    public function setValidation($bool) {
-        $this->validation = $bool;
+    public function setValidation($validationData = true) {
+
+
+        if (is_array($validationData)) {
+            CManager::asset()->module()->registerRunTimeModules('validate');
+            $this->validation = new CElement_Component_Form_Validation($validationData);
+
+            $ajaxMethod = CAjax::createMethod();
+            $ajaxMethod->setType('Validation');
+            $ajaxMethod->setData('dataValidation', $validationData);
+            $ajaxMethod->setData('formId', $this->id());
+            $ajaxUrl = $ajaxMethod->makeUrl();
+
+            $this->remoteValidationUrl = $ajaxUrl;
+            return $this;
+        }
+
+
+        $this->validation = $validationData;
         return $this;
     }
 
@@ -242,68 +285,58 @@ class CElement_Component_Form extends CElement_Component {
         return $data;
     }
 
-    public function html($indent = 0) {
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
-
-        $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
-        $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
-        if (strlen($custom_css) > 0) {
-            $custom_css = ' style="' . $custom_css . '"';
-        }
-        $addition_str = "";
+    public function build() {
         if ($this->autocomplete) {
-            $addition_str .= ' autocomplete="on"';
+            $this->setAttr('autocomplete', 'on');
         } else {
-            $addition_str .= ' autocomplete="off"';
+            $this->setAttr('autocomplete', 'off');
         }
         if (strlen($this->enctype) > 0) {
-            $addition_str .= ' enctype="' . $this->enctype . '"';
+            $this->setAttr('enctype', $this->enctype);
         }
-
-
-
-        if ($this->bootstrap == '3.3') {
-            $form_style_layout = '';
-            if (strlen($this->layout) > 0) {
-                $form_style_layout = 'form-' . $this->layout;
-            }
-            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->incIndent()
-                    ->br();
-//                $html->appendln("<div class='box-body'>");
-        } else {
-            $form_style_layout = '';
-            if (strlen($this->layout) > 0) {
-                $form_style_layout = 'form-' . $this->layout;
-            }
-            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->incIndent()
-                    ->br();
+        if (strlen($this->name) > 0) {
+            $this->setAttr('name', $this->name);
         }
-
+        if (strlen($this->target) > 0) {
+            $this->setAttr('target', $this->target);
+        }
+        if (strlen($this->method) > 0) {
+            $this->setAttr('method', $this->method);
+        }
+        if (strlen($this->action) > 0) {
+            $this->setAttr('action', $this->action);
+        }
+        if (strlen($this->remoteValidationUrl) > 0) {
+            $this->setAttr('remote-validation-url', $this->remoteValidationUrl);
+        }
+        if (strlen($this->layout) > 0) {
+            $this->addClass('form-' . $this->layout);
+        }
         if ($this->ajax_process_progress) {
-            $html->appendln('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
+            $this->add('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
         }
-        $html->appendln($this->htmlChild($html->getIndent()));
-        if ($this->bootstrap == '3.3') {
-//                $html->appendln("</div>");
-        }
-
-        $html->decIndent()
-                ->appendln('</form>');
-        return $html->text();
     }
 
     public function js($indent = 0) {
-        if ($this->disable_js)
+        if ($this->disable_js) {
             return parent::js($indent);
+        }
+
+
         $js = new CStringBuilder();
         $js->setIndent($indent);
+        if ($this->validation instanceof CElement_Component_Form_Validation) {
+            $js->append($this->validation->validator()->selector('#' . $this->id()));
+        }
+
+        $jsSubmitHandlers = '';
+        $jsSubmitReturn = 'return true;';
+        if ($this->submitListener != null) {
+            foreach ($this->submitListener->handlers() as $handler) {
+                $jsSubmitHandlers .= $handler->js();
+                $jsSubmitReturn = 'return false;';
+            }
+        }
         if ($this->ajax_submit) {
             $ajax_url = "";
             $ajax_process_script = "";
@@ -697,7 +730,10 @@ class CElement_Component_Form extends CElement_Component {
                             $('#" . $this->id . " .confirm').removeAttr('data-submitted');
                             return false;
                         }
+                        
 
+                        " . $jsSubmitHandlers . "
+                        " . $jsSubmitReturn . "
                     });
                 ");
 

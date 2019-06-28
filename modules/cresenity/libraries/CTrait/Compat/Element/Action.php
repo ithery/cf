@@ -88,4 +88,8 @@ trait CTrait_Compat_Element_Action {
         return $this->renderAsInput();
     }
 
+    public function set_jsparam($jsparam) {
+        return $this->setJsParam($jsparam);
+    }
+
 }

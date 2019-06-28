@@ -7,20 +7,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 3:43:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CObservable_Listener {
+class CObservable_Listener extends CObservable_ListenerAbstract {
 
     use CTrait_Compat_Listener;
 
-    protected $event;
-    protected $handlers;
-    protected $owner;
     protected $confirm;
     protected $confirm_message;
     protected $no_double;
 
-    public function __construct($owner, $event) {
-        $this->owner = $owner;
-        $this->handlers = array();
+    public function __construct($owner, $event = 'click') {
+        parent::__construct($owner);
         $this->confirm = false;
         $this->confirm_message = "";
         $this->no_double = false;
@@ -42,51 +38,16 @@ class CObservable_Listener {
         return $this;
     }
 
+    public function getEvent() {
+        return $this->event;
+    }
+
     public function setConfirmMessage($message) {
         $this->confirm_message = $message;
         return $this;
     }
 
-    public function owner() {
-        return $this->owner;
-    }
-
-    public function setOwner($owner) {
-        $this->owner = $owner;
-        //we set all handler owner too
-        foreach ($this->handlers as $handler) {
-            $handler->set_owner($owner);
-        }
-        return $this;
-    }
-
-    public function handlers() {
-        return $this->handlers;
-    }
-
-    public function setHandlerUrlParam($param) {
-
-        foreach ($this->handlers as $handler) {
-            $handler->set_url_param($param);
-        }
-    }
-
-    /**
-     * 
-     * @param string $handlerName
-     * @return CObservable_Listener_Handler
-     */
-    public function addHandler($handlerName) {
-        $handler = new CObservable_Listener_Handler($this->owner, $this->event, $handlerName);
-        $this->handlers[] = $handler;
-        return $handler;
-    }
-
-    public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->setIndent($indent);
-
-
+    public function getBodyJs() {
         $startScript = "
             var thiselm=jQuery(this);
             var clicked = thiselm.attr('data-clicked');
@@ -131,47 +92,37 @@ class CObservable_Listener {
                 });
             ";
         }
+        $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;
+        return $compiledJs;
+    }
+    
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
 
+        $compiledJs = $this->getBodyJs();
+        
+        $eventParameterImploded = implode(',', $this->eventParameters);
         if ($this->event == 'lazyload') {
             $js->append("
                     jQuery(window).ready(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $startScript . "
-                                " . $confirmStartScript . "
-                                " . $handlersScript . "
-                                " . $confirmEndScript . "
+                                " . $compiledJs . "
                             }
                     });
                     jQuery(window).scroll(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $startScript . "
-                                " . $confirmStartScript . "
-                                " . $handlersScript . "
-                                " . $confirmEndScript . "
+                                " . $compiledJs . "
                             }
                     });
                 ");
         } else {
-            $js->append('
-                    jQuery("#' . $this->owner . '").' . $this->event . '(function() {
-
-                        ' . $startScript . '
-                        ' . $confirmStartScript . '
-                        ' . $handlersScript . '
-                        ' . $confirmEndScript . '
-
+            $js->append("
+                    jQuery('#" . $this->owner . "')." . $this->event . "(function(" . $eventParameterImploded . ") {
+                        " . $compiledJs . "
                     });
-                ');
+                ");
         }
-
-        //           $js->append("
-        // 	jQuery('#" . $this->owner . "')." . $this->event . "(function() {				
-        // 		" . $startScript . "
-        // 		" . $confirmStartScript . "
-        // 		" . $handlersScript . "
-        // 		" . $confirmEndScript . "
-        // 	});
-        // ");
 
         return $js->text();
     }

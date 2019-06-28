@@ -26,7 +26,8 @@ class CFunction {
     public $type = "defined"; //defined,class,
 
     private function __construct($func) {
-        $this->func = $func;
+
+        $this->func = CHelper::closure()->deserializeClosure($func);
     }
 
     public static function factory($func) {
@@ -58,6 +59,13 @@ class CFunction {
     }
 
     public function setRequire($p) {
+        if ($p == null) {
+            $p = array();
+        }
+        if (is_string($p)) {
+            $p = array($p);
+        }
+
         $this->requires = $p;
         return $this;
     }
@@ -67,7 +75,9 @@ class CFunction {
             $args = array($args);
         }
         foreach ($this->requires as $r) {
-            require_once $r;
+            if (strlen($r) > 0 && file_exists($r)) {
+                require_once $r;
+            }
         }
         $args = array_merge($args, $this->args);
 
@@ -83,6 +93,16 @@ class CFunction {
             }
         }
         if ($error == 0) {
+            if ($this->func instanceof Closure) {
+                return call_user_func_array($this->func, $args);
+            }
+        }
+        if ($error == 0) {
+            if (is_callable($this->func)) {
+                return call_user_func_array($this->func, $args);
+            }
+        }
+        if ($error == 0) {
             //not array let check if it is a function name
             if (function_exists($this->func)) {
                 return call_user_func_array($this->func, $args);
@@ -95,6 +115,13 @@ class CFunction {
             }
         }
         if ($error == 0) {
+            //not the function name, let check it if it is function from CHelper_Transform class
+            $transform = CHelper::transform();
+            if (is_callable(array($transform, $this->func))) {
+                return call_user_func_array(array($transform, $this->func), $args);
+            }
+        }
+        if ($error == 0) {
             //it is not method from ctransform class, try the other class if it is found ::
             if (strpos($this->func, "::") !== false) {
                 return call_user_func_array(explode("::", $this->func), $args);
@@ -104,7 +131,7 @@ class CFunction {
         if ($error == 0) {
             return $this->func;
         }
-        return "ERROR";
+        return "ERROR ON CFUNCTION";
     }
 
 }

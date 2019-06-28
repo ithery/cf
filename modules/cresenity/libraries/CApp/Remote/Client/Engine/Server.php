@@ -48,4 +48,11 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         return $data;
     }
 
+    public function getFileList($directory) {
+        $post = array();
+        $post['directory'] = $directory;
+        $data = $this->request($this->baseUrl . 'GetFileList', $post);
+        return $data;
+    }
+
 }

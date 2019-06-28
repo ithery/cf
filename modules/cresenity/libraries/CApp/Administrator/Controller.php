@@ -12,11 +12,11 @@ use CApp_Administrator as Administrator;
 class CApp_Administrator_Controller extends CController {
 
     public function __construct() {
-        parent::__construct();
         $manager = CManager::instance();
         $manager->theme()->setThemeCallback(function($theme) {
             return 'cresenity-administrator';
         });
+        parent::__construct();
         $app = CApp::instance();
         $app->setLoginRequired(false);
 

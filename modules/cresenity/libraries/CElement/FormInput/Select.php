@@ -17,7 +17,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
     protected $dropdown_classes;
     protected $hide_search;
     protected $maximumSelectionLength;
-
+    protected $placeholder;
+    
     public function __construct($id) {
         parent::__construct($id);
 
@@ -25,12 +26,13 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->tag = "select";
         $this->multiple = false;
         $this->type = "select";
+        $this->placeholder = "";
         $this->applyJs = "false";
         $this->hide_search = false;
         $this->maximumSelectionLength = false;
     }
 
-    public function setMultiple($bool) {
+    public function setMultiple($bool = true) {
         $this->multiple = $bool;
         return $this;
     }
@@ -61,7 +63,10 @@ class CElement_FormInput_Select extends CElement_FormInput {
         }
         return $this;
     }
-
+    public function setPlaceholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
     public function toarray() {
         $data = array();
         $data = array_merge_recursive($data, parent::toarray());
@@ -114,12 +119,14 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $multiple = ' multiple="multiple"';
         }
         $name = $this->name;
-        if ($this->multiple)
+        if ($this->multiple) {
             $name = $name . "[]";
+        }
         $classes = $this->classes;
         $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
+        if (strlen($classes) > 0) {
             $classes = " " . $classes;
+        }
 
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
@@ -156,11 +163,13 @@ class CElement_FormInput_Select extends CElement_FormInput {
             foreach ($this->list as $k => $v) {
                 $selected = "";
                 if (is_array($this->value)) {
-                    if (in_array($k, $this->value))
+                    if (in_array($k, $this->value)) {
                         $selected = ' selected="selected"';
+                    }
                 } else {
-                    if ($this->value == (string) $k)
+                    if ($this->value == (string) $k) {
                         $selected = ' selected="selected"';
+                    }
                 }
                 $value = $v;
                 $addition_attribute = ' ';
@@ -191,6 +200,10 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
+        $placeholder = "";
+        if (strlen($this->placeholder) > 0) {
+            $placeholder = $this->placeholder;
+        }
         if ($this->applyJs == "select2") {
             if ($this->select2 == '4') {
                 CManager::instance()->registerModule('select2-4.0');
@@ -217,7 +230,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
             if ($this->maximumSelectionLength !== false) {
                 $js->append("maximumSelectionLength: " . $this->maximumSelectionLength . ",");
             }
-            $js->append("containerCssClass : 'tpx-select2-container " . $classes . "'");
+            $js->append("containerCssClass : 'tpx-select2-container " . $classes . "',");
+            $js->append("placeholder : '" . $placeholder . "'");
             $js->append("});")->br();
         }
         if ($this->applyJs == "chosen") {
