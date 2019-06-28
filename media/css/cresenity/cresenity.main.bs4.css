@@ -3,7 +3,9 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto:400,300,500,700");
 
 
-
+.material-style .layout-sidenav {
+    height: 100%;
+}
 .navbar .brand {
     color:unset!important;
     float: none;
