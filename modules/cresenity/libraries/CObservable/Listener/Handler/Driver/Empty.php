@@ -36,6 +36,7 @@ class CObservable_Listener_Handler_Driver_Empty extends CObservable_Listener_Han
 
     public function set_method($method) {
         $this->method = $method;
+        return $this;
     }
 
     public function content() {
