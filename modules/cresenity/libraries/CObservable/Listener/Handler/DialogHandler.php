@@ -77,6 +77,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
     public function set_method($method) {
         $this->method = $method;
+        return $this;
     }
 
     public function content() {
