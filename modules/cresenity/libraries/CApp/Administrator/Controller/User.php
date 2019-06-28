@@ -12,9 +12,6 @@ use CApp_Administrator as Administrator;
 class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
 
     public function __construct() {
-        parent::__construct();
-        $app = CApp::instance();
-
         if (!Administrator::isLogin()) {
             $app->setViewName('administrator/login');
         }
@@ -23,6 +20,10 @@ class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
             return 'administrator';
         });
 
+        parent::__construct();
+        $app = CApp::instance();
+
+        
 
         CManager::instance()->navigation()->setNavigationCallback(function($navs) {
             $navFile = CF::getFile('data', 'Administrator/Navigation');

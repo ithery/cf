@@ -24,6 +24,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
     protected $param_request;
     protected $isSidebar;
     protected $modalClass;
+    protected $backdrop;
 
     public function __construct($listener) {
         parent::__construct($listener);
@@ -43,9 +44,14 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         $this->isSidebar = $bool;
         return $this;
     }
-    
+
     public function setModalClass($class) {
         $this->modalClass = $class;
+        return $this;
+    }
+
+    public function setBackdrop($backdrop) {
+        $this->backdrop = $backdrop;
         return $this;
     }
 
@@ -107,11 +113,17 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         $reloadOptions .= "dataAddition:" . $dataAddition . ",";
         $reloadOptions .= "}";
 
+        $backdropValue = "'static'";
+
+        if (is_bool($this->backdrop)) {
+            $backdropValue = $this->backdrop ? 'true' : 'false';
+        }
 
         $jsOptions = "{";
         $jsOptions .= "selector:'#" . $this->target . "',";
         $jsOptions .= "title:'" . $this->title . "',";
         $jsOptions .= "modalClass:'" . $this->modalClass . "',";
+        $jsOptions .= "backdrop:" . $backdropValue . ",";
         $jsOptions .= "reload:" . $reloadOptions . ",";
         if ($this->haveCloseListener()) {
             $jsOptions .= "onClose:" . $this->getCloseListener()->js() . ",";

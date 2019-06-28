@@ -34,6 +34,7 @@ class carr {
         // not be associative (e.g. the keys array looked like {0:0, 1:1...}).
         return array_keys($keys) !== $keys;
     }
+
     /**
      * Alias of isAssoc
      * 
@@ -957,6 +958,59 @@ class carr {
      */
     public static function only($array, $keys) {
         return array_intersect_key($array, array_flip((array) $keys));
+    }
+
+    /**
+     * Alias of array reset
+     * 
+     * @param array $array
+     * @return mixed the value of the first array element, or <b>FALSE</b> if the array is
+     */
+    public static function head($array) {
+        return reset($array);
+    }
+
+    public static function implode($glue, $separator, $array) {
+        if (!is_array($array)) {
+            return $array;
+        }
+        $string = array();
+        foreach ($array as $key => $val) {
+            if (is_array($val)) {
+                $val = carr::implodes(',', $val);
+            }
+            $string[] = "{$key}{$glue}{$val}";
+        }
+        return implode($separator, $string);
+    }
+
+    public static function implodes($glue, $array) {
+        if (!is_array($array)) {
+            return $array;
+        }
+        $ret = '';
+        foreach ($array as $item) {
+            if (is_array($item)) {
+                $ret .= self::implodes($item, $glue) . $glue;
+            } else {
+                $ret .= $item . $glue;
+            }
+        }
+        $ret = substr($ret, 0, 0 - strlen($glue));
+        return $ret;
+    }
+
+    public static function inArrayWildcard($what, $array) {
+        foreach ($array as $pattern) {
+            if (cstr::is($pattern, $what)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function isIterable($var) {
+        return is_array($var) || $var instanceof \Traversable;
     }
 
 }

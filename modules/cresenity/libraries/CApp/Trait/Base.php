@@ -258,7 +258,7 @@ trait CApp_Trait_Base {
     public static function noImageUrl($width = 100, $height = 100) {
         return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height;
     }
-    
+
     public static function transparentImageUrl($width = 100, $height = 100) {
         return curl::httpbase() . 'cresenity/transparent/' . $width . '/' . $height;
     }
@@ -325,6 +325,20 @@ trait CApp_Trait_Base {
 
     public static function isLogin() {
         return static::userId() != null;
+    }
+
+    public static function environment() {
+        $domain = CF::domain();
+        if (strpos($domain, 'app.ittron.co.id') !== false) {
+            return 'appbox';
+        }
+        if (strpos($domain, 'dev.ittron.co.id') !== false) {
+            return 'development';
+        }
+        if (strpos($domain, 'staging.ittron.co.id') !== false) {
+            return 'staging';
+        }
+        return carr::get(CF::config('environment'), 'environment', 'production');
     }
 
 }

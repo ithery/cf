@@ -105,4 +105,13 @@ class CVendor {
         return new CVendor_Xendit($options);
     }
 
+    /**
+     * 
+     * @param type $options
+     * @return \CVendor_Odoo_Client
+     */
+    public static function odoo($options) {
+        return CVendor_Odoo::getClient($options);
+    }
+
 }
