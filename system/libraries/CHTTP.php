@@ -11,6 +11,10 @@ class CHTTP {
 
     protected static $request;
 
+    /**
+     * 
+     * @return CHTTP_Request
+     */
     public static function request() {
         if (self::$request == null) {
             self::$request = CHTTP_Request::capture();

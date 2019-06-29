@@ -669,6 +669,20 @@ return array(
             "plugins/quill/quill.core.css",
         ),
     ),
+    "tippy" => array(
+        "js" => array(
+            "plugins/tippy/tippy.js",
+        ),
+    ),
+    "pdfjs" => array(
+        "js" => array(
+            "plugins/pdfjs/pdf.js",
+            "plugins/pdfjs/viewer.js",
+        ),
+        "css" => array(
+            "plugins/pdfjs/viewer.css",
+        ),
+    ),
     "bootstrap-daterangepicker" => array(
         "js" => array(
             "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.js",
