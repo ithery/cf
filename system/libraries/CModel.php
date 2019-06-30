@@ -1470,7 +1470,7 @@ abstract class CModel implements ArrayAccess {
                 cdbg::var_dump(nl2br($ex->getTraceAsString()));
             }
             throw new BadMethodCallException(
-            sprintf('Call to undefined method %s::%s()', get_class($this), $method)
+            sprintf('Call to undefined method %s::%s()'.$e->getMessage(), get_class($this), $method)
             );
         }
     }
