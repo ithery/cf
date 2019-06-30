@@ -76,6 +76,7 @@ trait CDatabase_Trait_Builder {
      * @return mixed
      */
     public function when($value, $callback, $default = null) {
+      
         if ($value) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {

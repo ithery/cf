@@ -706,7 +706,7 @@ class CModel_Query {
      * @return CModel|$this
      */
     public function create(array $attributes = []) {
-        return $this->tap($this->newModelInstance($attributes), function ($instance) {
+        return CF::tap($this->newModelInstance($attributes), function ($instance) {
                     $instance->save();
                 });
     }
@@ -1167,13 +1167,13 @@ class CModel_Query {
      * @return mixed
      */
     public function __call($method, $parameters) {
-        
+
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];
 
             return;
         }
-        
+
         if (isset($this->localMacros[$method])) {
             array_unshift($parameters, $this);
 
@@ -1188,14 +1188,14 @@ class CModel_Query {
 
             return call_user_func_array(static::$macros[$method], $parameters);
         }
-        
+
         if (method_exists($this->model, $scope = 'scope' . ucfirst($method))) {
-          
+
             return $this->callScope([$this->model, $scope], $parameters);
         }
-        
+
         if (in_array($method, $this->passthru)) {
-             
+
             try {
                 $base = $this->toBase();
                 $class = new ReflectionClass(get_class($base));
@@ -1232,7 +1232,7 @@ class CModel_Query {
 
 
         $class = new ReflectionClass(get_class($this->query));
-        
+
         try {
             try {
                 // Load the controller method
