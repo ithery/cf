@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 12, 2019, 8:26:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable {
+class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CValidation_MessageBagInterface {
 
     /**
      * All of the registered messages.
