@@ -48,5 +48,10 @@ trait CTrait_Compat_Database {
     }
     
     
+    public function begin() {
+        return $this->beginTransaction();
+        
+    }
+    
     
 }
