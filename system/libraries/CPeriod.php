@@ -57,4 +57,27 @@ class CPeriod {
         $this->endDate = $endDate;
     }
 
+    public static function createFromInterval($interval = 'month', $count = 1, $start = '') {
+        if (empty($start)) {
+            $start = CCarbon::now();
+        } elseif (!$start instanceof Carbon) {
+            $start = new CCarbon($start);
+        } else {
+            $start = $start;
+        }
+
+        $startCloned = clone $start;
+        $method = 'add' . ucfirst($interval) . 's';
+        $end = $startCloned->{$method}($count);
+        return new static($start, $end);
+    }
+
+    public function getEndDate() {
+        return $this->endDate;
+    }
+
+    public function getStartDate() {
+        return $this->startDate;
+    }
+
 }
