@@ -461,6 +461,22 @@ var Cresenity = function () {
 
     this.filesAdded = "";
     this.modalElements = [];
+    this.loadJs = function (filename, callback) {
+        var fileref = document.createElement('script');
+        fileref.setAttribute("type", "text/javascript");
+        fileref.setAttribute("src", filename);
+        // IE 6 & 7
+        if (typeof (callback) === 'function') {
+            fileref.onload = callback;
+            fileref.onreadystatechange = function () {
+                if (this.readyState == 'complete') {
+                    callback();
+                }
+            }
+        }
+        document.getElementsByTagName("head")[0].appendChild(fileref);
+
+    }
     this.loadJsCss = function (filename, filetype, callback) {
         if (filetype == "js") { //if filename is a external JavaScript file
             var fileref = document.createElement('script')
@@ -715,19 +731,19 @@ var Cresenity = function () {
                         var Next = function () {
                             this.isRunning = false;
                             this.callback = (delay) => {
-                                if(typeof delay =='undefined') {
-                                    delay=0;
+                                if (typeof delay == 'undefined') {
+                                    delay = 0;
                                 }
-                                if(typeof parseInt(delay) == 'NaN') {
-                                    delay=0;
+                                if (typeof parseInt(delay) == 'NaN') {
+                                    delay = 0;
                                 }
-                                
-                                setTimeout(function(){
+
+                                setTimeout(function () {
                                     console.log('removed');
                                     $(modal).remove();
                                     cresenity.modalElements.pop();
-                                    
-                                },delay);
+
+                                }, delay);
                                 this.isRunning = true;
                             }
                         }
