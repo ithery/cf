@@ -2198,8 +2198,10 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     public function exists() {
-        $results = $this->db->select(
-                $this->grammar->compileExists($this), $this->getBindings(), !$this->useWritePdo
+       
+        
+        $results = $this->db->query(
+                $this->grammar->compileExists($this), $this->getBindings()
         );
 
         // If the results has rows, we will get the row and see if the exists column is a
