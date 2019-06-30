@@ -48,6 +48,7 @@ final class CF {
     private static $data;
     private static $sharedAppCode = array();
     public static $instances;
+    private static $translator;
 
     /**
      * @var  CLogger  logging object
