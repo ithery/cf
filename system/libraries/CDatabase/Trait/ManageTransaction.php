@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CDatabase_Trait_ManageTransaction {
 
+    protected $isSavePoint = false;
+
     /**
      * Execute a Closure within a transaction.
      *
@@ -80,10 +82,23 @@ trait CDatabase_Trait_ManageTransaction {
      *
      * @throws \Exception
      */
-    public function beginTransaction() {
+    public function beginTransaction($isSavePoint = true) {
+        if ($this->transactions == 0) {
+            $this->isSavePoint = $isSavePoint;
+        }
         $this->createTransaction();
         $this->transactions++;
         $this->fireConnectionEvent('beganTransaction');
+    }
+
+    /**
+     * Alias of beginTransaction but will not create save point
+     * 
+     * @return void
+     * @throws \Exception
+     */
+    public function begin() {
+        return $this->beginTransaction(false);
     }
 
     /**
@@ -92,6 +107,10 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     protected function createTransaction() {
+        if ($this->transactions > 0 && !$this->isSavePoint) {
+            //no need to handle this transaction
+            return;
+        }
         if ($this->transactions == 0) {
             try {
                 $this->driver->beginTransaction();
