@@ -483,7 +483,10 @@ class CApp extends CObservable {
         foreach ($css_urls as $url) {
 
             $additional_js .= "
-					$.cresenity._filesadded+='['+'" . $url . "'+']'
+					$.cresenity._filesadded+='['+'" . $url . "'+']';
+					if(cresenity) {
+                                            cresenity.filesAdded+='['+'" . $url . "'+']';
+                                        }
 				";
         }
         $js = "";
