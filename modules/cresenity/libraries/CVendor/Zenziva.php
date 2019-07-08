@@ -54,11 +54,11 @@ class CVendor_Zenziva
 
 	public function send($to = '', $message = '')
 	{
-		if (! $to) {
+		if ($to) {
 			$this->to($to);
 		}
 
-		if (! $message) {
+		if ($message) {
 			$this->message($message);
 		}
 
@@ -82,14 +82,24 @@ class CVendor_Zenziva
 			'userkey' => $this->username,
 			'passkey' => $this->password,
 			'nohp' => $this->to,
-			'pesan' => urlencode($this->message),
+			'pesan' => $this->message,
 		];
 
 		$client = new Client();
-		$response = $client->request('POST', $this->url(), $options);
 
-		$this->lastResponse = $response->getBody();
-		$this->responses[] = $this->lastResponse;
+		try {
+			$response = $client->request('POST', $this->url(), ['form_params' => $options]);
+
+			$this->lastResponse = json_decode($response->getBody()->getContents());
+			$this->responses[] = $this->lastResponse;
+
+			return true;
+		} catch (Exception $e) {
+			$this->lastError = $e->getMessage();
+			$this->errors[] = $this->lastError;
+
+			return false;
+		}
 	}
 
 	private function url()
