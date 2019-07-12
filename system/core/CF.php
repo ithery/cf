@@ -1912,7 +1912,7 @@ final class CF {
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
 
-                    $temp .= $sep . chtml::specialchars(print_r($arg, TRUE));
+                    $temp .= $sep . chtml::specialchars(@print_r($arg, TRUE));
 
                     // Change separator to a comma
                     $sep = ', ';
