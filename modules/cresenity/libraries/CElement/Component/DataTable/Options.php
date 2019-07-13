@@ -10,11 +10,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CElement_Component_DataTable_Options extends CList {
 
     private $default_options = array(
-        "defer_render" => true,
-        "filter" => true,
-        "info" => true,
-        "length_change" => true,
-        "pagination" => true,
+        "bDeferRender" => true,
+        "bFilter" => true,
+        "bInfo" => true,
+        "bPaginate" => true,
+        "bLengthChange" => true,
         "height" => false,
     );
 
