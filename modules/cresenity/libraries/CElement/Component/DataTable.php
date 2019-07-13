@@ -850,7 +850,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function html($indent = 0) {
 
-
+        $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $wrapped = ($this->apply_data_table > 0) || $this->have_header_action() || strlen($this->title) > 0;
@@ -927,6 +927,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function js($indent = 0) {
+        $this->buildOnce();
         $ajax_url = "";
         if ($this->ajax) {
             $columns = array();
