@@ -1121,9 +1121,9 @@ class CElement_Component_DataTable extends CElement_Component {
 					},
 				")
                         ->appendln("'fnInitComplete': function() {
-					this.fnAdjustColumnSizing(true);
-					},
-				")
+                                this.fnAdjustColumnSizing(true);
+                            },
+                        ")
                 ;
             }
             /*

@@ -1,0 +1,39 @@
+<?php
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @since Jun 13, 2018, 9:04:32 AM
+ * @license Ittron Global Teknologi <ittron.co.id>
+ */
+if (!isset($icon)) {
+    $icon = 'lnr lnr-cart';
+}
+if (!isset($label)) {
+    $label = '[EMPTY LABEL]';
+}
+if (!isset($amount)) {
+    $amount = '0';
+}
+if (!isset($action_link)) {
+    $action_link = '';
+}
+?>
+
+<div class="card card-small mb-3">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <div class="<?php echo $icon; ?> "></div>
+            <div class="ml-3">
+                <div class="text-muted small"><?php echo $label; ?></div>
+                <div class="text-large"><?php echo $amount; ?></div>
+            </div>
+            <?php if (strlen($action_link) > 0): ?>
+                <a href="<?php echo $action_link; ?>" class="btn btn-primary ml-auto">
+                    <i class="fas fa-cog"></i>
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
