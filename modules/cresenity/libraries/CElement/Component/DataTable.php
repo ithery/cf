@@ -870,7 +870,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action() || strlen($this->title) > 0;
+        $wrapped = ($this->apply_data_table > 0) || $this->haveHeaderAction() || strlen($this->title) > 0;
         if ($wrapped) {
 
             $mainClass = ' widget-box ';
