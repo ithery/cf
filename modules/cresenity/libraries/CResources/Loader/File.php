@@ -49,7 +49,7 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
         }
 
         $temp .= $filename;
-        $dir = DOCROOT.'/application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
+        $dir = rtrim(DOCROOT, '/') . '/application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
         $basepath = $dir . $temp;
         return $basepath;
     }
