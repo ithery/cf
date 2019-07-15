@@ -53,7 +53,7 @@ abstract class AbstractProxyFactory
      */
     const AUTOGENERATE_EVAL = 3;
 
-    private const AUTOGENERATE_MODES = [
+    private $AUTOGENERATE_MODES = [
         self::AUTOGENERATE_NEVER,
         self::AUTOGENERATE_ALWAYS,
         self::AUTOGENERATE_FILE_NOT_EXISTS,
@@ -93,7 +93,7 @@ abstract class AbstractProxyFactory
         $this->metadataFactory = $metadataFactory;
         $this->autoGenerate    = (int) $autoGenerate;
 
-        if ( ! in_array($this->autoGenerate, self::AUTOGENERATE_MODES, true)) {
+        if ( ! in_array($this->autoGenerate, self::$AUTOGENERATE_MODES, true)) {
             throw InvalidArgumentException::invalidAutoGenerateMode($autoGenerate);
         }
     }
