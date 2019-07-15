@@ -62,6 +62,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $callbackRequire = null;
     public $callbackOptions = null;
     public $searchPlaceholder = '';
+    public $infoText = '';
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
@@ -72,6 +73,7 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $haveDataTableViewAction;
     protected $dataTableViewColCount;
     protected $dataTableView;
+    protected $fixedColumn;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -144,7 +146,10 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->haveDataTableViewAction = false;
         $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         $this->dataTableViewColCount = 5;
+        $this->fixedColumn = false;
 
+
+        $this->infoText = clang::__('Showing') . " _START_ " . clang::__('to') . " _END_ " . clang::__('of') . " _TOTAL_ " . clang::__('entries') . "";
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
                 CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
@@ -178,6 +183,18 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setSearchPlaceholder($placeholder) {
         $this->searchPlaceholder = $placeholder;
+
+        return $this;
+    }
+
+    public function setInfoText($infoText) {
+        $this->infoText = $infoText;
+
+        return $this;
+    }
+
+    public function setFixedColumn($bool = true) {
+        $this->fixedColumn = $bool;
 
         return $this;
     }
@@ -1138,8 +1155,19 @@ class CElement_Component_DataTable extends CElement_Component {
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
+            if ($this->fixedColumn) {
 
-
+                $js->appendln("scrollY:        300,")->br()
+                        ->appendln("scrollX:        true,")->br()
+                        ->appendln("scrollCollapse: true,")->br();
+                if ($this->checkbox) {
+                    $js->appendln("'fixedColumns': {
+                        leftColumns: 2
+                    },")->br();
+                } else {
+                    $js->appendln("'fixedColumns': " . ($this->fixedColumn ? "true" : "false") . ",")->br();
+                }
+            }
             $js->appendln($jqueryui)->br()
                     ->appendln("'bStateSave': false,")->br()
                     ->appendln("'iDisplayLength': " . $this->display_length . ",")->br()
@@ -1156,7 +1184,7 @@ class CElement_Component_DataTable extends CElement_Component {
                                                     'sNext' : '" . clang::__('Next') . "',
                                                     'sPrevious' : '" . clang::__('Previous	') . "'
                                                 },
-                                                sinfo: '" . clang::__('Showing') . " _START_ " . clang::__('to') . " _END_ " . clang::__('of') . " _TOTAL_ " . clang::__('entries') . "',
+                                                sInfo: '" . $this->infoText . "',
 						sInfoEmpty  : '" . clang::__('No data available in table') . "',
 						sEmptyTable  : '" . clang::__('No data available in table') . "',
 						sInfoThousands   : '" . clang::__('') . "',
