@@ -48,7 +48,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 //if have callback
                 if ($col->callback != null) {
                     $col_v = CFunction::factory($col->callback)
-                            ->addArg($table)
+                            //->addArg($table)
                             ->addArg($row)
                             ->addArg($col_v)
                             ->setRequire($col->callbackRequire)
