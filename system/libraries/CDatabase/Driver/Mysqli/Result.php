@@ -10,6 +10,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
 
     // Database connection
+    /**
+     *
+     * @var \mysqli
+     */
     protected $link;
     // Data fetching types
     protected $fetch_type = 'mysqli_fetch_object';
@@ -23,7 +27,11 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
      * @param  string    SQL query that was run
      */
     public function __construct($link, $object = TRUE, $sql) {
+
+
+
         $this->link = $link;
+
 
         if (!$this->link->multi_query($sql)) {
             // SQL error
@@ -46,6 +54,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
             }
         }
 
+
         // Set result type
         $this->result($object);
 
@@ -62,7 +71,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
             // this is kinda useless, but needs to be done to avoid the "Commands out of sync; you
             // can't run this command now" error. Basically, we get all results after the first one
             // (the one we actually need) and free them.
-            if (is_resource($this->link) AND $this->link->more_results()) {
+            if (is_resource($this->link) && $this->link->more_results()) {
                 do {
                     if ($result = $this->link->store_result()) {
                         $result->free_result();

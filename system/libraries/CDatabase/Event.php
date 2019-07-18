@@ -8,7 +8,33 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CDatabase_Event {
+
+    /**
+     * The name of the connection.
+     *
+     * @var string
+     */
+    public $dbName;
+
+    /**
+     * The database connection instance.
+     *
+     * @var CDatabase
+     */
+    public $db;
+
     /* database */
+
+    /**
+     * Create a new event instance.
+     *
+     * @param  CDatabase  $db
+     * @return void
+     */
+    public function __construct($db) {
+        $this->db = $db;
+        $this->dbName = $db->getName();
+    }
 
     const onQueryExecuted = 'CDatabase_Event_OnQueryExecuted';
     const onPostConnect = 'CDatabase_Event_OnPostConnect';

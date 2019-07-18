@@ -131,4 +131,15 @@ trait CObservable_Trait_ComponentTrait {
         return $kanban;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_PdfViewer
+     */
+    public function addPdfViewer($id = "") {
+        $pdfViewer = CElement_Factory::createComponent('PdfViewer', $id);
+        $this->add($pdfViewer);
+        return $pdfViewer;
+    }
+
 }

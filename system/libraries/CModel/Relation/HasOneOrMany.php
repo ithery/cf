@@ -159,7 +159,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
+     * @return CCollection|CModel
      */
     public function findOrNew($id, $columns = ['*']) {
         if (is_null($instance = $this->find($id, $columns))) {
@@ -176,7 +176,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function firstOrNew(array $attributes, array $values = []) {
         if (is_null($instance = $this->where($attributes)->first())) {
@@ -193,7 +193,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function firstOrCreate(array $attributes, array $values = []) {
         if (is_null($instance = $this->where($attributes)->first())) {
@@ -208,7 +208,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function updateOrCreate(array $attributes, array $values = []) {
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
@@ -248,14 +248,14 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function create(array $attributes = []) {
-        return tap($this->related->newInstance($attributes), function ($instance) {
-            $this->setForeignAttributesForCreate($instance);
+        return CF::tap($this->related->newInstance($attributes), function ($instance) {
+                    $this->setForeignAttributesForCreate($instance);
 
-            $instance->save();
-        });
+                    $instance->save();
+                });
     }
 
     /**

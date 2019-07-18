@@ -42,13 +42,16 @@ class CValidation_Exception extends Exception {
     /**
      * Create a new exception instance.
      *
-     * @param  CValidation$validator
+     * @param  CValidation_Validator $validator
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  string  $errorBag
      * @return void
      */
     public function __construct($validator, $response = null, $errorBag = 'default') {
-        parent::__construct('The given data was invalid.');
+        parent::__construct('The given data was invalid. '.$validator->getAllErrorString());
+
+        
+       
 
         $this->response = $response;
         $this->errorBag = $errorBag;

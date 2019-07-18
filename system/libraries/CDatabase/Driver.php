@@ -405,6 +405,19 @@ abstract class CDatabase_Driver {
         return sha1(str_replace("\n", ' ', trim($sql)));
     }
 
+    public function beginTransaction() {
+        $this->query('START TRANSACTION;');
+    }
+
+    public function rollback() {
+        $this->query('ROLLBACK;');
+    }
+
+    public function commit() {
+
+        $this->query('COMMIT;');
+    }
+
 }
 
 // End Database Driver Interface

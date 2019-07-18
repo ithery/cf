@@ -78,7 +78,7 @@ class CElement_Component_Form extends CElement_Component {
     public function onSubmitListener() {
         return $this->addListener('submit');
     }
-    
+
     /**
      * 
      * @param string $event
@@ -196,7 +196,7 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function set_ajax_datatype($datatype) {
+    public function setAjaxDataType($datatype) {
         $this->ajax_datatype = $datatype;
         return $this;
     }

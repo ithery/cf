@@ -13,8 +13,6 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
 
-    protected $target;
-    protected $method;
     protected $content;
     protected $param;
     protected $param_inputs;

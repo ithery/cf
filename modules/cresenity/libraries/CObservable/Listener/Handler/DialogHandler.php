@@ -15,8 +15,6 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_CloseHandlerTrait,
         CTrait_Element_Property_Title;
 
-    protected $target;
-    protected $method;
     protected $content;
     protected $param;
     protected $actions;

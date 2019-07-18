@@ -8,5 +8,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CTranslation {
-    
+
+    public static function translator() {
+        return new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), DOCROOT . 'system/i18n'));
+    }
+
 }

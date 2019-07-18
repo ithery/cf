@@ -28,9 +28,8 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      */
     public function __construct(CModel_Query $query, CModel $parent, $type, $id, $localKey) {
         $this->morphType = $type;
-
+        
         $this->morphClass = $parent->getMorphClass();
-
         parent::__construct($query, $parent, $id, $localKey);
     }
 

@@ -124,4 +124,16 @@ trait CTrait_Compat_Element_Form {
         return $this->setLayout($layout);
     }
 
+    /**
+     * 
+     * @deprecated since version 1.2
+     * 
+     * @param type $datatype
+     * @return $this
+     */
+    public function set_ajax_datatype($datatype) {
+        return $this->setAjaxDataType($datatype);
+     
+    }
+
 }
