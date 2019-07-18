@@ -12,16 +12,19 @@ class CManager_Asset_Module {
     protected static $instance;
     protected $runTimeModules = array();
     protected $themeModules = array();
+    protected $unregisteredThemeModules = array();
     private $allModules = null;
 
     public function __construct() {
         $this->allModules = null;
         $this->reset();
+        $this->loadUnregisteredThemeModules();
     }
 
     public function reset() {
         $this->runTimeModules = array();
         $this->themeModules = array();
+        $this->unregisteredThemeModules = array();
     }
 
     public function allModules() {
@@ -65,10 +68,15 @@ class CManager_Asset_Module {
      * @return bool
      */
     public function isRegisteredModule($mod) {
+
         $inArray = in_array($mod, $this->runTimeModules);
         if (!$inArray) {
             $inArray = in_array($mod, $this->themeModules);
         }
+        if (!$inArray) {
+            $inArray = in_array($mod, $this->unregisteredThemeModules);
+        }
+        
         return $inArray;
     }
 
@@ -202,10 +210,10 @@ class CManager_Asset_Module {
         $runTimeContainer = new CManager_Asset_Container_RunTime();
         $allModules = $this->allModules();
 
-        
+
         foreach ($this->runTimeModules as $runTimeModule) {
             $mod = carr::get($allModules, $runTimeModule, array());
-          
+
             if (isset($mod["js"])) {
                 $runTimeContainer->registerJsFiles($mod['js']);
             }
@@ -242,6 +250,15 @@ class CManager_Asset_Module {
             self::$instance = new CManager_Asset_Module();
         }
         return self::$instance;
+    }
+
+    public function loadUnregisteredThemeModules() {
+        $theme = CManager::theme()->getCurrentTheme();
+        $themeFile = CF::get_file('themes', $theme);
+        if (file_exists($themeFile)) {
+            $themeData = include $themeFile;
+            $this->unregisteredThemeModules = carr::get($themeData, 'client_modules');
+        }
     }
 
 }
