@@ -9,7 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_SubmitHandler extends CObservable_Listener_Handler {
 
-    use CTrait_Compat_Handler_Driver_Submit;
+    use CTrait_Compat_Handler_Driver_Submit,
+        CObservable_Listener_Handler_Trait_TargetHandlerTrait;
 
     protected $formId;
 
