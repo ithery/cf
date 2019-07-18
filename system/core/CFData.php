@@ -26,7 +26,6 @@ final class CFData {
         }
         $file .= $dataName;
 
-
         if (file_exists($file . EXT)) {
             return self::load_value($file . EXT);
         }

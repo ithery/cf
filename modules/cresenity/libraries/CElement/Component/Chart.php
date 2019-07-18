@@ -3,41 +3,42 @@
 /**
  * 
  */
-abstract class CElement_Component_Chart extends CElement_Component
-{
+abstract class CElement_Component_Chart extends CElement_Component {
+
     protected $type;
     protected $labels;
     protected $data;
     protected $width;
     protected $height;
+    protected $options;
 
-    public function __construct($id = "")
-    {
+    public function __construct($id = "") {
         parent::__construct($id);
         $this->type = 'line';
         $this->data = [];
     }
 
-    public static function factory($type, $id = "")
-    {
+    public static function factory($type = 'Chart', $id = "") {
         $className = 'CElement_Component_Chart_' . ucfirst(strtolower($type));
         return new $className($id);
     }
 
-    public function setType($type)
-    {
+    public function setType($type) {
         $this->type = $type;
         return $this;
     }
 
-    public function setLabels(array $labels)
-    {
+    public function setLabels(array $labels) {
         $this->labels = $labels;
         return $this;
     }
 
-    public function addData(array $data, $label = null)
-    {
+    public function addRawData(array $data) {
+        $this->data[] = $data;
+        return $this;
+    }
+
+    public function addData(array $data, $label = null) {
         $this->data[] = [
             'data' => $data,
             'label' => $label,
@@ -45,21 +46,18 @@ abstract class CElement_Component_Chart extends CElement_Component
         return $this;
     }
 
-    public function setWidth($width)
-    {
+    public function setWidth($width) {
         $this->width = $width;
         return $this;
     }
 
-    public function setHeight($height)
-    {
+    public function setHeight($height) {
         $this->height = $height;
         return $this;
     }
 
-    protected function getColor($color = null, $opacity = 1.0)
-    {
-        if (! $color) {
+    protected function getColor($color = null, $opacity = 1.0) {
+        if (!$color) {
             return 'rgba(' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . mt_rand(0, 255) . ', ' . $opacity . ')';
         } else {
             preg_match_all("([\d\.]+)", $color, $matches);
@@ -67,4 +65,15 @@ abstract class CElement_Component_Chart extends CElement_Component
             return 'rgba(' . $matches[0][0] . ', ' . $matches[0][1] . ', ' . $matches[0][2] . ', ' . $opacity . ')';
         }
     }
+
+    public function setOptions(array $options) {
+        $this->options = $options;
+        return $this;
+    }
+
+    public function setOption($key, $value) {
+        carr::set($this->options, $key, $value);
+        return $this;
+    }
+
 }

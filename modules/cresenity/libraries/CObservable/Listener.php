@@ -11,13 +11,11 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
 
     use CTrait_Compat_Listener;
 
-    protected $event;
-
     protected $confirm;
     protected $confirm_message;
     protected $no_double;
 
-    public function __construct($owner, $event) {
+    public function __construct($owner, $event = 'click') {
         parent::__construct($owner);
         $this->confirm = false;
         $this->confirm_message = "";
@@ -40,18 +38,16 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         return $this;
     }
 
+    public function getEvent() {
+        return $this->event;
+    }
+
     public function setConfirmMessage($message) {
         $this->confirm_message = $message;
         return $this;
     }
 
-    
-    
-    public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->setIndent($indent);
-
-
+    public function getBodyJs() {
         $startScript = "
             var thiselm=jQuery(this);
             var clicked = thiselm.attr('data-clicked');
@@ -96,47 +92,37 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
                 });
             ";
         }
+        $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;
+        return $compiledJs;
+    }
+    
+    public function js($indent = 0) {
+        $js = new CStringBuilder();
+        $js->setIndent($indent);
 
+        $compiledJs = $this->getBodyJs();
+        
+        $eventParameterImploded = implode(',', $this->eventParameters);
         if ($this->event == 'lazyload') {
             $js->append("
                     jQuery(window).ready(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $startScript . "
-                                " . $confirmStartScript . "
-                                " . $handlersScript . "
-                                " . $confirmEndScript . "
+                                " . $compiledJs . "
                             }
                     });
                     jQuery(window).scroll(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $startScript . "
-                                " . $confirmStartScript . "
-                                " . $handlersScript . "
-                                " . $confirmEndScript . "
+                                " . $compiledJs . "
                             }
                     });
                 ");
         } else {
-            $js->append('
-                    jQuery("#' . $this->owner . '").' . $this->event . '(function() {
-
-                        ' . $startScript . '
-                        ' . $confirmStartScript . '
-                        ' . $handlersScript . '
-                        ' . $confirmEndScript . '
-
+            $js->append("
+                    jQuery('#" . $this->owner . "')." . $this->event . "(function(" . $eventParameterImploded . ") {
+                        " . $compiledJs . "
                     });
-                ');
+                ");
         }
-
-        //           $js->append("
-        // 	jQuery('#" . $this->owner . "')." . $this->event . "(function() {				
-        // 		" . $startScript . "
-        // 		" . $confirmStartScript . "
-        // 		" . $handlersScript . "
-        // 		" . $confirmEndScript . "
-        // 	});
-        // ");
 
         return $js->text();
     }

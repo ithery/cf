@@ -12,6 +12,7 @@ use CApp_Navigation_Helper as Helper;
 class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
 
     public function render($navs = null, $level = 0, &$child = 0) {
+        $domain = CF::domain();
         $is_admin = CApp::instance()->isAdmin();
         if ($navs == null && $level == 0) {
             $navs = $this->navs;
@@ -20,7 +21,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             return false;
         }
         $html = "";
-        $child_count = 0;
+        $childCount = 0;
         foreach ($navs as $d) {
 
             $child = 0;
@@ -30,6 +31,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             $method = carr::get($d, 'method');
             $label = carr::get($d, 'label');
             $icon = carr::get($d, 'icon');
+            $class = carr::get($d, 'class');
 
 
 
@@ -46,8 +48,8 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                 $url = "";
 
             if (strlen($childHtml) > 0 || strlen($url) > 0) {
-                
-                if (!Helper::accessAvailable($d, CF::appId(), CF::domain())) {
+
+                if (!Helper::accessAvailable($d, CF::appId(), $domain)) {
 
                     continue;
                 }
@@ -60,13 +62,18 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     }
                 }
 
-                $child_count++;
+                $childCount++;
 
                 $border = carr::get($d, 'border');
 
-                $find_nav = Helper::nav($d);
+                $findNav = Helper::nav($d);
 
-                if ($find_nav !== false) {
+                $isActive = $findNav !== false;
+                $activeCallback = CApp_Navigation::getActiveCallback($domain);
+                if ($activeCallback != null) {
+                    $isActive = CFunction::factory($activeCallback)->addArg($d)->addArg($isActive)->execute();
+                }
+                if ($isActive) {
                     $activeClass = " active open";
                 }
 
@@ -80,7 +87,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     $addition_style = ' style="border-bottom:1px solid #bbb"';
                 }
 
-                $html .= '<li class="' . $li_class . $activeClass . '" ' . $addition_style . '>';
+                $html .= '<li class="' . $li_class . $class . $activeClass . '" ' . $addition_style . '>';
 
                 $iconClass = carr::get($d, 'icon');
                 if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
@@ -134,10 +141,10 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                 $html = "  <ul class=\"sidenav-menu \">\r\n" . $html . "  </ul>\r\n";
             }
         }
-        if ($child_count == 0) {
+        if ($childCount == 0) {
             $html = "";
         }
-        $child = $child_count;
+        $child = $childCount;
 
         return $html;
     }

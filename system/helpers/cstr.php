@@ -150,6 +150,10 @@ class cstr {
      * @return string
      */
     public static function random($length = 16) {
+        if (!is_callable('random_bytes')) {
+            require_once \CF::get_file('vendor', 'random_compat/random');
+        }
+
         $string = '';
 
         while (($len = strlen($string)) < $length) {

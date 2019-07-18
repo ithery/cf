@@ -481,7 +481,7 @@ return array(
         "css" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
             "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css",
-            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css",
+            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css?v=1",
         ),
         "js" => array(
             "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
@@ -597,6 +597,11 @@ return array(
             "plugins/c3/c3.js",
         ),
     ),
+    "chartjs" => array(
+        "js" => array(
+            "plugins/chartjs/chartjs.js",
+        ),
+    ),
     "chartist" => array(
         "css" => array(
             "plugins/chartist/chartist.css",
@@ -629,6 +634,61 @@ return array(
         ),
         "css" => array(
             "plugins/vis/vis.min.css",
+        ),
+    ),
+    "toastr" => array(
+        "css" => array("plugins/toastr/toastr.css"),
+        "js" => array("plugins/toastr/toastr.js")
+    ),
+    "minicolors" => array(
+        "js" => array(
+            "plugins/minicolors/minicolors.js",
+        ),
+        "css" => array(
+            "plugins/minicolors/minicolors.css",
+        ),
+    ),
+    "dragula" => array(
+        "js" => array(
+            "plugins/dragula/dragula.js",
+        ),
+        "css" => array(
+            "plugins/dragula/dragula.css",
+        ),
+    ),
+    "clipboard" => array(
+        "js" => array(
+            "plugins/clipboard/clipboard.js",
+        )
+    ),
+    "quill" => array(
+        "js" => array(
+            "plugins/quill/quill.js",
+        ),
+        "css" => array(
+            "plugins/quill/quill.core.css",
+        ),
+    ),
+    "tippy" => array(
+        "js" => array(
+            "plugins/tippy/tippy.js",
+        ),
+    ),
+    "pdfjs" => array(
+        "js" => array(
+            "plugins/pdfjs/pdf.js",
+            "plugins/pdfjs/viewer.js",
+        ),
+        "css" => array(
+            "plugins/pdfjs/viewer.css",
+        ),
+    ),
+    "bootstrap-daterangepicker" => array(
+        "js" => array(
+            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.js",
+        ),
+        "css" => array(
+            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css",
         ),
     ),
 );

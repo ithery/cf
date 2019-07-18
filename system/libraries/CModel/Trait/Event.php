@@ -109,7 +109,6 @@ trait CModel_Trait_Event {
     protected static function registerModelEvent($event, $callback) {
         if (isset(static::$dispatcher)) {
             $name = static::class;
-
             static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
         }
     }
@@ -122,6 +121,8 @@ trait CModel_Trait_Event {
      * @return mixed
      */
     protected function fireModelEvent($event, $halt = true) {
+
+
         if (!isset(static::$dispatcher)) {
             return true;
         }

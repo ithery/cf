@@ -24,7 +24,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     }
 
     public function close() {
-        is_object($this->link) and @ $this->link->close();
+        is_object($this->link) && @$this->link->close();
     }
 
     /**
@@ -32,7 +32,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      */
     public function __destruct() {
         try {
-            is_object($this->link) and @ $this->link->close();
+            is_object($this->link) && @$this->link->close();
         } catch (Exception $ex) {
             //do nothing
         }
@@ -300,6 +300,9 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      * @link https://jira.mariadb.org/browse/MDEV-4088
      */
     public function getServerVersion() {
+        if (!$this->link) {
+            $this->connect();
+        }
         $serverInfos = $this->link->get_server_info();
         if (false !== stripos($serverInfos, 'mariadb')) {
             return $serverInfos;
@@ -322,49 +325,3 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 }
 
 // End Database_Mysqli_Driver Class
-
-/**
- * MySQLi Prepared Statement (experimental)
- */
-class Kohana_Mysqli_Statement {
-
-    protected $link = NULL;
-    protected $stmt;
-    protected $var_names = array();
-    protected $var_values = array();
-
-    public function __construct($sql, $link) {
-        $this->link = $link;
-
-        $this->stmt = $this->link->prepare($sql);
-
-        return $this;
-    }
-
-    public function __destruct() {
-        $this->stmt->close();
-    }
-
-    // Sets the bind parameters
-    public function bind_params($param_types, $params) {
-        $this->var_names = array_keys($params);
-        $this->var_values = array_values($params);
-        call_user_func_array(array($this->stmt, 'bind_param'), array_merge($param_types, $var_names));
-
-        return $this;
-    }
-
-    public function bind_result($params) {
-        call_user_func_array(array($this->stmt, 'bind_result'), $params);
-    }
-
-    // Runs the statement
-    public function execute() {
-        foreach ($this->var_names as $key => $name) {
-            $$name = $this->var_values[$key];
-        }
-        $this->stmt->execute();
-        return $this->stmt;
-    }
-
-}

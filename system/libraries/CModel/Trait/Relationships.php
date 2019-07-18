@@ -447,7 +447,7 @@ trait CModel_Trait_Relationships {
      */
     public function getMorphClass() {
         $morphMap = CModel_Relation::morphMap();
-
+        
         if (!empty($morphMap) && in_array(static::class, $morphMap)) {
             return array_search(static::class, $morphMap, true);
         }

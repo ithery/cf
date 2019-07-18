@@ -61,6 +61,8 @@ class CElement_Component_DataTable extends CElement_Component {
     public $isCallback = false;
     public $callbackRequire = null;
     public $callbackOptions = null;
+    public $searchPlaceholder = '';
+    public $infoText = '';
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
@@ -71,6 +73,7 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $haveDataTableViewAction;
     protected $dataTableViewColCount;
     protected $dataTableView;
+    protected $fixedColumn;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -86,7 +89,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->key_field = "";
         $this->columns = array();
         $this->rowActionList = CElement_Factory::createList('ActionList');
-        $this->rowActionList->setStyle('btn-icon-group');
+        $this->rowActionList->setStyle('btn-icon-group')->addClass('btn-table-action');
         $this->headerActionList = CElement_Factory::createList('ActionList');
         $this->headerActionList->setStyle('widget-action');
         $this->footer_action_list = CElement_List_ActionList::factory();
@@ -143,7 +146,10 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->haveDataTableViewAction = false;
         $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         $this->dataTableViewColCount = 5;
+        $this->fixedColumn = false;
 
+
+        $this->infoText = clang::__('Showing') . " _START_ " . clang::__('to') . " _END_ " . clang::__('of') . " _TOTAL_ " . clang::__('entries') . "";
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
                 CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
@@ -171,6 +177,24 @@ class CElement_Component_DataTable extends CElement_Component {
     public function setDatabase($db) {
         $this->db = $db;
         $this->dbConfig = $db->config();
+
+        return $this;
+    }
+
+    public function setSearchPlaceholder($placeholder) {
+        $this->searchPlaceholder = $placeholder;
+
+        return $this;
+    }
+
+    public function setInfoText($infoText) {
+        $this->infoText = $infoText;
+
+        return $this;
+    }
+
+    public function setFixedColumn($bool = true) {
+        $this->fixedColumn = $bool;
 
         return $this;
     }
@@ -499,7 +523,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function setDataFromCallback($callback, $callbackOptions = array(), $require = null) {
-        $this->query = $callback;
+        $this->query = CHelper::closure()->serializeClosure($callback);
         $this->isCallback = true;
         $this->callbackOptions = $callbackOptions;
         $this->callbackRequire = $require;
@@ -584,7 +608,15 @@ class CElement_Component_DataTable extends CElement_Component {
                             $col_v = $temp_v;
                         }
                     }
-
+                    //if have callback
+                    if ($col->callback != null) {
+                        $col_v = CFunction::factory($col->callback)
+                                // ->addArg($table)
+                                ->addArg($row)
+                                ->addArg($col_v)
+                                ->setRequire($col->callbackRequire)
+                                ->execute();
+                    }
                     $new_v = $col_v;
 
                     if (($this->cellCallbackFunc) != null) {
@@ -742,7 +774,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
                 }
                 if ($this->haveRowAction()) {
-                    $action_width = 31 * $this->action_count() + 5;
+                    $action_width = 31 * $this->rowActionCount() + 5;
                     if ($this->getRowActionStyle() == "btn-dropdown") {
                         $action_width = 70;
                     }
@@ -835,10 +867,10 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function html($indent = 0) {
 
-
+        $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $wrapped = ($this->apply_data_table > 0) || $this->have_header_action() || strlen($this->title) > 0;
+        $wrapped = ($this->apply_data_table > 0) || $this->haveHeaderAction() || strlen($this->title) > 0;
         if ($wrapped) {
 
             $mainClass = ' widget-box ';
@@ -912,6 +944,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function js($indent = 0) {
+        $this->buildOnce();
         $ajax_url = "";
         if ($this->ajax) {
             $columns = array();
@@ -1105,9 +1138,9 @@ class CElement_Component_DataTable extends CElement_Component {
 					},
 				")
                         ->appendln("'fnInitComplete': function() {
-					this.fnAdjustColumnSizing(true);
-					},
-				")
+                                this.fnAdjustColumnSizing(true);
+                            },
+                        ")
                 ;
             }
             /*
@@ -1122,43 +1155,45 @@ class CElement_Component_DataTable extends CElement_Component {
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
+            if ($this->fixedColumn) {
 
-            $js->append("")
-                    ->appendln("'oLanguage': {
-						'sLoadingRecords': '" . clang::__('Loading') . "',
-						'sZeroRecords': '" . clang::__('No records to display') . "',
-						'responsive': true,
-						'oPaginate': {
-							'sFirst': '" . clang::__('First') . "',
-							'sPrevious': '" . clang::__('Previous') . "',
-							'sNext': '" . clang::__('Next') . "',
-							'sLast': '" . clang::__('Last') . "'
-							
-						}
-					},")->br()
-                    ->appendln($jqueryui)->br()
+                $js->appendln("scrollY:        300,")->br()
+                        ->appendln("scrollX:        true,")->br()
+                        ->appendln("scrollCollapse: true,")->br();
+                if ($this->checkbox) {
+                    $js->appendln("'fixedColumns': {
+                        leftColumns: 2
+                    },")->br();
+                } else {
+                    $js->appendln("'fixedColumns': " . ($this->fixedColumn ? "true" : "false") . ",")->br();
+                }
+            }
+            $js->appendln($jqueryui)->br()
                     ->appendln("'bStateSave': false,")->br()
                     ->appendln("'iDisplayLength': " . $this->display_length . ",")->br()
                     ->appendln("'bSortCellsTop': " . $hs_val . ",")->br()
                     ->appendln("'aaSorting': [],")->br()
                     ->appendln("'oLanguage': { 
 						sSearch : '" . clang::__('Search') . "',
+						sSearchPlaceholder : '" . clang::__($this->searchPlaceholder) . "',
 						sProcessing : '" . clang::__('Processing') . "',
 						sLengthMenu  : '" . clang::__('Show') . " _MENU_ " . clang::__('Entries') . "',
-						oPaginate  : {'sFirst' : '" . clang::__('First') . "',
-                                                'sLast' : '" . clang::__('Last') . "',
-                                                'sNext' : '" . clang::__('Next') . "',
-                                                'sPrevious' : '" . clang::__('Previous	') . "'},
-                                                sinfo: '" . clang::__('Showing') . " _START_ " . clang::__('to') . " _END_ " . clang::__('of') . " _TOTAL_ " . clang::__('entries') . "',
+						oPaginate  : {
+                                                    'sFirst' : '" . clang::__('First') . "',
+                                                    'sLast' : '" . clang::__('Last') . "',
+                                                    'sNext' : '" . clang::__('Next') . "',
+                                                    'sPrevious' : '" . clang::__('Previous	') . "'
+                                                },
+                                                sInfo: '" . $this->infoText . "',
 						sInfoEmpty  : '" . clang::__('No data available in table') . "',
 						sEmptyTable  : '" . clang::__('No data available in table') . "',
 						sInfoThousands   : '" . clang::__('') . "',
 					},")->br()
-                    ->appendln("'bDeferRender': " . ($this->getOption("defer_render") ? "true" : "false") . ",")->br()
-                    ->appendln("'bFilter': " . ($this->getOption("filter") ? "true" : "false") . ",")->br()
-                    ->appendln("'bInfo': " . ($this->getOption("info") ? "true" : "false") . ",")->br()
-                    ->appendln("'bPaginate': " . ($this->getOption("pagination") ? "true" : "false") . ",")->br()
-                    ->appendln("'bLengthChange': " . ($this->getOption("length_change") ? "true" : "false") . ",")->br()
+                    ->appendln("'bDeferRender': " . ($this->getOption("bDeferRender") ? "true" : "false") . ",")->br()
+                    ->appendln("'bFilter': " . ($this->getOption("bFilter") ? "true" : "false") . ",")->br()
+                    ->appendln("'bInfo': " . ($this->getOption("bInfo") ? "true" : "false") . ",")->br()
+                    ->appendln("'bPaginate': " . ($this->getOption("bPaginate") ? "true" : "false") . ",")->br()
+                    ->appendln("'bLengthChange': " . ($this->getOption("bLengthChange") ? "true" : "false") . ",")->br()
                     ->appendln("'aoColumns': vaoColumns,")->br()
                     ->appendln("'autoWidth': false,")->br()
                     ->appendln("'aLengthMenu': [
@@ -1191,67 +1226,12 @@ class CElement_Component_DataTable extends CElement_Component {
                     ->appendln("'sPaginationType': 'full_numbers',")->br()
                     ->appendln("'sDom': '" . $this->dom . "',")->br();
 
-            /*
-              $js->append("
-              'fnDrawCallback': function ( oSettings ) {");
 
-              if(strlen($this->group_by)>0) {
-              $col_ind = false;
-              $inc = 0;
-              foreach($this->columns as $col) {
-
-              if($col->get_fieldname()==$this->group_by) {
-              $col_ind=$inc;
-              break;
-              }
-              $inc++;
-              }
-
-              if($col_ind>=0) {
-              $js->appendln("
-              if ( oSettings.aiDisplay.length >= 0 ) {
-              var nTrs = $('#".$this->id." tbody tr');
-              var iColspan = nTrs[0].getElementsByTagName('td').length;
-              var sLastGroup = '';
-              for ( var i=0 ; i<nTrs.length ; i++ )
-              {
-              var iDisplayIndex = oSettings._iDisplayStart + i;
-              var sGroup = oSettings.aoData[ oSettings.aiDisplay[iDisplayIndex] ]._aData[".$col_ind."];
-              if ( sGroup != sLastGroup )
-              {
-              var nGroup = document.createElement( 'tr' );
-              var nCell = document.createElement( 'td' );
-              nCell.colSpan = iColspan;
-              nCell.className = 'group';
-              nCell.innerHTML = sGroup;
-              nGroup.appendChild( nCell );
-              nTrs[i].parentNode.insertBefore( nGroup, nTrs[i] );
-              sLastGroup = sGroup;
-              }
-              }
-              }
-              ");
-              }
-              }
-
-              $js->append("
-              },");
-             */
 
             $js->append("")
                     ->decIndent()->appendln("});")->br();
 
 
-//                $js->append("oTable.columns().every( function () {
-//                                var that = this;
-//
-//                                $( 'input', this.footer() ).on( 'keyup change', function () {
-//                                    that
-//                                        .search( this.value )
-//                                        .draw();
-//                                } );
-//                            } );");
-            //$js->appendln("oTable.fnSortOnOff( '_all', false );")->br();
 
             $js->appendln('function buildFilters_' . $this->id . '() {')->br()
                     ->appendln("var quick_search = jQuery('<tr>');")->br()

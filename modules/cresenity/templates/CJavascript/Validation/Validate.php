@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 ?>
 
 <script>
-    jQuery(document).ready(function(){
+
     var selectorValidator = "<?= $validator['selector']; ?>";
     var validateOptions = {
     errorElement: 'span',
@@ -56,5 +56,5 @@ defined('SYSPATH') OR die('No direct access allowed.');
     rules: <?= json_encode($validator['rules']); ?>
     });
     });
-    });
+
 </script>

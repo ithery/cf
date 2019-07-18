@@ -10,9 +10,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CObservable_Trait_EventsTrait {
 
 
-    public function onClick(Closure $event, $options = array()) {
+    public function onClick(Closure $event=null, $options = array()) {
         $compiledJs = '';
-        
         if ($event instanceof Closure) {
             $this->javascript->startDeferred();
             $event($this->javascript);

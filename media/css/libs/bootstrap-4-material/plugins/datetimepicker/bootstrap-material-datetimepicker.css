@@ -9,13 +9,15 @@
     font-family:Font Awesome\ 5 Free;font-weight: 900;content:"\f077";
     display:inline-block;
 
-    direction:ltr !important
+    direction:ltr !important;
+    transform:rotate(0deg);
 }
 .dtp-select-year-range.after:before{
     font-family:Font Awesome\ 5 Free;font-weight: 900;content:"\f078";
     display:inline-block;
 
-    direction:ltr !important
+    direction:ltr !important;
+    transform:rotate(0deg);
 }
 .dtp-close>a:before{
     font-family:Font Awesome\ 5 Free;font-weight: 900;content:"\f00d";

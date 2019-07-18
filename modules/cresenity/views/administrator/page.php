@@ -20,7 +20,7 @@ $appImageUrl = curl::base() . 'media/img/cresenity-logo.png';
 $appTitle = ccfg::get("title");
 ?>
 <!DOCTYPE html>
-<html class="no-js material-style" lang="<?php echo clang::getlang(); ?>" >
+<html class="no-js material-style layout-navbar-fixed layout-fixed" lang="<?php echo clang::getlang(); ?>" >
     <head>
         <meta charset="utf-8">
         <title><?php echo $title; ?></title>
@@ -42,16 +42,14 @@ $appTitle = ccfg::get("title");
             <div class="layout-inner">
                 <?php if ($showNavigation): ?>
                     <nav id="layout-sidenav" class="layout-sidenav sidenav sidenav-vertical bg-sidenav-theme navbar-default navbar-static-side" role="navigation">
-
                         <div class="brand">
                             <span class="brand-logo">
                                 <img src="<?php echo $appImageUrl; ?>" />
                             </span>
-                            <a href="index.html" class="brand-name sidenav-text font-weight-normal ml-2">CF Administrator</a>
-                            <a href="javascript:void(0)" class="layout-sidenav-toggle sidenav-link text-large ml-auto">
-                                <i class="ion ion-md-menu align-middle"></i>
-                            </a>
-                        </div>
+                            <a href="home/index.php" class="brand-name sidenav-text font-weight-normal ml-2"><?php echo $appTitle; ?></a>
+
+                        </div>    
+
 
                         <div class="sidenav-divider mt-0"></div>
                         <div class="sidenav-inner py-1 ps">
@@ -63,6 +61,8 @@ $appTitle = ccfg::get("title");
                 <?php endif; ?>
 
                 <div id="page-wrapper" class="layout-container" <?php echo $pageWrapperAttr; ?>>
+
+
                     <nav class="layout-navbar navbar navbar-expand-lg align-items-lg-center container-p-x bg-navbar-theme" id="layout-navbar">
                         <a href="<?php echo curl::base(); ?>" class="navbar-brand brand d-lg-none py-0">
                             <span class="brand-logo">
@@ -70,7 +70,7 @@ $appTitle = ccfg::get("title");
                             </span>
                             <span class="brand-name font-weight-normal ml-2"><?php echo $appTitle; ?></span>
                         </a>
-                        <div class="layout-sidenav-toggle navbar-nav d-lg-none align-items-lg-center mr-auto">
+                        <div class="layout-sidenav-toggle navbar-nav align-items-lg-center mr-auto">
                             <a class="nav-item nav-link px-0 ml-2 ml-lg-0" href="javascript:void(0)">
                                 <i class="ion ion-md-menu text-large align-middle"></i>
                             </a>
@@ -105,14 +105,10 @@ $appTitle = ccfg::get("title");
                                             </span>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a href="<?php echo curl::base(); ?>account/profile" class="dropdown-item">
-                                                <i class="ion ion-ios-person text-lightest"></i> &nbsp; My profile</a>
-                                            <a href="<?php echo curl::base(); ?>account/change_password" class="dropdown-item">
-                                                <i class="ion ion-ios-key text-lightest"></i> &nbsp; Change Password</a>
-                                            <a href="<?php echo curl::base(); ?>account/setting" class="dropdown-item">
+                                            <a href="<?php echo curl::base(); ?>administrator/setting" class="dropdown-item">
                                                 <i class="ion ion-md-settings text-lightest"></i> &nbsp; Account settings</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="<?php echo curl::base(); ?>cresenity/logout" class="dropdown-item">
+                                            <a href="<?php echo curl::base(); ?>administrator/auth/logout" class="dropdown-item">
                                                 <i class="ion ion-ios-log-out text-danger"></i> &nbsp; Log Out</a>
                                         </div>
                                     </div>

@@ -67,6 +67,16 @@ class CApp_Navigation_Helper {
     }
 
     public static function haveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
+        $canAccess = static::protectedhaveAccess($nav, $roleId, $appId, $domain);
+        $accessCallback = CApp_Navigation::getAccessCallback($domain);
+        if ($accessCallback != null && is_callable($accessCallback)) {
+            $canAccess = call_user_func($accessCallback, $nav, $roleId, $appId, $domain, $canAccess);
+        }
+
+        return $canAccess;
+    }
+
+    protected static function protectedhaveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
 
         $app = CApp::instance();
         if ($roleId == null) {
@@ -138,10 +148,10 @@ class CApp_Navigation_Helper {
 
         /* @var $role CApp_Model */
         $role = CApp::model('Roles')->find($roleId);
-        if($role==null) {
+        if ($role == null) {
             return false;
         }
-        
+
         if ($role != null && $role->parent_id == null) {
             return true;
         }
@@ -169,10 +179,10 @@ class CApp_Navigation_Helper {
             }
 
             $res = $d;
-            if(!is_array($res)) {
-                throw new CException('Error on nav structure on navs: '.json_encode($navs));
+            if (!is_array($res)) {
+                throw new CException('Error on nav structure on navs: ' . json_encode($navs));
             }
-                
+
             $res["level"] = $level;
             $res["role_id"] = $roleId;
             $res["app_id"] = $appId;

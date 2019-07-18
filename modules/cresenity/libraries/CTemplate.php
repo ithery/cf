@@ -20,6 +20,7 @@ class CTemplate {
      * @var array
      */
     private $section;
+
     /**
      * Default folder for templates view
      * @var string
@@ -33,6 +34,7 @@ class CTemplate {
     protected $data = array();
     protected $name;
     protected $registry;
+    protected $blockRoutingCallback = null;
 
     /**
      * An aribtrary object for helpers.
@@ -42,6 +44,7 @@ class CTemplate {
 
     public function __construct($name, $data = array()) {
         $this->registry = new CTemplate_Registry();
+
         $filename = CF::find_file($this->templateFolder, $name, TRUE);
         $this->name = $name;
         $this->registry->set($name, $filename);
@@ -52,11 +55,18 @@ class CTemplate {
         $this->data = $data;
     }
 
+    public function setBlockRoutingCallback(callable $callback) {
+        $this->blockRoutingCallback = $callback;
+    }
+
     public static function factory($name, $data = array()) {
         return new CTemplate($name, $data);
     }
 
     public function block($name, $data = array()) {
+        if ($this->blockRoutingCallback != null && is_callable($this->blockRoutingCallback)) {
+            $name = call_user_func_array($this->blockRoutingCallback, array($name));
+        }
         $filename = CF::find_file($this->templateFolder, $name, TRUE);
         $this->registry->set($name, $filename);
         if ($data === NULL || !is_array($data)) {

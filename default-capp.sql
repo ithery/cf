@@ -238,15 +238,17 @@ INSERT INTO `users` (`user_id`, `role_id`, `org_id`, `store_id`, `username`, `us
 DROP TABLE IF EXISTS `var`;
 CREATE TABLE IF NOT EXISTS `var` (
   `var_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `org_id` bigint(20) NOT NULL,
+  `org_id` bigint(20) NULL,
   `key` varchar(32) NOT NULL,
   `caption` varchar(255) NOT NULL,
   `value` longtext,
   `is_var_user` tinyint(1) NOT NULL DEFAULT '0',
-  `data_type` varchar(255) NOT NULL,
+  `data_type` varchar(255) NOT NULL DEFAULT 'text',
   `description` varchar(255) DEFAULT NULL,
   `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_id`),
   UNIQUE KEY `var_id` (`var_id`)
@@ -264,11 +266,38 @@ CREATE TABLE IF NOT EXISTS `var_user` (
   `key` varchar(32) NOT NULL,
   `value` longtext,
   `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_user_id`),
   UNIQUE KEY `var_user_id` (`var_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `resource`;
+CREATE TABLE `resource` (
+  `resource_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `model_type` varchar(255) DEFAULT NULL,
+  `model_id` bigint(20) DEFAULT NULL,
+  `collection_name` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL,
+  `mime_type` varchar(255) DEFAULT NULL,
+  `disk` varchar(255) DEFAULT NULL,
+  `size` int(20) unsigned DEFAULT NULL,
+  `manipulations` longtext,
+  `custom_properties` longtext,
+  `responsive_images` longtext,
+  `order_column` int(20) unsigned DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `is_active` int(11) DEFAULT '1',
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`resource_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 /*!40000 ALTER TABLE `var_user` DISABLE KEYS */;
 /*!40000 ALTER TABLE `var_user` ENABLE KEYS */;

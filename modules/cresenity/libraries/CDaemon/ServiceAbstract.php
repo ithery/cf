@@ -883,7 +883,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @return CDaemon_Plugin
      * @throws Exception
      */
-    protected function getPlugin($alias) {
+    public function getPlugin($alias) {
         if (!isset($this->plugins[$alias])) {
             throw new Exception("Plugin alias not found. The identifier `{$alias}` is not found");
         }
@@ -1040,8 +1040,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     protected function setLoopInterval($setValue = null) {
 
-        if (!is_numeric($setValue))
+        if (!is_numeric($setValue)) {
             throw new Exception(__METHOD__ . ' Failed. Could not set loop interval. Number Expected. Given: ' . $setValue);
+        }
         $this->loopInterval = $setValue;
         $priority = -1;
         if ($setValue >= 5.0 || $setValue <= 0.0) {

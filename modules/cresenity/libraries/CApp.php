@@ -16,6 +16,7 @@ class CApp extends CObservable {
     private $show_breadcrumb = true;
     private $show_title = true;
     private $breadcrumb = array();
+    private $breadcrumbCallback = null;
     private $signup = false;
     private $activation = false;
     private $resend = false;
@@ -164,7 +165,6 @@ class CApp extends CObservable {
                 $this->_org = cstg::get($org_id);
             }
         }
-        $this->registerCoreModules();
         if (isset($_COOKIE['capp-debugbar'])) {
             CDebug::bar()->enable();
         }
@@ -294,8 +294,8 @@ class CApp extends CObservable {
      * @return CApp
      */
     public static function instance($install = false) {
-
-
+        
+      
         if (self::$_instance == null) {
             self::$_instance = new CApp($install);
             self::$_instance->setup($install);
@@ -351,6 +351,21 @@ class CApp extends CObservable {
         $this->breadcrumb[$caption] = $url;
         return $this;
     }
+    
+    public function getBreadcrumb() {
+        $breadcrumb = $this->breadcrumb;
+        if($this->breadcrumbCallback!=null) {
+            
+            
+            $breadcrumb = CFunction::factory($this->breadcrumbCallback)->addArg($this->breadcrumb)->execute();
+        }
+        return $breadcrumb;
+    }
+    
+    public function setBreadcrumbCallback($callback) {
+        $this->breadcrumbCallback = CHelper::closure()->serializeClosure($callback);
+        return $this;
+    }
 
     public function registerCoreModules() {
         $manager = CManager::instance();
@@ -372,12 +387,12 @@ class CApp extends CObservable {
             }
             if ($cssArray != null) {
                 foreach ($cssArray as $css) {
-                    $cs->registerCssFiles($css);
+                    $manager->asset()->theme()->registerCssFile($css);
                 }
             }
             if ($jsArray != null) {
                 foreach ($jsArray as $js) {
-                    $cs->registerJsFiles($js);
+                    $manager->asset()->theme()->registerJsFiles($js);
                 }
             }
         }
@@ -400,7 +415,8 @@ class CApp extends CObservable {
         }
         $this->rendered = true;
 
-
+        $this->registerCoreModules();
+        
 
         CFEvent::run('CApp.beforeRender');
 
@@ -467,7 +483,10 @@ class CApp extends CObservable {
         foreach ($css_urls as $url) {
 
             $additional_js .= "
-					$.cresenity._filesadded+='['+'" . $url . "'+']'
+					$.cresenity._filesadded+='['+'" . $url . "'+']';
+					if(cresenity) {
+                                            cresenity.filesAdded+='['+'" . $url . "'+']';
+                                        }
 				";
         }
         $js = "";
@@ -513,7 +532,7 @@ class CApp extends CObservable {
         $v->custom_footer = $this->custom_footer;
         $v->show_breadcrumb = $this->show_breadcrumb;
         $v->show_title = $this->show_title;
-        $v->breadcrumb = $this->breadcrumb;
+        $v->breadcrumb = $this->getBreadcrumb();
         $v->additional_head = $this->additional_head;
         $v->custom_data = $this->custom_data;
         $v->login_required = $this->login_required;

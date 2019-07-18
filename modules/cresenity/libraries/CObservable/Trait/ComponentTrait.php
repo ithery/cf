@@ -23,6 +23,17 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * 
      * @param string $id
+     * @return CElement_Component_ListGroup
+     */
+    public function addListGroup($id = "") {
+        $listGroup = CElement_Factory::createComponent('ListGroup', $id);
+        $this->add($listGroup);
+        return $listGroup;
+    }
+
+    /**
+     * 
+     * @param string $id
      * @return CElement_Component_DataGridList
      */
     public function addDataGridList($id = "") {
@@ -61,7 +72,7 @@ trait CObservable_Trait_ComponentTrait {
      * @param  string   $id
      * @return CElement_Component_Chart
      */
-    public function addChart($type, $id = "") {
+    public function addChart($type = 'Chart', $id = "") {
         $chart = CElement_Component_Chart::factory($type, $id);
         $this->add($chart);
         return $chart;
@@ -85,6 +96,50 @@ trait CObservable_Trait_ComponentTrait {
         $fileManager = CElement_Component_FileManager::factory($id);
         $this->add($fileManager);
         return $fileManager;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Widget
+     */
+    public function addWidget($id = "") {
+        $widget = CElement_Factory::createComponent('Widget', $id);
+        $this->add($widget);
+        return $widget;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Form
+     */
+    public function addForm($id = "") {
+        $form = CElement_Factory::createComponent('Form', $id);
+        $this->add($form);
+        return $form;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Form
+     */
+    public function addKanban($id = "") {
+        $kanban = CElement_Factory::createComponent('Kanban', $id);
+        $this->add($kanban);
+        return $kanban;
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_PdfViewer
+     */
+    public function addPdfViewer($id = "") {
+        $pdfViewer = CElement_Factory::createComponent('PdfViewer', $id);
+        $this->add($pdfViewer);
+        return $pdfViewer;
     }
 
 }

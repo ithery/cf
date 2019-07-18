@@ -581,14 +581,6 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         $no = 0;
         $data = $this->data;
 
-        if (is_object($data)) {
-            if ($data instanceof CDatabase_Driver_Mysqli_Result) {
-                $data = $data->result_array(false);
-            } else {
-                $data = $data->result_array(false);
-            }
-        }
-
         foreach ($data as $row) {
             $no++;
             $key = "";

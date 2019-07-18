@@ -7,7 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 1, 2018, 4:20:26 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CConstant {
+class CConstant implements CApp_Interface_ConstantInterface {
+
+    use CApp_Trait_ConstantTrait;
 
     /**
      * Handler Constant
@@ -34,11 +36,11 @@ class CConstant {
     const ALIGN_LEFT = 'left';
     const ALIGN_RIGHT = 'right';
     const ALIGN_CENTER = 'center';
-    
-     /**
+
+    /**
      * Table View Constant
      */
     const TABLE_VIEW_COL = 'col';
     const TABLE_VIEW_ROW = 'row';
-   
+
 }

@@ -825,6 +825,17 @@ class Controller_Cresenity extends CController {
         ImageDestroy($image);
     }
 
+    public function transparent($width = 100, $height = 100) {
+        $img = imagecreatetruecolor($width, $height);
+        imagesavealpha($img, true);
+        $color = imagecolorallocatealpha($img, 0, 0, 0, 127);
+        imagefill($img, 0, 0, $color);
+        //Tell the browser what kind of file is come in 
+        header("Content-Type: image/png");
+        imagepng($img);
+        imagedestroy($img);
+    }
+
     public function avatar($method = 'initials') {
         ob_start('ob_gzhandler');
 
@@ -995,6 +1006,19 @@ class Controller_Cresenity extends CController {
         $options['path'] = DOCROOT . 'temp/files';
         $connector = CManager_File::createConnector($engineName, $options);
         $connector->run();
+    }
+
+    public function pdf() {
+        $app = CApp::instance();
+
+        CManager::theme()->setThemeCallback(function($theme) {
+            return 'null';
+        });
+        
+        CManager::registerModule('pdfjs');
+        
+        $app->setViewName('cresenity/pdf');
+        echo $app->render();
     }
 
 }

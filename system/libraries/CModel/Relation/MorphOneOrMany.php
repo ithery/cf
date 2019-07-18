@@ -1,12 +1,7 @@
 <?php
 
-namespace Illuminate\Database\Eloquent\Relations;
+abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMany {
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-
-abstract class MorphOneOrMany extends HasOneOrMany
-{
     /**
      * The foreign key type for the relationship.
      *
@@ -24,19 +19,17 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Create a new morph one or many relationship instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  CModel_Query  $query
+     * @param  CModel  $parent
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $type, $id, $localKey)
-    {
+    public function __construct(CModel_Query $query, CModel $parent, $type, $id, $localKey) {
         $this->morphType = $type;
-
+        
         $this->morphClass = $parent->getMorphClass();
-
         parent::__construct($query, $parent, $id, $localKey);
     }
 
@@ -45,8 +38,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      *
      * @return void
      */
-    public function addConstraints()
-    {
+    public function addConstraints() {
         if (static::$constraints) {
             parent::addConstraints();
 
@@ -60,8 +52,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * @param  array  $models
      * @return void
      */
-    public function addEagerConstraints(array $models)
-    {
+    public function addEagerConstraints(array $models) {
         parent::addEagerConstraints($models);
 
         $this->query->where($this->morphType, $this->morphClass);
@@ -70,11 +61,10 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Attach a model instance to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  CModel  $model
+     * @return CModel
      */
-    public function save(Model $model)
-    {
+    public function save(CModel $model) {
         $model->setAttribute($this->getMorphType(), $this->morphClass);
 
         return parent::save($model);
@@ -83,11 +73,10 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Set the foreign ID and type for creating a related model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  CModel  $model
      * @return void
      */
-    protected function setForeignAttributesForCreate(Model $model)
-    {
+    protected function setForeignAttributesForCreate(CModel $model) {
         $model->{$this->getForeignKeyName()} = $this->getParentKey();
 
         $model->{$this->getMorphType()} = $this->morphClass;
@@ -96,15 +85,14 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Get the relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  CModel_Query  $query
+     * @param  CModel_Query  $parentQuery
      * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
-            $this->morphType, $this->morphClass
+                        $this->morphType, $this->morphClass
         );
     }
 
@@ -113,8 +101,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      *
      * @return string
      */
-    public function getQualifiedMorphType()
-    {
+    public function getQualifiedMorphType() {
         return $this->morphType;
     }
 
@@ -123,9 +110,8 @@ abstract class MorphOneOrMany extends HasOneOrMany
      *
      * @return string
      */
-    public function getMorphType()
-    {
-        return last(explode('.', $this->morphType));
+    public function getMorphType() {
+        return carr::last(explode('.', $this->morphType));
     }
 
     /**
@@ -133,8 +119,8 @@ abstract class MorphOneOrMany extends HasOneOrMany
      *
      * @return string
      */
-    public function getMorphClass()
-    {
+    public function getMorphClass() {
         return $this->morphClass;
     }
+
 }

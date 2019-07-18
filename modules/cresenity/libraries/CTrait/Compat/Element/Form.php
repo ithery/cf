@@ -41,7 +41,7 @@ trait CTrait_Compat_Element_Form {
     public function set_target($target) {
         return $this->setTarget($target);
     }
-    
+
     /**
      * 
      * @deprecated since version 1.2, please use setAjaxSubmit
@@ -100,6 +100,40 @@ trait CTrait_Compat_Element_Form {
      */
     public function set_autocomplete($bool) {
         return $this->setAutoComplete($bool);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2
+     * 
+     * @param string $name
+     * @return $this
+     */
+    public function set_name($name) {
+        return $this->setName($name);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2
+     * 
+     * @param string $layout
+     * @return $this
+     */
+    public function set_layout($layout) {
+        return $this->setLayout($layout);
+    }
+
+    /**
+     * 
+     * @deprecated since version 1.2
+     * 
+     * @param type $datatype
+     * @return $this
+     */
+    public function set_ajax_datatype($datatype) {
+        return $this->setAjaxDataType($datatype);
+     
     }
 
 }

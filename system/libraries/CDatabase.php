@@ -2,9 +2,14 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
+use Carbon\Carbon;
+
 class CDatabase {
 
     use CTrait_Compat_Database;
+    use CDatabase_Trait_DetectDeadlock;
+    use CDatabase_Trait_DetectLostConnection;
+    use CDatabase_Trait_ManageTransaction;
 
     // Database instances
     public static $instances = array();
@@ -62,6 +67,13 @@ class CDatabase {
     protected $last_query = '';
     // Stack of queries for push/pop
     protected $query_history = array();
+
+    /**
+     * The number of active transactions.
+     *
+     * @var int
+     */
+    protected $transactions = 0;
 
     /**
      * The event dispatcher instance.
@@ -1099,7 +1111,7 @@ class CDatabase {
      *
      * @return  string SQL
      */
-    public function last_query() {
+    public function lastQuery() {
         return $this->last_query;
     }
 
@@ -1193,7 +1205,9 @@ class CDatabase {
             // If the SQL contains no more bind marks ("?"), we're done.
             if (($next_bind_pos = strpos($sql, '?')) === FALSE)
                 break;
-
+            if ($val instanceof Carbon) {
+                $val = (string) $val;
+            }
             // Properly escape the bind value.
             $val = $this->driver->escape($val);
 
@@ -1385,41 +1399,17 @@ class CDatabase {
         return FALSE;
     }
 
-    protected $in_trans = false;
-
     public function __destruct() {
         self::rollback();
     }
 
-    public function in_transaction() {
-        return $this->in_trans;
-    }
-
-    public function begin() {
-        if (!$this->in_trans)
-            $this->query('START TRANSACTION;');
-        $this->in_trans = true;
-    }
-
-    public function commit() {
-        if ($this->in_trans)
-            $this->query('COMMIT;');
-        $this->in_trans = false;
-    }
-
-    public function rollback() {
-        if ($this->in_trans)
-            $this->query('ROLLBACK;');
-        $this->in_trans = false;
-    }
-
-    public function escape_like($str) {
+    public function escapeLike($str) {
         //$str = str_replace(array($e, '_', '%'), array($e.$e, $e.'_', $e.'%'), $s);
         $str = $this->escape_str($str);
         return $str;
     }
 
-    public function driver_name() {
+    public function driverName() {
         return ucfirst($this->config['connection']['type']);
     }
 
@@ -1656,6 +1646,16 @@ class CDatabase {
     }
 
     /**
+     * Get a new raw query expression.
+     *
+     * @param  mixed  $value
+     * @return CDatabase_Query_Expression
+     */
+    public static function raw($value) {
+        return new CDatabase_Query_Expression($value);
+    }
+
+    /**
      * Get the name of the connected database.
      *
      * @return string
@@ -1739,6 +1739,27 @@ class CDatabase {
         return new CDatabase_Query_Builder($this);
     }
 
+    /**
+     * Fire an event for this connection.
+     *
+     * @param  string  $event
+     * @return array|null
+     */
+    protected function fireConnectionEvent($event) {
+        if (!isset($this->events)) {
+            return;
+        }
+        switch ($event) {
+            case 'beganTransaction':
+                return $this->events->dispatch(new CDatabase_Event_Transaction_Beginning($this));
+            case 'committed':
+                return $this->events->dispatch(new CDatabase_Event_Transaction_Committed($this));
+            case 'rollingBack':
+                return $this->events->dispatch(new CDatabase_Event_Transaction_RolledBack($this));
+        }
+    }
+
+   
 }
 
 // End Database Class

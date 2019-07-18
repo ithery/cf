@@ -48,6 +48,7 @@ final class CF {
     private static $data;
     private static $sharedAppCode = array();
     public static $instances;
+    private static $translator;
 
     /**
      * @var  CLogger  logging object
@@ -200,14 +201,14 @@ final class CF {
         }
 
         // Enable CF routing
-        CFEvent::add('system.routing', array('CFRouter', 'find_uri'));
+        CFEvent::add('system.routing', array('CFRouter', 'findUri'));
         CFEvent::add('system.routing', array('CFRouter', 'setup'));
 
         // Enable CF controller initialization
         CFEvent::add('system.execute', array('CF', 'instance'));
 
         // Enable CF 404 pages
-        CFEvent::add('system.404', array('CF', 'show_404'));
+        CFEvent::add('system.404', array('CF', 'show404'));
 
         // Enable CF output handling
         CFEvent::add('system.shutdown', array('CF', 'shutdown'));
@@ -215,20 +216,20 @@ final class CF {
         CFBenchmark::start('system.cf.bootstrap');
         //try to locate bootstrap files for modules 
         foreach (CF::modules() as $module) {
-            $bootstrap_path = DOCROOT . 'modules' . DS . $module . DS;
-            if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-                include $bootstrap_path . 'bootstrap' . EXT;
+            $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;
+            if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+                include $bootstrapPath . 'bootstrap' . EXT;
             }
         }
         //try to locate bootstrap files for application 
-        $bootstrap_path = DOCROOT . 'application' . DS . CF::app_code() . DS;
-        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-            include $bootstrap_path . 'bootstrap' . EXT;
+        $bootstrapPath = DOCROOT . 'application' . DS . CF::app_code() . DS;
+        if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+            include $bootstrapPath . 'bootstrap' . EXT;
         }
         //try to locate bootstrap files for org
-        $bootstrap_path .= CF::org_code() . DS;
-        if (file_exists($bootstrap_path . 'bootstrap' . EXT)) {
-            include $bootstrap_path . 'bootstrap' . EXT;
+        $bootstrapPath .= CF::org_code() . DS;
+        if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+            include $bootstrapPath . 'bootstrap' . EXT;
         }
         CFBenchmark::stop('system.cf.bootstrap');
 
@@ -240,7 +241,7 @@ final class CF {
     }
 
     public static function invoke($uri) {
-        $routerData = CFRouter::get_route_data($uri);
+        $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
         $query_string = carr::get($routerData, 'query_string');
@@ -326,8 +327,10 @@ final class CF {
      */
     public static function & instance() {
         $null = NULL;
+
         if (self::$instance === NULL) {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
+
             if (empty(CFRouter::$controller_path)) {
                 CF::show_404();
             }
@@ -1061,7 +1064,7 @@ final class CF {
      * @param   string  custom template
      * @return  void
      */
-    public static function show_404($page = FALSE, $template = FALSE) {
+    public static function show404($page = FALSE, $template = FALSE) {
         if (CFRouter::$current_uri == 'favicon.ico') {
             return false;
         }
@@ -1073,6 +1076,10 @@ final class CF {
             }
         }
         throw new CF_404_Exception($page, $template);
+    }
+
+    public static function show_404($page = FALSE, $template = FALSE) {
+        return self::show404($page, $template);
     }
 
     /**
@@ -1905,7 +1912,7 @@ final class CF {
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
 
-                    $temp .= $sep . chtml::specialchars(print_r($arg, TRUE));
+                    $temp .= $sep . chtml::specialchars(@print_r($arg, TRUE));
 
                     // Change separator to a comma
                     $sep = ', ';
@@ -1957,8 +1964,9 @@ final class CF {
             self::$data[$domain] = CFData::domain($domain);
             if (self::$data[$domain] == null) {
                 //try to locate wildcard subdomain
-                $wildcard_domain = implode('.', array('_') + array_slice(explode('.', $domain), 0));
-                self::$data[$domain] = CFData::domain($wildcard_domain);
+                $wildcardDomain = implode('.', array('$') + array_slice(explode('.', $domain), 0));
+
+                self::$data[$domain] = CFData::domain($wildcardDomain);
             }
         }
         return self::$data[$domain];
@@ -2296,6 +2304,53 @@ final class CF {
      */
     public static function with($value, callable $callback = null) {
         return is_null($callback) ? $value : $callback($value);
+    }
+
+    /**
+     * Determine if a value is "filled".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function filled($value) {
+        return !static::blank($value);
+    }
+
+    /**
+     * Determine if the given value is "blank".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function blank($value) {
+        if (is_null($value)) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Countable) {
+            return count($value) === 0;
+        }
+
+        return empty($value);
+    }
+
+    public static function version() {
+        return CF_VERSION;
+    }
+
+    public static function appPath($domain = null) {
+
+        $appCode = static::appCode($domain);
+
+        return DOCROOT . 'application/' . $appCode . '/';
     }
 
 }

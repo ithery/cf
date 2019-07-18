@@ -266,10 +266,9 @@ class CModel_Query {
      * @return CModel|CModel_Collection|static[]|static|null
      */
     public function find($id, $columns = ['*']) {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (is_array($id) || $id instanceof CInterface_Arrayable) {
             return $this->findMany($id, $columns);
         }
-
         return $this->whereKey($id)->first($columns);
     }
 
@@ -707,7 +706,7 @@ class CModel_Query {
      * @return CModel|$this
      */
     public function create(array $attributes = []) {
-        return $this->tap($this->newModelInstance($attributes), function ($instance) {
+        return CF::tap($this->newModelInstance($attributes), function ($instance) {
                     $instance->save();
                 });
     }
@@ -1168,6 +1167,7 @@ class CModel_Query {
      * @return mixed
      */
     public function __call($method, $parameters) {
+
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];
 
@@ -1190,10 +1190,12 @@ class CModel_Query {
         }
 
         if (method_exists($this->model, $scope = 'scope' . ucfirst($method))) {
+
             return $this->callScope([$this->model, $scope], $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
+
             try {
                 $base = $this->toBase();
                 $class = new ReflectionClass(get_class($base));
