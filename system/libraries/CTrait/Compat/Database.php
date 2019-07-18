@@ -8,7 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CTrait_Compat_Database {
-    
+
     /**
      * 
      * @deprecated since version 1.2
@@ -17,7 +17,7 @@ trait CTrait_Compat_Database {
     public function driver_name() {
         return $this->driverName();
     }
-    
+
     /**
      * 
      * @deprecated
@@ -27,7 +27,7 @@ trait CTrait_Compat_Database {
     public function escape_like($str) {
         return $this->escapeLike($str);
     }
-    
+
     /**
      * 
      * @deprecated since version 1.2
@@ -36,7 +36,7 @@ trait CTrait_Compat_Database {
     public function in_transaction() {
         return $this->inTransaction();
     }
-    
+
     /**
      * Returns the last query run.
      *
@@ -46,7 +46,5 @@ trait CTrait_Compat_Database {
     public function last_query() {
         return $this->lastQuery();
     }
-    
-    
-    
+
 }

@@ -25,7 +25,7 @@ class CValidation_Validator {
     /**
      * The container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var CContainer
      */
     protected $container;
 
@@ -1090,6 +1090,14 @@ class CValidation_Validator {
         throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
         ));
+    }
+
+    public function getAllErrorString() {
+       
+        $messages = $this->errors()->messages();
+        $flattenMessages = carr::flatten($messages);
+        
+        return CF::collect($flattenMessages)->implode(",");
     }
 
 }

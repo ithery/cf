@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+//declare(strict_types=1);
 
 /*
  * This file is part of Evenement.
@@ -11,7 +13,7 @@
 
 namespace Evenement;
 
-class EventEmitter implements EventEmitterInterface
-{
+class EventEmitter implements EventEmitterInterface {
+
     use EventEmitterTrait;
 }

@@ -333,10 +333,12 @@ class CVendor_Odoo_Client {
      * @return bool true if the update was successful.
      */
     public function write($modelName, $resourceId, array $fields) {
+        $resourceId = (int) $resourceId;
         $msg = $this->getBaseObjectRequest($modelName, 'write');
-        $msg->addParam($this->nativeToValue([$resourceId]));
+        $msg->addParam($this->nativeToValue(array($resourceId)));
         $msg->addParam($this->nativeToValue($fields));
         $this->response = $this->getXmlRpcClient(static::API_TYPE_OBJECT)->send($msg);
+        
         return $this->responseAsNative();
     }
 
@@ -479,6 +481,7 @@ class CVendor_Odoo_Client {
             $msg->addParam($this->nativeToValue($group['keys']));
             $msg->addParam($this->nativeToValue($group['records']));
             $this->response = $this->getXmlRpcClient(static::API_TYPE_OBJECT)->send($msg);
+
             $groupResult = $this->responseAsNative();
             // Add in any ids (successfuly loaded) and messages (indicating
             // unsuccessfuly loaded records).

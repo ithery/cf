@@ -38,6 +38,7 @@ class CObservable_Listener_Handler_Driver_Prepend extends CObservable_Listener_H
 
     public function setMethod($method) {
         $this->method = $method;
+        return $this;
     }
 
     public function content() {

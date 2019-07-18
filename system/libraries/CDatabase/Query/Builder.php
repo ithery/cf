@@ -696,6 +696,26 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add an array of where clauses to the query.
+     *
+     * @param  array  $column
+     * @param  string  $boolean
+     * @param  string  $method
+     * @return $this
+     */
+    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    {
+        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+            foreach ($column as $key => $value) {
+                if (is_numeric($key) && is_array($value)) {
+                    $query->{$method}(...array_values($value));
+                } else {
+                    $query->$method($key, '=', $value, $boolean);
+                }
+            }
+        }, $boolean);
+    }
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  string|array|\Closure  $column
@@ -2198,8 +2218,10 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     public function exists() {
-        $results = $this->connection->select(
-                $this->grammar->compileExists($this), $this->getBindings(), !$this->useWritePdo
+       
+        
+        $results = $this->db->query(
+                $this->grammar->compileExists($this), $this->getBindings()
         );
 
         // If the results has rows, we will get the row and see if the exists column is a

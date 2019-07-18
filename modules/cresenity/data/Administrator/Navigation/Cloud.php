@@ -9,9 +9,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 return array(
     array(
+        "name" => "administrator.cloud.project.info",
+        "label" => "Project Information",
+        "controller" => "administrator/cloud/project/info",
+        "method" => "index",
+    ),
+    array(
         "name" => "administrator.cloud.info",
-        "label" => "Information",
-        "controller" => "administrator/cloud/info",
+        "label" => "Server Information",
+        "controller" => "administrator/cloud/server/info",
         "method" => "index",
     ),
 );

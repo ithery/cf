@@ -48,6 +48,7 @@ final class CF {
     private static $data;
     private static $sharedAppCode = array();
     public static $instances;
+    private static $translator;
 
     /**
      * @var  CLogger  logging object
@@ -1911,7 +1912,7 @@ final class CF {
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
 
-                    $temp .= $sep . chtml::specialchars(print_r($arg, TRUE));
+                    $temp .= $sep . chtml::specialchars(@print_r($arg, TRUE));
 
                     // Change separator to a comma
                     $sep = ', ';

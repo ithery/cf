@@ -1063,7 +1063,7 @@ form
 }
 
 .row-tab-menu {
-    z-index: 2;
+    z-index: 1;
     position: relative;
 }
 .row-tab-content {

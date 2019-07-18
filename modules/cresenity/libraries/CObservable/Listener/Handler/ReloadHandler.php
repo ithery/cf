@@ -13,7 +13,6 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
 
-    protected $method;
     protected $content;
     protected $param;
     protected $param_inputs;
@@ -65,6 +64,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
 
     public function setMethod($method) {
         $this->method = $method;
+        return $this;
     }
 
     public function content() {

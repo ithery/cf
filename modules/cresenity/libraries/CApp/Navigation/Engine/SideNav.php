@@ -31,6 +31,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             $method = carr::get($d, 'method');
             $label = carr::get($d, 'label');
             $icon = carr::get($d, 'icon');
+            $class = carr::get($d, 'class');
 
 
 
@@ -86,7 +87,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     $addition_style = ' style="border-bottom:1px solid #bbb"';
                 }
 
-                $html .= '<li class="' . $li_class . $activeClass . '" ' . $addition_style . '>';
+                $html .= '<li class="' . $li_class . $class . $activeClass . '" ' . $addition_style . '>';
 
                 $iconClass = carr::get($d, 'icon');
                 if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {

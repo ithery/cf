@@ -240,4 +240,73 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
+    function createRecurringPayment($externalId, $payerEmail, $interval, $intervalCount, $description, $amount, $options = array()) {
+        $curl = curl_init();
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+        $end_point = $this->server_domain . '/recurring_payments';
+
+        $data = array();
+        //string ID of your choice (typically the unique identifier of a recurring payment in your system)
+        $data['external_id'] = $externalId;
+        //string Email of the end user you're charging
+        $data['payer_email'] = $payerEmail;
+        //string One of DAY, WEEK, MONTH. The frequency with which a recurring payment invoice should be billed.
+        $data['interval'] = $interval;
+        //number The number of intervals (specified in the interval property) between recurring. For example, interval=MONTH and interval_count=3 bills every 3 months.
+        $data['interval_count'] = $intervalCount;
+        //string Description for the recurring payment and invoices
+        $data['description'] = $description;
+        //number Amount per invoice per interval.
+        //The minimum amount to create an invoice is 10.000 IDR. The maximum amount is 1.000.000.000 IDR
+        $data['amount'] = $amount;
+        if (!empty($options['invoice_duration'])) {
+            //number duration of time that end user have in order to pay the invoice before it's expired (in Second). If it's not filled, invoice_duration will follow your business default invoice duration. 
+            //invoice_duration should and will always be less than the interval-interval_count combination.
+            $data['invoice_duration'] = $options['invoice_duration'];
+        }
+        if (!empty($options['should_send_email'])) {
+            //boolean Specify should the end user get email when invoice is created, paid, or expired; or not
+            $data['should_send_email'] = $options['should_send_email'];
+        }
+        if (!empty($options['missed_payment_action'])) {
+            //string One of IGNORE, STOP. If there is an invoice from a recurring payment that expired, IGNORE will continue with the recurring payment as usual. STOP will stop the recurring payment.
+            $data['missed_payment_action'] = $options['missed_payment_action'];
+        }
+        if (!empty($options['credit_card_token'])) {
+            //string Token ID for credit card autocharge. If it's empty then the autocharge is disabled. This token must be multiple use (is_multiple_use is true). please refer create cards token on how to create multi-use token. The token will still be there even if it's failed to charge
+            $data['credit_card_token'] = $options['credit_card_token'];
+        }
+        if (!empty($options['start_date'])) {
+            //string (ISO 8601) time when the first invoice will be issued. When left blank, the invoice will be created immediately
+            $data['start_date'] = $options['start_date'];
+        }
+        if (!empty($options['success_redirect_url'])) {
+            //string url that end user will be redirected to upon successful payment to invoice created by this recurring payment. 
+            //example : https://yourcompany.com/example_item/10/success_page
+            $data['success_redirect_url'] = $options['success_redirect_url'];
+        }
+        if (!empty($options['failure_redirect_url'])) {
+            //string url that end user will be redirected to upon expireation of invoice created by this recurring payment. 
+            //example : https://yourcompany.com/example_item/10/failed_checkout
+            $data['failure_redirect_url'] = $options['failure_redirect_url'];
+        }
+     
+        
+        
+        
+         
+        $payload = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $end_point);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
+
 }

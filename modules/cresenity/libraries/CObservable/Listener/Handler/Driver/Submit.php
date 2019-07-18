@@ -34,6 +34,7 @@ class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Ha
 
     public function setMethod($method) {
         $this->method = $method;
+        return $this;
     }
 
     public function setForm($form_id) {

@@ -76,6 +76,7 @@ class CObservable_Listener_Handler_Driver_Dialog extends CObservable_Listener_Ha
 
     public function set_method($method) {
         $this->method = $method;
+        return $this;
     }
 
     public function content() {
