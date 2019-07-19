@@ -109,6 +109,7 @@ trait CDatabase_Trait_ManageTransaction {
     protected function createTransaction() {
         if ($this->transactions > 0 && !$this->isSavePoint) {
             //no need to handle this transaction
+            
             return;
         }
         if ($this->transactions == 0) {
