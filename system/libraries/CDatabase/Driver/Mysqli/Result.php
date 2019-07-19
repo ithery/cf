@@ -29,7 +29,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
     public function __construct($link, $object = TRUE, $sql) {
 
 
-
+      
         $this->link = $link;
 
 
