@@ -15,8 +15,6 @@ class CTracker_Model_Route extends CTracker_Model {
         'action',
     ];
 
-    public function paths() {
-        return $this->hasMany($this->getConfig()->get('routePathModel'));
-    }
+ 
 
 }
