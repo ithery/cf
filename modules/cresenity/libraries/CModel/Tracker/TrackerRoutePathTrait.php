@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jul 20, 2019, 10:58:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-trait CModel_Tracker_TrackerRefererTrait {
+trait CModel_Tracker_TrackerRoutePathTrait {
 
     public function parameters() {
         return $this->hasMany(CTracker::config()->get('routePathParameterModel', 'CTracker_Model_RoutePathParameter'));

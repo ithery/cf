@@ -8,7 +8,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CTracker_Model_Log extends CTracker_Model {
+
     use CModel_Tracker_TrackerLogTrait;
+
     protected $table = 'log_log';
     protected $fillable = [
         'log_session_id',
@@ -23,7 +25,5 @@ class CTracker_Model_Log extends CTracker_Model {
         'wants_json',
         'log_error_id',
     ];
-
-    
 
 }
