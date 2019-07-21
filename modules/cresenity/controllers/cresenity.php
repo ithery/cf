@@ -790,12 +790,12 @@ class Controller_Cresenity extends CController {
     public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
 
         //Create the image resource 
-        $image = ImageCreate($width, $height);
+        $image = imagecreate($width, $height);
         //Making of colors, we are changing HEX to RGB
-        $bg_color = ImageColorAllocate($image, base_convert(substr($bg_color, 0, 2), 16, 10), base_convert(substr($bg_color, 2, 2), 16, 10), base_convert(substr($bg_color, 4, 2), 16, 10));
+        $bg_color = imagecolorallocate($image, base_convert(substr($bg_color, 0, 2), 16, 10), base_convert(substr($bg_color, 2, 2), 16, 10), base_convert(substr($bg_color, 4, 2), 16, 10));
 
 
-        $txt_color = ImageColorAllocate($image, base_convert(substr($txt_color, 0, 2), 16, 10), base_convert(substr($txt_color, 2, 2), 16, 10), base_convert(substr($txt_color, 4, 2), 16, 10));
+        $txt_color = imagecolorallocate($image, base_convert(substr($txt_color, 0, 2), 16, 10), base_convert(substr($txt_color, 2, 2), 16, 10), base_convert(substr($txt_color, 4, 2), 16, 10));
 
         //Fill the background color 
         ImageFill($image, 0, 0, $bg_color);
@@ -806,8 +806,8 @@ class Controller_Cresenity extends CController {
         }
         $line_number = 1;
         $total_lines = 1;
-        $center_x = ceil(( imagesx($image) - ( ImageFontWidth($fontsize) * strlen($text) ) ) / 2);
-        $center_y = ceil(( ( imagesy($image) - ( ImageFontHeight($fontsize) * $total_lines ) ) / 2) + ( ($line_number - 1) * ImageFontHeight($fontsize) ));
+        $center_x = ceil(( imagesx($image) - ( imagefontwidth($fontsize) * strlen($text) ) ) / 2);
+        $center_y = ceil(( ( imagesy($image) - ( imagefontheight($fontsize) * $total_lines ) ) / 2) + ( ($line_number - 1) * ImageFontHeight($fontsize) ));
         //Inserting Text    
         imagestring($image, $fontsize, $center_x, $center_y, $text, $txt_color);
         /*
@@ -822,7 +822,7 @@ class Controller_Cresenity extends CController {
         //Output the newly created image in png format 
         imagepng($image);
         //Free up resources
-        ImageDestroy($image);
+        imagedestroy($image);
     }
 
     public function transparent($width = 100, $height = 100) {
@@ -1014,9 +1014,9 @@ class Controller_Cresenity extends CController {
         CManager::theme()->setThemeCallback(function($theme) {
             return 'null';
         });
-        
+
         CManager::registerModule('pdfjs');
-        
+
         $app->setViewName('cresenity/pdf');
         echo $app->render();
     }

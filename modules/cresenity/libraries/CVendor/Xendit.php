@@ -130,6 +130,64 @@ class CVendor_Xendit {
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
+    
+    public function updateCallbackVirtualAccount($virtualAccountId, $options = array()) {
+        $curl = curl_init();
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+        $end_point = $this->server_domain . '/callback_virtual_accounts/'.$virtualAccountId;
+        $isSingleUse = carr::get($options, 'is_single_use', null);
+        $suggestedAmount = carr::get($options, 'suggested_amount', null);
+        $expectedAmount = carr::get($options, 'expected_amount', null);
+        $expirationDate = carr::get($options, 'expiration_date', null);
+        $description = carr::get($options, 'description', null);
+        $data=array();
+        if (!empty($isSingleUse)) {
+            $data['is_single_use'] = $isSingleUse;
+        }
+        if (!empty($suggestedAmount)) {
+            $data['suggested_amount'] = $suggestedAmount;
+        }
+        if (!empty($expectedAmount)) {
+            $data['expected_amount'] = $expectedAmount;
+        }
+        if (!empty($expirationDate)) {
+            $data['expiration_date'] = $expirationDate;
+        }
+        if (!empty($description)) {
+            $data['description'] = $expirationDate;
+        }
+        $payload = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $end_point);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+      
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
+    
+    public function getCallbackVirtualAccount($virtualAccountId) {
+        $curl = curl_init();
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+        $end_point = $this->server_domain . '/callback_virtual_accounts/'.$virtualAccountId;
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $end_point);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+      
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
 
     public function getDisbursement($disbursement_id) {
         $curl = curl_init();
@@ -351,6 +409,7 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
+       
         curl_close($curl);
         $responseObject = json_decode($response, true);
         return $responseObject;

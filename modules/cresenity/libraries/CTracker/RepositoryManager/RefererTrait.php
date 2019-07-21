@@ -32,6 +32,7 @@ trait CTracker_RepositoryManager_RefererTrait {
 //                $domain = array_pop($parts) . '.' . $domain;
 //            }
             $domain = $url['host'];
+
             $domain_id = $this->getDomainId($domain);
             return $this->refererRepository->store($referer, $url['host'], $domain_id);
         }

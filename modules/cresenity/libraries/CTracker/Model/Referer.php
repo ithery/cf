@@ -15,7 +15,7 @@ class CTracker_Model_Referer extends CTracker_Model {
     protected $fillable = [
         'url',
         'host',
-        'domain_id',
+        'log_domain_id',
         'medium',
         'source',
         'search_terms_hash',
