@@ -109,7 +109,7 @@ trait CDatabase_Trait_ManageTransaction {
     protected function createTransaction() {
         if ($this->transactions > 0 && !$this->isSavePoint) {
             //no need to handle this transaction
-            
+
             return;
         }
         if ($this->transactions == 0) {
@@ -200,7 +200,7 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     protected function performRollBack($toLevel) {
-        if ($toLevel == 0) {
+        if ($toLevel == 0 || $this->isSavePoint == false) {
             $this->driver->rollBack();
         } elseif ($this->queryGrammar->supportsSavepoints()) {
             $this->driver->query(
