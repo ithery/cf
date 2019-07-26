@@ -127,7 +127,8 @@ class CSocialLogin_DriverManager {
      */
     protected function formatRedirectUrl(array $config) {
         $redirect = CF::value($config['redirect']);
-        return cstr::startsWith($redirect, '/') ? $this->app['url']->to($redirect) : $redirect;
+        //return cstr::startsWith($redirect, '/') ? $this->app['url']->to($redirect) : $redirect;
+        return $redirect;
     }
 
     /**
