@@ -29,6 +29,11 @@ class CTracker_Config {
         $default['refererModel'] = 'CTracker_Model_Referer';
         $default['refererSearchTermModel'] = 'CTracker_Model_RefererSearchTerm';
         $default['languageModel'] = 'CTracker_Model_Language';
+        $default['routeModel'] = 'CTracker_Model_Route';
+        $default['routePathModel'] = 'CTracker_Model_RoutePath';
+        $default['routePathParameterModel'] = 'CTracker_Model_RoutePathParameter';
+        $default['pathModel'] = 'CTracker_Model_Path';
+        $default['connectionModel'] = 'CTracker_Model_Connection';
         $default['geoIpModel'] = 'CTracker_Model_GeoIp';
         $default['domainModel'] = 'CTracker_Model_Domain';
         $default['deviceModel'] = 'CTracker_Model_Device';
@@ -37,6 +42,11 @@ class CTracker_Config {
         $default['errorModel'] = 'CTracker_Model_Error';
         $default['queryModel'] = 'CTracker_Model_Query';
         $default['queryArgumentModel'] = 'CTracker_Model_QueryArgument';
+        $default['sqlQueryModel'] = 'CTracker_Model_SqlQuery';
+        $default['sqlQueryBindingModel'] = 'CTracker_Model_SqlQueryBinding';
+        $default['sqlQueryBindingParameterModel'] = 'CTracker_Model_SqlQueryBindingParameter';
+        $default['sqlQueryLogModel'] = 'CTracker_Model_SqlQueryLog';
+        $default['systemClassModel'] = 'CTracker_Model_SystemClass';
         $default['logCookie'] = true;
         $default['logDevice'] = true;
         $default['logGeoIp'] = true;

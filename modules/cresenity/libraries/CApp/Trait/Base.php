@@ -255,8 +255,9 @@ trait CApp_Trait_Base {
         return crequest::remote_address();
     }
 
-    public static function noImageUrl($width = 100, $height = 100) {
-        return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height;
+    public static function noImageUrl($width = 100, $height = 100, $backgroundColor = 'EFEFEF', $color = 'AAAAAA', $text = 'NO IMAGE') {
+    
+        return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height . '/' . $backgroundColor . '/' . $color . '/' . rawurlencode($text);
     }
 
     public static function transparentImageUrl($width = 100, $height = 100) {

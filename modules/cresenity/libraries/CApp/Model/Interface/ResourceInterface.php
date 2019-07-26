@@ -8,5 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 interface CApp_Model_Interface_ResourceInterface extends CInterface_Responsable, CInterface_Htmlable {
-    
+
+    const TYPE_OTHER = 'other';
+
 }

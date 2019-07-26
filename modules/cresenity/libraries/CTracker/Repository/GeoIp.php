@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CTracker_Repository_GeoIp extends CTracker_AbstractRepository {
 
     public function __construct() {
-        $this->className = 'CTracker_Model_GeoIp';
+        $this->className = CTracker::config()->get('geoIpModel', 'CTracker_Model_GeoIp');
         $this->createModel();
 
         parent::__construct();

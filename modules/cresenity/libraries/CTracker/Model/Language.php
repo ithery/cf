@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_Language extends CTracker_Model {
 
+    use CModel_Tracker_TrackerLanguageTrait;
+
     protected $table = 'log_language';
     protected $fillable = ['preference', 'language-range'];
 

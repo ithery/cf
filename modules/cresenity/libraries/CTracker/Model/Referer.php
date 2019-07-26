@@ -9,18 +9,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_Referer extends CTracker_Model {
 
+    use CModel_Tracker_TrackerRefererTrait;
+
     protected $table = 'log_referer';
     protected $fillable = [
         'url',
         'host',
-        'domain_id',
+        'log_domain_id',
         'medium',
         'source',
         'search_terms_hash',
     ];
-
-    public function domain() {
-        return $this->belongsTo('CTracker_Model_Domain');
-    }
 
 }
