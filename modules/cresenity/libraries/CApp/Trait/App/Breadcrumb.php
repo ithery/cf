@@ -14,7 +14,7 @@ trait CApp_Trait_App_Breadcrumb {
     private $breadcrumbCallback = null;
 
     public function showBreadcrumb($bool = true) {
-        $this->show_breadcrumb = $bool;
+        $this->showBreadcrumb = $bool;
         return $this;
     }
 
