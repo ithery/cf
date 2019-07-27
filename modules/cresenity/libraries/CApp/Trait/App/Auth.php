@@ -11,17 +11,24 @@ trait CApp_Trait_App_Auth {
 
     private $_role = null;
     private $_user = null;
+    private $loginRequired = true;
 
-    public function is_user_login() {
+    public function isUserLogin() {
         return $this->user() != null;
+    }
+
+    public function setLoginRequired($bool) {
+        $this->loginRequired = $bool;
+        return $this;
     }
 
     public function user() {
         if ($this->_user == null) {
             $session = CSession::instance();
             $user = $session->get("user");
-            if (!$user)
+            if (!$user) {
                 $user = null;
+            }
             $this->_user = $user;
         }
         return $this->_user;

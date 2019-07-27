@@ -116,4 +116,9 @@ trait CTrait_Compat_App {
         CManager::instance()->register_module($module);
     }
 
+    public function is_user_login() {
+        return $this->isUserLogin();
+    }
+
+
 }

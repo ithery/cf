@@ -19,7 +19,6 @@ class CApp extends CObservable {
     private $signup = false;
     private $activation = false;
     private $resend = false;
-    private $loginRequired = true;
     private $_store = null;
     private $_org = null;
     private $_admin = null;
@@ -205,10 +204,6 @@ class CApp extends CObservable {
         }
     }
 
-    public function setLoginRequired($bool) {
-        return $this->loginRequired = $bool;
-    }
-
     public function appId() {
         return CF::appId();
     }
@@ -367,9 +362,9 @@ class CApp extends CObservable {
             $viewName = 'ccore/resend_activation';
         } else if ($this->activation) {
             $viewName = 'ccore/activation';
-        } else if (!$this->is_user_login() && ccfg::get("have_user_login") && $this->loginRequired) {
+        } else if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
             $viewName = $this->viewLoginName;
-        } else if (!$this->is_user_login() && ccfg::get("have_static_login") && $this->loginRequired) {
+        } else if (!$this->isUserLogin() && $this->config("have_static_login") && $this->loginRequired) {
             $viewName = 'ccore/static_login';
         }
 
@@ -444,7 +439,6 @@ class CApp extends CObservable {
         return $this->_member;
     }
 
-    
     public function org() {
 
         if ($this->_org == null) {
