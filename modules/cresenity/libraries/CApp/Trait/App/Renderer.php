@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CApp_Trait_App_Renderer {
 
     public function getVariables() {
-        $app = CApp::variables();
+        return $this->variables();
     }
 
     public function getViewData() {
@@ -93,6 +93,23 @@ trait CApp_Trait_App_Renderer {
         $viewData['loginRequired'] = $this->loginRequired;
 
         return $viewData;
+    }
+
+    public function allModuleData() {
+        $allModule = CManager::asset()->module()->allModules();
+        foreach ($allModule as $moduleName => $module) {
+            foreach ($module as $type => $urls) {
+                foreach ($urls as $indexUrl => $url) {
+                    if ($type == 'js') {
+
+                        $allModule[$moduleName][$type][$indexUrl] = CManager_Asset_Helper::urlJsFile($url);
+                    }
+                    if ($type == 'css') {
+                        $allModule[$moduleName][$type][$indexUrl] = CManager_Asset_Helper::urlCssFile($url);
+                    }
+                }
+            }
+        }
     }
 
 }
