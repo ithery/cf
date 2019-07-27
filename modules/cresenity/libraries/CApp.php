@@ -298,7 +298,7 @@ class CApp extends CObservable {
     public function registerCoreModules() {
         $manager = CManager::instance();
         $theme = CManager::theme()->getCurrentTheme();
-        $themeFile = CF::get_file('themes', $theme);
+        $themeFile = CF::getFile('themes', $theme);
         if (file_exists($themeFile)) {
             $themeData = include $themeFile;
             $moduleArray = carr::get($themeData, 'client_modules');
