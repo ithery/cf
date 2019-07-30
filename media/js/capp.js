@@ -862,9 +862,12 @@ var Cresenity = function () {
 
     };
 
-    this.blockPage = function () {
+    this.blockPage = function (options) {
+        var settings = $.extend({
+            innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+        }, options);
         $.blockUI({
-            message: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+            message: settings.message,
             css: {
                 backgroundColor: 'transparent',
                 border: '0',
