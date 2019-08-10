@@ -171,7 +171,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @return string|array
      */
     public function input($key = null, $default = null) {
-        return data_get(
+        return CF::get(
                 $this->getInputSource()->all() + $this->query->all(), $key, $default
         );
     }

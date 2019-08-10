@@ -995,17 +995,24 @@ class Controller_Cresenity extends CController {
         $connector->run();
     }
 
-    public function connector($engine) {
+    public function connector($engine, $method = null) {
         $engineName = 'FileManager';
         switch ($engine) {
             case 'elfinder':
                 $engineName = 'ElFinder';
                 break;
+            case 'fm':
+                $engineName = 'FileManager';
+                break;
+
+            default:
+                die('Error, Connector engine not found');
+                break;
         }
         $options = array();
         $options['path'] = DOCROOT . 'temp/files';
         $connector = CManager_File::createConnector($engineName, $options);
-        $connector->run();
+        $connector->run($method);
     }
 
     public function pdf() {

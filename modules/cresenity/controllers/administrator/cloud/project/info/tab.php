@@ -4,12 +4,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 2, 2019, 10:13:30 PM
+ * @since Aug 11, 2019, 12:33:14 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class Controller_Administrator_Cloud_Info_Project extends CApp_Administrator_Controller_User {
 
-    public function tab() {
+class Controller_Administrator_Cloud_Project_Info_Tab extends CApp_Administrator_Controller_User {
+
+    public function project() {
         $app = CApp::instance();
 
         $app->addH5()->add('Project Information');
@@ -64,6 +65,25 @@ class Controller_Administrator_Cloud_Info_Project extends CApp_Administrator_Con
             $divMediaBody = $divMedia->addDiv()->addClass('media-body flex-truncate ml-3');
             $divMediaBody->addSpan()->addClass('badge badge-outline-success')->add(carr::get($data, 'name'));
         }, __FILE__);
+        echo $app->render();
+    }
+
+    
+    
+    public function app() {
+        $app = CApp::instance();
+
+        $app->addH5()->add('Application Information');
+        $errCode = 0;
+        $errMessage = '';
+        $cloudData = array();
+        try {
+            $cloudData = CApp_Cloud::instance()->api('Development/GetInfo');
+        } catch (Exception $ex) {
+            $errCode++;
+            $errMessage = $ex->getMessage();
+        }
+      
         echo $app->render();
     }
 

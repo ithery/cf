@@ -23,6 +23,8 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
         CManager::instance()->asset()->module()->registerRunTimeModule('plupload');
         CManager::instance()->asset()->module()->registerRunTimeModule('jquery.filemanager');
+        
+        $this->addTemplate()->setTemplate('CElement/Component/FileManager/Index');
     }
 
     public function js($indent = 0) {

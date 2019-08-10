@@ -19,14 +19,8 @@ return array(
         "name" => "administrator.app",
         "label" => "Application",
         "icon" => " lnr lnr-dice",
-        "subnav" => array(
-            array(
-                "name" => "administrator.app.info",
-                "label" => "Information",
-                "controller" => "administrator/app/info",
-                "method" => "index",
-            ),
-        ),
+        "subnav" => include dirname(__FILE__) . "/Navigation/Application" . EXT,
+        
     ),
     array(
         "name" => "administrator.database",

@@ -24,11 +24,11 @@ class Controller_Administrator_Cloud_Project_Info extends CApp_Administrator_Con
         $tabAppActive = $tabActive == 'app';
 
         $tabList = $app->addTabList();
-        $tabList->addTab()->setLabel('Project')->setAjaxUrl(curl::base() . 'administrator/cloud/info/project/tab')
+        $tabList->addTab()->setLabel('Project')->setAjaxUrl(curl::base() . 'administrator/cloud/project/info/tab/project')
                 ->setActive($tabProjectActive);
 
-        $tabList->addTab()->setLabel('Application')->setAjaxUrl(curl::base() . 'administrator/cloud/info/app/tab')
-                ->setActive($tabAppActive)->setNoPadding();
+        $tabList->addTab()->setLabel('Application')->setAjaxUrl(curl::base() . 'administrator/cloud/project/info/tab/app')
+                ->setActive($tabAppActive);
 
         try {
             $cloudData = CApp_Cloud::instance()->api('Development/GetInfo');

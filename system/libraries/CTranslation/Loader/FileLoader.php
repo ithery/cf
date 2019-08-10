@@ -115,11 +115,21 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
      * @return array
      */
     protected function loadPath($path, $locale, $group) {
-        if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
-            return $this->files->getRequire($full);
+        $cfPaths = CF::paths();
+        $result = array();
+        foreach ($cfPaths as $cfPath) {
+            $pathToFind = $cfPath . $path;
+
+            if ($this->files->exists($full = "{$pathToFind}/{$locale}/{$group}.php")) {
+
+                $array = $this->files->getRequire($full);
+
+                $result = array_merge($result, $array);
+            }
         }
 
-        return [];
+
+        return $result;
     }
 
     /**

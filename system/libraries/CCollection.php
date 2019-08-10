@@ -421,8 +421,10 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @param  mixed  $value
      * @return static
      */
-    public function where($key, $operator, $value = null) {
-        return $this->filter($this->operatorForWhere($key, $operator, $value));
+    public function where($key, $operator = null, $value = null) {
+        
+        
+        return $this->filter(call_user_func_array(array($this,'operatorForWhere'), func_get_args()));
     }
 
     /**
@@ -434,29 +436,28 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return \Closure
      */
     protected function operatorForWhere($key, $operator, $value = null) {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 1) {
+            $value = true;
+            $operator = '=';
+        }
+        if (func_num_args() === 2) {
             $value = $operator;
-
             $operator = '=';
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = null;
+            $retrieved = CF::get($item, $key);
 
-            if (is_array($item)) {
-                $retrieved = carr::path($item, $key);
-            } elseif (is_object($item)) {
-                $retrieved = cobj::get($item, $key);
-            }
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
             });
+               
 
             if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
                 return in_array($operator, ['!=', '<>', '!==']);
             }
-
+            
             switch ($operator) {
                 default:
                 case '=':
@@ -1658,7 +1659,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
         if (!in_array($key, static::$proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
-        
+
         return new CProxy_HigherOrderCollectionProxy($this, $key);
     }
 
