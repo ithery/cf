@@ -18,7 +18,7 @@ return array(
      
     ),
     "js" => array(
-        "capp.js?v=1",
+        "capp.js?v=2",
         "cresenity.js",
     ),
     "css" => array(

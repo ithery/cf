@@ -461,10 +461,13 @@ var Cresenity = function () {
 
     this.filesAdded = "";
     this.modalElements = [];
-    
-    
-    this.isJson = function(text) {
-        return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
+
+
+    this.isJson = function (text) {
+        if (typeof text == 'string') {
+            return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
+        }
+        return false;
     };
     this.loadJs = function (filename, callback) {
         var fileref = document.createElement('script');

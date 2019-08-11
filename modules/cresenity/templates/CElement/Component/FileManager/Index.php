@@ -775,7 +775,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         return (match && match.length > 1) ? match[1] : null;
     }
 
-    function use(items) {
+    window.use=function(items) {
         function useTinymce3(url) {
             if (!usingTinymce3()) {
                 return;

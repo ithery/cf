@@ -8,6 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use CManager_File_Connector_FileManager_FM as FM;
+use \Illuminate\Support\Facades\Facade as Facade;
 
 class CManager_File_Connector_FileManager_Controller_BaseController {
 
@@ -19,6 +20,9 @@ class CManager_File_Connector_FileManager_Controller_BaseController {
         CManager::theme()->setThemeCallback(function($theme) {
             return 'cresenity-filemanager';
         });
+        
+        //do this with facade
+        Facade::setFacadeApplication(CContainer::getInstance());
     }
 
     public function error($error_type, $variables = []) {

@@ -8,6 +8,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Intervention\Image\Facades\Image;
+// import the Intervention Image Manager Class
+use Intervention\Image\ImageManager;
 
 class CManager_File_Connector_FileManager_FM_Path {
 
@@ -263,7 +265,9 @@ class CManager_File_Connector_FileManager_FM_Path {
         $this->setName(null)->thumb(true)->createFolder();
         // generate cropped image content
         $this->setName($file_name)->thumb(true);
-        $image = Image::make($original_image->get())
+        
+        $imageManager = new ImageManager();
+        $image = $imageManager->make($original_image->get())
                 ->fit($this->helper->config('thumb_img_width', 200), $this->helper->config('thumb_img_height', 200));
         $this->storage->put($image->stream()->detach());
     }
