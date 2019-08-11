@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CManager_File_Connector_FileManager_FM {
 
+    use CEvent_Trait_Dispatchable;
+
     public function path() {
         return new CManager_File_Connector_FileManager_FM_Path($this);
     }

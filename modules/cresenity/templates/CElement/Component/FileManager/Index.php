@@ -96,7 +96,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aia-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
-                <form action="<?php echo curl::base().'cresenity/connector/fm/upload'; ?>" role='form' id='uploadForm' name='uploadForm' method='post' enctype='multipart/form-data' class="dropzone">
+                <form action="<?php echo curl::base() . 'cresenity/connector/fm/upload'; ?>" role='form' id='uploadForm' name='uploadForm' method='post' enctype='multipart/form-data' class="dropzone">
                     <div class="form-group" id="attachment">
                         <div class="controls text-center">
                             <div class="input-group w-100">
@@ -235,7 +235,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     ];
 </script>
 <script>
-    var fmRoute = '<?php echo curl::base().'cresenity/connector/fm'; ?>';
+    var fmRoute = '<?php echo curl::base() . 'cresenity/connector/fm'; ?>';
     var show_list;
     var sort_type = 'alphabetic';
     var multi_selection_enabled = false;
@@ -525,6 +525,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         });
     }
 
+
     function displayErrorResponse(jqXHR) {
         notify('<div style="max-height:50vh;overflow: scroll;">' + jqXHR.responseText + '</div>');
     }
@@ -544,11 +545,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
     }
 
     function loadFolders() {
-        
+
         var reloadOptions = {};
         reloadOptions.selector = '#tree';
-        reloadOptions.url = fmRoute+'/folder';
-        reloadOptions.onSuccess=function(data) {
+        reloadOptions.url = fmRoute + '/folder';
+        reloadOptions.onSuccess = function (data) {
             loadItems();
         }
         cresenity.reload(reloadOptions);
@@ -652,7 +653,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 // ==         File Actions         ==
 // ==================================
 
-    function rename(item) {
+    window.rename = function (item) {
         dialog(lang['message-rename'], item.name, function (new_name) {
             performFmRequest('rename', {
                 file: item.name,
@@ -661,7 +662,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         });
     }
 
-    function trash(items) {
+    window.trash = function (items) {
         notify(lang['message-delete'], function () {
             performFmRequest('delete', {
                 items: items.map(function (item) {
@@ -671,17 +672,17 @@ defined('SYSPATH') OR die('No direct access allowed.');
         });
     }
 
-    function crop(item) {
+    window.crop = function (item) {
         performFmRequest('crop', {img: item.name})
                 .done(hideNavAndShowEditor);
     }
 
-    function resize(item) {
+    window.resize = function (item) {
         performFmRequest('resize', {img: item.name})
                 .done(hideNavAndShowEditor);
     }
 
-    function download(items) {
+    window.download = function (items) {
         items.forEach(function (item, index) {
             var data = defaultParameters();
 
@@ -698,11 +699,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
         });
     }
 
-    function open(item) {
+    window.open = function (item) {
         goTo(item.url);
     }
 
-    function preview(items) {
+    window.preview = function (items) {
         var carousel = $('#carouselTemplate').clone().attr('id', 'previewCarousel').removeClass('d-none');
         var imageTemplate = carousel.find('.carousel-item').clone().removeClass('active');
         var indicatorTemplate = carousel.find('.carousel-indicators > li').clone().removeClass('active');
@@ -762,7 +763,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         notify(carousel);
     }
 
-    function move(items) {
+    window.move = function (items) {
         performFmRequest('move', {items: items.map(function (item) {
                 return item.name;
             })})
@@ -914,7 +915,17 @@ defined('SYSPATH') OR die('No direct access allowed.');
     function notify(body, callback) {
         $('#notify').find('.btn-primary').toggle(callback !== undefined);
         $('#notify').find('.btn-primary').unbind().click(callback);
-        $('#notify').modal('show').find('.modal-body').html(body);
+
+        var json = JSON.parse(body);
+        if (typeof json == 'object') {
+            eval(cresenity.base64.decode(json.js));
+            console.log(cresenity.base64.decode(json.js))
+            $('#notify').find('.modal-body').html(json.html);
+            $('#notify').modal('show');
+        } else {
+            $('#notify').modal('show').find('.modal-body').html(body);
+        }
+
     }
 
     function dialog(title, value, callback) {
@@ -931,7 +942,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 </script>
 <script>
-    Dropzone.options.uploadForm = {
+    new Dropzone("#uploadForm", {
         paramName: "upload[]", // The name that will be used to transfer the file
         uploadMultiple: false,
         parallelUploads: 5,
@@ -952,5 +963,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         },
         acceptedFiles: "<?php echo implode(',', $fm->availableMimeTypes()); ?>",
         maxFilesize: (<?php echo $fm->maxUploadSize(); ?> / 1000)
-    }
+    });
+
+
 </script>
