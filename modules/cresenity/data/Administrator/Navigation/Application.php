@@ -20,4 +20,11 @@ return array(
         "controller" => "administrator/app/file",
         "method" => "index",
     ),
+    
+    array(
+        "name" => "administrator.app.generator",
+        "label" => "Generator",
+        "controller" => "administrator/app/generator",
+        "method" => "index",
+    ),
 );
