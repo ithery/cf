@@ -540,7 +540,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     var hideNavAndShowEditor = function (data) {
         $('#nav-buttons > ul').addClass('d-none');
-        $('#content').html(data).removeClass('preserve_actions_space');
+        var content = $('#content');
+        if(cresenity.isJson(data)) {
+            json = JSON.parse(data);
+            eval(cresenity.base64.decode(json.js))
+            content.html(json.html);
+        } else {
+            content.html(data);
+        }
+        content.removeClass('preserve_actions_space');
         clearSelected();
     }
 

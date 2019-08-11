@@ -13,6 +13,7 @@ return array(
         "jquery",
         "bootstrap-4",
         "fontawesome-5-f",
+        "jquery-ui-1.12.1.custom",
         "cropper",
         "dropzone",
      

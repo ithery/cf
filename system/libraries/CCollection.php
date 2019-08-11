@@ -422,9 +422,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
      * @return static
      */
     public function where($key, $operator = null, $value = null) {
-        
-        
-        return $this->filter(call_user_func_array(array($this,'operatorForWhere'), func_get_args()));
+
+
+        return $this->filter(call_user_func_array(array($this, 'operatorForWhere'), func_get_args()));
     }
 
     /**
@@ -452,12 +452,12 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
             });
-               
+
 
             if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
                 return in_array($operator, ['!=', '<>', '!==']);
             }
-            
+
             switch ($operator) {
                 default:
                 case '=':
@@ -986,6 +986,11 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate {
     public function only($keys) {
         if (is_null($keys)) {
             return new static($this->items);
+        }
+
+
+        if ($keys instanceof self) {
+            $keys = $keys->all();
         }
 
         $keys = is_array($keys) ? $keys : func_get_args();
