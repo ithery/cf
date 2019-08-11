@@ -325,7 +325,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @return \Illuminate\Http\UploadedFile|array|null
      */
     public function file($key = null, $default = null) {
-        return data_get($this->allFiles(), $key, $default);
+        return CF::get($this->allFiles(), $key, $default);
     }
 
     /**

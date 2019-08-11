@@ -23,6 +23,13 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     protected $json;
 
     /**
+     * All of the converted files for the request.
+     *
+     * @var array
+     */
+    protected $convertedFiles;
+
+    /**
      * Create an object request from a Symfony instance.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
