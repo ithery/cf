@@ -461,6 +461,11 @@ var Cresenity = function () {
 
     this.filesAdded = "";
     this.modalElements = [];
+    
+    
+    this.isJson = function(text) {
+        return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
+    };
     this.loadJs = function (filename, callback) {
         var fileref = document.createElement('script');
         fileref.setAttribute("type", "text/javascript");
@@ -476,7 +481,7 @@ var Cresenity = function () {
         }
         document.getElementsByTagName("head")[0].appendChild(fileref);
 
-    }
+    };
     this.loadJsCss = function (filename, filetype, callback) {
         if (filetype == "js") { //if filename is a external JavaScript file
             var fileref = document.createElement('script')
