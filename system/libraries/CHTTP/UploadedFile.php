@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class CHTTP_UploadedFile extends SymfonyUploadedFile {
 
-    use FileHelpers,
-        Macroable;
+    use CHTTP_Trait_FileHelpersTrait,
+        CTrait_Macroable;
 
     /**
      * Begin creating a new file fake.

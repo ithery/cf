@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Aug 11, 2019, 3:20:19 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Intervention\Image\Facades\Image;
+
 class CManager_File_Connector_FileManager_FM_Path {
 
     private $working_dir;
@@ -78,7 +80,7 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function folders() {
-        
+
         $all_folders = array_map(function ($directory_path) {
             return $this->pretty($directory_path);
         }, $this->storage->directories());
@@ -97,7 +99,7 @@ class CManager_File_Connector_FileManager_FM_Path {
 
     public function pretty($item_path) {
         $cloned = $this->createNewPathObject()->setName($this->helper->getNameFromPath($item_path));
-        return new CManager_File_Connector_FileManager_FM_Item($cloned,$this->helper);
+        return new CManager_File_Connector_FileManager_FM_Item($cloned, $this->helper);
     }
 
     public function delete() {
@@ -124,17 +126,17 @@ class CManager_File_Connector_FileManager_FM_Path {
     public function isDirectory() {
         $working_dir = $this->path('working_dir');
         $parent_dir = substr($working_dir, 0, strrpos($working_dir, '/'));
-        
+
         $parent_directories = array_map(function ($directory_path) {
             return $this->createNewPathObject()->translateToFmPath($directory_path);
         }, $this->createNewPathObject()->dir($parent_dir)->directories());
         return in_array($this->path('url'), $parent_directories);
     }
 
-    
     public function createNewPathObject() {
         return new static($this->helper);
     }
+
     /**
      * Check a folder and its subfolders is empty or not.
      *
@@ -186,22 +188,25 @@ class CManager_File_Connector_FileManager_FM_Path {
         $this->uploadValidator($file);
         $new_file_name = $this->getNewName($file);
         $new_file_path = $this->setName($new_file_name)->path('absolute');
-        event(new ImageIsUploading($new_file_path));
+
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsUploading($new_file_path));
         try {
             $new_file_name = $this->saveFile($file, $new_file_name);
         } catch (\Exception $e) {
-            \Log::info($e);
-            return $this->error('invalid');
+//            
+//            \Log::info($e);
+            //return $this->error('invalid');
+            return $this->error($e->getMessage());
         }
         // TODO should be "FileWasUploaded"
-        event(new ImageWasUploaded($new_file_path));
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasUploaded($new_file_path));
         return $new_file_name;
     }
 
     private function uploadValidator($file) {
         if (empty($file)) {
             return $this->error('file-empty');
-        } elseif (!$file instanceof UploadedFile) {
+        } elseif (!$file instanceof CHTTP_UploadedFile) {
             return $this->error('instance');
         } elseif ($file->getError() == UPLOAD_ERR_INI_SIZE) {
             return $this->error('file-size', ['max' => ini_get('upload_max_filesize')]);
@@ -209,16 +214,16 @@ class CManager_File_Connector_FileManager_FM_Path {
             throw new \Exception('File failed to upload. Error code: ' . $file->getError());
         }
         $new_file_name = $this->getNewName($file);
-        if ($this->setName($new_file_name)->exists() && !config('lfm.over_write_on_duplicate')) {
+        if ($this->setName($new_file_name)->exists() && !$this->helper->config('over_write_on_duplicate')) {
             return $this->error('file-exist');
         }
-        if (config('lfm.should_validate_mime', false)) {
+        if ($this->helper->config('should_validate_mime', false)) {
             $mimetype = $file->getMimeType();
             if (false === in_array($mimetype, $this->helper->availableMimeTypes())) {
                 return $this->error('mime') . $mimetype;
             }
         }
-        if (config('lfm.should_validate_size', false)) {
+        if ($this->helper->config('should_validate_size', false)) {
             // size to kb unit is needed
             $file_size = $file->getSize() / 1000;
             if ($file_size > $this->helper->maxUploadSize()) {
@@ -231,9 +236,9 @@ class CManager_File_Connector_FileManager_FM_Path {
     private function getNewName($file) {
         $new_file_name = $this->helper
                 ->translateFromUtf8(trim(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)));
-        if (config('lfm.rename_file') === true) {
+        if ($this->helper->config('rename_file') === true) {
             $new_file_name = uniqid();
-        } elseif (config('lfm.alphanumeric_filename') === true) {
+        } elseif ($this->helper->config('alphanumeric_filename') === true) {
             $new_file_name = preg_replace('/[^A-Za-z0-9\-\']/', '_', $new_file_name);
         }
         $extension = $file->getClientOriginalExtension();
@@ -259,7 +264,7 @@ class CManager_File_Connector_FileManager_FM_Path {
         // generate cropped image content
         $this->setName($file_name)->thumb(true);
         $image = Image::make($original_image->get())
-                ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200));
+                ->fit($this->helper->config('thumb_img_width', 200), $this->helper->config('thumb_img_height', 200));
         $this->storage->put($image->stream()->detach());
     }
 

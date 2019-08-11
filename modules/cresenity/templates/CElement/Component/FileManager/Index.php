@@ -766,8 +766,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     window.move = function (items) {
         performFmRequest('move', {items: items.map(function (item) {
                 return item.name;
-            })})
-                .done(refreshFoldersAndItems);
+            })}).done(refreshFoldersAndItems);
     }
 
     function getUrlParam(paramName) {
@@ -915,9 +914,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
     function notify(body, callback) {
         $('#notify').find('.btn-primary').toggle(callback !== undefined);
         $('#notify').find('.btn-primary').unbind().click(callback);
-
-        var json = JSON.parse(body);
-        if (typeof json == 'object') {
+       
+        if (cresenity.isJson(body) == 'object') {
+            json = JSON.parse(body);
             eval(cresenity.base64.decode(json.js));
             console.log(cresenity.base64.decode(json.js))
             $('#notify').find('.modal-body').html(json.html);
@@ -954,7 +953,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 if (response == 'OK') {
                     loadFolders();
                 } else {
-                    this.defaultOptions.error(file, response.join('\n'));
+                    if (cresenity.isJson(response)) {
+                        json = JSON.parse(response);
+                        this.defaultOptions.error(file, json.join('\n'));
+
+                    } else {
+                        this.defaultOptions.error(file, response);
+                    }
                 }
             });
         },

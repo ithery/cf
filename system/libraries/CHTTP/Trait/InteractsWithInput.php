@@ -283,7 +283,7 @@ trait CHTTP_Trait_InteractsWithInput {
                 return $file;
             }
 
-            return is_array($file) ? $this->convertUploadedFiles($file) : UploadedFile::createFromBase($file);
+            return is_array($file) ? $this->convertUploadedFiles($file) : CHTTP_UploadedFile::createFromBase($file);
         }, $files);
     }
 

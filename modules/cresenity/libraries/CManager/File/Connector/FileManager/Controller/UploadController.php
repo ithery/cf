@@ -21,7 +21,7 @@ class CManager_File_Connector_FileManager_Controller_UploadController extends CM
     public function execute() {
         $fm = new FM();
 
-       $uploaded_files = CHTTP::request()->file('upload');
+        $uploaded_files = CHTTP::request()->file('upload');
         $error_bag = [];
         $new_filename = null;
         foreach (is_array($uploaded_files) ? $uploaded_files : [$uploaded_files] as $file) {
@@ -53,11 +53,11 @@ class CManager_File_Connector_FileManager_Controller_UploadController extends CM
   var op = window.opener;
   var o = (par && par.CKEDITOR) ? par : ((op && op.CKEDITOR) ? op : false);
   if (op) window.close();
-  if (o !== false) o.CKEDITOR.tools.callFunction(funcNum, '".$fm->path()->setName($new_filename)->url()."');
+  if (o !== false) o.CKEDITOR.tools.callFunction(funcNum, '" . $fm->path()->setName($new_filename)->url() . "');
 </script>";
             }
         }
-        echo $response;
+        echo (is_string($response) ? $response : json_encode($response));
     }
 
 }
