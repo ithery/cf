@@ -14,6 +14,7 @@ class CElement_Component_PrismCode extends CElement_Component {
     protected $codeElement;
     protected $haveCopyToClipboard;
     protected $haveSelectCode;
+    protected $isWrap;
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
@@ -21,6 +22,7 @@ class CElement_Component_PrismCode extends CElement_Component {
         $this->codeElement = $this->addCode();
         $this->wrapper = $this->codeElement;
         $this->haveIndent = false;
+        $this->isWrap = false;
     }
 
     public function setLanguage($lang) {
@@ -41,14 +43,23 @@ class CElement_Component_PrismCode extends CElement_Component {
         $cs->registerCssFile('plugins/prism/themes/prism-' . $this->prismTheme . '.css');
         $cs->registerCssFile('plugins/prism/plugins/prism-toolbar.css');
         $this->codeElement->addClass('language-' . $this->prismLanguage);
+        if($this->isWrap) {
+            $this->codeElement->customCss('white-space','pre-wrap');
+        }
     }
 
     public function setHaveCopyToClipboard($bool = true) {
         $this->haveCopyToClipboard = $bool;
         return $this;
     }
-     public function setHaveSelectCode($bool = true) {
+
+    public function setHaveSelectCode($bool = true) {
         $this->haveSelectCode = $bool;
+        return $this;
+    }
+
+    public function setWrap($bool = true) {
+        $this->isWrap = $bool;
         return $this;
     }
 

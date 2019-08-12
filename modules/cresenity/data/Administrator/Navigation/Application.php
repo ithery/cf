@@ -27,4 +27,10 @@ return array(
         "controller" => "administrator/app/generator",
         "method" => "index",
     ),
+    array(
+        "name" => "administrator.app.fixer",
+        "label" => "Fixer",
+        "controller" => "administrator/app/fixer",
+        "method" => "index",
+    ),
 );
