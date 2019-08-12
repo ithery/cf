@@ -82,6 +82,10 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
                     'unsigned' => true,
                 );
 
+                if(!in_array($columnSchema->getType()->getName(), array(CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT))) {
+                    continue;
+                }
+
                 if ($table == 'cloud_messaging' && $column == 'registration_id') {
                     continue;
                 }
@@ -93,6 +97,10 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
                 if (in_array($table, ['log_activity', 'log_session', 'log_login', 'log_login_fail']) && $column == 'session_id') {
                     continue;
                 }
+                if (in_array($table, ['mobile_app_requirement']) && $column == 'firebase_sender_id') {
+                    continue;
+                }
+
                 //$targetColumnSchema = new CDatabase_Schema_Column($column, CDatabase_Type::getType(CDatabase_Type::BIGINT), $targetOptions);
                 $targetColumnSchema = clone $columnSchema;
                 $targetColumnSchema->setType(CDatabase_Type::getType(CDatabase_Type::BIGINT));
@@ -112,7 +120,8 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
         $sql = null;
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode("\n", $sqlArray);
+            $sql = implode(";\n", $sqlArray);
+            $sql .= ';';
         }
         return $sql;
     }
