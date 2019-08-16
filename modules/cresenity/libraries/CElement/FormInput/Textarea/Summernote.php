@@ -69,6 +69,13 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                     ]
                 ";
                 break;
+            case 'link-only':
+                $json = "
+                    [
+                        ['media', ['link']],
+                    ]
+                ";
+                break;
             case 'text-only':
                 $json = "
                     [
