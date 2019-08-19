@@ -9,13 +9,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_Query extends CTracker_Model {
 
+    use CModel_Tracker_TrackerQueryTrait;
+
     protected $table = 'log_query';
     protected $fillable = [
         'query',
     ];
-
-    public function arguments() {
-        return $this->hasMany($this->getConfig()->get('queryArgumentModel', 'CTracker_Model_QueryArgument'));
-    }
 
 }

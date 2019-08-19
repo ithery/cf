@@ -1438,11 +1438,8 @@ class CDatabase {
      * @throws \LogicException
      */
     public function reconnect() {
-        if (is_callable($this->reconnector)) {
-            return call_user_func($this->reconnector, $this);
-        }
-
-        throw new LogicException('Lost connection and no reconnector available.');
+        $this->driver->close();
+        $this->driver->connect();
     }
 
     /**
@@ -1736,7 +1733,7 @@ class CDatabase {
      * @return CDatabase_Query_Builder
      */
     public function createQueryBuilder() {
-        return new CDatabase_Query_Builder($this);
+        return $this->newQuery();
     }
 
     /**
@@ -1759,7 +1756,15 @@ class CDatabase {
         }
     }
 
-   
+    /**
+     * Get a new query builder instance.
+     *
+     * @return CDatabase_Query_Builder
+     */
+    public function newQuery() {
+        return new CDatabase_Query_Builder($this);
+    }
+
 }
 
 // End Database Class

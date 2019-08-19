@@ -171,7 +171,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @return string|array
      */
     public function input($key = null, $default = null) {
-        return data_get(
+        return CF::get(
                 $this->getInputSource()->all() + $this->query->all(), $key, $default
         );
     }
@@ -283,7 +283,7 @@ trait CHTTP_Trait_InteractsWithInput {
                 return $file;
             }
 
-            return is_array($file) ? $this->convertUploadedFiles($file) : UploadedFile::createFromBase($file);
+            return is_array($file) ? $this->convertUploadedFiles($file) : CHTTP_UploadedFile::createFromBase($file);
         }, $files);
     }
 
@@ -325,7 +325,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @return \Illuminate\Http\UploadedFile|array|null
      */
     public function file($key = null, $default = null) {
-        return data_get($this->allFiles(), $key, $default);
+        return CF::get($this->allFiles(), $key, $default);
     }
 
     /**

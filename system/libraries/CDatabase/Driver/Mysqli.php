@@ -40,7 +40,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
     public function connect() {
         // Check if link already exists
-       
+
         if (is_object($this->link)) {
             return $this->link;
         }

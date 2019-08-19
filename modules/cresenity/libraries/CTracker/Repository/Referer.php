@@ -50,15 +50,18 @@ class CTracker_Repository_Referer extends CTracker_AbstractRepository {
             'source' => null,
             'search_terms_hash' => null,
         ];
+       
         $parsed = $this->refererParser->parse($refererUrl, $this->currentUrl);
         if ($parsed->isKnown()) {
             $attributes['medium'] = $parsed->getMedium();
             $attributes['source'] = $parsed->getSource();
             $attributes['search_terms_hash'] = sha1($parsed->getSearchTerm());
         }
+        
         $referer = $this->findOrCreate(
                 $attributes, ['url', 'search_terms_hash']
         );
+       
         $referer = $this->find($referer);
         if ($parsed->isKnown()) {
             $this->storeSearchTerms($referer, $parsed);

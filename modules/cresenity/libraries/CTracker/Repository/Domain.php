@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CTracker_Repository_Domain extends CTracker_AbstractRepository {
 
     public function __construct() {
-        $this->className = 'CTracker_Model_Domain';
+        $this->className = CTracker::config()->get('domainModel', 'CTracker_Model_Domain');
         $this->createModel();
 
         parent::__construct();

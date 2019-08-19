@@ -1229,7 +1229,9 @@ body.mini-navbar #page-wrapper {
 .kanban .kanban-box {
     min-height:100px;
 }
-
+.sk-wave {
+    width: 50px;
+}
 
 @media (min-width: 319px) {
 

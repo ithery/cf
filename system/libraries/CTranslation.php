@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CTranslation {
 
     public static function translator() {
-        return new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), DOCROOT . 'system/i18n'));
+        return new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), 'i18n'));
     }
 
 }

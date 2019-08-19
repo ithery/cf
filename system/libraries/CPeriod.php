@@ -49,6 +49,66 @@ class CPeriod {
         return new static($startDate, $endDate);
     }
 
+    public static function thisWeek() {
+        $startDate = CCarbon::now()->modify('this week');
+        $endDate = CCarbon::now()->modify('this week +6 days');
+        
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+        
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;
+        
+        return new static($startDate, $endDate);
+    }
+
+    public static function lastWeek() {
+        $startDate = CCarbon::now()->modify('last week');
+        $endDate = CCarbon::now()->modify('last week +6 days');
+        
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+        
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;        
+
+        return new static($startDate, $endDate);
+    }
+
+    public static function thisMonth() {
+        $startDate = CCarbon::now()->modify('first day of this month');
+        $endDate = CCarbon::now()->modify('last day of this month');
+        
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+        
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;
+
+        return new static($startDate, $endDate);
+    }
+
+    public static function thisYear() {
+        $startDate = CCarbon::now()->modify('first day of this year');
+        $endDate = CCarbon::now()->modify('last day of this year');
+
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+        
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;
+
+        return new static($startDate, $endDate);
+    }
+
     public function __construct(DateTime $startDate, DateTime $endDate) {
         if ($startDate > $endDate) {
             throw CPeriod_Exception_InvalidPeriod::startDateCannotBeAfterEndDate($startDate, $endDate);

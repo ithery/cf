@@ -63,11 +63,11 @@ class CClientScript extends CObject {
         return self::$_instance;
     }
 
-    public function registerJsFiles($files, $pos = "end") {
+    public function registerJsFiles($files, $pos = CManager_Asset::POS_END) {
         return CManager::asset()->runTime()->registerJsFiles($files, $pos);
     }
 
-    public function registerJsFile($file, $pos = "end") {
+    public function registerJsFile($file, $pos = CManager_Asset::POS_END) {
         return CManager::asset()->runTime()->registerJsFile($file, $pos);
     }
 
@@ -79,11 +79,11 @@ class CClientScript extends CObject {
         return CManager::asset()->runTime()->unregisterJsFile($file, $pos);
     }
 
-    public function registerCssFiles($files, $pos = "head") {
+    public function registerCssFiles($files, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerCssFiles($files, $pos);
     }
 
-    public function registerCssFile($file, $pos = "head") {
+    public function registerCssFile($file, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerCssFile($file, $pos);
     }
 
@@ -130,10 +130,11 @@ class CClientScript extends CObject {
     public function urlJsFile() {
         return CManager::asset()->getAllJsFileUrl();
     }
+
     public function urlCssFile() {
         return CManager::asset()->getAllCssFileUrl();
     }
-    
+
     public function cssFiles() {
         $cssFileArray = array();
         foreach ($this->scripts as $script) {
@@ -152,7 +153,6 @@ class CClientScript extends CObject {
         return CResource::instance('js')->load($hash);
     }
 
-    
     public function css($hash) {
         return CResource::instance('css')->load($hash);
     }

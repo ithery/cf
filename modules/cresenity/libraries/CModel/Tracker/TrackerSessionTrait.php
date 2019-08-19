@@ -14,31 +14,31 @@ trait CModel_Tracker_TrackerSessionTrait {
     }
 
     public function device() {
-        return $this->belongsTo('CTracker_Model_Device');
+        return $this->belongsTo(CTracker::config()->get('deviceModel', 'CTracker_Model_Device'));
     }
 
     public function language() {
-        return $this->belongsTo('CTracker_Model_Language');
+        return $this->belongsTo(CTracker::config()->get('languageModel', 'CTracker_Model_Language'));
     }
 
     public function agent() {
-        return $this->belongsTo('CTracker_Model_Agent');
+        return $this->belongsTo(CTracker::config()->get('agentModel', 'CTracker_Model_Agent'));
     }
 
     public function referer() {
-        return $this->belongsTo('CTracker_Model_Referer');
+        return $this->belongsTo(CTracker::config()->get('refererModel', 'CTracker_Model_Referer'));
     }
 
     public function geoIp() {
-        return $this->belongsTo('CTracker_Model_GeoIp');
+        return $this->belongsTo(CTracker::config()->get('geoIpModel', 'CTracker_Model_GeoIp'));
     }
 
     public function cookie() {
-        return $this->belongsTo('CTracker_Model_Cookie');
+        return $this->belongsTo(CTracker::config()->get('cookieModel', 'CTracker_Model_Cookie'));
     }
 
     public function log() {
-        return $this->hasMany('CTracker_Model_Log');
+        return $this->hasMany(CTracker::config()->get('logModel', 'CTracker_Model_Log'));
     }
 
     public function getPageViewsAttribute() {
@@ -67,7 +67,7 @@ trait CModel_Tracker_TrackerSessionTrait {
                         'user_id', $this->getConnection()->raw('max(updated) as updated')
                 )
                 ->groupBy('user_id')
-                ->from('log_sessions')
+                ->from('log_session')
                 ->period($minutes)
                 ->whereNotNull('user_id')
                 ->orderBy($this->getConnection()->raw('max(updated)'), 'desc');

@@ -15,7 +15,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
 
     /**
-     * @var Type
+     * @var CDatabase_Type
      */
     protected $_type;
 

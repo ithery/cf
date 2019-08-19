@@ -718,6 +718,8 @@ class carr {
                     $passed = false;
                 }
             }
+            
+            
             if ($passed) {
                 $new_array[$k] = $v;
             }

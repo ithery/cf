@@ -75,7 +75,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
      * @throws Exception
      * @author Dmitry (dio) Levashov
      */
-    public function run() {
+    public function run($method=null) {
         $isPost = $this->reqMethod === 'POST';
         $src = $isPost ? array_merge($_GET, $_POST) : $_GET;
         $maxInputVars = (!$src || isset($src['targets'])) ? ini_get('max_input_vars') : null;

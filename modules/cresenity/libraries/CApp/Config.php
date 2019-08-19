@@ -32,6 +32,7 @@ class CApp_Config {
         if (strlen($domain) == 0) {
             $domain = CF::domain();
         }
+        $camelKey = cstr::camel($key);
         $data = CFData::get($domain, 'domain');
         $configFiles = array('app', 'app_setting');
         if (!isset(self::$configData[$domain])) {
@@ -50,8 +51,8 @@ class CApp_Config {
             }
             self::$configData[$domain] = $config;
         }
-
-        return carr::get(carr::get(self::$configData, $domain), $key);
+        $domainData = carr::get(self::$configData, $domain);
+        return carr::get($domainData, $camelKey, carr::get($domainData, $key));
     }
 
 }

@@ -1,11 +1,7 @@
 <?php
 
-namespace Illuminate\Database\Eloquent\Relations;
+class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
 
-use Illuminate\Database\Eloquent\Builder;
-
-class MorphPivot extends Pivot
-{
     /**
      * The type of the polymorphic relation.
      *
@@ -27,13 +23,11 @@ class MorphPivot extends Pivot
     /**
      * Set the keys for a save update query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  CModel_Query  $query
+     * @return CModel_Query
      */
-    protected function setKeysForSaveQuery(Builder $query)
-    {
+    protected function setKeysForSaveQuery(Builder $query) {
         $query->where($this->morphType, $this->morphClass);
-
         return parent::setKeysForSaveQuery($query);
     }
 
@@ -42,12 +36,9 @@ class MorphPivot extends Pivot
      *
      * @return int
      */
-    public function delete()
-    {
+    public function delete() {
         $query = $this->getDeleteQuery();
-
         $query->where($this->morphType, $this->morphClass);
-
         return $query->delete();
     }
 
@@ -57,10 +48,8 @@ class MorphPivot extends Pivot
      * @param  string  $morphType
      * @return $this
      */
-    public function setMorphType($morphType)
-    {
+    public function setMorphType($morphType) {
         $this->morphType = $morphType;
-
         return $this;
     }
 
@@ -68,12 +57,67 @@ class MorphPivot extends Pivot
      * Set the morph class for the pivot.
      *
      * @param  string  $morphClass
-     * @return \Illuminate\Database\Eloquent\Relations\MorphPivot
+     * @return CModel_Relation_MorphPivot
      */
-    public function setMorphClass($morphClass)
-    {
+    public function setMorphClass($morphClass) {
         $this->morphClass = $morphClass;
-
         return $this;
     }
+
+    /**
+     * Get the queueable identity for the entity.
+     *
+     * @return mixed
+     */
+    public function getQueueableId() {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return $this->getKey();
+        }
+        return sprintf(
+                '%s:%s:%s:%s:%s:%s', $this->foreignKey, $this->getAttribute($this->foreignKey), $this->relatedKey, $this->getAttribute($this->relatedKey), $this->morphType, $this->morphClass
+        );
+    }
+
+    /**
+     * Get a new query to restore one or more models by their queueable IDs.
+     *
+     * @param  array|int  $ids
+     * @return CModel_Query
+     */
+    public function newQueryForRestoration($ids) {
+        if (is_array($ids)) {
+            return $this->newQueryForCollectionRestoration($ids);
+        }
+        if (!cstr::contains($ids, ':')) {
+            return parent::newQueryForRestoration($ids);
+        }
+        $segments = explode(':', $ids);
+        return $this->newQueryWithoutScopes()
+                        ->where($segments[0], $segments[1])
+                        ->where($segments[2], $segments[3])
+                        ->where($segments[4], $segments[5]);
+    }
+
+    /**
+     * Get a new query to restore multiple models by their queueable IDs.
+     *
+     * @param  array  $ids
+     * @return CModel_Query
+     */
+    protected function newQueryForCollectionRestoration(array $ids) {
+        if (!cstr::contains($ids[0], ':')) {
+            return parent::newQueryForRestoration($ids);
+        }
+        $query = $this->newQueryWithoutScopes();
+        foreach ($ids as $id) {
+            $segments = explode(':', $id);
+            $query->orWhere(function ($query) use ($segments) {
+                return $query->where($segments[0], $segments[1])
+                                ->where($segments[2], $segments[3])
+                                ->where($segments[4], $segments[5]);
+            });
+        }
+        return $query;
+    }
+
 }

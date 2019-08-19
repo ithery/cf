@@ -103,7 +103,7 @@ class CManager_Asset {
      * 
      * @return CManager_Asset_Module
      */
-    public function & module() {
+    public function &module() {
         return $this->module;
     }
 
