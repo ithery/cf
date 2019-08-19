@@ -8,7 +8,7 @@ class CElement_Element_Code extends CElement_Element {
         
         parent::__construct($id);
         $this->tag = "code";
-        $this->isIndent=false;
+        $this->haveIndent=false;
     }
 
 }

@@ -34,7 +34,7 @@ class CManager_Theme {
                 $theme = 'cresenity';
             }
         }
-        
+
         if (self::$themeCallback != null && is_callable(self::$themeCallback)) {
             $theme = call_user_func(self::$themeCallback, $theme);
         }
@@ -76,19 +76,19 @@ class CManager_Theme {
     }
 
     public static function getThemePath() {
-        $theme_path = '';
+        $themePath = '';
         $theme = self::getCurrentTheme();
         $themeFile = CF::get_file('themes', $theme);
-        if (file_exists($theme_file)) {
-            $theme_data = include $theme_file;
-            $theme_path = carr::get($theme_data, 'theme_path');
-            if ($theme_path == null) {
-                $theme_path = '';
+        if (file_exists($themeFile)) {
+            $themeData = include $themeFile;
+            $themePath = carr::get($themeData, 'theme_path');
+            if ($themePath == null) {
+                $themePath = '';
             } else {
-                $theme_path .= '/';
+                $themePath .= '/';
             }
         }
-        return $theme_path;
+        return $themePath;
     }
 
 }

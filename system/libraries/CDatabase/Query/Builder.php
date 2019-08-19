@@ -39,11 +39,12 @@ class CDatabase_Query_Builder {
      */
     public $bindings = [
         'select' => [],
-        'join' => [],
-        'where' => [],
+        'from'   => [],
+        'join'   => [],
+        'where'  => [],
         'having' => [],
-        'order' => [],
-        'union' => [],
+        'order'  => [],
+        'union'  => [],
     ];
 
     /**
@@ -703,18 +704,18 @@ class CDatabase_Query_Builder {
      * @param  string  $method
      * @return $this
      */
-    protected function addArrayOfWheres($column, $boolean, $method = 'where')
-    {
+    protected function addArrayOfWheres($column, $boolean, $method = 'where') {
         return $this->whereNested(function ($query) use ($column, $method, $boolean) {
-            foreach ($column as $key => $value) {
-                if (is_numeric($key) && is_array($value)) {
-                    $query->{$method}(...array_values($value));
-                } else {
-                    $query->$method($key, '=', $value, $boolean);
-                }
-            }
-        }, $boolean);
+                    foreach ($column as $key => $value) {
+                        if (is_numeric($key) && is_array($value)) {
+                            $query->{$method}(...array_values($value));
+                        } else {
+                            $query->$method($key, '=', $value, $boolean);
+                        }
+                    }
+                }, $boolean);
     }
+
     /**
      * Add an "or where" clause to the query.
      *
@@ -2189,6 +2190,15 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Create a new query instance for a sub-query.
+     *
+     * @return CDatabase_Query_Builder
+     */
+    protected function forSubQuery() {
+        return $this->newQuery();
+    }
+
+    /**
      * Handle dynamic method calls into the method.
      *
      * @param  string  $method
@@ -2218,8 +2228,8 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     public function exists() {
-       
-        
+
+
         $results = $this->db->query(
                 $this->grammar->compileExists($this), $this->getBindings()
         );

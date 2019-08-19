@@ -1,0 +1,6 @@
+
+
+
+var CFileManager = function(options) {
+    
+}

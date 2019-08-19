@@ -140,8 +140,10 @@ trait CApp_Trait_Template {
         $helpers->set('section', function ($sectionName) {
             $section = $this->section($sectionName);
             if ($this instanceof CElement) {
+                //populate html first, because js sometime populated in html
+                $html = $section->htmlChild();
                 $this->sectionJs .= $section->jsChild();
-                return $section->htmlChild();
+                return $html;
             }
             $this->sectionJs .= $section->js();
             return $section->html();
