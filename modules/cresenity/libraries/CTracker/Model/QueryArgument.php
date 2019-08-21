@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_QueryArgument extends CTracker_Model {
 
+    use CModel_Tracker_TrackerQueryArgumentTrait;
+
     protected $table = 'log_query_argument';
     protected $fillable = [
         'log_query_id',

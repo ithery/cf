@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Feb 16, 2019, 2:44:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CCache_NullDriver extends CCache_DriverAbstract {
+class CCache_Driver_NullDriver extends CCache_DriverAbstract {
 
     /**
      * The array of stored values.

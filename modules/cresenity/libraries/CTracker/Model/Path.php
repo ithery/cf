@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_Path extends CTracker_Model {
 
+    use CModel_Tracker_TrackerPathTrait;
+    
     protected $table = 'log_path';
     protected $fillable = [
         'path',

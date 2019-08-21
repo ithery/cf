@@ -401,4 +401,13 @@ class CModel_Collection extends CCollection {
         return $connection;
     }
 
+    public function getAttributes() {
+        $parentArray = parent::toArray();
+        $result = [];
+        foreach ($this->items as $k => $item) {
+            $result[$k] = $item->getAttributes();
+        }
+        return $result;
+    }
+
 }

@@ -9,7 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CObservable_Listener_Handler_AjaxSubmitHandler extends CObservable_Listener_Handler {
 
-    use CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
+    use CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
+        CObservable_Listener_Handler_Trait_TargetHandlerTrait;
 
     public function __construct($listener) {
         parent::__construct($listener);

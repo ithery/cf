@@ -11,6 +11,10 @@ class clang {
 
     public static function __($message, $params = array(), $lang = null) {
 
+        if (strpos($message, '.') !== false) {
+            $message = CTranslation::translator()->get($message, $params, $lang);
+        }
+
         $langObject = CManager::lang();
         if ($lang == null) {
             $lang = $langObject->getLang();
@@ -22,36 +26,38 @@ class clang {
 
         return $translation;
     }
-/*
-    public static function __($word, $params = array()) {
-        if (!is_string($word))
-            return $word;
-        if (clang::$lang == null) {
-            //get $lang variable 
-            $lang = clang::getlang();
-            $files = CF::get_files('lang', $lang);
 
-            $files = array_reverse($files);
-            foreach ($files as $file) {
-                $lang = include $file;
-                // Merge in configuration
-                if (!empty($lang) AND is_array($lang)) {
-                    foreach ($lang as $k => $v) {
-                        self::$lang[$k] = $v;
-                    }
-                }
-            }
-        }
+    /*
+      public static function __($word, $params = array()) {
+      if (!is_string($word))
+      return $word;
+      if (clang::$lang == null) {
+      //get $lang variable
+      $lang = clang::getlang();
+      $files = CF::get_files('lang', $lang);
 
-        if (isset(clang::$lang[$word])) {
-            $word = clang::$lang[$word];
-        }
-        if (is_array($params)) {
-            $word = strtr($word, $params);
-        }
-        return $word;
-    }
-*/
+      $files = array_reverse($files);
+      foreach ($files as $file) {
+      $lang = include $file;
+      // Merge in configuration
+      if (!empty($lang) AND is_array($lang)) {
+      foreach ($lang as $k => $v) {
+      self::$lang[$k] = $v;
+      }
+      }
+      }
+      }
+
+      if (isset(clang::$lang[$word])) {
+      $word = clang::$lang[$word];
+      }
+      if (is_array($params)) {
+      $word = strtr($word, $params);
+      }
+      return $word;
+      }
+     */
+
     public static function current_lang_name() {
         $code = clang::getlang();
         $name = clang::get_lang_name_by_code($code);

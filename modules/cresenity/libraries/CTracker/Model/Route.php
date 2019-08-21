@@ -9,14 +9,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_Route extends CTracker_Model {
 
+    use CModel_Tracker_TrackerRouteTrait;
+
     protected $table = 'log_route';
     protected $fillable = [
         'name',
         'action',
     ];
-
-    public function paths() {
-        return $this->hasMany($this->getConfig()->get('routePathModel'));
-    }
 
 }

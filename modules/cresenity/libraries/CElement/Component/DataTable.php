@@ -5,6 +5,7 @@ class CElement_Component_DataTable extends CElement_Component {
     use CTrait_Compat_Element_DataTable,
         CTrait_Element_ActionList_Row,
         CTrait_Element_ActionList_Header,
+        CElement_Component_DataTable_Trait_GridViewTrait,
         CElement_Component_DataTable_Trait_ExportTrait;
 
     public $defaultPagingList = array(
@@ -29,6 +30,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $data;
     public $key_field;
     public $checkbox;
+    public $checkboxColumnWidth;
     public $checkbox_value;
     public $numbering;
     public $query;
@@ -70,9 +72,6 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $js_cell;
     protected $dom = null;
     protected $widget_title;
-    protected $haveDataTableViewAction;
-    protected $dataTableViewColCount;
-    protected $dataTableView;
     protected $fixedColumn;
 
     public function __construct($id = "") {
@@ -198,6 +197,10 @@ class CElement_Component_DataTable extends CElement_Component {
 
         return $this;
     }
+    
+    public function setCheckboxColumnWidth($width) {
+        $this->checkboxColumnWidth=$width;
+    }
 
     function setTableStriped($tableStriped) {
         $this->tableStriped = $tableStriped;
@@ -302,21 +305,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function getOption($key) {
         return $this->options->get_by_name($key);
-    }
-
-    public function setHaveDataTableViewAction($bool = true) {
-        $this->haveDataTableViewAction = $bool;
-        return $this;
-    }
-
-    public function setDataTableViewCol() {
-        $this->dataTableView = CConstant::TABLE_VIEW_COL;
-        return $this;
-    }
-
-    public function setDataTableViewRow() {
-        $this->dataTableView = CConstant::TABLE_VIEW_ROW;
-        return $this;
     }
 
     public function setAjax($bool = true) {
@@ -768,7 +756,11 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
                 }
                 if ($this->checkbox) {
-                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col"><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
+                    $attrWidth = "";
+                    if(strlen($this->checkboxColumnWidth)>0) {
+                        $attrWidth='width="'.$this->checkboxColumnWidth.'"';
+                    }
+                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" '.$attrWidth.'><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
                 }
                 foreach ($this->columns as $col) {
                     $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();

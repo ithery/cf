@@ -14,7 +14,7 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
     /**
      * The loader implementation.
      *
-     * @var \Illuminate\Contracts\Translation\Loader
+     * @var CTranslation_LoaderInterface
      */
     protected $loader;
 
@@ -104,10 +104,10 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true) {
         list($namespace, $group, $item) = $this->parseKey($key);
-
-// Here we will get the locale that should be used for the language line. If one
-// was not passed, we will use the default locales which was given to us when
-// the translator was instantiated. Then, we can load the lines and return.
+       
+        // Here we will get the locale that should be used for the language line. If one
+        // was not passed, we will use the default locales which was given to us when
+        // the translator was instantiated. Then, we can load the lines and return.
         $locales = $fallback ? $this->localeArray($locale) : [$locale ?: $this->locale];
 
         foreach ($locales as $locale) {
@@ -117,10 +117,10 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
                 break;
             }
         }
-
-// If the line doesn't exist, we will return back the key which was requested as
-// that will be quick to spot in the UI if language keys are wrong or missing
-// from the application's language files. Otherwise we can return the line.
+        
+        // If the line doesn't exist, we will return back the key which was requested as
+        // that will be quick to spot in the UI if language keys are wrong or missing
+        // from the application's language files. Otherwise we can return the line.
         if (isset($line)) {
             return $line;
         }
@@ -367,11 +367,11 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
     /**
      * Get the message selector instance.
      *
-     * @return \Illuminate\Translation\MessageSelector
+     * @return CTranslation_MessageSelector
      */
     public function getSelector() {
         if (!isset($this->selector)) {
-            $this->selector = new MessageSelector;
+            $this->selector = new CTranslation_MessageSelector;
         }
 
         return $this->selector;
@@ -380,17 +380,17 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
     /**
      * Set the message selector instance.
      *
-     * @param  \Illuminate\Translation\MessageSelector  $selector
+     * @param  CTranslation_MessageSelector  $selector
      * @return void
      */
-    public function setSelector(MessageSelector $selector) {
+    public function setSelector(CTranslation_MessageSelector $selector) {
         $this->selector = $selector;
     }
 
     /**
      * Get the language line loader implementation.
      *
-     * @return \Illuminate\Contracts\Translation\Loader
+     * @return CTranslation_LoaderAbstract
      */
     public function getLoader() {
         return $this->loader;

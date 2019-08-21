@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_GeoIp extends CTracker_Model {
 
+    use CModel_Tracker_TrackerGeoIpTrait;
+    
     protected $table = 'log_geoip';
     protected $fillable = [
         'org_id',

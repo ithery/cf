@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Model_RefererSearchTerm extends CTracker_Model {
 
+    use CModel_Tracker_TrackerRefererSearchTermTrait;
+
     protected $table = 'log_referer_search_term';
     protected $fillable = [
         'referer_id',

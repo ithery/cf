@@ -90,7 +90,7 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      * @param  array|mixed  $columns
      * @return CModel_Query
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
                         $this->morphType, $this->morphClass
         );

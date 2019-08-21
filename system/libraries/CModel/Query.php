@@ -245,6 +245,7 @@ class CModel_Query {
                         }, $items));
     }
 
+
     /**
      * Create a collection of models from a raw query.
      *
@@ -1078,19 +1079,20 @@ class CModel_Query {
     /**
      * Get the underlying query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     public function getQuery() {
+
         return $this->query;
     }
 
     /**
      * Set the underlying query builder instance.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  CDatabase_Query_Builder  $query
      * @return $this
      */
-    public function setQuery($query) {
+    public function setQuery(CDatabase_Query_Builder $query) {
         $this->query = $query;
 
         return $this;
@@ -1099,7 +1101,7 @@ class CModel_Query {
     /**
      * Get a base query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     public function toBase() {
         return $this->applyScopes()->getQuery();
@@ -1193,11 +1195,12 @@ class CModel_Query {
 
             return $this->callScope([$this->model, $scope], $parameters);
         }
-
+       
         if (in_array($method, $this->passthru)) {
 
             try {
                 $base = $this->toBase();
+                
                 $class = new ReflectionClass(get_class($base));
                 try {
                     // Load the controller method

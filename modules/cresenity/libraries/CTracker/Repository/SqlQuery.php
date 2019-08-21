@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Repository_SqlQuery extends CTracker_AbstractRepository {
 
+    use CModel_Tracker_TrackerSqlQueryTrait;
+    
     private $queries = [];
 
     /**

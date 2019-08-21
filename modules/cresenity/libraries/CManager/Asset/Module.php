@@ -76,7 +76,7 @@ class CManager_Asset_Module {
         if (!$inArray) {
             $inArray = in_array($mod, $this->unregisteredThemeModules);
         }
-        
+
         return $inArray;
     }
 

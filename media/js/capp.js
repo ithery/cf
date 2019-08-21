@@ -461,6 +461,14 @@ var Cresenity = function () {
 
     this.filesAdded = "";
     this.modalElements = [];
+
+
+    this.isJson = function (text) {
+        if (typeof text == 'string') {
+            return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
+        }
+        return false;
+    };
     this.loadJs = function (filename, callback) {
         var fileref = document.createElement('script');
         fileref.setAttribute("type", "text/javascript");
@@ -476,7 +484,7 @@ var Cresenity = function () {
         }
         document.getElementsByTagName("head")[0].appendChild(fileref);
 
-    }
+    };
     this.loadJsCss = function (filename, filetype, callback) {
         if (filetype == "js") { //if filename is a external JavaScript file
             var fileref = document.createElement('script')
@@ -862,9 +870,12 @@ var Cresenity = function () {
 
     };
 
-    this.blockPage = function () {
+    this.blockPage = function (options) {
+        var settings = $.extend({
+            innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+        }, options);
         $.blockUI({
-            message: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+            message: settings.message,
             css: {
                 backgroundColor: 'transparent',
                 border: '0',
