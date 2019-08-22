@@ -36,14 +36,14 @@ class CDatabase_Schema_Diff {
     /**
      * All added tables.
      *
-     * @var \Doctrine\DBAL\Schema\Table[]
+     * @var CDatabase_Schema_Table[]
      */
     public $newTables = [];
 
     /**
      * All changed tables.
      *
-     * @var \Doctrine\DBAL\Schema\TableDiff[]
+     * @var CDatabase_Schema_Table_Diff[]
      */
     public $changedTables = [];
 
@@ -80,9 +80,9 @@ class CDatabase_Schema_Diff {
      * @param CDatabase_Schema_Table[]     $newTables
      * @param CDatabase_Schema_TableDiff[] $changedTables
      * @param CDatabase_Schema_Table[]     $removedTables
-     * @param CDatabase_Schema_Schema|null $fromSchema
+     * @param CDatabase_Schema|null $fromSchema
      */
-    public function __construct($newTables = [], $changedTables = [], $removedTables = [], Schema $fromSchema = null) {
+    public function __construct($newTables = [], $changedTables = [], $removedTables = [], CDatabase_Schema $fromSchema = null) {
         $this->newTables = $newTables;
         $this->changedTables = $changedTables;
         $this->removedTables = $removedTables;
@@ -158,10 +158,11 @@ class CDatabase_Schema_Diff {
                     $sql, $platform->getCreateTableSQL($table, CDatabase_Platform::CREATE_INDEXES)
             );
 
-            if ($platform->supportsForeignKeyConstraints()) {
-                foreach ($table->getForeignKeys() as $foreignKey) {
-                    $foreignKeySql[] = $platform->getCreateForeignKeySQL($foreignKey, $table);
-                }
+            if (!$platform->supportsForeignKeyConstraints()) {
+                continue;
+            }
+            foreach ($table->getForeignKeys() as $foreignKey) {
+                $foreignKeySql[] = $platform->getCreateForeignKeySQL($foreignKey, $table);
             }
         }
         $sql = array_merge($sql, $foreignKeySql);
