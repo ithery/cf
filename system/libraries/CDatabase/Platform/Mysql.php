@@ -78,9 +78,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * {@inheritDoc}
      */
     public function getConcatExpression() {
-        $args = func_get_args();
-
-        return 'CONCAT(' . join(', ', (array) $args) . ')';
+        return sprintf('CONCAT(%s)', implode(', ', func_get_args()));
     }
 
     /**
@@ -123,14 +121,12 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
         if ($currentDatabase) {
             $currentDatabase = $this->quoteStringLiteral($currentDatabase);
             $table = $this->quoteStringLiteral($table);
-
-            return "SELECT TABLE_NAME AS `Table`, NON_UNIQUE AS Non_Unique, INDEX_NAME AS Key_name, " .
-                    "SEQ_IN_INDEX AS Seq_in_index, COLUMN_NAME AS Column_Name, COLLATION AS Collation, " .
-                    "CARDINALITY AS Cardinality, SUB_PART AS Sub_Part, PACKED AS Packed, " .
-                    "NULLABLE AS `Null`, INDEX_TYPE AS Index_Type, COMMENT AS Comment " .
-                    "FROM information_schema.STATISTICS WHERE TABLE_NAME = " . $table . " AND TABLE_SCHEMA = " . $currentDatabase;
+            return 'SELECT NON_UNIQUE AS Non_Unique, INDEX_NAME AS Key_name, COLUMN_NAME AS Column_Name,' .
+                    ' SUB_PART AS Sub_Part, INDEX_TYPE AS Index_Type' .
+                    ' FROM information_schema.STATISTICS WHERE TABLE_NAME = ' . $table .
+                    ' AND TABLE_SCHEMA = ' . $currentDatabase .
+                    ' ORDER BY SEQ_IN_INDEX ASC';
         }
-
         return 'SHOW INDEX FROM ' . $table;
     }
 
@@ -328,10 +324,22 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             $database = 'DATABASE()';
         }
 
-        return "SELECT COLUMN_NAME AS Field, COLUMN_TYPE AS Type, IS_NULLABLE AS `Null`, " .
-                "COLUMN_KEY AS `Key`, COLUMN_DEFAULT AS `Default`, EXTRA AS Extra, COLUMN_COMMENT AS Comment, " .
-                "CHARACTER_SET_NAME AS CharacterSet, COLLATION_NAME AS Collation " .
-                "FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = " . $database . " AND TABLE_NAME = " . $table;
+        return 'SELECT COLUMN_NAME AS Field, COLUMN_TYPE AS Type, IS_NULLABLE AS `Null`, ' .
+                'COLUMN_KEY AS `Key`, COLUMN_DEFAULT AS `Default`, EXTRA AS Extra, COLUMN_COMMENT AS Comment, ' .
+                'CHARACTER_SET_NAME AS CharacterSet, COLLATION_NAME AS Collation ' .
+                'FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ' . $database . ' AND TABLE_NAME = ' . $table .
+                ' ORDER BY ORDINAL_POSITION ASC';
+    }
+
+    public function getListTableMetadataSQL($table, $database = null) {
+        return sprintf(
+                <<<'SQL'
+SELECT ENGINE, AUTO_INCREMENT, TABLE_COLLATION, TABLE_COMMENT, CREATE_OPTIONS
+FROM information_schema.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = %s AND TABLE_NAME = %s
+SQL
+                , $database ? $this->quoteStringLiteral($database) : 'DATABASE()', $this->quoteStringLiteral($table)
+        );
     }
 
     /**
@@ -484,8 +492,9 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     public function getAlterTableSQL(CDatabase_Schema_Table_Diff $diff) {
         $columnSql = [];
         $queryParts = [];
-        if ($diff->newName !== false) {
-            $queryParts[] = 'RENAME TO ' . $diff->getNewName()->getQuotedName($this);
+        $newName = $diff->getNewName();
+        if ($newName !== false) {
+            $queryParts[] = 'RENAME TO ' . $newName->getQuotedName($this);
         }
 
         foreach ($diff->addedColumns as $column) {
@@ -511,15 +520,12 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
                 continue;
             }
 
-            /* @var $columnDiff \Doctrine\DBAL\Schema\ColumnDiff */
+            /* @var $columnDiff CDatabase_Schema_Column_Diff */
             $column = $columnDiff->column;
             $columnArray = $column->toArray();
 
             // Don't propagate default value changes for unsupported column types.
-            if ($columnDiff->hasChanged('default') &&
-                    count($columnDiff->changedProperties) === 1 &&
-                    ($columnArray['type'] instanceof CDatabase_Type_TextType || $columnArray['type'] instanceof CDatabase_Type_BlobType)
-            ) {
+            if ($columnDiff->hasChanged('default') && count($columnDiff->changedProperties) === 1 && ($columnArray['type'] instanceof CDatabase_Type_TextType || $columnArray['type'] instanceof CDatabase_Type_BlobType)) {
                 continue;
             }
 
@@ -544,6 +550,17 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             $keyColumns = array_unique(array_values($diff->addedIndexes['primary']->getColumns()));
             $queryParts[] = 'ADD PRIMARY KEY (' . implode(', ', $keyColumns) . ')';
             unset($diff->addedIndexes['primary']);
+        } elseif (isset($diff->changedIndexes['primary'])) {
+            // Necessary in case the new primary key includes a new auto_increment column
+            foreach ($diff->changedIndexes['primary']->getColumns() as $columnName) {
+                if (isset($diff->addedColumns[$columnName]) && $diff->addedColumns[$columnName]->getAutoincrement()) {
+                    $keyColumns = array_unique(array_values($diff->changedIndexes['primary']->getColumns()));
+                    $queryParts[] = 'DROP PRIMARY KEY';
+                    $queryParts[] = 'ADD PRIMARY KEY (' . implode(', ', $keyColumns) . ')';
+                    unset($diff->changedIndexes['primary']);
+                    break;
+                }
+            }
         }
 
         $sql = [];
@@ -588,7 +605,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
 
                     $query = 'ALTER TABLE ' . $table . ' DROP INDEX ' . $remIndex->getName() . ', ';
                     $query .= 'ADD ' . $indexClause;
-                    $query .= ' (' . $this->getIndexFieldDeclarationListSQL($addIndex->getQuotedColumns($this)) . ')';
+                    $query .= ' (' . $this->getIndexFieldDeclarationListSQL($addIndex) . ')';
 
                     $sql[] = $query;
 
@@ -641,16 +658,18 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             }
 
             $column = $diff->fromTable->getColumn($columnName);
-
-            if ($column->getAutoincrement() === true) {
-                $column->setAutoincrement(false);
-
-                $sql[] = 'ALTER TABLE ' . $tableName . ' MODIFY ' .
-                        $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
-
-                // original autoincrement information might be needed later on by other parts of the table alteration
-                $column->setAutoincrement(true);
+            if ($column->getAutoincrement() !== true) {
+                continue;
             }
+
+
+            $column->setAutoincrement(false);
+
+            $sql[] = 'ALTER TABLE ' . $tableName . ' MODIFY ' .
+                    $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+
+            // original autoincrement information might be needed later on by other parts of the table alteration
+            $column->setAutoincrement(true);
         }
 
         return $sql;
@@ -667,24 +686,28 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
 
         foreach ($diff->changedIndexes as $changedIndex) {
             // Changed primary key
-            if ($changedIndex->isPrimary() && $diff->fromTable instanceof CDatabase_Schema_Table) {
-                foreach ($diff->fromTable->getPrimaryKeyColumns() as $columnName) {
-                    $column = $diff->fromTable->getColumn($columnName);
+            if (!$changedIndex->isPrimary() || !($diff->fromTable instanceof CDatabase_Schema_Table)) {
+                continue;
+            }
 
-                    // Check if an autoincrement column was dropped from the primary key.
-                    if ($column->getAutoincrement() && !in_array($columnName, $changedIndex->getColumns())) {
-                        // The autoincrement attribute needs to be removed from the dropped column
-                        // before we can drop and recreate the primary key.
-                        $column->setAutoincrement(false);
+            foreach ($diff->fromTable->getPrimaryKeyColumns() as $columnName) {
+                $column = $diff->fromTable->getColumn($columnName);
 
-                        $sql[] = 'ALTER TABLE ' . $table . ' MODIFY ' .
-                                $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
-
-                        // Restore the autoincrement attribute as it might be needed later on
-                        // by other parts of the table alteration.
-                        $column->setAutoincrement(true);
-                    }
+                // Check if an autoincrement column was dropped from the primary key.
+                if (!$column->getAutoincrement() || in_array($columnName, $changedIndex->getColumns())) {
+                    continue;
                 }
+
+                // The autoincrement attribute needs to be removed from the dropped column
+                // before we can drop and recreate the primary key.
+                $column->setAutoincrement(false);
+
+                $sql[] = 'ALTER TABLE ' . $table . ' MODIFY ' .
+                        $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+
+                // Restore the autoincrement attribute as it might be needed later on
+                // by other parts of the table alteration.
+                $column->setAutoincrement(true);
             }
         }
 
@@ -701,9 +724,11 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
         $tableName = $diff->getName($this)->getQuotedName($this);
 
         foreach ($this->getRemainingForeignKeyConstraintsRequiringRenamedIndexes($diff) as $foreignKey) {
-            if (!in_array($foreignKey, $diff->changedForeignKeys, true)) {
-                $sql[] = $this->getDropForeignKeySQL($foreignKey, $tableName);
+            if (in_array($foreignKey, $diff->changedForeignKeys, true)) {
+                continue;
             }
+
+            $sql[] = $this->getDropForeignKeySQL($foreignKey, $tableName);
         }
 
         return $sql;
@@ -717,7 +742,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      *
      * @param CDatabase_Schema_Table_Diff $diff The table diff to evaluate.
      *
-     * @return array
+     * @return CDatabase_Schema_ForeignKeyConstraint[]
      */
     private function getRemainingForeignKeyConstraintsRequiringRenamedIndexes(CDatabase_Schema_Table_Diff $diff) {
         if (empty($diff->renamedIndexes) || !$diff->fromTable instanceof CDatabase_Schema_Table) {
@@ -725,7 +750,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
         }
 
         $foreignKeys = [];
-        /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint[] $remainingForeignKeys */
+        /** @var CDatabase_Schema_ForeignKeyConstraint[] $remainingForeignKeys */
         $remainingForeignKeys = array_diff_key(
                 $diff->fromTable->getForeignKeys(), $diff->removedForeignKeys
         );
@@ -753,18 +778,25 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * @param TableDiff $diff The table diff to gather the SQL for.
+     * @param CDatabase_Schema_Table_Diff $diff The table diff to gather the SQL for.
      *
      * @return array
      */
     protected function getPostAlterTableRenameIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $sql = [];
-        $tableName = (false !== $diff->newName) ? $diff->getNewName()->getQuotedName($this) : $diff->getName($this)->getQuotedName($this);
+        $newName = $diff->getNewName();
+        $tableName = null;
+        if ($newName !== false) {
+            $tableName = $newName->getQuotedName($this);
+        } else {
+            $tableName = $diff->getName($this)->getQuotedName($this);
+        }
 
         foreach ($this->getRemainingForeignKeyConstraintsRequiringRenamedIndexes($diff) as $foreignKey) {
-            if (!in_array($foreignKey, $diff->changedForeignKeys, true)) {
-                $sql[] = $this->getCreateForeignKeySQL($foreignKey, $tableName);
+            if (in_array($foreignKey, $diff->changedForeignKeys, true)) {
+                continue;
             }
+            $sql[] = $this->getCreateForeignKeySQL($foreignKey, $tableName);
         }
 
         return $sql;
@@ -843,6 +875,14 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
 
         return $this->getUnsignedDeclaration($columnDef) . $autoinc;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function getColumnCharsetDeclarationSQL($charset)
+    {
+        return 'CHARACTER SET ' . $charset;
+    }
 
     /**
      * {@inheritDoc}
@@ -875,7 +915,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
         }
 
-        if ($index instanceof Index && $index->isPrimary()) {
+        if ($index instanceof CDatabase_Schema_Index && $index->isPrimary()) {
             // mysql primary keys are always named "PRIMARY",
             // so we cannot use them in statements because of them being keyword.
             return $this->getDropPrimaryKeySQL($table);
@@ -1034,7 +1074,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * {@inheritdoc}
      */
     public function getDefaultTransactionIsolationLevel() {
-        return TransactionIsolationLevel::REPEATABLE_READ;
+        return CDatabase_TransactionIsolationLevel::REPEATABLE_READ;
     }
 
 }
