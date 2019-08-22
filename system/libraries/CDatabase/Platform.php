@@ -2259,20 +2259,28 @@ abstract class CDatabase_Platform {
      * Obtains DBMS specific SQL code portion needed to set an index
      * declaration to be used in statements like CREATE TABLE.
      *
-     * @param array $fields
+     *  @param mixed[]|CDatabase_Schema_Index $columnsOrIndex array declaration is deprecated, prefer passing Index to this method
      *
      * @return string
      */
-    public function getIndexFieldDeclarationListSQL(array $fields) {
+    public function getIndexFieldDeclarationListSQL($columnsOrIndex) {
+        if ($columnsOrIndex instanceof CDatabase_Schema_Index) {
+            return implode(', ', $columnsOrIndex->getQuotedColumns($this));
+        }
+
+         if (! is_array($columnsOrIndex)) {
+            throw new InvalidArgumentException('Fields argument should be an CDatabase_Schema_Index or array.');
+        }
         $ret = [];
 
-        foreach ($fields as $field => $definition) {
+        foreach ($columnsOrIndex as $column => $definition) {
             if (is_array($definition)) {
-                $ret[] = $field;
+                $ret[] = $column;
             } else {
                 $ret[] = $definition;
             }
         }
+
 
         return implode(', ', $ret);
     }
