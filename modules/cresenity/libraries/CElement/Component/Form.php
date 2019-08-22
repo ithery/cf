@@ -35,6 +35,7 @@ class CElement_Component_Form extends CElement_Component {
     protected $action_before_submit;
     protected $disable_js;
     protected $submitListener;
+    protected $validationPromptPosition;
 
     public function __construct($form_id = "") {
         parent::__construct($form_id);
@@ -64,6 +65,7 @@ class CElement_Component_Form extends CElement_Component {
         $this->auto_set_focus = true;
         $this->action_before_submit = '';
         $this->disable_js = false;
+        $this->validationPromptPosition = "topRight";
 
         if ($this->bootstrap == '3.3') {
             $this->layout = carr::get($this->theme_style, 'form_layout');
@@ -126,6 +128,10 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
+    public function setValidationPromptPosition($position) {
+        $this->validationPromptPosition= $position;
+    }
+    
     /**
      * Set target attribute value of form element
      * 
@@ -167,6 +173,7 @@ class CElement_Component_Form extends CElement_Component {
 
 
         if (is_array($validationData)) {
+            $this->validation=false;
             CManager::asset()->module()->registerRunTimeModules('validate');
             $this->validation = new CElement_Component_Form_Validation($validationData);
 
@@ -702,7 +709,7 @@ class CElement_Component_Form extends CElement_Component {
             $js->appendln("//Form validation")->br();
             $strvalidation = "";
             if ($this->validation) {
-                $strvalidation = "$('#" . $this->id . "').validationEngine();";
+                $strvalidation = "$('#" . $this->id . "').validationEngine('attach', {promptPosition:'".$this->validationPromptPosition."'});";
             }
 
             $js->appendln("
