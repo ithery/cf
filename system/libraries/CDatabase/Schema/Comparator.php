@@ -45,25 +45,27 @@ class CDatabase_Schema_Comparator {
         $foreignKeysToTable = [];
 
         foreach ($toSchema->getNamespaces() as $namespace) {
-            if (!$fromSchema->hasNamespace($namespace)) {
-                $diff->newNamespaces[$namespace] = $namespace;
+            if ($fromSchema->hasNamespace($namespace)) {
+                continue;
             }
+            $diff->newNamespaces[$namespace] = $namespace;
         }
 
         foreach ($fromSchema->getNamespaces() as $namespace) {
-            if (!$toSchema->hasNamespace($namespace)) {
-                $diff->removedNamespaces[$namespace] = $namespace;
+            if ($toSchema->hasNamespace($namespace)) {
+                continue;
             }
+            $diff->removedNamespaces[$namespace] = $namespace;
         }
 
-        
-      
+
+
         foreach ($toSchema->getTables() as $table) {
             $tableName = $table->getShortestName($toSchema->getName());
-        
-         
+
+
             if (!$fromSchema->hasTable($tableName)) {
-               
+
                 $diff->newTables[$tableName] = $toSchema->getTable($tableName);
             } else {
                 $tableDifferences = $this->diffTable($fromSchema->getTable($tableName), $toSchema->getTable($tableName));
@@ -76,7 +78,7 @@ class CDatabase_Schema_Comparator {
         /* Check if there are tables removed */
         foreach ($fromSchema->getTables() as $table) {
             $tableName = $table->getShortestName($fromSchema->getName());
-    
+
             $table = $fromSchema->getTable($tableName);
             if (!$toSchema->hasTable($tableName)) {
                 $diff->removedTables[$tableName] = $table;
@@ -93,23 +95,27 @@ class CDatabase_Schema_Comparator {
         }
 
         foreach ($diff->removedTables as $tableName => $table) {
-            if (isset($foreignKeysToTable[$tableName])) {
-                $diff->orphanedForeignKeys = array_merge($diff->orphanedForeignKeys, $foreignKeysToTable[$tableName]);
+            if (!isset($foreignKeysToTable[$tableName])) {
+                continue;
+            }
 
-                // deleting duplicated foreign keys present on both on the orphanedForeignKey
-                // and the removedForeignKeys from changedTables
-                foreach ($foreignKeysToTable[$tableName] as $foreignKey) {
-                    // strtolower the table name to make if compatible with getShortestName
-                    $localTableName = strtolower($foreignKey->getLocalTableName());
-                    if (isset($diff->changedTables[$localTableName])) {
-                        foreach ($diff->changedTables[$localTableName]->removedForeignKeys as $key => $removedForeignKey) {
-                            // We check if the key is from the removed table if not we skip.
-                            if ($tableName !== strtolower($removedForeignKey->getForeignTableName())) {
-                                continue;
-                            }
-                            unset($diff->changedTables[$localTableName]->removedForeignKeys[$key]);
-                        }
+            $diff->orphanedForeignKeys = array_merge($diff->orphanedForeignKeys, $foreignKeysToTable[$tableName]);
+
+            // deleting duplicated foreign keys present on both on the orphanedForeignKey
+            // and the removedForeignKeys from changedTables
+            foreach ($foreignKeysToTable[$tableName] as $foreignKey) {
+                // strtolower the table name to make if compatible with getShortestName
+                $localTableName = strtolower($foreignKey->getLocalTableName());
+                if (!isset($diff->changedTables[$localTableName])) {
+                    continue;
+                }
+
+                foreach ($diff->changedTables[$localTableName]->removedForeignKeys as $key => $removedForeignKey) {
+                    // We check if the key is from the removed table if not we skip.
+                    if ($tableName !== strtolower($removedForeignKey->getForeignTableName())) {
+                        continue;
                     }
+                    unset($diff->changedTables[$localTableName]->removedForeignKeys[$key]);
                 }
             }
         }
@@ -134,9 +140,10 @@ class CDatabase_Schema_Comparator {
 
             $sequenceName = $sequence->getShortestName($fromSchema->getName());
 
-            if (!$toSchema->hasSequence($sequenceName)) {
-                $diff->removedSequences[] = $sequence;
+            if ($toSchema->hasSequence($sequenceName)) {
+                continue;
             }
+            $diff->removedSequences[] = $sequence;
         }
 
         return $diff;
@@ -192,10 +199,11 @@ class CDatabase_Schema_Comparator {
 
         /* See if all the fields in table 1 exist in table 2 */
         foreach ($table2Columns as $columnName => $column) {
-            if (!$table1->hasColumn($columnName)) {
-                $tableDifferences->addedColumns[$columnName] = $column;
-                $changes++;
+            if ($table1->hasColumn($columnName)) {
+                continue;
             }
+            $tableDifferences->addedColumns[$columnName] = $column;
+            $changes++;
         }
         /* See if there are any removed fields in table 2 */
         foreach ($table1Columns as $columnName => $column) {
@@ -209,12 +217,13 @@ class CDatabase_Schema_Comparator {
             // See if column has changed properties in table 2.
             $changedProperties = $this->diffColumn($column, $table2->getColumn($columnName));
 
-            if (!empty($changedProperties)) {
-                $columnDiff = new CDatabase_Schema_Column_Diff($column->getName(), $table2->getColumn($columnName), $changedProperties);
-                $columnDiff->fromColumn = $column;
-                $tableDifferences->changedColumns[$column->getName()] = $columnDiff;
-                $changes++;
+            if (empty($changedProperties)) {
+                continue;
             }
+            $columnDiff = new CDatabase_Schema_Column_Diff($column->getName(), $table2->getColumn($columnName), $changedProperties);
+            $columnDiff->fromColumn = $column;
+            $tableDifferences->changedColumns[$column->getName()] = $columnDiff;
+            $changes++;
         }
 
         $this->detectColumnRenamings($tableDifferences);
@@ -234,9 +243,7 @@ class CDatabase_Schema_Comparator {
         /* See if there are any removed indexes in table 2 */
         foreach ($table1Indexes as $indexName => $index) {
             // See if index is removed in table 2.
-            if (($index->isPrimary() && !$table2->hasPrimaryKey()) ||
-                    !$index->isPrimary() && !$table2->hasIndex($indexName)
-            ) {
+            if (($index->isPrimary() && !$table2->hasPrimaryKey()) || !$index->isPrimary() && !$table2->hasIndex($indexName)) {
                 $tableDifferences->removedIndexes[$indexName] = $index;
                 $changes++;
                 continue;
@@ -245,10 +252,13 @@ class CDatabase_Schema_Comparator {
             // See if index has changed in table 2.
             $table2Index = $index->isPrimary() ? $table2->getPrimaryKey() : $table2->getIndex($indexName);
 
-            if ($this->diffIndex($index, $table2Index)) {
-                $tableDifferences->changedIndexes[$indexName] = $table2Index;
-                $changes++;
+            if (!$this->diffIndex($index, $table2Index)) {
+                continue;
             }
+
+
+            $tableDifferences->changedIndexes[$indexName] = $table2Index;
+            $changes++;
         }
 
         $this->detectIndexRenamings($tableDifferences);
@@ -300,18 +310,23 @@ class CDatabase_Schema_Comparator {
         }
 
         foreach ($renameCandidates as $candidateColumns) {
-            if (count($candidateColumns) == 1) {
-                list($removedColumn, $addedColumn) = $candidateColumns[0];
-                $removedColumnName = strtolower($removedColumn->getName());
-                $addedColumnName = strtolower($addedColumn->getName());
-
-                if (!isset($tableDifferences->renamedColumns[$removedColumnName])) {
-                    $tableDifferences->renamedColumns[$removedColumnName] = $addedColumn;
-                    unset(
-                            $tableDifferences->addedColumns[$addedColumnName], $tableDifferences->removedColumns[$removedColumnName]
-                    );
-                }
+            if (count($candidateColumns) !== 1) {
+                continue;
             }
+
+
+            list($removedColumn, $addedColumn) = $candidateColumns[0];
+            $removedColumnName = strtolower($removedColumn->getName());
+            $addedColumnName = strtolower($addedColumn->getName());
+
+            if (isset($tableDifferences->renamedColumns[$removedColumnName])) {
+                continue;
+            }
+
+            $tableDifferences->renamedColumns[$removedColumnName] = $addedColumn;
+            unset(
+                    $tableDifferences->addedColumns[$addedColumnName], $tableDifferences->removedColumns[$removedColumnName]
+            );
         }
     }
 
@@ -327,9 +342,11 @@ class CDatabase_Schema_Comparator {
         // Gather possible rename candidates by comparing each added and removed index based on semantics.
         foreach ($tableDifferences->addedIndexes as $addedIndexName => $addedIndex) {
             foreach ($tableDifferences->removedIndexes as $removedIndex) {
-                if (!$this->diffIndex($addedIndex, $removedIndex)) {
-                    $renameCandidates[$addedIndex->getName()][] = [$removedIndex, $addedIndex, $addedIndexName];
+                if ($this->diffIndex($addedIndex, $removedIndex)) {
+                    continue;
                 }
+
+                $renameCandidates[$addedIndex->getName()][] = [$removedIndex, $addedIndex, $addedIndexName];
             }
         }
 
@@ -338,19 +355,21 @@ class CDatabase_Schema_Comparator {
             // we can safely rename it.
             // Otherwise it is unclear if a rename action is really intended,
             // therefore we let those ambiguous indexes be added/dropped.
-            if (count($candidateIndexes) === 1) {
-                list($removedIndex, $addedIndex) = $candidateIndexes[0];
-
-                $removedIndexName = strtolower($removedIndex->getName());
-                $addedIndexName = strtolower($addedIndex->getName());
-
-                if (!isset($tableDifferences->renamedIndexes[$removedIndexName])) {
-                    $tableDifferences->renamedIndexes[$removedIndexName] = $addedIndex;
-                    unset(
-                            $tableDifferences->addedIndexes[$addedIndexName], $tableDifferences->removedIndexes[$removedIndexName]
-                    );
-                }
+            if (count($candidateIndexes) !== 1) {
+                continue;
             }
+            list($removedIndex, $addedIndex) = $candidateIndexes[0];
+
+            $removedIndexName = strtolower($removedIndex->getName());
+            $addedIndexName = strtolower($addedIndex->getName());
+
+            if (isset($tableDifferences->renamedIndexes[$removedIndexName])) {
+                continue;
+            }
+            $tableDifferences->renamedIndexes[$removedIndexName] = $addedIndex;
+            unset(
+                    $tableDifferences->addedIndexes[$addedIndexName], $tableDifferences->removedIndexes[$removedIndexName]
+            );
         }
     }
 
@@ -397,11 +416,15 @@ class CDatabase_Schema_Comparator {
 
         $changedProperties = [];
 
-        foreach (['type', 'notnull', 'unsigned', 'autoincrement'] as $property) {
-            if ($properties1[$property] != $properties2[$property]) {
-               
-                $changedProperties[] = $property;
+        if (get_class($properties1['type']) !== get_class($properties2['type'])) {
+            $changedProperties[] = 'type';
+        }
+
+        foreach (['notnull', 'unsigned', 'autoincrement'] as $property) {
+            if ($properties1[$property] === $properties2[$property]) {
+                continue;
             }
+            $changedProperties[] = $property;
         }
 
         // This is a very nasty hack to make comparator work with the legacy json_array type, which should be killed in v3
@@ -411,12 +434,9 @@ class CDatabase_Schema_Comparator {
             $changedProperties[] = 'comment';
         }
 
-        if ($properties1['default'] != $properties2['default'] ||
-                // Null values need to be checked additionally as they tell whether to create or drop a default value.
-                // null != 0, null != false, null != '' etc. This affects platform's table alteration SQL generation.
-                (null === $properties1['default'] && null !== $properties2['default']) ||
-                (null === $properties2['default'] && null !== $properties1['default'])
-        ) {
+        // Null values need to be checked additionally as they tell whether to create or drop a default value.
+        // null != 0, null != false, null != '' etc. This affects platform's table alteration SQL generation.
+        if (($properties1['default'] === null) !== ($properties2['default'] === null) || $properties1['default'] != $properties2['default']) {
             $changedProperties[] = 'default';
         }
 
@@ -444,8 +464,8 @@ class CDatabase_Schema_Comparator {
 
         // A null value and an empty string are actually equal for a comment so they should not trigger a change.
         if ($properties1['comment'] !== $properties2['comment'] &&
-                !(null === $properties1['comment'] && '' === $properties2['comment']) &&
-                !(null === $properties2['comment'] && '' === $properties1['comment'])
+                !($properties1['comment'] === null && $properties2['comment'] === '') &&
+                !($properties2['comment'] === null && $properties1['comment'] === '')
         ) {
             $changedProperties[] = 'comment';
         }
@@ -465,9 +485,10 @@ class CDatabase_Schema_Comparator {
         $platformOptions2 = $column2->getPlatformOptions();
 
         foreach (array_keys(array_intersect_key($platformOptions1, $platformOptions2)) as $key) {
-            if ($properties1[$key] !== $properties2[$key]) {
-                $changedProperties[] = $key;
+            if ($properties1[$key] === $properties2[$key]) {
+                continue;
             }
+            $changedProperties[] = $key;
         }
 
         return array_unique($changedProperties);
