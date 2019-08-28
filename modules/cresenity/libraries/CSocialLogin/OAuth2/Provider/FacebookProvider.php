@@ -101,7 +101,7 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
      */
     protected function mapUserToObject(array $user) {
         $avatarUrl = $this->graphUrl . '/' . $this->version . '/' . $user['id'] . '/picture';
-        return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
+        return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
                     'id' => $user['id'],
                     'nickname' => null,
                     'name' => isset($user['name']) ? $user['name'] : null,
