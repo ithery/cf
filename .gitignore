@@ -10,6 +10,7 @@ application/*
 
 #ignore data domain or org
 /data/*
+/data/org/*
 
 #ignore
 /index.php
@@ -25,6 +26,8 @@ application/*
 /modules/cresenity/vendor/lib/fonts/Helvetica-Oblique.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-BoldOblique.afm.php
 
+/system/vendor/Cresenity
+
 #ignore folder logs
 /application/logs
 /logs/
@@ -32,6 +35,8 @@ application/*
 /temp
 /temp/*
 /export/
+/resources
+/certificate
 /upload/*
 /payment_log/
 
@@ -55,3 +60,8 @@ __sublime_sftp_offset
 robots.txt
 botlog.log
 
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
