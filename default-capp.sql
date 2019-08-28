@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `log_login` (
   `login_date` datetime DEFAULT NULL,
   PRIMARY KEY (`log_login_id`),
   UNIQUE KEY `log_login_id` (`log_login_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=197 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 DROP TABLE IF EXISTS `log_login_fail`;
@@ -80,23 +80,20 @@ CREATE TABLE IF NOT EXISTS `log_login_fail` (
   `login_fail_date` datetime DEFAULT NULL,
   PRIMARY KEY (`log_login_fail_id`),
   UNIQUE KEY `log_login_fail_id` (`log_login_fail_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 DROP TABLE IF EXISTS `org`;
 CREATE TABLE IF NOT EXISTS `org` (
   `org_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(100) DEFAULT '',
-  `org_category` varchar(100) DEFAULT '',
+  `domain` varchar(255) DEFAULT '',
   `name` varchar(50) DEFAULT NULL,
   `address` varchar(100) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
-  `fax` varchar(50) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
-  `mobile` varchar(50) DEFAULT NULL,
   `contact_person` varchar(50) DEFAULT NULL,
-  `credit_limit` double DEFAULT '0',
   `created` datetime DEFAULT NULL,
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
@@ -104,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `org` (
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`org_id`),
   UNIQUE KEY `org_id` (`org_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table torsb2c.org: ~0 rows (approximately)
 /*!40000 ALTER TABLE `org` DISABLE KEYS */;
@@ -134,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `roleid` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table torsb2c.roles: ~6 rows (approximately)
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
@@ -195,7 +192,7 @@ CREATE TABLE IF NOT EXISTS `sys_counter` (
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`sys_counter_id`),
   UNIQUE KEY `counter_id` (`sys_counter_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=200 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
