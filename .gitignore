@@ -60,3 +60,8 @@ __sublime_sftp_offset
 robots.txt
 botlog.log
 
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
