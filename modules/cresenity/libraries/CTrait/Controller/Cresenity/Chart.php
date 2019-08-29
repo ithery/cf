@@ -93,7 +93,7 @@ trait CTrait_Controller_Cresenity_Chart {
         $myScatter->drawScatterLineChart();
 
         /* Draw the legend */
-        $myScatter->drawScatterLegend(280, 380, ["Mode" => CImage_Chart::LEGEND_HORIZONTAL, "Style" => CImage_Chart::LEGEND_NOBORDER]);
+        $myScatter->drawScatterLegend(280, 380, ["Mode" => Constant::LEGEND_HORIZONTAL, "Style" => Constant::LEGEND_NOBORDER]);
 
         /* Render the picture (choose the best way) */
         $image->autoOutput("example.drawScatterLineChart.png");
