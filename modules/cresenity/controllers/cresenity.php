@@ -12,6 +12,10 @@ class Controller_Cresenity extends CController {
         CJob::cliRunner();
     }
 
+    public function job() {
+        CJob::cliRunner();
+    }
+
     public function daemon() {
         CDaemon::cliRunner();
     }

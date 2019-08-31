@@ -229,7 +229,7 @@ class CJob {
             $parameter = $argv[3];
         }
         parse_str($parameter, $config);
-        $cls = carr::get($config, 'jobClass','CJob_BackgroundJob');
+        $cls = carr::get($config, 'jobClass', 'CJob_BackgroundJob');
         /** @var CJob_Exception $job */
         $jobName = carr::get($config, 'jobName');
 

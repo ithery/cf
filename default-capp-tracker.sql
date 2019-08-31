@@ -144,7 +144,7 @@ CREATE TABLE `log_language` (
   `log_language_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
   `preference` varchar(255) DEFAULT NULL,
-  `language-range` varchar(255) DEFAULT NULL,
+  `language_range` varchar(255) DEFAULT NULL,
   `created` datetime DEFAULT NULL,
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
