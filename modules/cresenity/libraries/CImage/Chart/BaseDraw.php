@@ -247,255 +247,255 @@ class CImage_Chart_BaseDraw {
     /**
      * Allocate a color with transparency
      * @param resource $picture
-     * @param int $R
-     * @param int $G
-     * @param int $B
-     * @param int $Alpha
+     * @param int $r
+     * @param int $g
+     * @param int $b
+     * @param int $alpha
      * @return int
      */
-    public function allocateColor($picture, $R, $G, $B, $Alpha = 100) {
-        if ($R < 0) {
-            $R = 0;
-        } if ($R > 255) {
-            $R = 255;
+    public function allocateColor($picture, $r, $g, $b, $alpha = 100) {
+        if ($r < 0) {
+            $r = 0;
+        } if ($r > 255) {
+            $r = 255;
         }
-        if ($G < 0) {
-            $G = 0;
-        } if ($G > 255) {
-            $G = 255;
+        if ($g < 0) {
+            $g = 0;
+        } if ($g > 255) {
+            $g = 255;
         }
-        if ($B < 0) {
-            $B = 0;
-        } if ($B > 255) {
-            $B = 255;
+        if ($b < 0) {
+            $b = 0;
+        } if ($b > 255) {
+            $b = 255;
         }
-        if ($Alpha < 0) {
-            $Alpha = 0;
+        if ($alpha < 0) {
+            $alpha = 0;
         }
-        if ($Alpha > 100) {
-            $Alpha = 100;
+        if ($alpha > 100) {
+            $alpha = 100;
         }
-        $Alpha = $this->convertAlpha($Alpha);
-        return imagecolorallocatealpha($picture, $R, $G, $B, $Alpha);
+        $alpha = $this->convertAlpha($alpha);
+        return imagecolorallocatealpha($picture, $r, $g, $b, $alpha);
     }
 
     /**
      * Convert apha to base 10
-     * @param int|float $AlphaValue
+     * @param int|float $alphaValue
      * @return integer
      */
-    public function convertAlpha($AlphaValue) {
-        return (127 / 100) * (100 - $AlphaValue);
+    public function convertAlpha($alphaValue) {
+        return (127 / 100) * (100 - $alphaValue);
     }
 
     /**
-     * @param string $FileName
+     * @param string $fileName
      * @return array
      */
-    public function getPicInfo($FileName) {
-        $Infos = getimagesize($FileName);
-        $Width = $Infos[0];
-        $Height = $Infos[1];
-        $Type = $Infos["mime"];
-        if ($Type == "image/png") {
-            $Type = 1;
+    public function getPicInfo($fileName) {
+        $infos = getimagesize($fileName);
+        $width = $infos[0];
+        $height = $infos[1];
+        $type = $infos["mime"];
+        if ($type == "image/png") {
+            $type = 1;
         }
-        if ($Type == "image/gif") {
-            $Type = 2;
+        if ($type == "image/gif") {
+            $type = 2;
         }
-        if ($Type == "image/jpeg ") {
-            $Type = 3;
+        if ($type == "image/jpeg ") {
+            $type = 3;
         }
-        return [$Width, $Height, $Type];
+        return [$width, $height, $type];
     }
 
     /**
      * Compute the scale, check for the best visual factors
-     * @param int $XMin
-     * @param int $XMax
-     * @param int $MaxDivs
-     * @param array $Factors
-     * @param int $AxisID
+     * @param int $xMin
+     * @param int $xMax
+     * @param int $maxDivs
+     * @param array $factors
+     * @param int $axisID
      * @return mixed
      */
-    public function computeScale($XMin, $XMax, $MaxDivs, array $Factors, $AxisID = 0) {
+    public function computeScale($xMin, $xMax, $maxDivs, array $factors, $axisID = 0) {
         /* Compute each factors */
-        $Results = [];
-        foreach ($Factors as $Key => $Factor) {
-            $Results[$Factor] = $this->processScale($XMin, $XMax, $MaxDivs, [$Factor], $AxisID);
+        $results = [];
+        foreach ($factors as $key => $factor) {
+            $results[$factor] = $this->processScale($xMin, $xMax, $maxDivs, [$factor], $axisID);
         }
         /* Remove scales that are creating to much decimals */
-        $GoodScaleFactors = [];
-        foreach ($Results as $Key => $Result) {
-            $Decimals = preg_split("/\./", $Result["RowHeight"]);
-            if ((!isset($Decimals[1])) || (strlen($Decimals[1]) < 6)) {
-                $GoodScaleFactors[] = $Key;
+        $goodScaleFactors = [];
+        foreach ($results as $key => $result) {
+            $decimals = preg_split("/\./", $result["rowHeight"]);
+            if ((!isset($decimals[1])) || (strlen($decimals[1]) < 6)) {
+                $goodScaleFactors[] = $key;
             }
         }
         /* Found no correct scale, shame,... returns the 1st one as default */
-        if (!count($GoodScaleFactors)) {
-            return $Results[$Factors[0]];
+        if (!count($goodScaleFactors)) {
+            return $results[$factors[0]];
         }
         /* Find the factor that cause the maximum number of Rows */
-        $MaxRows = 0;
-        $BestFactor = 0;
-        foreach ($GoodScaleFactors as $Key => $Factor) {
-            if ($Results[$Factor]["Rows"] > $MaxRows) {
-                $MaxRows = $Results[$Factor]["Rows"];
-                $BestFactor = $Factor;
+        $maxRows = 0;
+        $bestFactor = 0;
+        foreach ($goodScaleFactors as $key => $factor) {
+            if ($results[$factor]["rows"] > $maxRows) {
+                $maxRows = $results[$factor]["rows"];
+                $bestFactor = $factor;
             }
         }
         /* Return the best visual scale */
-        return $Results[$BestFactor];
+        return $results[$bestFactor];
     }
 
     /**
      * Compute the best matching scale based on size & factors
-     * @param int $XMin
-     * @param int $XMax
-     * @param int $MaxDivs
-     * @param array $Factors
-     * @param int $AxisID
+     * @param int $xMin
+     * @param int $xMax
+     * @param int $maxDivs
+     * @param array $factors
+     * @param int $axisID
      * @return array
      */
-    public function processScale($XMin, $XMax, $MaxDivs, array $Factors, $AxisID) {
-        $ScaleHeight = abs(ceil($XMax) - floor($XMin));
-        $Format = null;
-        if (isset($this->DataSet->Data["Axis"][$AxisID]["Format"])) {
-            $Format = $this->DataSet->Data["Axis"][$AxisID]["Format"];
+    public function processScale($xMin, $xMax, $maxDivs, array $factors, $axisID) {
+        $scaleHeight = abs(ceil($xMax) - floor($xMin));
+        $format = null;
+        if (isset($this->dataSet->data["axis"][$axisID]["format"])) {
+            $format = $this->dataSet->data["axis"][$axisID]["format"];
         }
-        $Mode = AXIS_FORMAT_DEFAULT;
-        if (isset($this->DataSet->Data["Axis"][$AxisID]["Display"])) {
-            $Mode = $this->DataSet->Data["Axis"][$AxisID]["Display"];
+        $mode = Constant::AXIS_FORMAT_DEFAULT;
+        if (isset($this->dataSet->data["axis"][$axisID]["display"])) {
+            $mode = $this->dataSet->data["axis"][$axisID]["display"];
         }
-        $Scale = [];
-        if ($XMin != $XMax) {
-            $Found = false;
-            $Rescaled = false;
-            $Scaled10Factor = .0001;
-            $Result = 0;
-            while (!$Found) {
-                foreach ($Factors as $Key => $Factor) {
-                    if (!$Found) {
-                        $XMinRescaled = $XMin;
-                        if (!($this->modulo($XMin, $Factor * $Scaled10Factor) == 0) || ($XMin != floor($XMin))
+        $scale = [];
+        if ($xMin != $xMax) {
+            $found = false;
+            $rescaled = false;
+            $scaled10Factor = .0001;
+            $result = 0;
+            while (!$found) {
+                foreach ($factors as $key => $factor) {
+                    if (!$found) {
+                        $xMinRescaled = $xMin;
+                        if (!($this->modulo($xMin, $factor * $scaled10Factor) == 0) || ($xMin != floor($xMin))
                         ) {
-                            $XMinRescaled = floor($XMin / ($Factor * $Scaled10Factor)) * $Factor * $Scaled10Factor
+                            $xMinRescaled = floor($xMin / ($factor * $scaled10Factor)) * $factor * $scaled10Factor
                             ;
                         }
-                        $XMaxRescaled = $XMax;
-                        if (!($this->modulo($XMax, $Factor * $Scaled10Factor) == 0) || ($XMax != floor($XMax))
+                        $xMaxRescaled = $xMax;
+                        if (!($this->modulo($xMax, $factor * $scaled10Factor) == 0) || ($xMax != floor($xMax))
                         ) {
-                            $XMaxRescaled = floor($XMax / ($Factor * $Scaled10Factor)) * $Factor * $Scaled10Factor + ($Factor * $Scaled10Factor)
+                            $xMaxRescaled = floor($xMax / ($factor * $scaled10Factor)) * $factor * $scaled10Factor + ($factor * $scaled10Factor)
                             ;
                         }
-                        $ScaleHeightRescaled = abs($XMaxRescaled - $XMinRescaled);
-                        if (!$Found && floor($ScaleHeightRescaled / ($Factor * $Scaled10Factor)) <= $MaxDivs
+                        $scaleHeightRescaled = abs($xMaxRescaled - $xMinRescaled);
+                        if (!$found && floor($scaleHeightRescaled / ($factor * $scaled10Factor)) <= $maxDivs
                         ) {
-                            $Found = true;
-                            $Rescaled = true;
-                            $Result = $Factor * $Scaled10Factor;
+                            $found = true;
+                            $rescaled = true;
+                            $result = $factor * $scaled10Factor;
                         }
                     }
                 }
-                $Scaled10Factor = $Scaled10Factor * 10;
+                $scaled10Factor = $scaled10Factor * 10;
             }
             /* ReCall Min / Max / Height */
-            if ($Rescaled) {
-                $XMin = $XMinRescaled;
-                $XMax = $XMaxRescaled;
-                $ScaleHeight = $ScaleHeightRescaled;
+            if ($rescaled) {
+                $xMin = $xMinRescaled;
+                $xMax = $xMaxRescaled;
+                $scaleHeight = $scaleHeightRescaled;
             }
             /* Compute rows size */
-            $Rows = floor($ScaleHeight / $Result);
-            if ($Rows == 0) {
-                $Rows = 1;
+            $rows = floor($scaleHeight / $result);
+            if ($rows == 0) {
+                $rows = 1;
             }
-            $RowHeight = $ScaleHeight / $Rows;
+            $rowHeight = $scaleHeight / $rows;
             /* Return the results */
-            $Scale["Rows"] = $Rows;
-            $Scale["RowHeight"] = $RowHeight;
-            $Scale["XMin"] = $XMin;
-            $Scale["XMax"] = $XMax;
+            $scale["rows"] = $rows;
+            $scale["rowHeight"] = $rowHeight;
+            $scale["xMin"] = $xMin;
+            $scale["xMax"] = $xMax;
             /* Compute the needed decimals for the metric view to avoid repetition of the same X Axis labels */
-            if ($Mode == AXIS_FORMAT_METRIC && $Format == null) {
-                $Done = false;
-                $GoodDecimals = 0;
-                for ($Decimals = 0; $Decimals <= 10; $Decimals++) {
-                    if (!$Done) {
-                        $LastLabel = "zob";
-                        $ScaleOK = true;
-                        for ($i = 0; $i <= $Rows; $i++) {
-                            $Value = $XMin + $i * $RowHeight;
-                            $Label = $this->scaleFormat($Value, AXIS_FORMAT_METRIC, $Decimals);
-                            if ($LastLabel == $Label) {
-                                $ScaleOK = false;
+            if ($mode == Constant::AXIS_FORMAT_METRIC && $format == null) {
+                $done = false;
+                $goodDecimals = 0;
+                for ($decimals = 0; $decimals <= 10; $decimals++) {
+                    if (!$done) {
+                        $lastLabel = "zob";
+                        $scaleOK = true;
+                        for ($i = 0; $i <= $rows; $i++) {
+                            $value = $xMin + $i * $rowHeight;
+                            $label = $this->scaleFormat($value, Constant::AXIS_FORMAT_METRIC, $decimals);
+                            if ($lastLabel == $label) {
+                                $scaleOK = false;
                             }
-                            $LastLabel = $Label;
+                            $lastLabel = $label;
                         }
-                        if ($ScaleOK) {
-                            $Done = true;
-                            $GoodDecimals = $Decimals;
+                        if ($scaleOK) {
+                            $done = true;
+                            $goodDecimals = $decimals;
                         }
                     }
                 }
-                $Scale["Format"] = $GoodDecimals;
+                $scale["format"] = $goodDecimals;
             }
         } else {
             /* If all values are the same we keep a +1/-1 scale */
-            $Rows = 2;
-            $XMin = $XMax - 1;
-            $XMax = $XMax + 1;
-            $RowHeight = 1;
+            $rows = 2;
+            $xMin = $xMax - 1;
+            $xMax = $xMax + 1;
+            $rowHeight = 1;
             /* Return the results */
-            $Scale["Rows"] = $Rows;
-            $Scale["RowHeight"] = $RowHeight;
-            $Scale["XMin"] = $XMin;
-            $Scale["XMax"] = $XMax;
+            $scale["rows"] = $rows;
+            $scale["rowHeight"] = $rowHeight;
+            $scale["xMin"] = $xMin;
+            $scale["xMax"] = $xMax;
         }
-        return $Scale;
+        return $scale;
     }
 
     /**
      *
-     * @param int|float $Value1
-     * @param int|float $Value2
+     * @param int|float $value1
+     * @param int|float $value2
      * @return double
      */
-    public function modulo($Value1, $Value2) {
-        if (floor($Value2) == 0) {
+    public function modulo($value1, $value2) {
+        if (floor($value2) == 0) {
             return 0;
         }
-        if (floor($Value2) != 0) {
-            return $Value1 % $Value2;
+        if (floor($value2) != 0) {
+            return $value1 % $value2;
         }
-        $MinValue = min($Value1, $Value2);
-        $Factor = 10;
-        while (floor($MinValue * $Factor) == 0) {
-            $Factor = $Factor * 10;
+        $minValue = min($value1, $value2);
+        $factor = 10;
+        while (floor($minValue * $factor) == 0) {
+            $factor = $factor * 10;
         }
-        return ($Value1 * $Factor) % ($Value2 * $Factor);
+        return ($value1 * $factor) % ($value2 * $factor);
     }
 
     /**
-     * @param mixed $Value
-     * @param mixed $LastValue
-     * @param integer $LabelingMethod
-     * @param integer $ID
-     * @param boolean $LabelSkip
+     * @param mixed $value
+     * @param mixed $lastValue
+     * @param integer $labelingMethod
+     * @param integer $iD
+     * @param boolean $labelSkip
      * @return boolean
      */
-    public function isValidLabel($Value, $LastValue, $LabelingMethod, $ID, $LabelSkip) {
-        if ($LabelingMethod == LABELING_DIFFERENT && $Value != $LastValue) {
+    public function isValidLabel($value, $lastValue, $labelingMethod, $iD, $labelSkip) {
+        if ($labelingMethod == Constant::LABELING_DIFFERENT && $value != $lastValue) {
             return true;
         }
-        if ($LabelingMethod == LABELING_DIFFERENT && $Value == $LastValue) {
+        if ($labelingMethod == Constant::LABELING_DIFFERENT && $value == $lastValue) {
             return false;
         }
-        if ($LabelingMethod == LABELING_ALL && $LabelSkip == 0) {
+        if ($labelingMethod == Constant::LABELING_ALL && $labelSkip == 0) {
             return true;
         }
-        if ($LabelingMethod == LABELING_ALL && ($ID + $LabelSkip) % ($LabelSkip + 1) != 1) {
+        if ($labelingMethod == Constant::LABELING_ALL && ($iD + $labelSkip) % ($labelSkip + 1) != 1) {
             return false;
         }
         return true;
@@ -507,9 +507,9 @@ class CImage_Chart_BaseDraw {
      */
     public function countDrawableSeries() {
         $count = 0;
-        $Data = $this->DataSet->getData();
-        foreach ($Data["Series"] as $SerieName => $Serie) {
-            if ($Serie["isDrawable"] == true && $SerieName != $Data["Abscissa"]) {
+        $data = $this->dataSet->getData();
+        foreach ($data["series"] as $serieName => $serie) {
+            if ($serie["isDrawable"] == true && $serieName != $data["abscissa"]) {
                 $count++;
             }
         }
@@ -518,113 +518,113 @@ class CImage_Chart_BaseDraw {
 
     /**
      * Fix box coordinates
-     * @param int $Xa
-     * @param int $Ya
-     * @param int $Xb
-     * @param int $Yb
+     * @param int $xa
+     * @param int $ya
+     * @param int $xb
+     * @param int $yb
      * @return integer[]
      */
-    public function fixBoxCoordinates($Xa, $Ya, $Xb, $Yb) {
-        return [min($Xa, $Xb), min($Ya, $Yb), max($Xa, $Xb), max($Ya, $Yb)];
+    public function fixBoxCoordinates($xa, $ya, $xb, $yb) {
+        return [min($xa, $xb), min($ya, $yb), max($xa, $xb), max($ya, $yb)];
     }
 
     /**
      * Apply AALias correction to the rounded box boundaries
-     * @param int|float $Value
-     * @param int $Mode
+     * @param int|float $value
+     * @param int $mode
      * @return int|float
      */
-    public function offsetCorrection($Value, $Mode) {
-        $Value = round($Value, 1);
-        if ($Value == 0 && $Mode != 1) {
+    public function offsetCorrection($value, $mode) {
+        $value = round($value, 1);
+        if ($value == 0 && $mode != 1) {
             return 0;
         }
-        if ($Mode == 1) {
-            if ($Value == .5) {
+        if ($mode == 1) {
+            if ($value == .5) {
                 return .5;
             }
-            if ($Value == .8) {
+            if ($value == .8) {
                 return .6;
             }
-            if (in_array($Value, [.4, .7])) {
+            if (in_array($value, [.4, .7])) {
                 return .7;
             }
-            if (in_array($Value, [.2, .3, .6])) {
+            if (in_array($value, [.2, .3, .6])) {
                 return .8;
             }
-            if (in_array($Value, [0, 1, .1, .9])) {
+            if (in_array($value, [0, 1, .1, .9])) {
                 return .9;
             }
         }
-        if ($Mode == 2) {
-            if ($Value == .1) {
+        if ($mode == 2) {
+            if ($value == .1) {
                 return .1;
             }
-            if ($Value == .2) {
+            if ($value == .2) {
                 return .2;
             }
-            if ($Value == .3) {
+            if ($value == .3) {
                 return .3;
             }
-            if ($Value == .4) {
+            if ($value == .4) {
                 return .4;
             }
-            if ($Value == .5) {
+            if ($value == .5) {
                 return .5;
             }
-            if ($Value == .7) {
+            if ($value == .7) {
                 return .7;
             }
-            if (in_array($Value, [.6, .8])) {
+            if (in_array($value, [.6, .8])) {
                 return .8;
             }
-            if (in_array($Value, [1, .9])) {
+            if (in_array($value, [1, .9])) {
                 return .9;
             }
         }
-        if ($Mode == 3) {
-            if (in_array($Value, [1, .1])) {
+        if ($mode == 3) {
+            if (in_array($value, [1, .1])) {
                 return .1;
             }
-            if ($Value == .2) {
+            if ($value == .2) {
                 return .2;
             }
-            if ($Value == .3) {
+            if ($value == .3) {
                 return .3;
             }
-            if (in_array($Value, [.4, .8])) {
+            if (in_array($value, [.4, .8])) {
                 return .4;
             }
-            if ($Value == .5) {
+            if ($value == .5) {
                 return .9;
             }
-            if ($Value == .6) {
+            if ($value == .6) {
                 return .6;
             }
-            if ($Value == .7) {
+            if ($value == .7) {
                 return .7;
             }
-            if ($Value == .9) {
+            if ($value == .9) {
                 return .5;
             }
         }
-        if ($Mode == 4) {
-            if ($Value == 1) {
+        if ($mode == 4) {
+            if ($value == 1) {
                 return -1;
             }
-            if (in_array($Value, [.1, .4, .7, .8, .9])) {
+            if (in_array($value, [.1, .4, .7, .8, .9])) {
                 return .1;
             }
-            if ($Value == .2) {
+            if ($value == .2) {
                 return .2;
             }
-            if ($Value == .3) {
+            if ($value == .3) {
                 return .3;
             }
-            if ($Value == .5) {
+            if ($value == .5) {
                 return -.1;
             }
-            if ($Value == .6) {
+            if ($value == .6) {
                 return .8;
             }
         }
@@ -632,103 +632,103 @@ class CImage_Chart_BaseDraw {
 
     /**
      * Get the legend box size
-     * @param array $Format
+     * @param array $format
      * @return array
      */
-    public function getLegendSize(array $Format = []) {
-        $fontName = isset($Format["FontName"]) ? $this->loadFont($Format["FontName"], 'fonts') : $this->FontName;
-        $fontSize = isset($Format["FontSize"]) ? $Format["FontSize"] : $this->FontSize;
-        $Margin = isset($Format["Margin"]) ? $Format["Margin"] : 5;
-        $Mode = isset($Format["Mode"]) ? $Format["Mode"] : LEGEND_VERTICAL;
-        $BoxWidth = isset($Format["BoxWidth"]) ? $Format["BoxWidth"] : 5;
-        $BoxHeight = isset($Format["BoxHeight"]) ? $Format["BoxHeight"] : 5;
-        $IconAreaWidth = isset($Format["IconAreaWidth"]) ? $Format["IconAreaWidth"] : $BoxWidth;
-        $IconAreaHeight = isset($Format["IconAreaHeight"]) ? $Format["IconAreaHeight"] : $BoxHeight;
-        $XSpacing = isset($Format["XSpacing"]) ? $Format["XSpacing"] : 5;
-        $Data = $this->DataSet->getData();
-        foreach ($Data["Series"] as $SerieName => $Serie) {
-            if ($Serie["isDrawable"] == true && $SerieName != $Data["Abscissa"] && isset($Serie["Picture"])
+    public function getLegendSize(array $format = []) {
+        $fontName = isset($format["fontName"]) ? $this->loadFont($format["fontName"], 'fonts') : $this->FontName;
+        $fontSize = isset($format["fontSize"]) ? $format["fontSize"] : $this->FontSize;
+        $margin = isset($format["margin"]) ? $format["margin"] : 5;
+        $mode = isset($format["mode"]) ? $format["mode"] : LEGEND_VERTICAL;
+        $boxWidth = isset($format["boxWidth"]) ? $format["boxWidth"] : 5;
+        $boxHeight = isset($format["boxHeight"]) ? $format["boxHeight"] : 5;
+        $iconAreaWidth = isset($format["iconAreaWidth"]) ? $format["iconAreaWidth"] : $boxWidth;
+        $iconAreaHeight = isset($format["iconAreaHeight"]) ? $format["iconAreaHeight"] : $boxHeight;
+        $xSpacing = isset($format["xSpacing"]) ? $format["xSpacing"] : 5;
+        $data = $this->dataSet->getData();
+        foreach ($data["series"] as $serieName => $serie) {
+            if ($serie["isDrawable"] == true && $serieName != $data["abscissa"] && isset($serie["picture"])
             ) {
-                list($PicWidth, $PicHeight) = $this->getPicInfo($Serie["Picture"]);
-                if ($IconAreaWidth < $PicWidth) {
-                    $IconAreaWidth = $PicWidth;
+                list($picWidth, $picHeight) = $this->getPicInfo($serie["picture"]);
+                if ($iconAreaWidth < $picWidth) {
+                    $iconAreaWidth = $picWidth;
                 }
-                if ($IconAreaHeight < $PicHeight) {
-                    $IconAreaHeight = $PicHeight;
+                if ($iconAreaHeight < $picHeight) {
+                    $iconAreaHeight = $picHeight;
                 }
             }
         }
-        $YStep = max($this->FontSize, $IconAreaHeight) + 5;
-        $XStep = $IconAreaWidth + 5;
-        $XStep = $XSpacing;
-        $X = 100;
-        $Y = 100;
-        $Boundaries = [];
-        $Boundaries["L"] = $X;
-        $Boundaries["T"] = $Y;
-        $Boundaries["R"] = 0;
-        $Boundaries["B"] = 0;
-        $vY = $Y;
-        $vX = $X;
-        foreach ($Data["Series"] as $SerieName => $Serie) {
-            if ($Serie["isDrawable"] == true && $SerieName != $Data["Abscissa"]) {
-                if ($Mode == LEGEND_VERTICAL) {
-                    $BoxArray = $this->getTextBox(
-                            $vX + $IconAreaWidth + 4, $vY + $IconAreaHeight / 2, $fontName, $fontSize, 0, $Serie["Description"]
+        $yStep = max($this->FontSize, $iconAreaHeight) + 5;
+        $xStep = $iconAreaWidth + 5;
+        $xStep = $xSpacing;
+        $x = 100;
+        $y = 100;
+        $boundaries = [];
+        $boundaries["l"] = $x;
+        $boundaries["t"] = $y;
+        $boundaries["r"] = 0;
+        $boundaries["b"] = 0;
+        $vY = $y;
+        $vX = $x;
+        foreach ($data["series"] as $serieName => $serie) {
+            if ($serie["isDrawable"] == true && $serieName != $data["abscissa"]) {
+                if ($mode == LEGEND_VERTICAL) {
+                    $boxArray = $this->getTextBox(
+                            $vX + $iconAreaWidth + 4, $vY + $iconAreaHeight / 2, $fontName, $fontSize, 0, $serie["description"]
                     );
-                    if ($Boundaries["T"] > $BoxArray[2]["Y"] + $IconAreaHeight / 2) {
-                        $Boundaries["T"] = $BoxArray[2]["Y"] + $IconAreaHeight / 2;
+                    if ($boundaries["t"] > $boxArray[2]["y"] + $iconAreaHeight / 2) {
+                        $boundaries["t"] = $boxArray[2]["y"] + $iconAreaHeight / 2;
                     }
-                    if ($Boundaries["R"] < $BoxArray[1]["X"] + 2) {
-                        $Boundaries["R"] = $BoxArray[1]["X"] + 2;
+                    if ($boundaries["r"] < $boxArray[1]["x"] + 2) {
+                        $boundaries["r"] = $boxArray[1]["x"] + 2;
                     }
-                    if ($Boundaries["B"] < $BoxArray[1]["Y"] + 2 + $IconAreaHeight / 2) {
-                        $Boundaries["B"] = $BoxArray[1]["Y"] + 2 + $IconAreaHeight / 2;
+                    if ($boundaries["b"] < $boxArray[1]["y"] + 2 + $iconAreaHeight / 2) {
+                        $boundaries["b"] = $boxArray[1]["y"] + 2 + $iconAreaHeight / 2;
                     }
-                    $Lines = preg_split("/\n/", $Serie["Description"]);
-                    $vY = $vY + max($this->FontSize * count($Lines), $IconAreaHeight) + 5;
-                } elseif ($Mode == LEGEND_HORIZONTAL) {
-                    $Lines = preg_split("/\n/", $Serie["Description"]);
-                    $Width = [];
-                    foreach ($Lines as $Key => $Value) {
-                        $BoxArray = $this->getTextBox(
-                                $vX + $IconAreaWidth + 6, $Y + $IconAreaHeight / 2 + (($this->FontSize + 3) * $Key), $fontName, $fontSize, 0, $Value
+                    $lines = preg_split("/\n/", $serie["description"]);
+                    $vY = $vY + max($this->FontSize * count($lines), $iconAreaHeight) + 5;
+                } elseif ($mode == Constant::LEGEND_HORIZONTAL) {
+                    $lines = preg_split("/\n/", $serie["description"]);
+                    $width = [];
+                    foreach ($lines as $key => $value) {
+                        $boxArray = $this->getTextBox(
+                                $vX + $iconAreaWidth + 6, $y + $iconAreaHeight / 2 + (($this->FontSize + 3) * $key), $fontName, $fontSize, 0, $value
                         );
-                        if ($Boundaries["T"] > $BoxArray[2]["Y"] + $IconAreaHeight / 2) {
-                            $Boundaries["T"] = $BoxArray[2]["Y"] + $IconAreaHeight / 2;
+                        if ($boundaries["t"] > $boxArray[2]["y"] + $iconAreaHeight / 2) {
+                            $boundaries["t"] = $boxArray[2]["y"] + $iconAreaHeight / 2;
                         }
-                        if ($Boundaries["R"] < $BoxArray[1]["X"] + 2) {
-                            $Boundaries["R"] = $BoxArray[1]["X"] + 2;
+                        if ($boundaries["r"] < $boxArray[1]["x"] + 2) {
+                            $boundaries["r"] = $boxArray[1]["x"] + 2;
                         }
-                        if ($Boundaries["B"] < $BoxArray[1]["Y"] + 2 + $IconAreaHeight / 2) {
-                            $Boundaries["B"] = $BoxArray[1]["Y"] + 2 + $IconAreaHeight / 2;
+                        if ($boundaries["b"] < $boxArray[1]["y"] + 2 + $iconAreaHeight / 2) {
+                            $boundaries["b"] = $boxArray[1]["y"] + 2 + $iconAreaHeight / 2;
                         }
-                        $Width[] = $BoxArray[1]["X"];
+                        $width[] = $boxArray[1]["x"];
                     }
-                    $vX = max($Width) + $XStep;
+                    $vX = max($width) + $xStep;
                 }
             }
         }
-        $vY = $vY - $YStep;
-        $vX = $vX - $XStep;
-        $TopOffset = $Y - $Boundaries["T"];
-        if ($Boundaries["B"] - ($vY + $IconAreaHeight) < $TopOffset) {
-            $Boundaries["B"] = $vY + $IconAreaHeight + $TopOffset;
+        $vY = $vY - $yStep;
+        $vX = $vX - $xStep;
+        $topOffset = $y - $boundaries["t"];
+        if ($boundaries["b"] - ($vY + $iconAreaHeight) < $topOffset) {
+            $boundaries["b"] = $vY + $iconAreaHeight + $topOffset;
         }
-        $Width = ($Boundaries["R"] + $Margin) - ($Boundaries["L"] - $Margin);
-        $Height = ($Boundaries["B"] + $Margin) - ($Boundaries["T"] - $Margin);
-        return ["Width" => $Width, "Height" => $Height];
+        $width = ($boundaries["r"] + $margin) - ($boundaries["l"] - $margin);
+        $height = ($boundaries["b"] + $margin) - ($boundaries["t"] - $margin);
+        return ["Width" => $width, "Height" => $height];
     }
 
     /**
      * Return the abscissa margin
-     * @param array $Data
+     * @param array $data
      * @return int
      */
-    public function getAbscissaMargin(array $Data) {
-        foreach ($Data["Axis"] as $Values) {
-            if ($Values["Identity"] == AXIS_X) {
-                return $Values["Margin"];
+    public function getAbscissaMargin(array $data) {
+        foreach ($data["axis"] as $values) {
+            if ($values["identity"] == AXIS_X) {
+                return $values["margin"];
             }
         }
         return 0;
@@ -736,448 +736,448 @@ class CImage_Chart_BaseDraw {
 
     /**
      * Returns a random color
-     * @param int $Alpha
+     * @param int $alpha
      * @return array
      */
-    public function getRandomColor($Alpha = 100) {
+    public function getRandomColor($alpha = 100) {
         return [
-            "R" => rand(0, 255),
-            "G" => rand(0, 255),
-            "B" => rand(0, 255),
-            "Alpha" => $Alpha
+            "r" => rand(0, 255),
+            "g" => rand(0, 255),
+            "b" => rand(0, 255),
+            "alpha" => $alpha
         ];
     }
 
     /**
      * Validate a palette
      * @param mixed $Colors
-     * @param int|float $Surrounding
+     * @param int|float $surrounding
      * @return array
      */
-    public function validatePalette($Colors, $Surrounding = null) {
-        $Result = [];
+    public function validatePalette($Colors, $surrounding = null) {
+        $result = [];
         if (!is_array($Colors)) {
             return $this->getRandomColor();
         }
-        foreach ($Colors as $Key => $Values) {
-            if (isset($Values["R"])) {
-                $Result[$Key]["R"] = $Values["R"];
+        foreach ($Colors as $key => $values) {
+            if (isset($values["r"])) {
+                $result[$key]["r"] = $values["r"];
             } else {
-                $Result[$Key]["R"] = rand(0, 255);
+                $result[$key]["r"] = rand(0, 255);
             }
-            if (isset($Values["G"])) {
-                $Result[$Key]["G"] = $Values["G"];
+            if (isset($values["g"])) {
+                $result[$key]["g"] = $values["g"];
             } else {
-                $Result[$Key]["G"] = rand(0, 255);
+                $result[$key]["g"] = rand(0, 255);
             }
-            if (isset($Values["B"])) {
-                $Result[$Key]["B"] = $Values["B"];
+            if (isset($values["b"])) {
+                $result[$key]["b"] = $values["b"];
             } else {
-                $Result[$Key]["B"] = rand(0, 255);
+                $result[$key]["b"] = rand(0, 255);
             }
-            if (isset($Values["Alpha"])) {
-                $Result[$Key]["Alpha"] = $Values["Alpha"];
+            if (isset($values["alpha"])) {
+                $result[$key]["alpha"] = $values["alpha"];
             } else {
-                $Result[$Key]["Alpha"] = 100;
+                $result[$key]["alpha"] = 100;
             }
-            if (null !== $Surrounding) {
-                $Result[$Key]["BorderR"] = $Result[$Key]["R"] + $Surrounding;
-                $Result[$Key]["BorderG"] = $Result[$Key]["G"] + $Surrounding;
-                $Result[$Key]["BorderB"] = $Result[$Key]["B"] + $Surrounding;
+            if (null !== $surrounding) {
+                $result[$key]["borderR"] = $result[$key]["r"] + $surrounding;
+                $result[$key]["borderG"] = $result[$key]["g"] + $surrounding;
+                $result[$key]["borderB"] = $result[$key]["b"] + $surrounding;
             } else {
-                if (isset($Values["BorderR"])) {
-                    $Result[$Key]["BorderR"] = $Values["BorderR"];
+                if (isset($values["borderR"])) {
+                    $result[$key]["borderR"] = $values["borderR"];
                 } else {
-                    $Result[$Key]["BorderR"] = $Result[$Key]["R"];
+                    $result[$key]["borderR"] = $result[$key]["r"];
                 }
-                if (isset($Values["BorderG"])) {
-                    $Result[$Key]["BorderG"] = $Values["BorderG"];
+                if (isset($values["borderG"])) {
+                    $result[$key]["borderG"] = $values["borderG"];
                 } else {
-                    $Result[$Key]["BorderG"] = $Result[$Key]["G"];
+                    $result[$key]["borderG"] = $result[$key]["g"];
                 }
-                if (isset($Values["BorderB"])) {
-                    $Result[$Key]["BorderB"] = $Values["BorderB"];
+                if (isset($values["borderB"])) {
+                    $result[$key]["borderB"] = $values["borderB"];
                 } else {
-                    $Result[$Key]["BorderB"] = $Result[$Key]["B"];
+                    $result[$key]["borderB"] = $result[$key]["b"];
                 }
-                if (isset($Values["BorderAlpha"])) {
-                    $Result[$Key]["BorderAlpha"] = $Values["BorderAlpha"];
+                if (isset($values["borderAlpha"])) {
+                    $result[$key]["borderAlpha"] = $values["borderAlpha"];
                 } else {
-                    $Result[$Key]["BorderAlpha"] = $Result[$Key]["Alpha"];
+                    $result[$key]["borderAlpha"] = $result[$key]["alpha"];
                 }
             }
         }
-        return $Result;
+        return $result;
     }
 
     /**
-     * @param mixed $Values
-     * @param array $Option
-     * @param boolean $ReturnOnly0Height
+     * @param mixed $values
+     * @param array $option
+     * @param boolean $returnOnly0Height
      * @return int|float|array
      */
-    public function scaleComputeY($Values, array $Option = [], $ReturnOnly0Height = false) {
-        $AxisID = isset($Option["AxisID"]) ? $Option["AxisID"] : 0;
-        $SerieName = isset($Option["SerieName"]) ? $Option["SerieName"] : null;
-        $Data = $this->DataSet->getData();
-        if (!isset($Data["Axis"][$AxisID])) {
+    public function scaleComputeY($values, array $option = [], $returnOnly0Height = false) {
+        $axisID = isset($option["axisID"]) ? $option["axisID"] : 0;
+        $serieName = isset($option["serieName"]) ? $option["serieName"] : null;
+        $data = $this->dataSet->getData();
+        if (!isset($data["axis"][$axisID])) {
             return -1;
         }
-        if ($SerieName != null) {
-            $AxisID = $Data["Series"][$SerieName]["Axis"];
+        if ($serieName != null) {
+            $axisID = $data["series"][$serieName]["axis"];
         }
-        if (!is_array($Values)) {
-            $tmp = $Values;
-            $Values = [];
-            $Values[0] = $tmp;
+        if (!is_array($values)) {
+            $tmp = $values;
+            $values = [];
+            $values[0] = $tmp;
         }
-        $Result = [];
-        if ($Data["Orientation"] == SCALE_POS_LEFTRIGHT) {
-            $Height = ($this->graphAreaY2 - $this->graphAreaY1) - $Data["Axis"][$AxisID]["Margin"] * 2;
-            $ScaleHeight = $Data["Axis"][$AxisID]["ScaleMax"] - $Data["Axis"][$AxisID]["ScaleMin"];
-            $Step = $Height / $ScaleHeight;
-            if ($ReturnOnly0Height) {
-                foreach ($Values as $Key => $Value) {
-                    if ($Value == VOID) {
-                        $Result[] = VOID;
+        $result = [];
+        if ($data["orientation"] == Constant::SCALE_POS_LEFTRIGHT) {
+            $height = ($this->graphAreaY2 - $this->graphAreaY1) - $data["axis"][$axisID]["margin"] * 2;
+            $scaleHeight = $data["axis"][$axisID]["scaleMax"] - $data["axis"][$axisID]["scaleMin"];
+            $step = $height / $scaleHeight;
+            if ($returnOnly0Height) {
+                foreach ($values as $key => $value) {
+                    if ($value == Constant::VOID) {
+                        $result[] = Constant::VOID;
                     } else {
-                        $Result[] = $Step * $Value;
+                        $result[] = $step * $value;
                     }
                 }
             } else {
-                foreach ($Values as $Key => $Value) {
-                    if ($Value == VOID) {
-                        $Result[] = VOID;
+                foreach ($values as $key => $value) {
+                    if ($value == Constant::VOID) {
+                        $result[] = Constant::VOID;
                     } else {
-                        $Result[] = $this->graphAreaY2 - $Data["Axis"][$AxisID]["Margin"] - ($Step * ($Value - $Data["Axis"][$AxisID]["ScaleMin"]))
+                        $result[] = $this->graphAreaY2 - $data["axis"][$axisID]["margin"] - ($step * ($value - $data["axis"][$axisID]["scaleMin"]))
                         ;
                     }
                 }
             }
         } else {
-            $Width = ($this->graphAreaX2 - $this->graphAreaX1) - $Data["Axis"][$AxisID]["Margin"] * 2;
-            $ScaleWidth = $Data["Axis"][$AxisID]["ScaleMax"] - $Data["Axis"][$AxisID]["ScaleMin"];
-            $Step = $Width / $ScaleWidth;
-            if ($ReturnOnly0Height) {
-                foreach ($Values as $Key => $Value) {
-                    if ($Value == VOID) {
-                        $Result[] = VOID;
+            $width = ($this->graphAreaX2 - $this->graphAreaX1) - $data["axis"][$axisID]["margin"] * 2;
+            $scaleWidth = $data["axis"][$axisID]["scaleMax"] - $data["axis"][$axisID]["scaleMin"];
+            $step = $width / $scaleWidth;
+            if ($returnOnly0Height) {
+                foreach ($values as $key => $value) {
+                    if ($value == Constant::VOID) {
+                        $result[] = Constant::VOID;
                     } else {
-                        $Result[] = $Step * $Value;
+                        $result[] = $step * $value;
                     }
                 }
             } else {
-                foreach ($Values as $Key => $Value) {
-                    if ($Value == VOID) {
-                        $Result[] = VOID;
+                foreach ($values as $key => $value) {
+                    if ($value == Constant::VOID) {
+                        $result[] = Constant::VOID;
                     } else {
-                        $Result[] = $this->graphAreaX1 + $Data["Axis"][$AxisID]["Margin"] + ($Step * ($Value - $Data["Axis"][$AxisID]["ScaleMin"]))
+                        $result[] = $this->graphAreaX1 + $data["axis"][$axisID]["margin"] + ($step * ($value - $data["axis"][$axisID]["scaleMin"]))
                         ;
                     }
                 }
             }
         }
-        return count($Result) == 1 ? reset($Result) : $Result;
+        return count($result) == 1 ? reset($result) : $result;
     }
 
     /**
      * Format the axis values
-     * @param mixed $Value
-     * @param int $Mode
-     * @param array $Format
-     * @param string $Unit
+     * @param mixed $value
+     * @param int $mode
+     * @param array $format
+     * @param string $unit
      * @return string
      */
-    public function scaleFormat($Value, $Mode = null, $Format = null, $Unit = null) {
-        if ($Value == VOID) {
+    public function scaleFormat($value, $mode = null, $format = null, $unit = null) {
+        if ($value == Constant::VOID) {
             return "";
         }
-        if ($Mode == AXIS_FORMAT_TRAFFIC) {
-            if ($Value == 0) {
+        if ($mode == Constant::AXIS_FORMAT_TRAFFIC) {
+            if ($value == 0) {
                 return "0B";
             }
-            $Units = ["B", "KB", "MB", "GB", "TB", "PB"];
-            $Sign = "";
-            if ($Value < 0) {
-                $Value = abs($Value);
-                $Sign = "-";
+            $units = ["b", "KB", "MB", "GB", "TB", "PB"];
+            $sign = "";
+            if ($value < 0) {
+                $value = abs($value);
+                $sign = "-";
             }
-            $Value = number_format($Value / pow(1024, ($Scale = floor(log($Value, 1024)))), 2, ",", ".");
-            return $Sign . $Value . " " . $Units[$Scale];
+            $value = number_format($value / pow(1024, ($scale = floor(log($value, 1024)))), 2, ",", ".");
+            return $sign . $value . " " . $units[$scale];
         }
-        if ($Mode == AXIS_FORMAT_CUSTOM) {
-            if (is_callable($Format)) {
-                return call_user_func($Format, $Value);
-            }
-        }
-        if ($Mode == AXIS_FORMAT_DATE) {
-            $Pattern = "d/m/Y";
-            if ($Format !== null) {
-                $Pattern = $Format;
-            }
-            return gmdate($Pattern, $Value);
-        }
-        if ($Mode == AXIS_FORMAT_TIME) {
-            $Pattern = "H:i:s";
-            if ($Format !== null) {
-                $Pattern = $Format;
-            }
-            return gmdate($Pattern, $Value);
-        }
-        if ($Mode == AXIS_FORMAT_CURRENCY) {
-            return $Format . number_format($Value, 2);
-        }
-        if ($Mode == AXIS_FORMAT_METRIC) {
-            if (abs($Value) > 1000000000) {
-                return round($Value / 1000000000, $Format) . "g" . $Unit;
-            }
-            if (abs($Value) > 1000000) {
-                return round($Value / 1000000, $Format) . "m" . $Unit;
-            } elseif (abs($Value) >= 1000) {
-                return round($Value / 1000, $Format) . "k" . $Unit;
+        if ($mode == Constant::AXIS_FORMAT_CUSTOM) {
+            if (is_callable($format)) {
+                return call_user_func($format, $value);
             }
         }
-        return $Value . $Unit;
+        if ($mode == Constant::AXIS_FORMAT_DATE) {
+            $pattern = "d/m/Y";
+            if ($format !== null) {
+                $pattern = $format;
+            }
+            return gmdate($pattern, $value);
+        }
+        if ($mode == Constant::AXIS_FORMAT_TIME) {
+            $pattern = "H:i:s";
+            if ($format !== null) {
+                $pattern = $format;
+            }
+            return gmdate($pattern, $value);
+        }
+        if ($mode == Constant::AXIS_FORMAT_CURRENCY) {
+            return $format . number_format($value, 2);
+        }
+        if ($mode == Constant::AXIS_FORMAT_METRIC) {
+            if (abs($value) > 1000000000) {
+                return round($value / 1000000000, $format) . "g" . $unit;
+            }
+            if (abs($value) > 1000000) {
+                return round($value / 1000000, $format) . "m" . $unit;
+            } elseif (abs($value) >= 1000) {
+                return round($value / 1000, $format) . "k" . $unit;
+            }
+        }
+        return $value . $unit;
     }
 
     /**
      * @return array|null
      */
     public function scaleGetXSettings() {
-        $Data = $this->DataSet->getData();
-        foreach ($Data["Axis"] as $Settings) {
-            if ($Settings["Identity"] == AXIS_X) {
-                return [$Settings["Margin"], $Settings["Rows"]];
+        $data = $this->dataSet->getData();
+        foreach ($data["axis"] as $settings) {
+            if ($settings["identity"] == Constant::AXIS_X) {
+                return [$settings["margin"], $settings["rows"]];
             }
         }
     }
 
     /**
      * Write Max value on a chart
-     * @param int $Type
-     * @param array $Format
+     * @param int $type
+     * @param array $format
      */
-    public function writeBounds($Type = BOUND_BOTH, $Format = null) {
-        $MaxLabelTxt = isset($Format["MaxLabelTxt"]) ? $Format["MaxLabelTxt"] : "max=";
-        $MinLabelTxt = isset($Format["MinLabelTxt"]) ? $Format["MinLabelTxt"] : "min=";
-        $Decimals = isset($Format["Decimals"]) ? $Format["Decimals"] : 1;
-        $ExcludedSeries = isset($Format["ExcludedSeries"]) ? $Format["ExcludedSeries"] : "";
-        $DisplayOffset = isset($Format["DisplayOffset"]) ? $Format["DisplayOffset"] : 4;
-        $DisplayColor = isset($Format["DisplayColor"]) ? $Format["DisplayColor"] : DISPLAY_MANUAL;
-        $MaxDisplayR = isset($Format["MaxDisplayR"]) ? $Format["MaxDisplayR"] : 0;
-        $MaxDisplayG = isset($Format["MaxDisplayG"]) ? $Format["MaxDisplayG"] : 0;
-        $MaxDisplayB = isset($Format["MaxDisplayB"]) ? $Format["MaxDisplayB"] : 0;
-        $MinDisplayR = isset($Format["MinDisplayR"]) ? $Format["MinDisplayR"] : 255;
-        $MinDisplayG = isset($Format["MinDisplayG"]) ? $Format["MinDisplayG"] : 255;
-        $MinDisplayB = isset($Format["MinDisplayB"]) ? $Format["MinDisplayB"] : 255;
-        $MinLabelPos = isset($Format["MinLabelPos"]) ? $Format["MinLabelPos"] : BOUND_LABEL_POS_AUTO;
-        $MaxLabelPos = isset($Format["MaxLabelPos"]) ? $Format["MaxLabelPos"] : BOUND_LABEL_POS_AUTO;
-        $DrawBox = isset($Format["DrawBox"]) ? $Format["DrawBox"] : true;
-        $DrawBoxBorder = isset($Format["DrawBoxBorder"]) ? $Format["DrawBoxBorder"] : false;
-        $BorderOffset = isset($Format["BorderOffset"]) ? $Format["BorderOffset"] : 5;
-        $BoxRounded = isset($Format["BoxRounded"]) ? $Format["BoxRounded"] : true;
-        $RoundedRadius = isset($Format["RoundedRadius"]) ? $Format["RoundedRadius"] : 3;
-        $BoxR = isset($Format["BoxR"]) ? $Format["BoxR"] : 0;
-        $BoxG = isset($Format["BoxG"]) ? $Format["BoxG"] : 0;
-        $BoxB = isset($Format["BoxB"]) ? $Format["BoxB"] : 0;
-        $BoxAlpha = isset($Format["BoxAlpha"]) ? $Format["BoxAlpha"] : 20;
-        $BoxSurrounding = isset($Format["BoxSurrounding"]) ? $Format["BoxSurrounding"] : "";
-        $BoxBorderR = isset($Format["BoxBorderR"]) ? $Format["BoxBorderR"] : 255;
-        $BoxBorderG = isset($Format["BoxBorderG"]) ? $Format["BoxBorderG"] : 255;
-        $BoxBorderB = isset($Format["BoxBorderB"]) ? $Format["BoxBorderB"] : 255;
-        $BoxBorderAlpha = isset($Format["BoxBorderAlpha"]) ? $Format["BoxBorderAlpha"] : 100;
+    public function writeBounds($type = BOUND_BOTH, $format = null) {
+        $maxLabelTxt = isset($format["maxLabelTxt"]) ? $format["maxLabelTxt"] : "max=";
+        $minLabelTxt = isset($format["minLabelTxt"]) ? $format["minLabelTxt"] : "min=";
+        $decimals = isset($format["decimals"]) ? $format["decimals"] : 1;
+        $ExcludedSeries = isset($format["excludedSeries"]) ? $format["excludedSeries"] : "";
+        $displayOffset = isset($format["displayOffset"]) ? $format["displayOffset"] : 4;
+        $displayColor = isset($format["displayColor"]) ? $format["displayColor"] : DISPLAY_MANUAL;
+        $maxDisplayR = isset($format["maxDisplayR"]) ? $format["maxDisplayR"] : 0;
+        $maxDisplayG = isset($format["maxDisplayG"]) ? $format["maxDisplayG"] : 0;
+        $maxDisplayB = isset($format["maxDisplayB"]) ? $format["maxDisplayB"] : 0;
+        $minDisplayR = isset($format["minDisplayR"]) ? $format["minDisplayR"] : 255;
+        $minDisplayG = isset($format["minDisplayG"]) ? $format["minDisplayG"] : 255;
+        $minDisplayB = isset($format["minDisplayB"]) ? $format["minDisplayB"] : 255;
+        $minLabelPos = isset($format["minLabelPos"]) ? $format["minLabelPos"] : BOUND_LABEL_POS_AUTO;
+        $maxLabelPos = isset($format["maxLabelPos"]) ? $format["maxLabelPos"] : BOUND_LABEL_POS_AUTO;
+        $drawBox = isset($format["drawBox"]) ? $format["drawBox"] : true;
+        $drawBoxBorder = isset($format["drawBoxBorder"]) ? $format["drawBoxBorder"] : false;
+        $borderOffset = isset($format["borderOffset"]) ? $format["borderOffset"] : 5;
+        $boxRounded = isset($format["boxRounded"]) ? $format["boxRounded"] : true;
+        $roundedRadius = isset($format["roundedRadius"]) ? $format["roundedRadius"] : 3;
+        $boxR = isset($format["boxR"]) ? $format["boxR"] : 0;
+        $boxG = isset($format["boxG"]) ? $format["boxG"] : 0;
+        $boxB = isset($format["boxB"]) ? $format["boxB"] : 0;
+        $boxAlpha = isset($format["boxAlpha"]) ? $format["boxAlpha"] : 20;
+        $boxSurrounding = isset($format["boxSurrounding"]) ? $format["boxSurrounding"] : "";
+        $boxBorderR = isset($format["boxBorderR"]) ? $format["boxBorderR"] : 255;
+        $boxBorderG = isset($format["boxBorderG"]) ? $format["boxBorderG"] : 255;
+        $boxBorderB = isset($format["boxBorderB"]) ? $format["boxBorderB"] : 255;
+        $boxBorderAlpha = isset($format["boxBorderAlpha"]) ? $format["boxBorderAlpha"] : 100;
         $CaptionSettings = [
-            "DrawBox" => $DrawBox,
-            "DrawBoxBorder" => $DrawBoxBorder,
-            "BorderOffset" => $BorderOffset,
-            "BoxRounded" => $BoxRounded,
-            "RoundedRadius" => $RoundedRadius,
-            "BoxR" => $BoxR,
-            "BoxG" => $BoxG,
-            "BoxB" => $BoxB,
-            "BoxAlpha" => $BoxAlpha,
-            "BoxSurrounding" => $BoxSurrounding,
-            "BoxBorderR" => $BoxBorderR,
-            "BoxBorderG" => $BoxBorderG,
-            "BoxBorderB" => $BoxBorderB,
-            "BoxBorderAlpha" => $BoxBorderAlpha
+            "DrawBox" => $drawBox,
+            "DrawBoxBorder" => $drawBoxBorder,
+            "BorderOffset" => $borderOffset,
+            "BoxRounded" => $boxRounded,
+            "RoundedRadius" => $roundedRadius,
+            "BoxR" => $boxR,
+            "BoxG" => $boxG,
+            "BoxB" => $boxB,
+            "BoxAlpha" => $boxAlpha,
+            "BoxSurrounding" => $boxSurrounding,
+            "BoxBorderR" => $boxBorderR,
+            "BoxBorderG" => $boxBorderG,
+            "BoxBorderB" => $boxBorderB,
+            "BoxBorderAlpha" => $boxBorderAlpha
         ];
-        list($XMargin, $XDivs) = $this->scaleGetXSettings();
-        $Data = $this->DataSet->getData();
-        foreach ($Data["Series"] as $SerieName => $Serie) {
-            if ($Serie["isDrawable"] == true && $SerieName != $Data["Abscissa"] && !isset($ExcludedSeries[$SerieName])
+        list($xMargin, $xDivs) = $this->scaleGetXSettings();
+        $data = $this->dataSet->getData();
+        foreach ($data["series"] as $serieName => $serie) {
+            if ($serie["isDrawable"] == true && $serieName != $data["abscissa"] && !isset($ExcludedSeries[$serieName])
             ) {
-                $R = $Serie["Color"]["R"];
-                $G = $Serie["Color"]["G"];
-                $B = $Serie["Color"]["B"];
-                $MinValue = $this->DataSet->getMin($SerieName);
-                $MaxValue = $this->DataSet->getMax($SerieName);
-                $MinPos = VOID;
-                $MaxPos = VOID;
-                foreach ($Serie["Data"] as $Key => $Value) {
-                    if ($Value == $MinValue && $MinPos == VOID) {
-                        $MinPos = $Key;
+                $r = $serie["color"]["r"];
+                $g = $serie["color"]["g"];
+                $b = $serie["color"]["b"];
+                $minValue = $this->dataSet->getMin($serieName);
+                $maxValue = $this->dataSet->getMax($serieName);
+                $minPos = VOID;
+                $maxPos = VOID;
+                foreach ($serie["data"] as $key => $value) {
+                    if ($value == $minValue && $minPos == VOID) {
+                        $minPos = $key;
                     }
-                    if ($Value == $MaxValue) {
-                        $MaxPos = $Key;
+                    if ($value == $maxValue) {
+                        $maxPos = $key;
                     }
                 }
-                $AxisID = $Serie["Axis"];
-                $Mode = $Data["Axis"][$AxisID]["Display"];
-                $Format = $Data["Axis"][$AxisID]["Format"];
-                $Unit = $Data["Axis"][$AxisID]["Unit"];
-                $PosArray = $this->scaleComputeY(
-                        $Serie["Data"], ["AxisID" => $Serie["Axis"]]
+                $axisID = $serie["axis"];
+                $mode = $data["axis"][$axisID]["display"];
+                $format = $data["axis"][$axisID]["format"];
+                $unit = $data["axis"][$axisID]["unit"];
+                $posArray = $this->scaleComputeY(
+                        $serie["data"], ["axisID" => $serie["axis"]]
                 );
-                if ($Data["Orientation"] == SCALE_POS_LEFTRIGHT) {
-                    $XStep = ($this->graphAreaX2 - $this->graphAreaX1 - $XMargin * 2) / $XDivs;
-                    $X = $this->graphAreaX1 + $XMargin;
-                    $SerieOffset = isset($Serie["XOffset"]) ? $Serie["XOffset"] : 0;
-                    if ($Type == BOUND_MAX || $Type == BOUND_BOTH) {
-                        if ($MaxLabelPos == BOUND_LABEL_POS_TOP || ($MaxLabelPos == BOUND_LABEL_POS_AUTO && $MaxValue >= 0)
+                if ($data["orientation"] == Constant::SCALE_POS_LEFTRIGHT) {
+                    $xStep = ($this->graphAreaX2 - $this->graphAreaX1 - $xMargin * 2) / $xDivs;
+                    $x = $this->graphAreaX1 + $xMargin;
+                    $serieOffset = isset($serie["xOffset"]) ? $serie["xOffset"] : 0;
+                    if ($type == Constant::BOUND_MAX || $type == Constant::BOUND_BOTH) {
+                        if ($maxLabelPos == Constant::BOUND_LABEL_POS_TOP || ($maxLabelPos == Constant::BOUND_LABEL_POS_AUTO && $maxValue >= 0)
                         ) {
-                            $YPos = $PosArray[$MaxPos] - $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_BOTTOMMIDDLE;
+                            $yPos = $posArray[$maxPos] - $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_BOTTOMMIDDLE;
                         }
-                        if ($MaxLabelPos == BOUND_LABEL_POS_BOTTOM || ($MaxLabelPos == BOUND_LABEL_POS_AUTO && $MaxValue < 0)
+                        if ($maxLabelPos == Constant::BOUND_LABEL_POS_BOTTOM || ($maxLabelPos == Constant::BOUND_LABEL_POS_AUTO && $maxValue < 0)
                         ) {
-                            $YPos = $PosArray[$MaxPos] + $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_TOPMIDDLE;
+                            $yPos = $posArray[$maxPos] + $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_TOPMIDDLE;
                         }
-                        $XPos = $X + $MaxPos * $XStep + $SerieOffset;
-                        $Label = sprintf(
-                                '%s%s', $MaxLabelTxt, $this->scaleFormat(round($MaxValue, $Decimals), $Mode, $Format, $Unit)
+                        $xPos = $x + $maxPos * $xStep + $serieOffset;
+                        $label = sprintf(
+                                '%s%s', $maxLabelTxt, $this->scaleFormat(round($maxValue, $decimals), $mode, $format, $unit)
                         );
-                        $TxtPos = $this->getTextBox($XPos, $YPos, $this->FontName, $this->FontSize, 0, $Label);
-                        $XOffset = 0;
-                        $YOffset = 0;
-                        if ($TxtPos[0]["X"] < $this->graphAreaX1) {
-                            $XOffset = (($this->graphAreaX1 - $TxtPos[0]["X"]) / 2);
+                        $txtPos = $this->getTextBox($xPos, $yPos, $this->FontName, $this->FontSize, 0, $label);
+                        $xOffset = 0;
+                        $yOffset = 0;
+                        if ($txtPos[0]["x"] < $this->graphAreaX1) {
+                            $xOffset = (($this->graphAreaX1 - $txtPos[0]["x"]) / 2);
                         }
-                        if ($TxtPos[1]["X"] > $this->graphAreaX2) {
-                            $XOffset = -(($TxtPos[1]["X"] - $this->graphAreaX2) / 2);
+                        if ($txtPos[1]["x"] > $this->graphAreaX2) {
+                            $xOffset = -(($txtPos[1]["x"] - $this->graphAreaX2) / 2);
                         }
-                        if ($TxtPos[2]["Y"] < $this->graphAreaY1) {
-                            $YOffset = $this->graphAreaY1 - $TxtPos[2]["Y"];
+                        if ($txtPos[2]["y"] < $this->graphAreaY1) {
+                            $yOffset = $this->graphAreaY1 - $txtPos[2]["y"];
                         }
-                        if ($TxtPos[0]["Y"] > $this->graphAreaY2) {
-                            $YOffset = -($TxtPos[0]["Y"] - $this->graphAreaY2);
+                        if ($txtPos[0]["y"] > $this->graphAreaY2) {
+                            $yOffset = -($txtPos[0]["y"] - $this->graphAreaY2);
                         }
-                        $CaptionSettings["R"] = $MaxDisplayR;
-                        $CaptionSettings["G"] = $MaxDisplayG;
-                        $CaptionSettings["B"] = $MaxDisplayB;
-                        $CaptionSettings["Align"] = $Align;
-                        $this->drawText($XPos + $XOffset, $YPos + $YOffset, $Label, $CaptionSettings);
+                        $CaptionSettings["r"] = $maxDisplayR;
+                        $CaptionSettings["g"] = $maxDisplayG;
+                        $CaptionSettings["b"] = $maxDisplayB;
+                        $CaptionSettings["align"] = $align;
+                        $this->drawText($xPos + $xOffset, $yPos + $yOffset, $label, $CaptionSettings);
                     }
-                    if ($Type == BOUND_MIN || $Type == BOUND_BOTH) {
-                        if ($MinLabelPos == BOUND_LABEL_POS_TOP || ($MinLabelPos == BOUND_LABEL_POS_AUTO && $MinValue >= 0)
+                    if ($type == Constant::BOUND_MIN || $type == Constant::BOUND_BOTH) {
+                        if ($minLabelPos == Constant::BOUND_LABEL_POS_TOP || ($minLabelPos == Constant::BOUND_LABEL_POS_AUTO && $minValue >= 0)
                         ) {
-                            $YPos = $PosArray[$MinPos] - $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_BOTTOMMIDDLE;
+                            $yPos = $posArray[$minPos] - $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_BOTTOMMIDDLE;
                         }
-                        if ($MinLabelPos == BOUND_LABEL_POS_BOTTOM || ($MinLabelPos == BOUND_LABEL_POS_AUTO && $MinValue < 0)
+                        if ($minLabelPos == Constant::BOUND_LABEL_POS_BOTTOM || ($minLabelPos == Constant::BOUND_LABEL_POS_AUTO && $minValue < 0)
                         ) {
-                            $YPos = $PosArray[$MinPos] + $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_TOPMIDDLE;
+                            $yPos = $posArray[$minPos] + $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_TOPMIDDLE;
                         }
-                        $XPos = $X + $MinPos * $XStep + $SerieOffset;
-                        $Label = sprintf(
-                                '%s%s', $MinLabelTxt, $this->scaleFormat(round($MinValue, $Decimals), $Mode, $Format, $Unit)
+                        $xPos = $x + $minPos * $xStep + $serieOffset;
+                        $label = sprintf(
+                                '%s%s', $minLabelTxt, $this->scaleFormat(round($minValue, $decimals), $mode, $format, $unit)
                         );
-                        $TxtPos = $this->getTextBox($XPos, $YPos, $this->FontName, $this->FontSize, 0, $Label);
-                        $XOffset = 0;
-                        $YOffset = 0;
-                        if ($TxtPos[0]["X"] < $this->graphAreaX1) {
-                            $XOffset = (($this->graphAreaX1 - $TxtPos[0]["X"]) / 2);
+                        $txtPos = $this->getTextBox($xPos, $yPos, $this->FontName, $this->FontSize, 0, $label);
+                        $xOffset = 0;
+                        $yOffset = 0;
+                        if ($txtPos[0]["x"] < $this->graphAreaX1) {
+                            $xOffset = (($this->graphAreaX1 - $txtPos[0]["x"]) / 2);
                         }
-                        if ($TxtPos[1]["X"] > $this->graphAreaX2) {
-                            $XOffset = -(($TxtPos[1]["X"] - $this->graphAreaX2) / 2);
+                        if ($txtPos[1]["x"] > $this->graphAreaX2) {
+                            $xOffset = -(($txtPos[1]["x"] - $this->graphAreaX2) / 2);
                         }
-                        if ($TxtPos[2]["Y"] < $this->graphAreaY1) {
-                            $YOffset = $this->graphAreaY1 - $TxtPos[2]["Y"];
+                        if ($txtPos[2]["y"] < $this->graphAreaY1) {
+                            $yOffset = $this->graphAreaY1 - $txtPos[2]["y"];
                         }
-                        if ($TxtPos[0]["Y"] > $this->graphAreaY2) {
-                            $YOffset = -($TxtPos[0]["Y"] - $this->graphAreaY2);
+                        if ($txtPos[0]["y"] > $this->graphAreaY2) {
+                            $yOffset = -($txtPos[0]["y"] - $this->graphAreaY2);
                         }
-                        $CaptionSettings["R"] = $MinDisplayR;
-                        $CaptionSettings["G"] = $MinDisplayG;
-                        $CaptionSettings["B"] = $MinDisplayB;
-                        $CaptionSettings["Align"] = $Align;
+                        $CaptionSettings["r"] = $minDisplayR;
+                        $CaptionSettings["g"] = $minDisplayG;
+                        $CaptionSettings["b"] = $minDisplayB;
+                        $CaptionSettings["align"] = $align;
                         $this->drawText(
-                                $XPos + $XOffset, $YPos - $DisplayOffset + $YOffset, $Label, $CaptionSettings
+                                $xPos + $xOffset, $yPos - $displayOffset + $yOffset, $label, $CaptionSettings
                         );
                     }
                 } else {
-                    $XStep = ($this->graphAreaY2 - $this->graphAreaY1 - $XMargin * 2) / $XDivs;
-                    $X = $this->graphAreaY1 + $XMargin;
-                    $SerieOffset = isset($Serie["XOffset"]) ? $Serie["XOffset"] : 0;
-                    if ($Type == BOUND_MAX || $Type == BOUND_BOTH) {
-                        if ($MaxLabelPos == BOUND_LABEL_POS_TOP || ($MaxLabelPos == BOUND_LABEL_POS_AUTO && $MaxValue >= 0)
+                    $xStep = ($this->graphAreaY2 - $this->graphAreaY1 - $xMargin * 2) / $xDivs;
+                    $x = $this->graphAreaY1 + $xMargin;
+                    $serieOffset = isset($serie["xOffset"]) ? $serie["xOffset"] : 0;
+                    if ($type == Constant::BOUND_MAX || $type == Constant::BOUND_BOTH) {
+                        if ($maxLabelPos == Constant::BOUND_LABEL_POS_TOP || ($maxLabelPos == Constant::BOUND_LABEL_POS_AUTO && $maxValue >= 0)
                         ) {
-                            $YPos = $PosArray[$MaxPos] + $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_MIDDLELEFT;
+                            $yPos = $posArray[$maxPos] + $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_MIDDLELEFT;
                         }
-                        if ($MaxLabelPos == BOUND_LABEL_POS_BOTTOM || ($MaxLabelPos == BOUND_LABEL_POS_AUTO && $MaxValue < 0)
+                        if ($maxLabelPos == Constant::BOUND_LABEL_POS_BOTTOM || ($maxLabelPos == Constant::BOUND_LABEL_POS_AUTO && $maxValue < 0)
                         ) {
-                            $YPos = $PosArray[$MaxPos] - $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_MIDDLERIGHT;
+                            $yPos = $posArray[$maxPos] - $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_MIDDLERIGHT;
                         }
-                        $XPos = $X + $MaxPos * $XStep + $SerieOffset;
-                        $Label = $MaxLabelTxt . $this->scaleFormat($MaxValue, $Mode, $Format, $Unit);
-                        $TxtPos = $this->getTextBox($YPos, $XPos, $this->FontName, $this->FontSize, 0, $Label);
-                        $XOffset = 0;
-                        $YOffset = 0;
-                        if ($TxtPos[0]["X"] < $this->graphAreaX1) {
-                            $XOffset = $this->graphAreaX1 - $TxtPos[0]["X"];
+                        $xPos = $x + $maxPos * $xStep + $serieOffset;
+                        $label = $maxLabelTxt . $this->scaleFormat($maxValue, $mode, $format, $unit);
+                        $txtPos = $this->getTextBox($yPos, $xPos, $this->FontName, $this->FontSize, 0, $label);
+                        $xOffset = 0;
+                        $yOffset = 0;
+                        if ($txtPos[0]["x"] < $this->graphAreaX1) {
+                            $xOffset = $this->graphAreaX1 - $txtPos[0]["x"];
                         }
-                        if ($TxtPos[1]["X"] > $this->graphAreaX2) {
-                            $XOffset = -($TxtPos[1]["X"] - $this->graphAreaX2);
+                        if ($txtPos[1]["x"] > $this->graphAreaX2) {
+                            $xOffset = -($txtPos[1]["x"] - $this->graphAreaX2);
                         }
-                        if ($TxtPos[2]["Y"] < $this->graphAreaY1) {
-                            $YOffset = ($this->graphAreaY1 - $TxtPos[2]["Y"]) / 2;
+                        if ($txtPos[2]["y"] < $this->graphAreaY1) {
+                            $yOffset = ($this->graphAreaY1 - $txtPos[2]["y"]) / 2;
                         }
-                        if ($TxtPos[0]["Y"] > $this->graphAreaY2) {
-                            $YOffset = -(($TxtPos[0]["Y"] - $this->graphAreaY2) / 2);
+                        if ($txtPos[0]["y"] > $this->graphAreaY2) {
+                            $yOffset = -(($txtPos[0]["y"] - $this->graphAreaY2) / 2);
                         }
-                        $CaptionSettings["R"] = $MaxDisplayR;
-                        $CaptionSettings["G"] = $MaxDisplayG;
-                        $CaptionSettings["B"] = $MaxDisplayB;
-                        $CaptionSettings["Align"] = $Align;
-                        $this->drawText($YPos + $XOffset, $XPos + $YOffset, $Label, $CaptionSettings);
+                        $CaptionSettings["r"] = $maxDisplayR;
+                        $CaptionSettings["g"] = $maxDisplayG;
+                        $CaptionSettings["b"] = $maxDisplayB;
+                        $CaptionSettings["align"] = $align;
+                        $this->drawText($yPos + $xOffset, $xPos + $yOffset, $label, $CaptionSettings);
                     }
-                    if ($Type == BOUND_MIN || $Type == BOUND_BOTH) {
-                        if ($MinLabelPos == BOUND_LABEL_POS_TOP || ($MinLabelPos == BOUND_LABEL_POS_AUTO && $MinValue >= 0)
+                    if ($type == Constant::BOUND_MIN || $type == Constant::BOUND_BOTH) {
+                        if ($minLabelPos == Constant::BOUND_LABEL_POS_TOP || ($minLabelPos == Constant::BOUND_LABEL_POS_AUTO && $minValue >= 0)
                         ) {
-                            $YPos = $PosArray[$MinPos] + $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_MIDDLELEFT;
+                            $yPos = $posArray[$minPos] + $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_MIDDLELEFT;
                         }
-                        if ($MinLabelPos == BOUND_LABEL_POS_BOTTOM || ($MinLabelPos == BOUND_LABEL_POS_AUTO && $MinValue < 0)
+                        if ($minLabelPos == Constant::BOUND_LABEL_POS_BOTTOM || ($minLabelPos == Constant::BOUND_LABEL_POS_AUTO && $minValue < 0)
                         ) {
-                            $YPos = $PosArray[$MinPos] - $DisplayOffset + 2;
-                            $Align = TEXT_ALIGN_MIDDLERIGHT;
+                            $yPos = $posArray[$minPos] - $displayOffset + 2;
+                            $align = Constant::TEXT_ALIGN_MIDDLERIGHT;
                         }
-                        $XPos = $X + $MinPos * $XStep + $SerieOffset;
-                        $Label = $MinLabelTxt . $this->scaleFormat($MinValue, $Mode, $Format, $Unit);
-                        $TxtPos = $this->getTextBox($YPos, $XPos, $this->FontName, $this->FontSize, 0, $Label);
-                        $XOffset = 0;
-                        $YOffset = 0;
-                        if ($TxtPos[0]["X"] < $this->graphAreaX1) {
-                            $XOffset = $this->graphAreaX1 - $TxtPos[0]["X"];
+                        $xPos = $x + $minPos * $xStep + $serieOffset;
+                        $label = $minLabelTxt . $this->scaleFormat($minValue, $mode, $format, $unit);
+                        $txtPos = $this->getTextBox($yPos, $xPos, $this->FontName, $this->FontSize, 0, $label);
+                        $xOffset = 0;
+                        $yOffset = 0;
+                        if ($txtPos[0]["x"] < $this->graphAreaX1) {
+                            $xOffset = $this->graphAreaX1 - $txtPos[0]["x"];
                         }
-                        if ($TxtPos[1]["X"] > $this->graphAreaX2) {
-                            $XOffset = -($TxtPos[1]["X"] - $this->graphAreaX2);
+                        if ($txtPos[1]["x"] > $this->graphAreaX2) {
+                            $xOffset = -($txtPos[1]["x"] - $this->graphAreaX2);
                         }
-                        if ($TxtPos[2]["Y"] < $this->graphAreaY1) {
-                            $YOffset = ($this->graphAreaY1 - $TxtPos[2]["Y"]) / 2;
+                        if ($txtPos[2]["y"] < $this->graphAreaY1) {
+                            $yOffset = ($this->graphAreaY1 - $txtPos[2]["y"]) / 2;
                         }
-                        if ($TxtPos[0]["Y"] > $this->graphAreaY2) {
-                            $YOffset = -(($TxtPos[0]["Y"] - $this->graphAreaY2) / 2);
+                        if ($txtPos[0]["y"] > $this->graphAreaY2) {
+                            $yOffset = -(($txtPos[0]["y"] - $this->graphAreaY2) / 2);
                         }
-                        $CaptionSettings["R"] = $MinDisplayR;
-                        $CaptionSettings["G"] = $MinDisplayG;
-                        $CaptionSettings["B"] = $MinDisplayB;
-                        $CaptionSettings["Align"] = $Align;
-                        $this->drawText($YPos + $XOffset, $XPos + $YOffset, $Label, $CaptionSettings);
+                        $CaptionSettings["r"] = $minDisplayR;
+                        $CaptionSettings["g"] = $minDisplayG;
+                        $CaptionSettings["b"] = $minDisplayB;
+                        $CaptionSettings["align"] = $align;
+                        $this->drawText($yPos + $xOffset, $xPos + $yOffset, $label, $CaptionSettings);
                     }
                 }
             }
@@ -1186,291 +1186,291 @@ class CImage_Chart_BaseDraw {
 
     /**
      * Write labels
-     * @param string $SeriesName
-     * @param array $Indexes
-     * @param array $Format
+     * @param string $seriesName
+     * @param array $indexes
+     * @param array $format
      */
-    public function writeLabel($SeriesName, $Indexes, array $Format = []) {
-        $OverrideTitle = isset($Format["OverrideTitle"]) ? $Format["OverrideTitle"] : null;
-        $ForceLabels = isset($Format["ForceLabels"]) ? $Format["ForceLabels"] : null;
-        $DrawPoint = isset($Format["DrawPoint"]) ? $Format["DrawPoint"] : LABEL_POINT_BOX;
-        $DrawVerticalLine = isset($Format["DrawVerticalLine"]) ? $Format["DrawVerticalLine"] : false;
-        $VerticalLineR = isset($Format["VerticalLineR"]) ? $Format["VerticalLineR"] : 0;
-        $VerticalLineG = isset($Format["VerticalLineG"]) ? $Format["VerticalLineG"] : 0;
-        $VerticalLineB = isset($Format["VerticalLineB"]) ? $Format["VerticalLineB"] : 0;
-        $VerticalLineAlpha = isset($Format["VerticalLineAlpha"]) ? $Format["VerticalLineAlpha"] : 40;
-        $VerticalLineTicks = isset($Format["VerticalLineTicks"]) ? $Format["VerticalLineTicks"] : 2;
-        $Data = $this->DataSet->getData();
-        list($XMargin, $XDivs) = $this->scaleGetXSettings();
-        if (!is_array($Indexes)) {
-            $Index = $Indexes;
-            $Indexes = [];
-            $Indexes[] = $Index;
+    public function writeLabel($seriesName, $indexes, array $format = []) {
+        $overrideTitle = isset($format["overrideTitle"]) ? $format["overrideTitle"] : null;
+        $forceLabels = isset($format["forceLabels"]) ? $format["forceLabels"] : null;
+        $drawPoint = isset($format["drawPoint"]) ? $format["drawPoint"] : LABEL_POINT_BOX;
+        $drawVerticalLine = isset($format["drawVerticalLine"]) ? $format["drawVerticalLine"] : false;
+        $verticalLineR = isset($format["verticalLineR"]) ? $format["verticalLineR"] : 0;
+        $verticalLineG = isset($format["verticalLineG"]) ? $format["verticalLineG"] : 0;
+        $verticalLineB = isset($format["verticalLineB"]) ? $format["verticalLineB"] : 0;
+        $verticalLineAlpha = isset($format["verticalLineAlpha"]) ? $format["verticalLineAlpha"] : 40;
+        $verticalLineTicks = isset($format["verticalLineTicks"]) ? $format["verticalLineTicks"] : 2;
+        $data = $this->dataSet->getData();
+        list($xMargin, $xDivs) = $this->scaleGetXSettings();
+        if (!is_array($indexes)) {
+            $index = $indexes;
+            $indexes = [];
+            $indexes[] = $index;
         }
-        if (!is_array($SeriesName)) {
-            $SerieName = $SeriesName;
-            $SeriesName = [];
-            $SeriesName[] = $SerieName;
+        if (!is_array($seriesName)) {
+            $serieName = $seriesName;
+            $seriesName = [];
+            $seriesName[] = $serieName;
         }
-        if ($ForceLabels != null && !is_array($ForceLabels)) {
-            $ForceLabel = $ForceLabels;
-            $ForceLabels = [];
-            $ForceLabels[] = $ForceLabel;
+        if ($forceLabels != null && !is_array($forceLabels)) {
+            $forceLabel = $forceLabels;
+            $forceLabels = [];
+            $forceLabels[] = $forceLabel;
         }
-        foreach ($Indexes as $Key => $Index) {
-            $Series = [];
-            if ($Data["Orientation"] == SCALE_POS_LEFTRIGHT) {
-                if ($XDivs == 0) {
-                    $XStep = ($this->graphAreaX2 - $this->graphAreaX1) / 4;
+        foreach ($indexes as $key => $index) {
+            $series = [];
+            if ($data["orientation"] == SCALE_POS_LEFTRIGHT) {
+                if ($xDivs == 0) {
+                    $xStep = ($this->graphAreaX2 - $this->graphAreaX1) / 4;
                 } else {
-                    $XStep = ($this->graphAreaX2 - $this->graphAreaX1 - $XMargin * 2) / $XDivs;
+                    $xStep = ($this->graphAreaX2 - $this->graphAreaX1 - $xMargin * 2) / $xDivs;
                 }
-                $X = $this->graphAreaX1 + $XMargin + $Index * $XStep;
-                if ($DrawVerticalLine) {
+                $x = $this->graphAreaX1 + $xMargin + $index * $xStep;
+                if ($drawVerticalLine) {
                     $this->drawLine(
-                            $X, $this->graphAreaY1 + $Data["YMargin"], $X, $this->graphAreaY2 - $Data["YMargin"], [
-                        "R" => $VerticalLineR,
-                        "G" => $VerticalLineG,
-                        "B" => $VerticalLineB,
-                        "Alpha" => $VerticalLineAlpha,
-                        "Ticks" => $VerticalLineTicks
+                            $x, $this->graphAreaY1 + $data["yMargin"], $x, $this->graphAreaY2 - $data["yMargin"], [
+                        "r" => $verticalLineR,
+                        "g" => $verticalLineG,
+                        "b" => $verticalLineB,
+                        "alpha" => $verticalLineAlpha,
+                        "ticks" => $verticalLineTicks
                             ]
                     );
                 }
-                $MinY = $this->graphAreaY2;
-                foreach ($SeriesName as $SerieName) {
-                    if (isset($Data["Series"][$SerieName]["Data"][$Index])) {
-                        $AxisID = $Data["Series"][$SerieName]["Axis"];
-                        $XAxisMode = $Data["XAxisDisplay"];
-                        $XAxisFormat = $Data["XAxisFormat"];
-                        $XAxisUnit = $Data["XAxisUnit"];
-                        $AxisMode = $Data["Axis"][$AxisID]["Display"];
-                        $AxisFormat = $Data["Axis"][$AxisID]["Format"];
-                        $AxisUnit = $Data["Axis"][$AxisID]["Unit"];
-                        $XLabel = "";
-                        if (isset($Data["Abscissa"]) && isset($Data["Series"][$Data["Abscissa"]]["Data"][$Index])
+                $minY = $this->graphAreaY2;
+                foreach ($seriesName as $serieName) {
+                    if (isset($data["series"][$serieName]["data"][$index])) {
+                        $axisID = $data["series"][$serieName]["axis"];
+                        $xAxisMode = $data["xAxisDisplay"];
+                        $xAxisFormat = $data["xAxisFormat"];
+                        $xAxisUnit = $data["xAxisUnit"];
+                        $axisMode = $data["axis"][$axisID]["display"];
+                        $axisFormat = $data["axis"][$axisID]["format"];
+                        $axisUnit = $data["axis"][$axisID]["unit"];
+                        $xLabel = "";
+                        if (isset($data["abscissa"]) && isset($data["series"][$data["abscissa"]]["data"][$index])
                         ) {
-                            $XLabel = $this->scaleFormat(
-                                    $Data["Series"][$Data["Abscissa"]]["Data"][$Index], $XAxisMode, $XAxisFormat, $XAxisUnit
+                            $xLabel = $this->scaleFormat(
+                                    $data["series"][$data["abscissa"]]["data"][$index], $xAxisMode, $xAxisFormat, $xAxisUnit
                             );
                         }
-                        if ($OverrideTitle != null) {
-                            $Description = $OverrideTitle;
-                        } elseif (count($SeriesName) == 1) {
-                            $Description = $Data["Series"][$SerieName]["Description"] . " - " . $XLabel;
-                        } elseif (isset($Data["Abscissa"]) && isset($Data["Series"][$Data["Abscissa"]]["Data"][$Index])
+                        if ($overrideTitle != null) {
+                            $description = $overrideTitle;
+                        } elseif (count($seriesName) == 1) {
+                            $description = $data["series"][$serieName]["description"] . " - " . $xLabel;
+                        } elseif (isset($data["abscissa"]) && isset($data["series"][$data["abscissa"]]["data"][$index])
                         ) {
-                            $Description = $XLabel;
+                            $description = $xLabel;
                         }
-                        $Serie = [
-                            "R" => $Data["Series"][$SerieName]["Color"]["R"],
-                            "G" => $Data["Series"][$SerieName]["Color"]["G"],
-                            "B" => $Data["Series"][$SerieName]["Color"]["B"],
-                            "Alpha" => $Data["Series"][$SerieName]["Color"]["Alpha"]
+                        $serie = [
+                            "r" => $data["series"][$serieName]["color"]["r"],
+                            "g" => $data["series"][$serieName]["color"]["g"],
+                            "b" => $data["series"][$serieName]["color"]["b"],
+                            "alpha" => $data["series"][$serieName]["color"]["alpha"]
                         ];
-                        if (count($SeriesName) == 1 && isset($Data["Series"][$SerieName]["XOffset"])
+                        if (count($seriesName) == 1 && isset($data["series"][$serieName]["xOffset"])
                         ) {
-                            $SerieOffset = $Data["Series"][$SerieName]["XOffset"];
+                            $serieOffset = $data["series"][$serieName]["xOffset"];
                         } else {
-                            $SerieOffset = 0;
+                            $serieOffset = 0;
                         }
-                        $Value = $Data["Series"][$SerieName]["Data"][$Index];
-                        if ($Value == VOID) {
-                            $Value = "NaN";
+                        $value = $data["series"][$serieName]["data"][$index];
+                        if ($value == VOID) {
+                            $value = "NaN";
                         }
-                        if ($ForceLabels != null) {
-                            $Caption = isset($ForceLabels[$Key]) ? $ForceLabels[$Key] : "Not set";
+                        if ($forceLabels != null) {
+                            $Caption = isset($forceLabels[$key]) ? $forceLabels[$key] : "Not set";
                         } else {
-                            $Caption = $this->scaleFormat($Value, $AxisMode, $AxisFormat, $AxisUnit);
+                            $Caption = $this->scaleFormat($value, $axisMode, $axisFormat, $axisUnit);
                         }
-                        if ($this->LastChartLayout == CHART_LAST_LAYOUT_STACKED) {
-                            if ($Value >= 0) {
-                                $LookFor = "+";
+                        if ($this->lastChartLayout == Constant::CHART_LAST_LAYOUT_STACKED) {
+                            if ($value >= 0) {
+                                $lookFor = "+";
                             } else {
-                                $LookFor = "-";
+                                $lookFor = "-";
                             }
-                            $Value = 0;
-                            $Done = false;
-                            foreach ($Data["Series"] as $Name => $SerieLookup) {
-                                if ($SerieLookup["isDrawable"] == true && $Name != $Data["Abscissa"] && !$Done
+                            $value = 0;
+                            $done = false;
+                            foreach ($data["series"] as $name => $serieLookup) {
+                                if ($serieLookup["isDrawable"] == true && $name != $data["abscissa"] && !$done
                                 ) {
-                                    if (isset($Data["Series"][$Name]["Data"][$Index]) && $Data["Series"][$Name]["Data"][$Index] != VOID
+                                    if (isset($data["series"][$name]["data"][$index]) && $data["series"][$name]["data"][$index] != VOID
                                     ) {
-                                        if ($Data["Series"][$Name]["Data"][$Index] >= 0 && $LookFor == "+") {
-                                            $Value = $Value + $Data["Series"][$Name]["Data"][$Index];
+                                        if ($data["series"][$name]["data"][$index] >= 0 && $lookFor == "+") {
+                                            $value = $value + $data["series"][$name]["data"][$index];
                                         }
-                                        if ($Data["Series"][$Name]["Data"][$Index] < 0 && $LookFor == "-") {
-                                            $Value = $Value - $Data["Series"][$Name]["Data"][$Index];
+                                        if ($data["series"][$name]["data"][$index] < 0 && $lookFor == "-") {
+                                            $value = $value - $data["series"][$name]["data"][$index];
                                         }
-                                        if ($Name == $SerieName) {
-                                            $Done = true;
+                                        if ($name == $serieName) {
+                                            $done = true;
                                         }
                                     }
                                 }
                             }
                         }
-                        $X = floor($this->graphAreaX1 + $XMargin + $Index * $XStep + $SerieOffset);
-                        $Y = floor($this->scaleComputeY($Value, ["AxisID" => $AxisID]));
-                        if ($Y < $MinY) {
-                            $MinY = $Y;
+                        $x = floor($this->graphAreaX1 + $xMargin + $index * $xStep + $serieOffset);
+                        $y = floor($this->scaleComputeY($value, ["axisID" => $axisID]));
+                        if ($y < $minY) {
+                            $minY = $y;
                         }
-                        if ($DrawPoint == LABEL_POINT_CIRCLE) {
+                        if ($drawPoint == LABEL_POINT_CIRCLE) {
                             $this->drawFilledCircle(
-                                    $X, $Y, 3, [
-                                "R" => 255,
-                                "G" => 255,
-                                "B" => 255,
+                                    $x, $y, 3, [
+                                "r" => 255,
+                                "g" => 255,
+                                "b" => 255,
                                 "BorderR" => 0,
                                 "BorderG" => 0,
                                 "BorderB" => 0
                                     ]
                             );
-                        } elseif ($DrawPoint == LABEL_POINT_BOX) {
+                        } elseif ($drawPoint == LABEL_POINT_BOX) {
                             $this->drawFilledRectangle(
-                                    $X - 2, $Y - 2, $X + 2, $Y + 2, [
-                                "R" => 255,
-                                "G" => 255,
-                                "B" => 255,
+                                    $x - 2, $y - 2, $x + 2, $y + 2, [
+                                "r" => 255,
+                                "g" => 255,
+                                "b" => 255,
                                 "BorderR" => 0,
                                 "BorderG" => 0,
                                 "BorderB" => 0
                                     ]
                             );
                         }
-                        $Series[] = ["Format" => $Serie, "Caption" => $Caption];
+                        $series[] = ["format" => $serie, "Caption" => $Caption];
                     }
                 }
-                $this->drawLabelBox($X, $MinY - 3, $Description, $Series, $Format);
+                $this->drawLabelBox($x, $minY - 3, $description, $series, $format);
             } else {
-                if ($XDivs == 0) {
-                    $XStep = ($this->graphAreaY2 - $this->graphAreaY1) / 4;
+                if ($xDivs == 0) {
+                    $xStep = ($this->graphAreaY2 - $this->graphAreaY1) / 4;
                 } else {
-                    $XStep = ($this->graphAreaY2 - $this->graphAreaY1 - $XMargin * 2) / $XDivs;
+                    $xStep = ($this->graphAreaY2 - $this->graphAreaY1 - $xMargin * 2) / $xDivs;
                 }
-                $Y = $this->graphAreaY1 + $XMargin + $Index * $XStep;
-                if ($DrawVerticalLine) {
+                $y = $this->graphAreaY1 + $xMargin + $index * $xStep;
+                if ($drawVerticalLine) {
                     $this->drawLine(
-                            $this->graphAreaX1 + $Data["YMargin"], $Y, $this->graphAreaX2 - $Data["YMargin"], $Y, [
-                        "R" => $VerticalLineR,
-                        "G" => $VerticalLineG,
-                        "B" => $VerticalLineB,
-                        "Alpha" => $VerticalLineAlpha,
-                        "Ticks" => $VerticalLineTicks
+                            $this->graphAreaX1 + $data["yMargin"], $y, $this->graphAreaX2 - $data["yMargin"], $y, [
+                        "r" => $verticalLineR,
+                        "g" => $verticalLineG,
+                        "b" => $verticalLineB,
+                        "alpha" => $verticalLineAlpha,
+                        "ticks" => $verticalLineTicks
                             ]
                     );
                 }
                 $minX = $this->graphAreaX2;
-                foreach ($SeriesName as $Key => $SerieName) {
-                    if (isset($Data["Series"][$SerieName]["Data"][$Index])) {
-                        $AxisID = $Data["Series"][$SerieName]["Axis"];
-                        $XAxisMode = $Data["XAxisDisplay"];
-                        $XAxisFormat = $Data["XAxisFormat"];
-                        $XAxisUnit = $Data["XAxisUnit"];
-                        $AxisMode = $Data["Axis"][$AxisID]["Display"];
-                        $AxisFormat = $Data["Axis"][$AxisID]["Format"];
-                        $AxisUnit = $Data["Axis"][$AxisID]["Unit"];
-                        $XLabel = "";
-                        if (isset($Data["Abscissa"]) && isset($Data["Series"][$Data["Abscissa"]]["Data"][$Index])
+                foreach ($seriesName as $key => $serieName) {
+                    if (isset($data["series"][$serieName]["data"][$index])) {
+                        $axisID = $data["series"][$serieName]["axis"];
+                        $xAxisMode = $data["xAxisDisplay"];
+                        $xAxisFormat = $data["xAxisFormat"];
+                        $xAxisUnit = $data["xAxisUnit"];
+                        $axisMode = $data["axis"][$axisID]["display"];
+                        $axisFormat = $data["axis"][$axisID]["format"];
+                        $axisUnit = $data["axis"][$axisID]["unit"];
+                        $xLabel = "";
+                        if (isset($data["abscissa"]) && isset($data["series"][$data["abscissa"]]["data"][$index])
                         ) {
-                            $XLabel = $this->scaleFormat(
-                                    $Data["Series"][$Data["Abscissa"]]["Data"][$Index], $XAxisMode, $XAxisFormat, $XAxisUnit
+                            $xLabel = $this->scaleFormat(
+                                    $data["series"][$data["abscissa"]]["data"][$index], $xAxisMode, $xAxisFormat, $xAxisUnit
                             );
                         }
-                        if ($OverrideTitle != null) {
-                            $Description = $OverrideTitle;
-                        } elseif (count($SeriesName) == 1) {
-                            if (isset($Data["Abscissa"]) && isset($Data["Series"][$Data["Abscissa"]]["Data"][$Index])
+                        if ($overrideTitle != null) {
+                            $description = $overrideTitle;
+                        } elseif (count($seriesName) == 1) {
+                            if (isset($data["abscissa"]) && isset($data["series"][$data["abscissa"]]["data"][$index])
                             ) {
-                                $Description = $Data["Series"][$SerieName]["Description"] . " - " . $XLabel;
+                                $description = $data["series"][$serieName]["description"] . " - " . $xLabel;
                             }
-                        } elseif (isset($Data["Abscissa"]) && isset($Data["Series"][$Data["Abscissa"]]["Data"][$Index])
+                        } elseif (isset($data["abscissa"]) && isset($data["series"][$data["abscissa"]]["data"][$index])
                         ) {
-                            $Description = $XLabel;
+                            $description = $xLabel;
                         }
-                        $Serie = [];
-                        if (isset($Data["Extended"]["Palette"][$Index])) {
-                            $Serie["R"] = $Data["Extended"]["Palette"][$Index]["R"];
-                            $Serie["G"] = $Data["Extended"]["Palette"][$Index]["G"];
-                            $Serie["B"] = $Data["Extended"]["Palette"][$Index]["B"];
-                            $Serie["Alpha"] = $Data["Extended"]["Palette"][$Index]["Alpha"];
+                        $serie = [];
+                        if (isset($data["extended"]["palette"][$index])) {
+                            $serie["r"] = $data["extended"]["palette"][$index]["r"];
+                            $serie["g"] = $data["extended"]["palette"][$index]["g"];
+                            $serie["b"] = $data["extended"]["palette"][$index]["b"];
+                            $serie["alpha"] = $data["extended"]["palette"][$index]["alpha"];
                         } else {
-                            $Serie["R"] = $Data["Series"][$SerieName]["Color"]["R"];
-                            $Serie["G"] = $Data["Series"][$SerieName]["Color"]["G"];
-                            $Serie["B"] = $Data["Series"][$SerieName]["Color"]["B"];
-                            $Serie["Alpha"] = $Data["Series"][$SerieName]["Color"]["Alpha"];
+                            $serie["r"] = $data["series"][$serieName]["color"]["r"];
+                            $serie["g"] = $data["series"][$serieName]["color"]["g"];
+                            $serie["b"] = $data["series"][$serieName]["color"]["b"];
+                            $serie["alpha"] = $data["series"][$serieName]["color"]["alpha"];
                         }
-                        if (count($SeriesName) == 1 && isset($Data["Series"][$SerieName]["XOffset"])) {
-                            $SerieOffset = $Data["Series"][$SerieName]["XOffset"];
+                        if (count($seriesName) == 1 && isset($data["series"][$serieName]["xOffset"])) {
+                            $serieOffset = $data["series"][$serieName]["xOffset"];
                         } else {
-                            $SerieOffset = 0;
+                            $serieOffset = 0;
                         }
-                        $Value = $Data["Series"][$SerieName]["Data"][$Index];
-                        if ($ForceLabels != null) {
-                            $Caption = isset($ForceLabels[$Key]) ? $ForceLabels[$Key] : "Not set";
+                        $value = $data["series"][$serieName]["data"][$index];
+                        if ($forceLabels != null) {
+                            $Caption = isset($forceLabels[$key]) ? $forceLabels[$key] : "Not set";
                         } else {
-                            $Caption = $this->scaleFormat($Value, $AxisMode, $AxisFormat, $AxisUnit);
+                            $Caption = $this->scaleFormat($value, $axisMode, $axisFormat, $axisUnit);
                         }
-                        if ($Value == VOID) {
-                            $Value = "NaN";
+                        if ($value == Constant::VOID) {
+                            $value = "NaN";
                         }
-                        if ($this->LastChartLayout == CHART_LAST_LAYOUT_STACKED) {
-                            if ($Value >= 0) {
-                                $LookFor = "+";
+                        if ($this->lastChartLayout == Constant::CHART_LAST_LAYOUT_STACKED) {
+                            if ($value >= 0) {
+                                $lookFor = "+";
                             } else {
-                                $LookFor = "-";
+                                $lookFor = "-";
                             }
-                            $Value = 0;
-                            $Done = false;
-                            foreach ($Data["Series"] as $Name => $SerieLookup) {
-                                if ($SerieLookup["isDrawable"] == true && $Name != $Data["Abscissa"] && !$Done
+                            $value = 0;
+                            $done = false;
+                            foreach ($data["series"] as $name => $serieLookup) {
+                                if ($serieLookup["isDrawable"] == true && $name != $data["abscissa"] && !$done
                                 ) {
-                                    if (isset($Data["Series"][$Name]["Data"][$Index]) && $Data["Series"][$Name]["Data"][$Index] != VOID
+                                    if (isset($data["series"][$name]["data"][$index]) && $data["series"][$name]["data"][$index] != VOID
                                     ) {
-                                        if ($Data["Series"][$Name]["Data"][$Index] >= 0 && $LookFor == "+") {
-                                            $Value = $Value + $Data["Series"][$Name]["Data"][$Index];
+                                        if ($data["series"][$name]["data"][$index] >= 0 && $lookFor == "+") {
+                                            $value = $value + $data["series"][$name]["data"][$index];
                                         }
-                                        if ($Data["Series"][$Name]["Data"][$Index] < 0 && $LookFor == "-") {
-                                            $Value = $Value - $Data["Series"][$Name]["Data"][$Index];
+                                        if ($data["series"][$name]["data"][$index] < 0 && $lookFor == "-") {
+                                            $value = $value - $data["series"][$name]["data"][$index];
                                         }
-                                        if ($Name == $SerieName) {
-                                            $Done = true;
+                                        if ($name == $serieName) {
+                                            $done = true;
                                         }
                                     }
                                 }
                             }
                         }
-                        $X = floor($this->scaleComputeY($Value, ["AxisID" => $AxisID]));
-                        $Y = floor($this->graphAreaY1 + $XMargin + $Index * $XStep + $SerieOffset);
-                        if ($X < $minX) {
-                            $minX = $X;
+                        $x = floor($this->scaleComputeY($value, ["axisID" => $axisID]));
+                        $y = floor($this->graphAreaY1 + $xMargin + $index * $xStep + $serieOffset);
+                        if ($x < $minX) {
+                            $minX = $x;
                         }
-                        if ($DrawPoint == LABEL_POINT_CIRCLE) {
+                        if ($drawPoint == LABEL_POINT_CIRCLE) {
                             $this->drawFilledCircle(
-                                    $X, $Y, 3, [
-                                "R" => 255,
-                                "G" => 255,
-                                "B" => 255,
+                                    $x, $y, 3, [
+                                "r" => 255,
+                                "g" => 255,
+                                "b" => 255,
                                 "BorderR" => 0,
                                 "BorderG" => 0,
                                 "BorderB" => 0
                                     ]
                             );
-                        } elseif ($DrawPoint == LABEL_POINT_BOX) {
+                        } elseif ($drawPoint == LABEL_POINT_BOX) {
                             $this->drawFilledRectangle(
-                                    $X - 2, $Y - 2, $X + 2, $Y + 2, [
-                                "R" => 255,
-                                "G" => 255,
-                                "B" => 255,
+                                    $x - 2, $y - 2, $x + 2, $y + 2, [
+                                "r" => 255,
+                                "g" => 255,
+                                "b" => 255,
                                 "BorderR" => 0,
                                 "BorderG" => 0,
                                 "BorderB" => 0
                                     ]
                             );
                         }
-                        $Series[] = ["Format" => $Serie, "Caption" => $Caption];
+                        $series[] = ["format" => $serie, "Caption" => $Caption];
                     }
                 }
-                $this->drawLabelBox($minX, $Y - 3, $Description, $Series, $Format);
+                $this->drawLabelBox($minX, $y - 3, $description, $series, $format);
             }
         }
     }
