@@ -36,7 +36,12 @@ CREATE TABLE `log_activity` (
   `data` longtext DEFAULT NULL,
   `activity_date` datetime DEFAULT NULL,
   `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`log_activity_id`),
   UNIQUE KEY `log_activity_id` (`log_activity_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
@@ -56,6 +61,13 @@ CREATE TABLE IF NOT EXISTS `log_login` (
   `browser_version` varchar(255) DEFAULT NULL,
   `browser` varchar(255) DEFAULT NULL,
   `login_date` datetime DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`log_login_id`),
   UNIQUE KEY `log_login_id` (`log_login_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
@@ -78,6 +90,13 @@ CREATE TABLE IF NOT EXISTS `log_login_fail` (
   `browser_version` varchar(255) DEFAULT NULL,
   `browser` varchar(255) DEFAULT NULL,
   `login_fail_date` datetime DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`log_login_fail_id`),
   UNIQUE KEY `log_login_fail_id` (`log_login_fail_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
@@ -98,6 +117,8 @@ CREATE TABLE IF NOT EXISTS `org` (
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`org_id`),
   UNIQUE KEY `org_id` (`org_id`)
@@ -128,6 +149,8 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `createdby` varchar(32) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(32) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `roleid` (`role_id`)
@@ -153,6 +176,8 @@ CREATE TABLE IF NOT EXISTS `role_nav` (
   `createdby` varchar(32) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(32) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`role_nav_id`),
   UNIQUE KEY `role_nav_id` (`role_nav_id`)
@@ -172,6 +197,8 @@ CREATE TABLE IF NOT EXISTS `role_permission` (
   `createdby` varchar(32) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(32) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`role_permission_id`),
   UNIQUE KEY `role_permission_id` (`role_permission_id`)
@@ -184,11 +211,15 @@ CREATE TABLE IF NOT EXISTS `role_permission` (
 DROP TABLE IF EXISTS `sys_counter`;
 CREATE TABLE IF NOT EXISTS `sys_counter` (
   `sys_counter_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `org_id` bigint(20) DEFAULT NULL,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
   `key` varchar(255) DEFAULT NULL,
   `counter` int(11) DEFAULT NULL,
   `created` datetime DEFAULT NULL,
+  `createdby` varchar(32) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(32) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`sys_counter_id`),
   UNIQUE KEY `counter_id` (`sys_counter_id`)
@@ -220,6 +251,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `createdby` varchar(32) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(32) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id` (`user_id`),
@@ -235,7 +268,7 @@ INSERT INTO `users` (`user_id`, `role_id`, `org_id`, `store_id`, `username`, `us
 DROP TABLE IF EXISTS `var`;
 CREATE TABLE IF NOT EXISTS `var` (
   `var_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `org_id` bigint(20) NULL,
+  `org_id` bigint(20) unsigned NULL,
   `key` varchar(32) NOT NULL,
   `caption` varchar(255) NOT NULL,
   `value` longtext,
@@ -246,6 +279,8 @@ CREATE TABLE IF NOT EXISTS `var` (
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_id`),
   UNIQUE KEY `var_id` (`var_id`)
@@ -258,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `var` (
 DROP TABLE IF EXISTS `var_user`;
 CREATE TABLE IF NOT EXISTS `var_user` (
   `var_user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `org_id` bigint(20) NOT NULL,
+  `org_id` bigint(20) unsigned NOT NULL,
   `user_id` bigint(20) unsigned NOT NULL,
   `key` varchar(32) NOT NULL,
   `value` longtext,
@@ -266,6 +301,8 @@ CREATE TABLE IF NOT EXISTS `var_user` (
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_user_id`),
   UNIQUE KEY `var_user_id` (`var_user_id`)
@@ -273,9 +310,9 @@ CREATE TABLE IF NOT EXISTS `var_user` (
 
 DROP TABLE IF EXISTS `resource`;
 CREATE TABLE `resource` (
-  `resource_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `resource_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `model_type` varchar(255) DEFAULT NULL,
-  `model_id` bigint(20) DEFAULT NULL,
+  `model_id` bigint(20) unsigned DEFAULT NULL,
   `collection_name` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `file_name` varchar(255) DEFAULT NULL,
@@ -290,10 +327,33 @@ CREATE TABLE `resource` (
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
   `is_active` int(11) DEFAULT '1',
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+DROP TABLE IF EXISTS `queue`;
+CREATE TABLE `queue` (
+  `queue_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `class_name` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(50) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(50) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(50) DEFAULT NULL,
+  `is_active` int(11) DEFAULT '1',
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`resource_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 
 
 /*!40000 ALTER TABLE `var_user` DISABLE KEYS */;
