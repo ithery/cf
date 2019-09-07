@@ -24,7 +24,7 @@ trait CQueue_Trait_DispatchableTrait {
      * @return mixed
      */
     public static function dispatchNow() {
-        return app(Dispatcher::class)->dispatchNow(new static(...func_get_args()));
+        return CQueue::dispatcher()->dispatchNow(new static(...func_get_args()));
     }
 
     /**

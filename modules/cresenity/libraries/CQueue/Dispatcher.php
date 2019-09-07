@@ -19,7 +19,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * The pipeline instance for the bus.
      *
-     * @var \Illuminate\Pipeline\Pipeline
+     * @var CQueue_Pipeline
      */
     protected $pipeline;
 
@@ -120,7 +120,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return bool
      */
     protected function commandShouldBeQueued($command) {
-        return $command instanceof ShouldQueue;
+        return $command instanceof CQueue_ShouldQueueInterface;
     }
 
     /**
@@ -134,7 +134,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     public function dispatchToQueue($command) {
         $connection = $command->connection ? $command->connection : null;
         $queue = call_user_func($this->queueResolver, $connection);
-        if (!$queue instanceof Queue) {
+        if (!$queue instanceof CQueue_QueueInterface) {
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }
         if (method_exists($command, 'queue')) {
@@ -146,7 +146,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Push the command onto the given queue instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Queue  $queue
+     * @param  CQueue_QueueInterface  $queue
      * @param  mixed  $command
      * @return mixed
      */

@@ -7,10 +7,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2019, 2:24:45 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_JobQueue_HouseKeeping_Temporary extends CApp_JobQueue_HouseKeeping {
+class CApp_TaskQueue_HouseKeeping_Temporary extends CApp_TaskQueue_HouseKeeping {
 
     public function execute() {
-        
+        echo static::class;
     }
 
 }

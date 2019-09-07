@@ -12,13 +12,16 @@ class Controller_Cresenity extends CController {
         CJob::cliRunner();
     }
 
-    public function job() {
+    public function task() {
         CJob::cliRunner();
     }
 
-    public function dispatch() {
-        $temp = new CApp_JobQueue_HouseKeeping_Temporary();
+    public function queue() {
+        $temp = new CApp_TaskQueue_HouseKeeping_Temporary();
         $temp->dispatch();
+    }
+    public function dispatch() {
+        CQueue::run();
     }
     
     public function daemon() {
