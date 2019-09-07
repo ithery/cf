@@ -27,7 +27,7 @@ class Controller_Administrator_App_Fixer_Database_Column extends CApp_Administra
         $db = CDatabase::instance();
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
-
+        $haveChanged = false;
         foreach ($tables as $table) {
             $sql = $this->getSqlResult($table);
 
@@ -41,7 +41,11 @@ class Controller_Administrator_App_Fixer_Database_Column extends CApp_Administra
                 $prismCode = $resultBody->addPrismCode();
                 $prismCode->setLanguage('sql');
                 $prismCode->add($sql);
+                $haveChanged = true;
             }
+        }
+        if (!$haveChanged) {
+            $app->addAlert()->setType('success')->add('No Problem Found');
         }
 
         echo $app->render();
