@@ -163,7 +163,6 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
             $options['scale'] = (int) $scale;
             $options['precision'] = (int) $precision;
         }
-
         $column = new CDatabase_Schema_Column($tableColumn['field'], CDatabase_Type::getType($type), $options);
 
         if (isset($tableColumn['collation'])) {
