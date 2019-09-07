@@ -37,6 +37,12 @@ class CElement_Component_Alert extends CElement_Component {
             case 'error':
                 $this->addClass('alert-danger');
                 break;
+            case 'info':
+                $this->addClass('alert-info');
+                break;
+            case 'warning':
+                $this->addClass('alert-warning');
+                break;
             default:
                 $this->addClass('alert-success');
                 break;
