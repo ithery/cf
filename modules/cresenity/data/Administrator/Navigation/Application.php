@@ -33,4 +33,10 @@ return array(
         "controller" => "administrator/app/fixer",
         "method" => "index",
     ),
+    array(
+        "name" => "administrator.app.cron",
+        "label" => "Cron",
+        "controller" => "administrator/app/cron",
+        "method" => "index",
+    ),
 );

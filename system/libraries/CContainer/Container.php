@@ -507,7 +507,7 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
      * @return mixed
      */
     public function call($callback, array $parameters = [], $defaultMethod = null) {
-        return BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+        return CContainer_BoundMethod::call($this, $callback, $parameters, $defaultMethod);
     }
 
     /**

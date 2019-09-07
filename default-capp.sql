@@ -336,22 +336,59 @@ CREATE TABLE `resource` (
 
 
 
-DROP TABLE IF EXISTS `queue`;
-CREATE TABLE `queue` (
-  `queue_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `cron`;
+CREATE TABLE `cron` (
+  `cron_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `class_name` varchar(255) DEFAULT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `command_type` varchar(200) DEFAULT NULL,
+  `command` varchar(200) DEFAULT NULL,
+  `closure` longtext DEFAULT NULL,
+  `closure_method` varchar(200) DEFAULT NULL,
+  `closure_data` longtext DEFAULT NULL,
+  `output` varchar(200) DEFAULT NULL,
+  `email` varchar(200) DEFAULT NULL,
+  `schedule` varchar(200) DEFAULT NULL,
+  `last_execute` datetime DEFAULT NULL,
+  `is_job` int(11) DEFAULT 0,
   `created` datetime DEFAULT NULL,
   `createdby` varchar(255) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
   `updatedby` varchar(255) DEFAULT NULL,
   `deleted` datetime DEFAULT NULL,
   `deletedby` varchar(255) DEFAULT NULL,
-  `is_active` int(11) DEFAULT '1',
   `status` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`resource_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  PRIMARY KEY (`cron_id`),
+  UNIQUE KEY `cron_id` (`cron_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `job`;
+CREATE TABLE `job` (
+  `job_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `command_type` varchar(200) DEFAULT NULL,
+  `command` varchar(200) DEFAULT NULL,
+  `closure` longtext DEFAULT NULL,
+  `closure_method` varchar(200) DEFAULT NULL,
+  `closure_data` longtext DEFAULT NULL,
+  `output` longtext DEFAULT NULL,
+  `log_file` longtext DEFAULT NULL,
+  `job_status` varchar(200) DEFAULT NULL,
+  `last_execute` datetime DEFAULT NULL,
+  `retry` int(10) unsigned DEFAULT 0,
+  `email` varchar(200) DEFAULT NULL,
+  `schedule` datetime DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`job_id`),
+  UNIQUE KEY `job_id` (`job_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 
