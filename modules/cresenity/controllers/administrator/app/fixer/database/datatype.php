@@ -27,7 +27,7 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
         $db = CDatabase::instance();
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
-
+        $haveChanged = false;
         foreach ($tables as $table) {
             $sql = $this->getSqlResult($table);
 
@@ -41,7 +41,11 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
                 $prismCode = $resultBody->addPrismCode();
                 $prismCode->setLanguage('sql');
                 $prismCode->add($sql);
+                $haveChanged = true;
             }
+        }
+        if (!$haveChanged) {
+            $app->addAlert()->setType('success')->add('No Problem Found');
         }
 
         echo $app->render();
@@ -82,7 +86,7 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
                     'unsigned' => true,
                 );
 
-                if(!in_array($columnSchema->getType()->getName(), array(CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT))) {
+                if (!in_array($columnSchema->getType()->getName(), array(CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT))) {
                     continue;
                 }
 

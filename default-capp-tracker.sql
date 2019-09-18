@@ -59,7 +59,7 @@ DROP TABLE IF EXISTS `log_agent`;
 CREATE TABLE `log_agent` (
   `log_agent_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
+  `name` varchar(1000) DEFAULT NULL,
   `name_hash` varchar(65) DEFAULT NULL,
   `browser` varchar(255) DEFAULT NULL,
   `browser_version` varchar(255) DEFAULT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE `log_language` (
   `log_language_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
   `preference` varchar(255) DEFAULT NULL,
-  `language-range` varchar(255) DEFAULT NULL,
+  `language_range` varchar(255) DEFAULT NULL,
   `created` datetime DEFAULT NULL,
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,

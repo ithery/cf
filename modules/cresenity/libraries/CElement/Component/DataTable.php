@@ -197,9 +197,9 @@ class CElement_Component_DataTable extends CElement_Component {
 
         return $this;
     }
-    
+
     public function setCheckboxColumnWidth($width) {
-        $this->checkboxColumnWidth=$width;
+        $this->checkboxColumnWidth = $width;
     }
 
     function setTableStriped($tableStriped) {
@@ -757,10 +757,10 @@ class CElement_Component_DataTable extends CElement_Component {
                 }
                 if ($this->checkbox) {
                     $attrWidth = "";
-                    if(strlen($this->checkboxColumnWidth)>0) {
-                        $attrWidth='width="'.$this->checkboxColumnWidth.'"';
+                    if (strlen($this->checkboxColumnWidth) > 0) {
+                        $attrWidth = 'width="' . $this->checkboxColumnWidth . '"';
                     }
-                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" '.$attrWidth.'><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
+                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" ' . $attrWidth . '><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
                 }
                 foreach ($this->columns as $col) {
                     $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
@@ -1087,7 +1087,8 @@ class CElement_Component_DataTable extends CElement_Component {
                                                     var script = $.cresenity.base64.decode(data.js);
                                                     eval(script);
                                                 }
-
+                                                jQuery('#" . $this->id . "-check-all').removeAttr('checked');
+                                                jQuery('#" . $this->id . "-check-all').prop('checked',false);
                                             },
                                             'error': function(a,b,c) {
                                                 $.cresenity.message(a);
@@ -1227,30 +1228,31 @@ class CElement_Component_DataTable extends CElement_Component {
 
             $js->appendln('function buildFilters_' . $this->id . '() {')->br()
                     ->appendln("var quick_search = jQuery('<tr>');")->br()
-                    ->appendln("jQuery('#" . $this->id . " thead th').each( function (i) {
+                    ->appendln("
+                        jQuery('#" . $this->id . " thead th').each( function (i) {
                             var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
                             var have_action = " . ($this->haveRowAction() ? "1" : "0") . ";
-                            
-                           
+
+
                             var total_th = jQuery('#" . $this->id . " thead th').length;
                             var input = '';
                             var have_checkbox = " . ($this->checkbox ? "1" : "0") . ";
-                                
+
                             if((!(have_action==1&&(total_th-1==jQuery(this).index())))&& (!(have_checkbox==1&&(0==jQuery(this).index()))) ) {
                                 var i2 = 0;
                                 if(have_checkbox) {
                                         i2 = -1;
                                 }
-                            
+
                                 var all_column = " . json_encode($this->columns) . ";
                                 var column = all_column[jQuery(this).index()+i2];
                                 var transforms = {};
                                 if(column) {
                                     if(hasOwnProperty.call(column, 'transforms')) {
-                                        
+
                                         transforms = JSON.stringify(column.transforms);
                                     }
-                               
+
                                     if(column.searchable) {
                                         input = jQuery('<input>');
                                         input.attr('type', 'text');
@@ -1261,37 +1263,37 @@ class CElement_Component_DataTable extends CElement_Component {
                                         input.attr('placeholder', 'Search ' + title );
                                     }
                                 }
-                                
+
                             }
                             var td = jQuery('<td>').append(input);
                             quick_search.append(td);
-                        });")->br()
+                        });
+                    ")->br()
                     ->appendln("table.children('thead').append(quick_search);")->br()
                     ->appendln('}')->br()
                     ->appendln('var dttable_quick_search = ' . ($this->quick_search ? "1" : "0") . ';')->br()
                     ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }')
             ;
 
-            $js->appendln("jQuery('.data_table-quick_search').on('keyup', function(){
-                            table.fnClearTable( 0 );
-                            table.fnDraw();
-                        });")
-            ;
+            $js->appendln("
+                jQuery('.data_table-quick_search').on('keyup', function(){
+                    table.fnClearTable( 0 );
+                    table.fnDraw();
+                });
+            ");
         }
         if ($this->checkbox) {
             $js->appendln("
-				jQuery('#" . $this->id . "-check-all').click(function() {
-					
-					if(jQuery(this).is(':checked')) {
-						jQuery('.checkbox-" . $this->id . "').attr('checked','checked');
-						jQuery('.checkbox-" . $this->id . "').prop('checked',true);
-					} else {
-						jQuery('.checkbox-" . $this->id . "').removeAttr('checked');
-						jQuery('.checkbox-" . $this->id . "').prop('checked',false);
-					}
-				});
-				
-			");
+                jQuery('#" . $this->id . "-check-all').click(function() {
+                        if(jQuery(this).is(':checked')) {
+                                jQuery('.checkbox-" . $this->id . "').attr('checked','checked');
+                                jQuery('.checkbox-" . $this->id . "').prop('checked',true);
+                        } else {
+                                jQuery('.checkbox-" . $this->id . "').removeAttr('checked');
+                                jQuery('.checkbox-" . $this->id . "').prop('checked',false);
+                        }
+                });
+            ");
         }
         $js->appendln($this->js_cell);
         if (!$this->ajax) {

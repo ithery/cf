@@ -73,4 +73,8 @@ class CException extends Exception {
         header('HTTP/1.1 500 Internal Server Error');
     }
 
+    
+    public static function createExceptionHandler() {
+        return new CException_ExceptionHandler(CContainer::getInstance());
+    }
 }

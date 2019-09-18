@@ -23,13 +23,13 @@ trait CTracker_RepositoryManager_LanguageTrait {
 
     public function findOrCreateLanguage($data) {
        
-        return $this->languageRepository->findOrCreate($data, ['preference', 'language-range']);
+        return $this->languageRepository->findOrCreate($data, ['preference', 'language_range']);
     }
 
     public function getCurrentLanguage() {
         if ($languages = $this->getLanguage()) {
             $languages['preference'] = $this->languageDetect->getLanguagePreference();
-            $languages['language-range'] = $this->languageDetect->getLanguageRange();
+            $languages['language_range'] = $this->languageDetect->getLanguageRange();
         }
         return $languages;
     }

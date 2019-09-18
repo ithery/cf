@@ -25,7 +25,7 @@ trait CModel_HasResource_HasResourceTrait {
             if ($entity->shouldDeletePreservingResource()) {
                 return;
             }
-            if (in_array(CModel_SoftDelete_SoftDeleteTrait::class, class_uses_recursive($entity))) {
+            if (in_array(CModel_SoftDelete_SoftDeleteTrait::class, CF::class_uses_recursive($entity))) {
                 if (!$entity->forceDeleting) {
                     return;
                 }

@@ -17,13 +17,13 @@ trait CQueue_Trait_SerializesAndRestoresModelIdentifiers {
      */
     protected function getSerializedPropertyValue($value) {
         if ($value instanceof QueueableCollection) {
-            return new ModelIdentifier(
+            return new CModel_Identifier(
                     $value->getQueueableClass(), $value->getQueueableIds(), $value->getQueueableConnection()
             );
         }
 
         if ($value instanceof QueueableEntity) {
-            return new ModelIdentifier(
+            return new CModel_Identifier(
                     get_class($value), $value->getQueueableId(), $value->getQueueableConnection()
             );
         }

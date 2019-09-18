@@ -7,13 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Aug 23, 2019, 2:32:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
-
-/**
- * @author Hery Kurniawan
- * @since Aug 13, 2019, 1:21:26 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administrator_Controller_User {
 
     public function index() {
@@ -21,7 +14,7 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
         $app->title('Fix Database Table Engine');
 
         $action = $app->addAction()->setLabel('Check Table Engine Problem')->addClass('btn-primary mb-3');
-        $action->onClickListener()->addReloadHandler()->setTarget('data-type-result')->setUrl(curl::base() . 'administrator/app/fixer/database/datatype/check');
+        $action->onClickListener()->addReloadHandler()->setTarget('data-type-result')->setUrl(curl::base() . 'administrator/app/fixer/database/engine/check');
 
         $app->addDiv('data-type-result');
 
@@ -34,7 +27,7 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
         $db = CDatabase::instance();
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
-
+        $haveChanged = false;
         foreach ($tables as $table) {
             $sql = $this->getSqlResult($table);
 
@@ -48,7 +41,11 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
                 $prismCode = $resultBody->addPrismCode();
                 $prismCode->setLanguage('sql');
                 $prismCode->add($sql);
+                $haveChanged = true;
             }
+        }
+        if (!$haveChanged) {
+            $app->addAlert()->setType('success')->add('No Problem Found');
         }
 
         echo $app->render();
@@ -83,36 +80,12 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
         foreach ($columns as $column) {
             $columnSchema = $tableSchema->getColumn($column);
 
-
-            if (cstr::endsWith($column, '_id')) {
+            if (in_array($columnSchema->getType()->getName(), [CDatabase_Type::STRING, CDatabase_Type::TEXT])) {
                 $targetOptions = array(
                     'unsigned' => true,
                 );
-
-                if(!in_array($columnSchema->getType()->getName(), array(CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT))) {
-                    continue;
-                }
-
-                if ($table == 'cloud_messaging' && $column == 'registration_id') {
-                    continue;
-                }
-                if (in_array($table, ['pushnotif_queue', 'pushnotif_queue_member']) && $column == 'reg_id') {
-                    continue;
-                }
-
-
-                if (in_array($table, ['log_activity', 'log_session', 'log_login', 'log_login_fail']) && $column == 'session_id') {
-                    continue;
-                }
-                if (in_array($table, ['mobile_app_requirement']) && $column == 'firebase_sender_id') {
-                    continue;
-                }
-
-                //$targetColumnSchema = new CDatabase_Schema_Column($column, CDatabase_Type::getType(CDatabase_Type::BIGINT), $targetOptions);
                 $targetColumnSchema = clone $columnSchema;
-                $targetColumnSchema->setType(CDatabase_Type::getType(CDatabase_Type::BIGINT));
-                $targetColumnSchema->setUnsigned(true);
-
+                $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
                 // See if column has changed properties in table 2.
                 $changedProperties = $comparator->diffColumn($columnSchema, $targetColumnSchema);
 
