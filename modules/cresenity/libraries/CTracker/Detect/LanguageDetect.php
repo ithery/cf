@@ -17,7 +17,7 @@ class CTracker_Detect_LanguageDetect extends CTracker_Detect_MobileDetect {
     public function detectLanguage() {
         return [
             'preference' => $this->getLanguagePreference(),
-            'language-range' => $this->getLanguageRange(),
+            'language_range' => $this->getLanguageRange(),
         ];
     }
 

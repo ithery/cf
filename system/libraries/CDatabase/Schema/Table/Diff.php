@@ -101,7 +101,7 @@ class CDatabase_Schema_Table_Diff {
     public $removedForeignKeys = [];
 
     /**
-     * @var CDatabase_Schema_Table
+     * @var CDatabase_Schema_Table|null
      */
     public $fromTable;
 
@@ -117,7 +117,7 @@ class CDatabase_Schema_Table_Diff {
      * @param CDatabase_Schema_Index[]      $removedIndexes
      * @param CDatabase_Schema_Table|null   $fromTable
      */
-    public function __construct($tableName, $addedColumns = [], $changedColumns = [], $removedColumns = [], $addedIndexes = [], $changedIndexes = [], $removedIndexes = [], Table $fromTable = null) {
+    public function __construct($tableName, $addedColumns = [], $changedColumns = [], $removedColumns = [], $addedIndexes = [], $changedIndexes = [], $removedIndexes = [], CDatabase_Schema_Table $fromTable = null) {
         $this->name = $tableName;
         $this->addedColumns = $addedColumns;
         $this->changedColumns = $changedColumns;
@@ -143,7 +143,7 @@ class CDatabase_Schema_Table_Diff {
      * @return CDatabase_Schema_Identifier|string|bool
      */
     public function getNewName() {
-        return $this->newName ? new Identifier($this->newName) : $this->newName;
+        return $this->newName ? new CDatabase_Schema_Identifier($this->newName) : $this->newName;
     }
 
 }

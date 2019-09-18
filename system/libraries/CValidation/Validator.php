@@ -194,7 +194,7 @@ class CValidation_Validator {
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
-        $this->translator = new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), DOCROOT . 'system/i18n'));
+        $this->translator = CTranslation::translator();
         $this->setRules($rules);
     }
 

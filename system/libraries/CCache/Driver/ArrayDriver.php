@@ -8,6 +8,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
+    
+    use CTrait_Helper_InteractsWithTime;
 
     /**
      * The array of stored values.

@@ -9,6 +9,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CEvent {
 
+    protected static $dispatcher;
+
+    public static function dispatcher() {
+        if (self::$dispatcher == null) {
+            self::$dispatcher = static::createDispatcher();
+        }
+        return self::$dispatcher;
+    }
+
     /**
      * 
      * @return CEvent_Dispatcher

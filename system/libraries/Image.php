@@ -68,11 +68,11 @@ class Image {
 		($check === NULL) and $check = function_exists('getimagesize');
 
 		if ($check === FALSE)
-			throw new Kohana_Exception('image.getimagesize_missing');
+			throw new Exception('image.getimagesize_missing');
 
 		// Check to make sure the image exists
 		if ( ! is_file($image))
-			throw new Kohana_Exception('image.file_not_found', $image);
+			throw new Exception('image.file_not_found', $image);
 
 		// Disable error reporting, to prevent PHP warnings
 		$ER = error_reporting(0);
@@ -85,11 +85,11 @@ class Image {
 
 		// Make sure that the image is readable and valid
 		if ( ! is_array($image_info) OR count($image_info) < 3)
-			throw new Kohana_Exception('image.file_unreadable', $image);
+			throw new Exception('image.file_unreadable', $image);
 
 		// Check to make sure the image type is allowed
 		if ( ! isset(Image::$allowed_types[$image_info[2]]))
-			throw new Kohana_Exception('image.type_not_allowed', $image);
+			throw new Exception('image.type_not_allowed', $image);
 
 		// Image has been validated, load it
 		$this->image = array
