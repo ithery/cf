@@ -2050,7 +2050,8 @@ appValidation = {
         /**
          * Create JQueryValidation check to validate Laravel rules.
          */
-
+                  
+                
         $.validator.addMethod("appValidation", function (value, element, params) {
             var validator = this;
             var validated = true;

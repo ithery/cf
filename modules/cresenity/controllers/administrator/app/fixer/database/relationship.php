@@ -28,7 +28,7 @@ class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Admi
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
         $schema = $schemaManager->createSchema();
-
+        $haveChanged = false;
         foreach ($tables as $table) {
             $sql = $this->getSqlResult($table);
 
@@ -44,7 +44,12 @@ class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Admi
                 $prismCode->setHaveCopyToClipboard();
                 $prismCode->setHaveSelectCode();
                 $prismCode->add($sql);
+                $haveChanged = true;
             }
+        }
+
+        if (!$haveChanged) {
+            $app->addAlert()->setType('success')->add('No Problem Found');
         }
 
         echo $app->render();

@@ -295,10 +295,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     protected function getVarcharTypeDeclarationSQLSnippet($length, $fixed) {
-        throw DBALException::notSupported('VARCHARs not supported by Platform.');
+        throw CDatabase_Exception::notSupported('VARCHARs not supported by Platform.');
     }
 
     /**
@@ -309,10 +309,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     protected function getBinaryTypeDeclarationSQLSnippet($length, $fixed) {
-        throw DBALException::notSupported('BINARY/VARBINARY column types are not supported by this platform.');
+        throw CDatabase_Exception::notSupported('BINARY/VARBINARY column types are not supported by this platform.');
     }
 
     /**
@@ -346,7 +346,7 @@ abstract class CDatabase_Platform {
      * @param string $dbType
      * @param string $doctrineType
      *
-     * @throws \Doctrine\DBAL\DBALException If the type is not found.
+     * @throws CDatabase_Exception If the type is not found.
      */
     public function registerDoctrineTypeMapping($dbType, $doctrineType) {
         if ($this->doctrineTypeMapping === null) {
@@ -354,7 +354,7 @@ abstract class CDatabase_Platform {
         }
 
         if (!Types\Type::hasType($doctrineType)) {
-            throw DBALException::typeNotFound($doctrineType);
+            throw CDatabase_Exception::typeNotFound($doctrineType);
         }
 
         $dbType = strtolower($dbType);
@@ -565,10 +565,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getRegexpExpression() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -576,12 +576,12 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      *
      * @deprecated Use application-generated UUIDs instead
      */
     public function getGuidExpression() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -794,10 +794,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getLocateExpression($str, $substr, $startPos = false) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -953,10 +953,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateDiffExpression($date1, $date2) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -967,7 +967,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddSecondsExpression($date, $seconds) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $seconds, DateIntervalUnit::SECOND);
@@ -981,7 +981,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubSecondsExpression($date, $seconds) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $seconds, DateIntervalUnit::SECOND);
@@ -995,7 +995,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddMinutesExpression($date, $minutes) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $minutes, DateIntervalUnit::MINUTE);
@@ -1009,7 +1009,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubMinutesExpression($date, $minutes) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $minutes, DateIntervalUnit::MINUTE);
@@ -1023,7 +1023,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddHourExpression($date, $hours) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $hours, DateIntervalUnit::HOUR);
@@ -1037,7 +1037,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubHourExpression($date, $hours) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $hours, DateIntervalUnit::HOUR);
@@ -1051,7 +1051,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddDaysExpression($date, $days) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $days, DateIntervalUnit::DAY);
@@ -1065,7 +1065,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubDaysExpression($date, $days) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $days, DateIntervalUnit::DAY);
@@ -1079,7 +1079,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddWeeksExpression($date, $weeks) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $weeks, DateIntervalUnit::WEEK);
@@ -1093,7 +1093,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubWeeksExpression($date, $weeks) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $weeks, DateIntervalUnit::WEEK);
@@ -1107,7 +1107,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddMonthExpression($date, $months) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $months, DateIntervalUnit::MONTH);
@@ -1121,7 +1121,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubMonthExpression($date, $months) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $months, DateIntervalUnit::MONTH);
@@ -1135,7 +1135,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddQuartersExpression($date, $quarters) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $quarters, DateIntervalUnit::QUARTER);
@@ -1149,7 +1149,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubQuartersExpression($date, $quarters) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $quarters, DateIntervalUnit::QUARTER);
@@ -1163,7 +1163,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateAddYearsExpression($date, $years) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $years, DateIntervalUnit::YEAR);
@@ -1177,7 +1177,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateSubYearsExpression($date, $years) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $years, DateIntervalUnit::YEAR);
@@ -1194,10 +1194,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     protected function getDateArithmeticIntervalExpression($date, $operator, $interval, $unit) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -1512,11 +1512,11 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getInlineColumnCommentSQL($comment) {
         if (!$this->supportsInlineColumnComments()) {
-            throw DBALException::notSupported(__METHOD__);
+            throw CDatabase_Exception::notSupported(__METHOD__);
         }
 
         return "COMMENT " . $this->quoteStringLiteral($comment);
@@ -1583,10 +1583,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getCreateSequenceSQL(Sequence $sequence) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -1596,10 +1596,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getAlterSequenceSQL(Sequence $sequence) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -1718,10 +1718,10 @@ abstract class CDatabase_Platform {
      * @param string $schemaName
      *
      * @return string
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getCreateSchemaSQL($schemaName) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -1787,10 +1787,10 @@ abstract class CDatabase_Platform {
      *
      * @return array
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getAlterTableSQL(CDatabase_Schema_Table_Diff $diff) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2259,20 +2259,28 @@ abstract class CDatabase_Platform {
      * Obtains DBMS specific SQL code portion needed to set an index
      * declaration to be used in statements like CREATE TABLE.
      *
-     * @param array $fields
+     *  @param mixed[]|CDatabase_Schema_Index $columnsOrIndex array declaration is deprecated, prefer passing Index to this method
      *
      * @return string
      */
-    public function getIndexFieldDeclarationListSQL(array $fields) {
+    public function getIndexFieldDeclarationListSQL($columnsOrIndex) {
+        if ($columnsOrIndex instanceof CDatabase_Schema_Index) {
+            return implode(', ', $columnsOrIndex->getQuotedColumns($this));
+        }
+
+        if (!is_array($columnsOrIndex)) {
+            throw new InvalidArgumentException('Fields argument should be an CDatabase_Schema_Index or array.');
+        }
         $ret = [];
 
-        foreach ($fields as $field => $definition) {
+        foreach ($columnsOrIndex as $column => $definition) {
             if (is_array($definition)) {
-                $ret[] = $field;
+                $ret[] = $column;
             } else {
                 $ret[] = $definition;
             }
         }
+
 
         return implode(', ', $ret);
     }
@@ -2550,13 +2558,13 @@ abstract class CDatabase_Platform {
      */
     protected function _getTransactionIsolationLevelSQL($level) {
         switch ($level) {
-            case TransactionIsolationLevel::READ_UNCOMMITTED:
+            case CDatabase_TransactionIsolationLevel::READ_UNCOMMITTED:
                 return 'READ UNCOMMITTED';
-            case TransactionIsolationLevel::READ_COMMITTED:
+            case CDatabase_TransactionIsolationLevel::READ_COMMITTED:
                 return 'READ COMMITTED';
-            case TransactionIsolationLevel::REPEATABLE_READ:
+            case CDatabase_TransactionIsolationLevel::REPEATABLE_READ:
                 return 'REPEATABLE READ';
-            case TransactionIsolationLevel::SERIALIZABLE:
+            case CDatabase_TransactionIsolationLevel::SERIALIZABLE:
                 return 'SERIALIZABLE';
             default:
                 throw new \InvalidArgumentException('Invalid isolation level:' . $level);
@@ -2566,10 +2574,10 @@ abstract class CDatabase_Platform {
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListDatabasesSQL() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2577,10 +2585,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListNamespacesSQL() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2588,10 +2596,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListSequencesSQL($database) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2599,10 +2607,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListTableConstraintsSQL($table) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2611,28 +2619,28 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListTableColumnsSQL($table, $database = null) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListTablesSQL() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListUsersSQL() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2642,10 +2650,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListViewsSQL($database) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2663,10 +2671,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListTableIndexesSQL($table, $currentDatabase = null) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2674,10 +2682,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getListTableForeignKeysSQL($table) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2686,10 +2694,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getCreateViewSQL($name, $sql) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2697,10 +2705,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDropViewSQL($name) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2710,10 +2718,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDropSequenceSQL($sequence) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2721,10 +2729,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getSequenceNextValSQL($sequenceName) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2734,10 +2742,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getCreateDatabaseSQL($database) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2747,10 +2755,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getSetTransactionIsolationSQL($level) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2761,10 +2769,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateTimeTypeDeclarationSQL(array $fieldDeclaration) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2786,10 +2794,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDateTypeDeclarationSQL(array $fieldDeclaration) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2800,10 +2808,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getTimeTypeDeclarationSQL(array $fieldDeclaration) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2870,12 +2878,12 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      *
      * @see    usesSequenceEmulatedIdentityColumns
      */
     public function getIdentitySequenceName($tableName, $columnName) {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -2986,10 +2994,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     public function getDefaultSchemaName() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
@@ -3298,7 +3306,7 @@ abstract class CDatabase_Platform {
         $class = $this->getReservedKeywordsClass();
         $keywords = new $class;
         if (!$keywords instanceof CDatabase_Platform_Keywords) {
-            throw DBALException::notSupported(__METHOD__);
+            throw CDatabase_Exception::notSupported(__METHOD__);
         }
 
 // Store the instance so it doesn't need to be generated on every request.
@@ -3312,10 +3320,10 @@ abstract class CDatabase_Platform {
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException If not supported on this platform.
+     * @throws CDatabase_Exception If not supported on this platform.
      */
     protected function getReservedKeywordsClass() {
-        throw DBALException::notSupported(__METHOD__);
+        throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**

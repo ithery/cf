@@ -39,6 +39,7 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
             $randColor = $this->getColor();
             $color = carr::get($value, 'color') ?: $randColor;
             $backgroundColor = carr::get($value, 'backgroundColor') ?: $this->getColor($randColor, 0.2);
+            $tension = carr::get($value, 'tension');
             //$backgroundColor = $this->getColor($color, 0.2);
             if (is_array($dataset['data'])) {
                 $color=[];
@@ -63,6 +64,9 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
             }
             $dataset['borderColor'] = $color;
             $dataset['backgroundColor'] = $backgroundColor;
+            if (strlen($tension) > 0) {
+                $dataset['tension'] = $tension;
+            }
 
             $this->data['datasets'][] = $dataset;
         }

@@ -15,10 +15,12 @@ set_exception_handler(array('CApp', 'exceptionHandler'));
 
 
 if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator") {
-    
+
     //we adjust the the client modules
     CManager::registerModule('jquery.datatable', array(
         "css" => array("administrator/datatables/datatables.css"),
         "js" => array("administrator/datatables/datatables.js"),
     ));
 }
+
+

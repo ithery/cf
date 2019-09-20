@@ -728,19 +728,18 @@ abstract class CDatabase_Schema_Manager {
         foreach ($tableColumns as $tableColumn) {
             $column = null;
             $defaultPrevented = false;
-
+            
             if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaColumnDefinition)) {
                 $eventArgs = new SchemaColumnDefinitionEventArgs($tableColumn, $table, $database, $this->db);
                 $eventManager->dispatchEvent(CDatabase_Event::onSchemaColumnDefinition, $eventArgs);
-
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $column = $eventArgs->getColumn();
             }
+           
 
             if (!$defaultPrevented) {
                 $column = $this->_getPortableTableColumnDefinition($tableColumn);
             }
-
             if ($column) {
                 $name = strtolower($column->getQuotedName($this->platform));
                 $list[$name] = $column;
