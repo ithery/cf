@@ -73,6 +73,8 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $dom = null;
     protected $widget_title;
     protected $fixedColumn;
+    protected $isScrollX;
+    protected $isScrollY;
 
     public function __construct($id = "") {
         parent::__construct($id);
