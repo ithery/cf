@@ -52,6 +52,11 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
         return carr::get($data, 'columns');
     }
 
+    public function table() {
+        $data = $this->engine->getData();
+        return carr::get($data, 'table');
+    }
+
     public function pageSize() {
         return $this->parameter->pageSize();
     }
