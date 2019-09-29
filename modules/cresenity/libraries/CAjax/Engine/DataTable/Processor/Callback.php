@@ -8,7 +8,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_Processor {
+
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
+
     public function process() {
         $data = $this->engine->getData();
 
@@ -23,22 +25,24 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
         $callback = carr::get($data, 'query');
         $params = array();
         $params['options'] = carr::get($data, 'callback_options');
-        
+        $params['processor'] = $this;
+
+
         $resultCallback = call_user_func_array($callback, $params);
 
         $data = carr::get($resultCallback, 'data', array());
         $totalRecord = carr::get($resultCallback, 'total_record', count($data));
         $totalFilteredRecord = carr::get($resultCallback, 'total_filtered_record', count($data));
 
-        
+
         $js = '';
         $output = array(
             "sEcho" => intval(carr::get($request, 'sEcho')),
             "iTotalRecords" => $totalRecord,
             "iTotalDisplayRecords" => $totalFilteredRecord,
-            "aaData" => $this->populateAAData($data,$table,$request,$js),
+            "aaData" => $this->populateAAData($data, $table, $request, $js),
         );
-        
+
 
 
 
