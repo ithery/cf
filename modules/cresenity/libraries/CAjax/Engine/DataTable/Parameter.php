@@ -55,8 +55,8 @@ class CAjax_Engine_DataTable_Parameter {
                     }
                 }
             }
-            return $sortingData;
         }
+        return $sortingData;
     }
 
 }
