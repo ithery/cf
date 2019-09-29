@@ -52,9 +52,16 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
         return carr::get($data, 'columns');
     }
 
+    public function domain() {
+        $data = $this->engine->getData();
+        $domain = carr::get($data, 'domain', CF::domain());
+        return $domain;
+    }
+
     public function table() {
         $data = $this->engine->getData();
-        return carr::get($data, 'table');
+        $table = unserialize(carr::get($data, 'table'));
+        return $table;
     }
 
     public function pageSize() {
@@ -67,6 +74,14 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
 
     public function searchTerm() {
         return $this->parameter->searchTerm();
+    }
+
+    public function sortingCol() {
+        return carr::get($this->parameter->sortingData(), '0.0');
+    }
+
+    public function sortingDir() {
+        return carr::get($this->parameter->sortingData(), '0.1');
     }
 
 }
