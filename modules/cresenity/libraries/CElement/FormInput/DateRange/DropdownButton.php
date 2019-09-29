@@ -27,6 +27,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
     public function build() {
 
         $this->addClass('btn dropdown-toggle md-btn-flat daterange-dropdownbutton');
+        $this->setAttr('type','button');
         $this->add($this->dateStart . ' - ' . $this->dateEnd);
         $this->after()->addControl($this->id . '-start', 'hidden')->setName($this->name . '[start]')->setValue($this->dateStart);
         $this->after()->addControl($this->id . '-end', 'hidden')->setName($this->name . '[end]')->setValue($this->dateEnd);
