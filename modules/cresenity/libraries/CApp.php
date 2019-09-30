@@ -627,6 +627,7 @@ class CApp extends CObservable {
         $data["css_require"] = $asset->getAllCssFileUrl();
         $data["message"] = $messageOrig;
         $data["ajaxData"] = $this->ajaxData;
+        $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
         return cjson::encode($data);
     }
 

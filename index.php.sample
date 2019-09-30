@@ -4,6 +4,20 @@ if (!defined('CURL_SSLVERSION_TLSv1_2')) {
     define('CURL_SSLVERSION_TLSv1_2', 6);
 }
 
+//auto redirect non www
+$pageURL = (@$_SERVER["HTTPS"] == "on") ? "https://" : "http://";
+
+if (substr($_SERVER['SERVER_NAME'], 0, 4) === 'www.') {
+    if ($_SERVER["SERVER_PORT"] != "80") {
+        $pageURL .= substr($_SERVER['SERVER_NAME'], 4) . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
+    } else {
+        $pageURL .= substr($_SERVER['SERVER_NAME'], 4) . $_SERVER["REQUEST_URI"];
+    }
+    header('Location: ' . $pageURL);
+    exit;
+}
+
+
 if (isset($_GET['kc']) && isset($_GET['msisdn']) && isset($_GET['price'])) {
     header('HTTP/1.0 503 Service Unavailable');
     header('Content-Type: text/html');
