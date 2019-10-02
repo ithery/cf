@@ -392,6 +392,14 @@ class CApp extends CObservable {
 
         return $v->render();
     }
+    
+    public function addCustomData($key, $value) {
+        if(!is_array($this->custom_data)){
+            $this->custom_data = array();
+        }
+        $this->custom_data[$key] = $value;
+        return $this;
+    }
 
     public function setCustomData($data) {
         $this->custom_data = $data;
