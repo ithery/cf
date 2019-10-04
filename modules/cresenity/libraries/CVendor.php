@@ -53,8 +53,18 @@ class CVendor {
         return $api;
     }
 
-    public static function rajaOngkir() {
-        return new CVendor_RajaOngkir();
+    public static function rajaOngkir($type = 'Pro') {
+        switch (strtolower($type)) {
+            case 'starter':
+                return new CVendor_RajaOngkir_Starter();
+                break;
+            case 'basic':
+                return new CVendor_RajaOngkir_Basic();
+                break;
+            default:
+                return new CVendor_RajaOngkir_Pro();
+                break;
+        }
     }
 
     public static function shipper($environment = 'production') {
@@ -112,6 +122,36 @@ class CVendor {
      */
     public static function odoo($options) {
         return CVendor_Odoo::getClient($options);
+    }
+
+    /**
+     * [zenziva description]
+     *
+     * @method zenziva
+     *
+     * @param  string  $username [description]
+     * @param  string  $password [description]
+     *
+     * @return CVendor_Zenziva            [description]
+     */
+    public static function zenziva($username, $password)
+    {
+        return new CVendor_Zenziva($username, $password);
+    }
+
+    /**
+     * [kredivo description]
+     *
+     * @method kredivo
+     *
+     * @param array     $options [<description>]
+     * @param string    $environment [<description>]
+     * 
+     * @return CVendor_Kredivo  [description]
+     */
+    public static function kredivo($options = [], $environment = 'production')
+    {
+        return new CVendor_Kredivo($environment, $options);
     }
 
 }
