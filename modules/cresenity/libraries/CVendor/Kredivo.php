@@ -60,6 +60,9 @@ class CVendor_Kredivo
 	public function checkout($options = [])
 	{
 		$url = $this->getEndPoint() . 'v2/checkout_url';
+
+		$options['server_key'] = $this->serverKey;
+
 		$this->execute($url, 'POST', $options);
 	}
 
