@@ -26,7 +26,8 @@ class CVendor_Kredivo
 	const PAYMENT_12_MONTHS = '12_months';
 
 	public function __construct($environment, $options)
-	{
+	{	
+		$environment = strtolower($environment);
 		if ($environment == 'dev' || $environment == 'development' || $environment == 'sandbox') {
 			$this->environment = 'development';
 			$this->endpoint = static::SANDBOX_ENDPOINT;
