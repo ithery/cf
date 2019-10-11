@@ -24,7 +24,6 @@ class CVendor_Kredivo
 	const PAYMENT_3_MONTHS = '3_months';
 	const PAYMENT_6_MONTHS = '6_months';
 	const PAYMENT_12_MONTHS = '12_months';
-	// const PAYMENT_TYPE = [PAYMENT_30_DAYS => '30 Days', PAYMENT_3_MONTHS => '3 Months', PAYMENT_6_MONTHS => '6 Months', PAYMENT_12_MONTHS => '12 Months'];
 
 	public function __construct($environment, $options)
 	{
@@ -44,40 +43,83 @@ class CVendor_Kredivo
 	}
 
 	private function getEndPoint() {
-		return $this->endpoint;
+		return rtrim($this->endpoint, '/') . '/';
+	}
+
+	public function getPaymentType()
+	{
+		return [
+			static::PAYMENT_3_MONTHS => '30 Days',
+			static::PAYMENT_3_MONTHS => '3 Months',
+			static::PAYMENT_6_MONTHS => '6 Months',
+			static::PAYMENT_12_MONTHS => '12 Months',
+		];
 	}
 
 	public function checkout($options = [])
 	{
 		$url = $this->getEndPoint() . 'v2/checkout_url';
-		$options = [];
-
-		$client = new Client();
-
-		try {
-			$response = $client->request('POST', $url, ['form_params' => $options]);
-
-			$this->lastResponse = json_decode($response->getBody()->getContents());
-			$this->responses[] = $this->lastResponse;
-
-			return true;
-		} catch (Exception $e) {
-			$this->lastError = $e->getMessage();
-			$this->errors[] = $this->lastError;
-
-			return false;
-		}
+		$this->execute($url, 'POST', $options);
 	}
 
 	public function payment($options = [])
 	{
 		$url = $this->getEndPoint() . 'v2/payments';
-		$options = [];
+		$this->execute($url, 'POST', $options);
+	}
 
+	public function confirm($options = [])
+	{
+		$url = $this->getEndPoint() . 'v2/update';
+		$this->execute($url, 'GET', $options);
+	}
+
+	public function cancel($options = [])
+	{
+		$url = $this->getEndPoint() . 'v2/cancel_transaction';
+		$this->execute($url, 'POST', $options);
+	}
+
+	public function transactionStatus($options = [])
+	{
+		$url = $this->getEndPoint() . 'transaction/status';
+		$this->execute($url, 'POST', $options);
+	}
+
+	public function deactiveToken($options = [])
+	{
+		$url = $this->getEndPoint() . 'v2/deactive_user_token';
+		$this->execute($url, 'POST', $options);
+	}
+
+	public function creditDetails($options = [])
+	{
+		$url = $this->getEndPoint() . 'v2/get_user_credit_details';
+		$this->execute($url, 'POST', $options);
+	}
+
+	public function connect($options = [])
+	{
+		$url = $this->getEndPoint() . 'v2/connect';
+		$this->execute($url, 'POST', $options);
+	}
+
+	private function execute($url, $method = 'GET', array $options = [])
+	{
 		$client = new Client();
+		$params = [];
+
+		switch ($method) {
+			case 'POST':
+				$params['form_params'] = $options;
+				break;
+			default:
+				$params['query'] = $options;
+				break;
+		}
 
 		try {
-			$response = $client->request('POST', $url, ['form_params' => $options]);
+			$response = $client->request($method, $url, $params);
 
 			$this->lastResponse = json_decode($response->getBody()->getContents());
 			$this->responses[] = $this->lastResponse;
@@ -89,11 +131,6 @@ class CVendor_Kredivo
 
 			return false;
 		}
-	}
-
-	public function transactionStatus()
-	{
-		$url = $this->getEndPoint() . 'transaction/status';
 	}
 
 	public function responses()
