@@ -19,12 +19,12 @@ class CMage {
      * @param CMage_Option $option
      * @return \CMage_Caster
      */
-    public static function createCaster($mage) {
+    public static function createCaster($mage,$controller) {
         
         if(is_string($mage)) {
             $mage = new $mage();
         }
-        $caster = new CMage_Caster($mage);
+        $caster = new CMage_Caster($mage,$controller);
         return $caster;
     }
     

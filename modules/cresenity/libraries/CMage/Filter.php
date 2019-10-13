@@ -6,6 +6,6 @@
  * and open the template in the editor.
  */
 
-abstract class CMage_AbstractField implements CMage_FieldInterface {
+class CMage_Filter {
     
 }

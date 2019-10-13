@@ -7,23 +7,34 @@
  */
 
 class CMage_Caster {
+
     protected $mage;
-    public function __construct(CMage_AbstractMage $mage) {
-        $this->mage=$mage;
+    protected $controller;
+
+    public function __construct(CMage_AbstractMage $mage, $controllerClass) {
+        $this->mage = $mage;
+        $this->controllerClass=$controllerClass;
     }
 
-    
     public function index() {
         $method = $this->createMethod('Index');
         $method->execute();
-        
     }
     
+    public function add() {
+        $method = $this->createMethod('Add');
+        $method->execute();
+    }
     
+    public function edit() {
+        $method = $this->createMethod('Edit');
+        $method->execute();
+    }
+
     protected function createMethod($methodName) {
-        $methodClassName='CMage_Method_'.$methodName.'Method';
-        $methodClass = new $methodClassName($this->option);
+        $methodClassName = 'CMage_Method_' . $methodName . 'Method';
+        $methodClass = new $methodClassName($this->mage,$this->controllerClass);
         return $methodClass;
-        
     }
+
 }
