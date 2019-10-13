@@ -22,5 +22,3 @@ if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator")
         "js" => array("administrator/datatables/datatables.js"),
     ));
 }
-
-

@@ -973,6 +973,7 @@ final class CF {
         // Close output buffers
         self::close_buffers(TRUE);
 
+
         // Run the output event
         CFEvent::run('system.display', self::$output);
 
