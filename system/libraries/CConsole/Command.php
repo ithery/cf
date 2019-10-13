@@ -395,7 +395,7 @@ class CConsole_Command extends SymfonyCommand
     {
         $table = new Table($this->output);
 
-        if ($rows instanceof Arrayable) {
+        if ($rows instanceof CInterface_Arrayable) {
             $rows = $rows->toArray();
         }
 

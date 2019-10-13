@@ -28,7 +28,26 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
             $this->error('Domain not set, please set with php cf domain {domain}');
         }
         
-        $this->line('Domain:'.$domain, 'yellow');
+        $this->info('Domain: '.$domain);
+        $this->output->newLine();
+        
+        $db = CDatabase::instance();
+        $config = $db->config();
+        $configConnection = carr::get($config,'connection');
+       
+        $rows=array();
+        $rows[] = array('Type',carr::get($configConnection,'type'));
+        $rows[] = array('Host',carr::get($configConnection,'host'));
+        $rows[] = array('Port',carr::get($configConnection,'port'));
+        $rows[] = array('Username',carr::get($configConnection,'user'));
+        $rows[] = array('Password',carr::get($configConnection,'pass'));
+        $rows[] = array('Database',carr::get($configConnection,'database'));
+        
+        $this->info('Database Configuration');
+        
+        $this->info('======================');
+        
+        $this->table(array('Description','Value'),$rows);
         
     }
 }
