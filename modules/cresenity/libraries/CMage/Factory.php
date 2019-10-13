@@ -6,12 +6,12 @@
  * and open the template in the editor.
  */
 
-class CMage {
-    
-    
+final class CMage_Factory {
+    /**
+     * 
+     * @return \CMage_Option
+     */
     public static function createOption() {
-        return CMage_Factory::createOption();
+        return new CMage_Option();
     }
-    
-    
 }

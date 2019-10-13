@@ -6,12 +6,7 @@
  * and open the template in the editor.
  */
 
-class CMage {
+interface CElement_Component_DataTable_Exporter_EngineInterface {
     
-    
-    public static function createOption() {
-        return CMage_Factory::createOption();
-    }
-    
-    
+    public function export();
 }

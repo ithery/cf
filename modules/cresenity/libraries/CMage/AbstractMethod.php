@@ -6,12 +6,14 @@
  * and open the template in the editor.
  */
 
-class CMage {
+abstract class CMage_AbstractMethod implements CMage_MethodInterface {
+    /**
+     *
+     * @var CMage 
+     */
+    protected $mage;
     
-    
-    public static function createOption() {
-        return CMage_Factory::createOption();
+    public function __construct($mage) {
+        
     }
-    
-    
 }

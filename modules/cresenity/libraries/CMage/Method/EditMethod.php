@@ -6,12 +6,3 @@
  * and open the template in the editor.
  */
 
-class CMage {
-    
-    
-    public static function createOption() {
-        return CMage_Factory::createOption();
-    }
-    
-    
-}
