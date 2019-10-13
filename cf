@@ -1,3 +1,12 @@
 #!/usr/bin/env php
 <?php
-include "index.php";
+
+define('CFCLI',true);
+
+if(!file_exists("index.php")) {
+    copy("index.php.sample","index.php");
+    echo "Copying index.php.sample to index.php \n";
+    echo "please run again with php cf\n";
+} else {
+    include "index.php";
+}

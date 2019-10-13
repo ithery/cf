@@ -9,11 +9,11 @@
 abstract class CMage_AbstractMethod implements CMage_MethodInterface {
     /**
      *
-     * @var CMage 
+     * @var CMage_Option 
      */
-    protected $mage;
+    protected $option;
     
-    public function __construct($mage) {
-        
+    public function __construct($option) {
+        $this->option=$option;
     }
 }

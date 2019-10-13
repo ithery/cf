@@ -14,4 +14,18 @@ class CMage {
     }
     
     
+    /**
+     * 
+     * @param CMage_Option $option
+     * @return \CMage_Caster
+     */
+    public static function createCaster($mage) {
+        
+        if(is_string($mage)) {
+            $mage = new $mage();
+        }
+        $caster = new CMage_Caster($mage);
+        return $caster;
+    }
+    
 }
