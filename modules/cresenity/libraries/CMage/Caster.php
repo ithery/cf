@@ -26,8 +26,9 @@ class CMage_Caster {
         $method->execute();
     }
     
-    public function edit() {
+    public function edit($id) {
         $method = $this->createMethod('Edit');
+        $method->setId($id);
         $method->execute();
     }
 

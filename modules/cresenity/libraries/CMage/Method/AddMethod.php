@@ -11,11 +11,11 @@ class CMage_Method_AddMethod extends CMage_AbstractMethod {
     public function execute() {
         $app = CApp::instance();
 
-        $request = CMage::request();
+        $request = CApp_Base::getRequestPost();
        
         $mage = $this->mage;
-        $post = CApp_Base::getRequestPost();
-        if ($post!=null) {
+     
+        if ($request!=null) {
             
 //            if(!$mage->authorizeToAdd()) {
 //                curl::redirect('/');
@@ -24,25 +24,27 @@ class CMage_Method_AddMethod extends CMage_AbstractMethod {
             //$mage->validateForAdd($request);
 
             $model = CDatabase::instance()->transaction(function () use ($request, $mage) {
-                
+                $addFields = $this->mage->getAddFieldsFromRequest($request);
+                $model = $addFields->fillModelFromRequest($this->mage->newModel(),$request);
 //                list($model, $callbacks) = $mage->fill(
 //                                $request, $mage->newModel()
 //                );
 
-                if ($request->viaRelationship()) {
-                    $request->findParentModelOrFail()
-                            ->{$request->viaRelationship}()
-                            ->save($model);
-                } else {
-                    $model->save();
-                }
+//                if ($request->viaRelationship()) {
+//                    $request->findParentModelOrFail()
+//                            ->{$request->viaRelationship}()
+//                            ->save($model);
+//                } else {
+//                    $model->save();
+//                }
+                $model->save();
+                //ActionEvent::forResourceCreate($request->user(), $model)->save();
 
-                ActionEvent::forResourceCreate($request->user(), $model)->save();
-
-                collect($callbacks)->each->__invoke();
+                //collect($callbacks)->each->__invoke();
 
                 return $model;
             });
+            curl::redirect($this->controllerUrl());
         }
 
         $app->setTitle('Add ' . $this->mage->getTitle());

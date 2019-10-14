@@ -22,4 +22,11 @@ class CMage_Mage_FieldCollection extends CCollection {
         return $field;
     }
 
+    public function fillModelFromRequest($model,$request) {
+        foreach($this->items as $field) {
+           
+            $model->{$field->getName()} = carr::get($request,$field->getName());
+        }
+        return $model;
+    }
 }

@@ -25,6 +25,19 @@ class CMage_Method_IndexMethod extends CMage_AbstractMethod {
             
         }
         
+        $model = $this->mage->buildModelForIndex();
+        $table->setDataFromModel($model);
+        $table->setRowActionStyle('btn-dropdown');
+        
+        $primaryKey = $model->getKeyName();
+        if($this->mage->haveEdit) {
+            $action = $table->addRowAction();
+            $action->setLabel('Edit')->setIcon('fas fa-edit')->setLink($this->controllerUrl().'edit/{'.$primaryKey.'}');
+        }
+        if($this->mage->haveDelete) {
+            $action = $table->addRowAction();
+            $action->setLabel('Delete')->setIcon('fas fa-trash')->setLink($this->controllerUrl().'delete/{'.$primaryKey.'}')->setConfirm();
+        }
         
         echo $app->render();
     }

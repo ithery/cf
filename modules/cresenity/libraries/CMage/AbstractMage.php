@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-abstract class CMage_AbstractMage implements ArrayAccess,CMage_MageInterface {
+abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
 
     use CMage_Mage_Trait_AuthorizableTrait;
     use CMage_Mage_Trait_ValidationTrait;
@@ -36,9 +36,8 @@ abstract class CMage_AbstractMage implements ArrayAccess,CMage_MageInterface {
     public $haveDetail = true;
 
     public function __construct() {
-        $this->fields = new CMage_Mage_FieldCollection([],$this);
-        $this->filters = new CMage_Mage_FilterCollection([],$this);
-      
+        $this->fields = new CMage_Mage_FieldCollection([], $this);
+        $this->filters = new CMage_Mage_FilterCollection([], $this);
     }
 
     public function getTitle() {
@@ -68,23 +67,49 @@ abstract class CMage_AbstractMage implements ArrayAccess,CMage_MageInterface {
      */
     public function newModel() {
         $model = $this->modelClass;
-
+       
         return new $model;
     }
-    
-    
+
     public function setModel($model) {
-        $this->model=$model;
+        $this->model = $model;
         return $this;
     }
+
+    public function getAddFieldsFromRequest($request=array()) {
+         if($request==null){
+            $request = CApp_Base::getRequest();
+        }
+        $addFields = $this->fields->reject(function($field) use ($request) {
+            return !$field->showOnAdd || !array_key_exists($field->getName(), $request);
+        });
+        return $addFields;
+    }
+    public function getEditFieldsFromRequest($request=array()) {
+        if($request==null){
+            $request = CApp_Base::getRequest();
+        }
+        $addFields = $this->fields->reject(function($field) use ($request) {
+            return !$field->showOnEdit || !array_key_exists($field->getName(), $request);
+        });
+        return $addFields;
+    }
+    public function getIndexFields() {
+        $request = CApp_Base::getRequest();
+        $indexFields = $this->fields->reject(function($field) {
+            return !$field->showOnIndex; 
+        });
+        return $indexFields;
+    }
     
-    
-    public function getAddFieldsFromRequest() {
-        $request = CApp_Base::request();
-//        $this->fields->map(function($field){
-//            if($field)
-//        });
+    public function buildModelForIndex() {
+        $model = $this->newModel();
+        $indexFields = $this->getIndexFields();
         
+        foreach($indexFields as $field) {
+            $model->addSelect($field->getName());
+        }
+        return $model;
     }
 
 }
