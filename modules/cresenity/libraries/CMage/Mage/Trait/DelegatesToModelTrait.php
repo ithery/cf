@@ -7,7 +7,7 @@
  */
 
 
-trait DelegatesToModelTrait
+trait CMage_Mage_Trait_DelegatesToModelTrait
 {
     /**
      * Get the value of the resource's route key.
@@ -72,7 +72,7 @@ trait DelegatesToModelTrait
      */
     public function offsetSet($offset, $value)
     {
-        $this->resource[$offset] = $value;
+        $this->model[$offset] = $value;
     }
 
     /**

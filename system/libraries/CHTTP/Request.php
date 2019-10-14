@@ -192,11 +192,12 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return mixed
      */
     public function __get($key) {
+        
         if (array_key_exists($key, $this->all())) {
             return carr::get($this->all(), $key);
         }
-
-        return $this->route($key);
+        return null;
+        //return $this->route($key);
     }
 
 }

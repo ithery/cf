@@ -13,7 +13,8 @@ class CMage_Method_AddMethod extends CMage_AbstractMethod {
 
         $request = CMage::request();
         $mage = $this->mage;
-        if ($request != null) {
+        $post = CApp_Base::getRequestPost();
+        if ($post!=null) {
             
             if(!$mage->authorizeToAdd()) {
                 curl::redirect('/');

@@ -84,7 +84,7 @@ trait CMage_Mage_Trait_ResolvesFieldTrait {
      * @param  \Illuminate\Support\Collection  $fields
      * @return \Illuminate\Support\Collection
      */
-    protected function removeNonCreationFields(Collection $fields) {
+    protected function removeNonCreationFields(CCollection $fields) {
         return $fields->reject(function ($field) {
                     return $field instanceof ListableField ||
                             $field instanceof ResourceToolElement ||
@@ -235,7 +235,8 @@ trait CMage_Mage_Trait_ResolvesFieldTrait {
      * @return \Illuminate\Support\Collection
      */
     public function availableFields(CMage_Request $request) {
-        return new CMage_Mage_FieldCollection(array_values($this->filter($this->fields($request))));
+       
+        return new CMage_Mage_FieldCollection(array_values($this->filter($this->fields()->all())),$this);
     }
 
     /**
@@ -353,4 +354,7 @@ trait CMage_Mage_Trait_ResolvesFieldTrait {
         }
     }
 
+    
+    
+    
 }

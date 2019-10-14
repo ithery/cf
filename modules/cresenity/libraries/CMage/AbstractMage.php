@@ -6,14 +6,17 @@
  * and open the template in the editor.
  */
 
-abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
+abstract class CMage_AbstractMage implements ArrayAccess,CMage_MageInterface {
 
     use CMage_Mage_Trait_AuthorizableTrait;
     use CMage_Mage_Trait_ValidationTrait;
+    use CMage_Mage_Trait_LoadAttributeTrait;
     use CMage_Mage_Trait_FillsFieldsTrait;
     use CMage_Mage_Trait_ResolvesFieldTrait;
+    use CMage_Mage_Trait_DelegatesToModelTrait;
 
     public $title = null;
+    public $modelClass;
     public $model;
 
     /**
@@ -24,7 +27,7 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
 
     /**
      *
-     * @var CMage_Mage_FilterData 
+     * @var CMage_Mage_FilterCollection
      */
     protected $filters;
     public $haveAdd = true;
@@ -33,8 +36,9 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
     public $haveDetail = true;
 
     public function __construct() {
-        $this->fields = new CMage_Mage_FieldCollection($this);
-        $this->filters = new CMage_Mage_FilterData($this);
+        $this->fields = new CMage_Mage_FieldCollection([],$this);
+        $this->filters = new CMage_Mage_FilterCollection([],$this);
+      
     }
 
     public function getTitle() {
@@ -43,7 +47,7 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
 
     /**
      * 
-     * @return CMage_Mage_FieldData
+     * @return CMage_Mage_FieldCollection
      */
     public function fields() {
         return $this->fields;
@@ -63,9 +67,16 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
      * @return mixed
      */
     public function newModel() {
-        $model = $this->model;
+        $model = $this->modelClass;
 
         return new $model;
     }
+    
+    
+    public function setModel($model) {
+        $this->model=$model;
+        return $this;
+    }
+    
 
 }

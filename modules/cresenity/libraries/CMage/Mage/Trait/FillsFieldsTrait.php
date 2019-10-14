@@ -16,8 +16,9 @@ trait CMage_Mage_Trait_FillsFieldsTrait {
      * @return array
      */
     public static function fill(CMage_Request $request, $model) {
+        
         return static::fillFields(
-                        $request, $model, (new static($model))->creationFields($request)
+                        $request, $model, (new static())->setModel($model)->creationFields($request)
         );
     }
 
