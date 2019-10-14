@@ -21,25 +21,25 @@ class CMage_Method_AddMethod extends CMage_AbstractMethod {
 
             //$mage->validateForAdd($request);
 
-//            $model = CDatabase::instance()->transaction(function () use ($request, $mage) {
-//                list($model, $callbacks) = $mage->fill(
-//                                $request, $mage->newModel()
-//                );
-//
-//                if ($request->viaRelationship()) {
-//                    $request->findParentModelOrFail()
-//                            ->{$request->viaRelationship}()
-//                            ->save($model);
-//                } else {
-//                    $model->save();
-//                }
-//
-//                ActionEvent::forResourceCreate($request->user(), $model)->save();
-//
-//                collect($callbacks)->each->__invoke();
-//
-//                return $model;
-//            });
+            $model = CDatabase::instance()->transaction(function () use ($request, $mage) {
+                list($model, $callbacks) = $mage->fill(
+                                $request, $mage->newModel()
+                );
+
+                if ($request->viaRelationship()) {
+                    $request->findParentModelOrFail()
+                            ->{$request->viaRelationship}()
+                            ->save($model);
+                } else {
+                    $model->save();
+                }
+
+                ActionEvent::forResourceCreate($request->user(), $model)->save();
+
+                collect($callbacks)->each->__invoke();
+
+                return $model;
+            });
         }
 
         $app->setTitle('Add ' . $this->mage->getTitle());

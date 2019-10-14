@@ -14,4 +14,16 @@ final class CMage_Factory {
     public static function createOption() {
         return new CMage_Option();
     }
+    
+    /**
+     * 
+     * @return \CMage_Option
+     */
+    public static function createCaster($mage,$controller) {
+           if(is_string($mage)) {
+            $mage = new $mage();
+        }
+        $caster = new CMage_Caster($mage,$controller);
+        return $caster;
+    }
 }
