@@ -12,20 +12,22 @@ class CMage_Method_AddMethod extends CMage_AbstractMethod {
         $app = CApp::instance();
 
         $request = CMage::request();
+       
         $mage = $this->mage;
         $post = CApp_Base::getRequestPost();
         if ($post!=null) {
             
-            if(!$mage->authorizeToAdd()) {
-                curl::redirect('/');
-            }
+//            if(!$mage->authorizeToAdd()) {
+//                curl::redirect('/');
+//            }
 
             //$mage->validateForAdd($request);
 
             $model = CDatabase::instance()->transaction(function () use ($request, $mage) {
-                list($model, $callbacks) = $mage->fill(
-                                $request, $mage->newModel()
-                );
+                
+//                list($model, $callbacks) = $mage->fill(
+//                                $request, $mage->newModel()
+//                );
 
                 if ($request->viaRelationship()) {
                     $request->findParentModelOrFail()

@@ -78,5 +78,13 @@ abstract class CMage_AbstractMage implements ArrayAccess,CMage_MageInterface {
         return $this;
     }
     
+    
+    public function getAddFieldsFromRequest() {
+        $request = CApp_Base::request();
+//        $this->fields->map(function($field){
+//            if($field)
+//        });
+        
+    }
 
 }
