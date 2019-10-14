@@ -7,12 +7,18 @@
  */
 
 abstract class CMage_AbstractMage implements CMage_MageInterface {
-
+    use CMage_Mage_Trait_AuthorizableTrait;
+    use CMage_Mage_Trait_ValidationTrait;
+    use CMage_Mage_Trait_FillsFieldsTrait;
+    
     public $title = null;
 
+    
+    public $model;
+    
     /**
      *
-     * @var CMage_Mage_FieldData 
+     * @var CMage_Mage_FieldCollection
      */
     protected $fields;
 
@@ -31,7 +37,7 @@ abstract class CMage_AbstractMage implements CMage_MageInterface {
     
     
     public function __construct() {
-        $this->fields = new CMage_Mage_FieldData($this);
+        $this->fields = new CMage_Mage_FieldCollection($this);
         $this->filters = new CMage_Mage_FilterData($this);
     }
 
@@ -55,4 +61,16 @@ abstract class CMage_AbstractMage implements CMage_MageInterface {
         return $this->filters;
     }
 
+    
+    /**
+     * Get a fresh instance of the model represented by the resource.
+     *
+     * @return mixed
+     */
+    public function newModel()
+    {
+        $model = $this->model;
+
+        return new $model;
+    }
 }

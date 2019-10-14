@@ -28,4 +28,7 @@ class CMage {
         return $caster;
     }
     
+    public static function request() {
+        return new CMage_Request();
+    }
 }

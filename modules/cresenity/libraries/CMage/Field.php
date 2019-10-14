@@ -6,12 +6,13 @@
  * and open the template in the editor.
  */
 
-class CMage_Field {
+class CMage_Field extends CMage_FieldBase{
     
     protected $name;
     protected $label='';
     protected $sortable=false;
     protected $width=null;
+    protected $controlType='text';
     
     public function __construct($name) {
         $this->setName($name);
@@ -43,6 +44,8 @@ class CMage_Field {
         return $this;
     }
     
+    
+    
     /**
      * 
      * @param CElement_Component_DataTable $table
@@ -56,5 +59,29 @@ class CMage_Field {
         $column->setSortable($this->sortable);
         return $column;
     }
+
+
+    /**
+     * 
+     * @param CElement $container
+     * @return CElement_Component_Form_Field
+     */
+    public function addAsField(CElement $container) {
+        $field = $container->addField()->setLabel($this->label);
     
+       
+        return $field;
+    }
+    
+    /**
+     * 
+     * @param CElement $container
+     * @return CElement_FormInput
+     */
+    public function addAsControl(CElement $container) {
+        $control = $container->addControl($this->name,$this->controlType);
+    
+       
+        return $control;
+    }
 }
