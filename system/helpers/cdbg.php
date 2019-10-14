@@ -721,5 +721,11 @@ class cdbg {
     public static function traceDump($return = false) {
         return cdbg::varDump(self::getTraceString(), $return);
     }
+    public static function queryDump($db = null,$return = false) {
+        if($db==null) {
+            $db = CDatabase::instance();
+        }
+        return cdbg::varDump($db->lastQuery(), $return);
+    }
 
 }

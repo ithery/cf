@@ -392,6 +392,14 @@ class CApp extends CObservable {
 
         return $v->render();
     }
+    
+    public function addCustomData($key, $value) {
+        if(!is_array($this->custom_data)){
+            $this->custom_data = array();
+        }
+        $this->custom_data[$key] = $value;
+        return $this;
+    }
 
     public function setCustomData($data) {
         $this->custom_data = $data;
@@ -627,6 +635,7 @@ class CApp extends CObservable {
         $data["css_require"] = $asset->getAllCssFileUrl();
         $data["message"] = $messageOrig;
         $data["ajaxData"] = $this->ajaxData;
+        $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
         return cjson::encode($data);
     }
 

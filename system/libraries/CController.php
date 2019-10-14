@@ -46,8 +46,8 @@ abstract class CController {
         CFEvent::run('system.404');
     }
 
-    protected function controllerUrl() {
-        $class = get_class($this);
+    protected static function controllerUrl() {
+        $class = get_called_class();
         $classExplode = explode("_", $class);
         $classExplode = array_map(function($item) {
             return cstr::camel($item);
