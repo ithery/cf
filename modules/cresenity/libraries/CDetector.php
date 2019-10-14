@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CDetector {
 
+    /**
+     * 
+     * @return \CDetector_Mobile
+     */
     public static function mobile() {
         return new CDetector_Mobile();
     }

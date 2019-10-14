@@ -73,6 +73,8 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $dom = null;
     protected $widget_title;
     protected $fixedColumn;
+    protected $scrollX;
+    protected $scrollY;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -146,6 +148,8 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         $this->dataTableViewColCount = 5;
         $this->fixedColumn = false;
+        $this->scrollX = false;
+        $this->scrollY = false;
 
 
         $this->infoText = clang::__('Showing') . " _START_ " . clang::__('to') . " _END_ " . clang::__('of') . " _TOTAL_ " . clang::__('entries') . "";
@@ -166,6 +170,17 @@ class CElement_Component_DataTable extends CElement_Component {
     public static function factory($id = "") {
         return new CElement_Component_DataTable($id);
     }
+    
+    public function setScrollY($bool=true) {
+        $this->scrollY = $bool;
+        return $this;
+    }
+    
+    public function setScrollX($bool=true) {
+        $this->scrollX = $bool;
+        return $this;
+    }
+    
 
     public function setDomain($domain) {
         parent::setDomain($domain);
@@ -1147,6 +1162,20 @@ class CElement_Component_DataTable extends CElement_Component {
             $jqueryui = "'bJQueryUI': false,";
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
+            }
+            if ($this->scrollX) {
+                $scrollX = $this->scrollX;
+                if(is_bool($scrollX)) {
+                    $scrollX = 'true';
+                }
+                $js->appendln("scrollX:        ".$scrollX.",")->br();
+            }
+            if ($this->scrollY) {
+                $scrollY = $this->scrollY;
+                if(is_bool($scrollY)) {
+                    $scrollY = 'true';
+                }
+                $js->appendln("scrollY:        ".$scrollY.",")->br();
             }
             if ($this->fixedColumn) {
 

@@ -1063,11 +1063,9 @@ form
 }
 
 .row-tab-menu {
-    z-index: 1;
     position: relative;
 }
 .row-tab-content {
-    z-index: 1;
     position: relative;
 }  
 

@@ -33,11 +33,55 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
      */
     protected $method;
 
+    /**
+     *
+     * @var CAjax_Engine_DataTable_Parameter
+     */
+    protected $parameter;
+
     public function __construct(CAjax_Engine $engine) {
         $this->engine = $engine;
         $this->input = $engine->getInput();
         $this->data = $engine->getData();
         $this->method = $engine->getMethod();
+        $this->parameter = new CAjax_Engine_DataTable_Parameter($this);
+    }
+
+    public function columns() {
+        $data = $this->engine->getData();
+        return carr::get($data, 'columns');
+    }
+
+    public function domain() {
+        $data = $this->engine->getData();
+        $domain = carr::get($data, 'domain', CF::domain());
+        return $domain;
+    }
+
+    public function table() {
+        $data = $this->engine->getData();
+        $table = unserialize(carr::get($data, 'table'));
+        return $table;
+    }
+
+    public function pageSize() {
+        return $this->parameter->pageSize();
+    }
+
+    public function page() {
+        return $this->parameter->page();
+    }
+
+    public function searchTerm() {
+        return $this->parameter->searchTerm();
+    }
+
+    public function sortingCol() {
+        return carr::get($this->parameter->sortingData(), '0.0');
+    }
+
+    public function sortingDir() {
+        return carr::get($this->parameter->sortingData(), '0.1');
     }
 
 }
