@@ -84,6 +84,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['font', ['fontname', 'fontsize']],
                         ['color', ['color']],
                         ['para', ['ul', 'ol', 'paragraph']],
+                        ['link', ['link']],
                         ['height', ['height']]
                     ]
                 ";

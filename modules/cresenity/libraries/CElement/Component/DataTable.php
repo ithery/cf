@@ -170,17 +170,16 @@ class CElement_Component_DataTable extends CElement_Component {
     public static function factory($id = "") {
         return new CElement_Component_DataTable($id);
     }
-    
-    public function setScrollY($bool=true) {
+
+    public function setScrollY($bool = true) {
         $this->scrollY = $bool;
         return $this;
     }
-    
-    public function setScrollX($bool=true) {
+
+    public function setScrollX($bool = true) {
         $this->scrollX = $bool;
         return $this;
     }
-    
 
     public function setDomain($domain) {
         parent::setDomain($domain);
@@ -324,6 +323,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setAjax($bool = true) {
         $this->ajax = $bool;
+        $this->requery();
         return $this;
     }
 
@@ -485,6 +485,25 @@ class CElement_Component_DataTable extends CElement_Component {
             $this->data = $r->result(false);
         }
         $this->query = $q;
+        return $this;
+    }
+
+    /**
+     * 
+     * @return $this
+     */
+    public function requery() {
+       
+        if (!$this->isElastic && !$this->isCallback) {
+            if ($this->ajax == false) {
+                $db = $this->db;
+                $r = $db->query($this->query);
+                $this->data = $r->result(false);
+            } else {
+                $this->data=array();
+            }
+        } 
+
         return $this;
     }
 
@@ -1165,17 +1184,17 @@ class CElement_Component_DataTable extends CElement_Component {
             }
             if ($this->scrollX) {
                 $scrollX = $this->scrollX;
-                if(is_bool($scrollX)) {
+                if (is_bool($scrollX)) {
                     $scrollX = 'true';
                 }
-                $js->appendln("scrollX:        ".$scrollX.",")->br();
+                $js->appendln("scrollX:        " . $scrollX . ",")->br();
             }
             if ($this->scrollY) {
                 $scrollY = $this->scrollY;
-                if(is_bool($scrollY)) {
+                if (is_bool($scrollY)) {
                     $scrollY = 'true';
                 }
-                $js->appendln("scrollY:        ".$scrollY.",")->br();
+                $js->appendln("scrollY:        " . $scrollY . ",")->br();
             }
             if ($this->fixedColumn) {
 

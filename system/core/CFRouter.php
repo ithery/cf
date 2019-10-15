@@ -249,19 +249,23 @@ class CFRouter {
     public static function getUri() {
         $currentUri = '';
         if (PHP_SAPI === 'cli') {
-            // Command line requires a bit of hacking
-            if (isset($_SERVER['argv'][1])) {
-                $currentUri = $_SERVER['argv'][1];
+            if (defined('CFCLI')) {
+                CFConsole::execute();
+            } else {
+                // Command line requires a bit of hacking
+                if (isset($_SERVER['argv'][1])) {
+                    $currentUri = $_SERVER['argv'][1];
 
-                // Remove GET string from segments
-                if (($query = strpos($currentUri, '?')) !== FALSE) {
-                    list ($currentUri, $query) = explode('?', $currentUri, 2);
+                    // Remove GET string from segments
+                    if (($query = strpos($currentUri, '?')) !== FALSE) {
+                        list ($currentUri, $query) = explode('?', $currentUri, 2);
 
-                    // Parse the query string into $_GET
-                    parse_str($query, $_GET);
+                        // Parse the query string into $_GET
+                        parse_str($query, $_GET);
 
-                    // Convert $_GET to UTF-8
-                    $_GET = utf8::clean($_GET);
+                        // Convert $_GET to UTF-8
+                        $_GET = utf8::clean($_GET);
+                    }
                 }
             }
         } elseif (isset($_GET['cfUri'])) {
@@ -380,19 +384,19 @@ class CFRouter {
                         $bracketKeys[] = null;
                         $key = str_replace($bStr, '(.+?)', $key);
                     }
-                    
-                    
+
+
                     $matchesBracket = false;
                     $key = str_replace("/", "\/", $key);
                     preg_match('#' . $key . '#ims', $uri, $matches);
-                    
+
                     if (preg_match('#' . $key . '#ims', $uri, $matches)) {
 
                         $matchesBracket = array_slice($matches, 1);
                     }
                     $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
                     $val = call_user_func_array($val, $callbackArgs);
-                   
+
                     if ($val == null) {
                         continue;
                     }
@@ -401,19 +405,19 @@ class CFRouter {
                 // Trim slashes
                 $key = trim($key, '/');
                 $val = trim($val, '/');
-                
-                
+
+
                 if (preg_match('#^' . $key . '#u', $uri)) {
-                   
+
                     if (strpos($val, '$') !== FALSE) {
                         // Use regex routing
-                        
+
                         $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);
                     } else {
                         // Standard routing
                         $routedUri = $val;
                     }
-                    
+
                     // A valid route has been found
                     break;
                 }

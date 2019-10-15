@@ -314,7 +314,8 @@ class CMysql_Result extends CDatabase_Result {
         } elseif (is_bool($result)) {
             if ($result == FALSE) {
                 // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => mysql_error($link) . ' - ' . $sql));
+                //throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => mysql_error($link) . ' - ' . $sql));
+                throw new Exception('There was an SQL error: '.mysql_error($link) . ' - ' . $sql);
             } else {
                 // Its an DELETE, INSERT, REPLACE, or UPDATE query
                 $this->insert_id = mysql_insert_id($link);

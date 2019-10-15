@@ -751,7 +751,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         return $this;
     }
 
-    public function exportExcel($filename, $sheet_name) {
+    public function exportExcel($filename, $sheet_name = 'data') {
         $this->export_excel = true;
         $excel = CExcel::factory()->set_creator("cresenity_system")->set_subject("Cresenity Report");
         $excel->setActiveSheetName($sheet_name);
@@ -793,7 +793,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         $i = $colStart;
         $j = 2 + $header_count;
         $no = 0;
+
         foreach ($this->data as $row) {
+
             $i = $colStart;
             $no++;
             $key = carr::get($row, $this->key_field);
@@ -829,6 +831,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                         }
                         $col_v = $temp_v;
                     }
+                }
+                //if have callback
+                if ($col->callback != null) {
+                    $col_v = CFunction::factory($col->callback)
+                            // ->addArg($table)
+                            ->addArg($row)
+                            ->addArg($col_v)
+                            ->setRequire($col->callbackRequire)
+                            ->execute();
                 }
 
                 $new_v = $col_v;

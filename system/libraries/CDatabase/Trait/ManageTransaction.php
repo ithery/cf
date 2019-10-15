@@ -68,8 +68,7 @@ trait CDatabase_Trait_ManageTransaction {
         // can check if we have exceeded the maximum attempt count for this and
         // if we haven't we will return and try this query again in our loop.
         $this->rollBack();
-        if ($this->causedByDeadlock($e) &&
-                $currentAttempt < $maxAttempts) {
+        if ($this->causedByDeadlock($e) && $currentAttempt < $maxAttempts) {
             return;
         }
         throw $e;
