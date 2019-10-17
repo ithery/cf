@@ -17,31 +17,26 @@ class CVendor_Kredivo
 	private $lastError;
 	private $environment;
 
+	const PRODUCTION_ENDPOINT = 'https://api.kredivo.com/kredivo/';
 	const SANDBOX_ENDPOINT = 'https://sandbox.kredivo.com/kredivo/';
 	const SANDBOX_SERVERKEY = '8tLHIx8V0N6KtnSpS9Nbd6zROFFJH7';
 
-	public function __construct($environment, $options)
+	public function __construct($environment, $serverKey)
 	{	
 		$environment = strtolower($environment);
+		$this->environment = $environment;
+		$this->endpoint = static::PRODUCTION_ENDPOINT;
+		$this->serverKey = $serverKey;
+
 		if ($environment == 'dev' || $environment == 'development' || $environment == 'sandbox') {
-			$this->environment = 'development';
-			$serverKey = carr::get($options, 'serverKey');
-
 			$this->endpoint = static::SANDBOX_ENDPOINT;
-
-			if ($serverKey) {
-				$this->serverKey = $serverKey;
-			} else {
+			if (! $this->serverKey) {
 				$this->serverKey = static::SANDBOX_SERVERKEY;
 			}
-		} else {
-			$this->environment = $environment;
-			$endpoint = carr::get($options, 'endpoint');
-			$serverKey = carr::get($options, 'serverKey');
+		}
 
-			if (! $endpoint || ! $serverKey) {
-				throw new Exception('serverKey and endpoint are required');
-			}
+		if (! $this->serverKey) {
+			throw new Exception('serverKey is required');
 		}
 	}
 
