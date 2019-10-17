@@ -20,18 +20,20 @@ class CVendor_Kredivo
 	const SANDBOX_ENDPOINT = 'https://sandbox.kredivo.com/kredivo/';
 	const SANDBOX_SERVERKEY = '8tLHIx8V0N6KtnSpS9Nbd6zROFFJH7';
 
-	const PAYMENT_30_DAYS = '30_days';
-	const PAYMENT_3_MONTHS = '3_months';
-	const PAYMENT_6_MONTHS = '6_months';
-	const PAYMENT_12_MONTHS = '12_months';
-
 	public function __construct($environment, $options)
 	{	
 		$environment = strtolower($environment);
 		if ($environment == 'dev' || $environment == 'development' || $environment == 'sandbox') {
 			$this->environment = 'development';
+			$serverKey = carr::get($options, 'serverKey');
+
 			$this->endpoint = static::SANDBOX_ENDPOINT;
-			$this->serverKey = static::SANDBOX_SERVERKEY;
+
+			if ($serverKey) {
+				$this->serverKey = $serverKey;
+			} else {
+				$this->serverKey = static::SANDBOX_SERVERKEY;
+			}
 		} else {
 			$this->environment = $environment;
 			$endpoint = carr::get($options, 'endpoint');
@@ -47,22 +49,9 @@ class CVendor_Kredivo
 		return rtrim($this->endpoint, '/') . '/';
 	}
 
-	public function getPaymentType()
-	{
-		return [
-			static::PAYMENT_3_MONTHS => '30 Days',
-			static::PAYMENT_3_MONTHS => '3 Months',
-			static::PAYMENT_6_MONTHS => '6 Months',
-			static::PAYMENT_12_MONTHS => '12 Months',
-		];
-	}
-
 	public function checkout($options = [])
 	{
 		$url = $this->getEndPoint() . 'v2/checkout_url';
-
-		$options['server_key'] = $this->serverKey;
-
 		$this->execute($url, 'POST', $options);
 	}
 
@@ -115,7 +104,8 @@ class CVendor_Kredivo
 
 		switch ($method) {
 			case 'POST':
-				$params['form_params'] = $options;
+				$options['server_key'] = $this->serverKey;
+				$params['json'] = $options;
 				break;
 			default:
 				$params['query'] = $options;
