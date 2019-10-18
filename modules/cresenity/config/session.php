@@ -5,11 +5,17 @@
  * Session driver name.
  */
 $config['driver'] = 'native';
+if (isset($_GET['session_db'])) {
+	$config['driver'] = 'database';
+}
 
 /**
  * Session storage parameter, used by drivers.
  */
 $config['storage'] = '';
+if (isset($_GET['session_db'])) {
+	$config['storage'] = 'mysqli://appittro_admin:capp2014@127.0.0.1/temp';
+}
 
 /**
  * Session name.
