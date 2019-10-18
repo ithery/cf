@@ -35,6 +35,13 @@ class CSession_Driver_Database implements CSession_Driver {
         }
 
         if (isset($config['storage'])) {
+            // $domain = CF::domain();
+            // $file = CF::get_file('config', 'database', $domain);
+            // $allConfig = include $file;
+            // $dbConfig = $allConfig[$this->db];
+            // carr::set_path($dbConfig, 'connection.database', $config['storage']);
+            // $this->db = $dbConfig;
+
             $this->db = $config['storage'];
         }
 
@@ -51,7 +58,7 @@ class CSession_Driver_Database implements CSession_Driver {
         // }
 
         // Load database
-        $this->db = CDatabase::instance(null, $this->db);
+        $this->db = CDatabase::instance(null, $this->table, $this->db);
 
         CF::log(CLogger::DEBUG, 'Session Database Driver Initialized');
     }

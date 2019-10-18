@@ -15,6 +15,7 @@ if (isset($_GET['session_db'])) {
 $config['storage'] = '';
 if (isset($_GET['session_db'])) {
 	$config['storage'] = 'mysqli://appittro_admin:capp2014@127.0.0.1/temp';
+	// $config['storage'] = 'temp';
 }
 
 /**
