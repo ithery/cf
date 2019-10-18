@@ -827,4 +827,10 @@ class cstr {
         return isset($languageSpecific[$language]) ? $languageSpecific[$language] : null;
     }
 
+    
+    public static function haveUpper($string) {
+        return preg_match('~^\p{Lu}~u', $string);
+    }
+    
+    
 }
