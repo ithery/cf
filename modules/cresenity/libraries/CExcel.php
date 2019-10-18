@@ -216,6 +216,7 @@ class CExcel {
     }
 
     public function writeByIndex($column, $row, $value) {
+        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
 
         $this->phpexcel->getActiveSheet()->setCellValueByColumnAndRow($column, $row, $value);
         return $this;
