@@ -64,6 +64,8 @@ use function current;
 use function is_array;
 use function strlen;
 
+require_once dirname(__FILE__) . '/functions.php';
+
 class Collection
 {
     /** @var array */

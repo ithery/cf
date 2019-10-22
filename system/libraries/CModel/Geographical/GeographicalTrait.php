@@ -52,10 +52,10 @@ trait CModel_Geographical_GeographicalTrait {
             $kilometers = static::$kilometers;
         }
         if ($kilometers) {
-            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         } else {
             // miles
-            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         }
         return $query->orderByRaw($sql.' '.$direction);
     }
@@ -69,10 +69,10 @@ trait CModel_Geographical_GeographicalTrait {
             $kilometers = static::$kilometers;
         }
         if ($kilometers) {
-            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         } else {
             // miles
-            $sql = $this->db->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         }
         return $query->whereRaw($sql.' BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
     }

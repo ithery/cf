@@ -119,7 +119,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
             $this->model = new $this->className();
         }
         if ($this->connection) {
-            $this->model->setConnection($this->connection);
+            $this->model->setConnection($this->connection->getName());
         }
         return $this->model;
     }
@@ -149,7 +149,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         }
         $this->builder = new $className();
         if ($this->connection) {
-            $this->builder = $this->builder->on($this->connection);
+            $this->builder = $this->builder->on($this->connection->getName());
         }
         return $this->builder->newQuery();
     }

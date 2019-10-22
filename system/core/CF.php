@@ -529,7 +529,7 @@ final class CF {
      * @return string
      */
     public static function getFile($directory, $filename, $domain = null) {
-        $files = CF::get_files($directory, $filename, $domain);
+        $files = CF::getFiles($directory, $filename, $domain);
         if (count($files) > 0) {
             return $files[0];
         }

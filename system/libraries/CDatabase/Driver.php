@@ -10,6 +10,11 @@ abstract class CDatabase_Driver {
     protected $query_cache;
 
     /**
+     *
+     * @var CDatabase
+     */
+    protected $db;
+    /**
      * Connect to our database.
      * Returns FALSE on failure or a MySQL resource.
      *
