@@ -21,6 +21,14 @@ abstract class CModel implements ArrayAccess {
      * The connection name for the model.
      *
      * @var string
+     * @deprecated
+     */
+    protected $db;
+
+    /**
+     * The connection name for the model.
+     *
+     * @var string
      */
     protected $connection;
 
@@ -343,7 +351,7 @@ abstract class CModel implements ArrayAccess {
         // set the connection on the model so that it is be used for the queries
         // we execute, as well as being set on each relationship we retrieve.
         $instance = new static;
-        
+
         $instance->setConnection($connection);
 
         return $instance->newQuery();
@@ -1067,7 +1075,7 @@ abstract class CModel implements ArrayAccess {
      * @return string
      */
     public function getConnectionName() {
-       
+
         return $this->connection;
     }
 
@@ -1326,7 +1334,7 @@ abstract class CModel implements ArrayAccess {
         /**
          * backward compatibility for use this->db using in model. it deprecated and this code will removed
          */
-        if($key=='db') {
+        if ($key == 'db') {
             return $this->getConnection();
         }
         return $this->getAttribute($key);
@@ -1412,8 +1420,8 @@ abstract class CModel implements ArrayAccess {
      * @return mixed
      */
     public function __call($method, $parameters) {
-        
-        
+
+
         if (in_array($method, ['increment', 'decrement'])) {
             $class = new ReflectionClass(get_class($this));
 
