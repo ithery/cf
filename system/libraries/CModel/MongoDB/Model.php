@@ -7,6 +7,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 21, 2019, 9:20:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use MongoDB\BSON\Binary;
+use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\UTCDateTime;
+
 abstract class CModel_MongoDB_Model extends CModel {
 
     use CModel_MongoDB_Trait_HybridRelationsTrait;

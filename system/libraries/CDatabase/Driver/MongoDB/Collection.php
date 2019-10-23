@@ -19,6 +19,13 @@ class CDatabase_Driver_MongoDB_Collection {
     protected $driver;
 
     /**
+     * The connection instance.
+     * @var CDatabase
+     */
+    protected $connection;
+
+    
+    /**
      * The MongoCollection instance..
      * @var MongoCollection
      */
@@ -28,8 +35,8 @@ class CDatabase_Driver_MongoDB_Collection {
      * @param CDatabase_Driver_MongoDB $connection
      * @param MongoCollection $collection
      */
-    public function __construct(CDatabase_Driver_MongoDB $connection, MongoCollection $collection) {
-        $this->connection = $connection;
+    public function __construct(CDatabase_Driver_MongoDB $driver, MongoCollection $collection) {
+        $this->driver = $driver;
         $this->collection = $collection;
     }
 
@@ -42,7 +49,7 @@ class CDatabase_Driver_MongoDB_Collection {
     public function __call($method, $parameters) {
         $start = microtime(true);
         $result = call_user_func_array([$this->collection, $method], $parameters);
-        if ($this->connection->logging()) {
+        if ($this->driver->db()->isLogQuery()) {
             // Once we have run the query we will calculate the time that it took to run and
             // then log the query, bindings, and execution time so we will report them on
             // the event that the developer needs them. We'll log time in milliseconds.
@@ -63,7 +70,7 @@ class CDatabase_Driver_MongoDB_Collection {
                 }
             }
             $queryString = $this->collection->getCollectionName() . '.' . $method . '(' . implode(',', $query) . ')';
-            $this->connection->logQuery($queryString, [], $time);
+            $this->driver->db()->logQuery($queryString, [], $time);
         }
         return $result;
     }

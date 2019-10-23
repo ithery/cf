@@ -1660,7 +1660,8 @@ class CDatabase {
             $this->queryLog[] = compact('query', 'bindings', 'time');
         }
     }
-
+    
+    
     /**
      * Get a new raw query expression.
      *

@@ -340,7 +340,7 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
             $cursor = $this->collection->find($wheres, $options);
             // Return results as an array with numeric keys
             $results = iterator_to_array($cursor, false);
-            return $this->useCollections ? new Collection($results) : $results;
+            return $this->useCollections ? new CCollection($results) : $results;
         }
     }
 
@@ -493,7 +493,7 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
      */
     public function update(array $values, array $options = []) {
         // Use $set as default operator.
-        if (!Str::startsWith(key($values), '$')) {
+        if (!cstr::startsWith(key($values), '$')) {
             $values = ['$set' => $values];
         }
         return $this->performUpdate($values, $options);
@@ -722,7 +722,7 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
         // Remove the leading $ from operators.
         if (func_num_args() == 3) {
             $operator = &$params[1];
-            if (Str::startsWith($operator, '$')) {
+            if (cstr::startsWith($operator, '$')) {
                 $operator = substr($operator, 1);
             }
         }
@@ -758,7 +758,7 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
                 }
             }
             // Convert id's.
-            if (isset($where['column']) && ($where['column'] == '_id' || Str::endsWith($where['column'], '._id'))) {
+            if (isset($where['column']) && ($where['column'] == '_id' || cstr::endsWith($where['column'], '._id'))) {
                 // Multiple values.
                 if (isset($where['values'])) {
                     foreach ($where['values'] as &$value) {
@@ -838,10 +838,10 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
             // Convert to regular expression.
             $regex = preg_replace('#(^|[^\\\])%#', '$1.*', preg_quote($value));
             // Convert like to regular expression.
-            if (!Str::startsWith($value, '%')) {
+            if (!cstr::startsWith($value, '%')) {
                 $regex = '^' . $regex;
             }
-            if (!Str::endsWith($value, '%')) {
+            if (!cstr::endsWith($value, '%')) {
                 $regex .= '$';
             }
             $value = new Regex($regex, 'i');
@@ -856,7 +856,7 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
             }
             // For inverse regexp operations, we can just use the $not operator
             // and pass it a Regex instence.
-            if (Str::startsWith($operator, 'not')) {
+            if (cstr::startsWith($operator, 'not')) {
                 $operator = 'not';
             }
         }

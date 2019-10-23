@@ -16,7 +16,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     protected $link;
 
     /**
-     * Database 
+     * @var CDatabase 
      */
     protected $db;
 
@@ -207,7 +207,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      * @return Collection
      */
     public function getCollection($name) {
-        return new CDatabase_Driver_MongoDB_Collection($this, $this->mongoDB->selectCollection($name));
+        return new CDatabase_Driver_MongoDB_Collection($this , $this->mongoDB->selectCollection($name));
     }
 
 }

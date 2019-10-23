@@ -423,6 +423,14 @@ abstract class CDatabase_Driver {
         $this->query('COMMIT;');
     }
 
+
+    /**
+     * 
+     * @return CDatabase
+     */
+    public function db() {
+        return $this->db;
+    }
 }
 
 // End Database Driver Interface
