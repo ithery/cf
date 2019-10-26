@@ -141,6 +141,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public static function createEngine(CAjax_Method $ajaxMethod, $input = null) {
         $class = 'CAjax_Engine_' . $ajaxMethod->type;
+        
         if (!class_exists($class)) {
             throw new CAjax_Exception('class ajax engine :class not found', array(':class' => $class));
         }

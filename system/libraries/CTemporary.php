@@ -11,6 +11,14 @@ class CTemporary {
 
     /**
      * 
+     * @return CStorage_FilesystemInterface
+     */
+    public static function disk() {
+        return CStorage::instance()->temp();
+    }
+
+    /**
+     * 
      * @param string $path
      * @return \CTemporary_Directory
      */
@@ -119,7 +127,6 @@ class CTemporary {
         return $url . $filename;
     }
 
-    
     /**
      * 
      * @param string $folder
@@ -127,10 +134,10 @@ class CTemporary {
      * @return string
      */
     public static function delete($folder, $filename) {
-        
 
-        $path= static::makePath($folder, $filename);
+
+        $path = static::makePath($folder, $filename);
         return @unlink($path);
-        
     }
+
 }
