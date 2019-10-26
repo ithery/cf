@@ -103,7 +103,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         try {
             return $this->driver->read($path);
         } catch (FileNotFoundException $e) {
-            throw new ContractFileNotFoundException($path, $e->getCode(), $e);
+            throw new CStorage_Exception_FileNotFoundException($path, $e->getCode(), $e);
         }
     }
 
@@ -170,8 +170,8 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
         // for the developer to store streams without managing them manually in code.
-        if ($contents instanceof File ||
-                $contents instanceof UploadedFile) {
+        if ($contents instanceof CHTTP_File ||
+                $contents instanceof CHTTP_UploadedFile) {
             return $this->putFile($path, $contents, $options);
         }
         return is_resource($contents) ? $this->driver->putStream($path, $contents, $options) : $this->driver->put($path, $contents, $options);
@@ -493,7 +493,9 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return array
      */
     public function files($directory = null, $recursive = false) {
+       
         $contents = $this->driver->listContents($directory, $recursive);
+        
         return $this->filterContentsByType($contents, 'file');
     }
 

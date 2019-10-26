@@ -8,7 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 $domain = CF::domain();
-$isAppBox = strpos($domain, 'app.ittron.co.id') !== false;
+$isAppBox = strpos($domain, 'app.ittron.co.id') !== false || strpos($domain, 'cpanel.ittron.co.id') !== false;
 if ($isAppBox) {
     $whoops = new \Whoops\Run;
     $whoops->prependHandler(new \Whoops\Handler\PrettyPageHandler);

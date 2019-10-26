@@ -17,6 +17,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
     protected $s3Options = null;
     protected $s3Object = null;
 
+
     public function __construct($resourceName, $options = array()) {
 
         $appCode = carr::get($options, 'app_code');

@@ -6,6 +6,9 @@ namespace GuzzleHttp\Promise;
  *
  * @link https://promisesaplus.com/
  */
+
+require_once dirname(__FILE__) . '/functions_include.php';
+
 class Promise implements PromiseInterface
 {
     private $state = self::PENDING;
@@ -59,8 +62,9 @@ class Promise implements PromiseInterface
 
     public function wait($unwrap = true)
     {
+        
         $this->waitIfPending();
-
+        
         $inner = $this->result instanceof PromiseInterface
             ? $this->result->wait($unwrap)
             : $this->result;
@@ -71,6 +75,7 @@ class Promise implements PromiseInterface
             ) {
                 return $inner;
             } else {
+                
                 // It's rejected so "unwrap" and throw an exception.
                 throw exception_for($inner);
             }
