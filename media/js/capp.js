@@ -462,7 +462,19 @@ var Cresenity = function () {
     this.filesAdded = "";
     this.modalElements = [];
 
-
+    this.isUsingRequireJs = function() {
+        return (typeof capp.requireJs !== "undefined") ? capp.requireJs:true;
+    }
+    this.normalizeRequireJs = function() {
+        if(!this.isUsingRequireJs()) {
+            console.log(typeof define);
+            if(typeof define === 'function' && define.amd) {
+                
+                window.define = undefined;
+                
+            }
+        }
+    }
     this.isJson = function (text) {
         if (typeof text == 'string') {
             return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
@@ -911,6 +923,7 @@ var Cresenity = function () {
 };
 if (!window.cresenity) {
     window.cresenity = new Cresenity();
+    window.cresenity.normalizeRequireJs();
 }
 (function ($, window, document, undefined) {
     $.cresenity = {
