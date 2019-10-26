@@ -639,42 +639,7 @@ class CApp extends CObservable {
         return cjson::encode($data);
     }
 
-    public static function variables() {
-        $variables = array();
-        $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['decimalSeparator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['thousand_separator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['thousandSeparator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['decimal_digit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
-        $variables['decimalDigit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
-        $variables['have_clock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-        $variables['haveScrollToTop'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-
-
-        $bootstrap = ccfg::get('bootstrap');
-        $themeData = CManager::instance()->get_theme_data();
-        if (isset($themeData) && strlen(carr::get($themeData, 'bootstrap')) > 0) {
-            $bootstrap = carr::get($themeData, 'bootstrap');
-        }
-
-        if (strlen($bootstrap) == 0) {
-            $bootstrap = '2.3';
-        }
-        $variables['bootstrap'] = $bootstrap;
-
-        $variables['base_url'] = curl::base();
-        $variables['baseUrl'] = curl::base();
-        $variables['label_confirm'] = clang::__("Are you sure ?");
-        $variables['labelConfirm'] = clang::__("Are you sure ?");
-        $variables['label_ok'] = clang::__("OK");
-        $variables['labelOk'] = clang::__("OK");
-        $variables['label_cancel'] = clang::__("Cancel");
-        $variables['labelCancel'] = clang::__("Cancel");
-        return $variables;
-    }
-
+    
     public function setViewName($viewName) {
         $this->viewName = $viewName;
     }
