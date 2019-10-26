@@ -16,6 +16,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     protected $maxUploadSize;   // in MB
     protected $disabledUpload;
     protected $cropper;
+    protected $tempStorage;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -107,4 +108,9 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         return $this->cropper;
     }
 
+    
+    public function setTempStorage($tempStorage) {
+        $this->tempStorage = $tempStorage;
+        return $this;
+    }
 }
