@@ -21,7 +21,7 @@ trait CApp_Trait_App_Renderer {
         $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
         $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
         $variables['haveScrollToTop'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-
+        $variables['CFVersion'] = CF::version();
 
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
@@ -48,7 +48,7 @@ trait CApp_Trait_App_Renderer {
         if (!$asset->isUseRequireJs()) {
 
 
-            $variables['requireJs'] = ccfg::get('require_js');
+            $variables['requireJs'] = false;
 
 
             //we collect all client modules data
@@ -57,6 +57,10 @@ trait CApp_Trait_App_Renderer {
             $variables['theme'] = array();
             $variables['theme']['name'] = CManager::theme()->getCurrentTheme();
             $variables['theme']['data'] = CManager::theme()->getThemeData();
+
+            $variables['jsUrl'] = CManager::asset()->getAllJsFileUrl();
+
+            $variables['defaultJQueryUrl'] = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
 
             $variables['assets'] = CManager::asset()->getAllJsFileUrl();
         }
@@ -72,7 +76,7 @@ trait CApp_Trait_App_Renderer {
 
         $theme = CManager::theme()->getCurrentTheme();
 
-        $themeFile = CF::get_file('themes', $theme);
+        $themeFile = CF::getFile('themes', $theme);
         if (file_exists($themeFile)) {
             $themeData = include $themeFile;
             $theme_path = carr::get($themeData, 'theme_path');
@@ -96,23 +100,28 @@ trait CApp_Trait_App_Renderer {
         $css_urls = $asset->getAllCssFileUrl();
         $js_urls = $asset->getAllJsFileUrl();
         $additional_js = "";
-        foreach ($css_urls as $url) {
-            $additional_js .= "
-					$.cresenity._filesadded+='['+'" . $url . "'+']';
-					if(cresenity) {
-                                            cresenity.filesAdded+='['+'" . $url . "'+']';
-                                        }
-				";
+        if ($asset->isUseRequireJs()) {
+            
+            foreach ($css_urls as $url) {
+                $additional_js .= "
+                    $.cresenity._filesadded+='['+'" . $url . "'+']';
+                    if(cresenity) {
+                        cresenity.filesAdded+='['+'" . $url . "'+']';
+                    }
+                ";
+            }
         }
         $js = "";
 
         $js .= PHP_EOL . $this->js . $additional_js;
         $jsScriptFile = '';
 
-        if (ccfg::get("require_js")) {
+        if ($asset->isUseRequireJs()) {
             $js = $asset->renderJsRequire($js);
         } else {
             $jsScriptFile .= '<script>' . $asset->varJs() . '</script>';
+            $jsScriptFile .= '<script>if(typeof define === "function") define=undefined;</script>';
+            //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
             $jsScriptFile .= $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
             $js = $asset->wrapJs($js, true);
         }

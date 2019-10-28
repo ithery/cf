@@ -164,7 +164,7 @@ class CManager_Asset {
         return $js_before . $js . PHP_EOL . ";" . PHP_EOL;
     }
 
-    public function renderJsRequire($js) {
+    public function renderJsRequire($js, $require='require') {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
 
@@ -195,7 +195,7 @@ class CManager_Asset {
                 }
 
 
-                $js_open .= str_repeat("\t", $i) . "require(['" . $urlJsFile . "'],function(){" . PHP_EOL;
+                $js_open .= str_repeat("\t", $i) . $require."(['" . $urlJsFile . "'],function(){" . PHP_EOL;
 
                 $js_close .= "})";
                 $i++;
@@ -281,7 +281,7 @@ class CManager_Asset {
 
     
     public function isUseRequireJs() {
-        $isUseRequireJs = ccfg::get('require_js');
+        $isUseRequireJs = ccfg::get('requireJs');
         if($isUseRequireJs===null) {
             $isUseRequireJs = true;
         }

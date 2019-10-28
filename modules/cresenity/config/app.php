@@ -11,6 +11,7 @@ return array(
     "multilang" => true,
     "update_last_request" => true,
     "require_js" => true,
+    "requireJs" => true,
     "merge_js" => false,
     "minify_js" => false,
     "merge_css" => false,

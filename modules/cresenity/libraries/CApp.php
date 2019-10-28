@@ -627,7 +627,12 @@ class CApp extends CObservable {
         $data["html"] = $message . $this->html();
         $asset = CManager::asset();
         $js = $this->js();
-        $js = $asset->renderJsRequire($js);
+        
+        if($asset->isUseRequireJs()) {
+            $js = $asset->renderJsRequire($js);
+        } else {
+            $js = $asset->renderJsRequire($js,'cresenity.cf.require');
+        }
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
         }
