@@ -62,7 +62,6 @@ trait CApp_Trait_App_Renderer {
 
             $variables['defaultJQueryUrl'] = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
 
-            $variables['assets'] = CManager::asset()->getAllJsFileUrl();
         }
         return $variables;
     }
