@@ -158,8 +158,8 @@ var CF = function () {
                 arrayJsUrl.forEach((item) => {
                     //console.log(item);
                     //if (document.querySelector('script[src="' + item + '"]') !== null) {
-                        //document.querySelector('script[src="/media/js/plugins/form/jquery.form.js"]')
-                        this.required.push(item);
+                    //document.querySelector('script[src="/media/js/plugins/form/jquery.form.js"]')
+                    this.required.push(item);
                     //}
                 });
 
@@ -180,6 +180,254 @@ var CF = function () {
 
     }
 }
+
+
+
+var CUploader = function (options) {
+    this.settings = $.extend({
+        // These are the defaults.
+        imgElement: null,
+        uploadUrl: null,
+        inputElement: null,
+        accept: null,
+        pageType: null,
+        onUploadSuccess: null,
+    }, options);
+
+    this.filename = '';
+    this.uploaded = false;
+    this.url = '';
+    this.mimeType = '';
+    this.size = 0;
+    this.fileObject = null;
+    this.isUploading = false;
+    this.objectType = 'file';
+
+
+    this.imgElement = this.settings.imgElement;
+    this.previewElement = this.settings.previewElement;
+    this.inputElement = this.settings.inputElement;
+    this.uploadUrl = this.settings.uploadUrl;
+    if (this.imgElement) {
+        this.objectType = 'image';
+    }
+
+    this.trigger = function () {
+        (function (cUploader) {
+            let inputTemp = $('.capp-input-file-temporary');
+            if (inputTemp.length == 0) {
+                inputTemp = $('<input />');
+                inputTemp.addClass('capp-input-file-temporary');
+                inputTemp.attr('type', 'file').attr('name', 'capp-input-file-temporary').css('display', 'none');
+                if (typeof this.settings.accept != 'undefined' && this.settings.accept != null) {
+                    inputTemp.attr('accept', this.settings.accept);
+                }
+                $('body').append(inputTemp);
+                inputTemp.change(function (e) {
+                    $.each(e.target.files, function (i, file) {
+                        cUploader.setFileObject(file);
+                        cUploader.uploadFile();
+                    });
+                    inputTemp.remove();
+                });
+
+
+
+            }
+            inputTemp.trigger('click');
+        })(this);
+        return false;
+    }
+
+
+
+    this.uploadFile = function () {
+
+        (function (cUploader) {
+            cUploader.isUploading = true;
+            cUploader.showLoading();
+            var ajaxData = new FormData();
+            ajaxData.append('files[]', cUploader.fileObject);
+
+            console.log('try to upload ' + cUploader.fileObject.name);
+
+            $.ajax({
+                url: cUploader.settings.uploadUrl,
+                type: 'post',
+                data: ajaxData,
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                xhr: function () {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function (e) {
+                            var total = e.total;
+                            var loaded = e.loaded;
+                            var percent = loaded * 100 / total;
+                            if (cUploader.getProgressBar()) {
+
+                                cUploader.getProgressBar().css('width', percent + '%');
+                                cUploader.getProgressBarInfo().html(dcUpload.getSizeFormatted(loaded) + ' / ' + dcUpload.getSizeFormatted(total));
+                            }
+                        }, false);
+                    }
+                    return myXhr;
+                },
+                complete: function () {
+                    cUploader.isUploading = false;
+                    cUploader.hideLoading();
+                },
+                success: function (response) {
+                    if (response.errCode == 0) {
+                        var responseData = response.data;
+                        if (responseData.files) {
+                            for (var i in responseData.files) {
+                                var data = responseData.files[i];
+
+                                cUploader.setUrl(data.url);
+                                cUploader.setInput(data.fileId);
+                                if (typeof cUploader.settings.onUploadSuccess == 'function') {
+                                    cUploader.settings.onUploadSuccess(data);
+                                }
+                            }
+                        }
+                    } else {
+                        cresenity.showError(response.errMessage);
+                    }
+                },
+                error: function () {
+                    // Log the error, show an alert, whatever works for you
+                }
+            });
+        })(this);
+    };
+
+
+    this.setFileObject = function (fileObject) {
+        this.fileObject = fileObject;
+        this.setMimeType(fileObject.type);
+        this.setFilename(fileObject.name);
+        this.setSize(fileObject.size);
+
+    }
+    this.setInput = function (fileId) {
+        if (this.inputElement) {
+            this.inputElement.val(fileId);
+        }
+    }
+    this.setFilename = function (filename) {
+        this.filename = filename;
+    }
+    this.getFilename = function () {
+        return this.filename;
+    }
+    this.setSize = function (size) {
+        this.size = size;
+    }
+    this.getSize = function () {
+        return this.size;
+    }
+    this.getSizeFormatted = function (size) {
+        if (typeof size == 'undefined') {
+            size = this.size;
+        }
+        var sizeStr = "";
+        var sizeKB = size / 1024;
+        if (parseInt(sizeKB) > 1024) {
+            var sizeMB = sizeKB / 1024;
+            if (parseInt(sizeMB) > 1024) {
+                var sizeGB = sizeMB / 1024;
+                sizeStr = sizeGB.toFixed(2) + " GB";
+            } else {
+                sizeStr = sizeMB.toFixed(2) + " MB";
+            }
+        } else {
+            sizeStr = sizeKB.toFixed(2) + " KB";
+        }
+        return sizeStr;
+    }
+
+    this.setMimeType = function (mimeType) {
+        this.mimeType = mimeType;
+    }
+    this.getMimeType = function () {
+        return this.mimeType;
+    }
+
+    this.setUrl = function (url) {
+        this.url = url;
+        this.uploaded = true;
+        switch (this.getMimeType()) {
+            case 'image/png':
+            case 'image/jpg':
+            case 'image/jpeg':
+            case 'image/gif':
+                this.objectType = 'image';
+                break;
+            case 'video/mp4':
+            case 'video/avi':
+                this.objectType = 'video';
+                break;
+        }
+
+        if (this.objectType == 'image' && this.imgElement) {
+            this.imgElement.attr('src', url);
+        }
+
+        if (this.objectType == 'image' && this.previewElement) {
+            var imgPreview = $('<img>', {class: 'img-fluid w-100 media-preview', src: url});
+            this.previewElement.prepend(imgPreview);
+        }
+        if (this.objectType == 'video' && this.previewElement) {
+            var videoPreviewControl = $('<video>', {controls: '', width: '100%', height: '100%', class: 'w-100 media-preview'});
+            var videoSource = $('<source>', {src: url});
+            videoPreviewControl.append(videoSource);
+            this.previewElement.prepend(videoPreviewControl);
+        }
+        if (this.objectType == 'file' && this.previewElement) {
+            var filePreview = $('<i>', {class: 'media-preview far fa-file fa-10x text-center'});
+            this.previewElement.prepend(filePreview);
+        }
+    }
+
+    this.getUrl = function () {
+        return this.url
+    }
+
+    this.showLoading = function (imgSrc) {
+        $.blockUI({
+            message: '<div class="dc-progress-upload-container" style="max-width:400px"><div class="progress" style="height: 6px;"><div class="progress-bar" style="width: 0%;"></div></div><div class="text-center mt-3 progress-bar-info"></div><h6 style="color: #444">LOADING...</h6></div>',
+            css: {
+                backgroundColor: 'transparent',
+                border: '0',
+                zIndex: 9999999
+            },
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8,
+                zIndex: 9999990
+            }
+        });
+    };
+    this.hideLoading = function () {
+        $.unblockUI();
+    };
+    this.getProgressBar = function () {
+        return $('.dc-progress-upload-container .progress-bar');
+    }
+
+    this.getProgressBarInfo = function () {
+        return $('.dc-progress-upload-container .progress-bar-info');
+
+    }
+}
+
+var CBlocker = function () {
+
+}
+
 
 
 function strlen(string) {
