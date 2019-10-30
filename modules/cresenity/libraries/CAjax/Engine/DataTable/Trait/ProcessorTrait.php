@@ -43,7 +43,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
 
                         $visibility = CFunction::factory($table->filterActionCallbackFunc)
                                 ->addArg($table)
-                                ->addArg($col->getFieldname())
+                                ->addArg('action')
                                 ->addArg($row)
                                 ->addArg($action)
                                 ->setRequire($table->requires)
