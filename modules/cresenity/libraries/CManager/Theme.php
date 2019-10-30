@@ -69,10 +69,10 @@ class CManager_Theme {
         return self::$themeData[$theme];
     }
 
-    public static function getData($key) {
+    public static function getData($key,$default=null) {
         $themeAllData = self::getThemeData();
-        $themeData = carr::get($themeAllData, 'data');
-        return carr::path($themeData, $key);
+        $themeData = carr::get($themeAllData, 'data',$default);
+        return carr::get($themeData, $key,$default);
     }
 
     public static function getThemePath() {

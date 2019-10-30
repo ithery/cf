@@ -166,6 +166,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
         $this->dom = CManager::theme()->getData('table.dom');
+        $this->actionLocation = CManager::theme()->getData('table.actionLocation','last');
     }
 
     public static function factory($id = "") {
@@ -624,7 +625,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 }
                 $jsparam = array();
                 if ($this->actionLocation == 'first') {
-                    $this->drawAction($html);
+                    $js.=$this->drawActionAndGetJs($html,$row,$key);
                 }
                 foreach ($this->columns as $col) {
                     $col_found = false;
@@ -724,7 +725,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $col_found = true;
                 }
                 if ($this->actionLocation == 'last') {
-                    $this->drawAction($html);
+                    $js.=$this->drawActionAndGetJs($html,$row,$key);
                 }
 
 
@@ -738,7 +739,8 @@ class CElement_Component_DataTable extends CElement_Component {
         return $html->text();
     }
 
-    protected function drawAction(CStringBuilder $html) {
+    protected function drawActionAndGetJs(CStringBuilder $html,$row,$key) {
+        $js = '';
         if ($this->haveRowAction()) {
             $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
             foreach ($row as $k => $v) {
@@ -772,11 +774,12 @@ class CElement_Component_DataTable extends CElement_Component {
             }
 
 
-            $js .= $this->rowActionList->js();
+            $js = $this->rowActionList->js();
 
             $html->appendln($this->rowActionList->html($html->getIndent()));
             $html->decIndent()->appendln('</td>')->br();
         }
+        return $js;
     }
 
     protected function rawHtml($indent = 0) {
