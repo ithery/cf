@@ -17,6 +17,54 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             $no++;
             $key = carr::get($row, $table->key_field, '');
 
+            $htmlRowAction = '';
+            if ($rowActionList != null && $rowActionList->childCount() > 0) {
+               
+                $html = new CStringBuilder();
+
+                $html->appendln('<td class="low-padding align-center cell-action td-action ">')->inc_indent()->br();
+                foreach ($row as $k => $v) {
+                    $jsparam[$k] = $v;
+                }
+                $jsparam["param1"] = $key;
+                if ($table->getRowActionList()->getStyle() == "btn-dropdown") {
+                    $table->getRowActionList()->add_class("pull-right");
+                }
+                $rowActionList->regenerateId(true);
+                $rowActionList->apply("setJsParam", $jsparam);
+
+                $rowActionList->apply("setHandlerUrlParam", $jsparam);
+
+                if (($table->filterActionCallbackFunc) != null) {
+                    $actions = $rowActionList->childs();
+
+                    foreach ($actions as &$action) {
+                        $action->removeClass('d-none');
+
+                        $visibility = CFunction::factory($table->filterActionCallbackFunc)
+                                ->addArg($table)
+                                ->addArg($col->getFieldname())
+                                ->addArg($row)
+                                ->addArg($action)
+                                ->setRequire($table->requires)
+                                ->execute();
+
+
+                        if ($visibility == false) {
+                            $action->addClass('d-none');
+                        }
+                        $action->setVisibility($visibility);
+                    }
+
+
+                    //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
+                }
+
+                $html->appendln($table->getRowActionList()->html($html->getIndent()));
+                $js .= $table->getRowActionList()->js();
+                $html->decIndent()->appendln('</td>')->br();
+                $htmlRowAction = $html->text();
+            }
 
             if ($table->numbering) {
                 $arr[] = $no;
@@ -24,6 +72,13 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
 
             if ($table->checkbox) {
                 $arr[] = '<input type="checkbox" name="' . $table->id() . '-check[]" id="' . $table->id() . '-' . $key . '" value="' . $key . '" class="checkbox-' . $table->id() . '">';
+            }
+            if ($table->getActionLocation() == 'first') {
+                if ($rowActionList != null && $rowActionList->childCount() > 0) {
+
+
+                    $arr[] = $htmlRowAction;
+                }
             }
             foreach ($table->columns as $col) {
                 $col_found = false;
@@ -84,54 +139,15 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 }
                 $arr[] = $new_v;
             }
-            if ($rowActionList != null && $rowActionList->childCount() > 0) {
-                $html = new CStringBuilder();
+            if ($table->getActionLocation() == 'last') {
+                if ($rowActionList != null && $rowActionList->childCount() > 0) {
 
-                $html->appendln('<td class="low-padding align-center cell-action td-action ">')->inc_indent()->br();
-                foreach ($row as $k => $v) {
-                    $jsparam[$k] = $v;
+
+                    $arr[] = $htmlRowAction;
                 }
-                $jsparam["param1"] = $key;
-                if ($table->getRowActionList()->getStyle() == "btn-dropdown") {
-                    $table->getRowActionList()->add_class("pull-right");
-                }
-                $rowActionList->regenerateId(true);
-                $rowActionList->apply("setJsParam", $jsparam);
-
-                $rowActionList->apply("setHandlerUrlParam", $jsparam);
-
-                if (($table->filterActionCallbackFunc) != null) {
-                    $actions = $rowActionList->childs();
-
-                    foreach ($actions as &$action) {
-                        $action->removeClass('d-none');
-
-                        $visibility = CFunction::factory($table->filterActionCallbackFunc)
-                                ->addArg($table)
-                                ->addArg($col->getFieldname())
-                                ->addArg($row)
-                                ->addArg($action)
-                                ->setRequire($table->requires)
-                                ->execute();
-
-
-                        if ($visibility == false) {
-                            $action->addClass('d-none');
-                        }
-                        $action->setVisibility($visibility);
-                    }
-
-
-                    //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
-                }
-
-                $html->appendln($table->getRowActionList()->html($html->getIndent()));
-                $js .= $table->getRowActionList()->js();
-                $html->decIndent()->appendln('</td>')->br();
-
-                $arr[] = $html->text();
-                $arr["DT_RowId"] = $key;
             }
+
+            $arr["DT_RowId"] = $key;
             $aaData[] = $arr;
         }
         return $aaData;
