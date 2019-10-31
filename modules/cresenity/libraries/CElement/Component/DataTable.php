@@ -761,7 +761,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 foreach ($actions as &$action) {
                     $visibility = CFunction::factory($this->filterActionCallbackFunc)
                             ->addArg($this)
-                            ->addArg($col->getFieldname())
+                            ->addArg('action')
                             ->addArg($row)
                             ->addArg($action)
                             ->setRequire($this->requires)
