@@ -1099,9 +1099,9 @@ class Controller_Cresenity extends CController {
                     die('fatal error');
                 }
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = CTemporary::makePath(TBConstant::TEMP_UPLOAD_FOLDER, $fileId);
-                $fullfilenameinf = CTemporary::makePath(TBConstant::TEMP_UPLOAD_INFO_FOLDER, $fileId);
-                $url = CTemporary::getUrl(TBConstant::TEMP_UPLOAD_FOLDER, $fileId);
+                $fullfilename = CTemporary::makePath('upload', $fileId);
+                $fullfilenameinf = CTemporary::makePath('upload', $fileId);
+                $url = CTemporary::getUrl('upload', $fileId);
                 if (!move_uploaded_file($filetmp, $fullfilename)) {
                     $errFileCode++;
                     $errFileMessage = 'Failed to move temporary file to new path';
