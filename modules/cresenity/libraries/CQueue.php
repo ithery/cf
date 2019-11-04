@@ -51,7 +51,7 @@ final class CQueue {
      * @param  CQueue_Manager  $manager
      * @return void
      */
-    protected function registerNullConnector($manager) {
+    protected static function registerNullConnector($manager) {
         $manager->addConnector('null', function () {
             return new CQueue_Connector_NullConnector;
         });
