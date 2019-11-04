@@ -44,7 +44,7 @@ class CQueue_Runner {
         // to the console as jobs are processed, which will let the developer watch
         // which jobs are coming through a queue and be informed on its progress.
         $this->listenForEvents();
-        $connection = 'database';
+        $connection = CQueue::config('driver');
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
@@ -120,7 +120,7 @@ class CQueue_Runner {
 //        return $this->option('queue') ?: $this->laravel['config']->get(
 //            "queue.connections.{$connection}.queue", 'default'
 //        );
-        return 'default';
+        return CQueue::config('connection');
     }
 
     /**
@@ -171,7 +171,7 @@ class CQueue_Runner {
      * @return void
      */
     protected function logFailedJob(CQueue_Event_JobFailed $event) {
-        $queueFailer = new CQueue_FailedJob_DatabaseFailedJob(CDatabase::instance(), 'queue_failed');
+        $queueFailer = new CQueue_FailedJob_DatabaseFailedJob(CDatabase::instance(), CQueue::config('tableFailed'));
         $queueFailer->log(
                 $event->connectionName, $event->job->getQueue(), $event->job->getRawBody(), $event->exception
         );

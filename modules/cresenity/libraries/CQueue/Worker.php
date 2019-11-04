@@ -231,6 +231,7 @@ class CQueue_Worker {
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     protected function getNextJob($connection, $queue) {
+        
         try {
             foreach (explode(',', $queue) as $queue) {
                 if (!is_null($job = $connection->pop($queue))) {

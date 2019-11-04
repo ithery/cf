@@ -34,7 +34,7 @@ class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
      */
     public function connect(array $config) {
         //todo read from config
-        return new CQueue_Queue_DatabaseQueue($this->db, 'queue');
+        return new CQueue_Queue_DatabaseQueue($this->db, CQueue::config('table'));
     }
 
 }
