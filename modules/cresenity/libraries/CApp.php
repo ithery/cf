@@ -213,9 +213,7 @@ class CApp extends CObservable {
     }
 
     public function name() {
-        //$app = CJDB::instance()->get("app", array("app_id" => $this->app_id()));
-        //return $app[0]->name;
-//		return CF::app_name();
+        return strlen(CF::appName()) > 0 ? CF::appName() : CF::appCode();
     }
 
     public function code() {
@@ -392,9 +390,9 @@ class CApp extends CObservable {
 
         return $v->render();
     }
-    
+
     public function addCustomData($key, $value) {
-        if(!is_array($this->custom_data)){
+        if (!is_array($this->custom_data)) {
             $this->custom_data = array();
         }
         $this->custom_data[$key] = $value;
@@ -627,11 +625,11 @@ class CApp extends CObservable {
         $data["html"] = $message . $this->html();
         $asset = CManager::asset();
         $js = $this->js();
-        
-        if($asset->isUseRequireJs()) {
+
+        if ($asset->isUseRequireJs()) {
             $js = $asset->renderJsRequire($js);
         } else {
-            $js = $asset->renderJsRequire($js,'cresenity.cf.require');
+            $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
         }
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
@@ -644,7 +642,6 @@ class CApp extends CObservable {
         return cjson::encode($data);
     }
 
-    
     public function setViewName($viewName) {
         $this->viewName = $viewName;
     }
