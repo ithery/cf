@@ -120,7 +120,7 @@ class CQueue_Runner {
 //        return $this->option('queue') ?: $this->laravel['config']->get(
 //            "queue.connections.{$connection}.queue", 'default'
 //        );
-        return CQueue::config('connection');
+        return CQueue::config('queue');
     }
 
     /**
@@ -171,7 +171,7 @@ class CQueue_Runner {
      * @return void
      */
     protected function logFailedJob(CQueue_Event_JobFailed $event) {
-        $queueFailer = new CQueue_FailedJob_DatabaseFailedJob(CDatabase::instance(), CQueue::config('tableFailed'));
+        $queueFailer = new CQueue_FailedJob_DatabaseFailedJob(CDatabase::instance(CQueue::config('connection','default')), CQueue::config('tableFailed'));
         $queueFailer->log(
                 $event->connectionName, $event->job->getQueue(), $event->job->getRawBody(), $event->exception
         );

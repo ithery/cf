@@ -95,8 +95,8 @@ final class CQueue {
         $runner->run();
     }
 
-    public static function config($config) {
-        return CF::config('queue.' . $config);
+    public static function config($config, $default = null) {
+        return CF::config('queue.' . $config, $default);
     }
 
 }

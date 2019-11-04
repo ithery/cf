@@ -10,6 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 return array(
     'driver' => 'database',
     'connection' => 'default',
+    'queue' => 'default',
     'table' => 'queue',
     'tableFailed' => 'queue_failed',
 );

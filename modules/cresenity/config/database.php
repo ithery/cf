@@ -44,26 +44,22 @@ return array(
         'cache' => FALSE,
         'escape' => TRUE,
     ),
+    'mongo' => array(
+        'benchmark' => TRUE,
+        'persistent' => FALSE,
+        'connection' => array(
+            'type' => 'mongodb',
+            'user' => 'development',
+            'pass' => 'system.online',
+            'host' => 'services.ittron.co.id',
+            'port' => FALSE,
+            'socket' => FALSE,
+            'database' => 'admin'
+        ),
+        'character_set' => 'utf8mb4',
+        'table_prefix' => '',
+        'object' => TRUE,
+        'cache' => FALSE,
+        'escape' => TRUE
+    ),
 );
-// return array(
-// 'default' => array
-// 	(
-// 		'benchmark'     => TRUE,
-// 		'persistent'    => FALSE,
-// 		'connection'    => array
-// 		(
-// 			'type'     => 'mysql',
-// 			'user'     => 'hallfami_admin',
-// 			'pass'     => 'ittron2015',
-// 			'host'     => 'hallfamilydb.cqatws5kitjc.ap-southeast-1.rds.amazonaws.com',
-// 			'port'     => FALSE,
-// 			'socket'   => FALSE,
-// 			'database' => 'hallfamily_admin'
-// 		),
-// 		'character_set' => 'utf8',
-// 		'table_prefix'  => '',
-// 		'object'        => TRUE,
-// 		'cache'         => FALSE,
-// 		'escape'        => TRUE
-// 	)
-// );
