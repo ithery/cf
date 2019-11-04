@@ -12,7 +12,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var CDatabase
      */
     protected $database;
 
@@ -47,6 +47,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return void
      */
     public function __construct(CDatabase $database, $table, $default = 'default', $retryAfter = 60) {
+        
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
@@ -146,6 +147,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return mixed
      */
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0) {
+        
         return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
                                 $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
         ));

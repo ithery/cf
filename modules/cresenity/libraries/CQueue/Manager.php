@@ -193,7 +193,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return string
      */
     public function getDefaultDriver() {
-        return 'database';
+        return CQueue::config('driver','database');
     }
 
     /**

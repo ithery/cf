@@ -179,6 +179,7 @@ class CDatabase_Query_Builder {
         }
         $this->db = $db;
         //get driver 
+        
         $driverName = $this->db->driverName();
         $grammarClass = 'CDatabase_Query_Grammar_' . $driverName;
         $processorClass = 'CDatabase_Query_Processor_' . $driverName;

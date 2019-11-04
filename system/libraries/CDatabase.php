@@ -17,7 +17,7 @@ class CDatabase {
     public static $benchmarks = array();
     public $domain;
     public $name;
-    public $config_file;
+
 
     /**
      *
@@ -177,16 +177,20 @@ class CDatabase {
         }
         $config_name = '';
         if ($load_config) {
-            $file = CF::get_file('config', 'database', $domain);
+            
+            
+            
+            //$file = CF::get_file('config', 'database', $domain);
 
-
+         
+           
             $found = false;
             $config_name = 'default';
             if (is_string($config)) {
                 $config_name = $config;
             }
 
-            $all_config = include $file;
+            $all_config = CF::config('database');
 
             if (isset($all_config[$config_name])) {
                 $config = $all_config[$config_name];
@@ -196,9 +200,7 @@ class CDatabase {
 
             if ($found == false) {
                 throw new Exception('Config ' . $config_name . ' Not Found');
-            } else {
-                $this->config_file = $file;
-            }
+            } 
         }
 
         $this->name = $config_name;

@@ -89,7 +89,7 @@ abstract class CModel_MongoDB_Model extends CModel {
     protected function asDateTime($value) {
         // Convert UTCDateTime instances.
         if ($value instanceof UTCDateTime) {
-            return Carbon::createFromTimestamp($value->toDateTime()->getTimestamp());
+            return CCarbon::createFromTimestamp($value->toDateTime()->getTimestamp());
         }
         return parent::asDateTime($value);
     }

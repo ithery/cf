@@ -49,12 +49,12 @@ return array(
         'persistent' => FALSE,
         'connection' => array(
             'type' => 'mongodb',
-            'user' => 'development',
+            'user' => 'tribelio',
             'pass' => 'system.online',
             'host' => 'services.ittron.co.id',
             'port' => FALSE,
             'socket' => FALSE,
-            'database' => 'admin'
+            'database' => 'tribelio'
         ),
         'character_set' => 'utf8mb4',
         'table_prefix' => '',

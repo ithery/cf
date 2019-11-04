@@ -77,7 +77,7 @@ final class CQueue {
      */
     protected static function registerDatabaseConnector($manager) {
         $manager->addConnector('database', function () {
-            return new CQueue_Connector_DatabaseConnector(CDatabase::instance());
+            return new CQueue_Connector_DatabaseConnector(CDatabase::instance(CQueue::config('connection')));
         });
     }
 
