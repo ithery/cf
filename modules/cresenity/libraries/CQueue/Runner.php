@@ -22,6 +22,7 @@ class CQueue_Runner {
      * @var CCache_Repository
      */
     protected $cache;
+    protected static $listenedForEvents = false;
 
     /**
      * Create a new queue work command.
@@ -94,16 +95,19 @@ class CQueue_Runner {
      * @return void
      */
     protected function listenForEvents() {
-        CEvent::dispatcher()->listen(CQueue_Event_JobProcessing::class, function ($event) {
-            $this->writeOutput($event->job, 'starting');
-        });
-        CEvent::dispatcher()->listen(CQueue_Event_JobProcessed::class, function ($event) {
-            $this->writeOutput($event->job, 'success');
-        });
-        CEvent::dispatcher()->listen(CQueue_Event_JobFailed::class, function ($event) {
-            $this->writeOutput($event->job, 'failed');
-            $this->logFailedJob($event);
-        });
+        if (!static::$listenedForEvents) {
+            CEvent::dispatcher()->listen(CQueue_Event_JobProcessing::class, function ($event) {
+                $this->writeOutput($event->job, 'starting');
+            });
+            CEvent::dispatcher()->listen(CQueue_Event_JobProcessed::class, function ($event) {
+                $this->writeOutput($event->job, 'success');
+            });
+            CEvent::dispatcher()->listen(CQueue_Event_JobFailed::class, function ($event) {
+                $this->writeOutput($event->job, 'failed');
+                $this->logFailedJob($event);
+            });
+            static::$listenedForEvents = true;
+        }
     }
 
     /**
@@ -183,6 +187,7 @@ class CQueue_Runner {
         $options['maxTries'] = 1;
         $options['force'] = false;
         $options['stopWhenEmpty'] = false;
+        $options['once'] = true;
 
         return carr::get($options, $name);
     }

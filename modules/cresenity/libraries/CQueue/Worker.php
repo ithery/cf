@@ -398,7 +398,7 @@ class CQueue_Worker {
     /**
      * Mark the given job as failed and raise the relevant event.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  \Exception  $e
      * @return void
      */
@@ -410,7 +410,7 @@ class CQueue_Worker {
      * Raise the before queue job event.
      *
      * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @return void
      */
     protected function raiseBeforeJobEvent($connectionName, $job) {
@@ -423,7 +423,7 @@ class CQueue_Worker {
      * Raise the after queue job event.
      *
      * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @return void
      */
     protected function raiseAfterJobEvent($connectionName, $job) {
