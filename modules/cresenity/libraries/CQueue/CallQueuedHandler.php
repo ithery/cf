@@ -32,7 +32,7 @@ class CQueue_CallQueuedHandler {
      */
     public function __construct() {
         $container = CContainer::getInstance();
-        $dispatcher = new CQueue_Dispatcher($container);
+        $dispatcher = CQueue::dispatcher();
         $this->container = $container;
         $this->dispatcher = $dispatcher;
     }

@@ -18,7 +18,6 @@ class CDatabase {
     public $domain;
     public $name;
 
-
     /**
      *
      * @var CDatabase_Schema_Manager
@@ -177,13 +176,13 @@ class CDatabase {
         }
         $config_name = '';
         if ($load_config) {
-            
-            
-            
+
+
+
             //$file = CF::get_file('config', 'database', $domain);
 
-         
-           
+
+
             $found = false;
             $config_name = 'default';
             if (is_string($config)) {
@@ -200,7 +199,7 @@ class CDatabase {
 
             if ($found == false) {
                 throw new Exception('Config ' . $config_name . ' Not Found');
-            } 
+            }
         }
 
         $this->name = $config_name;
@@ -359,6 +358,8 @@ class CDatabase {
             // Benchmark the query
             CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::caller_info());
         }
+
+
 
         // Once we have run the query we will calculate the time that it took to run and
         // then log the query, bindings, and execution time so we will report them on
@@ -1448,7 +1449,9 @@ class CDatabase {
     }
 
     public function table($table) {
-        return (new CDatabase_Query_Builder($this))->from($table);
+        $builderClass = $this->driverName == 'MongoDB' ? CDatabase_Query_Builder_MongoDBBuilder::class : CDatabase_Query_Builder::class;
+        $builder = $this->driverName == 'MongoDB' ? new $builderClass($this, new CDatabase_Query_Processor_MongoDB()) : new $builderClass($this);
+        return $builder->from($table);
     }
 
     /**
@@ -1662,8 +1665,7 @@ class CDatabase {
             $this->queryLog[] = compact('query', 'bindings', 'time');
         }
     }
-    
-    
+
     /**
      * Get a new raw query expression.
      *

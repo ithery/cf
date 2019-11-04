@@ -76,8 +76,9 @@ final class CQueue {
      * @return void
      */
     protected static function registerDatabaseConnector($manager) {
+
         $manager->addConnector('database', function () {
-            return new CQueue_Connector_DatabaseConnector(CDatabase::instance(CQueue::config('connection')));
+            return new CQueue_Connector_DatabaseConnector(CDatabase::instance(CF::domain(), CQueue::config('connection')));
         });
     }
 
@@ -97,6 +98,10 @@ final class CQueue {
 
     public static function config($config, $default = null) {
         return CF::config('queue.' . $config, $default);
+    }
+
+    public static function primaryKey($database) {
+        return $database->driverName() == 'MongoDB' ? '_id' : static::config('table') . '_id';
     }
 
 }

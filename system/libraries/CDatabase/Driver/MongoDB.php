@@ -170,11 +170,11 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     }
 
     public function escape_str($str) {
-        
+        return $str;
     }
 
     public function escape_table($table) {
-        
+        return $table;
     }
 
     public function field_data($table) {

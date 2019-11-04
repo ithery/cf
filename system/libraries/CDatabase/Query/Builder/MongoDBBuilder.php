@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 21, 2019, 9:31:14 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
+class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
 
     /**
      * The database collection.
@@ -177,7 +177,7 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
      */
     public function value($column) {
         $result = (array) $this->first([$column]);
-        return Arr::get($result, $column);
+        return carr::get($result, $column);
     }
 
     /**
@@ -677,7 +677,7 @@ class CModel_MongoDB_Query_Builder extends CDatabase_Query_Builder {
      * @inheritdoc
      */
     public function newQuery() {
-        return new Builder($this->connection, $this->processor);
+        return new static($this->connection, $this->processor);
     }
 
     /**

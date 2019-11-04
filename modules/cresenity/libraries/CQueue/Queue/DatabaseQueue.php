@@ -207,7 +207,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
                     $this->isAvailable($query);
                     $this->isReservedButExpired($query);
                 })
-                ->orderBy('queue_id', 'asc')
+                ->orderBy('created', 'asc')
                 ->first();
           
         return $job ? new CQueue_Job_DatabaseJobRecord((object) $job) : null;
@@ -262,7 +262,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return CDatabase_Job_DatabaseJobRecord
      */
     protected function markJobAsReserved($job) {
-        $this->database->table($this->table)->where('queue_id', $job->queue_id)->update([
+        $this->database->table($this->table)->where($this->primaryKey(), $job->{$this->primaryKey()})->update([
             'reserved_at' => date('Y-m-d H:i:s',$job->touch()),
             'attempts' => $job->increment(),
         ]);
@@ -281,7 +281,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
     public function deleteReserved($queue, $id) {
         $this->database->transaction(function () use ($id) {
             if ($this->database->table($this->table)->lockForUpdate()->find($id)) {
-                $this->database->table($this->table)->where('queue_id', $id)->delete();
+                $this->database->table($this->table)->where($this->primaryKey(), $id)->delete();
             }
         });
     }
@@ -299,10 +299,14 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
     /**
      * Get the underlying database instance.
      *
-     * @return \Illuminate\Database\Connection
+     * @return CDatabase
      */
     public function getDatabase() {
         return $this->database;
     }
 
+    
+    public function primaryKey() {
+        return CQueue::primaryKey($this->database);
+    }
 }

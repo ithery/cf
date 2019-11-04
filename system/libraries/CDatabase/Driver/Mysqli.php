@@ -9,7 +9,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
     // Database connection link
     protected $link;
-    protected $db_config;
+    protected $dbConfig;
     protected $statements = array();
 
     /**
@@ -19,7 +19,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      */
     public function __construct(CDatabase $db,$config) {
         $this->db = $db;
-        $this->db_config = $config;
+        $this->dbConfig = $config;
 
         CF::log(CLogger::DEBUG, 'MySQLi Database Driver Initialized');
     }
@@ -47,19 +47,19 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         }
 
         // Import the connect variables
-        extract($this->db_config['connection']);
+        extract($this->dbConfig['connection']);
 
         // Build the connection info
         $host = isset($host) ? $host : $socket;
         try {
             // Make the connection and select the database
             if ($this->link = new mysqli($host, $user, $pass, $database, $port)) {
-                if ($charset = $this->db_config['character_set']) {
+                if ($charset = $this->dbConfig['character_set']) {
                     $this->set_charset($charset);
                 }
 
                 // Clear password after successful connect
-                $this->db_config['connection']['pass'] = NULL;
+                $this->dbConfig['connection']['pass'] = NULL;
 
                 return $this->link;
             }
@@ -73,12 +73,12 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     public function query($sql) {
         $this->link or $this->connect();
         // Only cache if it's turned on, and only cache if it's not a write statement
-        if ($this->db_config['cache'] AND ! preg_match('#\b(?:INSERT|UPDATE|REPLACE|SET|DELETE|TRUNCATE)\b#i', $sql)) {
+        if ($this->dbConfig['cache'] AND ! preg_match('#\b(?:INSERT|UPDATE|REPLACE|SET|DELETE|TRUNCATE)\b#i', $sql)) {
             $hash = $this->query_hash($sql);
 
             if (!isset($this->query_cache[$hash])) {
                 // Set the cached object
-                $this->query_cache[$hash] = new CMysqli_Result($this->link, $this->db_config['object'], $sql);
+                $this->query_cache[$hash] = new CMysqli_Result($this->link, $this->dbConfig['object'], $sql);
             } else {
                 // Rewind cached result
                 $this->query_cache[$hash]->rewind();
@@ -88,7 +88,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
             return $this->query_cache[$hash];
         }
 
-        return new CDatabase_Driver_Mysqli_Result($this->link, $this->db_config['object'], $sql);
+        return new CDatabase_Driver_Mysqli_Result($this->link, $this->dbConfig['object'], $sql);
     }
 
     public function set_charset($charset) {
@@ -98,7 +98,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     }
 
     public function escape_table($table) {
-        if (!$this->db_config['escape'])
+        if (!$this->dbConfig['escape'])
             return $table;
 
         if (stripos($table, ' AS ') !== FALSE) {
@@ -115,7 +115,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     }
 
     public function escape_column($column) {
-        if (!$this->db_config['escape'])
+        if (!$this->dbConfig['escape'])
             return $column;
 
         if ($column == '*')
@@ -234,7 +234,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     }
 
     public function escape_str($str) {
-        if (!$this->db_config['escape'])
+        if (!$this->dbConfig['escape'])
             return $str;
 
         is_object($this->link) or $this->connect();
@@ -245,7 +245,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     public function list_tables() {
         $tables = array();
 
-        if ($query = $this->query('SHOW TABLES FROM ' . $this->escape_table($this->db_config['connection']['database']))) {
+        if ($query = $this->query('SHOW TABLES FROM ' . $this->escape_table($this->dbConfig['connection']['database']))) {
             foreach ($query->result(FALSE) as $row) {
                 $tables[] = current($row);
             }

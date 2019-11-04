@@ -271,7 +271,7 @@ abstract class CDatabase_Driver {
      * @return  string
      */
     public function escape($value) {
-        if (!$this->db_config['escape'])
+        if (!$this->dbConfig['escape'])
             return $value;
 
         switch (gettype($value)) {

@@ -37,6 +37,7 @@ class cdbg {
     }
 
     public static function varDump($var, $return = FALSE) {
+       
         $html = '<pre style="margin-bottom: 18px;' .
                 'background: #f7f7f9;' .
                 'border: 1px solid #e1e1e8;' .

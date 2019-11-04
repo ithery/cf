@@ -7,7 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 21, 2019, 9:20:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
@@ -342,7 +341,7 @@ abstract class CModel_MongoDB_Model extends CModel {
      */
     protected function newBaseQueryBuilder() {
         $connection = $this->getConnection();
-        return new CModel_MongoDB_Query_Builder($connection, $connection->getPostProcessor());
+        return new CDatabase_Query_MongoDB_MongoDBBuilder($connection, $connection->getPostProcessor());
     }
 
     /**
