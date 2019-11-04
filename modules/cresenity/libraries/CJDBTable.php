@@ -8,10 +8,10 @@ class CJDBTable {
 		$this->file = $file;
 		if($create_not_exists) {
 			if(!file_exists($file)) {
-				file_put_contents($file,"[]");
+				//file_put_contents($file,"[]");
 			}
 		}
-		$this->data = cjson::decode(file_get_contents($file));
+		//$this->data = cjson::decode(file_get_contents($file));
 		if(!is_array($this->data)) {
 			trigger_error('Data error when retrieving data from '.$file);
 		}
