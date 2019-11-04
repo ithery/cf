@@ -72,10 +72,10 @@ class CQueue_Runner {
     }
 
     protected function gatherWorkerOptions() {
-//        return new CQueue_WorkerOptions(
-//                $this->option('delay'), $this->option('memory'), $this->option('timeout'), $this->option('sleep'), $this->option('tries'), $this->option('force'), $this->option('stop-when-empty')
-//        );
-        return new CQueue_WorkerOptions();
+        return new CQueue_WorkerOptions(
+                $this->option('delay'), $this->option('memory'), $this->option('timeout'), $this->option('sleep'), $this->option('tries'), $this->option('force'), $this->option('stop-when-empty')
+        );
+        //return new CQueue_WorkerOptions();
     }
 
     /**
@@ -122,7 +122,7 @@ class CQueue_Runner {
     /**
      * Write the status output for the queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  string $status
      * @return void
      */
@@ -140,7 +140,7 @@ class CQueue_Runner {
     /**
      * Format the status output for the queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  string  $status
      * @param  string  $type
      * @return void
@@ -149,15 +149,21 @@ class CQueue_Runner {
 //        $this->output->writeln(sprintf(
 //                        "<{$type}>[%s][%s] %s</{$type}> %s", Carbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
 //        ));
-        echo sprintf(
+
+        $message = sprintf(
                 "<{$type}>[%s][%s] %s</{$type}> %s", CCarbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
         );
+        if (CDaemon::getRunningService() != null) {
+            CDaemon::log($message);
+        } else {
+            echo $message;
+        }
     }
 
     /**
      * Store a failed job event.
      *
-     * @param  \Illuminate\Queue\Events\JobFailed  $event
+     * @param  CQueue_Event_JobFailed  $event
      * @return void
      */
     protected function logFailedJob(CQueue_Event_JobFailed $event) {
@@ -165,6 +171,20 @@ class CQueue_Runner {
         $queueFailer->log(
                 $event->connectionName, $event->job->getQueue(), $event->job->getRawBody(), $event->exception
         );
+    }
+
+    protected function option($name) {
+        $options = [];
+
+        $options['delay'] = 0;
+        $options['memory'] = 1024;
+        $options['timeout'] = 300;
+        $options['sleep'] = 0;
+        $options['maxTries'] = 1;
+        $options['force'] = false;
+        $options['stopWhenEmpty'] = false;
+
+        return carr::get($options, $name);
     }
 
 }
