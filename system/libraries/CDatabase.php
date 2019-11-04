@@ -33,6 +33,12 @@ class CDatabase {
 
     /**
      *
+     * @var string
+     */
+    protected $driverName;
+
+    /**
+     *
      * @var CDatabase_Configuration
      */
     protected $configuration;
@@ -89,6 +95,13 @@ class CDatabase {
      */
     protected $queryGrammar;
 
+    /**
+     * The query post processor implementation.
+     *
+     * @var CDatabase_Query_Grammar_Processor
+     */
+    protected $postProcessor;
+
     public function config() {
         return $this->config;
     }
@@ -107,6 +120,7 @@ class CDatabase {
         if ($name == null) {
             $name = 'default';
         }
+
         if (!isset(CDatabase::$instances[$domain])) {
             CDatabase::$instances[$domain] = array();
         }
@@ -161,7 +175,7 @@ class CDatabase {
                 }
             }
         }
-
+        $config_name = '';
         if ($load_config) {
             $file = CF::get_file('config', 'database', $domain);
 
@@ -187,7 +201,7 @@ class CDatabase {
             }
         }
 
-
+        $this->name = $config_name;
         // Merge the default config with the passed config
         $this->config = array_merge($this->config, $config);
 
@@ -255,21 +269,26 @@ class CDatabase {
             $this->config['connection'] = $db;
         }
         // Set driver name
-        $driver = 'CDatabase_Driver_' . ucfirst($this->config['connection']['type']);
 
+        $connectionType = $this->config['connection']['type'];
+        switch ($this->config['connection']['type']) {
+            case 'mongodb':
+                $this->driverName = 'MongoDB';
+                break;
+            default:
+                $this->driverName = ucfirst($this->config['connection']['type']);
+                break;
+        }
+
+        $driver = 'CDatabase_Driver_' . $this->driverName;
         try {
             // Validation of the driver
             $class = new ReflectionClass($driver);
             // Initialize the driver
-            $this->driver = $class->newInstance($this->config);
-        } catch (ReflectionException $ex) {
-            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', array(':driver' => $this->config['connection']['type'], 'class' => get_class($this)));
+            $this->driver = $class->newInstance($this, $this->config);
+        } catch (ReflectionEcxeption $ex) {
+            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', array(':driver' => $driver, ':class' => get_class($this)));
         }
-
-        $connectionResolver = new CDatabase_Resolver(array($this->name => $this));
-        CModel::setConnectionResolver($connectionResolver);
-
-
 
         $this->events = CDatabase_Dispatcher::instance();
         CModel::setEventDispatcher($this->events);
@@ -277,7 +296,7 @@ class CDatabase {
 
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
-            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', array(':driver' => $this->config['connection']['type'], ':class' => get_class($this), ':interface' => 'CDatabase_Driver'));
+            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', array(':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver'));
         }
 
         CF::log(CLogger::DEBUG, 'Database Library initialized');
@@ -1410,7 +1429,7 @@ class CDatabase {
     }
 
     public function driverName() {
-        return ucfirst($this->config['connection']['type']);
+        return $this->driverName;
     }
 
     /**
@@ -1499,7 +1518,7 @@ class CDatabase {
     public function getQueryGrammar() {
 
         if ($this->queryGrammar == null) {
-            $driver_name = $this->driver_name();
+            $driver_name = $this->driverName();
             $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
             $this->queryGrammar = new $grammar_class();
         }
@@ -1641,7 +1660,8 @@ class CDatabase {
             $this->queryLog[] = compact('query', 'bindings', 'time');
         }
     }
-
+    
+    
     /**
      * Get a new raw query expression.
      *
@@ -1763,6 +1783,24 @@ class CDatabase {
      */
     public function newQuery() {
         return new CDatabase_Query_Builder($this);
+    }
+
+    /**
+     * Get the query post processor used by the connection.
+     *
+     * @return CDatabase_Query_Processor
+     */
+    public function getPostProcessor() {
+        if ($this->postProcessor == null) {
+            $driverName = $this->driverName();
+            $processorClass = 'CDatabase_Query_Processor_' . $driverName;
+            $this->postProcessor = new $processorClass();
+        }
+        return $this->postProcessor;
+    }
+
+    public function driver() {
+        return $this->driver;
     }
 
 }

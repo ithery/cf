@@ -1,14 +1,13 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
+trait CModel_MongoDB_QueriesRelationshipTrait {
 
-trait CModel_MongoDB_QueriesRelationshipTrait
-{
     /**
      * Add a relationship count / exists condition to the query.
      * @param string $relation
@@ -18,8 +17,7 @@ trait CModel_MongoDB_QueriesRelationshipTrait
      * @param Closure|null $callback
      * @return Builder|static
      */
-    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
-    {
+    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
         if (strpos($relation, '.') !== false) {
             return $this->hasNested($relation, $operator, $count, $boolean, $callback);
         }
@@ -32,11 +30,9 @@ trait CModel_MongoDB_QueriesRelationshipTrait
         // If we only need to check for the existence of the relation, then we can optimize
         // the subquery to only run a "where exists" clause instead of this full "count"
         // clause. This will make these queries run much faster compared with a count.
-        $method = $this->canUseExistsForExistenceCheck($operator, $count)
-            ? 'getRelationExistenceQuery'
-            : 'getRelationExistenceCountQuery';
+        $method = $this->canUseExistsForExistenceCheck($operator, $count) ? 'getRelationExistenceQuery' : 'getRelationExistenceCountQuery';
         $hasQuery = $relation->{$method}(
-            $relation->getRelated()->newQuery(), $this
+                $relation->getRelated()->newQuery(), $this
         );
         // Next we will call any given callback as an "anonymous" scope so they can get the
         // proper logical grouping of the where clauses if needed by this Eloquent query
@@ -45,17 +41,18 @@ trait CModel_MongoDB_QueriesRelationshipTrait
             $hasQuery->callScope($callback);
         }
         return $this->addHasWhere(
-            $hasQuery, $relation, $operator, $count, $boolean
+                        $hasQuery, $relation, $operator, $count, $boolean
         );
     }
+
     /**
      * @param $relation
      * @return bool
      */
-    protected function isAcrossConnections($relation)
-    {
+    protected function isAcrossConnections($relation) {
         return $relation->getParent()->getConnectionName() !== $relation->getRelated()->getConnectionName();
     }
+
     /**
      * Compare across databases
      * @param $relation
@@ -66,8 +63,7 @@ trait CModel_MongoDB_QueriesRelationshipTrait
      * @return mixed
      * @throws Exception
      */
-    public function addHybridHas($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
-    {
+    public function addHybridHas($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
         $hasQuery = $relation->getQuery();
         if ($callback) {
             $hasQuery->callScope($callback);
@@ -82,28 +78,28 @@ trait CModel_MongoDB_QueriesRelationshipTrait
         $relatedIds = $this->getConstrainedRelatedIds($relations, $operator, $count);
         return $this->whereIn($this->getRelatedConstraintKey($relation), $relatedIds, $boolean, $not);
     }
+
     /**
      * @param $relation
      * @return string
      */
-    protected function getHasCompareKey($relation)
-    {
+    protected function getHasCompareKey($relation) {
         if (method_exists($relation, 'getHasCompareKey')) {
             return $relation->getHasCompareKey();
         }
         return $relation instanceof CModel_Relation_HasOneOrMany ? $relation->getForeignKeyName() : $relation->getOwnerKeyName();
     }
+
     /**
      * @param $relations
      * @param $operator
      * @param $count
      * @return array
      */
-    protected function getConstrainedRelatedIds($relations, $operator, $count)
-    {
+    protected function getConstrainedRelatedIds($relations, $operator, $count) {
         $relationCount = array_count_values(array_map(function ($id) {
-            return (string) $id; // Convert Back ObjectIds to Strings
-        }, is_array($relations) ? $relations : $relations->flatten()->toArray()));
+                    return (string) $id; // Convert Back ObjectIds to Strings
+                }, is_array($relations) ? $relations : $relations->flatten()->toArray()));
         // Remove unwanted related objects based on the operator and count.
         $relationCount = array_filter($relationCount, function ($counted) use ($count, $operator) {
             // If we are comparing to 0, we always need all results.
@@ -125,14 +121,14 @@ trait CModel_MongoDB_QueriesRelationshipTrait
         // All related ids.
         return array_keys($relationCount);
     }
+
     /**
      * Returns key we are constraining this parent model's query with
      * @param $relation
      * @return string
      * @throws Exception
      */
-    protected function getRelatedConstraintKey($relation)
-    {
+    protected function getRelatedConstraintKey($relation) {
         if ($relation instanceof CModel_Relation_HasOneOrMany) {
             return $this->model->getKeyName();
         }
@@ -144,4 +140,5 @@ trait CModel_MongoDB_QueriesRelationshipTrait
         }
         throw new Exception(class_basename($relation) . ' is not supported for hybrid query constraints.');
     }
+
 }

@@ -10,6 +10,11 @@ abstract class CDatabase_Driver {
     protected $query_cache;
 
     /**
+     *
+     * @var CDatabase
+     */
+    protected $db;
+    /**
      * Connect to our database.
      * Returns FALSE on failure or a MySQL resource.
      *
@@ -418,6 +423,14 @@ abstract class CDatabase_Driver {
         $this->query('COMMIT;');
     }
 
+
+    /**
+     * 
+     * @return CDatabase
+     */
+    public function db() {
+        return $this->db;
+    }
 }
 
 // End Database Driver Interface

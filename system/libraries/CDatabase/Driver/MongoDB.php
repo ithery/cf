@@ -16,18 +16,29 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     protected $link;
 
     /**
+     * @var CDatabase 
+     */
+    protected $db;
+
+    /**
+     *
+     * @var \MongoDB\Database
+     */
+    protected $mongoDB;
+    /**
      * Database configuration
      */
-    protected $dbCconfig;
+    protected $dbConfig;
 
     /**
      * Sets the config for the class.
      *
      * @param  array  database configuration
      */
-    public function __construct($config) {
+    public function __construct(CDatabase $db, $config) {
+        $this->db = $db;
         $this->dbConfig = $config;
-
+        $this->connect();
         CF::log(CLogger::DEBUG, 'MongoDB Database Driver Initialized');
     }
 
@@ -46,7 +57,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      */
     protected function hasDsnString(array $config = null) {
         if ($config == null) {
-            $config = $this->dbCconfig;
+            $config = $this->dbConfig;
         }
         return isset($config['dsn']) && !empty($config['dsn']);
     }
@@ -58,7 +69,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      */
     protected function getDsnString(array $config = null) {
         if ($config == null) {
-            $config = $this->dbCconfig;
+            $config = $this->dbConfig;
         }
         return carr::get($config, 'dsn');
     }
@@ -70,18 +81,21 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      */
     protected function getHostDsn(array $config = null) {
         if ($config == null) {
-            $config = $this->dbCconfig;
+            $config = $this->dbConfig;
         }
+
+        $configConnection = carr::get($config, 'connection');
+
         // Treat host option as array of hosts
-        $hosts = is_array($config['host']) ? $config['host'] : [$config['host']];
+        $hosts = is_array($configConnection['host']) ? $configConnection['host'] : [$configConnection['host']];
         foreach ($hosts as &$host) {
             // Check if we need to add a port to the host
-            if (strpos($host, ':') === false && !empty($config['port'])) {
-                $host = $host . ':' . $config['port'];
+            if (strpos($host, ':') === false && !empty($configConnection['port'])) {
+                $host = $host . ':' . $configConnection['port'];
             }
         }
         // Check if we want to authenticate against a specific database.
-        $auth_database = isset($config['options']) && !empty($config['options']['database']) ? $config['options']['database'] : null;
+        $auth_database = isset($configConnection['options']) && !empty($configConnection['options']['database']) ? $configConnection['options']['database'] : null;
         return 'mongodb://' . implode(',', $hosts) . ($auth_database ? '/' . $auth_database : '');
     }
 
@@ -92,7 +106,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      */
     protected function getDsn(array $config = null) {
         if ($config == null) {
-            $config = $this->dbCconfig;
+            $config = $this->dbConfig;
         }
         return $this->hasDsnString($config) ? $this->getDsnString($config) : $this->getHostDsn($config);
     }
@@ -114,10 +128,11 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         }
 
         $dsn = $this->getDsn();
-        $options = carr::get($this->dbCconfig, 'options');
-
+       
+        $options = carr::get($this->dbConfig, 'options',[]);
+        
         $this->link = $this->createConnection($dsn, $this->dbConfig, $options);
-
+        $this->mongoDB = $this->link->selectDatabase(carr::get($this->dbConfig,'connection.database'));
         return $this->link;
     }
 
@@ -130,8 +145,8 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      */
     protected function createConnection($dsn, array $config, array $options) {
         // By default driver options is an empty array.
-        
-        $connectionData=carr::get($config,'connection');
+
+        $connectionData = carr::get($config, 'connection');
         $driverOptions = [];
         if (isset($config['driver_options']) && is_array($config['driver_options'])) {
             $driverOptions = $config['driver_options'];
@@ -184,6 +199,15 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     public function show_error() {
         
+    }
+
+    /**
+     * Get a MongoDB collection.
+     * @param string $name
+     * @return Collection
+     */
+    public function getCollection($name) {
+        return new CDatabase_Driver_MongoDB_Collection($this , $this->mongoDB->selectCollection($name));
     }
 
 }
