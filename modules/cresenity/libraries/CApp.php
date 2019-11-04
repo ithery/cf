@@ -213,7 +213,7 @@ class CApp extends CObservable {
     }
 
     public function name() {
-        return strlen(CF::appName()) > 0 ? CF::appName() : CF::appCode();
+        return strlen(CF::appCode()) > 0 ? CF::appCode() : CF::appCode();
     }
 
     public function code() {

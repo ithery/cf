@@ -93,5 +93,5 @@ final class CQueue {
         $runner = new CQueue_Runner(CQueue::worker(), null);
         $runner->run();
     }
-
+    
 }

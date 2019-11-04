@@ -150,7 +150,20 @@ class CQueue_Runner {
 //                        "<{$type}>[%s][%s] %s</{$type}> %s", Carbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
 //        ));
         echo sprintf(
-                        "<{$type}>[%s][%s] %s</{$type}> %s", CCarbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
+                "<{$type}>[%s][%s] %s</{$type}> %s", CCarbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
+        );
+    }
+
+    /**
+     * Store a failed job event.
+     *
+     * @param  \Illuminate\Queue\Events\JobFailed  $event
+     * @return void
+     */
+    protected function logFailedJob(CQueue_Event_JobFailed $event) {
+        $queueFailer = new CQueue_FailedJob_DatabaseFailedJob(CDatabase::instance(), 'queue_failed');
+        $queueFailer->log(
+                $event->connectionName, $event->job->getQueue(), $event->job->getRawBody(), $event->exception
         );
     }
 
