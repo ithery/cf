@@ -64,7 +64,9 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return mixed
      */
     public function dispatch($command) {
+        
         if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
+            
             return $this->dispatchToQueue($command);
         }
         return $this->dispatchNow($command);
@@ -87,6 +89,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
                 return $this->container->call([$command, 'execute']);
             };
         }
+        
         return $this->pipeline->send($command)->through($this->pipes)->then($callback);
     }
 
@@ -134,6 +137,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     public function dispatchToQueue($command) {
         $connection = $command->connection ? $command->connection : null;
         $queue = call_user_func($this->queueResolver, $connection);
+        
         if (!$queue instanceof CQueue_QueueInterface) {
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }

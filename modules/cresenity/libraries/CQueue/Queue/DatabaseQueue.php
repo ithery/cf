@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2019, 4:14:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_QueueInterface {
+class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
 
     /**
      * The database connection instance.
@@ -249,9 +249,9 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return CQueue_Job_DatabaseJob
      */
     protected function marshalJob($queue, $job) {
-        
+
         $job = $this->markJobAsReserved($job);
-        
+
         return new CQueue_Job_DatabaseJob(
                 $this->container, $this, $job, $this->connectionName, $queue
         );
@@ -264,7 +264,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return CDatabase_Job_DatabaseJobRecord
      */
     protected function markJobAsReserved($job) {
-       
+
         $this->database->table($this->table)->where($this->primaryKey(), $job->{$this->primaryKey()})->update([
             'reserved_at' => date('Y-m-d H:i:s', $job->touch()),
             'attempts' => $job->increment(),
@@ -309,7 +309,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
     }
 
     public function primaryKey() {
-        return CQueue::primaryKey($this->database,$this->table);
+        return CQueue::primaryKey($this->database, $this->table);
     }
 
 }

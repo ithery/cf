@@ -18,6 +18,7 @@ final class CQueue {
     public static function dispatcher() {
         if (self::$dispatcher == null) {
             self::$dispatcher = new CQueue_Dispatcher(CContainer::getInstance(), function ($connection = null) {
+
                 return CQueue::queuer()->connection($connection);
             });
         }
@@ -40,7 +41,7 @@ final class CQueue {
 //        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
 //            self::{"register{$connector}Connector"}($manager);
 //        }
-        foreach (['Null', 'Database'] as $connector) {
+        foreach (['Null', 'Database', 'Sqs'] as $connector) {
             self::{"register{$connector}Connector"}($manager);
         }
     }
@@ -82,6 +83,18 @@ final class CQueue {
         });
     }
 
+    /**
+     * Register the Amazon SQS queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected static function registerSqsConnector($manager) {
+        $manager->addConnector('sqs', function () {
+            return new CQueue_Connector_SqsConnector();
+        });
+    }
+
     public static function worker() {
         $isDownForMaintenance = function () {
             return false;
@@ -89,11 +102,11 @@ final class CQueue {
         return new CQueue_Worker(static::queuer(), CEvent::dispatcher(), CException::createExceptionHandler(), $isDownForMaintenance);
     }
 
-    public static function run() {
+    public static function run($connection = null) {
 
 
         $runner = new CQueue_Runner(CQueue::worker(), null);
-        $runner->run();
+        $runner->run($connection);
     }
 
     public static function config($config, $default = null) {

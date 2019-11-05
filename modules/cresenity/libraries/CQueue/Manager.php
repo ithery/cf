@@ -126,12 +126,12 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
         // If the connection has not been resolved yet we will resolve it now as all
         // of the connections are resolved when they are actually needed so we do
         // not make any unnecessary connection to the various queue end-points.
-        
-        
+       
         if (!isset($this->connections[$name])) {
             $this->connections[$name] = $this->resolve($name);
             $this->connections[$name]->setContainer(CContainer::getInstance());
         }
+        
         return $this->connections[$name];
     }
 
@@ -143,8 +143,10 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      */
     protected function resolve($name) {
             
-
+         
+        
         $config = $this->getConfig($name);
+        
         return $this->getConnector($config['driver'])
                         ->connect($config)
                         ->setConnectionName($name);
