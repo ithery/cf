@@ -62,6 +62,7 @@ class CTracker_Config {
         $default['trackEnabled'] = true;
         $default['robotEnabled'] = false;
         $default['consoleEnabled'] = false;
+        $default['database'] = 'default';
         $default['logger'] = null;
         $default['logEnabled'] = true;
         $default['cookieNamespace'] = 'CTrackerCookie';
