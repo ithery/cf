@@ -96,7 +96,7 @@ class CApp_Navigation_Helper {
         if (isset($_COOKIE['capp-administrator'])) {
             return true;
         }
-        $db = CDatabase::instance($domain);
+        $db = CDatabase::instance(null,null,$domain);
         if ($roleId == "PUBLIC") {
             $roleId = null;
         }
@@ -144,7 +144,7 @@ class CApp_Navigation_Helper {
         if ($appId == null) {
             $appId = $app->appId();
         }
-        $db = CDatabase::instance($domain);
+        $db = CDatabase::instance(null,null,$domain);
 
         /* @var $role CApp_Model */
         $role = CApp::model('Roles')->find($roleId);
@@ -156,7 +156,7 @@ class CApp_Navigation_Helper {
             return true;
         }
 
-        $db = CDatabase::instance($domain);
+        $db = CDatabase::instance(null,null,$domain);
 
         return $role->rolePermission()->where('name', '=', $action)->where('app_id', '=', $appId)->count() > 0;
     }

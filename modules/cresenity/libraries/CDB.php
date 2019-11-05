@@ -17,8 +17,8 @@ class CDB {
      * @param mixed $config
      * @return CDatabase
      */
-    public static function database($domain = null, $name = 'default', $config = NULL) {
-        return CDatabase::instance($domain, $name, $config);
+    public static function database($name = 'default', $config = NULL,$domain=null) {
+        return CDatabase::instance($name, $config,$domain);
     }
 
     

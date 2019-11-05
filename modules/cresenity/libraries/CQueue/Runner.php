@@ -25,6 +25,13 @@ class CQueue_Runner {
     protected static $listenedForEvents = false;
 
     /**
+     * The options for worker setting.
+     *
+     * @var array
+     */
+    protected $options = array();
+
+    /**
      * Create a new queue work command.
      *
      * @param  CQueue_Worker  $worker
@@ -36,15 +43,17 @@ class CQueue_Runner {
         $this->worker = $worker;
     }
 
-    public function run() {
-        if ($this->downForMaintenance() && $this->option('once')) {
-            return $this->worker->sleep($this->option('sleep'));
+    public function run($connection = null, $queue = null) {
+        if ($connection == null) {
+            $connection = CQueue::config('default');
+        }
+        if ($this->downForMaintenance() && $this->getOption('once')) {
+            return $this->worker->sleep($this->getOption('sleep'));
         }
         // We'll listen to the processed and failed events so we can write information
         // to the console as jobs are processed, which will let the developer watch
         // which jobs are coming through a queue and be informed on its progress.
         $this->listenForEvents();
-        $connection = CQueue::config('driver');
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
@@ -63,9 +72,8 @@ class CQueue_Runner {
      */
     protected function runWorker($connection, $queue) {
         $this->worker->setCache($this->cache);
-//        return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
-//                        $connection, $queue, $this->gatherWorkerOptions()
-        return $this->worker->runNextJob($connection, $queue, $this->gatherWorkerOptions());
+        return $this->worker->{$this->getOption('once') ? 'runNextJob' : 'daemon'}(
+                        $connection, $queue, $this->gatherWorkerOptions());
     }
 
     protected function runDaemon($connection, $queue) {
@@ -74,7 +82,7 @@ class CQueue_Runner {
 
     protected function gatherWorkerOptions() {
         return new CQueue_WorkerOptions(
-                $this->option('delay'), $this->option('memory'), $this->option('timeout'), $this->option('sleep'), $this->option('tries'), $this->option('force'), $this->option('stop-when-empty')
+                $this->getOption('delay'), $this->getOption('memory'), $this->getOption('timeout'), $this->getOption('sleep'), $this->getOption('tries'), $this->getOption('force'), $this->getOption('stopWhenEmpty')
         );
         //return new CQueue_WorkerOptions();
     }
@@ -85,7 +93,7 @@ class CQueue_Runner {
      * @return bool
      */
     protected function downForMaintenance() {
-        //return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
+        //return $this->getOption('force') ? false : $this->laravel->isDownForMaintenance();
         return false;
     }
 
@@ -117,10 +125,7 @@ class CQueue_Runner {
      * @return string
      */
     protected function getQueue($connection) {
-//        return $this->option('queue') ?: $this->laravel['config']->get(
-//            "queue.connections.{$connection}.queue", 'default'
-//        );
-        return CQueue::config('queue');
+        return $this->getOption('queue') ?: CQueue::config("connections.{$connection}.queue", 'default');
     }
 
     /**
@@ -171,24 +176,28 @@ class CQueue_Runner {
      * @return void
      */
     protected function logFailedJob(CQueue_Event_JobFailed $event) {
-        $queueFailer = new CQueue_FailedJob_DatabaseFailedJob(CDatabase::instance(CQueue::config('connection','default')), CQueue::config('tableFailed'));
-        $queueFailer->log(
+        CQueue_FailerFactory::getFailerInstance()->log(
                 $event->connectionName, $event->job->getQueue(), $event->job->getRawBody(), $event->exception
         );
     }
 
-    protected function option($name) {
-        $options = [];
+    public function setOption($name, $value) {
+        $this->options[$name] = $value;
+        return $this;
+    }
 
-        $options['delay'] = 0;
-        $options['memory'] = 1024;
-        $options['timeout'] = 300;
-        $options['sleep'] = 0;
-        $options['maxTries'] = 1;
-        $options['force'] = false;
-        $options['stopWhenEmpty'] = false;
-        $options['once'] = true;
+    protected function getOption($name) {
+        $defaultOptions = [];
 
+        $defaultOptions['delay'] = 0;
+        $defaultOptions['memory'] = 1024;
+        $defaultOptions['timeout'] = 300;
+        $defaultOptions['sleep'] = 0;
+        $defaultOptions['maxTries'] = 1;
+        $defaultOptions['force'] = false;
+        $defaultOptions['stopWhenEmpty'] = false;
+        $defaultOptions['once'] = true;
+        $options = array_merge($defaultOptions, $this->options);
         return carr::get($options, $name);
     }
 

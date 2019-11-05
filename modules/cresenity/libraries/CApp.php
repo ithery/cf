@@ -113,7 +113,7 @@ class CApp extends CObservable {
      * @return CDatabase
      */
     public static function db($domain = null, $dbName = null) {
-        return CDatabase::instance($domain, $dbName);
+        return CDatabase::instance($dbName,null,$domain);
     }
 
     public function setAjaxData($key, $value = null) {

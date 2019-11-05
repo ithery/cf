@@ -50,15 +50,13 @@ class CSession_Driver_Database implements CSession_Driver {
         //         // Set the group name
         //         $this->db = $config['storage']['group'];
         //     }
-
         //     if (!empty($config['storage']['table'])) {
         //         // Set the table name
         //         $this->table = $config['storage']['table'];
         //     }
         // }
-
         // Load database
-        $this->db = CDatabase::instance(null, $this->table, $this->db);
+        $this->db = CDatabase::instance($this->db, null, null);
 
         CF::log(CLogger::DEBUG, 'Session Database Driver Initialized');
     }

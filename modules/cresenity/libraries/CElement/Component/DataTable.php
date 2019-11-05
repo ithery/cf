@@ -82,7 +82,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->defaultPagingList["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
-        $this->db = CDatabase::instance($this->domain);
+        $this->db = CDatabase::instance(null,null,$this->domain);
         $this->dbConfig = $this->db->config();
         $this->display_length = "10";
         $this->paging_list = $this->defaultPagingList;
@@ -207,7 +207,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setDomain($domain) {
         parent::setDomain($domain);
-        $this->setDatabase(CDatabase::instance($domain));
+        $this->setDatabase(CDatabase::instance(null,null,$domain));
         return $this;
     }
 

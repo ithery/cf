@@ -39,14 +39,13 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
      *
      * @var \stdClass
      */
-    protected $primaryKey;
+  
     public function __construct(CContainer_Container $container, CQueue_Queue_DatabaseQueue $database, $job, $connectionName, $queue) {
         $this->job = $job;
         $this->queue = $queue;
         $this->database = $database;
         $this->container = $container;
         $this->connectionName = $connectionName;
-        $this->primaryKey = CQueue::primaryKey($this->database->getDatabase());
     }
 
     /**
@@ -68,7 +67,7 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
      */
     public function delete() {
         parent::delete();
-        $this->database->deleteReserved($this->queue, $this->job->{$this->primaryKey});
+        $this->database->deleteReserved($this->queue, $this->job->{$this->database->primaryKey()});
     }
 
     /**
@@ -86,7 +85,7 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
      * @return string
      */
     public function getJobId() {
-        return $this->job->{$this->primaryKey};
+        return $this->job->{$this->database->primaryKey()};
     }
 
     /**
