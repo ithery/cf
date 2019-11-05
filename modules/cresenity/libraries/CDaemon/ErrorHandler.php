@@ -83,9 +83,10 @@ class CDaemon_ErrorHandler {
             $runningService->log(str_replace(PHP_EOL, PHP_EOL . str_repeat(' ', 23), print_r($e->getTraceAsString(), true)));
         }
 
-
-        if ($is_fatal) {
-            exit(1);
+        if (!$runningService->isDaemonContinueOnFatalError()) {
+            if ($is_fatal) {
+                exit(1);
+            }
         }
 
         return true;
