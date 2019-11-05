@@ -341,7 +341,7 @@ abstract class CModel_MongoDB_Model extends CModel {
      */
     protected function newBaseQueryBuilder() {
         $connection = $this->getConnection();
-        return new CDatabase_Query_MongoDB_MongoDBBuilder($connection, $connection->getPostProcessor());
+        return new CDatabase_Query_Builder_MongoDBBuilder($connection, $connection->getPostProcessor());
     }
 
     /**
