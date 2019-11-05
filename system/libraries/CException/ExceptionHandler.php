@@ -74,14 +74,17 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         if (is_callable($reportCallable = [$e, 'report'])) {
             return $this->container->call($reportCallable);
         }
-        try {
-            $logger = $this->container->make(LoggerInterface::class);
-        } catch (Exception $ex) {
-            throw $e;
-        }
-        $logger->error(
-                $e->getMessage(), array_merge($this->context(), ['exception' => $e]
-        ));
+        
+        CLogger::instance()->add(CLogger::ERROR,$e->getMessage(),null,array_merge($this->context(), ['exception' => $e]));
+//        try {
+//            CLogger::instance()->add($reportCallable, $message)
+//            $logger = $this->container->make(LoggerInterface::class);
+//        } catch (Exception $ex) {
+//            throw $e;
+//        }
+//        $logger->error(
+//                $e->getMessage(), array_merge($this->context(), ['exception' => $e]
+//        ));
     }
 
     /**

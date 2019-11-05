@@ -87,6 +87,7 @@ class CDaemon_ErrorHandler {
         if ($is_fatal) {
             exit(1);
         }
+
         return true;
     }
 

@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2019, 4:51:15 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+
 class CQueue_Worker {
 
     use CDatabase_Trait_DetectLostConnection;
@@ -261,9 +264,11 @@ class CQueue_Worker {
         try {
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
+            CDaemon::log('Run Job Exception');
             $this->exceptions->report($e);
             $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
+            CDaemon::log('Run Job Throwable');
             $this->exceptions->report($e = new FatalThrowableError($e));
             $this->stopWorkerIfLostConnection($e);
         }
