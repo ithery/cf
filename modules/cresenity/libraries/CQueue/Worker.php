@@ -389,7 +389,7 @@ class CQueue_Worker {
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries) {
         $maxTries = !is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
         $timeoutAt = $job->timeoutAt();
-        if ($timeoutAt && Carbon::now()->getTimestamp() <= $timeoutAt) {
+        if ($timeoutAt && CCarbon::now()->getTimestamp() <= $timeoutAt) {
             return;
         }
         if (!$timeoutAt && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
@@ -410,7 +410,7 @@ class CQueue_Worker {
      */
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, $e) {
         $maxTries = !is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
-        if ($job->timeoutAt() && $job->timeoutAt() <= Carbon::now()->getTimestamp()) {
+        if ($job->timeoutAt() && $job->timeoutAt() <= CCarbon::now()->getTimestamp()) {
             $this->failJob($job, $e);
         }
         if ($maxTries > 0 && $job->attempts() >= $maxTries) {
