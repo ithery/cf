@@ -118,7 +118,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     protected function context() {
         try {
             return array_filter([
-                'userId' => Auth::id(),
+//                'userId' => Auth::id(),
                     // 'email' => optional(Auth::user())->email,
             ]);
         } catch (Throwable $e) {
