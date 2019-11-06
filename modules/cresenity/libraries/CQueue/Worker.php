@@ -263,12 +263,19 @@ class CQueue_Worker {
         try {
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
-            CDaemon::log('Run Job Exception');
-            $this->exceptions->report($e);
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Exception');
+            } else {
+                $this->exceptions->report($e);
+            }
             $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
-            $this->exceptions->report($e = new FatalThrowableError($e));
-            CDaemon::log('Run Job Throwable');
+            $e = new FatalThrowableError($e);
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Throwable');
+            } else {
+                $this->exceptions->report($e);
+            }
             $this->stopWorkerIfLostConnection($e);
         }
     }
@@ -313,16 +320,22 @@ class CQueue_Worker {
             $job->fire();
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Exception $e) {
-            CDaemon::log('Run Job Fire Exception');
-            CDaemon::log($e->getTraceAsString());
-            $this->handleJobException($connectionName, $job, $options, $e);
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Fire Exception');
+                CDaemon::log($e->getMessage());
+                CDaemon::log($e->getTraceAsString());
+            } else {
+                $this->handleJobException($connectionName, $job, $options, $e);
+            }
         } catch (Throwable $e) {
             $e = new FatalThrowableError($e);
-            CDaemon::log('Run Job Fire Throwable');
-            CDaemon::log($e->getTraceAsString());
-            $this->handleJobException(
-                    $connectionName, $job, $options, $e
-            );
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Fire Throwable');
+                CDaemon::log($e->getMessage());
+                CDaemon::log($e->getTraceAsString());
+            } else {
+                $this->handleJobException($connectionName, $job, $options, $e);
+            }
         }
     }
 
