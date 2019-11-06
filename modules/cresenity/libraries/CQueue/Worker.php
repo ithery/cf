@@ -7,7 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2019, 4:51:15 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class CQueue_Worker {
@@ -234,7 +233,7 @@ class CQueue_Worker {
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     protected function getNextJob($connection, $queue) {
-        
+
         try {
             foreach (explode(',', $queue) as $queue) {
                 if (!is_null($job = $connection->pop($queue))) {
@@ -265,14 +264,11 @@ class CQueue_Worker {
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             CDaemon::log('Run Job Exception');
-            CDaemon::log($e->getTraceAsString());
-            
             $this->exceptions->report($e);
             $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
-            CDaemon::log('Run Job Throwable');
             $this->exceptions->report($e = new FatalThrowableError($e));
-            CDaemon::log($e->getTraceAsString());
+            CDaemon::log('Run Job Throwable');
             $this->stopWorkerIfLostConnection($e);
         }
     }
@@ -317,10 +313,15 @@ class CQueue_Worker {
             $job->fire();
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Exception $e) {
+            CDaemon::log('Run Job Fire Exception');
+            CDaemon::log($e->getTraceAsString());
             $this->handleJobException($connectionName, $job, $options, $e);
         } catch (Throwable $e) {
+            $e = new FatalThrowableError($e);
+            CDaemon::log('Run Job Fire Throwable');
+            CDaemon::log($e->getTraceAsString());
             $this->handleJobException(
-                    $connectionName, $job, $options, new FatalThrowableError($e)
+                    $connectionName, $job, $options, $e
             );
         }
     }
