@@ -265,11 +265,14 @@ class CQueue_Worker {
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             CDaemon::log('Run Job Exception');
+            CDaemon::log($e->getTraceAsString());
+            
             $this->exceptions->report($e);
             $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
             CDaemon::log('Run Job Throwable');
             $this->exceptions->report($e = new FatalThrowableError($e));
+            CDaemon::log($e->getTraceAsString());
             $this->stopWorkerIfLostConnection($e);
         }
     }
