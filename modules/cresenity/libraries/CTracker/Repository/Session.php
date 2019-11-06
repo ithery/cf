@@ -79,6 +79,8 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         if (!$known = $this->sessionIsKnown()) {
             $this->sessionSetId($this->findOrCreate($this->sessionInfo, ['uuid']));
         } else {
+            $primaryKey = 'log_session_id';
+            
             $session = $this->find($this->getSessionData('log_session_id'));
             $session->updated = CCarbon::now();
             $session->save();
@@ -219,6 +221,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
 
     public function updateSessionData($data) {
         $session = $this->checkIfUserChanged($data, $this->find($this->getSessionData('log_session_id')));
+     
         foreach ($session->getAttributes() as $name => $value) {
             if (isset($data[$name]) && $name !== 'log_session_id' && $name !== 'uuid') {
                 $session->{$name} = $data[$name];

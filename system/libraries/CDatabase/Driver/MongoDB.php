@@ -25,6 +25,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      * @var \MongoDB\Database
      */
     protected $mongoDB;
+
     /**
      * Database configuration
      */
@@ -59,7 +60,9 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         if ($config == null) {
             $config = $this->dbConfig;
         }
-        return isset($config['dsn']) && !empty($config['dsn']);
+
+        $connection = carr::get($config, 'connection');
+        return isset($connection['dsn']) && !empty($connection['dsn']);
     }
 
     /**
@@ -71,7 +74,9 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         if ($config == null) {
             $config = $this->dbConfig;
         }
-        return carr::get($config, 'dsn');
+
+        $connection = carr::get($config, 'connection');
+        return carr::get($connection, 'dsn');
     }
 
     /**
@@ -111,15 +116,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         return $this->hasDsnString($config) ? $this->getDsnString($config) : $this->getHostDsn($config);
     }
 
-    /**
-     * Dynamically pass methods to the connection.
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters) {
-        return call_user_func_array([$this->link, $method], $parameters);
-    }
+    
 
     public function connect() {
         // Check if link already exists
@@ -128,11 +125,10 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         }
 
         $dsn = $this->getDsn();
-       
-        $options = carr::get($this->dbConfig, 'options',[]);
-        
+        $options = carr::get($this->dbConfig, 'options', []);
+
         $this->link = $this->createConnection($dsn, $this->dbConfig, $options);
-        $this->mongoDB = $this->link->selectDatabase(carr::get($this->dbConfig,'connection.database'));
+        $this->mongoDB = $this->link->selectDatabase(carr::get($this->dbConfig, 'connection.database'));
         return $this->link;
     }
 
@@ -207,7 +203,31 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      * @return Collection
      */
     public function getCollection($name) {
-        return new CDatabase_Driver_MongoDB_Collection($this , $this->mongoDB->selectCollection($name));
+        return new CDatabase_Driver_MongoDB_Collection($this, $this->mongoDB->selectCollection($name));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getDefaultPostProcessor() {
+        return new CDatabase_Query_Processor_MongoDB();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getDefaultQueryGrammar() {
+        return new CDatabase_Query_Grammar_MongoDB();
+    }
+
+    /**
+     * Dynamically pass methods to the connection.
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters) {
+        return call_user_func_array([$this->link, $method], $parameters);
     }
 
 }

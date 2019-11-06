@@ -24,7 +24,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $instance = new $related;
         $localKey = $localKey ?: $this->getKeyName();
-        return new CModel_MongoDB_Relations_HasOne($instance->newQuery(), $this, $foreignKey, $localKey);
+        return new CModel_MongoDB_Relation_HasOne($instance->newQuery(), $this, $foreignKey, $localKey);
     }
 
     /**
@@ -44,7 +44,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         $instance = new $related;
         list($type, $id) = $this->getMorphs($name, $type, $id);
         $localKey = $localKey ?: $this->getKeyName();
-        return new CModel_MongoDB_Relations_MorphOne($instance->newQuery(), $this, $type, $id, $localKey);
+        return new CModel_MongoDB_Relation_MorphOne($instance->newQuery(), $this, $type, $id, $localKey);
     }
 
     /**
@@ -62,7 +62,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $instance = new $related;
         $localKey = $localKey ?: $this->getKeyName();
-        return new CModel_MongoDB_Relations_HasMany($instance->newQuery(), $this, $foreignKey, $localKey);
+        return new CModel_MongoDB_Relation_HasMany($instance->newQuery(), $this, $foreignKey, $localKey);
     }
 
     /**
@@ -86,7 +86,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         list($type, $id) = $this->getMorphs($name, $type, $id);
         $table = $instance->getTable();
         $localKey = $localKey ?: $this->getKeyName();
-        return new CModel_MongoDB_Relations_MorphMany($instance->newQuery(), $this, $type, $id, $localKey);
+        return new CModel_MongoDB_Relation_MorphMany($instance->newQuery(), $this, $type, $id, $localKey);
     }
 
     /**
@@ -113,7 +113,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
         if ($foreignKey === null) {
-            $foreignKey = Str::snake($relation) . '_id';
+            $foreignKey = cstr::snake($relation) . '_id';
         }
         $instance = new $related;
         // Once we have the foreign key names, we'll just create a new Eloquent query
@@ -121,7 +121,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // actually be responsible for retrieving and hydrating every relations.
         $query = $instance->newQuery();
         $otherKey = $otherKey ?: $instance->getKeyName();
-        return new CModel_MongoDB_Relations_BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
+        return new CModel_MongoDB_Relation_BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
     }
 
     /**
@@ -138,14 +138,14 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // use that to get both the class and foreign key that will be utilized.
         if ($name === null) {
             list($current, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-            $name = Str::snake($caller['function']);
+            $name = cstr::snake($caller['function']);
         }
         list($type, $id) = $this->getMorphs($name, $type, $id);
         // If the type value is null it is probably safe to assume we're eager loading
         // the relationship. When that is the case we will pass in a dummy query as
         // there are multiple types in the morph and we can't use single queries.
         if (($class = $this->$type) === null) {
-            return new CModel_MongoDB_Relations_MorphTo(
+            return new CModel_MongoDB_Relation_MorphTo(
                     $this->newQuery(), $this, $id, null, $type, $name
             );
         }
@@ -154,7 +154,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // we will pass in the appropriate values so that it behaves as expected.
         $class = $this->getActualClassNameForMorph($class);
         $instance = new $class;
-        return new CModel_MongoDB_Relations_MorphTo(
+        return new CModel_MongoDB_Relation_MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
         );
     }
@@ -201,7 +201,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // the relationship instances for the relation. The relations will set
         // appropriate query constraint and entirely manages the hydrations.
         $query = $instance->newQuery();
-        return new CModel_MongoDB_Relations_BelongsToMany(
+        return new CModel_MongoDB_Relation_BelongsToMany(
                 $query, $this, $collection, $foreignKey, $otherKey, $parentKey ?: $this->getKeyName(), $relatedKey ?: $instance->getKeyName(), $relation
         );
     }

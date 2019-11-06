@@ -122,7 +122,7 @@ abstract class CModel_MongoDB_Model extends CModel {
             return;
         }
         // Dot notation support.
-        if (Str::contains($key, '.') && Arr::has($this->attributes, $key)) {
+        if (cstr::contains($key, '.') && carr::has($this->attributes, $key)) {
             return $this->getAttributeValue($key);
         }
         // This checks for embedded relation support.
@@ -137,8 +137,8 @@ abstract class CModel_MongoDB_Model extends CModel {
      */
     protected function getAttributeFromArray($key) {
         // Support keys in dot notation.
-        if (Str::contains($key, '.')) {
-            return Arr::get($this->attributes, $key);
+        if (cstr::contains($key, '.')) {
+            return carr::get($this->attributes, $key);
         }
         return parent::getAttributeFromArray($key);
     }
@@ -156,7 +156,7 @@ abstract class CModel_MongoDB_Model extends CModel {
             if (in_array($key, $this->getDates()) && $value) {
                 $value = $this->fromDateTime($value);
             }
-            Arr::set($this->attributes, $key, $value);
+            carr::set($this->attributes, $key, $value);
             return;
         }
         return parent::setAttribute($key, $value);
@@ -180,8 +180,8 @@ abstract class CModel_MongoDB_Model extends CModel {
         }
         // Convert dot-notation dates.
         foreach ($this->getDates() as $key) {
-            if (Str::contains($key, '.') && Arr::has($attributes, $key)) {
-                Arr::set($attributes, $key, (string) $this->asDateTime(Arr::get($attributes, $key)));
+            if (cstr::contains($key, '.') && carr::has($attributes, $key)) {
+                carr::set($attributes, $key, (string) $this->asDateTime(carr::get($attributes, $key)));
             }
         }
         return $attributes;
@@ -225,7 +225,7 @@ abstract class CModel_MongoDB_Model extends CModel {
      * @return int
      */
     public function drop($columns) {
-        $columns = Arr::wrap($columns);
+        $columns = carr::wrap($columns);
         // Unset attributes
         foreach ($columns as $column) {
             $this->__unset($column);
@@ -246,7 +246,7 @@ abstract class CModel_MongoDB_Model extends CModel {
                 list($column, $values) = $parameters;
             }
             // Do batch push by default.
-            $values = Arr::wrap($values);
+            $values = carr::wrap($values);
             $query = $this->setKeysForSaveQuery($this->newQuery());
             $this->pushAttributeValues($column, $values, $unique);
             return $query->push($column, $values, $unique);
@@ -262,7 +262,7 @@ abstract class CModel_MongoDB_Model extends CModel {
      */
     public function pull($column, $values) {
         // Do batch pull by default.
-        $values = Arr::wrap($values);
+        $values = carr::wrap($values);
         $query = $this->setKeysForSaveQuery($this->newQuery());
         $this->pullAttributeValues($column, $values);
         return $query->pull($column, $values);
@@ -310,7 +310,7 @@ abstract class CModel_MongoDB_Model extends CModel {
      * @inheritdoc
      */
     public function getForeignKey() {
-        return Str::snake(class_basename($this)) . '_' . ltrim($this->primaryKey, '_');
+        return cstr::snake(CF::class_basename($this)) . '_' . ltrim($this->primaryKey, '_');
     }
 
     /**
@@ -341,6 +341,7 @@ abstract class CModel_MongoDB_Model extends CModel {
      */
     protected function newBaseQueryBuilder() {
         $connection = $this->getConnection();
+        
         return new CDatabase_Query_Builder_MongoDBBuilder($connection, $connection->getPostProcessor());
     }
 
@@ -361,12 +362,12 @@ abstract class CModel_MongoDB_Model extends CModel {
             if (method_exists($this, $key)) {
                 $relations[] = $key;
             }
-            if ($relation instanceof QueueableCollection) {
+            if ($relation instanceof CModel_Queue_QueueableCollectionInterface) {
                 foreach ($relation->getQueueableRelations() as $collectionValue) {
                     $relations[] = $key . '.' . $collectionValue;
                 }
             }
-            if ($relation instanceof QueueableEntity) {
+            if ($relation instanceof CModel_Queue_QueueableEntityInterface) {
                 foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
                     $relations[] = $key . '.' . $entityValue;
                 }

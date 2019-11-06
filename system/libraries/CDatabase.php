@@ -156,53 +156,45 @@ class CDatabase {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $load_config = true;
+        $loadConfig = true;
 
         if (!empty($config)) {
             if (is_array($config) && count($config) > 0) {
                 if (!array_key_exists('connection', $config)) {
                     $config = array('connection' => $config);
-                    $load_config = false;
+                    $loadConfig = false;
                 } else {
-                    $load_config = false;
+                    $loadConfig = false;
                 }
             }
             if (is_string($config)) {
                 if (strpos($config, '://') !== FALSE) {
                     $config = array('connection' => $config);
-                    $load_config = false;
+                    $loadConfig = false;
                 }
             }
         }
-        $config_name = '';
-        if ($load_config) {
-
-
-
-            //$file = CF::get_file('config', 'database', $domain);
-
-
-
+        $configName = '';
+        if ($loadConfig) {
             $found = false;
-            $config_name = 'default';
+            $configName = 'default';
             if (is_string($config)) {
-                $config_name = $config;
+                $configName = $config;
             }
+            $allConfig = CF::config('database');
 
-            $all_config = CF::config('database');
-
-            if (isset($all_config[$config_name])) {
-                $config = $all_config[$config_name];
+            if (isset($allConfig[$configName])) {
+                $config = $allConfig[$configName];
                 $found = true;
             }
 
 
             if ($found == false) {
-                throw new Exception('Config ' . $config_name . ' Not Found');
+                throw new Exception('Config ' . $configName . ' Not Found');
             }
         }
 
-        $this->name = $config_name;
+        $this->name = $configName;
         // Merge the default config with the passed config
         $this->config = array_merge($this->config, $config);
 

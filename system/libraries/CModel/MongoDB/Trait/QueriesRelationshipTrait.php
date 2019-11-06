@@ -138,7 +138,7 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
         if ($relation instanceof CModel_Relation_BelongsToMany && !$this->isAcrossConnections($relation)) {
             return $this->model->getKeyName();
         }
-        throw new Exception(class_basename($relation) . ' is not supported for hybrid query constraints.');
+        throw new Exception(CF::class_basename($relation) . ' is not supported for hybrid query constraints.');
     }
 
 }

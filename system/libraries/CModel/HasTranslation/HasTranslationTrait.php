@@ -67,7 +67,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         $translations = $this->getTranslations($key);
         $oldValue = isset($translations[$locale]) ? $translations[$locale] : '';
         if ($this->hasSetMutator($key)) {
-            $method = 'set' . Str::studly($key) . 'Attribute';
+            $method = 'set' . cstr::studly($key) . 'Attribute';
             $this->{$method}($value, $locale);
             $value = $this->attributes[$key];
         }
@@ -93,7 +93,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
     }
 
     public function forgetAllTranslations($locale) {
-        collect($this->getTranslatableAttributes())->each(function ( $attribute) use ($locale) {
+        CF::collect($this->getTranslatableAttributes())->each(function ( $attribute) use ($locale) {
             $this->forgetTranslation($attribute, $locale);
         });
         return $this;

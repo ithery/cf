@@ -15,7 +15,7 @@ trait CModel_MongoDB_Trait_EmbedsRelationsTrait {
      * @param string $localKey
      * @param string $foreignKey
      * @param string $relation
-     * @return CModel_MongoDB_Relations_EmbedsMany
+     * @return CModel_MongoDB_Relation_EmbedsMany
      */
     protected function embedsMany($related, $localKey = null, $foreignKey = null, $relation = null) {
         // If no relation name was given, we will use this debug backtrace to extract
@@ -33,7 +33,7 @@ trait CModel_MongoDB_Trait_EmbedsRelationsTrait {
         }
         $query = $this->newQuery();
         $instance = new $related;
-        return new CModel_MongoDB_Relations_EmbedsMany($query, $this, $instance, $localKey, $foreignKey, $relation);
+        return new CModel_MongoDB_Relation_EmbedsMany($query, $this, $instance, $localKey, $foreignKey, $relation);
     }
 
     /**
@@ -42,7 +42,7 @@ trait CModel_MongoDB_Trait_EmbedsRelationsTrait {
      * @param string $localKey
      * @param string $foreignKey
      * @param string $relation
-     * @return CModel_MongoDB_Relations_EmbedsOne
+     * @return CModel_MongoDB_Relation_EmbedsOne
      */
     protected function embedsOne($related, $localKey = null, $foreignKey = null, $relation = null) {
         // If no relation name was given, we will use this debug backtrace to extract
@@ -60,7 +60,7 @@ trait CModel_MongoDB_Trait_EmbedsRelationsTrait {
         }
         $query = $this->newQuery();
         $instance = new $related;
-        return new CModel_MongoDB_Relations_EmbedsOne($query, $this, $instance, $localKey, $foreignKey, $relation);
+        return new CModel_MongoDB_Relation_EmbedsOne($query, $this, $instance, $localKey, $foreignKey, $relation);
     }
 
 }

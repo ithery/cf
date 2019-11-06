@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 21, 2019, 9:31:14 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use MongoDB\BSON\ObjectID;
+
 class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
 
     /**
