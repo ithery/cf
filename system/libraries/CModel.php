@@ -260,11 +260,10 @@ abstract class CModel implements ArrayAccess {
      * @param  array  $attributes
      * @return $this
      *
-     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     * @throws CModel_Exception_MassAssignment
      */
     public function fill(array $attributes) {
         $totallyGuarded = $this->totallyGuarded();
-
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
             $key = $this->removeTableFromKey($key);
 

@@ -520,9 +520,11 @@ class CElement_Component_DataTable extends CElement_Component {
 
         if (!$this->isElastic && !$this->isCallback) {
             if ($this->ajax == false) {
-                $db = $this->db;
-                $r = $db->query($this->query);
-                $this->data = $r->result(false);
+                if(strlen($this->query)>0) {
+                    $db = $this->db;
+                    $r = $db->query($this->query);
+                    $this->data = $r->result(false);
+                }
             } else {
                 $this->data = array();
             }

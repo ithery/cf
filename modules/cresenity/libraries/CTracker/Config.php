@@ -66,6 +66,8 @@ class CTracker_Config {
         $default['logger'] = null;
         $default['logEnabled'] = true;
         $default['cookieNamespace'] = 'CTrackerCookie';
+        $default['sessionKey'] = 'CTrackerSession';
+        $default['sessionNamespace'] = 'CTracker';
         $default['excludeConnection'] = [];
         $default['excludeIpAddress'] = [];
         $default['excludeEnvironment'] = [];
