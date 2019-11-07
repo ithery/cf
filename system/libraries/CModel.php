@@ -98,14 +98,14 @@ abstract class CModel implements ArrayAccess {
     /**
      * The connection resolver instance.
      *
-     * @var \Illuminate\Database\ConnectionResolverInterface
+     * @var CDatabase_ResolverInterface
      */
     protected static $resolver;
 
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var CEvent_DispatcherInterface
      */
     protected static $dispatcher;
 
@@ -832,7 +832,7 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get a new query builder with no relationships loaded.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public function newQueryWithoutRelationships() {
         return $this->registerGlobalScopes($this->newModelQuery($this->newBaseQueryBuilder())->setModel($this));
@@ -841,15 +841,15 @@ abstract class CModel implements ArrayAccess {
     /**
      * Register the global scopes for this builder instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  CModel_Query  $builder
+     * @return CModel_Query
      */
-    public function registerGlobalScopes($builder) {
+    public function registerGlobalScopes($query) {
         foreach ($this->getGlobalScopes() as $identifier => $scope) {
-            $builder->withGlobalScope($identifier, $scope);
+            $query->withGlobalScope($identifier, $scope);
         }
 
-        return $builder;
+        return $query;
     }
 
     /**
@@ -866,7 +866,7 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get a new query instance without a given scope.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @param  CModel_Interface_Scope|string  $scope
      * @return CModel_Query
      */
     public function newQueryWithoutScope($scope) {

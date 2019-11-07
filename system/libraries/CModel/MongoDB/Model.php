@@ -388,6 +388,33 @@ abstract class CModel_MongoDB_Model extends CModel {
         return $relations;
     }
 
+    protected static function usesSoftDeletes() {
+       
+       
+        $classUses = CF::collect(CF::class_uses_recursive(static::class));
+        $lastClassUses = $classUses->map(function($item){
+           
+            return carr::last(explode('_',$item));
+        });
+        if (in_array('SoftDeleteTrait', $lastClassUses->toArray())) {
+           
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Insert the given attributes and set the ID on the model.
+     *
+     * @param  CModel_Query  $query
+     * @param  array  $attributes
+     * @return void
+     */
+    protected function insertAndSetId(CModel_Query $query, $attributes) {
+        if($this->usesSoftDeletes()) {
+            $attributes['status']=1;
+        }
+        parent::insertAndSetId($query,$attributes);
+    }
     /**
      * @inheritdoc
      */

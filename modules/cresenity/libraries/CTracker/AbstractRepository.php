@@ -41,7 +41,9 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         list($model, $cacheKey) = $this->cache->findCached($id, null, $this->className);
         if (!$model) {
             $model = $this->newQuery();
+           
             if ($this->relations) {
+                
                 $model->with($this->relations);
             }
             if ($model = $model->find($id)) {

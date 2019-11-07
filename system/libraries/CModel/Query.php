@@ -708,6 +708,11 @@ class CModel_Query {
      */
     public function create(array $attributes = []) {
         return CF::tap($this->newModelInstance($attributes), function ($instance) {
+            
+                    if($instance->status==null) {
+                        $instance->status=1;
+                    }
+                    
                     $instance->save();
                 });
     }

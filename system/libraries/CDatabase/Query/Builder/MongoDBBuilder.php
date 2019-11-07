@@ -130,11 +130,11 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      * @return bool
      */
     protected function shouldUseCollections() {
-        if (function_exists('app')) {
-            $version = app()->version();
-            $version = filter_var(explode(')', $version)[0], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION); // lumen
-            return version_compare($version, '5.3', '>=');
-        }
+//        if (function_exists('app')) {
+//            $version = app()->version();
+//            $version = filter_var(explode(')', $version)[0], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION); // lumen
+//            return version_compare($version, '5.3', '>=');
+//        }
         return true;
     }
 
@@ -292,7 +292,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             // Execute aggregation
             $results = iterator_to_array($this->collection->aggregate($pipeline, $options));
             // Return results
-            return $this->useCollections ? new Collection($results) : $results;
+            return $this->useCollections ? new CCollection($results) : $results;
         } // Distinct query
         elseif ($this->distinct) {
             // Return distinct results directly
@@ -303,7 +303,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             } else {
                 $result = $this->collection->distinct($column);
             }
-            return $this->useCollections ? new Collection($result) : $result;
+            return $this->useCollections ? new CCollection($result) : $result;
         } // Normal query
         else {
             $columns = [];
@@ -339,10 +339,12 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             if (count($this->options)) {
                 $options = array_merge($options, $this->options);
             }
+
             // Execute query and get MongoCursor
             $cursor = $this->collection->find($wheres, $options);
             // Return results as an array with numeric keys
             $results = iterator_to_array($cursor, false);
+            
             return $this->useCollections ? new CCollection($results) : $results;
         }
     }
@@ -481,6 +483,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      * @inheritdoc
      */
     public function insertGetId(array $values, $sequence = null) {
+        
         $result = $this->collection->insertOne($values);
         if (1 == (int) $result->isAcknowledged()) {
             if ($sequence === null) {
