@@ -16,22 +16,22 @@ class CSession_Driver_CacheBased implements CSession_Driver {
     protected $cache;
 
     /**
-     * The number of minutes to store the data in the cache.
+     * The number of seconds to store the data in the cache.
      *
      * @var int
      */
-    protected $minutes;
+    protected $seconds;
 
     /**
      * Create a new cache driven handler instance.
      *
      * @param  CCache_Repository  $cache
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @return void
      */
-    public function __construct(CCache_Repository $cache, $minutes) {
+    public function __construct(CCache_Repository $cache, $seconds) {
         $this->cache = $cache;
-        $this->minutes = $minutes;
+        $this->seconds = $seconds;
     }
 
     public function close() {
@@ -59,7 +59,7 @@ class CSession_Driver_CacheBased implements CSession_Driver {
     }
 
     public function write($id, $data) {
-        return $this->cache->put($id, $data, $this->minutes * 60);
+        return $this->cache->put($id, $data, $this->seconds);
     }
 
     /**
