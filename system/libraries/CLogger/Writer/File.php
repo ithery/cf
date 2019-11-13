@@ -109,6 +109,9 @@ class CLogger_Writer_File extends CLogger_Writer {
             // Write each message into the log file
             file_put_contents($filename, PHP_EOL . $this->format_message($message), FILE_APPEND);
         }
+        
+        $rotator = CLogger_Rotator::createRotate($filename);
+        $rotator->run();
     }
 
 }

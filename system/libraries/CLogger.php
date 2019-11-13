@@ -30,7 +30,7 @@ class CLogger {
      */
     protected $_messages = array();
     private $_group = '';
-    protected static $write_on_add = false;
+    protected static $writeOnAdd = false;
 
     /**
      * 
@@ -46,7 +46,7 @@ class CLogger {
 
     private function __construct() {
         $options['path'] = 'system';
-        $this->create_writer('file', $options);
+        $this->createWriter('file', $options);
     }
 
     /**
@@ -59,7 +59,7 @@ class CLogger {
      * @param   options     $options    array of options for writers
      * @return  CLogger
      */
-    public function create_writer($type = 'file', $options = array()) {
+    public function createWriter($type = 'file', $options = array()) {
         $levels = carr::get($options, 'levels', array());
         $min_level = carr::get($options, 'min_level', 0);
         if (!is_array($levels)) {
@@ -128,7 +128,7 @@ class CLogger {
             'additional' => $additional,
         );
 
-        if (CLogger::$write_on_add) {
+        if (CLogger::$writeOnAdd) {
             // Write logs as they are added
             $this->write();
         }

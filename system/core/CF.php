@@ -1079,10 +1079,6 @@ final class CF {
         throw new CF_404_Exception($page, $template);
     }
 
-    public static function show_404($page = FALSE, $template = FALSE) {
-        return self::show404($page, $template);
-    }
-
     /**
      * Dual-purpose PHP error and exception handler. Uses the kohana_error_page
      * view to display the message.
@@ -2352,6 +2348,19 @@ final class CF {
         $appCode = static::appCode($domain);
 
         return DOCROOT . 'application/' . $appCode . '/';
+    }
+
+    /**
+     * Displays a 404 page.
+     *
+     * @throws  C_404_Exception
+     * @param   string  URI of page
+     * @param   string  custom template
+     * @return  void
+     * @deprecated
+     */
+    public static function show_404($page = FALSE, $template = FALSE) {
+        return self::show404($page, $template);
     }
 
 }
