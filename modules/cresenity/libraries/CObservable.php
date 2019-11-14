@@ -75,6 +75,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
         $this->manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
         $this->manager->registerControl('file', 'CFormInputFile');
+        $this->manager->registerControl('file-ajax', 'CElement_FormInput_FileAjax');
         $this->manager->registerControl('password', 'CElement_FormInput_Password');
         $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
         $this->manager->registerControl('select', 'CElement_FormInput_Select');
