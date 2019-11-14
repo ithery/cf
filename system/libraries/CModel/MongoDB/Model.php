@@ -413,7 +413,7 @@ abstract class CModel_MongoDB_Model extends CModel {
     protected function insertAndSetId(CModel_Query $query, $attributes) {
         if ($this->usesSoftDeletes()) {
             if ((!isset($attributes['status'])) || $attributes['status'] === null) {
-                $attributes['status'] = 1;
+                $attributes['status'] = "1";
             }
         }
         parent::insertAndSetId($query, $attributes);
