@@ -143,7 +143,7 @@ trait CModel_Trait_Relationships {
      * @return CModel_Relation_MorphTo
      */
     protected function morphEagerTo($name, $type, $id) {
-        return new MorphTo(
+        return new CModel_Relation_MorphTo(
                 $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
         );
     }
