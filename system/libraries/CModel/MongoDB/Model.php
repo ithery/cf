@@ -341,7 +341,7 @@ abstract class CModel_MongoDB_Model extends CModel {
      */
     protected function newBaseQueryBuilder() {
         $connection = $this->getConnection();
-        
+
         return new CDatabase_Query_Builder_MongoDBBuilder($connection, $connection->getPostProcessor());
     }
 
@@ -389,19 +389,20 @@ abstract class CModel_MongoDB_Model extends CModel {
     }
 
     protected static function usesSoftDeletes() {
-       
-       
+
+
         $classUses = CF::collect(CF::class_uses_recursive(static::class));
-        $lastClassUses = $classUses->map(function($item){
-           
-            return carr::last(explode('_',$item));
+        $lastClassUses = $classUses->map(function($item) {
+
+            return carr::last(explode('_', $item));
         });
         if (in_array('SoftDeleteTrait', $lastClassUses->toArray())) {
-           
+
             return true;
         }
         return false;
     }
+
     /**
      * Insert the given attributes and set the ID on the model.
      *
@@ -410,11 +411,14 @@ abstract class CModel_MongoDB_Model extends CModel {
      * @return void
      */
     protected function insertAndSetId(CModel_Query $query, $attributes) {
-        if($this->usesSoftDeletes()) {
-            $attributes['status']=1;
+        if ($this->usesSoftDeletes()) {
+            if ((!isset($attributes['status'])) || $attributes['status'] === null) {
+                $attributes['status'] = 1;
+            }
         }
-        parent::insertAndSetId($query,$attributes);
+        parent::insertAndSetId($query, $attributes);
     }
+
     /**
      * @inheritdoc
      */
