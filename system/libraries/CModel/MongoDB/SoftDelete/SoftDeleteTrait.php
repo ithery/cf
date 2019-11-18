@@ -20,14 +20,6 @@ trait CModel_MongoDB_SoftDelete_SoftDeleteTrait {
         return $this->getStatusColumn();
     }
 
-    
-   /**
-     * Indicates if the model is currently force deleting.
-     *
-     * @var bool
-     */
-    protected $forceDeleting = false;
-
     /**
      * Boot the soft deleting trait for a model.
      *
@@ -36,7 +28,6 @@ trait CModel_MongoDB_SoftDelete_SoftDeleteTrait {
     public static function bootSoftDeleteTrait() {
         static::addGlobalScope(new CModel_MongoDB_SoftDelete_Scope);
     }
-
 
     /**
      * Perform the actual delete query on this model instance.
@@ -57,7 +48,7 @@ trait CModel_MongoDB_SoftDelete_SoftDeleteTrait {
 
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
         }
-        
+
         $query->update($columns);
     }
 
