@@ -76,7 +76,7 @@ abstract class CSocialLogin_OAuth1_AbstractProvider extends CSocialLogin_Abstrac
      *
      * @param  string  $token
      * @param  string  $secret
-     * @return \Laravel\Socialite\One\User
+     * @return \CSocialLogin_OAuth1_User
      */
     public function userFromTokenAndSecret($token, $secret) {
         $tokenCredentials = new TokenCredentials();
@@ -85,7 +85,7 @@ abstract class CSocialLogin_OAuth1_AbstractProvider extends CSocialLogin_Abstrac
         $user = $this->server->getUserDetails(
                 $tokenCredentials, $this->shouldBypassCache($token, $secret)
         );
-        $instance = (new User)->setRaw($user->extra)
+        $instance = (new CSocialLogin_OAuth1_User)->setRaw($user->extra)
                 ->setToken($tokenCredentials->getIdentifier(), $tokenCredentials->getSecret());
         return $instance->map([
                     'id' => $user->uid,
