@@ -48,11 +48,16 @@ class cmailapi {
                 $filename = basename($path);
                 $attachmentFilename = carr::get($att, "filename");
                 $type = carr::get($att, "type");
-                
             } else {
                 $path = $att;
                 $filename = basename($att);
                 $attachmentFilename = $filename;
+                $type = "";
+            }
+
+
+            if (strlen($type) == 0) {
+
                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
                 $path = $att;
                 $type = 'application/text';
@@ -66,7 +71,6 @@ class cmailapi {
                     $type = 'image/png';
                 }
             }
-
 
             $attachment = new CSendGrid_Attachment();
             $attachment->setContent(base64_encode(file_get_contents($path)));
