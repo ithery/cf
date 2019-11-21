@@ -43,7 +43,7 @@ class cmailapi {
 
         $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
         foreach ($attachments as $att) {
-            if (!is_array($att)) {
+            if (is_array($att)) {
                 $path = carr::get($att, "path");
                 $filename = basename($path);
                 $attachmentFilename = carr::get($att, "filename");
