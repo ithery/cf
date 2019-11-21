@@ -25,12 +25,23 @@ class cmailapi {
             $smtp_from_name = ccfg::get('smtp_from_name');
         }
 
-
+        if (is_array($to)) {
+            $to = carr::get($to, 0);
+        }
         $from = new CSendGrid_Email($smtp_from_name, $smtp_from);
-        $to = new CSendGrid_Email(null, $to);
+
+        $toSendGrid = array();
+        if (!is_array($to)) {
+            $to = array($to);
+        }
+        foreach ($to as $toItem) {
+            $toSendGrid[] = new CSendGrid_Email(null, $toItem);
+        }
         $content = new CSendGrid_Content("text/html", $message);
 
-        $mail = new CSendGrid_Mail($from, $subject, $to, $content);
+
+
+        $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
         foreach ($attachments as $att) {
             $filename = basename($att);
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -38,6 +49,12 @@ class cmailapi {
             $type = 'application/text';
             if ($ext == 'pdf') {
                 $type = 'application/pdf';
+            }
+            if ($ext == 'jpg' || $ext == 'jpeg') {
+                $type = 'image/jpeg';
+            }
+            if ($ext == 'png') {
+                $type = 'image/png';
             }
             $attachment = new CSendGrid_Attachment();
             $attachment->setContent(base64_encode(file_get_contents($att)));
@@ -190,15 +207,15 @@ class cmailapi {
             'subject' => $subject . '',
             'html' => $message,
         );
-        
-        
-        if(count($cc)>0) {
-            $params['cc']=$cc;
+
+
+        if (count($cc) > 0) {
+            $params['cc'] = $cc;
         }
-        if(count($bcc)>0) {
-            $params['bcc']=$bcc;
+        if (count($bcc) > 0) {
+            $params['bcc'] = $bcc;
         }
-        
+
 
         if (isset($_GET['debug2'])) {
             cdbg::var_dump($url);

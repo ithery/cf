@@ -57,6 +57,7 @@ abstract class CSocialLogin_OAuth1_AbstractProvider extends CSocialLogin_Abstrac
             throw new InvalidArgumentException('Invalid request. Missing OAuth verifier.');
         }
         $token = $this->getToken();
+        
         $user = $this->server->getUserDetails(
                 $token, $this->shouldBypassCache($token->getIdentifier(), $token->getSecret())
         );

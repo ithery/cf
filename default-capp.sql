@@ -126,8 +126,8 @@ CREATE TABLE IF NOT EXISTS `org` (
 
 -- Dumping data for table torsb2c.org: ~0 rows (approximately)
 /*!40000 ALTER TABLE `org` DISABLE KEYS */;
-INSERT INTO `org` (`org_id`, `code`, `org_category`, `name`, `address`, `city`, `fax`, `email`, `phone`, `mobile`, `contact_person`, `credit_limit`, `created`, `createdby`, `updated`, `updatedby`, `status`) VALUES
-	(1, 'ittron', 'Ittron', 'Ittron', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, 1);
+INSERT INTO `org` (`org_id`, `code`, `name`, `address`, `city`,  `email`, `phone`,  `contact_person`, `created`, `createdby`, `updated`, `updatedby`, `status`) VALUES
+	(1, 'ittron', 'Ittron', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
 /*!40000 ALTER TABLE `org` ENABLE KEYS */;
 
 
