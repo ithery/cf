@@ -43,24 +43,36 @@ class cmailapi {
 
         $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
         foreach ($attachments as $att) {
-            $filename = basename($att);
-            $ext = pathinfo($filename, PATHINFO_EXTENSION);
-            $path = $att;
-            $type = 'application/text';
-            if ($ext == 'pdf') {
-                $type = 'application/pdf';
+            if (!is_array($att)) {
+                $path = carr::get($att, "path");
+                $filename = basename($path);
+                $attachmentFilename = carr::get($att, "filename");
+                $type = carr::get($att, "type");
+                
+            } else {
+                $path = $att;
+                $filename = basename($att);
+                $attachmentFilename = $filename;
+                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                $path = $att;
+                $type = 'application/text';
+                if ($ext == 'pdf') {
+                    $type = 'application/pdf';
+                }
+                if ($ext == 'jpg' || $ext == 'jpeg') {
+                    $type = 'image/jpeg';
+                }
+                if ($ext == 'png') {
+                    $type = 'image/png';
+                }
             }
-            if ($ext == 'jpg' || $ext == 'jpeg') {
-                $type = 'image/jpeg';
-            }
-            if ($ext == 'png') {
-                $type = 'image/png';
-            }
+
+
             $attachment = new CSendGrid_Attachment();
-            $attachment->setContent(base64_encode(file_get_contents($att)));
+            $attachment->setContent(base64_encode(file_get_contents($path)));
             $attachment->setType($type);
             $attachment->setDisposition("attachment");
-            $attachment->setFilename($filename);
+            $attachment->setFilename($attachmentFilename);
             $mail->addAttachment($attachment);
         }
 
