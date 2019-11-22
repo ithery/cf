@@ -122,11 +122,11 @@ class CQueue_CallQueuedHandler {
     /**
      * Handle a model not found exception.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  \Exception  $e
      * @return void
      */
-    protected function handleModelNotFound(Job $job, $e) {
+    protected function handleModelNotFound(CQueue_AbstractJob $job, $e) {
         $class = $job->resolveName();
         try {
             $reflectionClass = new ReflectionClass($class);

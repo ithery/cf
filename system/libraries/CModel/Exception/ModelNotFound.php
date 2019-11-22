@@ -1,10 +1,5 @@
 <?php
 
-//namespace Illuminate\Database\Eloquent;
-//
-//use RuntimeException;
-//use Illuminate\Support\Arr;
-
 class CModel_Exception_ModelNotFound extends CModel_Exception {
 
     /**
