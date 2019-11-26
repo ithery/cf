@@ -599,7 +599,7 @@ class CElement_Component_DataTable extends CElement_Component {
         //render body;
         $html->appendln($this->htmlChild($indent));
         $no = 0;
-        if (!$this->ajax) {
+        if (!$this->ajax && is_array($this->data)) {
             foreach ($this->data as $row) {
                 if ($row instanceof CRenderable) {
                     $html->appendln($row->html());
