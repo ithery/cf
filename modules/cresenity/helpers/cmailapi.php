@@ -59,7 +59,7 @@ class cmailapi {
             if (strlen($type) == 0) {
 
                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
-                $path = $att;
+                
                 $type = 'application/text';
                 if ($ext == 'pdf') {
                     $type = 'application/pdf';
