@@ -211,7 +211,7 @@ class CModel_HasResource_FileAdder_FileAdder {
                 return $collectionDiskName;
             }
         }
-        return CF::config('resource.disk_name');
+        return CF::config('resource.disk');
     }
 
     public function defaultSanitizer($fileName) {
@@ -245,16 +245,21 @@ class CModel_HasResource_FileAdder_FileAdder {
             unlink($fileAdder->pathToFile);
         }
         if ($this->generateResponsiveImages && (new ImageGenerator())->canConvert($resource)) {
-            $generateResponsiveImagesJobClass = config('resourcelibrary.jobs.generate_responsive_images', GenerateResponsiveImages::class);
+            $generateResponsiveImagesJobClass = CF::config('resource.jobs.generate_responsive_images', GenerateResponsiveImages::class);
             $job = new $generateResponsiveImagesJobClass($resource);
-            if ($customQueue = config('resourcelibrary.queue_name')) {
+            if ($customQueue = CF::config('resource.queue_name')) {
                 $job->onQueue($customQueue);
             }
             dispatch($job);
         }
-        if (COptional::create($this->getResourceCollection($resource->collection_name))->singleFile) {
-            $model->clearResourceCollectionExcept($resource->collection_name, $resource);
+        if ($collectionSizeLimit = COptional::create($this->getResourceCollection($resource->collection_name))->collectionSizeLimit) {
+            $collectionResource = $this->subject->fresh()->getResource($resource->collection_name);
+            
+            if ($collectionResource->count() > $collectionSizeLimit) {
+                $model->clearResourceCollectionExcept($resource->collection_name, $collectionResource->reverse()->take($collectionSizeLimit));
+            }
         }
+        
     }
 
     protected function getResourceCollection($collectionName) {
@@ -270,7 +275,7 @@ class CModel_HasResource_FileAdder_FileAdder {
         if (!$collection = $this->getResourceCollection($resource->collection_name)) {
             return;
         }
-        if (!call_user_func(array($collection->acceptsFile), $file, $this->subject)) {
+        if (!call_user_func($collection->acceptsFile, $file, $this->subject)) {
             throw CResources_Exception_FileCannotBeAdded_FileUnacceptableForCollection::create($file, $collection, $this->subject);
         }
     }

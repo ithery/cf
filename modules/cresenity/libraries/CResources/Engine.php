@@ -197,12 +197,12 @@ abstract class CResources_Engine implements CResources_EngineInterface {
     }
 
     public function getUrl($filename = null, $size = '', $encode = true) {
-        if(CResources::isS3()) {
-            $path = $this->getPath($filename,$size);
-            $disk = CResources::disk();
-            return $disk->url($path);
-            
-        }
+//        if(CResources::isS3()) {
+//            $path = $this->getPath($filename,$size);
+//            $disk = CResources::disk();
+//            return $disk->url($path);
+//            
+//        }
         
         if ($filename == null) {
             $filename = $this->_filename;

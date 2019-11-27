@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since May 2, 2019, 12:39:25 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use Finfo;
+
 class CResources_Helpers_File {
 
     public static function renameInDirectory($fileNameWithDirectory, $newFileNameWithoutDirectory) {

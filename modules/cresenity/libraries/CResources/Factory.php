@@ -30,6 +30,7 @@ class CResources_Factory {
     public static function createUrlGeneratorForResource(CApp_Model_Interface_ResourceInterface $resource, $conversionName = '') {
         $urlGeneratorClass = CF::config('resource.url_generator') != null ?
                 CF::config('resource.url_generator') : 'CResources_UrlGenerator_' . ucfirst($resource->getDiskDriverName()) . 'UrlGenerator';
+       
         static::guardAgainstInvalidUrlGenerator($urlGeneratorClass);
         $urlGenerator = new $urlGeneratorClass();
         $pathGenerator = static::createPathGenerator();

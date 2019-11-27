@@ -17,8 +17,6 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
     /** @var CResources_PathGeneratorInterface */
     protected $pathGenerator;
 
-    
-
     /**
      * @param CApp_Model_Interface_ResourceInterface $resource
      *
@@ -66,6 +64,13 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
 
     public function rawUrlEncodeFilename($path = '') {
         return pathinfo($path, PATHINFO_DIRNAME) . '/' . rawurlencode(pathinfo($path, PATHINFO_BASENAME));
+    }
+
+    public function versionUrl($path = '') {
+        if (!CF::config('resource.version_urls')) {
+            return $path;
+        }
+        return "{$path}?v={$this->resource->updated->timestamp}";
     }
 
 }

@@ -8,24 +8,27 @@ class CResources {
      * 
      * @return CStorage_Adapter
      */
-    public static function disk($diskName=null) {
-        if($diskName==null) {
+    public static function disk($diskName = null) {
+        if ($diskName == null) {
             $diskName = CF::config('resource.disk');
         }
+
         return CStorage::instance()->disk($diskName);
     }
-    
-    
-    public static function isS3($diskName=null) {
-         if($diskName==null) {
-            $diskName = CF::config('resource.disk');
-        }
-       
-        $config = CF::config("storage.disks.{$diskName}");
-        return carr::get($config,'driver') == 's3';
+
+//    public static function isS3($diskName=null) {
+//         if($diskName==null) {
+//            $diskName = CF::config('resource.disk');
+//        }
+//       
+//        $config = CF::config("storage.disks.{$diskName}");
+//        return carr::get($config,'driver') == 's3';
+//    }
+//    
+
+    public static function isOldSystem() {
+        return CF::config('resource.disk') == null;
     }
-    
-    
 
     public static function getFileInfo($filename) {
         $orgCode = '';
@@ -73,7 +76,13 @@ class CResources {
         );
     }
 
-    public static function getRelativePath($filename,$size) {
+    public static function exists($filename, $size = null) {
+        $path = static::getPath($filename, $size);
+        return file_exists($path);
+    }
+
+    public static function getRelativePath($filename, $size = null) {
+
         $temp = '';
         $arr_name = explode("_", $filename);
         //org_code
@@ -101,8 +110,9 @@ class CResources {
         $temp_path = str_replace(DS, "/", $dir) . "" . $temp;
         return $temp_path;
     }
-    
+
     public static function getPath($filename, $size = null) {
+
         $temp = '';
         $arr_name = explode("_", $filename);
         //org_code
@@ -165,14 +175,11 @@ class CResources {
                 'app_code' => $appCode,
             );
         }
+        $root_directory = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . 'resources';
 
-        if(!CResources::isS3()) {
-            $root_directory = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . 'resources';
-        
-        } else {
-            $root_directory = 'resources';
-        }
-        
+//        if(CResources::isS3()) {
+//             $root_directory = 'resources';
+//        }
         //try to get file_info
         $filepath = CResources::getPath($resource_type);
         if (file_exists($filepath)) {
@@ -303,13 +310,18 @@ class CResources {
         return $imageName;
     }
 
-    
     public static function getUrl($fileId) {
-        $disk = static::disk();
-        $path = static::getRelativePath($fileId);
-        return $disk->url($path);
-         
-       
-        
+        $path = static::getPath($fileId);
+        $url = str_replace(DOCROOT, curl::httpbase(), $path);
+        return $url;
     }
+
+    public static function delete($filename, $size = null) {
+        if (static::exists($filename, $size)) {
+            $path = static::getPath($filename);
+            return unlink($path);
+        }
+        return true;
+    }
+
 }

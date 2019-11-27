@@ -89,7 +89,7 @@ trait CModel_Resource_ResourceTrait {
         if (strlen($this->disk) == 0) {
             return 'local';
         }
-        return strtolower(config("filesystems.disks.{$this->disk}.driver"));
+        return strtolower(CF::config("storage.disks.{$this->disk}.driver"));
     }
 
     /*
@@ -109,7 +109,7 @@ trait CModel_Resource_ResourceTrait {
      * @return mixed
      */
     public function getCustomProperty($propertyName, $default = null) {
-        return array_get($this->custom_properties, $propertyName, $default);
+        return carr::get($this->custom_properties, $propertyName, $default);
     }
 
     /**
