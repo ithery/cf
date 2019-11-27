@@ -102,6 +102,29 @@ class CTemporary {
 
         return $path . $filename;
     }
+    
+    
+    public static function getPath($folder, $filename) {
+        $depth = 5;
+        $mainFolder = substr($filename, 0, 8);
+        $path = '';
+        $path = $path . $folder . DIRECTORY_SEPARATOR;
+        $path = $path . $mainFolder . DIRECTORY_SEPARATOR;
+        
+        $basefile = basename($filename);
+        for ($i = 0; $i < $depth; $i++) {
+            $c = "_";
+            if (strlen($basefile) > ($i + 1)) {
+                $c = substr($basefile, $i + 8, 1);
+                if (strlen($c) == 0) {
+                    $c = "_";
+                }
+                $path = $path = $path . $c . DIRECTORY_SEPARATOR;
+            }
+        }
+
+        return $path . $filename;
+    }
 
     /**
      * 
@@ -138,6 +161,19 @@ class CTemporary {
 
         $path = static::makePath($folder, $filename);
         return @unlink($path);
+    }
+
+    public static function generateRandomFilename() {
+        return date('Ymd') . cutils::randmd5() . $extension;
+    }
+    
+    public static function put($folder, $content ,$filename=null) {
+        if($filename == null) {
+            $filename = static::generateRandomFilename();
+        }
+        $path = static::getPath($folder, $filename);
+        static::disk()->put($path, $content);
+        return $path;
     }
 
 }

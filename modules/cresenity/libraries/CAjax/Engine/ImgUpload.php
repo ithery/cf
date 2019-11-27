@@ -9,6 +9,7 @@
 class CAjax_Engine_ImgUpload extends CAjax_Engine {
 
     public function execute() {
+        
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
         $fileId = '';
@@ -48,8 +49,10 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $filteredData = substr($imageData, strpos($imageData, ",") + 1);
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("imgupload", $fileId);
-                cfs::atomic_write($fullfilename, $unencodedData);
+                
+                //$fullfilename = ctemp::makepath("imgupload", $fileId);
+                //cfs::atomic_write($fullfilename, $unencodedData);
+                $fullfilename = CTemporary::put('imgupload',$unencodedData,$fileId);
                 $return[] = $fileId;
             }
         }
