@@ -4,6 +4,25 @@ class CResources {
 
     use CTrait_Compat_Resources;
 
+    /**
+     * 
+     * @return CStorage_Adapter
+     */
+    public static function disk() {
+        $diskName = CF::config('resource.disk');
+        return CStorage::instance()->disk($diskName);
+    }
+    
+    
+    public static function isS3() {
+        $diskName = CF::config('resource.disk');
+       
+        $config = CF::config("storage.disks.{$diskName}");
+        return carr::get($config,'driver') == 's3';
+    }
+    
+    
+
     public static function getFileInfo($filename) {
         $orgCode = '';
         $resource_type = '';
@@ -50,6 +69,35 @@ class CResources {
         );
     }
 
+    public static function getRelativePath($filename,$size) {
+        $temp = '';
+        $arr_name = explode("_", $filename);
+        //org_code
+        if (isset($arr_name[0])) {
+            $temp .= $arr_name[0] . DS;
+        }
+        //resource_type
+        if (isset($arr_name[1])) {
+            $temp .= $arr_name[1] . DS;
+        }
+        //name
+        if (isset($arr_name[2])) {
+            $temp .= $arr_name[2] . DS;
+        }
+        //date
+        if (isset($arr_name[3])) {
+            $temp .= $arr_name[3] . DS;
+        }
+        if ($size != null) {
+            $temp .= $size . DS;
+        }
+        $temp .= $filename;
+        $dir = 'resources';
+
+        $temp_path = str_replace(DS, "/", $dir) . "" . $temp;
+        return $temp_path;
+    }
+    
     public static function getPath($filename, $size = null) {
         $temp = '';
         $arr_name = explode("_", $filename);
@@ -114,11 +162,17 @@ class CResources {
             );
         }
 
-        $root_directory = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . 'resources';
+        if(!CResources::isS3()) {
+            $root_directory = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . 'resources';
+        
+        } else {
+            $root_directory = 'resources';
+        }
+        
         //try to get file_info
-        $filepath = CResources::get_path($resource_type);
+        $filepath = CResources::getPath($resource_type);
         if (file_exists($filepath)) {
-            $info = CResources::get_file_info($resource_type);
+            $info = CResources::getFileInfo($resource_type);
             $resource_type = carr::get($info, 'resource_type');
             $type = carr::get($info, 'type');
             $orgCode = carr::get($info, 'org_code');
@@ -229,20 +283,29 @@ class CResources {
         }
         return $results;
     }
-    
+
     public static function saveFromTemp($type, $resourceName, $tempPath, $resourceOptions = array()) {
         if (!is_array($resourceOptions)) {
             $resourceOptions = array();
         }
-        
+
         if (!isset($resourceOptions['app_code'])) {
             $resourceOptions['app_code'] = CF::appCode();
         }
-        
+
         $resource = CResources::factory($type, $resourceName, $resourceOptions);
         $filename = basename($tempPath);
         $imageName = $resource->saveFromTemp($filename, $tempPath);
         return $imageName;
     }
 
+    
+    public static function getUrl($fileId) {
+        $disk = static::disk();
+        $path = static::getRelativePath($fileId);
+        return $disk->url($path);
+         
+       
+        
+    }
 }
