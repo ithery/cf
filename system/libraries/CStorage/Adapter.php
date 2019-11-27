@@ -167,6 +167,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      */
     public function put($path, $contents, $options = []) {
         $options = is_string($options) ? ['visibility' => $options] : (array) $options;
+        
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
         // for the developer to store streams without managing them manually in code.

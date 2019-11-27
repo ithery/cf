@@ -76,14 +76,16 @@ return [
             'region' => 'sgp1',
             'bucket' => 'resource',
             'endpoint' => 'https://sgp1.digitaloceanspaces.com',
+            'visibility' => 'public',
         ],
         's3-temp' => [
             'driver' => 's3',
             'key' => 'AMCFVMWR7P225JAAGFSL',
             'secret' => '04yvHWJJFrKv71VoGbqL3rZ6dcXjeJIReq85XqAi6jg',
             'region' => 'sgp1',
-            'bucket' => 'resource',
+            'bucket' => 'temp-files',
             'endpoint' => 'https://sgp1.digitaloceanspaces.com',
+            'visibility' => 'public',
         ],
     ],
 ];
