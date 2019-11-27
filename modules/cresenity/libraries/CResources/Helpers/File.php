@@ -8,8 +8,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
-use Finfo;
-
 class CResources_Helpers_File {
 
     public static function renameInDirectory($fileNameWithDirectory, $newFileNameWithoutDirectory) {
