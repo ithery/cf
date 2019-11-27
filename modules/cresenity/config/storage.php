@@ -25,7 +25,7 @@ return [
       |--------------------------------------------------------------------------
       |
       | Here you may specify the default filesystem disk that should be used
-      | by the temporary for the framework. 
+      | by the temporary for the framework.
       |
      */
     'temp' => 'local-temp',
@@ -59,7 +59,7 @@ return [
         ],
         'local-temp' => [
             'driver' => 'local',
-            'root' => DOCROOT.'temp',
+            'root' => DOCROOT . 'temp',
             'url' => curl::httpbase() . 'temp',
             'visibility' => 'public',
         ],

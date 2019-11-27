@@ -8,8 +8,10 @@
 
 class CAjax_Engine_ImgUpload extends CAjax_Engine {
 
+    const FOLDER = 'imgupload';
+
     public function execute() {
-        
+
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
         $fileId = '';
@@ -49,16 +51,17 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $filteredData = substr($imageData, strpos($imageData, ",") + 1);
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                
+
                 //$fullfilename = ctemp::makepath("imgupload", $fileId);
                 //cfs::atomic_write($fullfilename, $unencodedData);
-                $fullfilename = CTemporary::put('imgupload',$unencodedData,$fileId);
+                $fullfilename = CTemporary::put(static::FOLDER, $unencodedData, $fileId);
+
                 $return[] = $fileId;
             }
         }
         $return = array(
             'fileId' => $fileId,
-            'url' => ctemp::get_url('imgupload', $fileId),
+            'url' => CTemporary::getUrl(static::FOLDER, $fileId),
         );
         return json_encode($return);
     }

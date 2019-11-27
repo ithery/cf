@@ -133,6 +133,9 @@ class CTemporary {
      * @return string
      */
     public static function getUrl($folder, $filename) {
+        $path = static::getPath($folder, $filename);
+        return static::disk()->url($path);
+        
         $mainFolder = substr($filename, 0, 8);
         $basefile = basename($filename);
         $url = curl::base() . 'temp/' . $folder . '/' . $mainFolder . '/';
