@@ -13,8 +13,19 @@ class CTemporary {
      * 
      * @return CStorage_FilesystemInterface
      */
-    public static function disk() {
-        return CStorage::instance()->temp();
+    public static function disk($diskName=null) {
+        return CStorage::instance()->temp($diskName);
+    }
+    
+    public static function defaultDiskDriver() {
+        $defaultDiskName = static::defaultDiskName();
+        $config = CF::config('storage.disks.'.$defaultDiskName);
+        return carr::get($config,'driver');
+      
+    }
+    
+    public static function defaultDiskName() {
+        return CF::config('storage.temp');;
     }
 
     /**
@@ -102,15 +113,14 @@ class CTemporary {
 
         return $path . $filename;
     }
-    
-    
+
     public static function getPath($folder, $filename) {
         $depth = 5;
         $mainFolder = substr($filename, 0, 8);
         $path = '';
         $path = $path . $folder . DIRECTORY_SEPARATOR;
         $path = $path . $mainFolder . DIRECTORY_SEPARATOR;
-        
+
         $basefile = basename($filename);
         for ($i = 0; $i < $depth; $i++) {
             $c = "_";
@@ -135,7 +145,7 @@ class CTemporary {
     public static function getUrl($folder, $filename) {
         $path = static::getPath($folder, $filename);
         return static::disk()->url($path);
-        
+
         $mainFolder = substr($filename, 0, 8);
         $basefile = basename($filename);
         $url = curl::base() . 'temp/' . $folder . '/' . $mainFolder . '/';
@@ -169,9 +179,9 @@ class CTemporary {
     public static function generateRandomFilename() {
         return date('Ymd') . cutils::randmd5() . $extension;
     }
-    
-    public static function put($folder, $content ,$filename=null) {
-        if($filename == null) {
+
+    public static function put($folder, $content, $filename = null) {
+        if ($filename == null) {
             $filename = static::generateRandomFilename();
         }
         $path = static::getPath($folder, $filename);
