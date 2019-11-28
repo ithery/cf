@@ -35,9 +35,12 @@ class cajax {
             $last_process_id = cprogress::last_process_id();
         }
         if (isset($input["cancel"])) {
-            $filename = $process_id . "_cancel";
-            $file = ctemp::makepath("process", $filename . ".tmp");
-            $json = file_put_contents($file, $form);
+            $filename = $process_id . "_cancel" . ".tmp";
+            $file = CTemporary::getPath("process", $filename);
+            $disk = CTemporary::disk();
+
+
+            $json = $disk->put($file, $form);
             echo json_encode(array(
                 "result" => "0",
                 "message" => "User cancelled",
@@ -45,11 +48,12 @@ class cajax {
             die();
         }
 
-        $filename = $process_id;
-        $file = ctemp::makepath("process", $filename . ".tmp");
+        $filename = $process_id . ".tmp";
+        $file = CTemporary::getPath("process", $filename);
+        $disk = CTemporary::disk();
         $json = '{"percent":0,"info":"Initializing"}';
-        if (file_exists($file)) {
-            $json = file_get_contents($file);
+        if ($disk->exists($file)) {
+            $json = $disk->get($file);
         }
         echo $json;
     }
@@ -327,7 +331,7 @@ class cajax {
             foreach ($row as $k => $v) {
                 $v = ($v == null) ? "" : $v;
                 if ($valueCallbackFunction != null && is_callable($valueCallbackFunction)) {
-                   
+
                     $v = call_user_func($valueCallbackFunction, $row, $k, $v);
                 }
                 $p[$k] = $v;
@@ -673,8 +677,9 @@ class cajax {
                     die('fatal error');
                 }
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("imgupload", $fileId);
-                if (!move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename)) {
+                $fullfilename = CTemporary::getPath("imgupload", $fileId);
+                $disk = CTemporary::disk();
+                if (!$disk->put($fullfilename, file_get_contents($_FILES[$input_name]['tmp_name'][$i]))) {
                     die('fail upload from ' . $_FILES[$input_name]['tmp_name'][$i] . ' to ' . $fullfilename);
                 }
                 $return[] = $fileId;
@@ -702,14 +707,15 @@ class cajax {
                 $filteredData = substr($imageData, strpos($imageData, ",") + 1);
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("imgupload", $fileId);
-                cfs::atomic_write($fullfilename, $unencodedData);
+                $fullfilename = CTemporary::getPath("imgupload", $fileId);
+                $disk = CTemporary::disk();
+                $disk->put($fullfilename, $unencodedData);
                 $return[] = $fileId;
             }
         }
         $return = array(
             'file_id' => $fileId,
-            'url' => ctemp::get_url('imgupload', $fileId),
+            'url' => CTemporary::getUrl('imgupload', $fileId),
         );
         return json_encode($return);
     }
@@ -723,10 +729,10 @@ class cajax {
             for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
                 $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
                 $file_id = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("fileupload", $file_id . ".tmp");
 
-
-                move_uploaded_file($_FILES[$input_name]['tmp_name'][$i], $fullfilename);
+                $fullfilename = CTemporary::getPath("fileupload", $file_id . ".tmp");
+                $disk = CTemporary::disk();
+                $disk->put($fullfilename, file_get_contents($_FILES[$input_name]['tmp_name'][$i]));
                 $return[] = $file_id;
             }
         }
