@@ -22,8 +22,6 @@ abstract class CObservable extends CRenderable {
      */
     protected $javascript;
 
-   
-
     /**
      * 
      * @return CObservable_Javascript
@@ -39,7 +37,7 @@ abstract class CObservable extends CRenderable {
     public function jquery() {
         return $this->javascript->jquery();
     }
-    
+
     /**
      * 
      * @return CObservable_Javascript_Handler
@@ -47,8 +45,6 @@ abstract class CObservable extends CRenderable {
     public function handler() {
         return $this->javascript->handler();
     }
-
-    
 
     protected function __construct($id = "") {
 
@@ -183,12 +179,6 @@ abstract class CObservable extends CRenderable {
         return $tabs;
     }
 
-    public function addAjax() {
-        $ajax = CAjaxObject::factory();
-        $this->add($ajax);
-        return $ajax;
-    }
-
     public function addElm($tag, $id = "") {
         $tag = CCustomElement::factory($tag, $id);
         $this->add($tag);
@@ -219,7 +209,6 @@ abstract class CObservable extends CRenderable {
         return $span;
     }
 
-   
     public function addPrismCode($id = "") {
         $code = CElement_Factory::createComponent('PrismCode', $id);
         $this->add($code);
