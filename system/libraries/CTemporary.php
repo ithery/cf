@@ -132,7 +132,7 @@ class CTemporary {
                 $path = $path = $path . $c . DIRECTORY_SEPARATOR;
             }
         }
-
+        
         return $path . $filename;
     }
 

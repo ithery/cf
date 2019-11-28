@@ -89,8 +89,12 @@ class CAjax_Method implements CInterface_Jsonable {
 
         //save this object to file.
         $ajaxMethod = date('Ymd') . cutils::randmd5();
-        $file = CApp::temp()->makePath("ajax", $ajaxMethod . ".tmp");
-        file_put_contents($file, $json);
+        $disk = CTemporary::disk();
+        $filename = $ajaxMethod . ".tmp";
+        
+        $file = CTemporary::getPath("ajax", $filename);
+        $disk->put($file, $json);
+        
         $base_url = curl::httpbase();
 
         return $base_url . "cresenity/ajax/" . $ajaxMethod;

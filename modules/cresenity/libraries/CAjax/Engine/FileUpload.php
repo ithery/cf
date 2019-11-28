@@ -21,8 +21,10 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                     die('fatal error');
                 }
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("fileupload", $fileId);
-                if (!move_uploaded_file($_FILES[$inputName]['tmp_name'][$i], $fullfilename)) {
+                $disk = CTemporary::disk();
+                $fullfilename = CTemporary::getPath("fileupload",$fileId);
+                
+                if (!$disk->put($fullfilename, file_get_contents($_FILES[$inputName]['tmp_name'][$i]))) {
                     die('fail upload from ' . $_FILES[$inputName]['tmp_name'][$i] . ' to ' . $fullfilename);
                 }
                 $return[] = $fileId;
@@ -49,15 +51,17 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                 $filteredData = substr($fileData, strpos($fileData, ",") + 1);
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = ctemp::makepath("fileupload", $fileId);
-                cfs::atomic_write($fullfilename, $unencodedData);
+                $fullfilename = CTemporary::getPath("fileupload", $fileId);
+                $disk = CTemporary::disk();
+                $disk->put($fullfilename, $unencodedData);
+               
                 $return[] = $fileId;
             }
         }
         $return = array(
             'fileId' => $fileId,
             'fileName' => $fileName,
-            'url' => ctemp::get_url('fileupload', $fileId),
+            'url' => CTemporary::getUrl('fileupload', $fileId),
         );
         return json_encode($return);
     }

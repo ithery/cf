@@ -41,8 +41,11 @@ class CAjaxMethod {
         $json = json_encode($this);
 
         $ajax_method = date('Ymd') . cutils::randmd5();
-        $file = ctemp::makepath("ajax", $ajax_method . ".tmp");
-        file_put_contents($file, $json);
+        $disk = CTemporary::disk();
+        $filename = $ajax_method . ".tmp";
+        
+        $file = CTemporary::getPath("ajax", $filename);
+        $disk->put($file, $json);
         $base_url = curl::base();
         if (CManager::instance()->isMobile()) {
             $base_url = curl::base(false, 'http');

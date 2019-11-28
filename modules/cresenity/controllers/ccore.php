@@ -103,7 +103,9 @@ class CCore_Controller extends CController {
     }
 
     public function ajaxInfo($method) {
-        $file = ctemp::makepath("ajax", $method . ".tmp");
+        $filename = $method.'.tmp';
+        $file = CTemporary::getPath("ajax", $filename);
+        
         if (isset($_GET['profiler'])) {
             new Profiler();
         }
@@ -117,7 +119,8 @@ class CCore_Controller extends CController {
     }
 
     public function ajax($method) {
-        $file = ctemp::makepath("ajax", $method . ".tmp");
+        $filename = $method.'.tmp';
+        $file = CTemporary::getPath("ajax", $filename);
         if (isset($_GET['profiler'])) {
             new Profiler();
         }
