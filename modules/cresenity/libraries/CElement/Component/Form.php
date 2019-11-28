@@ -18,7 +18,6 @@ class CElement_Component_Form extends CElement_Component {
      */
     protected $validation;
     protected $remoteValidationUrl;
-    protected $trigger_submit;
     protected $ajax_submit;
     protected $ajax_success_script_callback;
     protected $ajax_datatype;
@@ -49,7 +48,6 @@ class CElement_Component_Form extends CElement_Component {
         $this->autocomplete = true;
         $this->enctype = "application/x-www-form-urlencoded";
         $this->validation = true;
-        $this->trigger_submit = array();
         $this->ajax_submit = false;
         $this->ajax_success_script_callback = "";
         $this->ajax_datatype = "text";
@@ -129,9 +127,9 @@ class CElement_Component_Form extends CElement_Component {
     }
 
     public function setValidationPromptPosition($position) {
-        $this->validationPromptPosition= $position;
+        $this->validationPromptPosition = $position;
     }
-    
+
     /**
      * Set target attribute value of form element
      * 
@@ -173,7 +171,7 @@ class CElement_Component_Form extends CElement_Component {
 
 
         if (is_array($validationData)) {
-            $this->validation=false;
+            $this->validation = false;
             CManager::asset()->module()->registerRunTimeModules('validate');
             $this->validation = new CElement_Component_Form_Validation($validationData);
 
@@ -250,11 +248,6 @@ class CElement_Component_Form extends CElement_Component {
 
     public function set_ajax_redirect_url($url) {
         $this->ajax_redirect_url = $url;
-        return $this;
-    }
-
-    public function trigger_submit($elem, $evt) {
-        $this->trigger_submit[] = CJSTrigger::factory($elem, $evt);
         return $this;
     }
 
@@ -709,7 +702,7 @@ class CElement_Component_Form extends CElement_Component {
             $js->appendln("//Form validation")->br();
             $strvalidation = "";
             if ($this->validation) {
-                $strvalidation = "$('#" . $this->id . "').validationEngine('attach', {promptPosition:'".$this->validationPromptPosition."'});";
+                $strvalidation = "$('#" . $this->id . "').validationEngine('attach', {promptPosition:'" . $this->validationPromptPosition . "'});";
             }
 
             $js->appendln("
@@ -759,28 +752,7 @@ class CElement_Component_Form extends CElement_Component {
                     });
                 ")->br();
         }
-        if (count($this->trigger_submit) > 0) {
-            foreach ($this->trigger_submit as $t) {
-                $field = $this->get_field_by_id($t->element_id);
-                if ($field == null) {
-                    trigger_error('There are no element id "' . $t->element_id . '" on this form for trigger submit', E_USER_WARNING);
-                }
-                if ($field != null) {
-                    //opening
-                    if ($t->event == "change" && $field->field_type == "select") {
-                        $js->appendln("var select = jQuery('#" . $t->element_id . "').data('replacement');")->br();
-                        $js->appendln("select.on('select-close',function() {")->br();
-                    } else {
-                        $js->appendln("jQuery('#" . $t->element_id . "')." . $t->event . "(function(event) {")->br();
-                    }
-                    //submit method
-                    $js->incIndent()->appendln("jQuery('#" . $this->form_id . "').submit();")->br()->decIndent();
 
-                    //closing
-                    $js->appendln("});")->br();
-                }
-            }
-        }
         if ($this->auto_set_focus) {
             $js->appendln("
 				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
