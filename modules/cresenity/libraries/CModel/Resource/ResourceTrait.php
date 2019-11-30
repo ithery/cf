@@ -9,8 +9,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CModel_Resource_ResourceTrait {
 
-   
-
     public function model() {
         return $this->morphTo();
     }
@@ -20,7 +18,11 @@ trait CModel_Resource_ResourceTrait {
      */
 
     public function getFullUrl($conversionName = '') {
-        return rtrim(curl::httpbase(), '/') . $this->getUrl($conversionName);
+        $url = $this->getUrl($conversionName);
+        if (!cstr::startsWith($url, ['http://', 'https://'])) {
+            $url = rtrim(curl::httpbase(), '/') . $this->getUrl($conversionName);
+        }
+        return $url;
     }
 
     /*
