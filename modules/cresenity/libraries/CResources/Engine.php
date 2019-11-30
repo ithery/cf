@@ -60,6 +60,45 @@ abstract class CResources_Engine implements CResources_EngineInterface {
     public static function encode($filename) {
         return CResources_Encode::encode($filename);
     }
+    
+    public function saveToDisk($file_name, $file_request,$disk=null) {
+        if($disk==null) {
+            $disk = CResources::disk();
+        }
+        $date_now = date("Y-m-d H:i:s");
+
+        $dir = $this->_root_directory . DS;
+
+        $org_code = $this->_org_code;
+        if ($org_code == null)
+            $org_code = 'default';
+        $dir .= $org_code . DS;
+
+
+        $dir .= $this->_resource_type . DS;
+
+
+        $dir .= $this->_type . DS;
+
+
+        $dir .= date('YmdHis', strtotime($date_now)) . DS;
+
+        $temp_file_name = $org_code . '_' . $this->_resource_type . "_" . $this->_type . "_" . date('YmdHis', strtotime($date_now)) . "_" . $file_name;
+        $path = $dir . $temp_file_name;
+        
+        if(cstr::startsWith($path, DOCROOT)) {
+            $path = substr($path,strlen(DOCROOT));
+        }
+
+        $written = $disk->put($path, $file_request);
+
+        if ($written === false) {
+            throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
+        }
+        $this->_filename = $temp_file_name;
+        return $temp_file_name;
+    }
+    
 
     public function save($file_name, $file_request) {
         $date_now = date("Y-m-d H:i:s");
@@ -80,11 +119,16 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
-        cfs::mkdir($dir);
+        
 
         $temp_file_name = $org_code . '_' . $this->_resource_type . "_" . $this->_type . "_" . date('YmdHis', strtotime($date_now)) . "_" . $file_name;
         $path = $dir . $temp_file_name;
-        $written = cfs::atomic_write($path, $file_request);
+        
+        if(cstr::startsWith($path, DOCROOT)) {
+            $path = substr($path,strlen(DOCROOT));
+        }
+        $disk = CResources::disk();
+        $written = $disk->put($path, $file_request);
 
         if ($written === false) {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));

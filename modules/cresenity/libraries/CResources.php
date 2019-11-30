@@ -16,15 +16,15 @@ class CResources {
         return CStorage::instance()->disk($diskName);
     }
 
-//    public static function isS3($diskName=null) {
-//         if($diskName==null) {
-//            $diskName = CF::config('resource.disk');
-//        }
-//       
-//        $config = CF::config("storage.disks.{$diskName}");
-//        return carr::get($config,'driver') == 's3';
-//    }
-//    
+    public static function isS3($diskName=null) {
+         if($diskName==null) {
+            $diskName = CF::config('resource.disk');
+        }
+       
+        $config = CF::config("storage.disks.{$diskName}");
+        return carr::get($config,'driver') == 's3';
+    }
+    
 
     public static function isOldSystem() {
         return CF::config('resource.disk') == null;
