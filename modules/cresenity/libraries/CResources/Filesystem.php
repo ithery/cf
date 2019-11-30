@@ -39,6 +39,7 @@ class CResources_Filesystem {
             fclose($file);
             return;
         }
+        
         $this->filesystem
                 ->disk($resource->disk)
                 ->put($destination, $file, $this->getRemoteHeadersForFile($pathToFile, $resource->getCustomHeaders()));

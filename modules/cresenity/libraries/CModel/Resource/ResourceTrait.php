@@ -216,7 +216,7 @@ trait CModel_Resource_ResourceTrait {
             unset($attributes['conversion']);
             $extraAttributes = array_merge($attributes, $extraAttributes);
         }
-        $attributeString = collect($extraAttributes)
+        $attributeString = CF::collect($extraAttributes)
                         ->map(function ($value, $name) {
                             return $name . '="' . $value . '"';
                         })->implode(' ');
@@ -227,7 +227,7 @@ trait CModel_Resource_ResourceTrait {
         $viewName = 'image';
         $width = '';
         if ($this->hasResponsiveImages($conversion)) {
-            $viewName = config('medialibrary.responsive_images.use_tiny_placeholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
+            $viewName = CF::config('resource.responsive_images.use_tiny_placeholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
             $width = $this->responsiveImages($conversion)->files->first()->width();
         }
         return view("medialibrary::{$viewName}", compact(
@@ -235,13 +235,13 @@ trait CModel_Resource_ResourceTrait {
         ));
     }
 
-    public function move(HasMedia $model, $collectionName = 'default') {
+    public function move(CModel_HasResourceInterface $model, $collectionName = 'default') {
         $newMedia = $this->copy($model, $collectionName);
         $this->delete();
         return $newMedia;
     }
 
-    public function copy(HasMedia $model, $collectionName = 'default') {
+    public function copy(CModel_HasResourceInterface $model, $collectionName = 'default') {
         $temporaryDirectory = TemporaryDirectory::create();
         $temporaryFile = $temporaryDirectory->path($this->file_name);
         app(Filesystem::class)->copyFromMediaLibrary($this, $temporaryFile);

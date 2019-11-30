@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use CResources_Helpers_File as File;
 use CResources_File as PendingFile;
+use CResources_ImageGenerator_FileType_ImageType as ImageGenerator;
 
 class CModel_HasResource_FileAdder_FileAdder {
 
@@ -92,7 +93,7 @@ class CModel_HasResource_FileAdder_FileAdder {
             $this->resourceName = pathinfo($file, PATHINFO_FILENAME);
             return $this;
         }
-        if ($file instanceof UploadedFile) {
+        if ($file instanceof CHTTP_UploadedFile) {
             $this->pathToFile = $file->getPath() . '/' . $file->getFilename();
             $this->setFileName($file->getClientOriginalName());
             $this->resourceName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -104,7 +105,7 @@ class CModel_HasResource_FileAdder_FileAdder {
             $this->resourceName = pathinfo($file->getFilename(), PATHINFO_FILENAME);
             return $this;
         }
-        throw UnknownType::create();
+        throw CResources_Exception_FileCannotBeAdded_UnknownType::create();
     }
 
     public function preservingOriginal() {
@@ -171,7 +172,7 @@ class CModel_HasResource_FileAdder_FileAdder {
         }
         $maxFileSize = CF::config('resource.max_file_size');
         if ($maxFileSize !== null) {
-            if (filesize($this->pathToFile) > CF::config('resource.max_file_size')) {
+            if (filesize($this->pathToFile) > $maxFileSize) {
                 throw CResources_Exception_FileCannotBeAdded_FileIsTooBig::create($this->pathToFile);
             }
         }
@@ -228,7 +229,7 @@ class CModel_HasResource_FileAdder_FileAdder {
             $this->subject->prepareToAttachResource($resource, $this);
             $class = get_class($this->subject);
             $class::created(function ($model) {
-                $model->processUnattachedResource(function (CApp_Model_Interface_ResourceInterface $resource, FileAdder $fileAdder) use ($model) {
+                $model->processUnattachedResource(function (CApp_Model_Interface_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) use ($model) {
                     $this->processResourceItem($model, $resource, $fileAdder);
                 });
             });
@@ -250,7 +251,7 @@ class CModel_HasResource_FileAdder_FileAdder {
             if ($customQueue = CF::config('resource.queue_name')) {
                 $job->onQueue($customQueue);
             }
-            dispatch($job);
+            $job->dispatch();
         }
         if ($collectionSizeLimit = COptional::create($this->getResourceCollection($resource->collection_name))->collectionSizeLimit) {
             $collectionResource = $this->subject->fresh()->getResource($resource->collection_name);
