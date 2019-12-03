@@ -13,19 +13,19 @@ class CTemporary {
      * 
      * @return CStorage_FilesystemInterface
      */
-    public static function disk($diskName=null) {
+    public static function disk($diskName = null) {
         return CStorage::instance()->temp($diskName);
     }
-    
+
     public static function defaultDiskDriver() {
         $defaultDiskName = static::defaultDiskName();
-        $config = CF::config('storage.disks.'.$defaultDiskName);
-        return carr::get($config,'driver');
-      
+        $config = CF::config('storage.disks.' . $defaultDiskName);
+        return carr::get($config, 'driver');
     }
-    
+
     public static function defaultDiskName() {
-        return CF::config('storage.temp');;
+        return CF::config('storage.temp');
+        ;
     }
 
     /**
@@ -132,7 +132,7 @@ class CTemporary {
                 $path = $path = $path . $c . DIRECTORY_SEPARATOR;
             }
         }
-        
+
         return $path . $filename;
     }
 
@@ -187,6 +187,18 @@ class CTemporary {
         $path = static::getPath($folder, $filename);
         static::disk()->put($path, $content);
         return $path;
+    }
+
+    public static function getSize($folder, $content) {
+
+        $path = static::getPath($folder, $filename);
+        return static::disk()->size($path);
+    }
+
+    public static function isExists($folder, $content) {
+
+        $path = static::getPath($folder, $filename);
+        return static::disk()->exists($path);
     }
 
 }
