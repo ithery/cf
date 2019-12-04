@@ -25,7 +25,7 @@ return [
       |--------------------------------------------------------------------------
       |
       | Here you may specify the default filesystem disk that should be used
-      | by the temporary for the framework. 
+      | by the temporary for the framework.
       |
      */
     'temp' => 'local-temp',
@@ -59,7 +59,7 @@ return [
         ],
         'local-temp' => [
             'driver' => 'local',
-            'root' => DOCROOT.'temp',
+            'root' => DOCROOT . 'temp',
             'url' => curl::httpbase() . 'temp',
             'visibility' => 'public',
         ],
@@ -76,14 +76,16 @@ return [
             'region' => 'sgp1',
             'bucket' => 'resource',
             'endpoint' => 'https://sgp1.digitaloceanspaces.com',
+            'visibility' => 'public',
         ],
         's3-temp' => [
             'driver' => 's3',
             'key' => 'AMCFVMWR7P225JAAGFSL',
             'secret' => '04yvHWJJFrKv71VoGbqL3rZ6dcXjeJIReq85XqAi6jg',
             'region' => 'sgp1',
-            'bucket' => 'resource',
+            'bucket' => 'temp-files',
             'endpoint' => 'https://sgp1.digitaloceanspaces.com',
+            'visibility' => 'public',
         ],
     ],
 ];

@@ -17,7 +17,7 @@ class CResources_Filesystem {
 
     public function __construct($filesystem = null) {
         if ($filesystem == null) {
-            $filesystem = new CResources_Manager();
+            $filesystem = CStorage::instance();
         }
         $this->filesystem = $filesystem;
     }
@@ -39,6 +39,7 @@ class CResources_Filesystem {
             fclose($file);
             return;
         }
+        
         $this->filesystem
                 ->disk($resource->disk)
                 ->put($destination, $file, $this->getRemoteHeadersForFile($pathToFile, $resource->getCustomHeaders()));
@@ -52,8 +53,8 @@ class CResources_Filesystem {
     }
 
     public function getRemoteHeadersForFile($file, array $resourceCustomHeaders = []) {
-        $mimeTypeHeader = ['ContentType' => File::getMimeType($file)];
-        $extraHeaders = config('resourcelibrary.remote.extra_headers');
+        $mimeTypeHeader = ['ContentType' => CResources_Helpers_File::getMimeType($file)];
+        $extraHeaders = CF::config('resource.remote.extra_headers');
         return array_merge($mimeTypeHeader, $extraHeaders, $this->customRemoteHeaders, $resourceCustomHeaders);
     }
 
@@ -79,7 +80,7 @@ class CResources_Filesystem {
         $resourceDirectory = $this->getResourceDirectory($resource);
         $conversionsDirectory = $this->getResourceDirectory($resource, 'conversions');
         $responsiveImagesDirectory = $this->getResourceDirectory($resource, 'responsiveImages');
-        collect([$resourceDirectory, $conversionsDirectory, $responsiveImagesDirectory])
+        CF::collect([$resourceDirectory, $conversionsDirectory, $responsiveImagesDirectory])
                 ->each(function ($directory) use ($resource) {
                     $this->filesystem->disk($resource->disk)->deleteDirectory($directory);
                 });

@@ -49,20 +49,8 @@ class ctemp {
     }
 
     public static function get_url($folder, $filename) {
-        $main_folder = substr($filename, 0, 8);
-        $basefile = basename($filename);
-        $url = curl::base() . 'temp/' . $folder . '/' . $main_folder . '/';
-        $depth = 5;
-        for ($i = 0; $i < $depth; $i++) {
-            $c = "_";
-            if (strlen($basefile) > ($i + 1)) {
-                $c = substr($basefile, $i + 8, 1);
-                if (strlen($c) == 0)
-                    $c = "_";
-                $url .= $c . '/';
-            }
-        }
-        return $url . $filename;
+        return CTemporary::getUrl($folder,$filename);
+     
     }
 
 }

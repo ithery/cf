@@ -112,13 +112,13 @@ trait CModel_HasResource_HasResourceTrait {
             $filename = 'file';
         }
         $resourceExtension = explode('/', mime_content_type($temporaryFile));
-        if (!str_contains($filename, '.')) {
+        if (!cstr::contains($filename, '.')) {
             $filename = "{$filename}.{$resourceExtension[1]}";
         }
-        return app(FileAdderFactory::class)
-                        ->create($this, $temporaryFile)
-                        ->usingName(pathinfo($filename, PATHINFO_FILENAME))
-                        ->usingFileName($filename);
+        $file= CModel_HasResource_FileAdder_FileAdderFactory::create($this, $temporaryFile)
+                ->usingName(pathinfo($filename, PATHINFO_FILENAME))
+                        ->usingFileName($filename);;
+        return $file;
     }
 
     /**
@@ -154,7 +154,8 @@ trait CModel_HasResource_HasResourceTrait {
         $tmpFile = tempnam(sys_get_temp_dir(), 'resourcelibrary');
         file_put_contents($tmpFile, $binaryData);
         $this->guardAgainstInvalidMimeType($tmpFile, $allowedMimeTypes);
-        $file = app(FileAdderFactory::class)->create($this, $tmpFile);
+        $file= CModel_HasResource_FileAdder_FileAdderFactory::create($this, $tmpFile);
+       
         return $file;
     }
 
@@ -250,7 +251,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function updateResource(array $newResourceArray, $collectionName = 'default') {
         $this->removeResourceItemsNotPresentInArray($newResourceArray, $collectionName);
-        return collect($newResourceArray)
+        return CF::collect($newResourceArray)
                         ->map(function (array $newResourceItem) use ($collectionName) {
                             static $orderColumn = 1;
                             $resourceClass = config('resourcelibrary.resource_model');
@@ -308,12 +309,15 @@ trait CModel_HasResource_HasResourceTrait {
             $excludedResource = CF::collect()->push($excludedResource);
         }
         $excludedResource = CF::collect($excludedResource);
+        
         if ($excludedResource->isEmpty()) {
             return $this->clearResourceCollection($collectionName);
         }
+       
         $this->getResource($collectionName)
                 ->reject(function (CApp_Model_Interface_ResourceInterface $resource) use ($excludedResource) {
-                    return $excludedResource->where('id', $resource->id)->count();
+                    
+                    return $excludedResource->where('resource_id', $resource->resource_id)->count();
                 })
         ->each->delete();
         if ($this->resourceIsPreloaded()) {
@@ -352,7 +356,7 @@ trait CModel_HasResource_HasResourceTrait {
     }
 
     public function addResourceCollection($name) {
-        $resourceCollection = ResourceCollection::create($name);
+        $resourceCollection = CResources_ResourceCollection::create($name);
         $this->resourceCollections[] = $resourceCollection;
         return $resourceCollection;
     }
@@ -422,7 +426,7 @@ trait CModel_HasResource_HasResourceTrait {
         $args = func_get_args();
         $file = carr::get($args, 0);
         $allowedMimeTypes = array_slice($args, 1);
-        $allowedMimeTypes = array_flatten($allowedMimeTypes);
+        $allowedMimeTypes = carr::flatten($allowedMimeTypes);
         if (empty($allowedMimeTypes)) {
             return;
         }
@@ -447,7 +451,7 @@ trait CModel_HasResource_HasResourceTrait {
         CF::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
             $actualResourceConversions = $this->resourceConversions;
             $this->resourceConversions = [];
-            call_user_func_array(array($resourceCollection, 'resourceConversionRegistrations'), array($resource));
+            call_user_func_array($resourceCollection->resourceConversionRegistrations, array($resource));
 
             $preparedResourceConversions = CF::collect($this->resourceConversions)
                     ->each(function (Conversion $conversion) use ($resourceCollection) {

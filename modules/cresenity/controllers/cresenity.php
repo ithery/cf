@@ -34,14 +34,18 @@ class Controller_Cresenity extends CController {
 
     public function ajax($method) {
         $app = CApp::instance();
-        $file = CApp::temp()->makePath("ajax", $method . ".tmp");
+        $filename = $method.'.tmp';
+        $file = CTemporary::getPath("ajax", $filename);
+       
         if (isset($_GET['profiler'])) {
             new Profiler();
         }
-        if (!file_exists($file)) {
+        $disk =CTemporary::disk();
+        if (!$disk->exists($file)) {
             throw new CException('failed to get temporary file :filename', array(':filename' => $file));
         }
-        $json = file_get_contents($file);
+        $json = $disk->get($file);
+        
         $ajaxMethod = CAjax::createMethod($json);
         $response = $ajaxMethod->executeEngine();
 
