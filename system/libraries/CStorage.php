@@ -70,13 +70,13 @@ class CStorage {
      * Get a filesystem instance.
      *
      * @param  string|null  $name
-     * @return CStorage_FilesystemInterface
+     * @return CStorage_Adapter
      */
     public function disk($name = null) {
         $name = $name ?: $this->getDefaultDriver();
         return $this->disks[$name] = $this->get($name);
     }
-    
+
     /**
      * Get a filesystem instance.
      *
@@ -191,7 +191,7 @@ class CStorage {
         $s3Config = $this->formatS3Config($config);
         $root = isset($s3Config['root']) ? $s3Config['root'] : null;
         $options = isset($config['options']) ? $config['options'] : [];
-        
+
         return $this->adapt($this->createFlysystem(
                                 new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, $options), $config
         ));
@@ -208,7 +208,7 @@ class CStorage {
         if ($config['key'] && $config['secret']) {
             $config['credentials'] = carr::only($config, ['key', 'secret', 'token']);
         }
-       
+
         return $config;
     }
 
@@ -220,7 +220,7 @@ class CStorage {
      * @return \League\Flysystem\FilesystemInterface
      */
     protected function createFlysystem(AdapterInterface $adapter, array $config) {
-        
+
         $cache = carr::pull($config, 'cache');
         $config = carr::only($config, ['visibility', 'disable_asserts', 'url']);
         if ($cache) {
@@ -286,7 +286,7 @@ class CStorage {
     public function getDefaultDriver() {
         return CF::config('storage.default');
     }
-    
+
     /**
      * Get the default driver name.
      *
@@ -303,7 +303,6 @@ class CStorage {
      */
     public function getDefaultCloudDriver() {
         return CF::config('storage.cloud');
-      
     }
 
     /**
