@@ -17,6 +17,7 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
      * @return void
      */
     public function apply(CModel_Query $builder, CModel $model) {
+        
         $builder->where($model->getQualifiedStatusColumn(),'>',0);
     }
 

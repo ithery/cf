@@ -448,11 +448,12 @@ return array(
     ),
     "summernote" => array(
         "css" => array(
-            "plugins/summernote/summernote.css",
-            "plugins/summernote/summernote-bs3.css",
+            // "plugins/summernote/summernote.css",
+            "plugins/summernote/summernote-bs4.css",
         ),
         "js" => array(
-            "plugins/summernote/summernote-bs3.min.js",
+            // "plugins/summernote/summernote.min.js",
+            "plugins/summernote/summernote-bs4.min.js",
         ),
     ),
     "jquery-3.2.1" => array(

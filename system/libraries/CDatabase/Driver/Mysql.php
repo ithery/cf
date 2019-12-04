@@ -19,7 +19,8 @@ class CDatabase_Driver_Mysql extends CDatabase_Driver {
      *
      * @param  array  database configuration
      */
-    public function __construct($config) {
+    public function __construct(CDatabase $db, $config) {
+        $this->db = $db;
         $this->db_config = $config;
 
         CF::log(CLogger::DEBUG, 'MySQL Database Driver Initialized');
@@ -314,7 +315,8 @@ class CMysql_Result extends CDatabase_Result {
         } elseif (is_bool($result)) {
             if ($result == FALSE) {
                 // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => mysql_error($link) . ' - ' . $sql));
+                //throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => mysql_error($link) . ' - ' . $sql));
+                throw new Exception('There was an SQL error: '.mysql_error($link) . ' - ' . $sql);
             } else {
                 // Its an DELETE, INSERT, REPLACE, or UPDATE query
                 $this->insert_id = mysql_insert_id($link);

@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2019, 4:51:15 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+
 class CQueue_Worker {
 
     use CDatabase_Trait_DetectLostConnection;
@@ -231,6 +233,7 @@ class CQueue_Worker {
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     protected function getNextJob($connection, $queue) {
+
         try {
             foreach (explode(',', $queue) as $queue) {
                 if (!is_null($job = $connection->pop($queue))) {
@@ -260,10 +263,19 @@ class CQueue_Worker {
         try {
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
-            $this->exceptions->report($e);
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Exception');
+            } else {
+                $this->exceptions->report($e);
+            }
             $this->stopWorkerIfLostConnection($e);
         } catch (Throwable $e) {
-            $this->exceptions->report($e = new FatalThrowableError($e));
+            $e = new FatalThrowableError($e);
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Throwable');
+            } else {
+                $this->exceptions->report($e);
+            }
             $this->stopWorkerIfLostConnection($e);
         }
     }
@@ -308,11 +320,22 @@ class CQueue_Worker {
             $job->fire();
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Exception $e) {
-            $this->handleJobException($connectionName, $job, $options, $e);
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Fire Exception');
+                CDaemon::log($e->getMessage());
+                CDaemon::log($e->getTraceAsString());
+            } else {
+                $this->handleJobException($connectionName, $job, $options, $e);
+            }
         } catch (Throwable $e) {
-            $this->handleJobException(
-                    $connectionName, $job, $options, new FatalThrowableError($e)
-            );
+            $e = new FatalThrowableError($e);
+            if (CDaemon::getRunningService() != null) {
+                CDaemon::log('Run Job Fire Throwable');
+                CDaemon::log($e->getMessage());
+                CDaemon::log($e->getTraceAsString());
+            } else {
+                $this->handleJobException($connectionName, $job, $options, $e);
+            }
         }
     }
 
@@ -366,7 +389,7 @@ class CQueue_Worker {
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries) {
         $maxTries = !is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
         $timeoutAt = $job->timeoutAt();
-        if ($timeoutAt && Carbon::now()->getTimestamp() <= $timeoutAt) {
+        if ($timeoutAt && CCarbon::now()->getTimestamp() <= $timeoutAt) {
             return;
         }
         if (!$timeoutAt && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
@@ -387,7 +410,7 @@ class CQueue_Worker {
      */
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, $e) {
         $maxTries = !is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
-        if ($job->timeoutAt() && $job->timeoutAt() <= Carbon::now()->getTimestamp()) {
+        if ($job->timeoutAt() && $job->timeoutAt() <= CCarbon::now()->getTimestamp()) {
             $this->failJob($job, $e);
         }
         if ($maxTries > 0 && $job->attempts() >= $maxTries) {
@@ -398,7 +421,7 @@ class CQueue_Worker {
     /**
      * Mark the given job as failed and raise the relevant event.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  \Exception  $e
      * @return void
      */
@@ -410,7 +433,7 @@ class CQueue_Worker {
      * Raise the before queue job event.
      *
      * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @return void
      */
     protected function raiseBeforeJobEvent($connectionName, $job) {
@@ -423,7 +446,7 @@ class CQueue_Worker {
      * Raise the after queue job event.
      *
      * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @return void
      */
     protected function raiseAfterJobEvent($connectionName, $job) {

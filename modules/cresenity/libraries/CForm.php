@@ -10,7 +10,6 @@ class CForm extends CElement_Element {
     protected $target;
     protected $enctype;
     protected $validation;
-    protected $trigger_submit;
     protected $ajax_submit;
     protected $ajax_success_script_callback;
     protected $ajax_datatype;
@@ -39,7 +38,6 @@ class CForm extends CElement_Element {
         $this->autocomplete = true;
         $this->enctype = "application/x-www-form-urlencoded";
         $this->validation = true;
-        $this->trigger_submit = array();
         $this->ajax_submit = false;
         $this->ajax_success_script_callback = "";
         $this->ajax_datatype = "text";
@@ -163,11 +161,6 @@ class CForm extends CElement_Element {
 
     public function set_ajax_redirect_url($url) {
         $this->ajax_redirect_url = $url;
-        return $this;
-    }
-
-    public function trigger_submit($elem, $evt) {
-        $this->trigger_submit[] = CJSTrigger::factory($elem, $evt);
         return $this;
     }
 
@@ -383,7 +376,7 @@ class CForm extends CElement_Element {
             if (count($this->ajax_submit_handlers) > 0) {
                 $script_redirect_url = "";
                 foreach ($this->ajax_submit_handlers as $handler) {
-                    $script_redirect_url.= $handler->js();
+                    $script_redirect_url .= $handler->js();
                 }
             }
             $upload_progress_before_submit = "";
@@ -679,28 +672,7 @@ class CForm extends CElement_Element {
                     });
                 ")->br();
         }
-        if (count($this->trigger_submit) > 0) {
-            foreach ($this->trigger_submit as $t) {
-                $field = $this->get_field_by_id($t->element_id);
-                if ($field == null) {
-                    trigger_error('There are no element id "' . $t->element_id . '" on this form for trigger submit', E_USER_WARNING);
-                }
-                if ($field != null) {
-                    //opening
-                    if ($t->event == "change" && $field->field_type == "select") {
-                        $js->appendln("var select = jQuery('#" . $t->element_id . "').data('replacement');")->br();
-                        $js->appendln("select.on('select-close',function() {")->br();
-                    } else {
-                        $js->appendln("jQuery('#" . $t->element_id . "')." . $t->event . "(function(event) {")->br();
-                    }
-                    //submit method
-                    $js->inc_indent()->appendln("jQuery('#" . $this->form_id . "').submit();")->br()->dec_indent();
 
-                    //closing
-                    $js->appendln("});")->br();
-                }
-            }
-        }
         if ($this->auto_set_focus) {
             $js->appendln("
 				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();

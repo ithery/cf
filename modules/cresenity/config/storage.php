@@ -21,6 +21,16 @@ return [
     'default' => 'local',
     /*
       |--------------------------------------------------------------------------
+      | Default Temporary Disk
+      |--------------------------------------------------------------------------
+      |
+      | Here you may specify the default filesystem disk that should be used
+      | by the temporary for the framework.
+      |
+     */
+    'temp' => 'local-temp',
+    /*
+      |--------------------------------------------------------------------------
       | Default Cloud Filesystem Disk
       |--------------------------------------------------------------------------
       |
@@ -47,19 +57,35 @@ return [
             'driver' => 'local',
             'root' => DOCROOT,
         ],
+        'local-temp' => [
+            'driver' => 'local',
+            'root' => DOCROOT . 'temp',
+            'url' => curl::httpbase() . 'temp',
+            'visibility' => 'public',
+        ],
         'public' => [
             'driver' => 'local',
             'root' => DOCROOT . 'public',
             'url' => curl::httpbase() . 'public',
             'visibility' => 'public',
         ],
-//        's3' => [
-//            'driver' => 's3',
-//            'key' => env('AWS_ACCESS_KEY_ID'),
-//            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-//            'region' => env('AWS_DEFAULT_REGION'),
-//            'bucket' => env('AWS_BUCKET'),
-//            'url' => env('AWS_URL'),
-//        ],
+        's3' => [
+            'driver' => 's3',
+            'key' => 'AMCFVMWR7P225JAAGFSL',
+            'secret' => '04yvHWJJFrKv71VoGbqL3rZ6dcXjeJIReq85XqAi6jg',
+            'region' => 'sgp1',
+            'bucket' => 'resource',
+            'endpoint' => 'https://sgp1.digitaloceanspaces.com',
+            'visibility' => 'public',
+        ],
+        's3-temp' => [
+            'driver' => 's3',
+            'key' => 'AMCFVMWR7P225JAAGFSL',
+            'secret' => '04yvHWJJFrKv71VoGbqL3rZ6dcXjeJIReq85XqAi6jg',
+            'region' => 'sgp1',
+            'bucket' => 'temp-files',
+            'endpoint' => 'https://sgp1.digitaloceanspaces.com',
+            'visibility' => 'public',
+        ],
     ],
 ];

@@ -25,6 +25,9 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
+
+require_once dirname(__FILE__) . '/../../GuzzleHttp/Psr7/functions_include.php';
+
 /**
  * OAuth2 supports authentication by OAuth2 2-legged flows.
  *

@@ -94,6 +94,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @var integer The interval in Seconds
      */
     protected $autoRestartInterval = 43200;
+    protected $isDaemonContinueOnFatalError = false;
 
     /**
      * Process ID
@@ -147,6 +148,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     protected function setupWorkers() {
         
+    }
+
+    public function isDaemonContinueOnFatalError() {
+        return $this->isDaemonContinueOnFatalError;
     }
 
     public function __construct($serviceName, $config) {

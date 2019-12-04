@@ -9,8 +9,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker_Session {
 
-    const SESSION_NAMESPACE = 'CTracker';
-
     public function get($key) {
         $session = $this->getNamespaceData();
         return carr::get($session, $key);
@@ -43,12 +41,16 @@ class CTracker_Session {
     }
 
     private function getNamespaceData() {
-        return CSession::instance()->get(self::SESSION_NAMESPACE, array());
+        return CSession::instance()->get(self::sessionNamespace(), array());
     }
 
     private function setNamespaceData($value) {
-        
-        return CSession::instance()->set(self::SESSION_NAMESPACE, $value);
+
+        return CSession::instance()->set(self::sessionNamespace(), $value);
+    }
+
+    public static function sessionNamespace() {
+        return CTracker::config()->get('sessionNamespace', 'CTracker');
     }
 
 }

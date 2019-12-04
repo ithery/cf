@@ -58,4 +58,6 @@ class CQueue_Job_DatabaseJobRecord {
         return $this->record->{$key};
     }
 
+   
+
 }

@@ -34,7 +34,7 @@ $maxHeight .= $suffixHeight;
             <span class="btn btn-file btn-primary">
                 <span class="fileupload-new"><?php echo clang::__('Select Image'); ?></span>
                 <span class="fileupload-change fileupload-exists"><?php echo clang::__('Change'); ?></span>
-                <input id="input-temp-<?php echo $id; ?>" type="file" name="input-temp-<?php echo $id; ?>" style="display:none;" />
+                <input id="input-temp-<?php echo $id; ?>" type="file" name="input-temp-<?php echo $id; ?>" style="display:none;" accept="image/*"/>
                 <input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" />
             </span>
             <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload"><?php echo clang::__('Remove'); ?></a>
@@ -132,7 +132,8 @@ $maxHeight .= $suffixHeight;
                                     xhr.onreadystatechange = function () {
                                         if (this.readyState == 4 && this.status == 200) {
                                             var dataFile = JSON.parse(this.responseText);
-                                            $('#<?php echo $id; ?>').val(dataFile.file_id);
+                                            
+                                            $('#<?php echo $id; ?>').val(dataFile.fileId);
                                             $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
                                             $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
                                             $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
@@ -164,7 +165,7 @@ $maxHeight .= $suffixHeight;
                             xhr.onreadystatechange = function () {
                                 if (this.readyState == 4 && this.status == 200) {
                                     var dataFile = JSON.parse(this.responseText);
-                                    $('#<?php echo $id; ?>').val(dataFile.file_id);
+                                    $('#<?php echo $id; ?>').val(dataFile.fileId);
                                     $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
                                     $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
                                     $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');

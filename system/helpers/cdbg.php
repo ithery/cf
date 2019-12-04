@@ -37,6 +37,7 @@ class cdbg {
     }
 
     public static function varDump($var, $return = FALSE) {
+       
         $html = '<pre style="margin-bottom: 18px;' .
                 'background: #f7f7f9;' .
                 'border: 1px solid #e1e1e8;' .
@@ -80,7 +81,7 @@ class cdbg {
      * @param  mixed
      * @return void
      */
-    function d() {
+    public static function d() {
         $args = func_get_args();
         foreach ($args as $x) {
             (new Illuminate\Support\Debug\Dumper)->dump($x);
@@ -93,7 +94,7 @@ class cdbg {
      * @param  mixed
      * @return void
      */
-    function dd() {
+    public static function dd() {
         $args = func_get_args();
         foreach ($args as $x) {
             (new Illuminate\Support\Debug\Dumper)->dump($x);
@@ -719,7 +720,7 @@ class cdbg {
     }
 
     public static function traceDump($return = false) {
-        return cdbg::varDump(self::getTraceString(), $return);
+        return static::varDump(self::getTraceString(), $return);
     }
     public static function queryDump($db = null,$return = false) {
         if($db==null) {

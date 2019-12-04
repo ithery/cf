@@ -25,7 +25,7 @@ abstract class CModel_Search_SearchAspect {
         }
         $className = class_basename(static::class);
         $type = cstr::before($className, 'SearchAspect');
-        $type = cstr::snake(Str::plural($type));
+        $type = cstr::snake(cstr::plural($type));
         return cstr::plural($type);
     }
 

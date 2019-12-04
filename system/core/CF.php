@@ -529,7 +529,7 @@ final class CF {
      * @return string
      */
     public static function getFile($directory, $filename, $domain = null) {
-        $files = CF::get_files($directory, $filename, $domain);
+        $files = CF::getFiles($directory, $filename, $domain);
         if (count($files) > 0) {
             return $files[0];
         }
@@ -973,6 +973,7 @@ final class CF {
         // Close output buffers
         self::close_buffers(TRUE);
 
+
         // Run the output event
         CFEvent::run('system.display', self::$output);
 
@@ -1076,10 +1077,6 @@ final class CF {
             }
         }
         throw new CF_404_Exception($page, $template);
-    }
-
-    public static function show_404($page = FALSE, $template = FALSE) {
-        return self::show404($page, $template);
     }
 
     /**
@@ -2351,6 +2348,19 @@ final class CF {
         $appCode = static::appCode($domain);
 
         return DOCROOT . 'application/' . $appCode . '/';
+    }
+
+    /**
+     * Displays a 404 page.
+     *
+     * @throws  C_404_Exception
+     * @param   string  URI of page
+     * @param   string  custom template
+     * @return  void
+     * @deprecated
+     */
+    public static function show_404($page = FALSE, $template = FALSE) {
+        return self::show404($page, $template);
     }
 
 }

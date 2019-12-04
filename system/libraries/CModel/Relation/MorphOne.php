@@ -1,14 +1,8 @@
 <?php
 
-namespace Illuminate\Database\Eloquent\Relations;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
-
-class MorphOne extends MorphOneOrMany
+class CModel_Relation_MorphOne extends CModel_Relation_MorphOneOrMany
 {
-    use SupportsDefaultModels;
+    use CModel_Relation_Trait_SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -40,11 +34,11 @@ class MorphOne extends MorphOneOrMany
      * Match the eagerly loaded results to their parents.
      *
      * @param  array   $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  CModel_Collection  $results
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, CModel_Collection $results, $relation)
     {
         return $this->matchOne($models, $results, $relation);
     }
@@ -52,10 +46,10 @@ class MorphOne extends MorphOneOrMany
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  CModel  $parent
+     * @return CModel
      */
-    public function newRelatedInstanceFor(Model $parent)
+    public function newRelatedInstanceFor(CModel $parent)
     {
         return $this->related->newInstance()
                     ->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})

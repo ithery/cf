@@ -12,7 +12,7 @@ return array(
      * The disk on which to store added files and derived images by default. Choose
      * one or more of the disks you've configured in config/filesystems.php.
      */
-    'disk' => 'resources',
+    'disk' => 'local',
     /*
      * The maximum file size of an item in bytes.
      * Adding a larger file will result in an exception.

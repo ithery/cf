@@ -23,9 +23,11 @@ class CAjax_Engine_FormProcess extends CAjax_Engine {
             $last_process_id = cprogress::last_process_id();
         }
         if (isset($input["cancel"])) {
-            $filename = $process_id . "_cancel";
-            $file = ctemp::makepath("process", $filename . ".tmp");
-            $json = file_put_contents($file, $form);
+            $filename = $process_id . "_cancel". ".tmp";
+            $disk = CTemporary::disk();
+            
+            $file = CTemporary::getPath("process", $filename);
+            $json = $disk->put($file, $form);
             echo json_encode(array(
                 "result" => "0",
                 "message" => "User cancelled",
@@ -33,11 +35,13 @@ class CAjax_Engine_FormProcess extends CAjax_Engine {
             die();
         }
 
-        $filename = $process_id;
-        $file = ctemp::makepath("process", $filename . ".tmp");
+        $filename = $process_id . ".tmp";
+        $disk = CTemporary::disk();
+        $file = CTemporary::getPath("process", $filename);
+
         $json = '{"percent":0,"info":"Initializing"}';
-        if (file_exists($file)) {
-            $json = file_get_contents($file);
+        if ($disk->exists($file)) {
+            $json = $disk->get($file);
         }
         echo $json;
     }

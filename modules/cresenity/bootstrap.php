@@ -7,11 +7,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 4, 2019, 9:20:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+$domain = CF::domain();
+$isAppBox = strpos($domain, 'app.ittron.co.id') !== false || strpos($domain, 'cpanel.ittron.co.id') !== false;
+if ($isAppBox) {
+    $whoops = new \Whoops\Run;
+    $whoops->prependHandler(new \Whoops\Handler\PrettyPageHandler);
+    $whoops->register();
+} else {
 // Set error handler
-set_error_handler(array('CApp', 'exceptionHandler'));
+    set_error_handler(array('CApp', 'exceptionHandler'));
 
 // Set exception handler
-set_exception_handler(array('CApp', 'exceptionHandler'));
+    set_exception_handler(array('CApp', 'exceptionHandler'));
+}
 
 
 if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator") {
@@ -22,5 +30,3 @@ if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator")
         "js" => array("administrator/datatables/datatables.js"),
     ));
 }
-
-

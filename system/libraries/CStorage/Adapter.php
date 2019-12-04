@@ -46,7 +46,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return $this
      */
     public function assertExists($path) {
-        $paths = Arr::wrap($path);
+        $paths = carr::wrap($path);
         foreach ($paths as $path) {
             PHPUnit::assertTrue(
                     $this->exists($path), "Unable to find a file at path [{$path}]."
@@ -62,7 +62,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return $this
      */
     public function assertMissing($path) {
-        $paths = Arr::wrap($path);
+        $paths = carr::wrap($path);
         foreach ($paths as $path) {
             PHPUnit::assertFalse(
                     $this->exists($path), "Found unexpected file at path [{$path}]."
@@ -103,7 +103,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         try {
             return $this->driver->read($path);
         } catch (FileNotFoundException $e) {
-            throw new ContractFileNotFoundException($path, $e->getCode(), $e);
+            throw new CStorage_Exception_FileNotFoundException($path, $e->getCode(), $e);
         }
     }
 
@@ -167,13 +167,15 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      */
     public function put($path, $contents, $options = []) {
         $options = is_string($options) ? ['visibility' => $options] : (array) $options;
+        
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
         // for the developer to store streams without managing them manually in code.
-        if ($contents instanceof File ||
-                $contents instanceof UploadedFile) {
+        if ($contents instanceof CHTTP_File ||
+                $contents instanceof CHTTP_UploadedFile) {
             return $this->putFile($path, $contents, $options);
         }
+        
         return is_resource($contents) ? $this->driver->putStream($path, $contents, $options) : $this->driver->put($path, $contents, $options);
     }
 
@@ -181,7 +183,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * Store the uploaded file on the disk.
      *
      * @param  string  $path
-     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
+     * @param  CHttp_File|CHttp_UploadedFile  $file
      * @param  array  $options
      * @return string|false
      */
@@ -493,7 +495,9 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return array
      */
     public function files($directory = null, $recursive = false) {
+       
         $contents = $this->driver->listContents($directory, $recursive);
+        
         return $this->filterContentsByType($contents, 'file');
     }
 

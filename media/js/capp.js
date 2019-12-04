@@ -1,3 +1,435 @@
+if (!Object.assign) {
+    Object.assign = function assign(target, source) {
+        var result = {}
+        for (var i in target)
+            result[i] = target[i]
+        for (var i in source)
+            result[i] = source[i]
+        return result
+    }
+}
+
+String.prototype.contains = function (a) {
+    return !!~this.indexOf(a);
+};
+String.prototype.toNumber = function () {
+    var n = parseFloat(this);
+    if (!isNaN(n)) {
+        return n;
+    } else {
+        return 0;
+    }
+}
+
+var CF = function () {
+
+
+    this.required = typeof this.required === 'undefined' ? [] : this.required;
+
+    this.window = window;
+    this.document = window.document;
+    this.head = this.document.getElementsByTagName('head')[0];
+    this.beforeInitCallback = [];
+    this.afterInitCallback = [];
+
+    this.onBeforeInit = function (callback) {
+        this.beforeInitCallback.push(callback);
+        return this;
+    }
+    this.onAfterInit = function (callback) {
+        this.afterInitCallback.push(callback);
+        return this;
+    }
+
+
+    this.getConfig = function () {
+        return this.window.capp;
+    }
+
+
+    this.isUseRequireJs = function () {
+        return this.getConfig().requireJs;
+    }
+    this.CFVersion = function () {
+        return this.getConfig().CFVersion;
+    }
+    this.require = function (url, callback) {
+
+        if (typeof url != "string") {
+            url = url[0];
+        }
+
+        if (!url) {
+            return;
+        }
+
+        var toPush = url
+
+        var t = url.split('.').pop();
+        //url = url.contains('//') ? url : (t !== "css" ? "<?php print( mw_includes_url() ); ?>api/" + url : "<?php print( mw_includes_url() ); ?>css/" + url);
+
+        if (!~this.required.indexOf(toPush)) {
+            this.required.push(toPush);
+            url = url.contains("?") ? url + '&cappv=' + this.CFVersion() : url + "?cappv=" + this.CFVersion();
+            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
+                return
+            }
+            var string = t !== "css" ? "<script type='text/javascript'  src='" + url + "'></script>" : "<link rel='stylesheet' type='text/css' href='" + url + "' />";
+            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+                document.write(string);
+            } else {
+
+                var el;
+                if (t !== "css") {
+
+                    el = this.document.createElement('script');
+                    el.src = url;
+                    el.setAttribute('type', 'text/javascript');
+                    // IE 6 & 7
+                    if (typeof (callback) === 'function') {
+                        el.onload = callback;
+                        el.onreadystatechange = function () {
+                            if (this.readyState == 'complete') {
+                                callback();
+                            }
+                        }
+                    }
+                    this.head.appendChild(el);
+                } else {
+                    el = this.document.createElement('link');
+                    el.rel = 'stylesheet';
+                    el.type = 'text/css';
+                    el.href = url;
+                    // IE 6 & 7
+                    if (typeof (callback) === 'function') {
+                        el.onload = callback;
+                        el.onreadystatechange = function () {
+                            if (this.readyState == 'complete') {
+                                callback();
+                            }
+                        }
+                    }
+                    this.head.appendChild(el);
+                }
+
+            }
+        } else {
+            if (typeof (callback) === 'function') {
+                callback();
+            }
+        }
+    };
+
+    this.loadJQuery = function (callback) {
+
+        if (typeof jQuery == 'undefined') {
+            var fileref = this.document.createElement('script');
+            fileref.setAttribute("type", "text/javascript");
+            fileref.setAttribute("src", this.getConfig().defaultJQueryUrl);
+            // IE 6 & 7
+            if (typeof (callback) === 'function') {
+                fileref.onload = callback;
+                fileref.onreadystatechange = function () {
+                    if (this.readyState == 'complete') {
+                        callback();
+                    }
+                }
+            }
+            this.head.appendChild(fileref);
+        } else {
+            callback();
+        }
+    }
+
+    this.init = function () {
+        var arrayJsUrl = this.getConfig().jsUrl;
+        this.beforeInitCallback.forEach(function (item) {
+            item();
+        });
+
+        this.loadJQuery(() => {
+
+
+
+
+            if (typeof arrayJsUrl !== 'undefined') {
+                //todo add required for script already written in <script
+
+                arrayJsUrl.forEach((item) => {
+                    //console.log(item);
+                    //if (document.querySelector('script[src="' + item + '"]') !== null) {
+                    //document.querySelector('script[src="/media/js/plugins/form/jquery.form.js"]')
+                    this.required.push(item);
+                    //}
+                });
+
+//                arrayJsUrl.forEach((item) => {
+//
+//                    this.require(item);
+//                });
+            }
+        });
+
+
+
+        this.afterInitCallback.forEach(function (item) {
+            item();
+        });
+
+
+
+    }
+}
+
+
+
+var CUploader = function (options) {
+    this.settings = $.extend({
+        // These are the defaults.
+        imgElement: null,
+        uploadUrl: null,
+        inputElement: null,
+        accept: null,
+        pageType: null,
+        onUploadSuccess: null,
+    }, options);
+
+    this.filename = '';
+    this.uploaded = false;
+    this.url = '';
+    this.mimeType = '';
+    this.size = 0;
+    this.fileObject = null;
+    this.isUploading = false;
+    this.objectType = 'file';
+
+
+    this.imgElement = this.settings.imgElement;
+    this.previewElement = this.settings.previewElement;
+    this.inputElement = this.settings.inputElement;
+    this.uploadUrl = this.settings.uploadUrl;
+    if (this.imgElement) {
+        this.objectType = 'image';
+    }
+
+    this.trigger = function () {
+        (function (cUploader) {
+            let inputTemp = $('.capp-input-file-temporary');
+            if (inputTemp.length == 0) {
+                inputTemp = $('<input />');
+                inputTemp.addClass('capp-input-file-temporary');
+                inputTemp.attr('type', 'file').attr('name', 'capp-input-file-temporary').css('display', 'none');
+                if (typeof this.settings.accept != 'undefined' && this.settings.accept != null) {
+                    inputTemp.attr('accept', this.settings.accept);
+                }
+                $('body').append(inputTemp);
+                inputTemp.change(function (e) {
+                    $.each(e.target.files, function (i, file) {
+                        cUploader.setFileObject(file);
+                        cUploader.uploadFile();
+                    });
+                    inputTemp.remove();
+                });
+
+
+
+            }
+            inputTemp.trigger('click');
+        })(this);
+        return false;
+    }
+
+
+
+    this.uploadFile = function () {
+
+        (function (cUploader) {
+            cUploader.isUploading = true;
+            cUploader.showLoading();
+            var ajaxData = new FormData();
+            ajaxData.append('files[]', cUploader.fileObject);
+
+            console.log('try to upload ' + cUploader.fileObject.name);
+
+            $.ajax({
+                url: cUploader.settings.uploadUrl,
+                type: 'post',
+                data: ajaxData,
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                xhr: function () {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function (e) {
+                            var total = e.total;
+                            var loaded = e.loaded;
+                            var percent = loaded * 100 / total;
+                            if (cUploader.getProgressBar()) {
+
+                                cUploader.getProgressBar().css('width', percent + '%');
+                                cUploader.getProgressBarInfo().html(dcUpload.getSizeFormatted(loaded) + ' / ' + dcUpload.getSizeFormatted(total));
+                            }
+                        }, false);
+                    }
+                    return myXhr;
+                },
+                complete: function () {
+                    cUploader.isUploading = false;
+                    cUploader.hideLoading();
+                },
+                success: function (response) {
+                    if (response.errCode == 0) {
+                        var responseData = response.data;
+                        if (responseData.files) {
+                            for (var i in responseData.files) {
+                                var data = responseData.files[i];
+
+                                cUploader.setUrl(data.url);
+                                cUploader.setInput(data.fileId);
+                                if (typeof cUploader.settings.onUploadSuccess == 'function') {
+                                    cUploader.settings.onUploadSuccess(data);
+                                }
+                            }
+                        }
+                    } else {
+                        cresenity.showError(response.errMessage);
+                    }
+                },
+                error: function () {
+                    // Log the error, show an alert, whatever works for you
+                }
+            });
+        })(this);
+    };
+
+
+    this.setFileObject = function (fileObject) {
+        this.fileObject = fileObject;
+        this.setMimeType(fileObject.type);
+        this.setFilename(fileObject.name);
+        this.setSize(fileObject.size);
+
+    }
+    this.setInput = function (fileId) {
+        if (this.inputElement) {
+            this.inputElement.val(fileId);
+        }
+    }
+    this.setFilename = function (filename) {
+        this.filename = filename;
+    }
+    this.getFilename = function () {
+        return this.filename;
+    }
+    this.setSize = function (size) {
+        this.size = size;
+    }
+    this.getSize = function () {
+        return this.size;
+    }
+    this.getSizeFormatted = function (size) {
+        if (typeof size == 'undefined') {
+            size = this.size;
+        }
+        var sizeStr = "";
+        var sizeKB = size / 1024;
+        if (parseInt(sizeKB) > 1024) {
+            var sizeMB = sizeKB / 1024;
+            if (parseInt(sizeMB) > 1024) {
+                var sizeGB = sizeMB / 1024;
+                sizeStr = sizeGB.toFixed(2) + " GB";
+            } else {
+                sizeStr = sizeMB.toFixed(2) + " MB";
+            }
+        } else {
+            sizeStr = sizeKB.toFixed(2) + " KB";
+        }
+        return sizeStr;
+    }
+
+    this.setMimeType = function (mimeType) {
+        this.mimeType = mimeType;
+    }
+    this.getMimeType = function () {
+        return this.mimeType;
+    }
+
+    this.setUrl = function (url) {
+        this.url = url;
+        this.uploaded = true;
+        switch (this.getMimeType()) {
+            case 'image/png':
+            case 'image/jpg':
+            case 'image/jpeg':
+            case 'image/gif':
+                this.objectType = 'image';
+                break;
+            case 'video/mp4':
+            case 'video/avi':
+                this.objectType = 'video';
+                break;
+        }
+
+        if (this.objectType == 'image' && this.imgElement) {
+            this.imgElement.attr('src', url);
+        }
+
+        if (this.objectType == 'image' && this.previewElement) {
+            var imgPreview = $('<img>', {class: 'img-fluid w-100 media-preview', src: url});
+            this.previewElement.prepend(imgPreview);
+        }
+        if (this.objectType == 'video' && this.previewElement) {
+            var videoPreviewControl = $('<video>', {controls: '', width: '100%', height: '100%', class: 'w-100 media-preview'});
+            var videoSource = $('<source>', {src: url});
+            videoPreviewControl.append(videoSource);
+            this.previewElement.prepend(videoPreviewControl);
+        }
+        if (this.objectType == 'file' && this.previewElement) {
+            var filePreview = $('<i>', {class: 'media-preview far fa-file fa-10x text-center'});
+            this.previewElement.prepend(filePreview);
+        }
+    }
+
+    this.getUrl = function () {
+        return this.url
+    }
+
+    this.showLoading = function (imgSrc) {
+        $.blockUI({
+            message: '<div class="dc-progress-upload-container" style="max-width:400px"><div class="progress" style="height: 6px;"><div class="progress-bar" style="width: 0%;"></div></div><div class="text-center mt-3 progress-bar-info"></div><h6 style="color: #444">LOADING...</h6></div>',
+            css: {
+                backgroundColor: 'transparent',
+                border: '0',
+                zIndex: 9999999
+            },
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8,
+                zIndex: 9999990
+            }
+        });
+    };
+    this.hideLoading = function () {
+        $.unblockUI();
+    };
+    this.getProgressBar = function () {
+        return $('.dc-progress-upload-container .progress-bar');
+    }
+
+    this.getProgressBarInfo = function () {
+        return $('.dc-progress-upload-container .progress-bar-info');
+
+    }
+}
+
+var CBlocker = function () {
+
+}
+
+
+
 function strlen(string) {
     //  discuss at: http://phpjs.org/functions/strlen/
     // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
@@ -72,238 +504,120 @@ function strlen(string) {
 
 
 var capp_started_event_initialized = false;
-var scrolltotop = {
-    //startline: Integer. Number of pixels from top of doc scrollbar is scrolled before showing control
-    //scrollto: Keyword (Integer, or "Scroll_to_Element_ID"). How far to scroll document up when control is clicked on (0=top).
-    setting: {
-        startline: 100,
-        scrollto: 0,
-        scrollduration: 1000,
-        fadeduration: [500, 100]
-    },
-    controlHTML: '<img src="' + window.capp.base_url + 'media/img/up.png" style="width:51px; height:42px" />', //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
-    controlattrs: {
-        offsetx: 5,
-        offsety: 5
-    }, //offset of control relative to right/ bottom of window corner
-    anchorkeyword: '#top', //Enter href value of HTML anchors on the page that should also act as "Scroll Up" links
 
-    state: {
-        isvisible: false,
-        shouldvisible: false
-    },
-    scrollup: function () {
-        if (!this.cssfixedsupport) //if control is positioned using JavaScript
-            this.$control.css({
-                opacity: 0,
-                zIndex: -1,
-            }) //hide control immediately after clicking it
-        var dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto)
-        if (typeof dest == "string" && jQuery('#' + dest).length == 1) {
-            //check element set by string exists
-            dest = jQuery('#' + dest).offset().top;
-        } else {
-            dest = 0;
-        }
-
-        this.$body.animate({
-            scrollTop: dest
-        }, this.setting.scrollduration);
-    },
-    keepfixed: function () {
-        var $window = jQuery(window)
-        var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx
-        var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety
-        this.$control.css({
-            left: controlx + 'px',
-            top: controly + 'px'
-        })
-    },
-    togglecontrol: function () {
-        var scrolltop = jQuery(window).scrollTop()
-        if (!this.cssfixedsupport) {
-            this.keepfixed();
-        }
-        this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false
-        if (this.state.shouldvisible && !this.state.isvisible) {
-            this.$control.stop().animate({
-                opacity: 1,
-                zIndex: 99999,
-            }, this.setting.fadeduration[0])
-            this.state.isvisible = true
-        } else if (this.state.shouldvisible == false && this.state.isvisible) {
-            this.$control.stop().animate({
-                opacity: 0,
-                zIndex: -1
-            }, this.setting.fadeduration[1])
-            this.state.isvisible = false
-        }
-    },
-    init: function () {
-        jQuery(document).ready(function ($) {
-            var mainobj = scrolltotop;
-            var iebrws = document.all;
-            mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode == "CSS1Compat" && window.XMLHttpRequest;
-            //not IE or IE7+ browsers in standards mode
-            mainobj.$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
-            mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>')
-                    .css({
-                        position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
-                        bottom: mainobj.controlattrs.offsety,
-                        right: mainobj.controlattrs.offsetx,
-                        opacity: 0,
-                        cursor: 'pointer',
-                        zIndex: 99999
-                    })
-                    .attr({
-                        title: 'Scroll Back to Top'
-                    })
-                    .click(function () {
-                        mainobj.scrollup();
-                        return false
-                    })
-                    .appendTo('body')
-            if (document.all && !window.XMLHttpRequest && mainobj.$control.text() != '') { //loose check for IE6 and below, plus whether control contains any text
-                mainobj.$control.css({
-                    width: mainobj.$control.width()
-                }); //IE6- seems to require an explicit width on a DIV containing text
-            }
-            mainobj.togglecontrol()
-            $('a[href="' + mainobj.anchorkeyword + '"]').click(function () {
-                mainobj.scrollup()
-                return false
-            })
-            $(window).bind('scroll resize', function (e) {
-                mainobj.togglecontrol()
-            })
-        })
-    }
-}
-if (typeof window.capp.have_scroll_to_top != 'undefined' && window.capp.have_scroll_to_top) {
-    if (!document.getElementById('topcontrol')) {
-        scrolltotop.init();
-    }
-}
-var confirmInitialized = $('body').attr('data-confirm-initialized');
-if (!confirmInitialized) {
-    jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
-        var ahref = $(this).attr('href');
-        var message = $(this).attr('data-confirm-message');
-        var no_double = $(this).attr('data-no-double');
-        var clicked = $(this).attr('data-clicked');
-
-
-        var btn = jQuery(this);
-        btn.attr('data-clicked', '1');
-        if (no_double) {
-            if (clicked == 1)
-                return false;
-        }
-
-        if (!message) {
-            message = window.capp.label_confirm;
-        } else {
-            message = $.cresenity.base64.decode(message);
-        }
-
-        str_confirm = window.capp.label_ok;
-        str_cancel = window.capp.label_cancel;
-        e.preventDefault();
-        e.stopPropagation();
-        btn.off('click');
-        bootbox.confirm(message, function (confirmed) {
-            if (confirmed) {
-                if (ahref) {
-                    window.location.href = ahref;
-                } else {
-                    if (btn.attr('type') == 'submit') {
-                        btn.closest('form').submit();
-                    } else {
-                        btn.on('click');
-                    }
-
-                }
-            } else {
-                btn.removeAttr('data-clicked');
-            }
-            setTimeout(function () {
-                var modalExists = $('.modal:visible').length > 0;
-                if (!modalExists) {
-                    $('body').removeClass('modal-open');
-                } else {
-                    $('body').addClass('modal-open');
-                }
-            }, 750);
-        });
-
-
-        return false;
-    });
-    $('body').attr('data-confirm-initialized', '1');
-}
-var confirmSubmitInitialized = $('body').attr('data-confirm-submit-initialized');
-if (!confirmSubmitInitialized) {
-    jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
-
-        var submitted = $(this).attr('data-submitted');
-        var btn = jQuery(this);
-        if (submitted == '1')
-            return false;
-        btn.attr('data-submitted', '1');
-
-        var message = $(this).attr('data-confirm-message');
-        if (!message) {
-            message = window.capp.label_confirm;
-        } else {
-            message = $.cresenity.base64.decode(message);
-        }
-
-        str_confirm = window.capp.label_ok;
-        str_cancel = window.capp.label_cancel;
-        bootbox.confirm(message, str_cancel, str_confirm, function (confirmed) {
-            if (confirmed) {
-                jQuery(e.target).closest('form').submit();
-            } else {
-                btn.removeAttr('data-submitted');
-            }
-        });
-
-
-        return false;
-    });
-    $('body').attr('data-confirm-submit-initialized', '1');
-}
-jQuery(document).ready(function () {
-    jQuery("#toggle-subnavbar").click(function () {
-        var cmd = jQuery("#toggle-subnavbar span").html();
-        if (cmd == 'Hide') {
-            jQuery('#subnavbar').slideUp('slow');
-            jQuery("#toggle-subnavbar span").html('Show');
-        } else {
-            jQuery('#subnavbar').slideDown('slow');
-            jQuery("#toggle-subnavbar span").html('Hide');
-        }
-
-    });
-    jQuery("#toggle-fullscreen").click(function () {
-        $.cresenity.fullscreen(document.documentElement);
-    });
-});
-if (window.capp.have_clock) {
-
-    $(document).ready(function () {
-        $('#servertime').serverTime({
-            ajaxFile: window.capp.base_url + 'cresenity/server_time',
-            displayDateFormat: "yyyy-mm-dd HH:MM:ss"
-        });
-    });
-}
 /*
  cresenity.func.js
  */
 ;
 
 var Cresenity = function () {
+    var scrollToTop = function () {
+        //startline: Integer. Number of pixels from top of doc scrollbar is scrolled before showing control
+        //scrollto: Keyword (Integer, or "Scroll_to_Element_ID"). How far to scroll document up when control is clicked on (0=top).
+        this.setting = {
+            startline: 100,
+            scrollto: 0,
+            scrollduration: 1000,
+            fadeduration: [500, 100]
+        };
+        this.controlHTML = '<img src="' + window.capp.base_url + 'media/img/up.png" style="width:51px; height:42px" />'; //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
+        this.controlattrs = {
+            offsetx: 5,
+            offsety: 5
+        }; //offset of control relative to right/ bottom of window corner
+        this.anchorkeyword = '#top'; //Enter href value of HTML anchors on the page that should also act as "Scroll Up" links
+
+        this.state = {
+            isvisible: false,
+            shouldvisible: false
+        };
+        this.scrollup = function () {
+            if (!this.cssfixedsupport) //if control is positioned using JavaScript
+                this.$control.css({
+                    opacity: 0,
+                    zIndex: -1,
+                }) //hide control immediately after clicking it
+            var dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto)
+            if (typeof dest == "string" && jQuery('#' + dest).length == 1) {
+                //check element set by string exists
+                dest = jQuery('#' + dest).offset().top;
+            } else {
+                dest = 0;
+            }
+
+            this.$body.animate({
+                scrollTop: dest
+            }, this.setting.scrollduration);
+        },
+                this.keepfixed = function () {
+                    var $window = jQuery(window)
+                    var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx
+                    var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety
+                    this.$control.css({
+                        left: controlx + 'px',
+                        top: controly + 'px'
+                    })
+                };
+        this.togglecontrol = function () {
+            var scrolltop = jQuery(window).scrollTop()
+            if (!this.cssfixedsupport) {
+                this.keepfixed();
+            }
+            this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false
+            if (this.state.shouldvisible && !this.state.isvisible) {
+                this.$control.stop().animate({
+                    opacity: 1,
+                    zIndex: 99999,
+                }, this.setting.fadeduration[0])
+                this.state.isvisible = true
+            } else if (this.state.shouldvisible == false && this.state.isvisible) {
+                this.$control.stop().animate({
+                    opacity: 0,
+                    zIndex: -1
+                }, this.setting.fadeduration[1])
+                this.state.isvisible = false
+            }
+        };
+        this.init = function () {
+            jQuery(document).ready(($) => {
+                var mainobj = this;
+                var iebrws = document.all;
+                mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode == "CSS1Compat" && window.XMLHttpRequest;
+                //not IE or IE7+ browsers in standards mode
+                mainobj.$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
+                mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>')
+                        .css({
+                            position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
+                            bottom: mainobj.controlattrs.offsety,
+                            right: mainobj.controlattrs.offsetx,
+                            opacity: 0,
+                            cursor: 'pointer',
+                            zIndex: 99999
+                        })
+                        .attr({
+                            title: 'Scroll Back to Top'
+                        })
+                        .click(function () {
+                            mainobj.scrollup();
+                            return false
+                        })
+                        .appendTo('body')
+                if (document.all && !window.XMLHttpRequest && mainobj.$control.text() != '') { //loose check for IE6 and below, plus whether control contains any text
+                    mainobj.$control.css({
+                        width: mainobj.$control.width()
+                    }); //IE6- seems to require an explicit width on a DIV containing text
+                }
+                mainobj.togglecontrol()
+                $('a[href="' + mainobj.anchorkeyword + '"]').click(function () {
+                    mainobj.scrollup()
+                    return false
+                })
+                $(window).bind('scroll resize', function (e) {
+                    mainobj.togglecontrol()
+                })
+            })
+        }
+    }
 
     var Base64 = function (cresenity) {
         this.cresenity = cresenity;
@@ -459,10 +773,24 @@ var Cresenity = function () {
     this.url = new Url(this);
     this.base64 = new Base64(this);
 
+    this.cf = new CF();
+
     this.filesAdded = "";
     this.modalElements = [];
 
+    this.isUsingRequireJs = function () {
+        return (typeof capp.requireJs !== "undefined") ? capp.requireJs : true;
+    }
+    this.normalizeRequireJs = function () {
+        if (!this.isUsingRequireJs()) {
 
+            if (typeof define === 'function' && define.amd) {
+
+                window.define = undefined;
+
+            }
+        }
+    }
     this.isJson = function (text) {
         if (typeof text == 'string') {
             return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
@@ -908,9 +1236,150 @@ var Cresenity = function () {
     this.unblockElement = function (selector) {
         $(selector).unblock();
     };
+
+
+    this.initConfirm = function () {
+
+        var confirmInitialized = $('body').attr('data-confirm-initialized');
+        if (!confirmInitialized) {
+            jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
+                var ahref = $(this).attr('href');
+                var message = $(this).attr('data-confirm-message');
+                var no_double = $(this).attr('data-no-double');
+                var clicked = $(this).attr('data-clicked');
+
+
+                var btn = jQuery(this);
+                btn.attr('data-clicked', '1');
+                if (no_double) {
+                    if (clicked == 1)
+                        return false;
+                }
+
+                if (!message) {
+                    message = window.capp.label_confirm;
+                } else {
+                    message = $.cresenity.base64.decode(message);
+                }
+
+                str_confirm = window.capp.label_ok;
+                str_cancel = window.capp.label_cancel;
+                e.preventDefault();
+                e.stopPropagation();
+                btn.off('click');
+                bootbox.confirm(message, function (confirmed) {
+                    if (confirmed) {
+                        if (ahref) {
+                            window.location.href = ahref;
+                        } else {
+                            if (btn.attr('type') == 'submit') {
+                                btn.closest('form').submit();
+                            } else {
+                                btn.on('click');
+                            }
+
+                        }
+                    } else {
+                        btn.removeAttr('data-clicked');
+                    }
+                    setTimeout(function () {
+                        var modalExists = $('.modal:visible').length > 0;
+                        if (!modalExists) {
+                            $('body').removeClass('modal-open');
+                        } else {
+                            $('body').addClass('modal-open');
+                        }
+                    }, 750);
+                });
+
+
+                return false;
+            });
+            $('body').attr('data-confirm-initialized', '1');
+        }
+        var confirmSubmitInitialized = $('body').attr('data-confirm-submit-initialized');
+        if (!confirmSubmitInitialized) {
+            jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
+
+                var submitted = $(this).attr('data-submitted');
+                var btn = jQuery(this);
+                if (submitted == '1')
+                    return false;
+                btn.attr('data-submitted', '1');
+
+                var message = $(this).attr('data-confirm-message');
+                if (!message) {
+                    message = window.capp.label_confirm;
+                } else {
+                    message = $.cresenity.base64.decode(message);
+                }
+
+                str_confirm = window.capp.label_ok;
+                str_cancel = window.capp.label_cancel;
+                bootbox.confirm(message, str_cancel, str_confirm, function (confirmed) {
+                    if (confirmed) {
+                        jQuery(e.target).closest('form').submit();
+                    } else {
+                        btn.removeAttr('data-submitted');
+                    }
+                });
+
+
+                return false;
+            });
+            $('body').attr('data-confirm-submit-initialized', '1');
+        }
+        jQuery(document).ready(function () {
+            jQuery("#toggle-subnavbar").click(function () {
+                var cmd = jQuery("#toggle-subnavbar span").html();
+                if (cmd == 'Hide') {
+                    jQuery('#subnavbar').slideUp('slow');
+                    jQuery("#toggle-subnavbar span").html('Show');
+                } else {
+                    jQuery('#subnavbar').slideDown('slow');
+                    jQuery("#toggle-subnavbar span").html('Hide');
+                }
+
+            });
+            jQuery("#toggle-fullscreen").click(function () {
+                $.cresenity.fullscreen(document.documentElement);
+            });
+        });
+
+    }
+
+    this.initClock = function () {
+        if (!!this.cf.getConfig().haveClock) {
+            $(document).ready(function () {
+                $('#servertime').serverTime({
+                    ajaxFile: window.capp.base_url + 'cresenity/server_time',
+                    displayDateFormat: "yyyy-mm-dd HH:MM:ss"
+                });
+            });
+        }
+    }
+    this.init = function () {
+        this.cf.onBeforeInit(() => {
+            this.normalizeRequireJs();
+        });
+        this.cf.onAfterInit(() => {
+            if (!!this.cf.getConfig().haveScrollToTop) {
+                if (!document.getElementById('topcontrol')) {
+                    new scrollToTop().init();
+                }
+            }
+        });
+
+
+        this.cf.init();
+
+
+    }
 };
 if (!window.cresenity) {
     window.cresenity = new Cresenity();
+    window.cresenity.init();
+
 }
 (function ($, window, document, undefined) {
     $.cresenity = {
@@ -2050,8 +2519,8 @@ appValidation = {
         /**
          * Create JQueryValidation check to validate Laravel rules.
          */
-                  
-                
+
+
         $.validator.addMethod("appValidation", function (value, element, params) {
             var validator = this;
             var validated = true;
@@ -3699,3 +4168,15 @@ $.extend(true, appValidation, {
         }
     }
 });
+
+
+
+
+
+if (!window.cresenity) {
+
+    window.cresenity = new Cresenity();
+
+    window.cresenity.init();
+
+}

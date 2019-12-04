@@ -718,8 +718,8 @@ class carr {
                     $passed = false;
                 }
             }
-            
-            
+
+
             if ($passed) {
                 $new_array[$k] = $v;
             }
@@ -1013,6 +1013,16 @@ class carr {
 
     public static function isIterable($var) {
         return is_array($var) || $var instanceof \Traversable;
+    }
+
+    /**
+     * Convert the array into a query string.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function query($array) {
+        return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
     }
 
 }

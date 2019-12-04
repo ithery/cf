@@ -179,11 +179,12 @@ class CDatabase_Query_Builder {
         }
         $this->db = $db;
         //get driver 
-        $driver_name = $this->db->driver_name();
-        $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
-        $processor_class = 'CDatabase_Query_Processor_' . $driver_name;
-        $this->grammar = new $grammar_class();
-        $this->processor = new $processor_class();
+        
+        $driverName = $this->db->driverName();
+        $grammarClass = 'CDatabase_Query_Grammar_' . $driverName;
+        $processorClass = 'CDatabase_Query_Processor_' . $driverName;
+        $this->grammar = new $grammarClass();
+        $this->processor = new $processorClass();
     }
 
     /**

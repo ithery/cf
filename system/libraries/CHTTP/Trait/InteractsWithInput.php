@@ -49,8 +49,8 @@ trait CHTTP_Trait_InteractsWithInput {
     public function bearerToken() {
         $header = $this->header('Authorization', '');
 
-        if (Str::startsWith($header, 'Bearer ')) {
-            return Str::substr($header, 7);
+        if (cstr::startsWith($header, 'Bearer ')) {
+            return cstr::substr($header, 7);
         }
     }
 
@@ -76,7 +76,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $input = $this->all();
 
         foreach ($keys as $value) {
-            if (!Arr::has($input, $value)) {
+            if (!carr::has($input, $value)) {
                 return false;
             }
         }
@@ -94,7 +94,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $input = $this->all();
 
         foreach ($keys as $key) {
-            if (Arr::has($input, $key)) {
+            if (carr::has($input, $key)) {
                 return true;
             }
         }
@@ -157,7 +157,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $results = [];
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            Arr::set($results, $key, Arr::get($input, $key));
+            carr::set($results, $key, Arr::get($input, $key));
         }
 
         return $results;
@@ -193,7 +193,7 @@ trait CHTTP_Trait_InteractsWithInput {
             $value = data_get($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
-                Arr::set($results, $key, $value);
+                carr::set($results, $key, $value);
             }
         }
 
@@ -211,7 +211,7 @@ trait CHTTP_Trait_InteractsWithInput {
 
         $results = $this->all();
 
-        Arr::forget($results, $keys);
+        carr::forget($results, $keys);
 
         return $results;
     }

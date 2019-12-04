@@ -21,8 +21,16 @@ abstract class CModel implements ArrayAccess {
      * The connection name for the model.
      *
      * @var string
+     * @deprecated
      */
     protected $db;
+
+    /**
+     * The connection name for the model.
+     *
+     * @var string
+     */
+    protected $connection;
 
     /**
      * The table associated with the model.
@@ -90,14 +98,14 @@ abstract class CModel implements ArrayAccess {
     /**
      * The connection resolver instance.
      *
-     * @var \Illuminate\Database\ConnectionResolverInterface
+     * @var CDatabase_ResolverInterface
      */
     protected static $resolver;
 
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var CEvent_DispatcherInterface
      */
     protected static $dispatcher;
 
@@ -183,7 +191,6 @@ abstract class CModel implements ArrayAccess {
      * @return void
      */
     public function __construct(array $attributes = []) {
-        $this->db = CDatabase::instance();
         $this->primaryKey = $this->table . "_id";
         $this->bootIfNotBooted();
 
@@ -253,11 +260,10 @@ abstract class CModel implements ArrayAccess {
      * @param  array  $attributes
      * @return $this
      *
-     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     * @throws CModel_Exception_MassAssignment
      */
     public function fill(array $attributes) {
         $totallyGuarded = $this->totallyGuarded();
-
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
             $key = $this->removeTableFromKey($key);
 
@@ -551,7 +557,7 @@ abstract class CModel implements ArrayAccess {
             $saved = $this->performInsert($query);
 
             if (!$this->getConnectionName() && $connection = $query->getConnection()) {
-                $this->setConnection($connection);
+                $this->setConnection($connection->getName());
             }
         }
 
@@ -826,7 +832,7 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get a new query builder with no relationships loaded.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public function newQueryWithoutRelationships() {
         return $this->registerGlobalScopes($this->newModelQuery($this->newBaseQueryBuilder())->setModel($this));
@@ -835,15 +841,15 @@ abstract class CModel implements ArrayAccess {
     /**
      * Register the global scopes for this builder instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  CModel_Query  $builder
+     * @return CModel_Query
      */
-    public function registerGlobalScopes($builder) {
+    public function registerGlobalScopes($query) {
         foreach ($this->getGlobalScopes() as $identifier => $scope) {
-            $builder->withGlobalScope($identifier, $scope);
+            $query->withGlobalScope($identifier, $scope);
         }
 
-        return $builder;
+        return $query;
     }
 
     /**
@@ -860,7 +866,7 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get a new query instance without a given scope.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @param  CModel_Interface_Scope|string  $scope
      * @return CModel_Query
      */
     public function newQueryWithoutScope($scope) {
@@ -908,7 +914,7 @@ abstract class CModel implements ArrayAccess {
      * @return CDatabase_Query_Builder
      */
     protected function newBaseQueryBuilder() {
-        return new CDatabase_Query_Builder($this->db);
+        return new CDatabase_Query_Builder($this->getConnection());
     }
 
     /**
@@ -1055,9 +1061,10 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get the database connection for the model.
      *
-     * @return \Illuminate\Database\Connection
+     * @return CDatabase
      */
     public function getConnection() {
+
         return static::resolveConnection($this->getConnectionName());
     }
 
@@ -1067,7 +1074,8 @@ abstract class CModel implements ArrayAccess {
      * @return string
      */
     public function getConnectionName() {
-        return $this->db->name;
+
+        return $this->connection;
     }
 
     /**
@@ -1076,9 +1084,9 @@ abstract class CModel implements ArrayAccess {
      * @param  string  $name
      * @return $this
      */
-    public function setConnection(CDatabase $db) {
+    public function setConnection($connection) {
 
-        $this->db = $db;
+        $this->connection = $connection;
 
         return $this;
     }
@@ -1087,38 +1095,22 @@ abstract class CModel implements ArrayAccess {
      * Resolve a connection instance.
      *
      * @param  string|null  $connection
-     * @return \Illuminate\Database\Connection
+     * @return CDatabase
      */
     public static function resolveConnection($connection = null) {
-        return static::$resolver->connection($connection);
+        return static::getConnectionResolver()->connection($connection);
     }
 
     /**
      * Get the connection resolver instance.
      *
-     * @return \Illuminate\Database\ConnectionResolverInterface
+     * @return CDatabase_ResolverInterface
      */
-    public static function getConnectionResolver() {
-        return static::$resolver;
-    }
-
-    /**
-     * Set the connection resolver instance.
-     *
-     * @param  CDatabase_ResolverInterface  $resolver
-     * @return void
-     */
-    public static function setConnectionResolver(CDatabase_ResolverInterface $resolver) {
-        static::$resolver = $resolver;
-    }
-
-    /**
-     * Unset the connection resolver for models.
-     *
-     * @return void
-     */
-    public static function unsetConnectionResolver() {
-        static::$resolver = null;
+    public static function getConnectionResolver($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+        return CDatabase_Resolver::instance($domain);
     }
 
     /**
@@ -1338,7 +1330,12 @@ abstract class CModel implements ArrayAccess {
      * @return mixed
      */
     public function __get($key) {
-
+        /**
+         * backward compatibility for use this->db using in model. it deprecated and this code will removed
+         */
+        if ($key == 'db') {
+            return $this->getConnection();
+        }
         return $this->getAttribute($key);
     }
 
@@ -1422,7 +1419,8 @@ abstract class CModel implements ArrayAccess {
      * @return mixed
      */
     public function __call($method, $parameters) {
-        
+
+
         if (in_array($method, ['increment', 'decrement'])) {
             $class = new ReflectionClass(get_class($this));
 
@@ -1444,10 +1442,10 @@ abstract class CModel implements ArrayAccess {
 
         try {
             $query = $this->newQuery();
-            
-                
-            
-            
+
+
+
+
             $class = new ReflectionClass(get_class($query));
 
 
@@ -1470,7 +1468,7 @@ abstract class CModel implements ArrayAccess {
                 cdbg::var_dump(nl2br($ex->getTraceAsString()));
             }
             throw new BadMethodCallException(
-            sprintf('Call to undefined method %s::%s()'.$e->getMessage(), get_class($this), $method)
+            sprintf('Call to undefined method %s::%s()' . $e->getMessage(), get_class($this), $method)
             );
         }
     }

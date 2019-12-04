@@ -350,4 +350,14 @@ trait CApp_Trait_Base {
         ));
     }
 
+    
+    public static function link() {
+        $args = func_get_args();
+        $args = array_map(function($val) {
+            return trim($val, "/");
+        }, $args);
+        $link = implode("/", $args);
+        
+        return curl::httpbase() . $link;
+    }
 }

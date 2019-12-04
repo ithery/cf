@@ -16,8 +16,6 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     private $sessionInfo;
     protected $relations = ['device', 'user', 'log', 'language', 'agent', 'referer', 'geoIp', 'cookie'];
 
-    const SESSION_KEY = 'CTrackerSession';
-
     public function __construct() {
         $this->config = CTracker::config();
         $this->className = CTracker::config()->get('sessionModel', 'CTracker_Model_Session');
@@ -79,6 +77,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         if (!$known = $this->sessionIsKnown()) {
             $this->sessionSetId($this->findOrCreate($this->sessionInfo, ['uuid']));
         } else {
+            $primaryKey = 'log_session_id';
             $session = $this->find($this->getSessionData('log_session_id'));
             $session->updated = CCarbon::now();
             $session->save();
@@ -88,7 +87,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     private function sessionIsKnown() {
-        if (!$this->session->has(self::SESSION_KEY)) {
+        if (!$this->session->has($this->getSessionKey())) {
             return false;
         }
         if (!$this->getSessionData('uuid') == $this->getSystemSessionId()) {
@@ -103,7 +102,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     private function ensureSessionDataIsComplete() {
         $sessionData = $this->getSessionData();
         $wasComplete = true;
-    
+
         foreach ($this->sessionInfo as $key => $value) {
             if ($sessionData[$key] !== $value) {
                 if (!isset($model)) {
@@ -153,18 +152,18 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
      * @param string $variable
      */
     private function getSessionData($variable = null) {
-        $data = $this->session->get(self::SESSION_KEY);
+        $data = $this->session->get($this->getSessionKey());
 
         return $variable ? (isset($data[$variable]) ? $data[$variable] : null) : $data;
     }
 
     private function putSessionData($data) {
 
-        $this->session->put(self::SESSION_KEY, $data);
+        $this->session->put($this->getSessionKey(), $data);
     }
 
     private function getSessionKey() {
-        return $this->config->get('sessionKey');
+        return $this->config->get('sessionKey', 'CTrackerSession');
     }
 
     private function getSessions() {
@@ -219,6 +218,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
 
     public function updateSessionData($data) {
         $session = $this->checkIfUserChanged($data, $this->find($this->getSessionData('log_session_id')));
+
         foreach ($session->getAttributes() as $name => $value) {
             if (isset($data[$name]) && $name !== 'log_session_id' && $name !== 'uuid') {
                 $session->{$name} = $data[$name];
@@ -229,7 +229,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     private function checkIfUserChanged($data, $model) {
-          
+
         if (!is_null($model->user_id) && !is_null($data['user_id']) && $data['user_id'] !== $model->user_id) {
             $newSession = $this->regenerateSystemSession($data);
             $model = $this->findByUuid($newSession['uuid']);

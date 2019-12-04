@@ -14,10 +14,12 @@ class CTreeDB {
     protected $delete_child;
 
     public function __construct($table_name, $domain = null, $db = null, $prefix = '') {
-        if ($domain == null)
+        if ($domain == null) {
             $domain = crouter::domain();
-        if ($db == null)
-            $db = CDatabase::instance($domain);
+        }
+        if ($db == null) {
+            $db = CDatabase::instance(null,null,$domain);
+        }
         $data = cdata::get($domain, "domain");
         //$this->org_id = CF::org_id();
         $this->org_id = null;

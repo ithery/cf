@@ -2,12 +2,36 @@
 
 class CDatabase_Resolver implements CDatabase_ResolverInterface {
 
+    protected static $instance;
+
+    public static function instance($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+        if (static::$instance == null) {
+            static::$instance = array();
+        }
+        if (!isset(static::$instance[$domain])) {
+            $file = CF::getFile('config', 'database', $domain);
+            $allConfig = include $file;
+            static::$instance[$domain] = new static(array_keys($allConfig), $domain);
+        }
+        return static::$instance[$domain];
+    }
+
     /**
      * All of the registered connections.
      *
      * @var array
      */
     protected $connections = [];
+
+    /**
+     * The current domain name.
+     *
+     * @var string
+     */
+    protected $domain;
 
     /**
      * The default connection name.
@@ -22,9 +46,16 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
      * @param  array  $connections
      * @return void
      */
-    public function __construct(array $connections = []) {
-        foreach ($connections as $name => $connection) {
-            $this->addConnection($name, $connection);
+    public function __construct(array $configs = [], $domain = null) {
+        if ($domain == null) {
+            $this->domain = CF::domain();
+        }
+        foreach ($configs as $name => $config) {
+            $this->addConfig($name, $config);
+        }
+
+        if (array_key_exists('default', $configs)) {
+            $this->setDefaultConnection('default');
         }
     }
 
@@ -39,18 +70,18 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
             $name = $this->getDefaultConnection();
         }
 
-        return $this->connections[$name];
+        return CDatabase::instance($name, null, $this->domain);
     }
 
     /**
      * Add a connection to the resolver.
      *
      * @param  string  $name
-     * @param  CDatabase  $connection
+     * @param  array  $config
      * @return void
      */
-    public function addConnection($name, CDatabase $connection) {
-        $this->connections[$name] = $connection;
+    public function addConfig($name, $config) {
+        $this->connections[$name] = $config;
     }
 
     /**

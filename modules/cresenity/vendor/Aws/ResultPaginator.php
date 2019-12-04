@@ -3,6 +3,8 @@ namespace Aws;
 
 use GuzzleHttp\Promise;
 
+require_once DOCROOT . 'modules/cresenity/vendor/GuzzleHttp/Promise/functions_include.php';
+
 /**
  * Iterator that yields each page of results of a pageable operation.
  */
@@ -41,6 +43,7 @@ class ResultPaginator implements \Iterator
         array $args,
         array $config
     ) {
+         
         $this->client = $client;
         $this->operation = $operation;
         $this->args = $args;
@@ -68,6 +71,7 @@ class ResultPaginator implements \Iterator
      */
     public function each(callable $handleResult)
     {
+       
         return Promise\coroutine(function () use ($handleResult) {
             $nextToken = null;
             do {
@@ -103,34 +107,40 @@ class ResultPaginator implements \Iterator
      */
     public function current()
     {
+       
         return $this->valid() ? $this->result : false;
     }
 
     public function key()
     {
+        
         return $this->valid() ? $this->requestCount - 1 : null;
     }
 
     public function next()
     {
+        
         $this->result = null;
     }
 
     public function valid()
     {
+        
         if ($this->result) {
             return true;
         }
-
+        
         if ($this->nextToken || !$this->requestCount) {
+            
             $this->result = $this->client->execute(
                 $this->createNextCommand($this->args, $this->nextToken)
             );
+            
             $this->nextToken = $this->determineNextToken($this->result);
             $this->requestCount++;
             return true;
         }
-
+        
         return false;
     }
 
@@ -143,7 +153,7 @@ class ResultPaginator implements \Iterator
 
     private function createNextCommand(array $args, array $nextToken = null)
     {
-        return $this->client->getCommand($this->operation, $args + ($nextToken ?: []));
+        return $this->client->getCommand($this->operation, array_merge($args, ($nextToken ?: [])));
     }
 
     private function determineNextToken(Result $result)

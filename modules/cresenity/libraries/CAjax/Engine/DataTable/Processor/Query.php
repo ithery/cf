@@ -29,7 +29,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
     protected function db() {
         if ($this->db === null) {
             $domain = carr::get($this->data, 'domain');
-            $this->db = CDatabase::instance($domain);
+            $this->db = CDatabase::instance(null, null, $domain);
         }
         return $this->db;
     }

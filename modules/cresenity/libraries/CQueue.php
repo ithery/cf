@@ -18,6 +18,7 @@ final class CQueue {
     public static function dispatcher() {
         if (self::$dispatcher == null) {
             self::$dispatcher = new CQueue_Dispatcher(CContainer::getInstance(), function ($connection = null) {
+
                 return CQueue::queuer()->connection($connection);
             });
         }
@@ -40,7 +41,7 @@ final class CQueue {
 //        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
 //            self::{"register{$connector}Connector"}($manager);
 //        }
-        foreach (['Null', 'Database'] as $connector) {
+        foreach (['Null', 'Database', 'Sqs'] as $connector) {
             self::{"register{$connector}Connector"}($manager);
         }
     }
@@ -51,7 +52,7 @@ final class CQueue {
      * @param  CQueue_Manager  $manager
      * @return void
      */
-    protected function registerNullConnector($manager) {
+    protected static function registerNullConnector($manager) {
         $manager->addConnector('null', function () {
             return new CQueue_Connector_NullConnector;
         });
@@ -76,8 +77,21 @@ final class CQueue {
      * @return void
      */
     protected static function registerDatabaseConnector($manager) {
+
         $manager->addConnector('database', function () {
-            return new CQueue_Connector_DatabaseConnector(CDatabase::instance());
+            return new CQueue_Connector_DatabaseConnector();
+        });
+    }
+
+    /**
+     * Register the Amazon SQS queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected static function registerSqsConnector($manager) {
+        $manager->addConnector('sqs', function () {
+            return new CQueue_Connector_SqsConnector();
         });
     }
 
@@ -88,10 +102,19 @@ final class CQueue {
         return new CQueue_Worker(static::queuer(), CEvent::dispatcher(), CException::createExceptionHandler(), $isDownForMaintenance);
     }
 
-    public static function run() {
+    public static function run($connection = null) {
+
 
         $runner = new CQueue_Runner(CQueue::worker(), null);
-        $runner->run();
+        $runner->run($connection);
+    }
+
+    public static function config($config, $default = null) {
+        return CF::config('queue.' . $config, $default);
+    }
+
+    public static function primaryKey($database, $table) {
+        return $database->driverName() == 'MongoDB' ? '_id' : $table . '_id';
     }
 
 }

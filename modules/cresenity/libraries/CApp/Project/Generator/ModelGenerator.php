@@ -32,7 +32,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         }
         // generate the file name for the model based on the table name
         $filename = cstr::studly($table);
-        $db = CDatabase::instance(CF::domain(), $this->option('database'));
+        $db = CDatabase::instance($this->option('database'),null,CF::domain());
         $schemaManager = $db->getSchemaManager();
         $columns = $schemaManager->listTableColumns($table);
         $columnNames = array_keys($columns);

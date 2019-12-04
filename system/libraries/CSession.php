@@ -96,16 +96,33 @@ class CSession {
 
         if (CSession::$config['driver'] !== 'native') {
             // Set driver name
-            $driver = 'CSession_Driver_' . ucfirst(CSession::$config['driver']);
 
-            // Load the driver
-            try {
-                // Validation of the driver
-                $class = new ReflectionClass($driver);
-                // Initialize the driver
-                CSession::$driver = $class->newInstance();
-            } catch (ReflectionException $ex) {
-                throw new CException('The :driver driver for the :class library could not be found', array(':driver' => CSession::$config['driver'], ':class' => get_class($this)));
+            $driverName = CSession::$config['driver'];
+            if (!preg_match("/^[A-Z]/", $driverName)) {
+                $driverName = ucfirst($driverName);
+            }
+
+            $driver = 'CSession_Driver_' . $driverName;
+
+
+            $cacheBasedDriver = ['Redis'];
+
+            if (!in_array($driverName, $cacheBasedDriver)) {
+
+
+
+                // Load the driver
+                try {
+                    // Validation of the driver
+                    $class = new ReflectionClass($driver);
+                    // Initialize the driver
+                    CSession::$driver = $class->newInstance();
+                } catch (ReflectionException $ex) {
+                    throw new CException('The :driver driver for the :class library could not be found', array(':driver' => CSession::$config['driver'], ':class' => get_class($this)));
+                }
+            } else {
+                $method = 'create'.$driverName.'Driver';
+                CSession::$driver = call_user_func([CSession_Factory::class,$method]);
             }
 
             // Validate the driver

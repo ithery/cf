@@ -38,7 +38,7 @@ trait CTracker_RepositoryManager_QueryTrait {
         if ($created) {
             foreach ($data['arguments'] as $argument => $value) {
                 if (is_array($value)) {
-                    $value = multi_implode(',', $value);
+                    $value = carr::implodes(',', $value);
                 }
                 $this->queryArgumentRepository->create(
                         [

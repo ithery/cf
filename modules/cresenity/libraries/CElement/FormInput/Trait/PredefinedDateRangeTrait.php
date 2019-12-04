@@ -41,8 +41,8 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
     }
 
     public function addRangeYesterday($label = 'Yesterday') {
-        $dateStart = Carbon::yesterday();
-        $dateEnd = Carbon::now();
+        $dateStart = Carbon::yesterday()->hour(0)->minute(0)->second(0);
+        $dateEnd = Carbon::yesterday()->hour(23)->minute(59)->second(59);
         $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
         return $this;
     }

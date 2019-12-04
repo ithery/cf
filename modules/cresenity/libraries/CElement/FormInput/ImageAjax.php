@@ -16,6 +16,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     protected $maxUploadSize;   // in MB
     protected $disabledUpload;
     protected $cropper;
+    protected $tempStorage;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -33,9 +34,10 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
             $ajaxName = str_replace('[', '-', $ajaxName);
             $ajaxName = str_replace(']', '-', $ajaxName);
 
-            $ajaxUrl = CAjaxMethod::factory()->set_type('imgupload')
-                    ->set_data('input_name', $ajaxName)
-                    ->makeurl();  
+            $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
+                    ->setData('inputName', $ajaxName)
+                    ->makeUrl();  
+                   
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('maxWidth', $this->maxWidth);
@@ -107,4 +109,9 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         return $this->cropper;
     }
 
+    
+    public function setTempStorage($tempStorage) {
+        $this->tempStorage = $tempStorage;
+        return $this;
+    }
 }

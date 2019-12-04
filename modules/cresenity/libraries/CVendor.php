@@ -144,14 +144,14 @@ class CVendor {
      *
      * @method kredivo
      *
-     * @param array     $options [<description>]
+     * @param string    $serverKey [<description>]
      * @param string    $environment [<description>]
      * 
      * @return CVendor_Kredivo  [description]
      */
-    public static function kredivo($options = [], $environment = 'production')
+    public static function kredivo($serverKey, $environment = 'production')
     {
-        return new CVendor_Kredivo($environment, $options);
+        return new CVendor_Kredivo($environment, $serverKey);
     }
 
 }

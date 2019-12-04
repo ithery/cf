@@ -113,7 +113,7 @@ class CApp extends CObservable {
      * @return CDatabase
      */
     public static function db($domain = null, $dbName = null) {
-        return CDatabase::instance($domain, $dbName);
+        return CDatabase::instance($dbName,null,$domain);
     }
 
     public function setAjaxData($key, $value = null) {
@@ -213,9 +213,7 @@ class CApp extends CObservable {
     }
 
     public function name() {
-        //$app = CJDB::instance()->get("app", array("app_id" => $this->app_id()));
-        //return $app[0]->name;
-//		return CF::app_name();
+        return strlen(CF::appCode()) > 0 ? CF::appCode() : CF::appCode();
     }
 
     public function code() {
@@ -392,9 +390,9 @@ class CApp extends CObservable {
 
         return $v->render();
     }
-    
+
     public function addCustomData($key, $value) {
-        if(!is_array($this->custom_data)){
+        if (!is_array($this->custom_data)) {
             $this->custom_data = array();
         }
         $this->custom_data[$key] = $value;
@@ -627,7 +625,12 @@ class CApp extends CObservable {
         $data["html"] = $message . $this->html();
         $asset = CManager::asset();
         $js = $this->js();
-        $js = $asset->renderJsRequire($js);
+
+        if ($asset->isUseRequireJs()) {
+            $js = $asset->renderJsRequire($js);
+        } else {
+            $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
+        }
         if (ccfg::get("minify_js")) {
             $js = CJSMin::minify($js);
         }
@@ -637,42 +640,6 @@ class CApp extends CObservable {
         $data["ajaxData"] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
         return cjson::encode($data);
-    }
-
-    public static function variables() {
-        $variables = array();
-        $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['decimalSeparator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['thousand_separator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['thousandSeparator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['decimal_digit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
-        $variables['decimalDigit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
-        $variables['have_clock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-        $variables['haveScrollToTop'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-
-
-        $bootstrap = ccfg::get('bootstrap');
-        $themeData = CManager::instance()->get_theme_data();
-        if (isset($themeData) && strlen(carr::get($themeData, 'bootstrap')) > 0) {
-            $bootstrap = carr::get($themeData, 'bootstrap');
-        }
-
-        if (strlen($bootstrap) == 0) {
-            $bootstrap = '2.3';
-        }
-        $variables['bootstrap'] = $bootstrap;
-
-        $variables['base_url'] = curl::base();
-        $variables['baseUrl'] = curl::base();
-        $variables['label_confirm'] = clang::__("Are you sure ?");
-        $variables['labelConfirm'] = clang::__("Are you sure ?");
-        $variables['label_ok'] = clang::__("OK");
-        $variables['labelOk'] = clang::__("OK");
-        $variables['label_cancel'] = clang::__("Cancel");
-        $variables['labelCancel'] = clang::__("Cancel");
-        return $variables;
     }
 
     public function setViewName($viewName) {
