@@ -360,4 +360,12 @@ final class CManager {
         return self::$asset;
     }
 
+    
+    public static function registerDaemon($class) {
+        return CManager_Daemon::instance()->registerDaemon($class);
+    }
+    
+    public static function registeredDaemon() {
+        return CManager_Daemon::instance()->daemons();
+    }
 }

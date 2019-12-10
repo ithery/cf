@@ -1,26 +1,21 @@
 Options -Indexes
 
+ExpiresActive On
+
 # Turn on URL rewriting
 RewriteEngine On
 
 # Installation directory
 RewriteBase /
 
-RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
-
+RewriteCond %{REQUEST_URI} !^/phpinfo\.php$
 # Protect application and system files from being viewed
-# RewriteCond %{REQUEST_URI} !^/?(wp)/
 RewriteCond %{REQUEST_URI} !^/?(modules/.+?/media)/ [NC] 
-
 RewriteRule ^(modules|system) - [F,L]
 RewriteRule ^(wp)($|/) - [L]
 RewriteCond %{REQUEST_URI} !^/?(wp)/
-
-
-
-
 RewriteRule ^coba.php$ coba.php [QSA,L]
+
 
 # Allow any files or directories that exist to be displayed directly
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -28,3 +23,10 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # Rewrite all other URLs to index.php/URL
 RewriteRule .* index.php/$0 [PT,L]
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php56” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddType application/x-httpd-ea-php56 .php .php5 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

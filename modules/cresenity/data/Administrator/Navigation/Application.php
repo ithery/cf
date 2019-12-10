@@ -34,9 +34,9 @@ return array(
         "method" => "index",
     ),
     array(
-        "name" => "administrator.app.cron",
-        "label" => "Cron",
-        "controller" => "administrator/app/cron",
+        "name" => "administrator.app.daemon",
+        "label" => "Daemon",
+        "controller" => "administrator/app/daemon",
         "method" => "index",
     ),
 );
