@@ -365,7 +365,11 @@ final class CManager {
         return CManager_Daemon::instance()->registerDaemon($class);
     }
     
-    public static function registeredDaemon() {
+    public static function getRegisteredDaemon() {
         return CManager_Daemon::instance()->daemons();
+    }
+    
+    public static function daemon() {
+        return CManager_Daemon::instance();
     }
 }
