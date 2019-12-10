@@ -49,7 +49,8 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
      * Set the filesize to rotate files on
      *
      * @param string $size Define as an number with a string suffix indicating the unit measurement, e.g. 5MB
-     * @throws RotateException
+     * @return CLogger_Rotator_Rotate
+     * @throws CLogger_Rotator_Exception_RotateException
      */
     public function size($size) {
         if (!preg_match('/^(\d+)\s?(B|KB|MB|GB)$/i', $size, $m)) {
@@ -72,6 +73,7 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
                 $this->sizeToRotate = $m[1] * 1024 * 1024 * 1024;
                 break;
         }
+        return $this;
     }
 
     /**

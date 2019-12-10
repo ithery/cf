@@ -50,7 +50,7 @@ final class CManager_Daemon {
     }
     
     public function pidPath() {
-        return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid';
+        return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid/';
     }
 
     public function logPath() {
@@ -88,12 +88,31 @@ final class CManager_Daemon {
         return $serviceName;
     }
 
-    public function getLogFile($className) {
-        return self::logPath() . $className . '.log';
+    public function getLogFile($className,$filename=null) {
+        if($filename==null) {
+            $filename = $className . '.log';
+        }
+        return self::logPath() .$className.'/'. $filename;
     }
 
     public function getPidFile($className) {
         return self::pidPath() . $className . '.pid';
     }
 
+    
+    public function getLogFileList($className) {
+        $fileHelper = CHelper::file();
+        $logPath = rtrim(self::logPath(), '/').'/'.$className;
+
+        $files = $fileHelper->files($logPath);
+        $list = array();
+        foreach ($files as $file) {
+            /* @var $file \Symfony\Component\Finder\SplFileInfo */
+            $basename = $file->getBasename();
+           
+            $list[$file->getPath() . DS . $file->getFilename()] = $basename;
+        }
+
+        return $list;
+    }
 }
