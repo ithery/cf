@@ -521,7 +521,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             if(strlen($logFile)>0&& file_exists($logFile)) { 
                 $rotator = CLogger_Rotator::createRotate($logFile);
                 
-                $rotator->size('10KB')->run();
+                $rotator->run();
             }
             if (strlen($logFile) > 0 && self::$log_handle = @fopen($logFile, 'a+')) {
                 if ($this->parent) {

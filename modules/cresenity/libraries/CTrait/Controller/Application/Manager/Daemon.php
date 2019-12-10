@@ -41,7 +41,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
         $request = $options;
         if ($request == null) {
-            $request = D::getRequest();
+            $request = CApp_Base::getRequest();
         }
         $db = CDatabase::instance();
         $listService = CManager::getRegisteredDaemon();
@@ -155,6 +155,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $app->title(CManager::daemon()->getServiceName($serviceClass));
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
         $restartAction = $actionContainer->addAction()->setLabel('Restart')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/restart/' . $serviceClass)->setConfirm();
+        $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() );
 
 
         $logFileList = CManager::daemon()->getLogFileList($serviceClass);
