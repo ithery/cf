@@ -57,7 +57,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $table->addColumn('service_name')->setLabel('Name');
         $table->addColumn('service_status')->setLabel('Schedule');
         $table->setTitle('Service List');
-
+        $table->setApplyDataTable(false);
         $table->cellCallbackFunc(array(__CLASS__, 'cellCallback'), __FILE__);
 
         $table->setRowActionStyle('btn-dropdown');
