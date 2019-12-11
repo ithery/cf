@@ -162,7 +162,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $tabList = $app->addTabList()->setAjax(true);
         $logFile = CManager::daemon()->getLogFile($serviceClass);
         $basename = basename($logFile);
-        $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+        if(file_exists($logFile)) {
+            $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+        }
         for ($i = 1; $i <= 10; $i++) {
             $logFileRotate = $logFile . '.' . $i;
             if (file_exists($logFileRotate)) {

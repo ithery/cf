@@ -103,7 +103,9 @@ final class CManager_Daemon {
     public function getLogFileList($className) {
         $fileHelper = CHelper::file();
         $logPath = rtrim(self::logPath(), '/').'/'.$className;
-
+        if(!is_dir($logPath)) {
+            return [];
+        }
         $files = $fileHelper->files($logPath);
         $list = array();
         foreach ($files as $file) {
