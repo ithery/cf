@@ -692,5 +692,13 @@ return array(
             "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css",
         ),
     ),
+    "cropper" => array(
+        'css' => array(
+            'plugins/cropper/cropper.css',
+        ),
+        'js' => array(
+            'plugins/cropper/cropper.js',
+        ),
+    ),
 );
 ?>
