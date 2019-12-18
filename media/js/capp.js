@@ -1216,6 +1216,38 @@ var Cresenity = function () {
             }
         });
     };
+
+    this.formatCurrency = function (rp) {
+        rp = "" + rp;
+        var rupiah = "";
+        var vfloat = "";
+        var ds = window.capp.decimal_separator;
+        var ts = window.capp.thousand_separator;
+        var dd = window.capp.decimal_digit;
+        var dd = parseInt(dd);
+        var minus_str = "";
+        if (rp.indexOf("-") >= 0) {
+            minus_str = rp.substring(rp.indexOf("-"), 1);
+            rp = rp.substring(rp.indexOf("-") + 1);
+        }
+
+        if (rp.indexOf(".") >= 0) {
+            vfloat = rp.substring(rp.indexOf("."));
+            rp = rp.substring(0, rp.indexOf("."));
+        }
+        p = rp.length;
+        while (p > 3) {
+            rupiah = ts + rp.substring(p - 3) + rupiah;
+            l = rp.length - 3;
+            rp = rp.substring(0, l);
+            p = rp.length;
+        }
+        rupiah = rp + rupiah;
+        vfloat = vfloat.replace('.', ds);
+        if (vfloat.length > dd)
+            vfloat = vfloat.substring(0, dd + 1);
+        return minus_str + rupiah + vfloat;
+    }
     this.unblockPage = function () {
         $.unblockUI();
     };
