@@ -89,7 +89,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                     ]
                 ";
                 break;
-	        case 'text-media':
+	    case 'text-media':
 		        $json = "
                     [
                         ['fontstyle', ['style']],
@@ -102,7 +102,14 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['height', ['height']]
                     ]
                 ";
-		        break;
+		break;
+            case 'text':
+                $json = "
+                    [
+                        ['style', ['bold', 'italic', 'underline']],                        
+                    ]
+                ";
+                break;
         }
         return $json;
     }
