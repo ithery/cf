@@ -188,14 +188,21 @@ class CTemporary {
         static::disk()->put($path, $content);
         return $path;
     }
+    
+    public static function get($folder, $filename) {
+        
+        $path = static::getPath($folder,$filename);
+        return static::disk()->get($path);        
+    }
+    
 
-    public static function getSize($folder, $content) {
+    public static function getSize($folder, $filename) {
 
         $path = static::getPath($folder, $filename);
         return static::disk()->size($path);
     }
 
-    public static function isExists($folder, $content) {
+    public static function isExists($folder, $filename) {
 
         $path = static::getPath($folder, $filename);
         return static::disk()->exists($path);
