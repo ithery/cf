@@ -141,35 +141,58 @@ class Process implements \IteratorAggregate
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = null)
+    public function __construct($command, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = null)
     {
         if (!\function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
-        $this->commandline = $commandline;
+        $this->commandline = $command;
         $this->cwd = $cwd;
-
         // on Windows, if the cwd changed via chdir(), proc_open defaults to the dir where PHP was started
         // on Gnu/Linux, PHP builds with --enable-maintainer-zts are also affected
-        // @see : https://bugs.php.net/bug.php?id=51800
-        // @see : https://bugs.php.net/bug.php?id=50524
+        // @see : https://bugs.php.net/51800
+        // @see : https://bugs.php.net/50524
         if (null === $this->cwd && (\defined('ZEND_THREAD_SAFE') || '\\' === \DIRECTORY_SEPARATOR)) {
             $this->cwd = getcwd();
         }
         if (null !== $env) {
             $this->setEnv($env);
         }
-
         $this->setInput($input);
         $this->setTimeout($timeout);
         $this->useFileHandles = '\\' === \DIRECTORY_SEPARATOR;
         $this->pty = false;
-        $this->enhanceSigchildCompatibility = '\\' !== \DIRECTORY_SEPARATOR && $this->isSigchildEnabled();
-        if (null !== $options) {
-            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since Symfony 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
-            $this->options = array_replace($this->options, $options);
-        }
+    }
+    
+    /**
+     * Creates a Process instance as a command-line to be run in a shell wrapper.
+     *
+     * Command-lines are parsed by the shell of your OS (/bin/sh on Unix-like, cmd.exe on Windows.)
+     * This allows using e.g. pipes or conditional execution. In this mode, signals are sent to the
+     * shell wrapper and not to your commands.
+     *
+     * In order to inject dynamic values into command-lines, we strongly recommend using placeholders.
+     * This will save escaping values, which is not portable nor secure anyway:
+     *
+     *   $process = Process::fromShellCommandline('my_command "$MY_VAR"');
+     *   $process->run(null, ['MY_VAR' => $theValue]);
+     *
+     * @param string         $command The command line to pass to the shell of the OS
+     * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
+     * @param mixed|null     $input   The input as stream resource, scalar or \Traversable, or null for no input
+     * @param int|float|null $timeout The timeout in seconds or null to disable
+     *
+     * @return static
+     *
+     * @throws RuntimeException When proc_open is not installed
+     */
+    public static function fromShellCommandline( $command,  $cwd = null, array $env = null, $input = null, $timeout = 60)
+    {
+        $process = new static([], $cwd, $env, $input, $timeout);
+        $process->commandline = $command;
+        return $process;
     }
 
     public function __destruct()
