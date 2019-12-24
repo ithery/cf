@@ -1,17 +1,12 @@
 <?php
 
-/*
+/* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
-class CEmail {
-    /**
-     * 
-     * @return \CEmail_Builder
-     */
-    public static function createBuilder() {
-        return new CEmail_Builder();
-    }
+
+class CEmail_Element_Image extends CEmail_Element {
+    
 }

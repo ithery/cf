@@ -1025,6 +1025,33 @@ class carr {
         return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
     }
 
+    public static function baseIteratee($value) {
+        if (\is_callable($value)) {
+            return $value;
+        }
+        if (null === $value) {
+            return '_\identity';
+        }
+        if (\is_array($value)) {
+            return 2 === \count($value) && [0, 1] === \array_keys($value) ? baseMatchesProperty($value[0], $value[1]) : baseMatches($value);
+        }
+        return property($value);
+    }
+
+    public static function reduce(iterable $collection, $iteratee, $accumulator = null) {
+        $func = function (iterable $array, $iteratee, $accumulator, $initAccum = null) {
+            $length = \count(\is_array($array) ? $array : \iterator_to_array($array));
+            if ($initAccum && $length) {
+                $accumulator = \current($array);
+            }
+            foreach ($array as $key => $value) {
+                $accumulator = $iteratee($accumulator, $value, $key, $array);
+            }
+            return $accumulator;
+        };
+        return $func($collection, baseIteratee($iteratee), $accumulator, null === $accumulator);
+    }
+
 }
 
 // End carr

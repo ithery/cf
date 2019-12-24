@@ -6,3 +6,15 @@
  * and open the template in the editor.
  */
 
+class CEmail_Builder {
+    
+    protected  $baseComponent;
+    
+    public function __construct() {
+        
+    }
+    public function __call($method, $arguments) {
+        return call_user_func_array(array($this->baseComponent,$method), $arguments);
+        
+    }
+}
