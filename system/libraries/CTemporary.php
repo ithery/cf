@@ -50,12 +50,17 @@ class CTemporary {
      * 
      * @return string
      */
-    public static function getDirectory() {
+    public static function getDirectory($folder = null) {
         $path = DOCROOT . "temp" . DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            mkdir($path);
+
+
+        if ($folder != null) {
+            $path .= $folder . DIRECTORY_SEPARATOR;
         }
 
+        if (!is_dir($path)) {
+            @mkdir($path, 0777, true);
+        }
         return $path;
     }
 
@@ -118,7 +123,7 @@ class CTemporary {
         $depth = 5;
         $mainFolder = substr($filename, 0, 8);
         $path = '';
-        $path = $path . $folder . DIRECTORY_SEPARATOR;
+        $path = $path . rtrim($folder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $path = $path . $mainFolder . DIRECTORY_SEPARATOR;
 
         $basefile = basename($filename);
@@ -134,6 +139,10 @@ class CTemporary {
         }
 
         return $path . $filename;
+    }
+
+    public static function getLocalPath($folder, $filename) {
+        return rtrim(DOCROOT, '/') . '/' . static::getPath($folder, $filename);
     }
 
     /**
@@ -176,8 +185,8 @@ class CTemporary {
         return @unlink($path);
     }
 
-    public static function generateRandomFilename() {
-        return date('Ymd') . cutils::randmd5() . $extension;
+    public static function generateRandomFilename($extension = null) {
+        return date('Ymd') . cutils::randmd5() . (strlen($extension) > 0 ? $extension : "");
     }
 
     public static function put($folder, $content, $filename = null) {
@@ -188,13 +197,12 @@ class CTemporary {
         static::disk()->put($path, $content);
         return $path;
     }
-    
+
     public static function get($folder, $filename) {
-        
-        $path = static::getPath($folder,$filename);
-        return static::disk()->get($path);        
+
+        $path = static::getPath($folder, $filename);
+        return static::disk()->get($path);
     }
-    
 
     public static function getSize($folder, $filename) {
 
