@@ -145,7 +145,7 @@ class cdbg {
                     if (is_numeric($key)) {
                         $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
                     } else {
-                        $html .= str_repeat(' ', $indent) . str_pad('"' . c::htmlentities($key) . '"', $longest_key, ' ');
+                        $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
                     }
 
                     $html .= ' => ';
@@ -229,7 +229,7 @@ class cdbg {
                 if (is_numeric($key)) {
                     $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
                 } else {
-                    $html .= str_repeat(' ', $indent) . str_pad('"' . c::htmlentities($key) . '"', $longest_key, ' ');
+                    $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
                 }
 
                 $html .= ' => ';
