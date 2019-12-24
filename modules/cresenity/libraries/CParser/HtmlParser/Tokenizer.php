@@ -45,7 +45,7 @@ class CParser_HtmlParser_Tokenizer {
 
     /**
      *
-     * @var CParser_HtmlParser_Tokenizer_CallbackInterface 
+     * @var CParser_HtmlParser_TokenizerCallbackInterface 
      */
     protected $callbacks;
 
@@ -60,7 +60,7 @@ class CParser_HtmlParser_Tokenizer {
      */
     protected $decodeEntities = false;
 
-    public function __construct($options = [], CParser_HtmlParser_Tokenizer_CallbackInterface $callbacks = null) {
+    public function __construct($options = [], CParser_HtmlParser_TokenizerCallbackInterface $callbacks = null) {
         $this->xmlMode = carr::get($options, 'xmlMode', false);
         $this->decodeEntities = carr::get($options, 'decodeEntities', false);
         $this->callbacks = $callbacks;
@@ -557,14 +557,14 @@ class CParser_HtmlParser_Tokenizer {
     public function write($chunk) {
         if ($this->ended)
             $this->callbacks->onerror(Error(".write() after done!"));
-        $this->buffer .= chunk;
+        $this->buffer .= $chunk;
         $this->parse();
     }
 
     // Iterates through the buffer, calling the function corresponding to the current state.
     // States that are more likely to be hit are higher up, as a performance improvement.
     public function parse() {
-        while ($this->index < $this->buffer . length && $this->running) {
+        while ($this->index < strlen($this->buffer) && $this->running) {
             $c = $this->buffer[$this->index];
             if ($this->state === State::Text) {
                 $this->stateText($c);
@@ -699,10 +699,12 @@ class CParser_HtmlParser_Tokenizer {
     }
 
     public function end($chunk) {
-        if ($this->ended)
+        if ($this->ended) {
             $this->callbacks->onerror(".end() after done!");
-        if ($chunk)
+        }
+        if ($chunk) {
             $this->write($chunk);
+        }
         $this->ended = true;
         if ($this->running)
             $this->finish();
@@ -775,7 +777,7 @@ class CParser_HtmlParser_Tokenizer {
 
     protected function emitToken($name) {
         if ($name == "onopentagname" | $name == "onclosetag" | $name == "onattribdata") {
-            $this->callbacks->$$name($this->getSection());
+            $this->callbacks->$name($this->getSection());
             $this->sectionStart = -1;
         } else {
             throw new Exception("Emit token must be onopentagname|onclosetag|onattribdata");
@@ -798,6 +800,10 @@ class CParser_HtmlParser_Tokenizer {
     public function decIndex() {
         $this->index--;
         return $this;
+    }
+
+    public function getSectionStart() {
+        return $this->sectionStart;
     }
 
 }

@@ -8,36 +8,6 @@
 
 class CEmail_Builder_Parser {
 
-    public static function parse($xml, $options = [], $includedIn = []) {
-        $defaultOptions = array(
-            'addEmptyAttributes' => true,
-            'components' => [],
-            'convertBooleans' => true,
-            'keepComments' => true,
-            'filePath' => '.',
-            'ignoreIncludes' => false,
-        );
-        $options = array_merge($defaultOptions, $options);
-        $addEmptyAttributes = carr::get($options, 'addEmptyAttributes', true);
-        $components = carr::get($options, 'components', []);
-        $convertBooleans = carr::get($options, 'convertBooleans', true);
-        $keepComments = carr::get($options, 'keepComments', true);
-        $filePath = carr::get($options, 'filePath', '.');
-        $ignoreIncludes = carr::get($options, 'ignoreIncludes', false);
-        
-        
-        $currentEndingTagIndexes = array(
-            'startIndex'=>0,
-            'endIndex'=>0,
-            
-        );
-        
-        $findTag = function($tagName,$tree) {
-            return carr::find($tree->children(),array('tagName'=>$tagName));
-        };
-        
-    }
-
     public static function toHtml($xml, $options = []) {
         $content = '';
         $errors = [];
@@ -56,19 +26,19 @@ class CEmail_Builder_Parser {
         $minifyOptions = carr::get($options, 'minifyOptions', []);
         $validationLevel = carr::get($options, 'validationLevel', 'soft');
         $filePath = carr::get($options, 'filePath', '.');
-        
-        
-        
-        if (is_string($xml) ) {
+
+
+
+        if (is_string($xml)) {
             $parserOptions = [];
-            $parserOptions['keepComments']=$keepComments;
-            $parserOptions['components']=CEmail::builder()->components();
-            $parserOptions['filePath']=$filePath;
-            $xml = static::parse($xml, $parserOptions);
-       
+            $parserOptions['keepComments'] = $keepComments;
+            $parserOptions['components'] = CEmail::builder()->components();
+            $parserOptions['filePath'] = $filePath;
+            $xmlParser = new CEmail_Builder_Parser_XmlParser($xml, $parserOptions);
+            $xml = $xmlParser->parse();
         }
-        
-        
+
+
         return $content;
     }
 

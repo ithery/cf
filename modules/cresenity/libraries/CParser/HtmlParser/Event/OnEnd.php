@@ -6,10 +6,6 @@
  * and open the template in the editor.
  */
 
-class CParser {
-
-    public static function createHtmlParser($options = []) {
-        return new CParser_HtmlParser($options);
-    }
-
+class CParser_HtmlParser_Event_OnEnd {
+    
 }

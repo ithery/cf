@@ -6,10 +6,12 @@
  * and open the template in the editor.
  */
 
-class CParser {
+class CParser_HtmlParser_Event_OnOpenTagName {
 
-    public static function createHtmlParser($options = []) {
-        return new CParser_HtmlParser($options);
+    public $name;
+
+    public function __construct($name) {
+        $this->name = $name;
     }
 
 }
