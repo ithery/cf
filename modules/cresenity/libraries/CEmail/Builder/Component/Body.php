@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CEmail_Element_Body extends CEmail_Element {
+class CEmail_Builder_Component_Body extends CEmail_Builder_Component {
 
     protected $allowedAttributes = array(
         'width' => 'unit(px,%)',

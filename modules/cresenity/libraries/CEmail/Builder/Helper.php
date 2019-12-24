@@ -7,7 +7,7 @@
  */
 
 class CEmail_Builder_Helper {
-    public function formatAttributes($attributes, $allowedAttributes) {
+    public static function formatAttributes($attributes, $allowedAttributes) {
         return carr::reduce($attributes, function($acc,$val,$attrName){
             
         },[]);
