@@ -34,7 +34,7 @@ class CEvent {
         $args = func_get_args();
         $event = carr::get($args, 0);
         $payload = array_slice($args, 1);
-        static::createDispatcher()->dispatch($event, $payload);
+        static::dispatcher()->dispatch($event, $payload);
     }
 
 }
