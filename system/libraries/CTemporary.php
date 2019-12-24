@@ -176,12 +176,22 @@ class CTemporary {
      * 
      * @param string $folder
      * @param string $filename
-     * @return string
+     * @return bool
      */
     public static function delete($folder, $filename) {
 
+        $disk = static::disk();
+        return $disk->delete(static::getPath($folder, $filename));
+    }
 
-        $path = static::makePath($folder, $filename);
+    /**
+     * 
+     * @param string $folder
+     * @param string $filename
+     * @return bool
+     */
+    public static function deleteLocal($folder, $filename) {
+        $path = static::getLocalPath($folder, $filename);
         return @unlink($path);
     }
 
