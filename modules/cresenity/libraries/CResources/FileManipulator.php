@@ -111,7 +111,7 @@ class CResources_FileManipulator {
         if ($customQueue = CF::config('resource.queueName')) {
             $job->onQueue($customQueue);
         }
-        CQueue::dispatcher()->dispatchNow($job);
+        CQueue::dispatcher()->dispatch($job);
     }
 
     /**
