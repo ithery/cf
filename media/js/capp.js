@@ -1075,9 +1075,22 @@ var Cresenity = function () {
                                 }
 
                                 setTimeout(function () {
-                                    console.log('removed');
+                                    
                                     $(modal).remove();
                                     cresenity.modalElements.pop();
+                                    
+                                   
+
+                                    var modalExists = $('.modal:visible').length > 0;
+                                    if (!modalExists) {
+                                        $('body').removeClass('modal-open');
+                                    } else {
+                                        if (!$('body').hasClass('modal-open')) {
+                                            $('body').addClass('modal-open');
+                                        }
+
+                                    }
+
 
                                 }, delay);
                                 this.isRunning = true;
@@ -1088,7 +1101,7 @@ var Cresenity = function () {
                             settings.onClose(e, next.callback);
                         }
                         if (!next.isRunning) {
-                            console.log('next is not running');
+                            
                             next.callback();
                         }
                     })(lastModal);
@@ -2234,6 +2247,8 @@ if (!window.cresenity) {
                                 jQuery('#' + id_target + '').parent().find('.modal-header .modal-title').html(data.title);
                             }
                         });
+
+                        
                     },
                     error: function (obj, t, msg) {
                         if (msg != 'abort') {
