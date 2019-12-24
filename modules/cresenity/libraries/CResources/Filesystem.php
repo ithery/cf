@@ -54,7 +54,7 @@ class CResources_Filesystem {
 
     public function getRemoteHeadersForFile($file, array $resourceCustomHeaders = []) {
         $mimeTypeHeader = ['ContentType' => CResources_Helpers_File::getMimeType($file)];
-        $extraHeaders = CF::config('resource.remote.extra_headers');
+        $extraHeaders = CF::config('resource.remote.extraHeaders');
         return array_merge($mimeTypeHeader, $extraHeaders, $this->customRemoteHeaders, $resourceCustomHeaders);
     }
 

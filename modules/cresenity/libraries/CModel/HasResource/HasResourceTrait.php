@@ -37,10 +37,10 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Set the polymorphic relation.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return CModel_Relation_MorphMany
      */
     public function resource() {
-        $resourceModel = CF::config('resource.resource_model');
+        $resourceModel = CF::config('resource.resourceModel', CApp_Model_Resource::class);
         return $this->morphMany($resourceModel, 'model');
     }
 
@@ -350,7 +350,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
 
     public function addResourceConversion($name) {
-        $conversion = Conversion::create($name);
+        $conversion = CResources_Conversion::create($name);
         $this->resourceConversions[] = $conversion;
         return $conversion;
     }
@@ -454,7 +454,7 @@ trait CModel_HasResource_HasResourceTrait {
             call_user_func_array($resourceCollection->resourceConversionRegistrations, array($resource));
 
             $preparedResourceConversions = CF::collect($this->resourceConversions)
-                    ->each(function (Conversion $conversion) use ($resourceCollection) {
+                    ->each(function (CResources_Conversion $conversion) use ($resourceCollection) {
                         $conversion->performOnCollections($resourceCollection->name);
                     })
                     ->values()

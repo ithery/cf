@@ -50,7 +50,7 @@ trait CModel_Resource_ResourceTrait {
 
     public function getImageGenerators() {
 
-        return CF::collect(CF::config('resource')->get('image_generators'));
+        return CF::collect(CF::config('resource.imageGenerators'));
     }
 
     public function getTypeAttribute() {
@@ -99,7 +99,7 @@ trait CModel_Resource_ResourceTrait {
      */
 
     public function hasCustomProperty($propertyName) {
-        return array_has($this->custom_properties, $propertyName);
+        return carr::has($this->custom_properties, $propertyName);
     }
 
     /**
@@ -122,24 +122,24 @@ trait CModel_Resource_ResourceTrait {
      */
     public function setCustomProperty($name, $value) {
         $customProperties = $this->custom_properties;
-        array_set($customProperties, $name, $value);
+        carr::set($customProperties, $name, $value);
         $this->custom_properties = $customProperties;
         return $this;
     }
 
     public function forgetCustomProperty($name) {
         $customProperties = $this->custom_properties;
-        array_forget($customProperties, $name);
+        carr::forget($customProperties, $name);
         $this->custom_properties = $customProperties;
         return $this;
     }
 
     /*
-     * Get all the names of the registered media conversions.
+     * Get all the names of the registered resource conversions.
      */
 
-    public function getMediaConversionNames() {
-        $conversions = ConversionCollection::createForMedia($this);
+    public function getResourceConversionNames() {
+        $conversions = CResources_ConversionCollection::createForResource($this);
         return $conversions->map(function (Conversion $conversion) {
                     return $conversion->getName();
                 })->toArray();
@@ -157,7 +157,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function getGeneratedConversions() {
-        return collect($this->getCustomProperty('generated_conversions', []));
+        return CF::collect($this->getCustomProperty('generated_conversions', []));
     }
 
     /**
@@ -227,7 +227,7 @@ trait CModel_Resource_ResourceTrait {
         $viewName = 'image';
         $width = '';
         if ($this->hasResponsiveImages($conversion)) {
-            $viewName = CF::config('resource.responsive_images.use_tiny_placeholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
+            $viewName = CF::config('resource.responsiveImages.useTinyPlaceholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
             $width = $this->responsiveImages($conversion)->files->first()->width();
         }
         return view("medialibrary::{$viewName}", compact(

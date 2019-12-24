@@ -14,11 +14,11 @@ interface CResources_ImageGenerator_FileTypeInterface {
      * Receive a file and return a thumbnail in jpg/png format.
      *
      * @param string $path
-     * @param \Spatie\MediaLibrary\Conversion\Conversion|null $conversion
+     * @param CResources_Conversion|null $conversion
      *
      * @return string
      */
-    public function convert($path, Conversion $conversion = null);
+    public function convert($path, CResources_Conversion $conversion = null);
 
     /**
      * 
@@ -37,5 +37,5 @@ interface CResources_ImageGenerator_FileTypeInterface {
     /**
      * @return string
      */
-    public function getType(): string;
+    public function getType();
 }

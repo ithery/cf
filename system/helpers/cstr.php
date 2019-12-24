@@ -151,7 +151,7 @@ class cstr {
      */
     public static function random($length = 16) {
         if (!is_callable('random_bytes')) {
-            require_once \CF::get_file('vendor', 'random_compat/random');
+            require_once \CF::getFile('vendor', 'random_compat/random');
         }
 
         $string = '';
