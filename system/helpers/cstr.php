@@ -827,10 +827,12 @@ class cstr {
         return isset($languageSpecific[$language]) ? $languageSpecific[$language] : null;
     }
 
-    
     public static function haveUpper($string) {
         return preg_match('~^\p{Lu}~u', $string);
     }
-    
-    
+
+    public static function kebabCase($string) {
+        return \implode('-', \array_map('\strtolower', words(\preg_replace("/['\x{2019}]/u", '', $string))));
+    }
+
 }
