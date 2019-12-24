@@ -68,7 +68,7 @@ class CImage_OptimizerChain {
         }
     }
 
-    protected function applyOptimizer(Optimizer $optimizer, Image $image) {
+    protected function applyOptimizer(CImage_OptimizerAbstract $optimizer, CImage_Image $image) {
         if (!$optimizer->canHandle($image)) {
             return;
         }
