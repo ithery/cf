@@ -129,7 +129,7 @@ trait CQueue_Trait_QueueableTrait {
      * @return $this
      */
     public function through($middleware) {
-        $this->middleware = Arr::wrap($middleware);
+        $this->middleware = carr::wrap($middleware);
         return $this;
     }
 
@@ -140,7 +140,7 @@ trait CQueue_Trait_QueueableTrait {
      * @return $this
      */
     public function chain($chain) {
-        $this->chained = collect($chain)->map(function ($job) {
+        $this->chained = CF::collect($chain)->map(function ($job) {
                     return serialize($job);
                 })->all();
         return $this;
@@ -153,7 +153,8 @@ trait CQueue_Trait_QueueableTrait {
      */
     public function dispatchNextJobInChain() {
         if (!empty($this->chained)) {
-            dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
+            
+            CEvent::dispatcher()->dispatch(CF::tap(unserialize(array_shift($this->chained)), function ($next) {
                         $next->chained = $this->chained;
                         $next->onConnection($next->connection ?: $this->chainConnection);
                         $next->onQueue($next->queue ?: $this->chainQueue);
