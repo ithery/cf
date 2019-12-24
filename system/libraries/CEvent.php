@@ -11,6 +11,10 @@ class CEvent {
 
     protected static $dispatcher;
 
+    /**
+     * 
+     * @return CEvent_Dispatcher
+     */
     public static function dispatcher() {
         if (self::$dispatcher == null) {
             self::$dispatcher = static::createDispatcher();
