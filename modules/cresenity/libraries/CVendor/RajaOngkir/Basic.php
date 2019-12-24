@@ -172,7 +172,7 @@ class CVendor_RajaOngkir_Basic extends CVendor_RajaOngkir
 		$origin,
 		$destination,
 		$weight,
-		$courier,
+		$courier
 	) {
 		$method = 'POST';
 		$options = [
