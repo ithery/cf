@@ -86,7 +86,7 @@ class CComparator_Factory {
      *
      * @param Comparator $comparator The comparator to be unregistered
      */
-    public function unregister(Comparator $comparator) {
+    public function unregister(CComparator_AbstractEngine $comparator) {
         foreach ($this->customComparators as $key => $_comparator) {
             if ($comparator === $_comparator) {
                 unset($this->customComparators[$key]);
@@ -116,7 +116,7 @@ class CComparator_Factory {
         $this->registerDefaultComparator(new CComparator_Engine_TypeComparator);
     }
 
-    private function registerDefaultComparator(Comparator $comparator) {
+    private function registerDefaultComparator(CComparator_AbstractEngine $comparator) {
         $this->defaultComparators[] = $comparator;
         $comparator->setFactory($this);
     }
