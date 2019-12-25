@@ -19,6 +19,7 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
         }
         if (is_array($this->attributes) && !array_key_exists($this->attributeName, $this->attributes)) {
             $this->attributes[$this->attributeName] = $this->attributeValue;
+            
         }
         $this->attributeName = "";
         $this->attributeValue = "";
@@ -29,6 +30,7 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
             $name = strtolower($name);
         }
         $this->attributeName = $name;
+        
     }
 
     public function oncdata($data) {

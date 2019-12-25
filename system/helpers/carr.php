@@ -511,13 +511,26 @@ class carr {
      * @param   array  array to map to
      * @return  array
      */
-    public static function map_recursive($callback, array $array) {
+    public static function mapRecursive($callback, array $array) {
         foreach ($array as $key => $val) {
             // Map the callback to the key
-            $array[$key] = is_array($val) ? carr::map_recursive($callback, $val) : call_user_func($callback, $val);
+            $array[$key] = is_array($val) ? static::mapRecursive($callback, $val) : call_user_func($callback, $val);
         }
 
         return $array;
+    }
+
+    /**
+     * Because PHP does not have this function, and array_walk_recursive creates
+     * references in arrays and is not truly recursive.
+     *
+     * @param   mixed  callback to apply to each member of the array
+     * @param   array  array to map to
+     * @return  array
+     * @deprecated since version 1.2
+     */
+    public static function map_recursive($callback, array $array) {
+        return static::mapRecursive($callback, $array);
     }
 
     /**

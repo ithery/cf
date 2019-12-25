@@ -18,7 +18,7 @@ class CEmail_Builder_Parser {
         $defaultFonts['Roboto'] = 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700';
         $defaultFonts['Ubuntu'] = 'https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700';
 
-
+        $cnode = $cml;
         $beautify = carr::get($options, 'beautify', false);
         $fonts = carr::get($options, 'fonts', $defaultFonts);
         $keepComments = carr::get($options, 'keepComments', false);
@@ -29,14 +29,37 @@ class CEmail_Builder_Parser {
 
 
 
-        if (is_string($cml)) {
+        if (is_string($cnode)) {
             $parserOptions = [];
             $parserOptions['keepComments'] = $keepComments;
             $parserOptions['components'] = CEmail::builder()->components();
             $parserOptions['filePath'] = $filePath;
-            $cmlParser = new CEmail_Builder_Parser_CmlParser($cml, $parserOptions);
-            $cml = $cmlParser->parse();
+            $cmlParser = new CEmail_Builder_Parser_CmlParser($cnode, $parserOptions);
+            $cnode = $cmlParser->parse();
         }
+
+
+        $globalData = array();
+        $globalData['backgroundColor'] = '';
+        $globalData['breakpoiunt'] = '480px';
+        $globalData['classes'] = [];
+        $globalData['classesDefault'] = [];
+        $globalData['defaultAttributes'] = [];
+        $globalData['fonts'] = $fonts;
+        $globalData['inlineStyle'] = [];
+        $globalData['headStyle'] = [];
+        $globalData['componentHeadStyle'] = [];
+        $globalData['headRaw'] = [];
+        $globalData['mediaQueries'] = [];
+        $globalData['preview'] = '';
+        $globalData['style'] = [];
+        $globalData['title'] = '';
+        $globalData['forceOWADesktop'] = CF::get($cnode, 'attributes.owa', 'mobile') === 'desktop';
+        $globalData['lang'] = CF::get($cnode, 'attributes.lang');
+
+
+
+
 
 
         return $content;

@@ -76,12 +76,13 @@ class CEmail_Builder_Parser_CmlParser {
         $this->parser->write($this->cml);
         $this->parser->end();
 
-        cdbg::dd($this->parentNode);
+
+     
         return $this->parentNode;
     }
 
     public function convertBooleansOnAttrs($attrs) {
-        return carr::map($attrs, function($val) {
+        return carr::mapRecursive(function($val) {
                     if ($val === 'true') {
                         return true;
                     }
@@ -90,7 +91,7 @@ class CEmail_Builder_Parser_CmlParser {
                     }
 
                     return $val;
-                });
+                }, $attrs);
     }
 
     public function resolvePath($path) {
@@ -102,4 +103,5 @@ class CEmail_Builder_Parser_CmlParser {
                 $indexes['endIndex'] === $parser->getEndIndex();
     }
 
+    
 }

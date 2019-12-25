@@ -7,7 +7,9 @@
  */
 
 trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
-    public static $i=0;
+
+    public static $i = 0;
+
     public function onOpenTag(CParser_HtmlParser_Event_OnOpenTag $event) {
         $name = $event->name;
         $attributes = $event->attributes;
@@ -65,23 +67,22 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         $newNodeObject->tagName = $name;
         $newNodeObject->attributes = $attributes;
         $newNodeObject->children = [];
-        
+
         if ($this->currentNode) {
-            
-            
+
+
             $this->currentNode->children[] = $newNodeObject;
         } else {
             $this->parentNode = &$newNodeObject;
         }
 
         $this->currentNode = &$newNodeObject;
-      
     }
-    
+
     public function onCloseTag(CParser_HtmlParser_Event_OnCloseTag $event) {
-        
+
         $name = $event->name;
-        
+
         if (in_array($name, $this->endingTags)) {
             $this->inEndingTag -= 1;
 
@@ -109,16 +110,14 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         // for includes, setting cur is handled in handleInclude because when there is
         // only mj-head in include it doesn't create any elements, so setting back to parent is wrong
         if ($name !== 'mj-include') {
-            if($this->currentNode!=null) {
-                cdbg::varDump('Close '.$this->currentNode->tagName);
-              
-                   
-                    //cdbg::varDump($this->currentNode->parent->tagName);
-                    $this->currentNode = &$this->currentNode->parent;
-               
+            if ($this->currentNode != null) {
+
+
+                //cdbg::varDump($this->currentNode->parent->tagName);
+                $this->currentNode = &$this->currentNode->parent;
             }
             //$this->currentNode = ($this->currentNode && $this->currentNode->parent) | null;
         }
     }
-   
+
 }

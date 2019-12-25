@@ -32,7 +32,7 @@ class c {
         if (\is_array($value)) {
             return 2 === \count($value) && [0, 1] === \array_keys($value) ? static::baseMatchesProperty($value[0], $value[1]) : static::baseMatches($value);
         }
-        return property($value);
+        return static::property($value);
     }
 
     public static function baseMatchesProperty($property, $source) {
@@ -118,6 +118,213 @@ class c {
                 return null;
             }
         };
+    }
+
+    public static function baseGet($object, $path, $defaultValue = null) {
+        $path = static::castPath($path, $object);
+        $index = 0;
+        $length = \count($path);
+        while ($object !== null && !is_scalar($object) && $index < $length) {
+            $property = static::property(static::toKey($path[$index++]));
+            $object = $property($object);
+        }
+        return ($index > 0 && $index === $length) ? $object : $defaultValue;
+    }
+
+    /**
+     * Converts `value` to a string key if it's not a string.
+     *
+     * @param mixed $value The value to inspect.
+     *
+     * @return string Returns the key.
+     */
+    public static function toKey($value) {
+        if (\is_string($value)) {
+            return $value;
+        }
+        $result = (string) $value;
+        return ('0' === $result && (1 / $value) === -INF) ? '-0' : $result;
+    }
+
+    public static function castPath($value, $object) {
+        if (\is_array($value)) {
+            return $value;
+        }
+        return static::isKey($value, $object) ? [$value] : static::stringToPath((string) $value);
+    }
+
+    /**
+     * Checks if `value` is a property name and not a property path.
+     *
+     * @param mixed        $value  The value to check.
+     * @param object|array $object The object to query keys on.
+     *
+     * @return boolean Returns `true` if `value` is a property name, else `false`.
+     */
+    public static function isKey($value, $object = []) {
+
+        /** Used to match property names within property paths. */
+        $reIsDeepProp = '#\.|\[(?:[^[\]]*|(["\'])(?:(?!\1)[^\\\\]|\\.)*?\1)\]#';
+        $reIsPlainProp = '/^\w*$/';
+        if (\is_array($value)) {
+            return false;
+        }
+        if (\is_numeric($value)) {
+            return true;
+        }
+        $forceObject = ((object) $object);
+        return \preg_match($reIsPlainProp, $value) || !\preg_match($reIsDeepProp, $value) || (null !== $object && isset($forceObject->$value));
+    }
+
+    public static function stringToPath(...$args) {
+        $memoizeCapped = static::memoizeCapped(function ($string) {
+
+                    $reLeadingDot = '/^\./';
+                    $rePropName = '#[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["\'])((?:(?!\2)[^\\\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))#';
+                    /** Used to match backslashes in property paths. */
+                    $reEscapeChar = '/\\(\\)?/g';
+                    $result = [];
+                    if (\preg_match($reLeadingDot, $string)) {
+                        $result[] = '';
+                    }
+                    \preg_match_all($rePropName, $string, $matches, PREG_SPLIT_DELIM_CAPTURE);
+                    foreach ($matches as $match) {
+                        $result[] = isset($match[1]) ? $match[1] : $match[0];
+                    }
+                    return $result;
+                });
+        return $memoizeCapped(...$args);
+    }
+
+    public static function memoizeCapped(callable $func) {
+        $MaxMemoizeSize = 500;
+        $result = static::memoize($func, function ($key) use ($MaxMemoizeSize) {
+                    if ($this->cache->getSize() === $MaxMemoizeSize) {
+                        $this->cache->clear();
+                    }
+                    return $key;
+                });
+        return $result;
+    }
+
+    /**
+     * Creates a function that memoizes the result of `func`. If `resolver` is
+     * provided, it determines the cache key for storing the result based on the
+     * arguments provided to the memoized function. By default, the first argument
+     * provided to the memoized function is used as the map cache key
+     *
+     * **Note:** The cache is exposed as the `cache` property on the memoized
+     * function. Its creation may be customized by replacing the `_.memoize.Cache`
+     * constructor with one whose instances implement the
+     * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
+     * method interface of `clear`, `delete`, `get`, `has`, and `set`.
+     *
+     * @category Function
+     *
+     * @param callable      $func     The function to have its output memoized.
+     * @param callable|null $resolver The function to resolve the cache key.
+     *
+     * @return callable Returns the new memoized function.
+     *
+     * @example
+     * <code>
+     * $object = ['a' => 1, 'b' => 2];
+     * $other = ['c' => 3, 'd' => 4];
+     *
+     * $values = c::memoize('c::values');
+     * $values($object);
+     * // => [1, 2]
+     *
+     * $values($other);
+     * // => [3, 4]
+     *
+     * $object['a'] = 2;
+     * $values($object);
+     * // => [1, 2]
+     *
+     * // Modify the result cache.
+     * $values->cache->set($object, ['a', 'b']);
+     * $values($object);
+     * // => ['a', 'b']
+     * </code>
+     */
+    public static function memoize(callable $func, callable $resolver = null) {
+        $memoized = CBase::createMemoizeResolver($func, $resolver);
+        $memoized->cache = CBase::createMapCache();
+        return $memoized;
+    }
+
+    /**
+     * Gets the value at path of object. If the resolved value is null the defaultValue is returned in its place.
+     *
+     * @category Object
+     *
+     * @param mixed $object The associative array or object to fetch value from
+     * @param array|string $path Dot separated or array of string
+     * @param mixed $defaultValue (optional)The value returned for unresolved or null values.
+     *
+     * @return mixed Returns the resolved value.
+     *
+     * @author punit-kulal
+     *
+     * @example
+     * <code>
+     * $sampleArray = ["key1" => ["key2" => ["key3" => "val1", "key4" => ""]]];
+     * get($sampleArray, 'key1.key2.key3');
+     * // => "val1"
+     *
+     * get($sampleArray, 'key1.key2.key5', "default");
+     * // => "default"
+     *
+     * get($sampleArray, 'key1.key2.key4', "default");
+     * // => ""
+     * </code>
+     */
+    function get($object, $path, $defaultValue = null) {
+
+        return ($object !== null ? c::baseGet($object, $path, $defaultValue) : $defaultValue);
+    }
+
+    public static function assocIndexOf(array $array, $key) {
+        $length = \count($array);
+        while ($length--) {
+            if (static::eq($array[$length][0], $key)) {
+                return $length;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Performs a comparison between two values to determine if they are equivalent.
+     *
+     * @param mixed $value The value to compare.
+     * @param mixed $other The other value to compare.
+     *
+     * @return boolean Returns `true` if the values are equivalent, else `false`.
+     * @example
+     * <code>
+     * $object = (object) ['a' => 1];
+     * $other = (object) ['a' => 1];
+     *
+     * eq($object, $object);
+     * // => true
+     *
+     * eq($object, $other);
+     * // => false
+     *
+     * eq('a', 'a');
+     * // => true
+     *
+     * eq(['a'], (object) ['a']);
+     * // => false
+     *
+     * eq(INF, INF);
+     * // => true
+     * </code>
+     */
+    public static function eq($value, $other) {
+        return $value === $other;
     }
 
 }
