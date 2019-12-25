@@ -114,7 +114,8 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
         $this->updatePosition(1);
         if (is_array($this->attributes)) {
             if ($this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnOpenTag::class)) {
-                $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnOpenTag($this->tagName, $this->attributes));
+                
+                $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnOpenTag($this->tagname, $this->attributes));
             }
             $this->attributes = null;
         }
@@ -123,7 +124,7 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
                 $this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnCloseTag::class) &&
                 in_array($this->tagname, static::$voidElements)
         ) {
-            $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCloseTag($this->tagName));
+            $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCloseTag($this->tagname));
         }
         $this->tagname = "";
     }
@@ -133,6 +134,7 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
             $name = strtolower($name);
         }
         $this->tagname = $name;
+        
         if (!$this->getOption('xmlMode') && array_key_exists($name, static::$openImpliesClose)) {
             $processing = true;
 

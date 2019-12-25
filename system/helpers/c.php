@@ -49,7 +49,8 @@ class c {
             }
             if (\is_array($source) || $source instanceof \Traversable) {
                 foreach ($source as $k => $v) {
-                    if (!static::isEqual(property($k)($value, $index, $collection), $v)) {
+                    $propK = c::property($k);
+                    if (!static::isEqual($propK($value, $index, $collection), $v)) {
                         return false;
                     }
                 }
@@ -100,7 +101,8 @@ class c {
                 if (false !== \strpos($path, '.')) {
                     $paths = \explode('.', $path);
                     foreach ($paths as $path) {
-                        $value = property($path)($value, $index, $collection);
+                        $propPath = static::property($path);
+                        $value = $propPath($value, $index, $collection);
                     }
                     return $value;
                 }

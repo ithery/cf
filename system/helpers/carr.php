@@ -1025,7 +1025,6 @@ class carr {
         return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
     }
 
-    
     public static function reduce(iterable $collection, $iteratee, $accumulator = null) {
         $func = function (iterable $array, $iteratee, $accumulator, $initAccum = null) {
             $length = \count(\is_array($array) ? $array : \iterator_to_array($array));
@@ -1093,6 +1092,101 @@ class carr {
             }
         }
         return null;
+    }
+
+    /**
+     * This method is like `findIndex` except that it iterates over elements
+     * of `collection` from right to left.
+     *
+     *
+     * @param array $array     The array to inspect.
+     * @param mixed $predicate The function invoked per iteration.
+     * @param int   $fromIndex The index to search from.
+     *
+     * @return int the index of the found element, else `-1`.
+     * @example
+     * <code>
+     * $users = [
+     *   ['user' => 'barney',  'active' => true ],
+     *   ['user' => 'fred',    'active' => false ],
+     *   ['user' => 'pebbles', 'active' => false ]
+     * ]
+     *
+     * carr::findLastIndex($users, function($user) { return $user['user'] === 'pebbles'; })
+     * // => 2
+     * </code>
+     */
+    function findLastIndex(array $array, $predicate, $fromIndex = null) {
+        $length = \count($array);
+        $index = $fromIndex !== null ? $fromIndex : $length - 1;
+        if ($index < 0) {
+            $index = \max($length + $index, 0);
+        }
+        $iteratee = c::baseIteratee($predicate);
+        foreach (\array_reverse($array, true) as $key => $value) {
+            if ($iteratee($value, $key, $array)) {
+                return $index;
+            }
+            $index--;
+        }
+        return -1;
+    }
+
+    /**
+     * Creates an array of values by running each element in `collection` through
+     * `iteratee`. The iteratee is invoked with three arguments:
+     * (value, index|key, collection).
+     *
+     * Many lodash-php methods are guarded to work as iteratees for methods like
+     * `_::every`, `_::filter`, `_::map`, `_::mapValues`, `_::reject`, and `_::some`.
+     *
+     * The guarded methods are:
+     * `ary`, `chunk`, `curry`, `curryRight`, `drop`, `dropRight`, `every`,
+     * `fill`, `invert`, `parseInt`, `random`, `range`, `rangeRight`, `repeat`,
+     * `sampleSize`, `slice`, `some`, `sortBy`, `split`, `take`, `takeRight`,
+     * `template`, `trim`, `trimEnd`, `trimStart`, and `words`
+     *
+     * @category Collection
+     *
+     * @param array|object          $collection The collection to iterate over.
+     * @param callable|string|array $iteratee   The function invoked per iteration.
+     *
+     * @return array Returns the new mapped array.
+     * @example
+     * <code>
+     * function square(int $n) {
+     *   return $n * $n;
+     * }
+     *
+     * carr::map([4, 8], $square);
+     * // => [16, 64]
+     *
+     * carr::map((object) ['a' => 4, 'b' => 8], $square);
+     * // => [16, 64] (iteration order is not guaranteed)
+     *
+     * $users = [
+     *   [ 'user' => 'barney' ],
+     *   [ 'user' => 'fred' ]
+     * ];
+     *
+     * // The `property` iteratee shorthand.
+     * carr::map($users, 'user');
+     * // => ['barney', 'fred']
+     * </code>
+     */
+    public static function map($collection, $iteratee) {
+        $values = [];
+        if (\is_array($collection)) {
+            $values = $collection;
+        } elseif ($collection instanceof \Traversable) {
+            $values = \iterator_to_array($collection);
+        } elseif (\is_object($collection)) {
+            $values = \get_object_vars($collection);
+        }
+        $callable = c::baseIteratee($iteratee);
+        return \array_map(function ($value, $index) use ($callable, $collection) {
+            return $callable($value, $index, $collection);
+        }, $values, \array_keys($values));
     }
 
 }

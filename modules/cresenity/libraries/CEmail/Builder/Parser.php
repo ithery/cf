@@ -8,7 +8,7 @@
 
 class CEmail_Builder_Parser {
 
-    public static function toHtml($xml, $options = []) {
+    public static function toHtml($cml, $options = []) {
         $content = '';
         $errors = [];
         $defaultFonts = [];
@@ -29,13 +29,13 @@ class CEmail_Builder_Parser {
 
 
 
-        if (is_string($xml)) {
+        if (is_string($cml)) {
             $parserOptions = [];
             $parserOptions['keepComments'] = $keepComments;
             $parserOptions['components'] = CEmail::builder()->components();
             $parserOptions['filePath'] = $filePath;
-            $xmlParser = new CEmail_Builder_Parser_XmlParser($xml, $parserOptions);
-            $xml = $xmlParser->parse();
+            $cmlParser = new CEmail_Builder_Parser_CmlParser($cml, $parserOptions);
+            $cml = $cmlParser->parse();
         }
 
 

@@ -146,4 +146,12 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
         }
     }
 
+    public function getStartIndex() {
+        return $this->startIndex;
+    }
+
+    public function getEndIndex() {
+        return $this->endIndex;
+    }
+
 }
