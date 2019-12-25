@@ -55,7 +55,7 @@ class CComparator_Engine_ScalarComparator extends CComparator_AbstractEngine
             }
         }
         if ($expectedToCompare !== $actualToCompare && \is_string($expected) && \is_string($actual)) {
-            throw new ComparisonFailure(
+            throw new CComparator_Exception_ComparisonFailureException(
                 $expected,
                 $actual,
                 $this->exporter->export($expected),

@@ -42,9 +42,9 @@ class c {
         };
     }
 
-    function baseMatches($source) {
+    public static function baseMatches($source) {
         return function ($value, $index, $collection) use ($source) {
-            if ($value === $source || isEqual($value, $source)) {
+            if ($value === $source || static::isEqual($value, $source)) {
                 return true;
             }
             if (\is_array($source) || $source instanceof \Traversable) {

@@ -1097,7 +1097,7 @@ class carr {
      * // => object for 'barney'
      * </code>
      */
-    public static function find(iterable $collection, $predicate = null, $fromIndex = 0) {
+    public static function find($collection, $predicate = null, $fromIndex = 0) {
         $iteratee = c::baseIteratee($predicate);
         foreach (\array_slice(\is_array($collection) ? $collection : \iterator_to_array($collection), $fromIndex) as $key => $value) {
             if ($iteratee($value, $key, $collection)) {
@@ -1198,8 +1198,85 @@ class carr {
         }
         $callable = c::baseIteratee($iteratee);
         return \array_map(function ($value, $index) use ($callable, $collection) {
+            $test = $callable($value, $index, $collection);
+            cdbg::varDump($test);
+            die;
             return $callable($value, $index, $collection);
         }, $values, \array_keys($values));
+    }
+
+    /**
+     * Creates a new array concatenating `array` with any additional arrays
+     * and/or values.
+     *
+     * @category Array
+     *
+     * @param  array $array The array to concatenate.
+     * @param  array<int, mixed> $values The values to concatenate.
+     *
+     * @return array Returns the new concatenated array.
+     *
+     * @example
+     * <code>
+     * $array = [1];
+     * $other = carr::concat($array, 2, [3], [[4]]);
+     *
+     * var_dump($other)
+     * // => [1, 2, 3, [4]]
+     *
+     * var_dump($array)
+     * // => [1]
+     * </code>
+     */
+    public static function concat($array, ...$values) {
+        $check = function ($value) {
+            return \is_array($value) ? $value : [$value];
+        };
+        return \array_merge($check($array), ...\array_map($check, $values));
+    }
+
+    /**
+     * Checks if `predicate` returns truthy for **any** element of `collection`.
+     * Iteration is stopped once `predicate` returns truthy. The predicate is
+     * invoked with three arguments: (value, index|key, collection).
+     *
+     * @category Collection
+     *
+     * @param iterable              $collection The collection to iterate over.
+     * @param callable|string|array $predicate  The function invoked per iteration.
+     *
+     * @return boolean Returns `true` if any element passes the predicate check, else `false`.
+     * @example
+     * <code>
+     * some([null, 0, 'yes', false], , function ($value) { return \is_bool($value); }));
+     * // => true
+     *
+     * $users = [
+     *   ['user' => 'barney', 'active' => true],
+     *   ['user' => 'fred',   'active' => false]
+     * ];
+     *
+     * // The `matches` iteratee shorthand.
+     * some($users, ['user' => 'barney', 'active' => false ]);
+     * // => false
+     *
+     * // The `matchesProperty` iteratee shorthand.
+     * some($users, ['active', false]);
+     * // => true
+     *
+     * // The `property` iteratee shorthand.
+     * some($users, 'active');
+     * // => true
+     * </code>
+     */
+    public static function some($collection, $predicate = null) {
+        $iteratee = c::baseIteratee($predicate);
+        foreach ($collection as $key => $value) {
+            if ($iteratee($value, $key, $collection)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

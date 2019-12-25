@@ -748,7 +748,7 @@ class PropertyAccessor implements PropertyAccessorInterface {
             yield $result;
         }
 
-        return null;
+       
     }
 
     /**

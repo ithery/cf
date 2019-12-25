@@ -8,9 +8,22 @@
 
 class CEmail_Builder_Parser {
 
-    public static function toHtml($cml, $options = []) {
-        $content = '';
-        $errors = [];
+    /**
+     *
+     * @var CEmail_Builder_Node
+     */
+    protected $node;
+    /**
+     *
+     * @var array 
+     */
+    protected $globalData = [];
+    protected $errors = [];
+    protected $content = '';
+
+    public function __construct($cml, $options = []) {
+        $this->content = '';
+        $this->errors = [];
         $defaultFonts = [];
         $defaultFonts['Open Sans'] = 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,700';
         $defaultFonts['Droid Sans'] = 'https://fonts.googleapis.com/css?family=Droid+Sans:300,400,500,700';
@@ -18,7 +31,7 @@ class CEmail_Builder_Parser {
         $defaultFonts['Roboto'] = 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700';
         $defaultFonts['Ubuntu'] = 'https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700';
 
-        $cnode = $cml;
+        $this->node = $cml;
         $beautify = carr::get($options, 'beautify', false);
         $fonts = carr::get($options, 'fonts', $defaultFonts);
         $keepComments = carr::get($options, 'keepComments', false);
@@ -29,40 +42,63 @@ class CEmail_Builder_Parser {
 
 
 
-        if (is_string($cnode)) {
+        if (is_string($this->node)) {
             $parserOptions = [];
             $parserOptions['keepComments'] = $keepComments;
             $parserOptions['components'] = CEmail::builder()->components();
             $parserOptions['filePath'] = $filePath;
-            $cmlParser = new CEmail_Builder_Parser_CmlParser($cnode, $parserOptions);
-            $cnode = $cmlParser->parse();
+            $cmlParser = new CEmail_Builder_Parser_CmlParser($this->node, $parserOptions);
+            $this->node = $cmlParser->parse();
         }
 
 
-        $globalData = array();
-        $globalData['backgroundColor'] = '';
-        $globalData['breakpoiunt'] = '480px';
-        $globalData['classes'] = [];
-        $globalData['classesDefault'] = [];
-        $globalData['defaultAttributes'] = [];
-        $globalData['fonts'] = $fonts;
-        $globalData['inlineStyle'] = [];
-        $globalData['headStyle'] = [];
-        $globalData['componentHeadStyle'] = [];
-        $globalData['headRaw'] = [];
-        $globalData['mediaQueries'] = [];
-        $globalData['preview'] = '';
-        $globalData['style'] = [];
-        $globalData['title'] = '';
-        $globalData['forceOWADesktop'] = CF::get($cnode, 'attributes.owa', 'mobile') === 'desktop';
-        $globalData['lang'] = CF::get($cnode, 'attributes.lang');
-
-
-
-
-
-
-        return $content;
+        $this->globalData = array();
+        $this->globalData['backgroundColor'] = '';
+        $this->globalData['breakpoiunt'] = '480px';
+        $this->globalData['classes'] = [];
+        $this->globalData['classesDefault'] = [];
+        $this->globalData['defaultAttributes'] = [];
+        $this->globalData['fonts'] = $fonts;
+        $this->globalData['inlineStyle'] = [];
+        $this->globalData['headStyle'] = [];
+        $this->globalData['componentHeadStyle'] = [];
+        $this->globalData['headRaw'] = [];
+        $this->globalData['mediaQueries'] = [];
+        $this->globalData['preview'] = '';
+        $this->globalData['style'] = [];
+        $this->globalData['title'] = '';
+        $this->globalData['forceOWADesktop'] = CF::get($this->node, 'attributes.owa', 'mobile') === 'desktop';
+        $this->globalData['lang'] = CF::get($this->node, 'attributes.lang');
     }
 
+    public function parse() {
+        $cBody = carr::find($this->node->children, ['tagName' => 'c-body']);
+        $cHead = carr::find($this->node->children, ['tagName' => 'c-head']);
+        //$this->globalDatas['headRaw'] = $this->processing($cHead, $headHelpers);
+        //$content = $this->processing(mjBody, bodyHelpers, applyAttributes);
+        $content = '';
+        $options=$this->globalData;
+        
+        $renderer = new CEmail_Builder_Renderer($content, $options);
+        return trim($renderer->render());
+    }
+
+    public function processing($node, $context, $callbackParseCML = null) {
+        if ($node == null) {
+            return null;
+        }
+        $name = $node->tagName;
+        if (cstr::startsWith($name, 'c-')) {
+            $name = substr($name, '2');
+        }
+
+        if ($callbackParseCML == null) {
+            $callbackParseCML = array('c', 'identity');
+        }
+
+        $options = $callbackParseCML();
+        $options['context'] = $context;
+        
+        $component = CEmail::builder()->initComponent($name, $options);
+    }
 }

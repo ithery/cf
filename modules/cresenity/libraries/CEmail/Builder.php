@@ -23,7 +23,7 @@ class CEmail_Builder {
     }
 
     public function registerComponent($componentClass) {
-        $name = substr($componentClass,strlen('CEmail_Builder_Component_'));
+        $name = substr($componentClass, strlen('CEmail_Builder_Component_'));
         $this->components[cstr::kebabCase($name)] = $componentClass;
     }
 
@@ -47,7 +47,8 @@ class CEmail_Builder {
     }
 
     public function toHtml($xml, $options = []) {
-        return CEmail_Builder_Parser::toHtml($xml, $options = []);
+        $parser = new CEmail_Builder_Parser($xml, $options = []);
+        return $parser->parse();
     }
 
 }
