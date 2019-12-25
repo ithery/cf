@@ -26,6 +26,15 @@ class CEmail_Builder_Type_TypeFactory {
             'matcher' => CEmail_Builder_Type_Adapter_StringAdapter::MATCHER,
             'class' => CEmail_Builder_Type_Adapter_StringAdapter::class,
         ],
+        
+        'color' => [
+            'matcher' => CEmail_Builder_Type_Adapter_ColorAdapter::MATCHER,
+            'class' => CEmail_Builder_Type_Adapter_ColorAdapter::class,
+        ],
+        'integer' => [
+            'matcher' => CEmail_Builder_Type_Adapter_IntegerAdapter::MATCHER,
+            'class' => CEmail_Builder_Type_Adapter_IntegerAdapter::class,
+        ],
     ];
 
     public static function getAdapter($typeConfig) {

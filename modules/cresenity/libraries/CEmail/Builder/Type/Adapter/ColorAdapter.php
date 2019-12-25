@@ -1,0 +1,192 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+class CEmail_Builder_Type_Adapter_ColorAdapter extends CEmail_Builder_Type_AbstractAdapter {
+
+    const MATCHER = '/^color/im';
+    const TYPE = 'color';
+
+    public static $colorList = [
+        'aliceblue',
+        'antiquewhite',
+        'aqua',
+        'aquamarine',
+        'azure',
+        'beige',
+        'bisque',
+        'black',
+        'blanchedalmond',
+        'blue',
+        'blueviolet',
+        'brown',
+        'burlywood',
+        'cadetblue',
+        'chartreuse',
+        'chocolate',
+        'coral',
+        'cornflowerblue',
+        'cornsilk',
+        'crimson',
+        'cyan',
+        'darkblue',
+        'darkcyan',
+        'darkgoldenrod',
+        'darkgray',
+        'darkgreen',
+        'darkgrey',
+        'darkkhaki',
+        'darkmagenta',
+        'darkolivegreen',
+        'darkorange',
+        'darkorchid',
+        'darkred',
+        'darksalmon',
+        'darkseagreen',
+        'darkslateblue',
+        'darkslategray',
+        'darkslategrey',
+        'darkturquoise',
+        'darkviolet',
+        'deeppink',
+        'deepskyblue',
+        'dimgray',
+        'dimgrey',
+        'dodgerblue',
+        'firebrick',
+        'floralwhite',
+        'forestgreen',
+        'fuchsia',
+        'gainsboro',
+        'ghostwhite',
+        'gold',
+        'goldenrod',
+        'gray',
+        'green',
+        'greenyellow',
+        'grey',
+        'honeydew',
+        'hotpink',
+        'indianred',
+        'indigo',
+        'ivory',
+        'khaki',
+        'lavender',
+        'lavenderblush',
+        'lawngreen',
+        'lemonchiffon',
+        'lightblue',
+        'lightcoral',
+        'lightcyan',
+        'lightgoldenrodyellow',
+        'lightgray',
+        'lightgreen',
+        'lightgrey',
+        'lightpink',
+        'lightsalmon',
+        'lightseagreen',
+        'lightskyblue',
+        'lightslategray',
+        'lightslategrey',
+        'lightsteelblue',
+        'lightyellow',
+        'lime',
+        'limegreen',
+        'linen',
+        'magenta',
+        'maroon',
+        'mediumaquamarine',
+        'mediumblue',
+        'mediumorchid',
+        'mediumpurple',
+        'mediumseagreen',
+        'mediumslateblue',
+        'mediumspringgreen',
+        'mediumturquoise',
+        'mediumvioletred',
+        'midnightblue',
+        'mintcream',
+        'mistyrose',
+        'moccasin',
+        'navajowhite',
+        'navy',
+        'oldlace',
+        'olive',
+        'olivedrab',
+        'orange',
+        'orangered',
+        'orchid',
+        'palegoldenrod',
+        'palegreen',
+        'paleturquoise',
+        'palevioletred',
+        'papayawhip',
+        'peachpuff',
+        'peru',
+        'pink',
+        'plum',
+        'powderblue',
+        'purple',
+        'rebeccapurple',
+        'red',
+        'rosybrown',
+        'royalblue',
+        'saddlebrown',
+        'salmon',
+        'sandybrown',
+        'seagreen',
+        'seashell',
+        'sienna',
+        'silver',
+        'skyblue',
+        'slateblue',
+        'slategray',
+        'slategrey',
+        'snow',
+        'springgreen',
+        'steelblue',
+        'tan',
+        'teal',
+        'thistle',
+        'tomato',
+        'transparent',
+        'turquoise',
+        'violet',
+        'wheat',
+        'white',
+        'whitesmoke',
+        'yellow',
+        'yellowgreen',
+    ];
+
+    public function __construct($typeConfig, $value) {
+
+        parent::__construct($typeConfig, $value);
+
+
+        $this->matchers = [
+            '/rgba\(\d{1,3},\s?\d{1,3},\s?\d{1,3},\s?\d(\.\d{1,3})?\)/i',
+            '/rgb\(\d{1,3},\s?\d{1,3},\s?\d{1,3}\)/i',
+            '/^#([0-9a-f]{3}){1,2}$/i',
+            '^' . implode('|', static::$colorList) . '$',
+        ];
+    }
+
+    public function getValue() {
+        $shorthandRegex = '/^#\w{3}$/';
+
+        $replaceInputRegex = '/^#(\w)(\w)(\w)$/';
+
+        $replaceOutput = '#$1$1$2$2$3$3';
+
+        if (preg_match($shorthandRegex, $this->value)) {
+            return preg_replace($replaceInputRegex, $replaceOutput, $this->value);
+        }
+        return $this->value;
+    }
+
+}
