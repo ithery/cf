@@ -72,12 +72,13 @@ class CEmail_Builder_Parser_CmlParser {
         $this->parser = CParser::createHtmlParser($options);
         $this->parser->listen(CParser_HtmlParser_Event_OnOpenTag::class, array($this, 'onOpenTag'));
         $this->parser->listen(CParser_HtmlParser_Event_OnCloseTag::class, array($this, 'onCloseTag'));
+        $this->parser->listen(CParser_HtmlParser_Event_OnText::class, array($this, 'onText'));
 
         $this->parser->write($this->cml);
         $this->parser->end();
 
 
-     
+
         return $this->parentNode;
     }
 
@@ -103,5 +104,4 @@ class CEmail_Builder_Parser_CmlParser {
                 $indexes['endIndex'] === $parser->getEndIndex();
     }
 
-    
 }

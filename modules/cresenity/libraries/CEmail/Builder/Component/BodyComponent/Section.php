@@ -8,7 +8,7 @@
 
 use CEmail_Builder_Helper as Helper;
 
-class CEmail_Builder_Component_Section extends CEmail_Builder_BodyComponent {
+class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Component_BodyComponent {
 
     protected $allowedAttributes = [
         'background-color' => 'color',
@@ -43,6 +43,7 @@ class CEmail_Builder_Component_Section extends CEmail_Builder_BodyComponent {
     public function getStyles() {
         $parentStyles = parent::getStyles();
         $containerWidth = $this->context->getContainerWidth();
+        
         $fullWidth = $this->isFullWidth();
 
         $background = $this->hasBackground() ? $this->getBackground() : ['background' => $this->getAttribute('background-color'), 'background-color' => $this->getAttribute('background-color')];

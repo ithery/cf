@@ -120,4 +120,16 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         }
     }
 
+    public function onText($event) {
+        $text= $event->value;
+        
+        if ($this->inEndingTag > 0) {
+            return;
+        }
+        if ($text != null && strlen(trim($text)) > 0 && $this->currentNode != null) {
+            $this->currentNode->content = trim($this->currentNode->content . trim($text));
+        }
+    }
+
+
 }

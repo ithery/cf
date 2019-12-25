@@ -19,13 +19,14 @@ class CEmail_Builder {
     }
 
     public function __construct() {
-        $this->registerComponent(CEmail_Builder_Component_Body::class);
-        $this->registerComponent(CEmail_Builder_Component_Section::class);
-        $this->registerComponent(CEmail_Builder_Component_Column::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Body::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Section::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Column::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Text::class);
     }
 
     public function registerComponent($componentClass) {
-        $name = substr($componentClass, strlen('CEmail_Builder_Component_'));
+        $name = carr::last(explode("_",$componentClass));
         $this->components[cstr::kebabCase($name)] = $componentClass;
     }
 
@@ -41,11 +42,16 @@ class CEmail_Builder {
             }
             return $component;
         }
+        //throw new Exception('component not found:'.$name);
         return null;
     }
 
     public function components() {
         return $this->components;
+    }
+    
+    public function globalData() {
+        return CEmail_Builder_GlobalData::instance();
     }
     
     public function determineTypeAdapter($typeConfig) {

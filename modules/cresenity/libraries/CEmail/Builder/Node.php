@@ -15,6 +15,7 @@ class CEmail_Builder_Node {
     public $absoluteFilePath = null;
     public $tagName = null;
     public $attributes = [];
+    public $content='';
 
     public function getComponentName() {
         $name = $this->tagName;
@@ -35,6 +36,10 @@ class CEmail_Builder_Node {
 
     public function getTagName() {
         return $this->tagName;
+    }
+    
+    public function getContent() {
+        return $this->content;
     }
 
 }

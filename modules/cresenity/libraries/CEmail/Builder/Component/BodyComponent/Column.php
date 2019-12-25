@@ -8,7 +8,7 @@
 
 use CEmail_Builder_Helper as Helper;
 
-class CEmail_Builder_Component_Column extends CEmail_Builder_BodyComponent {
+class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Component_BodyComponent {
 
     protected $allowedAttributes = [
         'background-color' => 'color',
@@ -71,11 +71,10 @@ class CEmail_Builder_Component_Column extends CEmail_Builder_BodyComponent {
 
     public function getMobileWidth() {
         $containerWidth = $this->context->getContainerWidth();
-        $nonRawSiblings = $this->getProp('nonRawSublings', 0);
+        $nonRawSiblings = $this->getProp('nonRawSiblings', 0);
         $width = $this->getAttribute('width');
         $mobileWidth = $this->getAttribute('mobileWidth');
-
-
+        
 
         if ($mobileWidth !== 'mobileWidth') {
             return '100%';
@@ -235,7 +234,7 @@ class CEmail_Builder_Component_Column extends CEmail_Builder_BodyComponent {
                 return '
             <tr>
               <td' . $component->htmlAttributes($tdAttr) . '>
-                ' . $component . render() . '
+                ' . $component->render() . '
               </td>
             </tr>
           ';

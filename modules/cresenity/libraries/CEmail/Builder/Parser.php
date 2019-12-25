@@ -101,6 +101,7 @@ class CEmail_Builder_Parser {
         $options['children'] = $node->getChildren();
         $options['name'] = $name;
         $options['context']=$this->context;
+        $options['content']=$node->getContent();
         //$options = $callbackParseCML();
         //$options['context'] = $context;
         $component = CEmail::builder()->createComponent($name, $options);

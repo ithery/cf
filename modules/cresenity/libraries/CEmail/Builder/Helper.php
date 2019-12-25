@@ -59,7 +59,7 @@ class CEmail_Builder_Helper {
                         return $output . ' ' . $name . '="' . $v . '"';
                     }
                     return $output;
-                },'');
+                }, '');
 
         return '<' . $tagName . $attributesString . '>' . $subNode . '</' . $tagName . '>';
     }
@@ -88,7 +88,23 @@ class CEmail_Builder_Helper {
                         return $output . $name . ':' . $value . ';';
                     }
                     return $output;
-                },'');
+                }, '');
+    }
+
+    public static function conditionalTag($content, $negation = false) {
+        $startConditionalTag = '<!--[if mso | IE]>';
+        $startNegationConditionalTag = '<!--[if !mso | IE]><!-->';
+        $endConditionalTag = '<![endif]-->';
+        $endNegationConditionalTag = '<!--<![endif]-->';
+        return ($negation ? $startNegationConiditonalTag : $startConditionalTag) . $content . ($negation ? $endNegationConditionalTag : $endConditionalTag);
+    }
+
+    public static function msoConditionalTag($content, $negation = false) {
+        $startMsoConditionalTag = '<!--[if mso]>';
+        $startMsoNegationConditionalTag = '<!--[if !mso><!-->';
+        $endConditionalTag = '<![endif]-->';
+        $endNegationConditionalTag = '<!--<![endif]-->';
+        return ($negation ? $startMsoNegationConditionalTag : $startMsoConditionalTag) . $content . ($negation ? $endNegationConditionalTag : $endConditionalTag);
     }
 
 }

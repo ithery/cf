@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CEmail_Builder_Component_Body extends CEmail_Builder_BodyComponent {
+class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Component_BodyComponent {
 
     protected $allowedAttributes = array(
         'width' => 'unit(px,%)',
@@ -15,6 +15,15 @@ class CEmail_Builder_Component_Body extends CEmail_Builder_BodyComponent {
     protected $defaultAttributes = array(
         'width' => '600px',
     );
+
+    public function getChildContext() {
+
+        $context = clone $this->context;
+        $width = $this->getAttribute('width');
+       
+        $context->set('containerWidth',$width);
+        return $context;
+    }
 
     public function render() {
         $backgroundColor = $this->getAttribute('background-color');

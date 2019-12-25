@@ -8,7 +8,7 @@
 
 use CEmail_Builder_Helper as Helper;
 
-class CEmail_Builder_BodyComponent extends CEmail_Builder_Component {
+class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
 
     public function getStyles() {
         return [];

@@ -149,7 +149,7 @@ class CEmail_Builder_Renderer {
         <style type="text/css">
           ' . $toImportStyle . '
         </style>
-      <!--<![endif]-->\n
+      <!--<![endif]-->'."\n".'
     ';
         }
 
@@ -157,8 +157,9 @@ class CEmail_Builder_Renderer {
     }
 
     public function buildMediaQueriesTags() {
-        $breakpoint = $this->getOption('breakpoint');
-        $mediaQueries = $this->getOption('mediaQueries', []);
+        $globalData = CEmail::builder()->globalData();
+        $breakpoint = $this->getOption('breakpoint','480px');
+        $mediaQueries = $globalData->get('mediaQueries', []);
         $forceOWADesktop = $this->getOption('forceOWADesktop', false);
         if (count($mediaQueries) == 0) {
             return '';
@@ -178,7 +179,7 @@ class CEmail_Builder_Renderer {
 
         return '
     <style type="text/css">
-      @media only screen and (min-width:${breakpoint}) {
+      @media only screen and (min-width:'.$breakpoint.') {
         ' . $baseMediaQueriesStyle . '
       }
     </style>

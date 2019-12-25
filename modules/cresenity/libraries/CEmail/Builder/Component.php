@@ -17,7 +17,7 @@ class CEmail_Builder_Component {
     protected $componentHeadStyle = [];
     protected $children = [];
     protected $content = '';
-    protected $rawElement = false;
+    protected static $rawElement = false;
 
     public function __construct($options) {
         $defaultOptions = array();
@@ -28,12 +28,13 @@ class CEmail_Builder_Component {
         $defaultOptions['props'] = [];
         $defaultOptions['globalAttributes'] = [];
         $options = array_merge($defaultOptions, $options);
-
+        
         $this->props = carr::get($options, 'props');
         $this->children = carr::get($options, 'children', []);
         $this->content = carr::get($options, 'content', '');
         $this->name = carr::get($options,'name');
         $this->rawElement = false;
+       
 
         $attributes = array_merge($this->defaultAttributes, carr::get($options, 'globalAttributes', []), carr::get($options, 'attributes', []));
         $this->attributes = CEmail_Builder_Helper::formatAttributes($attributes, $this->allowedAttributes);
@@ -44,8 +45,8 @@ class CEmail_Builder_Component {
         return cstr::kebabCase($this->name);
     }
 
-    public function isRawElement() {
-        return !!$this->rawElement;
+    public static function isRawElement() {
+        return !!static::$rawElement;
     }
 
     public function getChildContext() {
@@ -69,7 +70,7 @@ class CEmail_Builder_Component {
     }
 
     public function getContent() {
-        return trim(carr::get($this->props, 'content'));
+        return trim($this->content);
     }
 
     public function addBody() {
@@ -148,15 +149,18 @@ class CEmail_Builder_Component {
                     },'');
         }
         $sibling = count($childrens);
-//        $rawComponents = carr::filter($childrens, function($c) {
-//                    return $c->isRawElement();
-//                });
+        $rawComponents = carr::filter(CEmail::builder()->components(), function($c) {
+            
+                    return $c::isRawElement();
+                });
 
+        $nonRawSiblings = count(carr::filter($childrens,function($child)  use ($rawComponents){
+            return !carr::find($rawComponents, function($c) use($child) {
+                return $c::getTagName()==$child->getTagName();
+            });
+        }));
 
-
-//        const nonRawSiblings = childrens.filter(
-//        child => !find(rawComponents, c => c.getTagName() === child.tagName),
-//        ).length
+        
 
         $output = '';
         $index = 0;
@@ -168,12 +172,13 @@ class CEmail_Builder_Component {
                 $options['attributes'] = array_merge($attributes, $children->getAttributes());
                 $options['context'] = $this->getChildContext();
                 $options['name']=$children->getComponentName();
+                $options['content']=$children->getContent();
                 $options['props'] = [];
                 $options['props']['first'] = $index === 0;
                 $options['props']['index'] = $index;
                 $options['props']['last'] = $sibling - 1 === $index;
                 $options['props']['sibling'] = $sibling;
-                
+                $options['props']['nonRawSiblings'] = $nonRawSiblings;
              
                 $component = CEmail::Builder()->createComponent($children->getComponentName(), $options);
             }

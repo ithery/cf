@@ -7,6 +7,6 @@
  */
 
 
-class CEmail_Element_Image extends CEmail_Element {
-    
+class CEmail_Builder_Component_BodyComponent_Image extends CEmail_Builder_Component_BodyComponent {
+
 }
