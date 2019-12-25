@@ -98,6 +98,7 @@ class c {
         return function ($value, $index = 0, $collection = []) use ($path, $propertyAccess) {
             $path = \implode('.', (array) $path);
             if (\is_array($value)) {
+                
                 if (false !== \strpos($path, '.')) {
                     $paths = \explode('.', $path);
                     foreach ($paths as $path) {
@@ -106,7 +107,8 @@ class c {
                     }
                     return $value;
                 }
-                if (\is_string($path) && $path[0] !== '[' && $path[-1] !== ']') {
+                
+                if (\is_string($path) && $path[0] !== '[' && $path[strlen($path)-1] !== ']') {
                     $path = "[$path]";
                 }
             }

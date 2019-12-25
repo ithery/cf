@@ -1038,8 +1038,11 @@ class carr {
         return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
     }
 
-    public static function reduce(iterable $collection, $iteratee, $accumulator = null) {
-        $func = function (iterable $array, $iteratee, $accumulator, $initAccum = null) {
+    public static function reduce($collection, $iteratee, $accumulator = null) {
+        if ($collection === null) {
+            return null;
+        }
+        $func = function ( $array, $iteratee, $accumulator, $initAccum = null) {
             $length = \count(\is_array($array) ? $array : \iterator_to_array($array));
             if ($initAccum && $length) {
                 $accumulator = \current($array);
@@ -1052,7 +1055,7 @@ class carr {
         return $func($collection, c::baseIteratee($iteratee), $accumulator, null === $accumulator);
     }
 
-    public static function filter(iterable $array, $predicate = null) {
+    public static function filter( $array, $predicate = null) {
         $iteratee = c::baseIteratee($predicate);
         $result = \array_filter(
                 \is_array($array) ? $array : \iterator_to_array($array), function ($value, $key) use ($array, $iteratee) {
@@ -1196,13 +1199,16 @@ class carr {
         } elseif (\is_object($collection)) {
             $values = \get_object_vars($collection);
         }
+
+
         $callable = c::baseIteratee($iteratee);
-        return \array_map(function ($value, $index) use ($callable, $collection) {
+        $keys = \array_keys($values);
+        $items = \array_map(function ($value, $index) use ($callable, $collection) {
             $test = $callable($value, $index, $collection);
-            cdbg::varDump($test);
-            die;
             return $callable($value, $index, $collection);
-        }, $values, \array_keys($values));
+        }, $values, $keys);
+
+        return array_combine($keys, $items);
     }
 
     /**
@@ -1277,6 +1283,42 @@ class carr {
             }
         }
         return false;
+    }
+
+    /**
+     * Iterates over elements of `collection` and invokes `iteratee` for each element.
+     * The iteratee is invoked with three arguments: (value, index|key, collection).
+     * Iteratee functions may exit iteration early by explicitly returning `false`.
+     *
+     * **Note:** As with other "Collections" methods, objects with a "length"
+     * property are iterated like arrays. To avoid this behavior use `forIn`
+     * or `forOwn` for object iteration.
+     *
+     * @category     Collection
+     *
+     * @param array|iterable|object $collection The collection to iterate over.
+     * @param callable              $iteratee   The function invoked per iteration.
+     *
+     * @return array|object Returns `collection`.
+     *
+     * @example
+     * <code>
+     * carr::each([1, 2], function ($value) { echo $value; })
+     * // => Echoes `1` then `2`.
+     *
+     * carr::each((object) ['a' => 1, 'b' => 2], function ($value, $key) { echo $key; });
+     * // => Echoes 'a' then 'b' (iteration order is not guaranteed).
+     * </code>
+     */
+    public static function each($collection, callable $iteratee) {
+        $values = \is_object($collection) ? \get_object_vars($collection) : $collection;
+        /** @var array $values */
+        foreach ($values as $index => $value) {
+            if (false === $iteratee($value, $index, $collection)) {
+                break;
+            }
+        }
+        return $collection;
     }
 
 }

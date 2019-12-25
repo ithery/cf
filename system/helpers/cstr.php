@@ -835,8 +835,6 @@ class cstr {
         return \implode('-', \array_map('\strtolower', cstr::words(\preg_replace("/['\x{2019}]/u", '', $string))));
     }
 
-    
-
     /**
      * Splits `string` into an array of its words.
      *
@@ -946,6 +944,26 @@ class cstr {
             return $matches[0];
         }
         return [];
+    }
+
+    /**
+     * Escapes the `RegExp` special characters "^", "$", "\", ".", "*", "+",
+     * "?", "(", ")", "[", "]", "{", "}", and "|" in `string`.
+     *
+     * @category String
+     *
+     * @param string $string The string to escape.
+     *
+     * @return string Returns the escaped string.
+     * @example
+     * <code>
+     * escapeRegExp('[lodash](https://lodash.com/)')
+     * // => '\[lodash\]\(https://lodash\.com/\)'
+     * </code>
+     */
+    public static function escapeRegExp($string) {
+        $reRegExpChar = '/([\\^$.*+?()[\]{}|])/';
+        return \preg_replace($reRegExpChar, '\\\$0', $string);
     }
 
 }

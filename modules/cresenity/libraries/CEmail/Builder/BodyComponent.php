@@ -6,6 +6,8 @@
  * and open the template in the editor.
  */
 
+use CEmail_Builder_Helper as Helper;
+
 class CEmail_Builder_BodyComponent extends CEmail_Builder_Component {
 
     public function getStyles() {
@@ -32,6 +34,23 @@ class CEmail_Builder_BodyComponent extends CEmail_Builder_Component {
         $border = $this->getAttribute('border');
 
         return borderParser($borderDirection || $border || '0', 10);
+    }
+
+    public function htmlAttributes($attributes) {
+      
+        return carr::reduce($attributes, function($output, $v, $name) {
+                    $value = $v;
+                    if ($name == 'style') {
+                        if (is_string($value)) {
+                            $value = carr::get($this->getStyles(), $v);
+                        }
+                        $value = Helper::renderStyle($value);
+                    }
+                    if ($value != null && strlen($value) > 0) {
+                        return $output . ' ' . $name . '="' . $value . '"';
+                    }
+                    return $output;
+                },'');
     }
 
 }

@@ -20,6 +20,8 @@ class CEmail_Builder {
 
     public function __construct() {
         $this->registerComponent(CEmail_Builder_Component_Body::class);
+        $this->registerComponent(CEmail_Builder_Component_Section::class);
+        $this->registerComponent(CEmail_Builder_Component_Column::class);
     }
 
     public function registerComponent($componentClass) {
@@ -31,11 +33,11 @@ class CEmail_Builder {
         $componentClass = carr::get($this->components, $name);
         if ($componentClass) {
             $component = new $componentClass($options);
-            if ($component->headStyle) {
-                $component->context->addHeadStyle($name, $component->headStyle);
+            if ($component->hasHeadStyle()) {
+                $component->context->addHeadStyle($name, $component->getHeadStyle());
             }
-            if ($component->componentHeadStyle) {
-                $component->context->addComponentHeadStyle($name, $component->componentHeadStyle);
+            if ($component->hasComponentHeadStyle()) {
+                $component->context->addComponentHeadStyle($name, $component->getComponentHeadStyle());
             }
             return $component;
         }
@@ -44,6 +46,10 @@ class CEmail_Builder {
 
     public function components() {
         return $this->components;
+    }
+    
+    public function determineTypeAdapter($typeConfig) {
+        return CEmail_Builder_Type_TypeFactory::getAdapter($typeConfig);
     }
 
     public function toHtml($xml, $options = []) {

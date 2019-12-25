@@ -13,6 +13,7 @@ class CEmail_Builder_Parser {
      * @var CEmail_Builder_Node
      */
     protected $node;
+
     /**
      *
      * @var array 
@@ -20,6 +21,7 @@ class CEmail_Builder_Parser {
     protected $globalData = [];
     protected $errors = [];
     protected $content = '';
+    protected $context = null;
 
     public function __construct($cml, $options = []) {
         $this->content = '';
@@ -69,24 +71,45 @@ class CEmail_Builder_Parser {
         $this->globalData['title'] = '';
         $this->globalData['forceOWADesktop'] = CF::get($this->node, 'attributes.owa', 'mobile') === 'desktop';
         $this->globalData['lang'] = CF::get($this->node, 'attributes.lang');
+
+        $this->context = new CEmail_Builder_Context();
     }
 
     public function parse() {
-        $cBody = carr::find($this->node->children, ['tagName' => 'c-body']);
+
         $cHead = carr::find($this->node->children, ['tagName' => 'c-head']);
         //$this->globalDatas['headRaw'] = $this->processing($cHead, $headHelpers);
-        //$content = $this->processing(mjBody, bodyHelpers, applyAttributes);
-        $content = '';
-        $options=$this->globalData;
-        
+
+        $content = $this->getContent();
+        $options = $this->globalData;
+
+
         $renderer = new CEmail_Builder_Renderer($content, $options);
         return trim($renderer->render());
     }
 
-    public function processing($node, $context, $callbackParseCML = null) {
-        if ($node == null) {
+    protected function getContent() {
+        if ($this->node == null) {
             return null;
         }
+        $node = $this->node;
+        $cBody = carr::find($this->node->children, ['tagName' => 'c-body']);
+        $name = $cBody->getComponentName();
+
+        $options = [];
+        $options['attributes'] = $node->getAttributes();
+        $options['children'] = $node->getChildren();
+        $options['name'] = $name;
+        $options['context']=$this->context;
+        //$options = $callbackParseCML();
+        //$options['context'] = $context;
+        $component = CEmail::builder()->createComponent($name, $options);
+
+        return $component->render();
+    }
+
+    public function processing($node, $context, $callbackParseCML = null) {
+
         $name = $node->tagName;
         if (cstr::startsWith($name, 'c-')) {
             $name = substr($name, '2');
@@ -98,7 +121,8 @@ class CEmail_Builder_Parser {
 
         $options = $callbackParseCML();
         $options['context'] = $context;
-        
+
         $component = CEmail::builder()->initComponent($name, $options);
     }
+
 }

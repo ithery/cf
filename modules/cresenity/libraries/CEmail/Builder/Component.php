@@ -7,11 +7,17 @@
  */
 
 class CEmail_Builder_Component {
+
     protected $name;
     protected $props = [];
-    protected $context = [];
+    protected $context = null;
     protected $defaultAttributes = [];
     protected $allowedAttributes = [];
+    protected $headStyle = [];
+    protected $componentHeadStyle = [];
+    protected $children = [];
+    protected $content = '';
+    protected $rawElement = false;
 
     public function __construct($options) {
         $defaultOptions = array();
@@ -24,9 +30,10 @@ class CEmail_Builder_Component {
         $options = array_merge($defaultOptions, $options);
 
         $this->props = carr::get($options, 'props');
-        $this->props['children'] = carr::get($options, 'children');
-        $this->props['content'] = carr::get($options, 'content');
-
+        $this->children = carr::get($options, 'children', []);
+        $this->content = carr::get($options, 'content', '');
+        $this->name = carr::get($options,'name');
+        $this->rawElement = false;
 
         $attributes = array_merge($this->defaultAttributes, carr::get($options, 'globalAttributes', []), carr::get($options, 'attributes', []));
         $this->attributes = CEmail_Builder_Helper::formatAttributes($attributes, $this->allowedAttributes);
@@ -60,7 +67,6 @@ class CEmail_Builder_Component {
     public function getAttribute($name) {
         return carr::get($this->attributes, $name);
     }
-    
 
     public function getContent() {
         return trim(carr::get($this->props, 'content'));
@@ -93,6 +99,93 @@ class CEmail_Builder_Component {
     public function setAttr($key, $value) {
         $this->attrs[$key] = $value;
         return $this;
+    }
+
+    public function getHeadStyle() {
+        return $this->headStyle;
+    }
+
+    public function getComponentHeadStyle() {
+        return $this->componentHeadStyle;
+    }
+
+    public function hasHeadStyle() {
+        return count($this->headStyle) > 0;
+    }
+
+    public function hasComponentHeadStyle() {
+        return count($this->componentHeadStyle) > 0;
+    }
+
+    public function getProp($key, $defaultValue = null) {
+        return carr::get($this->props, $key, $defaultValue);
+    }
+
+    public function getChildren() {
+        return $this->children;
+    }
+    public function renderChildren($options = []) {
+        $childrens = $this->getChildren();
+        if($childrens==null) {
+            return '';
+        }
+       
+        
+        $renderer = function($component) {
+            return $component->render();
+        };
+        $rawXML = carr::get($options, 'rawXML', false);
+        $attributes = carr::get($options, 'attributes', []);
+        if(isset($options['renderer'])) {
+            $renderer = $options['renderer'];
+        }
+       
+        $props = carr::get($options, 'props', []);
+
+        if ($rawXML) {
+            return carr::reduce($childrens, function($output, $child) {
+                        return $output .= "\n" . Helper::jsonToXML($child->getTagName(), $child->getAttributes(), $children->getChildren(), $child->getContent());
+                    },'');
+        }
+        $sibling = count($childrens);
+//        $rawComponents = carr::filter($childrens, function($c) {
+//                    return $c->isRawElement();
+//                });
+
+
+
+//        const nonRawSiblings = childrens.filter(
+//        child => !find(rawComponents, c => c.getTagName() === child.tagName),
+//        ).length
+
+        $output = '';
+        $index = 0;
+        foreach ($childrens as $children) {
+            $component = $children;
+            if ($children instanceof CEmail_Builder_Node) {
+                $options = [];
+                $options['children'] = $children->getChildren();
+                $options['attributes'] = array_merge($attributes, $children->getAttributes());
+                $options['context'] = $this->getChildContext();
+                $options['name']=$children->getComponentName();
+                $options['props'] = [];
+                $options['props']['first'] = $index === 0;
+                $options['props']['index'] = $index;
+                $options['props']['last'] = $sibling - 1 === $index;
+                $options['props']['sibling'] = $sibling;
+                
+             
+                $component = CEmail::Builder()->createComponent($children->getComponentName(), $options);
+            }
+            if ($component != null) {
+                $output .= $renderer($component);
+            }
+            $index++;
+        };
+
+
+
+        return $output;
     }
 
 }

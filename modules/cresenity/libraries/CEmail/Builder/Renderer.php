@@ -35,7 +35,7 @@ class CEmail_Builder_Renderer {
         $breakpoint = $this->getOption('breakpoint', '480px');
 //        $componentHeadStyleHtml = carr::reduce($this->getOption('componentHeadStyle',[]), function($result,$compHeadStyle) use($breakpoint){
 //            return $result."\n".$compHeadStyle($breakpoint);
-//        });
+//        },'');
 //        ${reduce(
 //          componentsHeadStyle,
 //          (result, compHeadStyle) => `${result}\n${compHeadStyle(breakpoint)}`,
