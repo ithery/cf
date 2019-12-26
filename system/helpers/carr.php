@@ -1057,12 +1057,15 @@ class carr {
 
     public static function filter( $array, $predicate = null) {
         $iteratee = c::baseIteratee($predicate);
+        //$keys = array_keys($array);
         $result = \array_filter(
                 \is_array($array) ? $array : \iterator_to_array($array), function ($value, $key) use ($array, $iteratee) {
             return $iteratee($value, $key, $array);
         }, \ARRAY_FILTER_USE_BOTH
         );
-        return \array_values($result);
+        
+        return $result;
+        
     }
 
     /**
