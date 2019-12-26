@@ -16,12 +16,20 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
         'width' => '600px',
     );
 
+    public function getStyles() {
+        return [
+            'div' => [
+                'background-color' => $this->getAttribute('background-color'),
+            ],
+        ];
+    }
+
     public function getChildContext() {
 
         $context = clone $this->context;
         $width = $this->getAttribute('width');
-       
-        $context->set('containerWidth',$width);
+
+        $context->set('containerWidth', $width);
         return $context;
     }
 

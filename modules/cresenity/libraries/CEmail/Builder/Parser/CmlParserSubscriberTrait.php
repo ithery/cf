@@ -121,8 +121,8 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
     }
 
     public function onText($event) {
-        $text= $event->value;
-        
+        $text = $event->value;
+
         if ($this->inEndingTag > 0) {
             return;
         }
@@ -131,5 +131,25 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         }
     }
 
+    public function onComment($event) {
+        if ($this->inEndingTag > 0) {
+            return;
+        }
+        if ($this->currentNode != null && $this->keepComments) {
+
+
+            $line = carr::findLastIndex($this->lineIndexes, function($i) {
+                        return $i < $this->parser->getStartIndex();
+                    }) + 1;
+
+            $newNodeObject = new CEmail_Builder_Node();
+            $newNodeObject->line = $line;
+            $newNodeObject->parent = &$this->currentNode;
+            $newNodeObject->tagName = 'c-raw';
+            $newNodeObject->children = [];
+            $newNodeObject->content = '<!-- ' . trim($data) . ' -->';
+            $this->currentNode->children[] = $newNodeObject;
+        }
+    }
 
 }
