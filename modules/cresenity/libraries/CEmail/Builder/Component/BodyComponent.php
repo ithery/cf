@@ -26,18 +26,18 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
             return 0;
         }
 
-        return $this->shorthandParser($componentAttribute, $direction);
+        return Helper::shorthandParser($componentAttribute, $direction);
     }
 
     public function getShorthandBorderValue($direction) {
         $borderDirection = $direction && $this->getAttribute('border-' . $direction);
         $border = $this->getAttribute('border');
-
-        return borderParser($borderDirection || $border || '0', 10);
+        
+        return Helper::borderParser($borderDirection || $border || '0', 10);
     }
 
     public function htmlAttributes($attributes) {
-      
+
         return carr::reduce($attributes, function($output, $v, $name) {
                     $value = $v;
                     if ($name == 'style') {
@@ -50,7 +50,26 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
                         return $output . ' ' . $name . '="' . $value . '"';
                     }
                     return $output;
-                },'');
+                }, '');
+    }
+
+    public function getBoxWidths() {
+        $containerWidth = $this->context->getContainerWidth();
+        //$parsedWidth = (int) $containerWidth;
+        
+        $widthParserResult = Helper::widthParser($containerWidth, ['parseFloatToInt' => false]);
+        $unit = carr::get($widthParserResult, 'unit');
+        $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
+        $paddings = $this->getShorthandAttrValue('padding', 'right') + $this->getShorthandAttrValue('padding', 'left');
+        $borders = $this->getShorthandBorderValue('right') + $this->getShorthandBorderValue('left');
+
+
+        return [
+            'totalWidth' => $parsedWidth,
+            'borders' => $borders,
+            'paddings' => $paddings,
+            'box' => $parsedWidth - $paddings - $borders,
+        ];
     }
 
 }

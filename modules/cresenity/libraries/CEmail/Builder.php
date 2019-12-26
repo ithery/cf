@@ -23,6 +23,7 @@ class CEmail_Builder {
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Section::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Column::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Text::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Image::class);
     }
 
     public function registerComponent($componentClass) {

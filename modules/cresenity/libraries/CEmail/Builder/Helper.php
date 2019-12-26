@@ -107,4 +107,32 @@ class CEmail_Builder_Helper {
         return ($negation ? $startMsoNegationConditionalTag : $startMsoConditionalTag) . $content . ($negation ? $endNegationConditionalTag : $endConditionalTag);
     }
 
+    public static function shorthandParser($cssValue, $direction) {
+        $splittedCssValue = explode(' ', $cssValue);
+        $directions = [];
+        switch (count($splittedCssValue)) {
+            case 2:
+                $directions = ['top' => 0, 'bottom' => 0, 'left' => 1, 'right' => 1];
+                break;
+            case 3:
+                $directions = ['top' => 0, 'left' => 0, 'right' => 1, 'bottom' => 2];
+                break;
+            case 4:
+                $directions = ['top' => 0, 'right' => 1, 'bottom' => 2, 'left' => 3];
+                break;
+            case 1:
+            default:
+                return $cssValue;
+        }
+        return carr::get($splittedCssValue, $directions[$direction], 0);
+    }
+
+    public static function borderParser($border) {
+        if (preg_match('/(?:(?:^| )(\d+))/', $border, $matches)) {
+            return carr::get($matches, 1);
+        }
+
+        return 0;
+    }
+
 }
