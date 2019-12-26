@@ -19,7 +19,6 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
         }
         if (is_array($this->attributes) && !array_key_exists($this->attributeName, $this->attributes)) {
             $this->attributes[$this->attributeName] = $this->attributeValue;
-            
         }
         $this->attributeName = "";
         $this->attributeValue = "";
@@ -30,7 +29,6 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
             $name = strtolower($name);
         }
         $this->attributeName = $name;
-        
     }
 
     public function oncdata($data) {
@@ -40,7 +38,7 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
             $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnText($data));
             $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCdataEnd());
         } else {
-            $this->oncomment(`[CDATA[${value}]]`);
+            $this->oncomment('[CDATA[' . $value . ']]');
         }
     }
 
@@ -116,7 +114,7 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
         $this->updatePosition(1);
         if (is_array($this->attributes)) {
             if ($this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnOpenTag::class)) {
-                
+
                 $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnOpenTag($this->tagname, $this->attributes));
             }
             $this->attributes = null;
@@ -136,7 +134,7 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
             $name = strtolower($name);
         }
         $this->tagname = $name;
-        
+
         if (!$this->getOption('xmlMode') && array_key_exists($name, static::$openImpliesClose)) {
             $processing = true;
 
@@ -173,8 +171,8 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
     public function onselfclosingtag() {
         $lastForeignContext = carr::get($this->foreignContext, count($this->foreignContext) - 1, false);
         if (
-                $this . getOption('xmlMode') ||
-                $this . getOption('recognizeSelfClosing') ||
+                $this->getOption('xmlMode') ||
+                $this->getOption('recognizeSelfClosing') ||
                 $lastForeignContext
         ) {
             $this->closeCurrentTag();

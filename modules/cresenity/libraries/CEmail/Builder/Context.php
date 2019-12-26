@@ -9,17 +9,21 @@
 class CEmail_Builder_Context {
 
     protected $data = [];
-    
-    
 
     public function __construct($initialData = []) {
         $this->data = $initialData;
-        
     }
 
     public function setBackgroundColor($color) {
-        $this->data['backgroundColor'] = $color;
+        $globalData = CEmail::builder()->globalData();
+        $globalData->set('backgroundColor', $color);
+
         return $this;
+    }
+
+    public function getBackgroundColor($color) {
+        $globalData = CEmail::builder()->globalData();
+        return $globalData->get('backgroundColor');
     }
 
     public function getContainerWidth() {
@@ -29,7 +33,7 @@ class CEmail_Builder_Context {
     public function get($key, $defaultValue = null) {
         return carr::get($this->data, $key, $defaultValue);
     }
-    
+
     public function set($key, $value) {
         return carr::set($this->data, $key, $value);
     }
@@ -37,15 +41,13 @@ class CEmail_Builder_Context {
     public function data() {
         return $this->data;
     }
-    
-    public function addMediaQuery($className,$options) {
-        $parsedWidth = carr::get($options,'parsedWidth');
-        $unit = carr::get($options,'unit');
+
+    public function addMediaQuery($className, $options) {
+        $parsedWidth = carr::get($options, 'parsedWidth');
+        $unit = carr::get($options, 'unit');
         $globalData = CEmail::builder()->globalData();
-     
-        $globalData->set('mediaQueries.'.$className,'{ width:'.$parsedWidth.$unit.' !important; max-width:'.$parsedWidth.$unit.'; }'); 
-       
-       
+
+        $globalData->set('mediaQueries.' . $className, '{ width:' . $parsedWidth . $unit . ' !important; max-width:' . $parsedWidth . $unit . '; }');
     }
 
 }

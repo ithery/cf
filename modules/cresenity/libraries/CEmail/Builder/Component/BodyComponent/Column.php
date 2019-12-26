@@ -9,7 +9,7 @@
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Component_BodyComponent {
-
+    protected static $tagName = 'c-column';
     protected $allowedAttributes = [
         'background-color' => 'color',
         'border' => 'string',

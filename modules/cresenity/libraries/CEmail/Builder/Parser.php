@@ -49,6 +49,8 @@ class CEmail_Builder_Parser {
             $parserOptions['keepComments'] = $keepComments;
             $parserOptions['components'] = CEmail::builder()->components();
             $parserOptions['filePath'] = $filePath;
+            
+            
             $cmlParser = new CEmail_Builder_Parser_CmlParser($this->node, $parserOptions);
             $this->node = $cmlParser->parse();
         }

@@ -6,6 +6,9 @@
  * and open the template in the editor.
  */
 
+/**
+ * @mixin CEmail_Builder_Parser_CmlParser
+ */
 trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
 
     public static $i = 0;
@@ -15,10 +18,12 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         $attributes = $event->attributes;
         $isAnEndingTag = in_array($name, $this->endingTags);
         if ($this->inEndingTag > 0) {
+
             if ($isAnEndingTag) {
+
                 $this->inEndingTag += 1;
-                return;
             }
+            return;
         }
 
         if ($isAnEndingTag) {
@@ -89,7 +94,7 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
             if (!$this->inEndingTag) { // we're getting out of endingTag
                 // if self-closing tag we don't get the content
                 if (!$this->isSelfClosing($this->currentEndingTagIndexes, $this->parser)) {
-                    $partialVal = trim(substr($this->cml, currentEndingTagIndexes['endIndex'] + 1, $this->parser->getEndIndex() - (currentEndingTagIndexes['endIndex'] + 1)));
+                    $partialVal = trim(substr($this->cml, $this->currentEndingTagIndexes['endIndex'] + 1, $this->parser->getEndIndex() - ($this->currentEndingTagIndexes['endIndex'] + 1)));
                     $val = substr($partialVal, 0, strrpos($partialVal, '</' . $name));
 
                     if ($val) {

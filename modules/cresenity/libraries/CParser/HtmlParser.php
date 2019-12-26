@@ -49,6 +49,7 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
         $this->startIndex = 0;
         $this->endIndex = null;
 
+        
         $this->lowerCaseTagNames = $this->hasOption("lowerCaseTags") ? !!$this->getOption('lowerCaseTags') : !$this->getOption('xmlMode');
         $this->lowerCaseAttributeNames = $this->hasOption("lowerCaseAttributeNames") ? !!$this->getOption('lowerCaseAttributeNames') : !$this->getOption('xmlMode');
 

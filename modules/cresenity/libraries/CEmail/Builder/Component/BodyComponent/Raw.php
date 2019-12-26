@@ -7,8 +7,8 @@
  */
 
 class CEmail_Builder_Component_BodyComponent_Raw extends CEmail_Builder_Component_BodyComponent {
-
-    protected $endingTag = true;
+    protected static $tagName = 'c-raw';
+    protected static $endingTag = true;
     protected static $rawElement = true;
 
     public function render() {

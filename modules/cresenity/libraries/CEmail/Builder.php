@@ -24,6 +24,10 @@ class CEmail_Builder {
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Column::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Text::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Image::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Button::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Raw::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Social::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_SocialElement::class);
     }
 
     public function registerComponent($componentClass) {
@@ -43,7 +47,7 @@ class CEmail_Builder {
             }
             return $component;
         }
-        //throw new Exception('component not found:'.$name);
+        throw new Exception('component not found:'.$name);
         return null;
     }
 

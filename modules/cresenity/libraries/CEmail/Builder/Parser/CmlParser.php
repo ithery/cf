@@ -55,7 +55,13 @@ class CEmail_Builder_Parser_CmlParser {
             'startIndex' => 0,
             'endIndex' => 0,
         );
-
+        $this->endingTags=carr::map(carr::filter(CEmail::builder()->instance()->components(),function($component){
+            return $component::isEndingTag();
+        }), function($component) {
+            return $component::getTagName();
+        });
+        
+        
         $this->lineIndexes = array();
         $posLine = -1;
         while (($posLine = strpos($this->cml, "\n", $posLine + 1)) !== false) {
@@ -69,6 +75,12 @@ class CEmail_Builder_Parser_CmlParser {
 
     public function parse() {
         $options = [];
+        $options['recognizeCDATA'] = true;
+        $options['decodeEntities'] = false;
+        $options['recognizeSelfClosing'] = true;
+        $options['lowerCaseAttributeNames'] = false;
+
+
         $this->parser = CParser::createHtmlParser($options);
         $this->parser->listen(CParser_HtmlParser_Event_OnOpenTag::class, array($this, 'onOpenTag'));
         $this->parser->listen(CParser_HtmlParser_Event_OnCloseTag::class, array($this, 'onCloseTag'));
@@ -78,7 +90,7 @@ class CEmail_Builder_Parser_CmlParser {
         $this->parser->end();
 
 
-
+        //cdbg::dd($this->parentNode);
         return $this->parentNode;
     }
 

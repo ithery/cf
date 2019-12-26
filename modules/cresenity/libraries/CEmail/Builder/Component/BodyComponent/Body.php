@@ -7,7 +7,8 @@
  */
 
 class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Component_BodyComponent {
-
+    protected static $tagName = 'c-body';
+    
     protected $allowedAttributes = array(
         'width' => 'unit(px,%)',
         'background-color' => 'color',
@@ -36,6 +37,7 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
     public function render() {
         $backgroundColor = $this->getAttribute('background-color');
         if (strlen($backgroundColor) > 0) {
+            
             $this->context->setbackgroundColor($backgroundColor);
         }
 

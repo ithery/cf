@@ -26,10 +26,12 @@ class CEmail_Builder_Renderer {
         if (strlen($lang) > 0) {
             $langAttribute = 'lang="' . $lang . '" ';
         }
-        $backgroundColor = $this->getOption('backgroundColor');
+        $globalData = CEmail::Builder()->globalData();
+        $backgroundColor = $globalData->get('backgroundColor');
+        
         $backgroundColorAttribute = '';
         if (strlen($backgroundColor) > 0) {
-            $backgroundColorAttribute = 'style="background-color:' . $backgroundColor . ';';
+            $backgroundColorAttribute = ' style="background-color:' . $backgroundColor . ';"';
         }
         $title = $this->getOption('title', '');
         $breakpoint = $this->getOption('breakpoint', '480px');

@@ -9,7 +9,7 @@
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Component_BodyComponent {
-
+    protected static $tagName = 'c-section';
     protected $allowedAttributes = [
         'background-color' => 'color',
         'background-url' => 'string',
@@ -49,7 +49,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
         $background = $this->hasBackground() ? $this->getBackground() : ['background' => $this->getAttribute('background-color'), 'background-color' => $this->getAttribute('background-color')];
         return [
             'tableFullWidth' => array_merge(($fullWidth ? $background : []), ['width' => '100%', 'border-radius' => $this->getAttribute('border-radius')]),
-            'table' => array_merge(($fullWidth ? $background : []), ['width' => '100%', 'border-radius' => $this->getAttribute('border-radius')]),
+            'table' => array_merge(($fullWidth ? [] : $background), ['width' => '100%', 'border-radius' => $this->getAttribute('border-radius')]),
             'td' => [
                 'border' => $this->getAttribute('border'),
                 'border-bottom' => $this->getAttribute('border-bottom'),
@@ -65,7 +65,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
                 'padding-top' => $this->getAttribute('padding-top'),
                 'text-align' => $this->getAttribute('text-align'),
             ],
-            'div' => array_merge(($fullWidth ? $background : []), ['margin' => '0px auto', 'border-radius' => $this->getAttribute('border-radius'), 'max-width' => $containerWidth]),
+            'div' => array_merge(($fullWidth ? [] : $background), ['margin' => '0px auto', 'border-radius' => $this->getAttribute('border-radius'), 'max-width' => $containerWidth]),
             'innerDiv' => [
                 'line-height' => '0',
                 'font-size' => '0'
@@ -77,6 +77,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
         $arrBackground = [];
         $arrBackground[] = $this->getAttribute('background-color');
         if ($this->hasBackground()) {
+            
             $arrBackground = array_merge($arrBackground, ['url(' . $this->getAttribute('background-url') . ')', 'top center / ' . $this->getAttribute('background-size'), $this->getAttribute('background-repeat')]);
         }
         return trim(carr::reduce($arrBackground, function($output, $v, $key) {
@@ -205,9 +206,9 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
         $tableAttributes = array();
         $tableAttributes['align'] = 'center';
         $tableAttributes['background'] = $this->isFullWidth() ? null : $this->getAttribute('background-url');
-        $tableAttributes['border'] = 0;
-        $tableAttributes['cellpadding'] = 0;
-        $tableAttributes['cellspacing'] = 0;
+        $tableAttributes['border'] = '0';
+        $tableAttributes['cellpadding'] = '0';
+        $tableAttributes['cellspacing'] = '0';
         $tableAttributes['role'] = 'presentation';
         $tableAttributes['style'] = 'table';
 
@@ -261,6 +262,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
 
     public function renderSimple() {
         $section = $this->renderSection();
+        
         return $this->renderBefore() . ($this->hasBackground() ? $this->renderWithBackground($section) : $section) . $this->renderAfter();
     }
 

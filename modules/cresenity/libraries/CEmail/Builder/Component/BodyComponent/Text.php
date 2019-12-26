@@ -9,8 +9,8 @@
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Text extends CEmail_Builder_Component_BodyComponent {
-
-    protected $endingTag = true;
+    protected static $tagName = 'c-text';
+    protected static $endingTag = true;
     protected $allowedAttributes = [
         'align' => 'enum(left,right,center,justify)',
         'background-color' => 'color',

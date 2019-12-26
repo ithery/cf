@@ -32,7 +32,7 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
     public function getShorthandBorderValue($direction) {
         $borderDirection = $direction && $this->getAttribute('border-' . $direction);
         $border = $this->getAttribute('border');
-        
+
         return Helper::borderParser($borderDirection || $border || '0', 10);
     }
 
@@ -46,17 +46,21 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
                         }
                         $value = Helper::renderStyle($value);
                     }
+
                     if ($value != null && strlen($value) > 0) {
                         return $output . ' ' . $name . '="' . $value . '"';
                     }
                     return $output;
                 }, '');
+
+
+        
     }
 
     public function getBoxWidths() {
         $containerWidth = $this->context->getContainerWidth();
         //$parsedWidth = (int) $containerWidth;
-        
+
         $widthParserResult = Helper::widthParser($containerWidth, ['parseFloatToInt' => false]);
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
