@@ -305,7 +305,7 @@ foreach ($customControl as $cc):
                     if (this.readyState == 4 && this.status == 200) {
                         var dataFile = JSON.parse(this.responseText);
                         div.removeClass("loading");
-                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.file_id + ">");
+                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.fileId + ">");
                         img.attr('src', data.url);
                         index++;
                         fileChanged();
