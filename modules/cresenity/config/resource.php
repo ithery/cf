@@ -28,10 +28,10 @@ return array(
      */
     'resource_model' => 'CApp_Model_Resource',
     's3' => [
-        /*
-         * The domain that should be prepended when generating urls.
-         */
-        //'domain' => 'https://' . env('AWS_BUCKET') . '.s3.amazonaws.com',
+    /*
+     * The domain that should be prepended when generating urls.
+     */
+    //'domain' => 'https://' . env('AWS_BUCKET') . '.s3.amazonaws.com',
     ],
     'remote' => [
         /*
@@ -60,11 +60,11 @@ return array(
          * This ensures that the browser can already determine the correct layout.
          */
         'use_tiny_placeholders' => true,
-        /*
-         * This class will generate the tiny placeholder used for progressive image loading. By default
-         * the medialibrary will use a tiny blurred jpg image.
-         */
-        //'tiny_placeholder_generator' => Spatie\MediaLibrary\ResponsiveImages\TinyPlaceholderGenerator\Blurred::class,
+    /*
+     * This class will generate the tiny placeholder used for progressive image loading. By default
+     * the medialibrary will use a tiny blurred jpg image.
+     */
+    //'tiny_placeholder_generator' => Spatie\MediaLibrary\ResponsiveImages\TinyPlaceholderGenerator\Blurred::class,
     ],
     /*
      * When urls to files get generated, this class will be called. Leave empty
@@ -81,7 +81,7 @@ return array(
      * the optimizers that will be used by default.
      */
     'image_optimizers' => [
-CImage_Optimizer_Jpegoptim::class => [
+        CImage_Optimizer_Jpegoptim::class => [
             '--strip-all', // this strips out all text information such as comments and EXIF data
             '--all-progressive', // this will make sure the resulting image is a progressive one
         ],
@@ -105,7 +105,7 @@ CImage_Optimizer_Jpegoptim::class => [
      * These generators will be used to create an image of media files.
      */
     'image_generators' => [
-CResources_ImageGenerator_FileType_ImageType::class,
+        CResources_ImageGenerator_FileType_ImageType::class,
 //        CResources_ImageGenerator_FileType_WebpType::class,
 //        CResources_ImageGenerator_FileType_PdfType::class,
 //        CResources_ImageGenerator_FileType_SvgType::class,
@@ -136,5 +136,4 @@ CResources_ImageGenerator_FileType_ImageType::class,
         'perform_conversions' => CResources_TaskQueue_PerformConversions::class,
         'generate_responsive_images' => CResources_TaskQueue_PerformConversions_GenerateResponsiveImages::class,
     ],
-    
 );
