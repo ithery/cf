@@ -13,7 +13,7 @@ class CResources_Exception_FileCannotBeAdded_FileIsTooBig extends CResources_Exc
 
     public static function create($path) {
         $fileSize = File::getHumanReadableSize(filesize($path));
-        $maxFileSize = File::getHumanReadableSize(CF::config('resource.maxFileSize'));
+        $maxFileSize = File::getHumanReadableSize(CF::config('resource.max_file_size'));
         return new static("File `{$path}` has a size of {$fileSize} which is greater than the maximum allowed {$maxFileSize}");
     }
 

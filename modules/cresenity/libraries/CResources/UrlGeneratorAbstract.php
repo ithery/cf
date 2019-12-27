@@ -67,7 +67,7 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
     }
 
     public function versionUrl($path = '') {
-        if (!CF::config('resource.versionUrls')) {
+        if (!CF::config('resource.version_urls')) {
             return $path;
         }
         return "{$path}?v={$this->resource->updated->timestamp}";

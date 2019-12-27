@@ -50,7 +50,7 @@ trait CModel_Resource_ResourceTrait {
 
     public function getImageGenerators() {
 
-        return CF::collect(CF::config('resource.imageGenerators'));
+        return CF::collect(CF::config('resource.image_generators'));
     }
 
     public function getTypeAttribute() {
@@ -227,7 +227,7 @@ trait CModel_Resource_ResourceTrait {
         $viewName = 'image';
         $width = '';
         if ($this->hasResponsiveImages($conversion)) {
-            $viewName = CF::config('resource.responsiveImages.useTinyPlaceholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
+            $viewName = CF::config('resource.responsive_images.use_tiny_placeholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
             $width = $this->responsiveImages($conversion)->files->first()->width();
         }
         return view("medialibrary::{$viewName}", compact(

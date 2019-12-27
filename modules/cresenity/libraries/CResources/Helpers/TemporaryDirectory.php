@@ -11,7 +11,7 @@ class CResources_Helpers_TemporaryDirectory {
     const DEFAULT_FOLDER = 'resource';
 
     protected static function folder() {
-        $folder = CF::config('resource.temporaryDirectoryPath');
+        $folder = CF::config('resource.temporary_directory_path');
         if (strlen($folder) == 0) {
             $folder = static::DEFAULT_FOLDER;
         }

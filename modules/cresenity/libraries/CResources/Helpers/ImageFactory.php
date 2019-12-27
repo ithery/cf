@@ -15,7 +15,7 @@ class CResources_Helpers_ImageFactory {
      */
     public static function load($path) {
         return CImage::image($path)
-                        ->useImageDriver(CF::config('resource.imageDriver'));
+                        ->useImageDriver(CF::config('resource.image_driver'));
     }
 
 }

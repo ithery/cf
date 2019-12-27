@@ -106,9 +106,9 @@ class CResources_FileManipulator {
     }
 
     protected function dispatchQueuedConversions(CApp_Model_Interface_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
-        $performConversionsJobClass = CF::config('resource.taskQueue.performConversions', CResources_TaskQueue_PerformConversions::class);
+        $performConversionsJobClass = CF::config('resource.task_queue.perform_conversions', CResources_TaskQueue_PerformConversions::class);
         $job = new $performConversionsJobClass($queuedConversions, $resource);
-        if ($customQueue = CF::config('resource.queueName')) {
+        if ($customQueue = CF::config('resource.queue_name')) {
             $job->onQueue($customQueue);
         }
         CQueue::dispatcher()->dispatch($job);

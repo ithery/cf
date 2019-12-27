@@ -40,7 +40,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @return CModel_Relation_MorphMany
      */
     public function resource() {
-        $resourceModel = CF::config('resource.resourceModel', CApp_Model_Resource::class);
+        $resourceModel = CF::config('resource.resource_model', CApp_Model_Resource::class);
         return $this->morphMany($resourceModel, 'model');
     }
 

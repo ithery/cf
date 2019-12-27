@@ -35,7 +35,7 @@ class CResources_Conversion {
     public function __construct($name) {
         $this->name = $name;
         $this->manipulations = (new CImage_Manipulations())
-                ->optimize(CF::config('resource.imageOptimizers'))
+                ->optimize(CF::config('resource.image_optimizers'))
                 ->format('jpg');
     }
 
