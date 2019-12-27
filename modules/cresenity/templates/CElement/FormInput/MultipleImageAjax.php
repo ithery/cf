@@ -106,7 +106,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 </style>
 
 <div id="container-<?php echo $id ?>" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
-    <input id="<?php echo $id ?>_input_temp" type="file" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
+    <input id="<?php echo $id ?>_input_temp" type="file" accept="image/*" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
     <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
