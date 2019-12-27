@@ -148,7 +148,7 @@ class CEmail_Builder_Component_BodyComponent_Button extends CEmail_Builder_Compo
         $tagAttr['href'] = $this->getAttribute('href');
         $tagAttr['rel'] = $this->getAttribute('rel');
         $tagAttr['name'] = $this->getAttribute('name');
-        $tagAttr['style'] = $this->getAttribute('content');
+        $tagAttr['style'] = 'content';
         $tagAttr['target'] = $tag === 'a' ? $this->getAttribute('target') : null;
 
         return '
