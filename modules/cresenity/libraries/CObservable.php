@@ -215,6 +215,12 @@ abstract class CObservable extends CRenderable {
         return $code;
     }
 
+    public function addBlockly($id = "") {
+        $code = CElement_Factory::createComponent('Blockly', $id);
+        $this->add($code);
+        return $code;
+    }
+
     /**
      * 
      * @return $this
