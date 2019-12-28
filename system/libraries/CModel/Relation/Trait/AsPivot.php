@@ -39,7 +39,7 @@ trait CModel_Relation_Trait_AsPivot {
      * @param  bool    $exists
      * @return static
      */
-    public static function fromAttributes(Model $parent, $attributes, $table, $exists = false) {
+    public static function fromAttributes(CModel $parent, $attributes, $table, $exists = false) {
         $instance = new static;
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
         // The pivot model is a "dynamic" model since we will set the tables dynamically
@@ -182,7 +182,7 @@ trait CModel_Relation_Trait_AsPivot {
      * @return bool
      */
     public function hasTimestampAttributes($attributes = null) {
-        return array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
+        return array_key_exists($this->getCreatedAtColumn(), $attributes ?$attributes: $this->attributes);
     }
 
     /**
