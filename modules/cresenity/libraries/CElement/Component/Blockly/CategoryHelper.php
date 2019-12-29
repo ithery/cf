@@ -33,12 +33,15 @@ class CElement_Component_Blockly_CategoryHelper {
     ];
 
     public static function renderCategory($category, $blocksArray) {
-        
-        $blockXml = carr::reduce($blocksArray, function($output,$block) {
-           
-                    return $output.BlockHelper::renderBlock($block);
-                },'');
-        $categoryName = ucwords(str_replace("_", "_", cstr::snakeCase($category)));
+
+        $blockXml = carr::reduce($blocksArray, function($output, $block) {
+                    try {
+                        return $output . BlockHelper::renderBlock($block);
+                    } catch (Exception $ex) {
+                        return $output;
+                    }
+                }, '');
+        $categoryName = ucwords(str_replace("_", "_", cstr::snake($category)));
         $categoryHue = carr::get(static::$categoryHue, strtolower($category), '230');
         $categoryOpen = '<category name="' . $categoryName . '" colour="' . $categoryHue . '">';
         $categoryClose = '</category>';

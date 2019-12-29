@@ -30,6 +30,7 @@ class CElement_Component_Blockly_ToolboxHelper {
         $cats[CategoryHelper::CATEGORY_LOOPS][] = BlockHelper::CONTROLS_FOR_EACH;
         //MATH
         $cats[CategoryHelper::CATEGORY_MATH]=[];
+        $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_NUMBER;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_ARITHMETIC;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_SINGLE;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_TRIG;

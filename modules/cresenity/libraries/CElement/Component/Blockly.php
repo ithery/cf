@@ -8,12 +8,13 @@
 
 class CElement_Component_Blockly extends CElement_Component {
 
-    use CTrait_Element_Property_Height;
-    use CTrait_Element_Property_Width;
-
     protected $mediaDirectory;
     protected $toolbox;
     protected $toolboxPosition;
+    protected $textareaXml;
+    protected $toolbarAction;
+    protected $blocklyWrapper;
+    
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
@@ -21,32 +22,29 @@ class CElement_Component_Blockly extends CElement_Component {
         $this->height = '600';
         $this->width = '400';
         $this->toolbox = new CElement_Component_Blockly_Toolbox();
+        $this->toolbar = new CElement_List_ActionList();
+        $this->blocklyWrapper = new CElement_Element_Div();
+        
+        
+        $action = $this->toolbar->addAction()->setLabel('Load');
     }
 
     public function build() {
         $this->addClass('capp-blockly');
         //$this->customCss('width', $this->width . 'px');
         $this->customCss('height', $this->height . 'px');
-        $this->add($this->toolbox);
+        $this->add($this->toolbar);
+        $this->blocklyWrapper->add($this->toolbox);
+        $this->add($this->blocklyWrapper);
     }
 
     public function js($indent = 0) {
-        $toolboxId = $this->toolbox->id();
+        $toolboxId = $jsOptions = [];
+        $jsOptions['blocklyElementId'] = $this->blocklyWrapper->id();
+        $jsOptions['toolboxElementId'] = $this->toolbox->id();
+        $jsOptions['mediaFolder'] = '/application/modules/cresenity/media/js/blockly/media/';
         return "
-            Blockly.inject('" . $this->id . "', {
-                grid:{
-                    spacing: 25,
-                    length: 3,
-                    colour: '#ccc',
-                    snap: true
-                },
-                media: '/application/devcloud/default/media/js/blockly/media/',
-                toolbox: document.getElementById('" . $toolboxId . "'),
-                //toolboxPosition: 'left',
-                //horizontalLayout: true,
-                //scrollbars: true,
-            });
-            //Blockly.Variables.predefinedVars.push('A');
+            new CBlockly(" . json_encode($jsOptions) . ");
         ";
     }
 

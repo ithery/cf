@@ -21,7 +21,7 @@ class CElement_Component_Blockly_Toolbox extends CElement_Element {
     }
 
     public function build() {
-      
+
         $this->categories = ToolboxHelper::getAllCategoryData();
     }
 
@@ -29,11 +29,18 @@ class CElement_Component_Blockly_Toolbox extends CElement_Element {
         $this->buildOnce();
         $xmlOpen = '<xml id="' . $this->id . '" style="display: none">';
         $xmlClose = '</xml>';
-        
-        $categoryXml = carr::reduce($this->categories, function($output,$blockArray, $name) {
-                    return $output.CategoryHelper::renderCategory($name, $blockArray);
-                },'');
-        return $xmlOpen . $categoryXml . $xmlClose;
+
+        $categoryXml = carr::reduce($this->categories, function($output, $blockArray, $name) {
+                    return $output . CategoryHelper::renderCategory($name, $blockArray);
+                }, '');
+
+        $sepXml = '<sep></sep>';
+
+        $customCategoriesXml = $sepXml . '
+            
+            <category name="' . ucfirst(CategoryHelper::CATEGORY_VARIABLES) . '" colour="' . CategoryHelper::$categoryHue[CategoryHelper::CATEGORY_VARIABLES] . '" custom="VARIABLE"></category>
+            <category name="' . ucfirst(CategoryHelper::CATEGORY_PROCEDURES) . '" colour="' . CategoryHelper::$categoryHue[CategoryHelper::CATEGORY_PROCEDURES] . '" custom="PROCEDURE"></category>';
+        return $xmlOpen . $categoryXml . $customCategoriesXml . $xmlClose;
     }
 
 }
