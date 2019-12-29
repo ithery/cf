@@ -10,9 +10,7 @@ class CElement_Component_Blockly extends CElement_Component {
 
     protected $mediaDirectory;
     protected $toolbox;
-    protected $toolboxPosition;
-    protected $textareaXml;
-    protected $toolbarAction;
+    protected $toolbar;
     protected $blocklyWrapper;
 
     public function __construct($id = "", $tag = "div") {
