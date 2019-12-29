@@ -10,12 +10,12 @@ class CElement_Component_Blockly_BlockHelper {
 
     //LOGIC
     const CONTROLS_IF = 'controls_if';
-    const lOGIC_COMPARE = 'logic_compare';
-    const lOGIC_OPERATION = 'logic_operation';
-    const lOGIC_NEGATE = 'logic_negate';
-    const lOGIC_BOOLEAN = 'logic_boolean';
-    const lOGIC_NULL = 'logic_null';
-    const lOGIC_TERNARY = 'logic_ternary';
+    const LOGIC_COMPARE = 'logic_compare';
+    const LOGIC_OPERATION = 'logic_operation';
+    const LOGIC_NEGATE = 'logic_negate';
+    const LOGIC_BOOLEAN = 'logic_boolean';
+    const LOGIC_NULL = 'logic_null';
+    const LOGIC_TERNARY = 'logic_ternary';
     //LOOPS
     const CONTROLS_REPEAT_EXT = 'controls_repeat_ext';
     const CONTROLS_WHILE_UNTIL = 'controls_whileUntil';
