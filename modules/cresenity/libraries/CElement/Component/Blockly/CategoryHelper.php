@@ -33,7 +33,9 @@ class CElement_Component_Blockly_CategoryHelper {
     ];
 
     public static function renderCategory($category, $blocksArray) {
+        
         $blockXml = carr::reduce($blocksArray, function($output,$block) {
+           
                     return $output.BlockHelper::renderBlock($block);
                 },'');
         $categoryName = ucwords(str_replace("_", "_", cstr::snakeCase($category)));

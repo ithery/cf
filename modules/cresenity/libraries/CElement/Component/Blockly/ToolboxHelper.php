@@ -26,8 +26,8 @@ class CElement_Component_Blockly_ToolboxHelper {
         $cats[CategoryHelper::CATEGORY_LOOPS]=[];
         $cats[CategoryHelper::CATEGORY_LOOPS][] = BlockHelper::CONTROLS_REPEAT_EXT;
         $cats[CategoryHelper::CATEGORY_LOOPS][] = BlockHelper::CONTROLS_WHILE_UNTIL;
-        $cats[CategoryHelper::CATEGORY_LOGIC][] = BlockHelper::CONTROLS_FOR;
-        $cats[CategoryHelper::CATEGORY_LOGIC][] = BlockHelper::CONTROLS_FOR_EACH;
+        $cats[CategoryHelper::CATEGORY_LOOPS][] = BlockHelper::CONTROLS_FOR;
+        $cats[CategoryHelper::CATEGORY_LOOPS][] = BlockHelper::CONTROLS_FOR_EACH;
         //MATH
         $cats[CategoryHelper::CATEGORY_MATH]=[];
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_ARITHMETIC;
