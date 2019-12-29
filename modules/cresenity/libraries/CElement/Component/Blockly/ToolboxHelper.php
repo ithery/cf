@@ -42,18 +42,18 @@ class CElement_Component_Blockly_ToolboxHelper {
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_RANDOM_FLOAT;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_ATAN2;
         //TEXT
-        $cats[CategoryHelper::CATEGORY_TEXT]=[];
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_JOIN;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_APPEND;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_LENGTH;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_IS_EMPTY;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_INDEX_OF;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_CHAR_AT;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_GET_SUBSTRING;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_CHANGE_CASE;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_TRIM;
-        $cats[CategoryHelper::CATEGORY_TEXT][] = BlockHelper::TEXT_PROMPT_EXT;
+        $cats[CategoryHelper::CATEGORY_TEXTS]=[];
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_JOIN;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_APPEND;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_LENGTH;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_IS_EMPTY;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_INDEX_OF;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_CHAR_AT;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_GET_SUBSTRING;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_CHANGE_CASE;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_TRIM;
+        $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_PROMPT_EXT;
         //LISTS
         $cats[CategoryHelper::CATEGORY_LISTS]=[];
         $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_CREATE_WITH;
