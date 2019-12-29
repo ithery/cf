@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-use CElement_Component_Blockly_CategoryHelper as BlockHelper;
+use CElement_Component_Blockly_BlockHelper as BlockHelper;
 
 class CElement_Component_Blockly_CategoryHelper {
 
@@ -33,9 +33,9 @@ class CElement_Component_Blockly_CategoryHelper {
     ];
 
     public static function renderCategory($category, $blocksArray) {
-        $blockXml = carr::reduce($blocksArray, function($block) {
-                    return BlockHelper::renderBlock($block);
-                });
+        $blockXml = carr::reduce($blocksArray, function($output,$block) {
+                    return $output.BlockHelper::renderBlock($block);
+                },'');
         $categoryName = ucwords(str_replace("_", "_", cstr::snakeCase($category)));
         $categoryHue = carr::get(static::$categoryHue, strtolower($category), '230');
         $categoryOpen = '<category name="' . $categoryName . '" colour="' . $categoryHue . '">';

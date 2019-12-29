@@ -68,7 +68,7 @@ class CElement_Component_Blockly_BlockHelper {
 
     public static function renderBlock($blockName) {
         $renderFunctionName = 'render' . carr::reduce(explode('_', $blockName), function($output, $value) {
-                    return ucfirst(cstr::camel($value));
+                    return $output.ucfirst(cstr::camel($value));
                 }, '');
         if (method_exists(static::class, $method_name)) {
             return static::$renderFunctionName();
