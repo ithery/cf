@@ -62,7 +62,7 @@ class CElement_Component_Blockly_ToolboxHelper {
         $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_SORT;
         
         
-        
+        return $cats;
         
         
         

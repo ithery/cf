@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class BlockHelper {
+class CElement_Component_Blockly_BlockHelper {
 
     //LOGIC
     const CONTROLS_IF = 'controls_if';
@@ -49,9 +49,6 @@ class BlockHelper {
     const TEXT_TRIM = 'text_trim';
     const TEXT_PRINT = 'text_print';
     const TEXT_PROMPT_EXT = 'text_prompt_ext';
-    const TEXT_LENGTH = 'text_length';
-    const TEXT_LENGTH = 'text_length';
-    const TEXT_LENGTH = 'text_length';
     //LIST
     const LISTS_CREATE_WITH = 'lists_create_with';
     const LISTS_REPEAT = 'lists_repeat';
@@ -68,6 +65,16 @@ class BlockHelper {
     const COLOUR_RANDOM = 'colour_random';
     const COLOUR_RGB = 'colour_rgb';
     const COLOUR_BLEND = 'colour_blend';
+
+    public static function renderBlock($blockName) {
+        $renderFunctionName = 'render' . carr::reduce(explode('_', $blockName), function($output, $value) {
+                    return ucfirst(cstr::camel($value));
+                }, '');
+        if (method_exists(static::class, $method_name)) {
+            return static::$renderFunctionName();
+        }
+        throw new Exception('No function ' . $renderFunctionName . ' is defined in BlockHelper');
+    }
 
     public function renderControlsIf() {
         return '<block type="controls_if"></block>';

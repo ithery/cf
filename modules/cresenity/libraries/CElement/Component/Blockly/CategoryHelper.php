@@ -6,9 +6,9 @@
  * and open the template in the editor.
  */
 
-use CElement_Component_Blockly_BlockHelper as BlockHelper;
+use CElement_Component_Blockly_CategoryHelper as BlockHelper;
 
-class CategoryHelper {
+class CElement_Component_Blockly_CategoryHelper {
 
     const CATEGORY_MATH = 'math';
     const CATEGORY_LOOPS = 'loops';

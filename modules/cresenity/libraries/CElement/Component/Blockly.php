@@ -15,8 +15,6 @@ class CElement_Component_Blockly extends CElement_Component {
     protected $toolbox;
     protected $toolboxPosition;
 
-    
-
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
         $this->tag = 'div';
@@ -31,21 +29,25 @@ class CElement_Component_Blockly extends CElement_Component {
         $this->customCss('height', $this->height . 'px');
         $this->add($this->toolbox);
     }
-    
-    
- 
+
     public function js($indent = 0) {
         $toolboxId = $this->toolbox->id();
         return "
-            Blockly.inject('".$this->id."', {
+            Blockly.inject('" . $this->id . "', {
+                grid:{
+                    spacing: 25,
+                    length: 3,
+                    colour: '#ccc',
+                    snap: true
+                },
                 media: '/application/devcloud/default/media/js/blockly/media/',
                 toolbox: document.getElementById('" . $toolboxId . "'),
-                toolboxPosition: 'left',
-                horizontalLayout: true,
-                scrollbars: true,
-              });
-               Blockly.Variables.predefinedVars.push('A');
-            ";
+                //toolboxPosition: 'left',
+                //horizontalLayout: true,
+                //scrollbars: true,
+            });
+            //Blockly.Variables.predefinedVars.push('A');
+        ";
     }
 
 }
