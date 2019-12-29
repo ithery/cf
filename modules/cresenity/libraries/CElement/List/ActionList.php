@@ -16,14 +16,14 @@ class CElement_List_ActionList extends CElement_List {
     public $actions = array();
     protected $style;
 
-    public function __construct($list_id) {
-        parent::__construct($list_id);
+    public function __construct($listId = null) {
+        parent::__construct($listId);
 
         $this->style = "btn-list";
         $this->label = clang::__("Action");
         $this->btn_dropdown_classes = array();
         $this->label_size = 2;
-        $this->icon='';
+        $this->icon = '';
     }
 
     public static function factory($list_id = "") {
@@ -107,13 +107,13 @@ class CElement_List_ActionList extends CElement_List {
         }
         $html->appendln($pretag)->incIndent()->br();
         if ($this->style == "btn-dropdown") {
-            $iconHtml='';
-            if(strlen($this->icon)>0) {
-                $iconHtml='<i class="'.$this->icon.'"></i> ';
+            $iconHtml = '';
+            if (strlen($this->icon) > 0) {
+                $iconHtml = '<i class="' . $this->icon . '"></i> ';
             }
             $html->appendln('
                     <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle" data-toggle="dropdown" href="#">
-                            ' . $iconHtml.$this->label . '
+                            ' . $iconHtml . $this->label . '
                             <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-right align-left ' . $classes . '">
