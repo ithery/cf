@@ -6,25 +6,38 @@
  * and open the template in the editor.
  */
 
+use CElement_Component_Blockly_BlockHelper as BlockHelper;
+use CElement_Component_Blockly_CategoryHelper as CategoryHelper;
+
+
 class CElement_Component_Blockly_Toolbox extends CElement_Element {
 
+    
+    protected $categories=[];
+    
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
         $this->tag = 'xml';
+        $this->categories=[];
+        
     }
+    
+    public function buildCategories() {
+        $this->categories[]=CategoryHelper::CATEGORY_LOOPS;
+        
+    }
+    
+    
 
-    public function render($indent = 0) {
-        return '<xml id="toolbox" style="display: none">
-  <category name="Loops" colour="120">
-    <block type="controls_repeat_ext">
-      <value name="TIMES">
-        <shadow type="math_number">
-          <field name="NUM">5</field>
-        </shadow>
-      </value>
-    </block>
-  </category>
-</xml>';
+    public function html($indent = 0) {
+        $xmlOpen = '<xml id="' . $this->id . '" style="display: none">';
+        $xmlClose = '</xml>';
+        $categoryXml = carr::reduce($this->categories, function($blockArray,$name){
+           return CategoryHelper::renderCategory($name,$blockArray);
+        });
+        return $xmlOpen.$categoryXml.$xmlClose;
+                
+      
     }
 
 }
