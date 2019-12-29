@@ -24,7 +24,7 @@ class CElement_Component_Blockly_BlockHelper {
     const CONTROLS_FLOW_STATEMENTS = 'controls_flow_statements';
     //MATH
     const MATH_NUMBER = 'math_number';
-    const MATH_ARTIHMETIC = 'math_arithmetic';
+    const MATH_ARITHMETIC = 'math_arithmetic';
     const MATH_SINGLE = 'math_single';
     const MATH_TRIG = 'math_trig';
     const MATH_CONSTANT = 'math_constant';
