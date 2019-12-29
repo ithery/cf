@@ -31,7 +31,7 @@ class CElement_Component_Blockly_BlockHelper {
     const MATH_NUMBER_PROPERTY = 'math_number_property';
     const MATH_ROUND = 'math_round';
     const MATH_ON_LIST = 'math_on_list';
-    const MATH_MODULE = 'math_modulo';
+    const MATH_MODULO = 'math_modulo';
     const MATH_CONSTRAIN = 'math_constrain';
     const MATH_RANDOM_INT = 'math_random_int';
     const MATH_RANDOM_FLOAT = 'math_random_float';
