@@ -10,7 +10,7 @@ var CBlockly = function (options) {
 
     }, options);
     this.mediaFolder = this.settings.mediaFolder;
-    this.toolboxElementId = this.settings.toolboxElementID;
+    this.toolboxElementId = this.settings.toolboxElementId;
 
     this.blocklyElementId = this.settings.blocklyElementId;
     this.workspace = null;
