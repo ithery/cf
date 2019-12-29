@@ -35,7 +35,7 @@ class CElement_Component_Blockly_ToolboxHelper {
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_ROUND;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_ON_LIST;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_MODULO;
-        $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_RANDOM_LIST;
+        $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_RANDOM_INT;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_RANDOM_FLOAT;
         $cats[CategoryHelper::CATEGORY_MATH][] = BlockHelper::MATH_ATAN2;
         //TEXT
