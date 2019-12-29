@@ -30,8 +30,8 @@ class CElement_Component_Blockly_Toolbox extends CElement_Element {
         $xmlOpen = '<xml id="' . $this->id . '" style="display: none">';
         $xmlClose = '</xml>';
        
-        $categoryXml = carr::reduce($this->categories, function($blockArray, $name) {
-                    return CategoryHelper::renderCategory($name, $blockArray);
+        $categoryXml = carr::reduce($this->categories, function($output,$blockArray, $name) {
+                    return $output.CategoryHelper::renderCategory($name, $blockArray);
                 },'');
         return $xmlOpen . $categoryXml . $xmlClose;
     }
