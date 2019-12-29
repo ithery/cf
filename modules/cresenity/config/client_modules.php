@@ -20,7 +20,7 @@ return array(
             "blockly/blocks_compressed.js",
             "blockly/php_compressed.js",
             "blockly/msg/js/en.js",
-            "element/blockly/blockly.js". uniqid(),
+            "element/blockly/blockly.js?". uniqid(),
         ),
     ),
         
