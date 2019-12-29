@@ -17,6 +17,7 @@ class CElement_Component_Blockly extends CElement_Component {
     protected $isFunctionWithReturn = false;
     protected $functionName='';
     protected $functionArgs=[];
+    protected $saveUrl = '';
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
@@ -48,7 +49,12 @@ class CElement_Component_Blockly extends CElement_Component {
         $this->functionArgs = $arguments;
     }
 
-    public function build() {
+    
+    public function setSaveUrl($url) {
+        $this->saveUrl = $url;
+        return $this;
+    }
+       public function build() {
         
     }
 
@@ -59,6 +65,7 @@ class CElement_Component_Blockly extends CElement_Component {
         $jsOptions['saveElementId'] = $this->saveAction->id();
         $jsOptions['mediaFolder'] = '/modules/cresenity/media/js/blockly/media/';
         $jsOptions['variables'] = $this->variables;
+        $jsOptions['saveUrl'] = $this->saveUrl;
         if($this->isFunctionWithReturn) {
              $jsOptions['defaultXml'] = Helper::buildDefaultXmlForFunction($this->functionName,$this->functionArgs);
         }
