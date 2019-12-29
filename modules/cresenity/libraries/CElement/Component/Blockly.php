@@ -36,7 +36,7 @@ class CElement_Component_Blockly extends CElement_Component {
         $toolboxId = $jsOptions = [];
         $jsOptions['blocklyElementId'] = $this->blocklyWrapper->id();
         $jsOptions['toolboxElementId'] = $this->toolbox->id();
-        $jsOptions['mediaFolder'] = '/application/modules/cresenity/media/js/blockly/media/';
+        $jsOptions['mediaFolder'] = '/modules/cresenity/media/js/blockly/media/';
         return "
             new CBlockly(" . json_encode($jsOptions) . ");
         ";
