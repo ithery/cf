@@ -13,7 +13,7 @@ class CElement_Component_Blockly_Helper {
         $y = carr::get($options, 'y', 70);
 
         $openXml = '<xml xmlns="https://developers.google.com/blockly/xml">';
-        $clsoeXml = '</xml>';
+        $closeXml = '</xml>';
         $openVariables = '<variables>';
         $closeVariables = '</variables>';
         $openBlock = '<block type="procedures_defreturn" x="' . $x . '" y="' . $y . '">';
@@ -24,7 +24,7 @@ class CElement_Component_Blockly_Helper {
         $variablesXml = '';
         $argsXml = '';
         $fieldXml = '<field name="NAME">' . $functionName . '</field>';
-        foreach ($args as $arg) {
+        foreach ($arguments as $arg) {
             $argsXml .= '<arg name="' . $arg . '"/>';
             $variablesXml = '<variable>' . $arg . '</variable>';
         }
