@@ -56,15 +56,15 @@ class CElement_Component_Blockly_ToolboxHelper {
         $cats[CategoryHelper::CATEGORY_TEXTS][] = BlockHelper::TEXT_PROMPT_EXT;
         //LISTS
         $cats[CategoryHelper::CATEGORY_LISTS]=[];
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_CREATE_WITH;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_REPEAT;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_IS_EMPTY;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_INDEX_OF;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_GET_INDEX;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_SET_INDEX;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_GET_SUBLIST;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_SPLIT;
-        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::lISTS_SORT;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_CREATE_WITH;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_REPEAT;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_IS_EMPTY;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_INDEX_OF;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_GET_INDEX;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_SET_INDEX;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_GET_SUBLIST;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_SPLIT;
+        $cats[CategoryHelper::CATEGORY_LISTS][] = BlockHelper::LISTS_SORT;
         
         
         return $cats;
