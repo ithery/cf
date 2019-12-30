@@ -329,6 +329,17 @@ class c {
         return $value === $other;
     }
 
+    
+    
+    /**
+     * Create a collection from the given value.
+     *
+     * @param  mixed  $value
+     * @return CCollection
+     */
+    public static function collect($value = null) {
+        return CBase::collect($value);
+    }
 }
 
 // End c
