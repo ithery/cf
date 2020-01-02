@@ -273,9 +273,9 @@ trait CModel_Resource_ResourceTrait {
         return new HtmlString($this->img(...$arguments));
     }
 
-    public function regenerateConversion($only = '*', $onlyMissing = true) {
+    public function regenerateConversion($only = [], $onlyMissing = true) {
         $fileManipulator = CResources_Factory::createFileManipulator();
-        $fileManipulator->createDerivedFiles($this, carr::wrap($only), $onlyMissing);
+        $fileManipulator->createDerivedFiles($this, $only, $onlyMissing);
     }
 
 }
