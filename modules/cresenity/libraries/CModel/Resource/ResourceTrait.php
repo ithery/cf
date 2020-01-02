@@ -47,6 +47,11 @@ trait CModel_Resource_ResourceTrait {
         $urlGenerator = CResources_Factory::createUrlGeneratorForResource($this, $conversionName);
         return $urlGenerator->getPath();
     }
+    
+    public function getContent($conversionName = '') {
+        $disk = CStorage::instance()->disk($this->disk);
+        return $disk->get($this->getPath($conversionName));
+    }
 
     public function getImageGenerators() {
 
