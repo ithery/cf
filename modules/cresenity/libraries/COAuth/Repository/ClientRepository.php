@@ -102,7 +102,7 @@ class COAuth_Repository_ClientRepository {
         $client = COAuth::client()->forceFill([
             'user_id' => $userId,
             'name' => $name,
-            'secret' => ($confidential || $personalAccess) ? Str::random(40) : null,
+            'secret' => ($confidential || $personalAccess) ? cstr::random(40) : null,
             'redirect' => $redirect,
             'personal_access_client' => $personalAccess,
             'password_client' => $password,
