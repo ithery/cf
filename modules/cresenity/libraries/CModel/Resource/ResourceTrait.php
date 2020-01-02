@@ -47,7 +47,7 @@ trait CModel_Resource_ResourceTrait {
         $urlGenerator = CResources_Factory::createUrlGeneratorForResource($this, $conversionName);
         return $urlGenerator->getPath();
     }
-    
+
     public function getContent($conversionName = '') {
         $disk = CStorage::instance()->disk($this->disk);
         return $disk->get($this->getPath($conversionName));
@@ -78,7 +78,7 @@ trait CModel_Resource_ResourceTrait {
     public function getTypeFromMime() {
         $imageGenerator = $this->getImageGenerators()
                         ->map(function ( $className) {
-                            return app($className);
+                            return new $className();
                         })
                 ->first->canHandleMime($this->mime_type);
         return $imageGenerator ? $imageGenerator->getType() : static::TYPE_OTHER;
@@ -89,11 +89,11 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function getHumanReadableSizeAttribute() {
-        return File::getHumanReadableSize($this->size);
+        return CResources_Helpers_File::getHumanReadableSize($this->size);
     }
 
     public function getDiskDriverName() {
-        
+
         if (strlen($this->disk) == 0) {
             return 'local';
         }
@@ -146,7 +146,7 @@ trait CModel_Resource_ResourceTrait {
 
     public function getResourceConversionNames() {
         $conversions = CResources_ConversionCollection::createForResource($this);
-        return $conversions->map(function (Conversion $conversion) {
+        return $conversions->map(function (CResources_Conversion $conversion) {
                     return $conversion->getName();
                 })->toArray();
     }
@@ -271,6 +271,11 @@ trait CModel_Resource_ResourceTrait {
 
     public function __invoke(...$arguments) {
         return new HtmlString($this->img(...$arguments));
+    }
+
+    public function regenerateConversion($only = '*', $onlyMissing = true) {
+        $fileManipulator = CResources_Factory::createFileManipulator();
+        $fileManipulator->createDerivedFiles($this, carr::wrap($only), $onlyMissing);
     }
 
 }
