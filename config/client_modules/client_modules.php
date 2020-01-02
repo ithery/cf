@@ -27,6 +27,12 @@ return array(
             "libs" . DS . "axios.min.js",
         ),
     ),
+    
+    "underscore" => array(
+        "js" => array(
+            "libs" . DS . "underscore.min.js",
+        ),
+    ),
     "jquery" => array(
         "js" => array("libs" . DS . "jquery.min.js"),
     ),
