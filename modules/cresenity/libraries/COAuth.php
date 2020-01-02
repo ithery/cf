@@ -8,6 +8,8 @@
 
 class COAuth {
 
+    protected static $clientRepository;
+
     /**
      * Get the auth code model class name.
      *
@@ -51,6 +53,23 @@ class COAuth {
      */
     public static function refreshTokenModel() {
         return CF::config('oauth.model.refreshToken');
+    }
+
+    /**
+     * Get a new client model instance.
+     *
+     * @return COAuth_Model_Client
+     */
+    public static function client() {
+        $clientModel = static::clientModel();
+        return new $clientModel;
+    }
+
+    public static function clientRepository() {
+        if (static::$clientRepository == null) {
+            static::$clientRepository = new COAuth_Repository_ClientRepository();
+        }
+        return static::$clientRepository;
     }
 
 }
