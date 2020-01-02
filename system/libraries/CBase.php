@@ -38,7 +38,6 @@ class CBase {
         return $basename;
     }
 
-    
     /**
      * Create a collection from the given value.
      *
@@ -48,7 +47,7 @@ class CBase {
     public static function collect($value = null) {
         return new CCollection($value);
     }
-    
+
     /**
      * Call the given Closure with the given value then return the value.
      *
@@ -64,6 +63,43 @@ class CBase {
         $callback($value);
 
         return $value;
+    }
+
+    
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @param  string  $trait
+     * @return array
+     */
+    public static function traitUsesRecursive($trait) {
+        $traits = class_uses($trait);
+
+        foreach ($traits as $trait) {
+            $traits += self::traitUsesRecursive($trait);
+        }
+
+        return $traits;
+    }
+
+    /**
+     * Returns all traits used by a class, its subclasses and trait of their traits.
+     *
+     * @param  object|string  $class
+     * @return array
+     */
+    public static function classUsesRecursive($class) {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $results = [];
+
+        foreach (array_merge([$class => $class], class_parents($class)) as $class) {
+            $results += self::traitUsesRecursive($class);
+        }
+
+        return array_unique($results);
     }
 
 }
