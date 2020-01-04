@@ -403,7 +403,7 @@ trait CModel_HasResource_HasResourceTrait {
                         ->values();
     }
 
-    public function prepareToAttachResource(CApp_Model_Resource $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) {
+    public function prepareToAttachResource(CApp_Model_Interface_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) {
         $this->unAttachedResourceLibraryItems[] = compact('resource', 'fileAdder');
     }
 
