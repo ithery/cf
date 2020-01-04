@@ -11,8 +11,8 @@ use Pheanstalk\Response\ArrayResponse;
  * @package Pheanstalk
  * @license http://www.opensource.org/licenses/mit-license.php
  */
-interface ResponseParserInterface
-{
+interface ResponseParserInterface {
+
     /**
      * Parses raw response data into a Response object.
      *
@@ -20,5 +20,5 @@ interface ResponseParserInterface
      * @param string $responseData (null if no data)
      * @return ArrayResponse
      */
-    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse;
+    public function parseResponse($responseLine, $responseData);
 }
