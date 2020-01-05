@@ -13,7 +13,7 @@ trait CTrait_Controller_Application_Server_Info {
         $app->title('Local Server');
 
         $actionContainer = $app->addDiv()->addClass('action-container mb-3 clearfix');
-        $sshAction = $actionContainer->addAction()->setIcon('fas fa-user-cog')->setLabel('PHP Info')->addClass('btn-warning float-right mr-2')->setLink(curl::base() . 'server/local/phpinfo');
+        $sshAction = $actionContainer->addAction()->setIcon('fas fa-user-cog')->setLabel('PHP Info')->addClass('btn-warning float-right mr-2')->setLink($this->controllerUrl() . 'phpinfo');
 
 
         $divRow = $app->addDiv()->addClass('row');
