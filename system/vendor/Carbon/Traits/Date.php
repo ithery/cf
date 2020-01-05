@@ -1018,7 +1018,9 @@ trait Date
     {
         try {
             $this->__get($name);
-        } catch (InvalidArgumentException | ReflectionException $e) {
+        } catch (InvalidArgumentException   $e) {
+            return false;
+        } catch (  ReflectionException $e) {
             return false;
         }
 
@@ -1098,7 +1100,7 @@ trait Date
             case 'hour':
             case 'minute':
             case 'second':
-                [$year, $month, $day, $hour, $minute, $second] = array_map('intval', explode('-', $this->rawFormat('Y-n-j-G-i-s')));
+                list($year, $month, $day, $hour, $minute, $second) = array_map('intval', explode('-', $this->rawFormat('Y-n-j-G-i-s')));
                 $$name = $value;
                 $this->setDateTime($year, $month, $day, $hour, $minute, $second);
 
@@ -1322,7 +1324,9 @@ trait Date
             }
 
             return $date;
-        } catch (BadMethodCallException | ReflectionException $exception) {
+        } catch (  ReflectionException $exception) {
+            throw new InvalidArgumentException("Unknown unit '$valueUnit'", 0, $exception);
+        } catch (BadMethodCallException   $exception) {
             throw new InvalidArgumentException("Unknown unit '$valueUnit'", 0, $exception);
         }
     }
@@ -2075,7 +2079,11 @@ trait Date
                 } elseif (is_array($sequence)) {
                     try {
                         $sequence = $this->{$sequence[0]}(...$sequence[1]);
-                    } catch (ReflectionException | InvalidArgumentException | BadMethodCallException $e) {
+                    } catch (ReflectionException  $e) {
+                        $sequence = '';
+                    } catch (InvalidArgumentException $e) {
+                        $sequence = '';
+                    } catch (BadMethodCallException $e) {
                         $sequence = '';
                     }
                 } elseif (is_string($sequence)) {
@@ -2537,7 +2545,9 @@ trait Date
         if (substr($unit, 0, 9) === 'isCurrent') {
             try {
                 return $this->isCurrentUnit(strtolower(substr($unit, 9)));
-            } catch (BadUnitException | BadMethodCallException $exception) {
+            } catch (BadUnitException $exception) {
+                // Try macros
+            } catch (BadMethodCallException $exception) {
                 // Try macros
             }
         }
@@ -2564,7 +2574,7 @@ trait Date
                     }
                 }
 
-                if ($this->localStrictModeEnabled ?? static::isStrictModeEnabled()) {
+                if (isset($this->localStrictModeEnabled)   ? $this->localStrictModeEnabled: static::isStrictModeEnabled()) {
                     throw new BadMethodCallException("Method $method does not exist.");
                 }
 
