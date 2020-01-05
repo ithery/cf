@@ -60,7 +60,7 @@ class CBackup_DatabaseDumperFactory {
             $customDriver = static::$custom[$driver];
             return $customDriver();
         }
-        if ($driver === 'mysql' || $driver === 'mariadb') {
+        if ($driver === 'mysql' || $driver === 'mysqli' || $driver === 'mariadb') {
             return new CBackup_Database_Dumper_MySqlDumper();
         }
         if ($driver === 'pgsql') {
@@ -72,7 +72,7 @@ class CBackup_DatabaseDumperFactory {
         if ($driver === 'mongodb') {
             return new CBackup_Database_Dumper_MongoDbDumper();
         }
-        throw CBackup_Exception_CannotCreateDbDumperException::unsupportedDriver($driver);
+        throw CBackup_Exception_CannotCreateDatabaseDumperException::unsupportedDriver($driver);
     }
 
     protected static function processExtraDumpParameters(array $dumpConfiguration, CBackup_Database_AbstractDumper $dbDumper) {
