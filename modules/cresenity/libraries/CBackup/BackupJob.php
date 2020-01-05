@@ -145,13 +145,13 @@ class CBackup_BackupJob {
                         ->each(function ( $backupDestinationDirectory) {
                             $this->fileSelection->excludeFilesFrom($backupDestinationDirectory);
                         })
-                        ->push($this->temporaryDirectory->path())
+                        ->push($this->temporaryDirectory->getPath())
                         ->toArray();
     }
 
-    protected function createZipContainingEveryFileInManifest(Manifest $manifest) {
+    protected function createZipContainingEveryFileInManifest(CBackup_Manifest $manifest) {
         CBackup::output()->info("Zipping {$manifest->count()} files and directories...");
-        $pathToZip = $this->temporaryDirectory->path(CF::config('backup.backup.destination.filename_prefix') . $this->filename);
+        $pathToZip = $this->temporaryDirectory->getPath(CF::config('backup.backup.destination.filename_prefix') . $this->filename);
         $zip = CBackup_Zip::createForManifest($manifest, $pathToZip);
         CBackup::output()->info("Created zip containing {$zip->count()} files and directories. Size is {$zip->humanReadableSize()}");
         //$this->sendNotification(new BackupZipWasCreated($pathToZip));
@@ -193,7 +193,7 @@ class CBackup_BackupJob {
                 CBackup::output()->info("Copying zip to disk named {$backupDestination->diskName()}...");
                 $backupDestination->write($path);
                 CBackup::output()->info("Successfully copied zip to disk named {$backupDestination->diskName()}.");
-                $this->sendNotification(new BackupWasSuccessful($backupDestination));
+                //$this->sendNotification(new BackupWasSuccessful($backupDestination));
             } catch (Exception $exception) {
                 CBackup::output()->error("Copying zip failed because: {$exception->getMessage()}.");
                 //$this->sendNotification(new BackupHasFailed($exception, $backupDestination ?? null));

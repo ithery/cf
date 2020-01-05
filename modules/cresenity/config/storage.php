@@ -57,6 +57,10 @@ return [
             'driver' => 'local',
             'root' => DOCROOT,
         ],
+        'local-files' => [
+            'driver' => 'local',
+            'root' => DOCROOT . 'files',
+        ],
         'local-temp' => [
             'driver' => 'local',
             'root' => DOCROOT . 'temp',

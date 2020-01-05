@@ -10,7 +10,8 @@ class CBackup_Output {
 
     private static $instance;
     protected $messages;
-
+    protected $errors;
+    
     public function instance() {
         if (static::$instance == null) {
             static::$instance = new CBackup_Output();
@@ -26,7 +27,16 @@ class CBackup_Output {
         $this->messages[] = $info;
     }
 
+    public function error($message) {
+        $this->messages[] = 'ERROR:'.$message;
+        $this->errors[] = $message;
+    }
     public function clear() {
         $this->messages = [];
     }
+    
+    public function getOutput() {
+        return $this->messages;
+    }
+    
 }
