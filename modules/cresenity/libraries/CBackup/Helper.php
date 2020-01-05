@@ -20,10 +20,13 @@ class CBackup_Helper {
     }
 
     public static function formatEmoji($bool) {
+
+        $unicodeChar = '\u274c';
         if ($bool) {
-            return "\u9989";
+            $unicodeChar = '\u2705';
         }
-        return "\u10060";
+
+        return json_decode('"' . $unicodeChar . '"');
     }
 
     public static function formatAgeInDays(Carbon $date) {
