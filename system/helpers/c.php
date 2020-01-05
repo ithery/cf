@@ -464,6 +464,16 @@ class c {
         return CEvent::dispatch(...$args);
     }
 
+    /**
+     * Create a new Carbon instance for the current time.
+     *
+     * @param  \DateTimeZone|string|null  $tz
+     * @return CCarbon
+     */
+    public static function now($tz = null) {
+        return CCarbon::now($tz);
+    }
+
 }
 
 // End c
