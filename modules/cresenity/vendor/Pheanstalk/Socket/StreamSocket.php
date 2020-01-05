@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Pheanstalk\Socket;
 
 use Pheanstalk\Contract\SocketInterface;
@@ -10,12 +9,10 @@ use Pheanstalk\Exception\SocketException;
 /**
  * A Socket implementation using the Streams extension
  */
-class StreamSocket extends FileSocket
-{
+class StreamSocket extends FileSocket {
+
     public function __construct(
-        string $host,
-        int $port,
-        int $connectTimeout
+    $host, $port, $connectTimeout
     ) {
         $addresses = gethostbynamel($host);
         if ($addresses === false) {
@@ -29,4 +26,5 @@ class StreamSocket extends FileSocket
             throw new ConnectionException($errorMessage, $error);
         }
     }
+
 }

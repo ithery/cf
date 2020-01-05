@@ -17,8 +17,8 @@ use Pheanstalk\Response\ArrayResponse;
  * @package Pheanstalk
  * @license http://www.opensource.org/licenses/mit-license.php
  */
-class YamlResponseParser implements ResponseParserInterface
-{
+class YamlResponseParser implements ResponseParserInterface {
+
     const MODE_LIST = 'list';
     const MODE_DICT = 'dict';
 
@@ -27,27 +27,23 @@ class YamlResponseParser implements ResponseParserInterface
     /**
      * @param string $mode self::MODE_*
      */
-    public function __construct(string $mode)
-    {
+    public function __construct($mode) {
         if (!in_array($mode, [self::MODE_DICT, self::MODE_LIST])) {
             throw new \InvalidArgumentException('Invalid mode');
         }
         $this->mode = $mode;
     }
 
-    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
-    {
+    public function parseResponse($responseLine, $responseData) {
         if ($responseLine === ResponseInterface::RESPONSE_NOT_FOUND) {
             throw new Exception\ServerException(sprintf(
-                'Server reported %s',
-                $responseLine
+                    'Server reported %s', $responseLine
             ));
         }
 
         if (!preg_match('#^OK \d+$#', $responseLine)) {
             throw new Exception\ServerException(sprintf(
-                'Unhandled response: "%s"',
-                $responseLine
+                    'Unhandled response: "%s"', $responseLine
             ));
         }
 
@@ -58,8 +54,7 @@ class YamlResponseParser implements ResponseParserInterface
         return $this->mode === self::MODE_LIST ? $this->parseList($lines) : $this->parseDictionary($lines);
     }
 
-    private function parseList(array $lines): ArrayResponse
-    {
+    private function parseList(array $lines) {
         $data = [];
         foreach ($lines as $line) {
             if (strncmp($line, '- ', 2) !== 0) {
@@ -70,8 +65,8 @@ class YamlResponseParser implements ResponseParserInterface
 
         return new ArrayResponse('OK', $data);
     }
-    private function parseDictionary(array $lines): ArrayResponse
-    {
+
+    private function parseDictionary(array $lines) {
         $data = [];
         foreach ($lines as $line) {
             if (!preg_match('#(\S+):\s*(.*)#', $line, $matches)) {
@@ -81,4 +76,5 @@ class YamlResponseParser implements ResponseParserInterface
         }
         return new ArrayResponse('OK', $data);
     }
+
 }

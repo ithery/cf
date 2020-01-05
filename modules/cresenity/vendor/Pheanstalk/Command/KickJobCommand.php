@@ -19,28 +19,26 @@ use Pheanstalk\Response\ArrayResponse;
  * ready queue of the the same tube where it currently belongs.
  *
  */
-class KickJobCommand extends JobCommand implements ResponseParserInterface
-{
-    public function getCommandLine(): string
-    {
-        return 'kick-job '.$this->jobId;
+class KickJobCommand extends JobCommand implements ResponseParserInterface {
+
+    public function getCommandLine() {
+        return 'kick-job ' . $this->jobId;
     }
 
     /* (non-phpdoc)
      * @see ResponseParser::parseResponse()
      */
-    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
-    {
+
+    public function parseResponse($responseLine, $responseData) {
         if ($responseLine == ResponseInterface::RESPONSE_NOT_FOUND) {
             throw new Exception\ServerException(sprintf(
-                '%s: Job %d does not exist or is not in a kickable state.',
-                $responseLine,
-                $this->jobId
+                    '%s: Job %d does not exist or is not in a kickable state.', $responseLine, $this->jobId
             ));
         } elseif ($responseLine == ResponseInterface::RESPONSE_KICKED) {
             return $this->createResponse(ResponseInterface::RESPONSE_KICKED);
         } else {
-            throw new Exception('Unhandled response: '.$responseLine);
+            throw new Exception('Unhandled response: ' . $responseLine);
         }
     }
+
 }
