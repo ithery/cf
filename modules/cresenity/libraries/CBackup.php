@@ -8,11 +8,19 @@
 
 class CBackup {
 
+    /**
+     * 
+     * @return CBackup_BackupJob
+     */
     public static function createJob() {
         $config = CF::config('backup');
         return CBackup_Factory::createJob($config);
     }
 
+    /**
+     * 
+     * @return CBackup_Output
+     */
     public static function output() {
         return CBackup_Output::instance();
     }
