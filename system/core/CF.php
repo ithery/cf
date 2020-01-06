@@ -2126,13 +2126,7 @@ final class CF {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        if (is_null($callback)) {
-            return new HigherOrderTapProxy($value);
-        }
-
-        $callback($value);
-
-        return $value;
+        return CBase::tap($value, $callback);
     }
 
     /**
