@@ -29,14 +29,7 @@ class CEvent {
     public static function createDispatcher() {
         return new CEvent_Dispatcher();
     }
-    /**
-     * Dispatch an event and call the listeners.
-     *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @param  bool  $halt
-     * @return array|null
-     */
+
     public static function dispatch() {
         $args = func_get_args();
         $event = carr::get($args, 0);

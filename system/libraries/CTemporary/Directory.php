@@ -16,8 +16,8 @@ class CTemporary_Directory {
         CFile::makeDirectory($this->getPath(), 0755, true, true);
     }
 
-    public function getPath($file = '') {
-        return rtrim(DOCROOT, '/') . '/' . rtrim($this->path, '/') . '/' . $file;
+    public function getPath() {
+        return rtrim(DOCROOT, '/') . '/' . rtrim($this->path, '/');
     }
 
     public function getUrl() {
@@ -26,10 +26,6 @@ class CTemporary_Directory {
 
     public function createFile($filename) {
         return new CTemporary_File($this, $filename);
-    }
-
-    public function delete() {
-        CFile::deleteDirectory($this->getPath());
     }
 
 }

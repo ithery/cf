@@ -8,7 +8,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class c {
 
@@ -337,7 +336,7 @@ class c {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return new CCollection($value);
+        return CBase::collect($value);
     }
 
     /**
@@ -346,122 +345,10 @@ class c {
      * @param  mixed  $value
      * @param  callable|null  $callback
      * @return mixed
+     * @see CBase::tap
      */
     public static function tap($value, $callback = null) {
-        if (is_null($callback)) {
-            return new CBase_HigherOrderTapProxy($value);
-        }
-
-        $callback($value);
-
-        return $value;
-    }
-
-    /**
-     * Get the class "basename" of the given object / class.
-     *
-     * @param  string|object  $class
-     * @return string
-     */
-    public static function classBasename($class) {
-        $class = is_object($class) ? get_class($class) : $class;
-
-        $basename = basename(str_replace('\\', '/', $class));
-        $basename = carr::last(explode("_", $basename));
-        return $basename;
-    }
-
-    /**
-     * Returns all traits used by a trait and its traits.
-     *
-     * @param  string  $trait
-     * @return array
-     */
-    public static function traitUsesRecursive($trait) {
-        $traits = class_uses($trait);
-
-        foreach ($traits as $trait) {
-            $traits += self::traitUsesRecursive($trait);
-        }
-
-        return $traits;
-    }
-
-    /**
-     * Returns all traits used by a class, its subclasses and trait of their traits.
-     *
-     * @param  object|string  $class
-     * @return array
-     */
-    public static function classUsesRecursive($class) {
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
-
-        $results = [];
-
-        foreach (array_merge([$class => $class], class_parents($class)) as $class) {
-            $results += self::traitUsesRecursive($class);
-        }
-
-        return array_unique($results);
-    }
-
-    /**
-     * Catch a potential exception and return a default value.
-     *
-     * @param  callable  $callback
-     * @param  mixed  $rescue
-     * @param  bool  $report
-     * @return mixed
-     */
-    public static function rescue(callable $callback, $rescue = null, $report = true) {
-        try {
-            return $callback();
-        } catch (Throwable $e) {
-            if ($report) {
-                static::report($e);
-            }
-
-            return static::value($rescue);
-        }
-    }
-
-    /**
-     * Report an exception.
-     *
-     * @param  \Throwable  $exception
-     * @return void
-     */
-    public static function report($exception) {
-        if ($exception instanceof Throwable &&
-                !$exception instanceof Exception) {
-            $exception = new FatalThrowableError($exception);
-        }
-        $exceptionHandler = new CException_ExceptionHandler();
-        $exceptionHandler->report($exception);
-    }
-
-    /**
-     * Return the default value of the given value.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    public static function value($value) {
-        return $value instanceof Closure ? $value() : $value;
-    }
-
-    /**
-     * Dispatch an event and call the listeners.
-     *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @param  bool  $halt
-     * @return array|null
-     */
-    public static function event(...$args) {
-        return CEvent::dispatch(...$args);
+        return CBase::tap($value, $callback);
     }
 
 }
