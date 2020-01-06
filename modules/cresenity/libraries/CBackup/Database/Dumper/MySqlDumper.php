@@ -156,6 +156,7 @@ class CBackup_Database_Dumper_MySqlDumper extends CBackup_Database_AbstractDumpe
         fwrite($tempFileHandle, $this->getContentsOfCredentialsFile());
         $temporaryCredentialsFile = stream_get_meta_data($tempFileHandle)['uri'];
         $command = $this->getDumpCommand($dumpFile, $temporaryCredentialsFile);
+        
         $process = Process::fromShellCommandline($command, null, null, null, $this->timeout);
         $process->run();
         $this->checkIfDumpWasSuccessFul($process, $dumpFile);
