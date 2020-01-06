@@ -36,7 +36,6 @@ application/*
 /temp/*
 /export/
 /resources
-/files
 /certificate
 /upload/*
 /payment_log/

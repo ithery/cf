@@ -23,32 +23,32 @@ class CBackup_BackupDestination {
     /** @var null|\Spatie\Backup\BackupDestination\BackupCollection */
     protected $backupCollectionCache = null;
 
-    public function __construct(CStorage_Adapter $disk = null,  $backupName,  $diskName) {
+    public function __construct(CStorage_Adapter $disk = null, string $backupName, string $diskName) {
         $this->disk = $disk;
         $this->diskName = $diskName;
         $this->backupName = preg_replace('/[^a-zA-Z0-9.]/', '-', $backupName);
     }
 
-    public function disk() {
+    public function disk(): Filesystem {
         return $this->disk;
     }
 
-    public function diskName() {
+    public function diskName(): string {
         return $this->diskName;
     }
 
-    public function filesystemType() {
+    public function filesystemType(): string {
         if (is_null($this->disk)) {
             return 'unknown';
         }
         $adapterClass = get_class($this->disk->getDriver()->getAdapter());
-        $filesystemType = carr::last(explode('\\', $adapterClass));
+        $filesystemType = last(explode('\\', $adapterClass));
         return strtolower($filesystemType);
     }
 
-    public static function create( $diskName,  $backupName) {
+    public static function create(string $diskName, string $backupName): self {
         try {
-            $disk = CStorage::instance()->disk($diskName);
+            $disk = app(Factory::class)->disk($diskName);
             return new static($disk, $backupName, $diskName);
         } catch (Exception $exception) {
             $backupDestination = new static(null, $backupName, $diskName);
@@ -57,9 +57,9 @@ class CBackup_BackupDestination {
         }
     }
 
-    public function write( $file) {
+    public function write(string $file) {
         if (is_null($this->disk)) {
-            throw CBackup_Exception_InvalidBackupDestinationException::diskNotSet($this->backupName);
+            throw InvalidBackupDestination::diskNotSet($this->backupName);
         }
         $destination = $this->backupName . '/' . pathinfo($file, PATHINFO_BASENAME);
         $handle = fopen($file, 'r+');
