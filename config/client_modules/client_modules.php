@@ -19,7 +19,7 @@ return array(
     "vue" => array(
         "js" => array(
             "libs" . DS . "vue.js",
-            "libs" . DS . "vue-loader.js",
+            "libs" . DS . "httpVueLoader.js",
         ),
     ),
     "jquery" => array(
