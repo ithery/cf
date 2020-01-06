@@ -18,28 +18,31 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-trait TranslatorTrait {
-
+trait TranslatorTrait
+{
     private $locale;
 
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale) {
+    public function setLocale(string $locale)
+    {
         $this->locale = $locale;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLocale() {
+    public function getLocale()
+    {
         return $this->locale ?: \Locale::getDefault();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null) {
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    {
         if (null === $id || '' === $id) {
             return '';
         }
@@ -92,7 +95,8 @@ EOF;
                     $leftNumber = '-Inf' === $matches['left'] ? -INF : (float) $matches['left'];
                     $rightNumber = is_numeric($matches['right']) ? (float) $matches['right'] : INF;
 
-                    if (('[' === $matches['left_delimiter'] ? $number >= $leftNumber : $number > $leftNumber) && (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)
+                    if (('[' === $matches['left_delimiter'] ? $number >= $leftNumber : $number > $leftNumber)
+                        && (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)
                     ) {
                         return strtr($matches['message'], $parameters);
                     }
@@ -132,7 +136,8 @@ EOF;
      * which is subject to the new BSD license (http://framework.zend.com/license/new-bsd).
      * Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
      */
-    private function getPluralizationRule($number, $locale) {
+    private function getPluralizationRule(int $number, string $locale): int
+    {
         switch ('pt_BR' !== $locale && \strlen($locale) > 3 ? substr($locale, 0, strrpos($locale, '_')) : $locale) {
             case 'af':
             case 'bn':
@@ -249,5 +254,4 @@ EOF;
                 return 0;
         }
     }
-
 }
