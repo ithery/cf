@@ -57,7 +57,7 @@ class CBackup {
     protected function convertToRow(CBackup_Monitor $backupDestinationStatus) {
         $destination = $backupDestinationStatus->backupDestination();
         $row = [
-            'name' => $destination->backupName(),
+            $destination->backupName(),
             'disk' => $destination->diskName(),
             'isReachable' => CBackup_Helper::formatEmoji($destination->isReachable()),
             'isHealthy' => CBackup_Helper::formatEmoji($backupDestinationStatus->isHealthy()),
