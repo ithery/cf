@@ -25,9 +25,13 @@ class CResources_FileManipulator {
                 return in_array($collection->getName(), $only);
             });
         }
+        
+        
         $this->performConversions(
                 $profileCollection->getNonQueuedConversions($resource->collection_name), $resource, $onlyIfMissing
         );
+       
+        
         $queuedConversions = $profileCollection->getQueuedConversions($resource->collection_name);
         if ($queuedConversions->isNotEmpty()) {
             $this->dispatchQueuedConversions($resource, $queuedConversions);
@@ -62,7 +66,8 @@ class CResources_FileManipulator {
                     if ($rootPath) {
                         $relativePath = str_replace($rootPath, '', $relativePath);
                     }
-                    return $onlyIfMissing && Storage::disk($resource->disk)->exists($relativePath);
+                    
+                    return $onlyIfMissing && CStorage::instance()->disk($resource->disk)->exists($relativePath);
                 })
                 ->each(function (CResources_Conversion $conversion) use ($resource, $imageGenerator, $copiedOriginalFile) {
                     CEvent::dispatcher()->dispatch(new CResources_Event_Conversion_WillStart($resource, $conversion, $copiedOriginalFile));
@@ -108,6 +113,8 @@ class CResources_FileManipulator {
     protected function dispatchQueuedConversions(CApp_Model_Interface_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
         $performConversionsJobClass = CF::config('resource.task_queue.perform_conversions', CResources_TaskQueue_PerformConversions::class);
         $job = new $performConversionsJobClass($queuedConversions, $resource);
+        
+       
         if ($customQueue = CF::config('resource.queue_name')) {
             $job->onQueue($customQueue);
         }

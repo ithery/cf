@@ -19,9 +19,14 @@ class CBase {
     public static function createMemoizeResolver(callable $func, callable $resolver = null) {
         return new CBase_MemoizeResolver($func, $resolver);
     }
-    
+
     public static function createMapCache() {
         return new CBase_MapCache();
     }
+
+    
+
+    
+    
 
 }

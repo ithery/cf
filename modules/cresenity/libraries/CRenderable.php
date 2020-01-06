@@ -91,6 +91,14 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $this->renderable = array();
         return $this;
     }
+    
+    public function parentHtml() {
+        return parent::html();
+    }
+    
+    public function parentJs() {
+        return parent::js();
+    }
 
     public function html($indent = 0) {
         if (!$this->visibility) {

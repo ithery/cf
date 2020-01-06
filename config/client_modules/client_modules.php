@@ -16,6 +16,23 @@ return array(
     "tmpl" => array(
         "js" => array("libs" . DS . "tmpl.min.js"),
     ),
+    "vue" => array(
+        "js" => array(
+            "libs" . DS . "vue.min.js",
+            "libs" . DS . "vue-loader.js",
+        ),
+    ),
+    "axios" => array(
+        "js" => array(
+            "libs" . DS . "axios.min.js",
+        ),
+    ),
+    
+    "underscore" => array(
+        "js" => array(
+            "libs" . DS . "underscore.min.js",
+        ),
+    ),
     "jquery" => array(
         "js" => array("libs" . DS . "jquery.min.js"),
     ),

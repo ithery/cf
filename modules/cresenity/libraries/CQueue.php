@@ -25,6 +25,10 @@ final class CQueue {
         return self::$dispatcher;
     }
 
+    /**
+     * 
+     * @return CQueue_Manager
+     */
     public static function queuer() {
         return CF::tap(new CQueue_Manager(), function ($manager) {
                     CQueue::registerConnectors($manager);
@@ -41,7 +45,7 @@ final class CQueue {
 //        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
 //            self::{"register{$connector}Connector"}($manager);
 //        }
-        foreach (['Null', 'Database', 'Sqs'] as $connector) {
+        foreach (['Null', 'Database', 'Sqs', 'Beanstalkd'] as $connector) {
             self::{"register{$connector}Connector"}($manager);
         }
     }
@@ -67,6 +71,18 @@ final class CQueue {
     protected static function registerSyncConnector($manager) {
         $manager->addConnector('sync', function () {
             return new CQueue_Connector_SyncConnector;
+        });
+    }
+
+    /**
+     * Register the Sync queue connector.
+     *
+     * @param  CQueue_Manager  $manager
+     * @return void
+     */
+    protected static function registerBeanstalkdConnector($manager) {
+        $manager->addConnector('beanstalkd', function () {
+            return new CQueue_Connector_BeanstalkdConnector;
         });
     }
 

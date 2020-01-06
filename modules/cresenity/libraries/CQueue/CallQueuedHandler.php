@@ -45,6 +45,7 @@ class CQueue_CallQueuedHandler {
      * @return void
      */
     public function call(CQueue_AbstractJob $job, array $data) {
+
         try {
             $command = $this->setJobInstanceIfNecessary(
                     $job, unserialize($data['command'])
@@ -52,7 +53,9 @@ class CQueue_CallQueuedHandler {
         } catch (CModel_Exception_ModelNotFound $e) {
             return $this->handleModelNotFound($job, $e);
         }
+
         $this->dispatchThroughMiddleware($job, $command);
+
         if (!$job->hasFailed() && !$job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
         }
@@ -69,6 +72,7 @@ class CQueue_CallQueuedHandler {
      * @return mixed
      */
     protected function dispatchThroughMiddleware(CQueue_AbstractJob $job, $command) {
+
         return (new CQueue_Pipeline($this->container))->send($command)
                         ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], isset($command->middleware) ? $command->middleware : []))
                         ->then(function ($command) use ($job) {
@@ -101,9 +105,12 @@ class CQueue_CallQueuedHandler {
      * @return mixed
      */
     protected function setJobInstanceIfNecessary(CQueue_AbstractJob $job, $instance) {
+
         if (in_array(CQueue_Trait_InteractsWithQueue::class, CF::class_uses_recursive($instance))) {
+
             $instance->setJob($job);
         }
+
         return $instance;
     }
 

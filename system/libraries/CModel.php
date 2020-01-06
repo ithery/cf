@@ -7,6 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 25, 2017, 8:42:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
 abstract class CModel implements ArrayAccess {
 
     use CModel_Trait_GuardsAttributes,
@@ -956,13 +957,13 @@ abstract class CModel implements ArrayAccess {
      * @param  int  $options
      * @return string
      *
-     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
+     * @throws CModel_Exception_JsonEncodingException
      */
     public function toJson($options = 0) {
         $json = json_encode($this->jsonSerialize(), $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw JsonEncodingException::forModel($this, json_last_error_msg());
+            throw CModel_Exception_JsonEncodingException::forModel($this, json_last_error_msg());
         }
 
         return $json;
