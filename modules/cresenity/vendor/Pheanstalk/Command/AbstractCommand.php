@@ -10,25 +10,21 @@ use Pheanstalk\Response\ArrayResponse;
 /**
  * Common functionality for Command implementations.
  */
-abstract class AbstractCommand implements CommandInterface
-{
-    public function hasData(): bool
-    {
+abstract class AbstractCommand implements CommandInterface {
+
+    public function hasData() {
         return false;
     }
 
-    public function getData(): string
-    {
+    public function getData() {
         throw new CommandException('Command has no data');
     }
 
-    public function getDataLength(): int
-    {
+    public function getDataLength() {
         throw new CommandException('Command has no data');
     }
 
-    public function getResponseParser(): ResponseParserInterface
-    {
+    public function getResponseParser() {
         if ($this instanceof ResponseParserInterface) {
             return $this;
         }
@@ -38,8 +34,8 @@ abstract class AbstractCommand implements CommandInterface
     /**
      * Creates a Response for the given data.
      */
-    protected function createResponse(string $name, array $data = []): ArrayResponse
-    {
+    protected function createResponse($name, array $data = []) {
         return new ArrayResponse($name, $data);
     }
+
 }

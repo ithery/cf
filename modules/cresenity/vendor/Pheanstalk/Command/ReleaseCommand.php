@@ -13,13 +13,12 @@ use Pheanstalk\Response\ArrayResponse;
  *
  * Releases a reserved job back onto the ready queue.
  */
-class ReleaseCommand extends JobCommand implements ResponseParserInterface
-{
+class ReleaseCommand extends JobCommand implements ResponseParserInterface {
+
     private $priority;
     private $delay;
 
-    public function __construct(JobIdInterface $job, int $priority, int $delay)
-    {
+    public function __construct(JobIdInterface $job, $priority, $delay) {
         parent::__construct($job);
         $this->priority = $priority;
         $this->delay = $delay;
@@ -28,34 +27,27 @@ class ReleaseCommand extends JobCommand implements ResponseParserInterface
     /* (non-phpdoc)
      * @see Command::getCommandLine()
      */
-    public function getCommandLine(): string
-    {
+
+    public function getCommandLine() {
         return sprintf(
-            'release %u %u %u',
-            $this->jobId,
-            $this->priority,
-            $this->delay
+                'release %u %u %u', $this->jobId, $this->priority, $this->delay
         );
     }
 
-    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
-    {
+    public function parseResponse($responseLine, $responseData) {
         if ($responseLine == ResponseInterface::RESPONSE_BURIED) {
             throw new Exception\ServerException(sprintf(
-                'Job %u %s: out of memory trying to grow data structure',
-                $this->jobId,
-                $responseLine
+                    'Job %u %s: out of memory trying to grow data structure', $this->jobId, $responseLine
             ));
         }
 
         if ($responseLine == ResponseInterface::RESPONSE_NOT_FOUND) {
             throw new Exception\ServerException(sprintf(
-                'Job %u %s: does not exist or is not reserved by client',
-                $this->jobId,
-                $responseLine
+                    'Job %u %s: does not exist or is not reserved by client', $this->jobId, $responseLine
             ));
         }
 
         return $this->createResponse($responseLine);
     }
+
 }

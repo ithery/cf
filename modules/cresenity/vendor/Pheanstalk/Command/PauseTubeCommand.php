@@ -12,8 +12,8 @@ use Pheanstalk\Response\ArrayResponse;
  *
  * Temporarily prevent jobs being reserved from the given tube.
  */
-class PauseTubeCommand extends TubeCommand implements ResponseParserInterface
-{
+class PauseTubeCommand extends TubeCommand implements ResponseParserInterface {
+
     /**
      * @var int
      */
@@ -23,33 +23,27 @@ class PauseTubeCommand extends TubeCommand implements ResponseParserInterface
      * @param string $tube  The tube to pause
      * @param int    $delay Seconds before jobs may be reserved from this queue.
      */
-    public function __construct(string $tube, int $delay)
-    {
+    public function __construct($tube, $delay) {
         parent::__construct($tube);
         $this->delay = $delay;
     }
 
-    public function getCommandLine(): string
-    {
+    public function getCommandLine() {
         return sprintf(
-            'pause-tube %s %u',
-            $this->tube,
-            $this->delay
+                'pause-tube %s %u', $this->tube, $this->delay
         );
     }
 
-    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
-    {
+    public function parseResponse($responseLine, $responseData) {
         if ($responseLine == ResponseInterface::RESPONSE_NOT_FOUND) {
             throw new Exception\ServerException(sprintf(
-                '%s: tube %s does not exist.',
-                $responseLine,
-                $this->tube
+                    '%s: tube %s does not exist.', $responseLine, $this->tube
             ));
         } elseif ($responseLine == ResponseInterface::RESPONSE_PAUSED) {
             return $this->createResponse(ResponseInterface::RESPONSE_PAUSED);
         } else {
-            throw new Exception('Unhandled response: "'.$responseLine.'"');
+            throw new Exception('Unhandled response: "' . $responseLine . '"');
         }
     }
+
 }

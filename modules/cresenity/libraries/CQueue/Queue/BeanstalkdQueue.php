@@ -116,7 +116,9 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      */
     public function pop($queue = null) {
         $queue = $this->getQueue($queue);
+        
         $job = $this->pheanstalk->watchOnly($queue)->reserveWithTimeout($this->blockFor);
+        
         if ($job instanceof PheanstalkJob) {
             return new CQueue_Job_BeanstalkdJob(
                     $this->container, $this->pheanstalk, $job, $this->connectionName, $queue

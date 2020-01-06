@@ -10,15 +10,14 @@ use Pheanstalk\YamlResponseParser;
  *
  * Lists the tubes on the watchlist.
  */
-class ListTubesWatchedCommand extends AbstractCommand
-{
-    public function getCommandLine(): string
-    {
+class ListTubesWatchedCommand extends AbstractCommand {
+
+    public function getCommandLine() {
         return 'list-tubes-watched';
     }
 
-    public function getResponseParser(): ResponseParserInterface
-    {
+    public function getResponseParser() {
         return new YamlResponseParser(YamlResponseParser::MODE_LIST);
     }
+
 }

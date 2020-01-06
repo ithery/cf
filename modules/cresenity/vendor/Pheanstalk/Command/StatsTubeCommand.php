@@ -8,17 +8,16 @@ use Pheanstalk\YamlResponseParser;
  * The 'stats-tube' command.
  * Gives statistical information about the specified tube if it exists.
  */
-class StatsTubeCommand extends TubeCommand
-{
-    public function getCommandLine(): string
-    {
+class StatsTubeCommand extends TubeCommand {
+
+    public function getCommandLine() {
         return sprintf('stats-tube %s', $this->tube);
     }
 
-    public function getResponseParser(): \Pheanstalk\Contract\ResponseParserInterface
-    {
+    public function getResponseParser() {
         return new YamlResponseParser(
-            YamlResponseParser::MODE_DICT
+                YamlResponseParser::MODE_DICT
         );
     }
+
 }

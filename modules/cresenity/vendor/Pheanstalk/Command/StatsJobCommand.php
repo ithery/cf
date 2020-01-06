@@ -12,15 +12,14 @@ use Pheanstalk\YamlResponseParser;
  *
  * Gives statistical information about the specified job if it exists.
  */
-class StatsJobCommand extends JobCommand
-{
-    public function getCommandLine(): string
-    {
+class StatsJobCommand extends JobCommand {
+
+    public function getCommandLine() {
         return sprintf('stats-job %u', $this->jobId);
     }
 
-    public function getResponseParser(): ResponseParserInterface
-    {
+    public function getResponseParser() {
         return new YamlResponseParser(YamlResponseParser::MODE_DICT);
     }
+
 }

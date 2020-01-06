@@ -10,17 +10,16 @@ use Pheanstalk\Response\ArrayResponse;
  *
  * Returns the tube currently being used by the client.
  */
-class ListTubeUsedCommand extends AbstractCommand implements ResponseParserInterface
-{
-    public function getCommandLine(): string
-    {
+class ListTubeUsedCommand extends AbstractCommand implements ResponseParserInterface {
+
+    public function getCommandLine() {
         return 'list-tube-used';
     }
 
-    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
-    {
+    public function parseResponse($responseLine, $responseData) {
         return $this->createResponse('USING', [
-            'tube' => preg_replace('#^USING (.+)$#', '$1', $responseLine),
+                    'tube' => preg_replace('#^USING (.+)$#', '$1', $responseLine),
         ]);
     }
+
 }
