@@ -185,20 +185,6 @@ class CServer_Service_Beanstalkd {
         $this->client->delete($job);
     }
 
-    public function pauseTube($tube, $delay) {
-        $this->client->pauseTube($tube, $delay);
-    }
-
-    public function getContentType() {
-        return $this->contentType;
-    }
-
-    public function addJob($tubeName, $tubeData, $tubePriority = Pheanstalk::DEFAULT_PRIORITY, $tubeDelay = Pheanstalk::DEFAULT_DELAY, $tubeTtr = Pheanstalk::DEFAULT_TTR) {
-        $this->_client->useTube($tubeName);
-        $result = $this->_client->useTube($tubeName)->put($tubeData, $tubePriority, $tubeDelay, $tubeTtr);
-        return $result;
-    }
-
     /**
      * Pheanstalk class instance
      *
