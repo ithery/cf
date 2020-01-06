@@ -1413,8 +1413,6 @@ var Cresenity = function () {
                     new scrollToTop().init();
                 }
             }
-            this.initConfirm();
-            
         });
 
 
