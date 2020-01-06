@@ -7,10 +7,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 17, 2017, 9:20:23 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CCollection implements ArrayAccess, Countable, IteratorAggregate,JsonSerializable {
+class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable {
 
-    
     use CTrait_Macroable;
+
     /**
      * The items contained in the collection.
      *
@@ -547,12 +547,12 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate,JsonSeria
      * @param  string  $type
      * @return static
      */
-    public function whereInstanceOf($type)
-    {
+    public function whereInstanceOf($type) {
         return $this->filter(function ($value) use ($type) {
-            return $value instanceof $type;
-        });
+                    return $value instanceof $type;
+                });
     }
+
     /**
      * Get the first item from the collection.
      *
@@ -1682,4 +1682,5 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate,JsonSeria
         return new CProxy_HigherOrderCollectionProxy($this, $key);
     }
 
+   
 }
