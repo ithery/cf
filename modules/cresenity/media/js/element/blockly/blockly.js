@@ -15,8 +15,8 @@ var CBlockly = function (options) {
     this.blocklyElementId = this.settings.blocklyElementId;
     this.workspace = null;
 
-    this.save = function (event) {
-        var code = this.getXml();
+    this.save = function () {
+        var code = this.getPhp();
         alert(code);
     }
 
@@ -39,8 +39,9 @@ var CBlockly = function (options) {
 
     this.getPhp = function () {
         var generator = Blockly.PHP;
-        //var xml = this.getXml()
-
+        var xml = this.getXml()
+        var content = document.getElementById('content_' + Code.selected);
+        content.textContent = '';
         if (this.checkAllGeneratorFunctionsDefined(generator)) {
             var code = generator.workspaceToCode(this.workspace);
             return code;
@@ -82,32 +83,18 @@ var CBlockly = function (options) {
                 snap: true
             },
             media: this.mediaFolder,
-            toolbox: document.getElementById(this.toolboxElementId),
+            toolbox: this.toolboxElementId,
             //toolboxPosition: 'left',
             //horizontalLayout: true,
             //scrollbars: true,
         });
-        if (typeof this.settings.saveElementId !== 'undefined') {
-            document.getElementById(this.settings.saveElementId).addEventListener('click', (event) => {
-                this.save(event);
-
-            }, true);
+        if(typeof this.settings.saveElementId !== 'undefined') {
+            document.getElementById(this.settings.saveElementId).addEventListener('click',this.save,true);
         }
-
-        if (typeof this.settings.variables !== 'undefined') {
-            this.settings.variables.forEach((item) => this.createVariable(item));
-        }
-        
-        if (typeof this.settings.defaultXml !== 'undefined') {
-            var xml = Blockly.Xml.textToDom(this.settings.defaultXml);
-            Blockly.Xml.domToWorkspace(xml, this.workspace);
-        }
-        
-       
     };
 
 
 
     this.init();
-    window.bworkspace=this.workspace;
+
 }
