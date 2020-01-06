@@ -16,6 +16,12 @@ return array(
     "tmpl" => array(
         "js" => array("libs" . DS . "tmpl.min.js"),
     ),
+    "vue" => array(
+        "js" => array(
+            "libs" . DS . "vue.js",
+            "libs" . DS . "httpVueLoader.js",
+        ),
+    ),
     "jquery" => array(
         "js" => array("libs" . DS . "jquery.min.js"),
     ),
