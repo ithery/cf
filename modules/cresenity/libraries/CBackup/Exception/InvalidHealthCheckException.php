@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CBackup_Monitor_Exception_InvalidHealthCheckException extends Exception {
+class CBackup_Exception_InvalidHealthCheckException extends Exception {
 
     public static function because($message) {
         return new static($message);
