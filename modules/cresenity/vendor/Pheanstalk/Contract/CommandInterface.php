@@ -12,8 +12,8 @@ use Pheanstalk\Exception;
  * @package Pheanstalk
  * @license http://www.opensource.org/licenses/mit-license.php
  */
-interface CommandInterface
-{
+interface CommandInterface {
+
     const COMMAND_PUT = 'put';
     const COMMAND_USE = 'use';
     const COMMAND_RESERVE = 'reserve';
@@ -33,25 +33,25 @@ interface CommandInterface
     /**
      * The command line, without trailing CRLF.
      */
-    public function getCommandLine(): string;
+    public function getCommandLine();
 
     /**
      * Whether the command is followed by data.
      */
-    public function hasData(): bool;
+    public function hasData();
 
     /**
      * The binary data to follow the command.
      */
-    public function getData(): string;
+    public function getData();
 
     /**
      * The length of the binary data in bytes.
      */
-    public function getDataLength(): int;
+    public function getDataLength();
 
     /**
      * The response parser for the command.
      */
-    public function getResponseParser(): ResponseParserInterface;
+    public function getResponseParser();
 }

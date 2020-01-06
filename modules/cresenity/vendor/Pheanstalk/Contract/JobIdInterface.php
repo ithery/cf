@@ -1,9 +1,8 @@
 <?php
 
-
 namespace Pheanstalk\Contract;
 
-interface JobIdInterface
-{
-    public function getId(): int;
+interface JobIdInterface {
+
+    public function getId();
 }
