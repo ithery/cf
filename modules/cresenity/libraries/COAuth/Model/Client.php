@@ -41,14 +41,4 @@ class COAuth_Model_Client extends COAuth_Model {
         'revoked' => 'bool',
     ];
 
-    
-    /**
-     * Get all of the tokens that belong to the client.
-     *
-     * @return CModel_Relation_HasMany
-     */
-    public function accessToken()
-    {
-        return $this->hasMany(COAuth::accessTokenModel(), 'client_id');
-    }
 }

@@ -18,7 +18,7 @@ return array(
     ),
     "vue" => array(
         "js" => array(
-            "libs" . DS . "vue.min.js",
+            "libs" . DS . "vue.js",
             "libs" . DS . "vue-loader.js",
         ),
     ),
