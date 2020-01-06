@@ -101,7 +101,7 @@ trait CModel_HasResource_HasResourceTrait {
         $url = carr::get($args, 0);
         $allowedMimeTypes = array_slice($args, 1);
         if (!$stream = @fopen($url, 'r')) {
-            throw CResources_Exception_FileCannotBeAdded_UnreachableUrl::create($url);
+            throw UnreachableUrl::create($url);
         }
         $temporaryFile = tempnam(sys_get_temp_dir(), 'resource-library');
         file_put_contents($temporaryFile, $stream);
