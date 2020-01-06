@@ -12,7 +12,6 @@ class CElement_Component_Blockly extends CElement_Component {
     protected $toolbox;
     protected $toolbar;
     protected $blocklyWrapper;
-    protected $saveAction;
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
@@ -29,18 +28,17 @@ class CElement_Component_Blockly extends CElement_Component {
         $this->add($this->toolbar);
         $this->blocklyWrapper->add($this->toolbox);
         $this->add($this->blocklyWrapper);
-        $this->saveAction = $this->toolbar->addAction()->setLabel('Save');
+        $action = $this->toolbar->addAction()->setLabel('Load');
     }
 
     public function build() {
-        
+       
     }
 
     public function js($indent = 0) {
         $toolboxId = $jsOptions = [];
         $jsOptions['blocklyElementId'] = $this->blocklyWrapper->id();
         $jsOptions['toolboxElementId'] = $this->toolbox->id();
-        $jsOptions['saveElementId'] = $this->saveAction->id();
         $jsOptions['mediaFolder'] = '/modules/cresenity/media/js/blockly/media/';
         return "
             new CBlockly(" . json_encode($jsOptions) . ");
