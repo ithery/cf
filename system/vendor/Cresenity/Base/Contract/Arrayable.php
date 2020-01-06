@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace Cresenity\Base\Contract\Arrayable;
+namespace Cresenity\Base\Contract;
 
 interface Arrayable {
 
