@@ -19,18 +19,19 @@ var CBlockly = function (options) {
         var code = this.getPhp();
         var saveUrl = this.settings.saveUrl;
 
-        var xhr = new XMLHttpRequest();
 
-        xhr.open('POST', saveUrl);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onload = function () {
-            if (xhr.status === 200 && xhr.responseText) {
-                alert(xhr.responseText);
-            } else if (xhr.status !== 200) {
-                alert('Request failed.  Returned status of ' + xhr.status);
+
+        $.ajax({
+            url:saveUrl,
+            type:'post',
+            data: {
+                code:code,
+            },
+            success: function(response) {
+                alert(response);
             }
-        };
-        xhr.send(encodeURI('code=' + code));
+        })
+        
 
     }
 
