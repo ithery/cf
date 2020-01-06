@@ -37,60 +37,59 @@ abstract class FileDumper implements DumperInterface
      *
      * @param string $relativePathTemplate A template for the relative paths to files
      */
-    public function setRelativePathTemplate(string $relativePathTemplate)
+    public function setRelativePathTemplate($relativePathTemplate)
     {
         $this->relativePathTemplate = $relativePathTemplate;
     }
 
     /**
+     * Sets backup flag.
+     *
+     * @param bool
+     */
+    public function setBackup($backup)
+    {
+        if (false !== $backup) {
+            throw new \LogicException('The backup feature is no longer supported.');
+        }
+
+        // the method is only present to not break BC
+        // to be deprecated in 4.1
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function dump(MessageCatalogue $messages, array $options = [])
+    public function dump(MessageCatalogue $messages, $options = array())
     {
-        if (!\array_key_exists('path', $options)) {
+        if (!array_key_exists('path', $options)) {
             throw new InvalidArgumentException('The file dumper needs a path option.');
         }
 
-        $hasMessageFormatter = class_exists(\MessageFormatter::class);
-
         // save a file for each domain
         foreach ($messages->getDomains() as $domain) {
-            if ($hasMessageFormatter) {
-                $defaultDomain = $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX;
-                $altDomain = $domain;
-            } else {
-                $defaultDomain = $domain;
-                $altDomain = $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX;
-            }
-            $defaultPath = $options['path'].'/'.$this->getRelativePath($defaultDomain, $messages->getLocale());
-            $altPath = $options['path'].'/'.$this->getRelativePath($altDomain, $messages->getLocale());
-
-            if (!file_exists($defaultPath) && file_exists($altPath)) {
-                [$defaultPath, $altPath] = [$altPath, $defaultPath];
-            }
-
-            if (!file_exists($defaultPath)) {
-                $directory = \dirname($defaultPath);
+            $fullpath = $options['path'].'/'.$this->getRelativePath($domain, $messages->getLocale());
+            if (!file_exists($fullpath)) {
+                $directory = \dirname($fullpath);
                 if (!file_exists($directory) && !@mkdir($directory, 0777, true)) {
                     throw new RuntimeException(sprintf('Unable to create directory "%s".', $directory));
                 }
             }
-
-            if (file_exists($altPath)) {
-                // clear alternative translation file
-                file_put_contents($altPath, $this->formatCatalogue(new MessageCatalogue($messages->getLocale()), $altDomain, $options));
-            }
-
-            file_put_contents($defaultPath, $this->formatCatalogue($messages, $domain, $options));
+            // save file
+            file_put_contents($fullpath, $this->formatCatalogue($messages, $domain, $options));
         }
     }
 
     /**
      * Transforms a domain of a message catalogue to its string representation.
      *
+     * @param MessageCatalogue $messages
+     * @param string           $domain
+     * @param array            $options
+     *
      * @return string representation
      */
-    abstract public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = []);
+    abstract public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array());
 
     /**
      * Gets the file extension of the dumper.
@@ -104,10 +103,10 @@ abstract class FileDumper implements DumperInterface
      */
     private function getRelativePath(string $domain, string $locale): string
     {
-        return strtr($this->relativePathTemplate, [
+        return strtr($this->relativePathTemplate, array(
             '%domain%' => $domain,
             '%locale%' => $locale,
             '%extension%' => $this->getExtension(),
-        ]);
+        ));
     }
 }
