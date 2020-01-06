@@ -10,8 +10,8 @@ use Pheanstalk\Response\ArrayResponse;
  * The 'reserve' command.
  * Reserves/locks a ready job in a watched tube.
  */
-class ReserveWithTimeoutCommand extends AbstractCommand implements ResponseParserInterface {
-
+class ReserveWithTimeoutCommand extends AbstractCommand implements ResponseParserInterface
+{
     private $timeout;
 
     /**
@@ -20,16 +20,20 @@ class ReserveWithTimeoutCommand extends AbstractCommand implements ResponseParse
      * time the client will block on the reserve request until a job becomes
      * available.
      */
-    public function __construct($timeout) {
+    public function __construct(int $timeout)
+    {
         $this->timeout = $timeout;
     }
 
-    public function getCommandLine() {
+    public function getCommandLine(): string
+    {
         return sprintf('reserve-with-timeout %s', $this->timeout);
     }
 
-    public function parseResponse($responseLine, $responseData) {
-        if ($responseLine === ResponseInterface::RESPONSE_DEADLINE_SOON || $responseLine === ResponseInterface::RESPONSE_TIMED_OUT
+    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
+    {
+        if ($responseLine === ResponseInterface::RESPONSE_DEADLINE_SOON
+            || $responseLine === ResponseInterface::RESPONSE_TIMED_OUT
         ) {
             return $this->createResponse($responseLine);
         }
@@ -37,9 +41,8 @@ class ReserveWithTimeoutCommand extends AbstractCommand implements ResponseParse
         list($code, $id) = explode(' ', $responseLine);
 
         return $this->createResponse($code, [
-                    'id' => (int) $id,
-                    'jobdata' => $responseData,
+            'id'      => (int) $id,
+            'jobdata' => $responseData,
         ]);
     }
-
 }

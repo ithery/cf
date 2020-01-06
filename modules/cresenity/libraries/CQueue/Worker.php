@@ -209,14 +209,13 @@ class CQueue_Worker {
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  CQueue_WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
     public function runNextJob($connectionName, $queue, CQueue_WorkerOptions $options) {
         $job = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
         );
-
         // If we're able to pull a job off of the stack, we will process it and then return
         // from this method. If there is no job on the queue, we will "sleep" the worker
         // for the specified number of seconds, then keep processing jobs after sleep.
@@ -229,9 +228,9 @@ class CQueue_Worker {
     /**
      * Get the next job from the queue connection.
      *
-     * @param  CQueue_AbstractQueue  $connection
+     * @param  \Illuminate\Contracts\Queue\Queue  $connection
      * @param  string  $queue
-     * @return CQueue_AbstractJob|null
+     * @return \Illuminate\Contracts\Queue\Job|null
      */
     protected function getNextJob($connection, $queue) {
 
@@ -262,7 +261,6 @@ class CQueue_Worker {
      */
     protected function runJob($job, $connectionName, CQueue_WorkerOptions $options) {
         try {
-            
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             if (CDaemon::getRunningService() != null) {
@@ -319,9 +317,7 @@ class CQueue_Worker {
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
-            
             $job->fire();
-           
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Exception $e) {
             if (CDaemon::getRunningService() != null) {

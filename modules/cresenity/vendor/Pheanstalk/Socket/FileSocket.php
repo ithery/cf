@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Pheanstalk\Socket;
 
 use Pheanstalk\Contract\SocketInterface;
@@ -8,8 +9,8 @@ use Pheanstalk\Exception\SocketException;
 /**
  * A Socket implementation using the standard file functions.
  */
-abstract class FileSocket implements SocketInterface {
-
+abstract class FileSocket implements SocketInterface
+{
     /** @var ?resource */
     protected $socket;
 
@@ -20,7 +21,8 @@ abstract class FileSocket implements SocketInterface {
      *
      * @return void
      */
-    public function write($data): void {
+    public function write(string $data): void
+    {
         $this->checkClosed();
         $retries = 0;
         error_clear_last();
@@ -41,14 +43,16 @@ abstract class FileSocket implements SocketInterface {
         }
     }
 
-    private function throwException() {
+    private function throwException()
+    {
         if (null === $error = error_get_last()) {
             throw new SocketException('Unknown error');
         }
         throw new SocketException($error['message'], $error['type']);
     }
 
-    private function checkClosed() {
+    private function checkClosed()
+    {
         if (!isset($this->socket)) {
             throw new SocketException('The connection was closed');
         }
@@ -59,7 +63,8 @@ abstract class FileSocket implements SocketInterface {
      *
      * @return string
      */
-    public function read($length) {
+    public function read(int $length): string
+    {
         $this->checkClosed();
         $buffer = '';
         while (mb_strlen($buffer, '8BIT') < $length) {
@@ -78,7 +83,8 @@ abstract class FileSocket implements SocketInterface {
      *
      * @param int
      */
-    public function getLine() {
+    public function getLine(): string
+    {
         $this->checkClosed();
         $result = fgets($this->socket, 8192);
         if ($result === false) {
@@ -90,10 +96,10 @@ abstract class FileSocket implements SocketInterface {
     /**
      * Disconnect the socket; subsequent usage of the socket will fail.
      */
-    public function disconnect() {
+    public function disconnect(): void
+    {
         $this->checkClosed();
         fclose($this->socket);
         $this->socket = null;
     }
-
 }

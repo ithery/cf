@@ -10,14 +10,15 @@ use Pheanstalk\YamlResponseParser;
  *
  * List all existing tubes.
  */
-class ListTubesCommand extends AbstractCommand {
-
-    public function getCommandLine() {
+class ListTubesCommand extends AbstractCommand
+{
+    public function getCommandLine(): string
+    {
         return 'list-tubes';
     }
 
-    public function getResponseParser() {
+    public function getResponseParser(): ResponseParserInterface
+    {
         return new YamlResponseParser(YamlResponseParser::MODE_LIST);
     }
-
 }

@@ -81,10 +81,8 @@ abstract class CQueue_AbstractJob {
      */
     public function fire() {
         $payload = $this->payload();
-        
         list($class, $method) = CQueue_JobName::parse($payload['job']);
         $this->instance = $this->resolve($class);
-        
         $this->instance->{$method}($this, $payload['data']);
     }
 

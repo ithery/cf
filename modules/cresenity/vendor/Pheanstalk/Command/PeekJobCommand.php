@@ -13,30 +13,34 @@ use Pheanstalk\Response\ArrayResponse;
  *
  * The peek command let the client inspect a specific job in the system.
  */
-class PeekJobCommand extends JobCommand implements ResponseParserInterface {
-
-    public function getCommandLine() {
+class PeekJobCommand extends JobCommand implements ResponseParserInterface
+{
+    public function getCommandLine(): string
+    {
         return sprintf('peek %u', $this->jobId);
     }
 
-    public function parseResponse($responseLine, $responseData) {
+    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
+    {
         if ($responseLine == ResponseInterface::RESPONSE_NOT_FOUND) {
             $message = sprintf(
-                    '%s: Job %u does not exist.', $responseLine, $this->jobId
+                '%s: Job %u does not exist.',
+                $responseLine,
+                $this->jobId
             );
             throw new Exception\ServerException($message);
         }
 
         if (preg_match('#^FOUND (\d+) \d+$#', $responseLine, $matches)) {
             return $this->createResponse(
-                            ResponseInterface::RESPONSE_FOUND, [
-                        'id' => (int) $matches[1],
-                        'jobdata' => $responseData,
-                            ]
+                ResponseInterface::RESPONSE_FOUND,
+                [
+                    'id'      => (int) $matches[1],
+                    'jobdata' => $responseData,
+                ]
             );
         }
 
         throw new Exception\ServerException("Unexpected response: " . $responseLine);
     }
-
 }

@@ -47,7 +47,6 @@ class CQueue_Runner {
         if ($connection == null) {
             $connection = CQueue::config('default');
         }
-        
         if ($this->downForMaintenance() && $this->getOption('once')) {
             return $this->worker->sleep($this->getOption('sleep'));
         }

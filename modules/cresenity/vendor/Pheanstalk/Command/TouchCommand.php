@@ -16,20 +16,23 @@ use Pheanstalk\Response\ArrayResponse;
  * may periodically tell the server that it's still alive and processing a job
  * (e.g. it may do this on DEADLINE_SOON).
  */
-class TouchCommand extends JobCommand implements ResponseParserInterface {
-
-    public function getCommandLine() {
+class TouchCommand extends JobCommand implements ResponseParserInterface
+{
+    public function getCommandLine(): string
+    {
         return sprintf('touch %u', $this->jobId);
     }
 
-    public function parseResponse($responseLine, $responseData) {
+    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
+    {
         if ($responseLine == ResponseInterface::RESPONSE_NOT_FOUND) {
             throw new Exception\ServerException(sprintf(
-                    'Job %u %s: does not exist or is not reserved by client', $this->jobId, $responseLine
+                'Job %u %s: does not exist or is not reserved by client',
+                $this->jobId,
+                $responseLine
             ));
         }
 
         return $this->createResponse($responseLine);
     }
-
 }

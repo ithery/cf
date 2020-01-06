@@ -9,16 +9,17 @@ use Pheanstalk\YamlResponseParser;
  *
  * Statistical information about the system as a whole.
  */
-class StatsCommand extends AbstractCommand {
-
-    public function getCommandLine() {
+class StatsCommand extends AbstractCommand
+{
+    public function getCommandLine(): string
+    {
         return 'stats';
     }
 
-    public function getResponseParser() {
+    public function getResponseParser(): \Pheanstalk\Contract\ResponseParserInterface
+    {
         return new YamlResponseParser(
-                YamlResponseParser::MODE_DICT
+            YamlResponseParser::MODE_DICT
         );
     }
-
 }

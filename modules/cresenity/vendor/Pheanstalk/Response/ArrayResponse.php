@@ -11,36 +11,40 @@ use Pheanstalk\Contract\ResponseInterface;
  * @package Pheanstalk
  * @license http://www.opensource.org/licenses/mit-license.php
  */
-class ArrayResponse extends \ArrayObject implements ResponseInterface {
-
+class ArrayResponse extends \ArrayObject implements ResponseInterface
+{
     private $name;
 
     /**
      * @param string $name
      * @param array  $data
      */
-    public function __construct($name, $data) {
+    public function __construct(string $name, array $data)
+    {
         $this->name = $name;
         parent::__construct($data);
     }
 
-    public function getResponseName() {
+    public function getResponseName(): string
+    {
         return $this->name;
     }
 
     /**
      * Object property access to ArrayObject data.
      */
-    public function __get($property) {
+    public function __get($property)
+    {
         $key = $this->transformPropertyName($property);
 
-        return isset($this[$key]) ? $this[$key] : null;
+        return $this[$key] ?? null;
     }
 
     /**
      * Object property access to ArrayObject data.
      */
-    public function __isset($property) {
+    public function __isset($property)
+    {
         $key = $this->transformPropertyName($property);
 
         return isset($this[$key]);
@@ -51,8 +55,8 @@ class ArrayResponse extends \ArrayObject implements ResponseInterface {
     /**
      * Tranform underscored property name to hyphenated array key.
      */
-    private function transformPropertyName($propertyName) {
+    private function transformPropertyName(string $propertyName): string
+    {
         return str_replace('_', '-', $propertyName);
     }
-
 }
