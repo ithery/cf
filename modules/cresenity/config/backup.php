@@ -148,10 +148,10 @@ return [
     'monitor_backups' => [
         [
             'name' => 'capp-backup',
-            'disks' => ['local'],
+            'disks' => ['local-files'],
             'health_checks' => [
-//                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
-//                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
+                CBackup_Monitor_HealthCheck_MaximumAgeInDays::class => 1,
+                CBackup_Monitor_HealthCheck_MaximumStorageInMegabytes::class => 5000,
             ],
         ],
     /*
