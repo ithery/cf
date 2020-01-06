@@ -22,11 +22,6 @@ return array(
             "libs" . DS . "vue-loader.js",
         ),
     ),
-    "axios" => array(
-        "js" => array(
-            "libs" . DS . "axios.min.js",
-        ),
-    ),
     "jquery" => array(
         "js" => array("libs" . DS . "jquery.min.js"),
     ),
