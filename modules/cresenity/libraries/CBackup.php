@@ -8,7 +8,8 @@
 
 class CBackup {
 
-    public static function createJob($options) {
+    public static function createJob() {
+        $config = CF::config('backup');
         return CBackup_Factory::createJob($config);
     }
 
