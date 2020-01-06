@@ -2142,7 +2142,11 @@ final class CF {
      * @return string
      */
     public static function class_basename($class) {
-        return CBase::classBasename($class);
+        $class = is_object($class) ? get_class($class) : $class;
+
+        $basename = basename(str_replace('\\', '/', $class));
+        $basename = carr::last(explode("_", $basename));
+        return $basename;
     }
 
     /**
@@ -2285,7 +2289,7 @@ final class CF {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return CBase::collect($value);
+        return new CCollection($value);
     }
 
     /**

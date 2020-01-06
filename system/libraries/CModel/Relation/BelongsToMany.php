@@ -157,7 +157,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set the join clause for the relation query.
      *
-     * @param  CModel_Query|null  $query
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @return $this
      */
     protected function performJoin($query = null) {
@@ -406,7 +406,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return CModel|CModel_Collection|null
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
      */
     public function find($id, $columns = ['*']) {
         return is_array($id) ? $this->findMany($id, $columns) : $this->where(
@@ -667,7 +667,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @return string
      */
     protected function guessInverseRelation() {
-        return cstr::camel(cstr::plural(CBase::classBasename($this->getParent())));
+        return cstr::camel(cstr::plural(class_basename($this->getParent())));
     }
 
     /**
@@ -779,12 +779,12 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Add the constraints for a relationship query.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
-     * @return CModel_Query
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
         if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
             return $this->getRelationExistenceQueryForSelfJoin($query, $parentQuery, $columns);
         }
@@ -797,12 +797,12 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Add the constraints for a relationship query on the same table.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
      * @param  array|mixed  $columns
-     * @return CModel_Query
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationExistenceQueryForSelfJoin(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQueryForSelfJoin(Builder $query, Builder $parentQuery, $columns = ['*']) {
         $query->select($columns);
 
         $query->from($this->related->getTable() . ' as ' . $hash = $this->getRelationCountHash());

@@ -19,33 +19,9 @@ class CBase {
     public static function createMemoizeResolver(callable $func, callable $resolver = null) {
         return new CBase_MemoizeResolver($func, $resolver);
     }
-
+    
     public static function createMapCache() {
         return new CBase_MapCache();
     }
 
-    /**
-     * Get the class "basename" of the given object / class.
-     *
-     * @param  string|object  $class
-     * @return string
-     */
-    public static function classBasename($class) {
-        $class = is_object($class) ? get_class($class) : $class;
-
-        $basename = basename(str_replace('\\', '/', $class));
-        $basename = carr::last(explode("_", $basename));
-        return $basename;
-    }
-
-    
-    /**
-     * Create a collection from the given value.
-     *
-     * @param  mixed  $value
-     * @return CCollection
-     */
-    public static function collect($value = null) {
-        return new CCollection($value);
-    }
 }
