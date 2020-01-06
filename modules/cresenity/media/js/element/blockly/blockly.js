@@ -16,7 +16,7 @@ var CBlockly = function (options) {
     this.workspace = null;
 
     this.save = function (event) {
-        var code = this.getXml();
+        var code = this.getPhp();
         alert(code);
     }
 
