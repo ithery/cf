@@ -956,7 +956,7 @@ abstract class CModel implements ArrayAccess, CInterface_Jsonable {
      * @param  int  $options
      * @return string
      *
-     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
+     * @throws CModel_Exception_JsonEncodingException
      */
     public function toJson($options = 0) {
         $json = json_encode($this->jsonSerialize(), $options);
