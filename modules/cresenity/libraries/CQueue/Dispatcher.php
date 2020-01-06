@@ -66,7 +66,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     public function dispatch($command) {
         
         if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
-            
+             
             return $this->dispatchToQueue($command);
         }
         return $this->dispatchNow($command);
@@ -135,6 +135,8 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @throws \RuntimeException
      */
     public function dispatchToQueue($command) {
+        
+        
         $connection = $command->connection ? $command->connection : null;
         $queue = call_user_func($this->queueResolver, $connection);
         
