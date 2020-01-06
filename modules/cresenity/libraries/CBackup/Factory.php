@@ -12,7 +12,7 @@ class CBackup_Factory {
         return (new CBackup_BackupJob())
                         ->setFileSelection(static::createFileSelection($config['backup']['source']['files']))
                         ->setDbDumpers(static::createDbDumpers($config['backup']['source']['databases']))
-                        ->setBackupDestinations(CBackup_BackupDestinationFactory::createFromArray($config['backup']));
+                        ->setBackupDestinations(BackupDestinationFactory::createFromArray($config['backup']));
     }
 
     protected static function createFileSelection(array $sourceFiles) {

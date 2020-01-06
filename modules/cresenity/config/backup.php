@@ -1,6 +1,6 @@
 <?php
 
-/*
+/* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -27,9 +27,9 @@ return [
                  * Directories used by the backup process will automatically be excluded.
                  */
                 'exclude' => [
-                    DOCROOT . 'system',
-                    DOCROOT . 'modules',
-                    DOCROOT . 'media',
+                    DOCROOT.'system',
+                    DOCROOT.'modules',
+                    DOCROOT.'media',
                 ],
                 /*
                  * Determines if symlinks should be followed.
@@ -121,10 +121,10 @@ return [
          */
 //        'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
         'mail' => [
-            'to' => 'hery@ittron.co.id',
+            'to' => 'your@example.com',
             'from' => [
-                'address' => 'no-reply@core.capp',
-                'name' => 'Core CApp',
+                'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+                'name' => env('MAIL_FROM_NAME', 'Example'),
             ],
         ],
         'slack' => [
@@ -151,16 +151,16 @@ return [
 //                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
             ],
         ],
-    /*
-      [
-      'name' => 'name of the second app',
-      'disks' => ['local', 's3'],
-      'health_checks' => [
-      \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
-      \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
-      ],
-      ],
-     */
+        /*
+        [
+            'name' => 'name of the second app',
+            'disks' => ['local', 's3'],
+            'health_checks' => [
+                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
+                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
+            ],
+        ],
+        */
     ],
     'cleanup' => [
         /*

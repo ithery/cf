@@ -8,7 +8,7 @@
 
 use Carbon\Carbon;
 
-class CBackup_BackupJob {
+class BackupJob {
 
     /** @var CBackup_FileSelection */
     protected $fileSelection;
