@@ -94,7 +94,7 @@ class CBackup_BackupJob {
     }
 
     public function run() {
-        CBackup::output()->clear();
+
         $temporaryDirectoryFolder = CF::config('backup.backup.temporary_folder', 'backup');
         $subfolder = date('YmdHis') . cstr::random(8);
         $path = $temporaryDirectoryFolder . DS . $subfolder;
@@ -117,7 +117,6 @@ class CBackup_BackupJob {
             throw $exception;
         }
         $this->temporaryDirectory->delete();
-        return CBackup::output()->getAndClearOutput();
     }
 
     protected function createBackupManifest() {

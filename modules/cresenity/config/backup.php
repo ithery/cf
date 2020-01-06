@@ -30,9 +30,6 @@ return [
                     DOCROOT . 'system',
                     DOCROOT . 'modules',
                     DOCROOT . 'media',
-                    DOCROOT . 'temp',
-                    DOCROOT . 'files',
-                    DOCROOT . '.git',
                 ],
                 /*
                  * Determines if symlinks should be followed.
