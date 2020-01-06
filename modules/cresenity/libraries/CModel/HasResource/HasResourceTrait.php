@@ -60,10 +60,10 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param string $key
      *
-     * @return CModel_HasResource_FileAdder_FileAdder
+     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
      */
     public function addResourceFromRequest($key) {
-        return CModel_HasResource_FileAdder_FileAdderFactory::createFromRequest($this, $key);
+        return app(FileAdderFactory::class)->createFromRequest($this, $key);
     }
 
     /**
@@ -71,19 +71,19 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param string[] $keys
      *
-     * @return CModel_HasResource_FileAdder_FileAdder[]
+     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder[]
      */
     public function addMultipleResourceFromRequest(array $keys) {
-        return CModel_HasResource_FileAdder_FileAdderFactory::createMultipleFromRequest($this, $keys);
+        return app(FileAdderFactory::class)->createMultipleFromRequest($this, $keys);
     }
 
     /**
      * Add all files from a request.
      *
-     * @return CModel_HasResource_FileAdder_FileAdder[]
+     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder[]
      */
     public function addAllResourceFromRequest() {
-        return CModel_HasResource_FileAdder_FileAdderFactory::createAllFromRequest($this);
+        return app(FileAdderFactory::class)->createAllFromRequest($this);
     }
 
     /**
@@ -92,9 +92,9 @@ trait CModel_HasResource_HasResourceTrait {
      * @param string $url
      * @param string|array ...$allowedMimeTypes
      *
-     * @return CModel_HasResource_FileAdder_FileAdder
+     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
      *
-     * @throws CResources_Exception_FileCannotBeAdded
+     * @throws \Spatie\ResourceLibrary\Exceptions\FileCannotBeAdded
      */
     public function addResourceFromUrl() {
         $args = func_get_args();
@@ -128,9 +128,9 @@ trait CModel_HasResource_HasResourceTrait {
      * @param string|array ...$allowedMimeTypes
      *
      * @throws InvalidBase64Data
-     * @throws CResources_Exception_FileCannotBeAdded
+     * @throws \Spatie\ResourceLibrary\Exceptions\FileCannotBeAdded
      *
-     * @return CModel_HasResource_FileAdder_FileAdder
+     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
      */
     public function addResourceFromBase64() {
         $args = func_get_args();
@@ -164,7 +164,7 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
-     * @return CModel_HasResource_FileAdder_FileAdder
+     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
      */
     public function copyResource($file) {
         return $this->addResource($file)->preservingOriginal();
@@ -287,7 +287,8 @@ trait CModel_HasResource_HasResourceTrait {
      * @return $this
      */
     public function clearResourceCollection($collectionName = 'default') {
-        $this->getResource($collectionName)->each->delete();
+        $this->getResource($collectionName)
+        ->each->delete();
         event(new CollectionHasBeenCleared($this, $collectionName));
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);

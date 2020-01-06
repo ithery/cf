@@ -61,7 +61,7 @@ class CResources_ConversionCollection extends CCollection {
      */
     protected function addConversionsFromRelatedModel(CApp_Model_Interface_ResourceInterface $resource) {
         $modelName = carr::get(CModel_Relation::morphMap(), $resource->model_type, $resource->model_type);
-        /** @var CModel_HasResourceInterface $model */
+        /** @var \Spatie\ResourceLibrary\HasResource\HasResource $model */
         $model = new $modelName();
         /*
          * In some cases the user might want to get the actual model
@@ -73,7 +73,6 @@ class CResources_ConversionCollection extends CCollection {
             $model->resourceConversion = [];
         }
         $model->registerAllResourceConversions($resource);
-        
         $this->items = $model->resourceConversions;
     }
 

@@ -20,16 +20,16 @@ class CModel_HasResource_FileAdder_FileAdderFactory {
         return $fileAdder->setSubject($subject)->setFile($file);
     }
 
-    public static function createFromRequest(CModel $subject, $key) {
+    public static function createFromRequest(Model $subject, $key) {
         return static::createMultipleFromRequest($subject, [$key])->first();
     }
 
-    public static function createMultipleFromRequest(CModel $subject, array $keys = []) {
+    public static function createMultipleFromRequest(Model $subject, array $keys = []) {
         return CF::collect($keys)->map(function ( $key) use ($subject) {
-                            if (!CHTTP::request()->hasFile($key)) {
+                            if (!request()->hasFile($key)) {
                                 throw RequestDoesNotHaveFile::create($key);
                             }
-                            $files = CHTTP::request()->file($key);
+                            $files = request()->file($key);
                             if (!is_array($files)) {
                                 return static::create($subject, $files);
                             }
@@ -41,7 +41,7 @@ class CModel_HasResource_FileAdder_FileAdderFactory {
     }
 
     public static function createAllFromRequest(CModel $subject) {
-        $fileKeys = array_keys(CHTTP::request()->allFiles());
+        $fileKeys = array_keys(request()->allFiles());
         return static::createMultipleFromRequest($subject, $fileKeys);
     }
 
