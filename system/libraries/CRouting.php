@@ -1007,7 +1007,7 @@ class CRouting {
      */
     public function uses(...$patterns) {
         foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $this->currentRouteAction())) {
+            if (cstr::is($pattern, $this->currentRouteAction())) {
                 return true;
             }
         }
