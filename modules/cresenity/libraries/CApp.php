@@ -33,7 +33,6 @@ class CApp extends CObservable {
     private $viewName = 'cpage';
     private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
-    protected $renderer;
 
     public function setViewCallback(callable $viewCallback) {
         self::$viewCallback = $viewCallback;
@@ -151,8 +150,6 @@ class CApp extends CObservable {
 
         $this->_org = corg::get(CF::orgCode());
 
-        
-        //$this->renderer = new CApp_Renderer($this);
 
         if (isset($_COOKIE['capp-profiler'])) {
             new Profiler();
