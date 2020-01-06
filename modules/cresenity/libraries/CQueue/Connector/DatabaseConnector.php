@@ -33,7 +33,7 @@ class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
      * Establish a queue connection.
      *
      * @param  array  $config
-     * @return CQueue_AbstractQueue
+     * @return CQueue_QueueInterface
      */
     public function connect(array $config) {
         //todo read from config
