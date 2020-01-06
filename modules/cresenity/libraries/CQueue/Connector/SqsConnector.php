@@ -15,7 +15,7 @@ class CQueue_Connector_SqsConnector extends CQueue_AbstractConnector {
      * Establish a queue connection.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Queue\Queue
+     * @return CQueue_AbstractQueue
      */
     public function connect(array $config) {
         $config = $this->getDefaultConfiguration($config);
