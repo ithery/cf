@@ -209,7 +209,6 @@ class CServer_Service_Beanstalkd {
             $job = $this->client->useTube($tube)->{$method}();
             $peek = array(
                 'id' => $job->getId(),
-                'rawData' => $job->getData(),
                 'data' => $job->getData(),
                 'stats' => $this->client->statsJob($job));
         } catch (Exception $ex) {
