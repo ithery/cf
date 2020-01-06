@@ -98,7 +98,7 @@ class c {
         return function ($value, $index = 0, $collection = []) use ($path, $propertyAccess) {
             $path = \implode('.', (array) $path);
             if (\is_array($value)) {
-
+                
                 if (false !== \strpos($path, '.')) {
                     $paths = \explode('.', $path);
                     foreach ($paths as $path) {
@@ -107,8 +107,8 @@ class c {
                     }
                     return $value;
                 }
-
-                if (\is_string($path) && $path[0] !== '[' && $path[strlen($path) - 1] !== ']') {
+                
+                if (\is_string($path) && $path[0] !== '[' && $path[strlen($path)-1] !== ']') {
                     $path = "[$path]";
                 }
             }
@@ -329,6 +329,8 @@ class c {
         return $value === $other;
     }
 
+    
+    
     /**
      * Create a collection from the given value.
      *
@@ -338,19 +340,6 @@ class c {
     public static function collect($value = null) {
         return CBase::collect($value);
     }
-
-    /**
-     * Call the given Closure with the given value then return the value.
-     *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @return mixed
-     * @see CBase::tap
-     */
-    public static function tap($value, $callback = null) {
-        return CBase::tap($value, $callback);
-    }
-
 }
 
 // End c
