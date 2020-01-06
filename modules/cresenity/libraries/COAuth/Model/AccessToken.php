@@ -13,7 +13,7 @@ class COAuth_Model_AccessToken extends COAuth_Model {
      *
      * @var string
      */
-    protected $table = 'oauth_access_tokens';
+    protected $table = 'oauth_access_token';
 
     /**
      * The "type" of the primary key ID.

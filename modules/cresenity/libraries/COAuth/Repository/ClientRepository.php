@@ -186,7 +186,7 @@ class COAuth_Repository_ClientRepository {
      * @return void
      */
     public function delete(COAuth_Model_Client $client) {
-        $client->tokens()->update(['revoked' => true]);
+        $client->accessToken()->update(['revoked' => true]);
         $client->forceFill(['revoked' => true])->save();
     }
 
