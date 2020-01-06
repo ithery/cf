@@ -13,8 +13,8 @@ use Pheanstalk\Response\ArrayResponse;
  *
  * @see UseCommand
  */
-class PutCommand extends AbstractCommand implements ResponseParserInterface {
-
+class PutCommand extends AbstractCommand implements ResponseParserInterface
+{
     private $data;
     private $priority;
     private $delay;
@@ -28,53 +28,66 @@ class PutCommand extends AbstractCommand implements ResponseParserInterface {
      * @param int    $delay    Seconds to wait before job becomes ready
      * @param int    $ttr      Time To Run: seconds a job can be reserved for
      */
-    public function __construct($data, $priority, $delay, $ttr) {
+    public function __construct(string $data, int $priority, int $delay, int $ttr)
+    {
         $this->data = $data;
         $this->priority = $priority;
         $this->delay = $delay;
         $this->ttr = $ttr;
     }
 
-    public function getCommandLine() {
+    public function getCommandLine(): string
+    {
         return sprintf(
-                'put %u %u %u %u', $this->priority, $this->delay, $this->ttr, $this->getDataLength()
+            'put %u %u %u %u',
+            $this->priority,
+            $this->delay,
+            $this->ttr,
+            $this->getDataLength()
         );
     }
 
-    public function hasData() {
+    public function hasData(): bool
+    {
         return true;
     }
 
-    public function getData() {
+    public function getData(): string
+    {
         return $this->data;
     }
 
-    public function getDataLength() {
+    public function getDataLength(): int
+    {
         return mb_strlen($this->data, '8bit');
     }
 
-    public function parseResponse($responseLine, $responseData) {
+    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
+    {
         if (preg_match('#^INSERTED (\d+)$#', $responseLine, $matches)) {
             return $this->createResponse('INSERTED', [
-                        'id' => (int) $matches[1],
+                'id' => (int) $matches[1],
             ]);
         } elseif (preg_match('#^BURIED (\d)+$#', $responseLine, $matches)) {
             throw new Exception(sprintf(
-                    '%s: server ran out of memory trying to grow the priority queue data structure.', $responseLine
+                '%s: server ran out of memory trying to grow the priority queue data structure.',
+                $responseLine
             ));
         } elseif (preg_match('#^JOB_TOO_BIG$#', $responseLine)) {
             throw new Exception(sprintf(
-                    '%s: job data exceeds server-enforced limit', $responseLine
+                '%s: job data exceeds server-enforced limit',
+                $responseLine
             ));
         } elseif (preg_match('#^EXPECTED_CRLF#', $responseLine)) {
             throw new Exception(sprintf(
-                    '%s: CRLF expected', $responseLine
+                '%s: CRLF expected',
+                $responseLine
             ));
         } else {
             throw new Exception(sprintf(
-                    'Unhandled response: %s', $responseLine
+                'Unhandled response: %s',
+                $responseLine
             ));
         }
     }
-
 }

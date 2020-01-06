@@ -11,8 +11,8 @@ namespace Pheanstalk\Contract;
  * @package Pheanstalk
  * @license http://www.opensource.org/licenses/mit-license.php
  */
-interface SocketInterface {
-
+interface SocketInterface
+{
     /**
      * Writes data to the socket.
      *
@@ -20,14 +20,14 @@ interface SocketInterface {
      *
      * @return void
      */
-    public function write($data);
+    public function write(string $data): void;
 
     /**
      * Reads up to $length bytes from the socket.
      *
      * @return string
      */
-    public function read($length);
+    public function read(int $length): string;
 
     /**
      * Reads up to the next new-line.
@@ -35,10 +35,10 @@ interface SocketInterface {
      *
      * @param int
      */
-    public function getLine();
+    public function getLine(): string;
 
     /**
      * Disconnect the socket; subsequent usage of the socket will fail.
      */
-    public function disconnect();
+    public function disconnect(): void;
 }

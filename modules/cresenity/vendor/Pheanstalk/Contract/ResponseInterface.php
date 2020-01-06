@@ -9,14 +9,15 @@ namespace Pheanstalk\Contract;
  * @package Pheanstalk
  * @license http://www.opensource.org/licenses/mit-license.php
  */
-interface ResponseInterface extends \ArrayAccess, \Traversable {
-
+interface ResponseInterface extends \ArrayAccess, \Traversable
+{
     // global error responses
     const RESPONSE_OUT_OF_MEMORY = 'OUT_OF_MEMORY';
     const RESPONSE_INTERNAL_ERROR = 'INTERNAL_ERROR';
     const RESPONSE_DRAINING = 'DRAINING';
     const RESPONSE_BAD_FORMAT = 'BAD_FORMAT';
     const RESPONSE_UNKNOWN_COMMAND = 'UNKNOWN_COMMAND';
+
     // command responses
     const RESPONSE_INSERTED = 'INSERTED';
     const RESPONSE_BURIED = 'BURIED';
@@ -41,5 +42,5 @@ interface ResponseInterface extends \ArrayAccess, \Traversable {
      * The name of the response.
      * @return string
      */
-    public function getResponseName();
+    public function getResponseName(): string;
 }

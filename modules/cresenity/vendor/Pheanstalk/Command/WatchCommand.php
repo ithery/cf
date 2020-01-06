@@ -9,16 +9,17 @@ use Pheanstalk\Response\ArrayResponse;
  * The 'watch' command.
  * Adds a tube to the watchlist to reserve jobs from.
  */
-class WatchCommand extends TubeCommand implements ResponseParserInterface {
-
-    public function getCommandLine() {
-        return 'watch ' . $this->tube;
+class WatchCommand extends TubeCommand implements ResponseParserInterface
+{
+    public function getCommandLine(): string
+    {
+        return 'watch '.$this->tube;
     }
 
-    public function parseResponse($responseLine, $responseData) {
+    public function parseResponse(string $responseLine, ?string $responseData): ArrayResponse
+    {
         return $this->createResponse('WATCHING', [
-                    'count' => preg_replace('#^WATCHING (.+)$#', '$1', $responseLine),
+            'count' => preg_replace('#^WATCHING (.+)$#', '$1', $responseLine),
         ]);
     }
-
 }

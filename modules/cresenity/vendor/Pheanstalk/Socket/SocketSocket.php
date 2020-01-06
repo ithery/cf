@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Pheanstalk\Socket;
 
 use Pheanstalk\Contract\SocketInterface;
@@ -9,13 +10,15 @@ use Pheanstalk\Exception\SocketException;
 /**
  * A Socket implementation using the Sockets extension
  */
-class SocketSocket implements SocketInterface {
-
+class SocketSocket implements SocketInterface
+{
     /** @var resource */
     private $socket;
 
     public function __construct(
-    $host, $port, $connectTimeout
+        string $host,
+        int $port,
+        int $connectTimeout
     ) {
         if (!extension_loaded('sockets')) {
             throw new \Exception('Sockets extension not found');
@@ -58,7 +61,8 @@ class SocketSocket implements SocketInterface {
      *
      * @return void
      */
-    public function write($data) {
+    public function write(string $data): void
+    {
         $this->checkClosed();
         while (!empty($data)) {
             $written = socket_write($this->socket, $data);
@@ -69,12 +73,14 @@ class SocketSocket implements SocketInterface {
         }
     }
 
-    private function throwException() {
+    private function throwException()
+    {
         $error = socket_last_error($this->socket);
         throw new SocketException(socket_strerror($error), $error);
     }
 
-    private function checkClosed() {
+    private function checkClosed()
+    {
         if (!isset($this->socket)) {
             throw new SocketException('The connection was closed');
         }
@@ -85,7 +91,8 @@ class SocketSocket implements SocketInterface {
      *
      * @return string
      */
-    public function read($length) {
+    public function read(int $length): string
+    {
         $this->checkClosed();
 
         $buffer = '';
@@ -100,7 +107,8 @@ class SocketSocket implements SocketInterface {
         return $buffer;
     }
 
-    public function getLine() {
+    public function getLine(): string
+    {
         $this->checkClosed();
 
         $buffer = '';
@@ -121,10 +129,10 @@ class SocketSocket implements SocketInterface {
     /**
      * Disconnect the socket; subsequent usage of the socket will fail.
      */
-    public function disconnect() {
+    public function disconnect(): void
+    {
         $this->checkClosed();
         socket_close($this->socket);
         unset($this->socket);
     }
-
 }
