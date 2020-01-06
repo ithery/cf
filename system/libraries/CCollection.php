@@ -1521,9 +1521,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            } elseif ($value instanceof CInterface_Jsonable) {
+            } elseif ($value instanceof Jsonable) {
                 return json_decode($value->toJson(), true);
-            } elseif ($value instanceof CInterface_Arrayable) {
+            } elseif ($value instanceof Arrayable) {
                 return $value->toArray();
             } else {
                 return $value;
