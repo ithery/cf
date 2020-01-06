@@ -43,7 +43,7 @@ class CElement_Component_Blockly extends CElement_Component {
     }
     
     public function setFunctionWithReturn($funcName,$arguments=array()) {
-        $this->isFunctionWithReturn=true;
+        $this->isFunctionWIthReturn=true;
         $this->functionName = $funcName;
         $this->functionArgs = $arguments;
     }
