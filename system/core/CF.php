@@ -2126,7 +2126,7 @@ final class CF {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        return CBase::tap($value, $callback);
+        return c::tap($value, $callback);
     }
 
     /**
@@ -2136,7 +2136,7 @@ final class CF {
      * @return string
      */
     public static function class_basename($class) {
-        return CBase::classBasename($class);
+        return c::classBasename($class);
     }
 
     /**
@@ -2279,7 +2279,7 @@ final class CF {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return CBase::collect($value);
+        return c::collect($value);
     }
 
     /**
