@@ -226,7 +226,6 @@ class CResources_Conversion {
     }
 
     public function getConversionFile($file) {
-        
         $fileName = pathinfo($file, PATHINFO_FILENAME);
         $extension = $this->getResultExtension();
         if (!$extension) {
