@@ -115,12 +115,4 @@ class CServer {
         return $isDisabled;
     }
 
-    /**
-     * 
-     * @return \CServer_Service_Beanstalkd
-     */
-    public static function createBeanstalkd($options=[]) {
-        return new CServer_Service_Beanstalkd($options);
-    }
-
 }

@@ -25,10 +25,6 @@ final class CQueue {
         return self::$dispatcher;
     }
 
-    /**
-     * 
-     * @return CQueue_Manager
-     */
     public static function queuer() {
         return CF::tap(new CQueue_Manager(), function ($manager) {
                     CQueue::registerConnectors($manager);
