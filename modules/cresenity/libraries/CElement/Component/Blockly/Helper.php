@@ -16,7 +16,7 @@ class CElement_Component_Blockly_Helper {
         $closeXml = '</xml>';
         $openVariables = '<variables>';
         $closeVariables = '</variables>';
-        $openBlock = '<block type="procedures_defreturn" x="' . $x . '" y="' . $y . '" deletable="false">';
+        $openBlock = '<block type="procedures_defreturn" x="' . $x . '" y="' . $y . '">';
         $closeBlock = '</block>';
         $openMutation = '<mutation>';
         $openMutation = '</mutation>';
