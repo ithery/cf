@@ -17,7 +17,21 @@ var CBlockly = function (options) {
 
     this.save = function (event) {
         var code = this.getPhp();
-        alert(code);
+        var saveUrl = this.settings.saveUrl;
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('POST', saveUrl);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function () {
+            if (xhr.status === 200 && xhr.responseText) {
+                alert(xhr.responseText);
+            } else if (xhr.status !== 200) {
+                alert('Request failed.  Returned status of ' + xhr.status);
+            }
+        };
+        xhr.send(encodeURI('code=' + code));
+
     }
 
 
@@ -97,17 +111,17 @@ var CBlockly = function (options) {
         if (typeof this.settings.variables !== 'undefined') {
             this.settings.variables.forEach((item) => this.createVariable(item));
         }
-        
+
         if (typeof this.settings.defaultXml !== 'undefined') {
             var xml = Blockly.Xml.textToDom(this.settings.defaultXml);
             Blockly.Xml.domToWorkspace(xml, this.workspace);
         }
-        
-       
+
+
     };
 
 
 
     this.init();
-    window.bworkspace=this.workspace;
+    window.bworkspace = this.workspace;
 }
