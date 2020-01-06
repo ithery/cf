@@ -120,10 +120,10 @@ trait CDatabase_Trait_Builder {
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return CPagination_LengthAwarePaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options) {
-        return CContainer::getInstance()->makeWith(Illuminate\Pagination\LengthAwarePaginator::class, compact(
+        return CContainer::getInstance()->makeWith(CPagination_LengthAwarePaginator::class, compact(
                                 'items', 'total', 'perPage', 'currentPage', 'options'
         ));
     }

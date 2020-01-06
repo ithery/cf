@@ -55,7 +55,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      * @return static
      */
     public static function wrap($value) {
-        return $value instanceof self ? new static($value) : new static(Arr::wrap($value));
+        return $value instanceof self ? new static($value) : new static(carr::wrap($value));
     }
 
     /**
@@ -1643,9 +1643,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
             return $items;
         } elseif ($items instanceof self) {
             return $items->all();
-        } elseif ($items instanceof Arrayable) {
+        } elseif ($items instanceof CInterface_Arrayable) {
             return $items->toArray();
-        } elseif ($items instanceof Jsonable) {
+        } elseif ($items instanceof CInterface_Jsonable) {
             return json_decode($items->toJson(), true);
         } elseif ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
