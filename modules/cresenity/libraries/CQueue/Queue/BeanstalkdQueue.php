@@ -75,6 +75,7 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      * @return mixed
      */
     public function push($job, $data = '', $queue = null) {
+
         return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
     }
 
@@ -87,6 +88,12 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []) {
+        $queue = $this->getQueue($queue);
+        if ($queue == 'beanstalkdJob') {
+            $e = new \Exception;
+            CDaemon::log($e->getTraceAsString());
+        }
+
         return $this->pheanstalk->useTube($this->getQueue($queue))->put(
                         $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
         );
@@ -116,9 +123,9 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      */
     public function pop($queue = null) {
         $queue = $this->getQueue($queue);
-        
+
         $job = $this->pheanstalk->watchOnly($queue)->reserveWithTimeout($this->blockFor);
-        
+
         if ($job instanceof PheanstalkJob) {
             return new CQueue_Job_BeanstalkdJob(
                     $this->container, $this->pheanstalk, $job, $this->connectionName, $queue
