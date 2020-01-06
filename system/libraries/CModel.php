@@ -7,7 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 25, 2017, 8:42:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CModel implements ArrayAccess, CInterface_Jsonable {
+
+abstract class CModel implements ArrayAccess {
 
     use CModel_Trait_GuardsAttributes,
         CModel_Trait_Attributes,
