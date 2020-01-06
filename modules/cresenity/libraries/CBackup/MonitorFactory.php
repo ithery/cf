@@ -16,7 +16,7 @@ class CBackup_MonitorFactory {
         $monitorConfiguration = CF::config('backup.monitor_backups');
         return c::collect($monitorConfiguration)->flatMap(function (array $monitorProperties) {
                     return self::createForSingleMonitor($monitorProperties);
-                })->sortBy(function (CBackup_Monitor $backupDestinationStatus) {
+                })->sortBy(function (BackupDestinationStatus $backupDestinationStatus) {
                     return $backupDestinationStatus->backupDestination()->backupName() . '-' .
                             $backupDestinationStatus->backupDestination()->diskName();
                 });
@@ -24,7 +24,7 @@ class CBackup_MonitorFactory {
 
     public static function createForSingleMonitor(array $monitorConfig) {
         return c::collect($monitorConfig['disks'])->map(function ($diskName) use ($monitorConfig) {
-                    $backupDestination = CBackup_BackupDestination::create($diskName, $monitorConfig['name']);
+                    $backupDestination = BackupDestination::create($diskName, $monitorConfig['name']);
                     return new CBackup_Monitor($backupDestination, static::buildHealthChecks($monitorConfig));
                 });
     }

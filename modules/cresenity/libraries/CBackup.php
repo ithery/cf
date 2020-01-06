@@ -32,7 +32,7 @@ class CBackup {
     public static function getMonitorStatusData() {
         $backupDestinationStatuses = static::getMonitorCollection();
         $rows = $backupDestinationStatuses->map(function (CBackup_Monitor $backupDestinationStatus) {
-            return static::convertToRow($backupDestinationStatus);
+            return $this->convertToRow($backupDestinationStatus);
         });
         return $rows;
     }
@@ -62,7 +62,7 @@ class CBackup {
             'isReachable' => CBackup_Helper::formatEmoji($destination->isReachable()),
             'isHealthy' => CBackup_Helper::formatEmoji($backupDestinationStatus->isHealthy()),
             'amount' => $destination->backups()->count(),
-            'newest' => static::getFormattedBackupDate($destination->newestBackup()),
+            'newest' => $this->getFormattedBackupDate($destination->newestBackup()),
             'usedStorage' => CBackup_Helper::formatHumanReadableSize($destination->usedStorage()),
         ];
         if (!$destination->isReachable()) {

@@ -1055,7 +1055,7 @@ class carr {
         return $func($collection, c::baseIteratee($iteratee), $accumulator, null === $accumulator);
     }
 
-    public static function filter($array, $predicate = null) {
+    public static function filter( $array, $predicate = null) {
         $iteratee = c::baseIteratee($predicate);
         //$keys = array_keys($array);
         $result = \array_filter(
@@ -1063,8 +1063,9 @@ class carr {
             return $iteratee($value, $key, $array);
         }, \ARRAY_FILTER_USE_BOTH
         );
-
+        
         return $result;
+        
     }
 
     /**
@@ -1321,23 +1322,6 @@ class carr {
             }
         }
         return $collection;
-    }
-
-    /**
-     * Push an item onto the beginning of an array.
-     *
-     * @param  array  $array
-     * @param  mixed  $value
-     * @param  mixed  $key
-     * @return array
-     */
-    public static function prepend($array, $value, $key = null) {
-        if (is_null($key)) {
-            array_unshift($array, $value);
-        } else {
-            $array = [$key => $value] + $array;
-        }
-        return $array;
     }
 
 }
