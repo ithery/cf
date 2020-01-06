@@ -64,7 +64,7 @@ trait CModel_Resource_ResourceTrait {
     public function getTypeFromExtension() {
         $imageGenerator = $this->getImageGenerators()
                         ->map(function ( $className) {
-                            return new $className();
+                            return app($className);
                         })
                 ->first->canHandleExtension(strtolower($this->extension));
         return $imageGenerator ? $imageGenerator->getType() : static::TYPE_OTHER;
@@ -88,7 +88,6 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function getDiskDriverName() {
-        
         if (strlen($this->disk) == 0) {
             return 'local';
         }
