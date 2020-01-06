@@ -17,8 +17,8 @@ use Symfony\Component\Translation\Exception\LogicException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface {
-
+class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
+{
     private $messages = [];
     private $metadata = [];
     private $resources = [];
@@ -30,7 +30,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * @param string $locale   The locale
      * @param array  $messages An array of messages classified by domain
      */
-    public function __construct($locale, $messages = []) {
+    public function __construct(string $locale, array $messages = [])
+    {
         $this->locale = $locale;
         $this->messages = $messages;
     }
@@ -38,14 +39,16 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function getLocale() {
+    public function getLocale()
+    {
         return $this->locale;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDomains() {
+    public function getDomains()
+    {
         $domains = [];
         $suffixLength = \strlen(self::INTL_DOMAIN_SUFFIX);
 
@@ -62,9 +65,10 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function all($domain = null) {
+    public function all(string $domain = null)
+    {
         if (null !== $domain) {
-            return (isset($this->messages[$domain . self::INTL_DOMAIN_SUFFIX]) ? $this->messages[$domain . self::INTL_DOMAIN_SUFFIX] : []) + (isset($this->messages[$domain]) ? $this->messages[$domain] : []);
+            return ($this->messages[$domain.self::INTL_DOMAIN_SUFFIX] ?? []) + ($this->messages[$domain] ?? []);
         }
 
         $allMessages = [];
@@ -73,9 +77,9 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         foreach ($this->messages as $domain => $messages) {
             if (\strlen($domain) > $suffixLength && false !== $i = strpos($domain, self::INTL_DOMAIN_SUFFIX, -$suffixLength)) {
                 $domain = substr($domain, 0, $i);
-                $allMessages[$domain] = $messages + (isset($allMessages[$domain]) ? $allMessages[$domain] : []);
+                $allMessages[$domain] = $messages + ($allMessages[$domain] ?? []);
             } else {
-                $allMessages[$domain] = (isset($allMessages[$domain]) ? $allMessages[$domain] : []) + $messages;
+                $allMessages[$domain] = ($allMessages[$domain] ?? []) + $messages;
             }
         }
 
@@ -85,15 +89,17 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function set($id, $translation, $domain = 'messages') {
+    public function set(string $id, string $translation, string $domain = 'messages')
+    {
         $this->add([$id => $translation], $domain);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function has($id, $domain = 'messages') {
-        if (isset($this->messages[$domain][$id]) || isset($this->messages[$domain . self::INTL_DOMAIN_SUFFIX][$id])) {
+    public function has(string $id, string $domain = 'messages')
+    {
+        if (isset($this->messages[$domain][$id]) || isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id])) {
             return true;
         }
 
@@ -107,16 +113,18 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function defines($id, $domain = 'messages') {
-        return isset($this->messages[$domain][$id]) || isset($this->messages[$domain . self::INTL_DOMAIN_SUFFIX][$id]);
+    public function defines(string $id, string $domain = 'messages')
+    {
+        return isset($this->messages[$domain][$id]) || isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($id, $domain = 'messages') {
-        if (isset($this->messages[$domain . self::INTL_DOMAIN_SUFFIX][$id])) {
-            return $this->messages[$domain . self::INTL_DOMAIN_SUFFIX][$id];
+    public function get(string $id, string $domain = 'messages')
+    {
+        if (isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id])) {
+            return $this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id];
         }
 
         if (isset($this->messages[$domain][$id])) {
@@ -133,8 +141,9 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function replace(array $messages, $domain = 'messages') {
-        unset($this->messages[$domain], $this->messages[$domain . self::INTL_DOMAIN_SUFFIX]);
+    public function replace(array $messages, string $domain = 'messages')
+    {
+        unset($this->messages[$domain], $this->messages[$domain.self::INTL_DOMAIN_SUFFIX]);
 
         $this->add($messages, $domain);
     }
@@ -142,7 +151,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function add(array $messages, $domain = 'messages') {
+    public function add(array $messages, string $domain = 'messages')
+    {
         if (!isset($this->messages[$domain])) {
             $this->messages[$domain] = $messages;
         } else {
@@ -155,14 +165,15 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function addCatalogue(MessageCatalogueInterface $catalogue) {
+    public function addCatalogue(MessageCatalogueInterface $catalogue)
+    {
         if ($catalogue->getLocale() !== $this->locale) {
             throw new LogicException(sprintf('Cannot add a catalogue for locale "%s" as the current locale for this catalogue is "%s"', $catalogue->getLocale(), $this->locale));
         }
 
         foreach ($catalogue->all() as $domain => $messages) {
-            if ($intlMessages = $catalogue->all($domain . self::INTL_DOMAIN_SUFFIX)) {
-                $this->add($intlMessages, $domain . self::INTL_DOMAIN_SUFFIX);
+            if ($intlMessages = $catalogue->all($domain.self::INTL_DOMAIN_SUFFIX)) {
+                $this->add($intlMessages, $domain.self::INTL_DOMAIN_SUFFIX);
                 $messages = array_diff_key($messages, $intlMessages);
             }
             $this->add($messages, $domain);
@@ -181,7 +192,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function addFallbackCatalogue(MessageCatalogueInterface $catalogue) {
+    public function addFallbackCatalogue(MessageCatalogueInterface $catalogue)
+    {
         // detect circular references
         $c = $catalogue;
         while ($c = $c->getFallbackCatalogue()) {
@@ -212,28 +224,32 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function getFallbackCatalogue() {
+    public function getFallbackCatalogue()
+    {
         return $this->fallbackCatalogue;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResources() {
+    public function getResources()
+    {
         return array_values($this->resources);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addResource(ResourceInterface $resource) {
+    public function addResource(ResourceInterface $resource)
+    {
         $this->resources[$resource->__toString()] = $resource;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($key = '', $domain = 'messages') {
+    public function getMetadata(string $key = '', string $domain = 'messages')
+    {
         if ('' == $domain) {
             return $this->metadata;
         }
@@ -254,14 +270,16 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function setMetadata($key, $value, $domain = 'messages') {
+    public function setMetadata(string $key, $value, string $domain = 'messages')
+    {
         $this->metadata[$domain][$key] = $value;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteMetadata($key = '', $domain = 'messages') {
+    public function deleteMetadata(string $key = '', string $domain = 'messages')
+    {
         if ('' == $domain) {
             $this->metadata = [];
         } elseif ('' == $key) {
@@ -276,12 +294,12 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      *
      * @param array $values Values to add
      */
-    private function addMetadata(array $values) {
+    private function addMetadata(array $values)
+    {
         foreach ($values as $domain => $keys) {
             foreach ($keys as $key => $value) {
                 $this->setMetadata($key, $value, $domain);
             }
         }
     }
-
 }

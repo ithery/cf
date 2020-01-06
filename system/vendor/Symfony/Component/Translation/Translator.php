@@ -86,7 +86,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct( $locale, MessageFormatterInterface $formatter = null,  $cacheDir = null,  $debug = false, array $cacheVary = [])
+    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [])
     {
         $this->setLocale($locale);
 
@@ -190,7 +190,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * {@inheritdoc}
      */
-    public function trans( $id, array $parameters = [],  $domain = null,  $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
     {
         if (null === $id || '' === $id) {
             return '';
