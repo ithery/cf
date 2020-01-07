@@ -51,7 +51,7 @@ class cdbg {
                 'word-wrap: break-word;' .
                 'color: #333;' .
                 'font-family: Menlo,Monaco,Consolas,\'Courier New\',monospace;">';
-        $html .= self::var_dump_plain($var);
+        $html .= self::varDumpPlain($var);
         $html .= '</pre>';
 
 //        try {
@@ -107,7 +107,7 @@ class cdbg {
         self::$debug_vars[$key] = $var;
     }
 
-    public static function var_dump_plain($var) {
+    public static function varDumpPlain($var) {
         $html = '';
 
         if (is_bool($var)) {
@@ -150,7 +150,7 @@ class cdbg {
 
                     $html .= ' => ';
 
-                    $value = explode('<br />', self::var_dump_plain($value));
+                    $value = explode('<br />', self::varDumpPlain($value));
 
                     foreach ($value as $line => $val) {
                         if ($line != 0) {
@@ -234,7 +234,7 @@ class cdbg {
 
                 $html .= ' => ';
 
-                $value = explode('<br />', self::var_dump_plain($value));
+                $value = explode('<br />', self::varDumpPlain($value));
 
                 foreach ($value as $line => $val) {
                     if ($line != 0) {
