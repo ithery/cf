@@ -68,7 +68,7 @@ class CTracker_Bootstrap {
 
     protected function registerSqlQueryLogWatcher() {
         if ($this->config()->isLogSqlQuery()) {
-            $db = CDatabase::instance();
+            $db = CDatabase::instance($this->config()->get('database'));
 
             $db->listenOnQueryExecuted(function ($query) use ($db) {
 

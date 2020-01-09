@@ -23,11 +23,11 @@ interface CResources_UrlGeneratorInterface {
     public function setResource(CApp_Model_Interface_ResourceInterface $media);
 
     /**
-     * @param \Spatie\MediaLibrary\Conversion\Conversion $conversion
+     * @param CResources_Conversion $conversion
      *
      * @return \CResources_UrlGeneratorInterface
      */
-    public function setConversion(Conversion $conversion);
+    public function setConversion(CResources_Conversion $conversion);
 
     /**
      * Set the path generator class.

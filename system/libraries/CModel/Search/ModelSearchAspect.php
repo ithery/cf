@@ -17,6 +17,9 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
 
     /** @var array */
     protected $attributes = [];
+    
+    
+    protected $explodeWord=false;
 
     public static function forModel(/* string $model, ...$attributes */) {
         $args = func_get_args();
@@ -92,7 +95,13 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
 
     protected function addSearchConditions(CModel_Query $query, $term) {
         $attributes = $this->attributes;
-        $searchTerms = explode(' ', $term);
+        $searchTerms=$term;
+        if($this->explodeWord) {
+            $searchTerms = explode(' ', $term);
+        } 
+        if(!is_array($searchTerms)) {
+            $searchTerms = array($searchTerms);
+        }
         $query->where(function (CModel_Query $query) use ($attributes, $term, $searchTerms) {
             foreach (carr::wrap($attributes) as $attribute) {
                 foreach ($searchTerms as $searchTerm) {

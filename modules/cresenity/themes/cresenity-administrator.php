@@ -21,6 +21,7 @@ return array(
         "glyphicons",
         "perfect-scrollbar",
         "sidenav",
+        "cropper",
         "layout-helpers",
         "form",
         "fileupload",

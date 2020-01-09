@@ -34,8 +34,8 @@ class CResources_Conversion {
 
     public function __construct($name) {
         $this->name = $name;
-        $this->manipulations = (new Manipulations())
-                ->optimize(config('medialibrary.image_optimizers'))
+        $this->manipulations = (new CImage_Manipulations())
+                ->optimize(CF::config('resource.image_optimizers'))
                 ->format('jpg');
     }
 
@@ -84,7 +84,7 @@ class CResources_Conversion {
     }
 
     public function withoutManipulations() {
-        $this->manipulations = new Manipulations();
+        $this->manipulations = new CImage_Manipulations();
         return $this;
     }
 
@@ -104,7 +104,7 @@ class CResources_Conversion {
      * @return $this
      */
     public function setManipulations($manipulations) {
-        if ($manipulations instanceof Manipulations) {
+        if ($manipulations instanceof CImage_Manipulations) {
             $this->manipulations = $this->manipulations->mergeManipulations($manipulations);
         }
         if (is_callable($manipulations)) {
@@ -226,6 +226,7 @@ class CResources_Conversion {
     }
 
     public function getConversionFile($file) {
+        
         $fileName = pathinfo($file, PATHINFO_FILENAME);
         $extension = $this->getResultExtension();
         if (!$extension) {

@@ -1,0 +1,79 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+final class CComparator_Differ_Chunk {
+
+    /**
+     * @var int
+     */
+    private $start;
+
+    /**
+     * @var int
+     */
+    private $startRange;
+
+    /**
+     * @var int
+     */
+    private $end;
+
+    /**
+     * @var int
+     */
+    private $endRange;
+
+    /**
+     * @var Line[]
+     */
+    private $lines;
+
+    public function __construct($start = 0, $startRange = 1, $end = 0, $endRange = 1, array $lines = []) {
+        $this->start = $start;
+        $this->startRange = $startRange;
+        $this->end = $end;
+        $this->endRange = $endRange;
+        $this->lines = $lines;
+    }
+
+    public function getStart() {
+        return $this->start;
+    }
+
+    public function getStartRange() {
+        return $this->startRange;
+    }
+
+    public function getEnd() {
+        return $this->end;
+    }
+
+    public function getEndRange() {
+        return $this->endRange;
+    }
+
+    /**
+     * @return Line[]
+     */
+    public function getLines() {
+        return $this->lines;
+    }
+
+    /**
+     * @param Line[] $lines
+     */
+    public function setLines(array $lines) {
+        foreach ($lines as $line) {
+            if (!$line instanceof CComparator_Differ_Line) {
+                throw new InvalidArgumentException;
+            }
+        }
+        $this->lines = $lines;
+    }
+
+}

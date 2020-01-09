@@ -34,14 +34,18 @@ class Controller_Cresenity extends CController {
 
     public function ajax($method) {
         $app = CApp::instance();
-        $file = CApp::temp()->makePath("ajax", $method . ".tmp");
+        $filename = $method.'.tmp';
+        $file = CTemporary::getPath("ajax", $filename);
+       
         if (isset($_GET['profiler'])) {
             new Profiler();
         }
-        if (!file_exists($file)) {
+        $disk =CTemporary::disk();
+        if (!$disk->exists($file)) {
             throw new CException('failed to get temporary file :filename', array(':filename' => $file));
         }
-        $json = file_get_contents($file);
+        $json = $disk->get($file);
+        
         $ajaxMethod = CAjax::createMethod($json);
         $response = $ajaxMethod->executeEngine();
 
@@ -1040,4 +1044,86 @@ class Controller_Cresenity extends CController {
         echo $app->render();
     }
 
+    
+    
+    public function upload($method='temp') {
+        
+
+        $orgId = CApp_Base::orgId();
+        $db = CDatabase::instance();
+
+        $filesInput = $_FILES;
+        $fileId = '';
+        $fileIdPreview = '';
+        $result = array();
+        
+        foreach ($filesInput as $k => $fileData) {
+            //check for array
+            $isArray = is_array(carr::get($fileData, 'name'));
+            $transposedDataArray = array();
+            if (!isset($result[$k])) {
+                $result[$k] = array();
+            }
+            foreach ($fileData as $dataKey => $dataValue) {
+                $dataArray = $dataValue;
+                if (!$isArray) {
+                    $dataArray = array($dataValue);
+                }
+                $i = 0;
+                foreach ($dataArray as $value) {
+                    $i++;
+                    carr::set_path($transposedDataArray, $i . '.' . $dataKey, $value);
+                }
+            }
+            foreach ($transposedDataArray as $transposedData) {
+                $filename = carr::get($transposedData, 'name');
+                $filetype = carr::get($transposedData, 'type');
+                $filetmp = carr::get($transposedData, 'tmp_name');
+                $filesize = carr::get($transposedData, 'size');
+                $fileerror = carr::get($transposedData, 'error');
+
+                $errFileCode = 0;
+                $errFileMessage = '';
+                
+                switch ($fileerror) {
+                    case UPLOAD_ERR_OK:
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
+                        $errFileCode++;
+                        $errFileMessage = 'No file sent.';
+                    case UPLOAD_ERR_INI_SIZE:
+                    case UPLOAD_ERR_FORM_SIZE:
+                        $errFileMessage = 'Exceeded filesize limit.';
+                    default:
+                        $errFileMessage = 'Unknown errors.';
+                }
+
+                $extension = "." . pathinfo($filename, PATHINFO_EXTENSION);
+                if (strtolower($extension) == 'php') {
+                    die('fatal error');
+                }
+                $fileId = date('Ymd') . cutils::randmd5() . $extension;
+                $fullfilename = CTemporary::makePath('upload', $fileId);
+                $fullfilenameinf = CTemporary::makePath('upload', $fileId);
+                $url = CTemporary::getUrl('upload', $fileId);
+                if (!move_uploaded_file($filetmp, $fullfilename)) {
+                    $errFileCode++;
+                    $errFileMessage = 'Failed to move temporary file to new path';
+                }
+                $resultData['filename'] = $filename;
+                $resultData['size'] = $filesize;
+                $resultData['fileId'] = $fileId;
+                $resultData['status'] = $errFileCode == 0;
+                $resultData['message'] = $errFileCode == 0 ? 'Upload success' : $errFileMessage;
+                $resultData['url'] = $url;
+                $resultData['fullUrl'] = trim(curl::httpbase(),'/').$url;
+                $resultData['type'] = $filetype;
+                $resultPutContent = file_put_contents($fullfilenameinf, json_encode($resultData));
+                
+                $result[$k][] = $resultData;
+            }
+        }
+
+        echo json_encode($result);
+    }
 }

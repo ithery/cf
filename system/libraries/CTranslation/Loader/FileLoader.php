@@ -123,8 +123,9 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
             if ($this->files->exists($full = "{$pathToFind}/{$locale}/{$group}.php")) {
 
                 $array = $this->files->getRequire($full);
-
-                $result = array_merge($result, $array);
+                if(is_array($array)) {
+                    $result = array_merge($result, $array);
+                }
             }
         }
 

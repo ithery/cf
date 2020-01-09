@@ -18,7 +18,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             <span class="btn btn-file btn-primary">
                 <span class="fileupload-new"><?php echo clang::__('Select Image'); ?></span>
                 <span class="fileupload-change fileupload-exists"><?php echo clang::__('Change'); ?></span>
-                <input type="file" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" style="display:none;" />
+                <input type="file" accept="image/*" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" style="display:none;" />
             </span>
             <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload"><?php echo clang::__('Remove'); ?></a>
         <?php endif; ?>

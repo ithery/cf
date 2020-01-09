@@ -17,7 +17,6 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
 
         $table = unserialize(carr::get($data, 'table'));
-        //$db = CDatabase::instance($table->domain(),'ctable',$table->db_config);
         $domain = carr::get($data, 'domain');
         $ajaxDataDomain = carr::get($ajaxData, 'domain');
         if (strlen($ajaxDataDomain) > 0) {

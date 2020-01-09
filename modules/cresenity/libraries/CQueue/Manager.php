@@ -28,12 +28,21 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
     protected $connectors = [];
 
     /**
+     * The event dispatcher instance
+     *
+     * @var array
+     */
+    protected $dispatcher;    
+    /**
      * Create a new queue manager instance.
      *
      * @return void
      */
-    public function __construct() {
-        
+    public function __construct(CEvent_Dispatcher $dispatcher= null) {
+        if($dispatcher==null) {
+            $dispatcher=CEvent::dispatcher();
+        }
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -43,7 +52,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return void
      */
     public function before($callback) {
-        $this->app['events']->listen(Events\JobProcessing::class, $callback);
+        $this->dispatcher->listen(CQueue_Event_JobProcessing::class, $callback);
     }
 
     /**
@@ -53,7 +62,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return void
      */
     public function after($callback) {
-        $this->app['events']->listen(Events\JobProcessed::class, $callback);
+        $this->dispatcher->listen(CQueue_Event_JobProcessed::class, $callback);
     }
 
     /**
@@ -63,7 +72,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return void
      */
     public function exceptionOccurred($callback) {
-        $this->app['events']->listen(Events\JobExceptionOccurred::class, $callback);
+        $this->dispatcher->listen(CQueue_Event_JobExceptionOccurred::class, $callback);
     }
 
     /**
@@ -73,7 +82,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return void
      */
     public function looping($callback) {
-        $this->app['events']->listen(Events\Looping::class, $callback);
+        $this->dispatcher->listen(CQueue_Event_Looping::class, $callback);
     }
 
     /**
@@ -83,7 +92,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return void
      */
     public function failing($callback) {
-        $this->app['events']->listen(Events\JobFailed::class, $callback);
+        $this->dispatcher->listen(CQueue_Event_JobFailed::class, $callback);
     }
 
     /**
@@ -93,7 +102,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return void
      */
     public function stopping($callback) {
-        $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+        $this->dispatcher->listen(CQueue_Event_WorkerStopping::class, $callback);
     }
 
     /**
@@ -117,10 +126,12 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
         // If the connection has not been resolved yet we will resolve it now as all
         // of the connections are resolved when they are actually needed so we do
         // not make any unnecessary connection to the various queue end-points.
+       
         if (!isset($this->connections[$name])) {
             $this->connections[$name] = $this->resolve($name);
             $this->connections[$name]->setContainer(CContainer::getInstance());
         }
+        
         return $this->connections[$name];
     }
 
@@ -131,8 +142,12 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return CQueue_QueueInterface
      */
     protected function resolve($name) {
+            
+         
+        
         $config = $this->getConfig($name);
-        return $this->getConnector('database')
+        
+        return $this->getConnector($config['driver'])
                         ->connect($config)
                         ->setConnectionName($name);
     }
@@ -141,7 +156,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * Get the connector for a given driver.
      *
      * @param  string  $driver
-     * @return \Illuminate\Queue\Connectors\ConnectorInterface
+     * @return CQueue_AbstractConnector
      *
      * @throws \InvalidArgumentException
      */
@@ -181,10 +196,11 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return array
      */
     protected function getConfig($name) {
-        if (!is_null($name) && $name !== 'null') {
-            return CF::config("queue.connections.{$name}", []);
+        if (! is_null($name) && $name !== 'null') {
+            return CQueue::config("connections.{$name}");
         }
         return ['driver' => 'null'];
+       
     }
 
     /**
@@ -193,7 +209,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      * @return string
      */
     public function getDefaultDriver() {
-        return 'database';
+        return CQueue::config('default','database');
     }
 
     /**

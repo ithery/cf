@@ -22,6 +22,10 @@ class CStorage {
 
     protected static $instance;
 
+    /**
+     * 
+     * @return CStorage
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
@@ -66,7 +70,7 @@ class CStorage {
      * Get a filesystem instance.
      *
      * @param  string|null  $name
-     * @return CStorage_FilesystemInterface
+     * @return CStorage_Adapter
      */
     public function disk($name = null) {
         $name = $name ?: $this->getDefaultDriver();
@@ -74,9 +78,20 @@ class CStorage {
     }
 
     /**
+     * Get a filesystem instance.
+     *
+     * @param  string|null  $name
+     * @return CStorage_FilesystemInterface
+     */
+    public function temp($name = null) {
+        $name = $name ?: $this->getTempDriver();
+        return $this->disks[$name] = $this->get($name);
+    }
+
+    /**
      * Get a default cloud filesystem instance.
      *
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return CStorage_FilesystemInterface
      */
     public function cloud() {
         $name = $this->getDefaultCloudDriver();
@@ -87,7 +102,7 @@ class CStorage {
      * Attempt to get the disk from the local cache.
      *
      * @param  string  $name
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return CStorage_FilesystemInterface
      */
     protected function get($name) {
         return isset($this->disks[$name]) ? $this->disks[$name] : $this->resolve($name);
@@ -97,7 +112,7 @@ class CStorage {
      * Resolve the given disk.
      *
      * @param  string  $name
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return CStorage_FilesystemInterface
      *
      * @throws \InvalidArgumentException
      */
@@ -118,7 +133,7 @@ class CStorage {
      * Call a custom driver creator.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return CStorage_FilesystemInterface
      */
     protected function callCustomCreator(array $config) {
         $driver = $this->customCreators[$config['driver']]($this->app, $config);
@@ -132,7 +147,7 @@ class CStorage {
      * Create an instance of the local driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return CStorage_FilesystemInterface
      */
     public function createLocalDriver(array $config) {
         $permissions = isset($config['permissions']) ? $config['permissions'] : [];
@@ -176,6 +191,7 @@ class CStorage {
         $s3Config = $this->formatS3Config($config);
         $root = isset($s3Config['root']) ? $s3Config['root'] : null;
         $options = isset($config['options']) ? $config['options'] : [];
+
         return $this->adapt($this->createFlysystem(
                                 new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, $options), $config
         ));
@@ -192,6 +208,7 @@ class CStorage {
         if ($config['key'] && $config['secret']) {
             $config['credentials'] = carr::only($config, ['key', 'secret', 'token']);
         }
+
         return $config;
     }
 
@@ -203,6 +220,7 @@ class CStorage {
      * @return \League\Flysystem\FilesystemInterface
      */
     protected function createFlysystem(AdapterInterface $adapter, array $config) {
+
         $cache = carr::pull($config, 'cache');
         $config = carr::only($config, ['visibility', 'disable_asserts', 'url']);
         if ($cache) {
@@ -270,12 +288,21 @@ class CStorage {
     }
 
     /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getTempDriver() {
+        return CF::config('storage.temp');
+    }
+
+    /**
      * Get the default cloud driver name.
      *
      * @return string
      */
     public function getDefaultCloudDriver() {
-        return $this->app['config']['filesystems.cloud'];
+        return CF::config('storage.cloud');
     }
 
     /**

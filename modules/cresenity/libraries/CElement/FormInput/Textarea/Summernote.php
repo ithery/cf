@@ -89,19 +89,27 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                     ]
                 ";
                 break;
-	        case 'text-media':
+	    case 'text-media':
 		        $json = "
                     [
+                        ['fontstyle', ['style']],
                         ['style', ['bold', 'italic', 'underline', 'clear']],
                         ['font', ['strikethrough', 'superscript', 'subscript']],
-                        ['fontsize', ['fontsize']],
+                        ['fontsize', ['fontname', 'fontsize']],
                         ['color', ['color']],
                         ['para', ['ul', 'ol', 'paragraph']],
                         ['media', ['link', 'picture']],
                         ['height', ['height']]
                     ]
                 ";
-		        break;
+		break;
+            case 'text':
+                $json = "
+                    [
+                        ['style', ['bold', 'italic', 'underline']],                        
+                    ]
+                ";
+                break;
         }
         return $json;
     }

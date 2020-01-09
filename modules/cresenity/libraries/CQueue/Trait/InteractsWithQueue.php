@@ -12,7 +12,7 @@ trait CQueue_Trait_InteractsWithQueue {
     /**
      * The underlying queue job instance.
      *
-     * @var \Illuminate\Contracts\Queue\Job
+     * @var CQueue_AbstractJob
      */
     protected $job;
 
@@ -63,10 +63,10 @@ trait CQueue_Trait_InteractsWithQueue {
     /**
      * Set the base queue job instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @return $this
      */
-    public function setJob(JobContract $job) {
+    public function setJob(CQueue_AbstractJob $job) {
         $this->job = $job;
         return $this;
     }

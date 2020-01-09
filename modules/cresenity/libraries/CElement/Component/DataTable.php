@@ -65,6 +65,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $callbackOptions = null;
     public $searchPlaceholder = '';
     public $infoText = '';
+    protected $actionLocation = 'last';
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
@@ -81,7 +82,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->defaultPagingList["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
-        $this->db = CDatabase::instance($this->domain);
+        $this->db = CDatabase::instance(null,null,$this->domain);
         $this->dbConfig = $this->db->config();
         $this->display_length = "10";
         $this->paging_list = $this->defaultPagingList;
@@ -165,6 +166,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
         $this->dom = CManager::theme()->getData('table.dom');
+        $this->actionLocation = CManager::theme()->getData('table.actionLocation','last');
     }
 
     public static function factory($id = "") {
@@ -176,6 +178,28 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param string $actionLocation
+     * @return $this
+     * @throws Exception
+     */
+    public function setActionLocation($actionLocation) {
+        if (!in_array($actionLocation, array('first', 'last'))) {
+            throw new Exception('action location parameter must be first or last');
+        }
+        $this->actionLocation = $actionLocation;
+        return $this;
+    }
+ 
+    /**
+     * 
+     * @return string
+     */
+    public function getActionLocation() {
+        return $this->actionLocation;
+    }
+
     public function setScrollX($bool = true) {
         $this->scrollX = $bool;
         return $this;
@@ -183,7 +207,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setDomain($domain) {
         parent::setDomain($domain);
-        $this->setDatabase(CDatabase::instance($domain));
+        $this->setDatabase(CDatabase::instance(null,null,$domain));
         return $this;
     }
 
@@ -493,16 +517,18 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function requery() {
-       
+
         if (!$this->isElastic && !$this->isCallback) {
             if ($this->ajax == false) {
-                $db = $this->db;
-                $r = $db->query($this->query);
-                $this->data = $r->result(false);
+                if(strlen($this->query)>0) {
+                    $db = $this->db;
+                    $r = $db->query($this->query);
+                    $this->data = $r->result(false);
+                }
             } else {
-                $this->data=array();
+                $this->data = array();
             }
-        } 
+        }
 
         return $this;
     }
@@ -573,7 +599,7 @@ class CElement_Component_DataTable extends CElement_Component {
         //render body;
         $html->appendln($this->htmlChild($indent));
         $no = 0;
-        if (!$this->ajax) {
+        if (!$this->ajax && (is_array($this->data) || $this->data instanceof Traversable)) {
             foreach ($this->data as $row) {
                 if ($row instanceof CRenderable) {
                     $html->appendln($row->html());
@@ -600,6 +626,9 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln('<td scope="row" class="checkbox-cell align-center"><input type="checkbox" class="checkbox-' . $this->id . '" name="' . $this->id . '-check[]" id="' . $this->id . '-' . $key . '" value="' . $key . '"' . $checkbox_checked . '></td>')->br();
                 }
                 $jsparam = array();
+                if ($this->actionLocation == 'first') {
+                    $js.=$this->drawActionAndGetJs($html,$row,$key);
+                }
                 foreach ($this->columns as $col) {
                     $col_found = false;
                     $new_v = "";
@@ -697,44 +726,8 @@ class CElement_Component_DataTable extends CElement_Component {
                     $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
                     $col_found = true;
                 }
-
-                if ($this->haveRowAction()) {
-                    $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
-                    foreach ($row as $k => $v) {
-                        $jsparam[$k] = $v;
-                    }
-
-                    $jsparam["param1"] = $key;
-                    if ($this->getRowActionStyle() == "btn-dropdown") {
-                        $this->rowActionList->addClass("pull-right");
-                    }
-                    $this->rowActionList->regenerateId(true);
-                    $this->rowActionList->apply("setJsParam", $jsparam);
-                    $this->rowActionList->apply("setHandlerUrlParam", $jsparam);
-
-                    if (($this->filterActionCallbackFunc) != null) {
-                        $actions = $this->rowActionList->childs();
-
-                        foreach ($actions as &$action) {
-                            $visibility = CFunction::factory($this->filterActionCallbackFunc)
-                                    ->addArg($this)
-                                    ->addArg($col->getFieldname())
-                                    ->addArg($row)
-                                    ->addArg($action)
-                                    ->setRequire($this->requires)
-                                    ->execute();
-                            if ($visibility == false) {
-                                $action->addClass('d-none');
-                            }
-                            $action->setVisibility($visibility);
-                        }
-                    }
-
-
-                    $js .= $this->rowActionList->js();
-
-                    $html->appendln($this->rowActionList->html($html->getIndent()));
-                    $html->decIndent()->appendln('</td>')->br();
+                if ($this->actionLocation == 'last') {
+                    $js.=$this->drawActionAndGetJs($html,$row,$key);
                 }
 
 
@@ -746,6 +739,49 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $html->decIndent()->appendln('</tbody>')->br();
         return $html->text();
+    }
+
+    protected function drawActionAndGetJs(CStringBuilder $html,$row,$key) {
+        $js = '';
+        if ($this->haveRowAction()) {
+            $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
+            foreach ($row as $k => $v) {
+                $jsparam[$k] = $v;
+            }
+
+            $jsparam["param1"] = $key;
+            if ($this->getRowActionStyle() == "btn-dropdown") {
+                $this->rowActionList->addClass("pull-right");
+            }
+            $this->rowActionList->regenerateId(true);
+            $this->rowActionList->apply("setJsParam", $jsparam);
+            $this->rowActionList->apply("setHandlerUrlParam", $jsparam);
+
+            if (($this->filterActionCallbackFunc) != null) {
+                $actions = $this->rowActionList->childs();
+
+                foreach ($actions as &$action) {
+                    $visibility = CFunction::factory($this->filterActionCallbackFunc)
+                            ->addArg($this)
+                            ->addArg('action')
+                            ->addArg($row)
+                            ->addArg($action)
+                            ->setRequire($this->requires)
+                            ->execute();
+                    if ($visibility == false) {
+                        $action->addClass('d-none');
+                    }
+                    $action->setVisibility($visibility);
+                }
+            }
+
+
+            $js = $this->rowActionList->js();
+
+            $html->appendln($this->rowActionList->html($html->getIndent()));
+            $html->decIndent()->appendln('</td>')->br();
+        }
+        return $js;
     }
 
     protected function rawHtml($indent = 0) {
@@ -796,15 +832,26 @@ class CElement_Component_DataTable extends CElement_Component {
                     }
                     $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" ' . $attrWidth . '><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
                 }
+                if($this->getActionLocation()=='first') {
+                    if ($this->haveRowAction()) {
+                        $action_width = 31 * $this->rowActionCount() + 5;
+                        if ($this->getRowActionStyle() == "btn-dropdown") {
+                            $action_width = 70;
+                        }
+                        $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
+                    }
+                }
                 foreach ($this->columns as $col) {
                     $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
                 }
-                if ($this->haveRowAction()) {
-                    $action_width = 31 * $this->rowActionCount() + 5;
-                    if ($this->getRowActionStyle() == "btn-dropdown") {
-                        $action_width = 70;
+                if($this->getActionLocation()=='last') {
+                    if ($this->haveRowAction()) {
+                        $action_width = 31 * $this->rowActionCount() + 5;
+                        if ($this->getRowActionStyle() == "btn-dropdown") {
+                            $action_width = 70;
+                        }
+                        $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
                     }
-                    $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
                 }
                 $html->decIndent()->appendln("</tr>")->br();
             }

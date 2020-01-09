@@ -94,6 +94,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @var integer The interval in Seconds
      */
     protected $autoRestartInterval = 43200;
+    protected $isDaemonContinueOnFatalError = false;
 
     /**
      * Process ID
@@ -147,6 +148,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     protected function setupWorkers() {
         
+    }
+
+    public function isDaemonContinueOnFatalError() {
+        return $this->isDaemonContinueOnFatalError;
     }
 
     public function __construct($serviceName, $config) {
@@ -513,6 +518,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             self::$log_handle = $logFile_error = false;
         }
         if (self::$log_handle === false) {
+            if(strlen($logFile)>0&& file_exists($logFile)) { 
+                $rotator = CLogger_Rotator::createRotate($logFile);
+                
+                $rotator->run();
+            }
             if (strlen($logFile) > 0 && self::$log_handle = @fopen($logFile, 'a+')) {
                 if ($this->parent) {
                     fwrite(self::$log_handle, $header);
@@ -527,6 +537,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $message = $prefix . ' ' . str_replace("\n", "\n$prefix ", trim($message)) . "\n";
         if (self::$log_handle) {
             fwrite(self::$log_handle, $message);
+           
+          
         }
         if ($this->stdout) {
             echo $message;

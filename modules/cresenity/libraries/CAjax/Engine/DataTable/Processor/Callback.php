@@ -51,6 +51,7 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
             "js" => cbase64::encode($js),
         );
         $response = json_encode($data);
+       
         return $response;
     }
 

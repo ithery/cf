@@ -89,8 +89,12 @@ class CAjax_Method implements CInterface_Jsonable {
 
         //save this object to file.
         $ajaxMethod = date('Ymd') . cutils::randmd5();
-        $file = CApp::temp()->makePath("ajax", $ajaxMethod . ".tmp");
-        file_put_contents($file, $json);
+        $disk = CTemporary::disk();
+        $filename = $ajaxMethod . ".tmp";
+        
+        $file = CTemporary::getPath("ajax", $filename);
+        $disk->put($file, $json);
+        
         $base_url = curl::httpbase();
 
         return $base_url . "cresenity/ajax/" . $ajaxMethod;
@@ -141,6 +145,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public static function createEngine(CAjax_Method $ajaxMethod, $input = null) {
         $class = 'CAjax_Engine_' . $ajaxMethod->type;
+        
         if (!class_exists($class)) {
             throw new CAjax_Exception('class ajax engine :class not found', array(':class' => $class));
         }
@@ -154,6 +159,7 @@ class CAjax_Method implements CInterface_Jsonable {
      * @return type
      */
     public function executeEngine($input = null) {
+        
         $engine = self::createEngine($this, $input);
         return $engine->execute();
     }

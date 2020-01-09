@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since May 2, 2019, 2:35:07 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use League\Flysystem\FileNotFoundException;
+
 class CImage_Manipulations {
 
     const CROP_TOP_LEFT = 'crop-top-left';
@@ -52,7 +55,7 @@ class CImage_Manipulations {
     const POSITION_BOTTOM = 'bottom';
     const POSITION_BOTTOM_RIGHT = 'bottom-right';
 
-    /** @var \Spatie\Image\ManipulationSequence */
+    /** @var CImage_ManipulationSequence */
     protected $manipulationSequence;
 
     public function __construct(array $manipulations = []) {
@@ -60,7 +63,7 @@ class CImage_Manipulations {
             $manipulations = [$manipulations];
         }
         foreach ($manipulations as $manipulation) {
-            $this->manipulationSequence = new ManipulationSequence($manipulation);
+            $this->manipulationSequence = new CImage_ManipulationSequence($manipulation);
         }
     }
 
@@ -89,7 +92,7 @@ class CImage_Manipulations {
      */
     public function flip($orientation) {
         if (!$this->validateManipulation($orientation, 'flip')) {
-            throw InvalidManipulation::invalidParameter(
+            throw CImage_Exception_InvalidManipulationException::invalidParameter(
                     'flip', $orientation, $this->getValidManipulationOptions('flip')
             );
         }
@@ -107,7 +110,7 @@ class CImage_Manipulations {
      */
     public function crop($cropMethod, $width, $height) {
         if (!$this->validateManipulation($cropMethod, 'crop')) {
-            throw InvalidManipulation::invalidParameter(
+            throw CImage_Exception_InvalidManipulationException::invalidParameter(
                     'cropmethod', $cropMethod, $this->getValidManipulationOptions('crop')
             );
         }
@@ -142,10 +145,10 @@ class CImage_Manipulations {
      */
     public function manualCrop($width, $height, $x, $y) {
         if ($width < 0) {
-            throw InvalidManipulation::invalidWidth($width);
+            throw CImage_Exception_InvalidManipulationException::invalidWidth($width);
         }
         if ($height < 0) {
-            throw InvalidManipulation::invalidWidth($height);
+            throw CImage_Exception_InvalidManipulationException::invalidHeight($height);
         }
         return $this->addManipulation('manualCrop', "{$width},{$height},{$x},{$y}");
     }
@@ -159,7 +162,7 @@ class CImage_Manipulations {
      */
     public function width($width) {
         if ($width < 0) {
-            throw InvalidManipulation::invalidWidth($width);
+            throw CImage_Exception_InvalidManipulationException::invalidWidth($width);
         }
         return $this->addManipulation('width', $width);
     }
@@ -173,7 +176,7 @@ class CImage_Manipulations {
      */
     public function height($height) {
         if ($height < 0) {
-            throw InvalidManipulation::invalidHeight($height);
+            throw CImage_Exception_InvalidManipulationException::invalidHeight($height);
         }
         return $this->addManipulation('height', $height);
     }
@@ -189,7 +192,7 @@ class CImage_Manipulations {
      */
     public function fit($fitMethod, $width, $height) {
         if (!$this->validateManipulation($fitMethod, 'fit')) {
-            throw InvalidManipulation::invalidParameter(
+            throw CImage_Exception_InvalidManipulationException::invalidParameter(
                     'fit', $fitMethod, $this->getValidManipulationOptions('fit')
             );
         }
@@ -207,7 +210,7 @@ class CImage_Manipulations {
      */
     public function devicePixelRatio($ratio) {
         if ($ratio < 1 || $ratio > 8) {
-            throw InvalidManipulation::valueNotInRange('ratio', $ratio, 1, 8);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('ratio', $ratio, 1, 8);
         }
         return $this->addManipulation('devicePixelRatio', $ratio);
     }
@@ -221,7 +224,7 @@ class CImage_Manipulations {
      */
     public function brightness($brightness) {
         if ($brightness < -100 || $brightness > 100) {
-            throw InvalidManipulation::valueNotInRange('brightness', $brightness, -100, 100);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('brightness', $brightness, -100, 100);
         }
         return $this->addManipulation('brightness', $brightness);
     }
@@ -235,7 +238,7 @@ class CImage_Manipulations {
      */
     public function gamma($gamma) {
         if ($gamma < 0.01 || $gamma > 9.99) {
-            throw InvalidManipulation::valueNotInRange('gamma', $gamma, 0.01, 9.00);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('gamma', $gamma, 0.01, 9.00);
         }
         return $this->addManipulation('gamma', $gamma);
     }
@@ -249,7 +252,7 @@ class CImage_Manipulations {
      */
     public function contrast($contrast) {
         if ($contrast < -100 || $contrast > 100) {
-            throw InvalidManipulation::valueNotInRange('contrast', $contrast, -100, 100);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('contrast', $contrast, -100, 100);
         }
         return $this->addManipulation('contrast', $contrast);
     }
@@ -263,7 +266,7 @@ class CImage_Manipulations {
      */
     public function sharpen($sharpen) {
         if ($sharpen < 0 || $sharpen > 100) {
-            throw InvalidManipulation::valueNotInRange('sharpen', $sharpen, 0, 100);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('sharpen', $sharpen, 0, 100);
         }
         return $this->addManipulation('sharpen', $sharpen);
     }
@@ -277,7 +280,7 @@ class CImage_Manipulations {
      */
     public function blur($blur) {
         if ($blur < 0 || $blur > 100) {
-            throw InvalidManipulation::valueNotInRange('blur', $blur, 0, 100);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('blur', $blur, 0, 100);
         }
         return $this->addManipulation('blur', $blur);
     }
@@ -291,7 +294,7 @@ class CImage_Manipulations {
      */
     public function pixelate($pixelate) {
         if ($pixelate < 0 || $pixelate > 1000) {
-            throw InvalidManipulation::valueNotInRange('pixelate', $pixelate, 0, 1000);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('pixelate', $pixelate, 0, 1000);
         }
         return $this->addManipulation('pixelate', $pixelate);
     }
@@ -349,7 +352,7 @@ class CImage_Manipulations {
      */
     public function quality($quality) {
         if ($quality < 0 || $quality > 100) {
-            throw InvalidManipulation::valueNotInRange('quality', $quality, 0, 100);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('quality', $quality, 0, 100);
         }
         return $this->addManipulation('quality', $quality);
     }
@@ -363,7 +366,7 @@ class CImage_Manipulations {
      */
     public function format($format) {
         if (!$this->validateManipulation($format, 'format')) {
-            throw InvalidManipulation::invalidParameter(
+            throw CImage_Exception_InvalidManipulationException::invalidParameter(
                     'format', $format, $this->getValidManipulationOptions('format')
             );
         }
@@ -379,7 +382,7 @@ class CImage_Manipulations {
      */
     protected function filter($filterName) {
         if (!$this->validateManipulation($filterName, 'filter')) {
-            throw InvalidManipulation::invalidParameter(
+            throw CImage_Exception_InvalidManipulationException::invalidParameter(
                     'filter', $filterName, $this->getValidManipulationOptions('filter')
             );
         }
@@ -432,7 +435,7 @@ class CImage_Manipulations {
      */
     public function watermarkFit($fitMethod) {
         if (!$this->validateManipulation($fitMethod, 'fit')) {
-            throw InvalidManipulation::invalidParameter(
+            throw CImage_Exception_InvalidManipulationException::invalidParameter(
                     'watermarkFit', $fitMethod, $this->getValidManipulationOptions('fit')
             );
         }
@@ -464,7 +467,7 @@ class CImage_Manipulations {
      */
     public function watermarkPosition($position) {
         if (!$this->validateManipulation($position, 'position')) {
-            throw InvalidManipulation::invalidParameter(
+            throw CImage_Exception_InvalidManipulationException::invalidParameter(
                     'watermarkPosition', $position, $this->getValidManipulationOptions('position')
             );
         }
@@ -482,7 +485,7 @@ class CImage_Manipulations {
      */
     public function watermarkOpacity($opacity) {
         if ($opacity < 0 || $opacity > 100) {
-            throw InvalidManipulation::valueNotInRange('opacity', $opacity, 0, 100);
+            throw CImage_Exception_InvalidManipulationException::valueNotInRange('opacity', $opacity, 0, 100);
         }
         return $this->addManipulation('watermarkOpacity', $opacity);
     }

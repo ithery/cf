@@ -16,6 +16,23 @@ return array(
     "tmpl" => array(
         "js" => array("libs" . DS . "tmpl.min.js"),
     ),
+    "vue" => array(
+        "js" => array(
+            "libs" . DS . "vue.min.js",
+            "libs" . DS . "vue-loader.js",
+        ),
+    ),
+    "axios" => array(
+        "js" => array(
+            "libs" . DS . "axios.min.js",
+        ),
+    ),
+    
+    "underscore" => array(
+        "js" => array(
+            "libs" . DS . "underscore.min.js",
+        ),
+    ),
     "jquery" => array(
         "js" => array("libs" . DS . "jquery.min.js"),
     ),
@@ -448,11 +465,12 @@ return array(
     ),
     "summernote" => array(
         "css" => array(
-            "plugins/summernote/summernote.css",
-            "plugins/summernote/summernote-bs3.css",
+            // "plugins/summernote/summernote.css",
+            "plugins/summernote/summernote-bs4.css",
         ),
         "js" => array(
-            "plugins/summernote/summernote-bs3.min.js",
+            // "plugins/summernote/summernote.min.js",
+            "plugins/summernote/summernote-bs4.min.js",
         ),
     ),
     "jquery-3.2.1" => array(
@@ -689,6 +707,14 @@ return array(
         ),
         "css" => array(
             "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css",
+        ),
+    ),
+    "cropper" => array(
+        'css' => array(
+            'plugins/cropper/cropper.css',
+        ),
+        'js' => array(
+            'plugins/cropper/cropper.js',
         ),
     ),
 );

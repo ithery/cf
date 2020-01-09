@@ -117,7 +117,7 @@ trait CDatabase_Trait_ManageTransaction {
             } catch (Exception $e) {
                 $this->handleBeginTransactionException($e);
             }
-        } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
+        } elseif ($this->transactions >= 1  && $this->getQueryGrammar()->supportsSavepoints()) {
 
             $this->createSavepoint();
         }
@@ -130,7 +130,7 @@ trait CDatabase_Trait_ManageTransaction {
      */
     protected function createSavepoint() {
         $this->driver->query(
-                $this->queryGrammar->compileSavepoint('trans' . ($this->transactions + 1))
+                $this->getQueryGrammar()->compileSavepoint('trans' . ($this->transactions + 1))
         );
     }
 
@@ -201,9 +201,9 @@ trait CDatabase_Trait_ManageTransaction {
     protected function performRollBack($toLevel) {
         if ($toLevel == 0 || $this->isSavePoint == false) {
             $this->driver->rollBack();
-        } elseif ($this->queryGrammar->supportsSavepoints()) {
+        } elseif ($this->getQueryGrammar()->supportsSavepoints()) {
             $this->driver->query(
-                    $this->queryGrammar->compileSavepointRollBack('trans' . ($toLevel + 1))
+                    $this->getQueryGrammar()->compileSavepointRollBack('trans' . ($toLevel + 1))
             );
         }
     }

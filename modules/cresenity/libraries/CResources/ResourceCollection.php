@@ -21,8 +21,20 @@ class CResources_ResourceCollection {
     /** @var callable */
     public $acceptsFile;
 
+    /** @var array $acceptsMimeTypes */
+    public $acceptsMimeTypes = [];
+
+    /** @var int */
+    public $collectionSizeLimit = false;
+
     /** @var bool */
     public $singleFile = false;
+
+    /** @var string */
+    public $fallbackUrl = '';
+
+    /** @var string */
+    public $fallbackPath = '';
 
     public function __construct($name) {
         $this->name = $name;
@@ -48,13 +60,36 @@ class CResources_ResourceCollection {
         return $this;
     }
 
+    public function acceptsMimeTypes($mimeTypes) {
+        $this->acceptsMimeTypes = $mimeTypes;
+        return $this;
+    }
+
     public function singleFile() {
-        $this->singleFile = true;
+        return $this->onlyKeepLatest(1);
+    }
+
+    public function onlyKeepLatest($maximumNumberOfItemsInCollection) {
+        if ($maximumNumberOfItemsInCollection < 1) {
+            throw new InvalidArgumentException("You should pass a value higher than 0. `{$maximumNumberOfItemsInCollection}` given.");
+        }
+        $this->singleFile = ($maximumNumberOfItemsInCollection === 1);
+        $this->collectionSizeLimit = $maximumNumberOfItemsInCollection;
         return $this;
     }
 
     public function registerResourceConversions(callable $resourceConversionRegistrations) {
         $this->resourceConversionRegistrations = $resourceConversionRegistrations;
+    }
+
+    public function useFallbackUrl($url) {
+        $this->fallbackUrl = $url;
+        return $this;
+    }
+
+    public function useFallbackPath($path) {
+        $this->fallbackPath = $path;
+        return $this;
     }
 
 }

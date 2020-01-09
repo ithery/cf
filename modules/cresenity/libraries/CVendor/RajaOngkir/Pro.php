@@ -113,6 +113,7 @@ class CVendor_RajaOngkir_Pro extends CVendor_RajaOngkir
 		$diameter = ''
 	) {
 		$method = 'POST';
+
 		$options = [
 			'origin' => $origin,
 			'originType' => $originType,
@@ -125,7 +126,7 @@ class CVendor_RajaOngkir_Pro extends CVendor_RajaOngkir
 			'height' => $height,
 			'diameter' => $diameter,
 		];
-
+                
 		curl_setopt_array($this->curl, [
 			CURLOPT_URL => $this->url . 'cost',
 			CURLOPT_RETURNTRANSFER => TRUE,
@@ -140,7 +141,6 @@ class CVendor_RajaOngkir_Pro extends CVendor_RajaOngkir
 				'key: ' . $this->key
 			],
 		]);
-
 		$response = curl_exec($this->curl);
 		$err = curl_error($this->curl);
 

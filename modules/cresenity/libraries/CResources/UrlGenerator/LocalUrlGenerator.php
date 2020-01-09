@@ -43,7 +43,7 @@ class CResources_UrlGenerator_LocalUrlGenerator extends CResources_UrlGeneratorA
     }
 
     protected function getBaseResourceDirectoryUrl() {
-        if ($diskUrl = CF::config("filesystems.disks.{$this->resource->disk}.url")) {
+        if ($diskUrl = CF::config("storage.disks.{$this->resource->disk}.url")) {
             return str_replace(url('/'), '', $diskUrl);
         }
         
@@ -67,7 +67,7 @@ class CResources_UrlGenerator_LocalUrlGenerator extends CResources_UrlGeneratorA
      */
 
     protected function getStoragePath() {
-        $diskRootPath = CF::config("filesystems.disks.{$this->resource->disk}.root");
+        $diskRootPath = CF::config("storage.disks.{$this->resource->disk}.root");
         if($diskRootPath==null) {
             return rtrim(DOCROOT);
         }

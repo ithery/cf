@@ -88,7 +88,7 @@ trait CTrait_Manager_DriverManager {
      * @return mixed
      */
     protected function callCustomCreator($driver) {
-        return $this->customCreators[$driver]($this->app);
+        return $this->customCreators[$driver]();
     }
 
     /**

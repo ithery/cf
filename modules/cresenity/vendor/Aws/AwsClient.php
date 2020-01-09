@@ -191,6 +191,7 @@ class AwsClient implements AwsClientInterface
         $this->handlerList = new HandlerList();
         $resolver = new ClientResolver(static::getArguments());
         $config = $resolver->resolve($args, $this->handlerList);
+        
         $this->api = $config['api'];
         $this->signatureProvider = $config['signature_provider'];
         $this->endpoint = new Uri($config['endpoint']);
@@ -217,6 +218,7 @@ class AwsClient implements AwsClientInterface
 
     public function getConfig($option = null)
     {
+        
         return $option === null
             ? $this->config
             : (isset($this->config[$option])

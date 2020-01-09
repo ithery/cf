@@ -17,7 +17,6 @@ class CDatabase {
     public static $benchmarks = array();
     public $domain;
     public $name;
-    public $config_file;
 
     /**
      *
@@ -30,6 +29,12 @@ class CDatabase {
      * @var CDatabase_Platform
      */
     protected $platform;
+
+    /**
+     *
+     * @var string
+     */
+    protected $driverName;
 
     /**
      *
@@ -89,6 +94,13 @@ class CDatabase {
      */
     protected $queryGrammar;
 
+    /**
+     * The query post processor implementation.
+     *
+     * @var CDatabase_Query_Grammar_Processor
+     */
+    protected $postProcessor;
+
     public function config() {
         return $this->config;
     }
@@ -99,7 +111,7 @@ class CDatabase {
      * @param   mixed   configuration array or DSN
      * @return  CDatabase
      */
-    public static function &instance($domain = null, $name = 'default', $config = NULL) {
+    public static function &instance($name = 'default', $config = NULL, $domain = null) {
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();
@@ -107,6 +119,7 @@ class CDatabase {
         if ($name == null) {
             $name = 'default';
         }
+
         if (!isset(CDatabase::$instances[$domain])) {
             CDatabase::$instances[$domain] = array();
         }
@@ -143,51 +156,45 @@ class CDatabase {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $load_config = true;
+        $loadConfig = true;
 
         if (!empty($config)) {
             if (is_array($config) && count($config) > 0) {
                 if (!array_key_exists('connection', $config)) {
                     $config = array('connection' => $config);
-                    $load_config = false;
+                    $loadConfig = false;
                 } else {
-                    $load_config = false;
+                    $loadConfig = false;
                 }
             }
             if (is_string($config)) {
                 if (strpos($config, '://') !== FALSE) {
                     $config = array('connection' => $config);
-                    $load_config = false;
+                    $loadConfig = false;
                 }
             }
         }
-
-        if ($load_config) {
-            $file = CF::get_file('config', 'database', $domain);
-
-
+        $configName = '';
+        if ($loadConfig) {
             $found = false;
-            $config_name = 'default';
+            $configName = 'default';
             if (is_string($config)) {
-                $config_name = $config;
+                $configName = $config;
             }
+            $allConfig = CF::config('database');
 
-            $all_config = include $file;
-
-            if (isset($all_config[$config_name])) {
-                $config = $all_config[$config_name];
+            if (isset($allConfig[$configName])) {
+                $config = $allConfig[$configName];
                 $found = true;
             }
 
 
             if ($found == false) {
-                throw new Exception('Config ' . $config_name . ' Not Found');
-            } else {
-                $this->config_file = $file;
+                throw new Exception('Config ' . $configName . ' Not Found');
             }
         }
 
-
+        $this->name = $configName;
         // Merge the default config with the passed config
         $this->config = array_merge($this->config, $config);
 
@@ -255,21 +262,26 @@ class CDatabase {
             $this->config['connection'] = $db;
         }
         // Set driver name
-        $driver = 'CDatabase_Driver_' . ucfirst($this->config['connection']['type']);
 
+        $connectionType = $this->config['connection']['type'];
+        switch ($this->config['connection']['type']) {
+            case 'mongodb':
+                $this->driverName = 'MongoDB';
+                break;
+            default:
+                $this->driverName = ucfirst($this->config['connection']['type']);
+                break;
+        }
+
+        $driver = 'CDatabase_Driver_' . $this->driverName;
         try {
             // Validation of the driver
             $class = new ReflectionClass($driver);
             // Initialize the driver
-            $this->driver = $class->newInstance($this->config);
-        } catch (ReflectionException $ex) {
-            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', array(':driver' => $this->config['connection']['type'], 'class' => get_class($this)));
+            $this->driver = $class->newInstance($this, $this->config);
+        } catch (ReflectionEcxeption $ex) {
+            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', array(':driver' => $driver, ':class' => get_class($this)));
         }
-
-        $connectionResolver = new CDatabase_Resolver(array($this->name => $this));
-        CModel::setConnectionResolver($connectionResolver);
-
-
 
         $this->events = CDatabase_Dispatcher::instance();
         CModel::setEventDispatcher($this->events);
@@ -277,7 +289,7 @@ class CDatabase {
 
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
-            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', array(':driver' => $this->config['connection']['type'], ':class' => get_class($this), ':interface' => 'CDatabase_Driver'));
+            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', array(':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver'));
         }
 
         CF::log(CLogger::DEBUG, 'Database Library initialized');
@@ -338,6 +350,8 @@ class CDatabase {
             // Benchmark the query
             CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::caller_info());
         }
+
+
 
         // Once we have run the query we will calculate the time that it took to run and
         // then log the query, bindings, and execution time so we will report them on
@@ -1410,7 +1424,7 @@ class CDatabase {
     }
 
     public function driverName() {
-        return ucfirst($this->config['connection']['type']);
+        return $this->driverName;
     }
 
     /**
@@ -1427,7 +1441,9 @@ class CDatabase {
     }
 
     public function table($table) {
-        return (new CDatabase_Query_Builder($this))->from($table);
+        $builderClass = $this->driverName == 'MongoDB' ? CDatabase_Query_Builder_MongoDBBuilder::class : CDatabase_Query_Builder::class;
+        $builder = $this->driverName == 'MongoDB' ? new $builderClass($this, new CDatabase_Query_Processor_MongoDB()) : new $builderClass($this);
+        return $builder->from($table);
     }
 
     /**
@@ -1499,7 +1515,7 @@ class CDatabase {
     public function getQueryGrammar() {
 
         if ($this->queryGrammar == null) {
-            $driver_name = $this->driver_name();
+            $driver_name = $this->driverName();
             $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
             $this->queryGrammar = new $grammar_class();
         }
@@ -1763,6 +1779,24 @@ class CDatabase {
      */
     public function newQuery() {
         return new CDatabase_Query_Builder($this);
+    }
+
+    /**
+     * Get the query post processor used by the connection.
+     *
+     * @return CDatabase_Query_Processor
+     */
+    public function getPostProcessor() {
+        if ($this->postProcessor == null) {
+            $driverName = $this->driverName();
+            $processorClass = 'CDatabase_Query_Processor_' . $driverName;
+            $this->postProcessor = new $processorClass();
+        }
+        return $this->postProcessor;
+    }
+
+    public function driver() {
+        return $this->driver;
     }
 
 }

@@ -511,13 +511,26 @@ class carr {
      * @param   array  array to map to
      * @return  array
      */
-    public static function map_recursive($callback, array $array) {
+    public static function mapRecursive($callback, array $array) {
         foreach ($array as $key => $val) {
             // Map the callback to the key
-            $array[$key] = is_array($val) ? carr::map_recursive($callback, $val) : call_user_func($callback, $val);
+            $array[$key] = is_array($val) ? static::mapRecursive($callback, $val) : call_user_func($callback, $val);
         }
 
         return $array;
+    }
+
+    /**
+     * Because PHP does not have this function, and array_walk_recursive creates
+     * references in arrays and is not truly recursive.
+     *
+     * @param   mixed  callback to apply to each member of the array
+     * @param   array  array to map to
+     * @return  array
+     * @deprecated since version 1.2
+     */
+    public static function map_recursive($callback, array $array) {
+        return static::mapRecursive($callback, $array);
     }
 
     /**
@@ -718,8 +731,8 @@ class carr {
                     $passed = false;
                 }
             }
-            
-            
+
+
             if ($passed) {
                 $new_array[$k] = $v;
             }
@@ -1013,6 +1026,318 @@ class carr {
 
     public static function isIterable($var) {
         return is_array($var) || $var instanceof \Traversable;
+    }
+
+    /**
+     * Convert the array into a query string.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function query($array) {
+        return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
+    }
+
+    public static function reduce($collection, $iteratee, $accumulator = null) {
+        if ($collection === null) {
+            return null;
+        }
+        $func = function ( $array, $iteratee, $accumulator, $initAccum = null) {
+            $length = \count(\is_array($array) ? $array : \iterator_to_array($array));
+            if ($initAccum && $length) {
+                $accumulator = \current($array);
+            }
+            foreach ($array as $key => $value) {
+                $accumulator = $iteratee($accumulator, $value, $key, $array);
+            }
+            return $accumulator;
+        };
+        return $func($collection, c::baseIteratee($iteratee), $accumulator, null === $accumulator);
+    }
+
+    public static function filter($array, $predicate = null) {
+        $iteratee = c::baseIteratee($predicate);
+        //$keys = array_keys($array);
+        $result = \array_filter(
+                \is_array($array) ? $array : \iterator_to_array($array), function ($value, $key) use ($array, $iteratee) {
+            return $iteratee($value, $key, $array);
+        }, \ARRAY_FILTER_USE_BOTH
+        );
+
+        return $result;
+    }
+
+    /**
+     * Iterates over elements of `collection`, returning the first element
+     * `predicate` returns truthy for. The predicate is invoked with three
+     * arguments: (value, index|key, collection).
+     *
+     * @param iterable $collection The collection to inspect.
+     * @param callable $predicate  The function invoked per iteration.
+     * @param int      $fromIndex  The index to search from.
+     *
+     * @return mixed Returns the matched element, else `null`.
+     *
+     * @example
+     * <code>
+     * $users = [
+     *     ['user' => 'barney',  'age' => 36, 'active' => true],
+     *     ['user' => 'fred',    'age' => 40, 'active' => false],
+     *     ['user' => 'pebbles', 'age' => 1,  'active' => true]
+     * ];
+     *
+     * carr::find($users, function($o) { return $o['age'] < 40; });
+     * // => object for 'barney'
+     *
+     * // The `matches` iteratee shorthand.
+     * carr::find($users, ['age' => 1, 'active' => true]);
+     * // => object for 'pebbles'
+     *
+     * // The `matchesProperty` iteratee shorthand.
+     * carr::find($users, ['active', false]);
+     * // => object for 'fred'
+     *
+     * // The `property` iteratee shorthand.
+     * carr::find($users, 'active');
+     * // => object for 'barney'
+     * </code>
+     */
+    public static function find($collection, $predicate = null, $fromIndex = 0) {
+        $iteratee = c::baseIteratee($predicate);
+        foreach (\array_slice(\is_array($collection) ? $collection : \iterator_to_array($collection), $fromIndex) as $key => $value) {
+            if ($iteratee($value, $key, $collection)) {
+                return $value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * This method is like `findIndex` except that it iterates over elements
+     * of `collection` from right to left.
+     *
+     *
+     * @param array $array     The array to inspect.
+     * @param mixed $predicate The function invoked per iteration.
+     * @param int   $fromIndex The index to search from.
+     *
+     * @return int the index of the found element, else `-1`.
+     * @example
+     * <code>
+     * $users = [
+     *   ['user' => 'barney',  'active' => true ],
+     *   ['user' => 'fred',    'active' => false ],
+     *   ['user' => 'pebbles', 'active' => false ]
+     * ]
+     *
+     * carr::findLastIndex($users, function($user) { return $user['user'] === 'pebbles'; })
+     * // => 2
+     * </code>
+     */
+    function findLastIndex(array $array, $predicate, $fromIndex = null) {
+        $length = \count($array);
+        $index = $fromIndex !== null ? $fromIndex : $length - 1;
+        if ($index < 0) {
+            $index = \max($length + $index, 0);
+        }
+        $iteratee = c::baseIteratee($predicate);
+        foreach (\array_reverse($array, true) as $key => $value) {
+            if ($iteratee($value, $key, $array)) {
+                return $index;
+            }
+            $index--;
+        }
+        return -1;
+    }
+
+    /**
+     * Creates an array of values by running each element in `collection` through
+     * `iteratee`. The iteratee is invoked with three arguments:
+     * (value, index|key, collection).
+     *
+     * Many lodash-php methods are guarded to work as iteratees for methods like
+     * `_::every`, `_::filter`, `_::map`, `_::mapValues`, `_::reject`, and `_::some`.
+     *
+     * The guarded methods are:
+     * `ary`, `chunk`, `curry`, `curryRight`, `drop`, `dropRight`, `every`,
+     * `fill`, `invert`, `parseInt`, `random`, `range`, `rangeRight`, `repeat`,
+     * `sampleSize`, `slice`, `some`, `sortBy`, `split`, `take`, `takeRight`,
+     * `template`, `trim`, `trimEnd`, `trimStart`, and `words`
+     *
+     * @category Collection
+     *
+     * @param array|object          $collection The collection to iterate over.
+     * @param callable|string|array $iteratee   The function invoked per iteration.
+     *
+     * @return array Returns the new mapped array.
+     * @example
+     * <code>
+     * function square(int $n) {
+     *   return $n * $n;
+     * }
+     *
+     * carr::map([4, 8], $square);
+     * // => [16, 64]
+     *
+     * carr::map((object) ['a' => 4, 'b' => 8], $square);
+     * // => [16, 64] (iteration order is not guaranteed)
+     *
+     * $users = [
+     *   [ 'user' => 'barney' ],
+     *   [ 'user' => 'fred' ]
+     * ];
+     *
+     * // The `property` iteratee shorthand.
+     * carr::map($users, 'user');
+     * // => ['barney', 'fred']
+     * </code>
+     */
+    public static function map($collection, $iteratee) {
+        $values = [];
+        if (\is_array($collection)) {
+            $values = $collection;
+        } elseif ($collection instanceof \Traversable) {
+            $values = \iterator_to_array($collection);
+        } elseif (\is_object($collection)) {
+            $values = \get_object_vars($collection);
+        }
+
+
+        $callable = c::baseIteratee($iteratee);
+        $keys = \array_keys($values);
+        $items = \array_map(function ($value, $index) use ($callable, $collection) {
+            $test = $callable($value, $index, $collection);
+            return $callable($value, $index, $collection);
+        }, $values, $keys);
+
+        return array_combine($keys, $items);
+    }
+
+    /**
+     * Creates a new array concatenating `array` with any additional arrays
+     * and/or values.
+     *
+     * @category Array
+     *
+     * @param  array $array The array to concatenate.
+     * @param  array<int, mixed> $values The values to concatenate.
+     *
+     * @return array Returns the new concatenated array.
+     *
+     * @example
+     * <code>
+     * $array = [1];
+     * $other = carr::concat($array, 2, [3], [[4]]);
+     *
+     * var_dump($other)
+     * // => [1, 2, 3, [4]]
+     *
+     * var_dump($array)
+     * // => [1]
+     * </code>
+     */
+    public static function concat($array, ...$values) {
+        $check = function ($value) {
+            return \is_array($value) ? $value : [$value];
+        };
+        return \array_merge($check($array), ...\array_map($check, $values));
+    }
+
+    /**
+     * Checks if `predicate` returns truthy for **any** element of `collection`.
+     * Iteration is stopped once `predicate` returns truthy. The predicate is
+     * invoked with three arguments: (value, index|key, collection).
+     *
+     * @category Collection
+     *
+     * @param iterable              $collection The collection to iterate over.
+     * @param callable|string|array $predicate  The function invoked per iteration.
+     *
+     * @return boolean Returns `true` if any element passes the predicate check, else `false`.
+     * @example
+     * <code>
+     * some([null, 0, 'yes', false], , function ($value) { return \is_bool($value); }));
+     * // => true
+     *
+     * $users = [
+     *   ['user' => 'barney', 'active' => true],
+     *   ['user' => 'fred',   'active' => false]
+     * ];
+     *
+     * // The `matches` iteratee shorthand.
+     * some($users, ['user' => 'barney', 'active' => false ]);
+     * // => false
+     *
+     * // The `matchesProperty` iteratee shorthand.
+     * some($users, ['active', false]);
+     * // => true
+     *
+     * // The `property` iteratee shorthand.
+     * some($users, 'active');
+     * // => true
+     * </code>
+     */
+    public static function some($collection, $predicate = null) {
+        $iteratee = c::baseIteratee($predicate);
+        foreach ($collection as $key => $value) {
+            if ($iteratee($value, $key, $collection)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Iterates over elements of `collection` and invokes `iteratee` for each element.
+     * The iteratee is invoked with three arguments: (value, index|key, collection).
+     * Iteratee functions may exit iteration early by explicitly returning `false`.
+     *
+     * **Note:** As with other "Collections" methods, objects with a "length"
+     * property are iterated like arrays. To avoid this behavior use `forIn`
+     * or `forOwn` for object iteration.
+     *
+     * @category     Collection
+     *
+     * @param array|iterable|object $collection The collection to iterate over.
+     * @param callable              $iteratee   The function invoked per iteration.
+     *
+     * @return array|object Returns `collection`.
+     *
+     * @example
+     * <code>
+     * carr::each([1, 2], function ($value) { echo $value; })
+     * // => Echoes `1` then `2`.
+     *
+     * carr::each((object) ['a' => 1, 'b' => 2], function ($value, $key) { echo $key; });
+     * // => Echoes 'a' then 'b' (iteration order is not guaranteed).
+     * </code>
+     */
+    public static function each($collection, callable $iteratee) {
+        $values = \is_object($collection) ? \get_object_vars($collection) : $collection;
+        /** @var array $values */
+        foreach ($values as $index => $value) {
+            if (false === $iteratee($value, $index, $collection)) {
+                break;
+            }
+        }
+        return $collection;
+    }
+
+    /**
+     * Push an item onto the beginning of an array.
+     *
+     * @param  array  $array
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return array
+     */
+    public static function prepend($array, $value, $key = null) {
+        if (is_null($key)) {
+            array_unshift($array, $value);
+        } else {
+            $array = [$key => $value] + $array;
+        }
+        return $array;
     }
 
 }

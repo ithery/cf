@@ -110,10 +110,6 @@ trait CTrait_Compat_Observable {
         return $this->addTabStaticList($tabs_id);
     }
 
-    public function add_ajax() {
-        return $this->addAjax();
-    }
-
     public function add_elm($tag, $id = "") {
         return $this->addElm($tag, $id);
     }

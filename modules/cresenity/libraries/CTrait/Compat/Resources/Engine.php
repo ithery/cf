@@ -13,4 +13,7 @@ trait CTrait_Compat_Resources_Engine {
         return $this->getUrl($filename, $size, $encode);
     }
 
+    public function get_path($filename, $size = null) {
+        return $this->getPath($filename,$size);
+    }
 }

@@ -29,7 +29,7 @@ trait CModel_HasSlug_HasSlugTrait {
                 }
             });
         } else {
-            
+
             static::creating(function (CModel $model) {
                 $model->generateSlugOnCreate();
             });
@@ -121,14 +121,22 @@ trait CModel_HasSlug_HasSlugTrait {
     }
 
     protected static function usesSoftDeletes() {
-        if (in_array('CModel_SoftDelete_SoftDeleteTrait', class_uses(static::class))) {
+
+
+        $classUses = CF::collect(CF::class_uses_recursive(static::class));
+        $lastClassUses = $classUses->map(function($item) {
+
+            return carr::last(explode('_', $item));
+        });
+        if (in_array('SoftDeleteTrait', $lastClassUses->toArray())) {
+
             return true;
         }
         return false;
     }
 
     protected static function usesValidating() {
-       
+
         if (in_array('CModel_Validating_ValidatingTrait', class_uses(static::class))) {
             return true;
         }

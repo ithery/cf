@@ -37,6 +37,7 @@ class cdbg {
     }
 
     public static function varDump($var, $return = FALSE) {
+        
         $html = '<pre style="margin-bottom: 18px;' .
                 'background: #f7f7f9;' .
                 'border: 1px solid #e1e1e8;' .
@@ -50,7 +51,7 @@ class cdbg {
                 'word-wrap: break-word;' .
                 'color: #333;' .
                 'font-family: Menlo,Monaco,Consolas,\'Courier New\',monospace;">';
-        $html .= self::var_dump_plain($var);
+        $html .= self::varDumpPlain($var);
         $html .= '</pre>';
 
 //        try {
@@ -80,7 +81,7 @@ class cdbg {
      * @param  mixed
      * @return void
      */
-    function d() {
+    public static function d() {
         $args = func_get_args();
         foreach ($args as $x) {
             (new Illuminate\Support\Debug\Dumper)->dump($x);
@@ -93,7 +94,7 @@ class cdbg {
      * @param  mixed
      * @return void
      */
-    function dd() {
+    public static function dd() {
         $args = func_get_args();
         foreach ($args as $x) {
             (new Illuminate\Support\Debug\Dumper)->dump($x);
@@ -106,7 +107,7 @@ class cdbg {
         self::$debug_vars[$key] = $var;
     }
 
-    public static function var_dump_plain($var) {
+    public static function varDumpPlain($var) {
         $html = '';
 
         if (is_bool($var)) {
@@ -144,12 +145,12 @@ class cdbg {
                     if (is_numeric($key)) {
                         $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
                     } else {
-                        $html .= str_repeat(' ', $indent) . str_pad('"' . c::htmlentities($key) . '"', $longest_key, ' ');
+                        $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
                     }
 
                     $html .= ' => ';
 
-                    $value = explode('<br />', self::var_dump_plain($value));
+                    $value = explode('<br />', self::varDumpPlain($value));
 
                     foreach ($value as $line => $val) {
                         if ($line != 0) {
@@ -228,12 +229,12 @@ class cdbg {
                 if (is_numeric($key)) {
                     $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
                 } else {
-                    $html .= str_repeat(' ', $indent) . str_pad('"' . c::htmlentities($key) . '"', $longest_key, ' ');
+                    $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
                 }
 
                 $html .= ' => ';
 
-                $value = explode('<br />', self::var_dump_plain($value));
+                $value = explode('<br />', self::varDumpPlain($value));
 
                 foreach ($value as $line => $val) {
                     if ($line != 0) {
@@ -719,7 +720,7 @@ class cdbg {
     }
 
     public static function traceDump($return = false) {
-        return cdbg::varDump(self::getTraceString(), $return);
+        return static::varDump(self::getTraceString(), $return);
     }
     public static function queryDump($db = null,$return = false) {
         if($db==null) {

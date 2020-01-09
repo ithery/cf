@@ -7,6 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2019, 2:25:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CApp_TaskQueue_HouseKeeping extends CApp_TaskQueue {
+abstract class CApp_TaskQueue_HouseKeeping extends CApp_TaskQueue {
     
+   
 }

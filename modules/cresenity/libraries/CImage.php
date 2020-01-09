@@ -20,5 +20,13 @@ class CImage {
         return new CImage_Avatar($engineName);
     }
 
+    /**
+     * 
+     * @param string $pathToImage
+     * @return CImage_Image
+     */
+    public static function image($pathToImage) {
+        return CImage_Image::load($pathToImage);
+    }
     
 }

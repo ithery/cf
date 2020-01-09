@@ -7,12 +7,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2019, 4:14:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_QueueInterface {
+class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
 
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var CDatabase
      */
     protected $database;
 
@@ -47,6 +47,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return void
      */
     public function __construct(CDatabase $database, $table, $default = 'default', $retryAfter = 60) {
+
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
@@ -128,7 +129,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * Release a reserved job back onto the queue.
      *
      * @param  string  $queue
-     * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
+     * @param  CQueue_Job_DatabaseJobRecord  $job
      * @param  int  $delay
      * @return mixed
      */
@@ -146,6 +147,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return mixed
      */
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0) {
+
         return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
                                 $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
         ));
@@ -167,8 +169,8 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
             'org_id' => CApp_Base::orgId(),
             'attempts' => $attempts,
             'reserved_at' => null,
-            'available_at' => date('Y-m-d H:i:s',$availableAt),
-            'created' => date('Y-m-d H:i:s',$this->currentTime()),
+            'available_at' => date('Y-m-d H:i:s', $availableAt),
+            'created' => date('Y-m-d H:i:s', $this->currentTime()),
             'createdby' => CApp_Base::username(),
             'payload' => $payload,
         ];
@@ -205,9 +207,9 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
                     $this->isAvailable($query);
                     $this->isReservedButExpired($query);
                 })
-                ->orderBy('queue_id', 'asc')
+                ->orderBy('created', 'asc')
                 ->first();
-          
+
         return $job ? new CQueue_Job_DatabaseJobRecord((object) $job) : null;
     }
 
@@ -219,7 +221,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      */
     protected function isAvailable($query) {
         $query->where(function ($query) {
-            $dateCurrentTime = date('Y-m-d H:i:s',$this->currentTime());
+            $dateCurrentTime = date('Y-m-d H:i:s', $this->currentTime());
             $query->whereNull('reserved_at')
                     ->where('available_at', '<=', $dateCurrentTime);
         });
@@ -233,7 +235,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      */
     protected function isReservedButExpired($query) {
         $expiration = CCarbon::now()->subSeconds($this->retryAfter)->getTimestamp();
-        $expirationDate = date('Y-m-d H:i:s',$expiration);
+        $expirationDate = date('Y-m-d H:i:s', $expiration);
         $query->orWhere(function ($query) use ($expirationDate) {
             $query->where('reserved_at', '<=', $expirationDate);
         });
@@ -243,11 +245,13 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * Marshal the reserved job into a DatabaseJob instance.
      *
      * @param  string  $queue
-     * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
-     * @return \Illuminate\Queue\Jobs\DatabaseJob
+     * @param  CQueue_Job_DatabaseJobRecord  $job
+     * @return CQueue_Job_DatabaseJob
      */
     protected function marshalJob($queue, $job) {
+
         $job = $this->markJobAsReserved($job);
+
         return new CQueue_Job_DatabaseJob(
                 $this->container, $this, $job, $this->connectionName, $queue
         );
@@ -260,8 +264,9 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
      * @return CDatabase_Job_DatabaseJobRecord
      */
     protected function markJobAsReserved($job) {
-        $this->database->table($this->table)->where('queue_id', $job->queue_id)->update([
-            'reserved_at' => date('Y-m-d H:i:s',$job->touch()),
+
+        $this->database->table($this->table)->where($this->primaryKey(), $job->{$this->primaryKey()})->update([
+            'reserved_at' => date('Y-m-d H:i:s', $job->touch()),
             'attempts' => $job->increment(),
         ]);
         return $job;
@@ -279,7 +284,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
     public function deleteReserved($queue, $id) {
         $this->database->transaction(function () use ($id) {
             if ($this->database->table($this->table)->lockForUpdate()->find($id)) {
-                $this->database->table($this->table)->where('queue_id', $id)->delete();
+                $this->database->table($this->table)->where($this->primaryKey(), $id)->delete();
             }
         });
     }
@@ -297,10 +302,14 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue implements CQueue_
     /**
      * Get the underlying database instance.
      *
-     * @return \Illuminate\Database\Connection
+     * @return CDatabase
      */
     public function getDatabase() {
         return $this->database;
+    }
+
+    public function primaryKey() {
+        return CQueue::primaryKey($this->database, $this->table);
     }
 
 }

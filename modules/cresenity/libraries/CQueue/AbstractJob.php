@@ -81,8 +81,10 @@ abstract class CQueue_AbstractJob {
      */
     public function fire() {
         $payload = $this->payload();
+        
         list($class, $method) = CQueue_JobName::parse($payload['job']);
         $this->instance = $this->resolve($class);
+        
         $this->instance->{$method}($this, $payload['data']);
     }
 
@@ -168,8 +170,9 @@ abstract class CQueue_AbstractJob {
             $this->delete();
             $this->failed($e);
         } finally {
-            $this->resolve(Dispatcher::class)->dispatch(new JobFailed(
-                    $this->connectionName, $this, $e ?: new ManuallyFailedException
+            $dispatcher = CEvent::dispatcher();
+            $dispatcher->dispatch(new CQueue_Event_JobFailed(
+                    $this->connectionName, $this, $e ?: new CQueue_Exception_ManuallFailedException
             ));
         }
     }
@@ -183,6 +186,7 @@ abstract class CQueue_AbstractJob {
     protected function failed($e) {
         $payload = $this->payload();
         list($class, $method) = CQueue_JobName::parse($payload['job']);
+        
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
             $this->instance->failed($payload['data'], $e);
         }

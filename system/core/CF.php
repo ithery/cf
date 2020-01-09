@@ -529,7 +529,7 @@ final class CF {
      * @return string
      */
     public static function getFile($directory, $filename, $domain = null) {
-        $files = CF::get_files($directory, $filename, $domain);
+        $files = CF::getFiles($directory, $filename, $domain);
         if (count($files) > 0) {
             return $files[0];
         }
@@ -1077,10 +1077,6 @@ final class CF {
             }
         }
         throw new CF_404_Exception($page, $template);
-    }
-
-    public static function show_404($page = FALSE, $template = FALSE) {
-        return self::show404($page, $template);
     }
 
     /**
@@ -2130,13 +2126,7 @@ final class CF {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        if (is_null($callback)) {
-            return new HigherOrderTapProxy($value);
-        }
-
-        $callback($value);
-
-        return $value;
+        return c::tap($value, $callback);
     }
 
     /**
@@ -2146,11 +2136,7 @@ final class CF {
      * @return string
      */
     public static function class_basename($class) {
-        $class = is_object($class) ? get_class($class) : $class;
-
-        $basename = basename(str_replace('\\', '/', $class));
-        $basename = carr::last(explode("_", $basename));
-        return $basename;
+        return c::classBasename($class);
     }
 
     /**
@@ -2293,7 +2279,7 @@ final class CF {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return new CCollection($value);
+        return c::collect($value);
     }
 
     /**
@@ -2352,6 +2338,19 @@ final class CF {
         $appCode = static::appCode($domain);
 
         return DOCROOT . 'application/' . $appCode . '/';
+    }
+
+    /**
+     * Displays a 404 page.
+     *
+     * @throws  C_404_Exception
+     * @param   string  URI of page
+     * @param   string  custom template
+     * @return  void
+     * @deprecated
+     */
+    public static function show_404($page = FALSE, $template = FALSE) {
+        return self::show404($page, $template);
     }
 
 }

@@ -22,8 +22,6 @@ abstract class CObservable extends CRenderable {
      */
     protected $javascript;
 
-   
-
     /**
      * 
      * @return CObservable_Javascript
@@ -39,7 +37,7 @@ abstract class CObservable extends CRenderable {
     public function jquery() {
         return $this->javascript->jquery();
     }
-    
+
     /**
      * 
      * @return CObservable_Javascript_Handler
@@ -47,8 +45,6 @@ abstract class CObservable extends CRenderable {
     public function handler() {
         return $this->javascript->handler();
     }
-
-    
 
     protected function __construct($id = "") {
 
@@ -75,6 +71,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
         $this->manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
         $this->manager->registerControl('file', 'CFormInputFile');
+        $this->manager->registerControl('file-ajax', 'CElement_FormInput_FileAjax');
         $this->manager->registerControl('password', 'CElement_FormInput_Password');
         $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
         $this->manager->registerControl('select', 'CElement_FormInput_Select');
@@ -182,12 +179,6 @@ abstract class CObservable extends CRenderable {
         return $tabs;
     }
 
-    public function addAjax() {
-        $ajax = CAjaxObject::factory();
-        $this->add($ajax);
-        return $ajax;
-    }
-
     public function addElm($tag, $id = "") {
         $tag = CCustomElement::factory($tag, $id);
         $this->add($tag);
@@ -218,9 +209,14 @@ abstract class CObservable extends CRenderable {
         return $span;
     }
 
-   
     public function addPrismCode($id = "") {
         $code = CElement_Factory::createComponent('PrismCode', $id);
+        $this->add($code);
+        return $code;
+    }
+
+    public function addBlockly($id = "") {
+        $code = CElement_Factory::createComponent('Blockly', $id);
         $this->add($code);
         return $code;
     }

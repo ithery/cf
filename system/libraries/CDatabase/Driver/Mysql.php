@@ -19,7 +19,8 @@ class CDatabase_Driver_Mysql extends CDatabase_Driver {
      *
      * @param  array  database configuration
      */
-    public function __construct($config) {
+    public function __construct(CDatabase $db, $config) {
+        $this->db = $db;
         $this->db_config = $config;
 
         CF::log(CLogger::DEBUG, 'MySQL Database Driver Initialized');

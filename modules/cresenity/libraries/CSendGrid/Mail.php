@@ -44,7 +44,12 @@ class CSendGrid_Mail implements \JsonSerializable {
         $this->setFrom($from);
         $this->setSubject($subject);
         $personalization = new CSendGrid_Personalization();
-        $personalization->addTo($to);
+        if($to instanceof CSendGrid_Email) {
+            $to = array($to);
+        }
+        foreach($to as $toItem) {
+            $personalization->addTo($toItem);
+        }
         $personalization->setSubject($subject);
         $this->addPersonalization($personalization);
         $this->addContent($content);

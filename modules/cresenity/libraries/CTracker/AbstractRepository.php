@@ -22,7 +22,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
     protected $cache;
 
     public function __construct() {
-        $this->connection = CDatabase::instance();
+        $this->connection = CDatabase::instance(CTracker::config()->get('database'));
         $this->cache = new CTracker_Cache();
     }
 
@@ -41,7 +41,9 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         list($model, $cacheKey) = $this->cache->findCached($id, null, $this->className);
         if (!$model) {
             $model = $this->newQuery();
+           
             if ($this->relations) {
+                
                 $model->with($this->relations);
             }
             if ($model = $model->find($id)) {
@@ -119,7 +121,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
             $this->model = new $this->className();
         }
         if ($this->connection) {
-            $this->model->setConnection($this->connection);
+            $this->model->setConnection($this->connection->getName());
         }
         return $this->model;
     }
@@ -149,7 +151,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         }
         $this->builder = new $className();
         if ($this->connection) {
-            $this->builder = $this->builder->on($this->connection);
+            $this->builder = $this->builder->on($this->connection->getName());
         }
         return $this->builder->newQuery();
     }

@@ -44,7 +44,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      * @param  string  $relation
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation) {
+    public function __construct(CModel_Query $query, CModel $parent, $foreignKey, $ownerKey, $type, $relation) {
         $this->morphType = $type;
         parent::__construct($query, $parent, $foreignKey, $ownerKey, $relation);
     }
@@ -135,7 +135,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection $results, $relation) {
+    public function match(array $models, CModel_Collection $results, $relation) {
         return $models;
     }
 
@@ -165,12 +165,12 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      */
     public function associate($model) {
         $this->parent->setAttribute(
-                $this->foreignKey, $model instanceof Model ? $model->getKey() : null
+                $this->foreignKey, $model instanceof CModel ? $model->getKey() : null
         );
         $this->parent->setAttribute(
-                $this->morphType, $model instanceof Model ? $model->getMorphClass() : null
+                $this->morphType, $model instanceof CModel ? $model->getMorphClass() : null
         );
-        return $this->parent->setRelation($this->relationName, $model);
+        return $this->parent->setRelation($this->relation, $model);
     }
 
     /**
@@ -181,7 +181,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     public function dissociate() {
         $this->parent->setAttribute($this->foreignKey, null);
         $this->parent->setAttribute($this->morphType, null);
-        return $this->parent->setRelation($this->relationName, null);
+        return $this->parent->setRelation($this->relation, null);
     }
 
     /**

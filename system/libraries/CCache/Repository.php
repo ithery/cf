@@ -30,11 +30,15 @@ class CCache_Repository implements ArrayAccess {
      * @param  array  $options
      * @return void
      */
-    public function __construct(array $options = array()) {
-        $driverName = carr::get($options, 'driver', 'Null');
-        $driverOption = carr::get($options, 'options', array());
-        $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
-        $this->driver = new $driverClass($driverOption);
+    public function __construct($options = array()) {
+        if ($options instanceof CCache_DriverAbstract) {
+            $this->driver = $options;
+        } else {
+            $driverName = carr::get($options, 'driver', 'Null');
+            $driverOption = carr::get($options, 'options', array());
+            $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
+            $this->driver = new $driverClass($driverOption);
+        }
     }
 
     /**

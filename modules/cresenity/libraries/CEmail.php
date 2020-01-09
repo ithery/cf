@@ -7,5 +7,13 @@
  */
 
 class CEmail {
-    
+
+    /**
+     * 
+     * @return \CEmail_Builder
+     */
+    public static function Builder() {
+        return CEmail_Builder::instance();
+    }
+
 }

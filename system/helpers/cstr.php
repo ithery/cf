@@ -151,7 +151,7 @@ class cstr {
      */
     public static function random($length = 16) {
         if (!is_callable('random_bytes')) {
-            require_once \CF::get_file('vendor', 'random_compat/random');
+            require_once \CF::getFile('vendor', 'random_compat/random');
         }
 
         $string = '';
@@ -825,6 +825,145 @@ class cstr {
         }
 
         return isset($languageSpecific[$language]) ? $languageSpecific[$language] : null;
+    }
+
+    public static function haveUpper($string) {
+        return preg_match('~^\p{Lu}~u', $string);
+    }
+
+    public static function kebabCase($string) {
+        return \implode('-', \array_map('\strtolower', cstr::words(\preg_replace("/['\x{2019}]/u", '', $string))));
+    }
+
+    /**
+     * Splits `string` into an array of its words.
+     *
+     * @category String
+     *
+     * @param    string $string  The string to inspect.
+     * @param   string  $pattern The pattern to match words.
+     *
+     * @return array Returns the words of `string`.
+     *
+     * @example
+     * <code>
+     * cstr::words('fred, barney, & pebbles')
+     * // => ['fred', 'barney', 'pebbles']
+     *
+     * cstr::words('fred, barney, & pebbles', '/[^, ]+/g')
+     * // => ['fred', 'barney', '&', 'pebbles']
+     * </code>
+     */
+    public static function words($string, $pattern = null) {
+
+        $asciiWords = '/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/';
+        $hasUnicodeWord = '/[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/';
+
+        if (null === $pattern) {
+            if (\preg_match($hasUnicodeWord, $string)) {
+                return cstr::unicodeWords($string);
+            }
+            \preg_match_all($asciiWords, $string, $matches);
+            return isset($matches[0]) ? $matches[0] : [];
+        }
+        if (\preg_match_all($pattern, $string, $matches) > 0) {
+            return $matches[0];
+        }
+        return [];
+    }
+
+    /**
+     * Splits a Unicode `string` into an array of its words.
+     *
+     * @private
+     *
+     * @param string $string The string to inspect.
+     *
+     * @return array Returns the words of `string`.
+     */
+    public static function unicodeWords($string) {
+
+        $rsAstralRange = '\\x{e800}-\\x{efff}';
+        $rsComboMarksRange = '\\x{0300}-\\x{036f}';
+        $reComboHalfMarksRange = '\\x{fe20}-\\x{fe2f}';
+        $rsComboSymbolsRange = '\\x{20d0}-\\x{20ff}';
+        $rsComboRange = $rsComboMarksRange . $reComboHalfMarksRange . $rsComboSymbolsRange;
+        $rsDingbatRange = '\\x{2700}-\\x{27bf}';
+        $rsLowerRange = 'a-z\\xdf-\\xf6\\xf8-\\xff';
+        $rsMathOpRange = '\\xac\\xb1\\xd7\\xf7';
+        $rsNonCharRange = '\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf';
+        $rsPunctuationRange = '\\x{2000}-\\x{206f}';
+        $rsSpaceRange = ' \\t\\x0b\\f\\xa0\\x{feff}\\n\\r\\x{2028}\\x{2029}\\x{1680}\\x{180e}\\x{2000}\\x{2001}\\x{2002}\\x{2003}\\x{2004}\\x{2005}\\x{2006}\\x{2007}\\x{2008}\\x{2009}\\x{200a}\\x{202f}\\x{205f}\\x{3000}';
+        $rsUpperRange = 'A-Z\\xc0-\\xd6\\xd8-\\xde';
+        $rsVarRange = '\\x{fe0e}\\x{fe0f}';
+        $rsBreakRange = $rsMathOpRange . $rsNonCharRange . $rsPunctuationRange . $rsSpaceRange;
+        /** Used to compose unicode capture groups. */
+        $rsApos = "[\\x{2019}]";
+        $rsBreak = '[' . $rsBreakRange . ']';
+        $rsCombo = '[' . $rsComboRange . ']';
+        $rsDigits = '\\d+';
+        $rsDingbat = '[' . $rsDingbatRange . ']';
+        $rsLower = '[' . $rsLowerRange . ']';
+        $rsMisc = '[^' . $rsAstralRange . $rsBreakRange . $rsDigits . $rsDingbatRange . $rsLowerRange . $rsUpperRange . ']';
+        $rsFitz = '\\x{e83c}[\\x{effb}-\\x{efff}]';
+        $rsModifier = '(?:' . $rsCombo . '|' . $rsFitz . ')';
+        $rsNonAstral = '[^' . $rsAstralRange . ']';
+        $rsRegional = '(?:\\x{e83c}[\\x{ede6}-\\x{edff}]){2}';
+        $rsSurrPair = '[\\x{e800}-\\x{ebff}][\\x{ec00}-\\x{efff}]';
+        $rsUpper = '[' . $rsUpperRange . ']';
+        $rsZWJ = '\\x{200d}';
+        /** Used to compose unicode regexes. */
+        $rsMiscLower = '(?:' . $rsLower . '|' . $rsMisc . ')';
+        $rsMiscUpper = '(?:' . $rsUpper . '|' . $rsMisc . ')';
+        $rsOptContrLower = '(?:' . $rsApos . '(?:d|ll|m|re|s|t|ve))?';
+        $rsOptContrUpper = '(?:' . $rsApos . '(?:D|LL|M|RE|S|T|VE))?';
+        $reOptMod = $rsModifier . '?';
+        $rsOptVar = '[' . $rsVarRange . ']?';
+        $rsOptJoin = '(?:' . $rsZWJ . '(?:' . implode('|', [$rsNonAstral, $rsRegional, $rsSurrPair]) . ')' . $rsOptVar . $reOptMod . ')*';
+        $rsOrdLower = '\\d*(?:(?:1st|2nd|3rd|(?![123])\\dth)\\b)';
+        $rsOrdUpper = '\\d*(?:(?:1ST|2ND|3RD|(?![123])\\dTH)\\b)';
+        $rsSeq = $rsOptVar . $reOptMod . $rsOptJoin;
+        $rsEmoji = '(?:' . implode('|', [$rsDingbat, $rsRegional, $rsSurrPair]) . ')' . $rsSeq;
+        $rsAstral = '[' . $rsAstralRange . ']';
+        $rsNonAstralCombo = $rsNonAstral . $rsCombo . '?';
+        $rsSymbol = '(?:' . implode('|', [$rsNonAstralCombo, $rsCombo, $rsRegional, $rsSurrPair, $rsAstral]) . ')';
+        /** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+        $reUnicode = $rsFitz . '(?=' . $rsFitz . ')|' . $rsSymbol . $rsSeq;
+
+        $regex = '#' . \implode('|', [
+                    $rsUpper . '?' . $rsLower . '+' . $rsOptContrLower . '(?=' . \implode('|', [$rsBreak, $rsUpper, '$']) . ')',
+                    $rsMiscUpper . '+' . $rsOptContrUpper . '(?=' . \implode('|', [$rsBreak, $rsUpper . $rsMiscLower, '$']) . ')',
+                    $rsUpper . '?' . $rsMiscLower . '+' . $rsOptContrLower,
+                    $rsUpper . '+' . $rsOptContrUpper,
+                    $rsOrdUpper,
+                    $rsOrdLower,
+                    $rsDigits,
+                    $rsEmoji,
+                ]) . '#u';
+        if (\preg_match_all($regex, $string, $matches) > 0) {
+            return $matches[0];
+        }
+        return [];
+    }
+
+    /**
+     * Escapes the `RegExp` special characters "^", "$", "\", ".", "*", "+",
+     * "?", "(", ")", "[", "]", "{", "}", and "|" in `string`.
+     *
+     * @category String
+     *
+     * @param string $string The string to escape.
+     *
+     * @return string Returns the escaped string.
+     * @example
+     * <code>
+     * escapeRegExp('[lodash](https://lodash.com/)')
+     * // => '\[lodash\]\(https://lodash\.com/\)'
+     * </code>
+     */
+    public static function escapeRegExp($string) {
+        $reRegExpChar = '/([\\^$.*+?()[\]{}|])/';
+        return \preg_replace($reRegExpChar, '\\\$0', $string);
     }
 
 }

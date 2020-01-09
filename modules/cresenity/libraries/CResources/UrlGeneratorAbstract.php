@@ -11,13 +11,11 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
     /** @var CApp_Model_Interface_ResourceInterface */
     protected $resource;
 
-    /** @var \Spatie\MediaLibrary\Conversion\Conversion */
+    /** @var CResources_Conversion */
     protected $conversion;
 
     /** @var CResources_PathGeneratorInterface */
     protected $pathGenerator;
-
-    
 
     /**
      * @param CApp_Model_Interface_ResourceInterface $resource
@@ -30,11 +28,11 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
     }
 
     /**
-     * @param \Spatie\MediaLibrary\Conversion\Conversion $conversion
+     * @param CResources_Conversion $conversion
      *
      * @return CResources_UrlGeneratorInterface
      */
-    public function setConversion(Conversion $conversion) {
+    public function setConversion(CResources_Conversion $conversion) {
         $this->conversion = $conversion;
         return $this;
     }
@@ -66,6 +64,13 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
 
     public function rawUrlEncodeFilename($path = '') {
         return pathinfo($path, PATHINFO_DIRNAME) . '/' . rawurlencode(pathinfo($path, PATHINFO_BASENAME));
+    }
+
+    public function versionUrl($path = '') {
+        if (!CF::config('resource.version_urls')) {
+            return $path;
+        }
+        return "{$path}?v={$this->resource->updated->timestamp}";
     }
 
 }
