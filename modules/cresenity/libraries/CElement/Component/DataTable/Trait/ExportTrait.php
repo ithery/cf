@@ -674,7 +674,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 } else {
                     $class .= " odd";
                 }
-                echo '<td class="' . $class . '" data-column="' . $col->get_fieldname() . '">' . $new_v . '</td>';
+                echo '<td class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>';
 
                 $col_found = true;
             }
