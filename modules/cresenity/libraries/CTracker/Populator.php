@@ -10,7 +10,7 @@ class CTracker_Populator {
     
     protected $data;
     public function __construct() {
-        
+        $this->data= [];
     }
     
     public function populate() {
