@@ -72,7 +72,7 @@ class CRedis implements CRedis_FactoryInterface {
      * Get a Redis connection by name.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Redis\Connections\Connection
+     * @return CRedis_AbstractConnector
      */
     public function connection($name = null) {
         $name = $name ?: 'default';
@@ -88,7 +88,7 @@ class CRedis implements CRedis_FactoryInterface {
      * Resolve the given connection by name.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Redis\Connections\Connection
+     * @return CRedis_AbstractConnector
      *
      * @throws \InvalidArgumentException
      */
