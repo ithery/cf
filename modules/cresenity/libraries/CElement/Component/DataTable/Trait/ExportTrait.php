@@ -464,9 +464,19 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
     public function exportExcelxml($filename, $sheet_name = null) {
         $this->export_excelxml = true;
+
         header("Cache-Control: no-cache, no-store, must-revalidate");
         header("Content-Type: application/vnd.ms-excel");
         header("Content-Disposition: attachment; filename=" . $filename);
+
+        if ($this->isCallback) {
+            $callbackData = CFunction::factory($this->query)
+                    ->addArg($this->callbackOptions)
+                    ->setRequire($this->callbackRequire)
+                    ->execute();
+            $this->data =carr::get($callbackData,'data');
+        }
+        
         echo '
                 <html xmlns:o="urn:schemas-microsoft-com:office:office"
                         xmlns:x="urn:schemas-microsoft-com:office:excel"
@@ -636,12 +646,12 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 $new_v = $col_v;
 
                 if (($this->cellCallbackFunc) != null) {
-                    $new_v = CDynFunction::factory($this->cellCallbackFunc)
-                            ->add_param($this)
-                            ->add_param($col->getFieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($this->requires)
+                    $new_v = CFunction::factory($this->cellCallbackFunc)
+                            ->addArg($this)
+                            ->addArg($col->getFieldname())
+                            ->addArg($row)
+                            ->addArg($new_v)
+                            ->setRequire($this->requires)
                             ->execute();
 
 
