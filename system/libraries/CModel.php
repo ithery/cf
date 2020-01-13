@@ -8,6 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
+
 abstract class CModel implements ArrayAccess {
 
     use CModel_Trait_GuardsAttributes,

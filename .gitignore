@@ -18,15 +18,13 @@ application/*
 #ignore git bak
 /.git.bak
 
-
+/access.log
 
 #ignore libs of CPDF
 /modules/cresenity/vendor/lib/fonts/Helvetica.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-Bold.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-Oblique.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-BoldOblique.afm.php
-
-/system/vendor/Cresenity
 
 #ignore folder logs
 /application/logs
