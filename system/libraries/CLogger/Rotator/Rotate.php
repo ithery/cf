@@ -94,6 +94,10 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
         return (is_int($this->getSizeToRotate()) && $this->getSizeToRotate() !== 0);
     }
 
+    public function forceRotate() {
+        $this->run(false);
+    }
+
     /**
      * Run the file rotation
      *
@@ -101,7 +105,7 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
      * @throws FilenameFormatException
      * @throws RotateException
      */
-    public function run() {
+    public function run($checkSize = true) {
         if (!$this->hasFilenameFormat()) {
             throw new CLogger_Rotator_Exception_FilenameFormatException('You must set a filename format to match files against');
         }
@@ -110,10 +114,12 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
         $dir->setFilenameFormat($this->getFilenameFormat());
         foreach ($dir as $file) {
             if ($file->isFile() && $file->isMatch()) {
-                // Skip if rotate size specified and initial matched file doesn't exceed this
-                if ($this->hasSizeToRotate()) {
-                    if ($file->getSize() < $this->getSizeToRotate()) {
-                        continue;
+                if ($checkSize) {
+                    // Skip if rotate size specified and initial matched file doesn't exceed this
+                    if ($this->hasSizeToRotate()) {
+                        if ($file->getSize() < $this->getSizeToRotate()) {
+                            continue;
+                        }
                     }
                 }
                 // Rotate files

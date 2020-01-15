@@ -138,6 +138,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
             case 'restart':
                 return call_user_func_array([$this, 'logRestart'], $logArgs);
                 break;
+            case 'rotate':
+                return call_user_func_array([$this, 'logRotate'], $logArgs);
+                break;
             case 'back':
                 curl::redirect($this->controllerUrl());
                 break;
@@ -156,6 +159,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
         $restartAction = $actionContainer->addAction()->setLabel('Restart')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/restart/' . $serviceClass)->setConfirm();
         $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() );
+        $rotateAction = $actionContainer->addAction()->setLabel('Force Rotate Log')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/rotate/' . $serviceClass)->setConfirm();
 
 
         $logFileList = CManager::daemon()->getLogFileList($serviceClass);
@@ -194,6 +198,38 @@ trait CTrait_Controller_Application_Manager_Daemon {
     }
 
     public function logRestart($serviceClass = null) {
+        if (strlen($serviceClass) == 0) {
+            curl::redirect($this->controllerUrl() . 'log/index');
+        }
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+
+        $errCode = 0;
+        $errMessage = '';
+
+
+        try {
+            $started = CManager::daemon()->stop($serviceClass);
+        } catch (Exception $ex) {
+            $errCode++;
+            $errMessage = $ex->getMessage();
+        }
+        sleep(2);
+        try {
+            $started = CManager::daemon()->start($serviceClass);
+        } catch (Exception $ex) {
+            $errCode++;
+            $errMessage = $ex->getMessage();
+        }
+        if ($errCode == 0) {
+            cmsg::add('success', 'Daemon Successfully Restarted');
+        } else {
+            cmsg::add('error', $errMessage);
+        }
+        curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass);
+    }
+    
+    public function logRotate($serviceClass = null) {
         if (strlen($serviceClass) == 0) {
             curl::redirect($this->controllerUrl() . 'log/index');
         }
