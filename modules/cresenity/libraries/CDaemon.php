@@ -163,9 +163,9 @@ class CDaemon {
         $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
         $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
-       
-        
-        
+
+
+
         exec("$binary $command 1> $output 2>&1 &");
     }
 
@@ -202,6 +202,23 @@ class CDaemon {
     protected function getPhpBinary() {
         $executableFinder = new PhpExecutableFinder();
         return $executableFinder->find();
+    }
+
+    public function rotateLog() {
+        $logFile = carr::get($this->config, 'logFile');
+
+        if (strlen($logFile) > 0 && file_exists($logFile)) {
+            $rotator = CLogger_Rotator::createRotate($logFile);
+
+            $rotator->forceRotate();
+        }
+    }
+
+    public function logDump() {
+        $pid = $this->getPid();
+        if ($pid) {
+            exec("kill -10 $pid");
+        }
     }
 
     public function getPid() {
