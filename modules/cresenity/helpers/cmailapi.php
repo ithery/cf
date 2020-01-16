@@ -76,7 +76,7 @@ class cmailapi {
             $content = '';
             if(strlen($disk)>0) {
                 $diskObject=CStorage::instance()->disk($disk);
-                $content = $disk->get($path);
+                $content = $diskObject->get($path);
             } else {
                 $content = file_get_contents($path);
             }
