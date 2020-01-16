@@ -664,6 +664,14 @@ class cdbg {
     }
 
     public static function caller_info() {
+        return static::callerInfo();
+    }
+    
+    /**
+     * 
+     * @return string
+     */
+    public static function callerInfo() {
         $c = '';
         $file = '';
         $func = '';
