@@ -426,8 +426,8 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         // If the path contains "storage/public", it probably means the developer is using
         // the default disk to generate the path instead of the "public" disk like they
         // are really supposed to use. We will remove the public from this path here.
-        if (Str::contains($path, '/storage/public/')) {
-            return Str::replaceFirst('/public/', '/', $path);
+        if (cstr::contains($path, '/storage/public/')) {
+            return cstr::replaceFirst('/public/', '/', $path);
         }
         return $path;
     }
