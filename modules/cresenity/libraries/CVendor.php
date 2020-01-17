@@ -134,8 +134,7 @@ class CVendor {
      *
      * @return CVendor_Zenziva            [description]
      */
-    public static function zenziva($username, $password)
-    {
+    public static function zenziva($username, $password) {
         return new CVendor_Zenziva($username, $password);
     }
 
@@ -149,9 +148,21 @@ class CVendor {
      * 
      * @return CVendor_Kredivo  [description]
      */
-    public static function kredivo($serverKey, $environment = 'production')
-    {
+    public static function kredivo($serverKey, $environment = 'production') {
         return new CVendor_Kredivo($environment, $serverKey);
+    }
+
+    /**
+     * 
+     * @param string $apiKey
+     * @param array $options
+     * @return \CVendor_SendGrid
+     */
+    public static function sendGrid($apiKey, $options = []) {
+        if (strlen($apiKey) == 0) {
+            $apiKey == ccfg::get('smtp_password');
+        }
+        return new CVendor_SendGrid($apiKey, $options);
     }
 
 }
