@@ -9,6 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 
 use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\UTCDateTime;
 
 class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
 
