@@ -48,7 +48,7 @@ final class CManager_Daemon {
         $daemon = new CDaemon($config);
         return $daemon;
     }
-    
+
     public function pidPath() {
         return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid/';
     }
@@ -56,7 +56,7 @@ final class CManager_Daemon {
     public function logPath() {
         return DOCROOT . 'data/daemon/' . CF::appCode() . '/log/';
     }
-    
+
     protected function runDaemon($className, $command) {
         $daemon = $this->getDaemon($className, $command);
         return $daemon->run();
@@ -79,6 +79,16 @@ final class CManager_Daemon {
         return $daemon->isRunning();
     }
 
+    public function rotateLog($className) {
+        $daemon = self::getDaemon($className);
+        return $daemon->rotateLog();
+    }
+    
+    public function logDump($className) {
+        $daemon = self::getDaemon($className);
+        return $daemon->logDump();
+    }
+
     public function getServiceName($className) {
         $serviceName = $className;
         $serviceNameExploded = explode('_', $className);
@@ -88,22 +98,21 @@ final class CManager_Daemon {
         return $serviceName;
     }
 
-    public function getLogFile($className,$filename=null) {
-        if($filename==null) {
+    public function getLogFile($className, $filename = null) {
+        if ($filename == null) {
             $filename = $className . '.log';
         }
-        return self::logPath() .$className.'/'. $filename;
+        return self::logPath() . $className . '/' . $filename;
     }
 
     public function getPidFile($className) {
         return self::pidPath() . $className . '.pid';
     }
 
-    
     public function getLogFileList($className) {
         $fileHelper = CHelper::file();
-        $logPath = rtrim(self::logPath(), '/').'/'.$className;
-        if(!is_dir($logPath)) {
+        $logPath = rtrim(self::logPath(), '/') . '/' . $className;
+        if (!is_dir($logPath)) {
             return [];
         }
         $files = $fileHelper->files($logPath);
@@ -111,10 +120,11 @@ final class CManager_Daemon {
         foreach ($files as $file) {
             /* @var $file \Symfony\Component\Finder\SplFileInfo */
             $basename = $file->getBasename();
-           
+
             $list[$file->getPath() . DS . $file->getFilename()] = $basename;
         }
 
         return $list;
     }
+
 }

@@ -348,7 +348,7 @@ class CDatabase {
         $is_benchmark = carr::get($this->config, 'benchmark', FALSE);
         if ($is_benchmark) {
             // Benchmark the query
-            CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::caller_info());
+            CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
         }
 
 

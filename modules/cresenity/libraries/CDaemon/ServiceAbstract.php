@@ -26,6 +26,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     protected $stdout = false;
     protected $debug = true;
     protected $terminateLimit = 20;
+    
+    protected $sizeToRotate = '500KB';
 
     /**
      * The application will attempt to restart itself it encounters a recoverable fatal error after it's been running
@@ -521,7 +523,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             if(strlen($logFile)>0&& file_exists($logFile)) { 
                 $rotator = CLogger_Rotator::createRotate($logFile);
                 
-                $rotator->run();
+                $rotator->size($this->sizeToRotate)->run();
             }
             if (strlen($logFile) > 0 && self::$log_handle = @fopen($logFile, 'a+')) {
                 if ($this->parent) {
