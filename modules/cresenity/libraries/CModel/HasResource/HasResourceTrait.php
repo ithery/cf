@@ -210,6 +210,20 @@ trait CModel_HasResource_HasResourceTrait {
         }
         return $resource->getUrl($conversionName);
     }
+    
+    /*
+     * Get the url of the image for the given conversionName
+     * for first resource for the given collectionName.
+     * If no profile is given, return the source's full url.
+     */
+
+    public function getFirstResourceFullUrl($collectionName = 'default', $conversionName = '') {
+        $resource = $this->getFirstResource($collectionName);
+        if (!$resource) {
+            return '';
+        }
+        return $resource->getFullUrl($conversionName);
+    }
 
     /*
      * Get the url of the image for the given conversionName
