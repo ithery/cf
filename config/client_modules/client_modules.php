@@ -695,6 +695,11 @@ return array(
             "plugins/tippy/tippy.js",
         ),
     ),
+    "locationpicker" => array(
+        "js" => array(
+            "plugins/locationpicker/locationpicker.jquery.js",
+        ),
+    ),
     "pdfjs" => array(
         "js" => array(
             "plugins/pdfjs/pdf.js",

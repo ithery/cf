@@ -76,6 +76,7 @@ abstract class CObservable extends CRenderable {
         $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
         $this->manager->registerControl('select', 'CElement_FormInput_Select');
         $this->manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
+        $this->manager->registerControl('map-picker', CElement_FormInput_MapPicker::class);
 
         $this->manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
 
