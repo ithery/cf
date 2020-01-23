@@ -16,10 +16,10 @@
 class CElement_FormInput_Textarea extends CElement_FormInput {
 
     use CTrait_Compat_Element_FormInput_Textarea;
+    use CTrait_Element_Property_Placeholder;
 
     protected $col;
     protected $row;
-    protected $placeholder;
 
     //put your code here
     public function __construct($id) {
@@ -28,7 +28,6 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         $this->tag = "textarea";
         $this->isOneTag = false;
 
-        $this->placeholder = "";
         $this->col = 60;
         $this->row = 10;
 
@@ -42,6 +41,9 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         }
         if ($this->disabled) {
             $this->setAttr('disabled', 'disabled');
+        }
+        if(strlen($this->placeholder)>0) {
+            $this->setAttr('placeholder',$this->placeholder);
         }
     }
 
@@ -70,4 +72,6 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         return $this;
     }
 
+    
+   
 }
