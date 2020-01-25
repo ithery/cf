@@ -19,5 +19,16 @@ trait CTrait_Compat_Element_FormInput_Checkbox {
     public function set_label($label, $lang = true) {
         return $this->setLabel($label, $lang);
     }
+    
+    /**
+     * 
+     * @deprecated
+     * @param string $label
+     * @param string $lang
+     * @return $this
+     */
+    public function set_checked($bool) {
+        return $this->setChecked($label, $lang);
+    }
 
 }
