@@ -667,7 +667,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @return string
      */
     protected function guessInverseRelation() {
-        return cstr::camel(cstr::plural(CBase::classBasename($this->getParent())));
+        return cstr::camel(cstr::plural(c::classBasename($this->getParent())));
     }
 
     /**
