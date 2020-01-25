@@ -864,6 +864,39 @@ var Cresenity = function () {
             callback();
         }
     };
+    this.handleJsonResponse = function (response, onSuccess, defaultUnexpectedMessage) {
+
+        if (typeof defaultUnexpectedMessage == 'undefined') {
+            defaultUnexpectedMessage = 'Unexpected error happen, please relogin ro refresh this page';
+        }
+
+        if (response.errCode == 0) {
+            if (typeof onSuccess == 'function') {
+                onSuccess(response.data);
+            }
+        } else {
+            if (typeof response.errMessage == 'undefined') {
+                if (response.title == 'Tribelio - Login Account') {
+                    cresenity.showError('Your session has ended, please relogin or refresh this page');
+                } else {
+                    cresenity.showError(defaultUnexpectedMessage);
+                }
+            } else {
+                cresenity.showError(response.errMessage);
+            }
+        }
+    }
+
+    this.showError = function (message) {
+        toastr['error'](message, 'Error', {
+            positionClass: 'toast-top-right',
+            closeButton: true,
+            progressBar: true,
+            preventDuplicates: false,
+            newestOnTop: false,
+
+        });
+    }
     this.require = function (filename, filetype, callback) {
         if (cresenity.filesAdded.indexOf("[" + filename + "]") == -1) {
             cresenity.loadJsCss(filename, filetype, callback);
