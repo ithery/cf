@@ -667,6 +667,10 @@ class CElement_Component_DataTable extends CElement_Component {
                                 ->addArg($col_v)
                                 ->setRequire($col->callbackRequire)
                                 ->execute();
+                         if (is_array($col_v) && isset($col_v['html']) && isset($col_v['js'])) {
+                            $js .= $col_v['js'];
+                            $col_v = $col_v['html'];
+                        }
                     }
                     $new_v = $col_v;
 
