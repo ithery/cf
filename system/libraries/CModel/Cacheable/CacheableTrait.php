@@ -249,7 +249,7 @@ trait CModel_Cacheable_CacheableTrait {
     /**
      * Cache given callback.
      *
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param CDatabase_Query_Builder|CModel_Query $builder
      * @param array                                                                    $columns
      * @param \Closure                                                                 $closure
      *
