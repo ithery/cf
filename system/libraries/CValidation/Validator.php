@@ -43,6 +43,13 @@ class CValidation_Validator {
      */
     protected $failedRules = [];
 
+     /**
+     * Attributes that should be excluded from the validated data.
+     *
+     * @var array
+     */
+    protected $excludeAttributes = [];
+
     /**
      * The message bag instance.
      *
