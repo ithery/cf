@@ -86,6 +86,20 @@ class CValidation_Validator {
     protected $implicitAttributes = [];
 
     /**
+     * The callback that should be used to format the attribute.
+     *
+     * @var callable|null
+     */
+    protected $implicitAttributesFormatter;
+
+    /**
+     * The cached data for the "distinct" rule.
+     *
+     * @var array
+     */
+    protected $distinctValues = [];
+
+    /**
      * All of the registered "after" callbacks.
      *
      * @var array
@@ -166,6 +180,13 @@ class CValidation_Validator {
     ];
 
     /**
+     * The validation rules that can exclude an attribute.
+     *
+     * @var array
+     */
+    protected $excludeRules = ['ExcludeIf', 'ExcludeUnless'];
+
+    /**
      * The size related validation rules.
      *
      * @var array
@@ -211,15 +232,8 @@ class CValidation_Validator {
             if (is_array($value)) {
                 $value = $this->parseData($value);
             }
-
-            // If the data key contains a dot, we will replace it with another character
-            // sequence so it doesn't interfere with dot processing when working with
-            // array based validation rules and array_dot later in the validations.
-            if (cstr::contains($key, '.')) {
-                $newData[str_replace('.', '->', $key)] = $value;
-            } else {
-                $newData[$key] = $value;
-            }
+            $key = str_replace(['.', '*'], ['->', '__asterisk__'], $key);
+            $newData[$key] = $value;
         }
 
         return $newData;
@@ -246,17 +260,29 @@ class CValidation_Validator {
      */
     public function passes() {
         $this->messages = new CValidation_MessageBag();
-
+        $this->distinctValues = [];
+        $this->failedRules = [];
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
             $attribute = str_replace('\.', '->', $attribute);
 
+            if ($this->shouldBeExcluded($attribute)) {
+                $this->removeAttribute($attribute);
+
+                continue;
+            }
+
             foreach ($rules as $rule) {
 
                 $this->validateAttribute($attribute, $rule);
 
+                if ($this->shouldBeExcluded($attribute)) {
+                    $this->removeAttribute($attribute);
+
+                    break;
+                }
                 if ($this->shouldStopValidating($attribute)) {
                     break;
                 }
@@ -280,6 +306,34 @@ class CValidation_Validator {
      */
     public function fails() {
         return !$this->passes();
+    }
+
+    /**
+     * Determine if the attribute should be excluded.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function shouldBeExcluded($attribute) {
+        foreach ($this->excludeAttributes as $excludeAttribute) {
+            if ($attribute === $excludeAttribute ||
+                    cstr::startsWith($attribute, $excludeAttribute . '.')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove the given attribute.
+     *
+     * @param  string  $attribute
+     *
+     * @return void
+     */
+    protected function removeAttribute($attribute) {
+        unset($this->data[$attribute], $this->rules[$attribute]);
     }
 
     /**
@@ -560,11 +614,30 @@ class CValidation_Validator {
      * @return void
      */
     protected function addFailure($attribute, $rule, $parameters) {
+        if (!$this->messages) {
+            $this->passes();
+        }
+        $attribute = str_replace('__asterisk__', '*', $attribute);
+        if (in_array($rule, $this->excludeRules)) {
+            return $this->excludeAttribute($attribute);
+        }
         $this->messages->add($attribute, $this->makeReplacements(
                         $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
         ));
 
         $this->failedRules[$attribute][$rule] = $parameters;
+    }
+
+    /**
+     * Add the given attribute to the list of excluded attributes.
+     *
+     * @param  string  $attribute
+     * @return void
+     */
+    protected function excludeAttribute($attribute) {
+        $this->excludeAttributes[] = $attribute;
+
+        $this->excludeAttributes = array_unique($this->excludeAttributes);
     }
 
     /**
@@ -936,6 +1009,18 @@ class CValidation_Validator {
     }
 
     /**
+     * Set the callback that used to format an implicit attribute..
+     *
+     * @param  callable|null  $formatter
+     * @return $this
+     */
+    public function setImplicitAttributesFormatter(callable $formatter = null) {
+        $this->implicitAttributesFormatter = $formatter;
+
+        return $this;
+    }
+
+    /**
      * Set the custom values on the validator.
      *
      * @param  array  $values
@@ -1093,10 +1178,10 @@ class CValidation_Validator {
     }
 
     public function getAllErrorString() {
-       
+
         $messages = $this->errors()->messages();
         $flattenMessages = carr::flatten($messages);
-        
+
         return CF::collect($flattenMessages)->implode(",");
     }
 
