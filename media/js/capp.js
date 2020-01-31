@@ -864,10 +864,10 @@ var Cresenity = function () {
             callback();
         }
     };
-    this.handleJsonResponse = function (response, onSuccess, defaultUnexpectedMessage) {
-
-        if (typeof defaultUnexpectedMessage == 'undefined') {
-            defaultUnexpectedMessage = 'Unexpected error happen, please relogin ro refresh this page';
+    this.handleJsonResponse = function (response, onSuccess, onError) {
+        var errMessage = 'Unexpected error happen, please relogin ro refresh this page';
+        if (typeof onError == 'string'){
+            errMessage = onError;
         }
 
         if (response.errCode == 0) {
@@ -875,14 +875,13 @@ var Cresenity = function () {
                 onSuccess(response.data);
             }
         } else {
-            if (typeof response.errMessage == 'undefined') {
-                if (response.title == 'Tribelio - Login Account') {
-                    cresenity.showError('Your session has ended, please relogin or refresh this page');
-                } else {
-                    cresenity.showError(defaultUnexpectedMessage);
-                }
+            if(typeof response.errMessage != 'undefined') {
+                errMessage = response.errMessage;
+            }
+            if (typeof onError == 'function') {
+                onError(errMessage);
             } else {
-                cresenity.showError(response.errMessage);
+                cresenity.showError(errMessage);
             }
         }
     }
@@ -1190,15 +1189,26 @@ var Cresenity = function () {
                     beforeSubmit: function () {
                         if (typeof $(element).validate == 'function') {
                             validationIsValid = $(element).validate().form();
-
+                            return validationIsValid;
                         }
                         return true;
                     },
-                    success: function (data) {
+                    success: function (response) {
+                        var onSuccess = function(){};
+                        var onError = function(errMessage) {cresenity.showError(errMessage)};
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
-                            settings.onSuccess(data);
+                            onSuccess=settings.onSuccess;
+                        }
+                        if (typeof settings.onError == 'function' && validationIsValid) {
+                            onError=settings.onError;
+                        }
+                        
+                        if (validationIsValid) {
+                            cresenity.handleJsonResponse(response,onSuccess,onError);
+                            
                         }
                     },
+                    
                     complete: function () {
                         cresenity.unblockElement($(element));
 

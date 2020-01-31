@@ -45,9 +45,9 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         $link = $this->url;
 
         if (strlen($link) == 0) {
-            $ajax_url = CAjaxMethod::factory()->set_type('handler_' . $this->name)
-                    ->set_data('json', $this->content->json())
-                    ->makeurl();
+            $ajax_url = CAjax::createMethod()->setType('handler_' . $this->name)
+                    ->setData('json', $this->content->json())
+                    ->makeUrl();
             $link = $ajax_url;
         }
 
