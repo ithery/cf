@@ -10,7 +10,7 @@ use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Image extends CEmail_Builder_Component_BodyComponent {
     protected static $tagName = 'c-image';
-    protected $tagOmission = true;
+    protected static $tagOmission = true;
     protected $allowedAttributes = [
         'alt' => 'string',
         'href' => 'string',
