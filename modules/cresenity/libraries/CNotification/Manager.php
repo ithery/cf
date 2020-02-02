@@ -31,12 +31,32 @@ class CNotification_Manager {
      * @param string $channel
      * @return \CNotification_ChannelAbstract
      */
-    public function channel($channel) {
+    public function channel($channel, $config = null) {
+        $className = 'CNotification_Channel_' . $channel . 'Channel';
+        if ($config != null) {
+            return new $className($config);
+        }
         if (!isset($this->channels[$channel])) {
-            $className = 'CNotification_Channel_' . $channel.'Channel';
             return new $className();
         }
         return $this->channels[$channel];
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    public function logNotificationModelName() {
+        return CF::config('notification.log_notification_model', CNotification_Model_LogNotification::class);
+    }
+
+    /**
+     * 
+     * @return \CModel
+     */
+    public function createLogNotificationModel() {
+        $modelName = $this->logNotificationModelName();
+        return new $modelName();
     }
 
 }

@@ -6,14 +6,11 @@
  * and open the template in the editor.
  */
 
-class CEmail {
-
-    /**
-     * 
-     * @return \CEmail_Builder
-     */
-    public static function builder() {
-        return CEmail_Builder::instance();
-    }
-
-}
+return array(
+    'log_notification_model' => CNotification_Model_LogNotification::class,
+    'queue' => array(
+    ),
+    'email' => array(
+        'smtp'
+    ),
+);

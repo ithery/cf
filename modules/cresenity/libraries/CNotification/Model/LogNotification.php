@@ -6,14 +6,7 @@
  * and open the template in the editor.
  */
 
-class CEmail {
+class CNotification_Model_LogNotification extends CModel {
 
-    /**
-     * 
-     * @return \CEmail_Builder
-     */
-    public static function builder() {
-        return CEmail_Builder::instance();
-    }
-
+    use CNotification_Trait_LogNotificationModelTrait;
 }

@@ -7,10 +7,6 @@
  */
 
 class CNotification_MessageAbstract {
-    /**
-     *
-     * @var []
-     */
-    protected $params;
-    
+
+    use CTrait_HasOptions;
 }
