@@ -9,6 +9,7 @@
 class CNotification_Manager {
 
     protected $channels;
+    protected $vendors;
     protected static $instance;
 
     /**
@@ -29,6 +30,7 @@ class CNotification_Manager {
     /**
      * 
      * @param string $channel
+     * @param array $config
      * @return \CNotification_ChannelAbstract
      */
     public function channel($channel, $config = null) {
@@ -40,6 +42,37 @@ class CNotification_Manager {
             return new $className();
         }
         return $this->channels[$channel];
+    }
+
+    /**
+     * 
+     * @param string $vendor
+     * @param array $config
+     * @return \CNotification_VendorAbstract
+     */
+    public function vendor($vendor, $config) {
+        $vendorClass = $this->toVendorClass($vendor);
+        $className = 'CNotification_Vendor_' . $vendorClass . '';
+        if ($config != null) {
+            return new $className($config);
+        }
+        if (!isset($this->vendors[$vendorClass])) {
+            return new $className();
+        }
+        return $this->vendors[$vendorClass];
+    }
+
+    /**
+     * 
+     * @param string $vendor
+     * @return string
+     */
+    protected function toVendorClass($vendor) {
+        switch ($vendor) {
+            case 'sendgrid':
+                return 'SendGrid';
+        }
+        return ucfirst(cstr::camel($vendor));
     }
 
     /**

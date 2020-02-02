@@ -11,6 +11,9 @@ return array(
     'queue' => array(
     ),
     'email' => array(
-        'smtp'
+        'vendor' => 'sendgrid',
+    ),
+    'sms' => array(
+        'vendor' => 'nexmo',
     ),
 );
