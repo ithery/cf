@@ -9,9 +9,11 @@
 
 namespace Zend\Diactoros\Exception;
 
+use BadMethodCallException;
+
 /**
- * Marker interface for package-specific exceptions.
+ * Exception indicating a deprecated method.
  */
-interface ExceptionInterface
+class DeprecatedMethodException extends BadMethodCallException implements ExceptionInterface
 {
 }
