@@ -866,7 +866,7 @@ var Cresenity = function () {
     };
     this.handleJsonResponse = function (response, onSuccess, onError) {
         var errMessage = 'Unexpected error happen, please relogin ro refresh this page';
-        if (typeof onError == 'string'){
+        if (typeof onError == 'string') {
             errMessage = onError;
         }
 
@@ -875,7 +875,7 @@ var Cresenity = function () {
                 onSuccess(response.data);
             }
         } else {
-            if(typeof response.errMessage != 'undefined') {
+            if (typeof response.errMessage != 'undefined') {
                 errMessage = response.errMessage;
             }
             if (typeof onError == 'function') {
@@ -1107,11 +1107,11 @@ var Cresenity = function () {
                                 }
 
                                 setTimeout(function () {
-                                    
+
                                     $(modal).remove();
                                     cresenity.modalElements.pop();
-                                    
-                                   
+
+
 
                                     var modalExists = $('.modal:visible').length > 0;
                                     if (!modalExists) {
@@ -1133,7 +1133,7 @@ var Cresenity = function () {
                             settings.onClose(e, next.callback);
                         }
                         if (!next.isRunning) {
-                            
+
                             next.callback();
                         }
                     })(lastModal);
@@ -1194,21 +1194,27 @@ var Cresenity = function () {
                         return true;
                     },
                     success: function (response) {
-                        var onSuccess = function(){};
-                        var onError = function(errMessage) {cresenity.showError(errMessage)};
+                        var onSuccess = function () {};
+                        var onError = function (errMessage) {
+                            cresenity.showError(errMessage)
+                        };
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
-                            onSuccess=settings.onSuccess;
+                            onSuccess = settings.onSuccess;
                         }
                         if (typeof settings.onError == 'function' && validationIsValid) {
-                            onError=settings.onError;
+                            onError = settings.onError;
                         }
-                        
+
                         if (validationIsValid) {
-                            cresenity.handleJsonResponse(response,onSuccess,onError);
-                            
+                            if (settings.handleJsonResponse == true) {
+                                cresenity.handleJsonResponse(response, onSuccess, onError);
+                            } else {
+                                onSuccess(response);
+                            }
+
                         }
                     },
-                    
+
                     complete: function () {
                         cresenity.unblockElement($(element));
 
@@ -1457,7 +1463,7 @@ var Cresenity = function () {
                 }
             }
             this.initConfirm();
-            
+
         });
 
 
@@ -2293,7 +2299,7 @@ if (!window.cresenity) {
                             }
                         });
 
-                        
+
                     },
                     error: function (obj, t, msg) {
                         if (msg != 'abort') {
