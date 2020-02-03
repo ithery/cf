@@ -165,4 +165,28 @@ class CVendor {
         return new CVendor_SendGrid($apiKey, $options);
     }
 
+    /**
+     * 
+     * @param string $apiKey
+     * @param string $apiSecret
+     * @param array $options
+     * @return \CVendor_Nexmo
+     */
+    public static function nexmo($apiKey, $apiSecret, $options = []) {
+
+        if (strlen($apiKey) == 0) {
+            $apiKey = CF::config('vendor.nexmo.key');
+        }
+        if (strlen($apiSecret) == 0) {
+            $apiSecret = CF::config('vendor.nexmo.secret');
+        }
+        if (!is_array($options)) {
+            $options = array();
+        }
+        if (!isset($options['from'])) {
+            $options['from'] = CF::config('vendor.nexmo.from');
+        }
+        return new CVendor_Nexmo($apiKey, $apiSecret, $options);
+    }
+
 }

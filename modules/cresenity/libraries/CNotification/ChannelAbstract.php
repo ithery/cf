@@ -25,7 +25,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $taskQueue = CNotification_TaskQueue_NotificationSender::dispatch($options);
     }
 
-    public function send($className, array $options = []) {
+    public function send($className,  $options = []) {
 
         $message = new $className();
         $message->setOptions($options);
@@ -39,7 +39,8 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         if (is_array($result)) {
             $result = c::collect($result);
         }
-        $result->each(function($value, $key) use ($message) {
+        $hasError = false;
+        $result->each(function($value, $key) use ($message, &$hasError) {
             $errCode = 0;
             $errMessage = '';
             $logNotificationModel = null;
@@ -51,13 +52,15 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                 try {
                     $result = $this->handleMessage($value, $logNotificationModel);
                 } catch (Exception $ex) {
+                    throw $ex;
                     $errCode++;
-                    $errMessage = $ex->getMessage();
+                    $errMessage = $ex->getMessage().':'.$ex->getTraceAsString();
                 }
             }
             if ($errCode > 0) {
-                $logNotificationModel->error = $ex->getMessage();
+                $logNotificationModel->error = $errMessage;
                 $logNotificationModel->notification_status = 'FAILED';
+                
             } else {
 
                 $logNotificationModel->notification_status = 'SUCCESS';
@@ -66,6 +69,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
             $logNotificationModel->save();
         });
+        
     }
 
     protected function insertLogNotification($message, $result) {
@@ -88,24 +92,24 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
     public function getVendorName() {
         $vendor = carr::get($this->config, 'vendor');
         if (strlen($vendor) == 0) {
-            $vendor = CF::config('notification.' . strtolower(cstr::snake($this->channelName)) . '.vendor');
+            $vendor = CF::config('notification.' . strtolower(cstr::snake(static::$channelName)) . '.vendor');
         }
         return $vendor;
     }
 
     /**
      * 
-     * @return CNotification_VendorAbstract
+     * @return CNotification_MessageAbstract
      */
-    public function createVendor($data) {
+    public function createMessage($data) {
         $vendorConfig = carr::get($this->config, 'vendor_config', []);
         if (!is_array($vendorConfig)) {
-            $vendorConfig = CF::config('vendor.') . $this->getVendorName();
+            $vendorConfig = CF::config('vendor.' . $this->getVendorName());
         }
         if (!is_array($vendorConfig)) {
             $vendorConfig = [];
         }
-        return CNotification::manager()->vendor($this->getVendorName(), $vendorConfig, $data);
+        return CNotification::manager()->createMessage($this->getVendorName(), $vendorConfig, $data);
     }
 
 }

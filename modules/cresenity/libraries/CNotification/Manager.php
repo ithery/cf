@@ -49,11 +49,11 @@ class CNotification_Manager {
      * @param string $vendor
      * @param array $data
      * @param array $config
-     * @return \CNotification_VendorAbstract
+     * @return \CNotification_MessageAbstract
      */
-    public function createVendor($vendor, $config = [], $data = []) {
-        $vendorClass = $this->toVendorClass($vendor);
-        $className = 'CNotification_Vendor_' . $vendorClass . '';
+    public function createMessage($vendor, $config = [], $data = []) {
+        $vendorClass = $this->toMessageClass($vendor);
+        $className = 'CNotification_Message_' . $vendorClass . '';
 
         return new $className($config, $data);
     }
@@ -63,7 +63,7 @@ class CNotification_Manager {
      * @param string $vendor
      * @return string
      */
-    protected function toVendorClass($vendor) {
+    protected function toMessageClass($vendor) {
         switch ($vendor) {
             case 'sendgrid':
                 return 'SendGrid';

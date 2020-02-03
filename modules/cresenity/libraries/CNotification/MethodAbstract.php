@@ -6,6 +6,7 @@
  * and open the template in the editor.
  */
 
-interface CNotification_VendorInterface {
-    
+abstract class CNotification_MethodAbstract implements CNotification_MethodInterface {
+
+    use CTrait_HasOptions;
 }

@@ -6,6 +6,6 @@
  * and open the template in the editor.
  */
 
-class CNotification_Vendor_SendGrid extends CNotification_VendorAbstract {
+interface CNotification_MethodInterface {
     
 }

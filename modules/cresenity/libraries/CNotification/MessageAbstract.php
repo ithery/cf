@@ -6,7 +6,15 @@
  * and open the template in the editor.
  */
 
-class CNotification_MessageAbstract {
+abstract class CNotification_MessageAbstract implements CNotification_MessageInterface {
 
     use CTrait_HasOptions;
+
+    protected $config;
+
+    public function __construct($config, $options) {
+        $this->options = $options;
+        $this->config = $config;
+    }
+
 }
