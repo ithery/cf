@@ -47,19 +47,15 @@ class CNotification_Manager {
     /**
      * 
      * @param string $vendor
+     * @param array $data
      * @param array $config
      * @return \CNotification_VendorAbstract
      */
-    public function vendor($vendor, $config) {
+    public function createVendor($vendor, $config = [], $data = []) {
         $vendorClass = $this->toVendorClass($vendor);
         $className = 'CNotification_Vendor_' . $vendorClass . '';
-        if ($config != null) {
-            return new $className($config);
-        }
-        if (!isset($this->vendors[$vendorClass])) {
-            return new $className();
-        }
-        return $this->vendors[$vendorClass];
+
+        return new $className($config, $data);
     }
 
     /**

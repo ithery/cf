@@ -97,7 +97,15 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
      * 
      * @return CNotification_VendorAbstract
      */
-    public function vendor() {
-        return CNotification::manager()->vendor($this->getVendorName());
+    public function createVendor($data) {
+        $vendorConfig = carr::get($this->config, 'vendor_config', []);
+        if (!is_array($vendorConfig)) {
+            $vendorConfig = CF::config('vendor.') . $this->getVendorName();
+        }
+        if (!is_array($vendorConfig)) {
+            $vendorConfig = [];
+        }
+        return CNotification::manager()->vendor($this->getVendorName(), $vendorConfig, $data);
     }
+
 }
