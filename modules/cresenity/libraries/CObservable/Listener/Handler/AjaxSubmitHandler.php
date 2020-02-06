@@ -26,6 +26,7 @@ class CObservable_Listener_Handler_AjaxSubmitHandler extends CObservable_Listene
         if ($this->haveSuccessListener()) {
             $optionsJson .= "onSuccess: " . $this->getSuccessListener()->js() . ",";
         }
+        $optionsJson.='handleJsonResponse: true,';
         $optionsJson .= "}";
         $js = '';
         $js .= "
