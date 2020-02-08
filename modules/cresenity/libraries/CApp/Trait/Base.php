@@ -264,6 +264,10 @@ trait CApp_Trait_Base {
         return curl::httpbase() . 'cresenity/transparent/' . $width . '/' . $height;
     }
 
+    public static function qrCodeImageUrl($code) {
+        return curl::httpbase() . 'cresenity/qrcode?d=' . rawurlencode($code);
+    }
+
     public static function gravatarImageUrl($email, $s = 100, $default = 'mp') {
         if ($default == null) {
             $default = static::noImageUrl();
@@ -350,14 +354,14 @@ trait CApp_Trait_Base {
         ));
     }
 
-    
     public static function link() {
         $args = func_get_args();
         $args = array_map(function($val) {
             return trim($val, "/");
         }, $args);
         $link = implode("/", $args);
-        
+
         return curl::httpbase() . $link;
     }
+
 }
