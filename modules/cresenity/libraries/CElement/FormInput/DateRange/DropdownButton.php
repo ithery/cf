@@ -16,17 +16,29 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
     protected $dateFormat;
     protected $start;
     protected $end;
+    protected $openDirection='left';
 
     public function __construct($id) {
         parent::__construct($id);
         $this->tag = 'button';
+        $this->openDirection = 'left';
         $this->setAttr('capp-input', 'daterange-dropdownbutton');
         $this->resetRange();
     }
 
+    /**
+     * 
+     * @param string $direction left,right
+     * @return $this
+     */
+    public function setOpenDirection($direction) {
+        $this->openDirection = $direction;
+        return $this;
+    }
+    
     public function build() {
 
-        $this->addClass('btn dropdown-toggle md-btn-flat daterange-dropdownbutton');
+        $this->addClass('btn dropdown-toggle md-btn-flat daterange-dropdownbutton uninit');
         $this->setAttr('type','button');
         $this->add($this->dateStart . ' - ' . $this->dateEnd);
         $this->after()->addControl($this->id . '-start', 'hidden')->setName($this->name . '[start]')->setValue($this->dateStart);
@@ -72,7 +84,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
                 startDate: moment('" . $this->dateStart . "'),
                 endDate: moment('" . $this->dateEnd . "'),
                 ranges: {" . $jsRange . "},
-                opens: 'left',
+                opens: '".$this->openDirection."',
                 locale: {
                     format: '" . $this->momentFormat . "'
                 },
@@ -93,6 +105,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             });
 
             $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
+            $('#" . $this->id . "').removeClass('uninit');   
         ";
         return $js;
     }

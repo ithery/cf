@@ -8,6 +8,9 @@
 
 class CEmail_Builder_Node {
 
+
+    use CEmail_Builder_Trait_NodeTrait;
+
     public $parent = null;
     public $line = null;
     public $children = [];
@@ -15,7 +18,12 @@ class CEmail_Builder_Node {
     public $absoluteFilePath = null;
     public $tagName = null;
     public $attributes = [];
-    public $content='';
+    public $content = '';
+
+    public function __construct($options = []) {
+        $this->tagName = carr::get($options, 'tagName');
+        $this->attributes = carr::get($options, 'attributes', []);
+    }
 
     public function getComponentName() {
         $name = $this->tagName;
@@ -37,9 +45,34 @@ class CEmail_Builder_Node {
     public function getTagName() {
         return $this->tagName;
     }
-    
+
     public function getContent() {
         return $this->content;
+    }
+
+    public function setAttr($key, $value) {
+        $this->attributes[$key] = $value;
+        return $this;
+    }
+
+    public function add($node) {
+        if ($node instanceof CEmail_Builder_Node) {
+            $this->children[] = $node;
+        } else if (is_string($node)) {
+            $this->content .= $node;
+        } else {
+            throw new Exception('Invalid argument for add method on object node');
+        }
+        return $this;
+    }
+
+    public function __call($name, $arguments) {
+        if (cstr::startsWith($name, 'set')) {
+            $attrCamel = substr($name, 3);
+            $attrSnake = cstr::snake($attrCamel, '-');
+            return $this->setAttr($attrSnake, carr::get($arguments, 0));
+        }
+        throw new Exception('undefined method ' . $name . ' called for node');
     }
 
 }

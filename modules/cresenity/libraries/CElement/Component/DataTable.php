@@ -22,6 +22,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @var CDatabase
      */
     public $db;
+    protected $dbName;
     public $dbConfig;
     public $columns;
     public $footer;

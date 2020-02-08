@@ -10,4 +10,8 @@ return array(
     'google' => array(
         'geocoding_api_key' => 'AIzaSyCwjQSTQxcu2Z2JVHxBW8zWHWRCsdbwMrM',
     ),
+    'sendgrid' => array(
+    ),
+    'nexmo' => array(
+    ),
 );

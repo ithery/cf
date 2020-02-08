@@ -42,7 +42,7 @@ class CEmail_Builder_Component {
         $this->name = carr::get($options, 'name');
         $this->rawElement = false;
 
-
+        
         $attributes = array_merge($this->defaultAttributes, carr::get($options, 'globalAttributes', []), carr::get($options, 'attributes', []));
         $this->attributes = CEmail_Builder_Helper::formatAttributes($attributes, $this->allowedAttributes);
         $this->context = carr::get($options, 'context');
