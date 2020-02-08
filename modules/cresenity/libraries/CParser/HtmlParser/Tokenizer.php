@@ -312,7 +312,7 @@ class CParser_HtmlParser_Tokenizer {
         if ($c === ">") {
             //remove 2 trailing chars
             $this->callbacks->oncomment(
-                    $this->buffer . substring($this->sectionStart, $this->index - 2)
+                    $this->buffer . substr($this->sectionStart, $this->index - 2)
             );
             $this->state = State::Text;
             $this->sectionStart = $this->index + 1;
@@ -611,41 +611,41 @@ class CParser_HtmlParser_Tokenizer {
             } else if ($this->state === State::BeforeSpecialEnd) {
                 $this->stateBeforeSpecialEnd($c);
             } else if ($this->state === State::AfterScript1) {
-                stateAfterScript1($this, $c);
+                $this->stateAfterScript1($c);
             } else if ($this->state === State::AfterScript2) {
-                stateAfterScript2(this, c);
+                $this->stateAfterScript2($c);
             } else if ($this->state === State::AfterScript3) {
-                stateAfterScript3(this, c);
+                $this->stateAfterScript3($c);
             } else if ($this->state === State::BeforeScript1) {
-                stateBeforeScript1(this, c);
+                $this->stateBeforeScript1($c);
             } else if ($this->state === State::BeforeScript2) {
-                stateBeforeScript2(this, c);
+                $this->stateBeforeScript2($c);
             } else if ($this->state === State::BeforeScript3) {
-                stateBeforeScript3(this, c);
+                $this->stateBeforeScript3($c);
             } else if ($this->state === State::BeforeScript4) {
-                stateBeforeScript4(this, c);
+                $this->stateBeforeScript4($c);
             } else if ($this->state === State::BeforeScript5) {
                 $this->stateBeforeScript5($c);
             } else if ($this->state === State::AfterScript4) {
-                stateAfterScript4(this, c);
+                $this->stateAfterScript4($c);
             } else if ($this->state === State::AfterScript5) {
                 $this->stateAfterScript5($c);
             } else if ($this->state === State::BeforeStyle1) {
-                stateBeforeStyle1(this, c);
+                $this->stateBeforeStyle1($c);
             } else if ($this->state === State::InCdata) {
                 $this->stateInCdata($c);
             } else if ($this->state === State::BeforeStyle2) {
-                stateBeforeStyle2(this, c);
+                $this->stateBeforeStyle2($c);
             } else if ($this->state === State::BeforeStyle3) {
-                stateBeforeStyle3(this, c);
+                $this->stateBeforeStyle3($c);
             } else if ($this->state === State::BeforeStyle4) {
                 $this->stateBeforeStyle4($c);
             } else if ($this->state === State::AfterStyle1) {
-                stateAfterStyle1(this, c);
+                $this->stateAfterStyle1($c);
             } else if ($this->state === State::AfterStyle2) {
-                stateAfterStyle2(this, c);
+                $this->stateAfterStyle2($c);
             } else if ($this->state === State::AfterStyle3) {
-                stateAfterStyle3(this, c);
+                $this->stateAfterStyle3($c);
             } else if ($this->state === State::AfterStyle4) {
                 $this->stateAfterStyle4($c);
             } else if ($this->state === State::InProcessingInstruction) {
@@ -653,21 +653,21 @@ class CParser_HtmlParser_Tokenizer {
             } else if ($this->state === State::InNamedEntity) {
                 $this->stateInNamedEntity($c);
             } else if ($this->state === State::BeforeCdata1) {
-                stateBeforeCdata1(this, c);
+                $this->stateBeforeCdata1($c);
             } else if ($this->state === State::BeforeEntity) {
-                stateBeforeEntity(this, c);
+                $this->stateBeforeEntity($c);
             } else if ($this->state === State::BeforeCdata2) {
-                stateBeforeCdata2(this, c);
+                $this->stateBeforeCdata2($c);
             } else if ($this->state === State::BeforeCdata3) {
-                stateBeforeCdata3(this, c);
+                $this->stateBeforeCdata3($c);
             } else if ($this->state === State::AfterCdata1) {
                 $this->stateAfterCdata1($c);
             } else if ($this->state === State::AfterCdata2) {
                 $this->stateAfterCdata2($c);
             } else if ($this->state === State::BeforeCdata4) {
-                stateBeforeCdata4(this, c);
+                $this->stateBeforeCdata4($c);
             } else if ($this->state === State::BeforeCdata5) {
-                stateBeforeCdata5(this, c);
+                $this->stateBeforeCdata5($c);
             } else if ($this->state === State::BeforeCdata6) {
                 $this->stateBeforeCdata6($c);
             } else if ($this->state === State::InHexEntity) {
@@ -675,7 +675,7 @@ class CParser_HtmlParser_Tokenizer {
             } else if ($this->state === State::InNumericEntity) {
                 $this->stateInNumericEntity($c);
             } else if ($this->state === State::BeforeNumericEntity) {
-                stateBeforeNumericEntity(this, c);
+                $this->stateBeforeNumericEntity($c);
             } else {
                 $this->callbacks->onerror(Error("unknown protected function state"), $this->state);
             }
@@ -804,6 +804,123 @@ class CParser_HtmlParser_Tokenizer {
 
     public function getSectionStart() {
         return $this->sectionStart;
+    }
+
+    protected function consumeSpecialNameChar($upper, $nextState, $c) {
+        $lower = strtolower($upper);
+
+        if ($c === $lower || $c === $upper) {
+            $this->state = $nextState;
+        } else {
+            $this->state = State::InTagName;
+            $this->index--;
+        }
+    }
+
+    protected function ifElseState($upper, $successState, $failureState, $c) {
+        $lower = strtolower($upper);
+
+        if ($upper === $lower) {
+
+            if ($c === $lower) {
+                $this->state = $successState;
+            } else {
+                $this->state = $failureState;
+                $this->index--;
+            }
+        } else {
+
+            if ($c === $lower || $c === $upper) {
+                $this->state = $successState;
+            } else {
+                $this->state = $failureState;
+                $this->index--;
+            }
+        }
+    }
+
+    public function stateBeforeStyle1($c) {
+        $this->consumeSpecialNameChar("Y", State::BeforeStyle2, $c);
+    }
+
+    public function stateBeforeStyle2($c) {
+        $this->consumeSpecialNameChar("L", State::BeforeStyle3, $c);
+    }
+
+    public function stateBeforeStyle3($c) {
+        $this->consumeSpecialNameChar("E", State::BeforeStyle4, $c);
+    }
+
+    public function stateBeforeScript1($c) {
+        $this->consumeSpecialNameChar("R", State::BeforeScript2, $c);
+    }
+
+    public function stateBeforeScript2($c) {
+        $this->consumeSpecialNameChar("I", State::BeforeScript3, $c);
+    }
+
+    public function stateBeforeScript3($c) {
+        $this->consumeSpecialNameChar("P", State::BeforeScript4, $c);
+    }
+
+    public function stateBeforeScript4($c) {
+        $this->consumeSpecialNameChar("T", State::BeforeScript5, $c);
+    }
+
+    public function stateBeforeCdata1($c) {
+        $this->ifElseState("C", State::BeforeCdata2, State::InDeclaration, $c);
+    }
+
+    public function stateBeforeCdata2($c) {
+        $this->ifElseState("D", State::BeforeCdata3, State::InDeclaration, $c);
+    }
+
+    public function stateBeforeCdata3($c) {
+        $this->ifElseState("A", State::BeforeCdata4, State::InDeclaration, $c);
+    }
+
+    public function stateBeforeCdata4($c) {
+        $this->ifElseState("T", State::BeforeCdata5, State::InDeclaration, $c);
+    }
+
+    public function stateBeforeCdata5($c) {
+        $this->ifElseState("A", State::BeforeCdata6, State::InDeclaration, $c);
+    }
+
+    public function stateAfterScript1($c) {
+        $this->ifElseState("R", State::AfterScript2, State::Text, $c);
+    }
+
+    public function stateAfterScript2($c) {
+        $this->ifElseState("I", State::AfterScript3, State::Text, $c);
+    }
+
+    public function stateAfterScript3($c) {
+        $this->ifElseState("P", State::AfterScript4, State::Text, $c);
+    }
+
+    public function stateAfterScript4($c) {
+        $this->ifElseState("T", State::AfterScript5, State::Text, $c);
+    }
+
+    public function stateAfterStyle1($c) {
+        $this->ifElseState("Y", State::AfterStyle2, State::Text, $c);
+    }
+
+    public function stateAfterStyle2($c) {
+        $this->ifElseState("L", State::AfterStyle3, State::Text, $c);
+    }
+
+    public function stateAfterStyle3($c) {
+        $this->ifElseState("E", State::AfterStyle4, State::Text, $c);
+    }
+
+    public function stateBeforeEntity($c) {
+        $this->ifElseState("#", State::BeforeNumericEntity, State::InNamedEntity, $c);
+    }
+
+    public function stateBeforeNumericEntity($c) {
+        $this->ifElseState("X", State::InHexEntity, State::InNumericEntity, $c);
     }
 
 }
