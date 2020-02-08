@@ -29,6 +29,10 @@ class CEmail_Builder {
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Social::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_SocialElement::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Divider::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Group::class);
+        $this->registerComponent(CEmail_Builder_Component_HeadComponent_Head::class);
+        $this->registerComponent(CEmail_Builder_Component_HeadComponent_Attributes::class);
+        $this->registerComponent(CEmail_Builder_Component_HeadComponent_Style::class);
     }
 
     public function registerComponent($componentClass) {
@@ -56,6 +60,10 @@ class CEmail_Builder {
         return $this->components;
     }
 
+    /**
+     * 
+     * @return CEmail_Builder_GlobalData
+     */
     public function globalData() {
         return CEmail_Builder_GlobalData::instance();
     }

@@ -9,44 +9,41 @@
 class CEmail_Builder_Renderer {
 
     protected $content;
-    protected $options;
 
     public function __construct($content, $options) {
         $this->content = $content;
-        $this->options = $options;
     }
 
-    public function getOption($key, $defaultValue = null) {
-        return carr::get($this->options, $key, $defaultValue);
+    public function get($key, $defaultValue = null) {
+        return CEmail::Builder()->globalData()->get($key, $defaultValue);
     }
 
     public function render() {
-        $lang = $this->getOption('lang');
+        $lang = $this->get('lang');
         $langAttribute = '';
         if (strlen($lang) > 0) {
             $langAttribute = 'lang="' . $lang . '" ';
         }
-        $globalData = CEmail::Builder()->globalData();
-        $backgroundColor = $globalData->get('backgroundColor');
-        
+    
+        $backgroundColor = $this->get('backgroundColor');
+
         $backgroundColorAttribute = '';
         if (strlen($backgroundColor) > 0) {
             $backgroundColorAttribute = ' style="background-color:' . $backgroundColor . ';"';
         }
-        $title = $this->getOption('title', '');
-        $breakpoint = $this->getOption('breakpoint', '480px');
-//        $componentHeadStyleHtml = carr::reduce($this->getOption('componentHeadStyle',[]), function($result,$compHeadStyle) use($breakpoint){
-//            return $result."\n".$compHeadStyle($breakpoint);
-//        },'');
-//        ${reduce(
-//          componentsHeadStyle,
-//          (result, compHeadStyle) => `${result}\n${compHeadStyle(breakpoint)}`,
-//          '',
-//        )}
-        $componentHeadStyleHtml = '';
-        $headStyleHtml = '';
-        $styleHtml = implode('', $this->getOption('style', []));
-        $headRaw = $this->getOption('headRaw');
+        $title = $this->get('title', '');
+        $breakpoint = $this->get('breakpoint', '480px');
+        $componentHeadStyleHtml = carr::reduce($this->get('componentHeadStyle',[]), function($result,$compHeadStyle) use($breakpoint){
+            return $result."\n".$compHeadStyle($breakpoint);
+        },'');
+        
+       
+        $headStyleHtml = carr::reduce($this->get('headStyle',[]),function($result,$headStyle) use($breakpoint) {
+            return $result."\n".$headStyle($breakpoint);
+        },'');
+
+        $styleHtml = implode('', $this->get('style', []));
+        $headRaw = $this->get('headRaw');
         $headRawHtml = '';
         if ($headRaw != null) {
             $headRaw = carr::filter($headRaw, function($item) {
@@ -106,7 +103,7 @@ class CEmail_Builder_Renderer {
     }
 
     public function buildPreview() {
-        $content = $this->getOption('preview', '');
+        $content = $this->get('preview', '');
         if ($content === '') {
             return '';
         }
@@ -120,8 +117,8 @@ class CEmail_Builder_Renderer {
 
     public function buildFontTags() {
         $content = $this->content;
-        $fonts = $this->getOption('fonts', []);
-        $inlineStyle = $this->getOption('inlineStyle', '');
+        $fonts = $this->get('fonts', []);
+        $inlineStyle = $this->get('inlineStyle', '');
         $toImport = [];
         foreach ($fonts as $name => $url) {
 
@@ -131,6 +128,7 @@ class CEmail_Builder_Renderer {
 
                 return preg_match($inlineRegex, $s);
             };
+            
             if (preg_match($regex, $this->content) || carr::some($inlineStyle, $inlineCallback)) {
                 $toImport[] = $url;
             }
@@ -151,7 +149,7 @@ class CEmail_Builder_Renderer {
         <style type="text/css">
           ' . $toImportStyle . '
         </style>
-      <!--<![endif]-->'."\n".'
+      <!--<![endif]-->' . "\n" . '
     ';
         }
 
@@ -159,10 +157,9 @@ class CEmail_Builder_Renderer {
     }
 
     public function buildMediaQueriesTags() {
-        $globalData = CEmail::builder()->globalData();
-        $breakpoint = $this->getOption('breakpoint','480px');
-        $mediaQueries = $globalData->get('mediaQueries', []);
-        $forceOWADesktop = $this->getOption('forceOWADesktop', false);
+        $breakpoint = $this->get('breakpoint', '480px');
+        $mediaQueries = $this->get('mediaQueries', []);
+        $forceOWADesktop = $this->get('forceOWADesktop', false);
         if (count($mediaQueries) == 0) {
             return '';
         }
@@ -181,7 +178,7 @@ class CEmail_Builder_Renderer {
 
         return '
     <style type="text/css">
-      @media only screen and (min-width:'.$breakpoint.') {
+      @media only screen and (min-width:' . $breakpoint . ') {
         ' . $baseMediaQueriesStyle . '
       }
     </style>

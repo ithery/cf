@@ -6,9 +6,6 @@
  * and open the template in the editor.
  */
 
-abstract class CNotification_MethodAbstract implements CNotification_MethodInterface {
-
-    use CTrait_HasOptions;
+trait CNotification_Trait_MessageEmailTrait {
     
-   
 }
