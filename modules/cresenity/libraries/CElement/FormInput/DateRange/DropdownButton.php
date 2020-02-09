@@ -103,8 +103,12 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
                     }
                 " . $jsChange . "
             });
-
+            
+            
             $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
+            if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') { 
+                $('#" . $this->id . "').html('Until ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
+            }
             $('#" . $this->id . "').removeClass('uninit');   
         ";
         return $js;

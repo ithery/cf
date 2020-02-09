@@ -16,4 +16,7 @@ return array(
     'sms' => array(
         'vendor' => 'nexmo',
     ),
+    'push_notification' => array(
+        'vendor' => 'firebase',
+    ),
 );

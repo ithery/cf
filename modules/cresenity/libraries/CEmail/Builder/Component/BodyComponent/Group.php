@@ -176,7 +176,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
                 $style['font-size'] = '0px';
                 $style['vertical-align'] = $component->getAttribute('vertical-align');
                 $style['width'] = call_user_func_array($getElementWidth, [(method_exists($component, 'getWidthAsPixel')) ? $component->getWidthAsPixel() : $component->getAttribute('width')]);
-
+                
                 $tdAttr = [];
 
                 $tdAttr['style'] = $style;
@@ -197,7 +197,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         <table  role="presentation" border="0" cellpadding="0" cellspacing="0">
           <tr>
         <![endif]-->
-        ' . $this->renderChildren(['mobileWidth' => 'mobileWidth', 'renderer' => $renderer]) . '
+        ' . $this->renderChildren(['attributes' => ['mobileWidth'=>'mobileWidth'], 'renderer' => $renderer]) . '
         <!--[if mso | IE]>
           </tr>
           </table>

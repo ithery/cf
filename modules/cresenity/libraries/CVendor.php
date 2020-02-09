@@ -188,5 +188,21 @@ class CVendor {
         }
         return new CVendor_Nexmo($apiKey, $apiSecret, $options);
     }
+    
+    
+    /**
+     * 
+    * @param array $options
+     * @return \CVendor_Firebase
+     */
+    public static function firebase($options = null) {
+
+       
+        if (!is_array($options)) {
+            $options = CF::config('vendor.firebase');
+        }
+        
+        return new CVendor_Firebase($options);
+    }
 
 }
