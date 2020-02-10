@@ -52,7 +52,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                 try {
                     $result = $this->handleMessage($value, $logNotificationModel);
                 } catch (Exception $ex) {
-                    throw $ex;
+                   
                     $errCode++;
                     $errMessage = $ex->getMessage().':'.$ex->getTraceAsString();
                 }

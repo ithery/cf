@@ -13,6 +13,8 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
 
         $firebase = CVendor::firebase(carr::get($this->config, 'key'), carr::except($this->config, ['key']));
         $tokens = carr::wrap($this->getOption('recipient'));
+
+        
         $data = $this->getOption('data');
         $messaging = $firebase->createMessaging();
 
