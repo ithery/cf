@@ -25,7 +25,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $taskQueue = CNotification_TaskQueue_NotificationSender::dispatch($options);
     }
 
-    public function send($className,  $options = []) {
+    public function send($className, $options = []) {
 
         $message = new $className();
         $message->setOptions($options);
@@ -54,13 +54,12 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                 } catch (Exception $ex) {
                     throw $ex;
                     $errCode++;
-                    $errMessage = $ex->getMessage().':'.$ex->getTraceAsString();
+                    $errMessage = $ex->getMessage() . ':' . $ex->getTraceAsString();
                 }
             }
             if ($errCode > 0) {
                 $logNotificationModel->error = $errMessage;
                 $logNotificationModel->notification_status = 'FAILED';
-                
             } else {
 
                 $logNotificationModel->notification_status = 'SUCCESS';
@@ -69,18 +68,27 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
             $logNotificationModel->save();
         });
-        
     }
 
     protected function insertLogNotification($message, $result) {
         $model = CNotification::manager()->createLogNotificationModel();
         $options = c::collect($result);
         $recipient = $options->pull('recipient');
-        if(is_array($recipient)) {
+        if (is_array($recipient)) {
             $recipient = CHelper::json()->encode($recipient);
         }
+
+        $orgId = $options->pull('orgId');
+        if (strlen($orgId) == 0) {
+            $orgId = CApp_Base::orgId();
+        }
         
+        $vendor = $this->getVendorName();
         
+        $model->message_class = get_class($message);
+        $model->vendor = $vendor;
+        $model->org_id = CApp_Base::orgId();
+        $model->channel = static::$channelName;
         $model->recipient = $recipient;
         $model->subject = $options->pull('subject');
         $model->message = $options->pull('message');
