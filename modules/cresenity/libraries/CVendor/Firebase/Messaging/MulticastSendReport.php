@@ -77,7 +77,7 @@ final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable 
 
             if ($response->getStatusCode() < 400) {
                 try {
-                    $responseData = JSON::decode((string) $response->getBody(), true);
+                    $responseData = CHelper::json()->decode((string) $response->getBody(), true);
                 } catch (CVendor_Firebase_Exception_InvalidArgumentException $e) {
                     $responseData = [];
                 }

@@ -74,9 +74,14 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
     protected function insertLogNotification($message, $result) {
         $model = CNotification::manager()->createLogNotificationModel();
-
         $options = c::collect($result);
-        $model->recipient = $options->pull('recipient');
+        $recipient = $options->pull('recipient');
+        if(is_array($recipient)) {
+            $recipient = CHelper::json()->encode($recipient);
+        }
+        
+        
+        $model->recipient = $recipient;
         $model->subject = $options->pull('subject');
         $model->message = $options->pull('message');
         $model->options = json_encode($options->all());
