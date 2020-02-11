@@ -325,10 +325,10 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 $options['sort'] = $this->orders;
             }
             if ($this->offset) {
-                $options['skip'] = $this->offset;
+                $options['skip'] = (int) $this->offset;
             }
             if ($this->limit) {
-                $options['limit'] = $this->limit;
+                $options['limit'] =(int) $this->limit;
             }
             if ($columns) {
                 $options['projection'] = $columns;
