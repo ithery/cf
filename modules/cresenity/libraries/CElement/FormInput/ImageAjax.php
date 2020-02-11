@@ -17,6 +17,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
     protected $disabledUpload;
     protected $cropper;
     protected $tempStorage;
+    protected $accept;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -27,6 +28,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         $this->maxHeight = "150";
         $this->maxUploadSize = 0;
         $this->disabledUpload = false;
+        $this->accept = 'image/*';
         $this->templateName = 'CElement/FormInput/ImageAjax';
         $this->onBeforeParse(function() {
 
@@ -36,8 +38,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
 
             $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
                     ->setData('inputName', $ajaxName)
-                    ->makeUrl();  
-                   
+                    ->makeUrl();
+
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('maxWidth', $this->maxWidth);
@@ -51,34 +53,75 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
             $this->setVar('ajaxName', $ajaxName);
             $this->setVar('ajaxUrl', $ajaxUrl);
             $this->setVar('cropper', $this->cropper);
+            $this->setVar('accept', $this->accept);
         });
     }
 
+    /**
+     * 
+     * @param string $imgsrc
+     * @return $this'
+     */
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;
         return $this;
     }
 
+    /**
+     * 
+     * @param int $maxwidth
+     * @return $this
+     */
     public function setMaxWidth($maxwidth) {
         $this->maxWidth = $maxwidth;
         return $this;
     }
 
+    /**
+     * 
+     * @param int $maxheight
+     * @return $this
+     */
     public function setMaxHeight($maxheight) {
         $this->maxHeight = $maxheight;
         return $this;
     }
 
+    /**
+     * 
+     * @param int $size
+     * @return $this
+     */
     public function setMaxUploadSize($size) {
         $this->maxUploadSize = $size;
         return $this;
     }
 
+    /**
+     * 
+     * @param string $accept
+     * @return $this
+     */
+    public function setAccept($accept) {
+        $this->accept = $accept;
+        return $this;
+    }
+
+    /**
+     * 
+     * @param bool $bool
+     * @return $this
+     */
     public function setDisabledUpload($bool) {
         $this->disabledUpload = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * @param int $indent
+     * @return string
+     */
     public function html($indent = 0) {
         $templateHtml = $this->getTemplateHtml();
         $html = $templateHtml;
@@ -88,6 +131,11 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         return $html;
     }
 
+    /**
+     * 
+     * @param int $indent
+     * @return string
+     */
     public function js($indent = 0) {
         $templateJs = $this->getTemplateJs();
         $js = $templateJs;
@@ -109,9 +157,9 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         return $this->cropper;
     }
 
-    
     public function setTempStorage($tempStorage) {
         $this->tempStorage = $tempStorage;
         return $this;
     }
+
 }
