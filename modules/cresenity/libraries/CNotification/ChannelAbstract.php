@@ -89,6 +89,8 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $model->vendor = $vendor;
         $model->org_id = CApp_Base::orgId();
         $model->channel = static::$channelName;
+        $model->notification_status = 'PENDING';
+        $model->is_read = 0;
         $model->recipient = $recipient;
         $model->subject = $options->pull('subject');
         $model->message = $options->pull('message');
@@ -97,7 +99,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $model->updatedby = CApp_Base::username();
         $model->created = CApp_Base::now();
         $model->updated = CApp_Base::now();
-
+        $model->status = 1;
         $model->save();
         return $model;
     }

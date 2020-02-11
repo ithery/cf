@@ -196,7 +196,7 @@ trait CApp_Trait_Base {
      * 
      * @return string
      */
-    public static function now($format='Y-m-d H:i:s') {
+    public static function now($format = 'Y-m-d H:i:s') {
         return date($format);
     }
 
@@ -262,6 +262,10 @@ trait CApp_Trait_Base {
 
     public static function transparentImageUrl($width = 100, $height = 100) {
         return curl::httpbase() . 'cresenity/transparent/' . $width . '/' . $height;
+    }
+
+    public static function qrCodeImageUrl($code) {
+        return curl::httpbase() . 'cresenity/qrcode?d=' . rawurlencode($code);
     }
 
     public static function gravatarImageUrl($email, $s = 100, $default = 'mp') {
@@ -350,14 +354,14 @@ trait CApp_Trait_Base {
         ));
     }
 
-    
     public static function link() {
         $args = func_get_args();
         $args = array_map(function($val) {
             return trim($val, "/");
         }, $args);
         $link = implode("/", $args);
-        
+
         return curl::httpbase() . $link;
     }
+
 }
