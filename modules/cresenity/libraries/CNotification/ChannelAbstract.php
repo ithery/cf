@@ -94,6 +94,8 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $model->recipient = $recipient;
         $model->subject = $options->pull('subject');
         $model->message = $options->pull('message');
+        $model->ref_type = $options->pull('refType');
+        $model->ref_id = $options->pull('refId');
         $model->options = json_encode($options->all());
         $model->createdby = CApp_Base::username();
         $model->updatedby = CApp_Base::username();
