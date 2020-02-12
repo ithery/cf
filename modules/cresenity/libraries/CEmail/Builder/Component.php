@@ -40,7 +40,6 @@ class CEmail_Builder_Component {
         $this->children = carr::get($options, 'children', []);
         $this->content = carr::get($options, 'content', '');
         $this->name = carr::get($options, 'name');
-        $this->rawElement = false;
 
         $globalAttributes = CEmail::builder()->globalData()->get('defaultAttributes');
         

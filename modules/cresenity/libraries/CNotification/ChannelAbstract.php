@@ -9,7 +9,7 @@
 abstract class CNotification_ChannelAbstract implements CNotification_ChannelInterface {
 
     protected static $channelName;
-    protected static $config;
+    protected $config;
 
     public function __construct($config = []) {
         $this->config = $config;

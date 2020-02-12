@@ -18,7 +18,10 @@ class CNotification_TaskQueue_NotificationSender extends CNotification_TaskQueue
         $channel = carr::get($this->params, 'channel');
         $options = carr::get($this->params, 'options');
         $className = carr::get($this->params, 'className');
+        $this->logDaemon('Processing '.$className.' with options: '.json_encode($options));
         CNotification::manager()->channel($channel)->sendWithoutQueue($className, $options);
+        $this->logDaemon('Processed '.$className.'');
+        
     }
 
 }
