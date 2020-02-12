@@ -263,12 +263,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
         }
-        $str_js_change = "";
+        $strJsChange = "";
         if ($this->submit_onchange) {
-            $str_js_change = "$(this).closest('form').submit();";
+            $strJsChange = "$(this).closest('form').submit();";
         }
 
-        $str_js_init = "";
+        $strJsInit = "";
         if ($this->autoSelect) {
             $db = CDatabase::instance();
             $rjson = 'false';
@@ -286,22 +286,20 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $rjson = json_encode($r);
 
 
-            $str_js_init = "
-				initSelection : function (element, callback) {
-					
-				var data = " . $rjson . ";
-				
-				callback(data);
-			},
-			";
+            $strJsInit = "
+                initSelection : function (element, callback) {
+                    var data = " . $rjson . ";
+                    callback(data);
+                },
+            ";
         }
 
 
 
 
-        $str_multiple = "";
+        $strMultiple = "";
         if ($this->multiple) {
-            $str_multiple = " multiple:'true',";
+            $strMultiple = " multiple:'true',";
         }
         $classes = $this->classes;
         $classes = implode(" ", $classes);
@@ -328,12 +326,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         dataType: 'jsonp',
                         quietMillis: " . $this->delay . ", 
                         delay: " . $this->delay . ", 
-                        " . $str_multiple . "
+                        " . $strMultiple . "
                         data: function (params) {
                             return {
-                              q: params.term, // search term
-                              page: params.page,
-                              limit: 10
+                                q: params.term, // search term
+                                page: params.page,
+                                limit: 10
                             };
                         },
                         processResults: function (data, params) { 
@@ -344,15 +342,15 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             params.page = params.page || 1;
                             var more = (params.page * 10) < data.total;
                             return {
-                                    results: data.data,
-                                    pagination: {
-                                      more: more
-                                    }
-                                  };
+                                results: data.data,
+                                pagination: {
+                                    more: more
+                                }
+                            };
                         },
                         cache:true,
                     },
-                " . $str_js_init . "
+                " . $strJsInit . "
                 templateResult: function(item) {
                     if (typeof item.loading !== 'undefined') {
                         return item.text;
@@ -370,7 +368,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 dropdownCssClass: '" . $dropdownClasses . "', // apply css that makes the dropdown taller
                 containerCssClass : 'tpx-select2-container " . $classes . "'
             }).change(function() {
-                        " . $str_js_change . "
+                " . $strJsChange . "
             });
             $('#" . $this->id . "').on('select2:open',function(event){
                 var modal = $('#" . $this->id . "').closest('.modal');
@@ -388,8 +386,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->valueCallback != null && is_callable($this->valueCallback)) {
             $str .= "
                 $('#" . $this->id . "').trigger('change');
-                
-                ";
+            ";
         }
 
         $js = new CStringBuilder();
