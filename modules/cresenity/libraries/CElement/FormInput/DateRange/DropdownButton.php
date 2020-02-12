@@ -23,9 +23,11 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         $this->tag = 'button';
         $this->openDirection = 'left';
         $this->setAttr('capp-input', 'daterange-dropdownbutton');
-        $this->resetRange();
+        $this->addDefaultRange();
     }
 
+    
+    
     /**
      * 
      * @param string $direction left,right
@@ -43,9 +45,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         $this->add($this->dateStart . ' - ' . $this->dateEnd);
         $this->after()->addControl($this->id . '-start', 'hidden')->setName($this->name . '[start]')->setValue($this->dateStart);
         $this->after()->addControl($this->id . '-end', 'hidden')->setName($this->name . '[end]')->setValue($this->dateEnd);
-        if (is_array($this->predefinedRanges) && count($this->predefinedRanges) == 0) {
-            $this->addDefaultRange();
-        }
+        
     }
 
     public function js($indent = 0) {
@@ -62,6 +62,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
 
 
         $jsRange = '';
+        $jsRangeProperty = '';
         foreach ($this->predefinedRanges as $range) {
             $label = carr::get($range, 'label');
             $dateStart = carr::get($range, 'dateStart');
@@ -77,13 +78,16 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             $jsRange .= "'" . $label . "': [" . $dateStartJs . ", " . $dateEndJs . "],";
         }
 
+        if(strlen($jsRange)>0) {
+            $jsRangeProperty = "ranges: {" . $jsRange . "},";
+        }
         $js .= "
            
           
             $('#" . $this->id . "').daterangepicker({
                 startDate: moment('" . $this->dateStart . "'),
                 endDate: moment('" . $this->dateEnd . "'),
-                ranges: {" . $jsRange . "},
+                ".$jsRangeProperty."
                 opens: '".$this->openDirection."',
                 locale: {
                     format: '" . $this->momentFormat . "'
