@@ -15,17 +15,30 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $this->config = $config;
     }
 
-    public function queue($className, array $options) {
+    public function send($className, array $options = []) {
+        $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
+
         $options = [
             'channel' => static::$channelName,
             'className' => $className,
             'options' => $options,
         ];
 
-        $taskQueue = CNotification_TaskQueue_NotificationSender::dispatch($options);
+        $isQueued = CF::config('notification.queue.queued');
+        if ($isQueued) {
+            $taskQueue = $notificationSenderJobClass::dispatch($options);
+            if ($customConnection = CF::config('notification.queue.connection')) {
+                $taskQueue->onConnection($customQueue);
+            }
+            if ($customQueue = CF::config('notification.queue.name')) {
+                $taskQueue->onQueue($customQueue);
+            }
+        } else {
+            $notificationSenderJobClass::dispatchNow($options);
+        }
     }
 
-    public function send($className, $options = []) {
+    public function sendWithoutQueue($className, array $options = []) {
 
         $message = new $className();
         $message->setOptions($options);
@@ -82,9 +95,9 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         if (strlen($orgId) == 0) {
             $orgId = CApp_Base::orgId();
         }
-        
+
         $vendor = $this->getVendorName();
-        
+
         $model->message_class = get_class($message);
         $model->vendor = $vendor;
         $model->org_id = CApp_Base::orgId();
@@ -127,6 +140,10 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
             $vendorConfig = [];
         }
         return CNotification::manager()->createMessage($this->getVendorName(), $vendorConfig, $data);
+    }
+
+    protected function dispatchQueuedConversions(CApp_Model_Interface_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
+        
     }
 
 }
