@@ -246,9 +246,7 @@ class Input {
      * @return  string
      */
     public function xss_clean($data, $tool = NULL) {
-        if(cstr::startsWith($data, '<p>Kelas ini')) {
-            cdbg::varDump($data);
-        }
+       
         if ($tool === NULL) {
             // Use the default tool
             $tool = CF::$global_xss_filtering;
@@ -270,23 +268,30 @@ class Input {
             // NOTE: This is necessary because switch is NOT type-sensative!
             $tool = 'default';
         }
-
+        $tool= 'htmlpurifier';
         switch ($tool) {
             case 'htmlpurifier':
+                
+                require_once DOCROOT.'system/vendor/HTMLPurifier.auto.php';
+
+                $config = HTMLPurifier_Config::createDefault();
+                $purifier = new HTMLPurifier($config);
+                $data = $purifier->purify($data);
+                
                 /**
                  * @todo License should go here, http://htmlpurifier.org/
                  */
-                if (!class_exists('HTMLPurifier_Config', FALSE)) {
-                    // Load HTMLPurifier
-                    require Kohana::find_file('vendor', 'htmlpurifier/HTMLPurifier.auto', TRUE);
-                    require 'HTMLPurifier.func.php';
-                }
-
-                // Set configuration
-                $config = HTMLPurifier_Config::createDefault();
-                $config->set('HTML', 'TidyLevel', 'none'); // Only XSS cleaning now
-                // Run HTMLPurifier
-                $data = HTMLPurifier($data, $config);
+//                if (!class_exists('HTMLPurifier_Config', FALSE)) {
+//                    // Load HTMLPurifier
+//                    require Kohana::find_file('vendor', 'htmlpurifier/HTMLPurifier.auto', TRUE);
+//                    require 'HTMLPurifier.func.php';
+//                }
+//
+//                // Set configuration
+//                $config = HTMLPurifier_Config::createDefault();
+//                $config->set('HTML', 'TidyLevel', 'none'); // Only XSS cleaning now
+//                // Run HTMLPurifier
+//                $data = HTMLPurifier($data, $config);
                 break;
             default:
                 // http://svn.bitflux.ch/repos/public/popoon/trunk/classes/externalinput.php
@@ -332,7 +337,9 @@ class Input {
                 $data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $data);
 
                 $data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $data);
-
+                /*
+                $data = preg_replace('#<svg.+?onload.+?>#u', '', $data);
+                */
                 // Only works in IE: <span style="width: expression(alert('Ping!'));"></span>
                 
                 $data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
