@@ -144,6 +144,24 @@ class CStorage {
     }
 
     /**
+     * Create an instance of the google drive driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createGoogleDriver(array $config) {
+        $client = new \Google_Client;
+        $client->setClientId(carr::get($config, 'clientId'));
+        $client->setClientSecret(carr::get($config, 'clientSecret'));
+        $client->refreshToken(carr::get($config, 'refreshToken'));
+        $folderId = carr::get($config, 'folderId');
+        $service = new \Google_Service_Drive($client);
+        return $this->adapt($this->createFlysystem(
+                                new CStorage_Adapter_GoogleDriveAdapter($service, $folderId), $config
+        ));
+    }
+
+    /**
      * Create an instance of the local driver.
      *
      * @param  array  $config
@@ -153,7 +171,7 @@ class CStorage {
         $permissions = isset($config['permissions']) ? $config['permissions'] : [];
         $links = (isset($config['links']) ? $config['links'] : null) === 'skip' ? LocalAdapter::SKIP_LINKS : LocalAdapter::DISALLOW_LINKS;
         return $this->adapt($this->createFlysystem(new LocalAdapter(
-                                $config['root'], isset($config['lock']) ? $config['lock'] : LOCK_EX, $links, $permissions
+                                        $config['root'], isset($config['lock']) ? $config['lock'] : LOCK_EX, $links, $permissions
                                 ), $config));
     }
 
