@@ -11,7 +11,7 @@ use CVendor_Firebase_Messaging_MessageTarget as MessageTarget;
 
 final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable {
 
-    /** @var SendReport[] */
+    /** @var CVendor_Firebase_Messaging_SendReport[] */
     private $items = [];
 
     private function __construct() {
@@ -19,7 +19,7 @@ final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable 
     }
 
     /**
-     * @param SendReport[] $items
+     * @param CVendor_Firebase_Messaging_SendReport[] $items
      */
     public static function withItems(array $items) {
         $report = new self();
@@ -100,18 +100,26 @@ final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable 
     }
 
     /**
-     * @return SendReport[]
+     * @return CVendor_Firebase_Messaging_SendReport[]
      */
     public function getItems() {
         return $this->items;
     }
 
+    /**
+     * 
+     * @return CVendor_Firebase_Messaging_MulticastSendReport
+     */
     public function successes() {
         return self::withItems(\array_filter($this->items, static function (CVendor_Firebase_Messaging_SendReport $item) {
                             return $item->isSuccess();
                         }));
     }
 
+    /**
+     * 
+     * @return CVendor_Firebase_Messaging_MulticastSendReport
+     */
     public function failures() {
         return self::withItems(\array_filter($this->items, static function (CVendor_Firebase_Messaging_SendReport $item) {
                             return $item->isFailure();

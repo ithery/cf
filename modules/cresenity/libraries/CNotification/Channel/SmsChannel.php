@@ -14,7 +14,7 @@ class CNotification_Channel_SmsChannel extends CNotification_ChannelAbstract {
        
         $message = $this->createMessage($data);
         
-       
+        
         return $message->send();
     }
 

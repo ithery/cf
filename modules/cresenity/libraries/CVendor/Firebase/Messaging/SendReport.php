@@ -8,7 +8,7 @@
 
 class CVendor_Firebase_Messaging_SendReport {
 
-    /** @var MessageTarget */
+    /** @var CVendor_Firebase_Messaging_MessageTarget */
     private $target;
 
     /** @var array|null */
@@ -37,6 +37,10 @@ class CVendor_Firebase_Messaging_SendReport {
         return $report;
     }
 
+    /**
+     * 
+     * @return CVendor_Firebase_Messaging_MessageTarget
+     */
     public function target() {
         return $this->target;
     }

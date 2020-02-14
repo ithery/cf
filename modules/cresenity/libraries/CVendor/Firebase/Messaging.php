@@ -60,6 +60,8 @@ class CVendor_Firebase_Messaging {
      * @throws InvalidArgumentException if the message is invalid
      * @throws MessagingException if the API request failed
      * @throws FirebaseException if something very unexpected happened (never :))
+     * 
+     * @return CVendor_Firebase_Messaging_MulticastSendReport
      */
     public function sendMulticast($message, $registrationTokens) {
         $message = $this->makeMessage($message);
@@ -188,7 +190,7 @@ class CVendor_Firebase_Messaging {
 
         if (!\is_array($message)) {
             throw new CVendor_Firebase_Exception_InvalidArgumentException(
-            'Unsupported message type. Use an array or a class implementing %s' . CVendor_Firebase_Messaging_MessageInterface::class
+                    'Unsupported message type. Use an array or a class implementing %s' . CVendor_Firebase_Messaging_MessageInterface::class
             );
         }
 

@@ -1231,6 +1231,16 @@ body.mini-navbar #page-wrapper {
     width: 50px;
 }
 
+
+.console {
+    background: #000;
+    color: #ccc;
+    white-space: pre-wrap;
+    font-family: monospace;
+    word-break: break-all;
+}
+
+
 @media (min-width: 319px) {
 
 }
