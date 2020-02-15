@@ -1637,7 +1637,13 @@ body.modal-open {
 .kanban .kanban-box {
     min-height:100px;
 }
-
+.console {
+    background: #000;
+    color: #ccc;
+    white-space: pre-wrap;
+    font-family: monospace;
+    word-break: break-all;
+}
 @media (min-width: 768px) {
 
     .modal-dialog {

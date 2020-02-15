@@ -558,7 +558,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
+        return c::tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
             $this->hydratePivotRelation($paginator->items());
         });
     }
@@ -575,7 +575,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
+        return c::tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
             $this->hydratePivotRelation($paginator->items());
         });
     }
@@ -667,7 +667,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @return string
      */
     protected function guessInverseRelation() {
-        return cstr::camel(cstr::plural(CBase::classBasename($this->getParent())));
+        return cstr::camel(cstr::plural(c::classBasename($this->getParent())));
     }
 
     /**

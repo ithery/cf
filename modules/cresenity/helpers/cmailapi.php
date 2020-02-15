@@ -43,11 +43,13 @@ class cmailapi {
 
         $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
         foreach ($attachments as $att) {
+            $disk='';
             if (is_array($att)) {
                 $path = carr::get($att, "path");
                 $filename = basename($path);
                 $attachmentFilename = carr::get($att, "filename");
                 $type = carr::get($att, "type");
+                $disk = carr::get($att, "disk");
             } else {
                 $path = $att;
                 $filename = basename($att);
@@ -71,9 +73,15 @@ class cmailapi {
                     $type = 'image/png';
                 }
             }
-
+            $content = '';
+            if(strlen($disk)>0) {
+                $diskObject=CStorage::instance()->disk($disk);
+                $content = $diskObject->get($path);
+            } else {
+                $content = file_get_contents($path);
+            }
             $attachment = new CSendGrid_Attachment();
-            $attachment->setContent(base64_encode(file_get_contents($path)));
+            $attachment->setContent(base64_encode($content));
             $attachment->setType($type);
             $attachment->setDisposition("attachment");
             $attachment->setFilename($attachmentFilename);

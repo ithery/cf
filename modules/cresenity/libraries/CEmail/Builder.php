@@ -28,10 +28,15 @@ class CEmail_Builder {
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Raw::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_Social::class);
         $this->registerComponent(CEmail_Builder_Component_BodyComponent_SocialElement::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Divider::class);
+        $this->registerComponent(CEmail_Builder_Component_BodyComponent_Group::class);
+        $this->registerComponent(CEmail_Builder_Component_HeadComponent_Head::class);
+        $this->registerComponent(CEmail_Builder_Component_HeadComponent_Attributes::class);
+        $this->registerComponent(CEmail_Builder_Component_HeadComponent_Style::class);
     }
 
     public function registerComponent($componentClass) {
-        $name = carr::last(explode("_",$componentClass));
+        $name = carr::last(explode("_", $componentClass));
         $this->components[cstr::kebabCase($name)] = $componentClass;
     }
 
@@ -47,18 +52,22 @@ class CEmail_Builder {
             }
             return $component;
         }
-        throw new Exception('component not found:'.$name);
+        throw new Exception('component not found:' . $name);
         return null;
     }
 
     public function components() {
         return $this->components;
     }
-    
+
+    /**
+     * 
+     * @return CEmail_Builder_GlobalData
+     */
     public function globalData() {
         return CEmail_Builder_GlobalData::instance();
     }
-    
+
     public function determineTypeAdapter($typeConfig) {
         return CEmail_Builder_Type_TypeFactory::getAdapter($typeConfig);
     }
@@ -66,6 +75,14 @@ class CEmail_Builder {
     public function toHtml($xml, $options = []) {
         $parser = new CEmail_Builder_Parser($xml, $options = []);
         return $parser->parse();
+    }
+
+    /**
+     * 
+     * @return \CEmail_Builder_RuntimeBuilder
+     */
+    public function createRuntimeBuilder() {
+        return new CEmail_Builder_RuntimeBuilder();
     }
 
 }

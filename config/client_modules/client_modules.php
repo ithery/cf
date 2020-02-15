@@ -534,6 +534,9 @@ return array(
     "linearicons" => array(
         "css" => array("icon/linearicons.css"),
     ),
+    "themify-icons" => array(
+        "css" => array("icon/themify-icons.css"),
+    ),
     "open-ionic" => array(
         "css" => array("icon/open-ionic.css"),
     ),
@@ -690,6 +693,11 @@ return array(
     "tippy" => array(
         "js" => array(
             "plugins/tippy/tippy.js",
+        ),
+    ),
+    "locationpicker" => array(
+        "js" => array(
+            "plugins/locationpicker/locationpicker.jquery.js",
         ),
     ),
     "pdfjs" => array(

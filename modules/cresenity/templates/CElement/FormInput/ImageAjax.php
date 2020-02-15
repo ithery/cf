@@ -27,14 +27,14 @@ $maxHeight .= $suffixHeight;
         <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
     </div>
     <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>; line-height: 20px;">
-      
+
     </div>
     <div>
         <?php if (!$disabledUpload): ?>
             <span class="btn btn-file btn-primary">
                 <span class="fileupload-new"><?php echo clang::__('Select Image'); ?></span>
                 <span class="fileupload-change fileupload-exists"><?php echo clang::__('Change'); ?></span>
-                <input id="input-temp-<?php echo $id; ?>" accept="image/*" type="file" name="input-temp-<?php echo $id; ?>" style="display:none;" accept="image/*"/>
+                <input id="input-temp-<?php echo $id; ?>" accept="<?php echo $accept; ?>" type="file" name="input-temp-<?php echo $id; ?>" style="display:none;" accept="image/*"/>
                 <input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" />
             </span>
             <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload"><?php echo clang::__('Remove'); ?></a>
@@ -125,14 +125,14 @@ $maxHeight .= $suffixHeight;
                                         $('#input-temp-<?php echo $id; ?>').trigger('click');
                                     });
                                     var data = new FormData();
-                                    
+
                                     data.append('<?php echo $ajaxName; ?>[]', imageData);
                                     data.append('<?php echo $ajaxName; ?>_filename[]', event.target.fileName);
                                     var xhr = new XMLHttpRequest();
                                     xhr.onreadystatechange = function () {
                                         if (this.readyState == 4 && this.status == 200) {
                                             var dataFile = JSON.parse(this.responseText);
-                                            
+
                                             $('#<?php echo $id; ?>').val(dataFile.fileId);
                                             $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
                                             $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');

@@ -16,6 +16,8 @@ class CImage_Image {
     /** @var string|null */
     protected $temporaryDirectory = null;
 
+    
+    protected $imageDriver='gd';
     /**
      * @param string $pathToImage
      *

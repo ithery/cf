@@ -21,6 +21,16 @@ class CEmail_Builder_Context {
         return $this;
     }
 
+    public function addHeadStyle($identifier, $headStyle) {
+        $globalData = CEmail::builder()->globalData();
+        $globalData->set('headStyle.' . $identifier, $headStyle);
+    }
+
+    public function addComponentHeadStyle($headStyle) {
+        $globalData = CEmail::builder()->globalData();
+        $globalData->push('componentsHeadStyle', $headStyle);
+    }
+
     public function getBackgroundColor($color) {
         $globalData = CEmail::builder()->globalData();
         return $globalData->get('backgroundColor');
@@ -48,6 +58,38 @@ class CEmail_Builder_Context {
         $globalData = CEmail::builder()->globalData();
 
         $globalData->set('mediaQueries.' . $className, '{ width:' . $parsedWidth . $unit . ' !important; max-width:' . $parsedWidth . $unit . '; }');
+    }
+
+    public function addHead() {
+        $args = func_get_args();
+        $attr = carr::get($args, 0);
+        $params = [];
+        if (count($args) > 1) {
+            $params = array_slice($args, 1);
+        }
+        $globalData = CEmail::builder()->globalData();
+        $attrToPush = ['inlineStyle','componentsHeadStyle','headRaw','style'];
+        if (in_array($attr, $attrToPush)) {
+        
+            $globalData->push($attr, $params);
+        } else if ($globalData->exists($attr)) {
+          
+            if (count($params) > 1) {
+                $paramKey = carr::get($params, 0);
+                $attrKey = $attr . '.' . $paramKey;
+                if (is_object($globalData->get($attrKey))) {
+                    throw new Exception('unimplement');
+                } else {
+                    
+                    $globalData->set($attrKey, carr::get($params, 1));
+                }
+            } else {
+                $globalData->set($attr, carr::get($params, 0));
+            }
+        } else {
+            throw new Exception('head element add an unknown head attribute : ' . $attr . '');
+        }
+        
     }
 
 }

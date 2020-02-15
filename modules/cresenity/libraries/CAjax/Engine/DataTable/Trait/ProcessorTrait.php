@@ -108,6 +108,11 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                             ->addArg($col_v)
                             ->setRequire($col->callbackRequire)
                             ->execute();
+                    if (is_array($col_v) && isset($col_v['html']) && isset($col_v['js'])) {
+                        $js .= $col_v['js'];
+                        $col_v = $col_v['html'];
+                    }
+
                 }
                 $new_v = $col_v;
 

@@ -17,7 +17,7 @@ trait CModel_Trait_QueriesRelationships {
      * @param  int     $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
         if (strpos($relation, '.') !== false) {
@@ -57,7 +57,7 @@ trait CModel_Trait_QueriesRelationships {
      * @param  int     $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null) {
         $relations = explode('.', $relations);
@@ -78,7 +78,7 @@ trait CModel_Trait_QueriesRelationships {
      * @param  string  $relation
      * @param  string  $operator
      * @param  int     $count
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function orHas($relation, $operator = '>=', $count = 1) {
         return $this->has($relation, $operator, $count, 'or');
@@ -90,7 +90,7 @@ trait CModel_Trait_QueriesRelationships {
      * @param  string  $relation
      * @param  string  $boolean
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function doesntHave($relation, $boolean = 'and', Closure $callback = null) {
         return $this->has($relation, '<', 1, $boolean, $callback);
@@ -100,7 +100,7 @@ trait CModel_Trait_QueriesRelationships {
      * Add a relationship count / exists condition to the query with an "or".
      *
      * @param  string  $relation
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function orDoesntHave($relation) {
         return $this->doesntHave($relation, 'or');
@@ -113,7 +113,7 @@ trait CModel_Trait_QueriesRelationships {
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int     $count
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1) {
         return $this->has($relation, $operator, $count, 'and', $callback);
@@ -126,7 +126,7 @@ trait CModel_Trait_QueriesRelationships {
      * @param  \Closure  $callback
      * @param  string    $operator
      * @param  int       $count
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function orWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1) {
         return $this->has($relation, $operator, $count, 'or', $callback);
@@ -137,7 +137,7 @@ trait CModel_Trait_QueriesRelationships {
      *
      * @param  string  $relation
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function whereDoesntHave($relation, Closure $callback = null) {
         return $this->doesntHave($relation, 'and', $callback);
@@ -148,7 +148,7 @@ trait CModel_Trait_QueriesRelationships {
      *
      * @param  string    $relation
      * @param  \Closure  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return CModel_Query|static
      */
     public function orWhereDoesntHave($relation, Closure $callback = null) {
         return $this->doesntHave($relation, 'or', $callback);

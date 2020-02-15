@@ -29,18 +29,6 @@ class CCore_Controller extends CController {
         }
     }
 
-    public function front_js() {
-        header('content-type: application/javascript');
-        $v = CView::factory('cfront/ccore/js');
-        echo $v->render();
-    }
-
-    public function front_css() {
-        header('content-type: text/css');
-        $v = CView::factory('cfront/ccore/css');
-        echo $v->render();
-    }
-
     public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
 
         //Create the image resource 
@@ -103,9 +91,9 @@ class CCore_Controller extends CController {
     }
 
     public function ajaxInfo($method) {
-        $filename = $method.'.tmp';
+        $filename = $method . '.tmp';
         $file = CTemporary::getPath("ajax", $filename);
-        
+
         if (isset($_GET['profiler'])) {
             new Profiler();
         }
@@ -119,7 +107,7 @@ class CCore_Controller extends CController {
     }
 
     public function ajax($method) {
-        $filename = $method.'.tmp';
+        $filename = $method . '.tmp';
         $file = CTemporary::getPath("ajax", $filename);
         if (isset($_GET['profiler'])) {
             new Profiler();

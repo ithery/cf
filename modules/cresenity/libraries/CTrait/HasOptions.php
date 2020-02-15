@@ -25,7 +25,7 @@ trait CTrait_HasOptions {
     }
 
     public function getOption($key, $defaultValue = null) {
-        return carr::get($this->option, $key, $defaultValue);
+        return carr::get($this->options, $key, $defaultValue);
     }
 
 }

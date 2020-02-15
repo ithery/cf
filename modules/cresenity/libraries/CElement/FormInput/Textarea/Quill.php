@@ -8,7 +8,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
-
+    use CTrait_Element_Property_Value;
+    
     protected $theme;
     protected $toolbar;
 
@@ -23,7 +24,9 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         $this->theme = $theme;
         return $this;
     }
-
+    public function setToolbarType($toolbar) {
+        $this->setToolbar($toolbar);
+    }
     public function setToolbar($toolbar) {
         if (!is_array($toolbar)) {
             $toolbarValue = $this->getToolbarJson($toolbar);
@@ -69,8 +72,10 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         return $json;
     }
 
+    
     public function build() {
         $this->addClass('quill-control');
+        $this->add($this->value);
     }
 
     public function js($indent = 0) {

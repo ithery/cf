@@ -138,6 +138,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
             case 'restart':
                 return call_user_func_array([$this, 'logRestart'], $logArgs);
                 break;
+            case 'dump':
+                return call_user_func_array([$this, 'logDump'], $logArgs);
+                break;
             case 'back':
                 curl::redirect($this->controllerUrl());
                 break;
@@ -156,6 +159,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
         $restartAction = $actionContainer->addAction()->setLabel('Restart')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/restart/' . $serviceClass)->setConfirm();
         $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() );
+        $rotateAction = $actionContainer->addAction()->setLabel('Dump Status')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/dump/' . $serviceClass)->setConfirm();
 
 
         $logFileList = CManager::daemon()->getLogFileList($serviceClass);
@@ -211,6 +215,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
             $errMessage = $ex->getMessage();
         }
         sleep(2);
+        CManager::daemon()->rotateLog($serviceClass);
         try {
             $started = CManager::daemon()->start($serviceClass);
         } catch (Exception $ex) {
@@ -224,5 +229,28 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
         curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass);
     }
+    
+    public function logDump($serviceClass = null) {
+        if (strlen($serviceClass) == 0) {
+            curl::redirect($this->controllerUrl() . 'log/index');
+        }
+        $app = CApp::instance();
+        $db = CDatabase::instance();
+
+        $errCode = 0;
+        $errMessage = '';
+
+
+      
+        CManager::daemon()->logDump($serviceClass);
+       
+        if ($errCode == 0) {
+            cmsg::add('success', 'Daemon Successfully Dumped on Log');
+        } else {
+            cmsg::add('error', $errMessage);
+        }
+        curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass);
+    }
+    
 
 }

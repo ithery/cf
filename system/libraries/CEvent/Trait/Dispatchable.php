@@ -13,7 +13,7 @@ trait CEvent_Trait_Dispatchable {
 
     protected static function getDispatcher() {
         if (self::$dispatcher == null) {
-            self::$dispatcher = new CEvent_Dispatcher();
+            self::$dispatcher = CEvent::createDispatcher();
         }
         return self::$dispatcher;
     }

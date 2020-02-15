@@ -16,24 +16,36 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
     protected $dateFormat;
     protected $start;
     protected $end;
+    protected $openDirection='left';
 
     public function __construct($id) {
         parent::__construct($id);
         $this->tag = 'button';
+        $this->openDirection = 'left';
         $this->setAttr('capp-input', 'daterange-dropdownbutton');
-        $this->resetRange();
+        $this->addDefaultRange();
     }
 
+    
+    
+    /**
+     * 
+     * @param string $direction left,right
+     * @return $this
+     */
+    public function setOpenDirection($direction) {
+        $this->openDirection = $direction;
+        return $this;
+    }
+    
     public function build() {
 
-        $this->addClass('btn dropdown-toggle md-btn-flat daterange-dropdownbutton');
+        $this->addClass('btn dropdown-toggle md-btn-flat daterange-dropdownbutton uninit');
         $this->setAttr('type','button');
         $this->add($this->dateStart . ' - ' . $this->dateEnd);
         $this->after()->addControl($this->id . '-start', 'hidden')->setName($this->name . '[start]')->setValue($this->dateStart);
         $this->after()->addControl($this->id . '-end', 'hidden')->setName($this->name . '[end]')->setValue($this->dateEnd);
-        if (is_array($this->predefinedRanges) && count($this->predefinedRanges) == 0) {
-            $this->addDefaultRange();
-        }
+        
     }
 
     public function js($indent = 0) {
@@ -50,6 +62,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
 
 
         $jsRange = '';
+        $jsRangeProperty = '';
         foreach ($this->predefinedRanges as $range) {
             $label = carr::get($range, 'label');
             $dateStart = carr::get($range, 'dateStart');
@@ -65,14 +78,17 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             $jsRange .= "'" . $label . "': [" . $dateStartJs . ", " . $dateEndJs . "],";
         }
 
+        if(strlen($jsRange)>0) {
+            $jsRangeProperty = "ranges: {" . $jsRange . "},";
+        }
         $js .= "
            
           
             $('#" . $this->id . "').daterangepicker({
                 startDate: moment('" . $this->dateStart . "'),
                 endDate: moment('" . $this->dateEnd . "'),
-                ranges: {" . $jsRange . "},
-                opens: 'left',
+                ".$jsRangeProperty."
+                opens: '".$this->openDirection."',
                 locale: {
                     format: '" . $this->momentFormat . "'
                 },
@@ -91,8 +107,13 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
                     }
                 " . $jsChange . "
             });
-
+            
+            
             $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
+            if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') { 
+                $('#" . $this->id . "').html('Until ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
+            }
+            $('#" . $this->id . "').removeClass('uninit');   
         ";
         return $js;
     }

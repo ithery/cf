@@ -75,7 +75,7 @@ class CModel_Nested_Query extends CModel_Query {
      */
     public function whereAncestorOf($id, $andSelf = false, $boolean = 'and') {
         $keyName = $this->model->getTable() . '.' . $this->model->getKeyName();
-        if (NestedSet::isNode($id)) {
+        if (CModel_Nested_NestedSet::isNode($id)) {
             $value = '?';
             $this->query->addBinding($id->getRgt());
             $id = $id->getKey();

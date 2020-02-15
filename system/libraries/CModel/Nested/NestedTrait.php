@@ -290,10 +290,10 @@ trait CModel_Nested_NestedTrait {
     /**
      * Get query ancestors of the node.
      *
-     * @return  AncestorsRelation
+     * @return  CModel_Nested_Relation_Ancestors
      */
     public function ancestors() {
-        return new AncestorsRelation($this->newScopedQuery(), $this);
+        return new CModel_Nested_Relation_Ancestors($this->newScopedQuery(), $this);
     }
 
     /**

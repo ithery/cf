@@ -26,7 +26,7 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
      * @param  CModel_Query  $query
      * @return CModel_Query
      */
-    protected function setKeysForSaveQuery(Builder $query) {
+    protected function setKeysForSaveQuery(CModel_Query $query) {
         $query->where($this->morphType, $this->morphClass);
         return parent::setKeysForSaveQuery($query);
     }
