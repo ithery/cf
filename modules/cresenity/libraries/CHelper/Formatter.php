@@ -45,5 +45,9 @@ class CHelper_Formatter {
     public static function formatNumber($number) {
         return ctransform::thousand_separator($number);
     }
+    
+    public static function formatCurrency($number) {
+        return ctransform::thousand_separator($number,2);
+    }
 
 }

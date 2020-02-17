@@ -26,6 +26,14 @@ application/*
 /modules/cresenity/vendor/lib/fonts/Helvetica-Oblique.afm.php
 /modules/cresenity/vendor/lib/fonts/Helvetica-BoldOblique.afm.php
 
+#ignore libs of HTMLPurifier
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/CSS/
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/HTML/
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/URI/
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/CSS/*
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/HTML/*
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/URI/*
+
 #ignore folder logs
 /application/logs
 /logs/

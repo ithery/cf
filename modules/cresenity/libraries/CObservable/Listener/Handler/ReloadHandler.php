@@ -11,6 +11,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
 
     use CTrait_Compat_Handler_Driver_Reload,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
+        CObservable_Listener_Handler_Trait_SelectorHandlerTrait,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
 
     protected $content;
@@ -18,6 +19,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
     protected $param_inputs;
     protected $param_inputs_by_name;
     protected $paramRequest;
+    
 
     public function __construct($listener) {
         parent::__construct($listener);
@@ -96,7 +98,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         $dataAddition = '{' . $dataAddition . '}';
         $generatedUrl = $this->generatedUrl();
         $jsOptions = "{";
-        $jsOptions .= "selector:'#" . $this->target . "',";
+        $jsOptions .= "selector:'" . $this->getSelector() . "',";
         $jsOptions .= "url:'" . $generatedUrl . "',";
         $jsOptions .= "method:'" . $this->method . "',";
         $jsOptions .= "dataAddition:" . $dataAddition . ",";
