@@ -1582,6 +1582,8 @@ body .modal{
 .dataTables_wrapper {
     overflow-x:auto;
 }
+
+
 .modal {
     position: fixed;
     top: 0;

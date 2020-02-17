@@ -406,6 +406,17 @@ class c {
 
         return array_unique($results);
     }
+    
+    /**
+     * Returns true of traits is used by a class, its subclasses and trait of their traits.
+     *
+     * @param  object|string  $class
+     * @param  string  $trait
+     * @return array
+     */
+    public static function hasTrait($class,$trait) {
+        return in_array($trait, static::classUsesRecursive($class));
+    }
 
     /**
      * Catch a potential exception and return a default value.

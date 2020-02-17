@@ -108,6 +108,19 @@ class CPeriod {
 
         return new static($startDate, $endDate);
     }
+    
+    public static function untilDateNow() {
+        $startDate =  CCarbon::createFromTimestamp(0);
+        $endDate = CCarbon::now();
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+        
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;
+        return new static($startDate, $endDate);
+    }
 
     public function __construct(DateTime $startDate, DateTime $endDate) {
         if ($startDate > $endDate) {
