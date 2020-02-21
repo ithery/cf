@@ -275,6 +275,10 @@ class Input {
                 require_once DOCROOT.'system/vendor/HTMLPurifier.auto.php';
 
                 $config = HTMLPurifier_Config::createDefault();
+                
+                $def = $config->getHTMLDefinition(true);
+                $def->addAttribute('span', 'data-member-id', 'Number');
+                
                 $purifier = new HTMLPurifier($config);
                 $data = $purifier->purify($data);
                 
