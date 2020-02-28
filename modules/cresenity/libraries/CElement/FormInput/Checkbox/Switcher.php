@@ -18,7 +18,7 @@ class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->customCss('display', 'none');
+        // $this->customCss('display', 'none');
     }
 
     public function build() {
@@ -28,7 +28,8 @@ class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
     public function html($indent = 0) {
         $html = '<div class="switcher">';
 
-        $html .= parent::html();
+        // $html .= parent::html();
+        $html .= '<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="switcher-control "' . $this->validation->validation_class() . ' style="display:none">';
 
         $html .= '
             <label class="switcher-label" for="' . $this->id . '">
