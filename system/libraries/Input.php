@@ -275,7 +275,7 @@ class Input {
                 require_once DOCROOT.'system/vendor/HTMLPurifier.auto.php';
 
                 $config = HTMLPurifier_Config::createDefault();
-                $config->set('URI.AllowedSchemes', array('data' => true));
+                $config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'data' => true));
                 
                 $def = $config->getHTMLDefinition(true);
                 $def->addAttribute('span', 'data-member-id', 'Number');
