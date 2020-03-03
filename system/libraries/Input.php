@@ -279,6 +279,7 @@ class Input {
                 
                 $def = $config->getHTMLDefinition(true);
                 $def->addAttribute('span', 'data-member-id', 'Number');
+                $def->addAttribute('img', 'style', 'Text');
                 
                 $purifier = new HTMLPurifier($config);
                 $data = $purifier->purify($data);
