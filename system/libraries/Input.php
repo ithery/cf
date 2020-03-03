@@ -275,6 +275,12 @@ class Input {
                 require_once DOCROOT.'system/vendor/HTMLPurifier.auto.php';
 
                 $config = HTMLPurifier_Config::createDefault();
+                $config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'data' => true));
+                
+                $def = $config->getHTMLDefinition(true);
+                $def->addAttribute('span', 'data-member-id', 'Number');
+                $def->addAttribute('img', 'style', 'Text');
+                
                 $purifier = new HTMLPurifier($config);
                 $data = $purifier->purify($data);
                 

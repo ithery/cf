@@ -17,6 +17,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     protected $toolbarType = 'default';
     protected $haveDragDrop = false;
+    protected $uploadUrl;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -34,6 +35,11 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     public function setDragDrop($bool = true) {
         $this->haveDragDrop = $bool;
+        return $this;
+    }
+
+    public function setUploadUrl($url) {
+        $this->uploadUrl = $url;
         return $this;
     }
 
@@ -116,8 +122,6 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
     }
 
     public function js($indent = 0) {
-
-
         $additionalOptions = 'disableDragAndDrop: true,';
         if ($this->haveDragDrop) {
             $additionalOptions = 'disableDragAndDrop: false,';
@@ -125,24 +129,56 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         if ($this->toolbarType != 'default') {
             $additionalOptions .= 'toolbar:' . $this->getToolbarJson() . ',';
         }
-        $js = "";
+        $additionalCallbackOptions = '';
+        if ($this->uploadUrl) {
+            $additionalCallbackOptions = "
+                onImageUpload: function(files) {
+                    var uploadUrl = '" . $this->uploadUrl . "';
 
+                    var data = new FormData();
+                    $.each(files, function(i, file) {
+                        data.append('files[]', file, file.name);
+                    });
+
+                    $.ajax(uploadUrl, {
+                        data: data,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        dataType: 'json',
+                        type: 'POST',
+                        success: function(data) {
+                            if (! data.errCode) {
+                                $.each(data.data, function(i, val) {
+                                    var imgNode = $('<img/>');
+                                    imgNode.attr('src', val.url);
+                                    imgNode.attr('alt', val.name);
+                                    $('#" . $this->id . "').summernote('insertNode', imgNode[0]);
+                                });
+                            } else {
+                                alert('Oops, something went wrong when uploading image');
+                            }
+                        }
+                    });
+                },
+            ";
+        }
+
+        $js = "";
         $js .= "
             
         $('#" . $this->id . "').summernote({
             height: '300px',
             " . $additionalOptions . "
             maximumImageFileSize:1024*1024, // 1 MB
-            callbacks:{ 
+            callbacks: {
+                " . $additionalCallbackOptions . "
                 onImageUploadError: function(msg){ 
                     alert('Oops, something went wrong with image url'); 
                 }
             }
-	});
-        
-      
+        });
         ";
-
 
         $js .= parent::js();
         return $js;
