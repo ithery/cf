@@ -1113,20 +1113,24 @@ class CElement_Component_DataTable extends CElement_Component {
                 $aojson["bSearchable"] = false;
                 $aojson["bVisible"] = true;
                 $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
-                ;
             }
 
+            if ($this->haveRowAction() && $this->actionLocation != 'last') {
+                $aojson = array();
+                $aojson["bSortable"] = false;
+                $aojson["bSearchable"] = false;
+                $aojson["bVisible"] = true;
+                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
+            }
             foreach ($this->columns as $col) {
                 $aojson = array();
                 $aojson["bSortable"] = $col->sortable && $this->header_sortable;
                 $aojson["bSearchable"] = $col->searchable;
                 $aojson["bVisible"] = $col->visible;
 
-                $js->appendln("
-                            
-					vaoColumns.push( " . json_encode($aojson) . " );");
+                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );");
             }
-            if ($this->haveRowAction()) {
+            if ($this->haveRowAction() && $this->actionLocation == 'last') {
                 $aojson = array();
                 $aojson["bSortable"] = false;
                 $aojson["bSearchable"] = false;
