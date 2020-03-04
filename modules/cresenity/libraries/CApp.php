@@ -492,7 +492,7 @@ class CApp extends CObservable {
         return $store->store_id;
     }
 
-    public function getRoleChildList($roleId = null, $orgId = null) {
+    public function getRoleChildList($roleId = null, $orgId = null,$type=null) {
         if (strlen($roleId) == 0) {
             $roleId = $this->role()->role_id;
         }
@@ -500,7 +500,7 @@ class CApp extends CObservable {
             $orgId = CApp_Base::orgId();
         }
 
-        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId);
+        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId,$type);
         $childList = array();
 
         $traverse = function ($childs) use (&$traverse, &$childList) {

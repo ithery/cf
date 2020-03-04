@@ -30,7 +30,7 @@ trait CApp_Model_Trait_Roles {
         return $this->hasMany('CApp_Model_RolePermission', 'role_id', 'role_id');
     }
 
-    public function getDescendantsTree($rootId = null, $orgId = null) {
+    public function getDescendantsTree($rootId = null, $orgId = null,$type=null) {
         $root = $this;
         if (strlen($rootId) > 0) {
             $root = $this->find($rootId);
@@ -45,6 +45,9 @@ trait CApp_Model_Trait_Roles {
             $root = $root->where(function($query) use ($orgId) {
                         $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
                     })->where('status', '>', 0);
+        }
+        if (strlen($type) > 0) {
+            $root = $root->where('type', '=', $type);
         }
         $tree = $root->get()->toTree();
 
