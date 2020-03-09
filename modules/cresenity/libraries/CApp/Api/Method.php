@@ -22,14 +22,12 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
     protected $domain;
     private $request = null;
 
-    final public function __construct(CApp_Api $api, $method, $request = null) {
+    public function __construct(CApp_Api $api, $method, $request = null) {
         $this->api = $api;
         $this->domain = $this->api->getDomain();
         $this->method = $method;
         $this->request = $request;
         $this->refId = md5(uniqid()) . uniqid();
-
-        $this->auth();
     }
 
     public function sessionId() {
