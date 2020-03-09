@@ -28,6 +28,8 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         $this->method = $method;
         $this->request = $request;
         $this->refId = md5(uniqid()) . uniqid();
+
+        $this->auth();
     }
 
     public function sessionId() {
@@ -56,6 +58,60 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
 
     public function getErrMessage() {
         return $this->errMessage;
+    }
+
+    public function auth() {
+        $config = [];
+        
+        try {
+            $appConfig = CF::getFile('config', 'app', $this->domain);
+            $config = include $appConfig;
+        } catch (Exception $ex) {
+            $this->errCode++;
+            $this->errMessage = $ex->getMessage();
+        }
+        
+        $apiKey = carr::get($config, 'api_key');
+        $secretKey = carr::get($config, 'secret_key');
+        
+        $requestApiKey = carr::get($this->request(), 'api_key');
+        $requestSecretKey = carr::get($this->request(), 'secret_key');
+        
+        if(empty($apiKey)){
+            $this->errCode++;
+            $this->errMessage = 'Project api_key not configured yet.';
+        }
+        
+        if(empty($secretKey)){
+            $this->errCode++;
+            $this->errMessage = 'Project secret_key not configured yet.';
+        }
+        
+        if($apiKey != $requestApiKey){
+            $this->errCode++;
+            $this->errMessage = 'Invalid API Key';
+        }
+        
+        if($secretKey != $requestSecretKey){
+            $this->errCode++;
+            $this->errMessage = 'Invalid Secret Key';
+        }
+        
+        if(empty($requestApiKey)){
+            $this->errCode++;
+            $this->errMessage = 'api_key is required.';
+        }
+        
+        if(empty($requestSecretKey)){
+            $this->errCode++;
+            $this->errMessage = 'secret_key is required.';
+        }
+        
+        if($apiKey != $requestApiKey && $secretKey != $requestSecretKey){
+            $this->errCode = 9999;
+            $this->errMessage = 'Authentication Failed!';
+        }
+        
     }
 
 }
