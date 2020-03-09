@@ -61,18 +61,8 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
     }
 
     public function auth() {
-        $config = [];
-        
-        try {
-            $appConfig = CF::getFile('config', 'app', $this->domain);
-            $config = include $appConfig;
-        } catch (Exception $ex) {
-            $this->errCode++;
-            $this->errMessage = $ex->getMessage();
-        }
-        
-        $apiKey = carr::get($config, 'api_key');
-        $secretKey = carr::get($config, 'secret_key');
+        $apiKey = CF::config('devcloud.api_key');
+        $secretKey = CF::config('devcloud.secret_key');
         
         $requestApiKey = carr::get($this->request(), 'api_key');
         $requestSecretKey = carr::get($this->request(), 'secret_key');
