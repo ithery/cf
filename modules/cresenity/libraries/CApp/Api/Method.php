@@ -47,7 +47,7 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         $return = array(
             'err_code' => $this->errCode,
             'err_message' => $this->errMessage,
-            'data' => $this->data,
+            'data' => (object) $this->data,
         );
         return $return;
     }
