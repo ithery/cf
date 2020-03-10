@@ -58,48 +58,4 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         return $this->errMessage;
     }
 
-    public function auth() {
-        $apiKey = CF::config('devcloud.api_key');
-        $secretKey = CF::config('devcloud.secret_key');
-        
-        $requestApiKey = carr::get($this->request(), 'api_key');
-        $requestSecretKey = carr::get($this->request(), 'secret_key');
-        
-        if(empty($apiKey)){
-            $this->errCode++;
-            $this->errMessage = 'Project api_key not configured yet.';
-        }
-        
-        if(empty($secretKey)){
-            $this->errCode++;
-            $this->errMessage = 'Project secret_key not configured yet.';
-        }
-        
-        if($apiKey != $requestApiKey){
-            $this->errCode++;
-            $this->errMessage = 'Invalid API Key';
-        }
-        
-        if($secretKey != $requestSecretKey){
-            $this->errCode++;
-            $this->errMessage = 'Invalid Secret Key';
-        }
-        
-        if(empty($requestApiKey)){
-            $this->errCode++;
-            $this->errMessage = 'api_key is required.';
-        }
-        
-        if(empty($requestSecretKey)){
-            $this->errCode++;
-            $this->errMessage = 'secret_key is required.';
-        }
-        
-        if($apiKey != $requestApiKey && $secretKey != $requestSecretKey){
-            $this->errCode = 9999;
-            $this->errMessage = 'Authentication Failed!';
-        }
-        
-    }
-
 }
