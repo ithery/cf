@@ -16,20 +16,29 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
         $data = array();
         $command = carr::get($this->request(), 'command');
         $allowedCommand = ['status', 'fetch', 'pull'];
-
+        $avalableAppList = explode('
+', shell_exec("cd application && ls"));
+        
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
             $errMessage = 'Command is not allowed';
         }
-        
-        if(empty($command)){
+
+        if (empty($command)) {
             $errCode++;
             $errMessage = 'Command is required';
         }
 
+        if (!in_array($this->appCode, $avalableAppList)) {
+            $errCode++;
+            $errMessage = "appCode '$this->appCode' not found";
+        }
+
         if ($errCode == 0) {
             try {
-                $output = shell_exec("cd application/$this->appCode && git $command");
+                $pwd = shell_exec("cd application/$this->appCode && pwd");
+                $output .= "working on directory $pwd";
+                $output .= shell_exec("cd application/$this->appCode && git $command");
             } catch (Exception $ex) {
                 $errCode++;
                 $errMessage = $ex->getMessage();
