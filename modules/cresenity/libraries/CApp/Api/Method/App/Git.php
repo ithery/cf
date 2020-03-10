@@ -2,6 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Symfony\Component\Process\Process;
+
 /**
  * @author Muhammad Harisuddin Thohir <me@harisuddin.com>
  * @since Mar 10, 2020, 11:13:37 AM
@@ -13,12 +15,14 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
         $errCode = 0;
         $errMessage = '';
         $output = '';
+        $successOutput = '';
+        $errorOutput = '';
         $data = array();
         $command = carr::get($this->request(), 'command');
         $allowedCommand = ['status', 'fetch', 'pull'];
         $avalableAppList = explode('
 ', shell_exec("cd application && ls"));
-        
+
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
             $errMessage = 'Command is not allowed';
@@ -38,7 +42,13 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
             try {
                 $pwd = shell_exec("cd application/$this->appCode && pwd");
                 $output .= "working on directory $pwd";
-                $output .= shell_exec("cd application/$this->appCode && git $command");
+//                $output .= shell_exec("cd application/$this->appCode && git $command");
+                $process = new Process("cd application/$this->appCode && git $command");
+                $process->run();
+                
+                $output .=  $process->getOutput();
+                $successOutput = $output;
+                $output .= $errorOutput = $process->getErrorOutput();
             } catch (Exception $ex) {
                 $errCode++;
                 $errMessage = $ex->getMessage();
@@ -48,6 +58,8 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
         if ($errCode == 0) {
             $data = [
                 'output' => $output,
+                'successOutput' => $successOutput,
+                'errorOutput' => $errorOutput,
             ];
         }
 
