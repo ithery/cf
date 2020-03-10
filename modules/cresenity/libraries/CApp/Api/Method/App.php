@@ -16,9 +16,9 @@ abstract class CApp_Api_Method_App extends CApp_Api_Method {
     public function __construct(CApp_Api $api, $method, $request = null) {
         parent::__construct($api, $method, $request);
         
-        $appCode = carr::get($this->request(), 'appCode');
+        $this->appCode = carr::get($this->request(), 'appCode');
         
-        if(empty($appCode)){
+        if(empty($this->appCode)){
             $this->errCode++;
             $this->errMessage = 'appCode is required';
         }
