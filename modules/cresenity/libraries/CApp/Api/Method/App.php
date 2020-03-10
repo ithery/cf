@@ -9,8 +9,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 
 abstract class CApp_Api_Method_App extends CApp_Api_Method {
+    
+    protected $appCode;
+
+
     public function __construct(CApp_Api $api, $method, $request = null) {
         parent::__construct($api, $method, $request);
+        
+        $appCode = carr::get($this->request(), 'appCode');
+        
+        if(empty($appCode)){
+            $this->errCode++;
+            $this->errMessage = 'appCode is required';
+        }
+        
         $this->auth();
     }
     
@@ -56,5 +68,9 @@ abstract class CApp_Api_Method_App extends CApp_Api_Method {
             $this->errMessage = 'Authentication Failed!';
         }
         
+    }
+    
+    public function appCode(){
+        return $this->appCode;
     }
 }
