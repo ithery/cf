@@ -14,18 +14,19 @@ class CApp_Api_Method_App_GitStatus extends CApp_Api_Method_App {
         $errMessage = '';
         $output = '';
         $data = array();
-        $appCode = carr::get($this->request(), 'appCode');
-        
-        try{
-            $output = shell_exec("cd application/$appCode && git status");
+
+        try {
+            $output = shell_exec("cd application/$this->appCode && git status");
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
         }
 
-        $data = [
-            'output' => $output,
-        ];
+        if ($errCode == 0) {
+            $data = [
+                'output' => $output,
+            ];
+        }
 
         $this->errCode = $errCode;
         $this->errMessage = $errMessage;
