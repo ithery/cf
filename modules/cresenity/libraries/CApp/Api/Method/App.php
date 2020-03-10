@@ -30,8 +30,8 @@ abstract class CApp_Api_Method_App extends CApp_Api_Method {
         $apiKey = CF::config("app.api_key");
         $secretKey = CF::config("app.secret_key");
         
-        $requestApiKey = carr::get($this->request(), 'api_key');
-        $requestSecretKey = carr::get($this->request(), 'secret_key');
+        $requestApiKey = carr::get($this->request(), 'apiKey');
+        $requestSecretKey = carr::get($this->request(), 'secretKey');
         
         if(empty($apiKey)){
             $this->errCode++;

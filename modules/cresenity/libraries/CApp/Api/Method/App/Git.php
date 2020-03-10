@@ -19,7 +19,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
 
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
-            $errMessage = 'Command not allowed';
+            $errMessage = 'Command is not allowed';
         }
         
         if(empty($command)){
