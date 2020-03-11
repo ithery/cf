@@ -22,7 +22,7 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
     protected $domain;
     private $request = null;
 
-    final public function __construct(CApp_Api $api, $method, $request = null) {
+    public function __construct(CApp_Api $api, $method, $request = null) {
         $this->api = $api;
         $this->domain = $this->api->getDomain();
         $this->method = $method;
@@ -45,7 +45,7 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         $return = array(
             'err_code' => $this->errCode,
             'err_message' => $this->errMessage,
-            'data' => $this->data,
+            'data' => (object) $this->data,
         );
         return $return;
     }

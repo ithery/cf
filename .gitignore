@@ -42,6 +42,7 @@ application/*
 /temp/*
 /export/
 /resources
+/resource
 /files
 /certificate
 /upload/*

@@ -18,10 +18,13 @@ class CNotification_TaskQueue_NotificationSender extends CNotification_TaskQueue
         $channel = carr::get($this->params, 'channel');
         $options = carr::get($this->params, 'options');
         $className = carr::get($this->params, 'className');
-        $this->logDaemon('Processing NotificationSender '.$className.' with options: '.json_encode($options));
-        CNotification::manager()->channel($channel)->sendWithoutQueue($className, $options);
-        $this->logDaemon('Processed NotificationSender '.$className.'');
-        
+        $this->logDaemon('Processing NotificationSender ' . $className . ' with options: ' . json_encode($options));
+        try {
+            CNotification::manager()->channel($channel)->sendWithoutQueue($className, $options);
+        } catch (CModel_Exception_ModelNotFound $ex) {
+            $this->logDaemon('Ignore Error: ' . $className . '');
+        }
+        $this->logDaemon('Processed NotificationSender ' . $className . '');
     }
 
 }

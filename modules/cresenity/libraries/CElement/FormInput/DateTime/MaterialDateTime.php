@@ -24,7 +24,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         $this->disableTomorrow = false;
         $this->disableDate = false;
         $this->disableTime = false;
-        
+
         $dateTimeFormat = ccfg::get('long_date_formatted');
         if ($dateTimeFormat != null) {
             $dateTimeFormat = str_replace('Y', 'YYYY', $dateTimeFormat);
@@ -38,12 +38,11 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         }
     }
 
-    public function setDateTimeFormat($format)
-    {
+    public function setDateTimeFormat($format) {
         $this->dateTimeFormat = $format;
         return $this;
     }
-    
+
     public function setDisableYesterday($bool = true) {
         $this->disableYesterday = $bool;
         return $this;
@@ -54,15 +53,13 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         return $this;
     }
 
-    public function setDisableDate($bool = true)
-    {
+    public function setDisableDate($bool = true) {
         $this->dateTimeFormat = "HH:mm";
         $this->disableDate = $bool;
         return $this;
     }
 
-    public function setDisableTime($bool = true)
-    {
+    public function setDisableTime($bool = true) {
         $this->dateTimeFormat = "YYYY-MM-DD";
         $this->disableTime = $bool;
         return $this;
@@ -71,7 +68,6 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
     protected function build() {
         parent::build();
         $this->addClass('form-control');
-     
     }
 
     public function js($indent = 0) {
@@ -91,10 +87,10 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         if ($this->disableTime) {
             $option .= " ,time: false";
         }
-        
+
         if ($this->disableYesterday) {
             if (strlen($option) > 0)
-            $option .= ",minDate: new Date()";
+                $option .= ",minDate: new Date()";
         }
 
         if ($this->disableTomorrow) {
