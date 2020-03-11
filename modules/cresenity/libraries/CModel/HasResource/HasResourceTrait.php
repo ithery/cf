@@ -37,10 +37,10 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Set the polymorphic relation.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return CModel_Relation_MorphMany
      */
     public function resource() {
-        $resourceModel = CF::config('resource.resource_model');
+        $resourceModel = CF::config('resource.resource_model', CApp_Model_Resource::class);
         return $this->morphMany($resourceModel, 'model');
     }
 
@@ -60,10 +60,10 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param string $key
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
+     * @return CModel_HasResource_FileAdder_FileAdder
      */
     public function addResourceFromRequest($key) {
-        return app(FileAdderFactory::class)->createFromRequest($this, $key);
+        return CModel_HasResource_FileAdder_FileAdderFactory::createFromRequest($this, $key);
     }
 
     /**
@@ -71,19 +71,19 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param string[] $keys
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder[]
+     * @return CModel_HasResource_FileAdder_FileAdder[]
      */
     public function addMultipleResourceFromRequest(array $keys) {
-        return app(FileAdderFactory::class)->createMultipleFromRequest($this, $keys);
+        return CModel_HasResource_FileAdder_FileAdderFactory::createMultipleFromRequest($this, $keys);
     }
 
     /**
      * Add all files from a request.
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder[]
+     * @return CModel_HasResource_FileAdder_FileAdder[]
      */
     public function addAllResourceFromRequest() {
-        return app(FileAdderFactory::class)->createAllFromRequest($this);
+        return CModel_HasResource_FileAdder_FileAdderFactory::createAllFromRequest($this);
     }
 
     /**
@@ -92,16 +92,16 @@ trait CModel_HasResource_HasResourceTrait {
      * @param string $url
      * @param string|array ...$allowedMimeTypes
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
+     * @return CModel_HasResource_FileAdder_FileAdder
      *
-     * @throws \Spatie\ResourceLibrary\Exceptions\FileCannotBeAdded
+     * @throws CResources_Exception_FileCannotBeAdded
      */
     public function addResourceFromUrl() {
         $args = func_get_args();
         $url = carr::get($args, 0);
         $allowedMimeTypes = array_slice($args, 1);
         if (!$stream = @fopen($url, 'r')) {
-            throw UnreachableUrl::create($url);
+            throw CResources_Exception_FileCannotBeAdded_UnreachableUrl::create($url);
         }
         $temporaryFile = tempnam(sys_get_temp_dir(), 'resource-library');
         file_put_contents($temporaryFile, $stream);
@@ -128,9 +128,9 @@ trait CModel_HasResource_HasResourceTrait {
      * @param string|array ...$allowedMimeTypes
      *
      * @throws InvalidBase64Data
-     * @throws \Spatie\ResourceLibrary\Exceptions\FileCannotBeAdded
+     * @throws CResources_Exception_FileCannotBeAdded
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
+     * @return CModel_HasResource_FileAdder_FileAdder
      */
     public function addResourceFromBase64() {
         $args = func_get_args();
@@ -164,7 +164,7 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
+     * @return CModel_HasResource_FileAdder_FileAdder
      */
     public function copyResource($file) {
         return $this->addResource($file)->preservingOriginal();
@@ -209,6 +209,20 @@ trait CModel_HasResource_HasResourceTrait {
             return '';
         }
         return $resource->getUrl($conversionName);
+    }
+    
+    /*
+     * Get the url of the image for the given conversionName
+     * for first resource for the given collectionName.
+     * If no profile is given, return the source's full url.
+     */
+
+    public function getFirstResourceFullUrl($collectionName = 'default', $conversionName = '') {
+        $resource = $this->getFirstResource($collectionName);
+        if (!$resource) {
+            return '';
+        }
+        return $resource->getFullUrl($conversionName);
     }
 
     /*
@@ -287,8 +301,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @return $this
      */
     public function clearResourceCollection($collectionName = 'default') {
-        $this->getResource($collectionName)
-        ->each->delete();
+        $this->getResource($collectionName)->each->delete();
         event(new CollectionHasBeenCleared($this, $collectionName));
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);
@@ -350,7 +363,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
 
     public function addResourceConversion($name) {
-        $conversion = Conversion::create($name);
+        $conversion = CResources_Conversion::create($name);
         $this->resourceConversions[] = $conversion;
         return $conversion;
     }
@@ -404,7 +417,7 @@ trait CModel_HasResource_HasResourceTrait {
                         ->values();
     }
 
-    public function prepareToAttachResource(Resource $resource, FileAdder $fileAdder) {
+    public function prepareToAttachResource(CApp_Model_Interface_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) {
         $this->unAttachedResourceLibraryItems[] = compact('resource', 'fileAdder');
     }
 
@@ -454,7 +467,7 @@ trait CModel_HasResource_HasResourceTrait {
             call_user_func_array($resourceCollection->resourceConversionRegistrations, array($resource));
 
             $preparedResourceConversions = CF::collect($this->resourceConversions)
-                    ->each(function (Conversion $conversion) use ($resourceCollection) {
+                    ->each(function (CResources_Conversion $conversion) use ($resourceCollection) {
                         $conversion->performOnCollections($resourceCollection->name);
                     })
                     ->values()

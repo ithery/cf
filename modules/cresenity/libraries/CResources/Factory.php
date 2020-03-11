@@ -38,7 +38,7 @@ class CResources_Factory {
                 ->setResource($resource)
                 ->setPathGenerator($pathGenerator);
         if ($conversionName !== '') {
-            $conversion = ConversionCollection::createForResource($resource)->getByName($conversionName);
+            $conversion = CResources_ConversionCollection::createForResource($resource)->getByName($conversionName);
             $urlGenerator->setConversion($conversion);
         }
         return $urlGenerator;
@@ -59,6 +59,14 @@ class CResources_Factory {
      */
     public static function createFileManipulator() {
         return new CResources_FileManipulator();
+    }
+    
+     /**
+     * 
+     * @return \CResources_FileSystem
+     */
+    public static function createFileSystem() {
+        return new CResources_Filesystem();
     }
 
     /**

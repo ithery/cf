@@ -50,12 +50,17 @@ class CTemporary {
      * 
      * @return string
      */
-    public static function getDirectory() {
+    public static function getDirectory($folder = null) {
         $path = DOCROOT . "temp" . DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            mkdir($path);
+
+
+        if ($folder != null) {
+            $path .= $folder . DIRECTORY_SEPARATOR;
         }
 
+        if (!is_dir($path)) {
+            @mkdir($path, 0777, true);
+        }
         return $path;
     }
 
@@ -118,7 +123,7 @@ class CTemporary {
         $depth = 5;
         $mainFolder = substr($filename, 0, 8);
         $path = '';
-        $path = $path . $folder . DIRECTORY_SEPARATOR;
+        $path = $path . rtrim($folder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $path = $path . $mainFolder . DIRECTORY_SEPARATOR;
 
         $basefile = basename($filename);
@@ -134,6 +139,10 @@ class CTemporary {
         }
 
         return $path . $filename;
+    }
+
+    public static function getLocalPath($folder, $filename) {
+        return rtrim(DOCROOT, '/') . '/' . static::getPath($folder, $filename);
     }
 
     /**
@@ -167,17 +176,27 @@ class CTemporary {
      * 
      * @param string $folder
      * @param string $filename
-     * @return string
+     * @return bool
      */
     public static function delete($folder, $filename) {
 
+        $disk = static::disk();
+        return $disk->delete(static::getPath($folder, $filename));
+    }
 
-        $path = static::makePath($folder, $filename);
+    /**
+     * 
+     * @param string $folder
+     * @param string $filename
+     * @return bool
+     */
+    public static function deleteLocal($folder, $filename) {
+        $path = static::getLocalPath($folder, $filename);
         return @unlink($path);
     }
 
-    public static function generateRandomFilename() {
-        return date('Ymd') . cutils::randmd5() . $extension;
+    public static function generateRandomFilename($extension = null) {
+        return date('Ymd') . cutils::randmd5() . (strlen($extension) > 0 ? $extension : "");
     }
 
     public static function put($folder, $content, $filename = null) {
@@ -189,13 +208,19 @@ class CTemporary {
         return $path;
     }
 
-    public static function getSize($folder, $content) {
+    public static function get($folder, $filename) {
+
+        $path = static::getPath($folder, $filename);
+        return static::disk()->get($path);
+    }
+
+    public static function getSize($folder, $filename) {
 
         $path = static::getPath($folder, $filename);
         return static::disk()->size($path);
     }
 
-    public static function isExists($folder, $content) {
+    public static function isExists($folder, $filename) {
 
         $path = static::getPath($folder, $filename);
         return static::disk()->exists($path);

@@ -864,6 +864,38 @@ var Cresenity = function () {
             callback();
         }
     };
+    this.handleJsonResponse = function (response, onSuccess, onError) {
+        var errMessage = 'Unexpected error happen, please relogin ro refresh this page';
+        if (typeof onError == 'string') {
+            errMessage = onError;
+        }
+
+        if (response.errCode == 0) {
+            if (typeof onSuccess == 'function') {
+                onSuccess(response.data);
+            }
+        } else {
+            if (typeof response.errMessage != 'undefined') {
+                errMessage = response.errMessage;
+            }
+            if (typeof onError == 'function') {
+                onError(errMessage);
+            } else {
+                cresenity.showError(errMessage);
+            }
+        }
+    }
+
+    this.showError = function (message) {
+        toastr['error'](message, 'Error', {
+            positionClass: 'toast-top-right',
+            closeButton: true,
+            progressBar: true,
+            preventDuplicates: false,
+            newestOnTop: false,
+
+        });
+    }
     this.require = function (filename, filetype, callback) {
         if (cresenity.filesAdded.indexOf("[" + filename + "]") == -1) {
             cresenity.loadJsCss(filename, filetype, callback);
@@ -1075,9 +1107,22 @@ var Cresenity = function () {
                                 }
 
                                 setTimeout(function () {
-                                    console.log('removed');
+
                                     $(modal).remove();
                                     cresenity.modalElements.pop();
+
+
+
+                                    var modalExists = $('.modal:visible').length > 0;
+                                    if (!modalExists) {
+                                        $('body').removeClass('modal-open');
+                                    } else {
+                                        if (!$('body').hasClass('modal-open')) {
+                                            $('body').addClass('modal-open');
+                                        }
+
+                                    }
+
 
                                 }, delay);
                                 this.isRunning = true;
@@ -1088,7 +1133,7 @@ var Cresenity = function () {
                             settings.onClose(e, next.callback);
                         }
                         if (!next.isRunning) {
-                            console.log('next is not running');
+
                             next.callback();
                         }
                     })(lastModal);
@@ -1144,15 +1189,32 @@ var Cresenity = function () {
                     beforeSubmit: function () {
                         if (typeof $(element).validate == 'function') {
                             validationIsValid = $(element).validate().form();
-
+                            return validationIsValid;
                         }
                         return true;
                     },
-                    success: function (data) {
+                    success: function (response) {
+                        var onSuccess = function () {};
+                        var onError = function (errMessage) {
+                            cresenity.showError(errMessage)
+                        };
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
-                            settings.onSuccess(data);
+                            onSuccess = settings.onSuccess;
+                        }
+                        if (typeof settings.onError == 'function' && validationIsValid) {
+                            onError = settings.onError;
+                        }
+
+                        if (validationIsValid) {
+                            if (settings.handleJsonResponse == true) {
+                                cresenity.handleJsonResponse(response, onSuccess, onError);
+                            } else {
+                                onSuccess(response);
+                            }
+
                         }
                     },
+
                     complete: function () {
                         cresenity.unblockElement($(element));
 
@@ -1216,6 +1278,38 @@ var Cresenity = function () {
             }
         });
     };
+
+    this.formatCurrency = function (rp) {
+        rp = "" + rp;
+        var rupiah = "";
+        var vfloat = "";
+        var ds = window.capp.decimal_separator;
+        var ts = window.capp.thousand_separator;
+        var dd = window.capp.decimal_digit;
+        var dd = parseInt(dd);
+        var minus_str = "";
+        if (rp.indexOf("-") >= 0) {
+            minus_str = rp.substring(rp.indexOf("-"), 1);
+            rp = rp.substring(rp.indexOf("-") + 1);
+        }
+
+        if (rp.indexOf(".") >= 0) {
+            vfloat = rp.substring(rp.indexOf("."));
+            rp = rp.substring(0, rp.indexOf("."));
+        }
+        p = rp.length;
+        while (p > 3) {
+            rupiah = ts + rp.substring(p - 3) + rupiah;
+            l = rp.length - 3;
+            rp = rp.substring(0, l);
+            p = rp.length;
+        }
+        rupiah = rp + rupiah;
+        vfloat = vfloat.replace('.', ds);
+        if (vfloat.length > dd)
+            vfloat = vfloat.substring(0, dd + 1);
+        return minus_str + rupiah + vfloat;
+    }
     this.unblockPage = function () {
         $.unblockUI();
     };
@@ -1368,6 +1462,8 @@ var Cresenity = function () {
                     new scrollToTop().init();
                 }
             }
+            this.initConfirm();
+
         });
 
 
@@ -2202,6 +2298,8 @@ if (!window.cresenity) {
                                 jQuery('#' + id_target + '').parent().find('.modal-header .modal-title').html(data.title);
                             }
                         });
+
+
                     },
                     error: function (obj, t, msg) {
                         if (msg != 'abort') {

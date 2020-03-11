@@ -12,7 +12,7 @@ trait CQueue_Trait_InteractsWithQueue {
     /**
      * The underlying queue job instance.
      *
-     * @var \Illuminate\Contracts\Queue\Job
+     * @var CQueue_AbstractJob
      */
     protected $job;
 

@@ -12,12 +12,25 @@ class CTemporary_Directory {
     protected $path;
 
     public function __construct($path) {
-        $this->path = 'temp/' . trim($path, '/');
-        CFile::makeDirectory($this->getPath(), 0755, true, true);
+        $this->path = 'temp' . DS . trim($path, DS);
+        CFile::makeDirectory($this->getPath(), 0777, true, true);
     }
 
-    public function getPath() {
-        return rtrim(DOCROOT, '/') . '/' . rtrim($this->path, '/');
+    protected function getBasePath() {
+        return rtrim(DOCROOT, DS) . DS . rtrim($this->path, DS) . DS;
+    }
+
+    public function getPath($pathOrFilename = '') {
+        if (empty($pathOrFilename)) {
+            return $this->getBasePath();
+        }
+
+        $path = rtrim($this->getBasePath(), DS) . DS . trim($pathOrFilename, DS);
+        $directoryPath = $this->removeFilenameFromPath($path);
+        if (!file_exists($directoryPath)) {
+            mkdir($directoryPath, 0777, true);
+        }
+        return $path;
     }
 
     public function getUrl() {
@@ -26,6 +39,21 @@ class CTemporary_Directory {
 
     public function createFile($filename) {
         return new CTemporary_File($this, $filename);
+    }
+
+    public function delete() {
+        CFile::deleteDirectory($this->getPath());
+    }
+
+    protected function removeFilenameFromPath($path) {
+        if (!$this->isFilePath($path)) {
+            return $path;
+        }
+        return substr($path, 0, strrpos($path, DS));
+    }
+
+    protected function isFilePath($path) {
+        return strpos($path, '.') !== false;
     }
 
 }

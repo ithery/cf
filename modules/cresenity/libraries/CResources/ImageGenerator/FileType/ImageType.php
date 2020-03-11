@@ -11,10 +11,10 @@ class CResources_ImageGenerator_FileType_ImageType extends CResources_ImageGener
     /**
      * 
      * @param string $path
-     * @param Conversion $conversion
+     * @param CResources_Conversion $conversion
      * @return string
      */
-    public function convert($path, Conversion $conversion = null) {
+    public function convert($path, CResources_Conversion $conversion = null) {
         return $path;
     }
 

@@ -2126,13 +2126,7 @@ final class CF {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        if (is_null($callback)) {
-            return new HigherOrderTapProxy($value);
-        }
-
-        $callback($value);
-
-        return $value;
+        return c::tap($value, $callback);
     }
 
     /**
@@ -2142,11 +2136,7 @@ final class CF {
      * @return string
      */
     public static function class_basename($class) {
-        $class = is_object($class) ? get_class($class) : $class;
-
-        $basename = basename(str_replace('\\', '/', $class));
-        $basename = carr::last(explode("_", $basename));
-        return $basename;
+        return c::classBasename($class);
     }
 
     /**
@@ -2289,7 +2279,7 @@ final class CF {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return new CCollection($value);
+        return c::collect($value);
     }
 
     /**

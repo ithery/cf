@@ -22,6 +22,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @var CDatabase
      */
     public $db;
+    protected $dbName;
     public $dbConfig;
     public $columns;
     public $footer;
@@ -82,7 +83,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->defaultPagingList["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
-        $this->db = CDatabase::instance(null,null,$this->domain);
+        $this->db = CDatabase::instance(null, null, $this->domain);
         $this->dbConfig = $this->db->config();
         $this->display_length = "10";
         $this->paging_list = $this->defaultPagingList;
@@ -166,7 +167,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
 
         $this->dom = CManager::theme()->getData('table.dom');
-        $this->actionLocation = CManager::theme()->getData('table.actionLocation','last');
+        $this->actionLocation = CManager::theme()->getData('table.actionLocation', 'last');
     }
 
     public static function factory($id = "") {
@@ -191,7 +192,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->actionLocation = $actionLocation;
         return $this;
     }
- 
+
     /**
      * 
      * @return string
@@ -207,7 +208,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setDomain($domain) {
         parent::setDomain($domain);
-        $this->setDatabase(CDatabase::instance(null,null,$domain));
+        $this->setDatabase(CDatabase::instance(null, null, $domain));
         return $this;
     }
 
@@ -520,7 +521,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         if (!$this->isElastic && !$this->isCallback) {
             if ($this->ajax == false) {
-                if(strlen($this->query)>0) {
+                if (strlen($this->query) > 0) {
                     $db = $this->db;
                     $r = $db->query($this->query);
                     $this->data = $r->result(false);
@@ -627,7 +628,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 }
                 $jsparam = array();
                 if ($this->actionLocation == 'first') {
-                    $js.=$this->drawActionAndGetJs($html,$row,$key);
+                    $js .= $this->drawActionAndGetJs($html, $row, $key);
                 }
                 foreach ($this->columns as $col) {
                     $col_found = false;
@@ -667,6 +668,10 @@ class CElement_Component_DataTable extends CElement_Component {
                                 ->addArg($col_v)
                                 ->setRequire($col->callbackRequire)
                                 ->execute();
+                        if (is_array($col_v) && isset($col_v['html']) && isset($col_v['js'])) {
+                            $js .= $col_v['js'];
+                            $col_v = $col_v['html'];
+                        }
                     }
                     $new_v = $col_v;
 
@@ -727,7 +732,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     $col_found = true;
                 }
                 if ($this->actionLocation == 'last') {
-                    $js.=$this->drawActionAndGetJs($html,$row,$key);
+                    $js .= $this->drawActionAndGetJs($html, $row, $key);
                 }
 
 
@@ -741,7 +746,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $html->text();
     }
 
-    protected function drawActionAndGetJs(CStringBuilder $html,$row,$key) {
+    protected function drawActionAndGetJs(CStringBuilder $html, $row, $key) {
         $js = '';
         if ($this->haveRowAction()) {
             $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
@@ -832,7 +837,7 @@ class CElement_Component_DataTable extends CElement_Component {
                     }
                     $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" ' . $attrWidth . '><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
                 }
-                if($this->getActionLocation()=='first') {
+                if ($this->getActionLocation() == 'first') {
                     if ($this->haveRowAction()) {
                         $action_width = 31 * $this->rowActionCount() + 5;
                         if ($this->getRowActionStyle() == "btn-dropdown") {
@@ -844,7 +849,7 @@ class CElement_Component_DataTable extends CElement_Component {
                 foreach ($this->columns as $col) {
                     $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
                 }
-                if($this->getActionLocation()=='last') {
+                if ($this->getActionLocation() == 'last') {
                     if ($this->haveRowAction()) {
                         $action_width = 31 * $this->rowActionCount() + 5;
                         if ($this->getRowActionStyle() == "btn-dropdown") {
@@ -1108,20 +1113,24 @@ class CElement_Component_DataTable extends CElement_Component {
                 $aojson["bSearchable"] = false;
                 $aojson["bVisible"] = true;
                 $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
-                ;
             }
 
+            if ($this->haveRowAction() && $this->actionLocation != 'last') {
+                $aojson = array();
+                $aojson["bSortable"] = false;
+                $aojson["bSearchable"] = false;
+                $aojson["bVisible"] = true;
+                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
+            }
             foreach ($this->columns as $col) {
                 $aojson = array();
                 $aojson["bSortable"] = $col->sortable && $this->header_sortable;
                 $aojson["bSearchable"] = $col->searchable;
                 $aojson["bVisible"] = $col->visible;
 
-                $js->appendln("
-                            
-					vaoColumns.push( " . json_encode($aojson) . " );");
+                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );");
             }
-            if ($this->haveRowAction()) {
+            if ($this->haveRowAction() && $this->actionLocation == 'last') {
                 $aojson = array();
                 $aojson["bSortable"] = false;
                 $aojson["bSearchable"] = false;
@@ -1393,14 +1402,16 @@ class CElement_Component_DataTable extends CElement_Component {
         $js->appendln($this->js_cell);
         if (!$this->ajax) {
             $js->append(parent::js($indent))->br();
-            foreach ($this->data as $row) {
-                if ($row instanceof CRenderable) {
-                    $js->appendln($row->js())->br();
-                    continue;
-                }
-                foreach ($row as $row_k => $row_v) {
-                    if ($row_v instanceof CRenderable) {
-                        $js->appendln($row_v->js())->br();
+            if (is_array($this->data)) {
+                foreach ($this->data as $row) {
+                    if ($row instanceof CRenderable) {
+                        $js->appendln($row->js())->br();
+                        continue;
+                    }
+                    foreach ($row as $row_k => $row_v) {
+                        if ($row_v instanceof CRenderable) {
+                            $js->appendln($row_v->js())->br();
+                        }
                     }
                 }
             }

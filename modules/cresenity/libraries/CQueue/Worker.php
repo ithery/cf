@@ -116,6 +116,7 @@ class CQueue_Worker {
             } else {
                 $this->sleep($options->sleep);
             }
+            $this->resetTimeoutHandler();
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
@@ -126,11 +127,11 @@ class CQueue_Worker {
     /**
      * Register the worker timeout handler.
      *
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
-     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  CQueue_AbstractJob|null  $job
+     * @param  CQueue_WorkerOptions  $options
      * @return void
      */
-    protected function registerTimeoutHandler($job, WorkerOptions $options) {
+    protected function registerTimeoutHandler($job, CQueue_WorkerOptions $options) {
         // We will register a signal handler for the alarm signal so that we can kill this
         // process if it is running too long because it has frozen. This uses the async
         // signals supported in recent versions of PHP to accomplish it conveniently.
@@ -148,25 +149,34 @@ class CQueue_Worker {
     }
 
     /**
+     * Reset the worker timeout handler.
+     *
+     * @return void
+     */
+    protected function resetTimeoutHandler() {
+        pcntl_alarm(0);
+    }
+
+    /**
      * Get the appropriate timeout for the given job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
-     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  CQueue_AbstractJob|null  $job
+     * @param  CQueue_WorkerOptions  $options
      * @return int
      */
-    protected function timeoutForJob($job, WorkerOptions $options) {
+    protected function timeoutForJob($job, CQueue_WorkerOptions $options) {
         return $job && !is_null($job->timeout()) ? $job->timeout() : $options->timeout;
     }
 
     /**
      * Determine if the daemon should process on this iteration.
      *
-     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  CQueue_WorkerOptions  $options
      * @param  string  $connectionName
      * @param  string  $queue
      * @return bool
      */
-    protected function daemonShouldRun(WorkerOptions $options, $connectionName, $queue) {
+    protected function daemonShouldRun(CQueue_WorkerOptions $options, $connectionName, $queue) {
         $isDownForMaintenance = $this->isDownForMaintenance();
         return !(($isDownForMaintenance && !$options->force) ||
                 $this->paused ||
@@ -176,11 +186,11 @@ class CQueue_Worker {
     /**
      * Pause the worker for the current loop.
      *
-     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  CQueue_WorkerOptions  $options
      * @param  int  $lastRestart
      * @return void
      */
-    protected function pauseWorker(WorkerOptions $options, $lastRestart) {
+    protected function pauseWorker(CQueue_WorkerOptions $options, $lastRestart) {
         $this->sleep($options->sleep > 0 ? $options->sleep : 1);
         $this->stopIfNecessary($options, $lastRestart);
     }
@@ -188,11 +198,11 @@ class CQueue_Worker {
     /**
      * Stop the process if necessary.
      *
-     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  CQueue_WorkerOptions  $options
      * @param  int  $lastRestart
      * @param  mixed  $job
      */
-    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $job = null) {
+    protected function stopIfNecessary(CQueue_WorkerOptions $options, $lastRestart, $job = null) {
         if ($this->shouldQuit) {
             $this->stop();
         } elseif ($this->memoryExceeded($options->memory)) {
@@ -209,13 +219,14 @@ class CQueue_Worker {
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param  CQueue_WorkerOptions  $options
      * @return void
      */
     public function runNextJob($connectionName, $queue, CQueue_WorkerOptions $options) {
         $job = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
         );
+
         // If we're able to pull a job off of the stack, we will process it and then return
         // from this method. If there is no job on the queue, we will "sleep" the worker
         // for the specified number of seconds, then keep processing jobs after sleep.
@@ -228,9 +239,9 @@ class CQueue_Worker {
     /**
      * Get the next job from the queue connection.
      *
-     * @param  \Illuminate\Contracts\Queue\Queue  $connection
+     * @param  CQueue_AbstractQueue  $connection
      * @param  string  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return CQueue_AbstractJob|null
      */
     protected function getNextJob($connection, $queue) {
 
@@ -261,6 +272,7 @@ class CQueue_Worker {
      */
     protected function runJob($job, $connectionName, CQueue_WorkerOptions $options) {
         try {
+
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             if (CDaemon::getRunningService() != null) {
@@ -317,7 +329,9 @@ class CQueue_Worker {
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
+
             $job->fire();
+
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Exception $e) {
             if (CDaemon::getRunningService() != null) {
@@ -382,7 +396,7 @@ class CQueue_Worker {
      * This will likely be because the job previously exceeded a timeout.
      *
      * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  int  $maxTries
      * @return void
      */
@@ -403,7 +417,7 @@ class CQueue_Worker {
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
      * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  int  $maxTries
      * @param  \Exception  $e
      * @return void
@@ -459,7 +473,7 @@ class CQueue_Worker {
      * Raise the exception occurred queue job event.
      *
      * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  CQueue_AbstractJob  $job
      * @param  \Exception  $e
      * @return void
      */
@@ -591,7 +605,7 @@ class CQueue_Worker {
     /**
      * Get the queue manager instance.
      *
-     * @return \Illuminate\Queue\QueueManager
+     * @return CQueue_Manager
      */
     public function getManager() {
         return $this->manager;
@@ -600,10 +614,10 @@ class CQueue_Worker {
     /**
      * Set the queue manager instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory $manager
+     * @param  CQueue_Manager $manager
      * @return void
      */
-    public function setManager(QueueManager $manager) {
+    public function setManager(CQueue_Manager $manager) {
         $this->manager = $manager;
     }
 

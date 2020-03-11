@@ -29,7 +29,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverAbstract {
     /**
      * Create a new Redis store.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
+     * @param  CRedis  $redis
      * @param  string  $prefix
      * @param  string  $connection
      * @return void
@@ -208,7 +208,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverAbstract {
     /**
      * Get the Redis connection instance.
      *
-     * @return \Illuminate\Redis\Connections\Connection
+     * @return CRedis_AbstractConnector
      */
     public function connection()
     {

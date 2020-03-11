@@ -263,7 +263,7 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
      * @return array
      */
     protected function sortReplacements(array $replace) {
-        return (new Collection($replace))->sortBy(function ($value, $key) {
+        return (new CCollection($replace))->sortBy(function ($value, $key) {
                     return mb_strlen($key) * -1;
                 })->all();
     }

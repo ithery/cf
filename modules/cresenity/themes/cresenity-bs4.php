@@ -18,6 +18,7 @@ return array(
         "ionicons",
         "linearicons",
         "open-ionic",
+        
         "pe-icon-7-stroke",
         "glyphicons",
         "perfect-scrollbar",

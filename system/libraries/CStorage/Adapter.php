@@ -167,7 +167,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      */
     public function put($path, $contents, $options = []) {
         $options = is_string($options) ? ['visibility' => $options] : (array) $options;
-        
+
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
         // for the developer to store streams without managing them manually in code.
@@ -175,7 +175,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
                 $contents instanceof CHTTP_UploadedFile) {
             return $this->putFile($path, $contents, $options);
         }
-        
+
         return is_resource($contents) ? $this->driver->putStream($path, $contents, $options) : $this->driver->put($path, $contents, $options);
     }
 
@@ -422,12 +422,18 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         if ($config->has('url')) {
             return $this->concatPathToUrl($config->get('url'), $path);
         }
+        if (cstr::startsWith($path, DOCROOT)) {
+            $path = substr($path, strlen(DOCROOT));
+        }
+        $path = ltrim($path, '/');
+        
+        return curl::httpbase().$path;
         $path = '/storage/' . $path;
         // If the path contains "storage/public", it probably means the developer is using
         // the default disk to generate the path instead of the "public" disk like they
         // are really supposed to use. We will remove the public from this path here.
-        if (Str::contains($path, '/storage/public/')) {
-            return Str::replaceFirst('/public/', '/', $path);
+        if (cstr::contains($path, '/storage/public/')) {
+            return cstr::replaceFirst('/public/', '/', $path);
         }
         return $path;
     }
@@ -495,9 +501,9 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return array
      */
     public function files($directory = null, $recursive = false) {
-       
+
         $contents = $this->driver->listContents($directory, $recursive);
-        
+
         return $this->filterContentsByType($contents, 'file');
     }
 
@@ -520,9 +526,9 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      */
     public function directories($directory = null, $recursive = false) {
         $contents = $this->driver->listContents($directory, $recursive);
-        
-        $result= $this->filterContentsByType($contents, 'dir');
-       
+
+        $result = $this->filterContentsByType($contents, 'dir');
+
         return $result;
     }
 
@@ -585,7 +591,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return array
      */
     protected function filterContentsByType($contents, $type) {
-      
+
         return CCollection::make($contents)
                         ->where('type', $type)
                         ->pluck('path')

@@ -22,22 +22,38 @@ class CLogger_Writer_File extends CLogger_Writer {
      * @return  void
      */
     public function __construct($options) {
-        $basic_path = DEFAULTPATH;
-        if(!is_dir(DEFAULTPATH)) {
-            $basic_path = DOCROOT;
+
+        $basicPath = DOCROOT;
+
+        $dir = $basicPath . 'logs' . DS;
+        if (!is_dir($dir)) {
+            mkdir($dir, 02777);
+            // Set permissions (must be manually set to fix umask issues)
+            chmod($dir, 02777);
         }
-        $dir = $basic_path . 'logs' . DS;
-        $path = carr::get($options, 'path');
-        if (!is_dir($dir . ltrim($path, '/'))) {
+        
+        $appCode = CF::appCode();
+        if (strlen($appCode) > 0) {
+            $dir .= $appCode . DS;
             if (!is_dir($dir)) {
                 mkdir($dir, 02777);
                 // Set permissions (must be manually set to fix umask issues)
                 chmod($dir, 02777);
             }
-            
+        }
+
+        $path = carr::get($options, 'path');
+        if (!is_dir($dir . ltrim($path, '/'))) {
+            if (!is_dir($dir)) {
+
+                mkdir($dir, 02777);
+                // Set permissions (must be manually set to fix umask issues)
+                chmod($dir, 02777);
+            }
+
             if (strlen($path) > 0) {
                 $folders = explode('/', $path);
-                
+
                 foreach ($folders as $folder) {
                     if (strlen($folder) > 0) {
                         if (!is_dir($dir)) {
@@ -49,12 +65,12 @@ class CLogger_Writer_File extends CLogger_Writer {
                 }
             }
         }
-        
-        
+
+
         if (!is_dir($dir) OR ! is_writable($dir)) {
             throw new CException('Directory :dir must be writable', array(':dir' => $path));
         }
-        
+
         // Determine the directory path
         $this->_directory = realpath($dir) . DIRECTORY_SEPARATOR;
     }
@@ -109,7 +125,7 @@ class CLogger_Writer_File extends CLogger_Writer {
             // Write each message into the log file
             file_put_contents($filename, PHP_EOL . $this->format_message($message), FILE_APPEND);
         }
-        
+
         $rotator = CLogger_Rotator::createRotate($filename);
         $rotator->run();
     }

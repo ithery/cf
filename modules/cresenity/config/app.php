@@ -10,6 +10,8 @@ return array(
     "default_timezone" => 'Asia/Jakarta',
     "multilang" => true,
     "update_last_request" => true,
+    "date_formatted"=>'Y-m-d',
+    "long_date_formatted"=>'Y-m-d H:i:s',
     "require_js" => true,
     "requireJs" => true,
     "merge_js" => false,

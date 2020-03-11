@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since May 2, 2019, 2:21:40 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use CResources_Helpers_File as ResourceLibraryFileHelper;
+
 class CResources_FileManipulator {
 
     /**
@@ -23,9 +25,13 @@ class CResources_FileManipulator {
                 return in_array($collection->getName(), $only);
             });
         }
+        
+        
         $this->performConversions(
                 $profileCollection->getNonQueuedConversions($resource->collection_name), $resource, $onlyIfMissing
         );
+       
+        
         $queuedConversions = $profileCollection->getQueuedConversions($resource->collection_name);
         if ($queuedConversions->isNotEmpty()) {
             $this->dispatchQueuedConversions($resource, $queuedConversions);
@@ -47,21 +53,25 @@ class CResources_FileManipulator {
         if (!$imageGenerator) {
             return;
         }
-        $temporaryDirectory = TemporaryDirectory::create();
-        $copiedOriginalFile = app(Filesystem::class)->copyFromResourceLibrary(
-                $resource, $temporaryDirectory->path(str_random(16) . '.' . $resource->extension)
+
+        $resourceFileSystem = CResources_Factory::createFileSystem();
+        $temporaryDirectoryPath = CResources_Helpers_TemporaryDirectory::generateLocalFilePath($resource->getExtensionAttribute());
+        $copiedOriginalFile = $resourceFileSystem->copyFromResourceLibrary(
+                $resource, $temporaryDirectoryPath
         );
         $conversions
-                ->reject(function (Conversion $conversion) use ($onlyIfMissing, $resource) {
+                ->reject(function (CResources_Conversion $conversion) use ($onlyIfMissing, $resource) {
                     $relativePath = $resource->getPath($conversion->getName());
-                    $rootPath = config('filesystems.disks.' . $resource->disk . '.root');
+                    $rootPath = CF::config('storage.disks.' . $resource->disk . '.root');
                     if ($rootPath) {
                         $relativePath = str_replace($rootPath, '', $relativePath);
                     }
-                    return $onlyIfMissing && Storage::disk($resource->disk)->exists($relativePath);
+                    
+                    return $onlyIfMissing && CStorage::instance()->disk($resource->disk)->exists($relativePath);
                 })
-                ->each(function (Conversion $conversion) use ($resource, $imageGenerator, $copiedOriginalFile) {
-                    event(new ConversionWillStart($resource, $conversion, $copiedOriginalFile));
+                ->each(function (CResources_Conversion $conversion) use ($resource, $imageGenerator, $copiedOriginalFile) {
+                    CEvent::dispatcher()->dispatch(new CResources_Event_Conversion_WillStart($resource, $conversion, $copiedOriginalFile));
+
                     $copiedOriginalFile = $imageGenerator->convert($copiedOriginalFile, $conversion);
                     $manipulationResult = $this->performManipulations($resource, $conversion, $copiedOriginalFile);
                     $newFileName = pathinfo($resource->file_name, PATHINFO_FILENAME) .
@@ -73,39 +83,42 @@ class CResources_FileManipulator {
                                 $resource, $conversion, $renamedFile
                         );
                     }
-                    app(Filesystem::class)->copyToResourceLibrary($renamedFile, $resource, 'conversions');
+                    CResources_Factory::createFileSystem()->copyToResourceLibrary($renamedFile, $resource, 'conversions');
                     $resource->markAsConversionGenerated($conversion->getName(), true);
-                    event(new ConversionHasBeenCompleted($resource, $conversion));
+                    CEvent::dispatcher()->dispatch(new CResources_Event_Conversion_ConversionHasBeenCompleted($resource, $conversion));
                 });
-        $temporaryDirectory->delete();
+
+        CResources_Helpers_TemporaryDirectory::delete($temporaryDirectoryPath);
     }
 
-    public function performManipulations(CApp_Model_Interface_ResourceInterface $resource, Conversion $conversion, $imageFile) {
+    public function performManipulations(CApp_Model_Interface_ResourceInterface $resource, CResources_Conversion $conversion, $imageFile) {
         if ($conversion->getManipulations()->isEmpty()) {
             return $imageFile;
         }
-        $conversionTempFile = pathinfo($imageFile, PATHINFO_DIRNAME) . '/' . str_random(16)
+        $conversionTempFile = pathinfo($imageFile, PATHINFO_DIRNAME) . '/' . cstr::random(16)
                 . $conversion->getName()
                 . '.'
-                . $resource->extension;
-        File::copy($imageFile, $conversionTempFile);
+                . $resource->getExtensionAttribute();
+        CHelper::file()->copy($imageFile, $conversionTempFile);
         $supportedFormats = ['jpg', 'pjpg', 'png', 'gif'];
-        if ($conversion->shouldKeepOriginalImageFormat() && in_array($resource->extension, $supportedFormats)) {
-            $conversion->format($resource->extension);
+        if ($conversion->shouldKeepOriginalImageFormat() && in_array(strtolower($resource->getExtensionAttribute()), $supportedFormats)) {
+            $conversion->format($resource->getExtensionAttribute());
         }
-        ImageFactory::load($conversionTempFile)
+        CResources_Helpers_ImageFactory::load($conversionTempFile)
                 ->manipulate($conversion->getManipulations())
                 ->save();
         return $conversionTempFile;
     }
 
-    protected function dispatchQueuedConversions(Resource $resource, ConversionCollection $queuedConversions) {
-        $performConversionsJobClass = config('resourcelibrary.jobs.perform_conversions', PerformConversions::class);
+    protected function dispatchQueuedConversions(CApp_Model_Interface_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
+        $performConversionsJobClass = CF::config('resource.task_queue.perform_conversions', CResources_TaskQueue_PerformConversions::class);
         $job = new $performConversionsJobClass($queuedConversions, $resource);
-        if ($customQueue = config('resourcelibrary.queue_name')) {
+        
+       
+        if ($customQueue = CF::config('resource.queue_name')) {
             $job->onQueue($customQueue);
         }
-        app(Dispatcher::class)->dispatch($job);
+        CQueue::dispatcher()->dispatch($job);
     }
 
     /**
@@ -116,9 +129,9 @@ class CResources_FileManipulator {
     public function determineImageGenerator(CApp_Model_Interface_ResourceInterface $resource) {
         return $resource->getImageGenerators()
                         ->map(function ( $imageGeneratorClassName) {
-                            return app($imageGeneratorClassName);
+                            return CContainer::getInstance()->build($imageGeneratorClassName);
                         })
-                        ->first(function (ImageGenerator $imageGenerator) use ($resource) {
+                        ->first(function (CResources_ImageGenerator_FileTypeAbstract $imageGenerator) use ($resource) {
                             return $imageGenerator->canConvert($resource);
                         });
     }

@@ -20,10 +20,11 @@ class Controller_Cresenity extends CController {
         $temp = new CApp_TaskQueue_HouseKeeping_Temporary();
         $temp->dispatch();
     }
+
     public function dispatch() {
         CQueue::run();
     }
-    
+
     public function daemon() {
         CDaemon::cliRunner();
     }
@@ -34,18 +35,18 @@ class Controller_Cresenity extends CController {
 
     public function ajax($method) {
         $app = CApp::instance();
-        $filename = $method.'.tmp';
+        $filename = $method . '.tmp';
         $file = CTemporary::getPath("ajax", $filename);
-       
+
         if (isset($_GET['profiler'])) {
             new Profiler();
         }
-        $disk =CTemporary::disk();
+        $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
             throw new CException('failed to get temporary file :filename', array(':filename' => $file));
         }
         $json = $disk->get($file);
-        
+
         $ajaxMethod = CAjax::createMethod($json);
         $response = $ajaxMethod->executeEngine();
 
@@ -1044,10 +1045,8 @@ class Controller_Cresenity extends CController {
         echo $app->render();
     }
 
-    
-    
-    public function upload($method='temp') {
-        
+    public function upload($method = 'temp') {
+
 
         $orgId = CApp_Base::orgId();
         $db = CDatabase::instance();
@@ -1056,7 +1055,7 @@ class Controller_Cresenity extends CController {
         $fileId = '';
         $fileIdPreview = '';
         $result = array();
-        
+
         foreach ($filesInput as $k => $fileData) {
             //check for array
             $isArray = is_array(carr::get($fileData, 'name'));
@@ -1084,7 +1083,7 @@ class Controller_Cresenity extends CController {
 
                 $errFileCode = 0;
                 $errFileMessage = '';
-                
+
                 switch ($fileerror) {
                     case UPLOAD_ERR_OK:
                         break;
@@ -1116,14 +1115,24 @@ class Controller_Cresenity extends CController {
                 $resultData['status'] = $errFileCode == 0;
                 $resultData['message'] = $errFileCode == 0 ? 'Upload success' : $errFileMessage;
                 $resultData['url'] = $url;
-                $resultData['fullUrl'] = trim(curl::httpbase(),'/').$url;
+                $resultData['fullUrl'] = trim(curl::httpbase(), '/') . $url;
                 $resultData['type'] = $filetype;
                 $resultPutContent = file_put_contents($fullfilenameinf, json_encode($resultData));
-                
+
                 $result[$k][] = $resultData;
             }
         }
 
         echo json_encode($result);
     }
+
+    public function qrcode() {
+        $request = $_GET;
+        $data = carr::get($request, 'd');
+        $options = []; 
+        $options['s'] = carr::get($request,'s','qr');
+        $qrcode = new CImage_QRCode($data, $options);
+        $qrcode->outputImage();
+    }
+
 }

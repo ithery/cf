@@ -37,7 +37,7 @@ class cdbg {
     }
 
     public static function varDump($var, $return = FALSE) {
-       
+
         $html = '<pre style="margin-bottom: 18px;' .
                 'background: #f7f7f9;' .
                 'border: 1px solid #e1e1e8;' .
@@ -51,7 +51,7 @@ class cdbg {
                 'word-wrap: break-word;' .
                 'color: #333;' .
                 'font-family: Menlo,Monaco,Consolas,\'Courier New\',monospace;">';
-        $html .= self::var_dump_plain($var);
+        $html .= self::varDumpPlain($var);
         $html .= '</pre>';
 
 //        try {
@@ -73,6 +73,10 @@ class cdbg {
         } catch (Exception $ex) {
             cdbg::varDump($ex->getTraceAsString(), $return);
         }
+    }
+    
+    public static function dumpLastQuery($db=null) {
+        cdbg::varDump(CDatabase::instance($db)->lastQuery());
     }
 
     /**
@@ -107,7 +111,7 @@ class cdbg {
         self::$debug_vars[$key] = $var;
     }
 
-    public static function var_dump_plain($var) {
+    public static function varDumpPlain($var) {
         $html = '';
 
         if (is_bool($var)) {
@@ -145,12 +149,12 @@ class cdbg {
                     if (is_numeric($key)) {
                         $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
                     } else {
-                        $html .= str_repeat(' ', $indent) . str_pad('"' . c::htmlentities($key) . '"', $longest_key, ' ');
+                        $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
                     }
 
                     $html .= ' => ';
 
-                    $value = explode('<br />', self::var_dump_plain($value));
+                    $value = explode('<br />', self::varDumpPlain($value));
 
                     foreach ($value as $line => $val) {
                         if ($line != 0) {
@@ -229,12 +233,12 @@ class cdbg {
                 if (is_numeric($key)) {
                     $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
                 } else {
-                    $html .= str_repeat(' ', $indent) . str_pad('"' . c::htmlentities($key) . '"', $longest_key, ' ');
+                    $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
                 }
 
                 $html .= ' => ';
 
-                $value = explode('<br />', self::var_dump_plain($value));
+                $value = explode('<br />', self::varDumpPlain($value));
 
                 foreach ($value as $line => $val) {
                     if ($line != 0) {
@@ -299,7 +303,7 @@ class cdbg {
      */
     public static function source($file, $line_number, $padding = 5) {
 
-        if (!$file OR ! is_readable($file)) {
+        if (!$file OR!is_readable($file)) {
             // Continuing will cause errors
             return FALSE;
         }
@@ -663,7 +667,11 @@ class cdbg {
         return true;
     }
 
-    public static function caller_info() {
+    /**
+     * 
+     * @return string
+     */
+    public static function callerInfo() {
         $c = '';
         $file = '';
         $func = '';
@@ -710,20 +718,17 @@ class cdbg {
     }
 
     public static function getTraceString() {
-        $trace = null;
-        try {
-            throw new Exception('test');
-        } catch (Exception $ex) {
-            $trace = $ex->getTraceAsString();
-        }
+        $ex = new Exception('test');
+        $trace = $ex->getTraceAsString();
         return $trace;
     }
 
     public static function traceDump($return = false) {
         return static::varDump(self::getTraceString(), $return);
     }
-    public static function queryDump($db = null,$return = false) {
-        if($db==null) {
+
+    public static function queryDump($db = null, $return = false) {
+        if ($db == null) {
             $db = CDatabase::instance();
         }
         return cdbg::varDump($db->lastQuery(), $return);

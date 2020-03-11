@@ -33,6 +33,7 @@ class CApp extends CObservable {
     private $viewName = 'cpage';
     private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
+    protected $renderer;
 
     public function setViewCallback(callable $viewCallback) {
         self::$viewCallback = $viewCallback;
@@ -150,6 +151,8 @@ class CApp extends CObservable {
 
         $this->_org = corg::get(CF::orgCode());
 
+        
+        //$this->renderer = new CApp_Renderer($this);
 
         if (isset($_COOKIE['capp-profiler'])) {
             new Profiler();
@@ -489,7 +492,7 @@ class CApp extends CObservable {
         return $store->store_id;
     }
 
-    public function getRoleChildList($roleId = null, $orgId = null) {
+    public function getRoleChildList($roleId = null, $orgId = null,$type=null) {
         if (strlen($roleId) == 0) {
             $roleId = $this->role()->role_id;
         }
@@ -497,7 +500,7 @@ class CApp extends CObservable {
             $orgId = CApp_Base::orgId();
         }
 
-        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId);
+        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId,$type);
         $childList = array();
 
         $traverse = function ($childs) use (&$traverse, &$childList) {

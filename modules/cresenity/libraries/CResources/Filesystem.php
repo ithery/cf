@@ -31,6 +31,7 @@ class CResources_Filesystem {
     public function copyToResourceLibrary($pathToFile, CApp_Model_Interface_ResourceInterface $resource, $type = null, $targetFileName = null) {
         $destinationFileName = $targetFileName ?: pathinfo($pathToFile, PATHINFO_BASENAME);
         $destination = $this->getResourceDirectory($resource, $type) . $destinationFileName;
+        
         $file = fopen($pathToFile, 'r');
         if ($resource->getDiskDriverName() === 'local') {
             $this->filesystem

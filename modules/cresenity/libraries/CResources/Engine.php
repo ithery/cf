@@ -90,6 +90,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             $path = substr($path,strlen(DOCROOT));
         }
 
+        
         $written = $disk->put($path, $file_request);
 
         if ($written === false) {
@@ -163,6 +164,10 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         $tempFileName = $orgCode . '_' . $this->_resource_type . "_" . $this->_type . "_" . date('YmdHis', strtotime($dateNow)) . "_" . $filename;
         $path = $dir . $tempFileName;
         
+        
+        if(cstr::startsWith($path, DOCROOT)) {
+            $path = substr($path,strlen(DOCROOT));
+        }
         $resourceDisk = CResources::disk();
         $written = $resourceDisk->put($path,$tempDisk->get($tempPath));
         //$written = copy($tempPath, $path);

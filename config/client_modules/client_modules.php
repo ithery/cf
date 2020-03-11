@@ -16,6 +16,23 @@ return array(
     "tmpl" => array(
         "js" => array("libs" . DS . "tmpl.min.js"),
     ),
+    "vue" => array(
+        "js" => array(
+            "libs" . DS . "vue.min.js",
+            "libs" . DS . "vue-loader.js",
+        ),
+    ),
+    "axios" => array(
+        "js" => array(
+            "libs" . DS . "axios.min.js",
+        ),
+    ),
+    
+    "underscore" => array(
+        "js" => array(
+            "libs" . DS . "underscore.min.js",
+        ),
+    ),
     "jquery" => array(
         "js" => array("libs" . DS . "jquery.min.js"),
     ),
@@ -517,6 +534,9 @@ return array(
     "linearicons" => array(
         "css" => array("icon/linearicons.css"),
     ),
+    "themify-icons" => array(
+        "css" => array("icon/themify-icons.css"),
+    ),
     "open-ionic" => array(
         "css" => array("icon/open-ionic.css"),
     ),
@@ -675,6 +695,11 @@ return array(
             "plugins/tippy/tippy.js",
         ),
     ),
+    "locationpicker" => array(
+        "js" => array(
+            "plugins/locationpicker/locationpicker.jquery.js",
+        ),
+    ),
     "pdfjs" => array(
         "js" => array(
             "plugins/pdfjs/pdf.js",
@@ -690,6 +715,14 @@ return array(
         ),
         "css" => array(
             "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css",
+        ),
+    ),
+    "cropper" => array(
+        'css' => array(
+            'plugins/cropper/cropper.css',
+        ),
+        'js' => array(
+            'plugins/cropper/cropper.js',
         ),
     ),
 );

@@ -368,7 +368,7 @@ class CRouting {
         if (!empty($this->groupStack)) {
             $last = end($this->groupStack);
 
-            return $last['prefix'] ?? '';
+            return isset($last['prefix']) ? $last['prefix'] : '';
         }
 
         return '';
@@ -502,7 +502,7 @@ class CRouting {
      */
     protected function addWhereClausesToRoute($route) {
         $route->where(array_merge(
-                        $this->patterns, $route->getAction()['where'] ?? []
+                        $this->patterns, isset($route->getAction()['where']) ? $route->getAction()['where'] : []
         ));
 
         return $route;
@@ -995,7 +995,7 @@ class CRouting {
      */
     public function currentRouteAction() {
         if ($this->current()) {
-            return $this->current()->getAction()['controller'] ?? null;
+            return isset($this->current()->getAction()['controller']) ? $this->current()->getAction()['controller'] : null;
         }
     }
 
@@ -1007,7 +1007,7 @@ class CRouting {
      */
     public function uses(...$patterns) {
         foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $this->currentRouteAction())) {
+            if (cstr::is($pattern, $this->currentRouteAction())) {
                 return true;
             }
         }

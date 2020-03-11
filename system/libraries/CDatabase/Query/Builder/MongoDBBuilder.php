@@ -7,8 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 21, 2019, 9:31:14 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\Regex;
 
 class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
 
@@ -324,10 +325,10 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 $options['sort'] = $this->orders;
             }
             if ($this->offset) {
-                $options['skip'] = $this->offset;
+                $options['skip'] = (int) $this->offset;
             }
             if ($this->limit) {
-                $options['limit'] = $this->limit;
+                $options['limit'] = (int) $this->limit;
             }
             if ($columns) {
                 $options['projection'] = $columns;
@@ -344,7 +345,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             $cursor = $this->collection->find($wheres, $options);
             // Return results as an array with numeric keys
             $results = iterator_to_array($cursor, false);
-            
+
             return $this->useCollections ? new CCollection($results) : $results;
         }
     }
@@ -483,7 +484,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      * @inheritdoc
      */
     public function insertGetId(array $values, $sequence = null) {
-        
+
         $result = $this->collection->insertOne($values);
         if (1 == (int) $result->isAcknowledged()) {
             if ($sequence === null) {
@@ -873,6 +874,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         } else {
             $query = [$column => ['$' . $operator => $value]];
         }
+
         return $query;
     }
 

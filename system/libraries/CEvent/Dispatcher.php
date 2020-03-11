@@ -150,7 +150,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     public function until($event, $payload = []) {
         return $this->dispatch($event, $payload, true);
     }
-    
+
     /**
      * Fire an event and call the listeners.
      *
@@ -159,8 +159,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @param  bool  $halt
      * @return array|null
      */
-    public function fire($event, $payload = [], $halt = false)
-    {
+    public function fire($event, $payload = [], $halt = false) {
         return $this->dispatch($event, $payload, $halt);
     }
 
@@ -181,7 +180,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             $this->broadcastEvent($payload[0]);
         }
 
-        
+
         $responses = [];
         foreach ($this->getListeners($event) as $listener) {
             $response = $listener($event, $payload);
