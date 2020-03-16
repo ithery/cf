@@ -64,8 +64,8 @@ class CModel_Query {
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql', 'dump', 'dd',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'raw',
+        'insert', 'insertGetId', 'getBindings', 'toSql',
+        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
     ];
 
     /**
@@ -658,19 +658,19 @@ class CModel_Query {
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @return CPagination_LengthAwarePaginatorInterface
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
-        $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Illuminate\Pagination\Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = ($total = $this->toBase()->getCountForPagination()) ? $this->forPage($page, $perPage)->get($columns) : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
-                    'path' => CPagination_Paginator::resolveCurrentPath(),
+                    'path' => Illuminate\Pagination\Paginator::resolveCurrentPath(),
                     'pageName' => $pageName,
         ]);
     }
@@ -682,10 +682,10 @@ class CModel_Query {
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @return CPagination_PaginatorInterface
+     * @return \Illuminate\Contracts\Pagination\Paginator
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
-        $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
@@ -695,7 +695,7 @@ class CModel_Query {
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
-                    'path' => CPagination_Paginator::resolveCurrentPath(),
+                    'path' => Paginator::resolveCurrentPath(),
                     'pageName' => $pageName,
         ]);
     }

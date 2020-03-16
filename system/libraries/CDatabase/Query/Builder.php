@@ -2349,26 +2349,4 @@ class CDatabase_Query_Builder {
         return is_array($queryResult[0]) ? $this->pluckFromArrayColumn($queryResult, $column, $key) : $this->pluckFromObjectColumn($queryResult, $column, $key);
     }
 
-    /**
-     * Dump the current SQL and bindings.
-     *
-     * @return $this
-     */
-    public function dump()
-    {
-        cdbg::d($this->toSql(), $this->getBindings());
-
-        return $this;
-    }
-
-    /**
-     * Die and dump the current SQL and bindings.
-     *
-     * @return void
-     */
-    public function dd()
-    {
-        cdbg::dd($this->toSql(), $this->getBindings());
-    }
-
 }
