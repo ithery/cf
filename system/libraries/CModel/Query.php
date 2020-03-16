@@ -64,8 +64,8 @@ class CModel_Query {
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
+        'insert', 'insertGetId', 'getBindings', 'toSql', 'dump', 'dd',
+        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'raw',
     ];
 
     /**
