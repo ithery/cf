@@ -658,19 +658,19 @@ class CModel_Query {
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return CPagination_LengthAwarePaginatorInterface
      *
      * @throws \InvalidArgumentException
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
-        $page = $page ?: Illuminate\Pagination\Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = ($total = $this->toBase()->getCountForPagination()) ? $this->forPage($page, $perPage)->get($columns) : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
-                    'path' => Illuminate\Pagination\Paginator::resolveCurrentPath(),
+                    'path' => CPagination_Paginator::resolveCurrentPath(),
                     'pageName' => $pageName,
         ]);
     }
@@ -682,10 +682,10 @@ class CModel_Query {
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\Paginator
+     * @return CPagination_PaginatorInterface
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
-        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
@@ -695,7 +695,7 @@ class CModel_Query {
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
-                    'path' => Paginator::resolveCurrentPath(),
+                    'path' => CPagination_Paginator::resolveCurrentPath(),
                     'pageName' => $pageName,
         ]);
     }
