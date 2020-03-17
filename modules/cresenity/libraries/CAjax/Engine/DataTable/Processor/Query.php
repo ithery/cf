@@ -98,7 +98,10 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
                 for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
                     $i2 = 0;
                     if ($table->checkbox) {
-                        $i2 = -1;
+                        $i2--;
+                    }
+                    if ($this->actionLocation() == 'first') {
+                        $i2--;
                     }
                     $fieldName = carr::get($columns[intval($request['iSortCol_' . $i]) + $i2], 'fieldname');
                     if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {

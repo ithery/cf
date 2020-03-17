@@ -1042,6 +1042,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajaxMethod->setData('table', serialize($this));
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('domain', $this->domain);
+            $ajaxMethod->setData('actionLocation', $this->actionLocation);
             $ajaxMethod->setData('checkbox', $this->checkbox);
             $ajaxMethod->setData('is_elastic', $this->isElastic);
             $ajaxMethod->setData('is_callback', $this->isCallback);
@@ -1265,6 +1266,29 @@ class CElement_Component_DataTable extends CElement_Component {
                     $js->appendln("'fixedColumns': " . ($this->fixedColumn ? "true" : "false") . ",")->br();
                 }
             }
+            
+            /*
+            $js->append("
+                initComplete : function() {
+                    var input = $('#" . $this->id() . " .dataTables_filter input').unbind();
+                    var self = this.api();
+                    var searchButton = $('<button>')
+                               .text('search')
+                               .click(function() {
+                                  self.search(input.val()).draw();
+                    });
+                    var clearButton = $('<button>')
+                               .text('clear')
+                               .click(function() {
+                                  input.val('');
+                                  searchButton.click(); 
+                    });
+                    
+                    $('#" . $this->id() . " .dataTables_filter').append(searchButton, clearButton);
+                },            
+            ");
+             * 
+             */
             $js->appendln($jqueryui)->br()
                     ->appendln("'bStateSave': false,")->br()
                     ->appendln("'iDisplayLength': " . $this->display_length . ",")->br()
@@ -1436,6 +1460,9 @@ class CElement_Component_DataTable extends CElement_Component {
                 });
             ");
         }
+
+
+        
 
         return $js->text();
     }

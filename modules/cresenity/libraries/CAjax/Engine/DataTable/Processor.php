@@ -57,6 +57,11 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
         $domain = carr::get($data, 'domain', CF::domain());
         return $domain;
     }
+    
+    public function actionLocation() {
+        $actionLocation = carr::get($this->data, 'actionLocation', CF::domain());
+        return $actionLocation;
+    }
 
     public function table() {
         $data = $this->engine->getData();
