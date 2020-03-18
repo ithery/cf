@@ -435,7 +435,7 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
-    public function createEWallet($external_id, $ewallet_type, $phone, $amount) {
+    public function createEWallet($external_id, $ewallet_type, $phone, $amount, $options = array()) {
         $curl = curl_init();
         $headers = array();
         $headers[] = 'Content-Type: application/json';
@@ -444,6 +444,12 @@ class CVendor_Xendit {
         $data['ewallet_type'] = $ewallet_type;
         $data['phone'] = $phone;
         $data['amount'] = $amount;
+        if ($ewallet_type == 'LINKAJA' || $ewallet_type == 'DANA') {
+            $data['items'][] = carr::get($options, 'items');
+            $data['callback_url'] = carr::get($options, 'callbackUrl');
+            $data['redirect_url'] = carr::get($options, 'redirectUrl');
+        }
+
 
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
@@ -457,6 +463,58 @@ class CVendor_Xendit {
         curl_close($curl);
         $responseObject = json_decode($response, true);
         return $responseObject;
+    }
+
+
+    public function cardlessCredit($externalId, $cardlessCreditType = null, $amount, $paymentType = '', $options = array()) {
+        $curl = curl_init();
+        $headers = array();
+        $data = array();
+
+        $item = new stdClass();
+        $item->id = "123123";
+        $item->name = "Phone Case";
+        $item->price = 200000;
+        $item->type = "Smartphone";
+        $item->url = "http://example.com/phone/phone_case";
+        $item->quantity = 2;
+
+        $headers[] = 'Content-Type: application/json';
+        $end_point = $this->server_domain . '/cardless-credit';
+        $data['external_id'] = $externalId;
+        if (strlen($cardlessCreditType) > 0) {
+            $data['cardless_credit_type'] = $cardlessCreditType;
+        }
+        if (strlen($paymentType) > 0) {
+            $data['payment_type'] = $paymentType;
+        }
+        if (strlen($amount) > 0) {
+            $data['amount'] = $amount;
+        }
+        if (is_array($options)) {
+            $data['items'][] = $item;
+            $data['callback_url'] = carr::get($options, 'callbackUrl');
+            $data['redirect_url'] = carr::get($options, 'redirectUrl');
+            $data['customer_details'] = carr::get($options, 'customerDetails');
+            $data['shipping_address'] = carr::get($options, 'shippingAddress');
+            $data['redirect_url'] =  'https://example.com';
+            $data['callback_url'] = 'http://example.com/callback-cardless-credit';
+        }
+
+
+        $payload = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $end_point);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+
     }
 
 }
