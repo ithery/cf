@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Aug 13, 2019, 12:54:01 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use CApp_Administrator_Fixer_Database as DatabaseFixer;
+
 class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Administrator_Controller_User {
 
     public function index() {
@@ -30,7 +33,7 @@ class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Admi
         $schema = $schemaManager->createSchema();
         $haveChanged = false;
         foreach ($tables as $table) {
-            $sql = $this->getSqlResult($table);
+            $sql = DatabaseFixer::sqlRelationship($table);
 
             if (strlen($sql) > 0) {
                 $template = $app->addTemplate()
@@ -56,7 +59,7 @@ class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Admi
     }
 
     public function execute($table) {
-        $sql = $this->getSqlResult($table);
+        $sql = DatabaseFixer::sqlRelationship($table);
         $db = CDatabase::instance();
         $errCode = 0;
         $errMessage = '';
@@ -67,89 +70,6 @@ class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Admi
             $errMessage = $ex->getMessage();
         }
         echo CApp_Base::jsonResponse($errCode, $errMessage);
-    }
-
-    private function getSqlResult($table) {
-        $db = CDatabase::instance();
-        $schemaManager = $db->getSchemaManager();
-        $tables = $schemaManager->listTableNames();
-        $schema = $schemaManager->createSchema();
-        $columnsData = $schemaManager->listTableColumns($table);
-        $columns = array_keys($columnsData);
-        $tableSchema = $schema->getTable($table);
-        $changes = 0;
-        $tableDifferences = new CDatabase_Schema_Table_Diff($table);
-
-        $dbPlatform = $db->getDatabasePlatform();
-        $comparator = new CDatabase_Schema_Comparator();
-        $app = CApp::instance();
-        $foreignKeys = $tableSchema->getForeignKeys();
-
-        foreach ($columns as $column) {
-            $columnSchema = $tableSchema->getColumn($column);
-            if (cstr::endsWith($column, '_id')) {
-                $tableRelation = substr($column, 0, -3);
-                if ($tableRelation == $table) {
-                    //this is primary key
-                    continue;
-                }
-
-                if (!in_array($columnSchema->getType()->getName(), array(CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT))) {
-                    continue;
-                }
-                if ($table == 'cloud_messaging' && $column == 'registration_id') {
-                    continue;
-                }
-                if (in_array($table, ['pushnotif_queue', 'pushnotif_queue_member']) && $column == 'reg_id') {
-                    continue;
-                }
-
-
-                if (in_array($table, ['log_activity', 'log_session', 'log_login', 'log_login_fail']) && $column == 'session_id') {
-                    continue;
-                }
-                if (in_array($table, ['mobile_app_requirement']) && $column == 'firebase_sender_id') {
-                    continue;
-                }
-                if (!in_array($tableRelation, $tables)) {
-                    //table relation is not found in current list of tables
-                    continue;
-                }
-
-                $haveForeign = false;
-
-
-                foreach ($foreignKeys as $foreignKey) {
-
-                    if ($foreignKey->getLocalTable()->getName() == $table && $foreignKey->getLocalColumns() == array($column)) {
-                        //already have foreign key
-                        $targetForeignKey = new CDatabase_Schema_ForeignKeyConstraint(array($column), $tableRelation, array($column), $foreignKey->getName(), array("onUpdate" => "RESTRICT", "onDelete" => "RESTRICT"));
-                        if ($comparator->diffForeignKey($targetForeignKey, $foreignKey)) {
-
-                            $tableDifferences->changedForeignKeys[] = $targetForeignKey;
-                            $changes++;
-                        }
-                        $haveForeign = true;
-                        break;
-                    }
-                }
-                if ($haveForeign) {
-                    continue;
-                }
-
-                $fkConstraint = new CDatabase_Schema_ForeignKeyConstraint(array($column), $tableRelation, array($column), null, array("onUpdate" => "RESTRICT", "onDelete" => "RESTRICT"));
-
-                $tableDifferences->addedForeignKeys[] = $fkConstraint;
-                $changes++;
-            }
-        }
-        $sql = null;
-        if ($changes) {
-            $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
-        }
-        return $sql;
     }
 
 }
