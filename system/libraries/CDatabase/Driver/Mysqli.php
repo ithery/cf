@@ -32,11 +32,11 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      * Closes the database connection.
      */
     public function __destruct() {
-        try {
-            is_object($this->link) && @$this->link->close();
-        } catch (Exception $ex) {
-            //do nothing
-        }
+//        try {
+//            is_object($this->link) && @$this->link->close();
+//        } catch (Exception $ex) {
+//            //do nothing
+//        }
     }
 
     public function connect() {
