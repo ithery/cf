@@ -101,6 +101,8 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         if ($this->height) {
             $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
         }
+        
+        $js->append("$('#" . $this->wrapper->id . "').data('capp-chart',chart" . $this->wrapper->id . ");");
 
         return $js->text();
     }
