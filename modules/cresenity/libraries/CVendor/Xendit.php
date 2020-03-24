@@ -366,6 +366,25 @@ class CVendor_Xendit {
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
+    
+    public function stopRecurringPayment($idXendit = null) {
+        $curl = curl_init();
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+        $end_point = $this->server_domain . '/recurring_payments/' . $idXendit . '/stop!';
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $end_point);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+        $response = curl_exec($curl);
+
+        $info = curl_getinfo($curl);
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
 
     public function createRecurringPayment($externalId, $payerEmail, $interval, $intervalCount, $description, $amount, $options = array()) {
         $curl = curl_init();
@@ -506,6 +525,53 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
+
+    public function invoices($data = null) {
+        $endPoint = $this->server_domain . '/v2/invoices';
+
+        $response = $this->requestToXendit($endPoint, 'GET', $data);
+        return $response;
+    }
+
+    public function balance($accountType = 'CASH') {
+        $endPoint = $this->server_domain . '/balance?account_type=' . $accountType;
+        $response = $this->requestToXendit($endPoint, 'GET');
+        return $response;
+    }
+
+    public function recurringPayments($id) {
+        $endPoint = $this->server_domain . '/recurring_payments/' . $id;
+        $response = $this->requestToXendit($endPoint, 'GET');
+        return $response;
+    }
+
+    protected function requestToXendit($endPoint, $method, $data = null) {
+        $curl = curl_init();
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $endPoint);
+        if ($method == 'POST') {
+            if ($data != null) {
+                $payload = json_encode($data);
+                curl_setopt($curl, CURLOPT_POST, true);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+            }
+        } else {
+            if ($data != null) {
+                $payload = curl::as_post_string($data);
+                curl_setopt($curl, CURLOPT_URL, $endPoint . '?' . $payload);
+            }
+        }
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
 
