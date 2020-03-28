@@ -30,7 +30,7 @@ class CDatabase_Driver_Mysql extends CDatabase_Driver {
      * Closes the database connection.
      */
     public function __destruct() {
-        is_resource($this->link) and mysql_close($this->link);
+        //is_resource($this->link) and mysql_close($this->link);
     }
 
     public function close() {

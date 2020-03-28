@@ -1415,6 +1415,14 @@ class CDatabase {
 
     public function __destruct() {
         self::rollback();
+        
+        try {
+            if($this->driver!=null) {
+                $this->driver->close();
+            }
+        } catch (Exception $ex) {
+
+        }
     }
 
     public function escapeLike($str) {
