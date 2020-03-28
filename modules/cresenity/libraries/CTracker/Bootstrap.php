@@ -71,7 +71,7 @@ class CTracker_Bootstrap {
             $db = CDatabase::instance($this->config()->get('database'));
 
             $db->listenOnQueryExecuted(function ($query) use ($db) {
-
+                
                 $bindings = $query->bindings;
                 $time = $query->time;
                 $connection = $query->connection;

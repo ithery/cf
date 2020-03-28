@@ -56,7 +56,7 @@ class CTracker_Tracker {
      * @return array
      */
     protected function getLogData() {
-        
+
         return [
             'log_session_id' => $this->getSessionId(true),
             'method' => $this->request->method(),
@@ -183,7 +183,9 @@ class CTracker_Tracker {
 
     public function track() {
         $log = $this->getLogData();
+        
         if ($this->config->isLogEnabled()) {
+            
             $this->repositoryManager->createLog($log);
         }
     }

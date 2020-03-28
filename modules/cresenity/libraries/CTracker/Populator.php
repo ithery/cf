@@ -13,8 +13,17 @@ class CTracker_Populator {
         $this->data= [];
     }
     
-    public function populate() {
+    public function populateSessionData() {
+        $repositoryManager = CTracker_RepositoryManager::instance();
+        
+        $currentDeviceProperties = $repositoryManager->getCurrentDeviceProperties();
+        
+        
+       
+    }
+ 
+    
+    public function populateLogData() {
         
     }
-    
 }
