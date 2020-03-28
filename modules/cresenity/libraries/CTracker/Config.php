@@ -198,6 +198,10 @@ class CTracker_Config {
         return $this->get('cookieNamespace');
     }
 
+    public function isQueued() {
+        return $this->get('isQueued');
+    }
+    
     public function getLogger() {
         $logger = $this->get('logger');
         if ($logger != null && is_string($logger)) {
