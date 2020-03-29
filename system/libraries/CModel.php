@@ -7,8 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 25, 2017, 8:42:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
-
 abstract class CModel implements ArrayAccess {
 
     use CModel_Trait_GuardsAttributes,
@@ -144,14 +142,28 @@ abstract class CModel implements ArrayAccess {
      *
      * @var string
      */
-    const CREATEDBY = 'created';
+    const CREATEDBY = 'createdby';
 
     /**
      * The name of the "updatedby" column.
      *
      * @var string
      */
-    const UPDATEDBY = 'updated';
+    const UPDATEDBY = 'updatedby';
+
+    /**
+     * The name of the "deleted" column.
+     *
+     * @var string
+     */
+    const DELETED = 'deleted';
+
+    /**
+     * The name of the "deletedby" column.
+     *
+     * @var string
+     */
+    const DELETEDBY = 'deletedby';
 
     /**
      * The array of mapping model class
@@ -1516,6 +1528,43 @@ abstract class CModel implements ArrayAccess {
      */
     public function __wakeup() {
         $this->bootIfNotBooted();
+    }
+
+    /**
+     * @return bool
+     */
+    public static function usesSoftDelete() {
+
+
+        $classUses = c::collect(c::classUsesRecursive(static::class));
+        $lastClassUses = $classUses->map(function($item) {
+
+            return carr::last(explode('_', $item));
+        });
+        if (in_array('SoftDeleteTrait', $lastClassUses->toArray())) {
+
+            return true;
+        }
+        return false;
+    }
+    
+    
+    /**
+     * @return bool
+     */
+    public static function usesDeleted() {
+
+
+        $classUses = c::collect(c::classUsesRecursive(static::class));
+        $lastClassUses = $classUses->map(function($item) {
+
+            return carr::last(explode('_', $item));
+        });
+        if (in_array('DeletedTrait', $lastClassUses->toArray())) {
+
+            return true;
+        }
+        return false;
     }
 
 }
