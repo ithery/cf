@@ -91,18 +91,6 @@ trait CModel_Nested_NestedTrait {
     /**
      * @return bool
      */
-    public static function usesSoftDelete() {
-        static $softDelete;
-        if (is_null($softDelete)) {
-            $instance = new static;
-            return $softDelete = method_exists($instance, 'bootSoftDeletes');
-        }
-        return $softDelete;
-    }
-
-    /**
-     * @return bool
-     */
     protected function actionRaw() {
         return true;
     }
