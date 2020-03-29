@@ -7,8 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 14, 2019, 7:00:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
-
 trait CModel_SoftDelete_SoftDeleteTrait {
 
     /**
@@ -72,13 +70,21 @@ trait CModel_SoftDelete_SoftDeleteTrait {
 
         $this->{$this->getStatusColumn()} = 0;
 
-        if ($this->timestamps && !is_null($this->getUpdatedAtColumn())) {
-            $this->{$this->getUpdatedAtColumn()} = $time;
+        if ($this->timestamps) {
+            if ($this->usesDeleted()) {
+                if (!is_null($this->getDeletedAtColumn())) {
+                    $this->{$this->getDeletedAtColumn()} = $time;
+                    $columns[$this->getDeletedAtColumn()] = $this->fromDateTime($time);
+                }
+            }
+            if (!is_null($this->getUpdatedAtColumn())) {
+                $this->{$this->getUpdatedAtColumn()} = $time;
 
-            $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
+                $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
+            }
         }
-        
         $query->update($columns);
+        $this->syncOriginalAttributes(array_keys($columns));
     }
 
     /**
