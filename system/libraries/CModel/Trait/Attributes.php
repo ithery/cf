@@ -393,7 +393,7 @@ trait CModel_Trait_Attributes {
             throw new LogicException(get_class($this) . '::' . $method . ' must return a relationship instance.');
         }
 
-        return CF::tap($relation->getResults(), function ($results) use ($method) {
+        return c::tap($relation->getResults(), function ($results) use ($method) {
                     $this->setRelation($method, $results);
                 });
     }
