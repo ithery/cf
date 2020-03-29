@@ -1088,7 +1088,7 @@ trait CModel_Trait_Attributes {
      * @return void
      */
     public static function cacheMutatedAttributes($class) {
-        static::$mutatorCache[$class] = CF::collect(static::getMutatorMethods($class))->map(function ($match) {
+        static::$mutatorCache[$class] = c::collect(static::getMutatorMethods($class))->map(function ($match) {
                     return lcfirst(static::$snakeAttributes ? cstr::snake($match) : $match);
                 })->all();
     }
