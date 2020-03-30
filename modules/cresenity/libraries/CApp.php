@@ -59,6 +59,14 @@ class CApp extends CObservable {
 
     /**
      * 
+     * @return CApp_SEO
+     */
+    public static function seo() {
+        return CApp_SEO::instance();
+    }
+
+    /**
+     * 
      * @param string $domain
      * @return CApp_Remote
      */
@@ -114,7 +122,7 @@ class CApp extends CObservable {
      * @return CDatabase
      */
     public static function db($domain = null, $dbName = null) {
-        return CDatabase::instance($dbName,null,$domain);
+        return CDatabase::instance($dbName, null, $domain);
     }
 
     public function setAjaxData($key, $value = null) {
@@ -151,7 +159,7 @@ class CApp extends CObservable {
 
         $this->_org = corg::get(CF::orgCode());
 
-        
+
         //$this->renderer = new CApp_Renderer($this);
 
         if (isset($_COOKIE['capp-profiler'])) {
@@ -492,7 +500,7 @@ class CApp extends CObservable {
         return $store->store_id;
     }
 
-    public function getRoleChildList($roleId = null, $orgId = null,$type=null) {
+    public function getRoleChildList($roleId = null, $orgId = null, $type = null) {
         if (strlen($roleId) == 0) {
             $roleId = $this->role()->role_id;
         }
@@ -500,7 +508,7 @@ class CApp extends CObservable {
             $orgId = CApp_Base::orgId();
         }
 
-        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId,$type);
+        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId, $type);
         $childList = array();
 
         $traverse = function ($childs) use (&$traverse, &$childList) {
