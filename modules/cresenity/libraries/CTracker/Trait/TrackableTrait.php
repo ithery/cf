@@ -90,14 +90,14 @@ trait CTracker_Trait_TrackableTrait {
             return false;
         }
         if (!$trackable = $this->repositoryManager->routeIsTrackable($this->route)) {
-            $this->logUntrackable('route ' . $this->route->getCurrentRoute()->getName() . ' is not trackable.');
+            $this->logUntrackable('route ' . $this->route . ' is not trackable.');
         }
         return $trackable;
     }
 
     private function pathIsTrackable() {
         if (!$trackable = $this->repositoryManager->pathIsTrackable(CTracker::populator()->get('request.path'))) {
-            $this->logUntrackable('path ' . $this->request->path() . ' is not trackable.');
+            $this->logUntrackable('path ' . CTracker::populator()->get('request.path') . ' is not trackable.');
         }
         return $trackable;
     }
