@@ -69,7 +69,7 @@ trait CTracker_Trait_TrackableTrait {
 
     protected function isTrackableIp() {
         $trackable = !IpAddress::ipv4InRange(
-                        $ipAddress = $this->request->getClientIp(), $this->config->get('excludeIpAddress')
+                        $ipAddress = CTracker::populator()->get('request.clientIp'), $this->config->get('excludeIpAddress')
         );
         if (!$trackable) {
             $this->logUntrackable($ipAddress . ' is not trackable.');
@@ -96,7 +96,7 @@ trait CTracker_Trait_TrackableTrait {
     }
 
     private function pathIsTrackable() {
-        if (!$trackable = $this->repositoryManager->pathIsTrackable($this->request->path())) {
+        if (!$trackable = $this->repositoryManager->pathIsTrackable(CTracker::populator()->get('request.path'))) {
             $this->logUntrackable('path ' . $this->request->path() . ' is not trackable.');
         }
         return $trackable;

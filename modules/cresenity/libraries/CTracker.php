@@ -19,6 +19,7 @@ class CTracker {
     public static function boot() {
        
         if (!self::$isBooted) {
+            
             self::$bootstrap = new CTracker_Bootstrap();
             self::$bootstrap->execute();
             self::$isBooted=true;
@@ -49,4 +50,11 @@ class CTracker {
         return CTracker_RepositoryManager::instance()->pageViewsByCountry(CPeriod::minutes($minutes), $results);
     }
 
+    /**
+     * 
+     * @return CTracker_Populator
+     */
+    public static function populator() {
+        return CTracker_Populator::instance();
+    }
 }

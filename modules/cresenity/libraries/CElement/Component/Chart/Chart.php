@@ -88,10 +88,14 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         }
 
         $js->append("
+                var chartOptions =$.parseJSON('" . json_encode($options) . "');
+
 	    	var chart" . $this->wrapper->id . " = new Chart($('#" . $this->wrapper->id . "'), {
 	    		type: '" . $this->type . "',
 	    		data: $.parseJSON('" . json_encode($this->data) . "'),
-	    		options: $.parseJSON('" . json_encode($options) . "'),
+	    		options: chartOptions,
+                        
+                        
     		});
 	    ")->br();
 
