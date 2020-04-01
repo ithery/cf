@@ -27,10 +27,6 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     public function close() {
         is_object($this->link) && @$this->link->close();
     }
-    
-    public function disconnect() {
-        $this->close();
-    }
 
     /**
      * Closes the database connection.
@@ -79,7 +75,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
             return $this->connect();
         }
         if(!mysqli_ping($this->link)) {
-            $this->disconnect();
+            $this->close();
             $This->connect();
         }
     }
