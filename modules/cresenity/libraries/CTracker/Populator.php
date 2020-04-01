@@ -5,6 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 use Ramsey\Uuid\Uuid as UUID;
 
 class CTracker_Populator {
@@ -21,7 +22,7 @@ class CTracker_Populator {
         $this->logDataPopulated = false;
     }
 
-    public function instance() {
+    public static function instance() {
         if (static::$instance == null) {
             static::$instance = new CTracker_Populator();
         }
@@ -41,10 +42,6 @@ class CTracker_Populator {
         }
     }
 
-    public function populateLogData() {
-        
-    }
-
     protected function populateRequestData() {
         $requestData = [];
         $request = CHTTP::request();
@@ -58,8 +55,8 @@ class CTracker_Populator {
         $requestData['isJson'] = $request->isJson();
         $requestData['wantsJson'] = $request->wantsJson();
 
-        
-        $requestData['route']=CFRouter::routedUri(CFRouter::currentUri());
+
+        $requestData['route'] = CFRouter::routedUri(CFRouter::currentUri());
 
 
         $this->data['request'] = $requestData;
@@ -153,6 +150,11 @@ class CTracker_Populator {
 
     public function getData() {
         return $this->data;
+    }
+
+    public function setData($data) {
+        $this->data = $data;
+        return $this;
     }
 
 }

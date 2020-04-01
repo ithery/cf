@@ -62,6 +62,8 @@ class CTracker_Config {
         $default['trackEnabled'] = true;
         $default['robotEnabled'] = false;
         $default['consoleEnabled'] = false;
+        $default['isQueued'] = false;
+        $default['queueConnection'] = 'database';
         $default['database'] = 'default';
         $default['logger'] = null;
         $default['logEnabled'] = true;
@@ -103,6 +105,14 @@ class CTracker_Config {
     public function setData($data) {
         $this->data = $data;
         return $this;
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public function getData() {
+        return $this->data;
     }
 
     public function set($key, $value) {
@@ -201,7 +211,7 @@ class CTracker_Config {
     public function isQueued() {
         return $this->get('isQueued');
     }
-    
+
     public function getLogger() {
         $logger = $this->get('logger');
         if ($logger != null && is_string($logger)) {

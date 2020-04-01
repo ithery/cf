@@ -50,7 +50,7 @@ class CTracker_Tracker {
      * @return array
      */
     protected function getLogData() {
-        CTracker::populator()->populateLogData();
+
         return [
             'log_session_id' => $this->getSessionId(true),
             'method' => CTracker::populator()->get('request.method'),
@@ -74,7 +74,7 @@ class CTracker_Tracker {
      * @return array
      */
     protected function makeSessionData() {
-        
+
         $sessionData = [
             'user_id' => $this->getUserId(),
             'log_device_id' => $this->getDeviceId(),
@@ -168,6 +168,16 @@ class CTracker_Tracker {
         }
         $this->booted = true;
         if ($this->isTrackable()) {
+
+            if (CTracker::config()->get('isQueued')) {
+                $queueData = [
+                    'data' => CTracker::populator()->getData(),
+                    'config' => CTracker::config()->getData(),
+                ];
+
+                CTracker_TaskQueue_TrackQueue::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
+            }
+
             $this->track();
         }
     }
