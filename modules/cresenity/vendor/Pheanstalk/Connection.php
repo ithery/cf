@@ -17,21 +17,20 @@ use Pheanstalk\Response\ArrayResponse;
  * A connection to a beanstalkd server, backed by any type of socket.
  *
  */
-class Connection
-{
+class Connection {
+
     const CRLF = "\r\n";
     const CRLF_LENGTH = 2;
     const DEFAULT_CONNECT_TIMEOUT = 2;
 
     // responses which are global errors, mapped to their exception classes
     private static $errorResponses = [
-        ResponseInterface::RESPONSE_OUT_OF_MEMORY   => ServerOutOfMemoryException::class,
-        ResponseInterface::RESPONSE_INTERNAL_ERROR  => ServerInternalErrorException::class,
-        ResponseInterface::RESPONSE_DRAINING        => ServerDrainingException::class,
-        ResponseInterface::RESPONSE_BAD_FORMAT      => ServerBadFormatException::class,
+        ResponseInterface::RESPONSE_OUT_OF_MEMORY => ServerOutOfMemoryException::class,
+        ResponseInterface::RESPONSE_INTERNAL_ERROR => ServerInternalErrorException::class,
+        ResponseInterface::RESPONSE_DRAINING => ServerDrainingException::class,
+        ResponseInterface::RESPONSE_BAD_FORMAT => ServerBadFormatException::class,
         ResponseInterface::RESPONSE_UNKNOWN_COMMAND => ServerUnknownCommandException::class,
     ];
-
     // responses which are followed by data
     private static $dataResponses = [
         ResponseInterface::RESPONSE_RESERVED,
@@ -49,8 +48,7 @@ class Connection
      */
     private $socket;
 
-    public function __construct(SocketFactoryInterface $factory)
-    {
+    public function __construct(SocketFactoryInterface $factory) {
         $this->factory = $factory;
     }
 
@@ -58,8 +56,7 @@ class Connection
      * Disconnect the socket.
      * Subsequent socket operations will create a new connection.
      */
-    public function disconnect()
-    {
+    public function disconnect() {
         if (isset($this->socket)) {
             $this->socket->disconnect();
             $this->socket = null;
@@ -68,15 +65,16 @@ class Connection
 
     /**
      * @throws Exception\ClientException
+     * 
+     * @return ArrayResponse
      */
-    public function dispatchCommand(CommandInterface $command): ArrayResponse
-    {
+    public function dispatchCommand(CommandInterface $command) {
         $socket = $this->getSocket();
 
-        $to_send = $command->getCommandLine().self::CRLF;
+        $to_send = $command->getCommandLine() . self::CRLF;
 
         if ($command->hasData()) {
-            $to_send .= $command->getData().self::CRLF;
+            $to_send .= $command->getData() . self::CRLF;
         }
 
         $socket->write($to_send);
@@ -88,9 +86,7 @@ class Connection
             $exceptionClass = self::$errorResponses[$responseName];
 
             throw new $exceptionClass(sprintf(
-                "%s in response to '%s'",
-                $responseName,
-                $command->getCommandLine()
+                    "%s in response to '%s'", $responseName, $command->getCommandLine()
             ));
         }
 
@@ -100,9 +96,7 @@ class Connection
             $crlf = $socket->read(self::CRLF_LENGTH);
             if ($crlf !== self::CRLF) {
                 throw new Exception\ClientException(sprintf(
-                    'Expected %u bytes of CRLF after %u bytes of data',
-                    self::CRLF_LENGTH,
-                    $dataLength
+                        'Expected %u bytes of CRLF after %u bytes of data', self::CRLF_LENGTH, $dataLength
                 ));
             }
         } else {
@@ -110,8 +104,8 @@ class Connection
         }
 
         return $command
-            ->getResponseParser()
-            ->parseResponse($responseLine, $data);
+                        ->getResponseParser()
+                        ->parseResponse($responseLine, $data);
     }
 
     // ----------------------------------------
@@ -123,12 +117,12 @@ class Connection
      *
      * @return SocketInterface
      */
-    private function getSocket()
-    {
+    private function getSocket() {
         if (!isset($this->socket)) {
             $this->socket = $this->factory->create();
         }
 
         return $this->socket;
     }
+
 }

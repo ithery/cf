@@ -27,6 +27,10 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     public function close() {
         is_object($this->link) && @$this->link->close();
     }
+    
+    public function disconnect() {
+        $this->close();
+    }
 
     /**
      * Closes the database connection.
@@ -70,8 +74,18 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return FALSE;
     }
 
+    public function reconnect() {
+        if(!$this->link) {
+            return $this->connect();
+        }
+        if(!mysqli_ping($this->link)) {
+            $this->disconnect();
+            $This->connect();
+        }
+    }
+    
     public function query($sql) {
-        $this->link or $this->connect();
+        $this->link or $this->reconnect();
         // Only cache if it's turned on, and only cache if it's not a write statement
         if ($this->dbConfig['cache'] AND ! preg_match('#\b(?:INSERT|UPDATE|REPLACE|SET|DELETE|TRUNCATE)\b#i', $sql)) {
             $hash = $this->query_hash($sql);

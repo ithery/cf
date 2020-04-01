@@ -7,8 +7,8 @@ use Pheanstalk\Contract\JobIdInterface;
 /**
  * A job in a beanstalkd server.
  */
-class Job implements JobIdInterface
-{
+class Job implements JobIdInterface {
+
     const STATUS_READY = 'ready';
     const STATUS_RESERVED = 'reserved';
     const STATUS_DELAYED = 'delayed';
@@ -18,6 +18,7 @@ class Job implements JobIdInterface
      * @var int
      */
     private $id;
+
     /**
      * @var string
      */
@@ -27,8 +28,7 @@ class Job implements JobIdInterface
      * @param int    $id   The job ID
      * @param string $data The job data
      */
-    public function __construct(int $id, string $data)
-    {
+    public function __construct($id, $data) {
         $this->id = $id;
         $this->data = $data;
     }
@@ -38,8 +38,7 @@ class Job implements JobIdInterface
      *
      * @return int
      */
-    public function getId(): int
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -48,8 +47,8 @@ class Job implements JobIdInterface
      *
      * @return string
      */
-    public function getData(): string
-    {
+    public function getData() {
         return $this->data;
     }
+
 }
