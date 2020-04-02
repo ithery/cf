@@ -27,8 +27,7 @@ class CTracker_Session {
 
         $session[$key] = $value;
         $this->setNamespaceData($session);
-    }
-
+    }  
     /**
      * Alias of function set
      * 
@@ -40,7 +39,7 @@ class CTracker_Session {
         return $this->set($key, $value);
     }
 
-    private function getNamespaceData() {
+    public function getNamespaceData() {
         return CSession::instance()->get(self::sessionNamespace(), array());
     }
 
