@@ -70,6 +70,7 @@ class CTracker_Config {
         $default['cookieNamespace'] = 'CTrackerCookie';
         $default['sessionKey'] = 'CTrackerSession';
         $default['sessionNamespace'] = 'CTracker';
+        $default['sessionClass'] = 'CTracker_Session';
         $default['excludeConnection'] = [];
         $default['excludeIpAddress'] = [];
         $default['excludeEnvironment'] = [];
@@ -220,6 +221,11 @@ class CTracker_Config {
         if ($logger != null && !($logger instanceof \Psr\Log\LoggerInterface)) {
             return null;
         }
+    }
+
+    public function isMongo() {
+        $driver = CF::config('database.' . $this->get('database') . '.connection.type');
+        return $driver == 'mongodb';
     }
 
 }
