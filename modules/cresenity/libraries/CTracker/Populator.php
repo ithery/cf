@@ -96,7 +96,7 @@ class CTracker_Populator {
                 //do nothing
             }
             $this->data['device']['platform'] = $operatingSystemFamily;
-            $this->data['device']['platform_version'] = $operatingSystemFamily;
+            $this->data['device']['platform_version'] = $operatingSystemVersion;
         }
     }
 

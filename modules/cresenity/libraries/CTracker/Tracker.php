@@ -193,10 +193,11 @@ class CTracker_Tracker {
                     'config' => CTracker::config()->getData(),
                 ];
 
-                CTracker_TaskQueue_TrackQueue::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
-            }
+                return CTracker_TaskQueue_TrackQueue::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
+            } 
 
             $this->track();
+            
         }
     }
 
