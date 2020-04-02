@@ -22,7 +22,7 @@ class CTracker_Bootstrap {
     public function execute() {
         if (CTracker::config()->get('trackEnabled')) {
             $this->register();
-            CTracker::populator()->populateSessionData();
+            CTracker::populator()->populateData();
             $this->getTracker()->boot();
         }
     }
@@ -72,7 +72,7 @@ class CTracker_Bootstrap {
             $db = CDatabase::instance($this->config()->get('database'));
 
             $db->listenOnQueryExecuted(function ($query) use ($db) {
-                
+
                 $bindings = $query->bindings;
                 $time = $query->time;
                 $connection = $query->connection;

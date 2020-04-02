@@ -12,14 +12,13 @@ class CTracker_Populator {
 
     protected static $instance;
     protected $data;
-    protected $sessionDataPopulated;
+    protected $isDataPopulated;
     protected $userAgentParser;
 
     private function __construct() {
         $this->data = [];
         $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT);
-        $this->sessionDataPopulated = false;
-        $this->logDataPopulated = false;
+        $this->isDataPopulated = false;
     }
 
     public static function instance() {
@@ -30,7 +29,16 @@ class CTracker_Populator {
     }
 
     public function populateSessionData() {
-        if (!$this->sessionDataPopulated) {
+        $sessionClass = CTracker::config()->get('sessionClass', 'CTracker_Session');
+        ;
+        $session = new $sessionClass();
+        $config = CTracker::config();
+        $this->data['session'] = carr::get($session->getNamespaceData(), $config->get('sessionKey', 'CTrackerSession'));
+    }
+
+    public function populateData() {
+        if (!$this->isDataPopulated) {
+            $this->populateSessionData();
             $this->populateRequestData();
             $this->populateDeviceData();
             $this->populateGeoIpData();
@@ -38,8 +46,17 @@ class CTracker_Populator {
             $this->populateLanguageData();
             $this->populateAgentData();
 
-            $this->sessionDataPopulated = true;
+            $this->isDataPopulated = true;
         }
+    }
+
+    public function setCustomSessionData(array $sessionData) {
+        $this->data['customSessionData'] = $sessionData;
+    }
+
+    public function setCustomLogData(array $logData) {
+
+        $this->data['customLogData'] = $logData;
     }
 
     protected function populateRequestData() {
