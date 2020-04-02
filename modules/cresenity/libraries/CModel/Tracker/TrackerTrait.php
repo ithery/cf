@@ -16,7 +16,7 @@ trait CModel_Tracker_TrackerTrait {
     public function save(array $options = []) {
         if ($this->org_id == null) {
             if (CApp_Base::orgId() != null) {
-                $this->org_id = CApp_Base::orgId();
+                $this->org_id = (int) CApp_Base::orgId();
             }
         }
         parent::save($options);
