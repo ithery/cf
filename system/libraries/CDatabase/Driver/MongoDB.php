@@ -202,6 +202,10 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         
     }
 
+    public function getElapsedTime($start) {
+        return round((microtime(true) - $start) * 1000, 2);
+    }
+
     /**
      * Get a MongoDB collection.
      * @param string $name

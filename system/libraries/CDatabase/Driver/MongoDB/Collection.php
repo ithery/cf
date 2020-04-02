@@ -53,7 +53,7 @@ class CDatabase_Driver_MongoDB_Collection {
             // Once we have run the query we will calculate the time that it took to run and
             // then log the query, bindings, and execution time so we will report them on
             // the event that the developer needs them. We'll log time in milliseconds.
-            $time = $this->connection->getElapsedTime($start);
+            $time = $this->driver->getElapsedTime($start);
             $query = [];
             // Convert the query parameters to a json string.
             array_walk_recursive($parameters, function (&$item, $key) {

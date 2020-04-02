@@ -70,6 +70,7 @@ class CDatabase {
     protected $limit = FALSE;
     protected $offset = FALSE;
     protected $last_query = '';
+    protected $queryLog = array();
     // Stack of queries for push/pop
     protected $query_history = array();
 
@@ -1664,6 +1665,14 @@ class CDatabase {
         if ($this->isLogQuery()) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
         }
+    }
+
+    public function enableQueryLog(){
+        $this->config['log'] = true;
+    }
+
+    public function getQueryLog() {
+        return $this->queryLog;
     }
 
     /**
