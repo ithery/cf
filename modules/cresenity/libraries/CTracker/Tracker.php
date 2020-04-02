@@ -8,6 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Psr\Log\NullLogger;
+use MongoDB\BSON\ObjectID;
 
 class CTracker_Tracker {
 
@@ -44,14 +45,15 @@ class CTracker_Tracker {
         $this->config = CTracker_Config::instance();
         $this->route = CTracker::populator()->get('route');
         $this->logger = $this->config->getLogger() ? $this->config->getLogger() : new NullLogger();
+        $this->sessionData = CTracker::populator()->get('session');
     }
 
     /**
      * @return array
      */
     protected function getLogData() {
-
-        return [
+        
+        $logData= [
             'log_session_id' => $this->getSessionId(true),
             'method' => CTracker::populator()->get('request.method'),
             'log_path_id' => $this->getPathId(),
@@ -62,6 +64,11 @@ class CTracker_Tracker {
             'is_json' => CTracker::populator()->get('request.isJson'),
             'wants_json' => CTracker::populator()->get('request.wantsJson'),
         ];
+        $customLogData = CTracker::populator()->get('customLogData');
+        if(is_array($customLogData)) {
+            $logData = array_merge($logData,$customLogData);
+        }
+        return $logData;
     }
 
     public function getSessionId($updateLastActivity = false) {
@@ -74,6 +81,10 @@ class CTracker_Tracker {
      * @return array
      */
     protected function makeSessionData() {
+        
+        
+        
+        //$logDeviceId = new ObjectID($this->getDeviceId());
 
         $sessionData = [
             'user_id' => $this->getUserId(),
@@ -91,7 +102,14 @@ class CTracker_Tracker {
             'user_agent' => $this->repositoryManager->getCurrentUserAgent(),
         ];
 
-        return $this->sessionData = $this->repositoryManager->checkSessionData($sessionData, $this->sessionData);
+        $customSessionData = CTracker::populator()->get('customSessionData');
+        if(is_array($customSessionData)) {
+            $sessionData = array_merge($sessionData,$customSessionData);
+        }
+        
+        $this->sessionData = $this->repositoryManager->checkSessionData($sessionData, $this->sessionData);
+        
+        return $this->sessionData;
     }
 
     public function getUserId() {
