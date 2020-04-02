@@ -18,7 +18,7 @@ class CTracker_TaskQueue_TrackQueue extends CTracker_TaskQueueAbstract {
         $data = carr::get($this->params, 'data');
         $config = carr::get($this->params, 'config');
 
-        $this->logDaemon('Processing Tracker Queue from ip:' . carr::get($data,'request.clientIp'));
+        $this->logDaemon('Processing Tracker Queue from ip:' . carr::get($data,'request.clientIp') .' => '.json_encode($data));
         try {
             CTracker::populator()->setData($data);
             CTracker::config()->setData($config);
