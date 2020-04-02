@@ -17,12 +17,12 @@ class CTracker {
     }
 
     public static function boot() {
-       
+
         if (!self::$isBooted) {
-            
+
             self::$bootstrap = new CTracker_Bootstrap();
             self::$bootstrap->execute();
-            self::$isBooted=true;
+            self::$isBooted = true;
         }
     }
 
@@ -35,7 +35,7 @@ class CTracker {
     }
 
     public static function onlineUsers($minutes = 3, $results = true) {
-        return self::sessions(3);
+        return self::sessions($minutes);
     }
 
     public static function sessions($minutes = 1440, $results = true) {
@@ -57,4 +57,14 @@ class CTracker {
     public static function populator() {
         return CTracker_Populator::instance();
     }
+
+    /**
+     * Check CTracker already booted
+     * 
+     * @return type
+     */
+    public static function isBooted() {
+        return static::$isBooted;
+    }
+
 }
