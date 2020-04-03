@@ -90,6 +90,7 @@ class CTracker_Tracker {
             'user_id' => $this->getUserId(),
             'log_device_id' => $this->getDeviceId(),
             'client_ip' => CTracker::populator()->get('request.clientIp'),
+            'uuid' => CTracker::populator()->get('session.uuid'),
             'log_geoip_id' => $this->getGeoIpId(),
             'log_agent_id' => $this->getAgentId(),
             'log_referer_id' => $this->getRefererId(),
@@ -100,6 +101,7 @@ class CTracker_Tracker {
             // it's internally used to check if the user agent changed
             // during a session.
             'user_agent' => $this->repositoryManager->getCurrentUserAgent(),
+            'updated' =>  CTracker::populator()->get('session.updated'),
         ];
 
         $customSessionData = CTracker::populator()->get('customSessionData');
@@ -107,7 +109,8 @@ class CTracker_Tracker {
             $sessionData = array_merge($sessionData,$customSessionData);
         }
         
-        $this->sessionData = $this->repositoryManager->checkSessionData($sessionData, $this->sessionData);
+        
+        $this->sessionData = $sessionData;
         
         return $this->sessionData;
     }
@@ -184,6 +187,7 @@ class CTracker_Tracker {
         if ($this->booted) {
             return false;
         }
+        
         $this->booted = true;
         if ($this->isTrackable()) {
 
@@ -192,7 +196,7 @@ class CTracker_Tracker {
                     'data' => CTracker::populator()->getData(),
                     'config' => CTracker::config()->getData(),
                 ];
-
+                
                 return CTracker_TaskQueue_TrackQueue::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
             } 
 

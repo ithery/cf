@@ -50,7 +50,7 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
 
     protected function __construct() {
         $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT);
-        $this->crawlerDetector = new CTracker_Detect_CrawlerDetect(CHTTP::request()->headers->all(), CHTTP::request()->server('HTTP_USER_AGENT'));
+        $this->crawlerDetector = new CTracker_Detect_CrawlerDetect(CTracker::populator()->get('request.headers'), CTracker::populator()->get('request.userAgent'));
         $classArray = CF::class_uses_recursive(get_class());
         foreach ($classArray as $class) {
             $methodName = 'boot' . carr::last(explode('_', $class));
@@ -59,7 +59,7 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
     }
 
     public function getCurrentUserId() {
-        return CApp_Base::userId();
+        return CTracker::populator()->get('user.userId');
     }
 
     public function isRobot() {

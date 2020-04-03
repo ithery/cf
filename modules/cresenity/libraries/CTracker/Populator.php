@@ -10,14 +10,40 @@ use Ramsey\Uuid\Uuid as UUID;
 
 class CTracker_Populator {
 
+    /**
+     *
+     * @var CTracker_Populator 
+     */
     protected static $instance;
+
+    /**
+     *
+     * @var array 
+     */
     protected $data;
+
+    /**
+     *
+     * @var bool 
+     */
     protected $isDataPopulated;
+
+    /**
+     *
+     * @var CTracker_Parser_UserAgentParser 
+     */
     protected $userAgentParser;
+
+    /**
+     *
+     * @var CTracker_Detect_MobileDetect 
+     */
+    protected $mobileDetect;
 
     private function __construct() {
         $this->data = [];
         $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT);
+        $this->mobileDetect = new CTracker_Detect_MobileDetect();
         $this->isDataPopulated = false;
     }
 
@@ -29,25 +55,35 @@ class CTracker_Populator {
     }
 
     public function populateSessionData() {
-        $sessionClass = CTracker::config()->get('sessionClass', 'CTracker_Session');
-        ;
-        $session = new $sessionClass();
-        $config = CTracker::config();
-        $this->data['session'] = carr::get($session->getNamespaceData(), $config->get('sessionKey', 'CTrackerSession'));
+
+        $sessionData = [];
+        $sessionPopulator = new CTracker_Populator_Session();
+        $sessionData = $sessionPopulator->populateSessionData($this->data);
+
+        
+        $this->data['session'] = $sessionData;
     }
 
+    public function populateUserData() {
+        $userData=[];
+        $userData['userId']=CApp_Base::userId();
+        $this->data['user']=$userData;
+    }
     public function populateData() {
         if (!$this->isDataPopulated) {
-            $this->populateSessionData();
+            $this->populateUserData();
             $this->populateRequestData();
             $this->populateDeviceData();
             $this->populateGeoIpData();
             $this->populateCookieData();
             $this->populateLanguageData();
             $this->populateAgentData();
+            //last call to generate session data
+            $this->populateSessionData();
 
             $this->isDataPopulated = true;
         }
+        return $this;
     }
 
     public function setCustomSessionData(array $sessionData) {
@@ -71,7 +107,8 @@ class CTracker_Populator {
         $requestData['isSecure'] = $request->isSecure();
         $requestData['isJson'] = $request->isJson();
         $requestData['wantsJson'] = $request->wantsJson();
-
+        $requestData['userAgent'] = $this->mobileDetect->getUserAgent();
+        $requestData['headers'] = CHTTP::request()->headers->all();
 
         $requestData['route'] = CFRouter::routedUri(CFRouter::currentUri());
 
@@ -81,8 +118,8 @@ class CTracker_Populator {
 
     protected function populateDeviceData() {
 
-        $mobileDetect = new CTracker_Detect_MobileDetect();
-        if ($this->data['device'] = $mobileDetect->detectDevice()) {
+
+        if ($this->data['device'] = $this->mobileDetect->detectDevice()) {
             $operatingSystemFamily = null;
             $operatingSystemVersion = null;
             try {

@@ -172,6 +172,7 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         $divCol = $divRow->addDiv()->addClass('col-md-4');
 
         $widget = $divCol->addWidget()->setTitle('Next Ready');
+        
         if ($nextReady) {
             $widget->addField()->setLabel('Job ID')->addControl('beanstalkd-next-ready-id', 'label')->setValue(carr::get($nextReady, 'id'));
             $widget->addField()->setLabel('Data')->addControl('beanstalkd-next-ready-data', 'textarea')->setValue(carr::get($nextReady, 'rawData'))->setAttr('readonly', 'readonly');

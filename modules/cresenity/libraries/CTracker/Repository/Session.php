@@ -21,7 +21,10 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         $this->className = CTracker::config()->get('sessionModel', 'CTracker_Model_Session');
         $this->createModel();
         $sessionClass = CTracker::config()->get('sessionClass', 'CTracker_Session');
-        $this->session = new $sessionClass();
+        if ($sessionClass) {
+            $this->session = new $sessionClass();
+        }
+
         parent::__construct();
     }
 
@@ -36,139 +39,23 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
 
     public function getCurrentId($sessionInfo) {
         $this->setSessionData($sessionInfo);
-        return $this->sessionGetId($sessionInfo);
+        return $this->sessionGetId();
     }
 
     public function setSessionData($sessionInfo) {
-
-        $this->generateSession($sessionInfo);
-        if ($this->sessionIsKnownOrCreateSession()) {
-
-            $this->ensureSessionDataIsComplete();
-        }
-    }
-
-    private function generateSession($sessionInfo) {
         $this->sessionInfo = $sessionInfo;
-        if (!$this->sessionIsReliable()) {
-            $this->regenerateSystemSession();
-        }
-        $this->checkSessionUuid();
-    }
-
-    private function sessionIsReliable() {
-        $data = $this->getSessionData();
-        if (isset($data['user_id'])) {
-            if ($data['user_id'] !== $this->sessionInfo['user_id']) {
-                return false;
-            }
-        }
-        if (isset($data['client_ip'])) {
-            if ($data['client_ip'] !== $this->sessionInfo['client_ip']) {
-                return false;
-            }
-        }
-        if (isset($data['user_agent'])) {
-            if ($data['user_agent'] !== $this->sessionInfo['user_agent']) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private function sessionIsKnownOrCreateSession() {
-        if (!$known = $this->sessionIsKnown()) {
-
-            $this->sessionSetId($this->findOrCreate($this->sessionInfo, ['uuid']));
-        } else {
-            $primaryKey = 'log_session_id';
-            $session = $this->find($this->getSessionData('log_session_id'));
-            $session->updated = CCarbon::now();
-            $session->save();
-            $this->sessionInfo['log_session_id'] = $this->getSessionData('log_session_id');
-        }
-        return $known;
-    }
-
-    private function sessionIsKnown() {
-        if (!$this->session->has($this->getSessionKey())) {
-            return false;
-        }
-        if (!$this->getSessionData('uuid') == $this->getSystemSessionId()) {
-            return false;
-        }
-        if (!$this->findByUuid($this->getSessionData('uuid'))) {
-            return false;
-        }
-        return true;
-    }
-
-    private function ensureSessionDataIsComplete() {
-        $sessionData = $this->getSessionData();
-        $wasComplete = true;
-
-        foreach ($this->sessionInfo as $key => $value) {
-
-            if (carr::get($sessionData, $key) !== $value) {
-                if (!isset($model)) {
-                    $model = $this->find($this->sessionInfo['log_session_id']);
-                }
-                $model->setAttribute($key, $value);
-                $model->save();
-                $wasComplete = false;
-            }
-        }
-        if (!$wasComplete) {
-            $this->storeSession();
+        $logSessionId = $this->findOrCreate($this->sessionInfo, ['uuid']);
+        if ($this->model) {
+            $this->updateSessionData($this->sessionInfo);
+            $this->sessionInfo[$this->model->getKeyName()] = $logSessionId;
         }
     }
 
     private function sessionGetId() {
-        return $this->sessionInfo['log_session_id'];
-    }
-
-    private function sessionSetId($id) {
-        $this->sessionInfo['log_session_id'] = $id;
-        $this->storeSession();
-    }
-
-    private function storeSession() {
-        $this->putSessionData($this->sessionInfo);
-    }
-
-    private function getSystemSessionId() {
-        $sessionData = $this->getSessionData();
-        if (isset($sessionData['uuid'])) {
-            return $sessionData['uuid'];
+        if ($this->model) {
+            return carr::get($this->sessionInfo, $this->model->getKeyName());
         }
-        return (string) UUID::uuid4();
-    }
-
-    private function regenerateSystemSession($data = null) {
-        $data = $data ?: $this->getSessionData();
-        if (!$data) {
-            $this->resetSessionUuid($data);
-            $this->sessionIsKnownOrCreateSession();
-        }
-        return $this->sessionInfo;
-    }
-
-    /**
-     * @param string $variable
-     */
-    private function getSessionData($variable = null) {
-        $data = $this->session->get($this->getSessionKey());
-
-        return $variable ? (isset($data[$variable]) ? $data[$variable] : null) : $data;
-    }
-
-    private function putSessionData($data) {
-
-        $this->session->put($this->getSessionKey(), $data);
-    }
-
-    private function getSessionKey() {
-        return $this->config->get('sessionKey', 'CTrackerSession');
+        return null;
     }
 
     private function getSessions() {
@@ -222,39 +109,19 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     }
 
     public function updateSessionData($data) {
-        $session = $this->checkIfUserChanged($data, $this->find($this->getSessionData('log_session_id')));
+        $session = $this->model;
         if ($session) {
+
             foreach ($session->getAttributes() as $name => $value) {
                 if (isset($data[$name]) && $name !== 'log_session_id' && $name !== 'uuid') {
-                    $session->{$name} = $data[$name];
+                    if (in_array($name, $session->getFillable())) {
+                        $session->{$name} = carr::get($data, $name);
+                    }
                 }
             }
+            $session->updated = CTracker::populator()->get('session.updated');
             $session->save();
         }
-        return $data;
-    }
-
-    private function checkIfUserChanged($data, $model) {
-
-        if (!is_null($model) && !is_null($model->user_id) && !is_null($data['user_id']) && $data['user_id'] !== $model->user_id) {
-            $newSession = $this->regenerateSystemSession($data);
-            $model = $this->findByUuid($newSession['uuid']);
-        }
-        return $model;
-    }
-
-    private function checkSessionUuid() {
-        if (!isset($this->sessionInfo['uuid']) || !$this->sessionInfo['uuid']) {
-            $this->sessionInfo['uuid'] = $this->getSystemSessionId();
-        }
-    }
-
-    private function resetSessionUuid($data = null) {
-        $this->sessionInfo['uuid'] = null;
-        $data = $data ?: $this->sessionInfo;
-        unset($data['uuid']);
-        $this->putSessionData($data);
-        $this->checkSessionUuid();
         return $data;
     }
 

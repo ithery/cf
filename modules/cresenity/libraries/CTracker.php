@@ -19,7 +19,7 @@ class CTracker {
     public static function boot() {
 
         if (!self::$isBooted) {
-
+            
             self::$bootstrap = new CTracker_Bootstrap();
             self::$bootstrap->execute();
             self::$isBooted = true;
