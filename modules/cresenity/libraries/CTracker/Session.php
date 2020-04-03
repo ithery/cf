@@ -42,12 +42,12 @@ class CTracker_Session {
     }
 
     protected function getNamespaceData() {
-        return CSession::instance()->get(self::sessionNamespace(), array());
+        return CSession::instance()->get(static::sessionNamespace(), array());
     }
 
     protected function setNamespaceData($value) {
          
-        return CSession::instance()->set(self::sessionNamespace(), $value);
+        return CSession::instance()->set(static::sessionNamespace(), $value);
     }
 
     public static function sessionNamespace() {

@@ -97,11 +97,12 @@ class CTracker_Tracker {
             'log_cookie_id' => $this->getCookieId(),
             'log_language_id' => $this->getLanguageId(),
             'is_robot' => $this->isRobot(),
+            'updated' =>  CTracker::populator()->get('session.updated'),
             // The key user_agent is not present in the sessions table, but
             // it's internally used to check if the user agent changed
             // during a session.
             'user_agent' => $this->repositoryManager->getCurrentUserAgent(),
-            'updated' =>  CTracker::populator()->get('session.updated'),
+            'active_second' =>  CTracker::populator()->get('session.activeSecond'),
         ];
 
         $customSessionData = CTracker::populator()->get('customSessionData');

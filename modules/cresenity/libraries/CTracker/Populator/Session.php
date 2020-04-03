@@ -5,6 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 use Ramsey\Uuid\Uuid as UUID;
 
 class CTracker_Populator_Session {
@@ -17,30 +18,33 @@ class CTracker_Populator_Session {
         if ($sessionClass) {
             $this->session = new $sessionClass();
         }
-            
     }
 
     public function populateSessionData($populatorData) {
         $this->populatorData = $populatorData;
-        return $this->getSessionData();
+        return $this->generateSessionData();
     }
 
     /**
      * @param string $variable
      */
-    private function getSessionData() {
+    private function generateSessionData() {
         if ($this->session == null) {
             return null;
         }
-        $data = $this->session->get($this->getSessionKey());
-
+        $data = $this->getSessionData();
+        
         if (!$data || !$this->sessionIsReliable($data)) {
             $data = $this->buildSessionData();
-            $data['uuid'] = (string) UUID::uuid4();
         }
+        $data = $this->ensureDataCompleted($data);
+        
+
         $data['updated'] = date('Y-m-d H:i:s');
-        $data['lastTimestamp'] = time();
-        $data['lastTimezone'] = date_default_timezone_get();
+        $data['updatedTimestamp'] = time();
+        $data['updatedTimezone'] = date_default_timezone_get();
+
+        $data['activeSecond'] = carr::get($data, 'updatedTimestamp') - carr::get($data, 'createdTimestamp');
         $this->putSessionData($data);
         return $data;
     }
@@ -51,6 +55,31 @@ class CTracker_Populator_Session {
         $sessionData['userId'] = $this->populatorUserId();
         $sessionData['clientIp'] = $this->populatorClientIp();
         $sessionData['userAgent'] = $this->populatorUserAgent();
+        $sessionData['created'] = date('Y-m-d H:i:s');
+        $sessionData['createdTimestamp'] = time();
+        $sessionData['createdTimezone'] = date_default_timezone_get();
+        $sessionData['uuid'] = (string) UUID::uuid4();
+        return $sessionData;
+    }
+
+    private function ensureDataCompleted($sessionData) {
+        
+        if (!isset($sessionData['created']) || !isset($sessionData['createdTimestamp']) || !isset($sessionData['createdTimezone'])) {
+            
+            $sessionData['created'] = date('Y-m-d H:i:s');
+            $sessionData['createdTimestamp'] = time();
+            $sessionData['createdTimezone'] = date_default_timezone_get();
+        }
+        if (!isset($sessionData['clientIp'])) {
+            $this->populatorClientIp();
+        }
+        if (!isset($sessionData['userAgent'])) {
+            $this->populatorUserAgent();
+        }
+        if (!isset($sessionData['userId'])) {
+            $this->populatorUserId();
+        }
+
 
         return $sessionData;
     }
@@ -68,6 +97,16 @@ class CTracker_Populator_Session {
         }
         if (isset($data['userAgent'])) {
             if ($data['userAgent'] !== $this->populatorUserAgent()) {
+                return false;
+            }
+        }
+        if (!isset($data['created'])) {
+            return false;
+        }
+        $sessionSecond = CTracker::config()->get('sessionSecond');
+        if ($sessionSecond && isset($data['updatedTimestamp'])) {
+            if (time() - $data['updatedTimestamp'] > $sessionSecond) {
+                
                 return false;
             }
         }
@@ -110,12 +149,19 @@ class CTracker_Populator_Session {
         return CTracker::config()->get('sessionKey', 'CTrackerSession');
     }
 
+    private function getSessionData() {
+        if ($this->session == null) {
+            return;
+        }
+        
+        return $this->session->get($this->getSessionKey());
+    }
     private function putSessionData($data) {
         if ($this->session == null) {
             return;
         }
-       
-        $this->session->put($this->getSessionKey(), $data);
+
+        return $this->session->put($this->getSessionKey(), $data);
     }
 
 }
