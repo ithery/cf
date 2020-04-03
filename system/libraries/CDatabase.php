@@ -346,11 +346,12 @@ class CDatabase {
         // Stop the benchmark
         $elapsedTime = $this->getElapsedTime($start);
 
-        $is_benchmark = carr::get($this->config, 'benchmark', FALSE);
-        if ($is_benchmark) {
+        if ($this->isBenchmarkQuery()) {
+            $this->benchmarkQuery($sql,$elapsedTime,count($result));
             // Benchmark the query
-            CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
+            //CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
         }
+
 
 
 
@@ -1129,6 +1130,15 @@ class CDatabase {
     public function lastQuery() {
         return $this->last_query;
     }
+    
+    /**
+     * Set the last query run.
+     *
+     * @return  string SQL
+     */
+    public function setLastQuery($sql) {
+        return $this->last_query = $sql;
+    }
 
     /**
      * Count query records.
@@ -1416,13 +1426,13 @@ class CDatabase {
 
     public function __destruct() {
         self::rollback();
-        
+
         try {
-            if($this->driver!=null) {
+            if ($this->driver != null) {
                 $this->driver->close();
             }
         } catch (Exception $ex) {
-
+            
         }
     }
 
@@ -1651,6 +1661,17 @@ class CDatabase {
         return carr::get($this->config, 'log', false);
     }
 
+    public function isBenchmarkQuery() {
+        return carr::get($this->config, 'benchmark', FALSE);
+    }
+    public function benchmarkQuery($query, $time = null, $rowsCount = null) {
+        if ($this->isBenchmarkQuery()) {
+            // Benchmark the query
+            //static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::getTraceString());
+            static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::callerInfo());
+        }
+    }
+    
     /**
      * Log a query in the connection's query log.
      *
@@ -1667,7 +1688,7 @@ class CDatabase {
         }
     }
 
-    public function enableQueryLog(){
+    public function enableQueryLog() {
         $this->config['log'] = true;
     }
 
