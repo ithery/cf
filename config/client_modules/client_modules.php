@@ -695,6 +695,11 @@ return array(
             "plugins/tippy/tippy.js",
         ),
     ),
+    "waypoints" => array(
+        "js" => array(
+            "plugins/waypoints/jquery.waypoints.min.js",
+        ),
+    ),
     "locationpicker" => array(
         "js" => array(
             "plugins/locationpicker/locationpicker.jquery.js",
