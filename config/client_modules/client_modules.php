@@ -460,7 +460,7 @@ return array(
     ),
     "animate" => array(
         "css" => array(
-            "plugins/animate/animate.css",
+            "plugins/animate/animate.css?v=1",
         ),
     ),
     "summernote" => array(
