@@ -52,8 +52,8 @@ class CTracker_Tracker {
      * @return array
      */
     protected function getLogData() {
-        
-        $logData= [
+
+        $logData = [
             'log_session_id' => $this->getSessionId(true),
             'method' => CTracker::populator()->get('request.method'),
             'log_path_id' => $this->getPathId(),
@@ -63,10 +63,13 @@ class CTracker_Tracker {
             'is_secure' => CTracker::populator()->get('request.isSecure'),
             'is_json' => CTracker::populator()->get('request.isJson'),
             'wants_json' => CTracker::populator()->get('request.wantsJson'),
+            'updated' => CTracker::populator()->get('session.updated'),
+            //make log created with current session updated
+            'created' => CTracker::populator()->get('session.updated'),
         ];
         $customLogData = CTracker::populator()->get('customLogData');
-        if(is_array($customLogData)) {
-            $logData = array_merge($logData,$customLogData);
+        if (is_array($customLogData)) {
+            $logData = array_merge($logData, $customLogData);
         }
         return $logData;
     }
@@ -81,9 +84,9 @@ class CTracker_Tracker {
      * @return array
      */
     protected function makeSessionData() {
-        
-        
-        
+
+
+
         //$logDeviceId = new ObjectID($this->getDeviceId());
 
         $sessionData = [
@@ -97,22 +100,23 @@ class CTracker_Tracker {
             'log_cookie_id' => $this->getCookieId(),
             'log_language_id' => $this->getLanguageId(),
             'is_robot' => $this->isRobot(),
-            'updated' =>  CTracker::populator()->get('session.updated'),
+            'updated' => CTracker::populator()->get('session.updated'),
+            'created' => CTracker::populator()->get('session.created'),
             // The key user_agent is not present in the sessions table, but
             // it's internally used to check if the user agent changed
             // during a session.
             'user_agent' => $this->repositoryManager->getCurrentUserAgent(),
-            'active_second' =>  CTracker::populator()->get('session.activeSecond'),
+            'active_second' => CTracker::populator()->get('session.activeSecond'),
         ];
 
         $customSessionData = CTracker::populator()->get('customSessionData');
-        if(is_array($customSessionData)) {
-            $sessionData = array_merge($sessionData,$customSessionData);
+        if (is_array($customSessionData)) {
+            $sessionData = array_merge($sessionData, $customSessionData);
         }
-        
-        
+
+
         $this->sessionData = $sessionData;
-        
+
         return $this->sessionData;
     }
 
@@ -188,7 +192,7 @@ class CTracker_Tracker {
         if ($this->booted) {
             return false;
         }
-        
+
         $this->booted = true;
         if ($this->isTrackable()) {
 
@@ -197,12 +201,11 @@ class CTracker_Tracker {
                     'data' => CTracker::populator()->getData(),
                     'config' => CTracker::config()->getData(),
                 ];
-                
+
                 return CTracker_TaskQueue_TrackQueue::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
-            } 
+            }
 
             $this->track();
-            
         }
     }
 
