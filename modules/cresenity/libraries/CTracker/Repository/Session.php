@@ -92,8 +92,11 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         }
         $sessions = $this
                 ->getSessions()
-                ->period($minutes)
-                ->where('user_id', $user_id);
+                ->period($minutes);
+
+        if (strlen($user_id) > 0) {
+            $sessions = $sessions->where('user_id', $user_id);
+        }
         if ($results) {
             $sessions = $sessions->get()->pluck('device')->unique();
         }

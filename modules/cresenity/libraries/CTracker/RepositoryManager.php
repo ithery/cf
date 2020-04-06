@@ -78,4 +78,10 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
         return $this->logRepository->pageViewsByCountry($minutes, $results);
     }
 
+    public function userDevices($minutes, $user_id, $results) {
+        return $this->sessionRepository->userDevices(
+                        $minutes, $user_id, $results
+        );
+    }
+
 }
