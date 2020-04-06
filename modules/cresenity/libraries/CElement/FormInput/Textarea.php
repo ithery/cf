@@ -42,6 +42,12 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         if ($this->disabled) {
             $this->setAttr('disabled', 'disabled');
         }
+        if ($this->row) {
+            $this->setAttr('row', $this->row);
+        }
+        if ($this->col) {
+            $this->setAttr('col', $this->col);
+        }
         if(strlen($this->placeholder)>0) {
             $this->setAttr('placeholder',$this->placeholder);
         }
