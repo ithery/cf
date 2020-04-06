@@ -105,7 +105,7 @@ class CTracker_Tracker {
             // The key user_agent is not present in the sessions table, but
             // it's internally used to check if the user agent changed
             // during a session.
-            'user_agent' => $this->repositoryManager->getCurrentUserAgent(),
+            'user_agent' => CTracker::populator()->get('request.userAgent'),
             'active_second' => CTracker::populator()->get('session.activeSecond'),
         ];
 
