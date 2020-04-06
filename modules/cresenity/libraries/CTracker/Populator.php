@@ -96,9 +96,30 @@ class CTracker_Populator {
     }
 
     protected function populateRequestData() {
-        $requestData = [];
         $request = CHTTP::request();
-        $requestData['clientIp'] = $request->getClientIp();
+        $requestData = [];
+        $clientIp = null;
+        $userAgent=null;
+        $headers = $request->header();
+        if(isset($headers['x-forwarded-for'])) {
+            $clientIp=carr::get($headers,'x-forwarded-for.0');
+        }
+        if(isset($headers['user-agent'])) {
+            $userAgent=carr::get($headers,'user-agent.0');
+        }
+        
+        if($clientIp==null) {
+            $clientIp = $request->getClientIp();
+        }
+        
+        if($userAgent==null) {
+            $userAgent = $this->mobileDetect->getUserAgent();
+        }
+        
+        
+        
+        
+        $requestData['clientIp'] = $clientIp;
         $requestData['referer'] = $request->headers->get('referer');
         $requestData['method'] = $request->method();
         $requestData['path'] = $request->path();
@@ -107,7 +128,7 @@ class CTracker_Populator {
         $requestData['isSecure'] = $request->isSecure();
         $requestData['isJson'] = $request->isJson();
         $requestData['wantsJson'] = $request->wantsJson();
-        $requestData['userAgent'] = $this->mobileDetect->getUserAgent();
+        $requestData['userAgent'] = $userAgent;
         $requestData['headers'] = CHTTP::request()->headers->all();
 
         $requestData['route'] = CFRouter::routedUri(CFRouter::currentUri());
