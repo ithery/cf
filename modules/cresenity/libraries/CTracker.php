@@ -17,12 +17,13 @@ class CTracker {
     }
 
     public static function boot() {
+        if (PHP_SAPI !== 'cli') {
+            if (!self::$isBooted) {
 
-        if (!self::$isBooted) {
-
-            self::$bootstrap = new CTracker_Bootstrap();
-            self::$bootstrap->execute();
-            self::$isBooted = true;
+                self::$bootstrap = new CTracker_Bootstrap();
+                self::$bootstrap->execute();
+                self::$isBooted = true;
+            }
         }
     }
 
