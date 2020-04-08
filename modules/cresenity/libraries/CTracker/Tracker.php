@@ -88,11 +88,14 @@ class CTracker_Tracker {
 
 
         //$logDeviceId = new ObjectID($this->getDeviceId());
-
+        $clientIp=CTracker::populator()->get('request.clientIp');
+        if (strpos($clientIp, ",") !== false) {
+            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        }
         $sessionData = [
             'user_id' => $this->getUserId(),
             'log_device_id' => $this->getDeviceId(),
-            'client_ip' => CTracker::populator()->get('request.clientIp'),
+            'client_ip' => $clientIp,
             'uuid' => CTracker::populator()->get('session.uuid'),
             'log_geoip_id' => $this->getGeoIpId(),
             'log_agent_id' => $this->getAgentId(),
