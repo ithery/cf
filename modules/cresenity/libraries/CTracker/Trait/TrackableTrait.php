@@ -68,8 +68,13 @@ trait CTracker_Trait_TrackableTrait {
     }
 
     protected function isTrackableIp() {
+        
+        $clientIp  = CTracker::populator()->get('request.clientIp');
+        if (strpos($clientIp, ",") !== false) {
+            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        }
         $trackable = !IpAddress::ipv4InRange(
-                        $ipAddress = CTracker::populator()->get('request.clientIp'), $this->config->get('excludeIpAddress')
+                        $ipAddress = $clientIp, $this->config->get('excludeIpAddress')
         );
         if (!$trackable) {
             $this->logUntrackable($ipAddress . ' is not trackable.');
