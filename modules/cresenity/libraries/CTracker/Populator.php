@@ -60,15 +60,16 @@ class CTracker_Populator {
         $sessionPopulator = new CTracker_Populator_Session();
         $sessionData = $sessionPopulator->populateSessionData($this->data);
 
-        
+
         $this->data['session'] = $sessionData;
     }
 
     public function populateUserData() {
-        $userData=[];
-        $userData['userId']=CApp_Base::userId();
-        $this->data['user']=$userData;
+        $userData = [];
+        $userData['userId'] = CApp_Base::userId();
+        $this->data['user'] = $userData;
     }
+
     public function populateData() {
         if (!$this->isDataPopulated) {
             $this->populateUserData();
@@ -99,26 +100,31 @@ class CTracker_Populator {
         $request = CHTTP::request();
         $requestData = [];
         $clientIp = null;
-        $userAgent=null;
+        $userAgent = null;
         $headers = $request->header();
-        if(isset($headers['x-forwarded-for'])) {
-            $clientIp=carr::get($headers,'x-forwarded-for.0');
+        if (isset($headers['x-forwarded-for'])) {
+            $clientIp = carr::get($headers, 'x-forwarded-for.0');
         }
-        if(isset($headers['user-agent'])) {
-            $userAgent=carr::get($headers,'user-agent.0');
+        if (strpos($clientIp, ",") !== false) {
+            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
         }
-        
-        if($clientIp==null) {
+
+
+        if (isset($headers['user-agent'])) {
+            $userAgent = carr::get($headers, 'user-agent.0');
+        }
+
+        if ($clientIp == null) {
             $clientIp = $request->getClientIp();
         }
-        
-        if($userAgent==null) {
+
+        if ($userAgent == null) {
             $userAgent = $this->mobileDetect->getUserAgent();
         }
-        
-        
-        
-        
+
+
+
+
         $requestData['clientIp'] = $clientIp;
         $requestData['referer'] = $request->headers->get('referer');
         $requestData['method'] = $request->method();
