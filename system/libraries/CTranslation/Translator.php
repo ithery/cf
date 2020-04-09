@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 14, 2019, 11:20:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CTranslation_Translator extends CNamespacedItemResolver implements CTranslation_TranslatorInterface {
+class CTranslation_Translator extends CBase_NamespacedItemResolver implements CTranslation_TranslatorInterface {
 
     use CTrait_Macroable;
 

@@ -1,13 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:52:49 AM
- * @license Ittron Global Teknologi <ittron.co.id>
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-class CNamespacedItemResolver {
+
+class CBase_NamespacedItemResolver {
 
     /**
      * A cache of the parsed items.
