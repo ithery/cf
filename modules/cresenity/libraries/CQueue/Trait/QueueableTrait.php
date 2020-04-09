@@ -153,8 +153,10 @@ trait CQueue_Trait_QueueableTrait {
      */
     public function dispatchNextJobInChain() {
         if (!empty($this->chained)) {
-            
-            CEvent::dispatcher()->dispatch(CF::tap(unserialize(array_shift($this->chained)), function ($next) {
+
+
+            new CQueue_PendingDispatch(c::tap(unserialize(array_shift($this->chained)), function ($next) {
+
                         $next->chained = $this->chained;
                         $next->onConnection($next->connection ?: $this->chainConnection);
                         $next->onQueue($next->queue ?: $this->chainQueue);
