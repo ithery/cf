@@ -10,6 +10,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CValidation_Factory implements CValidation_FactoryInterface {
 
     /**
+     *
+     * @var CValidation_Factory 
+     */
+    private static $instance;
+
+    /**
      * The Translator implementation.
      *
      * @var CTranslation_Translator
@@ -72,6 +78,13 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      */
     protected $resolver;
 
+    public static function instance() {
+        if (static::$instance == null) {
+            static::$instance = new CValidation_Factory();
+        }
+        return static::$instance;
+    }
+
     /**
      * Create a new Validator factory instance.
      *
@@ -79,9 +92,9 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct($translator, Container $container = null) {
-        $this->container = $container;
-        $this->translator = $translator;
+    private function __construct() {
+        $this->container = CContainer::getInstance();
+        $this->translator = CTranslation::translator();
     }
 
     /**
