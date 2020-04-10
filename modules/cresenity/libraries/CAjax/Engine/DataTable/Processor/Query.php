@@ -266,7 +266,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
             $this->table = $table;
         }
         $rowActionList = $table->getRowActionList();
-        $key = carr::get($data, 'key_field');
+        $key = $table->getKeyField();
 
         $qBase = $this->getBaseQuery();
 

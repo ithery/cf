@@ -15,7 +15,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
         foreach ($data as $row) {
             $arr = array();
             $no++;
-            $key = carr::get($row, $table->key_field, '');
+            $key = carr::get($row, $table->getKeyField(), '');
 
             $htmlRowAction = '';
             if ($rowActionList != null && $rowActionList->childCount() > 0) {
