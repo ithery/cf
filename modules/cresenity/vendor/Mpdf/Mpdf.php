@@ -1039,8 +1039,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		$originalConfig = $config;
                 
 		$config = $this->initConfig($originalConfig);
-                \cdbg::dd($config);
-		$serviceFactory = new ServiceFactory();
+                $serviceFactory = new ServiceFactory();
 		$services = $serviceFactory->getServices(
 			$this,
 			$this->logger,
