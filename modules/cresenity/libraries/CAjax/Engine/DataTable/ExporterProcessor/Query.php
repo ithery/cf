@@ -15,14 +15,20 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
 
         $db = $this->db();
 
-        $response='';
+        $response = '';
         $request = $this->input;
 
 
-        $qProcess = $this->getFullQuery($withPagination = false);
-        $response=$qProcess;
 
+        $filename = $this->getData('filename', 'exporter.xls');
+
+        $qProcess = $this->getFullQuery($withPagination = false);
+        $result = $db->query($qProcess)->result(false);
+
+
+        CExporter::download($result, $filename);
         return $response;
     }
 
+  
 }

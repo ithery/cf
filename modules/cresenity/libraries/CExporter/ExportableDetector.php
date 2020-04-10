@@ -16,6 +16,9 @@ class CExporter_ExportableDetector {
         if($data instanceof CCollection) {
             return new CExporter_Exportable_Collection($data);
         } 
+        if($data instanceof Iterator) {
+            return new CExporter_Exportable_Iterator($data);
+        } 
         
         
     }

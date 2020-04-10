@@ -2354,8 +2354,7 @@ class CDatabase_Query_Builder {
      *
      * @return $this
      */
-    public function dump()
-    {
+    public function dump() {
         cdbg::d($this->toSql(), $this->getBindings());
 
         return $this;
@@ -2366,9 +2365,21 @@ class CDatabase_Query_Builder {
      *
      * @return void
      */
-    public function dd()
-    {
+    public function dd() {
         cdbg::dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Throw an exception if the query doesn't have an orderBy clause.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function enforceOrderBy() {
+        if (empty($this->orders) && empty($this->unionOrders)) {
+            throw new RuntimeException('You must specify an orderBy clause when using this function.');
+        }
     }
 
 }

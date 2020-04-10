@@ -120,7 +120,7 @@ class CExporter_Sheet {
             $this->worksheet->setTitle($sheetExport->title());
         }
 
-        if (($sheetExport instanceof CExporter_Concern_FromQuery || $sheetExport instanceof CExporter_Concern_FromCollection || $sheetExport instanceof CExporter_Concern_FromArray) && $sheetExport instanceof CExporter_Concern_FromView) {
+        if (($sheetExport instanceof CExporter_Concern_FromQuery || $sheetExport instanceof CExporter_Concern_FromCollection || $sheetExport instanceof CExporter_Concern_FromArray) && $sheetExport instanceof CExporter_Concern_FromView && $sheetExport instanceof CExporter_Concern_FromSql) {
             throw CExporter_Exception_ConcernConflictException::queryOrCollectionAndView();
         }
 
@@ -157,6 +157,10 @@ class CExporter_Sheet {
         } else {
             if ($sheetExport instanceof CExporter_Concern_FromQuery) {
                 $this->fromQuery($sheetExport, $this->worksheet);
+            }
+
+            if ($sheetExport instanceof CExporter_Concern_FromSql) {
+                $this->fromSql($sheetExport, $this->worksheet);
             }
 
             if ($sheetExport instanceof CExporter_Concern_FromCollection) {
@@ -334,11 +338,22 @@ class CExporter_Sheet {
     }
 
     /**
-     * @param FromQuery $sheetExport
+     * @param CExporter_Concern_FromQuery $sheetExport
      * @param Worksheet $worksheet
      */
     public function fromQuery(CExporter_Concern_FromQuery $sheetExport, Worksheet $worksheet) {
         $sheetExport->query()->chunk($this->getChunkSize($sheetExport), function ($chunk) use ($sheetExport, $worksheet) {
+            $this->appendRows($chunk, $sheetExport);
+        });
+    }
+
+    /**
+     * @param CExporter_Concern_FromQuery $sheetExport
+     * @param Worksheet $worksheet
+     */
+    public function fromSql(CExporter_Concern_FromSql $sheetExport, Worksheet $worksheet) {
+
+        CExporter_Helper_SqlHelper::chunkSqlResult($sheetExport->sql(), $this->getChunkSize($sheetExport), function ($chunk) use ($sheetExport, $worksheet) {
             $this->appendRows($chunk, $sheetExport);
         });
     }

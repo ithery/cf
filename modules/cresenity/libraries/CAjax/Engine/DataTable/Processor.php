@@ -69,7 +69,6 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
         return $this->table()->getDomain();
     }
 
-    
     /**
      * 
      * @return string
@@ -105,6 +104,10 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
 
     public function sortingDir() {
         return carr::get($this->parameter->sortingData(), '0.1');
+    }
+
+    public function getData($key, $default = null) {
+        return carr::get($this->data, $key, $default);
     }
 
 }
