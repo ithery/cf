@@ -40,5 +40,6 @@ return array(
         "cresenity.widget.css",
         "cresenity.table.css",
         "cresenity.css",
+        "cresenity-compat.css",
     ),
 );
