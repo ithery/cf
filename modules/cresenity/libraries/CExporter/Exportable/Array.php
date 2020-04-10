@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CExporter_Exportable_Collection extends CExporter_Exportable implements CExporter_Concern_FromArray {
+class CExporter_Exportable_Array extends CExporter_Exportable implements CExporter_Concern_FromArray {
 
     protected $array;
 
