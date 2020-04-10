@@ -19,6 +19,10 @@ class CExporter {
         $queued = carr::get($options, 'queued', false);
         $diskOptions = carr::get($options, 'diskOptions', []);
 
+        $export = CExporter_ExportableDetector::toExportable($export);
+        
+        
+        
         if ($queued) {
             return static::queue($export, $filePath, $diskName, $writerType, $diskOptions);
         }
