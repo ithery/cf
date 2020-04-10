@@ -39,8 +39,13 @@ trait CTrait_Element_ActionList_Footer {
      * @param string $id
      * @return CElement_Component_Action
      */
-    public function addFooterAction($id = "") {
-        $rowAct = CElement_Factory::createComponent('Action', $id);
+    public function addFooterAction($id = null) {
+        $rowAct = $id;
+        if (!($id instanceof CElement_Component_Action)) {
+            $rowAct = CElement_Factory::createComponent('Action', $id);
+        }
+
+
         $this->footerActionList->add($rowAct);
         return $rowAct;
     }

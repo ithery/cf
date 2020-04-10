@@ -8,4 +8,13 @@
 
 trait CElement_Component_DataTable_Trait_ActionCreationTrait {
     
+    
+    public function createExportAction($options) {
+        $id = carr::get($options,'id');
+        $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
+        
+        
+        
+        return $act;
+    }
 }

@@ -39,8 +39,11 @@ trait CTrait_Element_ActionList_Header {
      * @param string $id
      * @return CElement_Component_Action
      */
-    public function addHeaderAction($id = "") {
-        $rowAct = CElement_Factory::createComponent('Action', $id);
+    public function addHeaderAction($id = null) {
+        $rowAct = $id;
+        if (!($id instanceof CElement_Component_Action)) {
+            $rowAct = CElement_Factory::createComponent('Action', $id);
+        }
         $this->headerActionList->add($rowAct);
         return $rowAct;
     }
