@@ -23,6 +23,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $dbName;
     public $dbConfig;
     public $columns;
+    public $footerTitle;
     public $footer;
     public $footer_field;
     public $requires = array();
@@ -101,6 +102,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->numbering = false;
         $this->query = '';
         $this->header_sortable = true;
+        $this->footerTitle = '';
         $this->footer = false;
         $this->footer_field = array();
         $this->cellCallbackFunc = "";
@@ -172,6 +174,21 @@ class CElement_Component_DataTable extends CElement_Component {
         return new CElement_Component_DataTable($id);
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
+    public function setScrollX($bool = true) {
+        $this->scrollX = $bool;
+        return $this;
+    }
+    
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     public function setScrollY($bool = true) {
         $this->scrollY = $bool;
         return $this;
@@ -199,10 +216,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->actionLocation;
     }
 
-    public function setScrollX($bool = true) {
-        $this->scrollX = $bool;
-        return $this;
-    }
+    
 
     public function setDomain($domain) {
         parent::setDomain($domain);
@@ -235,28 +249,63 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     public function setFixedColumn($bool = true) {
         $this->fixedColumn = $bool;
 
         return $this;
     }
 
+    /**
+     * 
+     * @param int $width
+     * @return \CElement_Component_DataTable
+     */
     public function setCheckboxColumnWidth($width) {
         $this->checkboxColumnWidth = $width;
     }
 
+    /**
+     * 
+     * @param bool $tableStriped
+     * @return \CElement_Component_DataTable
+     */
     function setTableStriped($tableStriped) {
         $this->tableStriped = $tableStriped;
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     function setTableBordered($bool) {
         $this->tableBordered = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     public function setWidgetTitle($bool) {
         $this->widget_title = $bool;
+        return $this;
+    }
+
+    /**
+     * 
+     * @param string $title
+     * @return \CElement_Component_DataTable
+     */
+    public function setFooterTitle($title) {
+        $this->footerTitle = $title;
         return $this;
     }
 
@@ -356,7 +405,7 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function setApplyDataTable($bool) {
         $this->applyDataTable = $bool;
-        if($this->applyDataTable==false) {
+        if ($this->applyDataTable == false) {
             $this->setAjax(false);
         }
         return $this;

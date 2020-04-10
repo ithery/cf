@@ -76,12 +76,22 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $html->append($this->rawHtml($html->getIndent()));
         if ($wrapped > 0) {
             $html->decIndent()->appendln('</div>');
-            if ($this->haveFooterAction()) {
-                $html->appendln('<div class="widget-footer">')->incIndent();
-                $html->appendln($this->footerActionList->html($html->getIndent()));
+            if ($this->haveFooterAction() || strlen($this->footerTitle) > 0) {
+                $mainFooterClass = "widget-footer";
+                if ($this->haveFooterAction()) {
+                    $mainFooterClass .= " with-elements";
+                }
+                $html->appendln('<div class="' . $mainFooterClass . '">')->incIndent();
+                if (strlen(strlen($this->footerTitle) > 0)) {
+                    $html->appendln('<h5>' . $this->footerTitle . '</h5>');
+                }
+                if ($this->haveFooterAction()) {
+                    $html->appendln('<div class="widget-footer-elements ml-auto">')->incIndent();
+                    $html->appendln($this->footerActionList->html($html->getIndent()));
 
-                $this->js_cell .= $this->footerActionList->js();
-                
+                    $this->js_cell .= $this->footerActionList->js();
+                    $html->decIndent()->appendln('</div>');
+                }
                 $html->decIndent()->appendln('</div>');
             }
             $html->decIndent()->appendln('</div>');
