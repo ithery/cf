@@ -5,10 +5,12 @@ class CElement_Component_DataTable extends CElement_Component {
     use CTrait_Compat_Element_DataTable,
         CTrait_Element_ActionList_Row,
         CTrait_Element_ActionList_Header,
+        CTrait_Element_ActionList_Footer,
         CElement_Component_DataTable_Trait_GridViewTrait,
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
-        CElement_Component_DataTable_Trait_HtmlTrait;
+        CElement_Component_DataTable_Trait_HtmlTrait,
+        CElement_Component_DataTable_Trait_ActionCreationTrait;
 
     public $defaultPagingList = array(
         "10" => "10",
@@ -54,8 +56,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $pdf_font_size;
     public $pdf_orientation;
     public $show_header;
-    public $footer_action_list = array();
-    public $footer_action_style;
     public $isElastic = false;
     public $isCallback = false;
     public $callbackRequire = null;
@@ -94,9 +94,8 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->rowActionList->setStyle('btn-icon-group')->addClass('btn-table-action');
         $this->headerActionList = CElement_Factory::createList('ActionList');
         $this->headerActionList->setStyle('widget-action');
-        $this->footer_action_list = CElement_List_ActionList::factory();
-        $this->footer_action_style = 'btn-list';
-        $this->footer_action_list->set_style('btn-list');
+        $this->footerActionList = CElement_Factory::createList('ActionList');
+        $this->footerActionList->setStyle('btn-list');
         $this->checkbox = false;
         $this->checkbox_value = array();
         $this->numbering = false;
@@ -269,18 +268,6 @@ class CElement_Component_DataTable extends CElement_Component {
             $export_filename .= '.xls';
         }
         self::exportExcelxmlStatic($export_filename, $table->export_sheetname, $table);
-    }
-
-    public function addFooterAction($id = "") {
-        $row_act = CAction::factory($id);
-        $this->footer_action_list->add($row_act);
-
-        return $row_act;
-    }
-
-    public function haveFooterAction() {
-        //return $this->can_edit||$this->can_delete||$this->can_view;
-        return $this->footer_action_list->child_count() > 0;
     }
 
     public function setTitle($title, $lang = true) {
@@ -593,7 +580,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    
     /**
      * 
      * @return CDatabase
@@ -602,7 +588,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return CDatabase::instance($this->dbName, $this->dbConfig, $this->domain);
     }
 
-    
     /**
      * 
      * @return string
@@ -610,6 +595,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public function getKeyField() {
         return $this->keyField;
     }
+
 }
 
 ?>

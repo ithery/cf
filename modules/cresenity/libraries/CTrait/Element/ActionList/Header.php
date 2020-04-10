@@ -15,6 +15,10 @@ trait CTrait_Element_ActionList_Header {
      */
     protected $headerActionList;
 
+    /**
+     * 
+     * @return int
+     */
     public function headerActionCount() {
         if ($this->headerActionList != null) {
             return $this->headerActionList->childCount();
@@ -22,21 +26,39 @@ trait CTrait_Element_ActionList_Header {
         return 0;
     }
 
+    /**
+     * 
+     * @return boolean
+     */
     public function haveHeaderAction() {
         return $this->headerActionCount() > 0;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_Action
+     */
     public function addHeaderAction($id = "") {
-        $row_act = CElement_Factory::createComponent('Action', $id);
-        $this->headerActionList->add($row_act);
-        return $row_act;
+        $rowAct = CElement_Factory::createComponent('Action', $id);
+        $this->headerActionList->add($rowAct);
+        return $rowAct;
     }
 
+    /**
+     * 
+     * @param string $style
+     * @return $this
+     */
     public function setHeaderActionStyle($style) {
         $this->headerActionList->setStyle($style);
         return $this;
     }
 
+    /**
+     * 
+     * @return CElement_List_ActionList
+     */
     public function getHeaderActionList() {
         return $this->headerActionList;
     }

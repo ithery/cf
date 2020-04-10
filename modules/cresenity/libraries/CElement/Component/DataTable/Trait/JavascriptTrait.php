@@ -35,7 +35,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajax_url = $ajaxMethod->makeUrl();
         }
 
-        foreach ($this->footer_action_list->childs() as $row_act) {
+        foreach ($this->footerActionList->childs() as $row_act) {
             $id = $row_act->id();
             if ((strpos($id, 'export_excel') !== false)) {
                 $row_act->set_label('Download Excel')->set_icon('file');
@@ -178,9 +178,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
 						
 						var footer_action = $('#" . $this->id . "_wrapper .footer_action');
 						
-						" . ($this->have_footer_action() ? "footer_action.html(" . json_encode($this->footer_action_list->html()) . ");" : "") . " 
+						" . ($this->haveFooterAction() ? "footer_action.html(" . json_encode($this->footerActionList->html()) . ");" : "") . " 
            
-						" . ($this->have_footer_action() ? "" . $this->footer_action_list->js() . "" : "") . " 
+						" . ($this->haveFooterAction() ? "" . $this->footerActionList->js() . "" : "") . " 
 						
 						footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
 						
