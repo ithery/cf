@@ -142,7 +142,7 @@ class CTemporary {
     }
 
     public static function getLocalPath($folder, $filename) {
-        return rtrim(DOCROOT, '/') . '/' . static::getPath($folder, $filename);
+        return rtrim(DOCROOT, '/') . '/temp/' . static::getPath($folder, $filename);
     }
 
     /**
