@@ -66,7 +66,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         }
 
 
-        if ($this->apply_data_table > 0) {
+        if ($this->applyDataTable > 0) {
 
             $length_menu = "";
             $km = "";

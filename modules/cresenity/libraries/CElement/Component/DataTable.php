@@ -41,7 +41,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $paging_list;
     public $responsive;
     public $options;
-    public $apply_data_table;
+    public $applyDataTable;
     public $group_by;
     public $title;
     public $ajax;
@@ -123,7 +123,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $this->customColumnHeader = "";
         $this->show_header = true;
-        $this->apply_data_table = true;
+        $this->applyDataTable = true;
         $this->group_by = "";
         $this->icon = "";
         $this->pdf_font_size = 8;
@@ -355,7 +355,10 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return CElement_Component_DataTable
      */
     public function setApplyDataTable($bool) {
-        $this->apply_data_table = $bool;
+        $this->applyDataTable = $bool;
+        if($this->applyDataTable==false) {
+            $this->setAjax(false);
+        }
         return $this;
     }
 

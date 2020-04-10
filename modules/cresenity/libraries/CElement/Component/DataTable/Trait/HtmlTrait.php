@@ -13,7 +13,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $wrapped = ($this->apply_data_table > 0) || $this->haveHeaderAction() || strlen($this->title) > 0;
+        $wrapped = $this->applyDataTable || $this->haveHeaderAction() || strlen($this->title) > 0;
         if ($wrapped) {
 
             $mainClass = ' widget-box ';
