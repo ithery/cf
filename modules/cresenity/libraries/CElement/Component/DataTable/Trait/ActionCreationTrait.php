@@ -15,10 +15,11 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType('DataTableExporter');
         $ajaxMethod->setData('table', serialize($this));
+        $ajaxMethod->setData('exporter', $options);
         $downloadUrl = $ajaxMethod->makeUrl();
 
         $act->setLink($downloadUrl)->setLinkTarget('_blank');
-        
+
         return $act;
     }
 

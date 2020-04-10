@@ -10,6 +10,8 @@ class CExporter {
 
     use CExporter_Trait_RegistersCustomConcernsTrait;
 
+    const ACTION_STORE = 'store';
+    const ACTION_DOWNLOAD = 'download';
     const XLSX = 'Xlsx';
     const CSV = 'Csv';
     const TSV = 'Csv';
@@ -53,6 +55,16 @@ class CExporter {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public static function download($export, $fileName, $writerType = null, array $headers = []) {
+        $localPath = static::export($export, $fileName, $writerType)->getLocalPath();
+
+        cdownload::force($localPath, null, $fileName);
+        unlink($localPath);
+    }
+
+    /**
      * @param object      $export
      * @param string|null $fileName
      * @param string      $writerType
@@ -61,8 +73,9 @@ class CExporter {
      * @return TemporaryFile
      */
     protected static function export($export, $fileName, $writerType = null) {
+        
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);
-
+        
         return static::writer()->export($export, $writerType);
     }
 
@@ -80,6 +93,40 @@ class CExporter {
 
     protected static function storage() {
         return CExporter_Storage::instance();
+    }
+
+    public static function generateExtension($writerType = self::XLSX) {
+        switch ($writerType) {
+            case static::XLSX:
+                return 'xlsx';
+            case static::XLS:
+                return 'xls';
+            case static::ODS:
+                return 'ods';
+            case static::XLS:
+                return 'xls';
+            case static::SLK:
+                return 'slk';
+            case static::XML:
+                return 'xml';
+            case static::GNUMERIC:
+                return 'gnumeric';
+            case static::HTML:
+                return 'html';
+            case static::CSV:
+                return 'csv';
+            case static::TSV:
+                return 'tsv';
+            case static::MPDF:
+            case static::TCPDF:
+            case static::DOMPDF:
+                return 'pdf';
+        }
+        return 'xlsx';
+    }
+
+    public static function randomFilename($writerType = self::XLSX) {
+        return 'export-' . cstr::random(32) . '.' . static::generateExtension($writerType);
     }
 
 }
