@@ -497,6 +497,15 @@ table.responsive {
     padding:0;
 }
 
+.widget-box .widget-footer {
+    padding: .875rem 1.5rem;
+    background-color: transparent;
+    border-top: 1px solid rgba(24,28,33,0.06);
+    border-color: rgba(24,28,33,0.06);
+}
+.widget-box .widget-footer:last-child {
+    border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
+}
 
 /* table */
 .table th {

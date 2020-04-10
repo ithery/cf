@@ -13,7 +13,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $wrapped = $this->applyDataTable || $this->haveHeaderAction() || strlen($this->title) > 0;
+        $wrapped = $this->applyDataTable || $this->haveHeaderAction() || $this->haveFooterAction() || strlen($this->title) > 0;
         if ($wrapped) {
 
             $mainClass = ' widget-box ';
@@ -76,6 +76,14 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $html->append($this->rawHtml($html->getIndent()));
         if ($wrapped > 0) {
             $html->decIndent()->appendln('</div>');
+            if ($this->haveFooterAction()) {
+                $html->appendln('<div class="widget-footer">')->incIndent();
+                $html->appendln($this->footerActionList->html($html->getIndent()));
+
+                $this->js_cell .= $this->footerActionList->js();
+                
+                $html->decIndent()->appendln('</div>');
+            }
             $html->decIndent()->appendln('</div>');
         }
 
