@@ -16,13 +16,7 @@ class CElement_Component_DataTable extends CElement_Component {
         "-1" => "ALL",
     );
     public $current_row = 1;
-
-    /**
-     *
-     * @var CDatabase
-     */
-    public $db;
-    protected $dbName;
+    public $dbName;
     public $dbConfig;
     public $columns;
     public $footer;
@@ -83,8 +77,11 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->defaultPagingList["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
-        $this->db = CDatabase::instance(null, null, $this->domain);
-        $this->dbConfig = $this->db->config();
+
+        $db = CDatabase::instance();
+        
+        $this->dbConfig = $db->config();
+        $this->dbName = $db->getName();
         $this->display_length = "10";
         $this->paging_list = $this->defaultPagingList;
         $this->options = CElement_Component_DataTable_Options::factory();
@@ -212,9 +209,15 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setDatabase($db) {
-        $this->db = $db;
-        $this->dbConfig = $db->config();
+    public function setDatabase($db, $dbConfig = null) {
+        if ($db instanceof CDatabase) {
+            $this->dbName = $db->getName();
+            $this->dbConfig = $db->config();
+        } else {
+            $this->dbName = $db;
+            $this->dbConfig = $dbConfig;
+        }
+
 
         return $this;
     }
@@ -505,8 +508,7 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function setDataFromQuery($q) {
         if ($this->ajax == false) {
-            $db = $this->db;
-            $r = $db->query($q);
+            $r = $this->db()->query($q);
             $this->data = $r->result(false);
         }
         $this->query = $q;
@@ -522,8 +524,7 @@ class CElement_Component_DataTable extends CElement_Component {
         if (!$this->isElastic && !$this->isCallback) {
             if ($this->ajax == false) {
                 if (strlen($this->query) > 0) {
-                    $db = $this->db;
-                    $r = $db->query($this->query);
+                    $r = $this->db()->query($this->query);
                     $this->data = $r->result(false);
                 }
             } else {
@@ -544,7 +545,7 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($modelQuery instanceof CModel_Collection) {
             throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
-        $sql = $this->db->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
+        $sql = $this->db()->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
         return $this->setDataFromQuery($sql);
     }
 
@@ -1030,8 +1031,6 @@ class CElement_Component_DataTable extends CElement_Component {
                 $columns[] = $col;
             }
 
-            $dbTemp = $this->db;
-            $this->db = null;
 
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DataTable');
@@ -1041,6 +1040,7 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajaxMethod->setData('key_field', $this->key_field);
             $ajaxMethod->setData('table', serialize($this));
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
+            $ajaxMethod->setData('dbName', $this->dbName);
             $ajaxMethod->setData('domain', $this->domain);
             $ajaxMethod->setData('actionLocation', $this->actionLocation);
             $ajaxMethod->setData('checkbox', $this->checkbox);
@@ -1049,7 +1049,6 @@ class CElement_Component_DataTable extends CElement_Component {
             $ajaxMethod->setData('callback_require', $this->callbackRequire);
             $ajaxMethod->setData('callback_options', $this->callbackOptions);
             $ajax_url = $ajaxMethod->makeUrl();
-            $this->db = $dbTemp;
         }
 
         foreach ($this->footer_action_list->childs() as $row_act) {
@@ -1266,27 +1265,27 @@ class CElement_Component_DataTable extends CElement_Component {
                     $js->appendln("'fixedColumns': " . ($this->fixedColumn ? "true" : "false") . ",")->br();
                 }
             }
-            
+
             /*
-            $js->append("
-                initComplete : function() {
-                    var input = $('#" . $this->id() . " .dataTables_filter input').unbind();
-                    var self = this.api();
-                    var searchButton = $('<button>')
-                               .text('search')
-                               .click(function() {
-                                  self.search(input.val()).draw();
-                    });
-                    var clearButton = $('<button>')
-                               .text('clear')
-                               .click(function() {
-                                  input.val('');
-                                  searchButton.click(); 
-                    });
-                    
-                    $('#" . $this->id() . " .dataTables_filter').append(searchButton, clearButton);
-                },            
-            ");
+              $js->append("
+              initComplete : function() {
+              var input = $('#" . $this->id() . " .dataTables_filter input').unbind();
+              var self = this.api();
+              var searchButton = $('<button>')
+              .text('search')
+              .click(function() {
+              self.search(input.val()).draw();
+              });
+              var clearButton = $('<button>')
+              .text('clear')
+              .click(function() {
+              input.val('');
+              searchButton.click();
+              });
+
+              $('#" . $this->id() . " .dataTables_filter').append(searchButton, clearButton);
+              },
+              ");
              * 
              */
             $js->appendln($jqueryui)->br()
@@ -1462,9 +1461,16 @@ class CElement_Component_DataTable extends CElement_Component {
         }
 
 
-        
+
 
         return $js->text();
+    }
+
+    /**
+     * CDatabase
+     */
+    public function db() {
+        return CDatabase::instance($this->dbName, $this->dbConfig, $this->domain);
     }
 
 }
