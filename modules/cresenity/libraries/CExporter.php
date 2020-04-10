@@ -10,6 +10,19 @@ class CExporter {
 
     use CExporter_Trait_RegistersCustomConcernsTrait;
 
+    const XLSX = 'Xlsx';
+    const CSV = 'Csv';
+    const TSV = 'Csv';
+    const ODS = 'Ods';
+    const XLS = 'Xls';
+    const SLK = 'Slk';
+    const XML = 'Xml';
+    const GNUMERIC = 'Gnumeric';
+    const HTML = 'Html';
+    const MPDF = 'Mpdf';
+    const DOMPDF = 'Dompdf';
+    const TCPDF = 'Tcpdf';
+
     /**
      * {@inheritdoc}
      */
@@ -20,20 +33,20 @@ class CExporter {
         $diskOptions = carr::get($options, 'diskOptions', []);
 
         $export = CExporter_ExportableDetector::toExportable($export);
-        
-        
-        
+
+
+
         if ($queued) {
             return static::queue($export, $filePath, $diskName, $writerType, $diskOptions);
         }
 
         $temporaryFile = static::export($export, $filePath, $writerType);
-        
-        
+
+
         $exported = static::storage()->disk($diskName, $diskOptions)->copy(
                 $temporaryFile, $filePath
         );
-        
+
         $temporaryFile->delete();
 
         return $exported;

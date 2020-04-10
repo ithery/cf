@@ -32,22 +32,22 @@ class CExporter_FileTypeDetector {
             throw new CExporter_Exception_NoTypeDetectedException();
         }
         $data = array(
-            'xlsx' => CExporter_Constant::XLSX,
-            'xlsm' => CExporter_Constant::XLSX,
-            'xltx' => CExporter_Constant::XLSX,
-            'xltm' => CExporter_Constant::XLSX,
-            'xls' => CExporter_Constant::XLS,
-            'xlt' => CExporter_Constant::XLS,
-            'ods' => CExporter_Constant::ODS,
-            'ots' => CExporter_Constant::ODS,
-            'slk' => CExporter_Constant::SLK,
-            'xml' => CExporter_Constant::XML,
-            'gnumeric' => CExporter_Constant::GNUMERIC,
-            'htm' => CExporter_Constant::HTML,
-            'html' => CExporter_Constant::HTML,
-            'csv' => CExporter_Constant::CSV,
-            'tsv' => CExporter_Constant::TSV,
-            'pdf' => CExporter_Constant::DOMPDF,
+            'xlsx' => CExporter::XLSX,
+            'xlsm' => CExporter::XLSX,
+            'xltx' => CExporter::XLSX,
+            'xltm' => CExporter::XLSX,
+            'xls' => CExporter::XLS,
+            'xlt' => CExporter::XLS,
+            'ods' => CExporter::ODS,
+            'ots' => CExporter::ODS,
+            'slk' => CExporter::SLK,
+            'xml' => CExporter::XML,
+            'gnumeric' => CExporter::GNUMERIC,
+            'htm' => CExporter::HTML,
+            'html' => CExporter::HTML,
+            'csv' => CExporter::CSV,
+            'tsv' => CExporter::TSV,
+            'pdf' => CExporter::DOMPDF,
         );
         return carr::get($data, strtolower($extension));
     }
