@@ -7,14 +7,19 @@
  */
 
 trait CElement_Component_DataTable_Trait_ActionCreationTrait {
-    
-    
+
     public function createExportAction($options) {
-        $id = carr::get($options,'id');
+        $id = carr::get($options, 'id');
         $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
-        
-        
+
+        $ajaxMethod = CAjax::createMethod();
+        $ajaxMethod->setType('DataTableExporter');
+        $ajaxMethod->setData('table', serialize($this));
+        $downloadUrl = $ajaxMethod->makeUrl();
+
+        $act->setLink($downloadUrl)->setLinkTarget('_blank');
         
         return $act;
     }
+
 }

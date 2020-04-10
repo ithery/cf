@@ -183,7 +183,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->scrollX = $bool;
         return $this;
     }
-    
+
     /**
      * 
      * @param bool $bool
@@ -215,8 +215,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public function getActionLocation() {
         return $this->actionLocation;
     }
-
-    
 
     public function setDomain($domain) {
         parent::setDomain($domain);
@@ -648,6 +646,28 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->keyField;
     }
 
-}
+    /**
+     * 
+     * @return string
+     */
+    public function getDomain() {
+        return $this->domain;
+    }
 
-?>
+    /**
+     * 
+     * @return array
+     */
+    public function getColumns() {
+        return $this->columns;
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    public function getQuery() {
+        return $this->query;
+    }
+
+}
