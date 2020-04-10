@@ -351,10 +351,10 @@ class CExporter_Sheet {
     }
 
     /**
-     * @param FromArray $sheetExport
+     * @param CExporter_Concern_FromArray $sheetExport
      */
     public function fromArray(CExporter_Concern_FromArray $sheetExport) {
-        $this->appendRows($sheetExport->array(), $sheetExport);
+        $this->appendRows($sheetExport->getArray(), $sheetExport);
     }
 
     /**
