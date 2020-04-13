@@ -15,7 +15,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
     public function process() {
 
         $db = $this->db();
-
+        
         $request = $this->input;
 
         $qProcess = $this->getFullQuery($withPagination = true);

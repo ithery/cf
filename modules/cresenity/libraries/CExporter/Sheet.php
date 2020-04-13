@@ -399,7 +399,7 @@ class CExporter_Sheet {
         if ($this->hasRows()) {
             $startCell = CExporter_Helper_CellHelper::getColumnFromCoordinate($startCell) . ($this->worksheet->getHighestRow() + 1);
         }
-
+        
         $this->worksheet->fromArray($rows, null, $startCell, $strictNullComparison);
     }
 
@@ -476,6 +476,7 @@ class CExporter_Sheet {
      * @param object   $sheetExport
      */
     public function appendRows($rows, $sheetExport) {
+        
         $rows = (new CCollection($rows))->flatMap(function ($row) use ($sheetExport) {
                     if ($sheetExport instanceof CExporter_Concern_WithMapping) {
                         $row = $sheetExport->map($row);
@@ -485,7 +486,7 @@ class CExporter_Sheet {
                                     static::mapArraybleRow($row)
                     );
                 })->toArray();
-
+                
         $this->append(
                 $rows, $sheetExport instanceof CExporter_Concern_WithCustomStartCell ? $sheetExport->startCell() : null, $this->hasStrictNullComparison($sheetExport)
         );

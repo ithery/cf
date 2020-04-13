@@ -15,6 +15,7 @@ class CExporter_Exportable_Iterator extends CExporter_Exportable implements CExp
     }
 
     public function iterator() {
+        
         return $this->iterator;
     }
 

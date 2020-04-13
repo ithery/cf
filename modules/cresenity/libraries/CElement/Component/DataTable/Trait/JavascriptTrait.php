@@ -23,6 +23,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('columns', $columns);
             $ajaxMethod->setData('query', $this->query);
             $ajaxMethod->setData('table', serialize($this));
+            
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('dbName', $this->dbName);
             $ajaxMethod->setData('domain', $this->domain);

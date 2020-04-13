@@ -60,6 +60,8 @@ class CExporter_Writer {
      * @return TemporaryFile
      */
     public function export($export, $writerType) {
+        
+        
         $this->open($export);
 
         $sheetExports = [$export];
@@ -136,18 +138,18 @@ class CExporter_Writer {
         $writer = CExporter_WriterFactory::make(
                         $writerType, $this->spreadsheet, $export
         );
-
+        
         $writer->save(
                 $path = $temporaryFile->getLocalPath()
         );
-
+        
         if ($temporaryFile instanceof CExporter_File_RemoteTemporaryFile) {
             $temporaryFile->updateRemote();
         }
 
         $this->spreadsheet->disconnectWorksheets();
         unset($this->spreadsheet);
-
+        
         return $temporaryFile;
     }
 

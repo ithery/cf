@@ -80,9 +80,10 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
     public function table() {
         if ($this->table == null) {
             $data = $this->engine->getData();
+           
             $this->table = unserialize(carr::get($data, 'table'));
         }
-
+         
         return $this->table;
     }
 

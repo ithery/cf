@@ -23,7 +23,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
 
         $action = $this->getData('exporter.action', CExporter::ACTION_DOWNLOAD);
         $queued = $this->getData('exporter.queued', false);
-        $writerType = $this->getData('exporter.writerType', CExporter::XLSX);
+        $writerType = $this->getData('exporter.writerType', CExporter::XLS);
 
         $filename = $this->getData('exporter.filename', CExporter::randomFilename($writerType));
 

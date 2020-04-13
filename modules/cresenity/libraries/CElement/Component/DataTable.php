@@ -635,6 +635,10 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return CDatabase
      */
     public function db() {
+        
+        if(strlen($this->dbName)>0) {
+            return CDatabase::instance($this->dbName,null,$this->domain);
+        } 
         return CDatabase::instance($this->dbName, $this->dbConfig, $this->domain);
     }
 

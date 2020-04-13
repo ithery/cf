@@ -75,7 +75,7 @@ class CExporter {
     protected static function export($export, $fileName, $writerType = null) {
         
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);
-        
+        $export = CExporter_ExportableDetector::toExportable($export);
         return static::writer()->export($export, $writerType);
     }
 
