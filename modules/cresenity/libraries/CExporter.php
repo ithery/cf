@@ -26,7 +26,15 @@ class CExporter {
     const TCPDF = 'Tcpdf';
 
     /**
-     * {@inheritdoc}
+     * @param object      $export
+     * @param string      $filePath
+     * @param string|null $disk
+     * @param string      $writerType
+     * @param mixed       $diskOptions
+     *
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @return bool
      */
     public static function store($export, $filePath, $options = []) {
         $diskName = carr::get($options, 'diskName');
@@ -55,7 +63,14 @@ class CExporter {
     }
 
     /**
-     * {@inheritdoc}
+     * @param object      $export
+     * @param string|null $fileName
+     * @param string      $writerType
+     * @param array       $headers
+     *
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @return void
      */
     public static function download($export, $fileName, $writerType = null, array $headers = []) {
         $localPath = static::export($export, $fileName, $writerType)->getLocalPath();
@@ -73,7 +88,7 @@ class CExporter {
      * @return TemporaryFile
      */
     protected static function export($export, $fileName, $writerType = null) {
-        
+
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);
         $export = CExporter_ExportableDetector::toExportable($export);
         return static::writer()->export($export, $writerType);
@@ -87,11 +102,23 @@ class CExporter {
      * 
      * @return CExporter_Writer
      */
-    protected static function writer() {
+    public static function writer() {
         return CExporter_Writer::instance();
     }
+    
+    /**
+     * 
+     * @return CExporter_QueuedWriter
+     */
+    public static function queuedWriter() {
+        return CExporter_QueuedWriter::instance();
+    }
 
-    protected static function storage() {
+    /**
+     * 
+     * @return CExporter_Storage
+     */
+    public static function storage() {
         return CExporter_Storage::instance();
     }
 
@@ -127,6 +154,38 @@ class CExporter {
 
     public static function randomFilename($writerType = self::XLSX) {
         return 'export-' . cstr::random(32) . '.' . static::generateExtension($writerType);
+    }
+
+    /**
+     * @param object $export
+     * @param string $writerType
+     *
+     * @return string
+     */
+    public static function raw($export, $writerType) {
+        $temporaryFile = static::writer()->export($export, $writerType);
+
+        $contents = $temporaryFile->contents();
+        $temporaryFile->delete();
+
+        return $contents;
+    }
+
+    /**
+     * @param object      $export
+     * @param string      $filePath
+     * @param string|null $disk
+     * @param string      $writerType
+     * @param mixed       $diskOptions
+     *
+     * @return PendingDispatch
+     */
+    public static function queue($export, $filePath, $disk = null, $writerType = null, $diskOptions = []) {
+        $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
+        $export = CExporter_ExportableDetector::toExportable($export);
+        return static::queuedWriter()->store(
+                        $export, $filePath, $disk, $writerType, $diskOptions
+        );
     }
 
 }

@@ -29,13 +29,16 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
 
         $qProcess = $this->getFullQuery($withPagination = false);
         $result = $db->query($qProcess)->result(false);
-
+        $result = c::collect($result);
+        
+        //$exportable = $this->table()->toExportable();
         if ($action == CExporter::ACTION_STORE) {
             $exportOptions = [];
             $exportOptions['writerType'] = $writerType;
+            $exportOptions['queued'] = $queued;
             CExporter::store($result, $filename, $exportOptions);
         } else {
-            CExporter::download($result, $filename,$writerType);
+            CExporter::download($result, $filename, $writerType);
         }
         return $response;
     }

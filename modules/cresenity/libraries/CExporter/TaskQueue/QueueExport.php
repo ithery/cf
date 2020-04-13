@@ -48,7 +48,10 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function execute(CExporter_Writer $writer) {
+    public function execute() {
+        
+       
+        $writer = CExporter::writer();
         $writer->open($this->export);
 
         $sheetExports = [$this->export];
@@ -61,6 +64,8 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
             $sheet = $writer->addNewSheet($sheetIndex);
             $sheet->open($sheetExport);
         }
+
+        CDaemon::log('Try to writing temporary '.$this->writerType.' to '.$this->temporaryFile->getLocalPath());
 
         // Write to temp file with empty sheets.
         $writer->write($sheetExport, $this->temporaryFile, $this->writerType);

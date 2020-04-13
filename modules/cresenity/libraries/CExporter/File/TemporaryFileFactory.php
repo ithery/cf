@@ -7,13 +7,13 @@
  */
 
 class CExporter_File_TemporaryFileFactory {
-    
+
     /**
      *
      * @var CExporter_File_TemporaryFileFactory 
      */
     private static $instance;
-    
+
     /**
      * @var string|null
      */
@@ -25,25 +25,25 @@ class CExporter_File_TemporaryFileFactory {
     private $temporaryDisk;
 
     public static function instance() {
-        if(static::$instance == null) {
+        if (static::$instance == null) {
             static::$instance = new CExporter_File_TemporaryFileFactory();
         }
         return static::$instance;
     }
-    
+
     /**
      * @param string|null $temporaryPath
      * @param string|null $temporaryDisk
      */
     private function __construct() {
-        $this->temporaryPath = CExporter::config()->get('temporary.path',DOCROOT.'temp');
-        $this->temporaryDisk = CExporter::config()->get('temporary.disk','local');
+        $this->temporaryPath = CExporter::config()->get('temporary.path', DOCROOT . 'temp');
+        $this->temporaryDisk = CExporter::config()->get('temporary.disk', 'local');
     }
 
     /**
      * @param string|null $fileExtension
      *
-     * @return TemporaryFile
+     * @return CExporter_File_TemporaryFile
      */
     public function make($fileExtension = null) {
         if (null !== $this->temporaryDisk) {
@@ -58,7 +58,7 @@ class CExporter_File_TemporaryFileFactory {
      *
      * @param string|null $fileExtension
      *
-     * @return LocalTemporaryFile
+     * @return CExporter_File_LocalTemporaryFile
      */
     public function makeLocal($fileName = null, $fileExtension = null) {
         if (!file_exists($this->temporaryPath) && !mkdir($concurrentDirectory = $this->temporaryPath) && !is_dir($concurrentDirectory)) {
@@ -71,7 +71,7 @@ class CExporter_File_TemporaryFileFactory {
     }
 
     /**
-     * @return RemoteTemporaryFile
+     * @return CExporter_File_RemoteTemporaryFile
      */
     private function makeRemote() {
         $filename = $this->generateFilename();

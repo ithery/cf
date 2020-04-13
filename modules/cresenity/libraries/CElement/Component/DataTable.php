@@ -635,10 +635,10 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return CDatabase
      */
     public function db() {
-        
-        if(strlen($this->dbName)>0) {
-            return CDatabase::instance($this->dbName,null,$this->domain);
-        } 
+
+        if (strlen($this->dbName) > 0) {
+            return CDatabase::instance($this->dbName, null, $this->domain);
+        }
         return CDatabase::instance($this->dbName, $this->dbConfig, $this->domain);
     }
 
@@ -672,6 +672,14 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function getQuery() {
         return $this->query;
+    }
+
+    /**
+     * 
+     * @return CExporter_Exportable_DataTable
+     */
+    public function toExportable() {
+        return new CExporter_Exportable_DataTable($this);
     }
 
 }

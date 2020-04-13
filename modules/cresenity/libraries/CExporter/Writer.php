@@ -106,13 +106,13 @@ class CExporter_Writer {
     }
 
     /**
-     * @param CExporter_TemporaryFile $tempFile
+     * @param CExporter_File_TemporaryFile $tempFile
      * @param string        $writerType
      *
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @return Writer
      */
-    public function reopen(CExporter_TemporaryFile $tempFile, $writerType) {
+    public function reopen(CExporter_File_TemporaryFile $tempFile, $writerType) {
         $reader = IOFactory::createReader($writerType);
         $this->spreadsheet = $reader->load($tempFile->sync()->getLocalPath());
 
