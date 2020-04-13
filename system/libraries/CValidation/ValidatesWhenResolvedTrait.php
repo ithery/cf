@@ -1,33 +1,31 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
-
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
-trait CValidation_ValidatesWhenResolvedTrait
-{
+trait CValidation_ValidatesWhenResolvedTrait {
+
     /**
      * Validate the class instance.
      *
      * @return void
      */
-    public function validateResolved()
-    {
+    public function validateResolved() {
         $this->prepareForValidation();
 
-        if (! $this->passesAuthorization()) {
+        if (!$this->passesAuthorization()) {
             $this->failedAuthorization();
         }
 
         $instance = $this->getValidatorInstance();
 
-        if (! $instance->passes()) {
+        if (!$instance->passes()) {
             $this->failedValidation($instance);
         }
     }
@@ -37,31 +35,28 @@ trait CValidation_ValidatesWhenResolvedTrait
      *
      * @return void
      */
-    protected function prepareForValidation()
-    {
+    protected function prepareForValidation() {
         // no default action
     }
 
     /**
      * Get the validator instance for the request.
      *
-     * @return \Illuminate\Validation\Validator
+     * @return CValidation_Validator
      */
-    protected function getValidatorInstance()
-    {
+    protected function getValidatorInstance() {
         return $this->validator();
     }
 
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
+     * @param  CValidation_Validator  $validator
      * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function failedValidation(Validator $validator)
-    {
+    protected function failedValidation(Validator $validator) {
         throw new ValidationException($validator);
     }
 
@@ -70,8 +65,7 @@ trait CValidation_ValidatesWhenResolvedTrait
      *
      * @return bool
      */
-    protected function passesAuthorization()
-    {
+    protected function passesAuthorization() {
         if (method_exists($this, 'authorize')) {
             return $this->authorize();
         }
@@ -86,8 +80,8 @@ trait CValidation_ValidatesWhenResolvedTrait
      *
      * @throws \Illuminate\Validation\UnauthorizedException
      */
-    protected function failedAuthorization()
-    {
+    protected function failedAuthorization() {
         throw new UnauthorizedException;
     }
+
 }
