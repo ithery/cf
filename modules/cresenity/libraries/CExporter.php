@@ -152,7 +152,7 @@ class CExporter {
         return 'xlsx';
     }
 
-    public static function randomFilename($writerType = self::XLSX) {
+    public static function randomFilename($writerType = self::XLS) {
         return 'export-' . cstr::random(32) . '.' . static::generateExtension($writerType);
     }
 

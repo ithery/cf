@@ -682,4 +682,32 @@ class CElement_Component_DataTable extends CElement_Component {
         return new CExporter_Exportable_DataTable($this);
     }
 
+    /**
+     * 
+     * @return CCollection
+     */
+    public function getCollection() {
+        $data = [];
+        if ($this->isCallback) {
+            $callbackData = CFunction::factory($this->query)
+                    ->addArg($this->callbackOptions)
+                    ->setRequire($this->callbackRequire)
+                    ->execute();
+            $data = carr::get($callbackData,'data');
+        } else {
+            $this->setAjax(false);
+            $data = $this->data;
+        }
+        return c::collect($data);
+    }
+    
+    public function downloadExcel() {
+        return CExporter::download($this->toExportable(), CExporter::randomFilename());
+    }
+    
+    public function queueDownloadExcel($filePath, $disk = null, $writerType = null, $diskOptions = []) {
+        
+        
+        return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
+    }
 }
