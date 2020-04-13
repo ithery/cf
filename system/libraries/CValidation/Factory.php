@@ -88,8 +88,6 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     /**
      * Create a new Validator factory instance.
      *
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
     private function __construct() {
@@ -104,7 +102,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
-     * @return \Illuminate\Validation\Validator
+     * @return CValidation_Validator
      */
     public function make(array $data, array $rules, array $messages = [], array $customAttributes = []) {
         $validator = $this->resolve(
@@ -202,7 +200,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     public function extendImplicit($rule, $extension, $message = null) {
         $this->implicitExtensions[$rule] = $extension;
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[cstr::snake($rule)] = $message;
         }
     }
 
@@ -217,7 +215,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     public function extendDependent($rule, $extension, $message = null) {
         $this->dependentExtensions[$rule] = $extension;
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[cstr::snake($rule)] = $message;
         }
     }
 
@@ -245,7 +243,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     /**
      * Get the Translator implementation.
      *
-     * @return \Illuminate\Contracts\Translation\Translator
+     * @return CTranslation_Translator
      */
     public function getTranslator() {
         return $this->translator;
@@ -254,7 +252,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     /**
      * Get the Presence Verifier implementation.
      *
-     * @return \Illuminate\Validation\PresenceVerifierInterface
+     * @return CValidation_PresenceVerifierInterface
      */
     public function getPresenceVerifier() {
         return $this->verifier;
