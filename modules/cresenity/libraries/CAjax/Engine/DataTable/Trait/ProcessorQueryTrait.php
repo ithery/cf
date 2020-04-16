@@ -80,22 +80,25 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
         if ($this->queryOrderBy === null) {
             $db = $this->db();
             $sOrder = "";
-            $columns = $this->columns;
+            $columns = $this->columns();
             $table = $this->table;
             $request = $this->engine->getInput();
             if (isset($request['iSortCol_0'])) {
-                $sOrder = "ORDER BY  ";
+                $sOrder = "ORDER BY ";
                 for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
                     $i2 = 0;
                     if ($table->checkbox) {
-                        $i2--;
+                        $i2++;
                     }
                     if ($this->actionLocation() == 'first') {
-                        $i2--;
+                        $i2++;
                     }
-                    $fieldName = carr::get($columns[intval($request['iSortCol_' . $i]) + $i2], 'fieldname');
                     if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
-                        $sOrder .= "" . $db->escape_column($fieldName) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
+                        $column = carr::get($columns, intval($request['iSortCol_' . $i]) - $i2);
+                        if ($column) {
+                            $fieldName = $column->getFieldname();
+                            $sOrder .= "" . $db->escape_column($fieldName) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
+                        }
                     }
                 }
                 $sOrder = substr_replace($sOrder, "", -2);
@@ -103,6 +106,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
                     $sOrder = "";
                 }
             }
+            
             if (strlen($sOrder) == 0) {
                 $stringOrderBy = $this->baseOrder();
 
@@ -122,6 +126,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
                     $sOrder = "ORDER BY " . substr($newStringOrderBy, 2);
                 }
             }
+            
             $this->queryOrderBy = $sOrder;
         }
         return $sOrder;
@@ -142,16 +147,22 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
             $db = $this->db();
             $qs_condition_str = "";
             $sWhere = '';
-            $columns = $this->columns;
+            $columns = $this->columns();
 
             if (isset($request['sSearch']) && $request['sSearch'] != "") {
                 for ($i = 0; $i < count($columns); $i++) {
+                    $column = $columns[$i];
                     $i2 = 0;
                     if ($table->checkbox) {
-                        $i2 = 1;
+                        $i2++;
                     }
-                    $fieldName = carr::get($columns[$i], 'fieldname');
+                    if ($this->actionLocation() == 'first') {
+                        $i2++;
+                    }
+                    $fieldName = $column->getFieldname();
+
                     if (isset($request['bSearchable_' . ($i + $i2)]) && $request['bSearchable_' . ($i + $i2)] == "true") {
+
                         $sWhere .= "`" . $fieldName . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                     }
                 }
@@ -202,6 +213,8 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
                     $sWhere .= "`" . $columns[$i]->fieldname . "` LIKE '%" . $db->escape_like($request['sSearch_' . $i]) . "%' ";
                 }
             }
+
+
             $this->queryWhere = $sWhere;
         }
 
@@ -239,7 +252,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
     protected function getFullQuery($withPagination = true) {
         $table = $this->table();
         $domain = $this->table()->getDomain();
-       
+
         $js = "";
 
         $request = $this->input;
@@ -255,13 +268,10 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
          */
         $sWhere = $this->getQueryWhere();
 
-        if (strlen($sOrder) > 0) {
-            //order by from paramter found, reset order by from baseQuery
-            $stringOrderBy = '';
-        }
+        
 
         $qProcess = "select * from (" . $qBase . ") as a " . $sWhere . " " . $sOrder;
-        
+
         if ($withPagination) {
             /* Paging */
             $sLimit = $this->getQueryLimit();
