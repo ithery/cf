@@ -35,6 +35,9 @@ use MongoDB\Operation\ListDatabases;
 use MongoDB\Operation\Watch;
 use function is_array;
 
+require_once __DIR__.'/functions.php';
+
+
 class Client
 {
     /** @var array */

@@ -74,6 +74,7 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $fixedColumn;
     protected $scrollX;
     protected $scrollY;
+    protected $dbResolver;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -174,6 +175,11 @@ class CElement_Component_DataTable extends CElement_Component {
         return new CElement_Component_DataTable($id);
     }
 
+    
+    public function setDatabaseResolver($dbResolver) {
+        $this->dbResolver = $dbResolver;
+        return $this;
+    }
     /**
      * 
      * @param bool $bool
@@ -222,10 +228,17 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param CDatabase|string $db
+     * @param array $dbConfig
+     * @return CElement_Component_DataTable
+     */
     public function setDatabase($db, $dbConfig = null) {
         if ($db instanceof CDatabase) {
             $this->dbName = $db->getName();
             $this->dbConfig = $db->config();
+            
         } else {
             $this->dbName = $db;
             $this->dbConfig = $dbConfig;
@@ -631,11 +644,16 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * 
+     *  
      * @return CDatabase
      */
     public function db() {
-
+        
+        if($this->dbResolver!=null) {
+            return $this->dbResolver->connection($this->dbName);
+        }
+        
+        
         if (strlen($this->dbName) > 0) {
             return CDatabase::instance($this->dbName, null, $this->domain);
         }
