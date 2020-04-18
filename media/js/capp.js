@@ -1171,6 +1171,72 @@ var Cresenity = function () {
     this.closeDialog = function (options) {
         this.closeLastModal(options);
     }
+    this.ajax = function (options) {
+        var settings = $.extend({
+            block:true, 
+            url:window.location.href,
+            method:'post',
+        }, options);
+        var dataAddition = settings.dataAddition;
+        var url = settings.url;
+        url = this.url.replaceParam(url);
+        if (typeof dataAddition == 'undefined') {
+            dataAddition = {};
+        }
+        if(settings.block) {
+            cresenity.blockPage();
+        }
+        
+        var validationIsValid = true;
+        var ajaxOptions = {
+            url: url,
+            dataType: 'json',
+            data:dataAddition,
+            type: settings.method,
+           
+            success: function (response) {
+                var onSuccess = function () {};
+                var onError = function (errMessage) {
+                    cresenity.showError(errMessage)
+                };
+                if (typeof settings.onSuccess == 'function' && validationIsValid) {
+                    onSuccess = settings.onSuccess;
+                }
+                if (typeof settings.onError == 'function' && validationIsValid) {
+                    onError = settings.onError;
+                }
+
+                if (validationIsValid) {
+                    if (settings.handleJsonResponse == true) {
+                        cresenity.handleJsonResponse(response, onSuccess, onError);
+                    } else {
+                        onSuccess(response);
+                    }
+
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                if (thrownError != 'abort') {
+                    console.log(thrownError);
+                    cresenity.showError(thrownError);
+                }
+
+            },
+
+            complete: function () {
+                if(settings.block) {
+                    cresenity.unblockPage();
+                }
+
+                if (typeof settings.onComplete == 'function' && validationIsValid) {
+                    settings.onComplete();
+                }
+            },
+        };
+       
+        return $.ajax(ajaxOptions);
+            
+    };
     this.ajaxSubmit = function (options) {
         var settings = $.extend({}, options);
         var selector = settings.selector;
@@ -1338,6 +1404,25 @@ var Cresenity = function () {
     };
     this.unblockElement = function (selector) {
         $(selector).unblock();
+    };
+    
+    this.value= function (elm) {
+        elm = jQuery(elm);
+        if (elm.length == 0) {
+            return null;
+        }
+        if (elm.attr('type') == 'checkbox') {
+            if (!elm.is(':checked')) {
+                return null;
+            }
+        }
+        if (typeof elm.val() != 'undefined') {
+            return elm.val();
+        }
+        if (typeof elm.attr('value') != 'undefined') {
+            return elm.attr('value');
+        }
+        return elm.html();
     };
 
 

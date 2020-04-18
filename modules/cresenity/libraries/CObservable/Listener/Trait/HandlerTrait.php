@@ -18,17 +18,7 @@ trait CObservable_Listener_Trait_HandlerTrait {
         $this->handlers[] = $handler;
         return $handler;
     }
-    
-    /**
-     * 
-     * @return \CObservable_Listener_Handler_ReloadTabHandler
-     */
-    public function addReloadTabHandler() {
-        $handler = new CObservable_Listener_Handler_ReloadTabHandler($this);
-        $this->handlers[] = $handler;
-        return $handler;
-    }
-    
+
     /**
      * 
      * @return \CObservable_Listener_Handler_ReloadDataTableHandler
@@ -91,6 +81,16 @@ trait CObservable_Listener_Trait_HandlerTrait {
 
     /**
      * 
+     * @return \CObservable_Listener_Handler_AjaxHandler
+     */
+    public function addAjaxHandler() {
+        $handler = new CObservable_Listener_Handler_AjaxHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
+    /**
+     * 
      * @return \CObservable_Listener_Handler_RemoveHandler
      */
     public function addRemoveHandler() {
@@ -98,7 +98,7 @@ trait CObservable_Listener_Trait_HandlerTrait {
         $this->handlers[] = $handler;
         return $handler;
     }
-    
+
     /**
      * 
      * @return \CObservable_Listener_Handler_ToastHandler
@@ -108,4 +108,5 @@ trait CObservable_Listener_Trait_HandlerTrait {
         $this->handlers[] = $handler;
         return $handler;
     }
+
 }
