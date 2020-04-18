@@ -436,7 +436,7 @@ SQL
 
         // Charset
         if (!isset($options['charset'])) {
-            $options['charset'] = 'utf8';
+            $options['charset'] = 'utf8mb4';
         }
 
         $tableOptions[] = sprintf('DEFAULT CHARACTER SET %s', $options['charset']);

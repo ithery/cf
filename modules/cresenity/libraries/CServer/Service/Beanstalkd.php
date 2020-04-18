@@ -8,6 +8,7 @@
 
 use Pheanstalk\Connection;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Job as PheanstalkJob;
 
 class CServer_Service_Beanstalkd {
 
@@ -36,6 +37,10 @@ class CServer_Service_Beanstalkd {
             $stats[] = $this->getTubeStats($tube);
         }
         return $stats;
+    }
+
+    public function getRawTubeStats($tube) {
+        return $this->client->statsTube($tube);
     }
 
     public function getTubeStats($tube) {
@@ -205,15 +210,18 @@ class CServer_Service_Beanstalkd {
      * @var Pheanstalk
      */
     private function peek($tube, $method) {
+        $peek = [];
         try {
             $job = $this->client->useTube($tube)->{$method}();
-            $peek = array(
-                'id' => $job->getId(),
-                'rawData' => $job->getData(),
-                'data' => $job->getData(),
-                'stats' => $this->client->statsJob($job));
+            if ($job) {
+                $peek = array(
+                    'id' => $job->getId(),
+                    'rawData' => $job->getData(),
+                    'data' => $job->getData(),
+                    'stats' => $this->client->statsJob($job));
+            }
         } catch (Exception $ex) {
-            $peek = array();
+            
         }
         if ($peek) {
             $peek['data'] = $this->decodeDate($peek['data']);

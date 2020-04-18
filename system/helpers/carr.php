@@ -1340,6 +1340,15 @@ class carr {
         return $array;
     }
 
+    /**
+     * 
+     * @param array $array
+     * @return int
+     */
+    public static function count($array) {
+        return count($array);
+    }
+
 }
 
 // End carr

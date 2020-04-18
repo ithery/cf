@@ -327,7 +327,7 @@ trait CModel_Validating_ValidatingTrait {
      * @return CValidation_Factory
      */
     public function getValidator() {
-        return $this->validator ?: new CValidation_Factory(CTranslation::translator());
+        return $this->validator ?: CValidation_Factory::instance();;
     }
 
     /**

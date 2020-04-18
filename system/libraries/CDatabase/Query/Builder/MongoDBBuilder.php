@@ -555,8 +555,8 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 return $item;
             });
         }
-        $p = Arr::pluck($results, $column, $key);
-        return $this->useCollections ? new Collection($p) : $p;
+        $p = carr::pluck($results, $column, $key);
+        return $this->useCollections ? new CCollection($p) : $p;
     }
 
     /**

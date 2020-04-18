@@ -393,7 +393,7 @@ trait CModel_Trait_Attributes {
             throw new LogicException(get_class($this) . '::' . $method . ' must return a relationship instance.');
         }
 
-        return CF::tap($relation->getResults(), function ($results) use ($method) {
+        return c::tap($relation->getResults(), function ($results) use ($method) {
                     $this->setRelation($method, $results);
                 });
     }
@@ -894,7 +894,23 @@ trait CModel_Trait_Attributes {
      * @return $this
      */
     public function syncOriginalAttribute($attribute) {
-        $this->original[$attribute] = $this->attributes[$attribute];
+        return $this->syncOriginalAttributes($attribute);
+    }
+
+    /**
+     * Sync multiple original attribute with their current values.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function syncOriginalAttributes($attributes) {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        $modelAttributes = $this->getAttributes();
+
+        foreach ($attributes as $attribute) {
+            $this->original[$attribute] = $modelAttributes[$attribute];
+        }
 
         return $this;
     }
@@ -1072,7 +1088,7 @@ trait CModel_Trait_Attributes {
      * @return void
      */
     public static function cacheMutatedAttributes($class) {
-        static::$mutatorCache[$class] = CF::collect(static::getMutatorMethods($class))->map(function ($match) {
+        static::$mutatorCache[$class] = c::collect(static::getMutatorMethods($class))->map(function ($match) {
                     return lcfirst(static::$snakeAttributes ? cstr::snake($match) : $match);
                 })->all();
     }

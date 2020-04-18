@@ -1126,10 +1126,10 @@ class CValidation_Validator {
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  CContainer_Container  $container
      * @return void
      */
-    public function setContainer(Container $container) {
+    public function setContainer(CContainer_Container $container) {
         $this->container = $container;
     }
 

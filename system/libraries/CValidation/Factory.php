@@ -10,6 +10,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CValidation_Factory implements CValidation_FactoryInterface {
 
     /**
+     *
+     * @var CValidation_Factory 
+     */
+    private static $instance;
+
+    /**
      * The Translator implementation.
      *
      * @var CTranslation_Translator
@@ -72,16 +78,21 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      */
     protected $resolver;
 
+    public static function instance() {
+        if (static::$instance == null) {
+            static::$instance = new CValidation_Factory();
+        }
+        return static::$instance;
+    }
+
     /**
      * Create a new Validator factory instance.
      *
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct($translator, Container $container = null) {
-        $this->container = $container;
-        $this->translator = $translator;
+    private function __construct() {
+        $this->container = CContainer::getInstance();
+        $this->translator = CTranslation::translator();
     }
 
     /**
@@ -91,7 +102,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
-     * @return \Illuminate\Validation\Validator
+     * @return CValidation_Validator
      */
     public function make(array $data, array $rules, array $messages = [], array $customAttributes = []) {
         $validator = $this->resolve(
@@ -189,7 +200,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     public function extendImplicit($rule, $extension, $message = null) {
         $this->implicitExtensions[$rule] = $extension;
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[cstr::snake($rule)] = $message;
         }
     }
 
@@ -204,7 +215,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     public function extendDependent($rule, $extension, $message = null) {
         $this->dependentExtensions[$rule] = $extension;
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[cstr::snake($rule)] = $message;
         }
     }
 
@@ -232,7 +243,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     /**
      * Get the Translator implementation.
      *
-     * @return \Illuminate\Contracts\Translation\Translator
+     * @return CTranslation_Translator
      */
     public function getTranslator() {
         return $this->translator;
@@ -241,7 +252,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     /**
      * Get the Presence Verifier implementation.
      *
-     * @return \Illuminate\Validation\PresenceVerifierInterface
+     * @return CValidation_PresenceVerifierInterface
      */
     public function getPresenceVerifier() {
         return $this->verifier;

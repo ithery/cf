@@ -19,6 +19,7 @@ class CElement_List_TabList extends CElement_List {
     protected $widgetClass;
     protected $header;
     protected $jsHeader;
+    protected $paramRequest;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -31,6 +32,7 @@ class CElement_List_TabList extends CElement_List {
         $this->widgetClass = array();
         $this->header = null;
         $this->jsHeader = '';
+        $this->paramRequest = [];
     }
 
     public static function factory($id) {
@@ -70,6 +72,11 @@ class CElement_List_TabList extends CElement_List {
 
     public function setTabPosition($tabPosition) {
         $this->tabPosition = $tabPosition;
+        return $this;
+    }
+
+    public function setParamRequest(array $paramRequest) {
+        $this->paramRequest = $paramRequest;
         return $this;
     }
 
@@ -247,71 +254,69 @@ class CElement_List_TabList extends CElement_List {
             $js->appendln($tab->js($js->getIndent()));
         }
         $js->appendln("
-			
-			jQuery('#" . $this->id . " #" . $this->id . "-tab-nav > li > a.tab-ajax-load').click(function(event) {
-				event.preventDefault();
-				var target = jQuery(this).attr('data-target');
-				var url = jQuery(this).attr('data-url');
-				var method = jQuery(this).attr('data-method');
-				if(!method) method='get';
-				var pare = jQuery(this).parent();
-		
-				if(pare.prop('tagName')=='LI') {
-                                       
-					pare.parent().children().removeClass('active');
-					pare.addClass('active');
-                                        pare.parent().find('> li > a').removeClass('active');
-					pare.find('> a').addClass('active');
-				}
-				jQuery(this).parent().children().removeClass('active');
-				jQuery(this).addClass('active');
-                               
-                                jQuery(this).parent().find('> li > a').removeClass('active');
-                                jQuery(this).find('> a').addClass('active');
-				var widget_tab = jQuery('#" . $this->id . "-tab-widget');
-				if(widget_tab.length>0) {
-					
-					
-					
-					var data_icon = jQuery(this).attr('data-icon');
-					var data_class = jQuery(this).attr('data-class');
-					var data_text = jQuery(this).text();
-					if(data_icon) widget_tab.find('> .widget-title .icon i').first().attr('class',data_icon);
-					
-					if(data_text) widget_tab.find('> .widget-title h5').first().html(data_text);
-					var widget_content = widget_tab.find('.widget-content').first();
-					widget_content.removeAttr('class').addClass('widget-content');
-					
-					if(data_class) widget_content.addClass(data_class);
-				}
-				
-				if(jQuery('#" . $this->id . "').hasClass('ajax')) {
-					$.cresenity.reload(target,url,method);
-				} 
-                                else {
-					var tab_id = jQuery(this).attr('data-tab');
-					jQuery('#'+tab_id).parent().children().hide();
-					jQuery('#'+tab_id).show();
-				}
-				
-			});
-		
-		");
+            jQuery('#" . $this->id . " #" . $this->id . "-tab-nav > li > a.tab-ajax-load').click(function(event) {
+                event.preventDefault();
+                var target = jQuery(this).attr('data-target');
+                var url = jQuery(this).attr('data-url');
+                var method = jQuery(this).attr('data-method');
+                if(!method) method='get';
+                var pare = jQuery(this).parent();
+
+                if(pare.prop('tagName')=='LI') {
+
+                    pare.parent().children().removeClass('active');
+                    pare.addClass('active');
+                    pare.parent().find('> li > a').removeClass('active');
+                    pare.find('> a').addClass('active');
+                }
+                jQuery(this).parent().children().removeClass('active');
+                jQuery(this).addClass('active');
+
+                jQuery(this).parent().find('> li > a').removeClass('active');
+                jQuery(this).find('> a').addClass('active');
+                var widget_tab = jQuery('#" . $this->id . "-tab-widget');
+                if(widget_tab.length>0) {
+                    var data_icon = jQuery(this).attr('data-icon');
+                    var data_class = jQuery(this).attr('data-class');
+                    var data_text = jQuery(this).text();
+                    if(data_icon) widget_tab.find('> .widget-title .icon i').first().attr('class',data_icon);
+
+                    if(data_text) widget_tab.find('> .widget-title h5').first().html(data_text);
+                    var widget_content = widget_tab.find('.widget-content').first();
+                    widget_content.removeAttr('class').addClass('widget-content');
+
+                    if(data_class) widget_content.addClass(data_class);
+                }
+
+                if(jQuery('#" . $this->id . "').hasClass('ajax')) {
+                    var reloadOptions = {};
+                    reloadOptions.selector = '#'+target;
+                    reloadOptions.url = url;
+                    reloadOptions.method = method;
+                    reloadOptions.dataAddition = " . json_encode($this->paramRequest) . ";
+                    cresenity.reload(reloadOptions);
+                } 
+                else {
+                    var tab_id = jQuery(this).attr('data-tab');
+                    jQuery('#'+tab_id).parent().children().hide();
+                    jQuery('#'+tab_id).show();
+                }
+
+            });
+
+        ");
 
 
         $js->appendln("
-                        //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
-			jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
-                        if(!jQuery('#" . $this->id . "').hasClass('ajax')) {
-                            setTimeout(function() {
-                                //console.log('BB');
-                                //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
-
-                                jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
-                            },500);
-                        }
-			
-		");
+            //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
+            jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
+            if(!jQuery('#" . $this->id . "').hasClass('ajax')) {
+                setTimeout(function() {
+                    //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
+                    jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
+                },500);
+            }
+        ");
 
         return $js->text();
     }

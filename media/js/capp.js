@@ -1278,6 +1278,15 @@ var Cresenity = function () {
             }
         });
     };
+    
+    this.scrollTo=function(element,container) {
+        if(typeof container == 'undefined') {
+            container=document.body;
+        }
+        $(container).animate({
+            scrollTop: $(element).offset().top - ($(container).offset().top + $(container).scrollTop())
+        });
+    };
 
     this.formatCurrency = function (rp) {
         rp = "" + rp;

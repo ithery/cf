@@ -47,6 +47,8 @@ application/*
 /certificate
 /upload/*
 /payment_log/
+/public/files/
+/public/files/*
 
 #ignore netbeans ide config
 /nbproject/

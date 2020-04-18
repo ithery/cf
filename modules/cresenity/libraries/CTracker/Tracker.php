@@ -8,6 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Psr\Log\NullLogger;
+use MongoDB\BSON\ObjectID;
 
 class CTracker_Tracker {
 
@@ -19,12 +20,6 @@ class CTracker_Tracker {
      * @var CRouting_Router
      */
     protected $route;
-
-    /**
-     *
-     * @var CHTTP_Request
-     */
-    protected $request;
 
     /**
      *
@@ -45,29 +40,38 @@ class CTracker_Tracker {
     protected $config;
 
     public function __construct() {
-        $this->request = CHTTP::request();
+
         $this->repositoryManager = CTracker_RepositoryManager::instance();
         $this->config = CTracker_Config::instance();
-        $this->route = CFRouter::routedUri(CFRouter::currentUri());
+        $this->route = CTracker::populator()->get('route');
         $this->logger = $this->config->getLogger() ? $this->config->getLogger() : new NullLogger();
+        $this->sessionData = CTracker::populator()->get('session');
     }
 
     /**
      * @return array
      */
     protected function getLogData() {
-        
-        return [
+
+        $logData = [
             'log_session_id' => $this->getSessionId(true),
-            'method' => $this->request->method(),
+            'method' => CTracker::populator()->get('request.method'),
             'log_path_id' => $this->getPathId(),
             'log_query_id' => $this->getQueryId(),
             'log_referer_id' => $this->getRefererId(),
-            'is_ajax' => $this->request->ajax(),
-            'is_secure' => $this->request->isSecure(),
-            'is_json' => $this->request->isJson(),
-            'wants_json' => $this->request->wantsJson(),
+            'is_ajax' => CTracker::populator()->get('request.isAjax'),
+            'is_secure' => CTracker::populator()->get('request.isSecure'),
+            'is_json' => CTracker::populator()->get('request.isJson'),
+            'wants_json' => CTracker::populator()->get('request.wantsJson'),
+            'updated' => CTracker::populator()->get('session.updated'),
+            //make log created with current session updated
+            'created' => CTracker::populator()->get('session.updated'),
         ];
+        $customLogData = CTracker::populator()->get('customLogData');
+        if (is_array($customLogData)) {
+            $logData = array_merge($logData, $customLogData);
+        }
+        return $logData;
     }
 
     public function getSessionId($updateLastActivity = false) {
@@ -80,23 +84,43 @@ class CTracker_Tracker {
      * @return array
      */
     protected function makeSessionData() {
+
+
+
+        //$logDeviceId = new ObjectID($this->getDeviceId());
+        $clientIp=CTracker::populator()->get('request.clientIp');
+        if (strpos($clientIp, ",") !== false) {
+            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        }
         $sessionData = [
             'user_id' => $this->getUserId(),
             'log_device_id' => $this->getDeviceId(),
-            'client_ip' => $this->request->getClientIp(),
+            'client_ip' => $clientIp,
+            'uuid' => CTracker::populator()->get('session.uuid'),
             'log_geoip_id' => $this->getGeoIpId(),
             'log_agent_id' => $this->getAgentId(),
             'log_referer_id' => $this->getRefererId(),
             'log_cookie_id' => $this->getCookieId(),
             'log_language_id' => $this->getLanguageId(),
             'is_robot' => $this->isRobot(),
+            'updated' => CTracker::populator()->get('session.updated'),
+            'created' => CTracker::populator()->get('session.created'),
             // The key user_agent is not present in the sessions table, but
             // it's internally used to check if the user agent changed
             // during a session.
-            'user_agent' => $this->repositoryManager->getCurrentUserAgent(),
+            'user_agent' => CTracker::populator()->get('request.userAgent'),
+            'active_second' => CTracker::populator()->get('session.activeSecond'),
         ];
 
-        return $this->sessionData = $this->repositoryManager->checkSessionData($sessionData, $this->sessionData);
+        $customSessionData = CTracker::populator()->get('customSessionData');
+        if (is_array($customSessionData)) {
+            $sessionData = array_merge($sessionData, $customSessionData);
+        }
+
+
+        $this->sessionData = $sessionData;
+
+        return $this->sessionData;
     }
 
     public function getUserId() {
@@ -110,7 +134,7 @@ class CTracker_Tracker {
     }
 
     protected function getGeoIpId() {
-        return $this->config->isLogGeoIp() ? $this->repositoryManager->getGeoIpId($this->request->getClientIp()) : null;
+        return $this->config->isLogGeoIp() ? $this->repositoryManager->getGeoIpId(CTracker::populator()->get('request.clientIp')) : null;
     }
 
     protected function getAgentId() {
@@ -119,7 +143,7 @@ class CTracker_Tracker {
 
     protected function getRefererId() {
         return $this->config->isLogReferer() ? $this->repositoryManager->getRefererId(
-                        $this->request->headers->get('referer')
+                        CTracker::populator()->get('request.referer')
                 ) : null;
     }
 
@@ -132,12 +156,12 @@ class CTracker_Tracker {
     }
 
     public function getPathId() {
-        return $this->config->isLogPath() ? $this->repositoryManager->findOrCreatePath(['path' => $this->request->path(),]) : null;
+        return $this->config->isLogPath() ? $this->repositoryManager->findOrCreatePath(['path' => CTracker::populator()->get('request.path'),]) : null;
     }
 
     public function getQueryId() {
         if ($this->config->isLogQuery()) {
-            if (count($arguments = $this->request->query())) {
+            if (count($arguments = CTracker::populator()->get('request.query'))) {
                 return $this->repositoryManager->getQueryId(
                                 [
                                     'query' => carr::implode('=', '|', $arguments),
@@ -171,8 +195,19 @@ class CTracker_Tracker {
         if ($this->booted) {
             return false;
         }
+
         $this->booted = true;
         if ($this->isTrackable()) {
+
+            if (CTracker::config()->get('isQueued')) {
+                $queueData = [
+                    'data' => CTracker::populator()->getData(),
+                    'config' => CTracker::config()->getData(),
+                ];
+
+                return CTracker_TaskQueue_TrackQueue::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
+            }
+
             $this->track();
         }
     }
@@ -183,7 +218,9 @@ class CTracker_Tracker {
 
     public function track() {
         $log = $this->getLogData();
+
         if ($this->config->isLogEnabled()) {
+
             $this->repositoryManager->createLog($log);
         }
     }

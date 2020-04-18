@@ -108,12 +108,11 @@ class CCore_Controller extends CController {
 
     public function ajax($method) {
         $filename = $method . '.tmp';
-        $file = CTemporary::getPath("ajax", $filename);
-        if (isset($_GET['profiler'])) {
-            new Profiler();
-        }
-        if (!file_exists($file)) {
+        $file = CTemporary::getLocalPath("ajax", $filename);
 
+
+        if (!file_exists($file)) {
+            cdbg::dd($file);
             return;
         }
         $text = file_get_contents($file);

@@ -40,7 +40,13 @@ class Pheanstalk implements PheanstalkInterface {
      * @param int $connectTimeout
      * @return Pheanstalk
      */
-    public static function create($host, $port = 11300, $connectTimeout = 10) {
+    public static function create($host, $port = null, $connectTimeout = null) {
+        if($port==null) {
+            $port=11300;
+        }
+        if($connectTimeout==null) {
+            $connectTimeout = 10;
+        }
         return self::createWithFactory(new SocketFactory($host, $port, $connectTimeout));
     }
 

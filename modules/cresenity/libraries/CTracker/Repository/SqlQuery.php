@@ -48,8 +48,7 @@ class CTracker_Repository_SqlQuery extends CTracker_AbstractRepository {
         $this->createModel();
         $this->refererParser = new CTracker_Parser_RefererParser();
         $this->currentUrl = curl::current(true);
-        $searchTermModelClass = CTracker::config()->get('refererSearchTermModel', 'CTracker_Model_RefererSearchTerm');
-        $this->searchTermModel = new $searchTermModelClass();
+
         parent::__construct();
 
         $this->sqlQueryLogRepository = new CTracker_Repository_SqlQueryLog();

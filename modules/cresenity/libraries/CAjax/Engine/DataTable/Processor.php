@@ -39,6 +39,12 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
      */
     protected $parameter;
 
+    /**
+     *
+     * @var CElement_Component_DataTable
+     */
+    protected $table;
+
     public function __construct(CAjax_Engine $engine) {
         $this->engine = $engine;
         $this->input = $engine->getInput();
@@ -47,21 +53,38 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
         $this->parameter = new CAjax_Engine_DataTable_Parameter($this);
     }
 
+    /**
+     * 
+     * @return array
+     */
     public function columns() {
-        $data = $this->engine->getData();
-        return carr::get($data, 'columns');
+        return $this->table()->getColumns();
     }
 
+    /**
+     * 
+     * @return string
+     */
     public function domain() {
-        $data = $this->engine->getData();
-        $domain = carr::get($data, 'domain', CF::domain());
-        return $domain;
+        return $this->table()->getDomain();
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    public function actionLocation() {
+        return $this->table->getActionLocation();
     }
 
     public function table() {
-        $data = $this->engine->getData();
-        $table = unserialize(carr::get($data, 'table'));
-        return $table;
+        if ($this->table == null) {
+            $data = $this->engine->getData();
+           
+            $this->table = unserialize(carr::get($data, 'table'));
+        }
+         
+        return $this->table;
     }
 
     public function pageSize() {
@@ -82,6 +105,10 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
 
     public function sortingDir() {
         return carr::get($this->parameter->sortingData(), '0.1');
+    }
+
+    public function getData($key, $default = null) {
+        return carr::get($this->data, $key, $default);
     }
 
 }

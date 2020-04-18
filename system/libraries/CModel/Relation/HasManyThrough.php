@@ -103,7 +103,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return void
      */
     protected function performJoin(Builder $query = null) {
-        $query = $query ? : $this->query;
+        $query = $query ?: $this->query;
 
         $farKey = $this->getQualifiedFarKeyName();
 
@@ -129,7 +129,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return bool
      */
     public function throughParentSoftDeletes() {
-        return in_array(CModel_SoftDelete_Trait::class, CF::class_uses_recursive(
+        return in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive(
                         get_class($this->throughParent)
         ));
     }
@@ -434,7 +434,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $hash . '.' . $this->secondLocalKey);
 
         if ($this->throughParentSoftDeletes()) {
-            $query->where($this->throughParent->getQualifiedDeletedAtColumn(), '>', 0);
+            $query->where($this->throughParent->getQualifiedStatusColumn(), '>', 0);
         }
 
         $query->getModel()->setTable($hash);

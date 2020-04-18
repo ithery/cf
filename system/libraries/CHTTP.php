@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CHTTP {
 
+    /**
+     *
+     * @var CHTTP_Request 
+     */
     protected static $request;
 
     /**
@@ -20,6 +24,14 @@ class CHTTP {
             self::$request = CHTTP_Request::capture();
         }
         return self::$request;
+    }
+
+    /**
+     * 
+     * @return CHTTP_Response
+     */
+    public static function createResponse($content = '', $status = 200, array $headers = []) {
+        return new CHTTP_Response($content, $status, $headers);
     }
 
 }

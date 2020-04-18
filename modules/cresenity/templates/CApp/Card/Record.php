@@ -32,7 +32,9 @@ if (!isset($info_text)) {
 if (!isset($second_text)) {
     $second_text = '';
 }
-
+if (!isset($description)) {
+    $description = '';
+}
 if (!isset($dropdown_menu)) {
     $dropdown_menu = array();
 }
@@ -58,6 +60,10 @@ if (!isset($dropdown_menu)) {
             </div>
         </div>
         <p class="card-text"><?php echo $content; ?></p>
+        <?php if (strlen($description) > 0): ?>
+            <p class="text-muted"><?php echo $description; ?></p>
+        <?php endif; ?>
+
         <div class="pull-right">
             <?php if (strlen($info_link) > 0): ?>
                 <a href="<?php echo $info_link ?>" class="btn btn-success card-link"><i class="fa fa-cog"></i> <?= $info_text ?></a>

@@ -20,8 +20,8 @@ class CAjax_Engine_DataTable extends CAjax_Engine {
 
         $data = $this->ajaxMethod->getData();
 
-        $isElastic = carr::get($data, 'is_elastic');
-        $isCallback = carr::get($data, 'is_callback');
+        $isElastic = carr::get($data, 'isElastic');
+        $isCallback = carr::get($data, 'isCallback');
 
         $processorType = 'Query';
         if ($isElastic) {

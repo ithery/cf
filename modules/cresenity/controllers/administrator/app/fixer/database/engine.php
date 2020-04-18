@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Aug 23, 2019, 2:32:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use CApp_Administrator_Fixer_Database as DatabaseFixer;
+
 class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administrator_Controller_User {
 
     public function index() {

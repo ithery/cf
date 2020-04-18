@@ -497,6 +497,31 @@ table.responsive {
     padding:0;
 }
 
+.widget-box .widget-footer {
+    padding: .875rem 1.5rem;
+    background-color: transparent;
+    border-top: 1px solid rgba(24,28,33,0.06);
+    border-color: rgba(24,28,33,0.06);
+}
+.widget-box .widget-footer:last-child {
+    border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
+}
+
+.widget-box .widget-footer.with-elements {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+.widget-box .widget-footer h5 {
+    margin:0;
+}
 
 /* table */
 .table th {

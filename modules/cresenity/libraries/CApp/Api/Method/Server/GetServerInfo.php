@@ -29,19 +29,29 @@ class CApp_Api_Method_Server_GetServerInfo extends CApp_Api_Method_Server {
             $dataSystem = array();
             $dataSystem['hostname'] = $serverSystem->getHostname();
             $dataSystem['distribution'] = $serverSystem->getDistribution();
-            $dataSystem['distribution_icon'] = $serverSystem->getDistributionIcon();
+            $dataSystem['distributionIcon'] = $serverSystem->getDistributionIcon();
             $dataSystem['ip'] = $serverSystem->getIp();
             $dataSystem['kernel'] = $serverSystem->getKernel();
-            $dataSystem['last_boot'] = $serverSystem->getLastBoot();
+            $dataSystem['lastBoot'] = $serverSystem->getLastBoot();
             $dataSystem['load'] = $serverSystem->getLoad();
-            $dataSystem['load_percent'] = $serverSystem->getLoadPercent();
+            $dataSystem['loadPercent'] = $serverSystem->getLoadPercent();
             $dataSystem['processes'] = $serverSystem->getProcesses();
             $dataSystem['uptime'] = $serverSystem->getUptime();
             $dataSystem['users'] = $serverSystem->getUsers();
 
             $dataSystem['machine'] = $serverSystem->getMachine();
-            $dataSystem['cpus'] = $serverSystem->getCpus();
+            $cpus = $serverSystem->getCpus();
+            $cpusData = [];
 
+            foreach ($cpus as $cpu) {
+                $cpusData[] = [
+                    'model' => $cpu->getModel(),
+                    'speed' => $cpu->getCpuSpeed(),
+                    'cache' => $cpu->getCache(),
+                    'virtualization' => $cpu->getVirt(),
+                ];
+            }
+            $dataSystem['cpus'] = $cpusData;
             $dataMemory = array();
             $dataMemory['physical'] = array();
             $dataMemory['physical']['free'] = $serverMemory->getMemFree();
@@ -50,16 +60,16 @@ class CApp_Api_Method_Server_GetServerInfo extends CApp_Api_Method_Server {
             $dataMemory['physical']['cache'] = $serverMemory->getMemCache();
             $dataMemory['physical']['buffer'] = $serverMemory->getMemBuffer();
             $dataMemory['physical']['application'] = $serverMemory->getMemApplication();
-            $dataMemory['physical']['application_percent'] = $serverMemory->getMemPercentApplication();
-            $dataMemory['physical']['buffer_percent'] = $serverMemory->getMemPercentBuffer();
-            $dataMemory['physical']['cache_percent'] = $serverMemory->getMemPercentCache();
-            $dataMemory['physical']['used_percent'] = $serverMemory->getMemPercentUsed();
+            $dataMemory['physical']['applicationPercent'] = $serverMemory->getMemPercentApplication();
+            $dataMemory['physical']['bufferPercent'] = $serverMemory->getMemPercentBuffer();
+            $dataMemory['physical']['cachePercent'] = $serverMemory->getMemPercentCache();
+            $dataMemory['physical']['usedPercent'] = $serverMemory->getMemPercentUsed();
 
             $dataMemory['swap'] = array();
             $dataMemory['swap']['free'] = $serverMemory->getSwapFree();
             $dataMemory['swap']['total'] = $serverMemory->getSwapTotal();
             $dataMemory['swap']['used'] = $serverMemory->getSwapUsed();
-            $dataMemory['swap']['used_percent'] = $serverMemory->getSwapPercentUsed();
+            $dataMemory['swap']['usedPercent'] = $serverMemory->getSwapPercentUsed();
             $dataMemory['swap']['devices'] = $serverMemory->getSwapDevices();
 
 

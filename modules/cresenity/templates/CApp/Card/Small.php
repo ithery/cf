@@ -18,6 +18,10 @@ if (!isset($amount)) {
 if (!isset($action_link)) {
     $action_link = '';
 }
+
+if (!isset($description)) {
+    $description = '';
+}
 ?>
 
 <div class="card card-small mb-3">
@@ -27,6 +31,9 @@ if (!isset($action_link)) {
             <div class="ml-3">
                 <div class="text-muted small"><?php echo $label; ?></div>
                 <div class="text-large"><?php echo $amount; ?></div>
+                <?php if (strlen($description) > 0): ?>
+                    <p class="text-muted"><?php echo $description; ?></p>
+                <?php endif; ?>
             </div>
             <?php if (strlen($action_link) > 0): ?>
                 <a href="<?php echo $action_link; ?>" class="btn btn-primary ml-auto">

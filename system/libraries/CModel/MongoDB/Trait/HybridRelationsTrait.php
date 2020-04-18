@@ -105,6 +105,10 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
             list($current, $caller) = debug_backtrace(false, 2);
             $relation = $caller['function'];
         }
+        
+       
+        
+        
         // Check if it is a relation with an original model.
         if (!is_subclass_of($related, CModel_MongoDB_Model::class)) {
             return parent::belongsTo($related, $foreignKey, $otherKey, $relation);
@@ -112,10 +116,18 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // If no foreign key was supplied, we can use a backtrace to guess the proper
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
+        
+         $instance = new $related;
+         
+        if ($foreignKey === null) {
+            $foreignKey = cstr::snake($instance->getTable()) . '_id';
+        }
+        
         if ($foreignKey === null) {
             $foreignKey = cstr::snake($relation) . '_id';
         }
-        $instance = new $related;
+        
+        
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
         // actually be responsible for retrieving and hydrating every relations.

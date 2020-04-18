@@ -16,7 +16,7 @@ interface CValidation_FactoryInterface {
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return CValidation_Validator
      */
     public function make(array $data, array $rules, array $messages = [], array $customAttributes = []);
 

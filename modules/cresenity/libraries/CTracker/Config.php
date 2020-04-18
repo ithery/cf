@@ -62,12 +62,15 @@ class CTracker_Config {
         $default['trackEnabled'] = true;
         $default['robotEnabled'] = false;
         $default['consoleEnabled'] = false;
+        $default['isQueued'] = false;
+        $default['queueConnection'] = 'database';
         $default['database'] = 'default';
         $default['logger'] = null;
         $default['logEnabled'] = true;
         $default['cookieNamespace'] = 'CTrackerCookie';
         $default['sessionKey'] = 'CTrackerSession';
         $default['sessionNamespace'] = 'CTracker';
+        $default['sessionClass'] = 'CTracker_Session';
         $default['excludeConnection'] = [];
         $default['excludeIpAddress'] = [];
         $default['excludeEnvironment'] = [];
@@ -103,6 +106,14 @@ class CTracker_Config {
     public function setData($data) {
         $this->data = $data;
         return $this;
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public function getData() {
+        return $this->data;
     }
 
     public function set($key, $value) {
@@ -198,6 +209,10 @@ class CTracker_Config {
         return $this->get('cookieNamespace');
     }
 
+    public function isQueued() {
+        return $this->get('isQueued');
+    }
+
     public function getLogger() {
         $logger = $this->get('logger');
         if ($logger != null && is_string($logger)) {
@@ -206,6 +221,11 @@ class CTracker_Config {
         if ($logger != null && !($logger instanceof \Psr\Log\LoggerInterface)) {
             return null;
         }
+    }
+
+    public function isMongo() {
+        $driver = CF::config('database.' . $this->get('database') . '.connection.type');
+        return $driver == 'mongodb';
     }
 
 }

@@ -2349,4 +2349,37 @@ class CDatabase_Query_Builder {
         return is_array($queryResult[0]) ? $this->pluckFromArrayColumn($queryResult, $column, $key) : $this->pluckFromObjectColumn($queryResult, $column, $key);
     }
 
+    /**
+     * Dump the current SQL and bindings.
+     *
+     * @return $this
+     */
+    public function dump() {
+        cdbg::d($this->toSql(), $this->getBindings());
+
+        return $this;
+    }
+
+    /**
+     * Die and dump the current SQL and bindings.
+     *
+     * @return void
+     */
+    public function dd() {
+        cdbg::dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Throw an exception if the query doesn't have an orderBy clause.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function enforceOrderBy() {
+        if (empty($this->orders) && empty($this->unionOrders)) {
+            throw new RuntimeException('You must specify an orderBy clause when using this function.');
+        }
+    }
+
 }

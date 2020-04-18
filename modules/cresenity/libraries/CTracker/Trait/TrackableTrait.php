@@ -68,8 +68,13 @@ trait CTracker_Trait_TrackableTrait {
     }
 
     protected function isTrackableIp() {
+        
+        $clientIp  = CTracker::populator()->get('request.clientIp');
+        if (strpos($clientIp, ",") !== false) {
+            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        }
         $trackable = !IpAddress::ipv4InRange(
-                        $ipAddress = $this->request->getClientIp(), $this->config->get('excludeIpAddress')
+                        $ipAddress = $clientIp, $this->config->get('excludeIpAddress')
         );
         if (!$trackable) {
             $this->logUntrackable($ipAddress . ' is not trackable.');
@@ -90,14 +95,14 @@ trait CTracker_Trait_TrackableTrait {
             return false;
         }
         if (!$trackable = $this->repositoryManager->routeIsTrackable($this->route)) {
-            $this->logUntrackable('route ' . $this->route->getCurrentRoute()->getName() . ' is not trackable.');
+            $this->logUntrackable('route ' . $this->route . ' is not trackable.');
         }
         return $trackable;
     }
 
     private function pathIsTrackable() {
-        if (!$trackable = $this->repositoryManager->pathIsTrackable($this->request->path())) {
-            $this->logUntrackable('path ' . $this->request->path() . ' is not trackable.');
+        if (!$trackable = $this->repositoryManager->pathIsTrackable(CTracker::populator()->get('request.path'))) {
+            $this->logUntrackable('path ' . CTracker::populator()->get('request.path') . ' is not trackable.');
         }
         return $trackable;
     }

@@ -460,7 +460,7 @@ return array(
     ),
     "animate" => array(
         "css" => array(
-            "plugins/animate/animate.css",
+            "plugins/animate/animate.css?v=1",
         ),
     ),
     "summernote" => array(
@@ -693,6 +693,11 @@ return array(
     "tippy" => array(
         "js" => array(
             "plugins/tippy/tippy.js",
+        ),
+    ),
+    "waypoints" => array(
+        "js" => array(
+            "plugins/waypoints/jquery.waypoints.min.js",
         ),
     ),
     "locationpicker" => array(

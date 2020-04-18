@@ -27,7 +27,9 @@ trait CTracker_RepositoryManager_GeoIpTrait {
     }
 
     public function getGeoIpId($clientIp) {
-        
+        if (strpos($clientIp, ",") !== false) {
+            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        }
      
         $id = null;
         if ($geoIpData = $this->geoIp->searchAddr($clientIp)) {

@@ -43,12 +43,17 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         CF::log(CLogger::DEBUG, 'MongoDB Database Driver Initialized');
     }
 
+    
+    public function close() {
+        unset($this->link);
+        $this->link = null;
+    }
+    
     /**
      * Closes the database connection.
      */
     public function __destruct() {
-        unset($this->link);
-        $this->link = null;
+        
     }
 
     /**
@@ -195,6 +200,10 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     public function show_error() {
         
+    }
+
+    public function getElapsedTime($start) {
+        return round((microtime(true) - $start) * 1000, 2);
     }
 
     /**
