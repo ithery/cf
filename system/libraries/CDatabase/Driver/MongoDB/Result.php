@@ -159,6 +159,9 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         $options = [];
 
         $cursor = null;
+        
+        
+        $rawSql = $sql;
         if (is_string($sql)) {
             if (cstr::startsWith($sql, 'db.')) {
                 $sql = substr($sql, 3);
@@ -175,8 +178,16 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
                         throw new CDatabase_Exception('Invalid mongo parameter to execute:' . $sql);
                     }
                 }
-
+                
                 $cursor = $this->getCollection($collectionName)->$method($parameters, $options);
+                
+                if($cursor==null) {
+                    switch($method) {
+                        case"count":
+                            $cursor = [[0]]; 
+                    }
+                }
+               
             }
         }
         if (is_array($sql)) {
@@ -184,7 +195,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         }
 
         if ($cursor == null) {
-            throw new Exception('You have exception on mongo query:' . (is_string($sql) ? $sql : json_encode($sql)));
+            throw new Exception('You have exception on mongo query:' . (is_string($rawSql) ? $rawSql : json_encode($rawSql)));
         }
         return $cursor;
     }
