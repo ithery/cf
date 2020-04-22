@@ -83,6 +83,15 @@ class CSocialLogin_DriverManager {
     protected function createGitlabDriver() {
         return $this->buildProvider(CSocialLogin_OAuth2_Provider_GitlabProvider::class, $this->config);
     }
+    
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return CSocialLogin_OAuth2_AbstractProvider
+     */
+    protected function createSignInWithAppleDriver() {
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_SignInWithAppleProvider::class, $this->config);
+    }
 
     /**
      * Build an OAuth 2 provider instance.
