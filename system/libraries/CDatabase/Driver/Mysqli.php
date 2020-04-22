@@ -88,7 +88,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
             if (!isset($this->query_cache[$hash])) {
                 // Set the cached object
-                $this->query_cache[$hash] = new CMysqli_Result($this->link, $this->dbConfig['object'], $sql);
+                $this->query_cache[$hash] = new CDatabase_Driver_Mysqli_Result($this->link, $this->dbConfig['object'], $sql);
             } else {
                 // Rewind cached result
                 $this->query_cache[$hash]->rewind();

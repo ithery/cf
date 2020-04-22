@@ -9,6 +9,26 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
+    	    	
+    public function getDatabaseRowCount() {
+        $databaseName = $this->db->getDatabaseName();
+        return $this->db->getValue('
+    	    	SELECT SUM(table_rows)
+    	    	FROM INFORMATION_SCHEMA.TABLES
+    	    	WHERE table_schema = ' . $this->db->escape($databaseName) . '
+    	    	GROUP BY table_schema
+    	    ');
+    }
+    public function getDatabaseSize() {
+        $databaseName = $this->db->getDatabaseName();
+        return $this->db->getValue('
+    	    	SELECT SUM(data_length + index_length)
+    	    	FROM INFORMATION_SCHEMA.TABLES
+    	    	WHERE table_schema = ' . $this->db->escape($databaseName) . '
+    	    	GROUP BY table_schema
+    	    ');
+    }
+    
     /**
      * {@inheritdoc}
      */

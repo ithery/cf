@@ -19,6 +19,7 @@ class CElement_Component_DataTable extends CElement_Component {
         "100" => "100",
         "-1" => "ALL",
     );
+    
     public $current_row = 1;
     public $dbName;
     public $dbConfig;
@@ -64,6 +65,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $searchPlaceholder = '';
     public $infoText = '';
     protected $actionLocation = 'last';
+    protected $haveRowSelection=false;
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
@@ -74,6 +76,7 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $fixedColumn;
     protected $scrollX;
     protected $scrollY;
+    protected $dbResolver;
 
     public function __construct($id = "") {
         parent::__construct($id);
@@ -168,12 +171,18 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $this->dom = CManager::theme()->getData('table.dom');
         $this->actionLocation = CManager::theme()->getData('table.actionLocation', 'last');
+        $this->haveRowSelection = CManager::theme()->getData('table.haveRowSelection', false);
     }
 
     public static function factory($id = "") {
         return new CElement_Component_DataTable($id);
     }
 
+    
+    public function setDatabaseResolver($dbResolver) {
+        $this->dbResolver = $dbResolver;
+        return $this;
+    }
     /**
      * 
      * @param bool $bool
@@ -222,10 +231,17 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param CDatabase|string $db
+     * @param array $dbConfig
+     * @return CElement_Component_DataTable
+     */
     public function setDatabase($db, $dbConfig = null) {
         if ($db instanceof CDatabase) {
             $this->dbName = $db->getName();
             $this->dbConfig = $db->config();
+            
         } else {
             $this->dbName = $db;
             $this->dbConfig = $dbConfig;
@@ -631,11 +647,16 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * 
+     *  
      * @return CDatabase
      */
     public function db() {
-
+        
+        if($this->dbResolver!=null) {
+            return $this->dbResolver->connection($this->dbName);
+        }
+        
+        
         if (strlen($this->dbName) > 0) {
             return CDatabase::instance($this->dbName, null, $this->domain);
         }
@@ -672,6 +693,14 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function getQuery() {
         return $this->query;
+    }
+    
+    /**
+     * 
+     * @return bool
+     */
+    public function haveRowSelection() {
+        return $this->haveRowSelection;
     }
 
     /**

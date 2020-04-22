@@ -6,7 +6,7 @@ interface CDatabase_ResolverInterface {
      * Get a database connection instance.
      *
      * @param  string  $name
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return CDatabase
      */
     public function connection($name = null);
 

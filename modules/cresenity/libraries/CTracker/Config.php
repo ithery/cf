@@ -23,7 +23,7 @@ class CTracker_Config {
 
     public function __construct() {
         $default = array();
-        $default['sessionModel'] = 'CTracker_Model_Session';
+        $default['sessionModel'] = CTracker_Model_Session::class;
         $default['pathModel'] = 'CTracker_Model_Path';
         $default['logModel'] = 'CTracker_Model_Log';
         $default['refererModel'] = 'CTracker_Model_Referer';
