@@ -38,6 +38,7 @@ class CSocialLogin_OAuth2_Provider_SignInWithAppleProvider extends CSocialLogin_
     }
 
     public function getAccessToken($code) {
+        
         $response = $this->getHttpClient()
                 ->post(
                 $this->getTokenUrl(), [
@@ -49,7 +50,7 @@ class CSocialLogin_OAuth2_Provider_SignInWithAppleProvider extends CSocialLogin_
             'body' => $this->getTokenFields($code),
                 ]
         );
-
+        
         return $this->parseAccessToken($response->getBody());
     }
 
