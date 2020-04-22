@@ -18,7 +18,7 @@ abstract class CNotification_MessageAbstract implements CNotification_MessageInt
      *
      * @var CEvent_DispatcherInterface
      */
-    protected static $dispatcher;
+    protected $dispatcher;
 
     public function __construct($config, $options) {
         $this->options = $options;
