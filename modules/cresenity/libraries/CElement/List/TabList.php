@@ -35,10 +35,19 @@ class CElement_List_TabList extends CElement_List {
         $this->paramRequest = [];
     }
 
+    /**
+     * 
+     * @param int $id
+     * @return \CElement_List_TabList
+     */
     public static function factory($id) {
         return new CElement_List_TabList($id);
     }
 
+    /**
+     * 
+     * @return CElement_Element_Div
+     */
     public function header() {
         if ($this->header == null) {
             $this->header = CElement_Factory::createElement('div')->addClass('ml-auto');
@@ -60,26 +69,51 @@ class CElement_List_TabList extends CElement_List {
         return $tab;
     }
 
+    /**
+     * 
+     * @param string $id
+     * @return CElement_List_TabList
+     */
     public function setActiveTab($tabId) {
         $this->activeTab = $tabId;
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return CElement_List_TabList
+     */
     public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * @param string $tabPosition
+     * @return CElement_List_TabList
+     */
     public function setTabPosition($tabPosition) {
         $this->tabPosition = $tabPosition;
         return $this;
     }
 
+    /**
+     * 
+     * @param array $paramRequest
+     * @return CElement_List_TabList
+     */
     public function setParamRequest(array $paramRequest) {
         $this->paramRequest = $paramRequest;
         return $this;
     }
 
+    /**
+     * 
+     * @param string $class
+     * @return CElement_List_TabList
+     */
     public function addWidgetClass($class) {
         if (is_array($class)) {
             $this->widgetClass = array_merge($class, $this->widgetClass);
@@ -89,6 +123,11 @@ class CElement_List_TabList extends CElement_List {
         return $this;
     }
 
+    /**
+     * 
+     * @param int $indent
+     * @return string
+     */
     public function html($indent = 0) {
 
 
@@ -224,7 +263,7 @@ class CElement_List_TabList extends CElement_List {
         }
 
         if ($this->ajax) {
-            $html->appendln('						<div id="' . $this->id . '-ajax-tab-content">');
+            $html->appendln('						<div id="' . $this->id . '-ajax-tab-content" class="ajax-tab-content">');
             $html->appendln('						</div>');
         } else {
             foreach ($this->tabs as $tab) {

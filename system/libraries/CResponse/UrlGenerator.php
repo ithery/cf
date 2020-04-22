@@ -191,7 +191,7 @@ class CResponse_UrlGenerator implements CResponose_UrlGeneratorInterface {
         // for passing the array of parameters to this URL as a list of segments.
         $root = $this->formatRoot($this->formatScheme($secure));
 
-        [$path, $query] = $this->extractQueryString($path);
+        list($path, $query) = $this->extractQueryString($path);
 
         return $this->format(
                         $root, '/' . trim($path . '/' . $tail, '/')

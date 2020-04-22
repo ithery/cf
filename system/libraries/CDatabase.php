@@ -354,11 +354,12 @@ class CDatabase {
 
 
 
-
+        
         // Once we have run the query we will calculate the time that it took to run and
         // then log the query, bindings, and execution time so we will report them on
         // the event that the developer needs them. We'll log time in milliseconds.
         $this->logQuery($sql, $bindings, $elapsedTime, $result->count());
+        
 
         return $result;
     }
@@ -1549,7 +1550,7 @@ class CDatabase {
      * Gets the SchemaManager that can be used to inspect or change the
      * database schema through the connection.
      *
-     * @return CDatabase_Schema_AbstractSchemaManager
+     * @return CDatabase_Schema_Manager
      */
     public function getSchemaManager() {
         if (!$this->schemaManager) {
@@ -1681,6 +1682,11 @@ class CDatabase {
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
+        if($this->driverName()=='MongoDB') {
+            if(is_array($query)) {
+                $query = CDatabase_Helper_MongoDB::commandToString($query);
+            }
+        } 
         $this->dispatchEvent(CDatabase_Event::createOnQueryExecutedEvent($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {

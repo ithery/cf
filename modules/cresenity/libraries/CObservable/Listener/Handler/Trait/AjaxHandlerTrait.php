@@ -45,10 +45,10 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         $link = $this->url;
 
         if (strlen($link) == 0) {
-            $ajax_url = CAjax::createMethod()->setType('handler_' . $this->name)
+            $ajaxUrl = CAjax::createMethod()->setType('handler_' . $this->name)
                     ->setData('json', $this->content->json())
                     ->makeUrl();
-            $link = $ajax_url;
+            $link = $ajaxUrl;
         }
 
         foreach ($this->urlParam as $k => $p) {
@@ -110,4 +110,9 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->getListener('ajaxError');
     }
 
+    
+    public function setMethod($method) {
+        $this->method = $method;
+        return $this;
+    }
 }
