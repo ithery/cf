@@ -445,6 +445,23 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             ");
         }
 
+        if($this->haveRowSelection()) {
+            if ($this->applyDataTable > 0) {
+                $js->append("
+                $('#" . $this->id . " tbody').on( 'click', 'tr', function () {
+                    if ($(this).hasClass('selected') ) {
+                        $(this).removeClass('selected');
+                    }
+                    else {
+                        table.$('tr.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                    }
+                });
+
+               
+                ");
+            }
+        }
 
 
 
