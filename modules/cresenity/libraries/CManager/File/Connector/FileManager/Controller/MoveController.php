@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
-class CManager_File_Connector_FileManager_Controller_MoveController extends CManager_File_Connector_FileManager_Controller_BaseController {
+class CManager_File_Connector_FileManager_Controller_MoveController extends CManager_File_Connector_FileManager_AbstractController {
 
     /**
      * Get list of folders as json to populate treeview.
@@ -17,17 +17,18 @@ class CManager_File_Connector_FileManager_Controller_MoveController extends CMan
      * @return mixed
      */
     public function execute() {
-        $fm = new FM();
+        $fm = $this->fm();
         $app = CApp::instance();
         $items = $fm->input('items');
-        $folder_types = array_filter(['user', 'share'], function ($type) use($fm) {
+        $folder_types = array_filter(['root'], function ($type) use($fm) {
             return $fm->allowFolderType($type);
         });
-
+       
         $rootFolders = array_map(function ($type) use ($folder_types, $fm) {
             $path = $fm->path()->dir($fm->getRootFolder($type));
+             
             return (object) [
-                        'name' => clang::__('filemanager.title-' . $type),
+                        'name' => $type,
                         'url' => $path->path('working_dir'),
                         'children' => $path->folders(),
                         'has_next' => !($type == end($folder_types)),

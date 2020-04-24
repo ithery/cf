@@ -9,17 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
-class CManager_File_Connector_FileManager_Controller_UploadController extends CManager_File_Connector_FileManager_Controller_BaseController {
-
-    protected $errors;
-
-    public function __construct() {
-        parent::__construct();
-        $this->errors = [];
-    }
+class CManager_File_Connector_FileManager_Controller_UploadController extends CManager_File_Connector_FileManager_AbstractController {
 
     public function execute() {
-        $fm = new FM();
+        $fm = $this->fm();
 
         $uploaded_files = CHTTP::request()->file('upload');
         $error_bag = [];

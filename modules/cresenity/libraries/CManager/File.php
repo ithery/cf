@@ -13,7 +13,7 @@ class CManager_File {
         $className = 'CManager_File_Connector_' . $engineName;
         $configClassName = 'CManager_File_Config_' . $engineName;
         $config = new $configClassName($options);
-        $connector = new $className($config->getConfig());
+        $connector = new $className($config);
         return $connector;
     }
 

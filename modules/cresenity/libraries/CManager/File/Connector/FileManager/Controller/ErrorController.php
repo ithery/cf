@@ -9,10 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
-class CManager_File_Connector_FileManager_Controller_ErrorController extends CManager_File_Connector_FileManager_Controller_BaseController {
+class CManager_File_Connector_FileManager_Controller_ErrorController extends CManager_File_Connector_FileManager_AbstractController {
 
     public function execute() {
-        $fm = new FM();
+        $fm = $this->fm();
         $arr_errors = [];
         if (!extension_loaded('gd') && !extension_loaded('imagick')) {
             array_push($arr_errors, trans('laravel-filemanager::lfm.message-extension_not_found'));

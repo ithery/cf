@@ -7,20 +7,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 28, 2019, 3:00:18 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CManager_File_Config_ElFinder {
+class CManager_File_Config_ElFinder extends CManager_File_ConfigAbstract {
 
-    protected $options;
+    public function __construct(array $options) {
 
-    public function __construct($options) {
-        $this->options = $options;
-    }
-
-    public function getConfig() {
-
-        $path = carr::get($this->options, 'path', DOCROOT . 'temp/files');
+        $path = carr::get($options, 'path', DOCROOT . 'temp/files');
         $url = str_replace(DOCROOT, curl::base(), $path);
-        $uploadAllow = carr::get($this->options, 'mime', array('image/jpeg', 'image/png'));
-        $access = carr::get($this->options, 'access', 'access');
+        $uploadAllow = carr::get($options, 'mime', array('image/jpeg', 'image/png'));
+        $access = carr::get($options, 'access', 'access');
         // Documentation for connector options:
         // https://github.com/Studio-42/elFinder/wiki/Connector-configuration-options
         $opts = array(
@@ -39,7 +33,7 @@ class CManager_File_Config_ElFinder {
                 ),
             )
         );
-        return $opts;
+        $this->options = $opts;
     }
 
 }

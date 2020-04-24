@@ -29,6 +29,7 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function __call($function_name, $arguments) {
+
         return $this->storage->$function_name(...$arguments);
     }
 
@@ -61,11 +62,12 @@ class CManager_File_Connector_FileManager_FM_Path {
         } elseif ($type == 'storage') {
             // storage: files/{user_slug}
             // storage on windows: files\{user_slug}
+
             return $this->translateToOsPath($this->path('url'));
         } else {
             // absolute: /var/www/html/project/storage/app/files/{user_slug}
             // absolute on windows: C:\project\storage\app\files\{user_slug}
-            return $this->storage->rootPath() . $this->path('storage');
+            return rtrim($this->storage->rootPath(), '/') . '/' . $this->path('storage');
         }
     }
 
@@ -84,8 +86,10 @@ class CManager_File_Connector_FileManager_FM_Path {
     public function folders() {
 
         $all_folders = array_map(function ($directory_path) {
+
             return $this->pretty($directory_path);
         }, $this->storage->directories());
+
         $folders = array_filter($all_folders, function ($directory) {
             return $directory->name !== $this->helper->getThumbFolderName();
         });
@@ -100,7 +104,10 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function pretty($item_path) {
-        $cloned = $this->createNewPathObject()->setName($this->helper->getNameFromPath($item_path));
+        $cloned = clone($this);
+
+        $cloned->setName($this->helper->getNameFromPath($item_path));
+
         return new CManager_File_Connector_FileManager_FM_Item($cloned, $this->helper);
     }
 
@@ -127,11 +134,16 @@ class CManager_File_Connector_FileManager_FM_Path {
 
     public function isDirectory() {
         $working_dir = $this->path('working_dir');
+
         $parent_dir = substr($working_dir, 0, strrpos($working_dir, '/'));
+        if (strlen($parent_dir) == 0) {
+            $parent_dir = "/";
+        }
 
         $parent_directories = array_map(function ($directory_path) {
             return $this->createNewPathObject()->translateToFmPath($directory_path);
         }, $this->createNewPathObject()->dir($parent_dir)->directories());
+
         return in_array($this->path('url'), $parent_directories);
     }
 
@@ -169,14 +181,14 @@ class CManager_File_Connector_FileManager_FM_Path {
      * @return array of object
      */
     public function sortByColumn($arr_items) {
-        $sort_by = $this->helper->input('sort_type');
-        if (in_array($sort_by, ['name', 'time'])) {
-            $key_to_sort = $sort_by;
+        $sortBy = $this->helper->input('sort_type');
+        if (in_array($sortBy, ['name', 'time'])) {
+            $keyToSort = $sortBy;
         } else {
-            $key_to_sort = 'name';
+            $keyToSort = 'name';
         }
-        uasort($arr_items, function ($a, $b) use ($key_to_sort) {
-            return strcmp($a->{$key_to_sort}, $b->{$key_to_sort});
+        uasort($arr_items, function ($a, $b) use ($keyToSort) {
+            return strcmp($a->{$keyToSort}, $b->{$keyToSort});
         });
         return $arr_items;
     }
@@ -188,12 +200,12 @@ class CManager_File_Connector_FileManager_FM_Path {
     // Upload section
     public function upload($file) {
         $this->uploadValidator($file);
-        $new_file_name = $this->getNewName($file);
-        $new_file_path = $this->setName($new_file_name)->path('absolute');
+        $newFileName = $this->getNewName($file);
+        $newFilePath = $this->setName($newFileName)->path('absolute');
 
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsUploading($new_file_path));
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsUploading($newFilePath));
         try {
-            $new_file_name = $this->saveFile($file, $new_file_name);
+            $newFileName = $this->saveFile($file, $newFileName);
         } catch (\Exception $e) {
 //            
 //            \Log::info($e);
@@ -201,8 +213,8 @@ class CManager_File_Connector_FileManager_FM_Path {
             return $this->error($e->getMessage());
         }
         // TODO should be "FileWasUploaded"
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasUploaded($new_file_path));
-        return $new_file_name;
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasUploaded($newFilePath));
+        return $newFileName;
     }
 
     private function uploadValidator($file) {
@@ -215,8 +227,8 @@ class CManager_File_Connector_FileManager_FM_Path {
         } elseif ($file->getError() != UPLOAD_ERR_OK) {
             throw new \Exception('File failed to upload. Error code: ' . $file->getError());
         }
-        $new_file_name = $this->getNewName($file);
-        if ($this->setName($new_file_name)->exists() && !$this->helper->config('over_write_on_duplicate')) {
+        $newFileName = $this->getNewName($file);
+        if ($this->setName($newFileName)->exists() && !$this->helper->config('over_write_on_duplicate')) {
             return $this->error('file-exist');
         }
         if ($this->helper->config('should_validate_mime', false)) {
@@ -236,36 +248,36 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     private function getNewName($file) {
-        $new_file_name = $this->helper
+        $newFileName = $this->helper
                 ->translateFromUtf8(trim(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)));
         if ($this->helper->config('rename_file') === true) {
-            $new_file_name = uniqid();
+            $newFileName = uniqid();
         } elseif ($this->helper->config('alphanumeric_filename') === true) {
-            $new_file_name = preg_replace('/[^A-Za-z0-9\-\']/', '_', $new_file_name);
+            $newFileName = preg_replace('/[^A-Za-z0-9\-\']/', '_', $newFileName);
         }
         $extension = $file->getClientOriginalExtension();
         if ($extension) {
-            $new_file_name .= '.' . $extension;
+            $newFileName .= '.' . $extension;
         }
-        return $new_file_name;
+        return $newFileName;
     }
 
-    private function saveFile($file, $new_file_name) {
-        $this->setName($new_file_name)->storage->save($file);
-        $this->makeThumbnail($new_file_name);
-        return $new_file_name;
+    private function saveFile($file, $newFileName) {
+        $this->setName($newFileName)->storage->save($file);
+        $this->makeThumbnail($newFileName);
+        return $newFileName;
     }
 
-    public function makeThumbnail($file_name) {
-        $original_image = $this->pretty($file_name);
+    public function makeThumbnail($fileName) {
+        $original_image = $this->pretty($fileName);
         if (!$original_image->shouldCreateThumb()) {
             return;
         }
         // create folder for thumbnails
         $this->setName(null)->thumb(true)->createFolder();
         // generate cropped image content
-        $this->setName($file_name)->thumb(true);
-        
+        $this->setName($fileName)->thumb(true);
+
         $imageManager = new ImageManager();
         $image = $imageManager->make($original_image->get())
                 ->fit($this->helper->config('thumb_img_width', 200), $this->helper->config('thumb_img_height', 200));

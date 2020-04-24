@@ -11,6 +11,14 @@ class CManager_File_Connector_FileManager_FM {
 
     use CEvent_Trait_Dispatchable;
 
+    protected $config = array();
+
+    public function __construct($config = []) {
+        $this->config = $config;
+
+        $this->dispatch(new CManager_File_Connector_FileManager_Event_ManagerInitialized($this));
+    }
+
     public function path() {
         return new CManager_File_Connector_FileManager_FM_Path($this);
     }
@@ -19,8 +27,12 @@ class CManager_File_Connector_FileManager_FM {
         return $this->translateFromUtf8(CHTTP::request()->input($key));
     }
 
-    public function config($key) {
-        return CF::config('filemanager.' . $key);
+    public function config($key, $default = null) {
+        return carr::get($this->config, $key, CF::config('filemanager.' . $key, $default));
+    }
+
+    public function configData() {
+        return $this->config;
     }
 
     /**
@@ -115,38 +127,27 @@ class CManager_File_Connector_FileManager_FM {
         return $view_type;
     }
 
-    public function getStorage($storage_path) {
-        return new CManager_File_Connector_FileManager_FM_StorageRepository($storage_path, $this);
+    public function getStorage($storagePath) {
+
+
+        return new CManager_File_Connector_FileManager_FM_StorageRepository($storagePath, $this);
     }
 
     public function getCategoryName() {
+       
         $type = $this->currentFmType();
-        return $this->config('folder_categories.' . $type . '.folder_name', 'files');
+        $categoryName =  $this->config('folder_categories.' . $type . '.folder_name', 'files');
+        $rootPath = ltrim($this->config('root_path'), '/');
+        if (strlen($rootPath) > 0) {
+            $rootPath = rtrim($rootPath) . '/' . rtrim($categoryName, '/');
+        }
+       
+        return $rootPath; 
     }
 
     public function getRootFolder($type = null) {
-        if (is_null($type)) {
-            $type = 'share';
-            if ($this->allowFolderType('user')) {
-                $type = 'user';
-            }
-        }
-        if ($type === 'user') {
-            $folder = $this->getUserSlug();
-        } else {
-            $folder = $this->config('shared_folder_name');
-        }
-        // the slash is for url, dont replace it with directory seperator
-        $appCode = CF::appCode();
-        $orgCode = CF::orgCode();
-        $path = '/';
-        if (strlen($appCode) > 0) {
-            $path .= $appCode . '/';
-        }
-        if (strlen($orgCode) > 0) {
-            $path .= $orgCode . '/';
-        }
-        return $path . $folder;
+
+        return '/';
     }
 
     public function getUserSlug() {
@@ -206,6 +207,11 @@ class CManager_File_Connector_FileManager_FM {
 
     public function getFileType($ext) {
         return $this->config("file_type_array.{$ext}", 'File');
+    }
+
+    public function connectorUrl() {
+
+        return $this->config('connector_url', curl::base() . 'cresenity/connector/fm');
     }
 
 }

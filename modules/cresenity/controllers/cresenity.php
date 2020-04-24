@@ -33,7 +33,9 @@ class Controller_Cresenity extends CController {
         CService::cliRunner();
     }
 
-    public function ajax($method) {
+    public function ajax() {
+        $args = func_get_args();
+        $method = carr::get($args,0);
         $app = CApp::instance();
         $filename = $method . '.tmp';
         $file = CTemporary::getPath("ajax", $filename);
@@ -47,7 +49,7 @@ class Controller_Cresenity extends CController {
         }
         $json = $disk->get($file);
 
-        $ajaxMethod = CAjax::createMethod($json);
+        $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
         $response = $ajaxMethod->executeEngine();
 
         echo $response;
