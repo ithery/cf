@@ -26,15 +26,14 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  *
  * @internal
  */
-class Tokenizer
-{
+class Tokenizer {
+
     /**
      * @var Handler\HandlerInterface[]
      */
     private $handlers;
 
-    public function __construct()
-    {
+    public function __construct() {
         $patterns = new TokenizerPatterns();
         $escaping = new TokenizerEscaping($patterns);
 
@@ -50,9 +49,11 @@ class Tokenizer
 
     /**
      * Tokenize selector source code.
+     * 
+     * @param Reader $reader
+     * @return TokenStream
      */
-    public function tokenize(Reader $reader): TokenStream
-    {
+    public function tokenize(Reader $reader) {
         $stream = new TokenStream();
 
         while (!$reader->isEOF()) {
@@ -67,7 +68,8 @@ class Tokenizer
         }
 
         return $stream
-            ->push(new Token(Token::TYPE_FILE_END, null, $reader->getPosition()))
-            ->freeze();
+                        ->push(new Token(Token::TYPE_FILE_END, null, $reader->getPosition()))
+                        ->freeze();
     }
+
 }

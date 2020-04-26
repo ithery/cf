@@ -29,13 +29,12 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  *
  * @internal
  */
-class StringHandler implements HandlerInterface
-{
+class StringHandler implements HandlerInterface {
+
     private $patterns;
     private $escaping;
 
-    public function __construct(TokenizerPatterns $patterns, TokenizerEscaping $escaping)
-    {
+    public function __construct(TokenizerPatterns $patterns, TokenizerEscaping $escaping) {
         $this->patterns = $patterns;
         $this->escaping = $escaping;
     }
@@ -43,8 +42,7 @@ class StringHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Reader $reader, TokenStream $stream): bool
-    {
+    public function handle(Reader $reader, TokenStream $stream) {
         $quote = $reader->getSubstring(1);
 
         if (!\in_array($quote, ["'", '"'])) {
@@ -74,4 +72,5 @@ class StringHandler implements HandlerInterface
 
         return true;
     }
+
 }

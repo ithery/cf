@@ -25,13 +25,12 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  *
  * @internal
  */
-class ElementParser implements ParserInterface
-{
+class ElementParser implements ParserInterface {
+
     /**
      * {@inheritdoc}
      */
-    public function parse(string $source): array
-    {
+    public function parse($source) {
         // Matches an optional namespace, required element or `*`
         // $source = 'testns|testel';
         // $matches = array (size=3)
@@ -44,4 +43,5 @@ class ElementParser implements ParserInterface
 
         return [];
     }
+
 }

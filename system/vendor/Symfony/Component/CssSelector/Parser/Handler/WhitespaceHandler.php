@@ -25,13 +25,12 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  *
  * @internal
  */
-class WhitespaceHandler implements HandlerInterface
-{
+class WhitespaceHandler implements HandlerInterface {
+
     /**
      * {@inheritdoc}
      */
-    public function handle(Reader $reader, TokenStream $stream): bool
-    {
+    public function handle(Reader $reader, TokenStream $stream) {
         $match = $reader->findPattern('~^[ \t\r\n\f]+~');
 
         if (false === $match) {
@@ -43,4 +42,5 @@ class WhitespaceHandler implements HandlerInterface
 
         return true;
     }
+
 }

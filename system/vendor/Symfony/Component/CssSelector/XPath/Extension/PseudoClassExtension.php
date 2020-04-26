@@ -24,13 +24,12 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  *
  * @internal
  */
-class PseudoClassExtension extends AbstractExtension
-{
+class PseudoClassExtension extends AbstractExtension {
+
     /**
      * {@inheritdoc}
      */
-    public function getPseudoClassTranslators(): array
-    {
+    public function getPseudoClassTranslators() {
         return [
             'root' => [$this, 'translateRoot'],
             'first-child' => [$this, 'translateFirstChild'],
@@ -43,80 +42,72 @@ class PseudoClassExtension extends AbstractExtension
         ];
     }
 
-    public function translateRoot(XPathExpr $xpath): XPathExpr
-    {
+    public function translateRoot(XPathExpr $xpath) {
         return $xpath->addCondition('not(parent::*)');
     }
 
-    public function translateFirstChild(XPathExpr $xpath): XPathExpr
-    {
+    public function translateFirstChild(XPathExpr $xpath) {
         return $xpath
-            ->addStarPrefix()
-            ->addNameTest()
-            ->addCondition('position() = 1');
+                        ->addStarPrefix()
+                        ->addNameTest()
+                        ->addCondition('position() = 1');
     }
 
-    public function translateLastChild(XPathExpr $xpath): XPathExpr
-    {
+    public function translateLastChild(XPathExpr $xpath) {
         return $xpath
-            ->addStarPrefix()
-            ->addNameTest()
-            ->addCondition('position() = last()');
+                        ->addStarPrefix()
+                        ->addNameTest()
+                        ->addCondition('position() = last()');
     }
 
     /**
      * @throws ExpressionErrorException
      */
-    public function translateFirstOfType(XPathExpr $xpath): XPathExpr
-    {
+    public function translateFirstOfType(XPathExpr $xpath) {
         if ('*' === $xpath->getElement()) {
             throw new ExpressionErrorException('"*:first-of-type" is not implemented.');
         }
 
         return $xpath
-            ->addStarPrefix()
-            ->addCondition('position() = 1');
+                        ->addStarPrefix()
+                        ->addCondition('position() = 1');
     }
 
     /**
      * @throws ExpressionErrorException
      */
-    public function translateLastOfType(XPathExpr $xpath): XPathExpr
-    {
+    public function translateLastOfType(XPathExpr $xpath) {
         if ('*' === $xpath->getElement()) {
             throw new ExpressionErrorException('"*:last-of-type" is not implemented.');
         }
 
         return $xpath
-            ->addStarPrefix()
-            ->addCondition('position() = last()');
+                        ->addStarPrefix()
+                        ->addCondition('position() = last()');
     }
 
-    public function translateOnlyChild(XPathExpr $xpath): XPathExpr
-    {
+    public function translateOnlyChild(XPathExpr $xpath) {
         return $xpath
-            ->addStarPrefix()
-            ->addNameTest()
-            ->addCondition('last() = 1');
+                        ->addStarPrefix()
+                        ->addNameTest()
+                        ->addCondition('last() = 1');
     }
 
-    public function translateOnlyOfType(XPathExpr $xpath): XPathExpr
-    {
+    public function translateOnlyOfType(XPathExpr $xpath) {
         $element = $xpath->getElement();
 
         return $xpath->addCondition(sprintf('count(preceding-sibling::%s)=0 and count(following-sibling::%s)=0', $element, $element));
     }
 
-    public function translateEmpty(XPathExpr $xpath): XPathExpr
-    {
+    public function translateEmpty(XPathExpr $xpath) {
         return $xpath->addCondition('not(*) and not(string-length())');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
-    {
+    public function getName() {
         return 'pseudo-class';
     }
+
 }

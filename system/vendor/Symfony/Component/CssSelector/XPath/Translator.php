@@ -28,8 +28,8 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  *
  * @internal
  */
-class Translator implements TranslatorInterface
-{
+class Translator implements TranslatorInterface {
+
     private $mainParser;
 
     /**
@@ -41,34 +41,31 @@ class Translator implements TranslatorInterface
      * @var Extension\ExtensionInterface[]
      */
     private $extensions = [];
-
     private $nodeTranslators = [];
     private $combinationTranslators = [];
     private $functionTranslators = [];
     private $pseudoClassTranslators = [];
     private $attributeMatchingTranslators = [];
 
-    public function __construct(ParserInterface $parser = null)
-    {
+    public function __construct(ParserInterface $parser = null) {
         $this->mainParser = $parser ?: new Parser();
 
         $this
-            ->registerExtension(new Extension\NodeExtension())
-            ->registerExtension(new Extension\CombinationExtension())
-            ->registerExtension(new Extension\FunctionExtension())
-            ->registerExtension(new Extension\PseudoClassExtension())
-            ->registerExtension(new Extension\AttributeMatchingExtension())
+                ->registerExtension(new Extension\NodeExtension())
+                ->registerExtension(new Extension\CombinationExtension())
+                ->registerExtension(new Extension\FunctionExtension())
+                ->registerExtension(new Extension\PseudoClassExtension())
+                ->registerExtension(new Extension\AttributeMatchingExtension())
         ;
     }
 
-    public static function getXpathLiteral(string $element): string
-    {
+    public static function getXpathLiteral($element) {
         if (false === strpos($element, "'")) {
-            return "'".$element."'";
+            return "'" . $element . "'";
         }
 
         if (false === strpos($element, '"')) {
-            return '"'.$element.'"';
+            return '"' . $element . '"';
         }
 
         $string = $element;
@@ -90,8 +87,7 @@ class Translator implements TranslatorInterface
     /**
      * {@inheritdoc}
      */
-    public function cssToXPath(string $cssExpr, string $prefix = 'descendant-or-self::'): string
-    {
+    public function cssToXPath($cssExpr, $prefix = 'descendant-or-self::') {
         $selectors = $this->parseSelectors($cssExpr);
 
         /** @var SelectorNode $selector */
@@ -109,16 +105,14 @@ class Translator implements TranslatorInterface
     /**
      * {@inheritdoc}
      */
-    public function selectorToXPath(SelectorNode $selector, string $prefix = 'descendant-or-self::'): string
-    {
-        return ($prefix ?: '').$this->nodeToXPath($selector);
+    public function selectorToXPath(SelectorNode $selector, $prefix = 'descendant-or-self::') {
+        return ($prefix ?: '') . $this->nodeToXPath($selector);
     }
 
     /**
      * @return $this
      */
-    public function registerExtension(Extension\ExtensionInterface $extension): self
-    {
+    public function registerExtension(Extension\ExtensionInterface $extension) {
         $this->extensions[$extension->getName()] = $extension;
 
         $this->nodeTranslators = array_merge($this->nodeTranslators, $extension->getNodeTranslators());
@@ -132,9 +126,9 @@ class Translator implements TranslatorInterface
 
     /**
      * @throws ExpressionErrorException
+     * @return Extension\ExtensionInterface
      */
-    public function getExtension(string $name): Extension\ExtensionInterface
-    {
+    public function getExtension($name) {
         if (!isset($this->extensions[$name])) {
             throw new ExpressionErrorException(sprintf('Extension "%s" not registered.', $name));
         }
@@ -145,8 +139,7 @@ class Translator implements TranslatorInterface
     /**
      * @return $this
      */
-    public function registerParserShortcut(ParserInterface $shortcut): self
-    {
+    public function registerParserShortcut(ParserInterface $shortcut) {
         $this->shortcutParsers[] = $shortcut;
 
         return $this;
@@ -154,9 +147,9 @@ class Translator implements TranslatorInterface
 
     /**
      * @throws ExpressionErrorException
+     * @return XPathExpr
      */
-    public function nodeToXPath(NodeInterface $node): XPathExpr
-    {
+    public function nodeToXPath(NodeInterface $node) {
         if (!isset($this->nodeTranslators[$node->getNodeName()])) {
             throw new ExpressionErrorException(sprintf('Node "%s" not supported.', $node->getNodeName()));
         }
@@ -166,9 +159,9 @@ class Translator implements TranslatorInterface
 
     /**
      * @throws ExpressionErrorException
+     * @return XPathExpr
      */
-    public function addCombination(string $combiner, NodeInterface $xpath, NodeInterface $combinedXpath): XPathExpr
-    {
+    public function addCombination($combiner, NodeInterface $xpath, NodeInterface $combinedXpath) {
         if (!isset($this->combinationTranslators[$combiner])) {
             throw new ExpressionErrorException(sprintf('Combiner "%s" not supported.', $combiner));
         }
@@ -178,9 +171,9 @@ class Translator implements TranslatorInterface
 
     /**
      * @throws ExpressionErrorException
+     * @return XPathExpr
      */
-    public function addFunction(XPathExpr $xpath, FunctionNode $function): XPathExpr
-    {
+    public function addFunction(XPathExpr $xpath, FunctionNode $function) {
         if (!isset($this->functionTranslators[$function->getName()])) {
             throw new ExpressionErrorException(sprintf('Function "%s" not supported.', $function->getName()));
         }
@@ -190,9 +183,9 @@ class Translator implements TranslatorInterface
 
     /**
      * @throws ExpressionErrorException
+     * @return XPathExpr
      */
-    public function addPseudoClass(XPathExpr $xpath, string $pseudoClass): XPathExpr
-    {
+    public function addPseudoClass(XPathExpr $xpath, $pseudoClass) {
         if (!isset($this->pseudoClassTranslators[$pseudoClass])) {
             throw new ExpressionErrorException(sprintf('Pseudo-class "%s" not supported.', $pseudoClass));
         }
@@ -202,9 +195,9 @@ class Translator implements TranslatorInterface
 
     /**
      * @throws ExpressionErrorException
+     * @return XPathExpr
      */
-    public function addAttributeMatching(XPathExpr $xpath, string $operator, string $attribute, $value): XPathExpr
-    {
+    public function addAttributeMatching(XPathExpr $xpath, $operator, $attribute, $value) {
         if (!isset($this->attributeMatchingTranslators[$operator])) {
             throw new ExpressionErrorException(sprintf('Attribute matcher operator "%s" not supported.', $operator));
         }
@@ -215,8 +208,7 @@ class Translator implements TranslatorInterface
     /**
      * @return SelectorNode[]
      */
-    private function parseSelectors(string $css): array
-    {
+    private function parseSelectors($css) {
         foreach ($this->shortcutParsers as $shortcut) {
             $tokens = $shortcut->parse($css);
 
@@ -227,4 +219,5 @@ class Translator implements TranslatorInterface
 
         return $this->mainParser->parse($css);
     }
+
 }

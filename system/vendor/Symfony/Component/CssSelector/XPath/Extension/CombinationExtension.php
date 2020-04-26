@@ -23,13 +23,12 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  *
  * @internal
  */
-class CombinationExtension extends AbstractExtension
-{
+class CombinationExtension extends AbstractExtension {
+
     /**
      * {@inheritdoc}
      */
-    public function getCombinationTranslators(): array
-    {
+    public function getCombinationTranslators() {
         return [
             ' ' => [$this, 'translateDescendant'],
             '>' => [$this, 'translateChild'],
@@ -38,34 +37,30 @@ class CombinationExtension extends AbstractExtension
         ];
     }
 
-    public function translateDescendant(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
-    {
+    public function translateDescendant(XPathExpr $xpath, XPathExpr $combinedXpath) {
         return $xpath->join('/descendant-or-self::*/', $combinedXpath);
     }
 
-    public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
-    {
+    public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath) {
         return $xpath->join('/', $combinedXpath);
     }
 
-    public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
-    {
+    public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath) {
         return $xpath
-            ->join('/following-sibling::', $combinedXpath)
-            ->addNameTest()
-            ->addCondition('position() = 1');
+                        ->join('/following-sibling::', $combinedXpath)
+                        ->addNameTest()
+                        ->addCondition('position() = 1');
     }
 
-    public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
-    {
+    public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath) {
         return $xpath->join('/following-sibling::', $combinedXpath);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
-    {
+    public function getName() {
         return 'combination';
     }
+
 }
