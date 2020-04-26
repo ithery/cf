@@ -14,6 +14,7 @@ class CElement_Component_FileManager extends CElement_Component {
     protected $disk = null;
     protected $rootPath = null;
     protected $theme = null;
+    protected $asPicker = false;
     public function __construct($id = "") {
         parent::__construct($id);
 
@@ -41,6 +42,10 @@ class CElement_Component_FileManager extends CElement_Component {
     
     public function setTheme($theme) {
         $this->theme= $theme;
+        return $this;
+    }
+    public function setAsPicker($bool=true) {
+        $this->asPicker= $bool;
         return $this;
     }
 
@@ -73,6 +78,10 @@ class CElement_Component_FileManager extends CElement_Component {
         }
         if ($this->theme != null) {
             $config['theme'] = $this->theme;
+        }
+        $config['action']=[];
+        if ($this->asPicker != null) {
+            $config['action']['use'] = true;
         }
         return $config;
     }

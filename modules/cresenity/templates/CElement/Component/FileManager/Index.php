@@ -53,8 +53,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     <nav class="bg-light fixed-bottom border-top d-none" id="actions">
         <a data-action="open" data-multiple="false"><i class="fas fa-folder-open"></i><?php echo clang::__('filemanager.btn-open'); ?></a>
-        <a data-action="preview" data-multiple="true"><i class="fas fa-images"></i><?php echo clang::__('filemanager.menu-view'); ?></a>
-        <a data-action="use" data-multiple="true"><i class="fas fa-check"></i><?php echo clang::__('filemanager.btn-confirm'); ?></a>
+        <?php if ($fm->config('action.preview')): ?>
+            <a data-action="preview" data-multiple="true"><i class="fas fa-images"></i><?php echo clang::__('filemanager.menu-view'); ?></a>
+        <?php endif; ?>
+        <?php if ($fm->config('action.use')): ?>
+            <a data-action="use" data-multiple="true"><i class="fas fa-check"></i><?php echo clang::__('filemanager.btn-confirm'); ?></a>
+        <?php endif; ?>
     </nav>
 
     <div class="d-flex flex-row">
@@ -172,56 +176,76 @@ defined('SYSPATH') OR die('No direct access allowed.');
 </div>
 <script>
     var lang = <?php echo json_encode($fm->getTranslation()); ?>;
-    var actions = [
-        // {
-        //   name: 'use',
-        //   icon: 'check',
-        //   label: 'Confirm',
-        //   multiple: true
-        // },
-        {
+    var config = {};
+    config.action = <?php echo json_encode($fm->config('action')); ?>;
+    var actions = [];
+    if (config.action.use) {
+        actions.push({
+            name: 'use',
+            icon: 'check',
+            label: 'Confirm',
+            multiple: true
+        });
+    }
+    if (config.action.use) {
+        actions.push({
             name: 'rename',
             icon: 'edit',
             label: lang['menu-rename'],
             multiple: false
-        },
-        {
+        });
+    }
+    if (config.action.use) {
+        actions.push({
             name: 'download',
             icon: 'download',
             label: lang['menu-download'],
             multiple: true
-        },
-         {
-           name: 'preview',
-           icon: 'image',
-           label: lang['menu-view'],
-           multiple: true
-         },
-        {
+        });
+    }
+    if (config.action.use) {
+        actions.push({
+            name: 'preview',
+            icon: 'image',
+            label: lang['menu-view'],
+            multiple: true
+        });
+    }
+    if (config.action.use) {
+        actions.push({
             name: 'move',
             icon: 'paste',
             label: lang['menu-move'],
             multiple: true
-        },
-//        {
-//            name: 'resize',
-//            icon: 'arrows-alt',
-//            label: lang['menu-resize'],
-//            multiple: false
-//        },
-//        {
-//            name: 'crop',
-//            icon: 'crop',
-//            label: lang['menu-crop'],
-//            multiple: false
-//        },
-        {
+        });
+    }
+    if (config.action.use) {
+        actions.push({
+            name: 'resize',
+            icon: 'arrows-alt',
+            label: lang['menu-resize'],
+            multiple: false
+        });
+    }
+    if (config.action.use) {
+        actions.push({
+            name: 'crop',
+            icon: 'crop',
+            label: lang['menu-crop'],
+            multiple: false
+        });
+    }
+    if (config.action.use) {
+        actions.push({
             name: 'trash',
             icon: 'trash',
             label: lang['menu-delete'],
             multiple: true
-        },
-    ];
+        });
+    }
+
+
+
     var sortings = [
         {
             by: 'alphabetic',
@@ -234,28 +258,23 @@ defined('SYSPATH') OR die('No direct access allowed.');
             label: lang['nav-sort-time']
         }
     ];
-</script>
-<script>
+
     var fmRoute = '<?php echo rtrim($fm->connectorUrl(), '/'); ?>';
     var show_list;
     var sort_type = 'alphabetic';
     var multi_selection_enabled = false;
     var selected = [];
     var items = [];
-
     $.fn.fab = function (options) {
         var menu = this;
         menu.addClass('fab-wrapper');
-
         var toggler = $('<a>')
                 .addClass('fab-button fab-toggle')
                 .append($('<i>').addClass('fas fa-plus'))
                 .click(function () {
                     menu.toggleClass('fab-expand');
                 });
-
         menu.append(toggler);
-
         options.buttons.forEach(function (button) {
             toggler.before(
                     $('<a>').addClass('fab-button fab-action')
@@ -268,7 +287,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     );
         });
     };
-
     $(document).ready(function () {
         $('#fab').fab({
             buttons: [
@@ -284,7 +302,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 }
             ]
         });
-
         actions.reverse().forEach(function (action) {
             $('#nav-buttons > ul').prepend(
                     $('<li>').addClass('nav-item').append(
@@ -296,7 +313,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     )
                     );
         });
-
         sortings.forEach(function (sort) {
             $('#nav-buttons .dropdown-menu').append(
                     $('<a>').addClass('dropdown-item').attr('data-sortby', sort.by)
@@ -308,7 +324,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     })
                     );
         });
-
         loadFolders();
         performFmRequest('error')
                 .done(function (response) {
@@ -320,39 +335,32 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                 );
                     });
                 });
-
         $(window).on('dragenter', function () {
             $('#uploadModal').modal('show');
         });
-
         if (usingWysiwygEditor()) {
             $('#multi_selection_toggle').hide();
         }
     });
-
 // ======================
 // ==  Navbar actions  ==
 // ======================
 
     $('#multi_selection_toggle').click(function () {
         multi_selection_enabled = !multi_selection_enabled;
-
         $('#multi_selection_toggle i')
                 .toggleClass('fa-times', multi_selection_enabled)
                 .toggleClass('fa-check-double', !multi_selection_enabled);
-
         if (!multi_selection_enabled) {
             clearSelected();
         }
     });
-
     $('#to-previous').click(function () {
         var previous_dir = getPreviousDir();
         if (previous_dir == '')
             return;
         goTo(previous_dir);
     });
-
     function toggleMobileTree(should_display) {
         if (should_display === undefined) {
             should_display = !$('#tree').hasClass('in');
@@ -363,30 +371,24 @@ defined('SYSPATH') OR die('No direct access allowed.');
     $('#show_tree').click(function (e) {
         toggleMobileTree();
     });
-
     $('#main').click(function (e) {
         if ($('#tree').hasClass('in')) {
             toggleMobileTree(false);
         }
     });
-
     $(document).on('click', '#add-folder', function () {
         dialog(lang['message-name'], '', createFolder);
     });
-
     $(document).on('click', '#upload', function () {
         $('#uploadModal').modal('show');
     });
-
     $(document).on('click', '[data-display]', function () {
         show_list = $(this).data('display');
         loadItems();
     });
-
     $(document).on('click', '[data-action]', function () {
         window[$(this).data('action')]($(this).data('multiple') ? getSelectedItems() : getOneSelectedElement());
     });
-
 // ==========================
 // ==  Multiple Selection  ==
 // ==========================
@@ -409,9 +411,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     function clearSelected() {
         selected = [];
-
         multi_selection_enabled = false;
-
         updateSelectedStyle();
     }
 
@@ -449,7 +449,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     return !item.is_file;
                 })
                 .length === 0;
-
         $('[data-action=use]').toggleClass('d-none', !(many_selected && only_file));
         $('[data-action=rename]').toggleClass('d-none', !one_selected);
         $('[data-action=preview]').toggleClass('d-none', !(many_selected && only_file));
@@ -472,7 +471,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
         goTo($(e.target).closest('a').data('path'));
         toggleMobileTree(false);
     });
-
     function goTo(new_dir) {
         $('#working_dir').val(new_dir);
         loadItems();
@@ -491,7 +489,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     .toggleClass('fa-folder-open', should_open)
                     .toggleClass('fa-folder', !should_open);
         });
-
         $('#tree .nav-item').removeClass('active');
         $('#tree [data-path="' + $('#working_dir').val() + '"]').parent('.nav-item').addClass('active');
     }
@@ -502,7 +499,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     function performFmRequest(url, parameter, type) {
         var data = defaultParameters();
-
         if (parameter != null) {
             $.each(parameter, function (key, value) {
                 data[key] = value;
@@ -539,7 +535,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
             notify(data);
         }
     };
-
     var hideNavAndShowEditor = function (data) {
         $('#nav-buttons > ul').addClass('d-none');
         var content = $('#content');
@@ -576,10 +571,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     var hasItems = items.length !== 0;
                     $('#empty').toggleClass('d-none', hasItems);
                     $('#content').html('').removeAttr('class');
-
                     if (hasItems) {
                         $('#content').addClass(response.display).addClass('preserve_actions_space');
-
                         items.forEach(function (item, index) {
                             var template = $('#item-template').clone()
                                     .removeAttr('id class')
@@ -592,7 +585,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                                             goTo(item.url);
                                         }
                                     });
-
                             if (item.thumb_url) {
                                 var image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
                             } else {
@@ -602,13 +594,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             template.find('.square').append(image);
                             template.find('.item_name').text(item.name);
                             template.find('time').text((new Date(item.time * 1000)).toLocaleString());
-
                             $('#content').append(template);
                         });
                     }
 
                     $('#nav-buttons > ul').removeClass('d-none');
-
                     $('#working_dir').val(working_dir);
                     console.log('Current working_dir : ' + working_dir);
                     var breadcrumbs = [];
@@ -623,12 +613,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             breadcrumbs.push(segment);
                         }
                     });
-
                     $('#current_folder').text(breadcrumbs[breadcrumbs.length - 1]);
                     $('#breadcrumbs > ol').html('');
                     breadcrumbs.forEach(function (breadcrumb, index) {
                         var li = $('<li>').addClass('breadcrumb-item').text(breadcrumb);
-
                         if (index === breadcrumbs.length - 1) {
                             li.addClass('active').attr('aria-current', 'page');
                         } else {
@@ -640,7 +628,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                         $('#breadcrumbs > ol').append(li);
                     });
-
                     var atRootFolder = getPreviousDir() == '';
                     $('#to-previous').toggleClass('d-none invisible-lg', atRootFolder);
                     $('#show_tree').toggleClass('d-none', !atRootFolder).toggleClass('d-block', atRootFolder);
@@ -695,9 +682,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     window.download = function (items) {
         items.forEach(function (item, index) {
             var data = defaultParameters();
-
             data['file'] = item.name;
-
             var token = getUrlParam('token');
             if (token) {
                 data['token'] = token;
@@ -720,11 +705,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
         carousel.children('.carousel-inner').html('');
         carousel.children('.carousel-indicators').html('');
         carousel.children('.carousel-indicators,.carousel-control-prev,.carousel-control-next').toggle(items.length > 1);
-
         items.forEach(function (item, index) {
             var carouselItem = imageTemplate.clone()
                     .addClass(index === 0 ? 'active' : '');
-
             if (item.thumb_url) {
                 carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
             } else {
@@ -734,19 +717,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
             carouselItem.find('.carousel-label').attr('target', '_blank').attr('href', item.url)
                     .append(item.name)
                     .append($('<i class="fas fa-external-link-alt ml-2"></i>'));
-
             carousel.children('.carousel-inner').append(carouselItem);
-
             var carouselIndicator = indicatorTemplate.clone()
                     .addClass(index === 0 ? 'active' : '')
                     .attr('data-slide-to', index);
             carousel.children('.carousel-indicators').append(carouselIndicator);
         });
-
-
         // carousel swipe control
         var touchStartX = null;
-
         carousel.on('touchstart', function (event) {
             var e = event.originalEvent;
             if (e.touches.length == 1) {
@@ -774,7 +752,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
     }
 
     window.move = function (items) {
-    
+
         performFmRequest('move', {items: items.map(function (item) {
                 return item.name;
             })}).done(refreshFoldersAndItems);
@@ -814,7 +792,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
             }
 
             parent.document.getElementById(getUrlParam('field_name')).value = url;
-
             if (typeof parent.tinyMCE !== "undefined") {
                 parent.tinyMCE.activeEditor.windowManager.close();
             }
@@ -850,16 +827,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
         }
 
         var url = items[0].url;
+
+        if (typeof cresenity.fileManager !== 'undefined') {
+            if (cresenity.fileManager.haveCallback('use')) {
+                return cresenity.fileManager.doCallback('use', url);
+            }
+            
+        }
+
         var callback = getUrlParam('callback');
         var useFileSucceeded = true;
-
         if (usingWysiwygEditor()) {
             useTinymce3(url);
-
             useTinymce4AndColorbox(url);
-
             useCkeditor3(url);
-
             useFckeditor2(url);
         } else if (callback && window[callback]) {
             window[callback](getSelectedItems());
@@ -967,7 +948,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     if (cresenity.isJson(response)) {
                         json = JSON.parse(response);
                         this.defaultOptions.error(file, json.join('\n'));
-
                     } else {
                         this.defaultOptions.error(file, response);
                     }
@@ -980,6 +960,15 @@ defined('SYSPATH') OR die('No direct access allowed.');
         acceptedFiles: "<?php echo implode(',', $fm->availableMimeTypes()); ?>",
         maxFilesize: (<?php echo $fm->maxUploadSize(); ?> / 1000)
     });
+
+    var fileManagerOptions = {
+        config: config,
+        lang: lang,
+
+    };
+    cresenity.fileManager = new CFileManager(fileManagerOptions);
+
+
 
 
 </script>

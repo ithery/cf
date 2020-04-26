@@ -23,7 +23,7 @@ return [
      */
     'allow_multi_user' => true,
     'allow_share_folder' => true,
-    'user_folder'=>true,
+    'user_folder' => true,
     /*
       |--------------------------------------------------------------------------
       | Folder Names
@@ -156,5 +156,15 @@ return [
      */
     'php_ini_overrides' => [
         'memory_limit' => '256M',
+    ],
+    'action' => [
+        'use' => false,
+        'preview' => true,
+        'download' => true,
+        'resize' => true,
+        'move' => true,
+        'rename' => true,
+        'delete' => true,
+        'crop' => false,
     ],
 ];
