@@ -21,16 +21,15 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @internal
  */
-class AttributeNode extends AbstractNode
-{
+class AttributeNode extends AbstractNode {
+
     private $selector;
     private $namespace;
     private $attribute;
     private $operator;
     private $value;
 
-    public function __construct(NodeInterface $selector, ?string $namespace, string $attribute, string $operator, ?string $value)
-    {
+    public function __construct(NodeInterface $selector, $namespace, $attribute, $operator, $value) {
         $this->selector = $selector;
         $this->namespace = $namespace;
         $this->attribute = $attribute;
@@ -38,48 +37,40 @@ class AttributeNode extends AbstractNode
         $this->value = $value;
     }
 
-    public function getSelector(): NodeInterface
-    {
+    public function getSelector() {
         return $this->selector;
     }
 
-    public function getNamespace(): ?string
-    {
+    public function getNamespace() {
         return $this->namespace;
     }
 
-    public function getAttribute(): string
-    {
+    public function getAttribute() {
         return $this->attribute;
     }
 
-    public function getOperator(): string
-    {
+    public function getOperator() {
         return $this->operator;
     }
 
-    public function getValue(): ?string
-    {
+    public function getValue() {
         return $this->value;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSpecificity(): Specificity
-    {
+    public function getSpecificity() {
         return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __toString(): string
-    {
-        $attribute = $this->namespace ? $this->namespace.'|'.$this->attribute : $this->attribute;
+    public function __toString() {
+        $attribute = $this->namespace ? $this->namespace . '|' . $this->attribute : $this->attribute;
 
-        return 'exists' === $this->operator
-            ? sprintf('%s[%s[%s]]', $this->getNodeName(), $this->selector, $attribute)
-            : sprintf("%s[%s[%s %s '%s']]", $this->getNodeName(), $this->selector, $attribute, $this->operator, $this->value);
+        return 'exists' === $this->operator ? sprintf('%s[%s[%s]]', $this->getNodeName(), $this->selector, $attribute) : sprintf("%s[%s[%s %s '%s']]", $this->getNodeName(), $this->selector, $attribute, $this->operator, $this->value);
     }
+
 }
