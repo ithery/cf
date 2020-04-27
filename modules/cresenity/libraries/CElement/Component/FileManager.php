@@ -15,6 +15,7 @@ class CElement_Component_FileManager extends CElement_Component {
     protected $rootPath = null;
     protected $theme = null;
     protected $asPicker = false;
+
     public function __construct($id = "") {
         parent::__construct($id);
 
@@ -39,13 +40,14 @@ class CElement_Component_FileManager extends CElement_Component {
         $this->rootPath = $path;
         return $this;
     }
-    
+
     public function setTheme($theme) {
-        $this->theme= $theme;
+        $this->theme = $theme;
         return $this;
     }
-    public function setAsPicker($bool=true) {
-        $this->asPicker= $bool;
+
+    public function setAsPicker($bool = true) {
+        $this->asPicker = $bool;
         return $this;
     }
 
@@ -63,8 +65,8 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
         CManager::instance()->asset()->module()->registerRunTimeModule('dropzone');
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
-        CManager::registerCss('element/filemanager/fm.css?v=2');
-        CManager::registerJs('element/filemanager/fm.js?v=1');
+        CManager::registerCss('element/filemanager/fm.css?v=2' . uniqid());
+        CManager::registerJs('element/filemanager/fm.js?v=1' . uniqid());
         $this->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
     }
 
@@ -79,8 +81,18 @@ class CElement_Component_FileManager extends CElement_Component {
         if ($this->theme != null) {
             $config['theme'] = $this->theme;
         }
-        $config['action']=[];
+        $config['action'] = [
+            'use' => false,
+            'preview' => true,
+            'download' => true,
+            'resize' => true,
+            'move' => true,
+            'rename' => true,
+            'delete' => true,
+            'crop' => false,
+        ];
         if ($this->asPicker != null) {
+
             $config['action']['use'] = true;
         }
         return $config;

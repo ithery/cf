@@ -28,6 +28,7 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     public function config($key, $default = null) {
+        
         return carr::get($this->config, $key, CF::config('filemanager.' . $key, $default));
     }
 
@@ -120,7 +121,7 @@ class CManager_File_Connector_FileManager_FM {
         $type_key = $this->currentFmType();
         $startup_view = $this->config('folder_categories.' . $type_key . '.startup_view');
         $view_type = 'grid';
-        $target_display_type = $this->input('show_list') ?: $startup_view;
+        $target_display_type = $this->input('showList') ?: $startup_view;
         if (in_array($target_display_type, ['list', 'grid'])) {
             $view_type = $target_display_type;
         }

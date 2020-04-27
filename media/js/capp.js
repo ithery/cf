@@ -1048,6 +1048,7 @@ var Cresenity = function () {
             backdrop: 'static',
             modalClass: false,
             onClose: false,
+            appendTo:false,
             footerAction: {}
         }, options);
 
@@ -1089,8 +1090,13 @@ var Cresenity = function () {
             modalContent.append(modalFooter);
         }
         modalContent.append(modalBody);
-        $('body').append(modalContainer);
-
+        
+        var appendTo = settings.appendTo;
+        if(typeof appendTo == 'undefined' || !appendTo) {
+            appendTo = $('body');
+        }
+        modalContainer.appendTo(appendTo);
+        
         modalContainer.on('hidden.bs.modal', function (e) {
             if (cresenity.modalElements.length > 0) {
                 var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];

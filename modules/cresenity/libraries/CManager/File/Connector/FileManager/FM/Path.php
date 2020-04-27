@@ -181,7 +181,7 @@ class CManager_File_Connector_FileManager_FM_Path {
      * @return array of object
      */
     public function sortByColumn($arr_items) {
-        $sortBy = $this->helper->input('sort_type');
+        $sortBy = $this->helper->input('sortType');
         if (in_array($sortBy, ['name', 'time'])) {
             $keyToSort = $sortBy;
         } else {
