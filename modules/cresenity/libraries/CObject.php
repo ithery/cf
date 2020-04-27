@@ -77,14 +77,6 @@ class CObject {
         return $this->domain;
     }
 
-    static public function isInstanceof($value) {
-        CCollector::deprecated();
-        if (is_object($value)) {
-            return ($value instanceof CObject);
-        }
-        return false;
-    }
-
     public function isUseTrait($trait) {
         $traits = c::classUsesRecursive(get_class($this));
         return isset($traits[$trait]);

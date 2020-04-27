@@ -51,7 +51,7 @@ abstract class CObservable extends CRenderable {
         parent::__construct($id);
         $this->listeners = array();
         $manager = CManager::instance();
-        
+
         $manager->registerControl('text', 'CElement_FormInput_Text');
         $manager->registerControl('number', 'CElement_FormInput_Number');
         $manager->registerControl('email', 'CElement_FormInput_Email');
@@ -125,10 +125,10 @@ abstract class CObservable extends CRenderable {
             $control = $id;
         }
         if ($control == null) {
-            if ($this->manager->isRegisteredControl($type)) {
-                $control = $this->manager->createControl($id, $type);
+            if (CManager::instance()->isRegisteredControl($type)) {
+                $control = CManager::instance()->createControl($id, $type);
             } else {
-                trigger_error('Unknown control type ' . $type);
+                throw new CException('Unknown control type :type', [':type' => $type]);
             }
         }
 
@@ -253,10 +253,10 @@ abstract class CObservable extends CRenderable {
 
     public function addElement($type, $id = "") {
         $element = null;
-        if ($this->manager->isRegisteredElement($type)) {
-            $element = $this->manager->createElement($id, $type);
+        if (CManager::instance()->isRegisteredElement($type)) {
+            $element = CManager::instance()->createElement($id, $type);
         } else {
-            throw new CException('Unknow element type :element_type', array(':element_type' => $type));
+            throw new CException('Unknow element type :elementType', array(':elementType' => $type));
         }
 
 
@@ -311,12 +311,24 @@ abstract class CObservable extends CRenderable {
         return $icon;
     }
 
+    /**
+     * 
+     * @param type $id
+     * @return type
+     * @deprecated
+     */
     public function addPieChart($id = "") {
         $pie_chart = CPieChartElement::factory($id);
         $this->add($pie_chart);
         return $pie_chart;
     }
 
+    /**
+     * 
+     * @param type $id
+     * @return type
+     * @deprecated
+     */
     public function addDashboard($id = "") {
         $dashboard = CDashboard::factory($id);
         $this->add($dashboard);
@@ -332,13 +344,6 @@ abstract class CObservable extends CRenderable {
         foreach ($this->listeners as $listener) {
             $listener->set_handler_url_param($param);
         }
-    }
-
-    public static function is_instanceof($value) {
-        if (is_object($value)) {
-            return ($value instanceof CObject);
-        }
-        return false;
     }
 
     public function js($indent = 0) {

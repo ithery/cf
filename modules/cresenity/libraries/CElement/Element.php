@@ -85,13 +85,6 @@ abstract class CElement_Element extends CElement {
         return $html_attr;
     }
 
-    public static function is_instanceof($val) {
-        if (is_object($val)) {
-            return ($val instanceof CElement_Element);
-        }
-        return false;
-    }
-
     protected function buildOnce() {
         //just build once
         if (!$this->isBuilded) {

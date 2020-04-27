@@ -184,13 +184,6 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         }
     }
 
-    public static function isInstanceof($value) {
-        if (is_object($value)) {
-            return ($value instanceof CRenderable);
-        }
-        return false;
-    }
-
     public function toArray() {
         $arrays = array();
         foreach ($this->renderable as $r) {

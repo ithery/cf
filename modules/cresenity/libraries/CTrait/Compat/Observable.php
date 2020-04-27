@@ -204,10 +204,6 @@ trait CTrait_Compat_Observable {
         return $this->setHandlerUrlParam($param);
     }
 
-    public static function is_instanceof($value) {
-        return $this->isInstanceof($value);
-    }
-
     /**
      * 
      * @deprecated since version 1.2, please use function regenerateId
