@@ -93,7 +93,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
   
 
     $('.btn-cropper-perform-crop').click(function (e) {
-        performFmRequest('cropImage', {
+        window.cfm.performFmRequest('cropImage', {
             img: $("#img").val(),
             working_dir: $("#working_dir").val(),
             dataX: $("#dataX").val(),
@@ -101,11 +101,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
             dataHeight: $("#dataHeight").val(),
             dataWidth: $("#dataWidth").val(),
             type: $('#type').val()
-        }).done(loadItems);
+        }).done(window.cfm.loadItems);
 
     });
     $('.btn-cropper-perform-crop-new').click(function (e) {
-        performFmRequest('cropNewImage', {
+        window.cfm.performFmRequest('cropNewImage', {
             img: $("#img").val(),
             working_dir: $("#working_dir").val(),
             dataX: $("#dataX").val(),
@@ -113,9 +113,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
             dataHeight: $("#dataHeight").val(),
             dataWidth: $("#dataWidth").val(),
             type: $('#type').val()
-        }).done(loadItems);
+        }).done(window.cfm.loadItems);
     });
     $('.btn-cropper-load-items').click(function(e){
-        loadItems();
+        window.cfm.loadItems();
     });
 </script>

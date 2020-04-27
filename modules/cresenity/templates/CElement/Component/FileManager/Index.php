@@ -260,16 +260,20 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     var fmRoute = '<?php echo rtrim($fm->connectorUrl(), '/'); ?>';
 
-    
-   
-    
+
+    var acceptedFiles = '<?php echo implode(',', $fm->availableMimeTypes()); ?>';
+    var maxFilesize = '<?php echo $fm->maxUploadSize(); ?>';
+
+
 
     var fileManagerOptions = {
         config: config,
         lang: lang,
-        actions:actions,
-        sortings:sortings,
+        actions: actions,
+        sortings: sortings,
         connectorUrl: fmRoute,
+        acceptedFiles: acceptedFiles,
+        maxFilesize: maxFilesize,
     };
     cresenity.fileManager = new CFileManager(fileManagerOptions);
 

@@ -40,10 +40,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
         $("#items").find("input").each(function () {
             items.push(this.id)
         });
-        performFmRequest('doMove', {
+        window.cfm.performFmRequest('doMove', {
             items: items,
             goToFolder: folder
-        }).done(refreshFoldersAndItems);
+        }).done(window.cfm.refreshFoldersAndItems);
     });
 
 </script>

@@ -494,11 +494,11 @@ var CFileManager = function (options) {
 // ======================
 
     $('#multi_selection_toggle').click(() => {
-        this.multiSelectionEnabled = !multiSelectionEnabled;
+        this.multiSelectionEnabled = !this.multiSelectionEnabled;
         $('#multi_selection_toggle i')
                 .toggleClass('fa-times', this.multiSelectionEnabled)
                 .toggleClass('fa-check-double', !this.multiSelectionEnabled);
-        if (!multiSelectionEnabled) {
+        if (!this.multiSelectionEnabled) {
             this.clearSelected();
         }
     });
@@ -569,14 +569,14 @@ var CFileManager = function (options) {
                 )
                 );
     });
-    this.settings.sortings.forEach(function (sort) {
+    this.settings.sortings.forEach( (sort) => {
         $('#nav-buttons .dropdown-menu').append(
                 $('<a>').addClass('dropdown-item').attr('data-sortby', sort.by)
                 .append($('<i>').addClass('fas fa-fw fa-' + sort.icon))
                 .append($('<span>').text(sort.label))
-                .click(function () {
-                    sort_type = sort.by;
-                    loadItems();
+                .click( () => {
+                    cfm.sortType = sort.by;
+                    cfm.loadItems();
                 })
                 );
     });
@@ -597,7 +597,33 @@ var CFileManager = function (options) {
     if (this.usingWysiwygEditor()) {
         $('#multi_selection_toggle').hide();
     }
-
+    new Dropzone("#uploadForm", {
+        paramName: "upload[]", // The name that will be used to transfer the file
+        uploadMultiple: false,
+        parallelUploads: 5,
+        clickable: '#upload-button',
+        dictDefaultMessage: this.settings.lang['message-drop'],
+        init: function () {
+            var _this = this; // For the closure
+            this.on('success', function (file, response) {
+                if (response == 'OK') {
+                    cfm.loadFolders();
+                } else {
+                    if (cresenity.isJson(response)) {
+                        json = JSON.parse(response);
+                        this.defaultOptions.error(file, json.join('\n'));
+                    } else {
+                        this.defaultOptions.error(file, response);
+                    }
+                }
+            });
+        },
+        headers: {
+            'Authorization': 'Bearer ' + this.getUrlParam('token')
+        },
+        acceptedFiles: this.settings.acceptedFiles,
+        maxFilesize: (this.settings.maxFilesize / 1000)
+    });
 
 }
 
