@@ -29,9 +29,7 @@ class CObject {
             return $this->$key;
         }
 
-        // normal __get() code here
         throw new CException('Cannot access private property :class::$:key', array(':class' => __CLASS__, ':key' => $key));
-        //trigger_error(, E_USER_ERROR);
     }
 
     public function __set($key, $value) {
@@ -40,9 +38,7 @@ class CObject {
             return $this->$key = $value;
         }
 
-        // normal __set() code here
-
-        trigger_error('Cannot access private property ' . get_called_class() . '::$' . $key, E_USER_ERROR);
+        throw new CException('Cannot access private property :class::$:key', array(':class' => get_called_class(), ':key' => $key));
     }
 
     protected function __construct($id = "") {
@@ -90,8 +86,8 @@ class CObject {
     }
 
     public function isUseTrait($trait) {
-        $traits = CF::class_uses_recursive(get_class($this));
-        return $traits[$trait];
+        $traits = c::classUsesRecursive(get_class($this));
+        return isset($traits[$trait]);
     }
 
 }
