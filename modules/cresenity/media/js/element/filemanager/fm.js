@@ -399,6 +399,104 @@ var CFileManager = function (options) {
             }, index * 100);
         });
     }
+    this.controllerMethod.use =  (items)=> {
+        function useTinymce3(url) {
+            if (!usingTinymce3()) {
+                return;
+            }
+
+            var win = tinyMCEPopup.getWindowArg("window");
+            win.document.getElementById(tinyMCEPopup.getWindowArg("input")).value = url;
+            if (typeof (win.ImageDialog) != "undefined") {
+                // Update image dimensions
+                if (win.ImageDialog.getImageData) {
+                    win.ImageDialog.getImageData();
+                }
+
+                // Preview if necessary
+                if (win.ImageDialog.showPreviewImage) {
+                    win.ImageDialog.showPreviewImage(url);
+                }
+            }
+            tinyMCEPopup.close();
+        }
+
+        function useTinymce4AndColorbox(url) {
+            if (!usingTinymce4AndColorbox()) {
+                return;
+            }
+
+            parent.document.getElementById(getUrlParam('field_name')).value = url;
+            if (typeof parent.tinyMCE !== "undefined") {
+                parent.tinyMCE.activeEditor.windowManager.close();
+            }
+            if (typeof parent.$.fn.colorbox !== "undefined") {
+                parent.$.fn.colorbox.close();
+            }
+        }
+
+        function useCkeditor3(url) {
+            if (!usingCkeditor3()) {
+                return;
+            }
+
+            if (window.opener) {
+                // Popup
+                window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), url);
+            } else {
+                // Modal (in iframe)
+                parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), url);
+                parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorCleanUpFuncNum'));
+            }
+        }
+
+        function useFckeditor2(url) {
+            if (!usingFckeditor2()) {
+                return;
+            }
+
+            var p = url;
+            var w = data['Properties']['Width'];
+            var h = data['Properties']['Height'];
+            window.opener.SetUrl(p, w, h);
+        }
+
+        var url = items[0].url;
+
+        if (typeof cresenity.fileManager !== 'undefined') {
+            if (cresenity.fileManager.haveCallback('use')) {
+                return cresenity.fileManager.doCallback('use', url);
+            }
+            
+        }
+
+        var callback = cfm.getUrlParam('callback');
+        var useFileSucceeded = true;
+        if (cfm.usingWysiwygEditor()) {
+            useTinymce3(url);
+            useTinymce4AndColorbox(url);
+            useCkeditor3(url);
+            useFckeditor2(url);
+        } else if (callback && window[callback]) {
+            window[callback](getSelectedItems());
+        } else if (callback && parent[callback]) {
+            parent[callback](getSelecteditems());
+        } else if (window.opener) { // standalone button or other situations
+            window.opener.SetUrl(getSelectedItems());
+        } else {
+            useFileSucceeded = false;
+        }
+
+        if (useFileSucceeded) {
+            if (window.opener) {
+                window.close();
+            }
+        } else {
+            console.log('window.opener not found');
+            // No editor found, open/download file using browser's default method
+            window.open(url);
+        }
+    }
 
     this.loadItems = () => {
         this.loading(true);
