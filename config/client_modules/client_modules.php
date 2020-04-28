@@ -537,6 +537,9 @@ return array(
     "themify-icons" => array(
         "css" => array("icon/themify-icons.css"),
     ),
+    "material-design-iconic-font" => array(
+        "css" => array("icon/material-design-iconic-font.min.css"),
+    ),
     "open-ionic" => array(
         "css" => array("icon/open-ionic.css"),
     ),
