@@ -13,6 +13,8 @@
 
 .capp-fm #nav, .capp-fm #nav .dropdown-menu, .capp-fm .bg-main {
     background-color: #333844;
+    height: 40px;
+    border-radius: 4px;
 }
 
 .capp-fm #nav .dropdown-menu > a:hover {
@@ -54,13 +56,14 @@
 
 .capp-fm #main {
     width: 100%;
+    padding: 0px;
 }
 
 @media screen and (min-width: 992px) {
     .capp-fm #main {
-        width: calc(100% - 300px);
+        width: calc(100% - 250px);
         /*margin-left: 1rem;*/
-        padding: 1rem;
+        /*padding: 1rem;*/
     }
 
     .capp-fm .invisible-lg {
@@ -70,7 +73,8 @@
 
 .capp-fm #tree {
     background-color: white;
-    width: 300px;
+    width: 250px;
+    border-right: 1px solid rgba(51,56,68,0.1);
 }
 
 @media screen and (max-width: 991px) {
@@ -176,18 +180,20 @@
 /* Sidebar */
 
 .capp-fm .nav-pills > .nav-item > .nav-link {
-    height: 5rem;
+    height: auto;
     display: flex;
     align-items: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .capp-fm .nav-pills > .sub-item > .nav-link {
-    height: 3rem;
-    padding-left: 3rem;
+    height: auto;
+    padding-left: 30px;
 }
 
 .capp-fm .nav-pills > li.active > a, .capp-fm .nav-pills > li:hover > a {
-    background-color: #ddd;
+    background-color: rgba(51,56, 68, 0.1);
     border-radius: 0;
     color: #333844;
 }
@@ -221,27 +227,40 @@
 }
 
 .capp-fm .list a {
-    border-top: 1px solid rgb(221, 221, 221);
+    /*border-top: 1px solid rgb(221, 221, 221);*/
     padding: 5px;
     margin-top: 0;
     display: flex;
     flex-direction: row;
 }
 
-.capp-fm .list a:last-child {
-    border-bottom: 1px solid rgb(221, 221, 221);
+.capp-fm .list a:first-child {
+    border-top: none;
 }
-
+.capp-fm .list a:last-child {
+    /*border-bottom: 1px solid rgb(221, 221, 221);*/
+}
+.capp-fm .list a:nth-child(odd) {
+    
+}
+.capp-fm .list a:nth-child(even) {
+    background-color: rgba(51, 56, 68, 0.04);
+}
 .capp-fm .grid .square {
-    border: 1px solid rgb(221, 221, 221);
+    border-left: 1px solid rgba(221, 221, 221, 0.5);
+    border-top: 1px solid rgba(221, 221, 221, 0.5);
+    border-right: 1px solid rgba(221, 221, 221, 0.5);
     width: 135px;
     height: 135px;
 }
 
 .capp-fm .list .square {
-    margin-right: 1rem;
-    width: 70px;
-    height: 70px;
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+}
+.capp-fm .list .info {
+    line-height: 1.3;
 }
 
 .capp-fm .square > div {
@@ -275,7 +294,7 @@
 }
 
 .capp-fm .grid .item_name {
-    border: 1px solid rgb(221, 221, 221);
+    border: 1px solid rgba(221, 221, 221, 0.5);
     border-top: none;
     margin-top: -1px;
     padding: 10px;
@@ -284,12 +303,11 @@
 }
 
 .capp-fm .list .item_name {
-    font-size: 1.25rem;
-    padding: 5px 0 5px;
+    font-size: .9rem;
 }
 
 .capp-fm time {
-    font-size: .9rem;
+    font-size: .8rem;
 }
 
 .capp-fm .grid time {
