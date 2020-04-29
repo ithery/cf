@@ -1199,7 +1199,7 @@ class CDatabase {
      *
      * @return  array
      */
-    public function list_tables() {
+    public function listTables() {
         $this->link or $this->connect();
 
         return $this->driver->list_tables();
@@ -1212,11 +1212,11 @@ class CDatabase {
      * @param   boolean  True to attach table prefix
      * @return  boolean
      */
-    public function table_exists($table_name, $prefix = TRUE) {
-        if ($prefix)
+    public function tableExists($table_name, $prefix = TRUE) {
+        if ($prefix) {
             return in_array($this->config['table_prefix'] . $table_name, $this->list_tables());
-        else
-            return in_array($table_name, $this->list_tables());
+        } 
+        return in_array($table_name, $this->list_tables());
     }
 
     /**
@@ -1266,7 +1266,7 @@ class CDatabase {
      * @param   string  table name
      * @return  array
      */
-    public function list_fields($table = '') {
+    public function listFields($table = '') {
         $this->link or $this->connect();
 
         return $this->driver->list_fields($this->config['table_prefix'] . $table);
@@ -1288,7 +1288,7 @@ class CDatabase {
      * @param   string  string to escape
      * @return  string
      */
-    public function escape_str($str) {
+    public function escapeStr($str) {
         return $this->driver->escape_str($str);
     }
 
@@ -1298,7 +1298,7 @@ class CDatabase {
      * @param   string  string to escape
      * @return  string
      */
-    public function escape_table($table) {
+    public function escapeTable($table) {
         return $this->driver->escape_table($table);
     }
 
@@ -1308,7 +1308,7 @@ class CDatabase {
      * @param   string  string to escape
      * @return  string
      */
-    public function escape_column($table) {
+    public function escapeColumn($table) {
         return $this->driver->escape_column($table);
     }
 
