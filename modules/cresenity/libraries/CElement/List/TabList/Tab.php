@@ -43,7 +43,8 @@ class CElement_List_TabList_Tab extends CElement_Element {
     }
 
     public function setActive($bool = true) {
-        if($bool) {
+        if($bool && $this->tabList) {
+            
             $this->tabList->setActiveTab($this->id);
         }
         $this->active = $bool;
