@@ -246,17 +246,17 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a sub-query count clause to this query.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  CDatabase_Query_Builder $query
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
      * @return $this
      */
-    protected function addWhereCountQuery(QueryBuilder $query, $operator = '>=', $count = 1, $boolean = 'and') {
+    protected function addWhereCountQuery(CDatabase_Query_Builder $query, $operator = '>=', $count = 1, $boolean = 'and') {
         $this->query->addBinding($query->getBindings(), 'where');
 
         return $this->where(
-                        new Expression('(' . $query->toSql() . ')'), $operator, is_numeric($count) ? new Expression($count) : $count, $boolean
+                        new CDatabase_Query_Expression('(' . $query->toSql() . ')'), $operator, is_numeric($count) ? new CDatabase_Query_Expression($count) : $count, $boolean
         );
     }
 

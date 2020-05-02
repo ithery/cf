@@ -1398,6 +1398,7 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     protected function invalidOperator($operator) {
+        
         return !in_array(strtolower($operator), $this->operators, true) &&
                 !in_array(strtolower($operator), $this->grammar->getOperators(), true);
     }
