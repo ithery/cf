@@ -52,29 +52,29 @@ class CPeriod {
     public static function thisWeek() {
         $startDate = CCarbon::now()->modify('this week');
         $endDate = CCarbon::now()->modify('this week +6 days');
-        
+
         $startDate->hour = 0;
         $startDate->minute = 0;
         $startDate->second = 0;
-        
+
         $endDate->hour = 23;
         $endDate->minute = 59;
         $endDate->second = 59;
-        
+
         return new static($startDate, $endDate);
     }
 
     public static function lastWeek() {
         $startDate = CCarbon::now()->modify('last week');
         $endDate = CCarbon::now()->modify('last week +6 days');
-        
+
         $startDate->hour = 0;
         $startDate->minute = 0;
         $startDate->second = 0;
-        
+
         $endDate->hour = 23;
         $endDate->minute = 59;
-        $endDate->second = 59;        
+        $endDate->second = 59;
 
         return new static($startDate, $endDate);
     }
@@ -82,11 +82,11 @@ class CPeriod {
     public static function thisMonth() {
         $startDate = CCarbon::now()->modify('first day of this month');
         $endDate = CCarbon::now()->modify('last day of this month');
-        
+
         $startDate->hour = 0;
         $startDate->minute = 0;
         $startDate->second = 0;
-        
+
         $endDate->hour = 23;
         $endDate->minute = 59;
         $endDate->second = 59;
@@ -101,21 +101,21 @@ class CPeriod {
         $startDate->hour = 0;
         $startDate->minute = 0;
         $startDate->second = 0;
-        
+
         $endDate->hour = 23;
         $endDate->minute = 59;
         $endDate->second = 59;
 
         return new static($startDate, $endDate);
     }
-    
+
     public static function untilDateNow() {
-        $startDate =  CCarbon::createFromTimestamp(0);
+        $startDate = CCarbon::createFromTimestamp(0);
         $endDate = CCarbon::now();
         $startDate->hour = 0;
         $startDate->minute = 0;
         $startDate->second = 0;
-        
+
         $endDate->hour = 23;
         $endDate->minute = 59;
         $endDate->second = 59;
@@ -151,6 +151,10 @@ class CPeriod {
 
     public function getStartDate() {
         return $this->startDate;
+    }
+
+    public function toArray() {
+        return [$this->startDate, $this->endDate];
     }
 
 }
