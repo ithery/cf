@@ -29,9 +29,49 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
 
         $reloadOptions = array();
-        $this->reloadTableService($tableServiceDiv, $reloadOptions);
+        static::reloadTabService($tableServiceDiv, $reloadOptions);
 
         echo $app->render();
+    }
+
+    public static function reloadTabService($container = null, $options = array()) {
+        $app = $container;
+        if ($container == null) {
+            $app = CApp::instance();
+        }
+        $daemonManager = CManager_Daemon::instance();
+        $request = $options;
+        if ($request == null) {
+            $request = CApp_Base::getRequest();
+        }
+        $db = CDatabase::instance();
+        $listService = $daemonManager->daemons();
+        $dataService = array();
+        $groupTab = carr::get($_GET, 'group');
+        if ($daemonManager->haveGroup()) {
+            $tabList = $app->addTabList()->setAjax(false);
+            $groupKeys = $daemonManager->getGroupsKey();
+            $notGrouped = $daemonManager->daemons(false);
+            if (count($notGrouped) > 0) {
+                $tab = $tabList->addTab()->setLabel('Not Grouped');
+                static::reloadTableService($tab, ['group' => false]);
+            }
+            foreach ($groupKeys as $groupName) {
+                $tab = $tabList->addTab()->setLabel($groupName);
+                if ($groupTab == $groupName) {
+                    $tab->setActive();
+                }
+
+                static::reloadTableService($tab, ['group' => $groupName]);
+            }
+        } else {
+            $div = $app->addDiv();
+            static::reloadTableService($div);
+        }
+
+        if ($container == null) {
+            echo $app->render();
+        }
     }
 
     public static function reloadTableService($container = null, $options = array()) {
@@ -39,12 +79,14 @@ trait CTrait_Controller_Application_Manager_Daemon {
         if ($container == null) {
             $app = CApp::instance();
         }
+        $daemonManager = CManager_Daemon::instance();
         $request = $options;
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
         $db = CDatabase::instance();
-        $listService = CManager::getRegisteredDaemon();
+        $group = carr::get($request, 'group');
+        $listService = $daemonManager->daemons($group);
         $dataService = array();
         foreach ($listService as $kService => $vService) {
             $dService = array();
@@ -63,15 +105,20 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $table->setRowActionStyle('btn-dropdown');
 
 
+        $groupQueryString = '';
+        if (strlen($group) > 0) {
+            $groupQueryString = '?group=' . $group;
+        }
+
         $actMonitor = $table->addRowAction();
         $actMonitor->setIcon("fas fa-file")->setLabel('Log');
-        $actMonitor->setLink(static::controllerUrl() . 'log/index/{service_class}');
+        $actMonitor->setLink(static::controllerUrl() . 'log/index/{service_class}' . $groupQueryString);
         $actStart = $table->addRowAction();
         $actStart->setIcon("fas fa-play")->setLabel('Start');
-        $actStart->setLink(static::controllerUrl() . 'start/{service_class}')->setConfirm();
+        $actStart->setLink(static::controllerUrl() . 'start/{service_class}' . $groupQueryString)->setConfirm();
         $actStop = $table->addRowAction();
         $actStop->setIcon("fas fa-stop")->setLabel('Stop');
-        $actStop->setLink(static::controllerUrl() . 'stop/{service_class}')->setConfirm();
+        $actStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString)->setConfirm();
 
         if ($container == null) {
             echo $app->render();
@@ -92,6 +139,8 @@ trait CTrait_Controller_Application_Manager_Daemon {
     public function start($serviceClass) {
         $errCode = 0;
         $errMessage = '';
+
+
         try {
             $started = CManager::daemon()->start($serviceClass);
         } catch (Exception $ex) {
@@ -103,12 +152,13 @@ trait CTrait_Controller_Application_Manager_Daemon {
         } else {
             cmsg::add('error', $errMessage);
         }
-        curl::redirect($this->controllerUrl());
+        curl::redirect($this->controllerUrl() . static::groupQueryString());
     }
 
     public function stop($serviceClass) {
         $errCode = 0;
         $errMessage = '';
+        $group = carr::get($_GET, 'group');
         try {
             $started = CManager::daemon()->stop($serviceClass);
         } catch (Exception $ex) {
@@ -121,13 +171,14 @@ trait CTrait_Controller_Application_Manager_Daemon {
             cmsg::add('error', $errMessage);
         }
 
-        curl::redirect($this->controllerUrl());
+        curl::redirect($this->controllerUrl() . static::groupQueryString());
     }
 
     public function log() {
         $args = func_get_args();
         $method = carr::get($args, 0);
         $logArgs = array_slice($args, 1);
+
         switch ($method) {
             case 'index':
                 return call_user_func_array([$this, 'logIndex'], $logArgs);
@@ -142,7 +193,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
                 return call_user_func_array([$this, 'logDump'], $logArgs);
                 break;
             case 'back':
-                curl::redirect($this->controllerUrl());
+                curl::redirect($this->controllerUrl() . static::groupQueryString());
                 break;
         }
     }
@@ -153,20 +204,20 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
         $app = CApp::instance();
         $db = CDatabase::instance();
-
+        $group = carr::get($_GET, 'group');
         $app->addBreadcrumb($this->getTitle(), static::controllerUrl());
         $app->title(CManager::daemon()->getServiceName($serviceClass));
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
-        $restartAction = $actionContainer->addAction()->setLabel('Restart')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/restart/' . $serviceClass)->setConfirm();
-        $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() );
-        $rotateAction = $actionContainer->addAction()->setLabel('Dump Status')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/dump/' . $serviceClass)->setConfirm();
+        $restartAction = $actionContainer->addAction()->setLabel('Restart')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/restart/' . $serviceClass . static::groupQueryString())->setConfirm();
+        $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() . static::groupQueryString());
+        $rotateAction = $actionContainer->addAction()->setLabel('Dump Status')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/dump/' . $serviceClass . static::groupQueryString())->setConfirm();
 
 
         $logFileList = CManager::daemon()->getLogFileList($serviceClass);
         $tabList = $app->addTabList()->setAjax(true);
         $logFile = CManager::daemon()->getLogFile($serviceClass);
         $basename = basename($logFile);
-        if(file_exists($logFile)) {
+        if (file_exists($logFile)) {
             $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
         }
         for ($i = 1; $i <= 10; $i++) {
@@ -183,10 +234,10 @@ trait CTrait_Controller_Application_Manager_Daemon {
     }
 
     public function logFile($serviceClass = null, $filename = null) {
-        
+
         $app = CApp::instance();
         $db = CDatabase::instance();
-        $logFile = CManager::daemon()->getLogFile($serviceClass,$filename);
+        $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
 
         $divLog = $app->addDiv()->addClass('console');
         $log = '';
@@ -198,9 +249,11 @@ trait CTrait_Controller_Application_Manager_Daemon {
     }
 
     public function logRestart($serviceClass = null) {
+
         if (strlen($serviceClass) == 0) {
-            curl::redirect($this->controllerUrl() . 'log/index');
+            curl::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
         }
+        $group = carr::get($_GET, 'group');
         $app = CApp::instance();
         $db = CDatabase::instance();
 
@@ -227,13 +280,15 @@ trait CTrait_Controller_Application_Manager_Daemon {
         } else {
             cmsg::add('error', $errMessage);
         }
-        curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass);
+        curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
     }
-    
+
     public function logDump($serviceClass = null) {
+        $group = carr::get($_GET, 'group');
         if (strlen($serviceClass) == 0) {
-            curl::redirect($this->controllerUrl() . 'log/index');
+            curl::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
         }
+
         $app = CApp::instance();
         $db = CDatabase::instance();
 
@@ -241,16 +296,28 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $errMessage = '';
 
 
-      
+
         CManager::daemon()->logDump($serviceClass);
-       
+
         if ($errCode == 0) {
             cmsg::add('success', 'Daemon Successfully Dumped on Log');
         } else {
             cmsg::add('error', $errMessage);
         }
-        curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass);
+        curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
     }
-    
+
+    /**
+     * 
+     * @return string
+     */
+    private static function groupQueryString() {
+        $group = carr::get($_GET, 'group');
+        $groupQueryString = '';
+        if (strlen($group) > 0) {
+            $groupQueryString = '?group=' . $group;
+        }
+        return $groupQueryString;
+    }
 
 }
