@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker {
 
+    /**
+     *
+     * @var CTracker_Bootstrap 
+     */
     protected static $bootstrap;
     protected static $isBooted = false;
 
