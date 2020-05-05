@@ -583,6 +583,23 @@ class CVendor_Xendit {
         return $response;
     }
 
+    public function virtualAccountSimulatePayment($id, $amount) {
+        $endPoint = $this->server_domain . '/callback_virtual_accounts/external_id=' . $id . '/simulate_payment';
+        $response = $this->requestToXendit($endPoint, 'POST', ['amount' => $amount]);
+        return $response;
+    }
+
+    public function retailSimulatePayment($external_id, $retail_outlet_name, $payment_code, $transfer_amount) {
+        $endPoint = $this->server_domain . '/fixed_payment_code/simulate_payment';
+        $data = [];
+        $data['external_id'] = $external_id;
+        $data['retail_outlet_name'] = $retail_outlet_name;
+        $data['payment_code'] = $payment_code;
+        $data['transfer_amount'] = $transfer_amount;
+        $response = $this->requestToXendit($endPoint, 'POST', $data);
+        return $response;
+    }
+
     protected function requestToXendit($endPoint, $method, $data = null) {
         $curl = curl_init();
         $headers = array();
