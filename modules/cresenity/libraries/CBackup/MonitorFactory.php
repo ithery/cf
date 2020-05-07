@@ -13,7 +13,7 @@ class CBackup_MonitorFactory {
      * @return CCollection
      */
     public static function createForMonitorConfig() {
-        $monitorConfiguration = CF::config('backup.monitor_backups');
+        $monitorConfiguration = CBackup::getConfig('monitor_backups');
         return c::collect($monitorConfiguration)->flatMap(function (array $monitorProperties) {
                     return self::createForSingleMonitor($monitorProperties);
                 })->sortBy(function (CBackup_Monitor $backupDestinationStatus) {

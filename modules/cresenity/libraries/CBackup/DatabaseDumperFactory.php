@@ -11,7 +11,10 @@ class CBackup_DatabaseDumperFactory {
     protected static $custom = [];
 
     public static function createFromConnection($dbConnectionName) {
-        $dbConfig = CF::config('database.' . $dbConnectionName);
+        $dbConfig = $dbConnectionName;
+        if(!is_array($dbConfig)) {
+             $dbConfig = CF::config('database.' . $dbConnectionName);
+        }
         if (!is_array($dbConfig)) {
             throw CBackup_Exception_CannotCreateDatabaseDumperException::unsupportedDriver($dbConnectionName);
         }
@@ -26,6 +29,7 @@ class CBackup_DatabaseDumperFactory {
         $dbName = carr::get($connection, 'database');
         $username = carr::get($connection, 'user');
         $password = carr::get($connection, 'pass');
+        $port = carr::get($connection, 'port');
         $host = carr::first(carr::wrap(carr::get($connection, 'host', '')));
 
 
@@ -38,8 +42,9 @@ class CBackup_DatabaseDumperFactory {
             $dbDumper->setDefaultCharacterSet(carr::get($dbConfig, 'character_set', ''));
         }
         if ($dbDumper instanceof CBackup_Database_Dumper_MongoDbDumper) {
-            $mongodbUserAuth = carr::get($config, 'dump.mongodb_user_auth', '');
-            $dbDumper->setAuthenticationDatabase($mongodbUserAuth);
+            //$dsn = sprintf('mongodb://%s:%s@%s:%s',$username,$password,$host,$port);
+            //$mongodbUserAuth = $dsn;
+            $dbDumper->setAuthenticationDatabase('admin');
         }
         if (isset($dbConfig['port'])) {
             $dbDumper = $dbDumper->setPort($dbConfig['port']);
@@ -97,7 +102,7 @@ class CBackup_DatabaseDumperFactory {
     }
 
     protected static function determineValidMethodName(DbDumper $dbDumper, $methodName) {
-        return collect([$methodName, 'set' . ucfirst($methodName)])
+        return c::collect([$methodName, 'set' . ucfirst($methodName)])
                         ->first(function ( $methodName) use ($dbDumper) {
                             return method_exists($dbDumper, $methodName);
                         }, '');

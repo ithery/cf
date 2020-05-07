@@ -8,11 +8,11 @@
 
 class CBackup_Factory {
 
-    public static function createJob($config) {
+    public static function createJob() {
         return (new CBackup_BackupJob())
-                        ->setFileSelection(static::createFileSelection($config['backup']['source']['files']))
-                        ->setDatabaseDumpers(static::createDatabaseDumpers($config['backup']['source']['databases']))
-                        ->setBackupDestinations(CBackup_BackupDestinationFactory::createFromArray($config['backup']));
+                        ->setFileSelection(static::createFileSelection(CBackup::getConfig('backup.source.files')))
+                        ->setDatabaseDumpers(static::createDatabaseDumpers(CBackup::getConfig('backup.source.databases')))
+                        ->setBackupDestinations(CBackup_BackupDestinationFactory::createFromArray(CBackup::getConfig('backup.destination.disks')));
     }
 
     protected static function createFileSelection(array $sourceFiles) {
@@ -23,7 +23,11 @@ class CBackup_Factory {
 
     protected static function createDatabaseDumpers(array $dbConnectionNames) {
         return c::collect($dbConnectionNames)->mapWithKeys(function ( $dbConnectionName) {
-                    return [$dbConnectionName => CBackup_DatabaseDumperFactory::createFromConnection($dbConnectionName)];
+                    $name = $dbConnectionName;
+                    if(is_array($name)) {
+                        $name = carr::get($dbConnectionName,'connection.database').'-'.uniqid();
+                    }
+                    return [$name => CBackup_DatabaseDumperFactory::createFromConnection($dbConnectionName)];
                 });
     }
 
