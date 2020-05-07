@@ -6,17 +6,19 @@
  * and open the template in the editor.
  */
 
-class CApp_Api_Method_Server_TempDeleteFile extends CApp_Api_Method_Server {
+class CApp_Api_Method_Server_Temp_DeleteFile extends CApp_Api_Method_Server_Temp_Abstract {
 
     public function execute() {
 
 
         $errCode = 0;
         $errMessage = '';
-        $domain = $this->domain;
-        $request = $this->request();
+        $domain = $this->method->domain();
+        $request = $this->method->request();
         $file = carr::get($request, 'file');
-        $file = DOCROOT . 'temp/' . ltrim($file, '/');
+        if(!cstr::startsWith($file, $this->basePath())) {
+            $file = $this->basePath().ltrim($file, '/');
+        }
         $data = [];
         $removed = false;
         if ($errCode == 0) {
@@ -35,11 +37,11 @@ class CApp_Api_Method_Server_TempDeleteFile extends CApp_Api_Method_Server {
             }
         }
 
-        $this->errCode = $errCode;
-        $this->errMessage = $errMessage;
-        $this->data = $data;
+        if ($errCode > 0) {
+            throw new CApp_Api_Exception_InternalException($errMessage);
+        }
 
-        return $this;
+        return $data;
     }
 
 }

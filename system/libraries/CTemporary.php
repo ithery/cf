@@ -226,4 +226,24 @@ class CTemporary {
         return static::disk()->exists($path);
     }
 
+    /**
+     * 
+     * @return CTemporary_Instance
+     */
+    public static function local() {
+        return CTemporary::instance('local');
+    }
+
+    /**
+     * 
+     * @return CTemporary_Instance
+     */
+    public static function instance($disk = null) {
+        return CTemporary_Instance::instance($disk);
+    }
+
+    
+    public function __call($name, $arguments) {
+        return $this->disk()->$name(...$arguments);
+    }
 }
