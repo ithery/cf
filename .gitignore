@@ -7,6 +7,10 @@ error_log
 
 #ignore application folder, application folder must be another project
 application/*
+!application/cresenity
+
+application/cresenity/default/config/*
+application/cresenity/config/*
 
 #ignore data domain or org
 /data/*
