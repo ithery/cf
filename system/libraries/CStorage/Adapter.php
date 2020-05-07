@@ -374,7 +374,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         try {
             return $this->driver->readStream($path) ?: null;
         } catch (FileNotFoundException $e) {
-            throw new ContractFileNotFoundException($e->getMessage(), $e->getCode(), $e);
+            throw new CStorage_Exception_FileNotFoundException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -385,7 +385,7 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         try {
             return $this->driver->writeStream($path, $resource, $options);
         } catch (FileExistsException $e) {
-            throw new ContractFileExistsException($e->getMessage(), $e->getCode(), $e);
+            throw new CStorage_Exception_FileExistsException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
