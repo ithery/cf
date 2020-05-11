@@ -59,10 +59,18 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
             $logNotificationModel = null;
 
             $logNotificationModel = $this->insertLogNotification($message, $value);
-      
+
             if ($errCode == 0) {
                 try {
                     $result = $this->handleMessage($value, $logNotificationModel);
+                    $vendorResponse = $result;
+                    if (is_array($vendorResponse) || is_object($vendorResponse)) {
+                        $vendorResponse = json_encode($vendorResponse);
+                    }
+
+                    $logNotificationModel->vendor_response = $vendorResponse;
+                    
+                    CDaemon::log('vendor response:' . $vendorResponse);
                 } catch (Exception $ex) {
                     //throw $ex;
                     $errCode++;
@@ -79,6 +87,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
 
             $logNotificationModel->save();
+            $message->onNotificationSent($logNotificationModel);
         });
     }
 
