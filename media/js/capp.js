@@ -1096,8 +1096,9 @@ var Cresenity = function () {
             appendTo = $('body');
         }
         modalContainer.appendTo(appendTo);
-        
+        modalContainer.addClass('capp-modal');
         modalContainer.on('hidden.bs.modal', function (e) {
+            
             if (cresenity.modalElements.length > 0) {
                 var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
                 if (lastModal && lastModal.get(0) === $(e.target).get(0)) {
