@@ -119,7 +119,13 @@ class CTemporary {
         return $path . $filename;
     }
 
-    public static function getPath($folder, $filename) {
+    public static function getPath($folder = null, $filename = null) {
+        if ($folder == null) {
+            $folder = 'common';
+        }
+        if ($filename == null) {
+            $filename = date('Ymd') . cutils::randmd5();
+        }
         $depth = 5;
         $mainFolder = substr($filename, 0, 8);
         $path = '';
@@ -231,7 +237,7 @@ class CTemporary {
      * @return CTemporary_Instance
      */
     public static function local() {
-        return CTemporary::instance('local');
+        return CTemporary::instance('local-temp');
     }
 
     /**
@@ -242,8 +248,8 @@ class CTemporary {
         return CTemporary_Instance::instance($disk);
     }
 
-    
-    public function __call($name, $arguments) {
-        return $this->disk()->$name(...$arguments);
+    public static function __callStatic($name, $arguments) {
+        return CTemporary::instance()->$name(...$arguments);
     }
+
 }

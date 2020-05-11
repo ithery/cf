@@ -29,11 +29,35 @@ class CTemporary_Instance {
     }
 
     protected function disk() {
-        return CStorage::instance($this->disk);
+        
+        return CStorage::instance()->disk($this->disk);
     }
 
-    
     public function __call($name, $arguments) {
         return $this->disk()->$name(...$arguments);
     }
+
+    /**
+     * 
+     * @param string $folder
+     * @param type $filename
+     * @return string
+     */
+    public function put($content, $folder = null, $filename = null) {
+        if ($folder == null) {
+            $folder = "default";
+        }
+        if ($filename == null) {
+            $filename = date('Ymd') . cutils::randmd5();
+        }
+       
+        
+  
+        $file = CTemporary::getPath($folder, $filename);
+        $this->disk()->put($file, $content);
+        return $file;
+    }
+
+    
+    
 }
