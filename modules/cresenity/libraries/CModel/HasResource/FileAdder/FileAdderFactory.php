@@ -19,6 +19,17 @@ class CModel_HasResource_FileAdder_FileAdderFactory {
         $fileAdder = new CModel_HasResource_FileAdder_FileAdder(new CResources_Filesystem());
         return $fileAdder->setSubject($subject)->setFile($file);
     }
+    
+    public static function createFromDisk(CModel $subject,  $key,  $disk)
+    {
+        /** @var CModel_HasResource_FileAdder_FileAdder $fileAdder */
+        $fileAdder = new CModel_HasResource_FileAdder_FileAdder(new CResources_Filesystem());
+
+        return $fileAdder
+            ->setSubject($subject)
+            ->setFile(new CResources_Support_RemoteFile($key, $disk));
+    }
+
 
     public static function createFromRequest(CModel $subject, $key) {
         return static::createMultipleFromRequest($subject, [$key])->first();

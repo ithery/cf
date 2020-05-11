@@ -56,6 +56,19 @@ trait CModel_HasResource_HasResourceTrait {
     }
 
     /**
+     * Add a file from the given disk.
+     *
+     * @param string $key
+     * @param string $disk
+     *
+     * @return CModel_HasResource_FileAdder_FileAdder
+     */
+    public function addResourceFromDisk( $key,  $disk = null)
+    {
+        return CModel_HasResource_FileAdder_FileAdderFactory::createFromDisk($this, $key, $disk ?: CF::config('storage.default'));
+    }
+    
+    /**
      * Add a file from a request.
      *
      * @param string $key
