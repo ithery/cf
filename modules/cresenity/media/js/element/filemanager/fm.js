@@ -161,7 +161,8 @@ var CFileManager = function (options) {
         $('#dialog').find('.btn-primary').unbind().click(function (e) {
             callback($('#dialog').find('input').val());
         });
-        $('#dialog').modal('show').find('.modal-title').text(title);
+        $('#dialog').find('.modal-title').text(title);
+        $('#dialog').modal();
     }
 
     this.refreshFoldersAndItems = (data) => {
@@ -198,7 +199,10 @@ var CFileManager = function (options) {
 
     this.getPreviousDir = () => {
         var working_dir = $('#working_dir').val();
-        return working_dir.substring(0, working_dir.lastIndexOf('/'));
+        if(working_dir) {
+            return working_dir.substring(0, working_dir.lastIndexOf('/'));
+        }
+        return null;
     }
 
     this.setOpenFolders = () => {
@@ -538,7 +542,7 @@ var CFileManager = function (options) {
 
                     $('#nav-buttons > ul').removeClass('d-none');
                     $('#working_dir').val(working_dir);
-                    console.log('Current working_dir : ' + working_dir);
+                    
                     var breadcrumbs = [];
                     var validSegments = working_dir.split('/').filter(function (e) {
                         return e;

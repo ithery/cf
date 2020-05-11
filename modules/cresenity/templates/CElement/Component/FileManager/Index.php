@@ -98,7 +98,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myModalLabel"><?php echo clang::__('filemanager.title-upload'); ?></h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aia-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss-modal="uploadModal" aria-label="Close"><span aia-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <form action="<?php echo rtrim($fm->connectorUrl(), '/') . '/upload'; ?>" role='form' id='uploadForm' name='uploadForm' method='post' enctype='multipart/form-data' class="dropzone">
@@ -115,7 +115,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary w-100" data-dismiss="modal"><?php echo clang::__('filemanager.btn-close'); ?></button>
+                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="uploadModal"><?php echo clang::__('filemanager.btn-close'); ?></button>
                 </div>
             </div>
         </div>
@@ -126,8 +126,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
             <div class="modal-content">
                 <div class="modal-body"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary w-100" data-dismiss="modal"><?php echo clang::__('filemanager.btn-close'); ?></button>
-                    <button type="button" class="btn btn-primary w-100" data-dismiss="modal"><?php echo clang::__('filemanager.btn-confirm'); ?></button>
+                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="notify"><?php echo clang::__('filemanager.btn-close'); ?></button>
+                    <button type="button" class="btn btn-primary w-100" data-dismiss-modal="notify"><?php echo clang::__('filemanager.btn-confirm'); ?></button>
                 </div>
             </div>
         </div>
@@ -143,8 +143,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     <input type="text" class="form-control">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary w-100" data-dismiss="modal"><?php echo clang::__('filemanager.btn-close'); ?></button>
-                    <button type="button" class="btn btn-primary w-100" data-dismiss="modal"><?php echo clang::__('filemanager.btn-confirm'); ?></button>
+                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="dialog"><?php echo clang::__('filemanager.btn-close'); ?></button>
+                    <button type="button" class="btn btn-primary w-100" data-dismiss-modal="dialog"><?php echo clang::__('filemanager.btn-confirm'); ?></button>
                 </div>
             </div>
         </div>
@@ -175,6 +175,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
     </div>
 </div>
 <script>
+    
+    $("[data-dismiss-modal=dialog]").click(function(){
+        $('#dialog').modal('hide');
+    });
+    $("[data-dismiss-modal=notify]").click(function(){
+        $('#notify').modal('hide');
+    });
+    $("[data-dismiss-modal=uploadModal]").click(function(){
+        $('#uploadModal').modal('hide');
+    });
     var lang = <?php echo json_encode($fm->getTranslation()); ?>;
     var config = {};
     config.action = <?php echo json_encode($fm->config('action')); ?>;
