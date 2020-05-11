@@ -45,6 +45,10 @@ class CTemporary_LocalFile {
         if ($suffix !== null) {
             $filename .= $suffix;
         }
+        
+        if($folder==null) {
+            $folder='common';
+        }
 
         $this->_fileName = CTemporary::local()->put($content, $folder, $filename);
     }
