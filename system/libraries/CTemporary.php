@@ -240,6 +240,10 @@ class CTemporary {
         return CTemporary::instance('local-temp');
     }
 
+    public static function createLocalFile($content, $folder = null, $suffix = null, $delete = true) {
+        return new CTemporary_LocalFile($content, $folder, $suffix, $delete);
+    }
+
     /**
      * 
      * @return CTemporary_Instance
