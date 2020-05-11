@@ -22,6 +22,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
     protected $customControl;
     protected $customControlValue;
     protected $maximum;
+    protected $accept;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -32,6 +33,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->maxHeight = "150";
         $this->maxUploadSize = 0;
         $this->limitFile = 10;
+        $this->accept = "image/*";
         $this->disabledUpload = false;
         $this->templateName = 'CElement/FormInput/MultipleImageAjax';
         $this->removeLink = true;
@@ -67,6 +69,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
             $this->setVar('customControl', $this->customControl);
             $this->setVar('customControlValue', $this->customControlValue);
             $this->setVar('cropper', $this->cropper);
+            $this->setVar('accept', $this->accept);
         });
     }
 
@@ -138,5 +141,8 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->maximum = $maximum;
         return $this;
     }
-    
+    public function setAccept($accept){
+        $this->accept = $accept;
+        return $this;
+    }
 }
