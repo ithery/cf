@@ -537,10 +537,16 @@ var CFileManager = function (options) {
                             } else {
                                 var image = $('<div>').addClass('mime-icon ico-' + item.icon);
                             }
+                            
 
                             template.find('.square').append(image);
                             template.find('.item_name').text(item.name);
                             template.find('time').text((new Date(item.time * 1000)).toLocaleString());
+                            if (!item.is_file) {
+                                template.find('time').addClass('d-none');
+                            } else {
+                                template.find('time').removeClass('d-none');
+                            }
                             $('#content').append(template);
                         });
                     }
