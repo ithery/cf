@@ -120,4 +120,5 @@ class CModel_Nested_Collection extends CModel_Collection {
         return $this;
     }
 
+
 }
