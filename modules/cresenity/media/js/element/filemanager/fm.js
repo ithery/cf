@@ -129,8 +129,11 @@ var CFileManager = function (options) {
 
     this.notify = (body, callback) => {
         $('#notify').find('.btn-primary').toggle(callback !== undefined);
-        $('#notify').find('.btn-primary').unbind().click(callback);
-        console.log(cresenity.isJson(body));
+        $('#notify').find('.btn-primary').unbind().click(()=>{
+            $('#notify').modal('hide');
+            callback();
+        });
+        
         if (cresenity.isJson(body)) {
             json = JSON.parse(body);
             eval(cresenity.base64.decode(json.js));
