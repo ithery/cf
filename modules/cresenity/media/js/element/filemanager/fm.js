@@ -160,6 +160,7 @@ var CFileManager = function (options) {
             $('#dialog').find('input').focus();
         });
         $('#dialog').find('.btn-primary').unbind().click(function (e) {
+            $('#dialog').modal('hide');
             callback($('#dialog').find('input').val());
         });
         $('#dialog').find('.modal-title').text(title);
