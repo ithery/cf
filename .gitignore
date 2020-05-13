@@ -83,3 +83,4 @@ botlog.log
 
 #ignore vscode
 .vscode
+*.py
