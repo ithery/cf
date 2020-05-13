@@ -85,7 +85,7 @@ class CElement_Component_FileManager extends CElement_Component {
             'use' => false,
             'preview' => true,
             'download' => true,
-            'resize' => true,
+            'resize' => false,
             'move' => true,
             'rename' => true,
             'delete' => true,
