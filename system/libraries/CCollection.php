@@ -1311,6 +1311,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         // function which we were given. Then, we will sort the returned values and
         // and grab the corresponding values for the sorted keys from this array.
         foreach ($this->items as $key => $value) {
+
             $results[$key] = $callback($value, $key);
         }
 
@@ -1465,7 +1466,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         }
 
         return function ($item) use ($value) {
-            return carr::path($item, $value);
+            return carr::get($item, $value);
         };
     }
 
@@ -1682,5 +1683,4 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         return new CProxy_HigherOrderCollectionProxy($this, $key);
     }
 
-   
 }
