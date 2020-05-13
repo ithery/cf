@@ -59,6 +59,12 @@
     padding: 0px;
 }
 
+.capp-fm #breadcrumb {
+    padding: 10px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+}
+
 @media screen and (min-width: 992px) {
     .capp-fm #main {
         width: calc(100% - 250px);
