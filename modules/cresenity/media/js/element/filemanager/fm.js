@@ -7,9 +7,10 @@ var CFileManager = function (options) {
         selector: '.capp-fm',
         connectorUrl: '/cresenity/connector/fm',
         sortType: 'alphabetic',
-        
+
     }, options);
 
+    this.dropzoneInitilized = false;
     this.multiSelectionEnabled = false;
     var fab = function (menu, options) {
 
@@ -192,14 +193,14 @@ var CFileManager = function (options) {
 // ==  Folder actions  ==
 // ======================
 
-    this.goTo= (new_dir) => {
+    this.goTo = (new_dir) => {
         $('#working_dir').val(new_dir);
         this.loadItems();
     }
 
     this.getPreviousDir = () => {
         var working_dir = $('#working_dir').val();
-        if(working_dir) {
+        if (working_dir) {
             return working_dir.substring(0, working_dir.lastIndexOf('/'));
         }
         return null;
@@ -291,14 +292,14 @@ var CFileManager = function (options) {
         if (!this.multiSelectionEnabled) {
             this.selected = [];
         }
-        
+
 
         var sequence = $(e.target).closest('a').data('id');
         var elementIndex = this.selected.indexOf(sequence);
-        
+
         if (elementIndex === -1) {
             this.selected.push(sequence);
-        } else {    
+        } else {
             this.selected.splice(elementIndex, 1);
         }
 
@@ -326,7 +327,7 @@ var CFileManager = function (options) {
     }
 
     this.getSelectedItems = () => {
-        return cfm.selected.reduce( (arrObjects, id) => {
+        return cfm.selected.reduce((arrObjects, id) => {
             arrObjects.push(this.getOneSelectedElement(id));
             return arrObjects;
         }, []);
@@ -361,7 +362,7 @@ var CFileManager = function (options) {
 
 
     this.controllerMethod.rename = (item) => {
-        this.dialog(this.settings.lang['message-rename'], item.name,  (new_name) => {
+        this.dialog(this.settings.lang['message-rename'], item.name, (new_name) => {
             this.performFmRequest('rename', {
                 file: item.name,
                 new_name: new_name
@@ -370,7 +371,7 @@ var CFileManager = function (options) {
     }
 
     this.controllerMethod.trash = (items) => {
-        this.notify(this.settings.lang['message-delete'],  () => {
+        this.notify(this.settings.lang['message-delete'], () => {
             this.performFmRequest('delete', {
                 items: items.map(function (item) {
                     return item.name;
@@ -390,7 +391,7 @@ var CFileManager = function (options) {
     }
 
     this.controllerMethod.download = (items) => {
-        items.forEach( (item, index) => {
+        items.forEach((item, index) => {
             var data = this.defaultParameters();
             data['file'] = item.name;
             var token = this.getUrlParam('token');
@@ -398,12 +399,12 @@ var CFileManager = function (options) {
                 data['token'] = token;
             }
 
-            setTimeout( () => {
+            setTimeout(() => {
                 window.location.href = this.connectorUrl + '/download?' + $.param(data);
             }, index * 100);
         });
     }
-    this.controllerMethod.use =  (items)=> {
+    this.controllerMethod.use = (items) => {
         function useTinymce3(url) {
             if (!usingTinymce3()) {
                 return;
@@ -471,7 +472,7 @@ var CFileManager = function (options) {
             if (cresenity.fileManager.haveCallback('use')) {
                 return cresenity.fileManager.doCallback('use', url);
             }
-            
+
         }
 
         var callback = cfm.getUrlParam('callback');
@@ -505,7 +506,7 @@ var CFileManager = function (options) {
     this.loadItems = () => {
         this.loading(true);
         this.performFmRequest('item', {showList: this.showList, sortType: this.sortType}, 'html')
-                .done( (data) => {
+                .done((data) => {
                     cfm.selected = [];
                     var response = JSON.parse(data);
                     var working_dir = response.working_dir;
@@ -515,7 +516,7 @@ var CFileManager = function (options) {
                     $('#content').html('').removeAttr('class');
                     if (hasItems) {
                         $('#content').addClass(response.display).addClass('preserve_actions_space');
-                        cfm.items.forEach( (item, index) => {
+                        cfm.items.forEach((item, index) => {
                             var template = $('#item-template').clone()
                                     .removeAttr('id class')
                                     .attr('data-id', index)
@@ -542,12 +543,12 @@ var CFileManager = function (options) {
 
                     $('#nav-buttons > ul').removeClass('d-none');
                     $('#working_dir').val(working_dir);
-                    
+
                     var breadcrumbs = [];
                     var validSegments = working_dir.split('/').filter(function (e) {
                         return e;
                     });
-                    validSegments.forEach( (segment, index) => {
+                    validSegments.forEach((segment, index) => {
                         if (index === 0) {
                             // set root folder name as the first breadcrumb
                             breadcrumbs.push($("[data-path='/" + segment + "']").text());
@@ -557,12 +558,12 @@ var CFileManager = function (options) {
                     });
                     $('#current_folder').text(breadcrumbs[breadcrumbs.length - 1]);
                     $('#breadcrumbs > ol').html('');
-                    breadcrumbs.forEach( (breadcrumb, index) => {
+                    breadcrumbs.forEach((breadcrumb, index) => {
                         var li = $('<li>').addClass('breadcrumb-item').text(breadcrumb);
                         if (index === breadcrumbs.length - 1) {
                             li.addClass('active').attr('aria-current', 'page');
                         } else {
-                            li.click( () => {
+                            li.click(() => {
                                 // go to corresponding path
                                 this.goTo('/' + validSegments.slice(0, 1 + index).join('/'));
                             });
@@ -588,6 +589,40 @@ var CFileManager = function (options) {
                 .done(this.refreshFoldersAndItems);
     };
 
+    this.initializeUploadForm = () => {
+        if (!this.dropzoneInitilized) {
+            this.dropzoneInitilized = true;
+
+            new Dropzone("#uploadForm", {
+                paramName: "upload[]", // The name that will be used to transfer the file
+                uploadMultiple: false,
+                parallelUploads: 5,
+                clickable: '#upload-button',
+                dictDefaultMessage: this.settings.lang['message-drop'],
+                init: function () {
+                    var _this = this; // For the closure
+                    this.on('success', function (file, response) {
+                        if (response == 'OK') {
+                            cfm.loadFolders();
+                        } else {
+                            if (cresenity.isJson(response)) {
+                                json = JSON.parse(response);
+                                this.defaultOptions.error(file, json.join('\n'));
+                            } else {
+                                this.defaultOptions.error(file, response);
+                            }
+                        }
+                    });
+                },
+                headers: {
+                    'Authorization': 'Bearer ' + this.getUrlParam('token')
+                },
+                acceptedFiles: this.settings.acceptedFiles,
+                maxFilesize: (this.settings.maxFilesize / 1000)
+            });
+        }
+
+    }
 
 
 
@@ -604,7 +639,7 @@ var CFileManager = function (options) {
             this.clearSelected();
         }
     });
-    $('#to-previous').click( () => {
+    $('#to-previous').click(() => {
         var previous_dir = this.getPreviousDir();
         if (previous_dir == '') {
             return;
@@ -632,11 +667,11 @@ var CFileManager = function (options) {
     $(document).on('click', '#upload', () => {
         $('#uploadModal').modal('show');
     });
-    $(document).on('click', '[data-display]', function() {
+    $(document).on('click', '[data-display]', function () {
         cfm.showList = $(this).data('display');
         cfm.loadItems();
     });
-    $(document).on('click', '[data-action]', function()  {
+    $(document).on('click', '[data-action]', function () {
         cfm.controllerMethod[$(this).data('action')]($(this).data('multiple') ? cfm.getSelectedItems() : cfm.getOneSelectedElement());
     });
 
@@ -671,12 +706,12 @@ var CFileManager = function (options) {
                 )
                 );
     });
-    this.settings.sortings.forEach( (sort) => {
+    this.settings.sortings.forEach((sort) => {
         $('#nav-buttons .dropdown-menu').append(
                 $('<a>').addClass('dropdown-item').attr('data-sortby', sort.by)
                 .append($('<i>').addClass('fas fa-fw fa-' + sort.icon))
                 .append($('<span>').text(sort.label))
-                .click( () => {
+                .click(() => {
                     cfm.sortType = sort.by;
                     cfm.loadItems();
                 })
@@ -699,33 +734,7 @@ var CFileManager = function (options) {
     if (this.usingWysiwygEditor()) {
         $('#multi_selection_toggle').hide();
     }
-    new Dropzone("#uploadForm", {
-        paramName: "upload[]", // The name that will be used to transfer the file
-        uploadMultiple: false,
-        parallelUploads: 5,
-        clickable: '#upload-button',
-        dictDefaultMessage: this.settings.lang['message-drop'],
-        init: function () {
-            var _this = this; // For the closure
-            this.on('success', function (file, response) {
-                if (response == 'OK') {
-                    cfm.loadFolders();
-                } else {
-                    if (cresenity.isJson(response)) {
-                        json = JSON.parse(response);
-                        this.defaultOptions.error(file, json.join('\n'));
-                    } else {
-                        this.defaultOptions.error(file, response);
-                    }
-                }
-            });
-        },
-        headers: {
-            'Authorization': 'Bearer ' + this.getUrlParam('token')
-        },
-        acceptedFiles: this.settings.acceptedFiles,
-        maxFilesize: (this.settings.maxFilesize / 1000)
-    });
 
+    this.initializeUploadForm();
 }
 
