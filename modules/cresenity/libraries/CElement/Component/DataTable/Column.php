@@ -22,6 +22,10 @@ class CElement_Component_DataTable_Column extends CObject {
     public $callback;
     public $callbackRequire;
     public $class;
+    
+    protected $exportLabel;
+    protected $exportCallback;
+    protected $exportCallbackRequire;
 
     public function __construct($fieldname) {
         parent::__construct();
@@ -106,6 +110,18 @@ class CElement_Component_DataTable_Column extends CObject {
 
         $this->callback = CHelper::closure()->serializeClosure($callback);
         $this->callbackRequire = $require;
+        return $this;
+    }
+    
+    public function setExportCallback($callback, $require = '') {
+
+        $this->exportCallback = CHelper::closure()->serializeClosure($callback);
+        $this->exportCallbackRequire = $require;
+        return $this;
+    }
+    
+    public function setExportLabel($label) {
+        $this->exportLabel = $label;
         return $this;
     }
 
