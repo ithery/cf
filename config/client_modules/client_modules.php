@@ -540,6 +540,9 @@ return array(
     "material-design-iconic-font" => array(
         "css" => array("icon/material-design-iconic-font.min.css"),
     ),
+    "piconsthin" => array(
+        "css" => array("icon/piconsthin.css"),
+    ),
     "open-ionic" => array(
         "css" => array("icon/open-ionic.css"),
     ),
