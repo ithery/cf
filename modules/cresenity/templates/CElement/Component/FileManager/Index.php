@@ -175,15 +175,34 @@ defined('SYSPATH') OR die('No direct access allowed.');
     </div>
 </div>
 <script>
-    
+    function checkModal() {
+        var modalExists = $('.modal:visible').length > 0;
+        if (!modalExists) {
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop.show').remove();
+        } else {
+            if (!$('body').hasClass('modal-open')) {
+                $('body').addClass('modal-open');
+            }
+
+        }
+    }
+    $(document).on('hidden.bs.modal', function() {
+	checkModal();
+    });
     $("[data-dismiss-modal=dialog]").click(function(){
         $('#dialog').modal('hide');
+                
+        
+        
     });
     $("[data-dismiss-modal=notify]").click(function(){
         $('#notify').modal('hide');
+        
     });
     $("[data-dismiss-modal=uploadModal]").click(function(){
         $('#uploadModal').modal('hide');
+        
     });
     var lang = <?php echo json_encode($fm->getTranslation()); ?>;
     var config = {};
