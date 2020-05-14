@@ -1212,13 +1212,7 @@ trait CModel_Nested_NestedTrait {
 
         $diff = $newDepth - $oldDepth;
 
-        if ($this->parent_id == 195) {
-            cdbg::dd($newDepth);
-        }
-        if ($diff > 0) {
-
-            cdbg::dd($diff);
-        }
+        
         if (!$self->isLeaf() && $diff != 0) {
             $self->descendants()->increment($self->getDepthName(), $diff);
         }
