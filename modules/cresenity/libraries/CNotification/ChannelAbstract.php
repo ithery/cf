@@ -87,7 +87,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
 
             $logNotificationModel->save();
-            $message->onNotificationSent($logNotificationModel);
+            //$message->onNotificationSent($logNotificationModel);
         });
     }
 
