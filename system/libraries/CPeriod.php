@@ -7,15 +7,17 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Jun 23, 2019, 12:50:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use \Carbon\Carbon;
+
 class CPeriod {
 
-    /** @var \DateTime */
+    /** @var \Carbon\Carbon */
     public $startDate;
 
-    /** @var \DateTime */
+    /** @var \Carbon\Carbon */
     public $endDate;
 
-    public static function create(DateTime $startDate, DateTime $endDate) {
+    public static function create($startDate, $endDate) {
         return new static($startDate, $endDate);
     }
 
@@ -122,10 +124,17 @@ class CPeriod {
         return new static($startDate, $endDate);
     }
 
-    public function __construct(DateTime $startDate, DateTime $endDate) {
+    public function __construct($startDate, $endDate) {
         if ($startDate > $endDate) {
             throw CPeriod_Exception_InvalidPeriod::startDateCannotBeAfterEndDate($startDate, $endDate);
         }
+        if ($startDate instanceof DateTime) {
+            $startDate = new Carbon($startDate->format('Y-m-d H:i:s.u'), $startDate->getTimezone());
+        }
+        if ($endDate instanceof DateTime) {
+            $endDate = new Carbon($endDate->format('Y-m-d H:i:s.u'), $endDate->getTimezone());
+        }
+
         $this->startDate = $startDate;
         $this->endDate = $endDate;
     }
@@ -145,10 +154,18 @@ class CPeriod {
         return new static($start, $end);
     }
 
+    /**
+     * 
+     * @return \Carbon\Carbon
+     */
     public function getEndDate() {
         return $this->endDate;
     }
 
+    /**
+     * 
+     * @return \Carbon\Carbon
+     */
     public function getStartDate() {
         return $this->startDate;
     }
