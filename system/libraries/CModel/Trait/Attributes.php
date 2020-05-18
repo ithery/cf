@@ -572,7 +572,7 @@ trait CModel_Trait_Attributes {
      * @return $this
      */
     protected function getArrayAttributeWithValue($path, $key, $value) {
-        return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
+        return c::tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
             carr::set($array, str_replace('->', '.', $path), $value);
         });
     }
@@ -632,7 +632,7 @@ trait CModel_Trait_Attributes {
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Support\Carbon
+     * @return CCarbon
      */
     protected function asDate($value) {
         return $this->asDateTime($value)->startOfDay();
@@ -642,7 +642,7 @@ trait CModel_Trait_Attributes {
      * Return a timestamp as DateTime object.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Support\Carbon
+     * @return CCarbon
      */
     protected function asDateTime($value) {
         // If this value is already a Carbon instance, we shall just return it as is.
