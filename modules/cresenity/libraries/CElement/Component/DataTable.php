@@ -753,8 +753,11 @@ class CElement_Component_DataTable extends CElement_Component {
         return c::collect($data);
     }
 
-    public function downloadExcel() {
-        return CExporter::download($this->toExportable(), CExporter::randomFilename());
+    public function downloadExcel($filename = null) {
+        if($filename==null) {
+            $filename = CExporter::randomFilename();
+        }
+        return CExporter::download($this->toExportable(), $filename);
     }
 
     public function queueDownloadExcel($filePath, $disk = null, $writerType = null, $diskOptions = []) {

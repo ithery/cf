@@ -42,11 +42,12 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
                 }
             }
             //if have callback
-            if ($column->callback != null) {
-                $value = CFunction::factory($column->callback)
+            $exportCallback = $column->determineExportCallback();
+            if ($exportCallback != null) {
+                $value = CFunction::factory($exportCallback)
                         ->addArg($data)
                         ->addArg($value)
-                        ->setRequire($column->callbackRequire)
+                        ->setRequire( $column->determineExportCallbackRequire())
                         ->execute();
                 if (is_array($value) && isset($value['html']) && isset($value['js'])) {
 
@@ -76,7 +77,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         $columns = $this->table->getColumns();
         $heading = [];
         foreach ($columns as $column) {
-            $heading[] = $column->getLabel();
+            $heading[] = $column->determineExportLabel();
         }
         return $heading;
     }

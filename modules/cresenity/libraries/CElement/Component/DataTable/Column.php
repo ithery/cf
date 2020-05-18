@@ -22,7 +22,6 @@ class CElement_Component_DataTable_Column extends CObject {
     public $callback;
     public $callbackRequire;
     public $class;
-    
     protected $exportLabel;
     protected $exportCallback;
     protected $exportCallbackRequire;
@@ -112,14 +111,14 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->callbackRequire = $require;
         return $this;
     }
-    
+
     public function setExportCallback($callback, $require = '') {
 
         $this->exportCallback = CHelper::closure()->serializeClosure($callback);
         $this->exportCallbackRequire = $require;
         return $this;
     }
-    
+
     public function setExportLabel($label) {
         $this->exportLabel = $label;
         return $this;
@@ -162,7 +161,7 @@ class CElement_Component_DataTable_Column extends CObject {
         if (strlen($this->width) > 0) {
             $addition_attr .= ' width="' . $this->width . '"';
         }
-        $class = implode(" ",$this->class);
+        $class = implode(" ", $this->class);
         $data_align = "";
         switch ($this->getAlign()) {
             case "left": $data_align .= "align-left";
@@ -186,7 +185,7 @@ class CElement_Component_DataTable_Column extends CObject {
                     break;
             }
         }
-        
+
         if ($this->sortable) {
             $class .= " sortable";
         }
@@ -210,6 +209,18 @@ class CElement_Component_DataTable_Column extends CObject {
     public function addClass($class) {
         $this->class[] = $class;
         return $this;
+    }
+
+    public function determineExportCallback() {
+        return $this->exportCallback ?: $this->callback;
+    }
+
+    public function determineExportCallbackRequire() {
+        return $this->exportCallbackRequire ?: $this->callbackRequire;
+    }
+
+    public function determineExportLabel() {
+        return $this->exportLabel ?: $this->label;
     }
 
 }
