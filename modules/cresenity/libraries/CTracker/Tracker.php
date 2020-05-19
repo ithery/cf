@@ -204,8 +204,9 @@ class CTracker_Tracker {
                     'data' => CTracker::populator()->getData(),
                     'config' => CTracker::config()->getData(),
                 ];
+                $trackQueueClass = CTracker::config()->get('trackQueueClass');
 
-                return CTracker_TaskQueue_TrackQueue::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
+                return $trackQueueClass::dispatch($queueData)->allOnConnection(CTracker::config()->get('queueConnection'));
             }
 
             $this->track();

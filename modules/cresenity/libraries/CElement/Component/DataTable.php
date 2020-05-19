@@ -19,7 +19,6 @@ class CElement_Component_DataTable extends CElement_Component {
         "100" => "100",
         "-1" => "ALL",
     );
-    
     public $current_row = 1;
     public $dbName;
     public $dbConfig;
@@ -65,7 +64,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $searchPlaceholder = '';
     public $infoText = '';
     protected $actionLocation = 'last';
-    protected $haveRowSelection=false;
+    protected $haveRowSelection = false;
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
@@ -178,11 +177,11 @@ class CElement_Component_DataTable extends CElement_Component {
         return new CElement_Component_DataTable($id);
     }
 
-    
     public function setDatabaseResolver($dbResolver) {
         $this->dbResolver = $dbResolver;
         return $this;
     }
+
     /**
      * 
      * @param bool $bool
@@ -241,7 +240,6 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($db instanceof CDatabase) {
             $this->dbName = $db->getName();
             $this->dbConfig = $db->config();
-            
         } else {
             $this->dbName = $db;
             $this->dbConfig = $dbConfig;
@@ -651,12 +649,12 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return CDatabase
      */
     public function db() {
-        
-        if($this->dbResolver!=null) {
+
+        if ($this->dbResolver != null) {
             return $this->dbResolver->connection($this->dbName);
         }
-        
-        
+
+
         if (strlen($this->dbName) > 0) {
             return CDatabase::instance($this->dbName, null, $this->domain);
         }
@@ -686,6 +684,31 @@ class CElement_Component_DataTable extends CElement_Component {
     public function getColumns() {
         return $this->columns;
     }
+    /**
+     * 
+     * @return CElement_Component_DataTable_Column
+     */
+    public function getColumn($index) {
+        return carr::get($this->columns,$index);
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public function getColumnOffset() {
+
+        $offset = 0;
+        if ($this->checkbox) {
+            $offset++;
+        }
+        if ($this->getActionLocation() == 'first') {
+            if($this->rowActionCount()>0) {
+                $offset++;
+            }
+        }
+        return $offset;
+    }
 
     /**
      * 
@@ -694,7 +717,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public function getQuery() {
         return $this->query;
     }
-    
+
     /**
      * 
      * @return bool
@@ -722,21 +745,25 @@ class CElement_Component_DataTable extends CElement_Component {
                     ->addArg($this->callbackOptions)
                     ->setRequire($this->callbackRequire)
                     ->execute();
-            $data = carr::get($callbackData,'data');
+            $data = carr::get($callbackData, 'data');
         } else {
             $this->setAjax(false);
             $data = $this->data;
         }
         return c::collect($data);
     }
-    
-    public function downloadExcel() {
-        return CExporter::download($this->toExportable(), CExporter::randomFilename());
+
+    public function downloadExcel($filename = null) {
+        if($filename==null) {
+            $filename = CExporter::randomFilename();
+        }
+        return CExporter::download($this->toExportable(), $filename);
     }
-    
+
     public function queueDownloadExcel($filePath, $disk = null, $writerType = null, $diskOptions = []) {
-        
-        
+
+
         return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
     }
+
 }

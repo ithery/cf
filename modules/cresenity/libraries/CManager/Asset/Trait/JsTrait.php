@@ -33,6 +33,7 @@ trait CManager_Asset_Trait_JsTrait {
 
     public function getAllJsFileUrl() {
         $files = $this->jsFiles();
+
         $urls = array();
         foreach ($files as $f) {
             $urls[] = CManager_Asset_Helper::urlJsFile($f);
@@ -49,12 +50,15 @@ trait CManager_Asset_Trait_JsTrait {
     }
 
     public function registerJsFile($file, $pos = "end") {
-       
+
+
         $dir_file = $file;
         $js_version = '';
-        if (strpos($file, '?') !== false) {
-            $dir_file = substr($file, 0, strpos($file, '?'));
-            $js_version = substr($file, strpos($file, '?'), strlen($file) - 1);
+        if (!cstr::startsWith($file, 'http')) {
+            if (strpos($file, '?') !== false) {
+                $dir_file = substr($file, 0, strpos($file, '?'));
+                $js_version = substr($file, strpos($file, '?'), strlen($file) - 1);
+            }
         }
         $js_file = $this->fullpathJsFile($dir_file);
         if (strpos($dir_file, 'http') !== false) {
@@ -70,7 +74,7 @@ trait CManager_Asset_Trait_JsTrait {
             }
         }
         $this->scripts[$pos]['js_file'][] = $js_file;
-       
+
         return $this;
     }
 

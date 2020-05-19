@@ -18,10 +18,12 @@ class CElement_List_TabList_Tab extends CElement_Element {
     protected $ajaxUrl;
     protected $ajax;
     protected $nopadding;
+    protected $tabList;
 
     public function __construct($id = "") {
         parent::__construct($id);
         $this->addFriend('CElement_List_TabList');
+       
         $this->label = "";
         $this->target = "";
         $this->icon = "";
@@ -30,13 +32,23 @@ class CElement_List_TabList_Tab extends CElement_Element {
         $this->active = false;
         $this->nopadding = false;
     }
+    
+    public function setTabList(CElement_List_TabList $tabList) {
+        $this->tabList = $tabList;
+        return $this;
+    }
 
     public static function factory($id = "") {
         return new CElement_List_TabList_Tab($id);
     }
 
-    public function setActive($bool) {
+    public function setActive($bool = true) {
+        if($bool && $this->tabList) {
+            
+            $this->tabList->setActiveTab($this->id);
+        }
         $this->active = $bool;
+        
         return $this;
     }
 
@@ -68,7 +80,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
 
         if (strlen($this->ajaxUrl) == 0) {
             if ($this->ajax) {
-                $ajaxUrl = CAjax::createMethod()->setType('reload')
+                $ajaxUrl = CAjax::createMethod()->setType('Reload')
                         ->setData('json', $this->json())
                         ->makeUrl();
                 $this->setAjaxUrl($ajaxUrl);

@@ -10,10 +10,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 use CManager_File_Connector_FileManager_FM as FM;
 use Intervention\Image\ImageManager;
 
-class CManager_File_Connector_FileManager_Controller_ResizeImageController extends CManager_File_Connector_FileManager_Controller_BaseController {
+class CManager_File_Connector_FileManager_Controller_ResizeImageController extends CManager_File_Connector_FileManager_AbstractController {
 
     public function execute() {
-        $fm = new FM();
+        $fm = $this->fm();
         $imageName = $fm->input('img');
         $dataWidth = $fm->input('dataWidth');
         $dataHeight = $fm->input('dataHeight');

@@ -8,13 +8,21 @@
 
 class CBackup {
 
+    public static function getConfig($key, $defaultValue = null) {
+        return CBackup_Config::instance()->getConfig($key, $defaultValue);
+    }
+
     /**
      * 
      * @return CBackup_BackupJob
      */
-    public static function createJob() {
-        $config = CF::config('backup');
-        return CBackup_Factory::createJob($config);
+    public static function createJob($config = null) {
+        CBackup_Config::instance()->reset();
+
+        if ($config != null) {
+            CBackup_Config::instance()->setConfig($config);
+        }
+        return CBackup_Factory::createJob();
     }
 
     /**
@@ -78,6 +86,42 @@ class CBackup {
 
     protected function getFormattedBackupDate(CBackup_Record $backup = null) {
         return is_null($backup) ? 'No backups present' : CBackup_Helper::formatAgeInDays($backup->date());
+    }
+
+    public static function houseKeeping($config = null) {
+        CBackup_Config::instance()->reset();
+        static::output()->clear();
+        if ($config != null) {
+            CBackup_Config::instance()->setConfig($config);
+        }
+        static::output()->info('Starting HouseKeeping...');
+
+        $disableNotifications = true;
+
+
+
+        try {
+            $strategyClass = static::getConfig('house_keeping.strategy', CBackup_HouseKeeping_Strategy_DefaultStrategy::class);
+            $strategy = new $strategyClass();
+            static::output()->info('HouseKeeping run on strategy:'.$strategyClass);
+            $backupDestinations = CBackup_BackupDestinationFactory::createFromArray(static::getConfig('backup.destination.disks'));
+            
+            $houseKeeping = new CBackup_HouseKeeping($backupDestinations, $strategy, $disableNotifications);
+
+            $deletedFiles = $houseKeeping->run();
+
+            static::output()->info('HouseKeeping completed!');
+        } catch (Exception $exception) {
+            CBackup::output()->error("HouseKeeping failed because {$exception->getMessage()}." . PHP_EOL . $exception->getTraceAsString());
+            
+            if (!$disableNotifications) {
+                CEvent::dispatch(new CBackup_Event_HouseKeepingHasFailed($exception));
+            }
+            
+            
+        }
+        $output = CBackup::output()->getAndClearOutput();
+        return $output;
     }
 
 }

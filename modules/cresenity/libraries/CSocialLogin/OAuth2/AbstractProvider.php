@@ -220,7 +220,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
         if ($this->isStateless()) {
             return false;
         }
-        
+
         $state = $this->session()->get('state');
         return !(strlen($state) > 0 && $this->input('state') === $state);
     }
@@ -387,6 +387,37 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     public function with(array $parameters) {
         $this->parameters = $parameters;
         return $this;
+    }
+
+    function jwtEncode($data) {
+        $encoded = strtr(base64_encode($data), '+/', '-_');
+        return rtrim($encoded, '=');
+    }
+
+    function jwtGenerateSecretKey($keyId, $teamId, $clientId, $key) {
+        $header = [
+            'alg' => 'ES256',
+            'kid' => $keyId
+        ];
+        $body = [
+            'iss' => $teamId,
+            'iat' => time(),
+            'exp' => time() + 3600,
+            'aud' => 'https://appleid.apple.com',
+            'sub' => $clientId
+        ];
+
+        $privKey = openssl_pkey_get_private($key);
+        if (!$privKey)
+            return false;
+
+        $payload = encode(json_encode($header)) . '.' . encode(json_encode($body));
+        $signature = '';
+        $success = openssl_sign($payloads, $signature, $privKey, OPENSSL_ALGO_SHA256);
+        if (!$success)
+            return false;
+
+        return $payload . '.' . encode($signature);
     }
 
 }

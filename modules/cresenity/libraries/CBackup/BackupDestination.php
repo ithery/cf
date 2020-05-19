@@ -23,7 +23,7 @@ class CBackup_BackupDestination {
     /** @var null|\Spatie\Backup\BackupDestination\BackupCollection */
     protected $backupCollectionCache = null;
 
-    public function __construct(CStorage_Adapter $disk = null,  $backupName,  $diskName) {
+    public function __construct(CStorage_Adapter $disk = null, $backupName, $diskName) {
         $this->disk = $disk;
         $this->diskName = $diskName;
         $this->backupName = preg_replace('/[^a-zA-Z0-9.]/', '-', $backupName);
@@ -46,7 +46,7 @@ class CBackup_BackupDestination {
         return strtolower($filesystemType);
     }
 
-    public static function create( $diskName,  $backupName) {
+    public static function create($diskName, $backupName) {
         try {
             $disk = CStorage::instance()->disk($diskName);
             return new static($disk, $backupName, $diskName);
@@ -57,7 +57,7 @@ class CBackup_BackupDestination {
         }
     }
 
-    public function write( $file) {
+    public function write($file) {
         if (is_null($this->disk)) {
             throw CBackup_Exception_InvalidBackupDestinationException::diskNotSet($this->backupName);
         }
@@ -69,6 +69,7 @@ class CBackup_BackupDestination {
         if (is_resource($handle)) {
             fclose($handle);
         }
+        return $destination;
     }
 
     public function backupName() {
@@ -131,4 +132,5 @@ class CBackup_BackupDestination {
         return $this;
     }
 
+ 
 }

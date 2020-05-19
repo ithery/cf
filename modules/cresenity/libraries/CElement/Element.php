@@ -59,8 +59,7 @@ abstract class CElement_Element extends CElement {
     }
 
     protected function htmlAttr() {
-        $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        
 
 
         $custom_css = $this->custom_css;
@@ -69,11 +68,20 @@ abstract class CElement_Element extends CElement {
             $custom_css = ' style="' . $custom_css . '"';
         }
         $addition_attribute = "";
+        $haveClass = false;
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= " " . $k . '="' . $v . '"';
+            if($k=="class") {
+                $haveClass=true;
+            }
         }
-        $class_attr = ' class="' . $classes . '"';
-        $html_attr = 'id="' . $this->id . '" ' . $class_attr . $custom_css . $addition_attribute;
+        $classAttr = "";
+        if(!$haveClass) {
+            $classes = $this->classes;
+            $classes = implode(" ", $classes);
+            $classAttr = ' class="' . $classes . '"';
+        }
+        $html_attr = 'id="' . $this->id . '" ' . $classAttr . $custom_css . $addition_attribute;
         return $html_attr;
     }
 
@@ -180,4 +188,6 @@ abstract class CElement_Element extends CElement {
         return $js->text();
     }
 
+    
+    
 }

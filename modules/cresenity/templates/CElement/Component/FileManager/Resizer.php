@@ -120,13 +120,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
     $('.btn-resizer-perform-resize').click(function (e) {
 
-        performFmRequest('resizeImage', {
+        window.cfm.performFmRequest('resizeImage', {
             img: $("#img").val(),
             dataHeight: $("#height").val(),
             dataWidth: $("#width").val()
         }).done(loadItems);
     });
     $('.btn-resizer-load-items').click(function(e){
-        loadItems();
+        window.cfm.loadItems();
     });
 </script>

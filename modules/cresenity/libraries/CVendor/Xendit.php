@@ -483,6 +483,37 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
+    public function createRetail($external_id, $retail_outlet_name, $name, $amount, $options = array()) {
+        $curl = curl_init();
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+        $end_point = $this->server_domain . '/fixed_payment_code';
+        $data['external_id'] = $external_id;
+        $data['retail_outlet_name'] = $retail_outlet_name;
+        $data['name'] = $name;
+        $data['expected_amount'] = $amount;
+        $isSingleUse = carr::get($options, 'is_single_use', null);
+        $expirationDate = carr::get($options, 'expiration_date', null);
+        if (!empty($isSingleUse)) {
+            $data['is_single_use'] = $isSingleUse;
+        }
+        if (!empty($expirationDate)) {
+            $data['expiration_date'] = $expirationDate;
+        }
+        $payload = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $end_point);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
+
     public function cardlessCredit($externalId, $cardlessCreditType = null, $amount, $paymentType = '', $options = array()) {
         $curl = curl_init();
         $headers = array();
@@ -549,6 +580,23 @@ class CVendor_Xendit {
     public function recurringPayments($id) {
         $endPoint = $this->server_domain . '/recurring_payments/' . $id;
         $response = $this->requestToXendit($endPoint, 'GET');
+        return $response;
+    }
+
+    public function virtualAccountSimulatePayment($id, $amount) {
+        $endPoint = $this->server_domain . '/callback_virtual_accounts/external_id=' . $id . '/simulate_payment';
+        $response = $this->requestToXendit($endPoint, 'POST', ['amount' => $amount]);
+        return $response;
+    }
+
+    public function retailSimulatePayment($external_id, $retail_outlet_name, $payment_code, $transfer_amount) {
+        $endPoint = $this->server_domain . '/fixed_payment_code/simulate_payment';
+        $data = [];
+        $data['external_id'] = $external_id;
+        $data['retail_outlet_name'] = $retail_outlet_name;
+        $data['payment_code'] = $payment_code;
+        $data['transfer_amount'] = $transfer_amount;
+        $response = $this->requestToXendit($endPoint, 'POST', $data);
         return $response;
     }
 

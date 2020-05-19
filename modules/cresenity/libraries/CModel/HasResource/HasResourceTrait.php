@@ -56,6 +56,18 @@ trait CModel_HasResource_HasResourceTrait {
     }
 
     /**
+     * Add a file from the given disk.
+     *
+     * @param string $key
+     * @param string $disk
+     *
+     * @return CModel_HasResource_FileAdder_FileAdder
+     */
+    public function addResourceFromDisk($key, $disk = null) {
+        return CModel_HasResource_FileAdder_FileAdderFactory::createFromDisk($this, $key, $disk ?: CF::config('storage.default'));
+    }
+
+    /**
      * Add a file from a request.
      *
      * @param string $key
@@ -115,9 +127,10 @@ trait CModel_HasResource_HasResourceTrait {
         if (!cstr::contains($filename, '.')) {
             $filename = "{$filename}.{$resourceExtension[1]}";
         }
-        $file= CModel_HasResource_FileAdder_FileAdderFactory::create($this, $temporaryFile)
+        $file = CModel_HasResource_FileAdder_FileAdderFactory::create($this, $temporaryFile)
                 ->usingName(pathinfo($filename, PATHINFO_FILENAME))
-                        ->usingFileName($filename);;
+                ->usingFileName($filename);
+        ;
         return $file;
     }
 
@@ -154,8 +167,8 @@ trait CModel_HasResource_HasResourceTrait {
         $tmpFile = tempnam(sys_get_temp_dir(), 'resourcelibrary');
         file_put_contents($tmpFile, $binaryData);
         $this->guardAgainstInvalidMimeType($tmpFile, $allowedMimeTypes);
-        $file= CModel_HasResource_FileAdder_FileAdderFactory::create($this, $tmpFile);
-       
+        $file = CModel_HasResource_FileAdder_FileAdderFactory::create($this, $tmpFile);
+
         return $file;
     }
 
@@ -188,7 +201,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function getResource($collectionName = 'default', $filters = []) {
         $repository = new CResources_Repository();
-        
+
         return $repository->getCollection($this, $collectionName, $filters);
     }
 
@@ -210,7 +223,7 @@ trait CModel_HasResource_HasResourceTrait {
         }
         return $resource->getUrl($conversionName);
     }
-    
+
     /*
      * Get the url of the image for the given conversionName
      * for first resource for the given collectionName.
@@ -322,14 +335,14 @@ trait CModel_HasResource_HasResourceTrait {
             $excludedResource = CF::collect()->push($excludedResource);
         }
         $excludedResource = CF::collect($excludedResource);
-        
+
         if ($excludedResource->isEmpty()) {
             return $this->clearResourceCollection($collectionName);
         }
-       
+
         $this->getResource($collectionName)
                 ->reject(function (CApp_Model_Interface_ResourceInterface $resource) use ($excludedResource) {
-                    
+
                     return $excludedResource->where('resource_id', $resource->resource_id)->count();
                 })
         ->each->delete();
@@ -406,15 +419,18 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function loadResource($collectionName) {
         $collection = $this->exists ? $this->resource : CF::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
-        return $collection
-                        ->filter(function (CApp_Model_Interface_ResourceInterface $resourceItem) use ($collectionName) {
-                            if ($collectionName == '') {
-                                return true;
-                            }
-                            return $resourceItem->collection_name === $collectionName;
-                        })
-                        ->sortBy('order_column')
-                        ->values();
+        $values = $collection
+                ->filter(function (CApp_Model_Interface_ResourceInterface $resourceItem) use ($collectionName) {
+                    if ($collectionName == '') {
+                        return true;
+                    }
+                    return $resourceItem->collection_name === $collectionName;
+                })
+                ->sortBy('order_column')
+                ->values();
+
+
+        return $values;
     }
 
     public function prepareToAttachResource(CApp_Model_Interface_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) {

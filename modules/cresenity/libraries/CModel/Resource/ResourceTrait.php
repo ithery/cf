@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CModel_Resource_ResourceTrait {
 
+    public static function bootResourceTrait() {
+        static::observe(new CModel_Resource_ResourceObserver());
+    }
+
     public function model() {
         return $this->morphTo();
     }
@@ -277,19 +281,18 @@ trait CModel_Resource_ResourceTrait {
         $fileManipulator = CResources_Factory::createFileManipulator();
         $fileManipulator->createDerivedFiles($this, $only, $onlyMissing);
     }
-    
-    
+
     public function withImage(callable $call) {
         $resourceFileSystem = CResources_Factory::createFileSystem();
         $temporaryDirectoryPath = CResources_Helpers_TemporaryDirectory::generateLocalFilePath($this->getExtensionAttribute());
         $copiedOriginalFile = $resourceFileSystem->copyFromResourceLibrary(
                 $this, $temporaryDirectoryPath
         );
-        
+
         $image = new CImage_Image($copiedOriginalFile);
-        
+
         $call($image);
-        
+
         CResources_Helpers_TemporaryDirectory::delete($temporaryDirectoryPath);
     }
 

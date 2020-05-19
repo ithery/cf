@@ -106,7 +106,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 </style>
 
 <div id="container-<?php echo $id ?>" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
-    <input id="<?php echo $id ?>_input_temp" type="file" accept="image/*" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
+    <input id="<?php echo $id ?>_input_temp" type="file" accept="<?php echo $accept;?>" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
     <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
@@ -261,7 +261,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             }
 
             function addFile(file, fileList, event, imageData) {
-                var img = file.type.match("image.*") ? $("<img src=" + imageData + " /> ") : "";
+                var img = file.type.match("image.*") ? $("<img src=" + imageData + " /> ") : $("<img src='/media/img/icons/file.png' />");
                 var div = $("<div>").addClass("multi-image-ajax-file container-file-upload");
                 div.click(function (e) {
                     e.preventDefault();
@@ -306,7 +306,9 @@ foreach ($customControl as $cc):
                         var dataFile = JSON.parse(this.responseText);
                         div.removeClass("loading");
                         div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.fileId + ">");
-                        img.attr('src', data.url);
+                        if(file.type.match("image.*")){
+                            img.attr('src', data.url);
+                        }
                         index++;
                         fileChanged();
                     } else if (this.readyState == 4 && this.status != 200) {

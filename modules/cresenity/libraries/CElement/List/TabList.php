@@ -61,7 +61,7 @@ class CElement_List_TabList extends CElement_List {
      * @return CElement_List_TabList_Tab
      */
     public function addTab($id = "") {
-        $tab = CElement_List_TabList_Tab::factory($id);
+        $tab = CElement_List_TabList_Tab::factory($id)->setTabList($this);
         if (strlen($this->activeTab) == 0) {
             $this->activeTab = $tab->id();
         }

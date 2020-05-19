@@ -115,16 +115,21 @@ abstract class CObservable extends CRenderable {
 
     /**
      * 
-     * @param type $id
-     * @param type $type
+     * @param string|CElement_FormInput $id
+     * @param string $type
      * @return CElement_FormInput
      */
-    public function addControl($id, $type) {
+    public function addControl($id, $type = 'text') {
         $control = null;
-        if ($this->manager->isRegisteredControl($type)) {
-            $control = $this->manager->createControl($id, $type);
-        } else {
-            trigger_error('Unknown control type ' . $type);
+        if ($id instanceof CElement_FormInput) {
+            $control = $id;
+        }
+        if ($control == null) {
+            if ($this->manager->isRegisteredControl($type)) {
+                $control = $this->manager->createControl($id, $type);
+            } else {
+                trigger_error('Unknown control type ' . $type);
+            }
         }
 
 

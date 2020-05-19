@@ -23,7 +23,7 @@ class CManager_Asset_Helper {
     }
 
     public static function urlJsFile($file) {
-
+        
         $docroot = str_replace(DS, "/", DOCROOT);
         $file = str_replace(DS, "/", $file);
         $base_url = curl::base();
@@ -31,7 +31,7 @@ class CManager_Asset_Helper {
 
             $base_url = curl::base(false, 'http');
         }
-
+        
         $file = str_replace($docroot, $base_url, $file);
 
         return $file;

@@ -45,6 +45,7 @@ class CManager_File_Connector_FileManager_FM_Item {
     }
 
     public function isDirectory() {
+        
         return $this->fmPath->isDirectory();
     }
 

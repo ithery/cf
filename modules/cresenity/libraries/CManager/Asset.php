@@ -117,26 +117,31 @@ class CManager_Asset {
 
     public function getAllJsFileUrl() {
 
-        
+
         $moduleThemeJs = $this->module->getThemeContainer()->getAllJsFileUrl();
         $themeJs = $this->themeContainer->getAllJsFileUrl();
         $moduleRunTimeJs = $this->module->getRunTimeContainer()->getAllJsFileUrl();
         $runTimeJs = $this->runTimeContainer->getAllJsFileUrl();
-        return array_merge($moduleThemeJs, $themeJs, $moduleRunTimeJs, $runTimeJs);
+       
+         
+       
+        $allJs = array_merge($moduleThemeJs, $themeJs, $moduleRunTimeJs, $runTimeJs);
+       
+        return $allJs;
     }
 
     public function varJs() {
-         $varJs = "
+        $varJs = "
             window.capp = " . json_encode(CApp::variables()) . ";
             ";
-         return $varJs;
+        return $varJs;
     }
-    
-    public function wrapJs($js,$documentReady=false) {
+
+    public function wrapJs($js, $documentReady = false) {
         $js_before = "";
-      
-        if($documentReady) {
-            $js = 'jQuery(document).ready(function(){'.$js.'});';
+
+        if ($documentReady) {
+            $js = 'jQuery(document).ready(function(){' . $js . '});';
         }
         $js .= "
             if (typeof cappStartedEventInitilized === 'undefined') {
@@ -153,7 +158,7 @@ class CManager_Asset {
         ";
 
 
-       
+
         $js .= CJavascript::compile();
         $bar = CDebug::bar();
         if ($bar->isEnabled()) {
@@ -164,13 +169,13 @@ class CManager_Asset {
         return $js_before . $js . PHP_EOL . ";" . PHP_EOL;
     }
 
-    public function renderJsRequire($js, $require='require') {
+    public function renderJsRequire($js, $require = 'require') {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
 
 
 
-        
+
         $moduleThemejsFiles = $this->module->getThemeContainer()->jsFiles();
         $themejsFiles = $this->themeContainer->jsFiles();
         $moduleRunTimejsFiles = $this->module->getRunTimeContainer()->jsFiles();
@@ -195,14 +200,14 @@ class CManager_Asset {
                 }
 
 
-                $js_open .= str_repeat("\t", $i) . $require."(['" . $urlJsFile . "'],function(){" . PHP_EOL;
+                $js_open .= str_repeat("\t", $i) . $require . "(['" . $urlJsFile . "'],function(){" . PHP_EOL;
 
                 $js_close .= "})";
                 $i++;
             }
         }
         $js_before = $this->varJs();
-        return $js_before.$this->wrapJs($js_open . $js . $js_close);
+        return $js_before . $this->wrapJs($js_open . $js . $js_close);
     }
 
     public function render($pos, $type = null) {
@@ -279,12 +284,12 @@ class CManager_Asset {
         return $script;
     }
 
-    
     public function isUseRequireJs() {
         $isUseRequireJs = ccfg::get('requireJs');
-        if($isUseRequireJs===null) {
+        if ($isUseRequireJs === null) {
             $isUseRequireJs = true;
         }
         return $isUseRequireJs;
     }
+
 }

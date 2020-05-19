@@ -22,6 +22,11 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
     protected $input;
 
     /**
+     *
+     * @var array 
+     */
+    protected $args;
+    /**
      * 
      * @param string $methodCall
      */
@@ -56,4 +61,11 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         return $this->ajaxMethod->getType();
     }
 
+    
+    public function getArgs() {
+        return $this->ajaxMethod->getArgs();
+    }
+    
+    
+    
 }

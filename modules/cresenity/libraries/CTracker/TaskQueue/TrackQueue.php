@@ -8,18 +8,12 @@
 
 class CTracker_TaskQueue_TrackQueue extends CTracker_TaskQueueAbstract {
 
-    protected $params;
-
-    public function __construct($params) {
-        $this->params = $params;
-    }
-
     public function execute() {
         $data = carr::get($this->params, 'data');
         $config = carr::get($this->params, 'config');
 
         //$this->logDaemon('Processing Tracker Queue from ip:' . carr::get($data,'request.clientIp') .' => '.json_encode($data).', config:'.json_encode($config));
-        $this->logDaemon('Processing Tracker Queue from ip:' . carr::get($data,'request.clientIp'));
+        $this->logDaemon('Processing Tracker Queue from ip:' . carr::get($data, 'request.clientIp'));
         try {
             CTracker::populator()->setData($data);
             CTracker::config()->setData($config);
@@ -28,7 +22,7 @@ class CTracker_TaskQueue_TrackQueue extends CTracker_TaskQueueAbstract {
         } catch (CModel_Exception_ModelNotFound $ex) {
             $this->logDaemon('Ignore Error: ' . $className . '');
         }
-        $this->logDaemon('Processed Tracker Queue from ip:' . carr::get($data,'request.clientIp'));
+        $this->logDaemon('Processed Tracker Queue from ip:' . carr::get($data, 'request.clientIp'));
     }
 
 }

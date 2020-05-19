@@ -7,8 +7,10 @@ final class CF {
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
-    // The singleton instance of the controller
+    // The singleton instance of the controller (last of the controller)
     public static $instance;
+    // The multiple instance of the controller when callback when routing is failed or redirected
+    public static $instances;
     // Output buffering level
     private static $buffer_level;
     // Will be set to TRUE when an exception is caught
@@ -47,7 +49,6 @@ final class CF {
     private static $internal_cache_encrypt;
     private static $data;
     private static $sharedAppCode = array();
-    public static $instances;
     private static $translator;
 
     /**
@@ -212,8 +213,9 @@ final class CF {
 
         // Enable CF output handling
         CFEvent::add('system.shutdown', array('CF', 'shutdown'));
-
+        
         CFBenchmark::start('system.cf.bootstrap');
+
         //try to locate bootstrap files for modules 
         foreach (CF::modules() as $module) {
             $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;
@@ -221,23 +223,28 @@ final class CF {
                 include $bootstrapPath . 'bootstrap' . EXT;
             }
         }
+       
         //try to locate bootstrap files for application 
         $bootstrapPath = DOCROOT . 'application' . DS . CF::app_code() . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
+        
+       
         //try to locate bootstrap files for org
         $bootstrapPath .= CF::org_code() . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
         CFBenchmark::stop('system.cf.bootstrap');
-
+       
         // Setup is complete, prevent it from being run again
         $run = TRUE;
-
+        
         // Stop the environment setup routine
+        
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
+         
     }
 
     public static function invoke($uri) {
@@ -369,6 +376,7 @@ final class CF {
                 if (!isset(self::$instances[CFRouter::$current_uri])) {
                     self::$instances[CFRouter::$current_uri] = $controller;
                 }
+                self::$instance = $controller;
             }
 
             // Controller constructor has been executed
@@ -2353,6 +2361,10 @@ final class CF {
         return self::show404($page, $template);
     }
 
+    
+    public static function currentController() {
+        return static::$instance;
+    }
 }
 
 // End C
@@ -2489,6 +2501,7 @@ class CF_404_Exception extends CF_Exception {
         // Send the 404 header
         header('HTTP/1.1 404 File Not Found');
     }
+
 
 }
 
