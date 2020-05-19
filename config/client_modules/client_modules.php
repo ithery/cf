@@ -526,7 +526,7 @@ return array(
         "css" => array("icon/fontawesome-5.css"),
     ),
     "fontawesome-5-f" => array(
-        "css" => array("icon/fontawesome-5-f.css"),
+        "css" => array("icon/fontawesome-5-f.min.css"),
     ),
     "ionicons" => array(
         "css" => array("icon/ionicons.css"),
