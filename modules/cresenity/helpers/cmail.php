@@ -180,6 +180,7 @@ class cmail {
         $smtp_host = carr::get($options, 'smtp_host');
         $smtp_port = carr::get($options, 'smtp_port');
         $secure = carr::get($options, 'smtp_secure');
+        
         if (!$smtp_username) {
             $smtp_username = ccfg::get('smtp_username');
         }
@@ -199,11 +200,11 @@ class cmail {
 
         switch ($smtp_host) {
             case 'smtp.sendgrid.net':
-                if (count($attachments) == 0) {
-                    return cmailapi::sendgrid($to, $subject, $message, $attachments, $cc, $bcc, $options);
-                } else {
+//                if (count($attachments) == 0) {
+//                    return cmailapi::sendgrid($to, $subject, $message, $attachments, $cc, $bcc, $options);
+//                } else {
                     return cmailapi::sendgridv3($to, $subject, $message, $attachments, $cc, $bcc, $options);
-                }
+//                }
                 break;
             case 'smtp.mailgun.org':
                 return cmailapi::mailgun($to, $subject, $message, $attachments, $cc, $bcc, $options);

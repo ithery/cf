@@ -25,9 +25,9 @@ class cmailapi {
             $smtp_from_name = ccfg::get('smtp_from_name');
         }
 
-        if (is_array($to)) {
-            $to = carr::get($to, 0);
-        }
+//        if (is_array($to)) {
+//            $to = carr::get($to, 0);
+//        }
         $from = new CSendGrid_Email($smtp_from_name, $smtp_from);
 
         $toSendGrid = array();
@@ -35,12 +35,18 @@ class cmailapi {
             $to = array($to);
         }
         foreach ($to as $toItem) {
-            $toSendGrid[] = new CSendGrid_Email(null, $toItem);
+            $toName='';
+            $toEmail=$toItem;
+            if(is_array($toItem)){
+                $toName=carr::get($toItem,'toName');
+                $toEmail=carr::get($toItem,'toEmail');
+            }
+            $toSendGrid[] = new CSendGrid_Email($toName, $toEmail);
         }
         $content = new CSendGrid_Content("text/html", $message);
 
 
-
+        $subjectPreview=carr::get($options,'subject_preview');
         $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
         foreach ($attachments as $att) {
             $disk='';
