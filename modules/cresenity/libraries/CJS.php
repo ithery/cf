@@ -102,17 +102,17 @@ class CJS {
             $resolvedValue = "'$value'";
         else if (is_array($value))
             $resolvedValue = CJS::json_encode($value);
-        else if (CObject::is_instanceof($value))
+        else if ($value instanceof CObject)
             $resolvedValue = $value->js($lazy);
-        else if (CObjectCollection::is_instanceof($value)) {
-            if ($value->getCount() > 0)
+        else if ($value instanceof CObjectCollection) {
+            if ($value->getCount() > 0) {
                 $resolvedValue = $value->js($lazy);
-        }
-        else if (CJS::is_js($value) ||
-                CJS::is_jsstm($value))
+            }
+        } else if (CJS::is_js($value) || CJS::is_jsstm($value)) {
             $resolvedValue = $value->output();
-        else if (is_object($value))
+        } else if (is_object($value)) {
             $resolvedValue = CJS::json_encode($value);
+        }
 
         return $resolvedValue;
     }

@@ -52,11 +52,7 @@ trait CTrait_Compat_Element {
     public function generate_class() {
         return $this->generateClass();
     }
-    
-    public static function is_instanceof($val) {
-        return $this->isInstanceof($val);
-    }
-    
+
     public function toarray() {
         return $this->toArray();
     }

@@ -344,17 +344,17 @@ class CApp extends CObservable {
     public function rendered() {
         return $this->rendered;
     }
-    
+
     public function reset() {
-        $this->rendered=false;
-        $this->renderable= new CCollection();
+        $this->rendered = false;
+        $this->renderable = new CCollection();
         return $this;
     }
 
     public function render() {
 
         if ($this->rendered) {
-            throw new CException('CApp already Rendered'.cdbg::getTraceString());
+            throw new CException('CApp already Rendered' . cdbg::getTraceString());
         }
         $this->rendered = true;
 

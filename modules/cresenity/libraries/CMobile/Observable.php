@@ -478,13 +478,6 @@ abstract class CMobile_Observable extends CRenderable {
         }
     }
 
-    public static function is_instanceof($value) {
-        if (is_object($value)) {
-            return ($value instanceof CObject);
-        }
-        return false;
-    }
-
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->set_indent($indent);
