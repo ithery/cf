@@ -543,6 +543,9 @@ return array(
     "piconsthin" => array(
         "css" => array("icon/piconsthin.css"),
     ),
+    "osicon" => array(
+        "css" => array("icon/osicon.css"),
+    ),
     "open-ionic" => array(
         "css" => array("icon/open-ionic.css"),
     ),
