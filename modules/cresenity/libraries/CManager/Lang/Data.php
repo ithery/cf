@@ -21,6 +21,7 @@ class CManager_Lang_Data {
     }
 
     public static function getLangDir() {
+
         $dir = DOCROOT . "application/" . CF::appCode() . "/default/lang/";
         if (!is_dir($dir)) {
             mkdir($dir);
@@ -97,6 +98,9 @@ class CManager_Lang_Data {
     }
 
     public static function getLangDataTranslation($lang, $message) {
+        if(!CF::appCode()) {
+            return $message;
+        }
         $char = static::getCharForFolder($message);
         if (!static::langDataExists($lang, $char, $message)) {
             static::load($char, $lang);
