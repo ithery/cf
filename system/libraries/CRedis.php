@@ -112,7 +112,7 @@ class CRedis implements CRedis_FactoryInterface {
      * Resolve the given cluster connection by name.
      *
      * @param  string  $name
-     * @return \Illuminate\Redis\Connections\Connection
+     * @return CRedis_AbstractConnection
      */
     protected function resolveCluster($name) {
         return $this->connector()->connectToCluster(
@@ -140,7 +140,7 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Get the connector instance for the current driver.
      *
-     * @return \Illuminate\Contracts\Redis\Connector
+     * @return CRedis_AbstractConnector
      */
     protected function connector() {
         $customCreator = isset($this->customCreators[$this->driver]) ? $this->customCreators[$this->driver] : null;
