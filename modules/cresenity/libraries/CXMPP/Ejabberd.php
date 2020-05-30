@@ -27,12 +27,21 @@ class CXMPP_Ejabberd {
         $this->client = new CXMPP_Ejabberd_Client($config);
     }
 
-    public function createUser($user, $password, $host =null) {
+    public function register($user, $password, $host =null) {
         
         if($host==null) {
             $host = carr::get($this->config,'domain');
         }
-        $command = new CXMPP_Ejabberd_Command_CreateUser($user, $password, $host);
+        $command = new CXMPP_Ejabberd_Command_Register($user, $password, $host);
+        return $this->client->execute($command);
+    }
+    
+    public function registeredUser($host =null) {
+        
+        if($host==null) {
+            $host = carr::get($this->config,'domain');
+        }
+        $command = new CXMPP_Ejabberd_Command_RegisteredUser($host);
         return $this->client->execute($command);
     }
 

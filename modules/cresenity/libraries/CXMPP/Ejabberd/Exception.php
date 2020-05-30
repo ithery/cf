@@ -18,11 +18,12 @@ class CXMPP_Ejabberd_Exception extends Exception {
     }
 
     public static function networkException(GuzzleException $exception) {
-        return new CXMPP_Ejabberd_Exception('Network exception', $exception->getCode(), $exception);
+        
+        return new CXMPP_Ejabberd_Exception('Network exception:'.$exception->getMessage(), $exception->getCode(), $exception);
     }
 
     public static function generalException(Exception $exception) {
-        return new CXMPP_Ejabberd_Exception('An error occurred', $exception->getCode(), $exception);
+        return new CXMPP_Ejabberd_Exception('An error occurred:'.$exception->getMessage(), $exception->getCode(), $exception);
     }
 
 }
