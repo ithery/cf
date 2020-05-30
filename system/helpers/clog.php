@@ -279,6 +279,45 @@ class clog {
         return $clogger_instance->add($level, $message);
     }
 
-}
+    const EMERGENCY = LOG_EMERG;    // 0
+    const ALERT = LOG_ALERT;    // 1
+    const CRITICAL = LOG_CRIT;     // 2
+    const ERROR = LOG_ERR;      // 3
+    const WARNING = LOG_WARNING;  // 4
+    const NOTICE = LOG_NOTICE;   // 5
+    const INFO = LOG_INFO;     // 6
+    const DEBUG = LOG_DEBUG;    // 7
 
-?>
+    public static function emergency($message) {
+        return CLogger::instance()->add(CLogger::EMERGENCY, $message);
+    }
+
+    public static function alert($message) {
+        return CLogger::instance()->add(CLogger::ALERT, $message);
+    }
+
+    public static function critical($message) {
+        return CLogger::instance()->add(CLogger::CRITICAL, $message);
+    }
+
+    public static function error($message) {
+        return CLogger::instance()->add(CLogger::ERROR, $message);
+    }
+
+    public static function warning($message) {
+        return CLogger::instance()->add(CLogger::WARNING, $message);
+    }
+
+    public static function notice($message) {
+        return CLogger::instance()->add(CLogger::NOTICE, $message);
+    }
+
+    public static function info($message) {
+        return CLogger::instance()->add(CLogger::INFO, $message);
+    }
+
+    public static function debug($message) {
+        return CLogger::instance()->add(CLogger::DEBUG, $message);
+    }
+
+}
