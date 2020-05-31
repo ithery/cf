@@ -10,6 +10,7 @@ class CXMPP_Ejabberd_Response {
     protected $errCode;
     protected $errMessage;
     protected $data;
+    protected $rawResponse;
 
     public function __construct($body) {
         $this->errCode = 0;
@@ -17,27 +18,37 @@ class CXMPP_Ejabberd_Response {
         $this->data = [];
         if ($body instanceof Exception) {
             $this->errCode = 9999;
-            $this->errMessage = $body->getMessage;
+            $this->errMessage = $body->getMessage();
             $this->data = [];
         }
 
+        $jsonDecoded = false;
+        
         if (is_string($body)) {
-            $body = json_decode($body, true);
+            $this->rawResponse = $body;
+            $jsonDecoded = json_decode($body, true);
+            if (!is_array($jsonDecoded)) {
+                $body = ['status' => 'success', 'ejabberd' => $body];
+            } else {
+                $body = $jsonDecoded;
+            }
         }
+         
 
         if (is_array($body)) {
-            $status = carr::get($body, 'status');
-            if ($status != 'success') {
-                $this->errCode++;
-                $this->errMessage=carr::get($body, 'ejabberd');
+            
+            $status = carr::get($body, 'status',null);
+            if ($status!=null && $status != 'success') {
+                $this->errCode = carr::get($body, 'code', 9998);
+                $this->errMessage = carr::get($body, 'message', 'ejabberd error on guzzle exception');
             }
-
-            $this->data = carr::get($body, 'ejabberd');
+            $this->data = $body;
         }
-        cdbg::dd($body);
 
+         
 
         if (!is_array($body)) {
+            cdbg::dd($body);
             $this->errCode = 10000;
             $this->errMessage = 'Unknown error';
         }
@@ -47,12 +58,19 @@ class CXMPP_Ejabberd_Response {
         return [
             'errCode' => $this->errCode,
             'errMessage' => $this->errMessage,
-            'data' => $this->data,
+            'data' => $this->data(),
         ];
     }
 
     public function data() {
-        return $this->data;
+
+        $data = $this->data;
+        
+        if (strlen($this->rawResponse) > 0) {
+            $data = array_merge($data, ['rawResponse' => $this->rawResponse]);
+        }
+        
+        return $data;
     }
 
     public function toJson() {
@@ -61,6 +79,18 @@ class CXMPP_Ejabberd_Response {
             $array['data'] = new stdclass();
         }
         return json_encode($array);
+    }
+
+    public function hasError() {
+        return $this->errCode > 0;
+    }
+
+    public function throwException() {
+        throw new CXMPP_Ejabberd_Exception($this->errMessage, $this->errCode);
+    }
+
+    public function __toString() {
+        return $this->toJson();
     }
 
 }

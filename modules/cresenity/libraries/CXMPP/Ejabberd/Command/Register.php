@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Description of CreateUser
- * 
  * @author Hery Kurniawan <hery@itton.co.id>
  * @since May 30, 2020 
  * @license Ittron Global Teknologi
  */
-class CXMPP_Ejabberd_Command_CreateUser extends CXMPP_Ejabberd_CommandAbstract {
+
+class CXMPP_Ejabberd_Command_Register extends CXMPP_Ejabberd_CommandAbstract {
 
     private $user;
     private $password;

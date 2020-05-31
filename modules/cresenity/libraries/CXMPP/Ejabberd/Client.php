@@ -52,8 +52,8 @@ class CXMPP_Ejabberd_Client {
      * @throws EjabberdException
      */
     public function execute(CXMPP_Ejabberd_CommandAbstract $command) {
-
-        $command_name = $command->getCommandName();
+        $result = null;
+        $commandName = $command->getCommandName();
         try {
             $request = [
                 'headers' => [
@@ -69,15 +69,22 @@ class CXMPP_Ejabberd_Client {
             }
 
 
-            $response = $this->client->request('POST', $command_name, $request)->getBody()->getContents();
+            $result = $this->client->request('POST', $commandName, $request)->getBody()->getContents();
+          
+           
+        
         } catch (GuzzleException $e) {
-            $response = $exception->getResponse()->getBody()->getContents();
+            $result = $e->getResponse()->getBody()->getContents();
         } catch (\Exception $e) {
 
-            $response = $e;
+            $result = $e;
         }
 
-        return (new CXMPP_Ejabberd_Response($response))->toArray();
+        $response= (new CXMPP_Ejabberd_Response($result));
+        if($response->hasError()) {
+            throw $response->throwException();
+        }
+        return $response->data();
     }
 
 }

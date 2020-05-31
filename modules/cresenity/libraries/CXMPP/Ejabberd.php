@@ -27,6 +27,14 @@ class CXMPP_Ejabberd {
         $this->client = new CXMPP_Ejabberd_Client($config);
     }
 
+    
+    /**
+     * 
+     * @param string $user
+     * @param string $password
+     * @param string $host
+     * @return CXMPP_Ejabberd_Response
+     */
     public function register($user, $password, $host =null) {
         
         if($host==null) {
@@ -44,5 +52,33 @@ class CXMPP_Ejabberd {
         $command = new CXMPP_Ejabberd_Command_RegisteredUser($host);
         return $this->client->execute($command);
     }
+    
+    public function createRoom($name, $service, $host=null, $options = []) {
+        
+        if($host==null) {
+            $host = carr::get($this->config,'domain');
+        }
+        $command = new CXMPP_Ejabberd_Command_CreateRoom($name,$service,$host,$options);
+        return $this->client->execute($command);
+    }
+    
+    
+    public function mucOnlineRooms($service) {
+        
+       
+        $command = new CXMPP_Ejabberd_Command_MucOnlineRooms($service);
+        return $this->client->execute($command);
+    }
 
+    
+    public function subscribeRoom($user, $nick, $room, $nodes = []) {
+        $command = new CXMPP_Ejabberd_Command_SubscribeRoom($user, $nick, $room, $nodes);
+        return $this->client->execute($command);
+    }
+    
+    
+    public function sendDirectInvitation($name, $service, $users, $reason = '', $password = '') {
+        $command = new CXMPP_Ejabberd_Command_SendDirectInvitation($name, $service, $users, $reason, $password);
+        return $this->client->execute($command);
+    }
 }
