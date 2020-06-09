@@ -11,11 +11,13 @@ class CXMPP_Ejabberd_Response {
     protected $errMessage;
     protected $data;
     protected $rawResponse;
+    protected $command;
 
-    public function __construct($body) {
+    public function __construct($command,$body) {
         $this->errCode = 0;
         $this->errMessage = '';
         $this->data = [];
+        $this->command = $command;
         if ($body instanceof Exception) {
             $this->errCode = 9999;
             $this->errMessage = $body->getMessage();
@@ -28,7 +30,14 @@ class CXMPP_Ejabberd_Response {
             $this->rawResponse = $body;
             $jsonDecoded = json_decode($body, true);
             if (!is_array($jsonDecoded)) {
-                $body = ['status' => 'success', 'ejabberd' => $body];
+                
+                if($body=='"internal_error"') {
+                    $body = ['status' => 'error', 'ejabberd' => $body];
+                    $body = ['status' => 'success', 'ejabberd' => $body, 'command' => $this->command->getCommandName()];
+                } else {
+                    $body = ['status' => 'success', 'ejabberd' => $body];
+                }
+                
             } else {
                 $body = $jsonDecoded;
             }

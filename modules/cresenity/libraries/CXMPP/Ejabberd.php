@@ -81,4 +81,16 @@ class CXMPP_Ejabberd {
         $command = new CXMPP_Ejabberd_Command_SendDirectInvitation($name, $service, $users, $reason, $password);
         return $this->client->execute($command);
     }
+    
+    public function autoJoinRoom($user, $host, $room, $service, $nick = "") {
+
+        $command = new CXMPP_Ejabberd_Command_AutoJoinRoom($user, $host, $room, $service, $nick);
+        return $this->client->execute($command);
+    }
+    
+    public function destroyRoom($room, $service) {
+
+        $command = new CXMPP_Ejabberd_Command_DestroyRoom($room,$service);
+        return $this->client->execute($command);
+    }
 }

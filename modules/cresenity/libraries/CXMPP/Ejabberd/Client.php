@@ -80,7 +80,7 @@ class CXMPP_Ejabberd_Client {
             $result = $e;
         }
 
-        $response= (new CXMPP_Ejabberd_Response($result));
+        $response= (new CXMPP_Ejabberd_Response($command,$result));
         if($response->hasError()) {
             throw $response->throwException();
         }

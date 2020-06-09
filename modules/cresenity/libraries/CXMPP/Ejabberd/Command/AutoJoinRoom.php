@@ -11,16 +11,12 @@ class CXMPP_Ejabberd_Command_AutoJoinRoom extends CXMPP_Ejabberd_Command_Private
 
     public function __construct($user, $host, $room, $service, $nick = "") {
 
-        $this->user = $user;
 
+        $room = strtolower($room);
         $roomJid = $room . '@' . $service;
-        $this->element = sprintf("
-            <storage xmlns='storage:bookmarks'>
-                <conference autojoin='true' jid='%s' name='%s'>
-                <nick>%s</nick></conference>
-            </storage>
-        ", $roomJid, $room, $nick);
-        $this->host = $host;
+        $element = sprintf("<storage xmlns='storage:bookmarks'><conference autojoin='true' jid='%s' name='%s'><nick>%s</nick></conference></storage>", $roomJid, $room, $nick);
+
+        parent::__construct($user, $host, $element);
     }
 
 }

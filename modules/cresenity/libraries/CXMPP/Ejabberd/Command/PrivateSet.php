@@ -37,11 +37,14 @@ class CXMPP_Ejabberd_Command_PrivateSet extends CXMPP_Ejabberd_CommandAbstract {
     }
 
     public function getCommandData() {
-        return [
+        $data= [
             'user' => $this->user,
             'host' => $this->host,
             'element' => $this->element
         ];
+       
+        return $data;
+        
     }
 
 }
