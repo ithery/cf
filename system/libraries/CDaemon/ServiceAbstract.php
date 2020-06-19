@@ -311,7 +311,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     private function loop() {
         while ($this->parent && !$this->shutdown) {
             $this->timer(true);
-            $this->autoRestart();
+//            $this->autoRestart(); // updated on 19-06-2020
             $this->dispatch(array(self::ON_PREEXECUTE));
             $this->loopProcess();
             if (version_compare(PHP_VERSION, "5.3.0", '>=')) {
