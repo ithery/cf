@@ -58,7 +58,7 @@ class CTemporary_LocalFile {
      */
     public function __destruct() {
         if ($this->delete) {
-            CTemporary::local()->delete($this->_fileName);
+            //CTemporary::local()->delete($this->_fileName);
         }
     }
 
