@@ -56,8 +56,9 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
      * @return void
      */
     public function teardown() {
-        if (!$this->service->isParent())
+        if ($this->service && !$this->service->isParent()) {
             return;
+        }
         while ($this->count() > 0) {
             foreach ($this->processes() as $pid => $process)
                 if ($message = $process->stop())
