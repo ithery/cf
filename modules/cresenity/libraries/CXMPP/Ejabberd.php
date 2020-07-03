@@ -36,7 +36,6 @@ class CXMPP_Ejabberd {
      * @return CXMPP_Ejabberd_Response
      */
     public function register($user, $password, $host =null) {
-        
         if($host==null) {
             $host = carr::get($this->config,'domain');
         }
@@ -54,7 +53,6 @@ class CXMPP_Ejabberd {
     }
     
     public function createRoom($name, $service, $host=null, $options = []) {
-        
         if($host==null) {
             $host = carr::get($this->config,'domain');
         }
@@ -64,8 +62,6 @@ class CXMPP_Ejabberd {
     
     
     public function mucOnlineRooms($service) {
-        
-       
         $command = new CXMPP_Ejabberd_Command_MucOnlineRooms($service);
         return $this->client->execute($command);
     }
@@ -73,6 +69,11 @@ class CXMPP_Ejabberd {
     
     public function subscribeRoom($user, $nick, $room, $nodes = []) {
         $command = new CXMPP_Ejabberd_Command_SubscribeRoom($user, $nick, $room, $nodes);
+        return $this->client->execute($command);
+    }
+    
+    public function unsubscribeRoom($user, $room) {
+        $command = new CXMPP_Ejabberd_Command_UnsubscribeRoom($user, $room);
         return $this->client->execute($command);
     }
     
@@ -85,6 +86,12 @@ class CXMPP_Ejabberd {
     public function autoJoinRoom($user, $host, $room, $service, $nick = "") {
 
         $command = new CXMPP_Ejabberd_Command_AutoJoinRoom($user, $host, $room, $service, $nick);
+        return $this->client->execute($command);
+    }
+    
+    public function removeAutoJoinRoom($user, $host, $room, $service, $nick = "") {
+
+        $command = new CXMPP_Ejabberd_Command_RemoveAutoJoinRoom($user, $host, $room, $service, $nick);
         return $this->client->execute($command);
     }
     
