@@ -20,6 +20,7 @@ class CXMPP_Ejabberd_Client {
     private $conference_domain = '';
     private $debug = '';
     private $client = '';
+    private $lastResponse = null;
 
     /**
      * Ejabberd constructor.
@@ -81,10 +82,15 @@ class CXMPP_Ejabberd_Client {
         }
 
         $response= (new CXMPP_Ejabberd_Response($command,$result));
+        $this->lastResponse = $response;
         if($response->hasError()) {
             throw $response->throwException();
         }
         return $response->data();
     }
 
+    
+    public function getLastResponse() {
+        return $this->lastResponse;
+    }
 }
