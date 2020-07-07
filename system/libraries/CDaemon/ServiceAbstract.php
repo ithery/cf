@@ -26,7 +26,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     protected $stdout = false;
     protected $debug = true;
     protected $terminateLimit = 20;
-    
     protected $sizeToRotate = '500KB';
 
     /**
@@ -64,7 +63,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var float The interval in Seconds
      */
-
     protected $loopInterval = null;
 
     /**
@@ -311,7 +309,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     private function loop() {
         while ($this->parent && !$this->shutdown) {
             $this->timer(true);
-//            $this->autoRestart(); // updated on 19-06-2020
+            $this->autoRestart(); // updated on 19-06-2020
             $this->dispatch(array(self::ON_PREEXECUTE));
             $this->loopProcess();
             if (version_compare(PHP_VERSION, "5.3.0", '>=')) {
@@ -520,9 +518,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             self::$log_handle = $logFile_error = false;
         }
         if (self::$log_handle === false) {
-            if(strlen($logFile)>0&& file_exists($logFile)) { 
+            if (strlen($logFile) > 0 && file_exists($logFile)) {
                 $rotator = CLogger_Rotator::createRotate($logFile);
-                
+
                 $rotator->size($this->sizeToRotate)->run();
             }
             if (strlen($logFile) > 0 && self::$log_handle = @fopen($logFile, 'a+')) {
@@ -539,8 +537,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $message = $prefix . ' ' . str_replace("\n", "\n$prefix ", trim($message)) . "\n";
         if (self::$log_handle) {
             fwrite(self::$log_handle, $message);
-           
-          
         }
         if ($this->stdout) {
             echo $message;
@@ -768,6 +764,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @return boolean|void
      */
     private function autoRestart() {
+        if ($this->autoRestartInterval === null) {
+            return;
+        }
         if (!$this->parent)
             return;
         if ($this->runtime() < $this->autoRestartInterval || $this->autoRestartInterval < self::MIN_RESTART_SECONDS) {
