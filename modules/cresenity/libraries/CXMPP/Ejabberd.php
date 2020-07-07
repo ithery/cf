@@ -50,6 +50,12 @@ class CXMPP_Ejabberd {
         return $this->client->execute($command);
     }
 
+    public function connectedUsers($fullInfo = false) {
+
+        $command = new CXMPP_Ejabberd_Command_ConnectedUsers($fullInfo);
+        return $this->client->execute($command);
+    }
+
     public function createRoom($name, $service, $host = null, $options = []) {
         if ($host == null) {
             $host = carr::get($this->config, 'domain');
