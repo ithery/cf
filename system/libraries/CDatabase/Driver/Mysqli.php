@@ -336,6 +336,14 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return false;
     }
 
+    
+    public function ping() {
+        if (!$this->link) {
+            $this->connect();
+        }
+        return mysqli_ping($this->link);
+        
+    }
 }
 
 // End Database_Mysqli_Driver Class
