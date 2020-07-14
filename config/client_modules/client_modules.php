@@ -187,7 +187,7 @@ return array(
         ),
     ),
     "bootbox" => array(
-        "js" => array("plugins" . DS . "bootbox" . DS . "jquery.bootbox.js?v=2"),
+        "js" => array("plugins" . DS . "bootbox" . DS . "bootbox.all.min.js?v=2"),
     ),
     "bootbox4.4.0" => array(
         "js" => array("plugins" . DS . "bootbox" . DS . "bootboxbootstrap3.min.js?v=3"),
