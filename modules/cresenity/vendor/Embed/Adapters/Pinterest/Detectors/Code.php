@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+
 
 namespace Embed\Adapters\Pinterest\Detectors;
 
@@ -8,16 +8,13 @@ use Embed\EmbedCode;
 use function Embed\html;
 use function Embed\match;
 
-class Code extends Detector
-{
-    public function detect(): ?EmbedCode
-    {
-        return parent::detect()
-            ?: $this->fallback();
+class Code extends Detector {
+
+    public function detect() {
+        return parent::detect() ?: $this->fallback();
     }
 
-    private function fallback(): ?EmbedCode
-    {
+    private function fallback() {
         $uri = $this->extractor->getUri();
 
         if (!match('/pin/*', $uri->getPath())) {
@@ -38,4 +35,5 @@ class Code extends Detector
 
         return new EmbedCode(implode('', $html), 236, 442);
     }
+
 }

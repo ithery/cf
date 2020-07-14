@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 
 namespace Embed\Adapters\Github\Detectors;
 
@@ -8,16 +7,13 @@ use Embed\EmbedCode;
 use function Embed\html;
 use function Embed\match;
 
-class Code extends Detector
-{
-    public function detect(): ?EmbedCode
-    {
-        return parent::detect()
-            ?: $this->fallback();
+class Code extends Detector {
+
+    public function detect() {
+        return parent::detect() ?: $this->fallback();
     }
 
-    private function fallback(): ?EmbedCode
-    {
+    private function fallback() {
         $uri = $this->extractor->getUri();
         $path = $uri->getPath();
 
@@ -42,4 +38,5 @@ class Code extends Detector
                 return new EmbedCode(html('script', ['src' => "https://embed.githubusercontent.com/view/3d/{$username}/{$repo}/{$ref}/{$file}"]));
         }
     }
+
 }

@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 
 namespace Embed\Adapters\Snipplr\Detectors;
 
@@ -8,16 +7,13 @@ use Embed\EmbedCode;
 use function Embed\html;
 use function Embed\match;
 
-class Code extends Detector
-{
-    public function detect(): ?EmbedCode
-    {
-        return parent::detect()
-            ?: $this->fallback();
+class Code extends Detector {
+
+    public function detect() {
+        return parent::detect() ?: $this->fallback();
     }
 
-    private function fallback(): ?EmbedCode
-    {
+    private function fallback() {
         $uri = $this->extractor->getUri();
 
         if (!match('/view/*', $uri->getPath())) {
@@ -30,7 +26,7 @@ class Code extends Detector
             html('div', [
                 'id' => "snipplr_embed_{$id}",
                 'class' => 'snipplr_embed',
-            ], '<a target="blank" href="https://snipplr.com/view/'.$id.'">View this snippet</a> on Snipplr'),
+                    ], '<a target="blank" href="https://snipplr.com/view/' . $id . '">View this snippet</a> on Snipplr'),
             html('script', [
                 'type' => 'text/javascript',
                 'src' => 'https://snipplr.com/js/embed.js',
@@ -43,4 +39,5 @@ class Code extends Detector
 
         return new EmbedCode(implode('', $html));
     }
+
 }

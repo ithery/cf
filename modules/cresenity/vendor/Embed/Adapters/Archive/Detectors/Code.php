@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+
 
 namespace Embed\Adapters\Archive\Detectors;
 
@@ -8,10 +8,9 @@ use Embed\EmbedCode;
 use function Embed\html;
 use function Embed\match;
 
-class Code extends Detector
-{
-    public function detect(): ?EmbedCode
-    {
+class Code extends Detector {
+
+    public function detect() {
         $uri = $this->extractor->getUri();
         $path = $uri->getPath();
 
@@ -34,4 +33,5 @@ class Code extends Detector
 
         return new EmbedCode($html, $width, $height);
     }
+
 }

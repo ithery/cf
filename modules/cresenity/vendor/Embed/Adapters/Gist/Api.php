@@ -1,19 +1,18 @@
 <?php
-declare(strict_types = 1);
 
 namespace Embed\Adapters\Gist;
 
 use Embed\HttpApiTrait;
 
-class Api
-{
+class Api {
+
     use HttpApiTrait;
 
-    protected function fetchData(): array
-    {
+    protected function fetchData() {
         $uri = $this->extractor->getUri();
-        $this->endpoint = $uri->withPath($uri->getPath().'.json');
+        $this->endpoint = $uri->withPath($uri->getPath() . '.json');
 
         return $this->fetchJSON($this->endpoint);
     }
+
 }

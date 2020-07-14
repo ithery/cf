@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 
 namespace Embed\Adapters\Archive;
 
@@ -9,12 +8,11 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
-class Extractor extends Base
-{
-    private Api $api;
+class Extractor extends Base {
 
-    public function __construct(UriInterface $uri, RequestInterface $request, ResponseInterface $response, Crawler $crawler)
-    {
+    private $api;
+
+    public function __construct(UriInterface $uri, RequestInterface $request, ResponseInterface $response, Crawler $crawler) {
         parent::__construct($uri, $request, $response, $crawler);
 
         $this->api = new Api($this);
@@ -27,8 +25,8 @@ class Extractor extends Base
         $this->publishedTime = new Detectors\PublishedTime($this);
     }
 
-    public function getApi(): Api
-    {
+    public function getApi() {
         return $this->api;
     }
+
 }

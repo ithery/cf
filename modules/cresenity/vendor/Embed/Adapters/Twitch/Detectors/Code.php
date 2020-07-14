@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 
 namespace Embed\Adapters\Twitch\Detectors;
 
@@ -7,16 +6,13 @@ use Embed\Detectors\Code as Detector;
 use Embed\EmbedCode;
 use function Embed\html;
 
-class Code extends Detector
-{
-    public function detect(): ?EmbedCode
-    {
-        return parent::detect()
-            ?: $this->fallback();
+class Code extends Detector {
+
+    public function detect() {
+        return parent::detect() ?: $this->fallback();
     }
 
-    private function fallback(): ?EmbedCode
-    {
+    private function fallback() {
         $path = $this->extractor->getUri()->getPath();
 
         if ($id = self::getVideoId($path)) {
@@ -32,8 +28,7 @@ class Code extends Detector
         return null;
     }
 
-    private static function getVideoId(string $path): ?string
-    {
+    private static function getVideoId($path) {
         if (preg_match('#^/videos/(\d+)$#', $path, $matches)) {
             return $matches[1];
         }
@@ -41,8 +36,7 @@ class Code extends Detector
         return null;
     }
 
-    private static function getChannelId(string $path): ?string
-    {
+    private static function getChannelId($path) {
         if (preg_match('#^/(\w+)$#', $path, $matches)) {
             return $matches[1];
         }
@@ -50,8 +44,7 @@ class Code extends Detector
         return null;
     }
 
-    private static function generateCode(array $params): string
-    {
+    private static function generateCode(array $params) {
         $query = http_build_query(['autoplay' => 'false'] + $params);
 
         return html('iframe', [
@@ -63,4 +56,5 @@ class Code extends Detector
             'width' => 620,
         ]);
     }
+
 }

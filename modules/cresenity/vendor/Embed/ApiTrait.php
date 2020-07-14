@@ -8,7 +8,6 @@ use Psr\Http\Message\UriInterface;
 
 require_once dirname(__FILE__) . '/functions.php';
 
-
 trait ApiTrait {
 
     private $extractor;
@@ -80,7 +79,11 @@ trait ApiTrait {
     public function url(...$keys) {
         $url = $this->str(...$keys);
 
-        return $url ? $this->extractor->resolveUri($url) : null;
+        try {
+            return $url ? $this->extractor->resolveUri($url) : null;
+        } catch (Throwable $error) {
+            return null;
+        }
     }
 
     public function time(...$keys) {

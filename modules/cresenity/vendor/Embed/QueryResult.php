@@ -81,7 +81,12 @@ class QueryResult {
             return null;
         }
 
-        return $this->extractor->resolveUri($value);
+        try {
+            return $this->extractor->resolveUri($value);
+        } catch (Exception $error) {
+            //do nothing
+        }
+        return null;
     }
 
     private static function getAttribute(DOMElement $node, $name) {

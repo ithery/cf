@@ -22,6 +22,8 @@ class Embed {
         $request = $this->crawler->createRequest('GET', $url);
         $response = $this->crawler->sendRequest($request);
 
+        
+        
         return $this->extract($request, $response);
     }
 

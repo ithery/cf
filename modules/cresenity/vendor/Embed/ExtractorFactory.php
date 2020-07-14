@@ -41,7 +41,7 @@ class ExtractorFactory {
         $class = isset($this->adapters[$host]) ? $this->adapters[$host] : $this->default;
 
         $extractor = new $class($uri, $request, $response, $crawler);
-
+        
         foreach ($this->customDetectors as $name => $detector) {
             $extractor->addDetector($name, new $detector($extractor));
         }

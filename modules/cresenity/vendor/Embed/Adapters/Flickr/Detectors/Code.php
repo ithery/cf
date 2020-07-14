@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 
 namespace Embed\Adapters\Flickr\Detectors;
 
@@ -9,23 +8,20 @@ use Embed\EmbedCode;
 use function Embed\html;
 use function Embed\match;
 
-class Code extends Detector
-{
-    public function detect(): ?EmbedCode
-    {
-        return parent::detect()
-            ?: $this->fallback();
+class Code extends Detector {
+
+    public function detect() {
+        return parent::detect() ?: $this->fallback();
     }
 
-    private function fallback(): ?EmbedCode
-    {
+    private function fallback() {
         $uri = $this->extractor->getUri();
 
         if (!match('/photos/*', $uri->getPath())) {
             return null;
         }
 
-        $path = cleanPath($uri->getPath().'/player');
+        $path = cleanPath($uri->getPath() . '/player');
         $src = $uri->withPath($path);
         $width = 640;
         $height = 425;
@@ -41,4 +37,5 @@ class Code extends Detector
 
         return new EmbedCode($html, $width, $height);
     }
+
 }
