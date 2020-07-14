@@ -61,7 +61,7 @@ trait CDatabase_Trait_Builder {
      * Execute the query and get the first result.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return CModel|object|static|null
      */
     public function first($columns = ['*']) {
         return $this->take(1)->get($columns)->first();
@@ -76,7 +76,7 @@ trait CDatabase_Trait_Builder {
      * @return mixed
      */
     public function when($value, $callback, $default = null) {
-      
+
         if ($value) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {
@@ -89,7 +89,7 @@ trait CDatabase_Trait_Builder {
      * Pass the query to a given callback.
      *
      * @param  \Closure  $callback
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     public function tap($callback) {
         return $this->when(true, $callback);
@@ -120,10 +120,10 @@ trait CDatabase_Trait_Builder {
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return CPagination_LengthAwarePaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options) {
-        return CContainer::getInstance()->makeWith(Illuminate\Pagination\LengthAwarePaginator::class, compact(
+        return CContainer::getInstance()->makeWith(CPagination_LengthAwarePaginator::class, compact(
                                 'items', 'total', 'perPage', 'currentPage', 'options'
         ));
     }
@@ -135,10 +135,10 @@ trait CDatabase_Trait_Builder {
      * @param  int $perPage
      * @param  int $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\Paginator
+     * @return CPagination_Paginator
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options) {
-        return CContainer::getInstance()->makeWith(Illuminate\Pagination\Paginator::class, compact(
+        return CContainer::getInstance()->makeWith(CPagination_Paginator::class, compact(
                                 'items', 'perPage', 'currentPage', 'options'
         ));
     }
@@ -148,10 +148,9 @@ trait CDatabase_Trait_Builder {
      *
      * @param  int  $page
      * @param  int  $perPage
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return CDatabase_Query_Builder|static
      */
-    public function forPage($page, $perPage = 15)
-    {
+    public function forPage($page, $perPage = 15) {
         return $this->skip(($page - 1) * $perPage)->take($perPage);
     }
 

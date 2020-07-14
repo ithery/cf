@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CApp_Trait_App_Renderer {
 
+    protected static $variables;
+
     public static function variables() {
         $variables = array();
         $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
@@ -22,6 +24,9 @@ trait CApp_Trait_App_Renderer {
         $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
         $variables['haveScrollToTop'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
         $variables['CFVersion'] = CF::version();
+        $variables['domain'] = CF::domain();
+        $variables['appCode'] = CF::appCode();
+        $variables['appId'] = CF::appId();
 
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
@@ -61,13 +66,22 @@ trait CApp_Trait_App_Renderer {
             $variables['jsUrl'] = CManager::asset()->getAllJsFileUrl();
 
             $variables['defaultJQueryUrl'] = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
-
+        }
+        if (is_array(static::$variables)) {
+            $variables = array_merge($variables, static::$variables);
         }
         return $variables;
     }
 
-    public function getVariables() {
-        return $this->variables();
+    public static function getVariables() {
+        return static::variables();
+    }
+
+    public static function setVariable($key, $value) {
+        if (static::$variables == null) {
+            static::$variables = [];
+        }
+        static::$variables[$key] = $value;
     }
 
     public function getViewData() {
@@ -100,7 +114,7 @@ trait CApp_Trait_App_Renderer {
         $js_urls = $asset->getAllJsFileUrl();
         $additional_js = "";
         if ($asset->isUseRequireJs()) {
-            
+
             foreach ($css_urls as $url) {
                 $additional_js .= "
                     $.cresenity._filesadded+='['+'" . $url . "'+']';

@@ -12,28 +12,23 @@ defined('SYSPATH') OR die('No direct access allowed.');
         <li class="nav-item">
             <a class="nav-link can-click" href="#" data-type="0" data-url="<?php echo $rootFolder->url; ?>">
                 <i class="fa fa-folder fa-fw"></i> <?php echo $rootFolder->name; ?>
-                <input type="hidden" id="goToFolder" name="goToFolder" value="<?php echo $rootFolder->url; ?>">
-                <div id="items">
-                    <?php foreach ($items as $i): ?>
-                        <input type="hidden" id="<?php echo $i; ?>" name="items[]" value="<?php echo $i; ?>">
-                    <?php endforeach; ?>
-                </div>
+
             </a>
         </li>
         <?php foreach ($rootFolder->children as $directory): ?>
             <li class="nav-item sub-item">
                 <a class="nav-link can-click" href="#" data-type="0" data-url="<?php echo $directory->url; ?>">
                     <i class="fa fa-folder fa-fw"></i> <?php echo $directory->name; ?>
-                    <input type="hidden" id="goToFolder" name="goToFolder" value="<?php echo $directory->url; ?>">
-                    <div id="items">
-                        <?php foreach ($items as $i): ?>
-                            <input type="hidden" id="<?php echo $i; ?>" name="items[]" value="<?php echo $i; ?>">
-                        <?php endforeach; ?>
-                    </div>
+
                 </a>
             </li>
         <?php endforeach; ?>
     <?php endforeach; ?>
+    <div id="items">
+        <?php foreach ($items as $i): ?>
+            <input type="hidden" id="<?php echo $i; ?>" name="items[]" value="<?php echo $i; ?>">
+        <?php endforeach; ?>
+    </div>
 </ul>
 
 <script>
@@ -45,10 +40,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
         $("#items").find("input").each(function () {
             items.push(this.id)
         });
-        performFmRequest('doMove', {
+        window.cfm.performFmRequest('doMove', {
             items: items,
             goToFolder: folder
-        }).done(refreshFoldersAndItems);
+        }).done(window.cfm.refreshFoldersAndItems);
     });
 
 </script>

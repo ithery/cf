@@ -30,7 +30,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
      * AncestorsRelation constructor.
      *
      * @param CModel_Nested_Query $builder
-     * @param Model $model
+     * @param CModel $model
      */
     public function __construct(CModel_Nested_Query $builder, CModel $model) {
         if (!CModel_Nested_NestedSet::isNode($model)) {
@@ -40,7 +40,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
     }
 
     /**
-     * @param Model $model
+     * @param CModel $model
      * @param $related
      *
      * @return bool
@@ -166,7 +166,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
      * @param Model $model
      * @param CModel_Collection $results
      *
-     * @return Collection
+     * @return CCollection
      */
     protected function matchForModel(Model $model, CModel_Collection $results) {
         $result = $this->related->newCollection();

@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 use CManager_File_Connector_FileManager_FM as FM;
 use Intervention\Image\ImageManager;
 
-class CManager_File_Connector_FileManager_Controller_CropImageController extends CManager_File_Connector_FileManager_Controller_BaseController {
+class CManager_File_Connector_FileManager_Controller_CropImageController extends CManager_File_Connector_FileManager_AbstractController {
 
    
     public function execute() {
@@ -21,7 +21,7 @@ class CManager_File_Connector_FileManager_Controller_CropImageController extends
      * Crop the image (called via ajax).
      */
     public function crop($overWrite = true) {
-        $fm = new FM();
+        $fm = $this->fm();
         $image_name = $fm->input('img');
         $image_path = $fm->path()->setName($image_name)->path('absolute');
         $crop_path = $image_path;

@@ -266,7 +266,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             }
             return $imageLoader->getUrl();
         }
-        if ($this->_resource_type == 'file') {
+        if ($this->_resource_type == 'file' || $this->_resource_type == 'pdf') {
             $options = array(
                 'app_code' => $this->_app_code,
             );

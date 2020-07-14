@@ -20,10 +20,12 @@ abstract class FileSocket implements SocketInterface {
      *
      * @return void
      */
-    public function write($data): void {
+    public function write($data) {
         $this->checkClosed();
         $retries = 0;
-        error_clear_last();
+        if (function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         while (!empty($data) && $retries < 10) {
             $written = fwrite($this->socket, $data);
 

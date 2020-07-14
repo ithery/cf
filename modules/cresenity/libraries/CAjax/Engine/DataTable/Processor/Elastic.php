@@ -35,7 +35,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
         $columns = carr::get($data, 'columns');
         $rowActionList = $table->getRowActionList();
-        $key = carr::get($data, 'key_field');
+        $key = $table->getKeyField();
 
         $elastic_index = carr::get($ajaxData, 'index');
         $elastic_document_type = carr::get($ajaxData, 'document_type');
@@ -187,9 +187,9 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
             $no++;
             $key = "";
 
-            if (array_key_exists($table->key_field, $row)) {
+            if (array_key_exists($table->getKeyField(), $row)) {
 
-                $key = $row[$table->key_field];
+                $key = $row[$table->getKeyField()];
             }
             if ($table->numbering) {
                 $arr[] = $no;

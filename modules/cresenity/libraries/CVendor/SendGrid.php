@@ -12,7 +12,7 @@ class CVendor_SendGrid {
 
     // @var string
     protected $namespace = 'SendGrid';
-    // @var \SendGrid\Client
+    // @var CVendor_SendGrid_Client
     public $client;
     // @var string
     public $version = self::VERSION;

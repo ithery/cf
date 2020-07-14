@@ -37,7 +37,12 @@ class CApp_Navigation_Helper {
             $nav_method = carr::get($nav, 'method', '');
             $nav_controller = carr::get($nav, 'controller', '');
 
-            if ($nav_controller != '' && $nav_method != '' && $path . $controller == $nav_path . $nav_controller && $method == $nav_method) {
+            $navAlias = carr::wrap(carr::get($nav, 'alias', ''));
+
+            if ($nav_controller != '' &&
+                    $nav_method != '' &&
+                    $path . $controller == $nav_path . $nav_controller &&
+                    ($method == $nav_method || in_array($method, $navAlias))) {
                 return $nav;
             }
 
@@ -96,7 +101,7 @@ class CApp_Navigation_Helper {
         if (isset($_COOKIE['capp-administrator'])) {
             return true;
         }
-        $db = CDatabase::instance(null,null,$domain);
+        $db = CDatabase::instance(null, null, $domain);
         if ($roleId == "PUBLIC") {
             $roleId = null;
         }
@@ -144,7 +149,7 @@ class CApp_Navigation_Helper {
         if ($appId == null) {
             $appId = $app->appId();
         }
-        $db = CDatabase::instance(null,null,$domain);
+        $db = CDatabase::instance(null, null, $domain);
 
         /* @var $role CApp_Model */
         $role = CApp::model('Roles')->find($roleId);
@@ -156,7 +161,7 @@ class CApp_Navigation_Helper {
             return true;
         }
 
-        $db = CDatabase::instance(null,null,$domain);
+        $db = CDatabase::instance(null, null, $domain);
 
         return $role->rolePermission()->where('name', '=', $action)->where('app_id', '=', $appId)->count() > 0;
     }

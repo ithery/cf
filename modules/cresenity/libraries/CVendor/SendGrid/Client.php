@@ -335,13 +335,14 @@ class CVendor_SendGrid_Client {
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_FAILONERROR => false
                 ] + $this->curlOptions;
-
+        
         if (isset($headers)) {
             $headers = array_merge($this->headers, $headers);
+            
         } else {
             $headers = $this->headers;
         }
-
+        
         if (isset($body)) {
             $encodedBody = json_encode($body);
             $options[CURLOPT_POSTFIELDS] = $encodedBody;
@@ -400,7 +401,7 @@ class CVendor_SendGrid_Client {
         $responseHeaders = explode("\n", $responseHeaders);
         $responseHeaders = array_map('trim', $responseHeaders);
 
-        return new CVendor_SendGrid_Mail_Response($statusCode, $responseBody, $responseHeaders);
+        return new CVendor_SendGrid_Response($statusCode, $responseBody, $responseHeaders);
     }
 
     /**
@@ -436,15 +437,16 @@ class CVendor_SendGrid_Client {
     public function makeRequest($method, $url, $body = null, $headers = null, $retryOnLimit = false) {
         $channel = curl_init($url);
 
+        
         $options = $this->createCurlOptions($method, $body, $headers);
-
+        
         curl_setopt_array($channel, $options);
         $content = curl_exec($channel);
 
         if ($content === false) {
             throw new CVendor_SendGrid_Exception_InvalidRequest(curl_error($channel), curl_errno($channel));
         }
-
+        
         $response = $this->parseResponse($channel, $content);
 
         if ($response->statusCode() === self::TOO_MANY_REQUESTS_HTTP_CODE && $retryOnLimit) {
@@ -523,6 +525,7 @@ class CVendor_SendGrid_Client {
         if (isset($name)) {
             $this->path[] = $name;
         }
+        
         $client = new static($this->host, $this->headers, $this->version, $this->path);
         $client->setCurlOptions($this->curlOptions);
         $client->setRetryOnLimit($this->retryOnLimit);
@@ -559,7 +562,7 @@ class CVendor_SendGrid_Client {
             $url = $this->buildUrl($queryParams);
             $headers = isset($args[2]) ? $args[2] : null;
             $retryOnLimit = isset($args[3]) ? $args[3] : $this->retryOnLimit;
-
+            
             if ($this->isConcurrentRequest) {
                 // save request to be sent later
                 $requestData = ['method' => $name, 'url' => $url, 'body' => $body, 'headers' => $headers];
@@ -569,7 +572,7 @@ class CVendor_SendGrid_Client {
 
             return $this->makeRequest($name, $url, $body, $headers, $retryOnLimit);
         }
-
+        
         return $this->_($name);
     }
 

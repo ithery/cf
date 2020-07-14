@@ -65,9 +65,9 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Add the given conditions to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  CDatabase_Query_Builder  $query
      * @param  array  $conditions
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     protected function addConditions($query, $conditions) {
         foreach ($conditions as $key => $value) {
@@ -86,7 +86,7 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Add a "where" clause to the given query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  CDatabase_Query_Builder  $query
      * @param  string  $key
      * @param  string  $extraValue
      * @return void
@@ -107,7 +107,7 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
      * Get a query builder for the given table.
      *
      * @param  string  $table
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     protected function table($table) {
         return $this->db->table($table);

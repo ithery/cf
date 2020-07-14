@@ -91,11 +91,11 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $this->renderable = array();
         return $this;
     }
-    
+
     public function parentHtml() {
         return parent::html();
     }
-    
+
     public function parentJs() {
         return parent::js();
     }
@@ -170,7 +170,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $data["js_require"] = CClientScript::instance()->urlJsFile();
         $data["css_require"] = CClientScript::instance()->urlCssFile();
 
-        return cjson::encode($data);
+        return CHelper::json()->encode($data);
     }
 
     public function regenerateId($recursive = false) {
@@ -182,13 +182,6 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 }
             }
         }
-    }
-
-    public static function isInstanceof($value) {
-        if (is_object($value)) {
-            return ($value instanceof CRenderable);
-        }
-        return false;
     }
 
     public function toArray() {

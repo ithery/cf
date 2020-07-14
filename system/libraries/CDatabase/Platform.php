@@ -1497,8 +1497,8 @@ abstract class CDatabase_Platform {
      * @return string
      */
     public function getCommentOnColumnSQL($tableName, $columnName, $comment) {
-        $tableName = new Identifier($tableName);
-        $columnName = new Identifier($columnName);
+        $tableName = new CDatabase_Schema_Identifier($tableName);
+        $columnName = new CDatabase_Schema_Identifier($columnName);
         $comment = $this->quoteStringLiteral($comment);
 
         return "COMMENT ON COLUMN " . $tableName->getQuotedName($this) . "." . $columnName->getQuotedName($this) .

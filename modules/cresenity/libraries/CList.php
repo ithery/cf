@@ -38,11 +38,4 @@ class CList extends CAbstractList {
             return "[" . implode(",", $resolvedObjs) . "]";
     }
 
-    static public function is_instanceof($value) {
-        if (is_object($value)) {
-            return ($value instanceof CAbstractList);
-        }
-        return false;
-    }
-
 }

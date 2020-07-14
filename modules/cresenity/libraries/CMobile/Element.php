@@ -97,13 +97,6 @@ abstract class CMobile_Element extends CMobile_Observable {
         return '</' . $this->tag . '>';
     }
 
-    public static function is_instanceof($val) {
-        if (is_object($val)) {
-            return ($val instanceof CElement);
-        }
-        return false;
-    }
-
     public function toarray() {
         if (!empty($this->classes)) {
             $data['attr']['class'] = implode(" ", $this->classes);
@@ -140,7 +133,7 @@ abstract class CMobile_Element extends CMobile_Observable {
         }
         $addition_attribute = "";
         foreach ($this->attr as $k => $v) {
-            $addition_attribute.=" " . $k . '="' . $v . '"';
+            $addition_attribute .= " " . $k . '="' . $v . '"';
         }
         $class_attr = ' class="' . $classes . '"';
         $html_attr = 'id="' . $this->id . '" ' . $class_attr . $custom_css . $addition_attribute;
@@ -228,8 +221,6 @@ abstract class CMobile_Element extends CMobile_Observable {
                 . "</pre>";
         return $return;
     }
-    
-
 
 }
 

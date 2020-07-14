@@ -1398,6 +1398,7 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     protected function invalidOperator($operator) {
+        
         return !in_array(strtolower($operator), $this->operators, true) &&
                 !in_array(strtolower($operator), $this->grammar->getOperators(), true);
     }
@@ -2347,6 +2348,39 @@ class CDatabase_Query_Builder {
         $column = $this->stripTableForPluck($column);
         $key = $this->stripTableForPluck($key);
         return is_array($queryResult[0]) ? $this->pluckFromArrayColumn($queryResult, $column, $key) : $this->pluckFromObjectColumn($queryResult, $column, $key);
+    }
+
+    /**
+     * Dump the current SQL and bindings.
+     *
+     * @return $this
+     */
+    public function dump() {
+        cdbg::d($this->toSql(), $this->getBindings());
+
+        return $this;
+    }
+
+    /**
+     * Die and dump the current SQL and bindings.
+     *
+     * @return void
+     */
+    public function dd() {
+        cdbg::dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Throw an exception if the query doesn't have an orderBy clause.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function enforceOrderBy() {
+        if (empty($this->orders) && empty($this->unionOrders)) {
+            throw new RuntimeException('You must specify an orderBy clause when using this function.');
+        }
     }
 
 }

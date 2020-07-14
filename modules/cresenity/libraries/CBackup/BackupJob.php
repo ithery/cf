@@ -29,6 +29,7 @@ class CBackup_BackupJob {
     protected $sendNotifications = true;
 
     public function __construct() {
+
         $this->dontBackupFilesystem();
         $this->dontBackupDatabases();
         $this->setDefaultFilename();
@@ -95,11 +96,13 @@ class CBackup_BackupJob {
 
     public function run() {
         CBackup::output()->clear();
-        $temporaryDirectoryFolder = CF::config('backup.backup.temporary_folder', 'backup');
+        $temporaryDirectoryFolder = $this->getConfig('backup.temporary_folder', 'backup');
         $subfolder = date('YmdHis') . cstr::random(8);
         $path = $temporaryDirectoryFolder . DS . $subfolder;
         $this->temporaryDirectory = CTemporary::createDirectory($path);
-
+        $zipFile = '';
+        $files = [];
+        $size = 0;
         try {
             if (!count($this->backupDestinations)) {
                 throw CBackup_Exception_InvalidBackupJobException::noDestinationsSpecified();
@@ -109,7 +112,8 @@ class CBackup_BackupJob {
                 throw CBackup_Exception_InvalidBackupJobException::noFilesToBeBackedUp();
             }
             $zipFile = $this->createZipContainingEveryFileInManifest($manifest);
-            $this->copyToBackupDestinations($zipFile);
+            $size = filesize($zipFile);
+            $files = $this->copyToBackupDestinations($zipFile);
         } catch (Exception $exception) {
             CBackup::output()->error("Backup failed because {$exception->getMessage()}." . PHP_EOL . $exception->getTraceAsString());
             //$this->sendNotification(new BackupHasFailed($exception));
@@ -117,7 +121,12 @@ class CBackup_BackupJob {
             throw $exception;
         }
         $this->temporaryDirectory->delete();
-        return CBackup::output()->getAndClearOutput();
+        $output = CBackup::output()->getAndClearOutput();
+        return [
+            'files' => $files,
+            'size' => $size,
+            'output' => $output,
+        ];
     }
 
     protected function createBackupManifest() {
@@ -152,7 +161,7 @@ class CBackup_BackupJob {
 
     protected function createZipContainingEveryFileInManifest(CBackup_Manifest $manifest) {
         CBackup::output()->info("Zipping {$manifest->count()} files and directories...");
-        $pathToZip = $this->temporaryDirectory->getPath(CF::config('backup.backup.destination.filename_prefix') . $this->filename);
+        $pathToZip = $this->temporaryDirectory->getPath($this->getConfig('backup.destination.filename_prefix') . $this->filename);
         $zip = CBackup_Zip::createForManifest($manifest, $pathToZip);
         CBackup::output()->info("Created zip containing {$zip->count()} files and directories. Size is {$zip->humanReadableSize()}");
         //$this->sendNotification(new BackupZipWasCreated($pathToZip));
@@ -174,11 +183,11 @@ class CBackup_BackupJob {
                         $dbName = $key . '-database';
                     }
                     $fileName = "{$dbType}-{$dbName}.{$this->getExtension($dbDumper)}";
-                    if (CF::config('backup.backup.gzip_database_dump')) {
+                    if ($this->getConfig('backup.gzip_database_dump')) {
                         $dbDumper->useCompressor(new CBackup_Compressor_GzipCompressor());
                         $fileName .= '.' . $dbDumper->getCompressorExtension();
                     }
-                    if ($compressor = CF::config('backup.backup.database_dump_compressor')) {
+                    if ($compressor = $this->getConfig('backup.database_dump_compressor')) {
                         $dbDumper->useCompressor(new $compressor());
                         $fileName .= '.' . $dbDumper->getCompressorExtension();
                     }
@@ -189,17 +198,21 @@ class CBackup_BackupJob {
     }
 
     protected function copyToBackupDestinations($path) {
-        $this->backupDestinations->each(function (CBackup_BackupDestination $backupDestination) use ($path) {
-            try {
-                CBackup::output()->info("Copying zip to disk named {$backupDestination->diskName()}...");
-                $backupDestination->write($path);
-                CBackup::output()->info("Successfully copied zip to disk named {$backupDestination->diskName()}.");
-                //$this->sendNotification(new BackupWasSuccessful($backupDestination));
-            } catch (Exception $exception) {
-                CBackup::output()->error("Copying zip failed because: {$exception->getMessage()}.");
-                //$this->sendNotification(new BackupHasFailed($exception, $backupDestination ?? null));
-            }
-        });
+        return $this->backupDestinations->map(function (CBackup_BackupDestination $backupDestination) use ($path) {
+                    try {
+                        CBackup::output()->info("Copying zip to disk named {$backupDestination->diskName()}...");
+                        $filename = $backupDestination->write($path);
+                        CBackup::output()->info("Successfully copied zip to disk named {$backupDestination->diskName()}.");
+                        //$this->sendNotification(new BackupWasSuccessful($backupDestination));
+                        return [
+                            'disk' => $backupDestination->diskName(),
+                            'filename' => $filename,
+                        ];
+                    } catch (Exception $exception) {
+                        CBackup::output()->error("Copying zip failed because: {$exception->getMessage()}.");
+                        //$this->sendNotification(new BackupHasFailed($exception, $backupDestination ?? null));
+                    }
+                })->toArray();
     }
 
     protected function sendNotification($notification) {
@@ -214,6 +227,10 @@ class CBackup_BackupJob {
 
     protected function getExtension(CBackup_Database_AbstractDumper $dbDumper) {
         return $dbDumper instanceof CBackup_Database_Dumper_MongoDbDumper ? 'archive' : 'sql';
+    }
+
+    protected function getConfig($key, $defaultValue = null) {
+        return CBackup::getConfig($key, $defaultValue);
     }
 
 }

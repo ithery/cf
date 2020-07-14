@@ -23,7 +23,7 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
         if ($errCode == 0) {
             try {
                 
-                cmail::send_smtp($to, $subject, $message, $attachment, $cc, $bcc, $options);
+                $response = cmail::send_smtp($to, $subject, $message, $attachment, $cc, $bcc, $options);
             } catch (Exception $ex) {
                 $errCode++;
                 $errMessage = $ex->getMessage();
@@ -32,7 +32,7 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
         if($errCode>0) {
             throw new CNotification_Exception($errMessage);
         }
-        return true;
+        return $response;
     }
 
     protected function sendEmail() {

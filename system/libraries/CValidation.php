@@ -22,10 +22,22 @@ class CValidation {
         return new CValidation_Validator($data, $rules, $messages, $customAttributes);
     }
 
-    
+    /**
+     * 
+     * @return \CValidation_Rule
+     */
     public static function createRule() {
         return new CValidation_Rule();
     }
+
+    /**
+     * 
+     * @return CValidation_Factory
+     */
+    public static function factory() {
+        return CValidation_Factory::instance();
+    }
+
 }
 
 // End CValidation

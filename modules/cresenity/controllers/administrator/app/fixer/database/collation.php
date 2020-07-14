@@ -7,6 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 17, 2019, 2:15:12 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use CApp_Administrator_Fixer_Database as DatabaseFixer;
 
 class Controller_Administrator_App_Fixer_Database_Collation extends CApp_Administrator_Controller_User {
 
@@ -30,7 +31,7 @@ class Controller_Administrator_App_Fixer_Database_Collation extends CApp_Adminis
         $tables = $schemaManager->listTableNames();
         $haveChanged = false;
         foreach ($tables as $table) {
-            $sql = $this->getSqlResult($table);
+            $sql = DatabaseFixer::sqlCollation($table);
 
             if (strlen($sql) > 0) {
                 $template = $app->addTemplate()
@@ -53,7 +54,7 @@ class Controller_Administrator_App_Fixer_Database_Collation extends CApp_Adminis
     }
 
     public function execute($table) {
-        $sql = $this->getSqlResult($table);
+        $sql = DatabaseFixer::sqlCollation($table);
         $db = CDatabase::instance();
         $errCode = 0;
         $errMessage = '';
@@ -64,47 +65,6 @@ class Controller_Administrator_App_Fixer_Database_Collation extends CApp_Adminis
             $errMessage = $ex->getMessage();
         }
         echo CApp_Base::jsonResponse($errCode, $errMessage);
-    }
-
-    private function getSqlResult($table) {
-        $db = CDatabase::instance();
-        $schemaManager = $db->getSchemaManager();
-        $schema = $schemaManager->createSchema();
-        $columnsData = $schemaManager->listTableColumns($table);
-        $columns = array_keys($columnsData);
-        $tableSchema = $schema->getTable($table);
-        $changes = 0;
-        $tableDifferences = new CDatabase_Schema_Table_Diff($table);
-
-        $dbPlatform = $db->getDatabasePlatform();
-        $comparator = new CDatabase_Schema_Comparator();
-        foreach ($columns as $column) {
-            $columnSchema = $tableSchema->getColumn($column);
-
-            if (in_array($columnSchema->getType()->getName(), [CDatabase_Type::STRING, CDatabase_Type::TEXT])) {
-                $targetOptions = array(
-                    'unsigned' => true,
-                );
-                $targetColumnSchema = clone $columnSchema;
-                $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
-                // See if column has changed properties in table 2.
-                $changedProperties = $comparator->diffColumn($columnSchema, $targetColumnSchema);
-
-                if (!empty($changedProperties)) {
-                    $columnDiff = new CDatabase_Schema_Column_Diff($column, $targetColumnSchema, $changedProperties);
-                    $columnDiff->fromColumn = $columnSchema;
-                    $tableDifferences->changedColumns[$column] = $columnDiff;
-                    $changes++;
-                }
-            }
-        }
-        $sql = null;
-        if ($changes) {
-            $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
-        }
-        return $sql;
     }
 
 }

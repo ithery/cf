@@ -1048,6 +1048,7 @@ var Cresenity = function () {
             backdrop: 'static',
             modalClass: false,
             onClose: false,
+            appendTo:false,
             footerAction: {}
         }, options);
 
@@ -1089,9 +1090,15 @@ var Cresenity = function () {
             modalContent.append(modalFooter);
         }
         modalContent.append(modalBody);
-        $('body').append(modalContainer);
-
+        
+        var appendTo = settings.appendTo;
+        if(typeof appendTo == 'undefined' || !appendTo) {
+            appendTo = $('body');
+        }
+        modalContainer.appendTo(appendTo);
+        modalContainer.addClass('capp-modal');
         modalContainer.on('hidden.bs.modal', function (e) {
+            
             if (cresenity.modalElements.length > 0) {
                 var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
                 if (lastModal && lastModal.get(0) === $(e.target).get(0)) {
@@ -1171,6 +1178,72 @@ var Cresenity = function () {
     this.closeDialog = function (options) {
         this.closeLastModal(options);
     }
+    this.ajax = function (options) {
+        var settings = $.extend({
+            block:true, 
+            url:window.location.href,
+            method:'post',
+        }, options);
+        var dataAddition = settings.dataAddition;
+        var url = settings.url;
+        url = this.url.replaceParam(url);
+        if (typeof dataAddition == 'undefined') {
+            dataAddition = {};
+        }
+        if(settings.block) {
+            cresenity.blockPage();
+        }
+        
+        var validationIsValid = true;
+        var ajaxOptions = {
+            url: url,
+            dataType: 'json',
+            data:dataAddition,
+            type: settings.method,
+           
+            success: function (response) {
+                var onSuccess = function () {};
+                var onError = function (errMessage) {
+                    cresenity.showError(errMessage)
+                };
+                if (typeof settings.onSuccess == 'function' && validationIsValid) {
+                    onSuccess = settings.onSuccess;
+                }
+                if (typeof settings.onError == 'function' && validationIsValid) {
+                    onError = settings.onError;
+                }
+
+                if (validationIsValid) {
+                    if (settings.handleJsonResponse == true) {
+                        cresenity.handleJsonResponse(response, onSuccess, onError);
+                    } else {
+                        onSuccess(response);
+                    }
+
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                if (thrownError != 'abort') {
+                    console.log(thrownError);
+                    cresenity.showError(thrownError);
+                }
+
+            },
+
+            complete: function () {
+                if(settings.block) {
+                    cresenity.unblockPage();
+                }
+
+                if (typeof settings.onComplete == 'function' && validationIsValid) {
+                    settings.onComplete();
+                }
+            },
+        };
+       
+        return $.ajax(ajaxOptions);
+            
+    };
     this.ajaxSubmit = function (options) {
         var settings = $.extend({}, options);
         var selector = settings.selector;
@@ -1278,6 +1351,15 @@ var Cresenity = function () {
             }
         });
     };
+    
+    this.scrollTo=function(element,container) {
+        if(typeof container == 'undefined') {
+            container=document.body;
+        }
+        $(container).animate({
+            scrollTop: $(element).offset().top - ($(container).offset().top + $(container).scrollTop())
+        });
+    };
 
     this.formatCurrency = function (rp) {
         rp = "" + rp;
@@ -1330,6 +1412,25 @@ var Cresenity = function () {
     this.unblockElement = function (selector) {
         $(selector).unblock();
     };
+    
+    this.value= function (elm) {
+        elm = jQuery(elm);
+        if (elm.length == 0) {
+            return null;
+        }
+        if (elm.attr('type') == 'checkbox') {
+            if (!elm.is(':checked')) {
+                return null;
+            }
+        }
+        if (typeof elm.val() != 'undefined') {
+            return elm.val();
+        }
+        if (typeof elm.attr('value') != 'undefined') {
+            return elm.attr('value');
+        }
+        return elm.html();
+    };
 
 
     this.initConfirm = function () {
@@ -1361,29 +1462,33 @@ var Cresenity = function () {
                 e.preventDefault();
                 e.stopPropagation();
                 btn.off('click');
-                bootbox.confirm(message, function (confirmed) {
-                    if (confirmed) {
-                        if (ahref) {
-                            window.location.href = ahref;
-                        } else {
-                            if (btn.attr('type') == 'submit') {
-                                btn.closest('form').submit();
+                bootbox.confirm({ 
+                    className: "capp-modal-confirm",
+                    message: message,
+                    callback: function (confirmed) {
+                        if (confirmed) {
+                            if (ahref) {
+                                window.location.href = ahref;
                             } else {
-                                btn.on('click');
-                            }
+                                if (btn.attr('type') == 'submit') {
+                                    btn.closest('form').submit();
+                                } else {
+                                    btn.on('click');
+                                }
 
-                        }
-                    } else {
-                        btn.removeAttr('data-clicked');
-                    }
-                    setTimeout(function () {
-                        var modalExists = $('.modal:visible').length > 0;
-                        if (!modalExists) {
-                            $('body').removeClass('modal-open');
+                            }
                         } else {
-                            $('body').addClass('modal-open');
+                            btn.removeAttr('data-clicked');
                         }
-                    }, 750);
+                        setTimeout(function () {
+                            var modalExists = $('.modal:visible').length > 0;
+                            if (!modalExists) {
+                                $('body').removeClass('modal-open');
+                            } else {
+                                $('body').addClass('modal-open');
+                            }
+                        }, 750);
+                    }
                 });
 
 

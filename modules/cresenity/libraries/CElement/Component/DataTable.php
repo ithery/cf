@@ -5,8 +5,12 @@ class CElement_Component_DataTable extends CElement_Component {
     use CTrait_Compat_Element_DataTable,
         CTrait_Element_ActionList_Row,
         CTrait_Element_ActionList_Header,
+        CTrait_Element_ActionList_Footer,
         CElement_Component_DataTable_Trait_GridViewTrait,
-        CElement_Component_DataTable_Trait_ExportTrait;
+        CElement_Component_DataTable_Trait_ExportTrait,
+        CElement_Component_DataTable_Trait_JavascriptTrait,
+        CElement_Component_DataTable_Trait_HtmlTrait,
+        CElement_Component_DataTable_Trait_ActionCreationTrait;
 
     public $defaultPagingList = array(
         "10" => "10",
@@ -16,20 +20,15 @@ class CElement_Component_DataTable extends CElement_Component {
         "-1" => "ALL",
     );
     public $current_row = 1;
-
-    /**
-     *
-     * @var CDatabase
-     */
-    public $db;
-    protected $dbName;
+    public $dbName;
     public $dbConfig;
     public $columns;
+    public $footerTitle;
     public $footer;
     public $footer_field;
     public $requires = array();
     public $data;
-    public $key_field;
+    public $keyField;
     public $checkbox;
     public $checkboxColumnWidth;
     public $checkbox_value;
@@ -43,7 +42,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $paging_list;
     public $responsive;
     public $options;
-    public $apply_data_table;
+    public $applyDataTable;
     public $group_by;
     public $title;
     public $ajax;
@@ -58,8 +57,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $pdf_font_size;
     public $pdf_orientation;
     public $show_header;
-    public $footer_action_list = array();
-    public $footer_action_style;
     public $isElastic = false;
     public $isCallback = false;
     public $callbackRequire = null;
@@ -67,6 +64,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $searchPlaceholder = '';
     public $infoText = '';
     protected $actionLocation = 'last';
+    protected $haveRowSelection = false;
     protected $tableStriped;
     protected $tableBordered;
     protected $quick_search = FALSE;
@@ -77,32 +75,36 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $fixedColumn;
     protected $scrollX;
     protected $scrollY;
+    protected $dbResolver;
 
     public function __construct($id = "") {
         parent::__construct($id);
         $this->defaultPagingList["-1"] = clang::__("ALL");
         $this->tag = "table";
         $this->responsive = false;
-        $this->db = CDatabase::instance(null, null, $this->domain);
-        $this->dbConfig = $this->db->config();
+
+        $db = CDatabase::instance();
+
+        $this->dbConfig = $db->config();
+        $this->dbName = $db->getName();
         $this->display_length = "10";
         $this->paging_list = $this->defaultPagingList;
         $this->options = CElement_Component_DataTable_Options::factory();
         $this->data = array();
-        $this->key_field = "";
+        $this->keyField = "";
         $this->columns = array();
         $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->rowActionList->setStyle('btn-icon-group')->addClass('btn-table-action');
         $this->headerActionList = CElement_Factory::createList('ActionList');
         $this->headerActionList->setStyle('widget-action');
-        $this->footer_action_list = CElement_List_ActionList::factory();
-        $this->footer_action_style = 'btn-list';
-        $this->footer_action_list->set_style('btn-list');
+        $this->footerActionList = CElement_Factory::createList('ActionList');
+        $this->footerActionList->setStyle('btn-list');
         $this->checkbox = false;
         $this->checkbox_value = array();
         $this->numbering = false;
         $this->query = '';
         $this->header_sortable = true;
+        $this->footerTitle = '';
         $this->footer = false;
         $this->footer_field = array();
         $this->cellCallbackFunc = "";
@@ -125,7 +127,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $this->customColumnHeader = "";
         $this->show_header = true;
-        $this->apply_data_table = true;
+        $this->applyDataTable = true;
         $this->group_by = "";
         $this->icon = "";
         $this->pdf_font_size = 8;
@@ -168,12 +170,33 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $this->dom = CManager::theme()->getData('table.dom');
         $this->actionLocation = CManager::theme()->getData('table.actionLocation', 'last');
+        $this->haveRowSelection = CManager::theme()->getData('table.haveRowSelection', false);
     }
 
     public static function factory($id = "") {
         return new CElement_Component_DataTable($id);
     }
 
+    public function setDatabaseResolver($dbResolver) {
+        $this->dbResolver = $dbResolver;
+        return $this;
+    }
+
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
+    public function setScrollX($bool = true) {
+        $this->scrollX = $bool;
+        return $this;
+    }
+
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     public function setScrollY($bool = true) {
         $this->scrollY = $bool;
         return $this;
@@ -201,20 +224,27 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this->actionLocation;
     }
 
-    public function setScrollX($bool = true) {
-        $this->scrollX = $bool;
-        return $this;
-    }
-
     public function setDomain($domain) {
         parent::setDomain($domain);
         $this->setDatabase(CDatabase::instance(null, null, $domain));
         return $this;
     }
 
-    public function setDatabase($db) {
-        $this->db = $db;
-        $this->dbConfig = $db->config();
+    /**
+     * 
+     * @param CDatabase|string $db
+     * @param array $dbConfig
+     * @return CElement_Component_DataTable
+     */
+    public function setDatabase($db, $dbConfig = null) {
+        if ($db instanceof CDatabase) {
+            $this->dbName = $db->getName();
+            $this->dbConfig = $db->config();
+        } else {
+            $this->dbName = $db;
+            $this->dbConfig = $dbConfig;
+        }
+
 
         return $this;
     }
@@ -231,28 +261,63 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     public function setFixedColumn($bool = true) {
         $this->fixedColumn = $bool;
 
         return $this;
     }
 
+    /**
+     * 
+     * @param int $width
+     * @return \CElement_Component_DataTable
+     */
     public function setCheckboxColumnWidth($width) {
         $this->checkboxColumnWidth = $width;
     }
 
+    /**
+     * 
+     * @param bool $tableStriped
+     * @return \CElement_Component_DataTable
+     */
     function setTableStriped($tableStriped) {
         $this->tableStriped = $tableStriped;
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     function setTableBordered($bool) {
         $this->tableBordered = $bool;
         return $this;
     }
 
+    /**
+     * 
+     * @param bool $bool
+     * @return \CElement_Component_DataTable
+     */
     public function setWidgetTitle($bool) {
         $this->widget_title = $bool;
+        return $this;
+    }
+
+    /**
+     * 
+     * @param string $title
+     * @return \CElement_Component_DataTable
+     */
+    public function setFooterTitle($title) {
+        $this->footerTitle = $title;
         return $this;
     }
 
@@ -264,18 +329,6 @@ class CElement_Component_DataTable extends CElement_Component {
             $export_filename .= '.xls';
         }
         self::exportExcelxmlStatic($export_filename, $table->export_sheetname, $table);
-    }
-
-    public function addFooterAction($id = "") {
-        $row_act = CAction::factory($id);
-        $this->footer_action_list->add($row_act);
-
-        return $row_act;
-    }
-
-    public function haveFooterAction() {
-        //return $this->can_edit||$this->can_delete||$this->can_view;
-        return $this->footer_action_list->child_count() > 0;
     }
 
     public function setTitle($title, $lang = true) {
@@ -363,7 +416,10 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return CElement_Component_DataTable
      */
     public function setApplyDataTable($bool) {
-        $this->apply_data_table = $bool;
+        $this->applyDataTable = $bool;
+        if ($this->applyDataTable == false) {
+            $this->setAjax(false);
+        }
         return $this;
     }
 
@@ -396,7 +452,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setKey($fieldname) {
-        $this->key_field = $fieldname;
+        $this->keyField = $fieldname;
         return $this;
     }
 
@@ -500,21 +556,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
     /**
      * 
-     * @param string $q
-     * @return $this
-     */
-    public function setDataFromQuery($q) {
-        if ($this->ajax == false) {
-            $db = $this->db;
-            $r = $db->query($q);
-            $this->data = $r->result(false);
-        }
-        $this->query = $q;
-        return $this;
-    }
-
-    /**
-     * 
      * @return $this
      */
     public function requery() {
@@ -522,8 +563,7 @@ class CElement_Component_DataTable extends CElement_Component {
         if (!$this->isElastic && !$this->isCallback) {
             if ($this->ajax == false) {
                 if (strlen($this->query) > 0) {
-                    $db = $this->db;
-                    $r = $db->query($this->query);
+                    $r = $this->db()->query($this->query);
                     $this->data = $r->result(false);
                 }
             } else {
@@ -531,6 +571,20 @@ class CElement_Component_DataTable extends CElement_Component {
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * 
+     * @param string $q
+     * @return $this
+     */
+    public function setDataFromQuery($q) {
+        if ($this->ajax == false) {
+            $r = $this->db()->query($q);
+            $this->data = $r->result(false);
+        }
+        $this->query = $q;
         return $this;
     }
 
@@ -544,7 +598,7 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($modelQuery instanceof CModel_Collection) {
             throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
-        $sql = $this->db->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
+        $sql = $this->db()->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
         return $this->setDataFromQuery($sql);
     }
 
@@ -590,856 +644,126 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    protected function rawTBody($indent = 0) {
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
+    /**
+     *  
+     * @return CDatabase
+     */
+    public function db() {
 
-        $tbodyId = (strlen($this->tbodyId) > 0 ? "id='" . $this->tbodyId . "' " : "");
-        $js = "";
-        $html->appendln('<tbody ' . $tbodyId . '>')->incIndent()->br();
-        //render body;
-        $html->appendln($this->htmlChild($indent));
-        $no = 0;
-        if (!$this->ajax && (is_array($this->data) || $this->data instanceof Traversable)) {
-            foreach ($this->data as $row) {
-                if ($row instanceof CRenderable) {
-                    $html->appendln($row->html());
-                    continue;
-                }
-
-                $no++;
-                $key = "";
-
-                if (array_key_exists($this->key_field, $row)) {
-
-                    $key = $row[$this->key_field];
-                }
-                $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
-
-                if ($this->numbering) {
-                    $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
-                }
-                if ($this->checkbox) {
-                    $checkbox_checked = "";
-                    if (in_array($key, $this->checkbox_value)) {
-                        $checkbox_checked = ' checked="checked"';
-                    }
-                    $html->appendln('<td scope="row" class="checkbox-cell align-center"><input type="checkbox" class="checkbox-' . $this->id . '" name="' . $this->id . '-check[]" id="' . $this->id . '-' . $key . '" value="' . $key . '"' . $checkbox_checked . '></td>')->br();
-                }
-                $jsparam = array();
-                if ($this->actionLocation == 'first') {
-                    $js .= $this->drawActionAndGetJs($html, $row, $key);
-                }
-                foreach ($this->columns as $col) {
-                    $col_found = false;
-                    $new_v = "";
-                    $col_v = "";
-                    $ori_v = "";
-                    //do print from query
-                    foreach ($row as $k => $v) {
-                        if ($v instanceof CRenderable) {
-                            $v = $v->html();
-                        }
-                        if ($k == $col->getFieldname()) {
-                            $col_v = $v;
-                            $ori_v = $col_v;
-                            foreach ($col->transforms as $trans) {
-                                $col_v = $trans->execute($col_v);
-                            }
-                        }
-                    }
-                    //if formatted
-                    if (strlen($col->format) > 0) {
-                        $temp_v = $col->format;
-                        foreach ($row as $k2 => $v2) {
-
-                            if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                                $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
-                            }
-                            $col_v = $temp_v;
-                        }
-                    }
-                    //if have callback
-                    if ($col->callback != null) {
-                        $col_v = CFunction::factory($col->callback)
-                                // ->addArg($table)
-                                ->addArg($row)
-                                ->addArg($col_v)
-                                ->setRequire($col->callbackRequire)
-                                ->execute();
-                        if (is_array($col_v) && isset($col_v['html']) && isset($col_v['js'])) {
-                            $js .= $col_v['js'];
-                            $col_v = $col_v['html'];
-                        }
-                    }
-                    $new_v = $col_v;
-
-                    if (($this->cellCallbackFunc) != null) {
-                        $new_v = CFunction::factory($this->cellCallbackFunc)
-                                ->addArg($this)
-                                ->addArg($col->getFieldname())
-                                ->addArg($row)
-                                ->addArg($new_v)
-                                ->setRequire($this->requires)
-                                ->execute();
-                        if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
-                            $js .= $new_v['js'];
-                            $new_v = $new_v['html'];
-                        }
-                    }
-                    $class = "";
-                    switch ($col->getAlign()) {
-                        case CConstant::ALIGN_LEFT:
-                            $class .= " align-left";
-                            break;
-                        case CConstant::ALIGN_RIGHT:
-                            $class .= " align-right";
-                            break;
-                        case CConstant::ALIGN_CENTER:
-                            $class .= " align-center";
-                            break;
-                    }
-                    if ($col->getNoLineBreak()) {
-                        $class .= " no-line-break";
-                    }
-                    if ($col->getHiddenPhone())
-                        $class .= " hidden-phone";
-
-                    if ($col->getHiddenTablet())
-                        $class .= " hidden-tablet";
-
-                    if ($col->getHiddenDesktop())
-                        $class .= " hidden-desktop";
-
-                    $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
-                    if ($this->export_pdf) {
-                        switch ($col->getAlign()) {
-                            case "left": $pdfTBodyTdCurrentAttr .= ' align="left"';
-                                break;
-                            case "right": $pdfTBodyTdCurrentAttr .= ' align="right"';
-                                break;
-                            case "center": $pdfTBodyTdCurrentAttr .= ' align="center"';
-                                break;
-                        }
-                    }
-                    if (is_array($new_v)) {
-                        $this->js_cell .= carr::get($new_v, 'js', '');
-                        $new_v = carr::get($new_v, 'html', '');
-                    }
-
-                    $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
-                    $col_found = true;
-                }
-                if ($this->actionLocation == 'last') {
-                    $js .= $this->drawActionAndGetJs($html, $row, $key);
-                }
-
-
-
-                $html->decIndent()->appendln('</tr>')->br();
-            }
+        if ($this->dbResolver != null) {
+            return $this->dbResolver->connection($this->dbName);
         }
-        $this->js_cell .= $js;
 
-        $html->decIndent()->appendln('</tbody>')->br();
-        return $html->text();
+
+        if (strlen($this->dbName) > 0) {
+            return CDatabase::instance($this->dbName, null, $this->domain);
+        }
+        return CDatabase::instance($this->dbName, $this->dbConfig, $this->domain);
     }
 
-    protected function drawActionAndGetJs(CStringBuilder $html, $row, $key) {
-        $js = '';
-        if ($this->haveRowAction()) {
-            $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
-            foreach ($row as $k => $v) {
-                $jsparam[$k] = $v;
-            }
-
-            $jsparam["param1"] = $key;
-            if ($this->getRowActionStyle() == "btn-dropdown") {
-                $this->rowActionList->addClass("pull-right");
-            }
-            $this->rowActionList->regenerateId(true);
-            $this->rowActionList->apply("setJsParam", $jsparam);
-            $this->rowActionList->apply("setHandlerUrlParam", $jsparam);
-
-            if (($this->filterActionCallbackFunc) != null) {
-                $actions = $this->rowActionList->childs();
-
-                foreach ($actions as &$action) {
-                    $visibility = CFunction::factory($this->filterActionCallbackFunc)
-                            ->addArg($this)
-                            ->addArg('action')
-                            ->addArg($row)
-                            ->addArg($action)
-                            ->setRequire($this->requires)
-                            ->execute();
-                    if ($visibility == false) {
-                        $action->addClass('d-none');
-                    }
-                    $action->setVisibility($visibility);
-                }
-            }
-
-
-            $js = $this->rowActionList->js();
-
-            $html->appendln($this->rowActionList->html($html->getIndent()));
-            $html->decIndent()->appendln('</td>')->br();
-        }
-        return $js;
+    /**
+     * 
+     * @return string
+     */
+    public function getKeyField() {
+        return $this->keyField;
     }
 
-    protected function rawHtml($indent = 0) {
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
-
-        $thClass = "";
-        if ($this->headerNoLineBreak) {
-            $thClass = " no-line-break";
-        }
-        $htmlResponsiveOpen = '<div class="table-responsive">';
-        $htmlResponsiveClose = '</div>';
-        if ($this->responsive) {
-            $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
-            $htmlResponsiveClose = '</div>';
-        }
-
-        $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0) {
-            $classes = " " . $classes;
-        }
-        if ($this->tableStriped) {
-            $classes .= " table-striped ";
-        }
-        if ($this->tableBordered) {
-            $classes .= " table-bordered ";
-        }
-
-        $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
-                ->incIndent()->br();
-        if ($this->show_header) {
-            $html->appendln('<thead>')
-                    ->incIndent()->br();
-            if (strlen($this->customColumnHeader) > 0) {
-                $html->appendln($this->customColumnHeader);
-            } else {
-                $html->appendln('<tr>')
-                        ->incIndent()->br();
-
-                if ($this->numbering) {
-                    $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
-                }
-                if ($this->checkbox) {
-                    $attrWidth = "";
-                    if (strlen($this->checkboxColumnWidth) > 0) {
-                        $attrWidth = 'width="' . $this->checkboxColumnWidth . '"';
-                    }
-                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" ' . $attrWidth . '><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
-                }
-                if ($this->getActionLocation() == 'first') {
-                    if ($this->haveRowAction()) {
-                        $action_width = 31 * $this->rowActionCount() + 5;
-                        if ($this->getRowActionStyle() == "btn-dropdown") {
-                            $action_width = 70;
-                        }
-                        $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
-                    }
-                }
-                foreach ($this->columns as $col) {
-                    $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
-                }
-                if ($this->getActionLocation() == 'last') {
-                    if ($this->haveRowAction()) {
-                        $action_width = 31 * $this->rowActionCount() + 5;
-                        if ($this->getRowActionStyle() == "btn-dropdown") {
-                            $action_width = 70;
-                        }
-                        $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
-                    }
-                }
-                $html->decIndent()->appendln("</tr>")->br();
-            }
-            $html->decIndent()->appendln("</thead>")->br();
-        }
-
-        $html->append($this->rawTBody($html->getIndent()));
-
-
-        //footer
-        if ($this->footer) {
-            $html->incIndent()->appendln('<tfoot>')->br();
-            $total_column = count($this->columns);
-            $addition_column = 0;
-            if ($this->haveRowAction())
-                $addition_column++;
-            if ($this->numbering)
-                $addition_column++;
-            if ($this->checkbox)
-                $addition_column++;
-
-            foreach ($this->footer_field as $f) {
-                $html->incIndent()->appendln('<tr>')->br();
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
-                    $colspan = $total_column + $addition_column - 1;
-                $html->incIndent()->appendln('<td colspan="' . ($colspan) . '">')->br();
-                $html->appendln($f["label"])->br();
-                $html->decIndent()->appendln('</td>')->br();
-                $class = "";
-                switch ($f["align"]) {
-                    case "left": $class .= " align-left";
-                        break;
-                    case "right": $class .= " align-right";
-                        break;
-                    case "center": $class .= " align-center";
-                        break;
-                }
-
-                $fval = $f["value"];
-                if ($fval instanceof CRenderable) {
-                    $html->incIndent()->appendln('<td class="' . $class . '">')->br();
-                    $html->appendln($fval->html($indent))->br();
-                    $html->decIndent()->appendln('</td>')->br();
-                } else if (is_array($fval)) {
-                    $skip_column = 0;
-
-                    foreach ($this->columns as $col) {
-                        $is_skipped = false;
-                        if ($skip_column < $colspan) {
-                            $skip_column++;
-                            $is_skipped = true;
-                        }
-                        if (!$is_skipped) {
-                            $fcolval = "";
-                            if (isset($fval[$col->get_fieldname()])) {
-                                $fcolval = $fval[$col->get_fieldname()];
-                            }
-
-                            switch ($col->get_align()) {
-                                case "left": $class .= " align-left";
-                                    break;
-                                case "right": $class .= " align-right";
-                                    break;
-                                case "center": $class .= " align-center";
-                                    break;
-                            }
-                            $html->incIndent()->appendln('<td class="' . $class . '">')->br();
-                            $html->appendln($fcolval)->br();
-                            $html->decIndent()->appendln('</td>')->br();
-                        }
-                    }
-                } else {
-                    $html->incIndent()->appendln('<td class="' . $class . '">')->br();
-                    $html->appendln($fval)->br();
-                    $html->decIndent()->appendln('</td>')->br();
-                }
-                $html->decIndent()->appendln('</tr>')->br();
-            }
-            $html->decIndent()->appendln('</tfoot>')->br();
-        }
-        $html->decIndent()->appendln('</table>' . $htmlResponsiveClose);
-
-        return $html->text();
+    /**
+     * 
+     * @return string
+     */
+    public function getDomain() {
+        return $this->domain;
     }
 
-    public function html($indent = 0) {
-
-        $this->buildOnce();
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
-        $wrapped = ($this->apply_data_table > 0) || $this->haveHeaderAction() || strlen($this->title) > 0;
-        if ($wrapped) {
-
-            $mainClass = ' widget-box ';
-            $mainClassTitle = ' widget-title ';
-            $tableViewClass = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' data-table-col-view' : ' data-table-row-view';
-            $mainClassContent = ' widget-content ' . $tableViewClass . ' col-view-count-' . $this->dataTableViewColCount;
-            if ($this->bootstrap == '3.3') {
-                $mainClass = ' box box-info';
-                $mainClassTitle = ' box-header with-border ';
-                $mainClassContent = ' box-body data-table-row-view';
-            }
-            if ($this->widget_title == false) {
-                $mainClassTitle = ' ';
-            }
-            if ($this->haveDataTableViewAction) {
-                $mainClassTitle .= ' with-elements';
-            }
-            $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
-            $showTitle = true;
-            if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
-                $showTitle = false;
-            }
-            if ($showTitle) {
-                $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
-                if (strlen($this->icon > 0)) {
-                    $html->appendln('<span class="icon">')->incIndent();
-                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
-                    $html->decIndent()->appendln('</span');
-                }
-                $html->appendln('<h5>' . $this->title . '</h5>');
-                if ($this->haveHeaderAction()) {
-                    $html->appendln($this->headerActionList->html($html->getIndent()));
-
-                    $this->js_cell .= $this->headerActionList->js();
-                }
-
-                if ($this->haveDataTableViewAction) {
-                    $colViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' active' : '';
-                    $rowViewActionActive = $this->dataTableView == CConstant::TABLE_VIEW_ROW ? ' active' : '';
-                    $colViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' checked="checked"' : '';
-                    $rowViewActionChecked = $this->dataTableView == CConstant::TABLE_VIEW_ROW ? ' checked="checked"' : '';
-                    $html->appendln('
-                        <div class="btn-group btn-group-toggle ml-auto" data-toggle="buttons">
-                            <label class="btn btn-default icon-btn md-btn-flat ' . $colViewActionActive . '">
-                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-col-view" ' . $colViewActionChecked . ' />
-                                <span class="ion ion-md-apps"></span>
-                            </label>
-                            <label class="btn btn-default icon-btn md-btn-flat ' . $rowViewActionActive . '">
-                                <input type="radio" name="' . $this->id() . '-data-table-view" value="data-table-row-view" ' . $rowViewActionChecked . '" />
-                                <span class="ion ion-md-menu"></span>
-                            </label>
-                        </div>
-                    ');
-                }
-                $html->decIndent()->appendln('</div>');
-            }
-            $html->appendln('<div class="' . $mainClassContent . ' nopadding">')->incIndent();
-        }
-
-        $html->append($this->rawHtml($html->getIndent()));
-        if ($wrapped > 0) {
-            $html->decIndent()->appendln('</div>');
-            $html->decIndent()->appendln('</div>');
-        }
-
-
-
-
-
-        return $html->text();
+    /**
+     * 
+     * @return array
+     */
+    public function getColumns() {
+        return $this->columns;
+    }
+    /**
+     * 
+     * @return CElement_Component_DataTable_Column
+     */
+    public function getColumn($index) {
+        return carr::get($this->columns,$index);
     }
 
-    public function js($indent = 0) {
-        $this->buildOnce();
-        $ajax_url = "";
-        if ($this->ajax) {
-            $columns = array();
-            foreach ($this->columns as $col) {
-                $columns[] = $col;
-            }
+    /**
+     * 
+     * @return array
+     */
+    public function getColumnOffset() {
 
-            $dbTemp = $this->db;
-            $this->db = null;
-
-            $ajaxMethod = CAjax::createMethod();
-            $ajaxMethod->setType('DataTable');
-            $ajaxMethod->setData('columns', $columns);
-            $ajaxMethod->setData('query', $this->query);
-            $ajaxMethod->setData('row_action_list', $this->rowActionList);
-            $ajaxMethod->setData('key_field', $this->key_field);
-            $ajaxMethod->setData('table', serialize($this));
-            $ajaxMethod->setData('dbConfig', $this->dbConfig);
-            $ajaxMethod->setData('domain', $this->domain);
-            $ajaxMethod->setData('checkbox', $this->checkbox);
-            $ajaxMethod->setData('is_elastic', $this->isElastic);
-            $ajaxMethod->setData('is_callback', $this->isCallback);
-            $ajaxMethod->setData('callback_require', $this->callbackRequire);
-            $ajaxMethod->setData('callback_options', $this->callbackOptions);
-            $ajax_url = $ajaxMethod->makeUrl();
-            $this->db = $dbTemp;
-        }
-
-        foreach ($this->footer_action_list->childs() as $row_act) {
-            $id = $row_act->id();
-            if ((strpos($id, 'export_excel') !== false)) {
-                $row_act->set_label('Download Excel')->set_icon('file');
-
-
-                $action_url = CAjaxMethod::factory()->set_type('callback')
-                        ->set_data('callable', array('CTable', 'action_download_excel'))
-                        ->set_data('query', $this->query)
-                        ->set_data('row_action_list', $this->rowActionList)
-                        ->set_data('key_field', $this->key_field)
-                        ->set_data('table', serialize($this))
-                        ->makeurl();
-                $row_act->add_listener('click')->add_handler('custom')->set_js("window.location.href='" . $action_url . "';");
-            }
-        }
-        $js = new CStringBuilder();
-
-
-        $js->setIndent($indent);
-
-
-        $total_column = count($this->columns);
-        if ($this->haveRowAction()) {
-            $total_column++;
-        }
+        $offset = 0;
         if ($this->checkbox) {
-            $total_column++;
+            $offset++;
         }
-
-
-        if ($this->apply_data_table > 0) {
-
-            $length_menu = "";
-            $km = "";
-            $vm = "";
-            foreach ($this->paging_list as $k => $v) {
-                if (strlen($km) > 0)
-                    $km .= ", ";
-                if (strlen($vm) > 0)
-                    $vm .= ", ";
-                $km .= $k;
-                $vm .= "'" . $v . "'";
-            }
-            $hs_val = $this->header_sortable ? "true" : "false";
-            $js->appendln("var table = jQuery('#" . $this->id . "');")->br();
-            $js->appendln("var header_sortable = " . $hs_val . ";")->br();
-            $js->appendln("var vaoColumns = [];")->br();
-            if ($this->numbering) {
-                $aojson = array();
-                $aojson["bSortable"] = false;
-                $aojson["bSearchable"] = false;
-                $aojson["bVisible"] = true;
-                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
-                ;
-            }
-            if ($this->checkbox) {
-                $aojson = array();
-                $aojson["bSortable"] = false;
-                $aojson["bSearchable"] = false;
-                $aojson["bVisible"] = true;
-                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
-            }
-
-            if ($this->haveRowAction() && $this->actionLocation != 'last') {
-                $aojson = array();
-                $aojson["bSortable"] = false;
-                $aojson["bSearchable"] = false;
-                $aojson["bVisible"] = true;
-                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
-            }
-            foreach ($this->columns as $col) {
-                $aojson = array();
-                $aojson["bSortable"] = $col->sortable && $this->header_sortable;
-                $aojson["bSearchable"] = $col->searchable;
-                $aojson["bVisible"] = $col->visible;
-
-                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );");
-            }
-            if ($this->haveRowAction() && $this->actionLocation == 'last') {
-                $aojson = array();
-                $aojson["bSortable"] = false;
-                $aojson["bSearchable"] = false;
-                $aojson["bVisible"] = true;
-                $js->appendln("vaoColumns.push( " . json_encode($aojson) . " );")->br();
-            }
-
-
-
-            $js->appendln("var tableStyled_" . $this->id . " = false;")->br()->
-                    appendln("var oTable = table.dataTable({")->br()->incIndent();
-
-
-//            $js->appendln("responsive: {
-//        details: {
-//            renderer: $.fn.dataTable.Responsive.renderer.tableAll()
-//        }
-//    },");
-            if ($this->ajax) {
-                $js->append("")
-                        ->appendln("'bRetrieve': true,")->br()
-                        ->appendln("'bProcessing': true,")->br()
-                        ->appendln("'bServerSide': true,")->br()
-                        ->appendln("'sAjaxSource': '" . $ajax_url . "',")->br()
-                        ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
-                        ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
-                                        var data_quick_search = [];
-                                        jQuery('.data_table-quick_search').each(function(){
-                                            if (jQuery(this).val() != '') {
-                                                var input_name = jQuery(this).attr('name');
-                                                var cur_transforms = jQuery(this).attr('transforms');
-                                                data_quick_search.push({'name': input_name, 'value': jQuery(this).val(), 'transforms': cur_transforms});
-                                            }
-                                        });
-                                        aoData.push({'name': 'dttable_quick_search', 'value': JSON.stringify(data_quick_search)});
-                                        oSettings.jqXHR = $.ajax( {
-                                            'dataType': 'json',
-                                            'type': '" . strtoupper($this->ajax_method) . "',
-                                            'url': sSource,
-                                            'data': aoData,
-                                            'success': function(data) {
-                                                fnCallback(data.datatable);
-                                                if(data.js && data.js.length>0) {
-                                                    var script = $.cresenity.base64.decode(data.js);
-                                                    eval(script);
-                                                }
-                                                jQuery('#" . $this->id . "-check-all').removeAttr('checked');
-                                                jQuery('#" . $this->id . "-check-all').prop('checked',false);
-                                            },
-                                            'error': function(a,b,c) {
-                                                $.cresenity.message(a);
-                                            }
-                                        })
-                                    },
-                                    ")
-                        ->appendln("'fnRowCallback': function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-						// Bold the grade for all 'A' grade browsers
-						
-							//$('td:eq(4)', nRow).html( '<b>A</b>' );
-						//$.cresenity.set_confirm($('a.confirm',nRow));
-						
-						var footer_action = $('#" . $this->id . "_wrapper .footer_action');
-						
-						" . ($this->have_footer_action() ? "footer_action.html(" . json_encode($this->footer_action_list->html()) . ");" : "") . " 
-           
-						" . ($this->have_footer_action() ? "" . $this->footer_action_list->js() . "" : "") . " 
-						
-						footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
-						
-						for(i=0;i<$(nRow).find('td').length;i++) {
-							
-							//get head data align
-							var data_align = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
-							var data_action = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
-							var data_no_line_break = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
-							if(data_action) {
-								$('td:eq('+i+')', nRow).addClass(data_action);
-							}
-							if(data_align) {
-								$('td:eq('+i+')', nRow).addClass(data_align);
-							}
-							if(data_no_line_break) {
-								$('td:eq('+i+')', nRow).addClass(data_no_line_break);
-							}
-						}
-						
-						
-					},
-				")
-                        ->appendln("'fnInitComplete': function() {
-                                this.fnAdjustColumnSizing(true);
-                            },
-                        ")
-                ;
-            }
-            /*
-              $js->append("")
-              ->appendln("'sScrollX': '100%',")->br()
-              ->appendln("'bScrollCollapse': true,")->br()
-              ;
-             */
-
-
-            $jqueryui = "'bJQueryUI': false,";
-            if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
-                $jqueryui = "'bJQueryUI': true,";
-            }
-            if ($this->scrollX) {
-                $scrollX = $this->scrollX;
-                if (is_bool($scrollX)) {
-                    $scrollX = 'true';
-                }
-                $js->appendln("scrollX:        " . $scrollX . ",")->br();
-            }
-            if ($this->scrollY) {
-                $scrollY = $this->scrollY;
-                if (is_bool($scrollY)) {
-                    $scrollY = 'true';
-                }
-                $js->appendln("scrollY:        " . $scrollY . ",")->br();
-            }
-            if ($this->fixedColumn) {
-
-                $js->appendln("scrollY:        300,")->br()
-                        ->appendln("scrollX:        true,")->br()
-                        ->appendln("scrollCollapse: true,")->br();
-                if ($this->checkbox) {
-                    $js->appendln("'fixedColumns': {
-                        leftColumns: 2
-                    },")->br();
-                } else {
-                    $js->appendln("'fixedColumns': " . ($this->fixedColumn ? "true" : "false") . ",")->br();
-                }
-            }
-            $js->appendln($jqueryui)->br()
-                    ->appendln("'bStateSave': false,")->br()
-                    ->appendln("'iDisplayLength': " . $this->display_length . ",")->br()
-                    ->appendln("'bSortCellsTop': " . $hs_val . ",")->br()
-                    ->appendln("'aaSorting': [],")->br()
-                    ->appendln("'oLanguage': { 
-						sSearch : '" . clang::__('Search') . "',
-						sSearchPlaceholder : '" . clang::__($this->searchPlaceholder) . "',
-						sProcessing : '" . clang::__('Processing') . "',
-						sLengthMenu  : '" . clang::__('Show') . " _MENU_ " . clang::__('Entries') . "',
-						oPaginate  : {
-                                                    'sFirst' : '" . clang::__('First') . "',
-                                                    'sLast' : '" . clang::__('Last') . "',
-                                                    'sNext' : '" . clang::__('Next') . "',
-                                                    'sPrevious' : '" . clang::__('Previous	') . "'
-                                                },
-                                                sInfo: '" . $this->infoText . "',
-						sInfoEmpty  : '" . clang::__('No data available in table') . "',
-						sEmptyTable  : '" . clang::__('No data available in table') . "',
-						sInfoThousands   : '" . clang::__('') . "',
-					},")->br()
-                    ->appendln("'bDeferRender': " . ($this->getOption("bDeferRender") ? "true" : "false") . ",")->br()
-                    ->appendln("'bFilter': " . ($this->getOption("bFilter") ? "true" : "false") . ",")->br()
-                    ->appendln("'bInfo': " . ($this->getOption("bInfo") ? "true" : "false") . ",")->br()
-                    ->appendln("'bPaginate': " . ($this->getOption("bPaginate") ? "true" : "false") . ",")->br()
-                    ->appendln("'bLengthChange': " . ($this->getOption("bLengthChange") ? "true" : "false") . ",")->br()
-                    ->appendln("'aoColumns': vaoColumns,")->br()
-                    ->appendln("'autoWidth': false,")->br()
-                    ->appendln("'aLengthMenu': [
-					[" . $km . "],
-					[" . $vm . "]
-				],")->br()
-            ;
-
-            /*
-              $js->append("")
-              ->appendln("'sScrollX': '100%',")->br()
-              ->appendln("'sScrollXInner': '100%',")->br()
-              ->appendln("'bScrollCollapse': true,")->br()
-              ;
-             */
-
-            // if ($this->bootstrap == '3') {
-            if ($this->bootstrap >= '3') {
-                if ($this->dom == null) {
-                    $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
-                }
-            }
-
-            if ($this->dom == null) {
-                $this->dom = "<\"\"l>t<\"F\"<\".footer_action\">frp>";
-            } else {
-                $this->dom = str_replace("'", "\'", $this->dom);
-            }
-            $js->append("")
-                    ->appendln("'sPaginationType': 'full_numbers',")->br()
-                    ->appendln("'sDom': '" . $this->dom . "',")->br();
-
-
-
-            $js->append("")
-                    ->decIndent()->appendln("});")->br();
-
-
-
-            $js->appendln('function buildFilters_' . $this->id . '() {')->br()
-                    ->appendln("var quick_search = jQuery('<tr>');")->br()
-                    ->appendln("
-                        jQuery('#" . $this->id . " thead th').each( function (i) {
-                            var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
-                            var have_action = " . ($this->haveRowAction() ? "1" : "0") . ";
-
-
-                            var total_th = jQuery('#" . $this->id . " thead th').length;
-                            var input = '';
-                            var have_checkbox = " . ($this->checkbox ? "1" : "0") . ";
-
-                            if((!(have_action==1&&(total_th-1==jQuery(this).index())))&& (!(have_checkbox==1&&(0==jQuery(this).index()))) ) {
-                                var i2 = 0;
-                                if(have_checkbox) {
-                                        i2 = -1;
-                                }
-
-                                var all_column = " . json_encode($this->columns) . ";
-                                var column = all_column[jQuery(this).index()+i2];
-                                var transforms = {};
-                                if(column) {
-                                    if(hasOwnProperty.call(column, 'transforms')) {
-
-                                        transforms = JSON.stringify(column.transforms);
-                                    }
-
-                                    if(column.searchable) {
-                                        input = jQuery('<input>');
-                                        input.attr('type', 'text');
-                                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
-                                        input.attr('class', 'data_table-quick_search');
-
-                                        input.attr('transforms', transforms);
-                                        input.attr('placeholder', 'Search ' + title );
-                                    }
-                                }
-
-                            }
-                            var td = jQuery('<td>').append(input);
-                            quick_search.append(td);
-                        });
-                    ")->br()
-                    ->appendln("table.children('thead').append(quick_search);")->br()
-                    ->appendln('}')->br()
-                    ->appendln('var dttable_quick_search = ' . ($this->quick_search ? "1" : "0") . ';')->br()
-                    ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }')
-            ;
-
-            $js->appendln("
-                jQuery('.data_table-quick_search').on('keyup', function(){
-                    table.fnClearTable( 0 );
-                    table.fnDraw();
-                });
-            ");
-        }
-        if ($this->checkbox) {
-            $js->appendln("
-                jQuery('#" . $this->id . "-check-all').click(function() {
-                        if(jQuery(this).is(':checked')) {
-                                jQuery('.checkbox-" . $this->id . "').attr('checked','checked');
-                                jQuery('.checkbox-" . $this->id . "').prop('checked',true);
-                        } else {
-                                jQuery('.checkbox-" . $this->id . "').removeAttr('checked');
-                                jQuery('.checkbox-" . $this->id . "').prop('checked',false);
-                        }
-                });
-            ");
-        }
-        $js->appendln($this->js_cell);
-        if (!$this->ajax) {
-            $js->append(parent::js($indent))->br();
-            if (is_array($this->data)) {
-                foreach ($this->data as $row) {
-                    if ($row instanceof CRenderable) {
-                        $js->appendln($row->js())->br();
-                        continue;
-                    }
-                    foreach ($row as $row_k => $row_v) {
-                        if ($row_v instanceof CRenderable) {
-                            $js->appendln($row_v->js())->br();
-                        }
-                    }
-                }
+        if ($this->getActionLocation() == 'first') {
+            if($this->rowActionCount()>0) {
+                $offset++;
             }
         }
+        return $offset;
+    }
 
-        if ($this->footer) {
+    /**
+     * 
+     * @return string
+     */
+    public function getQuery() {
+        return $this->query;
+    }
 
-            foreach ($this->footer_field as $f) {
-                $fval = $f["value"];
-                if ($fval instanceof CRenderable) {
-                    $js->appendln($fval->js())->br();
-                }
-            }
+    /**
+     * 
+     * @return bool
+     */
+    public function haveRowSelection() {
+        return $this->haveRowSelection;
+    }
+
+    /**
+     * 
+     * @return CExporter_Exportable_DataTable
+     */
+    public function toExportable() {
+        return new CExporter_Exportable_DataTable($this);
+    }
+
+    /**
+     * 
+     * @return CCollection
+     */
+    public function getCollection() {
+        $data = [];
+        if ($this->isCallback) {
+            $callbackData = CFunction::factory($this->query)
+                    ->addArg($this->callbackOptions)
+                    ->setRequire($this->callbackRequire)
+                    ->execute();
+            $data = carr::get($callbackData, 'data');
+        } else {
+            $this->setAjax(false);
+            $data = $this->data;
         }
+        return c::collect($data);
+    }
 
-        if ($this->haveDataTableViewAction) {
-            $js->append("
-                $('#" . $this->id() . "-widget-box [name=\"" . $this->id() . "-data-table-view\"]').on('change', function() {
-                    $('#" . $this->id() . "-widget-box > .widget-content')
-                        .removeClass('data-table-col-view data-table-row-view')
-                        .addClass(this.value);
-                });
-            ");
+    public function downloadExcel($filename = null) {
+        if($filename==null) {
+            $filename = CExporter::randomFilename();
         }
+        return CExporter::download($this->toExportable(), $filename);
+    }
 
-        return $js->text();
+    public function queueDownloadExcel($filePath, $disk = null, $writerType = null, $diskOptions = []) {
+
+
+        return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
     }
 
 }
-
-?>

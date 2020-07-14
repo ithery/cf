@@ -70,6 +70,7 @@ class CDatabase {
     protected $limit = FALSE;
     protected $offset = FALSE;
     protected $last_query = '';
+    protected $queryLog = array();
     // Stack of queries for push/pop
     protected $query_history = array();
 
@@ -345,18 +346,20 @@ class CDatabase {
         // Stop the benchmark
         $elapsedTime = $this->getElapsedTime($start);
 
-        $is_benchmark = carr::get($this->config, 'benchmark', FALSE);
-        if ($is_benchmark) {
+        if ($this->isBenchmarkQuery()) {
+            $this->benchmarkQuery($sql,$elapsedTime,count($result));
             // Benchmark the query
-            CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
+            //CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
         }
 
 
 
+        
         // Once we have run the query we will calculate the time that it took to run and
         // then log the query, bindings, and execution time so we will report them on
         // the event that the developer needs them. We'll log time in milliseconds.
         $this->logQuery($sql, $bindings, $elapsedTime, $result->count());
+        
 
         return $result;
     }
@@ -1128,6 +1131,15 @@ class CDatabase {
     public function lastQuery() {
         return $this->last_query;
     }
+    
+    /**
+     * Set the last query run.
+     *
+     * @return  string SQL
+     */
+    public function setLastQuery($sql) {
+        return $this->last_query = $sql;
+    }
 
     /**
      * Count query records.
@@ -1187,7 +1199,7 @@ class CDatabase {
      *
      * @return  array
      */
-    public function list_tables() {
+    public function listTables() {
         $this->link or $this->connect();
 
         return $this->driver->list_tables();
@@ -1200,11 +1212,11 @@ class CDatabase {
      * @param   boolean  True to attach table prefix
      * @return  boolean
      */
-    public function table_exists($table_name, $prefix = TRUE) {
-        if ($prefix)
+    public function tableExists($table_name, $prefix = TRUE) {
+        if ($prefix) {
             return in_array($this->config['table_prefix'] . $table_name, $this->list_tables());
-        else
-            return in_array($table_name, $this->list_tables());
+        } 
+        return in_array($table_name, $this->list_tables());
     }
 
     /**
@@ -1254,7 +1266,7 @@ class CDatabase {
      * @param   string  table name
      * @return  array
      */
-    public function list_fields($table = '') {
+    public function listFields($table = '') {
         $this->link or $this->connect();
 
         return $this->driver->list_fields($this->config['table_prefix'] . $table);
@@ -1276,7 +1288,7 @@ class CDatabase {
      * @param   string  string to escape
      * @return  string
      */
-    public function escape_str($str) {
+    public function escapeStr($str) {
         return $this->driver->escape_str($str);
     }
 
@@ -1286,7 +1298,7 @@ class CDatabase {
      * @param   string  string to escape
      * @return  string
      */
-    public function escape_table($table) {
+    public function escapeTable($table) {
         return $this->driver->escape_table($table);
     }
 
@@ -1296,7 +1308,7 @@ class CDatabase {
      * @param   string  string to escape
      * @return  string
      */
-    public function escape_column($table) {
+    public function escapeColumn($table) {
         return $this->driver->escape_column($table);
     }
 
@@ -1415,6 +1427,14 @@ class CDatabase {
 
     public function __destruct() {
         self::rollback();
+
+        try {
+            if ($this->driver != null) {
+                $this->driver->close();
+            }
+        } catch (Exception $ex) {
+            
+        }
     }
 
     public function escapeLike($str) {
@@ -1530,7 +1550,7 @@ class CDatabase {
      * Gets the SchemaManager that can be used to inspect or change the
      * database schema through the connection.
      *
-     * @return CDatabase_Schema_AbstractSchemaManager
+     * @return CDatabase_Schema_Manager
      */
     public function getSchemaManager() {
         if (!$this->schemaManager) {
@@ -1642,6 +1662,17 @@ class CDatabase {
         return carr::get($this->config, 'log', false);
     }
 
+    public function isBenchmarkQuery() {
+        return carr::get($this->config, 'benchmark', FALSE);
+    }
+    public function benchmarkQuery($query, $time = null, $rowsCount = null) {
+        if ($this->isBenchmarkQuery()) {
+            // Benchmark the query
+            //static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::getTraceString());
+            static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::callerInfo());
+        }
+    }
+    
     /**
      * Log a query in the connection's query log.
      *
@@ -1651,11 +1682,24 @@ class CDatabase {
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
+        if($this->driverName()=='MongoDB') {
+            if(is_array($query)) {
+                $query = CDatabase_Helper_MongoDB::commandToString($query);
+            }
+        } 
         $this->dispatchEvent(CDatabase_Event::createOnQueryExecutedEvent($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
         }
+    }
+
+    public function enableQueryLog() {
+        $this->config['log'] = true;
+    }
+
+    public function getQueryLog() {
+        return $this->queryLog;
     }
 
     /**
@@ -1797,6 +1841,10 @@ class CDatabase {
 
     public function driver() {
         return $this->driver;
+    }
+    
+    public function ping() {
+        return $this->driver->ping();
     }
 
 }

@@ -10,6 +10,7 @@ final class CManager_Daemon {
 
     protected static $instance;
     protected $daemons = array();
+    protected $daemonsGroup = array();
 
     /**
      * 
@@ -23,16 +24,45 @@ final class CManager_Daemon {
         return self::$instance;
     }
 
-    public function registerDaemon($class, $name = null) {
+    public function registerDaemon($class, $name = null, $group = null) {
 
         if ($name == null) {
             $name = carr::last(explode('_', $class));
         }
         $this->daemons[$class] = $name;
+        if ($group !== null) {
+            if (!isset($this->daemonsGroup[$group])) {
+                $this->daemonsGroup[$group] = [];
+            }
+            $this->daemonsGroup[$group][$class] = $name;
+        }
     }
 
-    public function daemons() {
-        return $this->daemons;
+    public function daemons($group = null) {
+        if ($group === null) {
+            return $this->daemons;
+        }
+        if ($group === false) {
+            $allDaemons = $this->daemons;
+            foreach ($this->daemonsGroup as $groupArray) {
+                $allDaemons = array_diff_key($allDaemons, $groupArray);
+            }
+            return $allDaemons;
+        }
+        if ($group !== null) {
+            if (!in_array($group, $this->getGroupsKey())) {
+                throw new Exception('group daemon ' . $group . ' not available');
+            }
+        }
+        return $this->daemonsGroup[$group];
+    }
+
+    public function getGroupsKey() {
+        return array_keys($this->daemonsGroup);
+    }
+
+    public function haveGroup() {
+        return count($this->getGroupsKey()) > 0;
     }
 
     protected function getDaemon($className, $command = 'status') {
@@ -83,7 +113,7 @@ final class CManager_Daemon {
         $daemon = self::getDaemon($className);
         return $daemon->rotateLog();
     }
-    
+
     public function logDump($className) {
         $daemon = self::getDaemon($className);
         return $daemon->logDump();

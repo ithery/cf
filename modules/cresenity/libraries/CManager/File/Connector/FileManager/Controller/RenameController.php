@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
-class CManager_File_Connector_FileManager_Controller_RenameController extends CManager_File_Connector_FileManager_Controller_BaseController {
+class CManager_File_Connector_FileManager_Controller_RenameController extends CManager_File_Connector_FileManager_AbstractController {
 
     /**
      * Get list of folders as json to populate treeview.
@@ -17,7 +17,7 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
      * @return mixed
      */
     public function execute() {
-        $fm = new FM();
+        $fm = $this->fm();
         $old_name = $fm->input('file');
         $new_name = $fm->input('new_name');
         $old_file = $fm->path()->pretty($old_name);
@@ -58,7 +58,7 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         } else {
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasRenamed($old_file->path(), $new_file));
         }
-        return parent::$successResponse;
+        echo parent::$successResponse;
     }
 
 }

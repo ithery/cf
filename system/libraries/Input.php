@@ -22,6 +22,9 @@ class Input {
     public $ip_address;
     // Input singleton
     protected static $instance;
+    protected $originalPost;
+    protected $originalGet;
+    protected $originalFiles;
 
     /**
      * Retrieve a singleton instance of Input. This will always be the first
@@ -47,6 +50,9 @@ class Input {
     public function __construct() {
         // Use XSS clean?
         $this->use_xss_clean = (bool) CF::$global_xss_filtering;
+        $this->originalPost = $_POST;
+        $this->originalGet = $_GET;
+        $this->originalFiles = $_FILES;
 
         if (Input::$instance === NULL) {
             // magic_quotes_runtime is enabled
@@ -126,6 +132,17 @@ class Input {
         }
     }
 
+    public function originalGetData() {
+        return $this->originalGet;
+    }
+    public function originalPostData() {
+        return $this->originalPost;
+    }
+    public function originalFilesData() {
+        return $this->originalPost;
+    }
+    
+    
     /**
      * Fetch an item from the $_GET array.
      *
@@ -246,7 +263,7 @@ class Input {
      * @return  string
      */
     public function xss_clean($data, $tool = NULL) {
-       
+
         if ($tool === NULL) {
             // Use the default tool
             $tool = CF::$global_xss_filtering;
@@ -268,22 +285,22 @@ class Input {
             // NOTE: This is necessary because switch is NOT type-sensative!
             $tool = 'default';
         }
-        $tool= 'htmlpurifier';
+        $tool = 'htmlpurifier';
         switch ($tool) {
             case 'htmlpurifier':
-                
-                require_once DOCROOT.'system/vendor/HTMLPurifier.auto.php';
+
+                require_once DOCROOT . 'system/vendor/HTMLPurifier.auto.php';
 
                 $config = HTMLPurifier_Config::createDefault();
                 $config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'data' => true));
-                
+
                 $def = $config->getHTMLDefinition(true);
                 $def->addAttribute('span', 'data-member-id', 'Number');
                 $def->addAttribute('img', 'style', 'Text');
-                
+
                 $purifier = new HTMLPurifier($config);
                 $data = $purifier->purify($data);
-                
+
                 /**
                  * @todo License should go here, http://htmlpurifier.org/
                  */
@@ -344,17 +361,16 @@ class Input {
 
                 $data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $data);
                 /*
-                $data = preg_replace('#<svg.+?onload.+?>#u', '', $data);
-                */
+                  $data = preg_replace('#<svg.+?onload.+?>#u', '', $data);
+                 */
                 // Only works in IE: <span style="width: expression(alert('Ping!'));"></span>
-                
+
                 $data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
                 $data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
                 //$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu', '$1>', $data);
-                
                 // Remove namespaced elements (we do not need them)
                 $data = preg_replace('#</*\w+:\w[^>]*+>#i', '', $data);
-                
+
                 do {
                     // Remove really unwanted tags
                     $old_data = $data;
@@ -362,7 +378,7 @@ class Input {
                 } while ($old_data !== $data);
                 break;
         }
-        
+
 
         return $data;
     }

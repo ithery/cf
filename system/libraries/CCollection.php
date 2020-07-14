@@ -55,7 +55,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      * @return static
      */
     public static function wrap($value) {
-        return $value instanceof self ? new static($value) : new static(Arr::wrap($value));
+        return $value instanceof self ? new static($value) : new static(carr::wrap($value));
     }
 
     /**
@@ -1311,6 +1311,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         // function which we were given. Then, we will sort the returned values and
         // and grab the corresponding values for the sorted keys from this array.
         foreach ($this->items as $key => $value) {
+
             $results[$key] = $callback($value, $key);
         }
 
@@ -1465,7 +1466,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         }
 
         return function ($item) use ($value) {
-            return carr::path($item, $value);
+            return carr::get($item, $value);
         };
     }
 
@@ -1643,9 +1644,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
             return $items;
         } elseif ($items instanceof self) {
             return $items->all();
-        } elseif ($items instanceof Arrayable) {
+        } elseif ($items instanceof CInterface_Arrayable) {
             return $items->toArray();
-        } elseif ($items instanceof Jsonable) {
+        } elseif ($items instanceof CInterface_Jsonable) {
             return json_decode($items->toJson(), true);
         } elseif ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
@@ -1682,5 +1683,4 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         return new CProxy_HigherOrderCollectionProxy($this, $key);
     }
 
-   
 }

@@ -16,7 +16,6 @@ abstract class CElement extends CObservable {
     protected $select2;
     protected $theme;
     protected $theme_style = array();
-    protected $client_modules = array();
     protected $theme_data = array();
     protected $before;
     protected $after;
@@ -39,7 +38,7 @@ abstract class CElement extends CObservable {
             $this->bootstrap = '2';
         }
         $this->theme = ccfg::get('theme');
-        $theme_data = CManager::instance()->get_theme_data();
+        $theme_data = CManager::instance()->getThemeData();
         $this->theme_data = $theme_data;
 
         if (isset($theme_data)) {
@@ -48,7 +47,6 @@ abstract class CElement extends CObservable {
             $this->checkbox = carr::get($theme_data, 'checkbox', '0');
             $this->radio = carr::get($theme_data, 'radio', '0');
             $this->theme_style = carr::get($theme_data, 'theme_style');
-            $this->client_modules = carr::get($theme_data, 'client_modules');
         }
         if (strlen($this->bootstrap) == 0) {
             $bootstrap = ccfg::get('bootstrap');
@@ -105,7 +103,7 @@ abstract class CElement extends CObservable {
                 }
             }
         }
-        
+
         return $this;
     }
 
@@ -121,8 +119,16 @@ abstract class CElement extends CObservable {
         return $this;
     }
 
+    public function setAttrFromArray($arr) {
+        foreach ($arr as $k => $v) {
+            $this->attr[$k] = $v;
+        }
+
+        return $this;
+    }
+
     public function addAttr($k, $v) {
-        return $this->set_attr($k, $v);
+        return $this->setAttr($k, $v);
     }
 
     public function getAttr($k) {
@@ -148,13 +154,6 @@ abstract class CElement extends CObservable {
             $classes = " " . $classes;
         }
         return $classes;
-    }
-
-    public static function isInstanceof($val) {
-        if (is_object($val)) {
-            return ($val instanceof CElement);
-        }
-        return false;
     }
 
     public function toArray() {

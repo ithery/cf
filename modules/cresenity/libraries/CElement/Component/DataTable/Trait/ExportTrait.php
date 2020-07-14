@@ -149,9 +149,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
             $no++;
             $key = "";
 
-            if (array_key_exists($table->key_field, $row)) {
+            if (array_key_exists($table->keyField, $row)) {
 
-                $key = $row[$table->key_field];
+                $key = $row[$table->keyField];
             }
             $class = "";
             if ($no % 2 == 0) {
@@ -378,9 +378,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
             $no++;
             $key = "";
             $line = "";
-            if (array_key_exists($this->key_field, $row)) {
+            if (array_key_exists($this->keyField, $row)) {
 
-                $key = $row[$this->key_field];
+                $key = $row[$this->keyField];
             }
             $class = "";
             if ($this->numbering) {
@@ -594,9 +594,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         foreach ($data as $row) {
             $no++;
             $key = "";
-            if (array_key_exists($this->key_field, $row)) {
+            if (array_key_exists($this->keyField, $row)) {
 
-                $key = $row[$this->key_field];
+                $key = $row[$this->keyField];
             }
             $class = "";
             if ($no % 2 == 0) {
@@ -808,7 +808,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
             $i = $colStart;
             $no++;
-            $key = carr::get($row, $this->key_field);
+            $key = carr::get($row, $this->keyField);
 
             if ($this->numbering) {
                 $excel->writeByIndex($i, $j, $no);

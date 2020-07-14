@@ -24,7 +24,6 @@ class CDatabase_Driver_MongoDB_Collection {
      */
     protected $connection;
 
-    
     /**
      * The MongoCollection instance..
      * @var MongoCollection
@@ -49,11 +48,12 @@ class CDatabase_Driver_MongoDB_Collection {
     public function __call($method, $parameters) {
         $start = microtime(true);
         $result = call_user_func_array([$this->collection, $method], $parameters);
-        if ($this->driver->db()->isLogQuery()) {
+
+        if ($this->driver->db()->isLogQuery() || $this->driver->db()->isBenchmarkQuery()) {
             // Once we have run the query we will calculate the time that it took to run and
             // then log the query, bindings, and execution time so we will report them on
             // the event that the developer needs them. We'll log time in milliseconds.
-            $time = $this->connection->getElapsedTime($start);
+            $time = $this->driver->getElapsedTime($start);
             $query = [];
             // Convert the query parameters to a json string.
             array_walk_recursive($parameters, function (&$item, $key) {
@@ -61,6 +61,7 @@ class CDatabase_Driver_MongoDB_Collection {
                     $item = (string) $item;
                 }
             });
+
             // Convert the query parameters to a json string.
             foreach ($parameters as $parameter) {
                 try {
@@ -69,7 +70,12 @@ class CDatabase_Driver_MongoDB_Collection {
                     $query[] = '{...}';
                 }
             }
+
             $queryString = $this->collection->getCollectionName() . '.' . $method . '(' . implode(',', $query) . ')';
+            if ($this->driver->db()->isBenchmarkQuery()) {
+                $this->driver->db()->benchmarkQuery($queryString, $time, count($result));
+            }
+            $this->driver->db()->setLastQuery($queryString);
             $this->driver->db()->logQuery($queryString, [], $time);
         }
         return $result;

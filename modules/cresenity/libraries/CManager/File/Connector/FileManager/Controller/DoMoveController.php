@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
-class CManager_File_Connector_FileManager_Controller_DoMoveController extends CManager_File_Connector_FileManager_Controller_BaseController {
+class CManager_File_Connector_FileManager_Controller_DoMoveController extends CManager_File_Connector_FileManager_AbstractController {
 
     /**
      * Get list of folders as json to populate treeview.
@@ -17,7 +17,7 @@ class CManager_File_Connector_FileManager_Controller_DoMoveController extends CM
      * @return mixed
      */
     public function execute() {
-        $fm = new FM();
+        $fm = $this->fm();
         $target = $fm->input('goToFolder');
         $items = $fm->input('items');
         foreach ($items as $item) {
@@ -40,7 +40,7 @@ class CManager_File_Connector_FileManager_Controller_DoMoveController extends CM
                 $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasMoving($old_file->path(), $new_file->path()));
             }
         };
-        return parent::$successResponse;
+        echo parent::$successResponse;
     }
 
 }

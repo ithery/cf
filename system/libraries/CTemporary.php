@@ -119,7 +119,13 @@ class CTemporary {
         return $path . $filename;
     }
 
-    public static function getPath($folder, $filename) {
+    public static function getPath($folder = null, $filename = null) {
+        if ($folder == null) {
+            $folder = 'common';
+        }
+        if ($filename == null) {
+            $filename = date('Ymd') . cutils::randmd5();
+        }
         $depth = 5;
         $mainFolder = substr($filename, 0, 8);
         $path = '';
@@ -142,7 +148,7 @@ class CTemporary {
     }
 
     public static function getLocalPath($folder, $filename) {
-        return rtrim(DOCROOT, '/') . '/' . static::getPath($folder, $filename);
+        return rtrim(DOCROOT, '/') . '/temp/' . static::getPath($folder, $filename);
     }
 
     /**
@@ -224,6 +230,30 @@ class CTemporary {
 
         $path = static::getPath($folder, $filename);
         return static::disk()->exists($path);
+    }
+
+    /**
+     * 
+     * @return CTemporary_Instance
+     */
+    public static function local() {
+        return CTemporary::instance('local-temp');
+    }
+
+    public static function createLocalFile($content, $folder = null, $suffix = null, $delete = true) {
+        return new CTemporary_LocalFile($content, $folder, $suffix, $delete);
+    }
+
+    /**
+     * 
+     * @return CTemporary_Instance
+     */
+    public static function instance($disk = null) {
+        return CTemporary_Instance::instance($disk);
+    }
+
+    public static function __callStatic($name, $arguments) {
+        return CTemporary::instance()->$name(...$arguments);
     }
 
 }

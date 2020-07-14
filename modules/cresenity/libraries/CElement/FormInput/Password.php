@@ -24,6 +24,7 @@ class CElement_FormInput_Password extends CElement_FormInput {
     public function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
+        $this->setAttr('placeholder', $this->placeholder);
         $this->setAttr('autocomplete', $this->autoComplete ? 'on' : 'off');
     }
 

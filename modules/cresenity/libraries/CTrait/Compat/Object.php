@@ -45,13 +45,6 @@ trait CTrait_Compat_Object {
         return $this->className();
     }
 
-    /**
-     * 
-     * @deprecated since version 1.2
-     * @return $this
-     */
-    static public function is_instanceof($value) {
-        return $this->isInstanceof($value);
-    }
+    
 
 }

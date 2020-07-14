@@ -187,7 +187,7 @@ return array(
         ),
     ),
     "bootbox" => array(
-        "js" => array("plugins" . DS . "bootbox" . DS . "jquery.bootbox.js?v=2"),
+        "js" => array("plugins" . DS . "bootbox" . DS . "bootbox.all.min.js?v=2"),
     ),
     "bootbox4.4.0" => array(
         "js" => array("plugins" . DS . "bootbox" . DS . "bootboxbootstrap3.min.js?v=3"),
@@ -460,7 +460,7 @@ return array(
     ),
     "animate" => array(
         "css" => array(
-            "plugins/animate/animate.css",
+            "plugins/animate/animate.css?v=1",
         ),
     ),
     "summernote" => array(
@@ -526,7 +526,7 @@ return array(
         "css" => array("icon/fontawesome-5.css"),
     ),
     "fontawesome-5-f" => array(
-        "css" => array("icon/fontawesome-5-f.css"),
+        "css" => array("icon/fontawesome-5-f.min.css"),
     ),
     "ionicons" => array(
         "css" => array("icon/ionicons.css"),
@@ -536,6 +536,15 @@ return array(
     ),
     "themify-icons" => array(
         "css" => array("icon/themify-icons.css"),
+    ),
+    "material-design-iconic-font" => array(
+        "css" => array("icon/material-design-iconic-font.min.css"),
+    ),
+    "piconsthin" => array(
+        "css" => array("icon/piconsthin.css"),
+    ),
+    "osicon" => array(
+        "css" => array("icon/osicon.css"),
     ),
     "open-ionic" => array(
         "css" => array("icon/open-ionic.css"),
@@ -693,6 +702,11 @@ return array(
     "tippy" => array(
         "js" => array(
             "plugins/tippy/tippy.js",
+        ),
+    ),
+    "waypoints" => array(
+        "js" => array(
+            "plugins/waypoints/jquery.waypoints.min.js",
         ),
     ),
     "locationpicker" => array(

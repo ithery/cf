@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 14, 2019, 11:20:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CTranslation_Translator extends CNamespacedItemResolver implements CTranslation_TranslatorInterface {
+class CTranslation_Translator extends CBase_NamespacedItemResolver implements CTranslation_TranslatorInterface {
 
     use CTrait_Macroable;
 
@@ -109,7 +109,6 @@ class CTranslation_Translator extends CNamespacedItemResolver implements CTransl
         // was not passed, we will use the default locales which was given to us when
         // the translator was instantiated. Then, we can load the lines and return.
         $locales = $fallback ? $this->localeArray($locale) : [$locale ?: $this->locale];
-
         foreach ($locales as $locale) {
             if (!is_null($line = $this->getLine(
                             $namespace, $group, $locale, $item, $replace

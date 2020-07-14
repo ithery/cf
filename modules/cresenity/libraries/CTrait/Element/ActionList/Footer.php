@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CTrait_Element_ActionList_Footer {
 
+    /**
+     *
+     * @var CElement_List_ActionList
+     */
     protected $footerActionList;
 
     /**
@@ -35,10 +39,15 @@ trait CTrait_Element_ActionList_Footer {
      * @param string $id
      * @return CElement_Component_Action
      */
-    public function addFooterAction($id = "") {
-        $row_act = CElement_Factory::createComponent('Action', $id);
-        $this->footerActionList->add($row_act);
-        return $row_act;
+    public function addFooterAction($id = null) {
+        $rowAct = $id;
+        if (!($id instanceof CElement_Component_Action)) {
+            $rowAct = CElement_Factory::createComponent('Action', $id);
+        }
+
+
+        $this->footerActionList->add($rowAct);
+        return $rowAct;
     }
 
     /**

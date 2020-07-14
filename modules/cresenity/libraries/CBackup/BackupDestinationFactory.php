@@ -8,10 +8,10 @@
 
 class CBackup_BackupDestinationFactory {
 
-    public static function createFromArray($config) {
-        return c::collect($config['destination']['disks'])
-                        ->map(function ($filesystemName) use ($config) {
-                            return CBackup_BackupDestination::create($filesystemName, $config['name']);
+    public static function createFromArray($disks) {
+        return c::collect($disks)
+                        ->map(function ($filesystemName) {
+                            return CBackup_BackupDestination::create($filesystemName, CBackup::getConfig('backup.name'));
                         });
     }
 

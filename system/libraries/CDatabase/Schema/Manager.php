@@ -26,8 +26,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Constructor. Accepts the Connection instance to manage the schema for.
      *
-     * @param \Doctrine\DBAL\Connection                      $conn
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform|null $platform
+     * @param CDatabase                      $conn
+     * @param CDatabase_Platform|null $platform
      */
     public function __construct(CDatabase $conn, CDatabase_Platform $platform = null) {
         $this->db = $conn;

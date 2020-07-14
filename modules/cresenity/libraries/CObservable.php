@@ -50,51 +50,51 @@ abstract class CObservable extends CRenderable {
 
         parent::__construct($id);
         $this->listeners = array();
-        $this->manager = CManager::instance();
+        $manager = CManager::instance();
 
-        $this->manager->registerControl('text', 'CElement_FormInput_Text');
-        $this->manager->registerControl('number', 'CElement_FormInput_Number');
-        $this->manager->registerControl('email', 'CElement_FormInput_Email');
-        $this->manager->registerControl('datepicker', 'CElement_FormInput_Date');
-        $this->manager->registerControl('date', 'CElement_FormInput_Date');
-        $this->manager->registerControl('material-datetime', 'CElement_FormInput_DateTime_MaterialDateTime');
-        $this->manager->registerControl('daterange-picker', 'CElement_FormInput_DateRange');
-        $this->manager->registerControl('daterange-dropdown', 'CElement_FormInput_DateRange_Dropdown');
-        $this->manager->registerControl('daterange-button', 'CElement_FormInput_DateRange_DropdownButton');
-        $this->manager->registerControl('currency', 'CElement_FormInput_Currency');
-        $this->manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
-        $this->manager->registerControl('time', 'CElement_FormInput_Time');
-        $this->manager->registerControl('timepicker', 'CElement_FormInput_Time');
-        $this->manager->registerControl('clock', 'CElement_FormInput_Clock');
-        $this->manager->registerControl('clockpicker', 'CElement_FormInput_Clock');
-        $this->manager->registerControl('image', 'CElement_FormInput_Image');
-        $this->manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
-        $this->manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
-        $this->manager->registerControl('file', 'CFormInputFile');
-        $this->manager->registerControl('file-ajax', 'CElement_FormInput_FileAjax');
-        $this->manager->registerControl('password', 'CElement_FormInput_Password');
-        $this->manager->registerControl('textarea', 'CElement_FormInput_Textarea');
-        $this->manager->registerControl('select', 'CElement_FormInput_Select');
-        $this->manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
-        $this->manager->registerControl('map-picker', CElement_FormInput_MapPicker::class);
+        $manager->registerControl('text', 'CElement_FormInput_Text');
+        $manager->registerControl('number', 'CElement_FormInput_Number');
+        $manager->registerControl('email', 'CElement_FormInput_Email');
+        $manager->registerControl('datepicker', 'CElement_FormInput_Date');
+        $manager->registerControl('date', 'CElement_FormInput_Date');
+        $manager->registerControl('material-datetime', 'CElement_FormInput_DateTime_MaterialDateTime');
+        $manager->registerControl('daterange-picker', 'CElement_FormInput_DateRange');
+        $manager->registerControl('daterange-dropdown', 'CElement_FormInput_DateRange_Dropdown');
+        $manager->registerControl('daterange-button', 'CElement_FormInput_DateRange_DropdownButton');
+        $manager->registerControl('currency', 'CElement_FormInput_Currency');
+        $manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
+        $manager->registerControl('time', 'CElement_FormInput_Time');
+        $manager->registerControl('timepicker', 'CElement_FormInput_Time');
+        $manager->registerControl('clock', 'CElement_FormInput_Clock');
+        $manager->registerControl('clockpicker', 'CElement_FormInput_Clock');
+        $manager->registerControl('image', 'CElement_FormInput_Image');
+        $manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
+        $manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
+        $manager->registerControl('file', 'CFormInputFile');
+        $manager->registerControl('file-ajax', 'CElement_FormInput_FileAjax');
+        $manager->registerControl('password', 'CElement_FormInput_Password');
+        $manager->registerControl('textarea', 'CElement_FormInput_Textarea');
+        $manager->registerControl('select', 'CElement_FormInput_Select');
+        $manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
+        $manager->registerControl('map-picker', CElement_FormInput_MapPicker::class);
 
-        $this->manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
+        $manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
 
-        $this->manager->registerControl('selectsearch', 'CFormInputSelectSearch');
-        $this->manager->registerControl('label', 'CFormInputLabel');
-        $this->manager->registerControl('checkbox', CElement_FormInput_Checkbox::class);
-        $this->manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
-        $this->manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
-        $this->manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
-        $this->manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
-        $this->manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
-        $this->manager->registerControl('ckeditor', 'CFormInputCKEditor');
-        $this->manager->registerControl('hidden', 'CFormInputHidden');
-        $this->manager->registerControl('radio', 'CFormInputRadio');
-        $this->manager->registerControl('filedrop', 'CFormInputFileDrop');
-        $this->manager->registerControl('slider', 'CFormInputSlider');
-        $this->manager->registerControl('tooltip', 'CFormInputTooltip');
-        $this->manager->registerControl('fileupload', 'CFormInputFileUpload');
+        $manager->registerControl('selectsearch', 'CFormInputSelectSearch');
+        $manager->registerControl('label', 'CFormInputLabel');
+        $manager->registerControl('checkbox', CElement_FormInput_Checkbox::class);
+        $manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
+        $manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
+        $manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
+        $manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
+        $manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
+        $manager->registerControl('ckeditor', 'CFormInputCKEditor');
+        $manager->registerControl('hidden', 'CFormInputHidden');
+        $manager->registerControl('radio', 'CFormInputRadio');
+        $manager->registerControl('filedrop', 'CFormInputFileDrop');
+        $manager->registerControl('slider', 'CFormInputSlider');
+        $manager->registerControl('tooltip', 'CFormInputTooltip');
+        $manager->registerControl('fileupload', 'CFormInputFileUpload');
 
         $this->javascript = new CObservable_Javascript($this);
     }
@@ -115,16 +115,21 @@ abstract class CObservable extends CRenderable {
 
     /**
      * 
-     * @param type $id
-     * @param type $type
+     * @param string|CElement_FormInput $id
+     * @param string $type
      * @return CElement_FormInput
      */
-    public function addControl($id, $type) {
+    public function addControl($id, $type = 'text') {
         $control = null;
-        if ($this->manager->isRegisteredControl($type)) {
-            $control = $this->manager->createControl($id, $type);
-        } else {
-            trigger_error('Unknown control type ' . $type);
+        if ($id instanceof CElement_FormInput) {
+            $control = $id;
+        }
+        if ($control == null) {
+            if (CManager::instance()->isRegisteredControl($type)) {
+                $control = CManager::instance()->createControl($id, $type);
+            } else {
+                throw new CException('Unknown control type :type', [':type' => $type]);
+            }
         }
 
 
@@ -248,10 +253,10 @@ abstract class CObservable extends CRenderable {
 
     public function addElement($type, $id = "") {
         $element = null;
-        if ($this->manager->isRegisteredElement($type)) {
-            $element = $this->manager->createElement($id, $type);
+        if (CManager::instance()->isRegisteredElement($type)) {
+            $element = CManager::instance()->createElement($id, $type);
         } else {
-            throw new CException('Unknow element type :element_type', array(':element_type' => $type));
+            throw new CException('Unknow element type :elementType', array(':elementType' => $type));
         }
 
 
@@ -306,12 +311,24 @@ abstract class CObservable extends CRenderable {
         return $icon;
     }
 
+    /**
+     * 
+     * @param type $id
+     * @return type
+     * @deprecated
+     */
     public function addPieChart($id = "") {
         $pie_chart = CPieChartElement::factory($id);
         $this->add($pie_chart);
         return $pie_chart;
     }
 
+    /**
+     * 
+     * @param type $id
+     * @return type
+     * @deprecated
+     */
     public function addDashboard($id = "") {
         $dashboard = CDashboard::factory($id);
         $this->add($dashboard);
@@ -327,13 +344,6 @@ abstract class CObservable extends CRenderable {
         foreach ($this->listeners as $listener) {
             $listener->set_handler_url_param($param);
         }
-    }
-
-    public static function is_instanceof($value) {
-        if (is_object($value)) {
-            return ($value instanceof CObject);
-        }
-        return false;
     }
 
     public function js($indent = 0) {

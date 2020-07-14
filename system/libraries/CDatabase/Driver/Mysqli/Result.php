@@ -16,7 +16,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
      */
     protected $link;
     // Data fetching types
-    protected $fetch_type = 'mysqli_fetch_object';
+    protected $fetch_type = 'fetch_object';
     protected $return_type = MYSQLI_ASSOC;
 
     /**

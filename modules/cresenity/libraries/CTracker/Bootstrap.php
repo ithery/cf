@@ -21,7 +21,10 @@ class CTracker_Bootstrap {
 
     public function execute() {
         if (CTracker::config()->get('trackEnabled')) {
+            
             $this->register();
+            CTracker::populator()->populateData();
+            
             $this->getTracker()->boot();
         }
     }

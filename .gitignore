@@ -7,6 +7,10 @@ error_log
 
 #ignore application folder, application folder must be another project
 application/*
+!application/cresenity
+
+application/cresenity/default/config/*
+application/cresenity/config/*
 
 #ignore data domain or org
 /data/*
@@ -47,6 +51,8 @@ application/*
 /certificate
 /upload/*
 /payment_log/
+/public/files/
+/public/files/*
 
 #ignore netbeans ide config
 /nbproject/
@@ -77,3 +83,4 @@ botlog.log
 
 #ignore vscode
 .vscode
+*.py

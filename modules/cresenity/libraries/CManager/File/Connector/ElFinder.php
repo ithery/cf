@@ -7,8 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 27, 2019, 2:50:02 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 use CManager_File_Connector_ElFinder_Base as ElFinder;
+
 class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
 
     /**
@@ -52,14 +52,12 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
      *
      * @param      $elFinder
      * @param bool $debug
-     *
-     * @author Dmitry (dio) Levashov
      */
-    public function __construct($elFinder, $debug = false) {
+    public function __construct(CManager_File_ConfigAbstract $config, $debug = false) {
 
-        if (is_array($elFinder)) {
-            $elFinder = new CManager_File_Connector_ElFinder_Base($elFinder);
-        }
+        parent::__construct($config);
+
+        $elFinder = new CManager_File_Connector_ElFinder_Base($config->getConfig());
 
         $this->elFinder = $elFinder;
         $this->reqMethod = strtoupper($_SERVER["REQUEST_METHOD"]);
@@ -75,7 +73,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
      * @throws Exception
      * @author Dmitry (dio) Levashov
      */
-    public function run($method=null) {
+    public function run($method = null) {
         $isPost = $this->reqMethod === 'POST';
         $src = $isPost ? array_merge($_GET, $_POST) : $_GET;
         $maxInputVars = (!$src || isset($src['targets'])) ? ini_get('max_input_vars') : null;

@@ -17,12 +17,4 @@ class CResources_Engine_Pdf extends CResources_Engine {
         return $filename;
     }
 
-    public function get_url($filename = null) {
-        if ($filename == null)
-            $filename = $this->_filename;
-
-        $path = curl::base(false, 'http') . 'assets/pdf/' . CResourcesEncode::encode($filename);
-        return $path;
-    }
-
 }

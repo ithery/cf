@@ -15,16 +15,16 @@ class CAjax_Engine_DataTable_Processor_Callback extends CAjax_Engine_DataTable_P
         $data = $this->engine->getData();
 
         $table = carr::get($data, 'table');
-        $keyField = carr::get($data, 'key_field');
+        $keyField = carr::get($data, 'keyField');
         $table = unserialize($table);
         $request = $this->input;
-        $callbackRequire = carr::get($data, 'callback_require');
+        $callbackRequire = carr::get($data, 'callbackRequire');
         if (strlen($callbackRequire) > 0 && is_file($callbackRequire)) {
             require_once $callbackRequire;
         }
         $callback = carr::get($data, 'query');
         $params = array();
-        $params['options'] = carr::get($data, 'callback_options');
+        $params['options'] = carr::get($data, 'callbackOptions');
         $params['processor'] = $this;
 
 

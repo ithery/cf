@@ -114,25 +114,10 @@ trait CModel_HasSlug_HasSlugTrait {
         $query = static::where($this->slugOptions->slugField, $slug)
                 ->where($this->getKeyName(), '!=', $key)
                 ->withoutGlobalScopes();
-        if ($this->usesSoftDeletes()) {
+        if ($this->usesSoftDelete()) {
             $query->withTrashed();
         }
         return $query->exists();
-    }
-
-    protected static function usesSoftDeletes() {
-
-
-        $classUses = CF::collect(CF::class_uses_recursive(static::class));
-        $lastClassUses = $classUses->map(function($item) {
-
-            return carr::last(explode('_', $item));
-        });
-        if (in_array('SoftDeleteTrait', $lastClassUses->toArray())) {
-
-            return true;
-        }
-        return false;
     }
 
     protected static function usesValidating() {

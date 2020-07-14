@@ -29,6 +29,13 @@ abstract class CDatabase_Driver {
      * @return CDatabase_Result
      */
     abstract public function query($sql);
+    
+    /**
+     * closing connection.
+     *
+     * @return void
+     */
+    abstract public function close();
 
     /**
      * Builds a DELETE query.

@@ -9,6 +9,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CTracker {
 
+    /**
+     *
+     * @var CTracker_Bootstrap 
+     */
     protected static $bootstrap;
     protected static $isBooted = false;
 
@@ -17,11 +21,13 @@ class CTracker {
     }
 
     public static function boot() {
-       
-        if (!self::$isBooted) {
-            self::$bootstrap = new CTracker_Bootstrap();
-            self::$bootstrap->execute();
-            self::$isBooted=true;
+        if (PHP_SAPI !== 'cli') {
+            if (!self::$isBooted) {
+
+                self::$bootstrap = new CTracker_Bootstrap();
+                self::$bootstrap->execute();
+                self::$isBooted = true;
+            }
         }
     }
 
@@ -34,7 +40,7 @@ class CTracker {
     }
 
     public static function onlineUsers($minutes = 3, $results = true) {
-        return self::sessions(3);
+        return self::sessions($minutes);
     }
 
     public static function sessions($minutes = 1440, $results = true) {
@@ -47,6 +53,28 @@ class CTracker {
 
     public function pageViewsByCountry($minutes, $results = true) {
         return CTracker_RepositoryManager::instance()->pageViewsByCountry(CPeriod::minutes($minutes), $results);
+    }
+
+    public function userDevices($minutes, $user_id = null, $results = true) {
+
+        return CTracker_RepositoryManager::instance()->userDevices(CPeriod::minutes($minutes), $user_id, $results);
+    }
+
+    /**
+     * 
+     * @return CTracker_Populator
+     */
+    public static function populator() {
+        return CTracker_Populator::instance();
+    }
+
+    /**
+     * Check CTracker already booted
+     * 
+     * @return type
+     */
+    public static function isBooted() {
+        return static::$isBooted;
     }
 
 }

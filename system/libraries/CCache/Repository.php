@@ -34,11 +34,27 @@ class CCache_Repository implements ArrayAccess {
         if ($options instanceof CCache_DriverAbstract) {
             $this->driver = $options;
         } else {
+            
             $driverName = carr::get($options, 'driver', 'Null');
             $driverOption = carr::get($options, 'options', array());
-            $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
-            $this->driver = new $driverClass($driverOption);
+            
+            $this->driver = $this->resolveDriver($driverName,$driverOption);
         }
+    }
+    
+    public function resolveDriver($driverName, $options=[]) {
+        switch($driverName) {
+            case 'Redis':
+                $redis = CRedis::instance(carr::get($options,'group','redis'));
+                return new CCache_Driver_RedisDriver($redis, carr::get($options,'prefix',''),carr::get($options,'connection','default'));
+                break;
+            default:
+                $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
+                return new $driverClass($options);
+                
+        }
+        
+        
     }
 
     /**

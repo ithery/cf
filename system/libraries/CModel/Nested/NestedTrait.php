@@ -41,21 +41,19 @@ trait CModel_Nested_NestedTrait {
     public static function bootNestedTrait() {
 
         static::saving(function ($model) {
-            return $model->callPendingAction();
+            $model->callPendingAction();
+        });
+        static::saved(function ($model) {
+            $model->refreshNode();
         });
         static::deleting(function ($model) {
             // We will need fresh data to delete node safely
             $model->refreshNode();
         });
-        static::deleted(function ($model) {
-            $model->deleteDescendants();
-        });
+
         if (static::usesSoftDelete()) {
             static::restoring(function ($model) {
-                static::$deletedAt = $model->{$model->getDeletedAtColumn()};
-            });
-            static::restored(function ($model) {
-                $model->restoreDescendants(static::$deletedAt);
+                static::$deletedAt = $model->{$model->getStatusColumn()};
             });
         }
     }
@@ -78,26 +76,17 @@ trait CModel_Nested_NestedTrait {
     protected function callPendingAction() {
         $this->moved = false;
         if (!$this->pending && !$this->exists) {
+
             $this->makeRoot();
         }
-        if (!$this->pending)
+        if (!$this->pending) {
             return;
+        }
         $method = 'action' . ucfirst(array_shift($this->pending));
+
         $parameters = $this->pending;
         $this->pending = null;
         $this->moved = call_user_func_array([$this, $method], $parameters);
-    }
-
-    /**
-     * @return bool
-     */
-    public static function usesSoftDelete() {
-        static $softDelete;
-        if (is_null($softDelete)) {
-            $instance = new static;
-            return $softDelete = method_exists($instance, 'bootSoftDeletes');
-        }
-        return $softDelete;
     }
 
     /**
@@ -140,10 +129,13 @@ trait CModel_Nested_NestedTrait {
      */
     protected function actionAppendOrPrepend(self $parent, $prepend = false) {
         $parent->refreshNode();
+
         $cut = $prepend ? $parent->getLft() + 1 : $parent->getRgt();
         if (!$this->insertAt($cut)) {
+
             return false;
         }
+        $this->setDepthWithSubtree();
         $parent->refreshNode();
         return true;
     }
@@ -179,11 +171,13 @@ trait CModel_Nested_NestedTrait {
      * Refresh node's crucial attributes.
      */
     public function refreshNode() {
-        if (!$this->exists || static::$actionsPerformed === 0)
-            return;
+        if (!$this->exists || static::$actionsPerformed === 0) {
+            return $this;
+        }
         $attributes = $this->newNestedSetQuery()->getNodeData($this->getKey());
         $this->attributes = array_merge($this->attributes, $attributes);
-//        $this->original = array_merge($this->original, $attributes);
+        return $this;
+        //        $this->original = array_merge($this->original, $attributes);
     }
 
     /**
@@ -213,6 +207,16 @@ trait CModel_Nested_NestedTrait {
      */
     public function descendants() {
         return new CModel_Nested_Relation_Descendants($this->newScopedQuery(), $this);
+    }
+
+    /**
+     *
+     * @return CDatabase_Query_Builder
+     */
+    public function descendantsAndSelf() {
+        return $this->newNestedSetQuery()
+                        ->where($this->getLftName(), '>=', $this->getLft())
+                        ->where($this->getLftName(), '<', $this->getRgt());
     }
 
     /**
@@ -373,7 +377,7 @@ trait CModel_Nested_NestedTrait {
                 ->assertNotDescendant($parent)
                 ->assertSameScope($parent);
         $this->setParent($parent)->dirtyBounds();
-        
+
         return $this->setNodeAction('appendOrPrepend', $parent, $prepend);
     }
 
@@ -449,8 +453,18 @@ trait CModel_Nested_NestedTrait {
      *
      * @return $this
      */
-    public function rawNode($lft, $rgt, $parentId) {
-        $this->setLft($lft)->setRgt($rgt)->setParentId($parentId);
+    public function rawNode($lft, $rgt, $parentId, $depth = null) {
+
+
+        if ($depth == null) {
+            $depth = 0;
+            $parentModel = static::find($parentId);
+            if ($parentModel != null) {
+                $depth = $parentModel->getDepth() + 1;
+            }
+        }
+
+        $this->setLft($lft)->setRgt($rgt)->setDepth($depth)->setParentId($parentId);
         return $this->setNodeAction('raw');
     }
 
@@ -517,8 +531,9 @@ trait CModel_Nested_NestedTrait {
         if ($updated instanceof CDatabase_Driver_Mysqli_Result) {
             $updated = $updated->count();
         }
-        if ($updated)
+        if ($updated) {
             $this->refreshNode();
+        }
         return $updated;
     }
 
@@ -591,7 +606,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * @param string $table
      *
-     * @return QueryBuilder
+     * @return CDatabase_Query_Builder
      */
     public function newScopedQuery($table = null) {
         return $this->applyNestedSetScope($this->newQuery(), $table);
@@ -656,7 +671,7 @@ trait CModel_Nested_NestedTrait {
         }
         $instance->save();
         // Now create children
-        $relation = new EloquentCollection;
+        $relation = new CModel_Collection;
         foreach ((array) $children as $child) {
             $relation->add($child = static::create($child, $instance));
             $child->setRelation('parent', $instance);
@@ -671,8 +686,9 @@ trait CModel_Nested_NestedTrait {
      * @return int
      */
     public function getNodeHeight() {
-        if (!$this->exists)
+        if (!$this->exists) {
             return 2;
+        }
         return $this->getRgt() - $this->getLft() + 1;
     }
 
@@ -695,8 +711,9 @@ trait CModel_Nested_NestedTrait {
      * @throws Exception If parent node doesn't exists
      */
     public function setParentIdAttribute($value) {
-        if ($this->getParentId() == $value)
+        if ($this->getParentId() == $value) {
             return;
+        }
         if ($value) {
             $this->appendToNode($this->newScopedQuery()->findOrFail($value));
         } else {
@@ -718,6 +735,24 @@ trait CModel_Nested_NestedTrait {
      */
     public function isLeaf() {
         return $this->getLft() + 1 == $this->getRgt();
+    }
+
+    /**
+     * Returns true if this is a trunk node (not root or leaf).
+     *
+     * @return boolean
+     */
+    public function isTrunk() {
+        return !$this->isRoot() && !$this->isLeaf();
+    }
+
+    /**
+     * Returns true if this is a child node.
+     *
+     * @return boolean
+     */
+    public function isChild() {
+        return !$this->isRoot();
     }
 
     /**
@@ -746,6 +781,7 @@ trait CModel_Nested_NestedTrait {
     public function getDepthName() {
         return CModel_Nested_NestedSet::DEPTH;
     }
+
     /**
      * Get the parent id key name.
      *
@@ -781,6 +817,7 @@ trait CModel_Nested_NestedTrait {
     public function getDepth() {
         return $this->getAttributeValue($this->getDepthName());
     }
+
     /**
      * Get the value of the model's parent id key.
      *
@@ -1001,14 +1038,22 @@ trait CModel_Nested_NestedTrait {
         $this->attributes[$this->getRgtName()] = $value;
         return $this;
     }
-    
+
     /**
      * @param $value
      *
      * @return $this
      */
-    public function setDepth($value) {
-        $this->attributes[$this->getDepthName()] = $value;
+    public function setDepth($value = null) {
+
+        $this->refreshNode();
+
+        $level = $value === null ? $this->getLevel() : $value;
+
+        $this->newNestedSetQuery()->where($this->getKeyName(), '=', $this->getKey())->update(array($this->getDepthName() => $level));
+        $this->setAttribute($this->getDepthName(), $level);
+
+
         return $this;
     }
 
@@ -1039,7 +1084,9 @@ trait CModel_Nested_NestedTrait {
      */
     protected function assertNotDescendant(self $node) {
         if ($node == $this || $node->isDescendantOf($this)) {
-            throw new LogicException('Node must not be a descendant.');
+            $str = "this lft:" . $this->getLft() . ', this rgt:' . $this->getRgt() . ' other lft:' . $node->getLft() . ' other rgt:' . $node->getRgt();
+            $str .= "-- this id" . $this->getKey() . ',other id:' . $node->getKey();
+            throw new LogicException('Node must not be a descendant.' . $str);
         }
         return $this;
     }
@@ -1085,5 +1132,167 @@ trait CModel_Nested_NestedTrait {
         return parent::replicate($except);
     }
 
-}
+    /**
+     * Returns the level of this node in the tree.
+     * Root level is 0.
+     *
+     * @return int
+     */
+    public function getLevel() {
+        if (is_null($this->getParentId())) {
+            return 0;
+        }
 
+        return $this->computeLevel();
+    }
+
+    /**
+     * Compute current node level. If could not move past ourseleves return
+     * our ancestor count, otherwhise get the first parent level + the computed
+     * nesting.
+     *
+     * @return integer
+     */
+    protected function computeLevel() {
+        list($node, $nesting) = $this->determineDepth($this);
+
+        if ($node->equals($this)) {
+            return $this->ancestors()->count();
+        }
+        return $node->getLevel() + $nesting;
+    }
+
+    /**
+     * Return an array with the last node we could reach and its nesting level
+     *
+     * @param   Baum\Node $node
+     * @param   integer   $nesting
+     * @return  array
+     */
+    protected function determineDepth($node, $nesting = 0) {
+        // Traverse back up the ancestry chain and add to the nesting level count
+        while ($parent = $node->getParent()->first()) {
+            $nesting = $nesting + 1;
+
+            $node = $parent;
+        }
+
+        return array($node, $nesting);
+    }
+
+    /**
+     * Equals?
+     *
+     * @param \Baum\Node
+     * @return boolean
+     */
+    public function equals($node) {
+        return ($this == $node);
+    }
+
+    /**
+     * Sets the depth attribute for the current node and all of its descendants.
+     *
+     * @return $this
+     */
+    public function setDepthWithSubtree() {
+        $self = $this;
+
+
+        $self->refreshNode();
+
+        $self->descendantsAndSelf()->select($self->getKeyName())->lockForUpdate()->get();
+
+        $oldDepth = !is_null($self->getDepth()) ? $self->getDepth() : 0;
+
+        $newDepth = $self->getLevel();
+
+        $self->newNestedSetQuery()->where($self->getKeyName(), '=', $self->getKey())->update(array($self->getDepthName() => $newDepth));
+        $self->setAttribute($self->getDepthName(), $newDepth);
+
+        $diff = $newDepth - $oldDepth;
+
+        
+        if (!$self->isLeaf() && $diff != 0) {
+            $self->descendants()->increment($self->getDepthName(), $diff);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Extracts current node (self) from current query expression.
+     *
+     * @return CDatabase_Query_builder
+     */
+    public function scopeWithoutSelf($query) {
+        return $this->scopeWithoutNode($query, $this);
+    }
+
+    /**
+     * Extracts first root (from the current node p-o-v) from current query
+     * expression.
+     *
+     * @return CDatabase_Query_builder
+     */
+    public function scopeWithoutRoot($query) {
+        return $this->scopeWithoutNode($query, $this->getRoot());
+    }
+
+    /**
+     * Query scope which extracts a certain node object from the current query
+     * expression.
+     *
+     * @return CDatabase_Query_builder
+     */
+    public function scopeWithoutNode($query, $node) {
+        return $query->where($node->getKeyName(), '!=', $node->getKey());
+    }
+
+    /**
+     * Instance scope which targes all the ancestor chain nodes including
+     * the current one.
+     *
+     * @return CDatabase_Query_builder
+     */
+    public function ancestorsAndSelf() {
+        return $this->newNestedSetQuery()
+                        ->where($this->getLftName(), '<=', $this->getLft())
+                        ->where($this->getRgtName(), '>=', $this->getRgt());
+    }
+
+    /**
+     * Returns the root node starting at the current node.
+     *
+     * @return CModel
+     */
+    public function getRoot() {
+        if ($this->exists) {
+            return $this->ancestorsAndSelf()->whereNull($this->getParentIdName())->first();
+        } else {
+            $parentId = $this->getParentId();
+
+            if (!is_null($parentId) && $currentParent = static::find($parentId)) {
+                return $currentParent->getRoot();
+            } else {
+                return $this;
+            }
+        }
+    }
+
+    /**
+     * Provides a depth level limit for the query.
+     *
+     * @param   query   CDatabase_Query_Builder
+     * @param   limit   integer
+     * @return  CDatabase_Query_Builder
+     */
+    public function scopeLimitDepth($query, $limit) {
+        $depth = $this->exists ? $this->getDepth() : $this->getLevel();
+        $max = $depth + $limit;
+        $scopes = array($depth, $max);
+
+        return $query->whereBetween($this->getDepthName(), array(min($scopes), max($scopes)));
+    }
+
+}

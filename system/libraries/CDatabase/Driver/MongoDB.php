@@ -43,12 +43,16 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         CF::log(CLogger::DEBUG, 'MongoDB Database Driver Initialized');
     }
 
+    public function close() {
+        unset($this->link);
+        $this->link = null;
+    }
+
     /**
      * Closes the database connection.
      */
     public function __destruct() {
-        unset($this->link);
-        $this->link = null;
+        
     }
 
     /**
@@ -99,9 +103,21 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
                 $host = $host . ':' . $configConnection['port'];
             }
         }
+        $authString = '';
+        if (isset($configConnection['user'])) {
+            $authString .= $configConnection['user'];
+        }
+        if (isset($configConnection['pass'])) {
+            $authString .= ':' . $configConnection['pass'];
+        }
+
+        if (strlen($authString) > 0) {
+            $authString .= '@';
+        }
+
         // Check if we want to authenticate against a specific database.
         $auth_database = isset($configConnection['options']) && !empty($configConnection['options']['database']) ? $configConnection['options']['database'] : null;
-        return 'mongodb://' . implode(',', $hosts) . ($auth_database ? '/' . $auth_database : '');
+        return 'mongodb://' . $authString . implode(',', $hosts) . ($auth_database ? '/' . $auth_database : '');
     }
 
     /**
@@ -116,7 +132,37 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         return $this->hasDsnString($config) ? $this->getDsnString($config) : $this->getHostDsn($config);
     }
 
+    /**
+     * 
+     * @return \MongoDB\Client
+     */
+    public function getMongoClient() {
+        return $this->link;
+    }
+
+    /**
+     * 
+     * @return \MongoDB\Driver\Manager
+     */
+    public function getMongoManager() {
+        return $this->getMongoClient()->getManager();
+    }
     
+    /**
+     * 
+     * @return \MongoDB\Driver\Server
+     */
+    public function getMongoServer() {
+        return $this->getMongoManager()->selectServer($this->getMongoManager()->getReadPreference());
+    }
+
+    /**
+     * 
+     * @return \MongoDB\Database
+     */
+    public function getMongoDatabase() {
+        return $this->mongoDB;
+    }
 
     public function connect() {
         // Check if link already exists
@@ -125,6 +171,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         }
 
         $dsn = $this->getDsn();
+
         $options = carr::get($this->dbConfig, 'options', []);
 
         $this->link = $this->createConnection($dsn, $this->dbConfig, $options);
@@ -190,11 +237,18 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     }
 
     public function query($sql) {
-        
+
+      
+        return new CDatabase_Driver_MongoDB_Result($this->link,$this->mongoDB, carr::get($this->dbConfig,'object',true), $sql);
+
     }
 
     public function show_error() {
         
+    }
+
+    public function getElapsedTime($start) {
+        return round((microtime(true) - $start) * 1000, 2);
     }
 
     /**
@@ -230,4 +284,29 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         return call_user_func_array([$this->link, $method], $parameters);
     }
 
+    /**
+     * {@inheritdoc}
+     * @return CDatabase_Schema_Manager_MongoDB
+     */
+    public function getSchemaManager(CDatabase $db) {
+        return new CDatabase_Schema_Manager_MongoDB($db);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return CDatabase_Platform_MongooDB
+     */
+    public function getDatabasePlatform() {
+        return new CDatabase_Platform_MongoDB();
+    }
+
+    
+    /**
+     * Get the name of the connected database.
+     *
+     * @return string
+     */
+    public function getDatabaseName() {
+        return carr::path($this->dbConfig, 'connection.database');
+    }
 }

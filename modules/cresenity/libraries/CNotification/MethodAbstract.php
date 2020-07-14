@@ -10,5 +10,9 @@ abstract class CNotification_MethodAbstract implements CNotification_MethodInter
 
     use CTrait_HasOptions;
     
+    
+    public function onNotificatonSent($logNotificationModel) {
+        
+    }
    
 }

@@ -12,6 +12,8 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class c {
 
+    
+    
     public static function urShift($a, $b) {
         if ($b == 0) {
             return $a;
@@ -436,6 +438,17 @@ class c {
 
             return static::value($rescue);
         }
+    }
+    
+    /**
+     * Return the given value, optionally passed through the given callback.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function with($value, callable $callback = null) {
+        return is_null($callback) ? $value : $callback($value);
     }
 
     /**

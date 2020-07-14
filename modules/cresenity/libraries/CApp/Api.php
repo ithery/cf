@@ -54,13 +54,15 @@ class CApp_Api {
         /**
          * @var CMApi_Method Description
          */
-        $class_name = 'CApp_Api_Method_' . $method;
+        $className = 'CApp_Api_Method_' . $method;
         if ($submethod != null) {
-            $class_name = 'CApp_Api_Method_' . $method . '_' . $submethod;
+            $className = 'CApp_Api_Method_' . $method . '_' . $submethod;
         }
+
+        
         $logger = null;
-        if (class_exists($class_name)) {
-            $methodObject = new $class_name($this, $method);
+        if (class_exists($className)) {
+            $methodObject = new $className($this, $method);
             //$logger = new CApp_Api_Logger($methodObject->sessionId());
             //$logger->logRequest($method, $methodObject->request());
             if ($methodObject->getErrCode() == 0) {
@@ -69,8 +71,8 @@ class CApp_Api {
             $response = $methodObject->result();
         } else {
             $response = array(
-                'err_code' => '11',
-                'err_message' => 'Class not found',
+                'errCode' => '11',
+                'errMessage' => 'Class not found',
             );
         }
         //if ($logger != null) {

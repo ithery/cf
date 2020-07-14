@@ -158,10 +158,12 @@ class CVendor {
      * @param array $options
      * @return \CVendor_SendGrid
      */
-    public static function sendGrid($apiKey, $options = []) {
+    public static function sendGrid($apiKey=null, $options = []) {
         if (strlen($apiKey) == 0) {
-            $apiKey == ccfg::get('smtp_password');
+            $apiKey = ccfg::get('smtp_password');
+            
         }
+        
         return new CVendor_SendGrid($apiKey, $options);
     }
 
