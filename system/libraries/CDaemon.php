@@ -164,9 +164,12 @@ class CDaemon {
         $binary = $this->getPhpBinary();
         $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
 
+        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED $binary $command 1> $output 2>&1 &";
 
-
-        exec("$binary $command 1> $output 2>&1 &");
+        //cdbg::dd($commandToExecute);
+        exec($commandToExecute);
+        
+        
     }
 
     // @codeCoverageIgnoreStart
