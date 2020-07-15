@@ -385,6 +385,7 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
 
         $info = curl_getinfo($curl);
+        curl_close($curl);
         $responseObject = json_decode($response, true);
 
         return $responseObject;
