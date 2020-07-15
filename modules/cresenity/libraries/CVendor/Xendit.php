@@ -128,6 +128,7 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         curl_close($curl);
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
@@ -282,6 +283,9 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         curl_close($curl);
+
+
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
@@ -381,8 +385,8 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
 
         $info = curl_getinfo($curl);
-        curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
     
@@ -394,7 +398,7 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
         curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLINFO_HEADER_OUT, true);
         $response = curl_exec($curl);
@@ -402,6 +406,7 @@ class CVendor_Xendit {
         $info = curl_getinfo($curl);
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -473,6 +478,9 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         curl_close($curl);
+
+
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
@@ -582,8 +590,8 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
-
         curl_close($curl);
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
