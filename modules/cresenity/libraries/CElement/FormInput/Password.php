@@ -26,6 +26,10 @@ class CElement_FormInput_Password extends CElement_FormInput {
         $this->setAttr('value', $this->value);
         $this->setAttr('placeholder', $this->placeholder);
         $this->setAttr('autocomplete', $this->autoComplete ? 'on' : 'off');
+
+        if ($this->readonly) {
+            $this->setAttr('readonly', 'readonly');
+        }
     }
 
 }
