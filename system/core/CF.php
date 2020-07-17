@@ -1605,9 +1605,9 @@ final class CF {
             // Messages for this group
             $messages = array();
 
-            if ($files = self::find_file('i18n', $locale . '/' . $group)) {
+            if ($files = self::findFile('i18n', $locale . '/' . $group)) {
                 foreach ($files as $file) {
-                    include $file;
+                    $lang = include $file;
 
                     // Merge in configuration
                     if (!empty($lang) AND is_array($lang)) {
