@@ -117,6 +117,15 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                     ]
                 ";
                 break;
+            case 'text-link-para':
+                $json = "
+                    [
+                        ['style', ['bold', 'italic', 'underline']],
+                        ['para', ['paragraph']],
+                        ['link', ['link']],                        
+                    ]
+                ";
+                break;
         }
         return $json;
     }
