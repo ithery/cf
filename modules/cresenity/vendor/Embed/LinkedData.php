@@ -38,7 +38,7 @@ class LinkedData {
         if (!isset($this->document)) {
             try {
                 $this->document = LdDocument::load(json_encode($this->all()));
-            } catch (Throwable $throwable) {
+            } catch (Exception $ex) {
                 $this->document = LdDocument::load('{}');
                 return null;
             }
