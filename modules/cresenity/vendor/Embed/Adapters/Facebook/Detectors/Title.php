@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Embed\Adapters\Facebook\Detectors;
 
 use Embed\Detectors\Title as Detector;
