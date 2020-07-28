@@ -20,13 +20,12 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
-{
+class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface {
+
     /**
      * {@inheritdoc}
      */
-    public function getLogs(Request $request = null)
-    {
+    public function getLogs(Request $request = null) {
         if ($logger = $this->getDebugLogger()) {
             return $logger->getLogs($request);
         }
@@ -37,8 +36,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function countErrors(Request $request = null)
-    {
+    public function countErrors(Request $request = null) {
         if ($logger = $this->getDebugLogger()) {
             return $logger->countErrors($request);
         }
@@ -49,8 +47,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
-    {
+    public function clear() {
         if ($logger = $this->getDebugLogger()) {
             $logger->clear();
         }
@@ -59,8 +56,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function reset(): void
-    {
+    public function reset() {
         $this->clear();
 
         if ($this instanceof ResettableInterface) {
@@ -68,8 +64,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         }
     }
 
-    public function removeDebugLogger()
-    {
+    public function removeDebugLogger() {
         foreach ($this->processors as $k => $processor) {
             if ($processor instanceof DebugLoggerInterface) {
                 unset($this->processors[$k]);
@@ -86,8 +81,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
      */
-    private function getDebugLogger(): ?DebugLoggerInterface
-    {
+    private function getDebugLogger() {
         foreach ($this->processors as $processor) {
             if ($processor instanceof DebugLoggerInterface) {
                 return $processor;
@@ -102,4 +96,5 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 
         return null;
     }
+
 }
