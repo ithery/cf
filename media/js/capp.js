@@ -1462,29 +1462,33 @@ var Cresenity = function () {
                 e.preventDefault();
                 e.stopPropagation();
                 btn.off('click');
-                bootbox.confirm(message, function (confirmed) {
-                    if (confirmed) {
-                        if (ahref) {
-                            window.location.href = ahref;
-                        } else {
-                            if (btn.attr('type') == 'submit') {
-                                btn.closest('form').submit();
+                bootbox.confirm({ 
+                    className: "capp-modal-confirm",
+                    message: message,
+                    callback: function (confirmed) {
+                        if (confirmed) {
+                            if (ahref) {
+                                window.location.href = ahref;
                             } else {
-                                btn.on('click');
-                            }
+                                if (btn.attr('type') == 'submit') {
+                                    btn.closest('form').submit();
+                                } else {
+                                    btn.on('click');
+                                }
 
-                        }
-                    } else {
-                        btn.removeAttr('data-clicked');
-                    }
-                    setTimeout(function () {
-                        var modalExists = $('.modal:visible').length > 0;
-                        if (!modalExists) {
-                            $('body').removeClass('modal-open');
+                            }
                         } else {
-                            $('body').addClass('modal-open');
+                            btn.removeAttr('data-clicked');
                         }
-                    }, 750);
+                        setTimeout(function () {
+                            var modalExists = $('.modal:visible').length > 0;
+                            if (!modalExists) {
+                                $('body').removeClass('modal-open');
+                            } else {
+                                $('body').addClass('modal-open');
+                            }
+                        }, 750);
+                    }
                 });
 
 

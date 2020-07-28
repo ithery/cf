@@ -265,4 +265,9 @@ class CRunner_WkHtmlToPdf_Image {
         return true;
     }
 
+    
+    public function getExecCommand() {
+        return $this->getCommand()->getExecCommand();
+        
+    }
 }

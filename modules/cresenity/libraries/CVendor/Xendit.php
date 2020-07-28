@@ -128,6 +128,7 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         curl_close($curl);
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
@@ -282,6 +283,9 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         curl_close($curl);
+
+
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
@@ -366,6 +370,26 @@ class CVendor_Xendit {
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
+
+    public function getRecurringPayment($id = null) {
+        $curl = curl_init();
+        $headers = array();
+        $headers[] = 'Content-Type: application/json';
+        $end_point = $this->server_domain . '/recurring_payments/' . $id;
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_URL, $end_point);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+        $response = curl_exec($curl);
+
+        $info = curl_getinfo($curl);
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+
+        return $responseObject;
+    }
     
     public function stopRecurringPayment($idXendit = null) {
         $curl = curl_init();
@@ -375,7 +399,7 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
         curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLINFO_HEADER_OUT, true);
         $response = curl_exec($curl);
@@ -383,6 +407,7 @@ class CVendor_Xendit {
         $info = curl_getinfo($curl);
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -438,6 +463,11 @@ class CVendor_Xendit {
             $data['failure_redirect_url'] = $options['failure_redirect_url'];
         }
 
+        if (carr::get($options, 'charge_immediately') == false) {
+            //string url that end user will be redirected to upon expireation of invoice created by this recurring payment.
+            //example : https://yourcompany.com/example_item/10/failed_checkout
+            $data['charge_immediately'] = $options['charge_immediately'];
+        }
 
 
         $payload = json_encode($data);
@@ -449,6 +479,9 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         curl_close($curl);
+
+
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
@@ -558,8 +591,8 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
-
         curl_close($curl);
+
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
