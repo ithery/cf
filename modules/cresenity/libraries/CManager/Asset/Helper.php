@@ -22,7 +22,7 @@ class CManager_Asset_Helper {
         $file = str_replace($docroot, $base_url, $file);
         
         $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
-        $file.=$separator.'v='.filemtime($path);
+        $file.=$separator.'m='.filemtime($path);
 
         return $file;
     }
@@ -41,7 +41,7 @@ class CManager_Asset_Helper {
         $file = str_replace($docroot, $base_url, $file);
 
         $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
-        $file.=$separator.'v='.filemtime($path);
+        $file.=$separator.'m='.filemtime($path);
 
         return $file;
     }

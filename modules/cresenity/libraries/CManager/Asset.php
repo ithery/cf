@@ -226,14 +226,26 @@ class CManager_Asset {
 
 
         //do recompile for theme script
-        $compileCss = false;
+        $compileCss = CF::config('assets.css.compile', false);
         if ($compileCss) {
             $cssScriptArray = carr::get($themeScriptArray, static::TYPE_CSS_FILE);
 
             if (count($cssScriptArray) > 0) {
                 $compiledScript = $this->compileCss($cssScriptArray);
-                $cssScriptArray = [$compiledScript];
-                $themeScriptArray[static::TYPE_CSS_FILE]=$cssScriptArray;
+
+                $themeScriptArray[static::TYPE_CSS_FILE] = [$compiledScript];
+            }
+        }
+
+        //do recompile for theme script
+        $compileJs = CF::config('assets.js.compile', false);
+        if ($compileJs) {
+            $jsScriptArray = carr::get($themeScriptArray, static::TYPE_JS_FILE);
+
+            if (count($jsScriptArray) > 0) {
+                $compiledScript = $this->compileJs($jsScriptArray);
+
+                $themeScriptArray[static::TYPE_JS_FILE] = [$compiledScript];
             }
         }
 
@@ -312,6 +324,13 @@ class CManager_Asset {
     public function compileCss($files) {
         $options = [];
         $options['type'] = 'css';
+        $compiler = new CManager_Asset_Compiler($files, $options);
+        return $compiler->compile();
+    }
+    
+    public function compileJs($files) {
+        $options = [];
+        $options['type'] = 'js';
         $compiler = new CManager_Asset_Compiler($files, $options);
         return $compiler->compile();
     }

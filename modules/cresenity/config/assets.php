@@ -11,5 +11,11 @@ return [
     'css' => [
         'compile' => false,
         'disk'=>'local',
+        'filters' => [],
+    ],
+    'js' => [
+        'compile' => false,
+        'disk'=>'local',
+        'filters' => [],
     ],
 ];
