@@ -1098,7 +1098,9 @@ final class CF {
      * @return  void
      */
     public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
-
+        if($exception instanceof \Pheanstalk\Exception\ServerException) {
+            return;
+        }
         try {
 
             // PHP errors have 5 args, always
