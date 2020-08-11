@@ -777,7 +777,20 @@ var Cresenity = function () {
 
     this.filesAdded = "";
     this.modalElements = [];
+    this.callback = {};
+    this.haveCallback = (name) => {
+        return typeof this.callback[name] == 'function';
+    };
+    this.doCallback = (name, ...args) => {
+        if (this.haveCallback(name)) {
+            this.callback[name](...args);
+        }
+    };
 
+    this.setCallback = (name, cb) => {
+        this.callback[name] = cb;
+    };
+    
     this.isUsingRequireJs = function () {
         return (typeof capp.requireJs !== "undefined") ? capp.requireJs : true;
     }
@@ -954,6 +967,7 @@ var Cresenity = function () {
                         dataType: 'json',
                         data: dataAddition,
                         success: function (data) {
+                            cresenity.doCallback('onReloadSuccess', data);
                             cresenity.handleResponse(data, function () {
                                 switch (settings.reloadType) {
                                     case 'after':
