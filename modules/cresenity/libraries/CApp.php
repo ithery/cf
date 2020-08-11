@@ -533,6 +533,10 @@ class CApp extends CObservable {
 
     public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
 
+        
+        if($exception instanceof \Pheanstalk\Exception\ServerException) {
+            return;
+        }
         try {
             $app = CApp::instance();
             $org = $app->org();
