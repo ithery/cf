@@ -94,7 +94,11 @@ class CManager_Asset_Compiler {
 
             file_put_contents($this->outFile, '');
             foreach ($this->files as $file) {
-                file_put_contents($this->outFile, $this->separator . file_get_contents($file), FILE_APPEND);
+                $compiledOutput = file_get_contents($file);
+                if($this->type=='css') {
+                    
+                }
+                file_put_contents($this->outFile, $this->separator . $compiledOutput, FILE_APPEND);
             }
         }
         return $this->outFile.'?v='.filemtime($this->outFile);
