@@ -73,7 +73,7 @@ class CDatabase_Driver_MongoDB_Collection {
 
             $queryString = $this->collection->getCollectionName() . '.' . $method . '(' . implode(',', $query) . ')';
             if ($this->driver->db()->isBenchmarkQuery()) {
-                $this->driver->db()->benchmarkQuery($queryString, $time, count($result));
+                $this->driver->db()->benchmarkQuery($queryString, $time, is_array($result) ? count($result) : 0);
             }
             $this->driver->db()->setLastQuery($queryString);
             $this->driver->db()->logQuery($queryString, [], $time);
