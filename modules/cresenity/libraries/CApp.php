@@ -533,8 +533,8 @@ class CApp extends CObservable {
 
     public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
 
-        
-        if($exception instanceof \Pheanstalk\Exception\ServerException) {
+
+        if ($exception instanceof \Pheanstalk\Exception\ServerException) {
             return;
         }
         try {
@@ -678,6 +678,15 @@ class CApp extends CObservable {
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
             gc_collect_cycles();
+        }
+    }
+
+    public static function sendExceptionEmail($email, Exception $exception) {
+
+
+        if (!($exception instanceof CF_404_Exception)) {
+
+            $html = CApp_ErrorHandler::sendExceptionEmail($email, $exception);
         }
     }
 
