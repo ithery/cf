@@ -21,8 +21,11 @@ class CManager_Asset_Helper {
         }
         $file = str_replace($docroot, $base_url, $file);
         
-        $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
-        $file.=$separator.'v='.filemtime($path);
+        if(CF::config('assets.css.versioning')) {
+        
+            $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
+            $file.=$separator.'v='.filemtime($path);
+        }
 
         return $file;
     }
@@ -40,8 +43,10 @@ class CManager_Asset_Helper {
         
         $file = str_replace($docroot, $base_url, $file);
 
-        $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
-        $file.=$separator.'v='.filemtime($path);
+        if(CF::config('assets.js.versioning')) {
+            $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
+            $file.=$separator.'v='.filemtime($path);
+        }
 
         return $file;
     }

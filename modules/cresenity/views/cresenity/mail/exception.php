@@ -79,7 +79,7 @@ $role = $app->role();
                                         </p>
 
                                         <h3><?php echo 'Trace String' ?></h3>
-                                        <?php echo $exception->getTraceAsString(); ?>
+                                        <?php echo nl2br($exception->getTraceAsString()); ?>
 
                                         <?php if (!empty($trace)): ?>
                                             <h3><?php echo CF::lang('core.stack_trace') ?></h3>
