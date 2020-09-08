@@ -180,6 +180,9 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             height: '300px',
             " . $additionalOptions . "
             maximumImageFileSize:1024*1024, // 1 MB
+            onCreateLink: function(originalLink) {
+                return originalLink; // return originalLink
+            },
             callbacks: {
                 " . $additionalCallbackOptions . "
                 onImageUploadError: function(msg){ 
