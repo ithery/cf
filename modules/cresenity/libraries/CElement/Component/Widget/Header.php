@@ -56,7 +56,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
 
     public function addSwitcher($id = null) {
         if ($this->switcher == null) {
-            $this->switcherWrapper = $this->addDiv()->addClass('pull-right');
+            $this->switcherWrapper = $this->addDiv()->addClass('widget-switcher-wrapper pull-right');
             $this->switcher = CFactory::create_control($id, 'switcher');
             $this->switcherWrapper->add($this->switcher);
         }
