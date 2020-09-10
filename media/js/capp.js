@@ -1637,19 +1637,6 @@ var Cresenity = function () {
                         cresenity.handleJsonResponse(response, function (data) {
                             var progressUrl = data.progressUrl;
                             var progressContainer = $('<div>').addClass('progress-container');
-                            
-                            var innerStatus = $('<div>');
-                                var innerStatusLabel = $('<label>', {class:'mb-4'}).append("Please Wait...");
-                                var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
-                                innerStatus.append(innerStatusLabel);
-                                innerStatus.append(innerStatusAnimation);
-                            progressContainer.append($('<div>').addClass('progress-container-status').append(innerStatus));
-                            
-
-                            cresenity.modal({
-                                message: progressContainer,
-                                modalClass: 'modal-download-progress'
-                            })
 
                             var interval = setInterval(function () {
                                 $.ajax({
@@ -1680,6 +1667,28 @@ var Cresenity = function () {
                                     }
                                 });
                             }, 3000);
+                            
+                            var innerStatus = $('<div>');
+                                var innerStatusLabel = $('<label>', {class:'mb-4'}).append("Please Wait...");
+                                var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
+                                var innerStatusAction = $('<div>', {class:'text-center my-3'});
+                                var innerStatusCancelButton = $('<button>', {class:'btn btn-primary'}).append('Cancel');
+                                innerStatusAction.append(innerStatusCancelButton);
+                                innerStatus.append(innerStatusLabel);
+                                innerStatus.append(innerStatusAnimation);
+                                innerStatus.append(innerStatusAction);
+                            progressContainer.append($('<div>').addClass('progress-container-status').append(innerStatus));
+                            
+                            innerStatusCancelButton.click(function(){
+                                clearInterval(interval);
+                                cresenity.closeLastModal();
+                            });
+                            
+
+                            cresenity.modal({
+                                message: progressContainer,
+                                modalClass: 'modal-download-progress'
+                            })
                         });
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
