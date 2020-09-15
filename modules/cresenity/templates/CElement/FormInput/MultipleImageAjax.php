@@ -157,8 +157,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
             var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
 
 <?php if ($cropper != null) : ?>
-                var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
-                var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
+            var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
+            var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
+            var cropBoxResizable = <?php echo json_encode($cropper->getCropperResizable()); ?>;
 <?php endif; ?>
             var index = 0;
             var descriptionElement = $("#container-<?php echo $id ?> .multi-image-ajax-description");
@@ -226,6 +227,29 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         cropperImg.cropper({
                             aspectRatio: cropperWidth / cropperHeight,
                             zoomOnWheel: false,
+                            cropBoxResizable: cropBoxResizable,
+                            ready: function(e) {
+                                var canvasData = $(this).cropper('getCanvasData');
+                                var cropBoxData = $(this).cropper('getCropBoxData');
+
+                                if (canvasData.naturalWidth < cropperWidth && canvasData.naturalHeight < cropperHeight) {
+                                    $(this).cropper('setCanvasData', {
+                                        left: canvasData.width / 2 - canvasData.naturalWidth,
+                                        top: canvasData.height / 2 - canvasData.naturalHeight,
+                                        width: cropperWidth,
+                                        height: cropperHeight
+                                    });
+                                }
+
+                                if (canvasData.naturalWidth == cropperWidth && canvasData.naturalHeight == cropperHeight) {
+                                    $(this).cropper('setCanvasData', {
+                                        left: cropBoxData.left,
+                                        top: cropBoxData.top,
+                                        width: cropBoxData.width,
+                                        height: cropBoxData.height
+                                    });
+                                }
+                            },
                             crop: function (e) {
 
                             }
