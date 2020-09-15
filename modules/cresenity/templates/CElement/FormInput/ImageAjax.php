@@ -101,7 +101,15 @@ $maxHeight .= $suffixHeight;
                                     aspectRatio: cropperWidth / cropperHeight,
                                     zoomOnWheel: false,
                                     ready: function(e) {
-                                        $(this).cropper('zoomTo', 1.58);
+                                        var cropBoxData = $(this).cropper('getCropBoxData');
+                                        if (cropBoxData) {
+                                            $(this).cropper('setCanvasData', {
+                                                left: cropBoxData.left,
+                                                top: cropBoxData.top,
+                                                width: cropBoxData.width,
+                                                height: cropBoxData.height
+                                            });
+                                        }
                                     },
                                     crop: function (e) {
 
