@@ -411,7 +411,7 @@
                         updateInputValues(gmapContext.settings.inputBinding, gmapContext);
                     }
                 });
-                gmapContext.map.addListener("idle", function () {
+                gmapContext.map.addListener("dragend", function () {
                     if (!gmapContext.marker.dragging) {
                         displayMarkerWithSelectedArea();
                     }
