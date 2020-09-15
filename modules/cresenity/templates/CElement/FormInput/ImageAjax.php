@@ -100,7 +100,9 @@ $maxHeight .= $suffixHeight;
                                 cropperImg.cropper({
                                     aspectRatio: cropperWidth / cropperHeight,
                                     zoomOnWheel: false,
-
+                                    ready: function(e) {
+                                        $(this).cropper('zoomTo', 1.5);
+                                    },
                                     crop: function (e) {
 
                                     }
