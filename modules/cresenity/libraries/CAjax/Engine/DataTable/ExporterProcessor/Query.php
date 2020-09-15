@@ -42,7 +42,9 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
             $exportOptions['writerType'] = $writerType;
             $exportOptions['queued'] = $queued;
             $exportOptions['diskName']=$disk;
-
+            $exportOptions['diskOptions'] = [
+                'ContentType' => 'application/octet-stream'
+                ];
 
             $storeResult = CExporter::store($exportable, $filename, $exportOptions);
 
