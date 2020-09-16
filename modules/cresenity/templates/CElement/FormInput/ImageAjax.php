@@ -107,8 +107,8 @@ $maxHeight .= $suffixHeight;
 
                                         if (canvasData.naturalWidth < cropperWidth && canvasData.naturalHeight < cropperHeight) {
                                             $(this).cropper('setCanvasData', {
-                                                left: canvasData.width / 2 - canvasData.naturalWidth,
-                                                top: canvasData.height / 2 - canvasData.naturalHeight,
+                                                left: canvasData.width / 2 - canvasData.naturalWidth / 2,
+                                                top: canvasData.height / 2 - canvasData.naturalHeight / 2,
                                                 width: cropperWidth,
                                                 height: cropperHeight
                                             });
