@@ -102,19 +102,20 @@ $maxHeight .= $suffixHeight;
                                     zoomOnWheel: false,
                                     cropBoxResizable: cropBoxResizable,
                                     ready: function(e) {
-                                        var canvasData = $(this).cropper('getCanvasData');
+                                        var imgData = $(this).cropper('getImageData');
+                                        var containerData = $(this).cropper('getContainerData');
                                         var cropBoxData = $(this).cropper('getCropBoxData');
 
-                                        if (canvasData.naturalWidth < cropperWidth && canvasData.naturalHeight < cropperHeight) {
+                                        if (imgData.naturalWidth < cropperWidth && imgData.naturalHeight < cropperHeight) {
                                             $(this).cropper('setCanvasData', {
-                                                left: canvasData.width / 2 - canvasData.naturalWidth / 2,
-                                                top: canvasData.height / 2 - canvasData.naturalHeight / 2,
+                                                left: containerData.width / 4,
+                                                top: containerData.height / 4,
                                                 width: cropperWidth,
                                                 height: cropperHeight
                                             });
                                         }
 
-                                        if (canvasData.naturalWidth == cropperWidth && canvasData.naturalHeight == cropperHeight) {
+                                        if (imgData.naturalWidth == cropperWidth && imgData.naturalHeight == cropperHeight) {
                                             $(this).cropper('setCanvasData', {
                                                 left: cropBoxData.left,
                                                 top: cropBoxData.top,
