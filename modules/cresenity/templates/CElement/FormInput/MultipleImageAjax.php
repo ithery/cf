@@ -235,10 +235,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
                                 if (imgData.naturalWidth < cropperWidth && imgData.naturalHeight < cropperHeight) {
                                     $(this).cropper('setCanvasData', {
-                                        left: containerData.width / 4,
-                                        top: containerData.height / 4,
-                                        width: cropperWidth,
-                                        height: cropperHeight
+                                        left: containerData.width / 2 - imgData.naturalWidth / 2,
+                                        top: containerData.height / 2 - imgData.naturalHeight / 2,
+                                        width: imgData.naturalWidth,
+                                        height: imgData.naturalHeight
                                     });
                                 }
 
