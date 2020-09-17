@@ -1842,6 +1842,10 @@ class CDatabase {
     public function driver() {
         return $this->driver;
     }
+    
+    public function ping() {
+        return $this->driver->ping();
+    }
 
 }
 

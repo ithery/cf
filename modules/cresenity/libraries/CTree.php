@@ -9,7 +9,7 @@ class CTree {
 
     private function __construct($id, $node = null) {
 
-        if (!CTreeNode::is_instanceof($node)) {
+        if (!($node instanceof CTreeNode)) {
             $root = CTreeNode::factory($node);
         }
         $this->root = $root;
@@ -49,7 +49,7 @@ class CTree {
 
     public function add_child($id, $child_id, $value) {
 
-        if (CTreeNode::is_instanceof($id)) {
+        if ($id instanceof CTreeNode) {
             $id = $id->get_id();
         }
         if (!array_key_exists($id, $this->nodes) === true) {
@@ -58,7 +58,7 @@ class CTree {
         if (array_key_exists($child_id, $this->nodes) === true) {
             trigger_error('Node exists for child_id ' . $child_id);
         }
-        if (!CTreeNode::is_instanceof($value)) {
+        if (!($value instanceof CTreeNode)) {
             $value = CTreeNode::factory($value);
         }
         $value->set_id($child_id);
@@ -69,10 +69,10 @@ class CTree {
 
     public function move_child($child, $parent) {
 
-        if (!CTreeNode::is_instanceof($child)) {
+        if (!($child instanceof CTreeNode)) {
             $child = $this->get_node($child);
         }
-        if (!CTreeNode::is_instanceof($parent)) {
+        if (!($parent instanceof CTreeNode)) {
             $parent = $this->get_node($parent);
         }
         $child->get_parent()->remove_child($child);

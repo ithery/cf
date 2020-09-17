@@ -10,6 +10,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CAjax {
 
+    /**
+     * 
+     * @param type $options
+     * @return \CAjax_Method
+     */
     public static function createMethod($options = null) {
         if (!is_array($options)) {
             if ($options != null) {
@@ -17,6 +22,36 @@ class CAjax {
             }
         }
         return new CAjax_Method($options);
+    }
+
+    public static function getData($file) {
+        $filename = $file . '.tmp';
+
+        $file = CTemporary::getPath("ajax", $filename);
+
+
+        $disk = CTemporary::disk();
+        if (!$disk->exists($file)) {
+            throw new CException('failed to get temporary file :filename', array(':filename' => $file));
+        }
+        $json = $disk->get($file);
+
+
+        $data = json_decode($json, true);
+        return $data;
+    }
+
+    public static function setData($file, $data) {
+        $filename = $file . '.tmp';
+
+        $file = CTemporary::getPath("ajax", $filename);
+
+
+        $disk = CTemporary::disk();
+
+        $json = $disk->put($file, json_encode($data));
+
+        return $data;
     }
 
 }

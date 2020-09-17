@@ -4,7 +4,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class cmail {
 
-    public static function error_mail($html) {
+    public static function error_mail($html, $admin_email = null) {
 
 
         $app = CApp::instance();
@@ -24,8 +24,9 @@ class cmail {
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
         $message = $html;
-        $admin_email = ccfg::get("admin_email");
-
+        if ($admin_email == null) {
+            $admin_email = ccfg::get("admin_email");
+        }
         if (ccfg::get("mail_error_smtp")) {
             $smtp_username = ccfg::get('smtp_username_error');
             $smtp_password = ccfg::get('smtp_password_error');
@@ -180,6 +181,7 @@ class cmail {
         $smtp_host = carr::get($options, 'smtp_host');
         $smtp_port = carr::get($options, 'smtp_port');
         $secure = carr::get($options, 'smtp_secure');
+
         if (!$smtp_username) {
             $smtp_username = ccfg::get('smtp_username');
         }
@@ -199,11 +201,11 @@ class cmail {
 
         switch ($smtp_host) {
             case 'smtp.sendgrid.net':
-                if (count($attachments) == 0) {
-                    return cmailapi::sendgrid($to, $subject, $message, $attachments, $cc, $bcc, $options);
-                } else {
-                    return cmailapi::sendgridv3($to, $subject, $message, $attachments, $cc, $bcc, $options);
-                }
+//                if (count($attachments) == 0) {
+//                    return cmailapi::sendgrid($to, $subject, $message, $attachments, $cc, $bcc, $options);
+//                } else {
+                return cmailapi::sendgridv3($to, $subject, $message, $attachments, $cc, $bcc, $options);
+//                }
                 break;
             case 'smtp.mailgun.org':
                 return cmailapi::mailgun($to, $subject, $message, $attachments, $cc, $bcc, $options);

@@ -1,19 +1,24 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
 trait CTrait_Controller_Application_Server_Info {
+
     public function info() {
         $app = CApp::instance();
 
         $app->title('Local Server');
 
+
+
         $actionContainer = $app->addDiv()->addClass('action-container mb-3 clearfix');
-        $sshAction = $actionContainer->addAction()->setIcon('fas fa-user-cog')->setLabel('PHP Info')->addClass('btn-warning float-right mr-2')->setLink($this->controllerUrl() . 'phpinfo');
+        if (c::hasTrait($this, 'CTrait_Controller_Application_Server_PhpInfo')) {
+            $phpInfoAction = $actionContainer->addAction()->setIcon('fas fa-user-cog')->setLabel('PHP Info')->addClass('btn-warning float-right mr-2')->setLink($this->controllerUrl() . 'phpinfo');
+        }
 
 
         $divRow = $app->addDiv()->addClass('row');
@@ -221,18 +226,4 @@ trait CTrait_Controller_Application_Server_Info {
         echo $app->render();
     }
 
-    public function phpinfo() {
-        $app = CApp::instance();
-
-        $app->title(clang::__("PHP Info"));
-
-        $html = CView::factory('admin/page/phpinfo/html');
-        $html = $html->render();
-        $js = CView::factory('admin/page/phpinfo/js');
-        $js = $js->render();
-        $app->add($html);
-        $app->addJs($js);
-
-        echo $app->render();
-    }
 }

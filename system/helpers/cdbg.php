@@ -74,8 +74,8 @@ class cdbg {
             cdbg::varDump($ex->getTraceAsString(), $return);
         }
     }
-    
-    public static function dumpLastQuery($db=null) {
+
+    public static function dumpLastQuery($db = null) {
         cdbg::varDump(CDatabase::instance($db)->lastQuery());
     }
 

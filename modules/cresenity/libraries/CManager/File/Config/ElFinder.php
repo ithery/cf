@@ -9,6 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CManager_File_Config_ElFinder extends CManager_File_ConfigAbstract {
 
+    
     public function __construct(array $options) {
 
         $path = carr::get($options, 'path', DOCROOT . 'temp/files');

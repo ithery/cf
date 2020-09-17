@@ -183,8 +183,8 @@
         
         public function add_list_control($id = '', $type){
             $control = null;
-            if ($this->manager->is_registered_control($type)) {
-                $control = $this->manager->create_control($id, $type);
+            if (CManager::instance()->is_registered_control($type)) {
+                $control = CManager::instance()->create_control($id, $type);
             } else {
                 trigger_error('Unknown control type ' . $type);
             }

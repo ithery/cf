@@ -25,6 +25,13 @@ class CCache_Repository implements ArrayAccess {
     protected $default = 3600;
 
     /**
+     * The event dispatcher implementation.
+     *
+     * @var CEveent_Dispatcher
+     */
+    protected $events;
+
+    /**
      * Create a new cache repository instance.
      *
      * @param  array  $options
@@ -34,10 +41,23 @@ class CCache_Repository implements ArrayAccess {
         if ($options instanceof CCache_DriverAbstract) {
             $this->driver = $options;
         } else {
+
             $driverName = carr::get($options, 'driver', 'Null');
             $driverOption = carr::get($options, 'options', array());
-            $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
-            $this->driver = new $driverClass($driverOption);
+
+            $this->driver = $this->resolveDriver($driverName, $driverOption);
+        }
+    }
+
+    public function resolveDriver($driverName, $options = []) {
+        switch ($driverName) {
+            case 'Redis':
+                $redis = CRedis::instance(carr::get($options, 'group', 'redis'));
+                return new CCache_Driver_RedisDriver($redis, carr::get($options, 'prefix', ''), carr::get($options, 'connection', 'default'));
+                break;
+            default:
+                $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
+                return new $driverClass($options);
         }
     }
 
@@ -271,6 +291,38 @@ class CCache_Repository implements ArrayAccess {
         $this->put($key, $value = $callback(), $minutes);
 
         return $value;
+    }
+
+    /**
+     * Begin executing a new tags operation if the store supports it.
+     *
+     * @param  array|mixed  $names
+     * @return \Illuminate\Cache\TaggedCache
+     *
+     * @throws \BadMethodCallException
+     */
+    public function tags($names) {
+        if (!method_exists($this->driver, 'tags')) {
+            throw new BadMethodCallException('This cache store does not support tagging.');
+        }
+
+        $cache = $this->driver->tags(is_array($names) ? $names : func_get_args());
+
+        if (!is_null($this->events)) {
+            $cache->setEventDispatcher($this->events);
+        }
+
+        return $cache->setDefaultCacheTime($this->default);
+    }
+
+    /**
+     * Set the event dispatcher instance.
+     *
+     * @param  CEvent_Dispatcher  $events
+     * @return void
+     */
+    public function setEventDispatcher(CEvent_Dispatcher $events) {
+        $this->events = $events;
     }
 
 }

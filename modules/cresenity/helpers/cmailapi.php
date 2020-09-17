@@ -25,25 +25,35 @@ class cmailapi {
             $smtp_from_name = ccfg::get('smtp_from_name');
         }
 
-        if (is_array($to)) {
-            $to = carr::get($to, 0);
-        }
-        $from = new CSendGrid_Email($smtp_from_name, $smtp_from);
+//        if (is_array($to)) {
+//            $to = carr::get($to, 0);
+//        }
+        $mail = new CVendor_SendGrid_Mail_Mail();
+        $mail->setFrom($smtp_from, $smtp_from_name);
 
         $toSendGrid = array();
         if (!is_array($to)) {
             $to = array($to);
         }
         foreach ($to as $toItem) {
-            $toSendGrid[] = new CSendGrid_Email(null, $toItem);
+            $toName = '';
+            $toEmail = $toItem;
+            if (is_array($toItem)) {
+                $toName = carr::get($toItem, 'toName');
+                $toEmail = carr::get($toItem, 'toEmail');
+            }
+            $mail->addTo($toEmail, $toName);
         }
-        $content = new CSendGrid_Content("text/html", $message);
+        $mail->setSubject($subject);
+        $mail->addContent("text/html", $message);
 
+        if (!is_array($attachments)) {
+            $attachments = [];
+        }
 
-
-        $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
+        $subjectPreview = carr::get($options, 'subject_preview');
         foreach ($attachments as $att) {
-            $disk='';
+            $disk = '';
             if (is_array($att)) {
                 $path = carr::get($att, "path");
                 $filename = basename($path);
@@ -61,7 +71,7 @@ class cmailapi {
             if (strlen($type) == 0) {
 
                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
-                
+
                 $type = 'application/text';
                 if ($ext == 'pdf') {
                     $type = 'application/pdf';
@@ -74,8 +84,113 @@ class cmailapi {
                 }
             }
             $content = '';
-            if(strlen($disk)>0) {
-                $diskObject=CStorage::instance()->disk($disk);
+            if (strlen($disk) > 0) {
+                $diskObject = CStorage::instance()->disk($disk);
+                $content = $diskObject->get($path);
+            } else {
+                $content = file_get_contents($path);
+            }
+            $attachment = new CVendor_SendGrid_Mail_Attachment();
+            $attachment->setContent(base64_encode($content));
+            $attachment->setType($type);
+            $attachment->setDisposition("attachment");
+            $attachment->setFilename($attachmentFilename);
+            $mail->addAttachment($attachment);
+        }
+
+
+        $sg = new CVendor_SendGrid($sendgrid_apikey);
+
+
+        //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
+
+        $response = $sg->send($mail);
+        if ($response->statusCode() > 400) {
+            throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
+        }
+        return $response;
+    }
+
+    public static function sendgridv3bak($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+        $smtp_password = carr::get($options, 'smtp_password');
+        $smtp_host = carr::get($options, 'smtp_host');
+        if (!$smtp_password) {
+            $smtp_password = ccfg::get('smtp_password');
+        }
+        if (!$smtp_host) {
+            $smtp_host = ccfg::get('smtp_host');
+        }
+        if ($smtp_host != 'smtp.sendgrid.net') {
+            throw new Exception('Fail to send mail API, SMTP Host is not valid');
+        }
+        $sendgrid_apikey = $smtp_password;
+
+        $smtp_from = carr::get($options, 'smtp_from');
+        if ($smtp_from == null) {
+            $smtp_from = ccfg::get('smtp_from');
+        }
+        $smtp_from_name = carr::get($options, 'smtp_from_name');
+        if ($smtp_from_name == null) {
+            $smtp_from_name = ccfg::get('smtp_from_name');
+        }
+
+//        if (is_array($to)) {
+//            $to = carr::get($to, 0);
+//        }
+        $from = new CSendGrid_Email($smtp_from_name, $smtp_from);
+
+        $toSendGrid = array();
+        if (!is_array($to)) {
+            $to = array($to);
+        }
+        foreach ($to as $toItem) {
+            $toName = '';
+            $toEmail = $toItem;
+            if (is_array($toItem)) {
+                $toName = carr::get($toItem, 'toName');
+                $toEmail = carr::get($toItem, 'toEmail');
+            }
+            $toSendGrid[] = new CSendGrid_Email($toName, $toEmail);
+        }
+        $content = new CSendGrid_Content("text/html", $message);
+
+
+        $subjectPreview = carr::get($options, 'subject_preview');
+        $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
+        foreach ($attachments as $att) {
+            $disk = '';
+            if (is_array($att)) {
+                $path = carr::get($att, "path");
+                $filename = basename($path);
+                $attachmentFilename = carr::get($att, "filename");
+                $type = carr::get($att, "type");
+                $disk = carr::get($att, "disk");
+            } else {
+                $path = $att;
+                $filename = basename($att);
+                $attachmentFilename = $filename;
+                $type = "";
+            }
+
+
+            if (strlen($type) == 0) {
+
+                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+                $type = 'application/text';
+                if ($ext == 'pdf') {
+                    $type = 'application/pdf';
+                }
+                if ($ext == 'jpg' || $ext == 'jpeg') {
+                    $type = 'image/jpeg';
+                }
+                if ($ext == 'png') {
+                    $type = 'image/png';
+                }
+            }
+            $content = '';
+            if (strlen($disk) > 0) {
+                $diskObject = CStorage::instance()->disk($disk);
                 $content = $diskObject->get($path);
             } else {
                 $content = file_get_contents($path);
@@ -95,7 +210,7 @@ class cmailapi {
         //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
 
         $response = $sg->client->mail()->send()->post($mail);
-
+        CDaemon::log(json_encode($response));
         if ($response->statusCode() > 400) {
             throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
         }

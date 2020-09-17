@@ -193,7 +193,7 @@ final class CF {
         // Set locale information
         self::$locale = setlocale(LC_ALL, $locales);
 
-        if (self::$configuration['core']['log_threshold'] > 0) {
+        if (isset(self::$configuration['core']) && isset(self::$configuration['core']['log_threshold']) && self::$configuration['core']['log_threshold'] > 0) {
             // Set the log directory
             self::log_directory(self::$configuration['core']['log_directory']);
 
@@ -1098,7 +1098,9 @@ final class CF {
      * @return  void
      */
     public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
-
+        if($exception instanceof \Pheanstalk\Exception\ServerException) {
+            return;
+        }
         try {
 
             // PHP errors have 5 args, always

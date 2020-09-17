@@ -30,6 +30,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->applyJs = "false";
         $this->hide_search = false;
         $this->maximumSelectionLength = false;
+        $this->addClass('form-control select');
     }
 
     public function setMultiple($bool = true) {
@@ -137,7 +138,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= " " . $k . '="' . $v . '"';
         }
-        $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')->inc_indent()->br();
+        $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')->inc_indent()->br();
         if (count($this->group_list) > 0) {
             foreach ($this->group_list as $g => $list) {
                 if (strlen($g) > 0) {

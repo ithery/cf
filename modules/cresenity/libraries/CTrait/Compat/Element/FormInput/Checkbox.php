@@ -28,7 +28,7 @@ trait CTrait_Compat_Element_FormInput_Checkbox {
      * @return $this
      */
     public function set_checked($bool) {
-        return $this->setChecked($label, $lang);
+        return $this->setChecked($bool);
     }
 
 }

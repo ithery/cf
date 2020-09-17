@@ -1265,7 +1265,11 @@ body.mini-navbar #page-wrapper {
     word-break: break-all;
 }
 
-
+.modal.modal-download-progress {}
+.modal.modal-download-progress .modal-dialog {
+    width: auto;
+    max-width: 35rem;
+}
 @media (min-width: 319px) {
 
 }

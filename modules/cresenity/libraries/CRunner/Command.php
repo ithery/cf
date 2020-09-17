@@ -45,7 +45,7 @@ class CRunner_Command {
     /**
      * @var bool to use symfony lib or nott
      */
-    public $useSymfony = false;
+    public $useSymfony = true;
 
     /**
      * @var bool whether to capture stderr (2>&1) when `useExec` is true. This

@@ -344,17 +344,17 @@ class CApp extends CObservable {
     public function rendered() {
         return $this->rendered;
     }
-    
+
     public function reset() {
-        $this->rendered=false;
-        $this->renderable= new CCollection();
+        $this->rendered = false;
+        $this->renderable = new CCollection();
         return $this;
     }
 
     public function render() {
 
         if ($this->rendered) {
-            throw new CException('CApp already Rendered'.cdbg::getTraceString());
+            throw new CException('CApp already Rendered' . cdbg::getTraceString());
         }
         $this->rendered = true;
 
@@ -533,6 +533,10 @@ class CApp extends CObservable {
 
     public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
 
+
+        if ($exception instanceof \Pheanstalk\Exception\ServerException) {
+            return;
+        }
         try {
             $app = CApp::instance();
             $org = $app->org();
@@ -674,6 +678,15 @@ class CApp extends CObservable {
     public function __destruct() {
         if (function_exists('gc_collect_cycles')) {
             gc_collect_cycles();
+        }
+    }
+
+    public static function sendExceptionEmail($email, Exception $exception) {
+
+
+        if (!($exception instanceof CF_404_Exception)) {
+
+            $html = CApp_ErrorHandler::sendExceptionEmail($email, $exception);
         }
     }
 
