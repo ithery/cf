@@ -12,10 +12,12 @@ return [
         'compile' => false,
         'disk'=>'local',
         'filters' => [],
+        'versioning'=>false,
     ],
     'js' => [
         'compile' => false,
         'disk'=>'local',
         'filters' => [],
+        'versioning'=>false,
     ],
 ];

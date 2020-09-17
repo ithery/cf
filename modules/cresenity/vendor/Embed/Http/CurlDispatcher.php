@@ -80,7 +80,7 @@ class CurlDispatcher implements DispatcherInterface
         $cookies = $this->config[CURLOPT_COOKIEJAR];
 
         if (is_file($cookies)) {
-            unlink($cookies);
+            @unlink($cookies);
         }
     }
 

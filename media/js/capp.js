@@ -790,7 +790,7 @@ var Cresenity = function () {
     this.setCallback = (name, cb) => {
         this.callback[name] = cb;
     };
-    
+
     this.isUsingRequireJs = function () {
         return (typeof capp.requireJs !== "undefined") ? capp.requireJs : true;
     }
@@ -1062,7 +1062,7 @@ var Cresenity = function () {
             backdrop: 'static',
             modalClass: false,
             onClose: false,
-            appendTo:false,
+            appendTo: false,
             footerAction: {}
         }, options);
 
@@ -1104,15 +1104,15 @@ var Cresenity = function () {
             modalContent.append(modalFooter);
         }
         modalContent.append(modalBody);
-        
+
         var appendTo = settings.appendTo;
-        if(typeof appendTo == 'undefined' || !appendTo) {
+        if (typeof appendTo == 'undefined' || !appendTo) {
             appendTo = $('body');
         }
         modalContainer.appendTo(appendTo);
         modalContainer.addClass('capp-modal');
         modalContainer.on('hidden.bs.modal', function (e) {
-            
+
             if (cresenity.modalElements.length > 0) {
                 var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
                 if (lastModal && lastModal.get(0) === $(e.target).get(0)) {
@@ -1194,9 +1194,9 @@ var Cresenity = function () {
     }
     this.ajax = function (options) {
         var settings = $.extend({
-            block:true, 
-            url:window.location.href,
-            method:'post',
+            block: true,
+            url: window.location.href,
+            method: 'post',
         }, options);
         var dataAddition = settings.dataAddition;
         var url = settings.url;
@@ -1204,17 +1204,17 @@ var Cresenity = function () {
         if (typeof dataAddition == 'undefined') {
             dataAddition = {};
         }
-        if(settings.block) {
+        if (settings.block) {
             cresenity.blockPage();
         }
-        
+
         var validationIsValid = true;
         var ajaxOptions = {
             url: url,
             dataType: 'json',
-            data:dataAddition,
+            data: dataAddition,
             type: settings.method,
-           
+
             success: function (response) {
                 var onSuccess = function () {};
                 var onError = function (errMessage) {
@@ -1245,7 +1245,7 @@ var Cresenity = function () {
             },
 
             complete: function () {
-                if(settings.block) {
+                if (settings.block) {
                     cresenity.unblockPage();
                 }
 
@@ -1254,9 +1254,9 @@ var Cresenity = function () {
                 }
             },
         };
-       
+
         return $.ajax(ajaxOptions);
-            
+
     };
     this.ajaxSubmit = function (options) {
         var settings = $.extend({}, options);
@@ -1365,10 +1365,10 @@ var Cresenity = function () {
             }
         });
     };
-    
-    this.scrollTo=function(element,container) {
-        if(typeof container == 'undefined') {
-            container=document.body;
+
+    this.scrollTo = function (element, container) {
+        if (typeof container == 'undefined') {
+            container = document.body;
         }
         $(container).animate({
             scrollTop: $(element).offset().top - ($(container).offset().top + $(container).scrollTop())
@@ -1426,8 +1426,8 @@ var Cresenity = function () {
     this.unblockElement = function (selector) {
         $(selector).unblock();
     };
-    
-    this.value= function (elm) {
+
+    this.value = function (elm) {
         elm = jQuery(elm);
         if (elm.length == 0) {
             return null;
@@ -1476,7 +1476,7 @@ var Cresenity = function () {
                 e.preventDefault();
                 e.stopPropagation();
                 btn.off('click');
-                bootbox.confirm({ 
+                bootbox.confirm({
                     className: "capp-modal-confirm",
                     message: message,
                     callback: function (confirmed) {
@@ -1590,6 +1590,131 @@ var Cresenity = function () {
 
 
     }
+
+    this.downloadProgress = function (options) {
+        let settings = $.extend({
+            // These are the defaults.
+            method: 'get',
+            dataAddition: {},
+            url: '/',
+            onComplete: false,
+            onSuccess: false,
+            onBlock: false,
+            onUnblock: false,
+        }, options);
+
+
+        var method = settings.method;
+
+        var xhr = jQuery(window).data('cappXhrProgress');
+        if (xhr) {
+            xhr.abort();
+        }
+
+        var dataAddition = settings.dataAddition;
+        var url = settings.url;
+        url = this.url.replaceParam(url);
+        if (typeof dataAddition == 'undefined') {
+            dataAddition = {};
+        }
+
+        (function (settings) {
+
+            (function (element) {
+                if (typeof settings.onBlock == 'function') {
+                    settings.onBlock();
+                } else {
+                    cresenity.blockPage();
+                }
+
+                $(element).data('xhr', $.ajax({
+                    type: method,
+                    url: url,
+                    dataType: 'json',
+                    data: dataAddition,
+                    success: function (response) {
+
+                        cresenity.handleJsonResponse(response, function (data) {
+                            var progressUrl = data.progressUrl;
+                            var progressContainer = $('<div>').addClass('progress-container');
+
+                            var interval = setInterval(function () {
+                                $.ajax({
+                                    type: method,
+                                    url: progressUrl,
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        cresenity.handleJsonResponse(response, function (data) {
+                                            if (data.state == 'DONE') {
+                                                progressContainer.find('.progress-container-status').empty();
+                                                var innerStatus = $('<div>');
+                                                
+                                                var innerStatusLabel = $('<label>', {class:'mb-3 d-block'}).append("Your file is ready");
+                                                var linkDownload = $('<a>', {target:'_blank', href:data.fileUrl, class:'btn btn-primary'}).append("Download");
+                                                var linkClose = $('<a>', {href:'javascript:;', class:'btn btn-primary ml-3'}).append("Close");
+                                                
+                                                innerStatus.append(innerStatusLabel);
+                                                innerStatus.append(linkDownload);
+                                                innerStatus.append(linkClose);
+                                                
+                                                progressContainer.find('.progress-container-status').append(innerStatus);
+                                                linkClose.click(function(){
+                                                    cresenity.closeLastModal();
+                                                })
+                                                clearInterval(interval);
+                                            }
+                                        });
+                                    }
+                                });
+                            }, 3000);
+                            
+                            var innerStatus = $('<div>');
+                                var innerStatusLabel = $('<label>', {class:'mb-4'}).append("Please Wait...");
+                                var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
+                                var innerStatusAction = $('<div>', {class:'text-center my-3'});
+                                var innerStatusCancelButton = $('<button>', {class:'btn btn-primary'}).append('Cancel');
+                                innerStatusAction.append(innerStatusCancelButton);
+                                innerStatus.append(innerStatusLabel);
+                                innerStatus.append(innerStatusAnimation);
+                                innerStatus.append(innerStatusAction);
+                            progressContainer.append($('<div>').addClass('progress-container-status').append(innerStatus));
+                            
+                            innerStatusCancelButton.click(function(){
+                                clearInterval(interval);
+                                cresenity.closeLastModal();
+                            });
+                            
+
+                            cresenity.modal({
+                                message: progressContainer,
+                                modalClass: 'modal-download-progress'
+                            })
+                        });
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError != 'abort') {
+                            cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
+                        }
+
+                    },
+                    complete: function () {
+                        $(element).data('xhr', false);
+                        if (typeof settings.onBlock == 'function') {
+                            settings.onUnblock();
+                        } else {
+                            cresenity.unblockPage();
+                        }
+
+                        if (typeof settings.onComplete == 'function') {
+                            settings.onComplete();
+                        }
+                    }
+                }));
+            })(this);
+
+        })(settings);
+
+    };
 };
 if (!window.cresenity) {
     window.cresenity = new Cresenity();

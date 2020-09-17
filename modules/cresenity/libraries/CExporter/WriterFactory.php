@@ -37,7 +37,7 @@ class CExporter_WriterFactory {
         }
 
         if ($writer instanceof Csv) {
-            static::applyCsvSettings(config('excel.exports.csv', []));
+            static::applyCsvSettings(CF::config('exporter.exports.csv', []));
 
             if ($export instanceof CExporter_Concern_WithCustomCsvSettings) {
                 static::applyCsvSettings($export->getCsvSettings());

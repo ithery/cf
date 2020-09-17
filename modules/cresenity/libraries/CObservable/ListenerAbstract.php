@@ -87,6 +87,9 @@ abstract class CObservable_ListenerAbstract {
                 case 'remove':
                     $handler = new CObservable_Listener_Handler_RemoveHandler($this);
                     break;
+                case 'downloadProgress':
+                    $handler = new CObservable_Listener_Handler_DownloadProgressHandler($this);
+                    break;
                 case 'custom':
                     $handler = new CObservable_Listener_Handler_CustomHandler($this);
                     break;

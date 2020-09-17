@@ -19,7 +19,7 @@ class CModel_Resource_ResourceObserver {
             /** @var CResources_Filesystem */
             $filesystem = CResources_Factory::createFileSystem();
 
-            $filesystem->syncFileNames($media);
+            $filesystem->syncFileNames($resource);
         }
     }
 
