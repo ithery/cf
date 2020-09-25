@@ -45,11 +45,13 @@ class CSession {
             // Makes a mirrored array, eg: foo=foo
             CSession::$protect = array_combine(CSession::$protect, CSession::$protect);
 
-            // Configure garbage collection
-            ini_set('session.gc_probability', (int) CSession::$config['gc_probability']);
-            ini_set('session.gc_divisor', 100);
-            ini_set('session.gc_maxlifetime', (CSession::$config['expiration'] == 0) ? 86400 : CSession::$config['expiration']);
+            if (session_status() == PHP_SESSION_NONE) {
 
+                // Configure garbage collection
+                ini_set('session.gc_probability', (int) CSession::$config['gc_probability']);
+                ini_set('session.gc_divisor', 100);
+                ini_set('session.gc_maxlifetime', (CSession::$config['expiration'] == 0) ? 86400 : CSession::$config['expiration']);
+            }
             // Create a new session
             $this->create();
 
@@ -121,8 +123,8 @@ class CSession {
                     throw new CException('The :driver driver for the :class library could not be found', array(':driver' => CSession::$config['driver'], ':class' => get_class($this)));
                 }
             } else {
-                $method = 'create'.$driverName.'Driver';
-                CSession::$driver = call_user_func([CSession_Factory::class,$method]);
+                $method = 'create' . $driverName . 'Driver';
+                CSession::$driver = call_user_func([CSession_Factory::class, $method]);
             }
 
             // Validate the driver
