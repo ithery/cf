@@ -176,11 +176,11 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
     /**
      * Minify the data.
      *
-     * @param string[optional] $path Path to write the data to
+     * @param string $path Path to write the data to
      *
      * @return string The minified data
      */
-    abstract public function execute($path = null);
+    abstract public function execute($content);
 
     /**
      * Load data.
