@@ -56,7 +56,7 @@ class CEmail_Builder_Component_BodyComponent_Divider extends CEmail_Builder_Comp
 
     public function getOutlookWidth() {
         $containerWidth = $this->context->getContainerWidth();
-        $paddingSize = $this->getShorthandAttrValue('padding', 'left') + $this->getShorthandAttrValue('padding', 'right');
+        $paddingSize = intval($this->getShorthandAttrValue('padding', 'left')) + intval($this->getShorthandAttrValue('padding', 'right'));
 
         $width = $this->getAttribute('width');
 
@@ -65,11 +65,11 @@ class CEmail_Builder_Component_BodyComponent_Divider extends CEmail_Builder_Comp
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
         switch ($unit) {
             case '%':
-                return (($containerWidth * $parsedWidth / 100) - $paddingSize) . 'px';
+                return ((intval($containerWidth) * $parsedWidth / 100) - $paddingSize) . 'px';
             case 'px':
                 return $width;
             default:
-                return ($containerWidth - $paddingSize) . 'px';
+                return (intval($containerWidth) - $paddingSize) . 'px';
         }
     }
 
