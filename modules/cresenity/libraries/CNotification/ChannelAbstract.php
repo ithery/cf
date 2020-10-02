@@ -140,10 +140,12 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
      * @return CNotification_MessageAbstract
      */
     public function createMessage($data) {
-        $vendorConfig = carr::get($this->config, 'vendor_config', []);
+        $vendorConfig = carr::get($this->config, 'vendor_config');
         if (!is_array($vendorConfig)) {
             $vendorConfig = CF::config('vendor.' . $this->getVendorName());
         }
+       
+        
         if (!is_array($vendorConfig)) {
             $vendorConfig = [];
         }
