@@ -14,7 +14,9 @@ class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
 
         $userKey = carr::get($this->config, 'key');
         $userPass = carr::get($this->config, 'secret');
-
+        
+        $message=$this->getOption('message');
+        $msisdn=$this->getOption('recipient');
         $text = urlencode($message);
         $url = 'https://reguler.zenziva.net/apps/smsapi.php?userkey=' . $userKey . '&passkey=' . $userPass . '&nohp=' . $msisdn . '&pesan=' . $text;
         $curl = CCurl::factory($url);
