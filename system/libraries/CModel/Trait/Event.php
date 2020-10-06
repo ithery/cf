@@ -306,7 +306,7 @@ trait CModel_Trait_Event {
      * @param  CEvent_Dispatcher  $dispatcher
      * @return void
      */
-    public static function setEventDispatcher(CEvent_Dispatcher $dispatcher) {
+    public static function setEventDispatcher(CEvent_DispatcherInterface $dispatcher) {
         static::$dispatcher = $dispatcher;
     }
 
