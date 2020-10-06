@@ -319,4 +319,27 @@ trait CModel_Trait_Event {
         static::$dispatcher = null;
     }
 
+    /**
+     * Execute a callback without firing any model events for any model type.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function withoutEvents(callable $callback)
+    {
+        $dispatcher = static::getEventDispatcher();
+
+        if ($dispatcher) {
+            static::setEventDispatcher(new CEvent_NullDispatcher($dispatcher));
+        }
+
+        try {
+            return $callback();
+        } finally {
+            if ($dispatcher) {
+                static::setEventDispatcher($dispatcher);
+            }
+        }
+    }
+
 }
