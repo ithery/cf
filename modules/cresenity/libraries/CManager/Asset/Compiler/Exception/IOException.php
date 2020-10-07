@@ -1,0 +1,14 @@
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan <hery@itton.co.id>
+ * @since Aug 11, 2020 
+ * @license Ittron Global Teknologi
+ */
+
+
+class CManager_Asset_Compiler_Exception_IOException extends CManager_Asset_Compiler_Exception {
+    
+}
