@@ -3,6 +3,7 @@
 namespace LEClient;
 
 use Exception;
+use LEClient\Exceptions\LEFunctionsException;
 
 /**
  * LetsEncrypt Functions class, supplying the LetsEncrypt Client with supportive functions.
@@ -49,8 +50,7 @@ class LEFunctions
      */
 	public static function RSAGenerateKeys($directory, $privateKeyFile = 'private.pem', $publicKeyFile = 'public.pem', $keySize = 4096)
 	{
-
-		if ($keySize < 2048 || $keySize > 4096) throw new \RuntimeException("RSA key size must be between 2048 and 4096.");
+		if ($keySize < 2048 || $keySize > 4096) throw LEFunctionsException::InvalidArgumentException('RSA key size must be between 2048 and 4096.');
 
 		$res = openssl_pkey_new(array(
 			"private_key_type" => OPENSSL_KEYTYPE_RSA,
@@ -62,7 +62,7 @@ class LEFunctions
 			while($message = openssl_error_string()){
 				$error .= $message.PHP_EOL;
 			}
-			throw new \RuntimeException($error);
+			throw LEFunctionsException::GenerateKeypairException($error);
 		}
 
 		if(!openssl_pkey_export($res, $privateKey)) {
@@ -70,7 +70,7 @@ class LEFunctions
 			while($message = openssl_error_string()){
 				$error .= $message.PHP_EOL;
 			}
-			throw new \RuntimeException($error);
+			throw LEFunctionsException::GenerateKeypairException($error);
 		}
 
 		$details = openssl_pkey_get_details($res);
@@ -87,8 +87,6 @@ class LEFunctions
 		openssl_pkey_free($res);
 	}
 
-
-
     /**
      * Generates a new EC prime256v1 keypair and saves both keys to a new file.
      *
@@ -99,26 +97,26 @@ class LEFunctions
      */
 	public static function ECGenerateKeys($directory, $privateKeyFile = 'private.pem', $publicKeyFile = 'public.pem', $keySize = 256)
 	{
-		if (version_compare(PHP_VERSION, '7.1.0') == -1) throw new \RuntimeException("PHP 7.1+ required for EC keys.");
+		if (version_compare(PHP_VERSION, '7.1.0') == -1) throw LEFunctionsException::PHPVersionException();
 
 		if ($keySize == 256)
 		{
-				$res = openssl_pkey_new(array(
-						"private_key_type" => OPENSSL_KEYTYPE_EC,
-						"curve_name" => "prime256v1",
-				));
+			$res = openssl_pkey_new(array(
+					"private_key_type" => OPENSSL_KEYTYPE_EC,
+					"curve_name" => "prime256v1",
+			));
 		}
 		elseif ($keySize == 384)
 		{
-				$res = openssl_pkey_new(array(
-						"private_key_type" => OPENSSL_KEYTYPE_EC,
-						"curve_name" => "secp384r1",
-				));
+			$res = openssl_pkey_new(array(
+					"private_key_type" => OPENSSL_KEYTYPE_EC,
+					"curve_name" => "secp384r1",
+			));
 		}
-		else throw new \RuntimeException("EC key size must be 256 or 384.");
+		else throw LEFunctionsException::InvalidArgumentException('EC key size must be 256 or 384.');
 
 
-		if(!openssl_pkey_export($res, $privateKey)) throw new \RuntimeException("EC keypair export failed!");
+		if(!openssl_pkey_export($res, $privateKey)) throw LEFunctionsException::GenerateKeypairException('EC keypair export failed!');
 
 		$details = openssl_pkey_get_details($res);
 
@@ -231,7 +229,7 @@ class LEFunctions
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_FOLLOWLOCATION, true);
         $response = json_decode(trim(curl_exec($handle)));
-		if($response->Status === 0)
+		if($response->Status === 0 && isset($response->Answer))
 		{
 			foreach($response->Answer as $answer) 
 			{
@@ -251,6 +249,12 @@ class LEFunctions
      */
 	public static function createhtaccess($directory)
 	{
-		file_put_contents($directory . '.htaccess', "order deny,allow\ndeny from all");
+		$htaccess = '<ifModule mod_authz_core.c>' . "\n"
+			. '    Require all denied' . "\n"
+			. '</ifModule>' . "\n"
+			. '<ifModule !mod_authz_core.c>' . "\n"
+			. '    Deny from all' . "\n"
+			. '</ifModule>' . "\n";
+		file_put_contents($directory . '.htaccess', $htaccess);
 	}
 }
