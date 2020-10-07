@@ -12,7 +12,7 @@ class CBackup_Output {
     protected $messages;
     protected $errors;
 
-    public function instance() {
+    public static function instance() {
         if (static::$instance == null) {
             static::$instance = new CBackup_Output();
         }
