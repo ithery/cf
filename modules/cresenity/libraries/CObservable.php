@@ -63,7 +63,7 @@ abstract class CObservable extends CRenderable {
         $manager->registerControl('daterange-button', 'CElement_FormInput_DateRange_DropdownButton');
         $manager->registerControl('currency', 'CElement_FormInput_Currency');
         $manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
-        $manager->registerControl('time', 'CElement_FormInput_Time');
+        $manager->registerControl('time', CElement_FormInput_Time::class);
         $manager->registerControl('timepicker', 'CElement_FormInput_Time');
         $manager->registerControl('clock', 'CElement_FormInput_Clock');
         $manager->registerControl('clockpicker', 'CElement_FormInput_Clock');
