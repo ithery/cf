@@ -20,6 +20,8 @@ class CElement_Component_Widget_Header extends CElement_Element {
     protected $switcher;
     protected $switcherWrapper;
     protected $titleWrapper;
+    protected $switcherBehaviour = 'hide';
+    protected $switcherBlockMessage = '';
 
     public function __construct($id = "", $tag = "div") {
         parent::__construct($id, $tag);
@@ -63,6 +65,11 @@ class CElement_Component_Widget_Header extends CElement_Element {
         return $this->switcher;
     }
 
+    public function setSwitcherBehaviour($behaviour = 'hide') {
+        $this->switcherBehaviour = $behaviour;
+        return $this;
+    }
+
     public function haveSwitcher() {
         if ($this->switcher) {
             return true;
@@ -76,22 +83,40 @@ class CElement_Component_Widget_Header extends CElement_Element {
         $js->setIndent($indent);
 
         if ($this->haveSwitcher()) {
-            $js->appendln('
-                if (jQuery("#' . $this->switcher->id . '").prop("checked")) {
-                    jQuery("#' . $this->parent->id . '").find(".widget-content").show();
-                } else {
-                    jQuery("#' . $this->parent->id . '").find(".widget-content").hide();
-                }
-
-                jQuery("#' . $this->switcher->id . '").click(function() {
+            if ($this->switcherBehaviour == 'block') {
+                $js->appendln('
+                    var blockMessage = "'.$this->switcherBlockMessage.'";
                     if (jQuery("#' . $this->switcher->id . '").prop("checked")) {
-                        console.log("parentId ' . $this->parent->id . '");
+                        cresenity.unblockElement(jQuery("#' . $this->parent->id . '").find(".widget-content"));
+                    } else {
+                        cresenity.blockElement(jQuery("#' . $this->parent->id . '").find(".widget-content"),{innerMessage:blockMessage});
+                    }
+
+                    jQuery("#' . $this->switcher->id . '").click(function() {
+                        if (jQuery("#' . $this->switcher->id . '").prop("checked")) {
+                            cresenity.unblockElement(jQuery("#' . $this->parent->id . '").find(".widget-content"));
+                        } else {
+                            cresenity.blockElement(jQuery("#' . $this->parent->id . '").find(".widget-content"),{innerMessage:blockMessage});
+                        }
+                    });
+                ');
+            } else {
+                $js->appendln('
+                    if (jQuery("#' . $this->switcher->id . '").prop("checked")) {
                         jQuery("#' . $this->parent->id . '").find(".widget-content").show();
                     } else {
                         jQuery("#' . $this->parent->id . '").find(".widget-content").hide();
                     }
-                });
-            ');
+
+                    jQuery("#' . $this->switcher->id . '").click(function() {
+                        if (jQuery("#' . $this->switcher->id . '").prop("checked")) {
+                            jQuery("#' . $this->parent->id . '").find(".widget-content").show();
+                        } else {
+                            jQuery("#' . $this->parent->id . '").find(".widget-content").hide();
+                        }
+                    });
+                ');
+            }
         }
         $js->append($this->jsChild($js->get_indent()));
         return $js->text();

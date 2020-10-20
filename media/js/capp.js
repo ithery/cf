@@ -1352,7 +1352,7 @@ var Cresenity = function () {
             innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
         }, options);
         $.blockUI({
-            message: settings.message,
+            message: settings.innerMessage,
             css: {
                 backgroundColor: 'transparent',
                 border: '0',
@@ -1409,9 +1409,13 @@ var Cresenity = function () {
     this.unblockPage = function () {
         $.unblockUI();
     };
-    this.blockElement = function (selector) {
+    this.blockElement = function (selector, options) {
+        var settings = $.extend({
+            innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+        }, options);
+        
         $(selector).block({
-            message: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+            message: settings.innerMessage,
             css: {
                 backgroundColor: 'transparent',
                 border: '0'
