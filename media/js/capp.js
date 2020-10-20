@@ -1081,6 +1081,9 @@ var Cresenity = function () {
             modalContainer.addClass('sidebar');
             modalContainer.addClass(settings.sidebarMode);
         }
+        if (settings.isFull) {
+            modalContainer.addClass('sidebar full');
+        }
         var modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
         var modalContent = jQuery('<div>').addClass('modal-content');
 

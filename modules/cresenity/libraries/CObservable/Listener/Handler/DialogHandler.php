@@ -21,6 +21,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
     protected $param_inputs;
     protected $param_request;
     protected $isSidebar;
+    protected $isFull;
     protected $modalClass;
     protected $backdrop;
 
@@ -40,6 +41,11 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
     public function setSidebar($bool = true) {
         $this->isSidebar = $bool;
+        return $this;
+    }
+    public function setFull($bool = true) {
+        $this->isFull = $bool;
+        
         return $this;
     }
 
@@ -128,6 +134,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
             $jsOptions .= "onClose:" . $this->getCloseListener()->js() . ",";
         }
         $jsOptions .= "isSidebar:" . ($this->isSidebar ? 'true' : 'false') . ",";
+        $jsOptions .= "isFull:" . ($this->isFull ? 'true' : 'false') . ",";
 
         $jsOptions .= "}";
 
