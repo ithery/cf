@@ -1444,6 +1444,11 @@ var Cresenity = function () {
                 return null;
             }
         }
+        if (elm.attr('type') == 'radio') {
+            if (!elm.is(':checked')) {
+                return null;
+            }
+        }
         if (typeof elm.val() != 'undefined') {
             return elm.val();
         }
@@ -2727,6 +2732,12 @@ if (!window.cresenity) {
             if (elm.length == 0)
                 return null;
             if (elm.attr('type') == 'checkbox') {
+
+                if (!elm.is(':checked')) {
+                    return null;
+                }
+            }
+            if (elm.attr('type') == 'radio') {
 
                 if (!elm.is(':checked')) {
                     return null;
