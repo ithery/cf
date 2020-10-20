@@ -1254,7 +1254,7 @@ body.mini-navbar #page-wrapper {
     max-width: none;
 }
 
-.modal.sidebar .modal-footer-inside {
+.modal.sidebar.full .modal-footer-inside {
     
     max-width: none;
 }
