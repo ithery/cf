@@ -6,12 +6,10 @@
  * and open the template in the editor.
  */
 
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
 interface CExporter_Concern_WithStyles
 {
 	/**
      * @return array
      */
-    public function styles(Worksheet $sheet);
+    public function styles($sheet);
 }
