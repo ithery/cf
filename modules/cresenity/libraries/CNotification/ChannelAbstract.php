@@ -100,6 +100,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         }
 
         $orgId = $options->pull('orgId');
+        
         if (strlen($orgId) == 0) {
             $orgId = CApp_Base::orgId();
         }
@@ -108,7 +109,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
         $model->message_class = get_class($message);
         $model->vendor = $vendor;
-        $model->org_id = CApp_Base::orgId();
+        $model->org_id = $orgId;
         $model->channel = static::$channelName;
         $model->notification_status = 'PENDING';
         $model->is_read = 0;
