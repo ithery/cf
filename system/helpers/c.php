@@ -498,6 +498,10 @@ class c {
         return CCarbon::now($tz);
     }
 
+    
+    public static function html($str) {
+        return chtml::specialchars($str);
+    }
 }
 
 // End c
