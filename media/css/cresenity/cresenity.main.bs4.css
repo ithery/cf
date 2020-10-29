@@ -1290,6 +1290,10 @@ body.mini-navbar #page-wrapper {
     width: auto;
     max-width: 35rem;
 }
+
+.dropdown-toggle.no-caret::after {
+    display:none;
+}
 @media (min-width: 319px) {
 
 }

@@ -40,9 +40,9 @@ trait CTrait_Element_ActionList_Row {
      * @return CElement_Component_Action
      */
     public function addRowAction($id = "") {
-        $row_act = CElement_Factory::createComponent('Action', $id);
-        $this->rowActionList->add($row_act);
-        return $row_act;
+        $rowAct = CElement_Factory::createComponent('Action', $id);
+        $this->rowActionList->add($rowAct);
+        return $rowAct;
     }
 
     /**

@@ -13,6 +13,14 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
+        
+         if ($this->haveRowAction()) {
+           
+            if ($this->getRowActionStyle() == "btn-dropdown") {
+                $this->rowActionList->addClass("pull-right");
+            }
+         }
+        
         $wrapped = $this->applyDataTable || $this->haveHeaderAction() || $this->haveFooterAction() || strlen($this->title) > 0;
         if ($wrapped) {
 
@@ -269,9 +277,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             }
 
             $jsparam["param1"] = $key;
-            if ($this->getRowActionStyle() == "btn-dropdown") {
-                $this->rowActionList->addClass("pull-right");
-            }
+            
             $this->rowActionList->regenerateId(true);
             $this->rowActionList->apply("setJsParam", $jsparam);
             $this->rowActionList->apply("setHandlerUrlParam", $jsparam);

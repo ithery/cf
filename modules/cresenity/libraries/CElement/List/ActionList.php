@@ -13,8 +13,11 @@ class CElement_List_ActionList extends CElement_List {
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
 
+
+    
     public $actions = array();
     protected $style;
+    protected $withCaret;
 
     public function __construct($listId = null) {
         parent::__construct($listId);
@@ -24,6 +27,8 @@ class CElement_List_ActionList extends CElement_List {
         $this->btn_dropdown_classes = array();
         $this->label_size = 2;
         $this->icon = '';
+        $this->withCaret = true;
+
     }
 
     public static function factory($list_id = "") {
@@ -47,6 +52,16 @@ class CElement_List_ActionList extends CElement_List {
         return $this->style;
     }
 
+    public function removeCaret() {
+        $this->withCaret=false;
+        return $this;
+    }
+    
+    
+    protected function htmlCaret() {
+        return $this->withCaret ? '<span class="caret"></span>':'';
+    }
+    
     public function html($indent = 0) {
         if ($this->id == "test-123") {
             //die($this->style);
@@ -77,6 +92,8 @@ class CElement_List_ActionList extends CElement_List {
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
+        
+        
         $pretag = '<div id="' . $this->id . '" class="button-list ' . $classes . '">';
         switch ($this->style) {
             case "form-action":
@@ -111,10 +128,11 @@ class CElement_List_ActionList extends CElement_List {
             if (strlen($this->icon) > 0) {
                 $iconHtml = '<i class="' . $this->icon . '"></i> ';
             }
+            $caretClass = $this->withCaret ? '' : 'no-caret';
             $html->appendln('
-                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle '.$caretClass.'" data-toggle="dropdown" href="#">
                             ' . $iconHtml . $this->label . '
-                            <span class="caret"></span>
+                            '.$this->htmlCaret().'
                     </a>
                     <ul class="dropdown-menu dropdown-menu-right align-left ' . $classes . '">
 
