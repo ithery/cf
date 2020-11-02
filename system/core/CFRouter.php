@@ -378,6 +378,7 @@ class CFRouter {
                 if (is_callable($val)) {
                     preg_match_all("/{([\w]*)}/", $key, $matches, PREG_SET_ORDER);
                     $callbackArgs = array($uri);
+                    $bracketKeys = [];
                     foreach ($matches as $matchedVal) {
                         $str = $matchedVal[1]; //matches str without bracket {}
                         $bStr = $matchedVal[0]; //matches str with bracket {}
