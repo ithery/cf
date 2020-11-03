@@ -69,6 +69,12 @@ abstract class CObservable_ListenerAbstract {
                 case 'reload':
                     $handler = new CObservable_Listener_Handler_ReloadHandler($this);
                     break;
+                case 'reloadDataTable':
+                    $handler = new CObservable_Listener_Handler_ReloadDataTableHandler($this);
+                    break;
+                case 'reloadElement':
+                    $handler = new CObservable_Listener_Handler_ReloadElementHandler($this);
+                    break;
                 case 'dialog':
                     $handler = new CObservable_Listener_Handler_DialogHandler($this);
                     break;

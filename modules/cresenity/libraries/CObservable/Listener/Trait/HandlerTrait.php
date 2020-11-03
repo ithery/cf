@@ -18,6 +18,17 @@ trait CObservable_Listener_Trait_HandlerTrait {
         $this->handlers[] = $handler;
         return $handler;
     }
+    
+    
+    /**
+     * 
+     * @return \CObservable_Listener_Handler_ReloadElementHandler
+     */
+    public function addReloadElementHandler() {
+        $handler = new CObservable_Listener_Handler_ReloadElementHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
 
     /**
      * 

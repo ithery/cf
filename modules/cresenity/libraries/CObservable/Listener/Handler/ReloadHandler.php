@@ -13,10 +13,12 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
         CObservable_Listener_Handler_Trait_SelectorHandlerTrait,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
+        CObservable_Listener_Handler_Trait_BlockerHandlerTrait,
         CObservable_Listener_Handler_Trait_ParamHandlerTrait;
 
     protected $content;
     protected $param;
+    
 
     
 
@@ -63,6 +65,17 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
          ";
 
         return $js;
+    }
+    
+    
+    public function toAttributeArray() {
+        $attributes = [];
+        $attributes['method']=$this->method;
+        $attributes['url']=$this->generatedUrl();
+        $attributes['dataAddition']=$this->populateParamJson();
+        $attributes['blockHtml']=$this->getBlockHtml();
+        return $attributes;
+        
     }
 
 }

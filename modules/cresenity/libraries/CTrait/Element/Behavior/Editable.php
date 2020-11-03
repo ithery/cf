@@ -20,8 +20,8 @@ trait CTrait_Element_Behavior_Editable {
      * @param bool $bool
      * @return $this
      */
-    public function setEditable($bool) {
-        $this->editable = true;
+    public function setEditable($bool = true) {
+        $this->editable = $bool;
         return $this;
     }
 
@@ -29,7 +29,7 @@ trait CTrait_Element_Behavior_Editable {
      * 
      * @return bool
      */
-    public function getEditble() {
+    public function getEditable() {
         return $this->editable;
     }
 

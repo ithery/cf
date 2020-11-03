@@ -922,6 +922,23 @@ var Cresenity = function () {
         }
     };
     this.reload = function (options) {
+        targetOptions = {};
+        if(options && options.selector) {
+            let target = $(options.selector);
+            if(target.attr('data-url')) {
+                targetOptions.url = target.attr('data-url');
+            }
+            if(target.attr('data-method')) {
+                targetOptions.method = target.attr('data-method');
+            }
+            if(target.attr('data-block-html')) {
+                targetOptions.blockHtml = target.attr('data-block-html');
+            }
+            if(target.attr('data-data-addition')) {
+                targetOptions.dataAddition = JSON.parse(target.attr('data-data-addition'));
+            }
+        }
+        console.log(targetOptions);
         let settings = $.extend({
             // These are the defaults.
             method: 'get',
@@ -931,19 +948,28 @@ var Cresenity = function () {
             onComplete: false,
             onSuccess: false,
             onBlock: false,
+            blockHtml: false,
             onUnblock: false,
-        }, options);
+        }, targetOptions, options);
 
 
         var method = settings.method;
         var selector = settings.selector;
+        
+        
+        var blockOptions = {};
+        if(settings.blockHtml) {
+            blockOptions.innerMessage=settings.blockHtml;
+        }
         var xhr = jQuery(selector).data('xhr');
         if (xhr) {
             xhr.abort();
         }
         var dataAddition = settings.dataAddition;
         var url = settings.url;
-        url = this.url.replaceParam(url);
+        if(url) {
+            url = this.url.replaceParam(url);
+        }
         if (typeof dataAddition == 'undefined') {
             dataAddition = {};
         }
@@ -958,7 +984,7 @@ var Cresenity = function () {
                     if (typeof settings.onBlock == 'function') {
                         settings.onBlock();
                     } else {
-                        cresenity.blockElement($(element));
+                        cresenity.blockElement($(element),blockOptions);
                     }
 
                     $(element).data('xhr', $.ajax({
@@ -1350,24 +1376,6 @@ var Cresenity = function () {
 
     };
 
-    this.blockPage = function (options) {
-        var settings = $.extend({
-            innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
-        }, options);
-        $.blockUI({
-            message: settings.innerMessage,
-            css: {
-                backgroundColor: 'transparent',
-                border: '0',
-                zIndex: 9999999
-            },
-            overlayCSS: {
-                backgroundColor: '#fff',
-                opacity: 0.8,
-                zIndex: 9999990
-            }
-        });
-    };
 
     this.scrollTo = function (element, container) {
         if (typeof container == 'undefined') {
@@ -1409,6 +1417,24 @@ var Cresenity = function () {
             vfloat = vfloat.substring(0, dd + 1);
         return minus_str + rupiah + vfloat;
     }
+    this.blockPage = function (options) {
+        var settings = $.extend({
+            innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+        }, options);
+        $.blockUI({
+            message: settings.innerMessage,
+            css: {
+                backgroundColor: 'transparent',
+                border: '0',
+                zIndex: 9999999
+            },
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8,
+                zIndex: 9999990
+            }
+        });
+    };
     this.unblockPage = function () {
         $.unblockUI();
     };
@@ -1571,6 +1597,27 @@ var Cresenity = function () {
             });
         });
 
+    }
+    
+    
+    this.initReload = function () {
+
+        var reloadInitialized = $('body').attr('data-reload-initialized');
+        if (!reloadInitialized) {
+            (function(cresenity) {
+                $('.capp-reload').each(function(item){
+                    if(!$(this).hasClass('capp-reloaded')) {
+                        var selector = $(this);
+                        var reloadOptions = {};
+                        reloadOptions.selector = $(this);
+                        cresenity.reload(reloadOptions)
+                        $(this).addClass('capp-reloaded');
+                    }
+                    
+                });
+                $('body').attr('data-reload-initialized', '1');
+            })(this);
+        }
     }
 
     this.initClock = function () {
