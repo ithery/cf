@@ -934,11 +934,14 @@ var Cresenity = function () {
             if(target.attr('data-block-html')) {
                 targetOptions.blockHtml = target.attr('data-block-html');
             }
+            if(target.attr('data-block-type')) {
+                targetOptions.blockType = target.attr('data-block-type');
+            }
             if(target.attr('data-data-addition')) {
                 targetOptions.dataAddition = JSON.parse(target.attr('data-data-addition'));
             }
         }
-        console.log(targetOptions);
+        
         let settings = $.extend({
             // These are the defaults.
             method: 'get',
@@ -949,6 +952,7 @@ var Cresenity = function () {
             onSuccess: false,
             onBlock: false,
             blockHtml: false,
+            blockType: 'default',
             onUnblock: false,
         }, targetOptions, options);
 
@@ -957,7 +961,9 @@ var Cresenity = function () {
         var selector = settings.selector;
         
         
-        var blockOptions = {};
+        var blockOptions = {
+            blockType: settings.blockType
+        };
         if(settings.blockHtml) {
             blockOptions.innerMessage=settings.blockHtml;
         }
@@ -1417,6 +1423,174 @@ var Cresenity = function () {
             vfloat = vfloat.substring(0, dd + 1);
         return minus_str + rupiah + vfloat;
     }
+    
+    this.getStyles = (selector,only,except) => {
+        // the map to return with requested styles and values as KVP
+        var product = {};
+
+        // the style object from the DOM element we need to iterate through
+        var style;
+
+        // recycle the name of the style attribute
+        var name;
+        
+        var element = $(selector);
+        
+        // if it's a limited list, no need to run through the entire style object
+        if (only && only instanceof Array) {
+
+            for (var i = 0, l = only.length; i < l; i++) {
+                // since we have the name already, just return via built-in .css method
+                name = only[i];
+                product[name] = element.css(name);
+            }
+
+        } else {
+
+            // prevent from empty selector
+            if (element.length) {
+
+                // otherwise, we need to get everything
+                var dom = element.get(0);
+
+                // standards
+                if (window.getComputedStyle) {
+
+                    // convenience methods to turn css case ('background-image') to camel ('backgroundImage')
+                    var pattern = /\-([a-z])/g;
+                    var uc = function (a, b) {
+                        return b.toUpperCase();
+                    };			
+                    var camelize = function(string){
+                        return string.replace(pattern, uc);
+                    };
+
+                    // make sure we're getting a good reference
+                    if (style = window.getComputedStyle(dom, null)) {
+
+                        var camel, value;
+                        // opera doesn't give back style.length - use truthy since a 0 length may as well be skipped anyways
+                        if (style.length) {
+                            for (var i = 0, l = style.length; i < l; i++) {
+                                name = style[i];
+                                camel = camelize(name);
+                                value = style.getPropertyValue(name);
+                                product[camel] = value;
+                            }
+                        } else {
+                            // opera
+                            for (name in style) {
+                                camel = camelize(name);
+                                value = style.getPropertyValue(name) || style[name];
+                                product[camel] = value;
+                            }
+                        }
+                    }
+                }
+                // IE - first try currentStyle, then normal style object - don't bother with runtimeStyle
+                else if (style = dom.currentStyle) {
+                    for (name in style) {
+                        product[name] = style[name];
+                    }
+                }
+                else if (style = dom.style) {
+                    for (name in style) {
+                        if (typeof style[name] != 'function') {
+                            product[name] = style[name];
+                        }
+                    }
+                }
+            }
+        }
+
+        // remove any styles specified...
+        // be careful on blacklist - sometimes vendor-specific values aren't obvious but will be visible...  e.g., excepting 'color' will still let '-webkit-text-fill-color' through, which will in fact color the text
+        if (except && except instanceof Array) {
+            for (var i = 0, l = except.length; i < l; i++) {
+                name = except[i];
+                delete product[name];
+            }
+        }
+
+        // one way out so we can process blacklist in one spot
+        return product;
+
+    }
+    
+    this.createPlaceholderElement = (selector,root,depth) => {
+        depth = parseInt(depth);
+        if(!Number.isInteger(depth)) {
+            depth = 0;
+        }
+        var element = $(selector);
+        if(element.length==0) {
+            return null;
+        }
+        
+        root = root || element;
+        var newElement = element.clone().empty();
+        newElement.removeAttr('id');
+        newElement.removeAttr('data-block-html');
+        
+        
+        if(!(element.is(':visible'))) {
+            return null;
+        }
+        
+        
+        var styles = this.getStyles(element);
+        
+        
+        if(depth>0) {
+            if(element.children(':visible').length==0) {
+                var relativeY = element.offset().top - root.offset().top;
+                var relativeX = element.offset().left - root.offset().left;
+                styles['width']=''+element.outerWidth()+'px';
+                styles['height']=''+ (element.outerHeight() - 8)+'px';
+                styles['position']='absolute';
+                styles['top']=''+(relativeY + 4)+'px';
+                styles['left']=''+relativeX+'px';
+                styles['backgroundColor']='#ced4da';
+            }
+        }
+        
+        
+        
+        switch(element.prop("tagName").toLowerCase()) {
+            case 'ul':
+                //styles['listStyle']='none';
+                styles['padding']='0px';
+                break;
+            case 'li':
+                styles['listStyle']='none';
+                //styles['color']='#ced4da';
+                /*
+                styles['height']='10px';
+                styles['marginBottom']='7.5px';
+                styles['backgroundColor']='#ced4da';
+                    */
+                break;
+        }
+        if(depth==0) {
+            styles['position'] = 'relative';
+            styles['overflow'] = 'hidden';
+       
+        }
+        newElement.css(styles);
+        if(depth==0) {
+            newElement.addClass('ph-item');
+            newElement.attr('style', function(i,s) { return (s || '') + 'margin: 0 !important;' });
+            
+        }
+        element.children().each((idx,item) => {
+            var newChild = this.createPlaceholderElement(item,root,depth+1);
+            if(newChild) {
+                newElement.append(newChild);
+            }
+        });
+        return newElement;
+    }
+    
     this.blockPage = function (options) {
         var settings = $.extend({
             innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
@@ -1438,25 +1612,40 @@ var Cresenity = function () {
     this.unblockPage = function () {
         $.unblockUI();
     };
-    this.blockElement = function (selector, options) {
+    this.blockElement = (selector, options) => {
         var settings = $.extend({
             innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+            blockType:'default'
         }, options);
         
-        $(selector).block({
-            message: settings.innerMessage,
-            css: {
+        var blockMessage = settings.innerMessage;
+        var blockType = settings.blockType || 'default';
+        var cssConfig = {
                 backgroundColor: 'transparent',
                 border: '0'
-            },
-            overlayCSS: {
-                backgroundColor: '#fff',
-                opacity: 0.8
-            }
+        };
+        
+        
+        overlayCssConfig = {
+            backgroundColor: '#fff',
+            opacity: 0.8
+        };
+
+        if(blockType=='shimmer') {
+            blockMessage = this.createPlaceholderElement($(selector));
+            cssConfig.width='100%';
+            overlayCssConfig.opacity = 1;
+        }
+        
+        $(selector).block({
+            message: blockMessage,
+            css: cssConfig,
+            overlayCSS: overlayCssConfig,
         });
 
     };
     this.unblockElement = function (selector) {
+
         $(selector).unblock();
     };
 
@@ -1605,7 +1794,7 @@ var Cresenity = function () {
         var reloadInitialized = $('body').attr('data-reload-initialized');
         if (!reloadInitialized) {
             (function(cresenity) {
-                $('.capp-reload').each(function(item){
+                $('.capp-reload').each(function(idx,item){
                     if(!$(this).hasClass('capp-reloaded')) {
                         var selector = $(this);
                         var reloadOptions = {};

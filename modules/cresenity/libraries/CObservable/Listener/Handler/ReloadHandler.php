@@ -73,7 +73,8 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         $attributes['method']=$this->method;
         $attributes['url']=$this->generatedUrl();
         $attributes['dataAddition']=$this->populateParamJson();
-        $attributes['blockHtml']=$this->getBlockHtml();
+        $attributes['blockHtml']=$this->getBlockerHtml();
+        $attributes['blockType']=$this->getBlockerType();
         return $attributes;
         
     }

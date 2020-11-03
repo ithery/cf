@@ -9,10 +9,14 @@
 trait CObservable_Listener_Handler_Trait_BlockerHandlerTrait {
 
     /**
-     * id of handler targeted renderable
      * @var string
      */
     protected $blocker;
+    /**
+     *
+     * @var string
+     */
+    protected $blockerType = 'default';
 
     public function setBlocker($blocker) {
         $this->blocker = $blocker;
@@ -21,8 +25,17 @@ trait CObservable_Listener_Handler_Trait_BlockerHandlerTrait {
     }
 
     
-    public function getBlockHtml() {
+    public function getBlockerHtml() {
         $html = $this->blocker;
         return $html;
+    }
+    
+    public function setBlockerType($blockerType) {
+        $this->blockerType = $blockerType;
+        return $this;
+    }
+    
+    public function getBlockerType() {
+        return $this->blockerType;
     }
 }
