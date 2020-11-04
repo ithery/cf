@@ -33,9 +33,14 @@ class Controller_Cresenity extends CController {
         CService::cliRunner();
     }
 
+    public function qc($className) {
+        $processor = CQC::createProcessor($className);
+        $processor->run();
+    }
+
     public function ajax() {
         $args = func_get_args();
-        $method = carr::get($args,0);
+        $method = carr::get($args, 0);
         $app = CApp::instance();
         $filename = $method . '.tmp';
         $file = CTemporary::getPath("ajax", $filename);
@@ -1131,8 +1136,8 @@ class Controller_Cresenity extends CController {
     public function qrcode() {
         $request = $_GET;
         $data = carr::get($request, 'd');
-        $options = []; 
-        $options['s'] = carr::get($request,'s','qr');
+        $options = [];
+        $options['s'] = carr::get($request, 's', 'qr');
         $qrcode = new CImage_QRCode($data, $options);
         $qrcode->outputImage();
     }

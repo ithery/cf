@@ -9,6 +9,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CQC {
 
+    const TYPE_DATABASE_CHECKER = 'DatabaseChecker';
+    const TYPE_UNIT_TEST = 'UnitTest';
+
     /**
      * 
      * @param string $class
@@ -38,6 +41,20 @@ class CQC {
      */
     public static function createDatabaseCheckerRunner($className) {
         return new CQC_Runner_DatabaseCheckerRunner($className);
+    }
+
+    /**
+     * 
+     * @param string $className
+     * @return \CQC_Runner_UnitTestRunner
+     */
+    public static function createUnitTestRunner($className) {
+        return new CQC_Runner_UnitTestRunner($className);
+    }
+
+    public static function createProcessor($className) {
+        $inspector = new CQC_Inspector($className);
+        return $inspector->createProcessor();
     }
 
 }

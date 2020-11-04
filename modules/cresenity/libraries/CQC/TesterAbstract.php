@@ -6,7 +6,7 @@
  * @author Hery
  */
 
-abstract class CQC_TesterAbstract {
+abstract class CQC_TesterAbstract extends CQC_QCAbstract {
     
     
 }

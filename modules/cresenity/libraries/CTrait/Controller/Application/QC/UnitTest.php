@@ -26,7 +26,7 @@ trait CTrait_Controller_Application_QC_UnitTest {
         $handlerActionClick->setTarget('tableUnitTest');
         $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabUnitTest');
         $handlerActionClick->setBlockerType('shimmer');
-        
+
 
 
         $reloadOptions = array();
@@ -126,8 +126,52 @@ trait CTrait_Controller_Application_QC_UnitTest {
         return $val;
     }
 
-    public function detail($class) {
-        
+    public function detail($class = null) {
+        $app = CApp::instance();
+        if ($class == null) {
+            curl::redirect($this->controllerUrl());
+        }
+        $name = carr::last(explode("_", $class));
+
+        $app->title('Test Case of ' . $name);
+        $app->addBreadcrumb($this->getTitle(), $this->controllerUrl());
+
+        $runner = CQC::createUnitTestRunner($class);
+        $methods = $runner->getTestMethods();
+
+        foreach ($methods as $method) {
+
+
+            $template = $app->addTemplate()->setTemplate('CApp/QC/UnitTest/Method');
+            $template->setVar('method', $method);
+            $template->setVar('name', $name);
+            $template->setVar('className', $class);
+            $template->setVar('controllerUrl', static::controllerUrl());
+        }
+
+        echo $app->render();
+    }
+
+    public function check($className, $method = null) {
+        $runner = CQC::createUnitTestRunner($className);
+
+        $errCode = 0;
+        $errMessage = '';
+        $data = [];
+        $output = '';
+        try {
+            if ($method != null) {
+                $output = $runner->runMethod($method);
+            } else {
+                $output = $runner->run();
+            }
+        } catch (Exception $ex) {
+            $errCode++;
+            $errMessage = $ex->getMessage();
+        }
+        $data['output'] = $output;
+
+        echo CApp_Base::jsonResponse($errCode, $errMessage, $data);
     }
 
 }

@@ -7,14 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 7, 2020 
  * @license Ittron Global Teknologi
  */
-
-
-abstract class CQC_CheckerAbstract {
+abstract class CQC_CheckerAbstract extends CQC_QCAbstract {
     
-    
-    
-    public function getName() {
-        $className = get_called_class();
-        return carr::last(explode("_",$className));
-    }
 }
