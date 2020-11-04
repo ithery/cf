@@ -58,7 +58,7 @@ class CQC {
     }
 
     public static function cliRunner($className, $parameter = null) {
-
+        
         $argv = carr::get($_SERVER, 'argv');
         if ($parameter == null) {
             $parameter = $argv[3];

@@ -63,8 +63,8 @@ abstract class CQC_UnitTestAbstract extends CQC_QCAbstract {
         $server = carr::get($options, 'server', $_SERVER);
         $session = carr::get($options, 'session', []);
         $_POST = $post;
-        $_GET = $post;
-        $_SERVER = $post;
+        $_GET = $get;
+        $_SERVER = $server;
         $_SESSION = $session;
         try {
             ob_start();
@@ -73,17 +73,19 @@ abstract class CQC_UnitTestAbstract extends CQC_QCAbstract {
             $result = ob_get_clean();
         } catch (Exception $ex) {
             $result = ob_get_clean();
-            die(json_encode($ex->getMessage().' '.$ex->getTraceAsString()));
+            throw $ex;
+        } finally {
+            $_POST = $postTemporary;
+            $_GET = $getTemporary;
+            $_SERVER = $serverTemporary;
+            if ($haveNativeSession) {
+                $_SESSION = $sessionTemporary;
+            } else {
+                CSession::instance()->set($sessionTemporary);
+            }
         }
 
-        $_POST = $postTemporary;
-        $_GET = $getTemporary;
-        $_SERVER = $serverTemporary;
-        if ($haveNativeSession) {
-            $_SESSION = $sessionTemporary;
-        } else {
-            CSession::instance()->set($sessionTemporary);
-        }
+
 
         return $result;
     }

@@ -63,8 +63,9 @@ class CQC_Process_UnitTestProcess extends CQC_ProcessAbstract {
             $isError = true;
             $exception = $ex;
         }
-
-
+        if($exception) {
+            throw $exception;
+        }
         $result = $unitTest->result();
         return $result;
     }

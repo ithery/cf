@@ -61,7 +61,7 @@ class CQC_ProcessRunner {
      * @return \CQC_ProcessRunnerResult
      */
     public function run() {
-
+        
         $process = new Process($this->getCommand());
         $process->run();
 
