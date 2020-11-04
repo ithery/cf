@@ -9,7 +9,7 @@
     <div class="card-header with-elements">
         <div class="card-header-title"><?php echo $name; ?> [<?php echo $className; ?>::<?php echo $method; ?>]</div>
         <div class="card-header-elements ml-auto">
-            <a class="btn btn-success" id="<?php echo $this->element()->id() . '-action'; ?>" data-class="<?php echo $className; ?>" data-method="<?php echo $method; ?>" data-container-id="<?php echo $this->element()->id(); ?>" href="javascript:;"><i class="fas fa-play"></i> Check</a>
+            <a class="btn btn-success btn-run-method" id="<?php echo $this->element()->id() . '-action'; ?>" data-class="<?php echo $className; ?>" data-method="<?php echo $method; ?>" data-container-id="<?php echo $this->element()->id(); ?>" href="javascript:;"><i class="fas fa-play"></i> Check</a>
         </div>
     </div>
     <div class="card-body overflow-auto">

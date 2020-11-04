@@ -136,6 +136,18 @@ trait CTrait_Controller_Application_QC_UnitTest {
         $app->title('Test Case of ' . $name);
         $app->addBreadcrumb($this->getTitle(), $this->controllerUrl());
 
+        
+        $actionContainer = $app->addDiv()->addClass('action-container mb-3');
+        $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() . static::groupQueryString());
+        $rotateAction = $actionContainer->addAction()->setLabel('Run All')->addClass('btn-primary')->setIcon('fas fa-play')
+                ->setConfirm()
+                ->addListener('click')->addHandler('custom')
+                ->setJs("
+                    $('.btn-run-method').trigger('click');
+                    ");
+                
+
+        
         $runner = CQC::createUnitTestRunner($class);
         $methods = $runner->getTestMethods();
 
@@ -174,4 +186,17 @@ trait CTrait_Controller_Application_QC_UnitTest {
         echo CApp_Base::jsonResponse($errCode, $errMessage, $data);
     }
 
+    
+    /**
+     * 
+     * @return string
+     */
+    private static function groupQueryString() {
+        $group = carr::get($_GET, 'group');
+        $groupQueryString = '';
+        if (strlen($group) > 0) {
+            $groupQueryString = '?group=' . $group;
+        }
+        return $groupQueryString;
+    }
 }
