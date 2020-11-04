@@ -1381,8 +1381,6 @@ var Cresenity = function () {
         }
 
     };
-
-
     this.scrollTo = function (element, container) {
         if (typeof container == 'undefined') {
             container = document.body;
@@ -1391,7 +1389,6 @@ var Cresenity = function () {
             scrollTop: $(element).offset().top - ($(container).offset().top + $(container).scrollTop())
         });
     };
-
     this.formatCurrency = function (rp) {
         rp = "" + rp;
         var rupiah = "";
@@ -1531,6 +1528,11 @@ var Cresenity = function () {
         var newElement = element.clone().empty();
         newElement.removeAttr('id');
         newElement.removeAttr('data-block-html');
+        newElement.removeClass();
+        
+        
+        newElement.addClass('remove-after');
+        newElement.addClass('remove-before');
         
         
         if(!(element.is(':visible'))) {
@@ -1542,7 +1544,7 @@ var Cresenity = function () {
         
         
         if(depth>0) {
-            if(element.children(':visible').length==0) {
+            if(element.children(':visible:not(:empty)').length==0) {
                 var relativeY = element.offset().top - root.offset().top;
                 var relativeX = element.offset().left - root.offset().left;
                 styles['width']=''+element.outerWidth()+'px';
@@ -1554,7 +1556,8 @@ var Cresenity = function () {
             }
         }
         
-        
+        styles['border'] = '0';
+        styles['borderRadius'] = '0';
         
         switch(element.prop("tagName").toLowerCase()) {
             case 'ul':
@@ -1634,6 +1637,7 @@ var Cresenity = function () {
         if(blockType=='shimmer') {
             blockMessage = this.createPlaceholderElement($(selector));
             cssConfig.width='100%';
+            cssConfig.top='0px';
             overlayCssConfig.opacity = 1;
         }
         

@@ -1616,7 +1616,6 @@ body .modal{
   margin-bottom: 15px; }
 
 
-
 @-webkit-keyframes phAnimation {
   0% {
     transform: translate3d(-30%, 0, 0); }
@@ -1628,3 +1627,12 @@ body .modal{
     transform: translate3d(-30%, 0, 0); }
   100% {
     transform: translate3d(30%, 0, 0); } }
+
+
+.remove-before::before {
+    display:none!important;
+}
+
+.remove-after::after{
+    display:none!important;
+}
