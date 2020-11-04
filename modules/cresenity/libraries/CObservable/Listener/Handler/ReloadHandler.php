@@ -50,6 +50,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         $jsOptions .= "url:'" . $generatedUrl . "',";
         $jsOptions .= "method:'" . $this->method . "',";
         $jsOptions .= "dataAddition:" . $dataAddition . ",";
+        $jsOptions .= "blockType:'" . $this->getBlockerType() . "',";
 
         $jsOptions .= "}";
 
