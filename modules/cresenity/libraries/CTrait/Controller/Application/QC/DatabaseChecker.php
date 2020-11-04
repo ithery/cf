@@ -42,19 +42,19 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         if ($container == null) {
             $app = CApp::instance();
         }
-        $databaseCheckerManager = CQC_Manager::instance();
+        $qcManager = CQC_Manager::instance();
         $request = $options;
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
         $db = CDatabase::instance();
-        $listChecker = $databaseCheckerManager->checkers();
+        $listChecker = $qcManager->checkers();
         $dataChecker = array();
         $groupTab = carr::get($_GET, 'group');
-        if ($databaseCheckerManager->haveGroup()) {
+        if ($qcManager->haveDatabaseCheckerGroup()) {
             $tabList = $app->addTabList()->setAjax(false);
-            $groupKeys = $databaseCheckerManager->getGroupsKey();
-            $notGrouped = $databaseCheckerManager->checkers(false);
+            $groupKeys = $qcManager->getDatabaseCheckerGroupsKey();
+            $notGrouped = $qcManager->databaseCheckers(false);
             if (count($notGrouped) > 0) {
                 $tab = $tabList->addTab()->setLabel('Not Grouped');
                 static::reloadTableChecker($tab, ['group' => false]);
@@ -82,14 +82,14 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         if ($container == null) {
             $app = CApp::instance();
         }
-        $databaseCheckerManager = CQC_Manager::instance();
+        $qcManager = CQC_Manager::instance();
         $request = $options;
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
         $db = CDatabase::instance();
         $group = carr::get($request, 'group');
-        $listChecker = $databaseCheckerManager->checkers($group);
+        $listChecker = $qcManager->databaseCheckers($group);
         $dataChecker = array();
         foreach ($listChecker as $kChecker => $vChecker) {
             

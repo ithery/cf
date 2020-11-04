@@ -7,16 +7,30 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 7, 2020 
  * @license Ittron Global Teknologi
  */
-
-
 class CQC {
-    
+
+    /**
+     * 
+     * @param string $class
+     * @param string $name
+     * @param string $group
+     * @return void
+     */
     public static function registerDatabaseChecker($class, $name = null, $group = null) {
         return CQC_Manager::instance()->registerDatabaseChecker($class, $name, $group);
     }
-    
-    
-    
+
+    /**
+     * 
+     * @param string $class
+     * @param string $name
+     * @param string $group
+     * @return void
+     */
+    public static function registerUnitTest($class, $name = null, $group = null) {
+        return CQC_Manager::instance()->registerUnitTest($class, $name, $group);
+    }
+
     /**
      * 
      * @param string $className
@@ -25,4 +39,5 @@ class CQC {
     public static function createDatabaseCheckerRunner($className) {
         return new CQC_Runner_DatabaseCheckerRunner($className);
     }
+
 }
