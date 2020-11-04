@@ -57,4 +57,15 @@ class CQC {
         return $inspector->createProcessor();
     }
 
+    public static function cliRunner($className, $parameter = null) {
+
+        $argv = carr::get($_SERVER, 'argv');
+        if ($parameter == null) {
+            $parameter = $argv[3];
+        }
+        parse_str($parameter, $options);
+        $processor = static::createProcessor($className);
+        $processor->run($options);
+    }
+
 }

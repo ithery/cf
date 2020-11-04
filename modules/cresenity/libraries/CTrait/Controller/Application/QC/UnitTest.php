@@ -173,7 +173,9 @@ trait CTrait_Controller_Application_QC_UnitTest {
         $output = '';
         try {
             if ($method != null) {
+                
                 $output = $runner->runMethod($method);
+                
             } else {
                 $output = $runner->run();
             }

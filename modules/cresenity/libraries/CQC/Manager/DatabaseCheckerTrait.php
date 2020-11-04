@@ -48,7 +48,7 @@ trait CQC_Manager_DatabaseCheckerTrait {
             return $allDaemons;
         }
         if ($group !== null) {
-            if (!in_array($group, $this->getGroupsKey())) {
+            if (!in_array($group, $this->getDatabaseCheckerGroupsKey())) {
                 throw new Exception('group daemon ' . $group . ' not available');
             }
         }
@@ -69,33 +69,6 @@ trait CQC_Manager_DatabaseCheckerTrait {
      */
     public function haveDatabaseCheckerGroup() {
         return count($this->getDatabaseCheckerGroupsKey()) > 0;
-    }
-
-    /**
-     * 
-     * @return array
-     * @deprecated
-     */
-    public function checkers($group = null) {
-        return $this->databaseCheckers($group);
-    }
-
-    /**
-     * 
-     * @return array
-     * @deprecated
-     */
-    public function getGroupsKey() {
-        return $this->getDatabaseCheckerGroupsKey();
-    }
-
-    /**
-     * 
-     * @return boolean
-     * @deprecated
-     */
-    public function haveGroup() {
-        return $this->haveDatabaseCheckerGroup();
     }
 
 }

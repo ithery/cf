@@ -36,8 +36,8 @@ trait CQC_Manager_UnitTestTrait {
             return $allDaemons;
         }
         if ($group !== null) {
-            if (!in_array($group, $this->getGroupsKey())) {
-                throw new Exception('group daemon ' . $group . ' not available');
+            if (!in_array($group, $this->getUnitTestGroupsKey())) {
+                throw new Exception('group unit test ' . $group . ' not available');
             }
         }
         return $this->unitTestGroup[$group];

@@ -33,9 +33,12 @@ class Controller_Cresenity extends CController {
         CService::cliRunner();
     }
 
-    public function qc($className) {
-        $processor = CQC::createProcessor($className);
-        $processor->run();
+    public function qc($className=null) {
+        if($className==null) {
+            CF::show404();
+            return;
+        }
+        CQC::cliRunner($className);
     }
 
     public function ajax() {

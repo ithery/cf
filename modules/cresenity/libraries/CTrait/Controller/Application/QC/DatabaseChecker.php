@@ -48,7 +48,7 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
             $request = CApp_Base::getRequest();
         }
         $db = CDatabase::instance();
-        $listChecker = $qcManager->checkers();
+        $listChecker = $qcManager->databaseCheckers();
         $dataChecker = array();
         $groupTab = carr::get($_GET, 'group');
         if ($qcManager->haveDatabaseCheckerGroup()) {

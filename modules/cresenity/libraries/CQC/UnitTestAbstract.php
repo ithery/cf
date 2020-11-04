@@ -44,4 +44,48 @@ abstract class CQC_UnitTestAbstract extends CQC_QCAbstract {
         return $this->assertResults;
     }
 
+    public function invoke($uri, $options) {
+
+        $postTemporary = $_POST;
+        $getTemporary = $_GET;
+        $serverTemporary = $_SERVER;
+        $haveNativeSession = true;
+
+        if (isset($_SESSION)) {
+            $sessionTemporary = $_SESSION;
+        } else {
+            $haveNativeSession = false;
+            $sessionTemporary = CSession::instance()->get();
+        }
+
+        $post = carr::get($options, 'post', []);
+        $get = carr::get($options, 'get', []);
+        $server = carr::get($options, 'server', $_SERVER);
+        $session = carr::get($options, 'session', []);
+        $_POST = $post;
+        $_GET = $post;
+        $_SERVER = $post;
+        $_SESSION = $session;
+        try {
+            ob_start();
+
+            CF::invoke($uri);
+            $result = ob_get_clean();
+        } catch (Exception $ex) {
+            $result = ob_get_clean();
+            die(json_encode($ex->getMessage().' '.$ex->getTraceAsString()));
+        }
+
+        $_POST = $postTemporary;
+        $_GET = $getTemporary;
+        $_SERVER = $serverTemporary;
+        if ($haveNativeSession) {
+            $_SESSION = $sessionTemporary;
+        } else {
+            CSession::instance()->set($sessionTemporary);
+        }
+
+        return $result;
+    }
+
 }

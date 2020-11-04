@@ -38,8 +38,10 @@ class CQC_Process_UnitTestProcess extends CQC_ProcessAbstract {
         return $methods;
     }
 
-    public function run() {
-        $methods = $this->getTestMethods();
+    public function run($options=[]) {
+        $methods = carr::wrap(carr::get($options,'method',$this->getTestMethods()));
+        
+       
         $result = [];
         foreach ($methods as $method) {
             $result[$method] = $this->runMethod($method);

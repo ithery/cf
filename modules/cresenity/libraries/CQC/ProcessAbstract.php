@@ -13,5 +13,5 @@ abstract class CQC_ProcessAbstract {
         $this->className = $className;
     }
 
-    abstract public function run();
+    abstract public function run($options = []);
 }

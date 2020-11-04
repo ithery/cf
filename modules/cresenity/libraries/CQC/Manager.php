@@ -16,7 +16,7 @@ class CQC_Manager {
 
     /**
      * 
-     * @return CManager_Daemon
+     * @return CQC_Manager
      */
     public static function instance() {
 
