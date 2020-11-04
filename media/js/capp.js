@@ -1531,8 +1531,6 @@ var Cresenity = function () {
         newElement.removeClass();
         
         
-        newElement.addClass('remove-after');
-        newElement.addClass('remove-before');
         
         
         if(!(element.is(':visible'))) {
@@ -1544,6 +1542,8 @@ var Cresenity = function () {
         
         
         if(depth>0) {
+            //newElement.addClass('remove-after');
+            //newElement.addClass('remove-before');
             if(element.children(':visible:not(:empty)').length==0) {
                 var relativeY = element.offset().top - root.offset().top;
                 var relativeX = element.offset().left - root.offset().left;
@@ -1554,10 +1554,11 @@ var Cresenity = function () {
                 styles['left']=''+relativeX+'px';
                 styles['backgroundColor']='#ced4da';
             }
-        }
+        } 
         
         styles['border'] = '0';
         styles['borderRadius'] = '0';
+        styles['overflow'] = 'hidden';
         
         switch(element.prop("tagName").toLowerCase()) {
             case 'ul':
@@ -1576,12 +1577,11 @@ var Cresenity = function () {
         }
         if(depth==0) {
             styles['position'] = 'relative';
-            styles['overflow'] = 'hidden';
        
         }
         newElement.css(styles);
         if(depth==0) {
-            newElement.addClass('ph-item');
+            newElement.addClass('capp-ph-item');
             newElement.attr('style', function(i,s) { return (s || '') + 'margin: 0 !important;' });
             
         }
