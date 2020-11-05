@@ -30,3 +30,9 @@ if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator")
         "js" => array("administrator/datatables/datatables.js"),
     ));
 }
+CFConsole::addCommand([
+    CQC_Console_Command_PhpUnitCommand::class,
+    CQC_Console_Command_PhpUnitListCommand::class,
+]);
+
+

@@ -7,7 +7,7 @@
  */
 use PHPUnit\TextUI\TestRunner;
 
-class CConsole_Command_QC_PhpUnitListCommand extends CConsole_Command {
+class CQC_Console_Command_PhpUnitListCommand extends CConsole_Command {
 
     /**
      * The name and signature of the console command.
