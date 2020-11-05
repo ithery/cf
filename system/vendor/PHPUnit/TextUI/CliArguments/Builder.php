@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -28,7 +28,7 @@ use SebastianBergmann\CliParser\Parser as CliParser;
  */
 final class Builder
 {
-    private const LONG_OPTIONS = [
+    const LONG_OPTIONS = [
         'atleast-version=',
         'prepend=',
         'bootstrap=',
@@ -120,9 +120,9 @@ final class Builder
         'dump-xdebug-filter=',
     ];
 
-    private const SHORT_OPTIONS = 'd:c:hv';
+    const SHORT_OPTIONS = 'd:c:hv';
 
-    public function fromParameters(array $parameters, array $additionalLongOptions): Configuration
+    public function fromParameters(array $parameters, array $additionalLongOptions)
     {
         try {
             $options = (new CliParser)->parse(

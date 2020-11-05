@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -30,72 +30,72 @@ final class IsType extends Constraint
     /**
      * @var string
      */
-    public const TYPE_ARRAY = 'array';
+    const TYPE_ARRAY = 'array';
 
     /**
      * @var string
      */
-    public const TYPE_BOOL = 'bool';
+    const TYPE_BOOL = 'bool';
 
     /**
      * @var string
      */
-    public const TYPE_FLOAT = 'float';
+    const TYPE_FLOAT = 'float';
 
     /**
      * @var string
      */
-    public const TYPE_INT = 'int';
+    const TYPE_INT = 'int';
 
     /**
      * @var string
      */
-    public const TYPE_NULL = 'null';
+    const TYPE_NULL = 'null';
 
     /**
      * @var string
      */
-    public const TYPE_NUMERIC = 'numeric';
+    const TYPE_NUMERIC = 'numeric';
 
     /**
      * @var string
      */
-    public const TYPE_OBJECT = 'object';
+    const TYPE_OBJECT = 'object';
 
     /**
      * @var string
      */
-    public const TYPE_RESOURCE = 'resource';
+    const TYPE_RESOURCE = 'resource';
 
     /**
      * @var string
      */
-    public const TYPE_CLOSED_RESOURCE = 'resource (closed)';
+    const TYPE_CLOSED_RESOURCE = 'resource (closed)';
 
     /**
      * @var string
      */
-    public const TYPE_STRING = 'string';
+    const TYPE_STRING = 'string';
 
     /**
      * @var string
      */
-    public const TYPE_SCALAR = 'scalar';
+    const TYPE_SCALAR = 'scalar';
 
     /**
      * @var string
      */
-    public const TYPE_CALLABLE = 'callable';
+    const TYPE_CALLABLE = 'callable';
 
     /**
      * @var string
      */
-    public const TYPE_ITERABLE = 'iterable';
+    const TYPE_ITERABLE = 'iterable';
 
     /**
      * @var array<string,bool>
      */
-    private const KNOWN_TYPES = [
+    public $KNOWN_TYPES = [
         'array'             => true,
         'boolean'           => true,
         'bool'              => true,
@@ -123,9 +123,9 @@ final class IsType extends Constraint
     /**
      * @throws \PHPUnit\Framework\Exception
      */
-    public function __construct(string $type)
+    public function __construct($type)
     {
-        if (!isset(self::KNOWN_TYPES[$type])) {
+        if (!isset(self::$KNOWN_TYPES[$type])) {
             throw new \PHPUnit\Framework\Exception(
                 sprintf(
                     'Type specified for PHPUnit\Framework\Constraint\IsType <%s> ' .
@@ -141,7 +141,7 @@ final class IsType extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'is of type "%s"',
@@ -155,7 +155,7 @@ final class IsType extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         switch ($this->type) {
             case 'numeric':

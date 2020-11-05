@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -35,13 +35,13 @@ final class ObjectEquals extends Constraint
      */
     private $method;
 
-    public function __construct(object $object, string $method = 'equals')
+    public function __construct(object $object, $method = 'equals')
     {
         $this->expected = $object;
         $this->method   = $method;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'two objects are equal';
     }
@@ -54,7 +54,7 @@ final class ObjectEquals extends Constraint
      * @throws ComparisonMethodDoesNotDeclareParameterTypeException
      * @throws ComparisonMethodDoesNotAcceptParameterTypeException
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         if (!is_object($other)) {
             throw new ActualValueIsNotAnObjectException;
@@ -144,7 +144,7 @@ final class ObjectEquals extends Constraint
         return $other->{$this->method}($this->expected);
     }
 
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return $this->toString();
     }

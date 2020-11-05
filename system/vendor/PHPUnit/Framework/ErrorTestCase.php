@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,14 +34,14 @@ final class ErrorTestCase extends TestCase
      */
     private $message;
 
-    public function __construct(string $message = '')
+    public function __construct($message = '')
     {
         $this->message = $message;
 
         parent::__construct('Error');
     }
 
-    public function getMessage(): string
+    public function getMessage()
     {
         return $this->message;
     }
@@ -49,7 +49,7 @@ final class ErrorTestCase extends TestCase
     /**
      * Returns a string representation of the test case.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'Error';
     }
@@ -59,7 +59,7 @@ final class ErrorTestCase extends TestCase
      *
      * @psalm-return never-return
      */
-    protected function runTest(): void
+    protected function runTest()
     {
         throw new Error($this->message);
     }

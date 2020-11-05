@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -26,7 +26,7 @@ final class XmlTestListRenderer
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function render(TestSuite $suite): string
+    public function render(TestSuite $suite)
     {
         $writer = new XMLWriter;
 

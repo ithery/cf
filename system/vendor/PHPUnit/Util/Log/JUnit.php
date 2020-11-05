@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -106,7 +106,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * @param null|mixed $out
      */
-    public function __construct($out = null, bool $reportRiskyTests = false)
+    public function __construct($out = null, $reportRiskyTests = false)
     {
         $this->document               = new DOMDocument('1.0', 'UTF-8');
         $this->document->formatOutput = true;
@@ -122,7 +122,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * Flush buffer and close output.
      */
-    public function flush(): void
+    public function flush()
     {
         $this->write($this->getXML());
 
@@ -132,7 +132,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * An error occurred.
      */
-    public function addError(Test $test, Throwable $t, float $time): void
+    public function addError(Test $test, Throwable $t, $time)
     {
         $this->doAddFault($test, $t, 'error');
         $this->testSuiteErrors[$this->testSuiteLevel]++;
@@ -141,7 +141,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * A warning occurred.
      */
-    public function addWarning(Test $test, Warning $e, float $time): void
+    public function addWarning(Test $test, Warning $e, $time)
     {
         $this->doAddFault($test, $e, 'warning');
         $this->testSuiteWarnings[$this->testSuiteLevel]++;
@@ -150,7 +150,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * A failure occurred.
      */
-    public function addFailure(Test $test, AssertionFailedError $e, float $time): void
+    public function addFailure(Test $test, AssertionFailedError $e, $time)
     {
         $this->doAddFault($test, $e, 'failure');
         $this->testSuiteFailures[$this->testSuiteLevel]++;
@@ -159,7 +159,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, Throwable $t, float $time): void
+    public function addIncompleteTest(Test $test, Throwable $t, $time)
     {
         $this->doAddSkipped();
     }
@@ -167,7 +167,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, Throwable $t, float $time): void
+    public function addRiskyTest(Test $test, Throwable $t, $time)
     {
         if (!$this->reportRiskyTests) {
             return;
@@ -180,7 +180,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, Throwable $t, float $time): void
+    public function addSkippedTest(Test $test, Throwable $t, $time)
     {
         $this->doAddSkipped();
     }
@@ -188,7 +188,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * A testsuite started.
      */
-    public function startTestSuite(TestSuite $suite): void
+    public function startTestSuite(TestSuite $suite)
     {
         $testSuite = $this->document->createElement('testsuite');
         $testSuite->setAttribute('name', $suite->getName());
@@ -222,7 +222,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * A testsuite ended.
      */
-    public function endTestSuite(TestSuite $suite): void
+    public function endTestSuite(TestSuite $suite)
     {
         $this->testSuites[$this->testSuiteLevel]->setAttribute(
             'tests',
@@ -275,7 +275,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * A test started.
      */
-    public function startTest(Test $test): void
+    public function startTest(Test $test)
     {
         $usesDataprovider = false;
 
@@ -325,7 +325,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * A test ended.
      */
-    public function endTest(Test $test, float $time): void
+    public function endTest(Test $test, $time)
     {
         $numAssertions = 0;
 
@@ -373,12 +373,12 @@ final class JUnit extends Printer implements TestListener
     /**
      * Returns the XML as a string.
      */
-    public function getXML(): string
+    public function getXML()
     {
         return $this->document->saveXML();
     }
 
-    private function doAddFault(Test $test, Throwable $t, string $type): void
+    private function doAddFault(Test $test, Throwable $t, $type)
     {
         if ($this->currentTestCase === null) {
             return;
@@ -409,7 +409,7 @@ final class JUnit extends Printer implements TestListener
         $this->currentTestCase->appendChild($fault);
     }
 
-    private function doAddSkipped(): void
+    private function doAddSkipped()
     {
         if ($this->currentTestCase === null) {
             return;

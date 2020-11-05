@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class Filter
     /**
      * @throws Exception
      */
-    public static function getFilteredStacktrace(Throwable $t): string
+    public static function getFilteredStacktrace(Throwable $t)
     {
         $filteredStacktrace = '';
 
@@ -64,7 +64,7 @@ final class Filter
                 $filteredStacktrace .= sprintf(
                     "%s:%s\n",
                     $frame['file'],
-                    $frame['line'] ?? '?'
+                    isset($frame['line']) ? $frame['line']: '?'
                 );
             }
         }
@@ -72,7 +72,7 @@ final class Filter
         return $filteredStacktrace;
     }
 
-    private static function shouldPrintFrame(array $frame, ?string $prefix, ExcludeList $excludeList): bool
+    private static function shouldPrintFrame(array $frame, $prefix, ExcludeList $excludeList)
     {
         if (!isset($frame['file'])) {
             return false;
@@ -96,14 +96,14 @@ final class Filter
                is_file($file);
     }
 
-    private static function fileIsExcluded(string $file, ExcludeList $excludeList): bool
+    private static function fileIsExcluded($file, ExcludeList $excludeList)
     {
         return (empty($GLOBALS['__PHPUNIT_ISOLATION_EXCLUDE_LIST']) ||
                 !in_array($file, $GLOBALS['__PHPUNIT_ISOLATION_EXCLUDE_LIST'], true)) &&
                 !$excludeList->isExcluded($file);
     }
 
-    private static function frameExists(array $trace, string $file, int $line): bool
+    private static function frameExists(array $trace, $file, $line)
     {
         foreach ($trace as $frame) {
             if (isset($frame['file'], $frame['line']) && $frame['file'] === $file && $frame['line'] === $line) {

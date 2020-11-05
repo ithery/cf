@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -38,7 +38,7 @@ trait Api
     private $__phpunit_invocationMocker;
 
     /** @noinspection MagicMethodsValidityInspection */
-    public static function __phpunit_initConfigurableMethods(ConfigurableMethod ...$configurableMethods): void
+    public static function __phpunit_initConfigurableMethods(ConfigurableMethod ...$configurableMethods)
     {
         if (isset(static::$__phpunit_configurableMethods)) {
             throw new ConfigurableMethodsAlreadyInitializedException(
@@ -50,19 +50,19 @@ trait Api
     }
 
     /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_setOriginalObject($originalObject): void
+    public function __phpunit_setOriginalObject($originalObject)
     {
         $this->__phpunit_originalObject = $originalObject;
     }
 
     /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_setReturnValueGeneration(bool $returnValueGeneration): void
+    public function __phpunit_setReturnValueGeneration($returnValueGeneration)
     {
         $this->__phpunit_returnValueGeneration = $returnValueGeneration;
     }
 
     /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_getInvocationHandler(): InvocationHandler
+    public function __phpunit_getInvocationHandler()
     {
         if ($this->__phpunit_invocationMocker === null) {
             $this->__phpunit_invocationMocker = new InvocationHandler(
@@ -75,13 +75,13 @@ trait Api
     }
 
     /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_hasMatchers(): bool
+    public function __phpunit_hasMatchers()
     {
         return $this->__phpunit_getInvocationHandler()->hasMatchers();
     }
 
     /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_verify(bool $unsetInvocationMocker = true): void
+    public function __phpunit_verify($unsetInvocationMocker = true)
     {
         $this->__phpunit_getInvocationHandler()->verify();
 
@@ -90,7 +90,7 @@ trait Api
         }
     }
 
-    public function expects(InvocationOrder $matcher): InvocationMockerBuilder
+    public function expects(InvocationOrder $matcher)
     {
         return $this->__phpunit_getInvocationHandler()->expects($matcher);
     }

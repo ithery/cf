@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,5 +16,5 @@ use DOMDocument;
  */
 interface Migration
 {
-    public function migrate(DOMDocument $document): void;
+    public function migrate(DOMDocument $document);
 }

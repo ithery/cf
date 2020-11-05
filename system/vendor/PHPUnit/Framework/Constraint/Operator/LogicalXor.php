@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -20,7 +20,7 @@ final class LogicalXor extends BinaryOperator
     /**
      * Returns the name of this operator.
      */
-    public function operator(): string
+    public function operator()
     {
         return 'xor';
     }
@@ -30,7 +30,7 @@ final class LogicalXor extends BinaryOperator
      *
      * @see https://www.php.net/manual/en/language.operators.precedence.php.
      */
-    public function precedence(): int
+    public function precedence()
     {
         return 23;
     }
@@ -41,7 +41,7 @@ final class LogicalXor extends BinaryOperator
      *
      * @param mixed $other value or object to evaluate
      */
-    public function matches($other): bool
+    public function matches($other)
     {
         $constraints = $this->constraints();
 
@@ -53,7 +53,7 @@ final class LogicalXor extends BinaryOperator
 
         return array_reduce(
             $constraints,
-            static function (bool $matches, Constraint $constraint) use ($other): bool {
+            static function ($matches, Constraint $constraint) use ($other) {
                 return $matches xor $constraint->evaluate($other, '', true);
             },
             $initial->evaluate($other, '', true)

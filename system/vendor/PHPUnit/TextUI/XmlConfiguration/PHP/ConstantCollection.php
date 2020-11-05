@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class ConstantCollection implements Countable, IteratorAggregate
     /**
      * @param Constant[] $constants
      */
-    public static function fromArray(array $constants): self
+    public static function fromArray(array $constants)
     {
         return new self(...$constants);
     }
@@ -40,17 +40,17 @@ final class ConstantCollection implements Countable, IteratorAggregate
     /**
      * @return Constant[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->constants;
     }
 
-    public function count(): int
+    public function count()
     {
         return count($this->constants);
     }
 
-    public function getIterator(): ConstantCollectionIterator
+    public function getIterator()
     {
         return new ConstantCollectionIterator($this);
     }

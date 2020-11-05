@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,18 +27,18 @@ class RequiresPhpunit
     /**
      * @psalm-param '<'|'lt'|'<='|'le'|'>'|'gt'|'>='|'ge'|'=='|'='|'eq'|'!='|'<>'|'ne' $operator
      */
-    public function __construct(string $version, string $operator = '>=')
+    public function __construct($version, $operator = '>=')
     {
         $this->version  = $version;
         $this->operator = $operator;
     }
 
-    public function version(): string
+    public function version()
     {
         return $this->version;
     }
 
-    public function operator(): string
+    public function operator()
     {
         return $this->operator;
     }

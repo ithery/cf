@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -62,42 +62,42 @@ final class Matcher
         $this->invocationRule = $rule;
     }
 
-    public function hasMatchers(): bool
+    public function hasMatchers()
     {
         return !$this->invocationRule instanceof AnyInvokedCount;
     }
 
-    public function hasMethodNameRule(): bool
+    public function hasMethodNameRule()
     {
         return $this->methodNameRule !== null;
     }
 
-    public function getMethodNameRule(): MethodName
+    public function getMethodNameRule()
     {
         return $this->methodNameRule;
     }
 
-    public function setMethodNameRule(MethodName $rule): void
+    public function setMethodNameRule(MethodName $rule)
     {
         $this->methodNameRule = $rule;
     }
 
-    public function hasParametersRule(): bool
+    public function hasParametersRule()
     {
         return $this->parametersRule !== null;
     }
 
-    public function setParametersRule(ParametersRule $rule): void
+    public function setParametersRule(ParametersRule $rule)
     {
         $this->parametersRule = $rule;
     }
 
-    public function setStub(Stub $stub): void
+    public function setStub(Stub $stub)
     {
         $this->stub = $stub;
     }
 
-    public function setAfterMatchBuilderId(string $id): void
+    public function setAfterMatchBuilderId($id)
     {
         $this->afterMatchBuilderId = $id;
     }
@@ -162,7 +162,7 @@ final class Matcher
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function matches(Invocation $invocation): bool
+    public function matches(Invocation $invocation)
     {
         if ($this->afterMatchBuilderId !== null) {
             $matcher = $invocation->getObject()
@@ -212,7 +212,7 @@ final class Matcher
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function verify(): void
+    public function verify()
     {
         if ($this->methodNameRule === null) {
             throw new MethodNameNotConfiguredException;
@@ -243,7 +243,7 @@ final class Matcher
         }
     }
 
-    public function toString(): string
+    public function toString()
     {
         $list = [];
 

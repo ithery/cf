@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,12 +19,12 @@ class TestDox
      */
     private $text;
 
-    public function __construct(string $text)
+    public function __construct($text)
     {
         $this->text = $text;
     }
 
-    public function text(): string
+    public function text()
     {
         return $this->text;
     }

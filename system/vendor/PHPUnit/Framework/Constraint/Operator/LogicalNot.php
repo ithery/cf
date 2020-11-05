@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -20,7 +20,7 @@ use function preg_replace;
  */
 final class LogicalNot extends UnaryOperator
 {
-    public static function negate(string $string): string
+    public static function negate($string)
     {
         $positives = [
             'contains ',
@@ -50,7 +50,7 @@ final class LogicalNot extends UnaryOperator
 
         preg_match('/(\'[\w\W]*\')([\w\W]*)("[\w\W]*")/i', $string, $matches);
 
-        $positives = array_map(function (string $s) {
+        $positives = array_map(function ($s) {
             return '/\\b' . preg_quote($s, '/') . '/';
         }, $positives);
 
@@ -80,7 +80,7 @@ final class LogicalNot extends UnaryOperator
     /**
      * Returns the name of this operator.
      */
-    public function operator(): string
+    public function operator()
     {
         return 'not';
     }
@@ -90,7 +90,7 @@ final class LogicalNot extends UnaryOperator
      *
      * @see https://www.php.net/manual/en/language.operators.precedence.php
      */
-    public function precedence(): int
+    public function precedence()
     {
         return 5;
     }
@@ -101,7 +101,7 @@ final class LogicalNot extends UnaryOperator
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return !$this->constraint()->evaluate($other, '', true);
     }
@@ -110,7 +110,7 @@ final class LogicalNot extends UnaryOperator
      * Applies additional transformation to strings returned by toString() or
      * failureDescription().
      */
-    protected function transformString(string $string): string
+    protected function transformString($string)
     {
         return self::negate($string);
     }
@@ -122,7 +122,7 @@ final class LogicalNot extends UnaryOperator
      *
      * See Constraint::reduce() for more.
      */
-    protected function reduce(): Constraint
+    protected function reduce()
     {
         $constraint = $this->constraint();
 

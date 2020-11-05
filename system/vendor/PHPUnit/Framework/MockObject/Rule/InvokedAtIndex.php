@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -39,12 +39,12 @@ final class InvokedAtIndex extends InvocationOrder
         $this->sequenceIndex = $sequenceIndex;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'invoked at sequence index ' . $this->sequenceIndex;
     }
 
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         $this->currentIndex++;
 
@@ -57,7 +57,7 @@ final class InvokedAtIndex extends InvocationOrder
      *
      * @throws ExpectationFailedException
      */
-    public function verify(): void
+    public function verify()
     {
         if ($this->currentIndex < $this->sequenceIndex) {
             throw new ExpectationFailedException(
@@ -69,7 +69,7 @@ final class InvokedAtIndex extends InvocationOrder
         }
     }
 
-    protected function invokedDo(BaseInvocation $invocation): void
+    protected function invokedDo(BaseInvocation $invocation)
     {
     }
 }

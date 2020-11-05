@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -35,7 +35,7 @@ final class Directory
      */
     private $group;
 
-    public function __construct(string $path, string $prefix, string $suffix, string $group)
+    public function __construct($path, $prefix, $suffix, $group)
     {
         $this->path   = $path;
         $this->prefix = $prefix;
@@ -43,22 +43,22 @@ final class Directory
         $this->group  = $group;
     }
 
-    public function path(): string
+    public function path()
     {
         return $this->path;
     }
 
-    public function prefix(): string
+    public function prefix()
     {
         return $this->prefix;
     }
 
-    public function suffix(): string
+    public function suffix()
     {
         return $this->suffix;
     }
 
-    public function group(): string
+    public function group()
     {
         return $this->group;
     }

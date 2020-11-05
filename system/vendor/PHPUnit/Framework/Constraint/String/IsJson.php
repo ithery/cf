@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -21,7 +21,7 @@ final class IsJson extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'is valid JSON';
     }
@@ -32,7 +32,7 @@ final class IsJson extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         if ($other === '') {
             return false;
@@ -57,7 +57,7 @@ final class IsJson extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         if ($other === '') {
             return 'an empty string is valid JSON';

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -475,7 +475,7 @@ final class Configuration
     /**
      * @param null|int|string $columns
      */
-    public function __construct(?string $argument, ?string $atLeastVersion, ?bool $backupGlobals, ?bool $backupStaticAttributes, ?bool $beStrictAboutChangesToGlobalState, ?bool $beStrictAboutResourceUsageDuringSmallTests, ?string $bootstrap, ?bool $cacheResult, ?string $cacheResultFile, ?bool $checkVersion, ?string $colors, $columns, ?string $configuration, ?string $coverageClover, ?string $coverageCobertura, ?string $coverageCrap4J, ?string $coverageHtml, ?string $coveragePhp, ?string $coverageText, ?bool $coverageTextShowUncoveredFiles, ?bool $coverageTextShowOnlySummary, ?string $coverageXml, ?bool $pathCoverage, ?string $coverageCacheDirectory, ?bool $warmCoverageCache, ?bool $debug, ?int $defaultTimeLimit, ?bool $disableCodeCoverageIgnore, ?bool $disallowTestOutput, ?bool $disallowTodoAnnotatedTests, ?bool $enforceTimeLimit, ?array $excludeGroups, ?int $executionOrder, ?int $executionOrderDefects, ?array $extensions, ?array $unavailableExtensions, ?bool $failOnEmptyTestSuite, ?bool $failOnIncomplete, ?bool $failOnRisky, ?bool $failOnSkipped, ?bool $failOnWarning, ?string $filter, ?bool $generateConfiguration, ?bool $migrateConfiguration, ?array $groups, ?array $testsCovering, ?array $testsUsing, ?bool $help, ?string $includePath, ?array $iniSettings, ?string $junitLogfile, ?bool $listGroups, ?bool $listSuites, ?bool $listTests, ?string $listTestsXml, ?string $loader, ?bool $noCoverage, ?bool $noExtensions, ?bool $noInteraction, ?bool $noLogging, ?string $printer, ?bool $processIsolation, ?int $randomOrderSeed, ?int $repeat, ?bool $reportUselessTests, ?bool $resolveDependencies, ?bool $reverseList, ?bool $stderr, ?bool $strictCoverage, ?bool $stopOnDefect, ?bool $stopOnError, ?bool $stopOnFailure, ?bool $stopOnIncomplete, ?bool $stopOnRisky, ?bool $stopOnSkipped, ?bool $stopOnWarning, ?string $teamcityLogfile, ?array $testdoxExcludeGroups, ?array $testdoxGroups, ?string $testdoxHtmlFile, ?string $testdoxTextFile, ?string $testdoxXmlFile, ?array $testSuffixes, ?string $testSuite, array $unrecognizedOptions, ?string $unrecognizedOrderBy, ?bool $useDefaultConfiguration, ?bool $verbose, ?bool $version, ?array $coverageFilter, ?string $xdebugFilterFile)
+    public function __construct($argument, $atLeastVersion, $backupGlobals, $backupStaticAttributes, $beStrictAboutChangesToGlobalState, $beStrictAboutResourceUsageDuringSmallTests, $bootstrap, $cacheResult, $cacheResultFile, $checkVersion, $colors, $columns, $configuration, $coverageClover, $coverageCobertura, $coverageCrap4J, $coverageHtml, $coveragePhp, $coverageText, $coverageTextShowUncoveredFiles, $coverageTextShowOnlySummary, $coverageXml, $pathCoverage, $coverageCacheDirectory, $warmCoverageCache, $debug, $defaultTimeLimit, $disableCodeCoverageIgnore, $disallowTestOutput, $disallowTodoAnnotatedTests, $enforceTimeLimit, $excludeGroups, $executionOrder, $executionOrderDefects, $extensions, $unavailableExtensions, $failOnEmptyTestSuite, $failOnIncomplete, $failOnRisky, $failOnSkipped, $failOnWarning, $filter, $generateConfiguration, $migrateConfiguration, $groups, $testsCovering, $testsUsing, $help, $includePath, $iniSettings, $junitLogfile, $listGroups, $listSuites, $listTests, $listTestsXml, $loader, $noCoverage, $noExtensions, $noInteraction, $noLogging, $printer, $processIsolation, $randomOrderSeed, $repeat, $reportUselessTests, $resolveDependencies, $reverseList, $stderr, $strictCoverage, $stopOnDefect, $stopOnError, $stopOnFailure, $stopOnIncomplete, $stopOnRisky, $stopOnSkipped, $stopOnWarning, $teamcityLogfile, $testdoxExcludeGroups, $testdoxGroups, $testdoxHtmlFile, $testdoxTextFile, $testdoxXmlFile, $testSuffixes, $testSuite, array $unrecognizedOptions, $unrecognizedOrderBy, $useDefaultConfiguration, $verbose, $version, $coverageFilter, $xdebugFilterFile)
     {
         $this->argument                                   = $argument;
         $this->atLeastVersion                             = $atLeastVersion;
@@ -570,7 +570,7 @@ final class Configuration
         $this->xdebugFilterFile                           = $xdebugFilterFile;
     }
 
-    public function hasArgument(): bool
+    public function hasArgument()
     {
         return $this->argument !== null;
     }
@@ -578,7 +578,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function argument(): string
+    public function argument()
     {
         if ($this->argument === null) {
             throw new Exception;
@@ -587,7 +587,7 @@ final class Configuration
         return $this->argument;
     }
 
-    public function hasAtLeastVersion(): bool
+    public function hasAtLeastVersion()
     {
         return $this->atLeastVersion !== null;
     }
@@ -595,7 +595,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function atLeastVersion(): string
+    public function atLeastVersion()
     {
         if ($this->atLeastVersion === null) {
             throw new Exception;
@@ -604,7 +604,7 @@ final class Configuration
         return $this->atLeastVersion;
     }
 
-    public function hasBackupGlobals(): bool
+    public function hasBackupGlobals()
     {
         return $this->backupGlobals !== null;
     }
@@ -612,7 +612,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function backupGlobals(): bool
+    public function backupGlobals()
     {
         if ($this->backupGlobals === null) {
             throw new Exception;
@@ -621,7 +621,7 @@ final class Configuration
         return $this->backupGlobals;
     }
 
-    public function hasBackupStaticAttributes(): bool
+    public function hasBackupStaticAttributes()
     {
         return $this->backupStaticAttributes !== null;
     }
@@ -629,7 +629,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function backupStaticAttributes(): bool
+    public function backupStaticAttributes()
     {
         if ($this->backupStaticAttributes === null) {
             throw new Exception;
@@ -638,7 +638,7 @@ final class Configuration
         return $this->backupStaticAttributes;
     }
 
-    public function hasBeStrictAboutChangesToGlobalState(): bool
+    public function hasBeStrictAboutChangesToGlobalState()
     {
         return $this->beStrictAboutChangesToGlobalState !== null;
     }
@@ -646,7 +646,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function beStrictAboutChangesToGlobalState(): bool
+    public function beStrictAboutChangesToGlobalState()
     {
         if ($this->beStrictAboutChangesToGlobalState === null) {
             throw new Exception;
@@ -655,7 +655,7 @@ final class Configuration
         return $this->beStrictAboutChangesToGlobalState;
     }
 
-    public function hasBeStrictAboutResourceUsageDuringSmallTests(): bool
+    public function hasBeStrictAboutResourceUsageDuringSmallTests()
     {
         return $this->beStrictAboutResourceUsageDuringSmallTests !== null;
     }
@@ -663,7 +663,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function beStrictAboutResourceUsageDuringSmallTests(): bool
+    public function beStrictAboutResourceUsageDuringSmallTests()
     {
         if ($this->beStrictAboutResourceUsageDuringSmallTests === null) {
             throw new Exception;
@@ -672,7 +672,7 @@ final class Configuration
         return $this->beStrictAboutResourceUsageDuringSmallTests;
     }
 
-    public function hasBootstrap(): bool
+    public function hasBootstrap()
     {
         return $this->bootstrap !== null;
     }
@@ -680,7 +680,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function bootstrap(): string
+    public function bootstrap()
     {
         if ($this->bootstrap === null) {
             throw new Exception;
@@ -689,7 +689,7 @@ final class Configuration
         return $this->bootstrap;
     }
 
-    public function hasCacheResult(): bool
+    public function hasCacheResult()
     {
         return $this->cacheResult !== null;
     }
@@ -697,7 +697,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function cacheResult(): bool
+    public function cacheResult()
     {
         if ($this->cacheResult === null) {
             throw new Exception;
@@ -706,7 +706,7 @@ final class Configuration
         return $this->cacheResult;
     }
 
-    public function hasCacheResultFile(): bool
+    public function hasCacheResultFile()
     {
         return $this->cacheResultFile !== null;
     }
@@ -714,7 +714,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function cacheResultFile(): string
+    public function cacheResultFile()
     {
         if ($this->cacheResultFile === null) {
             throw new Exception;
@@ -723,7 +723,7 @@ final class Configuration
         return $this->cacheResultFile;
     }
 
-    public function hasCheckVersion(): bool
+    public function hasCheckVersion()
     {
         return $this->checkVersion !== null;
     }
@@ -731,7 +731,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function checkVersion(): bool
+    public function checkVersion()
     {
         if ($this->checkVersion === null) {
             throw new Exception;
@@ -740,7 +740,7 @@ final class Configuration
         return $this->checkVersion;
     }
 
-    public function hasColors(): bool
+    public function hasColors()
     {
         return $this->colors !== null;
     }
@@ -748,7 +748,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function colors(): string
+    public function colors()
     {
         if ($this->colors === null) {
             throw new Exception;
@@ -757,7 +757,7 @@ final class Configuration
         return $this->colors;
     }
 
-    public function hasColumns(): bool
+    public function hasColumns()
     {
         return $this->columns !== null;
     }
@@ -774,7 +774,7 @@ final class Configuration
         return $this->columns;
     }
 
-    public function hasConfiguration(): bool
+    public function hasConfiguration()
     {
         return $this->configuration !== null;
     }
@@ -782,7 +782,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function configuration(): string
+    public function configuration()
     {
         if ($this->configuration === null) {
             throw new Exception;
@@ -791,7 +791,7 @@ final class Configuration
         return $this->configuration;
     }
 
-    public function hasCoverageFilter(): bool
+    public function hasCoverageFilter()
     {
         return $this->coverageFilter !== null;
     }
@@ -799,7 +799,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageFilter(): array
+    public function coverageFilter()
     {
         if ($this->coverageFilter === null) {
             throw new Exception;
@@ -808,7 +808,7 @@ final class Configuration
         return $this->coverageFilter;
     }
 
-    public function hasCoverageClover(): bool
+    public function hasCoverageClover()
     {
         return $this->coverageClover !== null;
     }
@@ -816,7 +816,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageClover(): string
+    public function coverageClover()
     {
         if ($this->coverageClover === null) {
             throw new Exception;
@@ -825,7 +825,7 @@ final class Configuration
         return $this->coverageClover;
     }
 
-    public function hasCoverageCobertura(): bool
+    public function hasCoverageCobertura()
     {
         return $this->coverageCobertura !== null;
     }
@@ -833,7 +833,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageCobertura(): string
+    public function coverageCobertura()
     {
         if ($this->coverageCobertura === null) {
             throw new Exception;
@@ -842,7 +842,7 @@ final class Configuration
         return $this->coverageCobertura;
     }
 
-    public function hasCoverageCrap4J(): bool
+    public function hasCoverageCrap4J()
     {
         return $this->coverageCrap4J !== null;
     }
@@ -850,7 +850,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageCrap4J(): string
+    public function coverageCrap4J()
     {
         if ($this->coverageCrap4J === null) {
             throw new Exception;
@@ -859,7 +859,7 @@ final class Configuration
         return $this->coverageCrap4J;
     }
 
-    public function hasCoverageHtml(): bool
+    public function hasCoverageHtml()
     {
         return $this->coverageHtml !== null;
     }
@@ -867,7 +867,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageHtml(): string
+    public function coverageHtml()
     {
         if ($this->coverageHtml === null) {
             throw new Exception;
@@ -876,7 +876,7 @@ final class Configuration
         return $this->coverageHtml;
     }
 
-    public function hasCoveragePhp(): bool
+    public function hasCoveragePhp()
     {
         return $this->coveragePhp !== null;
     }
@@ -884,7 +884,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coveragePhp(): string
+    public function coveragePhp()
     {
         if ($this->coveragePhp === null) {
             throw new Exception;
@@ -893,7 +893,7 @@ final class Configuration
         return $this->coveragePhp;
     }
 
-    public function hasCoverageText(): bool
+    public function hasCoverageText()
     {
         return $this->coverageText !== null;
     }
@@ -901,7 +901,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageText(): string
+    public function coverageText()
     {
         if ($this->coverageText === null) {
             throw new Exception;
@@ -910,7 +910,7 @@ final class Configuration
         return $this->coverageText;
     }
 
-    public function hasCoverageTextShowUncoveredFiles(): bool
+    public function hasCoverageTextShowUncoveredFiles()
     {
         return $this->coverageTextShowUncoveredFiles !== null;
     }
@@ -918,7 +918,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageTextShowUncoveredFiles(): bool
+    public function coverageTextShowUncoveredFiles()
     {
         if ($this->coverageTextShowUncoveredFiles === null) {
             throw new Exception;
@@ -927,7 +927,7 @@ final class Configuration
         return $this->coverageTextShowUncoveredFiles;
     }
 
-    public function hasCoverageTextShowOnlySummary(): bool
+    public function hasCoverageTextShowOnlySummary()
     {
         return $this->coverageTextShowOnlySummary !== null;
     }
@@ -935,7 +935,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageTextShowOnlySummary(): bool
+    public function coverageTextShowOnlySummary()
     {
         if ($this->coverageTextShowOnlySummary === null) {
             throw new Exception;
@@ -944,7 +944,7 @@ final class Configuration
         return $this->coverageTextShowOnlySummary;
     }
 
-    public function hasCoverageXml(): bool
+    public function hasCoverageXml()
     {
         return $this->coverageXml !== null;
     }
@@ -952,7 +952,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageXml(): string
+    public function coverageXml()
     {
         if ($this->coverageXml === null) {
             throw new Exception;
@@ -961,7 +961,7 @@ final class Configuration
         return $this->coverageXml;
     }
 
-    public function hasPathCoverage(): bool
+    public function hasPathCoverage()
     {
         return $this->pathCoverage !== null;
     }
@@ -969,7 +969,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function pathCoverage(): bool
+    public function pathCoverage()
     {
         if ($this->pathCoverage === null) {
             throw new Exception;
@@ -978,7 +978,7 @@ final class Configuration
         return $this->pathCoverage;
     }
 
-    public function hasCoverageCacheDirectory(): bool
+    public function hasCoverageCacheDirectory()
     {
         return $this->coverageCacheDirectory !== null;
     }
@@ -986,7 +986,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function coverageCacheDirectory(): string
+    public function coverageCacheDirectory()
     {
         if ($this->coverageCacheDirectory === null) {
             throw new Exception;
@@ -995,7 +995,7 @@ final class Configuration
         return $this->coverageCacheDirectory;
     }
 
-    public function hasWarmCoverageCache(): bool
+    public function hasWarmCoverageCache()
     {
         return $this->warmCoverageCache !== null;
     }
@@ -1003,7 +1003,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function warmCoverageCache(): bool
+    public function warmCoverageCache()
     {
         if ($this->warmCoverageCache === null) {
             throw new Exception;
@@ -1012,7 +1012,7 @@ final class Configuration
         return $this->warmCoverageCache;
     }
 
-    public function hasDebug(): bool
+    public function hasDebug()
     {
         return $this->debug !== null;
     }
@@ -1020,7 +1020,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function debug(): bool
+    public function debug()
     {
         if ($this->debug === null) {
             throw new Exception;
@@ -1029,7 +1029,7 @@ final class Configuration
         return $this->debug;
     }
 
-    public function hasDefaultTimeLimit(): bool
+    public function hasDefaultTimeLimit()
     {
         return $this->defaultTimeLimit !== null;
     }
@@ -1037,7 +1037,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function defaultTimeLimit(): int
+    public function defaultTimeLimit()
     {
         if ($this->defaultTimeLimit === null) {
             throw new Exception;
@@ -1046,7 +1046,7 @@ final class Configuration
         return $this->defaultTimeLimit;
     }
 
-    public function hasDisableCodeCoverageIgnore(): bool
+    public function hasDisableCodeCoverageIgnore()
     {
         return $this->disableCodeCoverageIgnore !== null;
     }
@@ -1054,7 +1054,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function disableCodeCoverageIgnore(): bool
+    public function disableCodeCoverageIgnore()
     {
         if ($this->disableCodeCoverageIgnore === null) {
             throw new Exception;
@@ -1063,7 +1063,7 @@ final class Configuration
         return $this->disableCodeCoverageIgnore;
     }
 
-    public function hasDisallowTestOutput(): bool
+    public function hasDisallowTestOutput()
     {
         return $this->disallowTestOutput !== null;
     }
@@ -1071,7 +1071,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function disallowTestOutput(): bool
+    public function disallowTestOutput()
     {
         if ($this->disallowTestOutput === null) {
             throw new Exception;
@@ -1080,7 +1080,7 @@ final class Configuration
         return $this->disallowTestOutput;
     }
 
-    public function hasDisallowTodoAnnotatedTests(): bool
+    public function hasDisallowTodoAnnotatedTests()
     {
         return $this->disallowTodoAnnotatedTests !== null;
     }
@@ -1088,7 +1088,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function disallowTodoAnnotatedTests(): bool
+    public function disallowTodoAnnotatedTests()
     {
         if ($this->disallowTodoAnnotatedTests === null) {
             throw new Exception;
@@ -1097,7 +1097,7 @@ final class Configuration
         return $this->disallowTodoAnnotatedTests;
     }
 
-    public function hasEnforceTimeLimit(): bool
+    public function hasEnforceTimeLimit()
     {
         return $this->enforceTimeLimit !== null;
     }
@@ -1105,7 +1105,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function enforceTimeLimit(): bool
+    public function enforceTimeLimit()
     {
         if ($this->enforceTimeLimit === null) {
             throw new Exception;
@@ -1114,7 +1114,7 @@ final class Configuration
         return $this->enforceTimeLimit;
     }
 
-    public function hasExcludeGroups(): bool
+    public function hasExcludeGroups()
     {
         return $this->excludeGroups !== null;
     }
@@ -1122,7 +1122,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function excludeGroups(): array
+    public function excludeGroups()
     {
         if ($this->excludeGroups === null) {
             throw new Exception;
@@ -1131,7 +1131,7 @@ final class Configuration
         return $this->excludeGroups;
     }
 
-    public function hasExecutionOrder(): bool
+    public function hasExecutionOrder()
     {
         return $this->executionOrder !== null;
     }
@@ -1139,7 +1139,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function executionOrder(): int
+    public function executionOrder()
     {
         if ($this->executionOrder === null) {
             throw new Exception;
@@ -1148,7 +1148,7 @@ final class Configuration
         return $this->executionOrder;
     }
 
-    public function hasExecutionOrderDefects(): bool
+    public function hasExecutionOrderDefects()
     {
         return $this->executionOrderDefects !== null;
     }
@@ -1156,7 +1156,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function executionOrderDefects(): int
+    public function executionOrderDefects()
     {
         if ($this->executionOrderDefects === null) {
             throw new Exception;
@@ -1165,7 +1165,7 @@ final class Configuration
         return $this->executionOrderDefects;
     }
 
-    public function hasFailOnEmptyTestSuite(): bool
+    public function hasFailOnEmptyTestSuite()
     {
         return $this->failOnEmptyTestSuite !== null;
     }
@@ -1173,7 +1173,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function failOnEmptyTestSuite(): bool
+    public function failOnEmptyTestSuite()
     {
         if ($this->failOnEmptyTestSuite === null) {
             throw new Exception;
@@ -1182,7 +1182,7 @@ final class Configuration
         return $this->failOnEmptyTestSuite;
     }
 
-    public function hasFailOnIncomplete(): bool
+    public function hasFailOnIncomplete()
     {
         return $this->failOnIncomplete !== null;
     }
@@ -1190,7 +1190,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function failOnIncomplete(): bool
+    public function failOnIncomplete()
     {
         if ($this->failOnIncomplete === null) {
             throw new Exception;
@@ -1199,7 +1199,7 @@ final class Configuration
         return $this->failOnIncomplete;
     }
 
-    public function hasFailOnRisky(): bool
+    public function hasFailOnRisky()
     {
         return $this->failOnRisky !== null;
     }
@@ -1207,7 +1207,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function failOnRisky(): bool
+    public function failOnRisky()
     {
         if ($this->failOnRisky === null) {
             throw new Exception;
@@ -1216,7 +1216,7 @@ final class Configuration
         return $this->failOnRisky;
     }
 
-    public function hasFailOnSkipped(): bool
+    public function hasFailOnSkipped()
     {
         return $this->failOnSkipped !== null;
     }
@@ -1224,7 +1224,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function failOnSkipped(): bool
+    public function failOnSkipped()
     {
         if ($this->failOnSkipped === null) {
             throw new Exception;
@@ -1233,7 +1233,7 @@ final class Configuration
         return $this->failOnSkipped;
     }
 
-    public function hasFailOnWarning(): bool
+    public function hasFailOnWarning()
     {
         return $this->failOnWarning !== null;
     }
@@ -1241,7 +1241,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function failOnWarning(): bool
+    public function failOnWarning()
     {
         if ($this->failOnWarning === null) {
             throw new Exception;
@@ -1250,7 +1250,7 @@ final class Configuration
         return $this->failOnWarning;
     }
 
-    public function hasFilter(): bool
+    public function hasFilter()
     {
         return $this->filter !== null;
     }
@@ -1258,7 +1258,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function filter(): string
+    public function filter()
     {
         if ($this->filter === null) {
             throw new Exception;
@@ -1267,7 +1267,7 @@ final class Configuration
         return $this->filter;
     }
 
-    public function hasGenerateConfiguration(): bool
+    public function hasGenerateConfiguration()
     {
         return $this->generateConfiguration !== null;
     }
@@ -1275,7 +1275,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function generateConfiguration(): bool
+    public function generateConfiguration()
     {
         if ($this->generateConfiguration === null) {
             throw new Exception;
@@ -1284,7 +1284,7 @@ final class Configuration
         return $this->generateConfiguration;
     }
 
-    public function hasMigrateConfiguration(): bool
+    public function hasMigrateConfiguration()
     {
         return $this->migrateConfiguration !== null;
     }
@@ -1292,7 +1292,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function migrateConfiguration(): bool
+    public function migrateConfiguration()
     {
         if ($this->migrateConfiguration === null) {
             throw new Exception;
@@ -1301,7 +1301,7 @@ final class Configuration
         return $this->migrateConfiguration;
     }
 
-    public function hasGroups(): bool
+    public function hasGroups()
     {
         return $this->groups !== null;
     }
@@ -1309,7 +1309,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function groups(): array
+    public function groups()
     {
         if ($this->groups === null) {
             throw new Exception;
@@ -1318,7 +1318,7 @@ final class Configuration
         return $this->groups;
     }
 
-    public function hasTestsCovering(): bool
+    public function hasTestsCovering()
     {
         return $this->testsCovering !== null;
     }
@@ -1326,7 +1326,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testsCovering(): array
+    public function testsCovering()
     {
         if ($this->testsCovering === null) {
             throw new Exception;
@@ -1335,7 +1335,7 @@ final class Configuration
         return $this->testsCovering;
     }
 
-    public function hasTestsUsing(): bool
+    public function hasTestsUsing()
     {
         return $this->testsUsing !== null;
     }
@@ -1343,7 +1343,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testsUsing(): array
+    public function testsUsing()
     {
         if ($this->testsUsing === null) {
             throw new Exception;
@@ -1352,7 +1352,7 @@ final class Configuration
         return $this->testsUsing;
     }
 
-    public function hasHelp(): bool
+    public function hasHelp()
     {
         return $this->help !== null;
     }
@@ -1360,7 +1360,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function help(): bool
+    public function help()
     {
         if ($this->help === null) {
             throw new Exception;
@@ -1369,7 +1369,7 @@ final class Configuration
         return $this->help;
     }
 
-    public function hasIncludePath(): bool
+    public function hasIncludePath()
     {
         return $this->includePath !== null;
     }
@@ -1377,7 +1377,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function includePath(): string
+    public function includePath()
     {
         if ($this->includePath === null) {
             throw new Exception;
@@ -1386,7 +1386,7 @@ final class Configuration
         return $this->includePath;
     }
 
-    public function hasIniSettings(): bool
+    public function hasIniSettings()
     {
         return $this->iniSettings !== null;
     }
@@ -1394,7 +1394,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function iniSettings(): array
+    public function iniSettings()
     {
         if ($this->iniSettings === null) {
             throw new Exception;
@@ -1403,7 +1403,7 @@ final class Configuration
         return $this->iniSettings;
     }
 
-    public function hasJunitLogfile(): bool
+    public function hasJunitLogfile()
     {
         return $this->junitLogfile !== null;
     }
@@ -1411,7 +1411,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function junitLogfile(): string
+    public function junitLogfile()
     {
         if ($this->junitLogfile === null) {
             throw new Exception;
@@ -1420,7 +1420,7 @@ final class Configuration
         return $this->junitLogfile;
     }
 
-    public function hasListGroups(): bool
+    public function hasListGroups()
     {
         return $this->listGroups !== null;
     }
@@ -1428,7 +1428,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function listGroups(): bool
+    public function listGroups()
     {
         if ($this->listGroups === null) {
             throw new Exception;
@@ -1437,7 +1437,7 @@ final class Configuration
         return $this->listGroups;
     }
 
-    public function hasListSuites(): bool
+    public function hasListSuites()
     {
         return $this->listSuites !== null;
     }
@@ -1445,7 +1445,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function listSuites(): bool
+    public function listSuites()
     {
         if ($this->listSuites === null) {
             throw new Exception;
@@ -1454,7 +1454,7 @@ final class Configuration
         return $this->listSuites;
     }
 
-    public function hasListTests(): bool
+    public function hasListTests()
     {
         return $this->listTests !== null;
     }
@@ -1462,7 +1462,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function listTests(): bool
+    public function listTests()
     {
         if ($this->listTests === null) {
             throw new Exception;
@@ -1471,7 +1471,7 @@ final class Configuration
         return $this->listTests;
     }
 
-    public function hasListTestsXml(): bool
+    public function hasListTestsXml()
     {
         return $this->listTestsXml !== null;
     }
@@ -1479,7 +1479,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function listTestsXml(): string
+    public function listTestsXml()
     {
         if ($this->listTestsXml === null) {
             throw new Exception;
@@ -1488,7 +1488,7 @@ final class Configuration
         return $this->listTestsXml;
     }
 
-    public function hasLoader(): bool
+    public function hasLoader()
     {
         return $this->loader !== null;
     }
@@ -1496,7 +1496,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function loader(): string
+    public function loader()
     {
         if ($this->loader === null) {
             throw new Exception;
@@ -1505,7 +1505,7 @@ final class Configuration
         return $this->loader;
     }
 
-    public function hasNoCoverage(): bool
+    public function hasNoCoverage()
     {
         return $this->noCoverage !== null;
     }
@@ -1513,7 +1513,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function noCoverage(): bool
+    public function noCoverage()
     {
         if ($this->noCoverage === null) {
             throw new Exception;
@@ -1522,7 +1522,7 @@ final class Configuration
         return $this->noCoverage;
     }
 
-    public function hasNoExtensions(): bool
+    public function hasNoExtensions()
     {
         return $this->noExtensions !== null;
     }
@@ -1530,7 +1530,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function noExtensions(): bool
+    public function noExtensions()
     {
         if ($this->noExtensions === null) {
             throw new Exception;
@@ -1539,7 +1539,7 @@ final class Configuration
         return $this->noExtensions;
     }
 
-    public function hasExtensions(): bool
+    public function hasExtensions()
     {
         return $this->extensions !== null;
     }
@@ -1547,7 +1547,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function extensions(): array
+    public function extensions()
     {
         if ($this->extensions === null) {
             throw new Exception;
@@ -1556,7 +1556,7 @@ final class Configuration
         return $this->extensions;
     }
 
-    public function hasUnavailableExtensions(): bool
+    public function hasUnavailableExtensions()
     {
         return $this->unavailableExtensions !== null;
     }
@@ -1564,7 +1564,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function unavailableExtensions(): array
+    public function unavailableExtensions()
     {
         if ($this->unavailableExtensions === null) {
             throw new Exception;
@@ -1573,7 +1573,7 @@ final class Configuration
         return $this->unavailableExtensions;
     }
 
-    public function hasNoInteraction(): bool
+    public function hasNoInteraction()
     {
         return $this->noInteraction !== null;
     }
@@ -1581,7 +1581,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function noInteraction(): bool
+    public function noInteraction()
     {
         if ($this->noInteraction === null) {
             throw new Exception;
@@ -1590,7 +1590,7 @@ final class Configuration
         return $this->noInteraction;
     }
 
-    public function hasNoLogging(): bool
+    public function hasNoLogging()
     {
         return $this->noLogging !== null;
     }
@@ -1598,7 +1598,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function noLogging(): bool
+    public function noLogging()
     {
         if ($this->noLogging === null) {
             throw new Exception;
@@ -1607,7 +1607,7 @@ final class Configuration
         return $this->noLogging;
     }
 
-    public function hasPrinter(): bool
+    public function hasPrinter()
     {
         return $this->printer !== null;
     }
@@ -1615,7 +1615,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function printer(): string
+    public function printer()
     {
         if ($this->printer === null) {
             throw new Exception;
@@ -1624,7 +1624,7 @@ final class Configuration
         return $this->printer;
     }
 
-    public function hasProcessIsolation(): bool
+    public function hasProcessIsolation()
     {
         return $this->processIsolation !== null;
     }
@@ -1632,7 +1632,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function processIsolation(): bool
+    public function processIsolation()
     {
         if ($this->processIsolation === null) {
             throw new Exception;
@@ -1641,7 +1641,7 @@ final class Configuration
         return $this->processIsolation;
     }
 
-    public function hasRandomOrderSeed(): bool
+    public function hasRandomOrderSeed()
     {
         return $this->randomOrderSeed !== null;
     }
@@ -1649,7 +1649,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function randomOrderSeed(): int
+    public function randomOrderSeed()
     {
         if ($this->randomOrderSeed === null) {
             throw new Exception;
@@ -1658,7 +1658,7 @@ final class Configuration
         return $this->randomOrderSeed;
     }
 
-    public function hasRepeat(): bool
+    public function hasRepeat()
     {
         return $this->repeat !== null;
     }
@@ -1666,7 +1666,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function repeat(): int
+    public function repeat()
     {
         if ($this->repeat === null) {
             throw new Exception;
@@ -1675,7 +1675,7 @@ final class Configuration
         return $this->repeat;
     }
 
-    public function hasReportUselessTests(): bool
+    public function hasReportUselessTests()
     {
         return $this->reportUselessTests !== null;
     }
@@ -1683,7 +1683,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function reportUselessTests(): bool
+    public function reportUselessTests()
     {
         if ($this->reportUselessTests === null) {
             throw new Exception;
@@ -1692,7 +1692,7 @@ final class Configuration
         return $this->reportUselessTests;
     }
 
-    public function hasResolveDependencies(): bool
+    public function hasResolveDependencies()
     {
         return $this->resolveDependencies !== null;
     }
@@ -1700,7 +1700,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function resolveDependencies(): bool
+    public function resolveDependencies()
     {
         if ($this->resolveDependencies === null) {
             throw new Exception;
@@ -1709,7 +1709,7 @@ final class Configuration
         return $this->resolveDependencies;
     }
 
-    public function hasReverseList(): bool
+    public function hasReverseList()
     {
         return $this->reverseList !== null;
     }
@@ -1717,7 +1717,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function reverseList(): bool
+    public function reverseList()
     {
         if ($this->reverseList === null) {
             throw new Exception;
@@ -1726,7 +1726,7 @@ final class Configuration
         return $this->reverseList;
     }
 
-    public function hasStderr(): bool
+    public function hasStderr()
     {
         return $this->stderr !== null;
     }
@@ -1734,7 +1734,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stderr(): bool
+    public function stderr()
     {
         if ($this->stderr === null) {
             throw new Exception;
@@ -1743,7 +1743,7 @@ final class Configuration
         return $this->stderr;
     }
 
-    public function hasStrictCoverage(): bool
+    public function hasStrictCoverage()
     {
         return $this->strictCoverage !== null;
     }
@@ -1751,7 +1751,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function strictCoverage(): bool
+    public function strictCoverage()
     {
         if ($this->strictCoverage === null) {
             throw new Exception;
@@ -1760,7 +1760,7 @@ final class Configuration
         return $this->strictCoverage;
     }
 
-    public function hasStopOnDefect(): bool
+    public function hasStopOnDefect()
     {
         return $this->stopOnDefect !== null;
     }
@@ -1768,7 +1768,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stopOnDefect(): bool
+    public function stopOnDefect()
     {
         if ($this->stopOnDefect === null) {
             throw new Exception;
@@ -1777,7 +1777,7 @@ final class Configuration
         return $this->stopOnDefect;
     }
 
-    public function hasStopOnError(): bool
+    public function hasStopOnError()
     {
         return $this->stopOnError !== null;
     }
@@ -1785,7 +1785,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stopOnError(): bool
+    public function stopOnError()
     {
         if ($this->stopOnError === null) {
             throw new Exception;
@@ -1794,7 +1794,7 @@ final class Configuration
         return $this->stopOnError;
     }
 
-    public function hasStopOnFailure(): bool
+    public function hasStopOnFailure()
     {
         return $this->stopOnFailure !== null;
     }
@@ -1802,7 +1802,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stopOnFailure(): bool
+    public function stopOnFailure()
     {
         if ($this->stopOnFailure === null) {
             throw new Exception;
@@ -1811,7 +1811,7 @@ final class Configuration
         return $this->stopOnFailure;
     }
 
-    public function hasStopOnIncomplete(): bool
+    public function hasStopOnIncomplete()
     {
         return $this->stopOnIncomplete !== null;
     }
@@ -1819,7 +1819,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stopOnIncomplete(): bool
+    public function stopOnIncomplete()
     {
         if ($this->stopOnIncomplete === null) {
             throw new Exception;
@@ -1828,7 +1828,7 @@ final class Configuration
         return $this->stopOnIncomplete;
     }
 
-    public function hasStopOnRisky(): bool
+    public function hasStopOnRisky()
     {
         return $this->stopOnRisky !== null;
     }
@@ -1836,7 +1836,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stopOnRisky(): bool
+    public function stopOnRisky()
     {
         if ($this->stopOnRisky === null) {
             throw new Exception;
@@ -1845,7 +1845,7 @@ final class Configuration
         return $this->stopOnRisky;
     }
 
-    public function hasStopOnSkipped(): bool
+    public function hasStopOnSkipped()
     {
         return $this->stopOnSkipped !== null;
     }
@@ -1853,7 +1853,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stopOnSkipped(): bool
+    public function stopOnSkipped()
     {
         if ($this->stopOnSkipped === null) {
             throw new Exception;
@@ -1862,7 +1862,7 @@ final class Configuration
         return $this->stopOnSkipped;
     }
 
-    public function hasStopOnWarning(): bool
+    public function hasStopOnWarning()
     {
         return $this->stopOnWarning !== null;
     }
@@ -1870,7 +1870,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function stopOnWarning(): bool
+    public function stopOnWarning()
     {
         if ($this->stopOnWarning === null) {
             throw new Exception;
@@ -1879,7 +1879,7 @@ final class Configuration
         return $this->stopOnWarning;
     }
 
-    public function hasTeamcityLogfile(): bool
+    public function hasTeamcityLogfile()
     {
         return $this->teamcityLogfile !== null;
     }
@@ -1887,7 +1887,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function teamcityLogfile(): string
+    public function teamcityLogfile()
     {
         if ($this->teamcityLogfile === null) {
             throw new Exception;
@@ -1896,7 +1896,7 @@ final class Configuration
         return $this->teamcityLogfile;
     }
 
-    public function hasTestdoxExcludeGroups(): bool
+    public function hasTestdoxExcludeGroups()
     {
         return $this->testdoxExcludeGroups !== null;
     }
@@ -1904,7 +1904,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testdoxExcludeGroups(): array
+    public function testdoxExcludeGroups()
     {
         if ($this->testdoxExcludeGroups === null) {
             throw new Exception;
@@ -1913,7 +1913,7 @@ final class Configuration
         return $this->testdoxExcludeGroups;
     }
 
-    public function hasTestdoxGroups(): bool
+    public function hasTestdoxGroups()
     {
         return $this->testdoxGroups !== null;
     }
@@ -1921,7 +1921,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testdoxGroups(): array
+    public function testdoxGroups()
     {
         if ($this->testdoxGroups === null) {
             throw new Exception;
@@ -1930,7 +1930,7 @@ final class Configuration
         return $this->testdoxGroups;
     }
 
-    public function hasTestdoxHtmlFile(): bool
+    public function hasTestdoxHtmlFile()
     {
         return $this->testdoxHtmlFile !== null;
     }
@@ -1938,7 +1938,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testdoxHtmlFile(): string
+    public function testdoxHtmlFile()
     {
         if ($this->testdoxHtmlFile === null) {
             throw new Exception;
@@ -1947,7 +1947,7 @@ final class Configuration
         return $this->testdoxHtmlFile;
     }
 
-    public function hasTestdoxTextFile(): bool
+    public function hasTestdoxTextFile()
     {
         return $this->testdoxTextFile !== null;
     }
@@ -1955,7 +1955,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testdoxTextFile(): string
+    public function testdoxTextFile()
     {
         if ($this->testdoxTextFile === null) {
             throw new Exception;
@@ -1964,7 +1964,7 @@ final class Configuration
         return $this->testdoxTextFile;
     }
 
-    public function hasTestdoxXmlFile(): bool
+    public function hasTestdoxXmlFile()
     {
         return $this->testdoxXmlFile !== null;
     }
@@ -1972,7 +1972,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testdoxXmlFile(): string
+    public function testdoxXmlFile()
     {
         if ($this->testdoxXmlFile === null) {
             throw new Exception;
@@ -1981,7 +1981,7 @@ final class Configuration
         return $this->testdoxXmlFile;
     }
 
-    public function hasTestSuffixes(): bool
+    public function hasTestSuffixes()
     {
         return $this->testSuffixes !== null;
     }
@@ -1989,7 +1989,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testSuffixes(): array
+    public function testSuffixes()
     {
         if ($this->testSuffixes === null) {
             throw new Exception;
@@ -1998,7 +1998,7 @@ final class Configuration
         return $this->testSuffixes;
     }
 
-    public function hasTestSuite(): bool
+    public function hasTestSuite()
     {
         return $this->testSuite !== null;
     }
@@ -2006,7 +2006,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function testSuite(): string
+    public function testSuite()
     {
         if ($this->testSuite === null) {
             throw new Exception;
@@ -2015,12 +2015,12 @@ final class Configuration
         return $this->testSuite;
     }
 
-    public function unrecognizedOptions(): array
+    public function unrecognizedOptions()
     {
         return $this->unrecognizedOptions;
     }
 
-    public function hasUnrecognizedOrderBy(): bool
+    public function hasUnrecognizedOrderBy()
     {
         return $this->unrecognizedOrderBy !== null;
     }
@@ -2028,7 +2028,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function unrecognizedOrderBy(): string
+    public function unrecognizedOrderBy()
     {
         if ($this->unrecognizedOrderBy === null) {
             throw new Exception;
@@ -2037,7 +2037,7 @@ final class Configuration
         return $this->unrecognizedOrderBy;
     }
 
-    public function hasUseDefaultConfiguration(): bool
+    public function hasUseDefaultConfiguration()
     {
         return $this->useDefaultConfiguration !== null;
     }
@@ -2045,7 +2045,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function useDefaultConfiguration(): bool
+    public function useDefaultConfiguration()
     {
         if ($this->useDefaultConfiguration === null) {
             throw new Exception;
@@ -2054,7 +2054,7 @@ final class Configuration
         return $this->useDefaultConfiguration;
     }
 
-    public function hasVerbose(): bool
+    public function hasVerbose()
     {
         return $this->verbose !== null;
     }
@@ -2062,7 +2062,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function verbose(): bool
+    public function verbose()
     {
         if ($this->verbose === null) {
             throw new Exception;
@@ -2071,7 +2071,7 @@ final class Configuration
         return $this->verbose;
     }
 
-    public function hasVersion(): bool
+    public function hasVersion()
     {
         return $this->version !== null;
     }
@@ -2079,7 +2079,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function version(): bool
+    public function version()
     {
         if ($this->version === null) {
             throw new Exception;
@@ -2088,7 +2088,7 @@ final class Configuration
         return $this->version;
     }
 
-    public function hasXdebugFilterFile(): bool
+    public function hasXdebugFilterFile()
     {
         return $this->xdebugFilterFile !== null;
     }
@@ -2096,7 +2096,7 @@ final class Configuration
     /**
      * @throws Exception
      */
-    public function xdebugFilterFile(): string
+    public function xdebugFilterFile()
     {
         if ($this->xdebugFilterFile === null) {
             throw new Exception;

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,24 +32,24 @@ class RequiresPhpExtension
     /**
      * @psalm-param '<'|'lt'|'<='|'le'|'>'|'gt'|'>='|'ge'|'=='|'='|'eq'|'!='|'<>'|'ne' $operator
      */
-    public function __construct(string $extension, string $version, string $operator = '>=')
+    public function __construct($extension, $version, $operator = '>=')
     {
         $this->extension = $extension;
         $this->version   = $version;
         $this->operator  = $operator;
     }
 
-    public function extension(): string
+    public function extension()
     {
         return $this->extension;
     }
 
-    public function version(): string
+    public function version()
     {
         return $this->version;
     }
 
-    public function operator(): string
+    public function operator()
     {
         return $this->operator;
     }

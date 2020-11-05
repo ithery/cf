@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -31,22 +31,22 @@ final class Groups
         $this->exclude = $exclude;
     }
 
-    public function hasInclude(): bool
+    public function hasInclude()
     {
         return !$this->include->isEmpty();
     }
 
-    public function include(): GroupCollection
+    public function getInclude()
     {
         return $this->include;
     }
 
-    public function hasExclude(): bool
+    public function hasExclude()
     {
         return !$this->exclude->isEmpty();
     }
 
-    public function exclude(): GroupCollection
+    public function exclude()
     {
         return $this->exclude;
     }

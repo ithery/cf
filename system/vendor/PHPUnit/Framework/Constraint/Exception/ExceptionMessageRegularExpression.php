@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -23,12 +23,12 @@ final class ExceptionMessageRegularExpression extends Constraint
      */
     private $expectedMessageRegExp;
 
-    public function __construct(string $expected)
+    public function __construct($expected)
     {
         $this->expectedMessageRegExp = $expected;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'exception message matches ';
     }
@@ -42,7 +42,7 @@ final class ExceptionMessageRegularExpression extends Constraint
      * @throws Exception
      * @throws \PHPUnit\Framework\Exception
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         $match = RegularExpressionUtil::safeMatch($this->expectedMessageRegExp, $other->getMessage());
 
@@ -63,7 +63,7 @@ final class ExceptionMessageRegularExpression extends Constraint
      *
      * @param mixed $other evaluated value or object
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return sprintf(
             "exception message '%s' matches '%s'",

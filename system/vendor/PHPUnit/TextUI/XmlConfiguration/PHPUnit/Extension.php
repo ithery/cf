@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,7 +34,7 @@ final class Extension
     /**
      * @psalm-param class-string $className
      */
-    public function __construct(string $className, string $sourceFile, array $arguments)
+    public function __construct($className, $sourceFile, array $arguments)
     {
         $this->className  = $className;
         $this->sourceFile = $sourceFile;
@@ -44,27 +44,27 @@ final class Extension
     /**
      * @psalm-return class-string
      */
-    public function className(): string
+    public function className()
     {
         return $this->className;
     }
 
-    public function hasSourceFile(): bool
+    public function hasSourceFile()
     {
         return $this->sourceFile !== '';
     }
 
-    public function sourceFile(): string
+    public function sourceFile()
     {
         return $this->sourceFile;
     }
 
-    public function hasArguments(): bool
+    public function hasArguments()
     {
         return !empty($this->arguments);
     }
 
-    public function arguments(): array
+    public function arguments()
     {
         return $this->arguments;
     }

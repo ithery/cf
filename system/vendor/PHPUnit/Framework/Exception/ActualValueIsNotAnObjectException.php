@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class ActualValueIsNotAnObjectException extends Exception
         );
     }
 
-    public function __toString(): string
+    public function __toString()
     {
         return $this->getMessage() . PHP_EOL;
     }

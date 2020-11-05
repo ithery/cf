@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,7 +32,7 @@ abstract class TraversableContains extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString(): string
+    public function toString()
     {
         return 'contains ' . $this->exporter()->export($this->value);
     }
@@ -47,7 +47,7 @@ abstract class TraversableContains extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return sprintf(
             '%s %s',

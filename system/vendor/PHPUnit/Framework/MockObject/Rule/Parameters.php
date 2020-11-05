@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -55,7 +55,7 @@ final class Parameters implements ParametersRule
         }
     }
 
-    public function toString(): string
+    public function toString()
     {
         $text = 'with parameter';
 
@@ -73,7 +73,7 @@ final class Parameters implements ParametersRule
     /**
      * @throws Exception
      */
-    public function apply(BaseInvocation $invocation): void
+    public function apply(BaseInvocation $invocation)
     {
         $this->invocation                  = $invocation;
         $this->parameterVerificationResult = null;
@@ -95,7 +95,7 @@ final class Parameters implements ParametersRule
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function verify(): void
+    public function verify()
     {
         $this->doVerify();
     }
@@ -104,7 +104,7 @@ final class Parameters implements ParametersRule
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function doVerify(): bool
+    private function doVerify()
     {
         if (isset($this->parameterVerificationResult)) {
             return $this->guardAgainstDuplicateEvaluationOfParameterConstraints();
@@ -149,7 +149,7 @@ final class Parameters implements ParametersRule
     /**
      * @throws ExpectationFailedException
      */
-    private function guardAgainstDuplicateEvaluationOfParameterConstraints(): bool
+    private function guardAgainstDuplicateEvaluationOfParameterConstraints()
     {
         if ($this->parameterVerificationResult instanceof ExpectationFailedException) {
             throw $this->parameterVerificationResult;

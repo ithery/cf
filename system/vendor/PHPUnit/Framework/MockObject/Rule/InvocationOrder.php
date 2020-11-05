@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -24,12 +24,12 @@ abstract class InvocationOrder implements SelfDescribing, Verifiable
      */
     private $invocations = [];
 
-    public function getInvocationCount(): int
+    public function getInvocationCount()
     {
         return count($this->invocations);
     }
 
-    public function hasBeenInvoked(): bool
+    public function hasBeenInvoked()
     {
         return count($this->invocations) > 0;
     }
@@ -41,7 +41,7 @@ abstract class InvocationOrder implements SelfDescribing, Verifiable
         return $this->invokedDo($invocation);
     }
 
-    abstract public function matches(BaseInvocation $invocation): bool;
+    abstract public function matches(BaseInvocation $invocation);
 
     abstract protected function invokedDo(BaseInvocation $invocation);
 }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class Migrator
      * @throws Exception
      * @throws XmlException
      */
-    public function migrate(string $filename): string
+    public function migrate($filename)
     {
         $origin = (new SchemaDetector)->detect($filename);
 
@@ -33,7 +33,7 @@ final class Migrator
             throw new Exception(
                 sprintf(
                     '"%s" is not a valid PHPUnit XML configuration file that can be migrated',
-                    $filename,
+                    $filename
                 )
             );
         }

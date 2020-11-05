@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -21,17 +21,17 @@ final class SuccessfulSchemaDetectionResult extends SchemaDetectionResult
      */
     private $version;
 
-    public function __construct(string $version)
+    public function __construct($version)
     {
         $this->version = $version;
     }
 
-    public function detected(): bool
+    public function detected()
     {
         return true;
     }
 
-    public function version(): string
+    public function version()
     {
         return $this->version;
     }

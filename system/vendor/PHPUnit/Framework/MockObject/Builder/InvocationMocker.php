@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -69,7 +69,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
      *
      * @return $this
      */
-    public function id($id): self
+    public function id($id)
     {
         $this->invocationHandler->registerMatcher($id, $this->matcher);
 
@@ -79,7 +79,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
     /**
      * @return $this
      */
-    public function will(Stub $stub): Identity
+    public function will(Stub $stub)
     {
         $this->matcher->setStub($stub);
 
@@ -92,7 +92,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
      *
      * @throws IncompatibleReturnValueException
      */
-    public function willReturn($value, ...$nextValues): self
+    public function willReturn($value, ...$nextValues)
     {
         if (count($nextValues) === 0) {
             $this->ensureTypeOfReturnValues([$value]);
@@ -109,49 +109,49 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
         return $this->will($stub);
     }
 
-    public function willReturnReference(&$reference): self
+    public function willReturnReference(&$reference)
     {
         $stub = new ReturnReference($reference);
 
         return $this->will($stub);
     }
 
-    public function willReturnMap(array $valueMap): self
+    public function willReturnMap(array $valueMap)
     {
         $stub = new ReturnValueMap($valueMap);
 
         return $this->will($stub);
     }
 
-    public function willReturnArgument($argumentIndex): self
+    public function willReturnArgument($argumentIndex)
     {
         $stub = new ReturnArgument($argumentIndex);
 
         return $this->will($stub);
     }
 
-    public function willReturnCallback($callback): self
+    public function willReturnCallback($callback)
     {
         $stub = new ReturnCallback($callback);
 
         return $this->will($stub);
     }
 
-    public function willReturnSelf(): self
+    public function willReturnSelf()
     {
         $stub = new ReturnSelf;
 
         return $this->will($stub);
     }
 
-    public function willReturnOnConsecutiveCalls(...$values): self
+    public function willReturnOnConsecutiveCalls(...$values)
     {
         $stub = new ConsecutiveCalls($values);
 
         return $this->will($stub);
     }
 
-    public function willThrowException(Throwable $exception): self
+    public function willThrowException(Throwable $exception)
     {
         $stub = new Exception($exception);
 
@@ -161,7 +161,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
     /**
      * @return $this
      */
-    public function after($id): self
+    public function after($id)
     {
         $this->matcher->setAfterMatchBuilderId($id);
 
@@ -177,7 +177,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
      *
      * @return $this
      */
-    public function with(...$arguments): self
+    public function with(...$arguments)
     {
         $this->ensureParametersCanBeConfigured();
 
@@ -195,7 +195,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
      *
      * @return $this
      */
-    public function withConsecutive(...$arguments): self
+    public function withConsecutive(...$arguments)
     {
         $this->ensureParametersCanBeConfigured();
 
@@ -210,7 +210,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
      *
      * @return $this
      */
-    public function withAnyParameters(): self
+    public function withAnyParameters()
     {
         $this->ensureParametersCanBeConfigured();
 
@@ -228,7 +228,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
      *
      * @return $this
      */
-    public function method($constraint): self
+    public function method($constraint)
     {
         if ($this->matcher->hasMethodNameRule()) {
             throw new MethodNameAlreadyConfiguredException;
@@ -254,7 +254,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
      * @throws MethodNameNotConfiguredException
      * @throws MethodParametersAlreadyConfiguredException
      */
-    private function ensureParametersCanBeConfigured(): void
+    private function ensureParametersCanBeConfigured()
     {
         if (!$this->matcher->hasMethodNameRule()) {
             throw new MethodNameNotConfiguredException;
@@ -265,7 +265,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
         }
     }
 
-    private function getConfiguredMethod(): ?ConfigurableMethod
+    private function getConfiguredMethod()
     {
         $configuredMethod = null;
 
@@ -285,7 +285,7 @@ final class InvocationMocker implements InvocationStubber, MethodNameMatch
     /**
      * @throws IncompatibleReturnValueException
      */
-    private function ensureTypeOfReturnValues(array $values): void
+    private function ensureTypeOfReturnValues(array $values)
     {
         $configuredMethod = $this->getConfiguredMethod();
 

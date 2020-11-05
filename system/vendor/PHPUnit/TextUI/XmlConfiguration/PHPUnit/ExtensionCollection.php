@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class ExtensionCollection implements IteratorAggregate
     /**
      * @param Extension[] $extensions
      */
-    public static function fromArray(array $extensions): self
+    public static function fromArray(array $extensions)
     {
         return new self(...$extensions);
     }
@@ -38,12 +38,12 @@ final class ExtensionCollection implements IteratorAggregate
     /**
      * @return Extension[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->extensions;
     }
 
-    public function getIterator(): ExtensionCollectionIterator
+    public function getIterator()
     {
         return new ExtensionCollectionIterator($this);
     }

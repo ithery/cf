@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,7 +34,7 @@ final class GlobalState
     /**
      * @var string[]
      */
-    private const SUPER_GLOBAL_ARRAYS = [
+    const SUPER_GLOBAL_ARRAYS = [
         '_ENV',
         '_POST',
         '_GET',
@@ -47,7 +47,7 @@ final class GlobalState
     /**
      * @throws Exception
      */
-    public static function getIncludedFilesAsString(): string
+    public static function getIncludedFilesAsString()
     {
         return self::processIncludedFilesAsString(get_included_files());
     }
@@ -57,7 +57,7 @@ final class GlobalState
      *
      * @throws Exception
      */
-    public static function processIncludedFilesAsString(array $files): string
+    public static function processIncludedFilesAsString(array $files)
     {
         $excludeList = new ExcludeList;
         $prefix      = false;
@@ -93,7 +93,7 @@ final class GlobalState
         return $result;
     }
 
-    public static function getIniSettingsAsString(): string
+    public static function getIniSettingsAsString()
     {
         $result = '';
 
@@ -108,7 +108,7 @@ final class GlobalState
         return $result;
     }
 
-    public static function getConstantsAsString(): string
+    public static function getConstantsAsString()
     {
         $constants = get_defined_constants(true);
         $result    = '';
@@ -127,7 +127,7 @@ final class GlobalState
         return $result;
     }
 
-    public static function getGlobalsAsString(): string
+    public static function getGlobalsAsString()
     {
         $result = '';
 
@@ -164,7 +164,7 @@ final class GlobalState
         return $result;
     }
 
-    private static function exportVariable($variable): string
+    private static function exportVariable($variable)
     {
         if (is_scalar($variable) || $variable === null ||
             (is_array($variable) && self::arrayOnlyContainsScalars($variable))) {
@@ -174,7 +174,7 @@ final class GlobalState
         return 'unserialize(' . var_export(serialize($variable), true) . ')';
     }
 
-    private static function arrayOnlyContainsScalars(array $array): bool
+    private static function arrayOnlyContainsScalars(array $array)
     {
         $result = true;
 

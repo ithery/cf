@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -28,14 +28,14 @@ final class ExpectationFailedException extends AssertionFailedError
      */
     protected $comparisonFailure;
 
-    public function __construct(string $message, ComparisonFailure $comparisonFailure = null, Exception $previous = null)
+    public function __construct($message, ComparisonFailure $comparisonFailure = null, Exception $previous = null)
     {
         $this->comparisonFailure = $comparisonFailure;
 
         parent::__construct($message, 0, $previous);
     }
 
-    public function getComparisonFailure(): ?ComparisonFailure
+    public function getComparisonFailure()
     {
         return $this->comparisonFailure;
     }

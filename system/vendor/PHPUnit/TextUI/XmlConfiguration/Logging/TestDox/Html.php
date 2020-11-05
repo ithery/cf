@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class Html
         $this->target = $target;
     }
 
-    public function target(): File
+    public function target()
     {
         return $this->target;
     }

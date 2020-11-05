@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -29,7 +29,7 @@ final class StringMatchesFormatDescription extends RegularExpression
      */
     private $string;
 
-    public function __construct(string $string)
+    public function __construct($string)
     {
         parent::__construct(
             $this->createPatternFromFormat(
@@ -46,19 +46,19 @@ final class StringMatchesFormatDescription extends RegularExpression
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return parent::matches(
             $this->convertNewlines($other)
         );
     }
 
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return 'string matches format description';
     }
 
-    protected function additionalFailureDescription($other): string
+    protected function additionalFailureDescription($other)
     {
         $from = explode("\n", $this->string);
         $to   = explode("\n", $this->convertNewlines($other));
@@ -79,7 +79,7 @@ final class StringMatchesFormatDescription extends RegularExpression
         return (new Differ(new UnifiedDiffOutputBuilder("--- Expected\n+++ Actual\n")))->diff($this->string, $other);
     }
 
-    private function createPatternFromFormat(string $string): string
+    private function createPatternFromFormat($string)
     {
         $string = strtr(
             preg_quote($string, '/'),
@@ -102,7 +102,7 @@ final class StringMatchesFormatDescription extends RegularExpression
         return '/^' . $string . '$/s';
     }
 
-    private function convertNewlines(string $text): string
+    private function convertNewlines($text)
     {
         return preg_replace('/\r\n/', "\n", $text);
     }

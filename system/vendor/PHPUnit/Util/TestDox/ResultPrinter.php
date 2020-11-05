@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -117,7 +117,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * Flush buffer and close output.
      */
-    public function flush(): void
+    public function flush()
     {
         $this->doEndClass();
         $this->endRun();
@@ -128,7 +128,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * An error occurred.
      */
-    public function addError(Test $test, Throwable $t, float $time): void
+    public function addError(Test $test, Throwable $t, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -141,7 +141,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * A warning occurred.
      */
-    public function addWarning(Test $test, Warning $e, float $time): void
+    public function addWarning(Test $test, Warning $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -154,7 +154,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * A failure occurred.
      */
-    public function addFailure(Test $test, AssertionFailedError $e, float $time): void
+    public function addFailure(Test $test, AssertionFailedError $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -167,7 +167,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, Throwable $t, float $time): void
+    public function addIncompleteTest(Test $test, Throwable $t, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -180,7 +180,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, Throwable $t, float $time): void
+    public function addRiskyTest(Test $test, Throwable $t, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -193,7 +193,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, Throwable $t, float $time): void
+    public function addSkippedTest(Test $test, Throwable $t, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -206,14 +206,14 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * A testsuite started.
      */
-    public function startTestSuite(TestSuite $suite): void
+    public function startTestSuite(TestSuite $suite)
     {
     }
 
     /**
      * A testsuite ended.
      */
-    public function endTestSuite(TestSuite $suite): void
+    public function endTestSuite(TestSuite $suite)
     {
     }
 
@@ -222,7 +222,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function startTest(Test $test): void
+    public function startTest(Test $test)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -252,7 +252,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * A test ended.
      */
-    public function endTest(Test $test, float $time): void
+    public function endTest(Test $test, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -264,7 +264,7 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
         $this->currentTestMethodPrettified = null;
     }
 
-    protected function doEndClass(): void
+    protected function doEndClass()
     {
         foreach ($this->tests as $test) {
             $this->onTest($test[0], $test[1] === BaseTestRunner::STATUS_PASSED);
@@ -276,39 +276,39 @@ abstract class ResultPrinter extends Printer implements ResultPrinterInterface
     /**
      * Handler for 'start run' event.
      */
-    protected function startRun(): void
+    protected function startRun()
     {
     }
 
     /**
      * Handler for 'start class' event.
      */
-    protected function startClass(string $name): void
+    protected function startClass($name)
     {
     }
 
     /**
      * Handler for 'on test' event.
      */
-    protected function onTest(string $name, bool $success = true): void
+    protected function onTest($name, $success = true)
     {
     }
 
     /**
      * Handler for 'end class' event.
      */
-    protected function endClass(string $name): void
+    protected function endClass($name)
     {
     }
 
     /**
      * Handler for 'end run' event.
      */
-    protected function endRun(): void
+    protected function endRun()
     {
     }
 
-    private function isOfInterest(Test $test): bool
+    private function isOfInterest(Test $test)
     {
         if (!$test instanceof TestCase) {
             return false;

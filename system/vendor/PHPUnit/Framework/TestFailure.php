@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -38,7 +38,7 @@ final class TestFailure
     /**
      * Returns a description for an exception.
      */
-    public static function exceptionToString(Throwable $e): string
+    public static function exceptionToString(Throwable $e)
     {
         if ($e instanceof SelfDescribing) {
             $buffer = $e->toString();
@@ -90,7 +90,7 @@ final class TestFailure
     /**
      * Returns a short description of the failure.
      */
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             '%s: %s',
@@ -102,7 +102,7 @@ final class TestFailure
     /**
      * Returns a description for the thrown exception.
      */
-    public function getExceptionAsString(): string
+    public function getExceptionAsString()
     {
         return self::exceptionToString($this->thrownException);
     }
@@ -110,7 +110,7 @@ final class TestFailure
     /**
      * Returns the name of the failing test (including data set, if any).
      */
-    public function getTestName(): string
+    public function getTestName()
     {
         return $this->testName;
     }
@@ -123,7 +123,7 @@ final class TestFailure
      *
      * @see Exception
      */
-    public function failedTest(): ?Test
+    public function failedTest()
     {
         return $this->failedTest;
     }
@@ -131,7 +131,7 @@ final class TestFailure
     /**
      * Gets the thrown exception.
      */
-    public function thrownException(): Throwable
+    public function thrownException()
     {
         return $this->thrownException;
     }
@@ -139,7 +139,7 @@ final class TestFailure
     /**
      * Returns the exception's message.
      */
-    public function exceptionMessage(): string
+    public function exceptionMessage()
     {
         return $this->thrownException()->getMessage();
     }
@@ -148,7 +148,7 @@ final class TestFailure
      * Returns true if the thrown exception
      * is of type AssertionFailedError.
      */
-    public function isFailure(): bool
+    public function isFailure()
     {
         return $this->thrownException() instanceof AssertionFailedError;
     }

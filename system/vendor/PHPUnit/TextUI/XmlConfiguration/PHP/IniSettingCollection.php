@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class IniSettingCollection implements Countable, IteratorAggregate
     /**
      * @param IniSetting[] $iniSettings
      */
-    public static function fromArray(array $iniSettings): self
+    public static function fromArray(array $iniSettings)
     {
         return new self(...$iniSettings);
     }
@@ -40,17 +40,17 @@ final class IniSettingCollection implements Countable, IteratorAggregate
     /**
      * @return IniSetting[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->iniSettings;
     }
 
-    public function count(): int
+    public function count()
     {
         return count($this->iniSettings);
     }
 
-    public function getIterator(): IniSettingCollectionIterator
+    public function getIterator()
     {
         return new IniSettingCollectionIterator($this);
     }

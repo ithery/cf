@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class VariableCollection implements Countable, IteratorAggregate
     /**
      * @param Variable[] $variables
      */
-    public static function fromArray(array $variables): self
+    public static function fromArray(array $variables)
     {
         return new self(...$variables);
     }
@@ -40,17 +40,17 @@ final class VariableCollection implements Countable, IteratorAggregate
     /**
      * @return Variable[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->variables;
     }
 
-    public function count(): int
+    public function count()
     {
         return count($this->variables);
     }
 
-    public function getIterator(): VariableCollectionIterator
+    public function getIterator()
     {
         return new VariableCollectionIterator($this);
     }

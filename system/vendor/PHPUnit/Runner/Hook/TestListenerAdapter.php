@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,12 +32,12 @@ final class TestListenerAdapter implements TestListener
      */
     private $lastTestWasNotSuccessful;
 
-    public function add(TestHook $hook): void
+    public function add(TestHook $hook)
     {
         $this->hooks[] = $hook;
     }
 
-    public function startTest(Test $test): void
+    public function startTest(Test $test)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof BeforeTestHook) {
@@ -48,7 +48,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = false;
     }
 
-    public function addError(Test $test, Throwable $t, float $time): void
+    public function addError(Test $test, Throwable $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterTestErrorHook) {
@@ -59,7 +59,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addWarning(Test $test, Warning $e, float $time): void
+    public function addWarning(Test $test, Warning $e, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterTestWarningHook) {
@@ -70,7 +70,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addFailure(Test $test, AssertionFailedError $e, float $time): void
+    public function addFailure(Test $test, AssertionFailedError $e, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterTestFailureHook) {
@@ -81,7 +81,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addIncompleteTest(Test $test, Throwable $t, float $time): void
+    public function addIncompleteTest(Test $test, Throwable $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterIncompleteTestHook) {
@@ -92,7 +92,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addRiskyTest(Test $test, Throwable $t, float $time): void
+    public function addRiskyTest(Test $test, Throwable $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterRiskyTestHook) {
@@ -103,7 +103,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addSkippedTest(Test $test, Throwable $t, float $time): void
+    public function addSkippedTest(Test $test, Throwable $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterSkippedTestHook) {
@@ -114,7 +114,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function endTest(Test $test, float $time): void
+    public function endTest(Test $test, $time)
     {
         if (!$this->lastTestWasNotSuccessful) {
             foreach ($this->hooks as $hook) {
@@ -131,11 +131,11 @@ final class TestListenerAdapter implements TestListener
         }
     }
 
-    public function startTestSuite(TestSuite $suite): void
+    public function startTestSuite(TestSuite $suite)
     {
     }
 
-    public function endTestSuite(TestSuite $suite): void
+    public function endTestSuite(TestSuite $suite)
     {
     }
 }

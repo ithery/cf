@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -33,7 +33,7 @@ final class ReturnReference implements Stub
         return $this->reference;
     }
 
-    public function toString(): string
+    public function toString()
     {
         $exporter = new Exporter;
 

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -29,7 +29,7 @@ final class StringContains extends Constraint
      */
     private $ignoreCase;
 
-    public function __construct(string $string, bool $ignoreCase = false)
+    public function __construct($string, $ignoreCase = false)
     {
         $this->string     = $string;
         $this->ignoreCase = $ignoreCase;
@@ -38,7 +38,7 @@ final class StringContains extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         if ($this->ignoreCase) {
             $string = mb_strtolower($this->string, 'UTF-8');
@@ -58,7 +58,7 @@ final class StringContains extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         if ('' === $this->string) {
             return true;

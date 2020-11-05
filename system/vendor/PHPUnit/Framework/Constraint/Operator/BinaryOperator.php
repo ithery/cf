@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -23,7 +23,7 @@ abstract class BinaryOperator extends Operator
      */
     private $constraints = [];
 
-    public static function fromConstraints(Constraint ...$constraints): self
+    public static function fromConstraints(Constraint ...$constraints)
     {
         $constraint = new static;
 
@@ -35,9 +35,9 @@ abstract class BinaryOperator extends Operator
     /**
      * @param mixed[] $constraints
      */
-    public function setConstraints(array $constraints): void
+    public function setConstraints(array $constraints)
     {
-        $this->constraints = array_map(function ($constraint): Constraint {
+        $this->constraints = array_map(function ($constraint) {
             return $this->checkConstraint($constraint);
         }, array_values($constraints));
     }
@@ -45,7 +45,7 @@ abstract class BinaryOperator extends Operator
     /**
      * Returns the number of operands (constraints).
      */
-    final public function arity(): int
+    final public function arity()
     {
         return count($this->constraints);
     }
@@ -53,7 +53,7 @@ abstract class BinaryOperator extends Operator
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         $reduced = $this->reduce();
 
@@ -75,7 +75,7 @@ abstract class BinaryOperator extends Operator
     /**
      * Counts the number of constraint elements.
      */
-    public function count(): int
+    public function count()
     {
         $count = 0;
 
@@ -89,7 +89,7 @@ abstract class BinaryOperator extends Operator
     /**
      * Returns the nested constraints.
      */
-    final protected function constraints(): array
+    final protected function constraints()
     {
         return $this->constraints;
     }
@@ -97,7 +97,7 @@ abstract class BinaryOperator extends Operator
     /**
      * Returns true if the $constraint needs to be wrapped with braces.
      */
-    final protected function constraintNeedsParentheses(Constraint $constraint): bool
+    final protected function constraintNeedsParentheses(Constraint $constraint)
     {
         return $this->arity() > 1 && parent::constraintNeedsParentheses($constraint);
     }
@@ -109,7 +109,7 @@ abstract class BinaryOperator extends Operator
      *
      * See Constraint::reduce() for more.
      */
-    protected function reduce(): Constraint
+    protected function reduce()
     {
         if ($this->arity() === 1 && $this->constraints[0] instanceof Operator) {
             return $this->constraints[0]->reduce();
@@ -124,7 +124,7 @@ abstract class BinaryOperator extends Operator
      * @param Constraint $constraint operand constraint
      * @param int        $position   position of $constraint in this expression
      */
-    private function constraintToString(Constraint $constraint, int $position): string
+    private function constraintToString(Constraint $constraint, $position)
     {
         $prefix = '';
 

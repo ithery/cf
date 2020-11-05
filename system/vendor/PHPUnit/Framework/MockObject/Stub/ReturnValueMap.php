@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -46,7 +46,7 @@ final class ReturnValueMap implements Stub
         }
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'return value from a map';
     }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -113,7 +113,7 @@ final class CodeCoverage
      */
     private $xml;
 
-    public function __construct(?Directory $cacheDirectory, DirectoryCollection $directories, FileCollection $files, DirectoryCollection $excludeDirectories, FileCollection $excludeFiles, bool $pathCoverage, bool $includeUncoveredFiles, bool $processUncoveredFiles, bool $ignoreDeprecatedCodeUnits, bool $disableCodeCoverageIgnore, ?Clover $clover, ?Cobertura $cobertura, ?Crap4j $crap4j, ?Html $html, ?Php $php, ?Text $text, ?Xml $xml)
+    public function __construct($cacheDirectory, DirectoryCollection $directories, FileCollection $files, DirectoryCollection $excludeDirectories, FileCollection $excludeFiles, $pathCoverage, $includeUncoveredFiles, $processUncoveredFiles, $ignoreDeprecatedCodeUnits, $disableCodeCoverageIgnore, $clover, $cobertura, $crap4j, $html, $php, $text, $xml)
     {
         $this->cacheDirectory            = $cacheDirectory;
         $this->directories               = $directories;
@@ -137,7 +137,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->cacheDirectory
      */
-    public function hasCacheDirectory(): bool
+    public function hasCacheDirectory()
     {
         return $this->cacheDirectory !== null;
     }
@@ -145,7 +145,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function cacheDirectory(): Directory
+    public function cacheDirectory()
     {
         if (!$this->hasCacheDirectory()) {
             throw new Exception(
@@ -156,52 +156,52 @@ final class CodeCoverage
         return $this->cacheDirectory;
     }
 
-    public function hasNonEmptyListOfFilesToBeIncludedInCodeCoverageReport(): bool
+    public function hasNonEmptyListOfFilesToBeIncludedInCodeCoverageReport()
     {
         return count($this->directories) > 0 || count($this->files) > 0;
     }
 
-    public function directories(): DirectoryCollection
+    public function directories()
     {
         return $this->directories;
     }
 
-    public function files(): FileCollection
+    public function files()
     {
         return $this->files;
     }
 
-    public function excludeDirectories(): DirectoryCollection
+    public function excludeDirectories()
     {
         return $this->excludeDirectories;
     }
 
-    public function excludeFiles(): FileCollection
+    public function excludeFiles()
     {
         return $this->excludeFiles;
     }
 
-    public function pathCoverage(): bool
+    public function pathCoverage()
     {
         return $this->pathCoverage;
     }
 
-    public function includeUncoveredFiles(): bool
+    public function includeUncoveredFiles()
     {
         return $this->includeUncoveredFiles;
     }
 
-    public function ignoreDeprecatedCodeUnits(): bool
+    public function ignoreDeprecatedCodeUnits()
     {
         return $this->ignoreDeprecatedCodeUnits;
     }
 
-    public function disableCodeCoverageIgnore(): bool
+    public function disableCodeCoverageIgnore()
     {
         return $this->disableCodeCoverageIgnore;
     }
 
-    public function processUncoveredFiles(): bool
+    public function processUncoveredFiles()
     {
         return $this->processUncoveredFiles;
     }
@@ -209,7 +209,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->clover
      */
-    public function hasClover(): bool
+    public function hasClover()
     {
         return $this->clover !== null;
     }
@@ -217,7 +217,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function clover(): Clover
+    public function clover()
     {
         if (!$this->hasClover()) {
             throw new Exception(
@@ -231,7 +231,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->cobertura
      */
-    public function hasCobertura(): bool
+    public function hasCobertura()
     {
         return $this->cobertura !== null;
     }
@@ -239,7 +239,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function cobertura(): Cobertura
+    public function cobertura()
     {
         if (!$this->hasCobertura()) {
             throw new Exception(
@@ -253,7 +253,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->crap4j
      */
-    public function hasCrap4j(): bool
+    public function hasCrap4j()
     {
         return $this->crap4j !== null;
     }
@@ -261,7 +261,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function crap4j(): Crap4j
+    public function crap4j()
     {
         if (!$this->hasCrap4j()) {
             throw new Exception(
@@ -275,7 +275,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->html
      */
-    public function hasHtml(): bool
+    public function hasHtml()
     {
         return $this->html !== null;
     }
@@ -283,7 +283,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function html(): Html
+    public function html()
     {
         if (!$this->hasHtml()) {
             throw new Exception(
@@ -297,7 +297,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->php
      */
-    public function hasPhp(): bool
+    public function hasPhp()
     {
         return $this->php !== null;
     }
@@ -305,7 +305,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function php(): Php
+    public function php()
     {
         if (!$this->hasPhp()) {
             throw new Exception(
@@ -319,7 +319,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->text
      */
-    public function hasText(): bool
+    public function hasText()
     {
         return $this->text !== null;
     }
@@ -327,7 +327,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function text(): Text
+    public function text()
     {
         if (!$this->hasText()) {
             throw new Exception(
@@ -341,7 +341,7 @@ final class CodeCoverage
     /**
      * @psalm-assert-if-true !null $this->xml
      */
-    public function hasXml(): bool
+    public function hasXml()
     {
         return $this->xml !== null;
     }
@@ -349,7 +349,7 @@ final class CodeCoverage
     /**
      * @throws Exception
      */
-    public function xml(): Xml
+    public function xml()
     {
         if (!$this->hasXml()) {
             throw new Exception(

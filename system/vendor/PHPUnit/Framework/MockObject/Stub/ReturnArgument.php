@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,7 +34,7 @@ final class ReturnArgument implements Stub
         }
     }
 
-    public function toString(): string
+    public function toString()
     {
         return sprintf('return argument #%d', $this->argumentIndex);
     }

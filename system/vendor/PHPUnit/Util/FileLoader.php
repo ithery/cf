@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,7 +32,7 @@ final class FileLoader
      *
      * @throws Exception
      */
-    public static function checkAndLoad(string $filename): string
+    public static function checkAndLoad($filename)
     {
         $includePathFilename = stream_resolve_include_path($filename);
 
@@ -54,7 +54,7 @@ final class FileLoader
     /**
      * Loads a PHP sourcefile.
      */
-    public static function load(string $filename): void
+    public static function load($filename)
     {
         $oldVariableNames = array_keys(get_defined_vars());
 
@@ -72,7 +72,7 @@ final class FileLoader
     /**
      * @see https://github.com/sebastianbergmann/phpunit/pull/2751
      */
-    private static function isReadable(string $filename): bool
+    private static function isReadable($filename)
     {
         return @fopen($filename, 'r') !== false;
     }

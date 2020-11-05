@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -36,14 +36,14 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
     /**
      * @var string
      */
-    public const DEFAULT_RESULT_CACHE_FILENAME = '.phpunit.result.cache';
+    const DEFAULT_RESULT_CACHE_FILENAME = '.phpunit.result.cache';
 
     /**
      * Provide extra protection against incomplete or corrupt caches.
      *
      * @var int[]
      */
-    private const ALLOWED_CACHE_TEST_STATUSES = [
+    const ALLOWED_CACHE_TEST_STATUSES = [
         BaseTestRunner::STATUS_SKIPPED,
         BaseTestRunner::STATUS_INCOMPLETE,
         BaseTestRunner::STATUS_FAILURE,
@@ -83,20 +83,20 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
      */
     private $times = [];
 
-    public function __construct(?string $filepath = null)
+    public function __construct($filepath = null)
     {
         if ($filepath !== null && is_dir($filepath)) {
             // cache path provided, use default cache filename in that location
             $filepath .= DIRECTORY_SEPARATOR . self::DEFAULT_RESULT_CACHE_FILENAME;
         }
 
-        $this->cacheFilename = $filepath ?? $_ENV['PHPUNIT_RESULT_CACHE'] ?? self::DEFAULT_RESULT_CACHE_FILENAME;
+        $this->cacheFilename = $filepath != null ? $filepath : isset($_ENV['PHPUNIT_RESULT_CACHE']) ? $_ENV['PHPUNIT_RESULT_CACHE'] : self::DEFAULT_RESULT_CACHE_FILENAME;
     }
 
     /**
      * @throws Exception
      */
-    public function persist(): void
+    public function persist()
     {
         $this->saveToFile();
     }
@@ -104,7 +104,7 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
     /**
      * @throws Exception
      */
-    public function saveToFile(): void
+    public function saveToFile()
     {
         if (defined('PHPUNIT_TESTSUITE_RESULTCACHE')) {
             return;
@@ -125,29 +125,29 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
         );
     }
 
-    public function setState(string $testName, int $state): void
+    public function setState($testName, $state)
     {
         if ($state !== BaseTestRunner::STATUS_PASSED) {
             $this->defects[$testName] = $state;
         }
     }
 
-    public function getState(string $testName): int
+    public function getState($testName)
     {
-        return $this->defects[$testName] ?? BaseTestRunner::STATUS_UNKNOWN;
+        return isset($this->defects[$testName]) ? $this->defects[$testName] : BaseTestRunner::STATUS_UNKNOWN;
     }
 
-    public function setTime(string $testName, float $time): void
+    public function setTime($testName, $time)
     {
         $this->times[$testName] = $time;
     }
 
-    public function getTime(string $testName): float
+    public function getTime($testName)
     {
-        return $this->times[$testName] ?? 0.0;
+        return isset($this->times[$testName]) ? $this->times[$testName] : 0.0;
     }
 
-    public function load(): void
+    public function load()
     {
         $this->clear();
 
@@ -179,7 +179,7 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
         }
     }
 
-    public function copyStateToCache(self $targetCache): void
+    public function copyStateToCache(self $targetCache)
     {
         foreach ($this->defects as $name => $state) {
             $targetCache->setState($name, $state);
@@ -190,13 +190,13 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
         }
     }
 
-    public function clear(): void
+    public function clear()
     {
         $this->defects = [];
         $this->times   = [];
     }
 
-    public function serialize(): string
+    public function serialize()
     {
         return serialize([
             'defects' => $this->defects,
@@ -207,7 +207,7 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
     /**
      * @param string $serialized
      */
-    public function unserialize($serialized): void
+    public function unserialize($serialized)
     {
         $data = unserialize($serialized);
 

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestResult;
  */
 interface ResultPrinter extends TestListener
 {
-    public function printResult(TestResult $result): void;
+    public function printResult(TestResult $result);
 
-    public function write(string $buffer): void;
+    public function write($buffer);
 }

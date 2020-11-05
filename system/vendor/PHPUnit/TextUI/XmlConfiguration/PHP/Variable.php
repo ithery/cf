@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -30,14 +30,14 @@ final class Variable
      */
     private $force;
 
-    public function __construct(string $name, $value, bool $force)
+    public function __construct($name, $value, $force)
     {
         $this->name  = $name;
         $this->value = $value;
         $this->force = $force;
     }
 
-    public function name(): string
+    public function name()
     {
         return $this->name;
     }
@@ -47,7 +47,7 @@ final class Variable
         return $this->value;
     }
 
-    public function force(): bool
+    public function force()
     {
         return $this->force;
     }

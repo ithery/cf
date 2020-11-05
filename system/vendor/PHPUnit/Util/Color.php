@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -31,7 +31,7 @@ final class Color
     /**
      * @var array<string,string>
      */
-    private const WHITESPACE_MAP = [
+    const WHITESPACE_MAP = [
         ' '  => '·',
         "\t" => '⇥',
     ];
@@ -39,7 +39,7 @@ final class Color
     /**
      * @var array<string,string>
      */
-    private const WHITESPACE_EOL_MAP = [
+    const WHITESPACE_EOL_MAP = [
         ' '  => '·',
         "\t" => '⇥',
         "\n" => '↵',
@@ -75,7 +75,7 @@ final class Color
         'bg-white'   => '47',
     ];
 
-    public static function colorize(string $color, string $buffer): string
+    public static function colorize($color, $buffer)
     {
         if (trim($buffer) === '') {
             return $buffer;
@@ -86,7 +86,7 @@ final class Color
 
         foreach ($codes as $code) {
             if (isset(self::$ansiCodes[$code])) {
-                $styles[] = self::$ansiCodes[$code] ?? '';
+                $styles[] = isset(self::$ansiCodes[$code]) ?self::$ansiCodes[$code]: '';
             }
         }
 
@@ -97,7 +97,7 @@ final class Color
         return self::optimizeColor(sprintf("\x1b[%sm", implode(';', $styles)) . $buffer . "\x1b[0m");
     }
 
-    public static function colorizePath(string $path, ?string $prevPath = null, bool $colorizeFilename = false): string
+    public static function colorizePath($path, $prevPath = null, $colorizeFilename = false)
     {
         if ($prevPath === null) {
             $prevPath = '';
@@ -126,7 +126,7 @@ final class Color
         return self::optimizeColor(implode(self::dim(DIRECTORY_SEPARATOR), $path));
     }
 
-    public static function dim(string $buffer): string
+    public static function dim($buffer)
     {
         if (trim($buffer) === '') {
             return $buffer;
@@ -135,7 +135,7 @@ final class Color
         return "\e[2m{$buffer}\e[22m";
     }
 
-    public static function visualizeWhitespace(string $buffer, bool $visualizeEOL = false): string
+    public static function visualizeWhitespace($buffer, $visualizeEOL = false)
     {
         $replaceMap = $visualizeEOL ? self::WHITESPACE_EOL_MAP : self::WHITESPACE_MAP;
 
@@ -144,7 +144,7 @@ final class Color
         }, $buffer);
     }
 
-    private static function optimizeColor(string $buffer): string
+    private static function optimizeColor($buffer)
     {
         $patterns = [
             "/\e\\[22m\e\\[2m/"                   => '',

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -33,27 +33,27 @@ final class TestSuiteIterator implements RecursiveIterator
         $this->tests = $testSuite->tests();
     }
 
-    public function rewind(): void
+    public function rewind()
     {
         $this->position = 0;
     }
 
-    public function valid(): bool
+    public function valid()
     {
         return $this->position < count($this->tests);
     }
 
-    public function key(): int
+    public function key()
     {
         return $this->position;
     }
 
-    public function current(): Test
+    public function current()
     {
         return $this->tests[$this->position];
     }
 
-    public function next(): void
+    public function next()
     {
         $this->position++;
     }
@@ -61,7 +61,7 @@ final class TestSuiteIterator implements RecursiveIterator
     /**
      * @throws NoChildTestSuiteException
      */
-    public function getChildren(): self
+    public function getChildren()
     {
         if (!$this->hasChildren()) {
             throw new NoChildTestSuiteException(
@@ -76,7 +76,7 @@ final class TestSuiteIterator implements RecursiveIterator
         return new self($current);
     }
 
-    public function hasChildren(): bool
+    public function hasChildren()
     {
         return $this->valid() && $this->current() instanceof TestSuite;
     }

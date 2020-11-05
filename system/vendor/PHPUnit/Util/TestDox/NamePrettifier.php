@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -63,7 +63,7 @@ final class NamePrettifier
      */
     private $useColor;
 
-    public function __construct(bool $useColor = false)
+    public function __construct($useColor = false)
     {
         $this->useColor = $useColor;
     }
@@ -73,7 +73,7 @@ final class NamePrettifier
      *
      * @psalm-param class-string $className
      */
-    public function prettifyTestClass(string $className): string
+    public function prettifyTestClass($className)
     {
         try {
             $annotations = Test::parseTestMethodAnnotations($className);
@@ -138,7 +138,7 @@ final class NamePrettifier
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function prettifyTestCase(TestCase $test): string
+    public function prettifyTestCase(TestCase $test)
     {
         $annotations = Test::parseTestMethodAnnotations(
             get_class($test),
@@ -147,7 +147,7 @@ final class NamePrettifier
 
         $annotationWithPlaceholders = false;
 
-        $callback = static function (string $variable): string {
+        $callback = static function ($variable) {
             return sprintf('/%s(?=\b)/', preg_quote($variable, '/'));
         };
 
@@ -174,7 +174,7 @@ final class NamePrettifier
         return $result;
     }
 
-    public function prettifyDataSet(TestCase $test): string
+    public function prettifyDataSet(TestCase $test)
     {
         if (!$this->useColor) {
             return $test->getDataSetAsString(false);
@@ -192,7 +192,7 @@ final class NamePrettifier
     /**
      * Prettifies the name of a test method.
      */
-    public function prettifyTestMethod(string $name): string
+    public function prettifyTestMethod($name)
     {
         $buffer = '';
 
@@ -251,7 +251,7 @@ final class NamePrettifier
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function mapTestMethodParameterNamesToProvidedDataValues(TestCase $test): array
+    private function mapTestMethodParameterNamesToProvidedDataValues(TestCase $test)
     {
         try {
             $reflector = new ReflectionMethod(get_class($test), $test->getName(false));
@@ -286,8 +286,9 @@ final class NamePrettifier
                 // @codeCoverageIgnoreEnd
             }
 
-            $value = $providedDataValues[$i++] ?? null;
-
+            $value = isset($providedDataValues[$i]) ? $providedDataValues[$i] : null;
+            $i++;
+            
             if (is_object($value)) {
                 $reflector = new ReflectionObject($value);
 

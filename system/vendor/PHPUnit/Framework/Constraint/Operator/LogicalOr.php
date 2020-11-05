@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ final class LogicalOr extends BinaryOperator
     /**
      * Returns the name of this operator.
      */
-    public function operator(): string
+    public function operator()
     {
         return 'or';
     }
@@ -27,7 +27,7 @@ final class LogicalOr extends BinaryOperator
      *
      * @see https://www.php.net/manual/en/language.operators.precedence.php
      */
-    public function precedence(): int
+    public function precedence()
     {
         return 24;
     }
@@ -38,7 +38,7 @@ final class LogicalOr extends BinaryOperator
      *
      * @param mixed $other value or object to evaluate
      */
-    public function matches($other): bool
+    public function matches($other)
     {
         foreach ($this->constraints() as $constraint) {
             if ($constraint->evaluate($other, '', true)) {

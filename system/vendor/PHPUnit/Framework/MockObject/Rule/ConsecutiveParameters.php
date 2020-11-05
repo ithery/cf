@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -60,7 +60,7 @@ final class ConsecutiveParameters implements ParametersRule
         }
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'with consecutive parameters';
     }
@@ -69,7 +69,7 @@ final class ConsecutiveParameters implements ParametersRule
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function apply(BaseInvocation $invocation): void
+    public function apply(BaseInvocation $invocation)
     {
         $this->invocations[] = $invocation;
         $callIndex           = count($this->invocations) - 1;
@@ -81,7 +81,7 @@ final class ConsecutiveParameters implements ParametersRule
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function verify(): void
+    public function verify()
     {
         foreach ($this->invocations as $callIndex => $invocation) {
             $this->verifyInvocation($invocation, $callIndex);
@@ -96,7 +96,7 @@ final class ConsecutiveParameters implements ParametersRule
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function verifyInvocation(BaseInvocation $invocation, $callIndex): void
+    private function verifyInvocation(BaseInvocation $invocation, $callIndex)
     {
         if (!isset($this->parameterGroups[$callIndex])) {
             // no parameter assertion for this call index

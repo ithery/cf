@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class DataProviderTestSuite extends TestSuite
     /**
      * @param list<ExecutionOrderDependency> $dependencies
      */
-    public function setDependencies(array $dependencies): void
+    public function setDependencies(array $dependencies)
     {
         $this->dependencies = $dependencies;
 
@@ -42,7 +42,7 @@ final class DataProviderTestSuite extends TestSuite
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function provides(): array
+    public function provides()
     {
         if ($this->providedTests === null) {
             $this->providedTests = [new ExecutionOrderDependency($this->getName())];
@@ -54,7 +54,7 @@ final class DataProviderTestSuite extends TestSuite
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function requires(): array
+    public function requires()
     {
         // A DataProviderTestSuite does not have to traverse its child tests
         // as these are inherited and cannot reference dataProvider rows directly
@@ -66,9 +66,9 @@ final class DataProviderTestSuite extends TestSuite
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function getSize(): int
+    public function getSize()
     {
-        [$className, $methodName] = explode('::', $this->getName());
+        list($className, $methodName) = explode('::', $this->getName());
 
         return TestUtil::getSize($className, $methodName);
     }

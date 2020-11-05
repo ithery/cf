@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -43,7 +43,7 @@ final class ExecutionOrderDependency
      */
     private $useDeepClone = false;
 
-    public static function createFromDependsAnnotation(string $className, string $annotation): self
+    public static function createFromDependsAnnotation($className, $annotation)
     {
         // Split clone option and target
         $parts = explode(' ', trim($annotation), 2);
@@ -69,7 +69,7 @@ final class ExecutionOrderDependency
      *
      * @psalm-return list<ExecutionOrderDependency>
      */
-    public static function filterInvalid(array $dependencies): array
+    public static function filterInvalid(array $dependencies)
     {
         return array_values(
             array_filter(
@@ -87,7 +87,7 @@ final class ExecutionOrderDependency
      *
      * @psalm-return list<ExecutionOrderDependency>
      */
-    public static function mergeUnique(array $existing, array $additional): array
+    public static function mergeUnique(array $existing, array $additional)
     {
         $existingTargets = array_map(
             static function ($dependency) {
@@ -114,7 +114,7 @@ final class ExecutionOrderDependency
      *
      * @psalm-return list<ExecutionOrderDependency>
      */
-    public static function diff(array $left, array $right): array
+    public static function diff(array $left, array $right)
     {
         if ($right === []) {
             return $left;
@@ -143,14 +143,14 @@ final class ExecutionOrderDependency
         return $diff;
     }
 
-    public function __construct(string $classOrCallableName, ?string $methodName = null, ?string $option = null)
+    public function __construct($classOrCallableName, $methodName = null, $option = null)
     {
         if ($classOrCallableName === '') {
             return;
         }
 
         if (strpos($classOrCallableName, '::') !== false) {
-            [$this->className, $this->methodName] = explode('::', $classOrCallableName);
+            list($this->className, $this->methodName) = explode('::', $classOrCallableName);
         } else {
             $this->className  = $classOrCallableName;
             $this->methodName = !empty($methodName) ? $methodName : 'class';
@@ -163,40 +163,40 @@ final class ExecutionOrderDependency
         }
     }
 
-    public function __toString(): string
+    public function __toString()
     {
         return $this->getTarget();
     }
 
-    public function isValid(): bool
+    public function isValid()
     {
         // Invalid dependencies can be declared and are skipped by the runner
         return $this->className !== '' && $this->methodName !== '';
     }
 
-    public function useShallowClone(): bool
+    public function useShallowClone()
     {
         return $this->useShallowClone;
     }
 
-    public function useDeepClone(): bool
+    public function useDeepClone()
     {
         return $this->useDeepClone;
     }
 
-    public function targetIsClass(): bool
+    public function targetIsClass()
     {
         return $this->methodName === 'class';
     }
 
-    public function getTarget(): string
+    public function getTarget()
     {
         return $this->isValid()
             ? $this->className . '::' . $this->methodName
             : '';
     }
 
-    public function getTargetClassName(): string
+    public function getTargetClassName()
     {
         return $this->className;
     }

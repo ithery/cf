@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -157,7 +157,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @throws Exception
      */
-    public function __construct($theClass = '', string $name = '')
+    public function __construct($theClass = '', $name = '')
     {
         if (!is_string($theClass) && !$theClass instanceof ReflectionClass) {
             throw InvalidArgumentException::create(
@@ -210,7 +210,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
             $this->addTest(
                 new WarningTestCase(
                     sprintf(
-                        'Class "%s" has no public constructor.',
+                        'Class "%s" has no constructor.',
                         $theClass->getName()
                     )
                 )
@@ -252,7 +252,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Returns a string representation of the test suite.
      */
-    public function toString(): string
+    public function toString()
     {
         return $this->getName();
     }
@@ -262,7 +262,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @param array $groups
      */
-    public function addTest(Test $test, $groups = []): void
+    public function addTest(Test $test, $groups = [])
     {
         try {
             $class = new ReflectionClass($test);
@@ -309,7 +309,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @throws Exception
      */
-    public function addTestSuite($testClass): void
+    public function addTestSuite($testClass)
     {
         if (!(is_object($testClass) || (is_string($testClass) && class_exists($testClass)))) {
             throw InvalidArgumentException::create(
@@ -369,7 +369,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
         }
     }
 
-    public function addWarning(string $warning): void
+    public function addWarning($warning)
     {
         $this->warnings[] = $warning;
     }
@@ -384,7 +384,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @throws Exception
      */
-    public function addTestFile(string $filename): void
+    public function addTestFile($filename)
     {
         if (is_file($filename) && substr($filename, -5) === '.phpt') {
             $this->addTest(new PhptTestCase($filename));
@@ -523,7 +523,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @throws Exception
      */
-    public function addTestFiles(iterable $fileNames): void
+    public function addTestFiles(iterable $fileNames)
     {
         foreach ($fileNames as $filename) {
             $this->addTestFile((string) $filename);
@@ -535,7 +535,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @todo refactor usage of numTests in DefaultResultPrinter
      */
-    public function count(): int
+    public function count()
     {
         $this->numTests = 0;
 
@@ -549,7 +549,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Returns the name of the suite.
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -557,12 +557,12 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Returns the test groups of the suite.
      */
-    public function getGroups(): array
+    public function getGroups()
     {
         return array_keys($this->groups);
     }
 
-    public function getGroupDetails(): array
+    public function getGroupDetails()
     {
         return $this->groups;
     }
@@ -570,7 +570,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Set tests groups of the test case.
      */
-    public function setGroupDetails(array $groups): void
+    public function setGroupDetails(array $groups)
     {
         $this->groups = $groups;
     }
@@ -584,7 +584,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws Warning
      */
-    public function run(TestResult $result = null): TestResult
+    public function run(TestResult $result = null)
     {
         if ($result === null) {
             $result = $this->createResult();
@@ -694,12 +694,12 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
         return $result;
     }
 
-    public function setRunTestInSeparateProcess(bool $runTestInSeparateProcess): void
+    public function setRunTestInSeparateProcess($runTestInSeparateProcess)
     {
         $this->runTestInSeparateProcess = $runTestInSeparateProcess;
     }
 
-    public function setName(string $name): void
+    public function setName($name)
     {
         $this->name = $name;
     }
@@ -709,7 +709,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @return Test[]
      */
-    public function tests(): array
+    public function tests()
     {
         return $this->tests;
     }
@@ -719,7 +719,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @param Test[] $tests
      */
-    public function setTests(array $tests): void
+    public function setTests(array $tests)
     {
         $this->tests = $tests;
     }
@@ -733,7 +733,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      *
      * @psalm-return never-return
      */
-    public function markTestSuiteSkipped($message = ''): void
+    public function markTestSuiteSkipped($message = '')
     {
         throw new SkippedTestSuiteError($message);
     }
@@ -741,7 +741,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * @param bool $beStrictAboutChangesToGlobalState
      */
-    public function setBeStrictAboutChangesToGlobalState($beStrictAboutChangesToGlobalState): void
+    public function setBeStrictAboutChangesToGlobalState($beStrictAboutChangesToGlobalState)
     {
         if (null === $this->beStrictAboutChangesToGlobalState && is_bool($beStrictAboutChangesToGlobalState)) {
             $this->beStrictAboutChangesToGlobalState = $beStrictAboutChangesToGlobalState;
@@ -751,7 +751,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * @param bool $backupGlobals
      */
-    public function setBackupGlobals($backupGlobals): void
+    public function setBackupGlobals($backupGlobals)
     {
         if (null === $this->backupGlobals && is_bool($backupGlobals)) {
             $this->backupGlobals = $backupGlobals;
@@ -761,7 +761,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * @param bool $backupStaticAttributes
      */
-    public function setBackupStaticAttributes($backupStaticAttributes): void
+    public function setBackupStaticAttributes($backupStaticAttributes)
     {
         if (null === $this->backupStaticAttributes && is_bool($backupStaticAttributes)) {
             $this->backupStaticAttributes = $backupStaticAttributes;
@@ -771,7 +771,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Returns an iterator for this test suite.
      */
-    public function getIterator(): Iterator
+    public function getIterator()
     {
         $iterator = new TestSuiteIterator($this);
 
@@ -782,7 +782,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
         return $iterator;
     }
 
-    public function injectFilter(Factory $filter): void
+    public function injectFilter(Factory $filter)
     {
         $this->iteratorFilter = $filter;
 
@@ -796,7 +796,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * @psalm-return array<int,string>
      */
-    public function warnings(): array
+    public function warnings()
     {
         return array_unique($this->warnings);
     }
@@ -804,7 +804,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function provides(): array
+    public function provides()
     {
         if ($this->providedTests === null) {
             $this->providedTests = [];
@@ -829,7 +829,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function requires(): array
+    public function requires()
     {
         if ($this->requiredTests === null) {
             $this->requiredTests = [];
@@ -852,7 +852,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
         return $this->requiredTests;
     }
 
-    public function sortId(): string
+    public function sortId()
     {
         return $this->getName() . '::class';
     }
@@ -860,7 +860,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Creates a default TestResult object.
      */
-    protected function createResult(): TestResult
+    protected function createResult()
     {
         return new TestResult;
     }
@@ -868,7 +868,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * @throws Exception
      */
-    protected function addTestMethod(ReflectionClass $class, ReflectionMethod $method): void
+    protected function addTestMethod(ReflectionClass $class, ReflectionMethod $method)
     {
         $methodName = $method->getName();
 
@@ -886,14 +886,14 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
         );
     }
 
-    private function clearCaches(): void
+    private function clearCaches()
     {
         $this->numTests      = -1;
         $this->providedTests = null;
         $this->requiredTests = null;
     }
 
-    private function containsOnlyVirtualGroups(array $groups): bool
+    private function containsOnlyVirtualGroups(array $groups)
     {
         foreach ($groups as $group) {
             if (strpos($group, '__phpunit_') !== 0) {

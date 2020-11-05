@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ use function sprintf;
  */
 final class ClassIsFinalException extends \PHPUnit\Framework\Exception implements Exception
 {
-    public function __construct(string $className)
+    public function __construct($className)
     {
         parent::__construct(
             sprintf(

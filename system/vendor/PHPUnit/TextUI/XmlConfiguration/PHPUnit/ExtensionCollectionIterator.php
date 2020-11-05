@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,32 +34,32 @@ final class ExtensionCollectionIterator implements Countable, Iterator
         $this->extensions = $extensions->asArray();
     }
 
-    public function count(): int
+    public function count()
     {
         return iterator_count($this);
     }
 
-    public function rewind(): void
+    public function rewind()
     {
         $this->position = 0;
     }
 
-    public function valid(): bool
+    public function valid()
     {
         return $this->position < count($this->extensions);
     }
 
-    public function key(): int
+    public function key()
     {
         return $this->position;
     }
 
-    public function current(): Extension
+    public function current()
     {
         return $this->extensions[$this->position];
     }
 
-    public function next(): void
+    public function next()
     {
         $this->position++;
     }

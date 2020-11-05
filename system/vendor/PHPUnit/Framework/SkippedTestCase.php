@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,14 +34,14 @@ final class SkippedTestCase extends TestCase
      */
     private $message;
 
-    public function __construct(string $className, string $methodName, string $message = '')
+    public function __construct($className, $methodName, $message = '')
     {
         parent::__construct($className . '::' . $methodName);
 
         $this->message = $message;
     }
 
-    public function getMessage(): string
+    public function getMessage()
     {
         return $this->message;
     }
@@ -51,7 +51,7 @@ final class SkippedTestCase extends TestCase
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString(): string
+    public function toString()
     {
         return $this->getName();
     }
@@ -59,7 +59,7 @@ final class SkippedTestCase extends TestCase
     /**
      * @throws Exception
      */
-    protected function runTest(): void
+    protected function runTest()
     {
         $this->markTestSkipped($this->message);
     }

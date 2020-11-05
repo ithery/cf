@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,12 +16,12 @@ use DOMElement;
  */
 final class CoverageTextToReport extends LogToReportMigration
 {
-    protected function forType(): string
+    protected function forType()
     {
         return 'coverage-text';
     }
 
-    protected function toReportFormat(DOMElement $logNode): DOMElement
+    protected function toReportFormat(DOMElement $logNode)
     {
         $text = $logNode->ownerDocument->createElement('text');
         $text->setAttribute('outputFile', $logNode->getAttribute('target'));

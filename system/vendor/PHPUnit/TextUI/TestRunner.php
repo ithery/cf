@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -86,11 +86,11 @@ use SebastianBergmann\Timer\Timer;
  */
 final class TestRunner extends BaseTestRunner
 {
-    public const SUCCESS_EXIT = 0;
+    const SUCCESS_EXIT = 0;
 
-    public const FAILURE_EXIT = 1;
+    const FAILURE_EXIT = 1;
 
-    public const EXCEPTION_EXIT = 2;
+    const EXCEPTION_EXIT = 2;
 
     /**
      * @var bool
@@ -143,7 +143,7 @@ final class TestRunner extends BaseTestRunner
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
      * @throws Exception
      */
-    public function run(TestSuite $suite, array $arguments = [], array $warnings = [], bool $exit = true): TestResult
+    public function run(TestSuite $suite, array $arguments = [], array $warnings = [], $exit = true)
     {
         if (isset($arguments['configuration'])) {
             $GLOBALS['__PHPUNIT_CONFIGURATION_FILE'] = $arguments['configuration'];
@@ -201,7 +201,7 @@ final class TestRunner extends BaseTestRunner
         }
 
         if ($arguments['executionOrder'] !== TestSuiteSorter::ORDER_DEFAULT || $arguments['executionOrderDefects'] !== TestSuiteSorter::ORDER_DEFAULT || $arguments['resolveDependencies']) {
-            $cache = $cache ?? new NullTestResultCache;
+            $cache = isset($cache) ? $cache : new NullTestResultCache;
 
             $cache->load();
 
@@ -836,7 +836,7 @@ final class TestRunner extends BaseTestRunner
     /**
      * Returns the loader to be used.
      */
-    public function getLoader(): TestSuiteLoader
+    public function getLoader()
     {
         if ($this->loader === null) {
             $this->loader = new StandardTestSuiteLoader;
@@ -845,7 +845,7 @@ final class TestRunner extends BaseTestRunner
         return $this->loader;
     }
 
-    public function addExtension(Hook $extension): void
+    public function addExtension(Hook $extension)
     {
         $this->extensions[] = $extension;
     }
@@ -854,19 +854,19 @@ final class TestRunner extends BaseTestRunner
      * Override to define how to handle a failed loading of
      * a test suite.
      */
-    protected function runFailed(string $message): void
+    protected function runFailed($message)
     {
         $this->write($message . PHP_EOL);
 
         exit(self::FAILURE_EXIT);
     }
 
-    private function createTestResult(): TestResult
+    private function createTestResult()
     {
         return new TestResult;
     }
 
-    private function write(string $buffer): void
+    private function write($buffer)
     {
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $buffer = htmlspecialchars($buffer);
@@ -883,15 +883,15 @@ final class TestRunner extends BaseTestRunner
      * @throws Exception
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
      */
-    private function handleConfiguration(array &$arguments): void
+    private function handleConfiguration(array &$arguments)
     {
         if (!isset($arguments['configurationObject']) && isset($arguments['configuration'])) {
             $arguments['configurationObject'] = (new Loader)->load($arguments['configuration']);
         }
 
-        $arguments['debug']     = $arguments['debug'] ?? false;
-        $arguments['filter']    = $arguments['filter'] ?? false;
-        $arguments['listeners'] = $arguments['listeners'] ?? [];
+        $arguments['debug'] = isset($arguments['debug']) ? $arguments['debug'] : false;
+        $arguments['filter'] = isset($arguments['filter']) ? $arguments['filter'] : false;
+        $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : [];
 
         if (isset($arguments['configurationObject'])) {
             (new PhpHandler)->handle($arguments['configurationObject']->php());
@@ -944,47 +944,47 @@ final class TestRunner extends BaseTestRunner
 
             $phpunitConfiguration = $arguments['configurationObject']->phpunit();
 
-            $arguments['backupGlobals']                                   = $arguments['backupGlobals'] ?? $phpunitConfiguration->backupGlobals();
-            $arguments['backupStaticAttributes']                          = $arguments['backupStaticAttributes'] ?? $phpunitConfiguration->backupStaticAttributes();
-            $arguments['beStrictAboutChangesToGlobalState']               = $arguments['beStrictAboutChangesToGlobalState'] ?? $phpunitConfiguration->beStrictAboutChangesToGlobalState();
-            $arguments['cacheResult']                                     = $arguments['cacheResult'] ?? $phpunitConfiguration->cacheResult();
-            $arguments['colors']                                          = $arguments['colors'] ?? $phpunitConfiguration->colors();
-            $arguments['convertDeprecationsToExceptions']                 = $arguments['convertDeprecationsToExceptions'] ?? $phpunitConfiguration->convertDeprecationsToExceptions();
-            $arguments['convertErrorsToExceptions']                       = $arguments['convertErrorsToExceptions'] ?? $phpunitConfiguration->convertErrorsToExceptions();
-            $arguments['convertNoticesToExceptions']                      = $arguments['convertNoticesToExceptions'] ?? $phpunitConfiguration->convertNoticesToExceptions();
-            $arguments['convertWarningsToExceptions']                     = $arguments['convertWarningsToExceptions'] ?? $phpunitConfiguration->convertWarningsToExceptions();
-            $arguments['processIsolation']                                = $arguments['processIsolation'] ?? $phpunitConfiguration->processIsolation();
-            $arguments['stopOnDefect']                                    = $arguments['stopOnDefect'] ?? $phpunitConfiguration->stopOnDefect();
-            $arguments['stopOnError']                                     = $arguments['stopOnError'] ?? $phpunitConfiguration->stopOnError();
-            $arguments['stopOnFailure']                                   = $arguments['stopOnFailure'] ?? $phpunitConfiguration->stopOnFailure();
-            $arguments['stopOnWarning']                                   = $arguments['stopOnWarning'] ?? $phpunitConfiguration->stopOnWarning();
-            $arguments['stopOnIncomplete']                                = $arguments['stopOnIncomplete'] ?? $phpunitConfiguration->stopOnIncomplete();
-            $arguments['stopOnRisky']                                     = $arguments['stopOnRisky'] ?? $phpunitConfiguration->stopOnRisky();
-            $arguments['stopOnSkipped']                                   = $arguments['stopOnSkipped'] ?? $phpunitConfiguration->stopOnSkipped();
-            $arguments['failOnEmptyTestSuite']                            = $arguments['failOnEmptyTestSuite'] ?? $phpunitConfiguration->failOnEmptyTestSuite();
-            $arguments['failOnIncomplete']                                = $arguments['failOnIncomplete'] ?? $phpunitConfiguration->failOnIncomplete();
-            $arguments['failOnRisky']                                     = $arguments['failOnRisky'] ?? $phpunitConfiguration->failOnRisky();
-            $arguments['failOnSkipped']                                   = $arguments['failOnSkipped'] ?? $phpunitConfiguration->failOnSkipped();
-            $arguments['failOnWarning']                                   = $arguments['failOnWarning'] ?? $phpunitConfiguration->failOnWarning();
-            $arguments['enforceTimeLimit']                                = $arguments['enforceTimeLimit'] ?? $phpunitConfiguration->enforceTimeLimit();
-            $arguments['defaultTimeLimit']                                = $arguments['defaultTimeLimit'] ?? $phpunitConfiguration->defaultTimeLimit();
-            $arguments['timeoutForSmallTests']                            = $arguments['timeoutForSmallTests'] ?? $phpunitConfiguration->timeoutForSmallTests();
-            $arguments['timeoutForMediumTests']                           = $arguments['timeoutForMediumTests'] ?? $phpunitConfiguration->timeoutForMediumTests();
-            $arguments['timeoutForLargeTests']                            = $arguments['timeoutForLargeTests'] ?? $phpunitConfiguration->timeoutForLargeTests();
-            $arguments['reportUselessTests']                              = $arguments['reportUselessTests'] ?? $phpunitConfiguration->beStrictAboutTestsThatDoNotTestAnything();
-            $arguments['strictCoverage']                                  = $arguments['strictCoverage'] ?? $phpunitConfiguration->beStrictAboutCoversAnnotation();
-            $arguments['ignoreDeprecatedCodeUnitsFromCodeCoverage']       = $arguments['ignoreDeprecatedCodeUnitsFromCodeCoverage'] ?? $codeCoverageConfiguration->ignoreDeprecatedCodeUnits();
-            $arguments['disallowTestOutput']                              = $arguments['disallowTestOutput'] ?? $phpunitConfiguration->beStrictAboutOutputDuringTests();
-            $arguments['disallowTodoAnnotatedTests']                      = $arguments['disallowTodoAnnotatedTests'] ?? $phpunitConfiguration->beStrictAboutTodoAnnotatedTests();
-            $arguments['beStrictAboutResourceUsageDuringSmallTests']      = $arguments['beStrictAboutResourceUsageDuringSmallTests'] ?? $phpunitConfiguration->beStrictAboutResourceUsageDuringSmallTests();
-            $arguments['verbose']                                         = $arguments['verbose'] ?? $phpunitConfiguration->verbose();
-            $arguments['reverseDefectList']                               = $arguments['reverseDefectList'] ?? $phpunitConfiguration->reverseDefectList();
-            $arguments['forceCoversAnnotation']                           = $arguments['forceCoversAnnotation'] ?? $phpunitConfiguration->forceCoversAnnotation();
-            $arguments['disableCodeCoverageIgnore']                       = $arguments['disableCodeCoverageIgnore'] ?? $codeCoverageConfiguration->disableCodeCoverageIgnore();
-            $arguments['registerMockObjectsFromTestArgumentsRecursively'] = $arguments['registerMockObjectsFromTestArgumentsRecursively'] ?? $phpunitConfiguration->registerMockObjectsFromTestArgumentsRecursively();
-            $arguments['noInteraction']                                   = $arguments['noInteraction'] ?? $phpunitConfiguration->noInteraction();
-            $arguments['executionOrder']                                  = $arguments['executionOrder'] ?? $phpunitConfiguration->executionOrder();
-            $arguments['resolveDependencies']                             = $arguments['resolveDependencies'] ?? $phpunitConfiguration->resolveDependencies();
+            $arguments['backupGlobals'] = isset($arguments['backupGlobals']) ? $arguments['backupGlobals'] : $phpunitConfiguration->backupGlobals();
+            $arguments['backupStaticAttributes'] = isset($arguments['backupStaticAttributes']) ? $arguments['backupStaticAttributes'] : $phpunitConfiguration->backupStaticAttributes();
+            $arguments['beStrictAboutChangesToGlobalState'] = isset($arguments['beStrictAboutChangesToGlobalState']) ? $arguments['beStrictAboutChangesToGlobalState'] : $phpunitConfiguration->beStrictAboutChangesToGlobalState();
+            $arguments['cacheResult'] = isset($arguments['cacheResult']) ? $arguments['cacheResult'] : $phpunitConfiguration->cacheResult();
+            $arguments['colors'] = isset($arguments['colors']) ? $arguments['colors'] : $phpunitConfiguration->colors();
+            $arguments['convertDeprecationsToExceptions'] = isset($arguments['convertDeprecationsToExceptions']) ? $arguments['convertDeprecationsToExceptions'] : $phpunitConfiguration->convertDeprecationsToExceptions();
+            $arguments['convertErrorsToExceptions'] = isset($arguments['convertErrorsToExceptions']) ? $arguments['convertErrorsToExceptions'] : $phpunitConfiguration->convertErrorsToExceptions();
+            $arguments['convertNoticesToExceptions'] = isset($arguments['convertNoticesToExceptions']) ? $arguments['convertNoticesToExceptions'] : $phpunitConfiguration->convertNoticesToExceptions();
+            $arguments['convertWarningsToExceptions'] = isset($arguments['convertWarningsToExceptions']) ? $arguments['convertWarningsToExceptions'] : $phpunitConfiguration->convertWarningsToExceptions();
+            $arguments['processIsolation'] = isset($arguments['processIsolation']) ? $arguments['processIsolation'] : $phpunitConfiguration->processIsolation();
+            $arguments['stopOnDefect'] = isset($arguments['stopOnDefect']) ? $arguments['stopOnDefect'] : $phpunitConfiguration->stopOnDefect();
+            $arguments['stopOnError'] = isset($arguments['stopOnError']) ? $arguments['stopOnError'] : $phpunitConfiguration->stopOnError();
+            $arguments['stopOnFailure'] = isset($arguments['stopOnFailure']) ? $arguments['stopOnFailure'] : $phpunitConfiguration->stopOnFailure();
+            $arguments['stopOnWarning'] = isset($arguments['stopOnWarning']) ? $arguments['stopOnWarning'] : $phpunitConfiguration->stopOnWarning();
+            $arguments['stopOnIncomplete'] = isset($arguments['stopOnIncomplete']) ? $arguments['stopOnIncomplete'] : $phpunitConfiguration->stopOnIncomplete();
+            $arguments['stopOnRisky'] = isset($arguments['stopOnRisky']) ? $arguments['stopOnRisky'] : $phpunitConfiguration->stopOnRisky();
+            $arguments['stopOnSkipped'] = isset($arguments['stopOnSkipped']) ? $arguments['stopOnSkipped'] : $phpunitConfiguration->stopOnSkipped();
+            $arguments['failOnEmptyTestSuite'] = isset($arguments['failOnEmptyTestSuite']) ? $arguments['failOnEmptyTestSuite'] : $phpunitConfiguration->failOnEmptyTestSuite();
+            $arguments['failOnIncomplete'] = isset($arguments['failOnIncomplete']) ? $arguments['failOnIncomplete'] : $phpunitConfiguration->failOnIncomplete();
+            $arguments['failOnRisky'] = isset($arguments['failOnRisky']) ? $arguments['failOnRisky'] : $phpunitConfiguration->failOnRisky();
+            $arguments['failOnSkipped'] = isset($arguments['failOnSkipped']) ? $arguments['failOnSkipped'] : $phpunitConfiguration->failOnSkipped();
+            $arguments['failOnWarning'] = isset($arguments['failOnWarning']) ? $arguments['failOnWarning'] : $phpunitConfiguration->failOnWarning();
+            $arguments['enforceTimeLimit'] = isset($arguments['enforceTimeLimit']) ? $arguments['enforceTimeLimit'] : $phpunitConfiguration->enforceTimeLimit();
+            $arguments['defaultTimeLimit'] = isset($arguments['defaultTimeLimit']) ? $arguments['defaultTimeLimit'] : $phpunitConfiguration->defaultTimeLimit();
+            $arguments['timeoutForSmallTests'] = isset($arguments['timeoutForSmallTests']) ? $arguments['timeoutForSmallTests'] : $phpunitConfiguration->timeoutForSmallTests();
+            $arguments['timeoutForMediumTests'] = isset($arguments['timeoutForMediumTests']) ? $arguments['timeoutForMediumTests'] : $phpunitConfiguration->timeoutForMediumTests();
+            $arguments['timeoutForLargeTests'] = isset($arguments['timeoutForLargeTests']) ? $arguments['timeoutForLargeTests'] : $phpunitConfiguration->timeoutForLargeTests();
+            $arguments['reportUselessTests'] = isset($arguments['reportUselessTests']) ? $arguments['reportUselessTests'] : $phpunitConfiguration->beStrictAboutTestsThatDoNotTestAnything();
+            $arguments['strictCoverage'] = isset($arguments['strictCoverage']) ? $arguments['strictCoverage'] : $phpunitConfiguration->beStrictAboutCoversAnnotation();
+            $arguments['ignoreDeprecatedCodeUnitsFromCodeCoverage'] = isset($arguments['ignoreDeprecatedCodeUnitsFromCodeCoverage']) ? $arguments['ignoreDeprecatedCodeUnitsFromCodeCoverage'] : $codeCoverageConfiguration->ignoreDeprecatedCodeUnits();
+            $arguments['disallowTestOutput'] = isset($arguments['disallowTestOutput']) ? $arguments['disallowTestOutput'] : $phpunitConfiguration->beStrictAboutOutputDuringTests();
+            $arguments['disallowTodoAnnotatedTests'] = isset($arguments['disallowTodoAnnotatedTests']) ? $arguments['disallowTodoAnnotatedTests'] : $phpunitConfiguration->beStrictAboutTodoAnnotatedTests();
+            $arguments['beStrictAboutResourceUsageDuringSmallTests'] = isset($arguments['beStrictAboutResourceUsageDuringSmallTests']) ? $arguments['beStrictAboutResourceUsageDuringSmallTests'] : $phpunitConfiguration->beStrictAboutResourceUsageDuringSmallTests();
+            $arguments['verbose'] = isset($arguments['verbose']) ? $arguments['verbose'] : $phpunitConfiguration->verbose();
+            $arguments['reverseDefectList'] = isset($arguments['reverseDefectList']) ? $arguments['reverseDefectList'] : $phpunitConfiguration->reverseDefectList();
+            $arguments['forceCoversAnnotation'] = isset($arguments['forceCoversAnnotation']) ? $arguments['forceCoversAnnotation'] : $phpunitConfiguration->forceCoversAnnotation();
+            $arguments['disableCodeCoverageIgnore'] = isset($arguments['disableCodeCoverageIgnore']) ? $arguments['disableCodeCoverageIgnore'] : $codeCoverageConfiguration->disableCodeCoverageIgnore();
+            $arguments['registerMockObjectsFromTestArgumentsRecursively'] = isset($arguments['registerMockObjectsFromTestArgumentsRecursively']) ? $arguments['registerMockObjectsFromTestArgumentsRecursively'] : $phpunitConfiguration->registerMockObjectsFromTestArgumentsRecursively();
+            $arguments['noInteraction'] = isset($arguments['noInteraction']) ? $arguments['noInteraction'] : $phpunitConfiguration->noInteraction();
+            $arguments['executionOrder'] = isset($arguments['executionOrder']) ? $arguments['executionOrder'] : $phpunitConfiguration->executionOrder();
+            $arguments['resolveDependencies'] = isset($arguments['resolveDependencies']) ? $arguments['resolveDependencies'] : $phpunitConfiguration->resolveDependencies();
 
             if (!isset($arguments['bootstrap']) && $phpunitConfiguration->hasBootstrap()) {
                 $arguments['bootstrap'] = $phpunitConfiguration->bootstrap();
@@ -1011,7 +1011,7 @@ final class TestRunner extends BaseTestRunner
             $groupConfiguration = $arguments['configurationObject']->groups();
 
             if (!isset($arguments['groups']) && $groupConfiguration->hasInclude()) {
-                $arguments['groups'] = $groupConfiguration->include()->asArrayOfStrings();
+                $arguments['groups'] = $groupConfiguration->getInclude()->asArrayOfStrings();
             }
 
             if (!isset($arguments['excludeGroups']) && $groupConfiguration->hasExclude()) {
@@ -1071,7 +1071,7 @@ final class TestRunner extends BaseTestRunner
             $testdoxGroupConfiguration = $arguments['configurationObject']->testdoxGroups();
 
             if (!isset($arguments['testdoxGroups']) && $testdoxGroupConfiguration->hasInclude()) {
-                $arguments['testdoxGroups'] = $testdoxGroupConfiguration->include()->asArrayOfStrings();
+                $arguments['testdoxGroups'] = $testdoxGroupConfiguration->getInclude()->asArrayOfStrings();
             }
 
             if (!isset($arguments['testdoxExcludeGroups']) && $testdoxGroupConfiguration->hasExclude()) {
@@ -1087,57 +1087,57 @@ final class TestRunner extends BaseTestRunner
 
         unset($extensionHandler);
 
-        $arguments['backupGlobals']                                   = $arguments['backupGlobals'] ?? null;
-        $arguments['backupStaticAttributes']                          = $arguments['backupStaticAttributes'] ?? null;
-        $arguments['beStrictAboutChangesToGlobalState']               = $arguments['beStrictAboutChangesToGlobalState'] ?? null;
-        $arguments['beStrictAboutResourceUsageDuringSmallTests']      = $arguments['beStrictAboutResourceUsageDuringSmallTests'] ?? false;
-        $arguments['cacheResult']                                     = $arguments['cacheResult'] ?? true;
-        $arguments['colors']                                          = $arguments['colors'] ?? DefaultResultPrinter::COLOR_DEFAULT;
-        $arguments['columns']                                         = $arguments['columns'] ?? 80;
-        $arguments['convertDeprecationsToExceptions']                 = $arguments['convertDeprecationsToExceptions'] ?? true;
-        $arguments['convertErrorsToExceptions']                       = $arguments['convertErrorsToExceptions'] ?? true;
-        $arguments['convertNoticesToExceptions']                      = $arguments['convertNoticesToExceptions'] ?? true;
-        $arguments['convertWarningsToExceptions']                     = $arguments['convertWarningsToExceptions'] ?? true;
-        $arguments['crap4jThreshold']                                 = $arguments['crap4jThreshold'] ?? 30;
-        $arguments['disallowTestOutput']                              = $arguments['disallowTestOutput'] ?? false;
-        $arguments['disallowTodoAnnotatedTests']                      = $arguments['disallowTodoAnnotatedTests'] ?? false;
-        $arguments['defaultTimeLimit']                                = $arguments['defaultTimeLimit'] ?? 0;
-        $arguments['enforceTimeLimit']                                = $arguments['enforceTimeLimit'] ?? false;
-        $arguments['excludeGroups']                                   = $arguments['excludeGroups'] ?? [];
-        $arguments['executionOrder']                                  = $arguments['executionOrder'] ?? TestSuiteSorter::ORDER_DEFAULT;
-        $arguments['executionOrderDefects']                           = $arguments['executionOrderDefects'] ?? TestSuiteSorter::ORDER_DEFAULT;
-        $arguments['failOnIncomplete']                                = $arguments['failOnIncomplete'] ?? false;
-        $arguments['failOnRisky']                                     = $arguments['failOnRisky'] ?? false;
-        $arguments['failOnSkipped']                                   = $arguments['failOnSkipped'] ?? false;
-        $arguments['failOnWarning']                                   = $arguments['failOnWarning'] ?? false;
-        $arguments['groups']                                          = $arguments['groups'] ?? [];
-        $arguments['noInteraction']                                   = $arguments['noInteraction'] ?? false;
-        $arguments['processIsolation']                                = $arguments['processIsolation'] ?? false;
-        $arguments['randomOrderSeed']                                 = $arguments['randomOrderSeed'] ?? time();
-        $arguments['registerMockObjectsFromTestArgumentsRecursively'] = $arguments['registerMockObjectsFromTestArgumentsRecursively'] ?? false;
-        $arguments['repeat']                                          = $arguments['repeat'] ?? false;
-        $arguments['reportHighLowerBound']                            = $arguments['reportHighLowerBound'] ?? 90;
-        $arguments['reportLowUpperBound']                             = $arguments['reportLowUpperBound'] ?? 50;
-        $arguments['reportUselessTests']                              = $arguments['reportUselessTests'] ?? true;
-        $arguments['reverseList']                                     = $arguments['reverseList'] ?? false;
-        $arguments['resolveDependencies']                             = $arguments['resolveDependencies'] ?? true;
-        $arguments['stopOnError']                                     = $arguments['stopOnError'] ?? false;
-        $arguments['stopOnFailure']                                   = $arguments['stopOnFailure'] ?? false;
-        $arguments['stopOnIncomplete']                                = $arguments['stopOnIncomplete'] ?? false;
-        $arguments['stopOnRisky']                                     = $arguments['stopOnRisky'] ?? false;
-        $arguments['stopOnSkipped']                                   = $arguments['stopOnSkipped'] ?? false;
-        $arguments['stopOnWarning']                                   = $arguments['stopOnWarning'] ?? false;
-        $arguments['stopOnDefect']                                    = $arguments['stopOnDefect'] ?? false;
-        $arguments['strictCoverage']                                  = $arguments['strictCoverage'] ?? false;
-        $arguments['testdoxExcludeGroups']                            = $arguments['testdoxExcludeGroups'] ?? [];
-        $arguments['testdoxGroups']                                   = $arguments['testdoxGroups'] ?? [];
-        $arguments['timeoutForLargeTests']                            = $arguments['timeoutForLargeTests'] ?? 60;
-        $arguments['timeoutForMediumTests']                           = $arguments['timeoutForMediumTests'] ?? 10;
-        $arguments['timeoutForSmallTests']                            = $arguments['timeoutForSmallTests'] ?? 1;
-        $arguments['verbose']                                         = $arguments['verbose'] ?? false;
+        $arguments['backupGlobals'] = isset($arguments['backupGlobals']) ? $arguments['backupGlobals'] : null;
+        $arguments['backupStaticAttributes'] = isset($arguments['backupStaticAttributes']) ? $arguments['backupStaticAttributes'] : null;
+        $arguments['beStrictAboutChangesToGlobalState'] = isset($arguments['beStrictAboutChangesToGlobalState']) ? $arguments['beStrictAboutChangesToGlobalState'] : null;
+        $arguments['beStrictAboutResourceUsageDuringSmallTests'] = isset($arguments['beStrictAboutResourceUsageDuringSmallTests']) ? $arguments['beStrictAboutResourceUsageDuringSmallTests'] : false;
+        $arguments['cacheResult'] = isset($arguments['cacheResult']) ? $arguments['cacheResult'] : true;
+        $arguments['colors'] = isset($arguments['colors']) ? $arguments['colors'] : DefaultResultPrinter::COLOR_DEFAULT;
+        $arguments['columns'] = isset($arguments['columns']) ? $arguments['columns'] : 80;
+        $arguments['convertDeprecationsToExceptions'] = isset($arguments['convertDeprecationsToExceptions']) ? $arguments['convertDeprecationsToExceptions'] : true;
+        $arguments['convertErrorsToExceptions'] = isset($arguments['convertErrorsToExceptions']) ? $arguments['convertErrorsToExceptions'] : true;
+        $arguments['convertNoticesToExceptions'] = isset($arguments['convertNoticesToExceptions']) ? $arguments['convertNoticesToExceptions'] : true;
+        $arguments['convertWarningsToExceptions'] = isset($arguments['convertWarningsToExceptions']) ? $arguments['convertWarningsToExceptions'] : true;
+        $arguments['crap4jThreshold'] = isset($arguments['crap4jThreshold']) ? $arguments['crap4jThreshold'] : 30;
+        $arguments['disallowTestOutput'] = isset($arguments['disallowTestOutput']) ? $arguments['disallowTestOutput'] : false;
+        $arguments['disallowTodoAnnotatedTests'] = isset($arguments['disallowTodoAnnotatedTests']) ? $arguments['disallowTodoAnnotatedTests'] : false;
+        $arguments['defaultTimeLimit'] = isset($arguments['defaultTimeLimit']) ? $arguments['defaultTimeLimit'] : 0;
+        $arguments['enforceTimeLimit'] = isset($arguments['enforceTimeLimit']) ? $arguments['enforceTimeLimit'] : false;
+        $arguments['excludeGroups'] = isset($arguments['excludeGroups']) ? $arguments['excludeGroups'] : [];
+        $arguments['executionOrder'] = isset($arguments['executionOrder']) ? $arguments['executionOrder'] : TestSuiteSorter::ORDER_DEFAULT;
+        $arguments['executionOrderDefects'] = isset($arguments['executionOrderDefects']) ? $arguments['executionOrderDefects'] : TestSuiteSorter::ORDER_DEFAULT;
+        $arguments['failOnIncomplete'] = isset($arguments['failOnIncomplete']) ? $arguments['failOnIncomplete'] : false;
+        $arguments['failOnRisky'] = isset($arguments['failOnRisky']) ? $arguments['failOnRisky'] : false;
+        $arguments['failOnSkipped'] = isset($arguments['failOnSkipped']) ? $arguments['failOnSkipped'] : false;
+        $arguments['failOnWarning'] = isset($arguments['failOnWarning']) ? $arguments['failOnWarning'] : false;
+        $arguments['groups'] = isset($arguments['groups']) ? $arguments['groups'] : [];
+        $arguments['noInteraction'] = isset($arguments['noInteraction']) ? $arguments['noInteraction'] : false;
+        $arguments['processIsolation'] = isset($arguments['processIsolation']) ? $arguments['processIsolation'] : false;
+        $arguments['randomOrderSeed'] = isset($arguments['randomOrderSeed']) ? $arguments['randomOrderSeed'] : time();
+        $arguments['registerMockObjectsFromTestArgumentsRecursively'] = isset($arguments['registerMockObjectsFromTestArgumentsRecursively']) ? $arguments['registerMockObjectsFromTestArgumentsRecursively'] : false;
+        $arguments['repeat'] = isset($arguments['repeat']) ? $arguments['repeat'] : false;
+        $arguments['reportHighLowerBound'] = isset($arguments['reportHighLowerBound']) ? $arguments['reportHighLowerBound'] : 90;
+        $arguments['reportLowUpperBound'] = isset($arguments['reportLowUpperBound']) ? $arguments['reportLowUpperBound'] : 50;
+        $arguments['reportUselessTests'] = isset($arguments['reportUselessTests']) ? $arguments['reportUselessTests'] : true;
+        $arguments['reverseList'] = isset($arguments['reverseList']) ? $arguments['reverseList'] : false;
+        $arguments['resolveDependencies'] = isset($arguments['resolveDependencies']) ? $arguments['resolveDependencies'] : true;
+        $arguments['stopOnError'] = isset($arguments['stopOnError']) ? $arguments['stopOnError'] : false;
+        $arguments['stopOnFailure'] = isset($arguments['stopOnFailure']) ? $arguments['stopOnFailure'] : false;
+        $arguments['stopOnIncomplete'] = isset($arguments['stopOnIncomplete']) ? $arguments['stopOnIncomplete'] : false;
+        $arguments['stopOnRisky'] = isset($arguments['stopOnRisky']) ? $arguments['stopOnRisky'] : false;
+        $arguments['stopOnSkipped'] = isset($arguments['stopOnSkipped']) ? $arguments['stopOnSkipped'] : false;
+        $arguments['stopOnWarning'] = isset($arguments['stopOnWarning']) ? $arguments['stopOnWarning'] : false;
+        $arguments['stopOnDefect'] = isset($arguments['stopOnDefect']) ? $arguments['stopOnDefect'] : false;
+        $arguments['strictCoverage'] = isset($arguments['strictCoverage']) ? $arguments['strictCoverage'] : false;
+        $arguments['testdoxExcludeGroups'] = isset($arguments['testdoxExcludeGroups']) ? $arguments['testdoxExcludeGroups'] : [];
+        $arguments['testdoxGroups'] = isset($arguments['testdoxGroups']) ? $arguments['testdoxGroups'] : [];
+        $arguments['timeoutForLargeTests'] = isset($arguments['timeoutForLargeTests']) ? $arguments['timeoutForLargeTests'] : 60;
+        $arguments['timeoutForMediumTests'] = isset($arguments['timeoutForMediumTests']) ? $arguments['timeoutForMediumTests'] : 10;
+        $arguments['timeoutForSmallTests'] = isset($arguments['timeoutForSmallTests']) ? $arguments['timeoutForSmallTests'] : 1;
+        $arguments['verbose'] = isset($arguments['verbose']) ? $arguments['verbose'] : false;
     }
 
-    private function processSuiteFilters(TestSuite $suite, array $arguments): void
+    private function processSuiteFilters(TestSuite $suite, array $arguments)
     {
         if (!$arguments['filter'] &&
             empty($arguments['groups']) &&
@@ -1167,7 +1167,7 @@ final class TestRunner extends BaseTestRunner
             $filterFactory->addFilter(
                 new ReflectionClass(IncludeGroupFilterIterator::class),
                 array_map(
-                    static function (string $name): string {
+                    static function ($name) {
                         return '__phpunit_covers_' . $name;
                     },
                     $arguments['testsCovering']
@@ -1179,7 +1179,7 @@ final class TestRunner extends BaseTestRunner
             $filterFactory->addFilter(
                 new ReflectionClass(IncludeGroupFilterIterator::class),
                 array_map(
-                    static function (string $name): string {
+                    static function ($name) {
                         return '__phpunit_uses_' . $name;
                     },
                     $arguments['testsUsing']
@@ -1197,7 +1197,7 @@ final class TestRunner extends BaseTestRunner
         $suite->injectFilter($filterFactory);
     }
 
-    private function writeMessage(string $type, string $message): void
+    private function writeMessage($type, $message)
     {
         if (!$this->messagePrinted) {
             $this->write("\n");
@@ -1214,7 +1214,7 @@ final class TestRunner extends BaseTestRunner
         $this->messagePrinted = true;
     }
 
-    private function createPrinter(string $class, array $arguments): ResultPrinter
+    private function createPrinter($class, array $arguments)
     {
         $object = new $class(
             (isset($arguments['stderr']) && $arguments['stderr'] === true) ? 'php://stderr' : null,
@@ -1230,7 +1230,7 @@ final class TestRunner extends BaseTestRunner
         return $object;
     }
 
-    private function codeCoverageGenerationStart(string $format): void
+    private function codeCoverageGenerationStart($format)
     {
         $this->printer->write(
             sprintf(
@@ -1242,7 +1242,7 @@ final class TestRunner extends BaseTestRunner
         $this->timer->start();
     }
 
-    private function codeCoverageGenerationSucceeded(): void
+    private function codeCoverageGenerationSucceeded()
     {
         $this->printer->write(
             sprintf(
@@ -1252,7 +1252,7 @@ final class TestRunner extends BaseTestRunner
         );
     }
 
-    private function codeCoverageGenerationFailed(\Exception $e): void
+    private function codeCoverageGenerationFailed(\Exception $e)
     {
         $this->printer->write(
             sprintf(

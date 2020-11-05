@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,7 +19,7 @@ use function sprintf;
  */
 final class InvalidArgumentException extends Exception
 {
-    public static function create(int $argument, string $type): self
+    public static function create($argument, $type)
     {
         $stack = debug_backtrace();
 
@@ -35,7 +35,7 @@ final class InvalidArgumentException extends Exception
         );
     }
 
-    private function __construct(string $message = '', int $code = 0, \Exception $previous = null)
+    private function __construct($message = '', $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

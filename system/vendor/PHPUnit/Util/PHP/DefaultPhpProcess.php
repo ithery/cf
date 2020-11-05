@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -43,7 +43,7 @@ class DefaultPhpProcess extends AbstractPhpProcess
      *
      * @throws Exception
      */
-    public function runJob(string $job, array $settings = []): array
+    public function runJob($job, array $settings = [])
     {
         if ($this->stdin || $this->useTemporaryFile()) {
             if (!($this->tempFile = tempnam(sys_get_temp_dir(), 'PHPUnit')) ||
@@ -62,7 +62,7 @@ class DefaultPhpProcess extends AbstractPhpProcess
     /**
      * Returns an array of file handles to be used in place of pipes.
      */
-    protected function getHandles(): array
+    protected function getHandles()
     {
         return [];
     }
@@ -72,14 +72,14 @@ class DefaultPhpProcess extends AbstractPhpProcess
      *
      * @throws Exception
      */
-    protected function runProcess(string $job, array $settings): array
+    protected function runProcess($job, array $settings)
     {
         $handles = $this->getHandles();
 
         $env = null;
 
         if ($this->env) {
-            $env = $_SERVER ?? [];
+            $env = isset($_SERVER) ? $_SERVER : [];
             unset($env['argv'], $env['argc']);
             $env = array_merge($env, $this->env);
 
@@ -91,9 +91,9 @@ class DefaultPhpProcess extends AbstractPhpProcess
         }
 
         $pipeSpec = [
-            0 => $handles[0] ?? ['pipe', 'r'],
-            1 => $handles[1] ?? ['pipe', 'w'],
-            2 => $handles[2] ?? ['pipe', 'w'],
+            0 => isset($handles[0]) ? $handles[0] : ['pipe', 'r'],
+            1 => isset($handles[1]) ? $handles[1] : ['pipe', 'w'],
+            2 => isset($handles[2]) ? $handles[2] : ['pipe', 'w'],
         ];
 
         $process = proc_open(
@@ -217,19 +217,19 @@ class DefaultPhpProcess extends AbstractPhpProcess
     /**
      * @param resource $pipe
      */
-    protected function process($pipe, string $job): void
+    protected function process($pipe, $job)
     {
         fwrite($pipe, $job);
     }
 
-    protected function cleanup(): void
+    protected function cleanup()
     {
         if ($this->tempFile) {
             unlink($this->tempFile);
         }
     }
 
-    protected function useTemporaryFile(): bool
+    protected function useTemporaryFile()
     {
         return false;
     }

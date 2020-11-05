@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -22,7 +22,7 @@ final class StringEndsWith extends Constraint
      */
     private $suffix;
 
-    public function __construct(string $suffix)
+    public function __construct($suffix)
     {
         $this->suffix = $suffix;
     }
@@ -30,7 +30,7 @@ final class StringEndsWith extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'ends with "' . $this->suffix . '"';
     }
@@ -41,7 +41,7 @@ final class StringEndsWith extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return substr($other, 0 - strlen($this->suffix)) === $this->suffix;
     }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class TestSuiteCollection implements Countable, IteratorAggregate
     /**
      * @param TestSuite[] $testSuites
      */
-    public static function fromArray(array $testSuites): self
+    public static function fromArray(array $testSuites)
     {
         return new self(...$testSuites);
     }
@@ -40,22 +40,22 @@ final class TestSuiteCollection implements Countable, IteratorAggregate
     /**
      * @return TestSuite[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->testSuites;
     }
 
-    public function count(): int
+    public function count()
     {
         return count($this->testSuites);
     }
 
-    public function getIterator(): TestSuiteCollectionIterator
+    public function getIterator()
     {
         return new TestSuiteCollectionIterator($this);
     }
 
-    public function isEmpty(): bool
+    public function isEmpty()
     {
         return $this->count() === 0;
     }

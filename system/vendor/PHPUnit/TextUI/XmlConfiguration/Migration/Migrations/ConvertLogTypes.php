@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ use DOMElement;
  */
 final class ConvertLogTypes implements Migration
 {
-    public function migrate(DOMDocument $document): void
+    public function migrate(DOMDocument $document)
     {
         $logging = $document->getElementsByTagName('logging')->item(0);
 

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -23,7 +23,7 @@ final class StringStartsWith extends Constraint
      */
     private $prefix;
 
-    public function __construct(string $prefix)
+    public function __construct($prefix)
     {
         if (strlen($prefix) === 0) {
             throw InvalidArgumentException::create(1, 'non-empty string');
@@ -35,7 +35,7 @@ final class StringStartsWith extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'starts with "' . $this->prefix . '"';
     }
@@ -46,7 +46,7 @@ final class StringStartsWith extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return strpos((string) $other, $this->prefix) === 0;
     }

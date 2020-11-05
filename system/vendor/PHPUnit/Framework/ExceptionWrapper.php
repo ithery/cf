@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -47,7 +47,7 @@ final class ExceptionWrapper extends Exception
         $this->setOriginalException($t);
     }
 
-    public function __toString(): string
+    public function __toString()
     {
         $string = TestFailure::exceptionToString($this);
 
@@ -62,22 +62,22 @@ final class ExceptionWrapper extends Exception
         return $string;
     }
 
-    public function getClassName(): string
+    public function getClassName()
     {
         return $this->className;
     }
 
-    public function getPreviousWrapped(): ?self
+    public function getPreviousWrapped()
     {
         return $this->previous;
     }
 
-    public function setClassName(string $className): void
+    public function setClassName($className)
     {
         $this->className = $className;
     }
 
-    public function setOriginalException(Throwable $t): void
+    public function setOriginalException(Throwable $t)
     {
         $this->originalException($t);
 
@@ -96,7 +96,7 @@ final class ExceptionWrapper extends Exception
         }
     }
 
-    public function getOriginalException(): ?Throwable
+    public function getOriginalException()
     {
         return $this->originalException();
     }
@@ -107,7 +107,7 @@ final class ExceptionWrapper extends Exception
      *
      * Approach works both for var_dump() and var_export() and print_r().
      */
-    private function originalException(Throwable $exceptionToStore = null): ?Throwable
+    private function originalException(Throwable $exceptionToStore = null)
     {
         static $originalExceptions;
 
@@ -117,6 +117,6 @@ final class ExceptionWrapper extends Exception
             $originalExceptions[$instanceId] = $exceptionToStore;
         }
 
-        return $originalExceptions[$instanceId] ?? null;
+        return isset($originalExceptions[$instanceId]) ? $originalExceptions[$instanceId]: null;
     }
 }

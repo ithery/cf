@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class GroupCollection implements IteratorAggregate
     /**
      * @param Group[] $groups
      */
-    public static function fromArray(array $groups): self
+    public static function fromArray(array $groups)
     {
         return new self(...$groups);
     }
@@ -38,7 +38,7 @@ final class GroupCollection implements IteratorAggregate
     /**
      * @return Group[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->groups;
     }
@@ -46,7 +46,7 @@ final class GroupCollection implements IteratorAggregate
     /**
      * @return string[]
      */
-    public function asArrayOfStrings(): array
+    public function asArrayOfStrings()
     {
         $result = [];
 
@@ -57,12 +57,12 @@ final class GroupCollection implements IteratorAggregate
         return $result;
     }
 
-    public function isEmpty(): bool
+    public function isEmpty()
     {
         return empty($this->groups);
     }
 
-    public function getIterator(): GroupCollectionIterator
+    public function getIterator()
     {
         return new GroupCollectionIterator($this);
     }

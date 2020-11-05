@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,13 +19,13 @@ final class PHPTAssertionFailedError extends SyntheticError
      */
     private $diff;
 
-    public function __construct(string $message, int $code, string $file, int $line, array $trace, string $diff)
+    public function __construct($message, $code, $file, $line, array $trace, $diff)
     {
         parent::__construct($message, $code, $file, $line, $trace);
         $this->diff = $diff;
     }
 
-    public function getDiff(): string
+    public function getDiff()
     {
         return $this->diff;
     }

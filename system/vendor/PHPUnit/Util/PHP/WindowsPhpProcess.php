@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -20,7 +20,7 @@ use PHPUnit\Framework\Exception;
  */
 final class WindowsPhpProcess extends DefaultPhpProcess
 {
-    public function getCommand(array $settings, string $file = null): string
+    public function getCommand(array $settings, $file = null)
     {
         if (PHP_MAJOR_VERSION < 8) {
             return '"' . parent::getCommand($settings, $file) . '"';
@@ -32,7 +32,7 @@ final class WindowsPhpProcess extends DefaultPhpProcess
     /**
      * @throws Exception
      */
-    protected function getHandles(): array
+    protected function getHandles()
     {
         if (false === $stdout_handle = tmpfile()) {
             throw new Exception(
@@ -45,7 +45,7 @@ final class WindowsPhpProcess extends DefaultPhpProcess
         ];
     }
 
-    protected function useTemporaryFile(): bool
+    protected function useTemporaryFile()
     {
         return true;
     }

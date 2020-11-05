@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -29,7 +29,7 @@ final class IsIdentical extends Constraint
     /**
      * @var float
      */
-    private const EPSILON = 0.0000000001;
+    const EPSILON = 0.0000000001;
 
     /**
      * @var mixed
@@ -54,7 +54,7 @@ final class IsIdentical extends Constraint
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate($other, $description = '', $returnResult = false)
     {
         if (is_float($this->value) && is_float($other) &&
             !is_infinite($this->value) && !is_infinite($other) &&
@@ -102,7 +102,7 @@ final class IsIdentical extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString(): string
+    public function toString()
     {
         if (is_object($this->value)) {
             return 'is identical to an object of class "' .
@@ -122,7 +122,7 @@ final class IsIdentical extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         if (is_object($this->value) && is_object($other)) {
             return 'two variables reference the same object';

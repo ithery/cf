@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ use function sprintf;
  */
 final class CannotUseAddMethodsException extends \PHPUnit\Framework\Exception implements Exception
 {
-    public function __construct(string $type, string $methodName)
+    public function __construct($type, $methodName)
     {
         parent::__construct(
             sprintf(

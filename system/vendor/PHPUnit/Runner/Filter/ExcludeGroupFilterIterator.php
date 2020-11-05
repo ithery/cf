@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ use function in_array;
  */
 final class ExcludeGroupFilterIterator extends GroupFilterIterator
 {
-    protected function doAccept(string $hash): bool
+    protected function doAccept($hash)
     {
         return !in_array($hash, $this->groupTests, true);
     }

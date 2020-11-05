@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -39,7 +39,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
     /**
      * The default Testdox left margin for messages is a vertical line.
      */
-    private const PREFIX_SIMPLE = [
+    public $PREFIX_SIMPLE = [
         'default' => '│',
         'start'   => '│',
         'message' => '│',
@@ -51,7 +51,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
     /**
      * Colored Testdox use box-drawing for a more textured map of the message.
      */
-    private const PREFIX_DECORATED = [
+    public $PREFIX_DECORATED = [
         'default' => '│',
         'start'   => '┐',
         'message' => '├',
@@ -60,14 +60,14 @@ class CliTestDoxPrinter extends TestDoxPrinter
         'last'    => '┴',
     ];
 
-    private const SPINNER_ICONS = [
+    public $SPINNER_ICONS = [
         " \e[36m◐\e[0m running tests",
         " \e[36m◓\e[0m running tests",
         " \e[36m◑\e[0m running tests",
         " \e[36m◒\e[0m running tests",
     ];
 
-    private const STATUS_STYLES = [
+    public $STATUS_STYLES = [
         BaseTestRunner::STATUS_PASSED => [
             'symbol' => '✔',
             'color'  => 'fg-green',
@@ -125,7 +125,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
      *
      * @throws \PHPUnit\Framework\Exception
      */
-    public function __construct($out = null, bool $verbose = false, string $colors = self::COLOR_DEFAULT, bool $debug = false, $numberOfColumns = 80, bool $reverse = false)
+    public function __construct($out = null, $verbose = false, $colors = self::COLOR_DEFAULT, $debug = false, $numberOfColumns = 80, $reverse = false)
     {
         parent::__construct($out, $verbose, $colors, $debug, $numberOfColumns, $reverse);
 
@@ -134,7 +134,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
         $this->timer->start();
     }
 
-    public function printResult(TestResult $result): void
+    public function printResult(TestResult $result)
     {
         $this->printHeader($result);
 
@@ -143,12 +143,12 @@ class CliTestDoxPrinter extends TestDoxPrinter
         $this->printFooter($result);
     }
 
-    protected function printHeader(TestResult $result): void
+    protected function printHeader(TestResult $result)
     {
         $this->write("\n" . (new ResourceUsageFormatter)->resourceUsage($this->timer->stop()) . "\n\n");
     }
 
-    protected function formatClassName(Test $test): string
+    protected function formatClassName(Test $test)
     {
         if ($test instanceof TestCase) {
             return $this->prettifier->prettifyTestClass(get_class($test));
@@ -160,7 +160,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function registerTestResult(Test $test, ?Throwable $t, int $status, float $time, bool $verbose): void
+    protected function registerTestResult(Test $test, $t, $status, $time, $verbose)
     {
         if ($status !== BaseTestRunner::STATUS_PASSED) {
             $this->nonSuccessfulTestResults[] = $this->testIndex;
@@ -172,7 +172,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function formatTestName(Test $test): string
+    protected function formatTestName(Test $test)
     {
         if ($test instanceof TestCase) {
             return $this->prettifier->prettifyTestCase($test);
@@ -181,7 +181,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
         return parent::formatTestName($test);
     }
 
-    protected function writeTestResult(array $prevResult, array $result): void
+    protected function writeTestResult(array $prevResult, array $result)
     {
         // spacer line for new suite headers and after verbose messages
         if ($prevResult['testName'] !== '' &&
@@ -201,7 +201,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
             $testName = $result['testMethod'];
         }
 
-        $style = self::STATUS_STYLES[$result['status']];
+        $style = self::$STATUS_STYLES[$result['status']];
         $line  = sprintf(
             ' %s %s%s' . PHP_EOL,
             $this->colorizeTextBox($style['color'], $style['symbol']),
@@ -215,12 +215,12 @@ class CliTestDoxPrinter extends TestDoxPrinter
         $this->write($result['message']);
     }
 
-    protected function formatThrowable(Throwable $t, ?int $status = null): string
+    protected function formatThrowable(Throwable $t, $status = null)
     {
         return trim(\PHPUnit\Framework\TestFailure::exceptionToString($t));
     }
 
-    protected function colorizeMessageAndDiff(string $style, string $buffer): array
+    protected function colorizeMessageAndDiff($style, $buffer)
     {
         $lines      = $buffer ? array_map('\rtrim', explode(PHP_EOL, $buffer)) : [];
         $message    = [];
@@ -254,7 +254,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
         return [$message, $diff];
     }
 
-    protected function formatStacktrace(Throwable $t): string
+    protected function formatStacktrace(Throwable $t)
     {
         $trace = \PHPUnit\Util\Filter::getFilteredStacktrace($t);
 
@@ -281,7 +281,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
         return implode('', $lines);
     }
 
-    protected function formatTestResultMessage(Throwable $t, array $result, ?string $prefix = null): string
+    protected function formatTestResultMessage(Throwable $t, array $result, $prefix = null)
     {
         $message = $this->formatThrowable($t, $result['status']);
         $diff    = '';
@@ -291,19 +291,19 @@ class CliTestDoxPrinter extends TestDoxPrinter
         }
 
         if ($message && $this->colors) {
-            $style            = self::STATUS_STYLES[$result['status']]['message'] ?? '';
-            [$message, $diff] = $this->colorizeMessageAndDiff($style, $message);
+            $style            = isset(self::$STATUS_STYLES[$result['status']]['message']) ? self::$STATUS_STYLES[$result['status']]['message'] : '';
+            list($message, $diff) = $this->colorizeMessageAndDiff($style, $message);
         }
 
         if ($prefix === null || !$this->colors) {
-            $prefix = self::PREFIX_SIMPLE;
+            $prefix = self::$PREFIX_SIMPLE;
         }
 
         if ($this->colors) {
-            $color  = self::STATUS_STYLES[$result['status']]['color'] ?? '';
+            $color  = isset(self::$STATUS_STYLES[$result['status']]['color']) ? self::$STATUS_STYLES[$result['status']]['color'] : '';
             $prefix = array_map(static function ($p) use ($color) {
                 return Color::colorize($color, $p);
-            }, self::PREFIX_DECORATED);
+            }, self::$PREFIX_DECORATED);
         }
 
         $trace = $this->formatStacktrace($t);
@@ -328,23 +328,23 @@ class CliTestDoxPrinter extends TestDoxPrinter
         return $out;
     }
 
-    protected function drawSpinner(): void
+    protected function drawSpinner()
     {
         if ($this->colors) {
-            $id = $this->spinState % count(self::SPINNER_ICONS);
-            $this->write(self::SPINNER_ICONS[$id]);
+            $id = $this->spinState % count(self::$SPINNER_ICONS);
+            $this->write(self::$SPINNER_ICONS[$id]);
         }
     }
 
-    protected function undrawSpinner(): void
+    protected function undrawSpinner()
     {
         if ($this->colors) {
-            $id = $this->spinState % count(self::SPINNER_ICONS);
-            $this->write("\e[1K\e[" . strlen(self::SPINNER_ICONS[$id]) . 'D');
+            $id = $this->spinState % count(self::$SPINNER_ICONS);
+            $this->write("\e[1K\e[" . strlen(self::$SPINNER_ICONS[$id]) . 'D');
         }
     }
 
-    private function formatRuntime(float $time, string $color = ''): string
+    private function formatRuntime($time, $color = '')
     {
         if (!$this->colors) {
             return sprintf('[%.2f ms]', $time * 1000);
@@ -357,7 +357,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
         return Color::colorize($color, ' ' . (int) ceil($time * 1000) . ' ' . Color::dim('ms'));
     }
 
-    private function printNonSuccessfulTestsSummary(int $numberOfExecutedTests): void
+    private function printNonSuccessfulTestsSummary($numberOfExecutedTests)
     {
         if (empty($this->nonSuccessfulTestResults)) {
             return;

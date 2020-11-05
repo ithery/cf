@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -85,7 +85,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
      *
      * @throws Exception
      */
-    public function __construct(string $filename, AbstractPhpProcess $phpUtil = null)
+    public function __construct($filename, AbstractPhpProcess $phpUtil = null)
     {
         if (!is_file($filename)) {
             throw new Exception(
@@ -103,7 +103,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * Counts the number of test cases executed by run(TestResult result).
      */
-    public function count(): int
+    public function count()
     {
         return 1;
     }
@@ -116,7 +116,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
      * @throws \SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function run(TestResult $result = null): TestResult
+    public function run(TestResult $result = null)
     {
         if ($result === null) {
             $result = new TestResult;
@@ -193,7 +193,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
 
         $jobResult    = $this->phpUtil->runJob($code, $this->stringifyIni($settings));
         $time         = $timer->stop()->asSeconds();
-        $this->output = $jobResult['stdout'] ?? '';
+        $this->output = isset($jobResult['stdout']) ? $jobResult['stdout'] : '';
 
         if (isset($codeCoverage) && ($coverage = $this->cleanupForCoverage())) {
             $codeCoverage->append($coverage, $this, true, [], []);
@@ -246,7 +246,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * Returns the name of the test case.
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->toString();
     }
@@ -254,32 +254,32 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * Returns a string representation of the test case.
      */
-    public function toString(): string
+    public function toString()
     {
         return $this->filename;
     }
 
-    public function usesDataProvider(): bool
+    public function usesDataProvider()
     {
         return false;
     }
 
-    public function getNumAssertions(): int
+    public function getNumAssertions()
     {
         return 1;
     }
 
-    public function getActualOutput(): string
+    public function getActualOutput()
     {
         return $this->output;
     }
 
-    public function hasOutput(): bool
+    public function hasOutput()
     {
         return !empty($this->output);
     }
 
-    public function sortId(): string
+    public function sortId()
     {
         return $this->filename;
     }
@@ -287,7 +287,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function provides(): array
+    public function provides()
     {
         return [];
     }
@@ -295,7 +295,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function requires(): array
+    public function requires()
     {
         return [];
     }
@@ -305,7 +305,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
      *
      * @param array|string $content
      */
-    private function parseIniSection($content, array $ini = []): array
+    private function parseIniSection($content, array $ini = [])
     {
         if (is_string($content)) {
             $content = explode("\n", trim($content));
@@ -336,7 +336,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         return $ini;
     }
 
-    private function parseEnvSection(string $content): array
+    private function parseEnvSection($content)
     {
         $env = [];
 
@@ -356,7 +356,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws Exception
      */
-    private function assertPhptExpectation(array $sections, string $output): void
+    private function assertPhptExpectation(array $sections, $output)
     {
         $assertions = [
             'EXPECT'      => 'assertEquals',
@@ -387,7 +387,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function runSkip(array &$sections, TestResult $result, array $settings): bool
+    private function runSkip(array &$sections, TestResult $result, array $settings)
     {
         if (!isset($sections['SKIPIF'])) {
             return false;
@@ -418,7 +418,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         return false;
     }
 
-    private function runClean(array &$sections, bool $collectCoverage): void
+    private function runClean(array &$sections, $collectCoverage)
     {
         $this->phpUtil->setStdin('');
         $this->phpUtil->setArgs('');
@@ -433,7 +433,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * @throws Exception
      */
-    private function parse(): array
+    private function parse()
     {
         $sections = [];
         $section  = '';
@@ -500,7 +500,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * @throws Exception
      */
-    private function parseExternal(array &$sections): void
+    private function parseExternal(array &$sections)
     {
         $allowSections = [
             'FILE',
@@ -530,7 +530,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         }
     }
 
-    private function validate(array &$sections): bool
+    private function validate(array &$sections)
     {
         $requiredSections = [
             'FILE',
@@ -568,7 +568,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         return true;
     }
 
-    private function render(string $code): string
+    private function render($code)
     {
         return str_replace(
             [
@@ -583,7 +583,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         );
     }
 
-    private function getCoverageFiles(): array
+    private function getCoverageFiles()
     {
         $baseDir  = dirname(realpath($this->filename)) . DIRECTORY_SEPARATOR;
         $basename = basename($this->filename, 'phpt');
@@ -594,7 +594,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         ];
     }
 
-    private function renderForCoverage(string &$job, bool $pathCoverage, ?string $codeCoverageCacheDirectory): void
+    private function renderForCoverage(&$job, $pathCoverage, $codeCoverageCacheDirectory)
     {
         $files = $this->getCoverageFiles();
 
@@ -646,7 +646,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         $job = $template->render();
     }
 
-    private function cleanupForCoverage(): RawCodeCoverageData
+    private function cleanupForCoverage()
     {
         $coverage = RawCodeCoverageData::fromXdebugWithoutPathCoverage([]);
         $files    = $this->getCoverageFiles();
@@ -670,7 +670,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         return $coverage;
     }
 
-    private function stringifyIni(array $ini): array
+    private function stringifyIni(array $ini)
     {
         $settings = [];
 
@@ -689,7 +689,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         return $settings;
     }
 
-    private function getLocationHintFromDiff(string $message, array $sections): array
+    private function getLocationHintFromDiff($message, array $sections)
     {
         $needle       = '';
         $previousLine = '';
@@ -728,7 +728,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         return $this->getLocationHint($needle, $sections);
     }
 
-    private function getCleanDiffLine(string $line): string
+    private function getCleanDiffLine($line)
     {
         if (preg_match('/^[\-+]([\'\"]?)(.*)\1$/', $line, $matches)) {
             $line = $matches[2];
@@ -737,7 +737,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         return $line;
     }
 
-    private function getLocationHint(string $needle, array $sections, ?string $sectionName = null): array
+    private function getLocationHint($needle, array $sections, $sectionName = null)
     {
         $needle = trim($needle);
 
@@ -776,12 +776,12 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
                     ],
                     [
                         'file' => realpath($this->filename),
-                        'line' => ($sections[$section . '_EXTERNAL_offset'] ?? 0) + 1,
+                        'line' => (isset($sections[$section . '_EXTERNAL_offset']) ? $sections[$section . '_EXTERNAL_offset'] : 0) + 1,
                     ],
                 ];
             }
 
-            $sectionOffset = $sections[$section . '_offset'] ?? 0;
+            $sectionOffset = isset($sections[$section . '_offset']) ? $sections[$section . '_offset'] : 0;
             $offset        = $sectionOffset + 1;
 
             foreach (preg_split('/\r\n|\r|\n/', $sections[$section]) as $line) {
@@ -813,7 +813,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
     /**
      * @psalm-return list<string>
      */
-    private function settings(bool $collectCoverage): array
+    private function settings($collectCoverage)
     {
         $settings = [
             'allow_url_fopen=1',

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -65,7 +65,7 @@ final class Loader
     /**
      * @throws Exception
      */
-    public function load(string $filename): Configuration
+    public function load($filename)
     {
         try {
             $document = (new XmlLoader)->loadFile($filename, false, true, true);
@@ -104,7 +104,7 @@ final class Loader
         );
     }
 
-    public function logging(string $filename, DOMXPath $xpath): Logging
+    public function logging($filename, DOMXPath $xpath)
     {
         if ($xpath->query('logging/log')->length !== 0) {
             return $this->legacyLogging($filename, $xpath);
@@ -204,7 +204,7 @@ final class Loader
         );
     }
 
-    public function legacyLogging(string $filename, DOMXPath $xpath): Logging
+    public function legacyLogging($filename, DOMXPath $xpath)
     {
         $junit       = null;
         $teamCity    = null;
@@ -280,7 +280,7 @@ final class Loader
         );
     }
 
-    private function extensions(string $filename, DOMXPath $xpath): ExtensionCollection
+    private function extensions($filename, DOMXPath $xpath)
     {
         $extensions = [];
 
@@ -293,7 +293,7 @@ final class Loader
         return ExtensionCollection::fromArray($extensions);
     }
 
-    private function getElementConfigurationParameters(string $filename, DOMElement $element): Extension
+    private function getElementConfigurationParameters($filename, DOMElement $element)
     {
         /** @psalm-var class-string $class */
         $class     = (string) $element->getAttribute('class');
@@ -311,7 +311,7 @@ final class Loader
         return new Extension($class, $file, $arguments);
     }
 
-    private function toAbsolutePath(string $filename, string $path, bool $useIncludePath = false): string
+    private function toAbsolutePath($filename, $path, $useIncludePath = false)
     {
         $path = trim($path);
 
@@ -349,7 +349,7 @@ final class Loader
         return $file;
     }
 
-    private function getConfigurationArguments(string $filename, DOMNodeList $nodes): array
+    private function getConfigurationArguments($filename, DOMNodeList $nodes)
     {
         $arguments = [];
 
@@ -382,7 +382,7 @@ final class Loader
         return $arguments;
     }
 
-    private function codeCoverage(string $filename, DOMXPath $xpath, DOMDocument $document): CodeCoverage
+    private function codeCoverage($filename, DOMXPath $xpath, DOMDocument $document)
     {
         if ($xpath->query('filter/whitelist')->length !== 0) {
             return $this->legacyCodeCoverage($filename, $xpath, $document);
@@ -564,7 +564,7 @@ final class Loader
     /**
      * @deprecated
      */
-    private function legacyCodeCoverage(string $filename, DOMXPath $xpath, DOMDocument $document): CodeCoverage
+    private function legacyCodeCoverage($filename, DOMXPath $xpath, DOMDocument $document)
     {
         $ignoreDeprecatedCodeUnits = $this->getBooleanAttribute(
             $document->documentElement,
@@ -707,7 +707,7 @@ final class Loader
      *
      * @return bool|string
      */
-    private function getBoolean(string $value, $default)
+    private function getBoolean($value, $default)
     {
         if (strtolower($value) === 'false') {
             return false;
@@ -720,7 +720,7 @@ final class Loader
         return $default;
     }
 
-    private function readFilterDirectories(string $filename, DOMXPath $xpath, string $query): FilterDirectoryCollection
+    private function readFilterDirectories($filename, DOMXPath $xpath, $query)
     {
         $directories = [];
 
@@ -744,7 +744,7 @@ final class Loader
         return FilterDirectoryCollection::fromArray($directories);
     }
 
-    private function readFilterFiles(string $filename, DOMXPath $xpath, string $query): FileCollection
+    private function readFilterFiles($filename, DOMXPath $xpath, $query)
     {
         $files = [];
 
@@ -759,17 +759,17 @@ final class Loader
         return FileCollection::fromArray($files);
     }
 
-    private function groups(DOMXPath $xpath): Groups
+    private function groups(DOMXPath $xpath)
     {
         return $this->parseGroupConfiguration($xpath, 'groups');
     }
 
-    private function testdoxGroups(DOMXPath $xpath): Groups
+    private function testdoxGroups(DOMXPath $xpath)
     {
         return $this->parseGroupConfiguration($xpath, 'testdoxGroups');
     }
 
-    private function parseGroupConfiguration(DOMXPath $xpath, string $root): Groups
+    private function parseGroupConfiguration(DOMXPath $xpath, $root)
     {
         $include = [];
         $exclude = [];
@@ -788,7 +788,7 @@ final class Loader
         );
     }
 
-    private function listeners(string $filename, DOMXPath $xpath): ExtensionCollection
+    private function listeners($filename, DOMXPath $xpath)
     {
         $listeners = [];
 
@@ -801,7 +801,7 @@ final class Loader
         return ExtensionCollection::fromArray($listeners);
     }
 
-    private function getBooleanAttribute(DOMElement $element, string $attribute, bool $default): bool
+    private function getBooleanAttribute(DOMElement $element, $attribute, $default)
     {
         if (!$element->hasAttribute($attribute)) {
             return $default;
@@ -813,7 +813,7 @@ final class Loader
         );
     }
 
-    private function getIntegerAttribute(DOMElement $element, string $attribute, int $default): int
+    private function getIntegerAttribute(DOMElement $element, $attribute, $default)
     {
         if (!$element->hasAttribute($attribute)) {
             return $default;
@@ -825,7 +825,7 @@ final class Loader
         );
     }
 
-    private function getStringAttribute(DOMElement $element, string $attribute): ?string
+    private function getStringAttribute(DOMElement $element, $attribute)
     {
         if (!$element->hasAttribute($attribute)) {
             return null;
@@ -834,7 +834,7 @@ final class Loader
         return (string) $element->getAttribute($attribute);
     }
 
-    private function getInteger(string $value, int $default): int
+    private function getInteger($value, $default)
     {
         if (is_numeric($value)) {
             return (int) $value;
@@ -843,7 +843,7 @@ final class Loader
         return $default;
     }
 
-    private function php(string $filename, DOMXPath $xpath): Php
+    private function php($filename, DOMXPath $xpath)
     {
         $includePaths = [];
 
@@ -926,11 +926,11 @@ final class Loader
             VariableCollection::fromArray($variables['cookie']),
             VariableCollection::fromArray($variables['server']),
             VariableCollection::fromArray($variables['files']),
-            VariableCollection::fromArray($variables['request']),
+            VariableCollection::fromArray($variables['request'])
         );
     }
 
-    private function phpunit(string $filename, DOMDocument $document): PHPUnit
+    private function phpunit($filename, DOMDocument $document)
     {
         $executionOrder      = TestSuiteSorter::ORDER_DEFAULT;
         $defectsFirst        = false;
@@ -1081,7 +1081,7 @@ final class Loader
         );
     }
 
-    private function getColors(DOMDocument $document): string
+    private function getColors(DOMDocument $document)
     {
         $colors = DefaultResultPrinter::COLOR_DEFAULT;
 
@@ -1116,7 +1116,7 @@ final class Loader
         return $columns;
     }
 
-    private function testSuite(string $filename, DOMXPath $xpath): TestSuiteCollection
+    private function testSuite($filename, DOMXPath $xpath)
     {
         $testSuites = [];
 
@@ -1219,7 +1219,7 @@ final class Loader
     /**
      * @return DOMElement[]
      */
-    private function getTestSuiteElements(DOMXPath $xpath): array
+    private function getTestSuiteElements(DOMXPath $xpath)
     {
         /** @var DOMElement[] $elements */
         $elements = [];
@@ -1247,7 +1247,7 @@ final class Loader
         return $elements;
     }
 
-    private function element(DOMXPath $xpath, string $element): ?DOMElement
+    private function element(DOMXPath $xpath, $element)
     {
         $nodes = $xpath->query($element);
 

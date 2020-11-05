@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -85,57 +85,57 @@ final class Php
         $this->requestVariables = $requestVariables;
     }
 
-    public function includePaths(): DirectoryCollection
+    public function includePaths()
     {
         return $this->includePaths;
     }
 
-    public function iniSettings(): IniSettingCollection
+    public function iniSettings()
     {
         return $this->iniSettings;
     }
 
-    public function constants(): ConstantCollection
+    public function constants()
     {
         return $this->constants;
     }
 
-    public function globalVariables(): VariableCollection
+    public function globalVariables()
     {
         return $this->globalVariables;
     }
 
-    public function envVariables(): VariableCollection
+    public function envVariables()
     {
         return $this->envVariables;
     }
 
-    public function postVariables(): VariableCollection
+    public function postVariables()
     {
         return $this->postVariables;
     }
 
-    public function getVariables(): VariableCollection
+    public function getVariables()
     {
         return $this->getVariables;
     }
 
-    public function cookieVariables(): VariableCollection
+    public function cookieVariables()
     {
         return $this->cookieVariables;
     }
 
-    public function serverVariables(): VariableCollection
+    public function serverVariables()
     {
         return $this->serverVariables;
     }
 
-    public function filesVariables(): VariableCollection
+    public function filesVariables()
     {
         return $this->filesVariables;
     }
 
-    public function requestVariables(): VariableCollection
+    public function requestVariables()
     {
         return $this->requestVariables;
     }

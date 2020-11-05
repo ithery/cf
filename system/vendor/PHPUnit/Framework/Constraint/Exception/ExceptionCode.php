@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -30,7 +30,7 @@ final class ExceptionCode extends Constraint
         $this->expectedCode = $expected;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'exception code is ';
     }
@@ -41,7 +41,7 @@ final class ExceptionCode extends Constraint
      *
      * @param Throwable $other
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return (string) $other->getCode() === (string) $this->expectedCode;
     }
@@ -56,7 +56,7 @@ final class ExceptionCode extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return sprintf(
             '%s is equal to expected exception code %s',

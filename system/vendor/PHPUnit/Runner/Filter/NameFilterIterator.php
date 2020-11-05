@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -45,7 +45,7 @@ final class NameFilterIterator extends RecursiveFilterIterator
     /**
      * @throws Exception
      */
-    public function __construct(RecursiveIterator $iterator, string $filter)
+    public function __construct(RecursiveIterator $iterator, $filter)
     {
         parent::__construct($iterator);
 
@@ -55,7 +55,7 @@ final class NameFilterIterator extends RecursiveFilterIterator
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function accept(): bool
+    public function accept()
     {
         $test = $this->getInnerIterator()->current();
 
@@ -86,7 +86,7 @@ final class NameFilterIterator extends RecursiveFilterIterator
     /**
      * @throws Exception
      */
-    private function setFilter(string $filter): void
+    private function setFilter($filter)
     {
         if (RegularExpression::safeMatch($filter, '') === false) {
             // Handles:

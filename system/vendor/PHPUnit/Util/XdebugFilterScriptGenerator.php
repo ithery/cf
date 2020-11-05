@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\CodeCoverage as FilterConfigura
  */
 final class XdebugFilterScriptGenerator
 {
-    public function generate(FilterConfiguration $filter): string
+    public function generate(FilterConfiguration $filter)
     {
         $files = array_map(
             static function ($item) {
@@ -40,7 +40,7 @@ final class XdebugFilterScriptGenerator
         $files = implode(",\n", $files);
 
         return <<<EOF
-<?php declare(strict_types=1);
+<?php
 if (!\\function_exists('xdebug_set_filter')) {
     return;
 }
@@ -56,7 +56,7 @@ if (!\\function_exists('xdebug_set_filter')) {
 EOF;
     }
 
-    private function getItems(FilterConfiguration $filter): array
+    private function getItems(FilterConfiguration $filter)
     {
         $files = [];
 

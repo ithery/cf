@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,9 +32,9 @@ final class Registry
     /** @var array<string, array<string, DocBlock>> indexed by class name and method name */
     private $methodDocBlocks = [];
 
-    public static function getInstance(): self
+    public static function getInstance()
     {
-        return self::$instance ?? self::$instance = new self;
+        return self::$instance!=null ? self::$instance : self::$instance = new self;
     }
 
     private function __construct()
@@ -45,7 +45,7 @@ final class Registry
      * @throws Exception
      * @psalm-param class-string $class
      */
-    public function forClassName(string $class): DocBlock
+    public function forClassName($class)
     {
         if (array_key_exists($class, $this->classDocBlocks)) {
             return $this->classDocBlocks[$class];
@@ -70,7 +70,7 @@ final class Registry
      * @throws Exception
      * @psalm-param class-string $classInHierarchy
      */
-    public function forMethod(string $classInHierarchy, string $method): DocBlock
+    public function forMethod($classInHierarchy, $method)
     {
         if (isset($this->methodDocBlocks[$classInHierarchy][$method])) {
             return $this->methodDocBlocks[$classInHierarchy][$method];

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -98,7 +98,7 @@ final class MockMethod
      * @throws ReflectionException
      * @throws RuntimeException
      */
-    public static function fromReflection(ReflectionMethod $method, bool $callOriginalMethod, bool $cloneArguments): self
+    public static function fromReflection(ReflectionMethod $method, $callOriginalMethod, $cloneArguments)
     {
         if ($method->isPrivate()) {
             $modifier = 'private';
@@ -142,7 +142,7 @@ final class MockMethod
         );
     }
 
-    public static function fromName(string $fullClassName, string $methodName, bool $cloneArguments): self
+    public static function fromName($fullClassName, $methodName, $cloneArguments)
     {
         return new self(
             $fullClassName,
@@ -159,7 +159,7 @@ final class MockMethod
         );
     }
 
-    public function __construct(string $className, string $methodName, bool $cloneArguments, string $modifier, string $argumentsForDeclaration, string $argumentsForCall, Type $returnType, string $reference, bool $callOriginalMethod, bool $static, ?string $deprecation)
+    public function __construct($className, $methodName, $cloneArguments, $modifier, $argumentsForDeclaration, $argumentsForCall, Type $returnType, $reference, $callOriginalMethod, $static, $deprecation)
     {
         $this->className               = $className;
         $this->methodName              = $methodName;
@@ -174,7 +174,7 @@ final class MockMethod
         $this->deprecation             = $deprecation;
     }
 
-    public function getName(): string
+    public function getName()
     {
         return $this->methodName;
     }
@@ -182,7 +182,7 @@ final class MockMethod
     /**
      * @throws RuntimeException
      */
-    public function generateCode(): string
+    public function generateCode()
     {
         if ($this->static) {
             $templateFile = 'mocked_static_method.tpl';
@@ -234,7 +234,7 @@ final class MockMethod
         return $template->render();
     }
 
-    public function getReturnType(): Type
+    public function getReturnType()
     {
         return $this->returnType;
     }
@@ -242,7 +242,7 @@ final class MockMethod
     /**
      * @throws RuntimeException
      */
-    private function getTemplate(string $template): Template
+    private function getTemplate($template)
     {
         $filename = __DIR__ . DIRECTORY_SEPARATOR . 'Generator' . DIRECTORY_SEPARATOR . $template;
 
@@ -266,7 +266,7 @@ final class MockMethod
      *
      * @throws RuntimeException
      */
-    private static function getMethodParametersForDeclaration(ReflectionMethod $method): string
+    private static function getMethodParametersForDeclaration(ReflectionMethod $method)
     {
         $parameters = [];
 
@@ -335,7 +335,7 @@ final class MockMethod
      *
      * @throws ReflectionException
      */
-    private static function getMethodParametersForCall(ReflectionMethod $method): string
+    private static function getMethodParametersForCall(ReflectionMethod $method)
     {
         $parameters = [];
 
@@ -366,7 +366,7 @@ final class MockMethod
     /**
      * @throws ReflectionException
      */
-    private static function exportDefaultValue(ReflectionParameter $parameter): string
+    private static function exportDefaultValue(ReflectionParameter $parameter)
     {
         try {
             return (string) var_export($parameter->getDefaultValue(), true);
@@ -381,7 +381,7 @@ final class MockMethod
         // @codeCoverageIgnoreEnd
     }
 
-    private static function unionTypeAsString(ReflectionUnionType $union, string $self): string
+    private static function unionTypeAsString(ReflectionUnionType $union, $self)
     {
         $types = [];
 

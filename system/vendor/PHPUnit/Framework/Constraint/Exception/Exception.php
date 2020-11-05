@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -24,7 +24,7 @@ final class Exception extends Constraint
      */
     private $className;
 
-    public function __construct(string $className)
+    public function __construct($className)
     {
         $this->className = $className;
     }
@@ -32,7 +32,7 @@ final class Exception extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'exception of type "%s"',
@@ -46,7 +46,7 @@ final class Exception extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return $other instanceof $this->className;
     }
@@ -59,7 +59,7 @@ final class Exception extends Constraint
      *
      * @param mixed $other evaluated value or object
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         if ($other !== null) {
             $message = '';

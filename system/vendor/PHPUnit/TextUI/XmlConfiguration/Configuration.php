@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -74,7 +74,7 @@ final class Configuration
      */
     private $testSuite;
 
-    public function __construct(string $filename, ValidationResult $validationResult, ExtensionCollection $extensions, CodeCoverage $codeCoverage, Groups $groups, Groups $testdoxGroups, ExtensionCollection $listeners, Logging $logging, Php $php, PHPUnit $phpunit, TestSuiteCollection $testSuite)
+    public function __construct($filename, ValidationResult $validationResult, ExtensionCollection $extensions, CodeCoverage $codeCoverage, Groups $groups, Groups $testdoxGroups, ExtensionCollection $listeners, Logging $logging, Php $php, PHPUnit $phpunit, TestSuiteCollection $testSuite)
     {
         $this->filename         = $filename;
         $this->validationResult = $validationResult;
@@ -89,62 +89,62 @@ final class Configuration
         $this->testSuite        = $testSuite;
     }
 
-    public function filename(): string
+    public function filename()
     {
         return $this->filename;
     }
 
-    public function hasValidationErrors(): bool
+    public function hasValidationErrors()
     {
         return $this->validationResult->hasValidationErrors();
     }
 
-    public function validationErrors(): string
+    public function validationErrors()
     {
         return $this->validationResult->asString();
     }
 
-    public function extensions(): ExtensionCollection
+    public function extensions()
     {
         return $this->extensions;
     }
 
-    public function codeCoverage(): CodeCoverage
+    public function codeCoverage()
     {
         return $this->codeCoverage;
     }
 
-    public function groups(): Groups
+    public function groups()
     {
         return $this->groups;
     }
 
-    public function testdoxGroups(): Groups
+    public function testdoxGroups()
     {
         return $this->testdoxGroups;
     }
 
-    public function listeners(): ExtensionCollection
+    public function listeners()
     {
         return $this->listeners;
     }
 
-    public function logging(): Logging
+    public function logging()
     {
         return $this->logging;
     }
 
-    public function php(): Php
+    public function php()
     {
         return $this->php;
     }
 
-    public function phpunit(): PHPUnit
+    public function phpunit()
     {
         return $this->phpunit;
     }
 
-    public function testSuite(): TestSuiteCollection
+    public function testSuite()
     {
         return $this->testSuite;
     }

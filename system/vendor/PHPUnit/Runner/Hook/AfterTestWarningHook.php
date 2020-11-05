@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -14,5 +14,5 @@ namespace PHPUnit\Runner;
  */
 interface AfterTestWarningHook extends TestHook
 {
-    public function executeAfterTestWarning(string $test, string $message, float $time): void;
+    public function executeAfterTestWarning($test, $message, $time);
 }

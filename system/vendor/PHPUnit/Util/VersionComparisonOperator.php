@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -23,7 +23,7 @@ final class VersionComparisonOperator
      */
     private $operator;
 
-    public function __construct(string $operator)
+    public function __construct($operator)
     {
         $this->ensureOperatorIsValid($operator);
 
@@ -33,7 +33,7 @@ final class VersionComparisonOperator
     /**
      * @return '<'|'lt'|'<='|'le'|'>'|'gt'|'>='|'ge'|'=='|'='|'eq'|'!='|'<>'|'ne'
      */
-    public function asString(): string
+    public function asString()
     {
         return $this->operator;
     }
@@ -43,7 +43,7 @@ final class VersionComparisonOperator
      *
      * @psalm-assert '<'|'lt'|'<='|'le'|'>'|'gt'|'>='|'ge'|'=='|'='|'eq'|'!='|'<>'|'ne' $operator
      */
-    private function ensureOperatorIsValid(string $operator): void
+    private function ensureOperatorIsValid($operator)
     {
         if (!in_array($operator, ['<', 'lt', '<=', 'le', '>', 'gt', '>=', 'ge', '==', '=', 'eq', '!=', '<>', 'ne'], true)) {
             throw new Exception(

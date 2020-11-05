@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -64,7 +64,7 @@ final class Invocation implements SelfDescribing
      */
     private $object;
 
-    public function __construct(string $className, string $methodName, array $parameters, string $returnType, object $object, bool $cloneObjects = false, bool $proxiedCall = false)
+    public function __construct($className, $methodName, array $parameters, $returnType, object $object, $cloneObjects = false, $proxiedCall = false)
     {
         $this->className   = $className;
         $this->methodName  = $methodName;
@@ -94,17 +94,17 @@ final class Invocation implements SelfDescribing
         }
     }
 
-    public function getClassName(): string
+    public function getClassName()
     {
         return $this->className;
     }
 
-    public function getMethodName(): string
+    public function getMethodName()
     {
         return $this->methodName;
     }
 
-    public function getParameters(): array
+    public function getParameters()
     {
         return $this->parameters;
     }
@@ -161,13 +161,13 @@ final class Invocation implements SelfDescribing
 
             case 'callable':
             case 'closure':
-                return static function (): void {
+                return static function () {
                 };
 
             case 'traversable':
             case 'generator':
             case 'iterable':
-                $generator = static function (): \Generator {
+                $generator = static function () {
                     yield;
                 };
 
@@ -181,7 +181,7 @@ final class Invocation implements SelfDescribing
         }
     }
 
-    public function toString(): string
+    public function toString()
     {
         $exporter = new Exporter;
 
@@ -200,12 +200,12 @@ final class Invocation implements SelfDescribing
         );
     }
 
-    public function getObject(): object
+    public function getObject()
     {
         return $this->object;
     }
 
-    private function cloneObject(object $original): object
+    private function cloneObject(object $original)
     {
         if (Type::isCloneable($original)) {
             return clone $original;

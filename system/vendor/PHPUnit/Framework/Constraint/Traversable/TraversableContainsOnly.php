@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -30,7 +30,7 @@ final class TraversableContainsOnly extends Constraint
     /**
      * @throws \PHPUnit\Framework\Exception
      */
-    public function __construct(string $type, bool $isNativeType = true)
+    public function __construct($type, $isNativeType = true)
     {
         if ($isNativeType) {
             $this->constraint = new IsType($type);
@@ -58,7 +58,7 @@ final class TraversableContainsOnly extends Constraint
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate($other, $description = '', $returnResult = false)
     {
         $success = true;
 
@@ -84,7 +84,7 @@ final class TraversableContainsOnly extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'contains only values of type "' . $this->type . '"';
     }

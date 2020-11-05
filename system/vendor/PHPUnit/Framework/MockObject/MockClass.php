@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,14 +32,14 @@ final class MockClass implements MockType
      */
     private $configurableMethods;
 
-    public function __construct(string $classCode, string $mockName, array $configurableMethods)
+    public function __construct($classCode, $mockName, array $configurableMethods)
     {
         $this->classCode           = $classCode;
         $this->mockName            = $mockName;
         $this->configurableMethods = $configurableMethods;
     }
 
-    public function generate(): string
+    public function generate()
     {
         if (!class_exists($this->mockName, false)) {
             eval($this->classCode);
@@ -56,7 +56,7 @@ final class MockClass implements MockType
         return $this->mockName;
     }
 
-    public function getClassCode(): string
+    public function getClassCode()
     {
         return $this->classCode;
     }

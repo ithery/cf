@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,13 +25,13 @@ final class Constant
      */
     private $value;
 
-    public function __construct(string $name, $value)
+    public function __construct($name, $value)
     {
         $this->name  = $name;
         $this->value = $value;
     }
 
-    public function name(): string
+    public function name()
     {
         return $this->name;
     }

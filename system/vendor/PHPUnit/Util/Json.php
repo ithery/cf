@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -31,7 +31,7 @@ final class Json
      *
      * @throws \PHPUnit\Framework\Exception
      */
-    public static function prettify(string $json): string
+    public static function prettify($json)
     {
         $decodedJson = json_decode($json, false);
 
@@ -52,7 +52,7 @@ final class Json
      *               to indicate an error decoding the json. This is used to avoid ambiguity
      *               with JSON strings consisting entirely of 'null' or 'false'.
      */
-    public static function canonicalize(string $json): array
+    public static function canonicalize($json)
     {
         $decodedJson = json_decode($json);
 
@@ -73,7 +73,7 @@ final class Json
      * Sort all array keys to ensure both the expected and actual values have
      * their keys in the same order.
      */
-    private static function recursiveSort(&$json): void
+    private static function recursiveSort(&$json)
     {
         if (!is_array($json)) {
             // If the object is not empty, change it to an associative array

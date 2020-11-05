@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,7 +19,7 @@ use DOMDocument;
  */
 final class Validator
 {
-    public function validate(DOMDocument $document, string $xsdFilename): ValidationResult
+    public function validate(DOMDocument $document, $xsdFilename)
     {
         $originalErrorHandling = libxml_use_internal_errors(true);
 

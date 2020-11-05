@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -63,7 +63,7 @@ final class ExcludeList
     /**
      * @var array<string,int>
      */
-    private const EXCLUDED_CLASS_NAMES = [
+    const EXCLUDED_CLASS_NAMES = [
         // composer
         ClassLoader::class => 1,
 
@@ -172,7 +172,7 @@ final class ExcludeList
      */
     private static $directories;
 
-    public static function addDirectory(string $directory): void
+    public static function addDirectory($directory)
     {
         if (!is_dir($directory)) {
             throw new Exception(
@@ -191,7 +191,7 @@ final class ExcludeList
      *
      * @return string[]
      */
-    public function getExcludedDirectories(): array
+    public function getExcludedDirectories()
     {
         $this->initialize();
 
@@ -201,7 +201,7 @@ final class ExcludeList
     /**
      * @throws Exception
      */
-    public function isExcluded(string $file): bool
+    public function isExcluded($file)
     {
         if (defined('PHPUNIT_TESTSUITE')) {
             return false;
@@ -221,7 +221,7 @@ final class ExcludeList
     /**
      * @throws Exception
      */
-    private function initialize(): void
+    private function initialize()
     {
         if (self::$directories === null) {
             self::$directories = [];

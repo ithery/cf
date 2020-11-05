@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -21,7 +21,7 @@ final class MoveWhitelistDirectoriesToCoverage implements Migration
     /**
      * @throws MigrationException
      */
-    public function migrate(DOMDocument $document): void
+    public function migrate(DOMDocument $document)
     {
         $whitelist = $document->getElementsByTagName('whitelist')->item(0);
 

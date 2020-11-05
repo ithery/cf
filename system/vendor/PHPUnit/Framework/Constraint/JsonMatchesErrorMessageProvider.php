@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class JsonMatchesErrorMessageProvider
     /**
      * Translates JSON error to a human readable string.
      */
-    public static function determineJsonError(string $error, string $prefix = ''): ?string
+    public static function determineJsonError($error, $prefix = '')
     {
         switch ($error) {
             case JSON_ERROR_NONE:
@@ -49,7 +49,7 @@ final class JsonMatchesErrorMessageProvider
     /**
      * Translates a given type to a human readable message prefix.
      */
-    public static function translateTypeToPrefix(string $type): string
+    public static function translateTypeToPrefix($type)
     {
         switch (strtolower($type)) {
             case 'expected':

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ use PHPUnit\Framework\Exception;
  */
 class Error extends Exception
 {
-    public function __construct(string $message, int $code, string $file, int $line, \Exception $previous = null)
+    public function __construct($message, $code, $file, $line, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

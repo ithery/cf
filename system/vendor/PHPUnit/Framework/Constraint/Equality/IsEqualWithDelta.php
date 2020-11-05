@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -30,7 +30,7 @@ final class IsEqualWithDelta extends Constraint
      */
     private $delta;
 
-    public function __construct($value, float $delta)
+    public function __construct($value, $delta)
     {
         $this->value = $value;
         $this->delta = $delta;
@@ -48,7 +48,7 @@ final class IsEqualWithDelta extends Constraint
      *
      * @throws ExpectationFailedException
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate($other, $description = '', $returnResult = false)
     {
         // If $this->value and $other are identical, they are also equal.
         // This is the most common path and will allow us to skip
@@ -89,7 +89,7 @@ final class IsEqualWithDelta extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'is equal to %s with delta <%F>>',

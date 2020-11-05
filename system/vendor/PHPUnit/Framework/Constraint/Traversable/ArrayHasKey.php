@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -36,7 +36,7 @@ final class ArrayHasKey extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString(): string
+    public function toString()
     {
         return 'has the key ' . $this->exporter()->export($this->key);
     }
@@ -47,7 +47,7 @@ final class ArrayHasKey extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         if (is_array($other)) {
             return array_key_exists($this->key, $other);
@@ -70,7 +70,7 @@ final class ArrayHasKey extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return 'an array ' . $this->toString();
     }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ namespace PHPUnit\Util;
  */
 final class Blacklist
 {
-    public static function addDirectory(string $directory): void
+    public static function addDirectory($directory)
     {
         ExcludeList::addDirectory($directory);
     }
@@ -26,7 +26,7 @@ final class Blacklist
      *
      * @return string[]
      */
-    public function getBlacklistedDirectories(): array
+    public function getBlacklistedDirectories()
     {
         return (new ExcludeList)->getExcludedDirectories();
     }
@@ -34,7 +34,7 @@ final class Blacklist
     /**
      * @throws Exception
      */
-    public function isBlacklisted(string $file): bool
+    public function isBlacklisted($file)
     {
         return (new ExcludeList)->isExcluded($file);
     }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -21,7 +21,7 @@ final class RemoveEmptyFilter implements Migration
     /**
      * @throws MigrationException
      */
-    public function migrate(DOMDocument $document): void
+    public function migrate(DOMDocument $document)
     {
         $whitelist = $document->getElementsByTagName('whitelist')->item(0);
 
@@ -41,7 +41,7 @@ final class RemoveEmptyFilter implements Migration
     /**
      * @throws MigrationException
      */
-    private function ensureEmpty(DOMElement $element): void
+    private function ensureEmpty(DOMElement $element)
     {
         if ($element->attributes->length > 0) {
             throw new MigrationException(sprintf('%s element has unexpected attributes', $element->nodeName));

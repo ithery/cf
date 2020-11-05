@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -43,7 +43,7 @@ final class MethodName
         $this->constraint = $constraint;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'method name ' . $this->constraint->toString();
     }
@@ -52,7 +52,7 @@ final class MethodName
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         return $this->matchesName($invocation->getMethodName());
     }
@@ -61,7 +61,7 @@ final class MethodName
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function matchesName(string $methodName): bool
+    public function matchesName($methodName)
     {
         return (bool) $this->constraint->evaluate($methodName, '', true);
     }

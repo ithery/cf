@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,12 +16,12 @@ use DOMElement;
  */
 final class CoverageCrap4jToReport extends LogToReportMigration
 {
-    protected function forType(): string
+    protected function forType()
     {
         return 'coverage-crap4j';
     }
 
-    protected function toReportFormat(DOMElement $logNode): DOMElement
+    protected function toReportFormat(DOMElement $logNode)
     {
         $crap4j = $logNode->ownerDocument->createElement('crap4j');
         $crap4j->setAttribute('outputFile', $logNode->getAttribute('target'));

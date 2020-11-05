@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -20,5 +20,5 @@ interface AfterTestHook extends TestHook
      * For more fine grained control, have a look at the other hooks
      * that extend PHPUnit\Runner\Hook.
      */
-    public function executeAfterTest(string $test, float $time): void;
+    public function executeAfterTest($test, $time);
 }

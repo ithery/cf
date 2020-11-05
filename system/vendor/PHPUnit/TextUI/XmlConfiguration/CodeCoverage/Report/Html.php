@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,24 +32,24 @@ final class Html
      */
     private $highLowerBound;
 
-    public function __construct(Directory $target, int $lowUpperBound, int $highLowerBound)
+    public function __construct(Directory $target, $lowUpperBound, $highLowerBound)
     {
         $this->target         = $target;
         $this->lowUpperBound  = $lowUpperBound;
         $this->highLowerBound = $highLowerBound;
     }
 
-    public function target(): Directory
+    public function target()
     {
         return $this->target;
     }
 
-    public function lowUpperBound(): int
+    public function lowUpperBound()
     {
         return $this->lowUpperBound;
     }
 
-    public function highLowerBound(): int
+    public function highLowerBound()
     {
         return $this->highLowerBound;
     }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,24 +32,24 @@ final class Text
      */
     private $showOnlySummary;
 
-    public function __construct(File $target, bool $showUncoveredFiles, bool $showOnlySummary)
+    public function __construct(File $target, $showUncoveredFiles, $showOnlySummary)
     {
         $this->target             = $target;
         $this->showUncoveredFiles = $showUncoveredFiles;
         $this->showOnlySummary    = $showOnlySummary;
     }
 
-    public function target(): File
+    public function target()
     {
         return $this->target;
     }
 
-    public function showUncoveredFiles(): bool
+    public function showUncoveredFiles()
     {
         return $this->showUncoveredFiles;
     }
 
-    public function showOnlySummary(): bool
+    public function showOnlySummary()
     {
         return $this->showOnlySummary;
     }

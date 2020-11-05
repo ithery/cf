@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -90,7 +90,7 @@ class Printer
         $this->isPhpStream = strncmp($out, 'php://', 6) !== 0;
     }
 
-    public function write(string $buffer): void
+    public function write($buffer)
     {
         if ($this->stream) {
             assert(is_resource($this->stream));
@@ -105,7 +105,7 @@ class Printer
         }
     }
 
-    public function flush(): void
+    public function flush()
     {
         if ($this->stream && $this->isPhpStream) {
             assert(is_resource($this->stream));

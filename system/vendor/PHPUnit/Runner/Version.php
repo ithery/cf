@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,7 +34,7 @@ final class Version
     /**
      * Returns the current version of PHPUnit.
      */
-    public static function id(): string
+    public static function id()
     {
         if (self::$pharVersion !== '') {
             return self::$pharVersion;
@@ -47,7 +47,7 @@ final class Version
         return self::$version;
     }
 
-    public static function series(): string
+    public static function series()
     {
         if (strpos(self::id(), '-')) {
             $version = explode('-', self::id())[0];
@@ -58,7 +58,7 @@ final class Version
         return implode('.', array_slice(explode('.', $version), 0, 2));
     }
 
-    public static function getVersionString(): string
+    public static function getVersionString()
     {
         return 'PHPUnit ' . self::id() . ' by Sebastian Bergmann and contributors.';
     }

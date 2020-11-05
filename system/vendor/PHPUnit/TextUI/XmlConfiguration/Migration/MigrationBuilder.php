@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -18,7 +18,7 @@ use function version_compare;
  */
 final class MigrationBuilder
 {
-    private const AVAILABLE_MIGRATIONS = [
+    const AVAILABLE_MIGRATIONS = [
         '8.5' => [
             RemoveLogTypes::class,
         ],
@@ -45,7 +45,7 @@ final class MigrationBuilder
     /**
      * @throws MigrationBuilderException
      */
-    public function build(string $fromVersion): array
+    public function build($fromVersion)
     {
         if (!array_key_exists($fromVersion, self::AVAILABLE_MIGRATIONS)) {
             throw new MigrationBuilderException(

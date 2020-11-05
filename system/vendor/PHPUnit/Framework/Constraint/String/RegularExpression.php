@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -22,7 +22,7 @@ class RegularExpression extends Constraint
      */
     private $pattern;
 
-    public function __construct(string $pattern)
+    public function __construct($pattern)
     {
         $this->pattern = $pattern;
     }
@@ -30,7 +30,7 @@ class RegularExpression extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'matches PCRE pattern "%s"',
@@ -44,7 +44,7 @@ class RegularExpression extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return preg_match($this->pattern, $other) > 0;
     }

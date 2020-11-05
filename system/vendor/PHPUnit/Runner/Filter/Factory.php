@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -33,7 +33,7 @@ final class Factory
      *
      * @throws Exception
      */
-    public function addFilter(ReflectionClass $filter, $args): void
+    public function addFilter(ReflectionClass $filter, $args)
     {
         if (!$filter->isSubclassOf(RecursiveFilterIterator::class)) {
             throw new Exception(
@@ -47,10 +47,10 @@ final class Factory
         $this->filters[] = [$filter, $args];
     }
 
-    public function factory(Iterator $iterator, TestSuite $suite): FilterIterator
+    public function factory(Iterator $iterator, TestSuite $suite)
     {
         foreach ($this->filters as $filter) {
-            [$class, $args] = $filter;
+            list($class, $args) = $filter;
             $iterator       = $class->newInstance($iterator, $args, $suite);
         }
 

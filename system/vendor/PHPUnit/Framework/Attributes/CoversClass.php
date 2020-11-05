@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,12 +19,12 @@ final class CoversClass
      */
     private $className;
 
-    public function __construct(string $className)
+    public function __construct($className)
     {
         $this->className = $className;
     }
 
-    public function className(): string
+    public function className()
     {
         return $this->className;
     }

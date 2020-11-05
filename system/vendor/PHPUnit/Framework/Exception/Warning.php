@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ final class Warning extends Exception implements SelfDescribing
     /**
      * Wrapper for getMessage() which is declared as final.
      */
-    public function toString(): string
+    public function toString()
     {
         return $this->getMessage();
     }

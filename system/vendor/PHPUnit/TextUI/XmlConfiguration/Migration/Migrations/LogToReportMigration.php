@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -22,7 +22,7 @@ abstract class LogToReportMigration implements Migration
     /**
      * @throws MigrationException
      */
-    public function migrate(DOMDocument $document): void
+    public function migrate(DOMDocument $document)
     {
         $coverage = $document->getElementsByTagName('coverage')->item(0);
 
@@ -48,7 +48,7 @@ abstract class LogToReportMigration implements Migration
         $logNode->parentNode->removeChild($logNode);
     }
 
-    protected function migrateAttributes(DOMElement $src, DOMElement $dest, array $attributes): void
+    protected function migrateAttributes(DOMElement $src, DOMElement $dest, array $attributes)
     {
         foreach ($attributes as $attr) {
             if (!$src->hasAttribute($attr)) {
@@ -60,11 +60,11 @@ abstract class LogToReportMigration implements Migration
         }
     }
 
-    abstract protected function forType(): string;
+    abstract protected function forType();
 
-    abstract protected function toReportFormat(DOMElement $logNode): DOMElement;
+    abstract protected function toReportFormat(DOMElement $logNode);
 
-    private function findLogNode(DOMDocument $document): ?DOMElement
+    private function findLogNode(DOMDocument $document)
     {
         $logNode = (new DOMXPath($document))->query(
             sprintf('//logging/log[@type="%s"]', $this->forType())

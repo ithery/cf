@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -14,15 +14,15 @@ namespace PHPUnit\Framework;
  */
 interface Reorderable
 {
-    public function sortId(): string;
+    public function sortId();
 
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function provides(): array;
+    public function provides();
 
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function requires(): array;
+    public function requires();
 }

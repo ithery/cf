@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class JsonMatches extends Constraint
      */
     private $value;
 
-    public function __construct(string $value)
+    public function __construct($value)
     {
         $this->value = $value;
     }
@@ -33,7 +33,7 @@ final class JsonMatches extends Constraint
     /**
      * Returns a string representation of the object.
      */
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'matches JSON string "%s"',
@@ -49,15 +49,15 @@ final class JsonMatches extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
-        [$error, $recodedOther] = Json::canonicalize($other);
+        list($error, $recodedOther) = Json::canonicalize($other);
 
         if ($error) {
             return false;
         }
 
-        [$error, $recodedValue] = Json::canonicalize($this->value);
+        list($error, $recodedValue) = Json::canonicalize($this->value);
 
         if ($error) {
             return false;
@@ -79,16 +79,16 @@ final class JsonMatches extends Constraint
      *
      * @psalm-return never-return
      */
-    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
+    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null)
     {
         if ($comparisonFailure === null) {
-            [$error, $recodedOther] = Json::canonicalize($other);
+            list($error, $recodedOther) = Json::canonicalize($other);
 
             if ($error) {
                 parent::fail($other, $description);
             }
 
-            [$error, $recodedValue] = Json::canonicalize($this->value);
+            list($error, $recodedValue) = Json::canonicalize($this->value);
 
             if ($error) {
                 parent::fail($other, $description);

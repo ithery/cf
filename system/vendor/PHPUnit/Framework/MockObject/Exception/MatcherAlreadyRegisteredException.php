@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ use function sprintf;
  */
 final class MatcherAlreadyRegisteredException extends \PHPUnit\Framework\Exception implements Exception
 {
-    public function __construct(string $id)
+    public function __construct($id)
     {
         parent::__construct(
             sprintf(

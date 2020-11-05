@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -26,52 +26,52 @@ abstract class BaseTestRunner
     /**
      * @var int
      */
-    public const STATUS_UNKNOWN = -1;
+    const STATUS_UNKNOWN = -1;
 
     /**
      * @var int
      */
-    public const STATUS_PASSED = 0;
+    const STATUS_PASSED = 0;
 
     /**
      * @var int
      */
-    public const STATUS_SKIPPED = 1;
+    const STATUS_SKIPPED = 1;
 
     /**
      * @var int
      */
-    public const STATUS_INCOMPLETE = 2;
+    const STATUS_INCOMPLETE = 2;
 
     /**
      * @var int
      */
-    public const STATUS_FAILURE = 3;
+    const STATUS_FAILURE = 3;
 
     /**
      * @var int
      */
-    public const STATUS_ERROR = 4;
+    const STATUS_ERROR = 4;
 
     /**
      * @var int
      */
-    public const STATUS_RISKY = 5;
+    const STATUS_RISKY = 5;
 
     /**
      * @var int
      */
-    public const STATUS_WARNING = 6;
+    const STATUS_WARNING = 6;
 
     /**
      * @var string
      */
-    public const SUITE_METHODNAME = 'suite';
+    const SUITE_METHODNAME = 'suite';
 
     /**
      * Returns the loader to be used.
      */
-    public function getLoader(): TestSuiteLoader
+    public function getLoader()
     {
         return new StandardTestSuiteLoader;
     }
@@ -85,7 +85,7 @@ abstract class BaseTestRunner
      *
      * @throws Exception
      */
-    public function getTest(string $suiteClassFile, $suffixes = ''): ?TestSuite
+    public function getTest($suiteClassFile, $suffixes = '')
     {
         if (is_dir($suiteClassFile)) {
             /** @var string[] $files */
@@ -141,7 +141,7 @@ abstract class BaseTestRunner
     /**
      * Returns the loaded ReflectionClass for a suite name.
      */
-    protected function loadSuiteClass(string $suiteClassFile): ReflectionClass
+    protected function loadSuiteClass($suiteClassFile)
     {
         return $this->getLoader()->load($suiteClassFile);
     }
@@ -149,7 +149,7 @@ abstract class BaseTestRunner
     /**
      * Clears the status message.
      */
-    protected function clearStatus(): void
+    protected function clearStatus()
     {
     }
 
@@ -157,5 +157,5 @@ abstract class BaseTestRunner
      * Override to define how to handle a failed loading of
      * a test suite.
      */
-    abstract protected function runFailed(string $message): void;
+    abstract protected function runFailed($message);
 }

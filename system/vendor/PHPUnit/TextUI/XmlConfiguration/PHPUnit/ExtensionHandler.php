@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -22,7 +22,7 @@ use ReflectionException;
  */
 final class ExtensionHandler
 {
-    public function createHookInstance(Extension $extension): Hook
+    public function createHookInstance(Extension $extension)
     {
         $object = $this->createInstance($extension);
 
@@ -38,7 +38,7 @@ final class ExtensionHandler
         return $object;
     }
 
-    public function createTestListenerInstance(Extension $extension): TestListener
+    public function createTestListenerInstance(Extension $extension)
     {
         $object = $this->createInstance($extension);
 
@@ -54,7 +54,7 @@ final class ExtensionHandler
         return $object;
     }
 
-    private function createInstance(Extension $extension): object
+    private function createInstance(Extension $extension)
     {
         $this->ensureClassExists($extension);
 
@@ -78,7 +78,7 @@ final class ExtensionHandler
     /**
      * @throws Exception
      */
-    private function ensureClassExists(Extension $extension): void
+    private function ensureClassExists(Extension $extension)
     {
         if (class_exists($extension->className(), false)) {
             return;

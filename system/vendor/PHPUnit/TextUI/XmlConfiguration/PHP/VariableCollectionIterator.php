@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,32 +34,32 @@ final class VariableCollectionIterator implements Countable, Iterator
         $this->variables = $variables->asArray();
     }
 
-    public function count(): int
+    public function count()
     {
         return iterator_count($this);
     }
 
-    public function rewind(): void
+    public function rewind()
     {
         $this->position = 0;
     }
 
-    public function valid(): bool
+    public function valid()
     {
         return $this->position < count($this->variables);
     }
 
-    public function key(): int
+    public function key()
     {
         return $this->position;
     }
 
-    public function current(): Variable
+    public function current()
     {
         return $this->variables[$this->position];
     }
 
-    public function next(): void
+    public function next()
     {
         $this->position++;
     }

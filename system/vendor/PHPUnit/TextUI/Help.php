@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -26,9 +26,9 @@ use SebastianBergmann\Environment\Console;
  */
 final class Help
 {
-    private const LEFT_MARGIN = '  ';
+    const LEFT_MARGIN = '  ';
 
-    private const HELP_TEXT = [
+    const HELP_TEXT = [
         'Usage' => [
             ['text' => 'phpunit [options] UnitTest.php'],
             ['text' => 'phpunit [options] <directory>'],
@@ -162,7 +162,7 @@ final class Help
      */
     private $hasColor = false;
 
-    public function __construct(?int $width = null, ?bool $withColor = null)
+    public function __construct($width = null, $withColor = null)
     {
         if ($width === null) {
             $width = (new Console)->getNumberOfColumns();
@@ -188,7 +188,7 @@ final class Help
     /**
      * Write the help file to the CLI, adapting width and colors to the console.
      */
-    public function writeToConsole(): void
+    public function writeToConsole()
     {
         if ($this->hasColor) {
             $this->writeWithColor();
@@ -197,7 +197,7 @@ final class Help
         }
     }
 
-    private function writePlaintext(): void
+    private function writePlaintext()
     {
         foreach (self::HELP_TEXT as $section => $options) {
             print "{$section}:" . PHP_EOL;
@@ -225,7 +225,7 @@ final class Help
         }
     }
 
-    private function writeWithColor(): void
+    private function writeWithColor()
     {
         foreach (self::HELP_TEXT as $section => $options) {
             print Color::colorize('fg-yellow', "{$section}:") . PHP_EOL;

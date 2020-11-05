@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -14,7 +14,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS)]
 final class Large extends Group
 {
-    public function name(): string
+    public function name()
     {
         return 'large';
     }

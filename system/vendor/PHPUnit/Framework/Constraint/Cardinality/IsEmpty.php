@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -24,7 +24,7 @@ final class IsEmpty extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'is empty';
     }
@@ -35,7 +35,7 @@ final class IsEmpty extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         if ($other instanceof EmptyIterator) {
             return true;
@@ -56,7 +56,7 @@ final class IsEmpty extends Constraint
      *
      * @param mixed $other evaluated value or object
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         $type = gettype($other);
 

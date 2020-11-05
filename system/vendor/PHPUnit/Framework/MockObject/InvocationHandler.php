@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -45,13 +45,13 @@ final class InvocationHandler
      */
     private $deferredError;
 
-    public function __construct(array $configurableMethods, bool $returnValueGeneration)
+    public function __construct(array $configurableMethods, $returnValueGeneration)
     {
         $this->configurableMethods   = $configurableMethods;
         $this->returnValueGeneration = $returnValueGeneration;
     }
 
-    public function hasMatchers(): bool
+    public function hasMatchers()
     {
         foreach ($this->matchers as $matcher) {
             if ($matcher->hasMatchers()) {
@@ -67,7 +67,7 @@ final class InvocationHandler
      *
      * @param string $id The identification of the match builder
      */
-    public function lookupMatcher(string $id): ?Matcher
+    public function lookupMatcher($id)
     {
         if (isset($this->matcherMap[$id])) {
             return $this->matcherMap[$id];
@@ -85,7 +85,7 @@ final class InvocationHandler
      *
      * @throws MatcherAlreadyRegisteredException
      */
-    public function registerMatcher(string $id, Matcher $matcher): void
+    public function registerMatcher($id, Matcher $matcher)
     {
         if (isset($this->matcherMap[$id])) {
             throw new MatcherAlreadyRegisteredException($id);
@@ -94,7 +94,7 @@ final class InvocationHandler
         $this->matcherMap[$id] = $matcher;
     }
 
-    public function expects(InvocationOrder $rule): InvocationMocker
+    public function expects(InvocationOrder $rule)
     {
         $matcher = new Matcher($rule);
         $this->addMatcher($matcher);
@@ -154,7 +154,7 @@ final class InvocationHandler
         return $invocation->generateReturnValue();
     }
 
-    public function matches(Invocation $invocation): bool
+    public function matches(Invocation $invocation)
     {
         foreach ($this->matchers as $matcher) {
             if (!$matcher->matches($invocation)) {
@@ -168,7 +168,7 @@ final class InvocationHandler
     /**
      * @throws Throwable
      */
-    public function verify(): void
+    public function verify()
     {
         foreach ($this->matchers as $matcher) {
             $matcher->verify();
@@ -179,7 +179,7 @@ final class InvocationHandler
         }
     }
 
-    private function addMatcher(Matcher $matcher): void
+    private function addMatcher(Matcher $matcher)
     {
         $this->matchers[] = $matcher;
     }

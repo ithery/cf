@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -46,23 +46,23 @@ use Throwable;
  */
 class DefaultResultPrinter extends Printer implements ResultPrinter
 {
-    public const EVENT_TEST_START = 0;
+    const EVENT_TEST_START = 0;
 
-    public const EVENT_TEST_END = 1;
+    const EVENT_TEST_END = 1;
 
-    public const EVENT_TESTSUITE_START = 2;
+    const EVENT_TESTSUITE_START = 2;
 
-    public const EVENT_TESTSUITE_END = 3;
+    const EVENT_TESTSUITE_END = 3;
 
-    public const COLOR_NEVER = 'never';
+    const COLOR_NEVER = 'never';
 
-    public const COLOR_AUTO = 'auto';
+    const COLOR_AUTO = 'auto';
 
-    public const COLOR_ALWAYS = 'always';
+    const COLOR_ALWAYS = 'always';
 
-    public const COLOR_DEFAULT = self::COLOR_NEVER;
+    const COLOR_DEFAULT = self::COLOR_NEVER;
 
-    private const AVAILABLE_COLORS = [self::COLOR_NEVER, self::COLOR_AUTO, self::COLOR_ALWAYS];
+    const AVAILABLE_COLORS = [self::COLOR_NEVER, self::COLOR_AUTO, self::COLOR_ALWAYS];
 
     /**
      * @var int
@@ -142,7 +142,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
      *
      * @throws Exception
      */
-    public function __construct($out = null, bool $verbose = false, string $colors = self::COLOR_DEFAULT, bool $debug = false, $numberOfColumns = 80, bool $reverse = false)
+    public function __construct($out = null, $verbose = false, $colors = self::COLOR_DEFAULT, $debug = false, $numberOfColumns = 80, $reverse = false)
     {
         parent::__construct($out);
 
@@ -180,7 +180,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         $this->timer->start();
     }
 
-    public function printResult(TestResult $result): void
+    public function printResult(TestResult $result)
     {
         $this->printHeader($result);
         $this->printErrors($result);
@@ -199,7 +199,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * An error occurred.
      */
-    public function addError(Test $test, Throwable $t, float $time): void
+    public function addError(Test $test, Throwable $t, $time)
     {
         $this->writeProgressWithColor('fg-red, bold', 'E');
         $this->lastTestFailed = true;
@@ -208,7 +208,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * A failure occurred.
      */
-    public function addFailure(Test $test, AssertionFailedError $e, float $time): void
+    public function addFailure(Test $test, AssertionFailedError $e, $time)
     {
         $this->writeProgressWithColor('bg-red, fg-white', 'F');
         $this->lastTestFailed = true;
@@ -217,7 +217,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * A warning occurred.
      */
-    public function addWarning(Test $test, Warning $e, float $time): void
+    public function addWarning(Test $test, Warning $e, $time)
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'W');
         $this->lastTestFailed = true;
@@ -226,7 +226,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, Throwable $t, float $time): void
+    public function addIncompleteTest(Test $test, Throwable $t, $time)
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'I');
         $this->lastTestFailed = true;
@@ -235,7 +235,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, Throwable $t, float $time): void
+    public function addRiskyTest(Test $test, Throwable $t, $time)
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'R');
         $this->lastTestFailed = true;
@@ -244,7 +244,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, Throwable $t, float $time): void
+    public function addSkippedTest(Test $test, Throwable $t, $time)
     {
         $this->writeProgressWithColor('fg-cyan, bold', 'S');
         $this->lastTestFailed = true;
@@ -253,7 +253,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * A testsuite started.
      */
-    public function startTestSuite(TestSuite $suite): void
+    public function startTestSuite(TestSuite $suite)
     {
         if ($this->numTests == -1) {
             $this->numTests      = count($suite);
@@ -265,14 +265,14 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * A testsuite ended.
      */
-    public function endTestSuite(TestSuite $suite): void
+    public function endTestSuite(TestSuite $suite)
     {
     }
 
     /**
      * A test started.
      */
-    public function startTest(Test $test): void
+    public function startTest(Test $test)
     {
         if ($this->debug) {
             $this->write(
@@ -287,7 +287,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * A test ended.
      */
-    public function endTest(Test $test, float $time): void
+    public function endTest(Test $test, $time)
     {
         if ($this->debug) {
             $this->write(
@@ -315,7 +315,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         }
     }
 
-    protected function printDefects(array $defects, string $type): void
+    protected function printDefects(array $defects, $type)
     {
         $count = count($defects);
 
@@ -350,13 +350,13 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         $this->defectListPrinted = true;
     }
 
-    protected function printDefect(TestFailure $defect, int $count): void
+    protected function printDefect(TestFailure $defect, $count)
     {
         $this->printDefectHeader($defect, $count);
         $this->printDefectTrace($defect);
     }
 
-    protected function printDefectHeader(TestFailure $defect, int $count): void
+    protected function printDefectHeader(TestFailure $defect, $count)
     {
         $this->write(
             sprintf(
@@ -367,7 +367,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         );
     }
 
-    protected function printDefectTrace(TestFailure $defect): void
+    protected function printDefectTrace(TestFailure $defect)
     {
         $e = $defect->thrownException();
 
@@ -378,44 +378,44 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         }
     }
 
-    protected function printErrors(TestResult $result): void
+    protected function printErrors(TestResult $result)
     {
         $this->printDefects($result->errors(), 'error');
     }
 
-    protected function printFailures(TestResult $result): void
+    protected function printFailures(TestResult $result)
     {
         $this->printDefects($result->failures(), 'failure');
     }
 
-    protected function printWarnings(TestResult $result): void
+    protected function printWarnings(TestResult $result)
     {
         $this->printDefects($result->warnings(), 'warning');
     }
 
-    protected function printIncompletes(TestResult $result): void
+    protected function printIncompletes(TestResult $result)
     {
         $this->printDefects($result->notImplemented(), 'incomplete test');
     }
 
-    protected function printRisky(TestResult $result): void
+    protected function printRisky(TestResult $result)
     {
         $this->printDefects($result->risky(), 'risky test');
     }
 
-    protected function printSkipped(TestResult $result): void
+    protected function printSkipped(TestResult $result)
     {
         $this->printDefects($result->skipped(), 'skipped test');
     }
 
-    protected function printHeader(TestResult $result): void
+    protected function printHeader(TestResult $result)
     {
         if (count($result) > 0) {
             $this->write(PHP_EOL . PHP_EOL . (new ResourceUsageFormatter)->resourceUsage($this->timer->stop()) . PHP_EOL . PHP_EOL);
         }
     }
 
-    protected function printFooter(TestResult $result): void
+    protected function printFooter(TestResult $result)
     {
         if (count($result) === 0) {
             $this->writeWithColor(
@@ -490,7 +490,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         $this->writeWithColor($color, '.');
     }
 
-    protected function writeProgress(string $progress): void
+    protected function writeProgress($progress)
     {
         if ($this->debug) {
             return;
@@ -521,7 +521,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         }
     }
 
-    protected function writeNewLine(): void
+    protected function writeNewLine()
     {
         $this->column = 0;
         $this->write("\n");
@@ -531,7 +531,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
      * Formats a buffer with a specified ANSI color sequence if colors are
      * enabled.
      */
-    protected function colorizeTextBox(string $color, string $buffer): string
+    protected function colorizeTextBox($color, $buffer)
     {
         if (!$this->colors) {
             return $buffer;
@@ -552,7 +552,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Writes a buffer out with a color sequence if colors are enabled.
      */
-    protected function writeWithColor(string $color, string $buffer, bool $lf = true): void
+    protected function writeWithColor($color, $buffer, $lf = true)
     {
         $this->write($this->colorizeTextBox($color, $buffer));
 
@@ -564,13 +564,13 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Writes progress with a color sequence if colors are enabled.
      */
-    protected function writeProgressWithColor(string $color, string $buffer): void
+    protected function writeProgressWithColor($color, $buffer)
     {
         $buffer = $this->colorizeTextBox($color, $buffer);
         $this->writeProgress($buffer);
     }
 
-    private function writeCountString(int $count, string $name, string $color, bool $always = false): void
+    private function writeCountString($count, $name, $color, $always = false)
     {
         static $first = true;
 

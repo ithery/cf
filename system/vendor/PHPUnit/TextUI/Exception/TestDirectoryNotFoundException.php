@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ use RuntimeException;
  */
 final class TestDirectoryNotFoundException extends RuntimeException implements Exception
 {
-    public function __construct(string $path)
+    public function __construct($path)
     {
         parent::__construct(
             sprintf(

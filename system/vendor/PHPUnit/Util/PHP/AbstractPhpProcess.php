@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -71,7 +71,7 @@ abstract class AbstractPhpProcess
      */
     protected $timeout = 0;
 
-    public static function factory(): self
+    public static function factory()
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             return new WindowsPhpProcess;
@@ -90,7 +90,7 @@ abstract class AbstractPhpProcess
      *
      * Then $stderrRedirection is TRUE, STDERR is redirected to STDOUT.
      */
-    public function setUseStderrRedirection(bool $stderrRedirection): void
+    public function setUseStderrRedirection($stderrRedirection)
     {
         $this->stderrRedirection = $stderrRedirection;
     }
@@ -98,7 +98,7 @@ abstract class AbstractPhpProcess
     /**
      * Returns TRUE if uses STDERR redirection or FALSE if not.
      */
-    public function useStderrRedirection(): bool
+    public function useStderrRedirection()
     {
         return $this->stderrRedirection;
     }
@@ -106,7 +106,7 @@ abstract class AbstractPhpProcess
     /**
      * Sets the input string to be sent via STDIN.
      */
-    public function setStdin(string $stdin): void
+    public function setStdin($stdin)
     {
         $this->stdin = $stdin;
     }
@@ -114,7 +114,7 @@ abstract class AbstractPhpProcess
     /**
      * Returns the input string to be sent via STDIN.
      */
-    public function getStdin(): string
+    public function getStdin()
     {
         return $this->stdin;
     }
@@ -122,7 +122,7 @@ abstract class AbstractPhpProcess
     /**
      * Sets the string of arguments to pass to the php job.
      */
-    public function setArgs(string $args): void
+    public function setArgs($args)
     {
         $this->args = $args;
     }
@@ -130,7 +130,7 @@ abstract class AbstractPhpProcess
     /**
      * Returns the string of arguments to pass to the php job.
      */
-    public function getArgs(): string
+    public function getArgs()
     {
         return $this->args;
     }
@@ -140,7 +140,7 @@ abstract class AbstractPhpProcess
      *
      * @param array<string, string> $env
      */
-    public function setEnv(array $env): void
+    public function setEnv(array $env)
     {
         $this->env = $env;
     }
@@ -148,7 +148,7 @@ abstract class AbstractPhpProcess
     /**
      * Returns the array of environment variables to start the child process with.
      */
-    public function getEnv(): array
+    public function getEnv()
     {
         return $this->env;
     }
@@ -156,7 +156,7 @@ abstract class AbstractPhpProcess
     /**
      * Sets the amount of seconds to wait before timing out.
      */
-    public function setTimeout(int $timeout): void
+    public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
     }
@@ -164,7 +164,7 @@ abstract class AbstractPhpProcess
     /**
      * Returns the amount of seconds to wait before timing out.
      */
-    public function getTimeout(): int
+    public function getTimeout()
     {
         return $this->timeout;
     }
@@ -174,7 +174,7 @@ abstract class AbstractPhpProcess
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function runTestJob(string $job, Test $test, TestResult $result): void
+    public function runTestJob($job, Test $test, TestResult $result)
     {
         $result->startTest($test);
 
@@ -191,7 +191,7 @@ abstract class AbstractPhpProcess
     /**
      * Returns the command based into the configurations.
      */
-    public function getCommand(array $settings, string $file = null): string
+    public function getCommand(array $settings, $file = null)
     {
         $command = $this->runtime->getBinary();
 
@@ -242,9 +242,9 @@ abstract class AbstractPhpProcess
     /**
      * Runs a single job (PHP code) using a separate PHP process.
      */
-    abstract public function runJob(string $job, array $settings = []): array;
+    abstract public function runJob($job, array $settings = []);
 
-    protected function settingsToParameters(array $settings): string
+    protected function settingsToParameters(array $settings)
     {
         $buffer = '';
 
@@ -260,7 +260,7 @@ abstract class AbstractPhpProcess
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function processChildResult(Test $test, TestResult $result, string $stdout, string $stderr): void
+    private function processChildResult(Test $test, TestResult $result, $stdout, $stderr)
     {
         $time = 0;
 
@@ -275,7 +275,7 @@ abstract class AbstractPhpProcess
                 /**
                  * @throws ErrorException
                  */
-                static function ($errno, $errstr, $errfile, $errline): void {
+                static function ($errno, $errstr, $errfile, $errline) {
                     throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
                 }
             );
@@ -385,7 +385,7 @@ abstract class AbstractPhpProcess
      *
      * @see https://github.com/sebastianbergmann/phpunit/issues/74
      */
-    private function getException(TestFailure $error): Exception
+    private function getException(TestFailure $error)
     {
         $exception = $error->thrownException();
 

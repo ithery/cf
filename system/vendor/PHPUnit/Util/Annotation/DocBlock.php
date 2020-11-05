@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -65,19 +65,19 @@ final class DocBlock
     /**
      * @todo This constant should be private (it's public because of TestTest::testGetProvidedDataRegEx)
      */
-    public const REGEX_DATA_PROVIDER = '/@dataProvider\s+([a-zA-Z0-9._:-\\\\x7f-\xff]+)/';
+    const REGEX_DATA_PROVIDER = '/@dataProvider\s+([a-zA-Z0-9._:-\\\\x7f-\xff]+)/';
 
-    private const REGEX_REQUIRES_VERSION = '/@requires\s+(?P<name>PHP(?:Unit)?)\s+(?P<operator>[<>=!]{0,2})\s*(?P<version>[\d\.-]+(dev|(RC|alpha|beta)[\d\.])?)[ \t]*\r?$/m';
+    const REGEX_REQUIRES_VERSION = '/@requires\s+(?P<name>PHP(?:Unit)?)\s+(?P<operator>[<>=!]{0,2})\s*(?P<version>[\d\.-]+(dev|(RC|alpha|beta)[\d\.])?)[ \t]*\r?$/m';
 
-    private const REGEX_REQUIRES_VERSION_CONSTRAINT = '/@requires\s+(?P<name>PHP(?:Unit)?)\s+(?P<constraint>[\d\t \-.|~^]+)[ \t]*\r?$/m';
+    const REGEX_REQUIRES_VERSION_CONSTRAINT = '/@requires\s+(?P<name>PHP(?:Unit)?)\s+(?P<constraint>[\d\t \-.|~^]+)[ \t]*\r?$/m';
 
-    private const REGEX_REQUIRES_OS = '/@requires\s+(?P<name>OS(?:FAMILY)?)\s+(?P<value>.+?)[ \t]*\r?$/m';
+    const REGEX_REQUIRES_OS = '/@requires\s+(?P<name>OS(?:FAMILY)?)\s+(?P<value>.+?)[ \t]*\r?$/m';
 
-    private const REGEX_REQUIRES_SETTING = '/@requires\s+(?P<name>setting)\s+(?P<setting>([^ ]+?))\s*(?P<value>[\w\.-]+[\w\.]?)?[ \t]*\r?$/m';
+    const REGEX_REQUIRES_SETTING = '/@requires\s+(?P<name>setting)\s+(?P<setting>([^ ]+?))\s*(?P<value>[\w\.-]+[\w\.]?)?[ \t]*\r?$/m';
 
-    private const REGEX_REQUIRES = '/@requires\s+(?P<name>function|extension)\s+(?P<value>([^\s<>=!]+))\s*(?P<operator>[<>=!]{0,2})\s*(?P<version>[\d\.-]+[\d\.]?)?[ \t]*\r?$/m';
+    const REGEX_REQUIRES = '/@requires\s+(?P<name>function|extension)\s+(?P<value>([^\s<>=!]+))\s*(?P<operator>[<>=!]{0,2})\s*(?P<version>[\d\.-]+[\d\.]?)?[ \t]*\r?$/m';
 
-    private const REGEX_TEST_WITH = '/@testWith\s+/';
+    const REGEX_TEST_WITH = '/@testWith\s+/';
 
     /** @var string */
     private $docComment;
@@ -121,7 +121,7 @@ final class DocBlock
      */
     private $className;
 
-    public static function ofClass(ReflectionClass $class): self
+    public static function ofClass(ReflectionClass $class)
     {
         $className = $class->getName();
 
@@ -140,7 +140,7 @@ final class DocBlock
     /**
      * @psalm-param class-string $classNameInHierarchy
      */
-    public static function ofMethod(ReflectionMethod $method, string $classNameInHierarchy): self
+    public static function ofMethod(ReflectionMethod $method, $classNameInHierarchy)
     {
         return new self(
             (string) $method->getDocComment(),
@@ -161,7 +161,7 @@ final class DocBlock
      *
      * @psalm-param class-string $className
      */
-    private function __construct(string $docComment, bool $isMethod, array $symbolAnnotations, int $startLine, int $endLine, string $fileName, string $name, string $className)
+    private function __construct($docComment, $isMethod, array $symbolAnnotations, $startLine, $endLine, $fileName, $name, $className)
     {
         $this->docComment        = $docComment;
         $this->isMethod          = $isMethod;
@@ -185,7 +185,7 @@ final class DocBlock
      *
      * @throws Warning if the requirements version constraint is not well-formed
      */
-    public function requirements(): array
+    public function requirements()
     {
         if ($this->parsedRequirements !== null) {
             return $this->parsedRequirements;
@@ -277,10 +277,11 @@ final class DocBlock
      *
      * @throws Exception
      */
-    public function getProvidedData(): ?array
+    public function getProvidedData()
     {
         /** @noinspection SuspiciousBinaryOperationInspection */
-        $data = $this->getDataFromDataProviderAnnotation($this->docComment) ?? $this->getDataFromTestWithAnnotation($this->docComment);
+        $dataFromDataProviderAnnotation = $this->getDataFromDataProviderAnnotation($this->docComment);
+        $data = $dataFromDataProviderAnnotation!=null ? $dataFromDataProviderAnnotation : $this->getDataFromTestWithAnnotation($this->docComment);
 
         if ($data === null) {
             return null;
@@ -307,7 +308,7 @@ final class DocBlock
     /**
      * @psalm-return array<string, array{line: int, value: string}>
      */
-    public function getInlineAnnotations(): array
+    public function getInlineAnnotations()
     {
         $code        = file($this->fileName);
         $lineNumber  = $this->startLine;
@@ -330,44 +331,44 @@ final class DocBlock
         return $annotations;
     }
 
-    public function symbolAnnotations(): array
+    public function symbolAnnotations()
     {
         return $this->symbolAnnotations;
     }
 
-    public function isHookToBeExecutedBeforeClass(): bool
+    public function isHookToBeExecutedBeforeClass()
     {
         return $this->isMethod
             && false !== strpos($this->docComment, '@beforeClass');
     }
 
-    public function isHookToBeExecutedAfterClass(): bool
+    public function isHookToBeExecutedAfterClass()
     {
         return $this->isMethod
             && false !== strpos($this->docComment, '@afterClass');
     }
 
-    public function isToBeExecutedBeforeTest(): bool
+    public function isToBeExecutedBeforeTest()
     {
         return 1 === preg_match('/@before\b/', $this->docComment);
     }
 
-    public function isToBeExecutedAfterTest(): bool
+    public function isToBeExecutedAfterTest()
     {
         return 1 === preg_match('/@after\b/', $this->docComment);
     }
 
-    public function isToBeExecutedAsPreCondition(): bool
+    public function isToBeExecutedAsPreCondition()
     {
         return 1 === preg_match('/@preCondition\b/', $this->docComment);
     }
 
-    public function isToBeExecutedAsPostCondition(): bool
+    public function isToBeExecutedAsPostCondition()
     {
         return 1 === preg_match('/@postCondition\b/', $this->docComment);
     }
 
-    private function getDataFromDataProviderAnnotation(string $docComment): ?array
+    private function getDataFromDataProviderAnnotation($docComment)
     {
         $methodName = null;
         $className  = $this->className;
@@ -460,7 +461,7 @@ final class DocBlock
     /**
      * @throws Exception
      */
-    private function getDataFromTestWithAnnotation(string $docComment): ?array
+    private function getDataFromTestWithAnnotation($docComment)
     {
         $docComment = $this->cleanUpMultiLineAnnotation($docComment);
 
@@ -497,7 +498,7 @@ final class DocBlock
         return $data;
     }
 
-    private function cleanUpMultiLineAnnotation(string $docComment): string
+    private function cleanUpMultiLineAnnotation($docComment)
     {
         //removing initial '   * ' for docComment
         $docComment = str_replace("\r\n", "\n", $docComment);
@@ -508,7 +509,7 @@ final class DocBlock
     }
 
     /** @return array<string, array<int, string>> */
-    private static function parseDocBlock(string $docBlock): array
+    private static function parseDocBlock($docBlock)
     {
         // Strip away the docblock header and footer to ease parsing of one line annotations
         $docBlock    = (string) substr($docBlock, 3, -2);
@@ -526,7 +527,7 @@ final class DocBlock
     }
 
     /** @param ReflectionClass|ReflectionFunctionAbstract $reflector */
-    private static function extractAnnotationsFromReflector(Reflector $reflector): array
+    private static function extractAnnotationsFromReflector(Reflector $reflector)
     {
         $annotations = [];
 
@@ -534,7 +535,7 @@ final class DocBlock
             $annotations = array_merge(
                 $annotations,
                 ...array_map(
-                    function (ReflectionClass $trait): array {
+                    function (ReflectionClass $trait) {
                         return self::parseDocBlock((string) $trait->getDocComment());
                     },
                     array_values($reflector->getTraits())

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class TestFileCollection implements Countable, IteratorAggregate
     /**
      * @param TestFile[] $files
      */
-    public static function fromArray(array $files): self
+    public static function fromArray(array $files)
     {
         return new self(...$files);
     }
@@ -40,22 +40,22 @@ final class TestFileCollection implements Countable, IteratorAggregate
     /**
      * @return TestFile[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->files;
     }
 
-    public function count(): int
+    public function count()
     {
         return count($this->files);
     }
 
-    public function getIterator(): TestFileCollectionIterator
+    public function getIterator()
     {
         return new TestFileCollectionIterator($this);
     }
 
-    public function isEmpty(): bool
+    public function isEmpty()
     {
         return $this->count() === 0;
     }

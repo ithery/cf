@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -24,7 +24,7 @@ use function putenv;
  */
 final class PhpHandler
 {
-    public function handle(Php $configuration): void
+    public function handle(Php $configuration)
     {
         $this->handleIncludePaths($configuration->includePaths());
         $this->handleIniSettings($configuration->iniSettings());
@@ -39,7 +39,7 @@ final class PhpHandler
         $this->handleVariables('_REQUEST', $configuration->requestVariables());
     }
 
-    private function handleIncludePaths(DirectoryCollection $includePaths): void
+    private function handleIncludePaths(DirectoryCollection $includePaths)
     {
         if (!$includePaths->isEmpty()) {
             $includePathsAsStrings = [];
@@ -57,7 +57,7 @@ final class PhpHandler
         }
     }
 
-    private function handleIniSettings(IniSettingCollection $iniSettings): void
+    private function handleIniSettings(IniSettingCollection $iniSettings)
     {
         foreach ($iniSettings as $iniSetting) {
             $value = $iniSetting->value();
@@ -70,7 +70,7 @@ final class PhpHandler
         }
     }
 
-    private function handleConstants(ConstantCollection $constants): void
+    private function handleConstants(ConstantCollection $constants)
     {
         foreach ($constants as $constant) {
             if (!defined($constant->name())) {
@@ -79,28 +79,28 @@ final class PhpHandler
         }
     }
 
-    private function handleGlobalVariables(VariableCollection $variables): void
+    private function handleGlobalVariables(VariableCollection $variables)
     {
         foreach ($variables as $variable) {
             $GLOBALS[$variable->name()] = $variable->value();
         }
     }
 
-    private function handleServerVariables(VariableCollection $variables): void
+    private function handleServerVariables(VariableCollection $variables)
     {
         foreach ($variables as $variable) {
             $_SERVER[$variable->name()] = $variable->value();
         }
     }
 
-    private function handleVariables(string $target, VariableCollection $variables): void
+    private function handleVariables($target, VariableCollection $variables)
     {
         foreach ($variables as $variable) {
             $GLOBALS[$target][$variable->name()] = $variable->value();
         }
     }
 
-    private function handleEnvVariables(VariableCollection $variables): void
+    private function handleEnvVariables(VariableCollection $variables)
     {
         foreach ($variables as $variable) {
             $name  = $variable->name();

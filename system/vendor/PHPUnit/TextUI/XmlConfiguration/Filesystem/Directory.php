@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -20,12 +20,12 @@ final class Directory
      */
     private $path;
 
-    public function __construct(string $path)
+    public function __construct($path)
     {
         $this->path = $path;
     }
 
-    public function path(): string
+    public function path()
     {
         return $this->path;
     }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ use DOMDocument;
  */
 final class UpdateSchemaLocationTo93 implements Migration
 {
-    public function migrate(DOMDocument $document): void
+    public function migrate(DOMDocument $document)
     {
         $document->documentElement->setAttributeNS(
             'http://www.w3.org/2001/XMLSchema-instance',

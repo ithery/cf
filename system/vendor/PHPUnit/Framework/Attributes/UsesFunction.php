@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,12 +19,12 @@ final class UsesFunction
      */
     private $functionName;
 
-    public function __construct(string $functionName)
+    public function __construct($functionName)
     {
         $this->functionName = $functionName;
     }
 
-    public function functionName(): string
+    public function functionName()
     {
         return $this->functionName;
     }

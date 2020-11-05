@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,12 +19,12 @@ class RequiresOperatingSystemFamily
      */
     private $operatingSystemFamily;
 
-    public function __construct(string $operatingSystemFamily)
+    public function __construct($operatingSystemFamily)
     {
         $this->operatingSystemFamily = $operatingSystemFamily;
     }
 
-    public function operatingSystemFamily(): string
+    public function operatingSystemFamily()
     {
         return $this->operatingSystemFamily;
     }

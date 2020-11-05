@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,18 +27,18 @@ final class Crap4j
      */
     private $threshold;
 
-    public function __construct(File $target, int $threshold)
+    public function __construct(File $target, $threshold)
     {
         $this->target    = $target;
         $this->threshold = $threshold;
     }
 
-    public function target(): File
+    public function target()
     {
         return $this->target;
     }
 
-    public function threshold(): int
+    public function threshold()
     {
         return $this->threshold;
     }

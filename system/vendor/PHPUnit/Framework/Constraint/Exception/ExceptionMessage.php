@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -23,12 +23,12 @@ final class ExceptionMessage extends Constraint
      */
     private $expectedMessage;
 
-    public function __construct(string $expected)
+    public function __construct($expected)
     {
         $this->expectedMessage = $expected;
     }
 
-    public function toString(): string
+    public function toString()
     {
         if ($this->expectedMessage === '') {
             return 'exception message is empty';
@@ -43,7 +43,7 @@ final class ExceptionMessage extends Constraint
      *
      * @param Throwable $other
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         if ($this->expectedMessage === '') {
             return $other->getMessage() === '';
@@ -60,7 +60,7 @@ final class ExceptionMessage extends Constraint
      *
      * @param mixed $other evaluated value or object
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         if ($this->expectedMessage === '') {
             return sprintf(

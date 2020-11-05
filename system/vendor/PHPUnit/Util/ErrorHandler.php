@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -73,7 +73,7 @@ final class ErrorHandler
         return $result;
     }
 
-    public function __construct(bool $convertDeprecationsToExceptions, bool $convertErrorsToExceptions, bool $convertNoticesToExceptions, bool $convertWarningsToExceptions)
+    public function __construct($convertDeprecationsToExceptions, $convertErrorsToExceptions, $convertNoticesToExceptions, $convertWarningsToExceptions)
     {
         $this->convertDeprecationsToExceptions = $convertDeprecationsToExceptions;
         $this->convertErrorsToExceptions       = $convertErrorsToExceptions;
@@ -81,7 +81,7 @@ final class ErrorHandler
         $this->convertWarningsToExceptions     = $convertWarningsToExceptions;
     }
 
-    public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool
+    public function __invoke($errorNumber, $errorString, $errorFile, $errorLine)
     {
         /*
          * Do not raise an exception when the error suppression operator (@) was used.
@@ -127,7 +127,7 @@ final class ErrorHandler
         }
     }
 
-    public function register(): void
+    public function register()
     {
         if ($this->registered) {
             return;
@@ -144,7 +144,7 @@ final class ErrorHandler
         $this->registered = true;
     }
 
-    public function unregister(): void
+    public function unregister()
     {
         if (!$this->registered) {
             return;

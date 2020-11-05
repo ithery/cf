@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,24 +17,24 @@ abstract class Operator extends Constraint
     /**
      * Returns the name of this operator.
      */
-    abstract public function operator(): string;
+    abstract public function operator();
 
     /**
      * Returns this operator's precedence.
      *
      * @see https://www.php.net/manual/en/language.operators.precedence.php
      */
-    abstract public function precedence(): int;
+    abstract public function precedence();
 
     /**
      * Returns the number of operands.
      */
-    abstract public function arity(): int;
+    abstract public function arity();
 
     /**
      * Validates $constraint argument.
      */
-    protected function checkConstraint($constraint): Constraint
+    protected function checkConstraint($constraint)
     {
         if (!$constraint instanceof Constraint) {
             return new IsEqual($constraint);
@@ -46,7 +46,7 @@ abstract class Operator extends Constraint
     /**
      * Returns true if the $constraint needs to be wrapped with braces.
      */
-    protected function constraintNeedsParentheses(Constraint $constraint): bool
+    protected function constraintNeedsParentheses(Constraint $constraint)
     {
         return $constraint instanceof self &&
                $constraint->arity() > 1 &&

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,18 +25,18 @@ final class IniSetting
      */
     private $value;
 
-    public function __construct(string $name, string $value)
+    public function __construct($name, $value)
     {
         $this->name  = $name;
         $this->value = $value;
     }
 
-    public function name(): string
+    public function name()
     {
         return $this->name;
     }
 
-    public function value(): string
+    public function value()
     {
         return $this->value;
     }

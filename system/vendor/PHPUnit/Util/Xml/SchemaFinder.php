@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -22,7 +22,7 @@ final class SchemaFinder
     /**
      * @throws Exception
      */
-    public function find(string $version): string
+    public function find($version)
     {
         if ($version === Version::series()) {
             $filename = $this->path() . 'phpunit.xsd';
@@ -42,7 +42,7 @@ final class SchemaFinder
         return $filename;
     }
 
-    private function path(): string
+    private function path()
     {
         if (defined('__PHPUNIT_PHAR_ROOT__')) {
             return __PHPUNIT_PHAR_ROOT__ . '/';

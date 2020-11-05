@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -28,7 +28,7 @@ final class IsAnything extends Constraint
      *
      * @throws ExpectationFailedException
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate($other, $description = '', $returnResult = false)
     {
         return $returnResult ? true : null;
     }
@@ -36,7 +36,7 @@ final class IsAnything extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'is anything';
     }
@@ -44,7 +44,7 @@ final class IsAnything extends Constraint
     /**
      * Counts the number of constraint elements.
      */
-    public function count(): int
+    public function count()
     {
         return 0;
     }

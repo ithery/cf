@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ use SebastianBergmann\CodeCoverage\Filter;
  */
 final class FilterMapper
 {
-    public function map(Filter $filter, CodeCoverage $configuration): void
+    public function map(Filter $filter, CodeCoverage $configuration)
     {
         foreach ($configuration->directories() as $directory) {
             $filter->includeDirectory(

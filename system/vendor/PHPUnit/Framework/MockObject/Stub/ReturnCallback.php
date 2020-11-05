@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -33,7 +33,7 @@ final class ReturnCallback implements Stub
         return call_user_func_array($this->callback, $invocation->getParameters());
     }
 
-    public function toString(): string
+    public function toString()
     {
         if (is_array($this->callback)) {
             if (is_object($this->callback[0])) {

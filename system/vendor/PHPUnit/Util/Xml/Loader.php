@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class Loader
     /**
      * @throws Exception
      */
-    public function loadFile(string $filename, bool $isHtml = false, bool $xinclude = false, bool $strict = false): DOMDocument
+    public function loadFile($filename, $isHtml = false, $xinclude = false, $strict = false)
     {
         $reporting = error_reporting(0);
         $contents  = file_get_contents($filename);
@@ -49,7 +49,7 @@ final class Loader
     /**
      * @throws Exception
      */
-    public function load(string $actual, bool $isHtml = false, string $filename = '', bool $xinclude = false, bool $strict = false): DOMDocument
+    public function load($actual, $isHtml = false, $filename = '', $xinclude = false, $strict = false)
     {
         if ($actual === '') {
             throw new Exception('Could not load XML from empty string');

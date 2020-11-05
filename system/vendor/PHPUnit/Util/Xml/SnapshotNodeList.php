@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class SnapshotNodeList implements Countable, IteratorAggregate
      */
     private $nodes = [];
 
-    public static function fromNodeList(DOMNodeList $list): self
+    public static function fromNodeList(DOMNodeList $list)
     {
         $snapshot = new self;
 
@@ -36,12 +36,12 @@ final class SnapshotNodeList implements Countable, IteratorAggregate
         return $snapshot;
     }
 
-    public function count(): int
+    public function count()
     {
         return count($this->nodes);
     }
 
-    public function getIterator(): ArrayIterator
+    public function getIterator()
     {
         return new ArrayIterator($this->nodes);
     }

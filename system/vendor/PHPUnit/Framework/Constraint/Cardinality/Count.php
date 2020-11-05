@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -31,12 +31,12 @@ class Count extends Constraint
      */
     private $expectedCount;
 
-    public function __construct(int $expected)
+    public function __construct($expected)
     {
         $this->expectedCount = $expected;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'count matches %d',
@@ -50,7 +50,7 @@ class Count extends Constraint
      *
      * @throws Exception
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return $this->expectedCount === $this->getCountOf($other);
     }
@@ -58,7 +58,7 @@ class Count extends Constraint
     /**
      * @throws Exception
      */
-    protected function getCountOf($other): ?int
+    protected function getCountOf($other)
     {
         if ($other instanceof Countable || is_array($other)) {
             return count($other);
@@ -114,7 +114,7 @@ class Count extends Constraint
      * Returns the total number of iterations from a generator.
      * This will fully exhaust the generator.
      */
-    protected function getCountOfGenerator(Generator $generator): int
+    protected function getCountOfGenerator(Generator $generator)
     {
         for ($count = 0; $generator->valid(); $generator->next()) {
             $count++;
@@ -131,7 +131,7 @@ class Count extends Constraint
      *
      * @param mixed $other evaluated value or object
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return sprintf(
             'actual size %d matches expected size %d',

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -35,7 +35,7 @@ final class TestSuite
      */
     private $exclude;
 
-    public function __construct(string $name, TestDirectoryCollection $directories, TestFileCollection $files, FileCollection $exclude)
+    public function __construct($name, TestDirectoryCollection $directories, TestFileCollection $files, FileCollection $exclude)
     {
         $this->name        = $name;
         $this->directories = $directories;
@@ -43,22 +43,22 @@ final class TestSuite
         $this->exclude     = $exclude;
     }
 
-    public function name(): string
+    public function name()
     {
         return $this->name;
     }
 
-    public function directories(): TestDirectoryCollection
+    public function directories()
     {
         return $this->directories;
     }
 
-    public function files(): TestFileCollection
+    public function files()
     {
         return $this->files;
     }
 
-    public function exclude(): FileCollection
+    public function exclude()
     {
         return $this->exclude;
     }

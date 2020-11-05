@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -43,7 +43,7 @@ abstract class GroupFilterIterator extends RecursiveFilterIterator
         }
     }
 
-    public function accept(): bool
+    public function accept()
     {
         $test = $this->getInnerIterator()->current();
 
@@ -54,5 +54,5 @@ abstract class GroupFilterIterator extends RecursiveFilterIterator
         return $this->doAccept(spl_object_hash($test));
     }
 
-    abstract protected function doAccept(string $hash);
+    abstract protected function doAccept($hash);
 }

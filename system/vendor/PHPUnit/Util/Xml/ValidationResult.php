@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class ValidationResult
     /**
      * @psalm-param array<int,\LibXMLError> $errors
      */
-    public static function fromArray(array $errors): self
+    public static function fromArray(array $errors)
     {
         $validationErrors = [];
 
@@ -47,12 +47,12 @@ final class ValidationResult
         $this->validationErrors = $validationErrors;
     }
 
-    public function hasValidationErrors(): bool
+    public function hasValidationErrors()
     {
         return !empty($this->validationErrors);
     }
 
-    public function asString(): string
+    public function asString()
     {
         $buffer = '';
 

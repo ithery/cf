@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -33,7 +33,7 @@ final class StandardTestSuiteLoader implements TestSuiteLoader
     /**
      * @throws Exception
      */
-    public function load(string $suiteClassFile): ReflectionClass
+    public function load($suiteClassFile)
     {
         $suiteClassName = basename($suiteClassFile, '.php');
         $loadedClasses  = get_declared_classes();
@@ -105,12 +105,12 @@ final class StandardTestSuiteLoader implements TestSuiteLoader
         throw $this->exceptionFor($suiteClassName, $suiteClassFile);
     }
 
-    public function reload(ReflectionClass $aClass): ReflectionClass
+    public function reload(ReflectionClass $aClass)
     {
         return $aClass;
     }
 
-    private function exceptionFor(string $className, string $filename): Exception
+    private function exceptionFor($className, $filename)
     {
         return new Exception(
             sprintf(

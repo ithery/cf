@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,16 +16,16 @@ use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
  */
 final class AnyParameters implements ParametersRule
 {
-    public function toString(): string
+    public function toString()
     {
         return 'with any parameters';
     }
 
-    public function apply(BaseInvocation $invocation): void
+    public function apply(BaseInvocation $invocation)
     {
     }
 
-    public function verify(): void
+    public function verify()
     {
     }
 }

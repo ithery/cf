@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -42,7 +42,7 @@ final class IsEqual extends Constraint
      */
     private $ignoreCase;
 
-    public function __construct($value, float $delta = 0.0, bool $canonicalize = false, bool $ignoreCase = false)
+    public function __construct($value, $delta = 0.0, $canonicalize = false, $ignoreCase = false)
     {
         $this->value        = $value;
         $this->delta        = $delta;
@@ -64,7 +64,7 @@ final class IsEqual extends Constraint
      *
      * @return bool
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate($other, $description = '', $returnResult = false)
     {
         // If $this->value and $other are identical, they are also equal.
         // This is the most common path and will allow us to skip
@@ -107,7 +107,7 @@ final class IsEqual extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString(): string
+    public function toString()
     {
         $delta = '';
 

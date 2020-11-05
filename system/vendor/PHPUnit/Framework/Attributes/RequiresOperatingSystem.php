@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,12 +19,12 @@ class RequiresOperatingSystem
      */
     private $regularExpression;
 
-    public function __construct(string $regularExpression)
+    public function __construct($regularExpression)
     {
         $this->regularExpression = $regularExpression;
     }
 
-    public function regularExpression(): string
+    public function regularExpression()
     {
         return $this->regularExpression;
     }

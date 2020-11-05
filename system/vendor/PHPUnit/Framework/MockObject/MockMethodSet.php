@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -23,7 +23,7 @@ final class MockMethodSet
      */
     private $methods = [];
 
-    public function addMethods(MockMethod ...$methods): void
+    public function addMethods(MockMethod ...$methods)
     {
         foreach ($methods as $method) {
             $this->methods[strtolower($method->getName())] = $method;
@@ -33,12 +33,12 @@ final class MockMethodSet
     /**
      * @return MockMethod[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return array_values($this->methods);
     }
 
-    public function hasMethod(string $methodName): bool
+    public function hasMethod($methodName)
     {
         return array_key_exists(strtolower($methodName), $this->methods);
     }

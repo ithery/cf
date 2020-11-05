@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -22,7 +22,7 @@ interface ParametersRule extends SelfDescribing, Verifiable
     /**
      * @throws ExpectationFailedException if the invocation violates the rule
      */
-    public function apply(BaseInvocation $invocation): void;
+    public function apply(BaseInvocation $invocation);
 
-    public function verify(): void;
+    public function verify();
 }

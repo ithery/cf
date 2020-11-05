@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ use Throwable;
  */
 interface InvocationStubber
 {
-    public function will(Stub $stub): Identity;
+    public function will(Stub $stub);
 
     /** @return self */
     public function willReturn($value, ...$nextValues)/*: self */;

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ use Throwable;
  */
 final class TestBuilder
 {
-    public function build(ReflectionClass $theClass, string $methodName): Test
+    public function build(ReflectionClass $theClass, $methodName)
     {
         $className = $theClass->getName();
 
@@ -133,7 +133,7 @@ final class TestBuilder
     }
 
     /** @psalm-param class-string $className */
-    private function buildTestWithoutData(string $className)
+    private function buildTestWithoutData($className)
     {
         return new $className;
     }
@@ -144,10 +144,10 @@ final class TestBuilder
         string $className,
         $data,
         bool $runTestInSeparateProcess,
-        ?bool $preserveGlobalState,
+        $preserveGlobalState,
         bool $runClassInSeparateProcess,
         array $backupSettings
-    ): DataProviderTestSuite {
+    ) {
         $dataProviderTestSuite = new DataProviderTestSuite(
             $className . '::' . $methodName
         );
@@ -182,10 +182,10 @@ final class TestBuilder
     private function configureTestCase(
         TestCase $test,
         bool $runTestInSeparateProcess,
-        ?bool $preserveGlobalState,
+        $preserveGlobalState,
         bool $runClassInSeparateProcess,
         array $backupSettings
-    ): void {
+    ) {
         if ($runTestInSeparateProcess) {
             $test->setRunTestInSeparateProcess(true);
 
@@ -213,7 +213,7 @@ final class TestBuilder
         }
     }
 
-    private function throwableToString(Throwable $t): string
+    private function throwableToString(Throwable $t)
     {
         $message = $t->getMessage();
 

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -26,7 +26,7 @@ final class TextTestListRenderer
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function render(TestSuite $suite): string
+    public function render(TestSuite $suite)
     {
         $buffer = 'Available test(s):' . PHP_EOL;
 

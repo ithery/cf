@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,24 +32,24 @@ final class TestFile
      */
     private $phpVersionOperator;
 
-    public function __construct(string $path, string $phpVersion, VersionComparisonOperator $phpVersionOperator)
+    public function __construct($path, $phpVersion, VersionComparisonOperator $phpVersionOperator)
     {
         $this->path               = $path;
         $this->phpVersion         = $phpVersion;
         $this->phpVersionOperator = $phpVersionOperator;
     }
 
-    public function path(): string
+    public function path()
     {
         return $this->path;
     }
 
-    public function phpVersion(): string
+    public function phpVersion()
     {
         return $this->phpVersion;
     }
 
-    public function phpVersionOperator(): VersionComparisonOperator
+    public function phpVersionOperator()
     {
         return $this->phpVersionOperator;
     }

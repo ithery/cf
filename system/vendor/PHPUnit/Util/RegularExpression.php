@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,7 +19,7 @@ final class RegularExpression
     /**
      * @return false|int
      */
-    public static function safeMatch(string $pattern, string $subject)
+    public static function safeMatch($pattern, $subject)
     {
         return ErrorHandler::invokeIgnoringWarnings(
             static function () use ($pattern, $subject) {

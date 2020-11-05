@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -25,7 +25,7 @@ final class Filesystem
      *   - PEAR CS:   Foo_Bar_Baz -> Foo/Bar/Baz.php
      *   - Namespace: Foo\Bar\Baz -> Foo/Bar/Baz.php
      */
-    public static function classNameToFilename(string $className): string
+    public static function classNameToFilename($className)
     {
         return str_replace(
             ['_', '\\'],
@@ -34,7 +34,7 @@ final class Filesystem
         ) . '.php';
     }
 
-    public static function createDirectory(string $directory): bool
+    public static function createDirectory($directory)
     {
         return !(!is_dir($directory) && !@mkdir($directory, 0777, true) && !is_dir($directory));
     }

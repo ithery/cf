@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ final class LogicalAnd extends BinaryOperator
     /**
      * Returns the name of this operator.
      */
-    public function operator(): string
+    public function operator()
     {
         return 'and';
     }
@@ -27,7 +27,7 @@ final class LogicalAnd extends BinaryOperator
      *
      * @see https://www.php.net/manual/en/language.operators.precedence.php
      */
-    public function precedence(): int
+    public function precedence()
     {
         return 22;
     }
@@ -38,7 +38,7 @@ final class LogicalAnd extends BinaryOperator
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         foreach ($this->constraints() as $constraint) {
             if (!$constraint->evaluate($other, '', true)) {

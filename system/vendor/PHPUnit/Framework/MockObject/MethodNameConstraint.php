@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -24,12 +24,12 @@ final class MethodNameConstraint extends Constraint
      */
     private $methodName;
 
-    public function __construct(string $methodName)
+    public function __construct($methodName)
     {
         $this->methodName = $methodName;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'is "%s"',
@@ -37,7 +37,7 @@ final class MethodNameConstraint extends Constraint
         );
     }
 
-    protected function matches($other): bool
+    protected function matches($other)
     {
         if (!is_string($other)) {
             return false;

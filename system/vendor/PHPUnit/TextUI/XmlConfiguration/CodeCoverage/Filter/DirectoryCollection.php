@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -27,7 +27,7 @@ final class DirectoryCollection implements Countable, IteratorAggregate
     /**
      * @param Directory[] $directories
      */
-    public static function fromArray(array $directories): self
+    public static function fromArray(array $directories)
     {
         return new self(...$directories);
     }
@@ -40,17 +40,17 @@ final class DirectoryCollection implements Countable, IteratorAggregate
     /**
      * @return Directory[]
      */
-    public function asArray(): array
+    public function asArray()
     {
         return $this->directories;
     }
 
-    public function count(): int
+    public function count()
     {
         return count($this->directories);
     }
 
-    public function getIterator(): DirectoryCollectionIterator
+    public function getIterator()
     {
         return new DirectoryCollectionIterator($this);
     }

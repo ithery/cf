@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -14,5 +14,5 @@ namespace PHPUnit\Runner;
  */
 interface BeforeTestHook extends TestHook
 {
-    public function executeBeforeTest(string $test): void;
+    public function executeBeforeTest($test);
 }

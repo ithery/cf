@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -31,7 +31,7 @@ final class TestSuiteMapper
      * @throws TestDirectoryNotFoundException
      * @throws TestFileNotFoundException
      */
-    public function map(TestSuiteCollection $configuration, string $filter): TestSuiteObject
+    public function map(TestSuiteCollection $configuration, $filter)
     {
         try {
             $filterAsArray = $filter ? explode(',', $filter) : [];

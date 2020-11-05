@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ final class SchemaDetector
     /**
      * @throws Exception
      */
-    public function detect(string $filename): SchemaDetectionResult
+    public function detect($filename)
     {
         $document = (new Loader)->loadFile(
             $filename,

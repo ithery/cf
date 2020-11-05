@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -23,7 +23,7 @@ final class IsInstanceOf extends Constraint
      */
     private $className;
 
-    public function __construct(string $className)
+    public function __construct($className)
     {
         $this->className = $className;
     }
@@ -31,7 +31,7 @@ final class IsInstanceOf extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return sprintf(
             'is instance of %s "%s"',
@@ -46,7 +46,7 @@ final class IsInstanceOf extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return $other instanceof $this->className;
     }
@@ -61,7 +61,7 @@ final class IsInstanceOf extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return sprintf(
             '%s is an instance of %s "%s"',
@@ -71,7 +71,7 @@ final class IsInstanceOf extends Constraint
         );
     }
 
-    private function getType(): string
+    private function getType()
     {
         try {
             $reflection = new ReflectionClass($this->className);

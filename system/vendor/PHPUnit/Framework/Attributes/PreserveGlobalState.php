@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -19,12 +19,12 @@ final class PreserveGlobalState
      */
     private $enabled;
 
-    public function __construct(bool $enabled)
+    public function __construct($enabled)
     {
         $this->enabled = $enabled;
     }
 
-    public function enabled(): bool
+    public function enabled()
     {
         return $this->enabled;
     }

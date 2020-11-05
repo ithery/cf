@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,7 +16,7 @@ namespace PHPUnit\Util\Xml;
  */
 abstract class SchemaDetectionResult
 {
-    public function detected(): bool
+    public function detected()
     {
         return false;
     }
@@ -24,7 +24,7 @@ abstract class SchemaDetectionResult
     /**
      * @throws Exception
      */
-    public function version(): string
+    public function version()
     {
         throw new Exception('No supported schema was detected');
     }

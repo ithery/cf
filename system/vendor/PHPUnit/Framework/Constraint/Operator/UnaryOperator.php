@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -32,7 +32,7 @@ abstract class UnaryOperator extends Operator
     /**
      * Returns the number of operands (constraints).
      */
-    public function arity(): int
+    public function arity()
     {
         return 1;
     }
@@ -40,7 +40,7 @@ abstract class UnaryOperator extends Operator
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         $reduced = $this->reduce();
 
@@ -66,7 +66,7 @@ abstract class UnaryOperator extends Operator
     /**
      * Counts the number of constraint elements.
      */
-    public function count(): int
+    public function count()
     {
         return count($this->constraint);
     }
@@ -81,7 +81,7 @@ abstract class UnaryOperator extends Operator
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         $reduced = $this->reduce();
 
@@ -115,7 +115,7 @@ abstract class UnaryOperator extends Operator
      *
      * @param string $string the string to be transformed
      */
-    protected function transformString(string $string): string
+    protected function transformString($string)
     {
         return $string;
     }
@@ -123,7 +123,7 @@ abstract class UnaryOperator extends Operator
     /**
      * Provides access to $this->constraint for subclasses.
      */
-    final protected function constraint(): Constraint
+    final protected function constraint()
     {
         return $this->constraint;
     }
@@ -131,7 +131,7 @@ abstract class UnaryOperator extends Operator
     /**
      * Returns true if the $constraint needs to be wrapped with parentheses.
      */
-    protected function constraintNeedsParentheses(Constraint $constraint): bool
+    protected function constraintNeedsParentheses(Constraint $constraint)
     {
         $constraint = $constraint->reduce();
 

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -93,7 +93,7 @@ class Command
     /**
      * @throws Exception
      */
-    public static function main(bool $exit = true): int
+    public static function main($exit = true)
     {
         try {
             return (new static)->run($_SERVER['argv'], $exit);
@@ -109,7 +109,7 @@ class Command
     /**
      * @throws Exception
      */
-    public function run(array $argv, bool $exit = true): int
+    public function run(array $argv, $exit = true)
     {
         $this->handleArguments($argv);
 
@@ -166,7 +166,7 @@ class Command
     /**
      * Create a TestRunner, override in subclasses.
      */
-    protected function createRunner(): TestRunner
+    protected function createRunner()
     {
         return new TestRunner($this->arguments['loader']);
     }
@@ -216,7 +216,7 @@ class Command
      *
      * @throws Exception
      */
-    protected function handleArguments(array $argv): void
+    protected function handleArguments(array $argv)
     {
         try {
             $arguments = (new Builder)->fromParameters($argv, array_keys($this->longOptions));
@@ -385,7 +385,7 @@ class Command
                 try {
                     $this->arguments['test'] = (new TestSuiteMapper)->map(
                         $this->arguments['configurationObject']->testSuite(),
-                        $this->arguments['testsuite'] ?? ''
+                        isset($this->arguments['testsuite']) ? $this->arguments['testsuite'] : ''
                     );
                 } catch (Exception $e) {
                     $this->printVersionString();
@@ -419,7 +419,7 @@ class Command
      *
      * @deprecated see https://github.com/sebastianbergmann/phpunit/issues/4039
      */
-    protected function handleLoader(string $loaderClass, string $loaderFile = ''): ?TestSuiteLoader
+    protected function handleLoader($loaderClass, $loaderFile = '')
     {
         $this->warnings[] = 'Using a custom test suite loader is deprecated';
 
@@ -478,7 +478,7 @@ class Command
      *
      * @return null|Printer|string
      */
-    protected function handlePrinter(string $printerClass, string $printerFile = '')
+    protected function handlePrinter($printerClass, $printerFile = '')
     {
         if (!class_exists($printerClass, false)) {
             if ($printerFile === '') {
@@ -546,7 +546,7 @@ class Command
     /**
      * Loads a bootstrap file.
      */
-    protected function handleBootstrap(string $filename): void
+    protected function handleBootstrap($filename)
     {
         try {
             FileLoader::checkAndLoad($filename);
@@ -555,7 +555,7 @@ class Command
         }
     }
 
-    protected function handleVersionCheck(): void
+    protected function handleVersionCheck()
     {
         $this->printVersionString();
 
@@ -578,7 +578,7 @@ class Command
     /**
      * Show the help message.
      */
-    protected function showHelp(): void
+    protected function showHelp()
     {
         $this->printVersionString();
         (new Help)->writeToConsole();
@@ -587,11 +587,11 @@ class Command
     /**
      * Custom callback for test suite discovery.
      */
-    protected function handleCustomTestSuite(): void
+    protected function handleCustomTestSuite()
     {
     }
 
-    private function printVersionString(): void
+    private function printVersionString()
     {
         if ($this->versionStringPrinted) {
             return;
@@ -602,7 +602,7 @@ class Command
         $this->versionStringPrinted = true;
     }
 
-    private function exitWithErrorMessage(string $message): void
+    private function exitWithErrorMessage($message)
     {
         $this->printVersionString();
 
@@ -611,7 +611,7 @@ class Command
         exit(TestRunner::FAILURE_EXIT);
     }
 
-    private function handleExtensions(string $directory): void
+    private function handleExtensions($directory)
     {
         foreach ((new FileIteratorFacade)->getFilesAsArray($directory, '.phar') as $file) {
             if (!is_file('phar://' . $file . '/manifest.xml')) {
@@ -648,7 +648,7 @@ class Command
         }
     }
 
-    private function handleListGroups(TestSuite $suite, bool $exit): int
+    private function handleListGroups(TestSuite $suite, $exit)
     {
         $this->printVersionString();
 
@@ -679,7 +679,7 @@ class Command
      * @throws \PHPUnit\Framework\Exception
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
      */
-    private function handleListSuites(bool $exit): int
+    private function handleListSuites($exit)
     {
         $this->printVersionString();
 
@@ -702,7 +702,7 @@ class Command
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function handleListTests(TestSuite $suite, bool $exit): int
+    private function handleListTests(TestSuite $suite, $exit)
     {
         $this->printVersionString();
 
@@ -720,7 +720,7 @@ class Command
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function handleListTestsXml(TestSuite $suite, string $target, bool $exit): int
+    private function handleListTestsXml(TestSuite $suite, $target, $exit)
     {
         $this->printVersionString();
 
@@ -740,7 +740,7 @@ class Command
         return TestRunner::SUCCESS_EXIT;
     }
 
-    private function generateConfiguration(): void
+    private function generateConfiguration()
     {
         $this->printVersionString();
 
@@ -796,7 +796,7 @@ class Command
         exit(TestRunner::SUCCESS_EXIT);
     }
 
-    private function migrateConfiguration(string $filename): void
+    private function migrateConfiguration($filename)
     {
         $this->printVersionString();
 
@@ -826,7 +826,7 @@ class Command
         exit(TestRunner::SUCCESS_EXIT);
     }
 
-    private function handleCustomOptions(array $unrecognizedOptions): void
+    private function handleCustomOptions(array $unrecognizedOptions)
     {
         foreach ($unrecognizedOptions as $name => $value) {
             if (isset($this->longOptions[$name])) {
@@ -847,7 +847,7 @@ class Command
         }
     }
 
-    private function handleWarmCoverageCache(XmlConfiguration\Configuration $configuration): void
+    private function handleWarmCoverageCache(XmlConfiguration\Configuration $configuration)
     {
         $this->printVersionString();
 
@@ -901,7 +901,7 @@ class Command
         exit(TestRunner::SUCCESS_EXIT);
     }
 
-    private function configurationFileInDirectory(string $directory): ?string
+    private function configurationFileInDirectory($directory)
     {
         $candidates = [
             $directory . '/phpunit.xml',

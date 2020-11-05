@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -39,7 +39,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate($other, $description = '', $returnResult = false)
     {
         $success = false;
 
@@ -61,12 +61,12 @@ abstract class Constraint implements Countable, SelfDescribing
     /**
      * Counts the number of constraint elements.
      */
-    public function count(): int
+    public function count()
     {
         return 1;
     }
 
-    protected function exporter(): Exporter
+    protected function exporter()
     {
         if ($this->exporter === null) {
             $this->exporter = new Exporter;
@@ -84,7 +84,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param mixed $other value or object to evaluate
      * @codeCoverageIgnore
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
         return false;
     }
@@ -101,7 +101,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @psalm-return never-return
      */
-    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
+    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null)
     {
         $failureDescription = sprintf(
             'Failed asserting that %s.',
@@ -132,7 +132,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @param mixed $other evaluated value or object
      */
-    protected function additionalFailureDescription($other): string
+    protected function additionalFailureDescription($other)
     {
         return '';
     }
@@ -150,7 +150,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other): string
+    protected function failureDescription($other)
     {
         return $this->exporter()->export($other) . ' ' . $this->toString();
     }
@@ -170,7 +170,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param Operator $operator the $operator of the expression
      * @param mixed    $role     role of $this constraint in the $operator expression
      */
-    protected function toStringInContext(Operator $operator, $role): string
+    protected function toStringInContext(Operator $operator, $role)
     {
         return '';
     }
@@ -191,7 +191,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param mixed    $role     role of $this constraint in the $operator expression
      * @param mixed    $other    evaluated value or object
      */
-    protected function failureDescriptionInContext(Operator $operator, $role, $other): string
+    protected function failureDescriptionInContext(Operator $operator, $role, $other)
     {
         $string = $this->toStringInContext($operator, $role);
 
@@ -262,7 +262,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *      LogicalNot
      *      + IsTrue
      */
-    protected function reduce(): self
+    protected function reduce()
     {
         return $this;
     }

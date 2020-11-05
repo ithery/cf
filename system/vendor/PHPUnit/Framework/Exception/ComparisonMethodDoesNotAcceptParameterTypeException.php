@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ use function sprintf;
  */
 final class ComparisonMethodDoesNotAcceptParameterTypeException extends Exception
 {
-    public function __construct(string $className, string $methodName, string $type)
+    public function __construct($className, $methodName, $type)
     {
         parent::__construct(
             sprintf(
@@ -31,7 +31,7 @@ final class ComparisonMethodDoesNotAcceptParameterTypeException extends Exceptio
         );
     }
 
-    public function __toString(): string
+    public function __toString()
     {
         return $this->getMessage() . PHP_EOL;
     }

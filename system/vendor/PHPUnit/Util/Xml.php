@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -34,7 +34,7 @@ final class Xml
     /**
      * @deprecated Only used by assertEqualXMLStructure()
      */
-    public static function import(DOMElement $element): DOMElement
+    public static function import(DOMElement $element)
     {
         return (new DOMDocument)->importNode($element, true);
     }
@@ -42,7 +42,7 @@ final class Xml
     /**
      * @deprecated Only used by assertEqualXMLStructure()
      */
-    public static function removeCharacterDataNodes(DOMNode $node): void
+    public static function removeCharacterDataNodes(DOMNode $node)
     {
         if ($node->hasChildNodes()) {
             for ($i = $node->childNodes->length - 1; $i >= 0; $i--) {
@@ -61,7 +61,7 @@ final class Xml
      *
      * @see https://www.w3.org/TR/xml/#charsets
      */
-    public static function prepareString(string $string): string
+    public static function prepareString($string)
     {
         return preg_replace(
             '/[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]/',
@@ -155,7 +155,7 @@ final class Xml
         return $variable;
     }
 
-    private static function convertToUtf8(string $string): string
+    private static function convertToUtf8($string)
     {
         if (!self::isUtf8($string)) {
             $string = mb_convert_encoding($string, 'UTF-8');
@@ -164,7 +164,7 @@ final class Xml
         return $string;
     }
 
-    private static function isUtf8(string $string): bool
+    private static function isUtf8($string)
     {
         $length = strlen($string);
 
