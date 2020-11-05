@@ -132,7 +132,7 @@ final class ErrorHandler
         if ($this->registered) {
             return;
         }
-
+        
         $oldErrorHandler = set_error_handler($this);
 
         if ($oldErrorHandler !== null) {

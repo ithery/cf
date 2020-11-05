@@ -144,8 +144,9 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
      */
     public function __construct($out = null, $verbose = false, $colors = self::COLOR_DEFAULT, $debug = false, $numberOfColumns = 80, $reverse = false)
     {
+       
         parent::__construct($out);
-
+       
         if (!in_array($colors, self::AVAILABLE_COLORS, true)) {
             throw InvalidArgumentException::create(
                 3,
@@ -156,10 +157,17 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         if (!is_int($numberOfColumns) && $numberOfColumns !== 'max') {
             throw InvalidArgumentException::create(5, 'integer or "max"');
         }
+        
 
-        $console            = new Console;
+        echo "Console\n";
+        $console            = new \SebastianBergmann\Environment\Console();
+        echo "Printer\n";
+        echo json_encode($console->isInteractive())."\n";
+        echo json_encode(get_class($console))."\n";
+        echo json_encode($console->getNumberOfColumns())."\n";
+        
         $maxNumberOfColumns = $console->getNumberOfColumns();
-
+        echo json_encode($maxNumberOfColumns);
         if ($numberOfColumns === 'max' || ($numberOfColumns !== 80 && $numberOfColumns > $maxNumberOfColumns)) {
             $numberOfColumns = $maxNumberOfColumns;
         }

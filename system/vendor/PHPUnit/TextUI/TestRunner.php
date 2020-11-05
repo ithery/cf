@@ -31,20 +31,20 @@ use function time;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Runner\AfterLastTestHook;
+use PHPUnit\Runner\Hook\AfterLastTestHook;
 use PHPUnit\Runner\BaseTestRunner;
-use PHPUnit\Runner\BeforeFirstTestHook;
+use PHPUnit\Runner\Hook\BeforeFirstTestHook;
 use PHPUnit\Runner\DefaultTestResultCache;
 use PHPUnit\Runner\Filter\ExcludeGroupFilterIterator;
 use PHPUnit\Runner\Filter\Factory;
 use PHPUnit\Runner\Filter\IncludeGroupFilterIterator;
 use PHPUnit\Runner\Filter\NameFilterIterator;
-use PHPUnit\Runner\Hook;
+use PHPUnit\Runner\Hook\Hook;
 use PHPUnit\Runner\NullTestResultCache;
 use PHPUnit\Runner\ResultCacheExtension;
 use PHPUnit\Runner\StandardTestSuiteLoader;
-use PHPUnit\Runner\TestHook;
-use PHPUnit\Runner\TestListenerAdapter;
+use PHPUnit\Runner\Hook\TestHook;
+use PHPUnit\Runner\Hook\TestListenerAdapter;
 use PHPUnit\Runner\TestSuiteLoader;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\Runner\Version;
@@ -242,7 +242,7 @@ final class TestRunner extends BaseTestRunner
         if ($listenerNeeded) {
             $result->addListener($listener);
         }
-
+        
         unset($listener, $listenerNeeded);
 
         if (!$arguments['convertDeprecationsToExceptions']) {
@@ -288,11 +288,11 @@ final class TestRunner extends BaseTestRunner
         if ($arguments['stopOnDefect']) {
             $result->stopOnDefect(true);
         }
-
+        
         if ($arguments['registerMockObjectsFromTestArgumentsRecursively']) {
             $result->setRegisterMockObjectsFromTestArgumentsRecursively(true);
         }
-
+        
         if ($this->printer === null) {
             if (isset($arguments['printer'])) {
                 if ($arguments['printer'] instanceof ResultPrinter) {
@@ -317,6 +317,7 @@ final class TestRunner extends BaseTestRunner
                 }
             } else {
                 $this->printer = $this->createPrinter(DefaultResultPrinter::class, $arguments);
+                
             }
         }
 
@@ -327,6 +328,8 @@ final class TestRunner extends BaseTestRunner
             $this->printer->setShowProgressAnimation(!$arguments['noInteraction']);
         }
 
+        
+        
         $this->printer->write(
             Version::getVersionString() . "\n"
         );
@@ -1218,6 +1221,8 @@ final class TestRunner extends BaseTestRunner
 
     private function createPrinter($class, array $arguments)
     {
+        
+        
         $object = new $class(
             (isset($arguments['stderr']) && $arguments['stderr'] === true) ? 'php://stderr' : null,
             $arguments['verbose'],
@@ -1227,6 +1232,7 @@ final class TestRunner extends BaseTestRunner
             $arguments['reverseList']
         );
 
+        
         assert($object instanceof ResultPrinter);
 
         return $object;

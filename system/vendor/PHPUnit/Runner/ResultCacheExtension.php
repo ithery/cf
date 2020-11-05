@@ -16,6 +16,7 @@ use PHPUnit\Runner\Hook\AfterIncompleteTestHook;
 use PHPUnit\Runner\Hook\AfterLastTestHook;
 use PHPUnit\Runner\Hook\AfterRiskyTestHook;
 use PHPUnit\Runner\Hook\AfterSkippedTestHook;
+use PHPUnit\Runner\Hook\AfterSuccessfulTestHook;
 use PHPUnit\Runner\Hook\AfterTestErrorHook;
 use PHPUnit\Runner\Hook\AfterTestFailureHook;
 use PHPUnit\Runner\Hook\AfterTestWarningHook;
