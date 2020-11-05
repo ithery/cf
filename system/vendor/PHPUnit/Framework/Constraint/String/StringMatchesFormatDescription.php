@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+namespace PHPUnit\Framework\Constraint\String;
 
 use const DIRECTORY_SEPARATOR;
 use function explode;
@@ -18,6 +18,7 @@ use function preg_replace;
 use function strtr;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
