@@ -50,7 +50,7 @@ use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\Runner\Version;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\FilterMapper;
 use PHPUnit\TextUI\XmlConfiguration\Configuration;
-use PHPUnit\TextUI\XmlConfiguration\ExtensionHandler;
+use PHPUnit\TextUI\XmlConfiguration\PHPUnit\ExtensionHandler;
 use PHPUnit\TextUI\XmlConfiguration\Loader;
 use PHPUnit\TextUI\XmlConfiguration\PhpHandler;
 use PHPUnit\Util\Filesystem;
@@ -1081,8 +1081,10 @@ final class TestRunner extends BaseTestRunner
 
         $extensionHandler = new ExtensionHandler;
 
-        foreach ($arguments['extensions'] as $extension) {
-            $this->addExtension($extensionHandler->createHookInstance($extension));
+        if(isset($arguments['extensions'])) {
+            foreach ($arguments['extensions'] as $extension) {
+                $this->addExtension($extensionHandler->createHookInstance($extension));
+            }
         }
 
         unset($extensionHandler);

@@ -12,6 +12,16 @@ namespace PHPUnit\Runner;
 use function preg_match;
 use function round;
 
+use PHPUnit\Runner\Hook\AfterIncompleteTestHook;
+use PHPUnit\Runner\Hook\AfterLastTestHook;
+use PHPUnit\Runner\Hook\AfterRiskyTestHook;
+use PHPUnit\Runner\Hook\AfterSkippedTestHook;
+use PHPUnit\Runner\Hook\AfterTestErrorHook;
+use PHPUnit\Runner\Hook\AfterTestFailureHook;
+use PHPUnit\Runner\Hook\AfterTestWarningHook;
+
+
+
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */

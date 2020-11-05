@@ -140,12 +140,12 @@ final class TestBuilder
 
     /** @psalm-param class-string $className */
     private function buildDataProviderTestSuite(
-        string $methodName,
-        string $className,
+        $methodName,
+        $className,
         $data,
-        bool $runTestInSeparateProcess,
+        $runTestInSeparateProcess,
         $preserveGlobalState,
-        bool $runClassInSeparateProcess,
+        $runClassInSeparateProcess,
         array $backupSettings
     ) {
         $dataProviderTestSuite = new DataProviderTestSuite(
@@ -181,9 +181,9 @@ final class TestBuilder
 
     private function configureTestCase(
         TestCase $test,
-        bool $runTestInSeparateProcess,
+        $runTestInSeparateProcess,
         $preserveGlobalState,
-        bool $runClassInSeparateProcess,
+        $runClassInSeparateProcess,
         array $backupSettings
     ) {
         if ($runTestInSeparateProcess) {

@@ -90,7 +90,7 @@ final class DefaultTestResultCache implements Serializable, TestResultCache
             $filepath .= DIRECTORY_SEPARATOR . self::DEFAULT_RESULT_CACHE_FILENAME;
         }
 
-        $this->cacheFilename = $filepath != null ? $filepath : isset($_ENV['PHPUNIT_RESULT_CACHE']) ? $_ENV['PHPUNIT_RESULT_CACHE'] : self::DEFAULT_RESULT_CACHE_FILENAME;
+        $this->cacheFilename = $filepath != null ? $filepath : (isset($_ENV['PHPUNIT_RESULT_CACHE']) ? $_ENV['PHPUNIT_RESULT_CACHE'] : self::DEFAULT_RESULT_CACHE_FILENAME);
     }
 
     /**

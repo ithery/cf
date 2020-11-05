@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+namespace PHPUnit\TextUI\XmlConfiguration\PHPUnit;
 
 use function class_exists;
 use function sprintf;

@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Runner;
+namespace PHPUnit\Runner\Hook;
 
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Test;
