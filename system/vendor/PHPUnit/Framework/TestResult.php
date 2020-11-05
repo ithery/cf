@@ -21,6 +21,9 @@ use PHPUnit\Util\ErrorHandler;
 use PHPUnit\Util\ExcludeList;
 use PHPUnit\Util\Printer;
 use PHPUnit\Util\Test as TestUtil;
+use PHPUnit\Framework\Exception\RiskyTestError;
+use PHPUnit\Framework\Exception\AssertionFailedError;
+
 use ReflectionClass;
 use ReflectionException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;

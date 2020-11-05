@@ -5,6 +5,9 @@
  *
  * @author Hery
  */
+
+use PHPUnit\TextUI\TestRunner;
+
 class CQC_Runner_UnitTestRunner extends CQC_RunnerAbstract {
 
     /**
@@ -39,6 +42,7 @@ class CQC_Runner_UnitTestRunner extends CQC_RunnerAbstract {
     }
 
     public function run() {
+        
         $methods = $this->getTestMethods();
         $result = [];
         foreach ($methods as $method) {
@@ -48,6 +52,28 @@ class CQC_Runner_UnitTestRunner extends CQC_RunnerAbstract {
     }
 
     public function runMethod($method) {
+        $runner = new TestRunner();
+        $suite = $runner->getTest(TBQC_UnitTest_MemberApi_BasicTestMemberApi::class);
+        $errMessage = "";
+        $output = "AA";
+        try {
+            $result = $runner->run($suite, [], [], true);
+        } catch (Throwable $t) {
+            $errMessage = $t->getMessage() . PHP_EOL;
+        }
+        
+        
+        $return = TestRunner::FAILURE_EXIT;
+
+        if (isset($result) && $result->wasSuccessful()) {
+            $return = TestRunner::SUCCESS_EXIT;
+        } elseif (!isset($result) || $result->errorCount() > 0) {
+            $return = TestRunner::EXCEPTION_EXIT;
+        }
+
+        
+        return new CQC_ProcessRunnerResult($output,$errMessage);
+        /**
         $isError = false;
         $result = null;
         try {
@@ -64,6 +90,8 @@ class CQC_Runner_UnitTestRunner extends CQC_RunnerAbstract {
         }
 
         return $processRunnerResult->getOutput();
+         * 
+         */
     }
 
 }

@@ -22,7 +22,7 @@ interface TestListener
      *
      * @deprecated Use `AfterTestErrorHook::executeAfterTestError` instead
      */
-    public function addError(Test $test, Throwable $t, $time);
+    public function addError(Test $test, \Exception $t, $time);
 
     /**
      * A warning occurred.
@@ -43,21 +43,21 @@ interface TestListener
      *
      * @deprecated Use `AfterIncompleteTestHook::executeAfterIncompleteTest` instead
      */
-    public function addIncompleteTest(Test $test, Throwable $t, $time);
+    public function addIncompleteTest(Test $test, \Exception $t, $time);
 
     /**
      * Risky test.
      *
      * @deprecated Use `AfterRiskyTestHook::executeAfterRiskyTest` instead
      */
-    public function addRiskyTest(Test $test, Throwable $t, $time);
+    public function addRiskyTest(Test $test, \Exception $t, $time);
 
     /**
      * Skipped test.
      *
      * @deprecated Use `AfterSkippedTestHook::executeAfterSkippedTest` instead
      */
-    public function addSkippedTest(Test $test, Throwable $t, $time);
+    public function addSkippedTest(Test $test, \Exception $t, $time);
 
     /**
      * A test suite started.

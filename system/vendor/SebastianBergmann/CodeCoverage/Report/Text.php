@@ -73,7 +73,7 @@ final class Text
      */
     private $showOnlySummary;
 
-    public function __construct($lowUpperBound = 50, int $highLowerBound = 90, bool $showUncoveredFiles = false, bool $showOnlySummary = false)
+    public function __construct($lowUpperBound = 50, int $highLowerBound = 90, $showUncoveredFiles = false, $showOnlySummary = false)
     {
         $this->lowUpperBound      = $lowUpperBound;
         $this->highLowerBound     = $highLowerBound;
@@ -81,7 +81,7 @@ final class Text
         $this->showOnlySummary    = $showOnlySummary;
     }
 
-    public function process(CodeCoverage $coverage, bool $showColors = false)
+    public function process(CodeCoverage $coverage, $showColors = false)
     {
         $hasBranchCoverage = !empty($coverage->getData(true)->functionCoverage());
 

@@ -546,18 +546,22 @@ final class TestRunner extends BaseTestRunner
                 );
             }
 
-            foreach ($arguments['loadedExtensions'] as $extension) {
-                $this->writeMessage(
-                    'Extension',
-                    $extension
-                );
+            if(isset($arguments['loadedExtensions'])) {
+                foreach ($arguments['loadedExtensions'] as $extension) {
+                    $this->writeMessage(
+                        'Extension',
+                        $extension
+                    );
+                }
             }
 
-            foreach ($arguments['notLoadedExtensions'] as $extension) {
-                $this->writeMessage(
-                    'Extension',
-                    $extension
-                );
+            if(isset($arguments['notLoadedExtensions'])) {
+                foreach ($arguments['notLoadedExtensions'] as $extension) {
+                    $this->writeMessage(
+                        'Extension',
+                        $extension
+                    );
+                }
             }
         }
 

@@ -202,7 +202,7 @@ final class CodeCoverage
      *
      * @param PhptTestCase|string|TestCase $id
      */
-    public function start($id, bool $clear = false)
+    public function start($id, $clear = false)
     {
         if ($clear) {
             $this->clear();
@@ -244,7 +244,7 @@ final class CodeCoverage
      * @throws TestIdMissingException
      * @throws ReflectionException
      */
-    public function append(RawCodeCoverageData $rawData, $id = null, bool $append = true, $linesToBeCovered = [], array $linesToBeUsed = [])
+    public function append(RawCodeCoverageData $rawData, $id = null, $append = true, $linesToBeCovered = [], array $linesToBeUsed = [])
     {
         if ($id === null) {
             $id = $this->currentId;

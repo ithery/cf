@@ -62,7 +62,7 @@ abstract class Renderer
      */
     protected $version;
 
-    public function __construct($templatePath, $generator, $date, int $lowUpperBound, int $highLowerBound, bool $hasBranchCoverage)
+    public function __construct($templatePath, $generator, $date, int $lowUpperBound, int $highLowerBound, $hasBranchCoverage)
     {
         $this->templatePath      = $templatePath;
         $this->generator         = $generator;

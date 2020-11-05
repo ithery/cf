@@ -84,7 +84,7 @@ final class XmlResultPrinter extends Printer implements TestListener
     /**
      * An error occurred.
      */
-    public function addError(Test $test, Throwable $t, $time)
+    public function addError(Test $test, \Exception $t, $time)
     {
         $this->exception = $t;
     }
@@ -107,21 +107,21 @@ final class XmlResultPrinter extends Printer implements TestListener
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, Throwable $t, $time)
+    public function addIncompleteTest(Test $test, \Exception $t, $time)
     {
     }
 
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, Throwable $t, $time)
+    public function addRiskyTest(Test $test, \Exception $t, $time)
     {
     }
 
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, Throwable $t, $time)
+    public function addSkippedTest(Test $test, \Exception $t, $time)
     {
     }
 

@@ -15,6 +15,8 @@ class CFConsole {
         $commands = [
             CConsole_Command_DomainCommand::class,
             CConsole_Command_StatusCommand::class,
+            CConsole_Command_QC_PhpUnitCommand::class,
+            CConsole_Command_QC_PhpUnitListCommand::class,
         ];
         CConsole_Application::starting(function ($cfCli) use ($commands) {
             $cfCli->resolveCommands($commands);
@@ -27,7 +29,7 @@ class CFConsole {
 
         $kernel->terminate($input, $status);
 
-        
+
         exit($status);
     }
 

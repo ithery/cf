@@ -159,15 +159,8 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
         }
         
 
-        echo "Console\n";
-        $console            = new \SebastianBergmann\Environment\Console();
-        echo "Printer\n";
-        echo json_encode($console->isInteractive())."\n";
-        echo json_encode(get_class($console))."\n";
-        echo json_encode($console->getNumberOfColumns())."\n";
-        
+        $console            = new Console();
         $maxNumberOfColumns = $console->getNumberOfColumns();
-        echo json_encode($maxNumberOfColumns);
         if ($numberOfColumns === 'max' || ($numberOfColumns !== 80 && $numberOfColumns > $maxNumberOfColumns)) {
             $numberOfColumns = $maxNumberOfColumns;
         }
@@ -207,7 +200,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * An error occurred.
      */
-    public function addError(Test $test, Throwable $t, $time)
+    public function addError(Test $test, \Exception $t, $time)
     {
         $this->writeProgressWithColor('fg-red, bold', 'E');
         $this->lastTestFailed = true;
@@ -234,7 +227,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, Throwable $t, $time)
+    public function addIncompleteTest(Test $test, \Exception $t, $time)
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'I');
         $this->lastTestFailed = true;
@@ -243,7 +236,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, Throwable $t, $time)
+    public function addRiskyTest(Test $test, \Exception $t, $time)
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'R');
         $this->lastTestFailed = true;
@@ -252,7 +245,7 @@ class DefaultResultPrinter extends Printer implements ResultPrinter
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, Throwable $t, $time)
+    public function addSkippedTest(Test $test, \Exception $t, $time)
     {
         $this->writeProgressWithColor('fg-cyan, bold', 'S');
         $this->lastTestFailed = true;

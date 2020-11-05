@@ -5,7 +5,11 @@
  *
  * @author Hery
  */
-abstract class CQC_UnitTestAbstract extends CQC_QCAbstract {
+
+
+use \PHPUnit\Framework\TestCase;
+
+abstract class CQC_UnitTestAbstract extends TestCase {
 
     /**
      *

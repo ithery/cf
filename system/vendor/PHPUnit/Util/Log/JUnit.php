@@ -132,7 +132,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * An error occurred.
      */
-    public function addError(Test $test, Throwable $t, $time)
+    public function addError(Test $test, \Exception $t, $time)
     {
         $this->doAddFault($test, $t, 'error');
         $this->testSuiteErrors[$this->testSuiteLevel]++;
@@ -159,7 +159,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, Throwable $t, $time)
+    public function addIncompleteTest(Test $test, \Exception $t, $time)
     {
         $this->doAddSkipped();
     }
@@ -167,7 +167,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, Throwable $t, $time)
+    public function addRiskyTest(Test $test, \Exception $t, $time)
     {
         if (!$this->reportRiskyTests) {
             return;
@@ -180,7 +180,7 @@ final class JUnit extends Printer implements TestListener
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, Throwable $t, $time)
+    public function addSkippedTest(Test $test, \Exception $t, $time)
     {
         $this->doAddSkipped();
     }

@@ -17,15 +17,29 @@ class CConsole_Command_QC_PhpUnitCommand extends CConsole_Command {
     protected $signature = 'qc:phpunit {--class=}';
 
     public function handle() {
+
+
         $class = $this->option('class');
+        
+        if (strlen($class) > 0) {
+            if (!class_exists($class)) {
+                $this->error('Class not exists:' . $class);
+                return;
+            }
+        }
+        
         $inspector = CQC::createInspector($class);
         $fileName = $inspector->getFileName();
+
+        
 
         $this->info('Running test on file ' . $fileName);
         $runner = new TestRunner();
         $suite = $runner->getTest(TBQC_UnitTest_MemberApi_BasicTestMemberApi::class);
         try {
-            $result = $runner->run($suite, [], [], true);
+            $args = [];
+            $args['verbose'] = $this->option('verbose');
+            $result = $runner->run($suite, $args, [], true);
         } catch (Throwable $t) {
             $this->error($t->getMessage() . PHP_EOL);
         }

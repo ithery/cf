@@ -48,7 +48,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = false;
     }
 
-    public function addError(Test $test, Throwable $t, $time)
+    public function addError(Test $test, \Exception $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterTestErrorHook) {
@@ -81,7 +81,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addIncompleteTest(Test $test, Throwable $t, $time)
+    public function addIncompleteTest(Test $test, \Exception $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterIncompleteTestHook) {
@@ -92,7 +92,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addRiskyTest(Test $test, Throwable $t, $time)
+    public function addRiskyTest(Test $test, \Exception $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterRiskyTestHook) {
@@ -103,7 +103,7 @@ final class TestListenerAdapter implements TestListener
         $this->lastTestWasNotSuccessful = true;
     }
 
-    public function addSkippedTest(Test $test, Throwable $t, $time)
+    public function addSkippedTest(Test $test, \Exception $t, $time)
     {
         foreach ($this->hooks as $hook) {
             if ($hook instanceof AfterSkippedTestHook) {

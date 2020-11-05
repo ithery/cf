@@ -48,7 +48,7 @@ final class Directory extends Renderer
         $template->renderTo($file);
     }
 
-    private function renderItem(Node $node, bool $total = false)
+    private function renderItem(Node $node, $total = false)
     {
         $data = [
             'numClasses'                      => $node->numberOfClassesAndTraits(),

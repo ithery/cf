@@ -19,7 +19,7 @@ final class ResourceUsageFormatter
     /**
      * @psalm-var array<string,int>
      */
-    public $SIZES = [
+    public static $SIZES = [
         'GB' => 1073741824,
         'MB' => 1048576,
         'KB' => 1024,
@@ -58,7 +58,7 @@ final class ResourceUsageFormatter
         );
     }
 
-    private function bytesToString(int $bytes)
+    private function bytesToString($bytes)
     {
         foreach (self::$SIZES as $unit => $value) {
             if ($bytes >= $value) {

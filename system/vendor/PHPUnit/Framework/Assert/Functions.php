@@ -3019,7 +3019,7 @@ if (!function_exists('PHPUnit\Framework\returnSelf')) {
 }
 
 if (!function_exists('PHPUnit\Framework\throwException')) {
-    function throwException(Throwable $exception)
+    function throwException( $exception)
     {
         return new ExceptionStub($exception);
     }

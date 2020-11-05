@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework;
+namespace PHPUnit\Framework\Exception;
 
 use function array_keys;
 use function get_object_vars;
@@ -37,6 +37,9 @@ use Throwable;
  *
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
+
+use PHPUnit\Framework\TestFailure;
+
 class Exception extends RuntimeException implements \PHPUnit\Exception
 {
     /**
@@ -44,7 +47,7 @@ class Exception extends RuntimeException implements \PHPUnit\Exception
      */
     protected $serializableTrace;
 
-    public function __construct($message = '', $code = 0, Throwable $previous = null)
+    public function __construct($message = '', $code = 0,  $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

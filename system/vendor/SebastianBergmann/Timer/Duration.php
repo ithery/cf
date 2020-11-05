@@ -42,17 +42,17 @@ final class Duration
      */
     private $milliseconds;
 
-    public static function fromMicroseconds(float $microseconds)
+    public static function fromMicroseconds( $microseconds)
     {
         return new self($microseconds * 1000);
     }
 
-    public static function fromNanoseconds(float $nanoseconds)
+    public static function fromNanoseconds( $nanoseconds)
     {
         return new self($nanoseconds);
     }
 
-    private function __construct(float $nanoseconds)
+    private function __construct( $nanoseconds)
     {
         $this->nanoseconds     = $nanoseconds;
         $timeInMilliseconds    = $nanoseconds / 1000000;

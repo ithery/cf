@@ -38,7 +38,7 @@ final class TestFailure
     /**
      * Returns a description for an exception.
      */
-    public static function exceptionToString(Throwable $e)
+    public static function exceptionToString( $e)
     {
         if ($e instanceof SelfDescribing) {
             $buffer = $e->toString();
@@ -72,7 +72,7 @@ final class TestFailure
     /**
      * Constructs a TestFailure with the given test and exception.
      */
-    public function __construct(Test $failedTest, Throwable $t)
+    public function __construct(Test $failedTest,  $t)
     {
         if ($failedTest instanceof SelfDescribing) {
             $this->testName = $failedTest->toString();

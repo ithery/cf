@@ -52,13 +52,23 @@ class CQC {
         return new CQC_Runner_UnitTestRunner($className);
     }
 
+    /**
+     * 
+     * @param string $className
+     * @return \CQC_Inspector
+     */
+    public static function createInspector($className) {
+        return new CQC_Inspector($className);
+    }
+
+    
     public static function createProcessor($className) {
         $inspector = new CQC_Inspector($className);
         return $inspector->createProcessor();
     }
 
     public static function cliRunner($className, $parameter = null) {
-        
+
         $argv = carr::get($_SERVER, 'argv');
         if ($parameter == null) {
             $parameter = $argv[3];

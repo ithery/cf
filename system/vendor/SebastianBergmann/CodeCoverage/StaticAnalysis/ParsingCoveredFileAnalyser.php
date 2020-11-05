@@ -67,7 +67,7 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
      */
     private $ignoreDeprecatedCode;
 
-    public function __construct($useAnnotationsForIgnoringCode, bool $ignoreDeprecatedCode)
+    public function __construct($useAnnotationsForIgnoringCode, $ignoreDeprecatedCode)
     {
         $this->useAnnotationsForIgnoringCode = $useAnnotationsForIgnoringCode;
         $this->ignoreDeprecatedCode          = $ignoreDeprecatedCode;
@@ -175,7 +175,7 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
         sort($this->ignoredLines[$filename]);
     }
 
-    private function findLinesIgnoredByLineBasedAnnotations($filename, $source, bool $useAnnotationsForIgnoringCode)
+    private function findLinesIgnoredByLineBasedAnnotations($filename, $source, $useAnnotationsForIgnoringCode)
     {
         $ignore = false;
         $stop   = false;

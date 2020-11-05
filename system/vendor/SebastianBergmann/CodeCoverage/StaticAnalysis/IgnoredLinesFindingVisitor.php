@@ -41,7 +41,7 @@ final class IgnoredLinesFindingVisitor extends NodeVisitorAbstract
      */
     private $ignoreDeprecated;
 
-    public function __construct($useAnnotationsForIgnoringCode, bool $ignoreDeprecated)
+    public function __construct($useAnnotationsForIgnoringCode, $ignoreDeprecated)
     {
         $this->useAnnotationsForIgnoringCode = $useAnnotationsForIgnoringCode;
         $this->ignoreDeprecated              = $ignoreDeprecated;

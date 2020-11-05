@@ -13,7 +13,7 @@ use SebastianBergmann\CodeCoverage\Filter;
 
 final class CacheWarmer
 {
-    public function warmCache($cacheDirectory, bool $useAnnotationsForIgnoringCode, bool $ignoreDeprecatedCode, Filter $filter)
+    public function warmCache($cacheDirectory, $useAnnotationsForIgnoringCode, $ignoreDeprecatedCode, Filter $filter)
     {
         $coveredFileAnalyser = new CachingCoveredFileAnalyser(
             $cacheDirectory,

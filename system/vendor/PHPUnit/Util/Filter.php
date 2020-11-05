@@ -27,7 +27,7 @@ final class Filter
     /**
      * @throws Exception
      */
-    public static function getFilteredStacktrace(Throwable $t)
+    public static function getFilteredStacktrace(\Exception $t)
     {
         $filteredStacktrace = '';
 
