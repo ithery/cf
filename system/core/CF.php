@@ -4,6 +4,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CF {
 
+    const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
@@ -213,8 +214,23 @@ final class CF {
 
         // Enable CF output handling
         CFEvent::add('system.shutdown', array('CF', 'shutdown'));
-        
+
+        static::loadBootstrapFiles();
+
+        // Setup is complete, prevent it from being run again
+        $run = TRUE;
+
+        // Stop the environment setup routine
+
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
+    }
+
+    /**
+     * load all bootstrap files
+     */
+    private static function loadBootstrapFiles() {
         CFBenchmark::start('system.cf.bootstrap');
+
 
         //try to locate bootstrap files for modules 
         foreach (CF::modules() as $module) {
@@ -223,28 +239,21 @@ final class CF {
                 include $bootstrapPath . 'bootstrap' . EXT;
             }
         }
-       
+
+
         //try to locate bootstrap files for application 
-        $bootstrapPath = DOCROOT . 'application' . DS . CF::app_code() . DS;
+        $bootstrapPath = DOCROOT . 'application' . DS . CF::appCode() . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
-        
-       
+
+
         //try to locate bootstrap files for org
-        $bootstrapPath .= CF::org_code() . DS;
+        $bootstrapPath .= CF::orgCode() . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
         CFBenchmark::stop('system.cf.bootstrap');
-       
-        // Setup is complete, prevent it from being run again
-        $run = TRUE;
-        
-        // Stop the environment setup routine
-        
-        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
-         
     }
 
     public static function invoke($uri) {
@@ -334,7 +343,9 @@ final class CF {
      */
     public static function & instance() {
         $null = NULL;
-
+        if (defined('CFCLI')) {
+            CFConsole::execute();
+        }
         if (self::$instance === NULL) {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
 
@@ -416,6 +427,8 @@ final class CF {
 
             // Execute the controller method
             $method->invokeArgs($controller, $arguments);
+
+
 
             // Controller method has been executed
             CFEvent::run('system.post_controller');
@@ -1098,7 +1111,7 @@ final class CF {
      * @return  void
      */
     public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
-        if($exception instanceof \Pheanstalk\Exception\ServerException) {
+        if ($exception instanceof \Pheanstalk\Exception\ServerException) {
             return;
         }
         try {
@@ -1438,12 +1451,24 @@ final class CF {
         return TRUE;
     }
 
+    public static function cliDomain() {
+        $domain = null;
+        if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
+            $domain = file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE);
+        }
+        return $domain;
+    }
+
     public static function domain() {
         $domain = '';
         if (PHP_SAPI === 'cli') {
             // Command line requires a bit of hacking
-            if (isset($_SERVER['argv'][2])) {
-                $domain = $_SERVER['argv'][2];
+            if (defined('CFCLI')) {
+                $domain = static::cliDomain();
+            } else {
+                if (isset($_SERVER['argv'][2])) {
+                    $domain = $_SERVER['argv'][2];
+                }
             }
         } else {
             $domain = $_SERVER["SERVER_NAME"];
@@ -2363,10 +2388,10 @@ final class CF {
         return self::show404($page, $template);
     }
 
-    
     public static function currentController() {
         return static::$instance;
     }
+
 }
 
 // End C
@@ -2503,7 +2528,6 @@ class CF_404_Exception extends CF_Exception {
         // Send the 404 header
         header('HTTP/1.1 404 File Not Found');
     }
-
 
 }
 

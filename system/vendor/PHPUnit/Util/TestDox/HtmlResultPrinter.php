@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,6 +9,9 @@
  */
 namespace PHPUnit\Util\TestDox;
 
+use function sprintf;
+use PHPUnit\Framework\TestResult;
+
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
@@ -17,7 +20,7 @@ final class HtmlResultPrinter extends ResultPrinter
     /**
      * @var string
      */
-    private const PAGE_HEADER = <<<EOT
+    const PAGE_HEADER = <<<'EOT'
 <!doctype html>
 <html lang="en">
     <head>
@@ -53,7 +56,7 @@ EOT;
     /**
      * @var string
      */
-    private const CLASS_HEADER = <<<EOT
+    const CLASS_HEADER = <<<'EOT'
 
         <h2 id="%s">%s</h2>
         <ul>
@@ -63,23 +66,27 @@ EOT;
     /**
      * @var string
      */
-    private const CLASS_FOOTER = <<<EOT
+    const CLASS_FOOTER = <<<'EOT'
         </ul>
 EOT;
 
     /**
      * @var string
      */
-    private const PAGE_FOOTER = <<<EOT
+    const PAGE_FOOTER = <<<'EOT'
 
     </body>
 </html>
 EOT;
 
+    public function printResult(TestResult $result)
+    {
+    }
+
     /**
      * Handler for 'start run' event.
      */
-    protected function startRun(): void
+    protected function startRun()
     {
         $this->write(self::PAGE_HEADER);
     }
@@ -87,10 +94,10 @@ EOT;
     /**
      * Handler for 'start class' event.
      */
-    protected function startClass(string $name): void
+    protected function startClass($name)
     {
         $this->write(
-            \sprintf(
+            sprintf(
                 self::CLASS_HEADER,
                 $name,
                 $this->currentTestClassPrettified
@@ -101,10 +108,10 @@ EOT;
     /**
      * Handler for 'on test' event.
      */
-    protected function onTest($name, bool $success = true): void
+    protected function onTest($name, $success = true)
     {
         $this->write(
-            \sprintf(
+            sprintf(
                 "            <li style=\"color: %s;\">%s %s</li>\n",
                 $success ? '#555753' : '#ef2929',
                 $success ? '✓' : '❌',
@@ -116,7 +123,7 @@ EOT;
     /**
      * Handler for 'end class' event.
      */
-    protected function endClass(string $name): void
+    protected function endClass($name)
     {
         $this->write(self::CLASS_FOOTER);
     }
@@ -124,7 +131,7 @@ EOT;
     /**
      * Handler for 'end run' event.
      */
-    protected function endRun(): void
+    protected function endRun()
     {
         $this->write(self::PAGE_FOOTER);
     }

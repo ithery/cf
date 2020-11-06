@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,13 +9,17 @@
  */
 namespace PHPUnit\Framework\MockObject\Rule;
 
+use function sprintf;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
+ *
+ * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4297
+ * @codeCoverageIgnore
  */
-class InvokedAtIndex extends InvocationOrder
+final class InvokedAtIndex extends InvocationOrder
 {
     /**
      * @var int
@@ -35,12 +39,12 @@ class InvokedAtIndex extends InvocationOrder
         $this->sequenceIndex = $sequenceIndex;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'invoked at sequence index ' . $this->sequenceIndex;
     }
 
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         $this->currentIndex++;
 
@@ -53,11 +57,11 @@ class InvokedAtIndex extends InvocationOrder
      *
      * @throws ExpectationFailedException
      */
-    public function verify(): void
+    public function verify()
     {
         if ($this->currentIndex < $this->sequenceIndex) {
             throw new ExpectationFailedException(
-                \sprintf(
+                sprintf(
                     'The expected invocation at index %s was never reached.',
                     $this->sequenceIndex
                 )
@@ -65,7 +69,7 @@ class InvokedAtIndex extends InvocationOrder
         }
     }
 
-    protected function invokedDo(BaseInvocation $invocation): void
+    protected function invokedDo(BaseInvocation $invocation)
     {
     }
 }

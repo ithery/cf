@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,5 +17,5 @@ interface SelfDescribing
     /**
      * Returns a string representation of the object.
      */
-    public function toString(): string;
+    public function toString();
 }

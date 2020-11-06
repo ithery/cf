@@ -249,8 +249,9 @@ class CFRouter {
     public static function getUri() {
         $currentUri = '';
         if (PHP_SAPI === 'cli') {
+
             if (defined('CFCLI')) {
-                CFConsole::execute();
+                $currentUri = '';
             } else {
                 // Command line requires a bit of hacking
                 if (isset($_SERVER['argv'][1])) {

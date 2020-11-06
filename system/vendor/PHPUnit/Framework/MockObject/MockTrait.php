@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 namespace PHPUnit\Framework\MockObject;
+
+use function class_exists;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -24,22 +26,22 @@ final class MockTrait implements MockType
      */
     private $mockName;
 
-    public function __construct(string $classCode, string $mockName)
+    public function __construct($classCode, $mockName)
     {
         $this->classCode = $classCode;
         $this->mockName  = $mockName;
     }
 
-    public function generate(): string
+    public function generate()
     {
-        if (!\class_exists($this->mockName, false)) {
+        if (!class_exists($this->mockName, false)) {
             eval($this->classCode);
         }
 
         return $this->mockName;
     }
 
-    public function getClassCode(): string
+    public function getClassCode()
     {
         return $this->classCode;
     }

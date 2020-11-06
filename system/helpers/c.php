@@ -12,6 +12,8 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class c {
 
+    
+    
     public static function urShift($a, $b) {
         if ($b == 0) {
             return $a;
@@ -406,7 +408,7 @@ class c {
 
         return array_unique($results);
     }
-
+    
     /**
      * Returns true of traits is used by a class, its subclasses and trait of their traits.
      *
@@ -414,7 +416,7 @@ class c {
      * @param  string  $trait
      * @return array
      */
-    public static function hasTrait($class, $trait) {
+    public static function hasTrait($class,$trait) {
         return in_array($trait, static::classUsesRecursive($class));
     }
 
@@ -437,7 +439,7 @@ class c {
             return static::value($rescue);
         }
     }
-
+    
     /**
      * Return the given value, optionally passed through the given callback.
      *
@@ -500,7 +502,7 @@ class c {
         if (function_exists('hrtime')) {
             return hrtime($getAsNumber);
         }
-
+    
         if ($getAsNumber) {
             return microtime(true) * 1e+6;
         }
@@ -512,7 +514,14 @@ class c {
     public static function html($str) {
         return chtml::specialchars($str);
     }
-
+    
+    public static function dirname($path, $count=1){
+        if ($count > 1){
+           return dirname(static::dirname($path, --$count));
+        }else{
+           return dirname($path);
+        }
+    }
 }
 
 // End c

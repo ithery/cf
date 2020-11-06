@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,6 +9,16 @@
  */
 namespace PHPUnit\Util;
 
+use const E_DEPRECATED;
+use const E_NOTICE;
+use const E_STRICT;
+use const E_USER_DEPRECATED;
+use const E_USER_NOTICE;
+use const E_USER_WARNING;
+use const E_WARNING;
+use function error_reporting;
+use function restore_error_handler;
+use function set_error_handler;
 use PHPUnit\Framework\Error\Deprecated;
 use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\Error\Notice;
@@ -46,9 +56,9 @@ final class ErrorHandler
 
     public static function invokeIgnoringWarnings(callable $callable)
     {
-        \set_error_handler(
+        set_error_handler(
             static function ($errorNumber, $errorString) {
-                if ($errorNumber === \E_WARNING) {
+                if ($errorNumber === E_WARNING) {
                     return;
                 }
 
@@ -58,12 +68,12 @@ final class ErrorHandler
 
         $result = $callable();
 
-        \restore_error_handler();
+        restore_error_handler();
 
         return $result;
     }
 
-    public function __construct(bool $convertDeprecationsToExceptions, bool $convertErrorsToExceptions, bool $convertNoticesToExceptions, bool $convertWarningsToExceptions)
+    public function __construct($convertDeprecationsToExceptions, $convertErrorsToExceptions, $convertNoticesToExceptions, $convertWarningsToExceptions)
     {
         $this->convertDeprecationsToExceptions = $convertDeprecationsToExceptions;
         $this->convertErrorsToExceptions       = $convertErrorsToExceptions;
@@ -71,37 +81,37 @@ final class ErrorHandler
         $this->convertWarningsToExceptions     = $convertWarningsToExceptions;
     }
 
-    public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool
+    public function __invoke($errorNumber, $errorString, $errorFile, $errorLine)
     {
         /*
          * Do not raise an exception when the error suppression operator (@) was used.
          *
          * @see https://github.com/sebastianbergmann/phpunit/issues/3739
          */
-        if (!($errorNumber & \error_reporting())) {
+        if (!($errorNumber & error_reporting())) {
             return false;
         }
 
         switch ($errorNumber) {
-            case \E_NOTICE:
-            case \E_USER_NOTICE:
-            case \E_STRICT:
+            case E_NOTICE:
+            case E_USER_NOTICE:
+            case E_STRICT:
                 if (!$this->convertNoticesToExceptions) {
                     return false;
                 }
 
                 throw new Notice($errorString, $errorNumber, $errorFile, $errorLine);
 
-            case \E_WARNING:
-            case \E_USER_WARNING:
+            case E_WARNING:
+            case E_USER_WARNING:
                 if (!$this->convertWarningsToExceptions) {
                     return false;
                 }
 
                 throw new Warning($errorString, $errorNumber, $errorFile, $errorLine);
 
-            case \E_DEPRECATED:
-            case \E_USER_DEPRECATED:
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
                 if (!$this->convertDeprecationsToExceptions) {
                     return false;
                 }
@@ -117,16 +127,16 @@ final class ErrorHandler
         }
     }
 
-    public function register(): void
+    public function register()
     {
         if ($this->registered) {
             return;
         }
-
-        $oldErrorHandler = \set_error_handler($this);
+        
+        $oldErrorHandler = set_error_handler($this);
 
         if ($oldErrorHandler !== null) {
-            \restore_error_handler();
+            restore_error_handler();
 
             return;
         }
@@ -134,12 +144,12 @@ final class ErrorHandler
         $this->registered = true;
     }
 
-    public function unregister(): void
+    public function unregister()
     {
         if (!$this->registered) {
             return;
         }
 
-        \restore_error_handler();
+        restore_error_handler();
     }
 }

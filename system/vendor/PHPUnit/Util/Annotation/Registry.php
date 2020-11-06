@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,7 +9,11 @@
  */
 namespace PHPUnit\Util\Annotation;
 
+use function array_key_exists;
 use PHPUnit\Util\Exception;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
 
 /**
  * Reflection information, and therefore DocBlock information, is static within
@@ -28,9 +32,9 @@ final class Registry
     /** @var array<string, array<string, DocBlock>> indexed by class name and method name */
     private $methodDocBlocks = [];
 
-    public static function getInstance(): self
+    public static function getInstance()
     {
-        return self::$instance ?? self::$instance = new self;
+        return self::$instance!=null ? self::$instance : self::$instance = new self;
     }
 
     private function __construct()
@@ -41,16 +45,16 @@ final class Registry
      * @throws Exception
      * @psalm-param class-string $class
      */
-    public function forClassName(string $class): DocBlock
+    public function forClassName($class)
     {
-        if (\array_key_exists($class, $this->classDocBlocks)) {
+        if (array_key_exists($class, $this->classDocBlocks)) {
             return $this->classDocBlocks[$class];
         }
 
         try {
-            $reflection = new \ReflectionClass($class);
+            $reflection = new ReflectionClass($class);
             // @codeCoverageIgnoreStart
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             throw new Exception(
                 $e->getMessage(),
                 (int) $e->getCode(),
@@ -66,16 +70,16 @@ final class Registry
      * @throws Exception
      * @psalm-param class-string $classInHierarchy
      */
-    public function forMethod(string $classInHierarchy, string $method): DocBlock
+    public function forMethod($classInHierarchy, $method)
     {
         if (isset($this->methodDocBlocks[$classInHierarchy][$method])) {
             return $this->methodDocBlocks[$classInHierarchy][$method];
         }
 
         try {
-            $reflection = new \ReflectionMethod($classInHierarchy, $method);
+            $reflection = new ReflectionMethod($classInHierarchy, $method);
             // @codeCoverageIgnoreStart
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             throw new Exception(
                 $e->getMessage(),
                 (int) $e->getCode(),
