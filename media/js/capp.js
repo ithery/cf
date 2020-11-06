@@ -1288,15 +1288,18 @@ var Cresenity = function () {
                         var onError = function (errMessage) {
                             cresenity.showError(errMessage)
                         };
+                        
+                        haveOnSuccess = false;
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
                             onSuccess = settings.onSuccess;
+                            haveOnSuccess = true;
                         }
                         if (typeof settings.onError == 'function' && validationIsValid) {
                             onError = settings.onError;
                         }
 
                         if (validationIsValid) {
-                            if (settings.handleJsonResponse == true) {
+                            if (settings.handleJsonResponse == true && haveOnSuccess) {
                                 cresenity.handleJsonResponse(response, onSuccess, onError);
                             } else {
                                 onSuccess(response);
