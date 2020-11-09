@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,6 +9,23 @@
  */
 namespace PHPUnit\Util\PHP;
 
+use function array_merge;
+use function fclose;
+use function file_put_contents;
+use function fread;
+use function fwrite;
+use function is_array;
+use function is_resource;
+use function proc_close;
+use function proc_open;
+use function proc_terminate;
+use function rewind;
+use function sprintf;
+use function stream_get_contents;
+use function stream_select;
+use function sys_get_temp_dir;
+use function tempnam;
+use function unlink;
 use PHPUnit\Framework\Exception;
 
 /**
@@ -26,11 +43,11 @@ class DefaultPhpProcess extends AbstractPhpProcess
      *
      * @throws Exception
      */
-    public function runJob(string $job, array $settings = []): array
+    public function runJob($job, array $settings = [])
     {
         if ($this->stdin || $this->useTemporaryFile()) {
-            if (!($this->tempFile = \tempnam(\sys_get_temp_dir(), 'PHPUnit')) ||
-                \file_put_contents($this->tempFile, $job) === false) {
+            if (!($this->tempFile = tempnam(sys_get_temp_dir(), 'PHPUnit')) ||
+                file_put_contents($this->tempFile, $job) === false) {
                 throw new Exception(
                     'Unable to write temporary file'
                 );
@@ -43,43 +60,43 @@ class DefaultPhpProcess extends AbstractPhpProcess
     }
 
     /**
-     * Returns an array of file handles to be used in place of pipes
+     * Returns an array of file handles to be used in place of pipes.
      */
-    protected function getHandles(): array
+    protected function getHandles()
     {
         return [];
     }
 
     /**
-     * Handles creating the child process and returning the STDOUT and STDERR
+     * Handles creating the child process and returning the STDOUT and STDERR.
      *
      * @throws Exception
      */
-    protected function runProcess(string $job, array $settings): array
+    protected function runProcess($job, array $settings)
     {
         $handles = $this->getHandles();
 
         $env = null;
 
         if ($this->env) {
-            $env = $_SERVER ?? [];
+            $env = isset($_SERVER) ? $_SERVER : [];
             unset($env['argv'], $env['argc']);
-            $env = \array_merge($env, $this->env);
+            $env = array_merge($env, $this->env);
 
             foreach ($env as $envKey => $envVar) {
-                if (\is_array($envVar)) {
+                if (is_array($envVar)) {
                     unset($env[$envKey]);
                 }
             }
         }
 
         $pipeSpec = [
-            0 => $handles[0] ?? ['pipe', 'r'],
-            1 => $handles[1] ?? ['pipe', 'w'],
-            2 => $handles[2] ?? ['pipe', 'w'],
+            0 => isset($handles[0]) ? $handles[0] : ['pipe', 'r'],
+            1 => isset($handles[1]) ? $handles[1] : ['pipe', 'w'],
+            2 => isset($handles[2]) ? $handles[2] : ['pipe', 'w'],
         ];
 
-        $process = \proc_open(
+        $process = proc_open(
             $this->getCommand($settings, $this->tempFile),
             $pipeSpec,
             $pipes,
@@ -87,7 +104,7 @@ class DefaultPhpProcess extends AbstractPhpProcess
             $env
         );
 
-        if (!\is_resource($process)) {
+        if (!is_resource($process)) {
             throw new Exception(
                 'Unable to spawn worker process'
             );
@@ -97,7 +114,7 @@ class DefaultPhpProcess extends AbstractPhpProcess
             $this->process($pipes[0], $job);
         }
 
-        \fclose($pipes[0]);
+        fclose($pipes[0]);
 
         $stderr = $stdout = '';
 
@@ -109,17 +126,17 @@ class DefaultPhpProcess extends AbstractPhpProcess
                 $w = null;
                 $e = null;
 
-                $n = @\stream_select($r, $w, $e, $this->timeout);
+                $n = @stream_select($r, $w, $e, $this->timeout);
 
                 if ($n === false) {
                     break;
                 }
 
                 if ($n === 0) {
-                    \proc_terminate($process, 9);
+                    proc_terminate($process, 9);
 
                     throw new Exception(
-                        \sprintf(
+                        sprintf(
                             'Job execution aborted after %d seconds',
                             $this->timeout
                         )
@@ -142,10 +159,10 @@ class DefaultPhpProcess extends AbstractPhpProcess
                             break;
                         }
 
-                        $line = \fread($pipe, 8192);
+                        $line = fread($pipe, 8192);
 
-                        if ($line === '') {
-                            \fclose($pipes[$pipeOffset]);
+                        if ($line === '' || $line === false) {
+                            fclose($pipes[$pipeOffset]);
 
                             unset($pipes[$pipeOffset]);
                         } elseif ($pipeOffset === 1) {
@@ -162,54 +179,57 @@ class DefaultPhpProcess extends AbstractPhpProcess
             }
         } else {
             if (isset($pipes[1])) {
-                $stdout = \stream_get_contents($pipes[1]);
+                $stdout = stream_get_contents($pipes[1]);
 
-                \fclose($pipes[1]);
+                fclose($pipes[1]);
             }
 
             if (isset($pipes[2])) {
-                $stderr = \stream_get_contents($pipes[2]);
+                $stderr = stream_get_contents($pipes[2]);
 
-                \fclose($pipes[2]);
+                fclose($pipes[2]);
             }
         }
 
         if (isset($handles[1])) {
-            \rewind($handles[1]);
+            rewind($handles[1]);
 
-            $stdout = \stream_get_contents($handles[1]);
+            $stdout = stream_get_contents($handles[1]);
 
-            \fclose($handles[1]);
+            fclose($handles[1]);
         }
 
         if (isset($handles[2])) {
-            \rewind($handles[2]);
+            rewind($handles[2]);
 
-            $stderr = \stream_get_contents($handles[2]);
+            $stderr = stream_get_contents($handles[2]);
 
-            \fclose($handles[2]);
+            fclose($handles[2]);
         }
 
-        \proc_close($process);
+        proc_close($process);
 
         $this->cleanup();
 
         return ['stdout' => $stdout, 'stderr' => $stderr];
     }
 
-    protected function process($pipe, string $job): void
+    /**
+     * @param resource $pipe
+     */
+    protected function process($pipe, $job)
     {
-        \fwrite($pipe, $job);
+        fwrite($pipe, $job);
     }
 
-    protected function cleanup(): void
+    protected function cleanup()
     {
         if ($this->tempFile) {
-            \unlink($this->tempFile);
+            unlink($this->tempFile);
         }
     }
 
-    protected function useTemporaryFile(): bool
+    protected function useTemporaryFile()
     {
         return false;
     }

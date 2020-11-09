@@ -36,8 +36,11 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
             $tableData[] = $rowData;
         }
 
-        $app->addH5()->addClass('mb-3')->add('Tubes');
-        $table = $app->addTable();
+        
+        $widget = $app->addWidget();
+        $widget->setTitle('Tubes')->setNoPadding();
+        //$app->addH5()->addClass('mb-3')->add('Tubes');
+        $table = $widget->addTable();
         $table->setDataFromArray($tableData);
         $table->setApplyDataTable(false);
         $table->setAjax(false);
@@ -65,10 +68,13 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         $action = $table->addRowAction()->setLabel('Delete Ready')->setIcon('fas fa-trash')->setConfirm();
         $action->setLink($this->controllerUrl() . 'delete/ready/{name}');
 
-        $app->addH5()->addClass('my-3')->add('Stats');
+        
+        $widget = $app->addWidget();
+        $widget->setTitle('Stats')->setNoPadding();
+        //$app->addH5()->addClass('my-3')->add('Stats');
 
         $statsData = $beanstalkd->getServerStats();
-        $table = $app->addTable();
+        $table = $widget->addTable();
         $table->setDataFromArray($statsData);
         $table->setApplyDataTable(false);
         $table->setAjax(false);

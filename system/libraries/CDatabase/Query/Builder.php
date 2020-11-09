@@ -1290,7 +1290,7 @@ class CDatabase_Query_Builder {
     public function addWhereExistsQuery(self $query, $boolean = 'and', $not = false) {
         $type = $not ? 'NotExists' : 'Exists';
 
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+        $this->wheres[] = compact('type', 'query', 'boolean');
 
         $this->addBinding($query->getBindings(), 'where');
 

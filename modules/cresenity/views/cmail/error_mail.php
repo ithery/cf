@@ -58,6 +58,8 @@ div#framework_error .backtrace li { list-style-type:none; margin:0; padding:0;}
 					<p><strong>Username</strong>:<?php echo $user->username; ?></p>
 					<p><strong>Role name</strong>:<?php echo $role==null?'':$role->name; ?></p>
 					<?php endif ?>
+					<p><strong>Domain</strong>:<?php echo CF::domain(); ?></p>
+					<p><strong>Time</strong>:<?php echo date('Y-m-d H:i:s'); ?></p>
 					<p><strong>Browser</strong>:<?php echo crequest::browser(); ?></p>
 					<p><strong>Browser Version</strong>:<?php echo crequest::browser_version(); ?></p>
 					<p><strong>Platform</strong>:<?php echo crequest::platform(); ?></p>

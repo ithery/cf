@@ -46,6 +46,7 @@ application/cresenity/config/*
 /temp/*
 /export/
 /resources
+
 /resource
 /files
 /certificate
@@ -53,6 +54,7 @@ application/cresenity/config/*
 /payment_log/
 /public/files/
 /public/files/*
+/compiled
 
 #ignore netbeans ide config
 /nbproject/

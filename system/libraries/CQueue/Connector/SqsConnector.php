@@ -36,6 +36,7 @@ class CQueue_Connector_SqsConnector extends CQueue_AbstractConnector {
     protected function getDefaultConfiguration(array $config) {
         return array_merge([
             'version' => 'latest',
+            'curl.options' => [CURLOPT_SSL_VERIFYPEER => false],
             'http' => [
                 'timeout' => 60,
                 'connect_timeout' => 60,

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,6 +9,7 @@
  */
 namespace PHPUnit\Framework\MockObject\Rule;
 
+use function is_string;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\InvalidArgumentException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
@@ -25,25 +26,24 @@ final class MethodName
     private $constraint;
 
     /**
-     * @param  Constraint|string
+     * @param Constraint|string $constraint
      *
-     * @throws Constraint
-     * @throws \PHPUnit\Framework\Exception
+     * @throws InvalidArgumentException
      */
     public function __construct($constraint)
     {
-        if (!$constraint instanceof Constraint) {
-            if (!\is_string($constraint)) {
-                throw InvalidArgumentException::create(1, 'string');
-            }
-
+        if (is_string($constraint)) {
             $constraint = new MethodNameConstraint($constraint);
+        }
+
+        if (!$constraint instanceof Constraint) {
+            throw InvalidArgumentException::create(1, 'PHPUnit\Framework\Constraint\Constraint object or string');
         }
 
         $this->constraint = $constraint;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'method name ' . $this->constraint->toString();
     }
@@ -52,13 +52,17 @@ final class MethodName
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         return $this->matchesName($invocation->getMethodName());
     }
 
-    public function matchesName(string $methodName): bool
+    /**
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     */
+    public function matchesName($methodName)
     {
-        return $this->constraint->evaluate($methodName, '', true);
+        return (bool) $this->constraint->evaluate($methodName, '', true);
     }
 }

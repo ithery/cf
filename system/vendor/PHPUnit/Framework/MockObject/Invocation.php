@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,9 +9,20 @@
  */
 namespace PHPUnit\Framework\MockObject;
 
+use function array_map;
+use function explode;
+use function get_class;
+use function implode;
+use function is_object;
+use function sprintf;
+use function strpos;
+use function strtolower;
+use function substr;
+use Doctrine\Instantiator\Instantiator;
 use PHPUnit\Framework\SelfDescribing;
 use PHPUnit\Util\Type;
 use SebastianBergmann\Exporter\Exporter;
+use stdClass;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -53,7 +64,7 @@ final class Invocation implements SelfDescribing
      */
     private $object;
 
-    public function __construct(string $className, string $methodName, array $parameters, string $returnType, object $object, bool $cloneObjects = false, bool $proxiedCall = false)
+    public function __construct($className, $methodName, array $parameters, $returnType, object $object, $cloneObjects = false, $proxiedCall = false)
     {
         $this->className   = $className;
         $this->methodName  = $methodName;
@@ -61,14 +72,12 @@ final class Invocation implements SelfDescribing
         $this->object      = $object;
         $this->proxiedCall = $proxiedCall;
 
-        $returnType = \ltrim($returnType, ': ');
-
-        if (\strtolower($methodName) === '__tostring') {
+        if (strtolower($methodName) === '__tostring') {
             $returnType = 'string';
         }
 
-        if (\strpos($returnType, '?') === 0) {
-            $returnType                 = \substr($returnType, 1);
+        if (strpos($returnType, '?') === 0) {
+            $returnType                 = substr($returnType, 1);
             $this->isReturnTypeNullable = true;
         }
 
@@ -79,23 +88,23 @@ final class Invocation implements SelfDescribing
         }
 
         foreach ($this->parameters as $key => $value) {
-            if (\is_object($value)) {
+            if (is_object($value)) {
                 $this->parameters[$key] = $this->cloneObject($value);
             }
         }
     }
 
-    public function getClassName(): string
+    public function getClassName()
     {
         return $this->className;
     }
 
-    public function getMethodName(): string
+    public function getMethodName()
     {
         return $this->methodName;
     }
 
-    public function getParameters(): array
+    public function getParameters()
     {
         return $this->parameters;
     }
@@ -111,7 +120,20 @@ final class Invocation implements SelfDescribing
             return;
         }
 
-        switch (\strtolower($this->returnType)) {
+        $returnType = $this->returnType;
+
+        if (strpos($returnType, '|') !== false) {
+            $types      = explode('|', $returnType);
+            $returnType = $types[0];
+
+            foreach ($types as $type) {
+                if ($type === 'null') {
+                    return;
+                }
+            }
+        }
+
+        switch (strtolower($returnType)) {
             case '':
             case 'void':
                 return;
@@ -131,12 +153,15 @@ final class Invocation implements SelfDescribing
             case 'array':
                 return [];
 
+            case 'static':
+                return (new Instantiator)->instantiate(get_class($this->object));
+
             case 'object':
-                return new \stdClass;
+                return new stdClass;
 
             case 'callable':
             case 'closure':
-                return function (): void {
+                return static function () {
                 };
 
             case 'traversable':
@@ -148,38 +173,39 @@ final class Invocation implements SelfDescribing
 
                 return $generator();
 
-            default:
-                $generator = new Generator;
+            case 'mixed':
+                return null;
 
-                return $generator->getMock($this->returnType, [], [], '', false);
+            default:
+                return (new Generator)->getMock($this->returnType, [], [], '', false);
         }
     }
 
-    public function toString(): string
+    public function toString()
     {
         $exporter = new Exporter;
 
-        return \sprintf(
+        return sprintf(
             '%s::%s(%s)%s',
             $this->className,
             $this->methodName,
-            \implode(
+            implode(
                 ', ',
-                \array_map(
+                array_map(
                     [$exporter, 'shortenedExport'],
                     $this->parameters
                 )
             ),
-            $this->returnType ? \sprintf(': %s', $this->returnType) : ''
+            $this->returnType ? sprintf(': %s', $this->returnType) : ''
         );
     }
 
-    public function getObject(): object
+    public function getObject()
     {
         return $this->object;
     }
 
-    private function cloneObject(object $original): object
+    private function cloneObject(object $original)
     {
         if (Type::isCloneable($original)) {
             return clone $original;

@@ -93,6 +93,7 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
             $e = new \Exception;
             CDaemon::log($e->getTraceAsString());
         }
+ 
 
         return $this->pheanstalk->useTube($this->getQueue($queue))->put(
                         $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun

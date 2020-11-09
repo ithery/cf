@@ -79,7 +79,16 @@ class CElement_Component_Widget extends CElement_Component {
     public function addSwitcher($id = "") {
         return $this->header->addSwitcher($id);
     }
+    
+    public function setSwitcherBehaviour($behaviour='hide') {
+        $this->header->setSwitcherBehaviour($behaviour);
+        return $this;
+    }
 
+     public function setSwitcherBlockMessage($blockMessage='') {
+        $this->header->setSwitcherBlockMessage($blockMessage);
+        return $this;
+    }
     public function get_collapse() {
         return $this->collapse;
     }

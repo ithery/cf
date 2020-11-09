@@ -67,6 +67,10 @@ class CNotification_Manager {
         switch ($vendor) {
             case 'sendgrid':
                 return 'SendGrid';
+            case 'zenziva':
+            case 'nexmo':
+            default:
+                return ucfirst(cstr::camel($vendor));
         }
         return ucfirst(cstr::camel($vendor));
     }

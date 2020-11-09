@@ -122,9 +122,9 @@ class CConsole_Parser
         }
 
         switch (true) {
-            case Str::endsWith($token, '='):
+            case cstr::endsWith($token, '='):
                 return new InputOption(trim($token, '='), $shortcut, InputOption::VALUE_OPTIONAL, $description);
-            case Str::endsWith($token, '=*'):
+            case cstr::endsWith($token, '=*'):
                 return new InputOption(trim($token, '=*'), $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description);
             case preg_match('/(.+)\=\*(.+)/', $token, $matches):
                 return new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description, preg_split('/,\s?/', $matches[2]));

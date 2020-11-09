@@ -16,6 +16,8 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
     protected $searchControl;
     protected $haveSearch;
     protected $searchPlaceholder;
+    protected $radius;
+    protected $markerInCenter;
     protected $geoCodingApiKey;
 
     public function __construct($id) {
@@ -32,9 +34,11 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->wrapperContainer = $this->addDiv($this->id . '-wrapper')->addClass('map-wrapper');
         $this->haveSearch = true;
         $this->searchPlaceholder = 'Search Location';
-        
+
+        $this->radius = 300;
+        $this->markerInCenter = true;
+
         $this->geoCodingApiKey = CF::config('vendor.google.geocoding_api_key');
-        
     }
 
     public function setValue($val) {
@@ -44,8 +48,18 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->lng = carr::get($latlngArray, 1,0);
     }
 
+    public function radius($val) {
+        $this->radius = $val;
+        return $this;
+    }
+
+    public function markerInCenter($bool = true) {
+        $this->markerInCenter = $bool;
+        return $this;
+    }
+
     public function build() {
-        if(strlen($this->geoCodingApiKey)==0) {
+        if (strlen($this->geoCodingApiKey) == 0) {
             throw new Exception('no api key found in config vendor.google.geocoding_api_key');
         }
        
@@ -70,35 +84,38 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $js = new CStringBuilder();
         $js->setIndent($indent);
 
-        $miniColorJs = "$('#" . $this->id . "-map').locationpicker({
-                    location: {
-                        latitude: " . $this->lat . ",
-                        longitude: " . $this->lng . ",
-                    },
+        $miniColorJs = "
+            $('#" . $this->id . "-map').locationpicker({
+                location: {
+                    latitude: " . $this->lat . ",
+                    longitude: " . $this->lng . ",
+                },
 
-                    inputBinding: {
-                        latitudeInput: $('#" . $this->id . "-lat'),
-                        longitudeInput: $('#" . $this->id . "-lng'),
-                        radiusInput: null,
-                        locationNameInput: $('#" . $this->id . "-search')
-                    },
-                    
-                    enableAutocomplete: true,
-                    enableAutocompleteBlur: true,
-                    draggable: true,
-                    scrollwheel: true,
-                    radius: 300,
-                    onchanged: function (currentLocation, radius, isMarkerDropped) {
-                        $('#" . $this->id . "-lat').val(currentLocation.latitude);
-                        $('#" . $this->id . "-lng').val(currentLocation.longitude);
-                    },
-                    
-                    // markerInCenter: true,
-                    scrollwheel: true,     
-                });";
+                inputBinding: {
+                    latitudeInput: $('#" . $this->id . "-lat'),
+                    longitudeInput: $('#" . $this->id . "-lng'),
+                    radiusInput: null,
+                    locationNameInput: $('#" . $this->id . "-search')
+                },
+                
+                enableAutocomplete: true,
+                enableAutocompleteBlur: true,
+                addressFormat: 'street_address',
+                draggable: true,
+                scrollwheel: true,
+                radius: " . $this->radius . ",
+                onchanged: function (currentLocation, radius, isMarkerDropped) {
+                    $('#" . $this->id . "-lat').val(currentLocation.latitude);
+                    $('#" . $this->id . "-lng').val(currentLocation.longitude);
+                },
+                
+                markerInCenter: " . $this->markerInCenter . ",
+                scrollwheel: true,     
+            });
+        ";
+        
         $js->appendln($miniColorJs);
         $js->append(parent::js());
-
 
         return $js->text();
     }

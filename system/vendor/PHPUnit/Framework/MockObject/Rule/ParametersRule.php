@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -14,12 +14,15 @@ use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
 use PHPUnit\Framework\MockObject\Verifiable;
 use PHPUnit\Framework\SelfDescribing;
 
+/**
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ */
 interface ParametersRule extends SelfDescribing, Verifiable
 {
     /**
      * @throws ExpectationFailedException if the invocation violates the rule
      */
-    public function apply(BaseInvocation $invocation): void;
+    public function apply(BaseInvocation $invocation);
 
-    public function verify(): void;
+    public function verify();
 }

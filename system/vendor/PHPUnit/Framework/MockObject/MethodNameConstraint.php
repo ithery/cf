@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,6 +9,9 @@
  */
 namespace PHPUnit\Framework\MockObject;
 
+use function is_string;
+use function sprintf;
+use function strtolower;
 use PHPUnit\Framework\Constraint\Constraint;
 
 /**
@@ -21,25 +24,25 @@ final class MethodNameConstraint extends Constraint
      */
     private $methodName;
 
-    public function __construct(string $methodName)
+    public function __construct($methodName)
     {
         $this->methodName = $methodName;
     }
 
-    public function toString(): string
+    public function toString()
     {
-        return \sprintf(
+        return sprintf(
             'is "%s"',
             $this->methodName
         );
     }
 
-    protected function matches($other): bool
+    protected function matches($other)
     {
-        if (!\is_string($other)) {
+        if (!is_string($other)) {
             return false;
         }
 
-        return \strtolower($this->methodName) === \strtolower($other);
+        return strtolower($this->methodName) === strtolower($other);
     }
 }

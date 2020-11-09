@@ -41,7 +41,7 @@ class CExporter_Import_HeadingRowFormatter {
      *
      * @return array
      */
-    public static function format(array $headings): array {
+    public static function format(array $headings) {
         return (new Collection($headings))->map(function ($value) {
                     return static::callFormatter($value);
                 })->toArray();

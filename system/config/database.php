@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+
+defined("SYSPATH") or die("No direct script access.");
 /**
  * @package  Database
  *
@@ -21,25 +23,26 @@
  *  table_prefix  - Database table prefix
  *  object        - Enable or disable object results
  *  cache         - Enable or disable query caching
- *	escape        - Enable automatic query builder escaping
+ * 	escape        - Enable automatic query builder escaping
  */
-$config['default'] = array
-(
-	'benchmark'     => TRUE,
-	'persistent'    => FALSE,
-	'connection'    => array
-	(
-		'type'     => 'mysql',
-		'user'     => 'root',
-		'pass'     => 'heerrr',
-		'host'     => 'localhost',
-		'port'     => FALSE,
-		'socket'   => FALSE,
-		'database' => 'kohana'
-	),
-	'character_set' => 'utf8',
-	'table_prefix'  => '',
-	'object'        => TRUE,
-	'cache'         => FALSE,
-	'escape'        => TRUE
+return array(
+    'default' => array(
+        'benchmark' => FALSE,
+        'persistent' => FALSE,
+        'connection' => array(
+            'type' => 'mysqli',
+            'user' => 'root',
+            'pass' => '',
+            'host' => 'localhost',
+            'port' => FALSE,
+            'socket' => FALSE,
+            'database' => 'cresenity'
+        ),
+        'character_set' => 'utf8',
+        'table_prefix' => '',
+        'object' => TRUE,
+        'cache' => FALSE,
+        'escape' => TRUE,
+    ),
+
 );

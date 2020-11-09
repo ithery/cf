@@ -1239,6 +1239,26 @@ body.mini-navbar #page-wrapper {
     transform:translate3d(0,0,0)
 }
 
+
+
+.modal.sidebar.full .modal-dialog{
+    max-width:100%;
+    margin:0;
+    margin-left:auto;
+    padding: 0;
+    width:100%;
+}
+
+.modal.sidebar.full .modal-body {
+    width:100%;
+    max-width: none;
+}
+
+.modal.sidebar.full .modal-footer-inside {
+    
+    max-width: none;
+}
+
 /*chart*/
 .cchart-container {
     position: relative;
@@ -1265,7 +1285,15 @@ body.mini-navbar #page-wrapper {
     word-break: break-all;
 }
 
+.modal.modal-download-progress {}
+.modal.modal-download-progress .modal-dialog {
+    width: auto;
+    max-width: 35rem;
+}
 
+.dropdown-toggle.no-caret::after {
+    display:none;
+}
 @media (min-width: 319px) {
 
 }

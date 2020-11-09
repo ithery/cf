@@ -122,11 +122,11 @@ class CManager_Asset {
         $themeJs = $this->themeContainer->getAllJsFileUrl();
         $moduleRunTimeJs = $this->module->getRunTimeContainer()->getAllJsFileUrl();
         $runTimeJs = $this->runTimeContainer->getAllJsFileUrl();
-       
-         
-       
+
+
+
         $allJs = array_merge($moduleThemeJs, $themeJs, $moduleRunTimeJs, $runTimeJs);
-       
+
         return $allJs;
     }
 
@@ -215,12 +215,41 @@ class CManager_Asset {
         $themeScripts = $this->themeContainer->getScripts($pos);
         $moduleRunTimeScripts = $this->module->getRunTimeContainer()->getScripts($pos);
         $runTimeScripts = $this->runTimeContainer->getScripts($pos);
-        $scriptArray = array();
-        $scriptArray = carr::merge($scriptArray, $moduleThemeScripts);
-        $scriptArray = carr::merge($scriptArray, $themeScripts);
-        $scriptArray = carr::merge($scriptArray, $moduleRunTimeScripts);
-        $scriptArray = carr::merge($scriptArray, $runTimeScripts);
+        $themeScriptArray = [];
+        $runtimeScriptArray = [];
 
+
+        $themeScriptArray = carr::merge($themeScriptArray, $moduleThemeScripts);
+        $themeScriptArray = carr::merge($themeScriptArray, $themeScripts);
+        $runtimeScriptArray = carr::merge($runtimeScriptArray, $moduleRunTimeScripts);
+        $runtimeScriptArray = carr::merge($runtimeScriptArray, $runTimeScripts);
+
+
+        //do recompile for theme script
+        $compileCss = CF::config('assets.css.compile', false);
+        if ($compileCss) {
+            $cssScriptArray = carr::get($themeScriptArray, static::TYPE_CSS_FILE);
+
+            if (count($cssScriptArray) > 0) {
+                $compiledScript = $this->compileCss($cssScriptArray);
+
+                $themeScriptArray[static::TYPE_CSS_FILE] = [$compiledScript];
+            }
+        }
+
+        //do recompile for theme script
+        $compileJs = CF::config('assets.js.compile', false);
+        if ($compileJs) {
+            $jsScriptArray = carr::get($themeScriptArray, static::TYPE_JS_FILE);
+
+            if (count($jsScriptArray) > 0) {
+                $compiledScript = $this->compileJs($jsScriptArray);
+
+                $themeScriptArray[static::TYPE_JS_FILE] = [$compiledScript];
+            }
+        }
+
+        $scriptArray = carr::merge($themeScriptArray, $runtimeScriptArray);
         $script = '';
         $manager = CManager::instance();
         if ($type == null) {
@@ -234,43 +263,43 @@ class CManager_Asset {
                 foreach ($scriptValueArray as $scriptValue) {
                     switch ($scriptType) {
                         case self::TYPE_JS_FILE:
-                            if (!ccfg::get('merge_js')) {
-                                $urlJsFile = CManager_Asset_Helper::urlJsFile($scriptValue);
-                                if ($manager->is_mobile()) {
-                                    $mobilePath = $manager->getMobilePath();
-                                    if (strlen($mobilePath) > 0) {
-                                        $urlJsFile = $mobilePath . $scriptValue;
-                                    }
-                                }
 
-                                $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
+                            $urlJsFile = CManager_Asset_Helper::urlJsFile($scriptValue);
+                            if ($manager->is_mobile()) {
+                                $mobilePath = $manager->getMobilePath();
+                                if (strlen($mobilePath) > 0) {
+                                    $urlJsFile = $mobilePath . $scriptValue;
+                                }
                             }
+
+                            $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
+
                             break;
                         case self::TYPE_CSS_FILE:
-                            if (!ccfg::get('merge_css')) {
-                                $urlCssFile = CManager_Asset_Helper::urlCssFile($scriptValue);
-                                if ($manager->is_mobile()) {
-                                    $mobilePath = $manager->getMobilePath();
-                                    if (strlen($mobilePath) > 0) {
-                                        $urlCssFile = $mobilePath . $scriptValue;
-                                    }
-                                }
 
-                                $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
+                            $urlCssFile = CManager_Asset_Helper::urlCssFile($scriptValue);
+                            if ($manager->is_mobile()) {
+                                $mobilePath = $manager->getMobilePath();
+                                if (strlen($mobilePath) > 0) {
+                                    $urlCssFile = $mobilePath . $scriptValue;
+                                }
                             }
+
+                            $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
+
                             break;
 
                         case self::TYPE_JS:
-                            if (!ccfg::get('merge_js')) {
 
-                                $script .= '<script>' . $scriptValue . '</script>' . PHP_EOL;
-                            }
+
+                            $script .= '<script>' . $scriptValue . '</script>' . PHP_EOL;
+
                             break;
                         case self::TYPE_CSS:
-                            if (!ccfg::get('merge_css')) {
 
-                                $script .= '<style>' . $scriptValue . '</style>' . PHP_EOL;
-                            }
+
+                            $script .= '<style>' . $scriptValue . '</style>' . PHP_EOL;
+
                             break;
                         case self::TYPE_PLAIN:
 
@@ -290,6 +319,20 @@ class CManager_Asset {
             $isUseRequireJs = true;
         }
         return $isUseRequireJs;
+    }
+
+    public function compileCss($files) {
+        $options = [];
+        $options['type'] = 'css';
+        $compiler = new CManager_Asset_Compiler($files, $options);
+        return $compiler->compile();
+    }
+    
+    public function compileJs($files) {
+        $options = [];
+        $options['type'] = 'js';
+        $compiler = new CManager_Asset_Compiler($files, $options);
+        return $compiler->compile();
     }
 
 }

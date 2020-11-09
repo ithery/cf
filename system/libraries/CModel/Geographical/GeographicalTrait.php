@@ -52,7 +52,7 @@ trait CModel_Geographical_GeographicalTrait {
             $kilometers = static::$kilometers;
         }
         if ($kilometers) {
-            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515 * 1.609344]);
         } else {
             // miles
             $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
@@ -69,7 +69,7 @@ trait CModel_Geographical_GeographicalTrait {
             $kilometers = static::$kilometers;
         }
         if ($kilometers) {
-            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
+            $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515 * 1.609344]);
         } else {
             // miles
             $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);

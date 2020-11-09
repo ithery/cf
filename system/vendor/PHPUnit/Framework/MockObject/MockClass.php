@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -8,6 +8,9 @@
  * file that was distributed with this source code.
  */
 namespace PHPUnit\Framework\MockObject;
+
+use function call_user_func;
+use function class_exists;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -29,19 +32,19 @@ final class MockClass implements MockType
      */
     private $configurableMethods;
 
-    public function __construct(string $classCode, string $mockName, array $configurableMethods)
+    public function __construct($classCode, $mockName, array $configurableMethods)
     {
         $this->classCode           = $classCode;
         $this->mockName            = $mockName;
         $this->configurableMethods = $configurableMethods;
     }
 
-    public function generate(): string
+    public function generate()
     {
-        if (!\class_exists($this->mockName, false)) {
+        if (!class_exists($this->mockName, false)) {
             eval($this->classCode);
 
-            \call_user_func(
+            call_user_func(
                 [
                     $this->mockName,
                     '__phpunit_initConfigurableMethods',
@@ -53,7 +56,7 @@ final class MockClass implements MockType
         return $this->mockName;
     }
 
-    public function getClassCode(): string
+    public function getClassCode()
     {
         return $this->classCode;
     }

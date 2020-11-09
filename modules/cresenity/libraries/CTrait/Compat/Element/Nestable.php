@@ -68,4 +68,13 @@ trait CTrait_Compat_Element_Nestable {
         return $this->setInput($input);
     }
 
+    
+    /**
+     * 
+     * @deprecated since version 1.2
+     * @return $this
+     */
+    public function set_data_from_array($a) {
+        return $this->setDataFromArray($a);
+    }
 }

@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CCache_Driver_RedisDriver extends CCache_DriverAbstract {
+class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
 
     /**
      * The Redis factory implementation.
@@ -203,8 +203,8 @@ class CCache_Driver_RedisDriver extends CCache_DriverAbstract {
      * @return \Illuminate\Cache\RedisTaggedCache
      */
     public function tags($names) {
-        return new RedisTaggedCache(
-                $this, new TagSet($this, is_array($names) ? $names : func_get_args())
+        return new CCache_Driver_RedisDriver_RedisTaggedCache(
+                $this, new CCache_TagSet($this, is_array($names) ? $names : func_get_args())
         );
     }
 

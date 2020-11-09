@@ -7,6 +7,10 @@ use Embed\Http\CurlDispatcher;
 use Embed\Http\DispatcherInterface;
 use Embed\Http\Url;
 
+/**
+ * https://github.com/oscarotero/Embed/tree/v1.x
+ */
+
 abstract class Embed
 {
     /**

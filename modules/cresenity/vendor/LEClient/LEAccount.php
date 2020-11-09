@@ -2,6 +2,8 @@
 
 namespace LEClient;
 
+use LEClient\Exceptions\LEAccountException;
+
 /**
  * LetsEncrypt Account class, containing the functions and data associated with a LetsEncrypt account.
  *
@@ -35,22 +37,20 @@ namespace LEClient;
  * @link       https://github.com/yourivw/LEClient
  * @since      Class available since Release 1.0.0
  */
-class LEAccount {
+class LEAccount
+{
+	private $connector;
+	private $accountKeys;
 
-    /**
-     *
-     * @var LEClient\LEConnector
-     */
-    private $connector;
-    private $accountKeys;
-    public $id;
-    public $key;
-    public $contact;
-    public $agreement;
-    public $initialIp;
-    public $createdAt;
-    public $status;
-    private $log;
+	public $id;
+	public $key;
+	public $contact;
+	public $agreement;
+	public $initialIp;
+	public $createdAt;
+	public $status;
+
+	private $log;
 
     /**
      * Initiates the LetsEncrypt Account class.
@@ -60,27 +60,30 @@ class LEAccount {
      * @param array 		$email	 		The array of strings containing e-mail addresses. Only used when creating a new account.
      * @param array 		$accountKeys 	Array containing location of account keys files.
      */
-    public function __construct($connector, $log, $email, $accountKeys) {
-        $this->connector = $connector;
-        $this->accountKeys = $accountKeys;
-        $this->log = $log;
+	public function __construct($connector, $log, $email, $accountKeys)
+	{
+		$this->connector = $connector;
+		$this->accountKeys = $accountKeys;
+		$this->log = $log;
 
-        if (!file_exists($this->accountKeys['private_key']) OR ! file_exists($this->accountKeys['public_key'])) {
-            if ($this->log instanceof \Psr\Log\LoggerInterface) {
-                $this->log->info('No account found, attempting to create account.');
-            } else if ($this->log >= LECLient::LOG_STATUS)
-                LEFunctions::log('No account found, attempting to create account.', 'function LEAccount __construct');
-
-            LEFunctions::RSAgenerateKeys(null, $this->accountKeys['private_key'], $this->accountKeys['public_key']);
-            $this->connector->accountURL = $this->createLEAccount($email);
-        }
-        else {
-            $this->connector->accountURL = $this->getLEAccount();
-        }
-        if ($this->connector->accountURL == false)
-            throw new \RuntimeException('Account not found or deactivated.');
-        $this->getLEAccountData();
-    }
+		if(!file_exists($this->accountKeys['private_key']) OR !file_exists($this->accountKeys['public_key']))
+		{
+			if($this->log instanceof \Psr\Log\LoggerInterface) 
+			{
+				$this->log->info('No account found, attempting to create account.');
+			}
+			else if($this->log >= LECLient::LOG_STATUS) LEFunctions::log('No account found, attempting to create account.', 'function LEAccount __construct');
+			
+			LEFunctions::RSAgenerateKeys(null, $this->accountKeys['private_key'], $this->accountKeys['public_key']);
+			$this->connector->accountURL = $this->createLEAccount($email);
+		}
+		else
+		{
+			$this->connector->accountURL = $this->getLEAccount();
+		}
+		if($this->connector->accountURL == false) throw LEAccountException::AccountNotFoundException();
+		$this->getLEAccountData();
+	}
 
     /**
      * Creates a new LetsEncrypt account.
@@ -89,54 +92,58 @@ class LEAccount {
      *
      * @return object	Returns the new account URL when the account was successfully created, false if not.
      */
-    private function createLEAccount($email) {
-        $contact = array_map(function($addr) {
-            return empty($addr) ? '' : (strpos($addr, 'mailto') === false ? 'mailto:' . $addr : $addr);
-        }, $email);
-        $sign = $this->connector->signRequestJWK(array('contact' => $contact, 'termsOfServiceAgreed' => true), $this->connector->newAccount);
+	private function createLEAccount($email)
+	{
+		$contact = array_map(function($addr) { return empty($addr) ? '' : (strpos($addr, 'mailto') === false ? 'mailto:' . $addr : $addr); }, $email);
 
-        $post = $this->connector->post($this->connector->newAccount, $sign);
-        if (strpos($post['header'], "201 Created") !== false) {
-            if (preg_match('~Location: (\S+)~i', $post['header'], $matches))
-                return trim($matches[1]);
-        }
-        return false;
-    }
+		$sign = $this->connector->signRequestJWK(array('contact' => $contact, 'termsOfServiceAgreed' => true), $this->connector->newAccount);
+		$post = $this->connector->post($this->connector->newAccount, $sign);
+		if($post['status'] === 201)
+		{
+			if(preg_match('~Location: (\S+)~i', $post['header'], $matches)) return trim($matches[1]);
+		}
+		return false;
+	}
 
     /**
      * Gets the LetsEncrypt account URL associated with the stored account keys.
      *
      * @return object	Returns the account URL if it is found, or false when none is found.
      */
-    private function getLEAccount() {
-        $sign = $this->connector->signRequestJWK(array('onlyReturnExisting' => true), $this->connector->newAccount);
-        $post = $this->connector->post($this->connector->newAccount, $sign);
+	private function getLEAccount()
+	{
+		$sign = $this->connector->signRequestJWK(array('onlyReturnExisting' => true), $this->connector->newAccount);
+		$post = $this->connector->post($this->connector->newAccount, $sign);
 
-        if (strpos($post['header'], "200 OK") !== false) {
-            if (preg_match('~Location: (\S+)~i', $post['header'], $matches))
-                return trim($matches[1]);
-        }
-        return false;
-    }
+		if($post['status'] === 200)
+		{
+			if(preg_match('~Location: (\S+)~i', $post['header'], $matches)) return trim($matches[1]);
+		}
+		return false;
+	}
 
     /**
      * Gets the LetsEncrypt account data from the account URL.
      */
-    private function getLEAccountData() {
-        $sign = $this->connector->signRequestKid(array('' => ''), $this->connector->accountURL, $this->connector->accountURL);
-        $post = $this->connector->post($this->connector->accountURL, $sign);
-        if (strpos($post['header'], "200 OK") !== false) {
-            $this->id = $post['body']['id'];
-            $this->key = $post['body']['key'];
-            $this->contact = $post['body']['contact'];
-            $this->agreement = isset($post['body']['agreement']) ? $post['body']['agreement'] : '';
-            $this->initialIp = $post['body']['initialIp'];
-            $this->createdAt = $post['body']['createdAt'];
-            $this->status = $post['body']['status'];
-        } else {
-            throw new \RuntimeException('Account data cannot be found.');
-        }
-    }
+	private function getLEAccountData()
+	{
+		$sign = $this->connector->signRequestKid(array('' => ''), $this->connector->accountURL, $this->connector->accountURL);
+		$post = $this->connector->post($this->connector->accountURL, $sign);
+		if($post['status'] === 200)
+		{
+			$this->id = isset($post['body']['id']) ? $post['body']['id'] : '';
+			$this->key = $post['body']['key'];
+			$this->contact = $post['body']['contact'];
+			$this->agreement = isset($post['body']['agreement']) ? $post['body']['agreement'] : '';
+			$this->initialIp = $post['body']['initialIp'];
+			$this->createdAt = $post['body']['createdAt'];
+			$this->status = $post['body']['status'];
+		}
+		else
+		{
+			throw LEAccountException::AccountNotFoundException();
+		}
+	}
 
     /**
      * Updates account data. Now just supporting new contact information.
@@ -145,86 +152,97 @@ class LEAccount {
      *
      * @return boolean	Returns true if the update is successful, false if not.
      */
-    public function updateAccount($email) {
-        $contact = array_map(function($addr) {
-            return empty($addr) ? '' : (strpos($addr, 'mailto') === false ? 'mailto:' . $addr : $addr);
-        }, $email);
+	public function updateAccount($email)
+	{
+		$contact = array_map(function($addr) { return empty($addr) ? '' : (strpos($addr, 'mailto') === false ? 'mailto:' . $addr : $addr); }, $email);
 
-        $sign = $this->connector->signRequestKid(array('contact' => $contact), $this->connector->accountURL, $this->connector->accountURL);
-        $post = $this->connector->post($this->connector->accountURL, $sign);
-        if (strpos($post['header'], "200 OK") !== false) {
-            $this->id = $post['body']['id'];
-            $this->key = $post['body']['key'];
-            $this->contact = $post['body']['contact'];
-            $this->agreement = isset($post['body']['agreement']) ? $post['body']['agreement'] : '';
-            $this->initialIp = $post['body']['initialIp'];
-            $this->createdAt = $post['body']['createdAt'];
-            $this->status = $post['body']['status'];
-            if ($this->log instanceof \Psr\Log\LoggerInterface) {
-                $this->log->info('Account data updated.');
-            } else if ($this->log >= LECLient::LOG_STATUS)
-                LEFunctions::log('Account data updated.', 'function updateAccount');
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+		$sign = $this->connector->signRequestKid(array('contact' => $contact), $this->connector->accountURL, $this->connector->accountURL);
+		$post = $this->connector->post($this->connector->accountURL, $sign);
+		if($post['status'] === 200)
+		{
+			$this->id = isset($post['body']['id']) ? $post['body']['id'] : '';
+			$this->key = $post['body']['key'];
+			$this->contact = $post['body']['contact'];
+			$this->agreement = isset($post['body']['agreement']) ? $post['body']['agreement'] : '';
+			$this->initialIp = $post['body']['initialIp'];
+			$this->createdAt = $post['body']['createdAt'];
+			$this->status = $post['body']['status'];
+			if($this->log instanceof \Psr\Log\LoggerInterface) 
+			{
+				$this->log->info('Account data updated.');
+			}
+			else if($this->log >= LEClient::LOG_STATUS) LEFunctions::log('Account data updated.', 'function updateAccount');
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
     /**
      * Creates new RSA account keys and updates the keys with LetsEncrypt.
      *
      * @return boolean	Returns true if the update is successful, false if not.
      */
-    public function changeAccountKeys() {
-        LEFunctions::RSAgenerateKeys(null, $this->accountKeys['private_key'] . '.new', $this->accountKeys['public_key'] . '.new');
-        $oldPrivateKey = openssl_pkey_get_private(file_get_contents($this->accountKeys['private_key']));
-        $oldDetails = openssl_pkey_get_details($oldPrivateKey);
-        $innerPayload = array('account' => $this->connector->accountURL, 'oldKey' => array(
-                "kty" => "RSA",
-                "n" => LEFunctions::Base64UrlSafeEncode($oldDetails["rsa"]["n"]),
-                "e" => LEFunctions::Base64UrlSafeEncode($oldDetails["rsa"]["e"])
-        ));
-        $outerPayload = $this->connector->signRequestJWK($innerPayload, $this->connector->keyChange, $this->accountKeys['private_key'] . '.new');
-        $sign = $this->connector->signRequestKid($outerPayload, $this->connector->accountURL, $this->connector->keyChange);
-        $post = $this->connector->post($this->connector->keyChange, $sign);
-        if (strpos($post['header'], "200 OK") !== false) {
-            unlink($this->accountKeys['private_key']);
-            unlink($this->accountKeys['public_key']);
-            rename($this->accountKeys['private_key'] . '.new', $this->accountKeys['private_key']);
-            rename($this->accountKeys['public_key'] . '.new', $this->accountKeys['public_key']);
+	public function changeAccountKeys()
+	{
+		LEFunctions::RSAgenerateKeys(null, $this->accountKeys['private_key'].'.new', $this->accountKeys['public_key'].'.new');
+		$oldPrivateKey = openssl_pkey_get_private(file_get_contents($this->accountKeys['private_key']));
+		$oldDetails = openssl_pkey_get_details($oldPrivateKey);
+		$innerPayload = array('account' => $this->connector->accountURL, 'oldKey' => array(
+			"kty" => "RSA",
+			"n" => LEFunctions::Base64UrlSafeEncode($oldDetails["rsa"]["n"]),
+			"e" => LEFunctions::Base64UrlSafeEncode($oldDetails["rsa"]["e"])
+		));
+		$outerPayload = $this->connector->signRequestJWK($innerPayload, $this->connector->keyChange, $this->accountKeys['private_key'].'.new');
+		$sign = $this->connector->signRequestKid($outerPayload, $this->connector->accountURL, $this->connector->keyChange);
+		$post = $this->connector->post($this->connector->keyChange, $sign);
+		if($post['status'] === 200)
+		{
+			unlink($this->accountKeys['private_key']);
+			unlink($this->accountKeys['public_key']);
+			rename($this->accountKeys['private_key'].'.new', $this->accountKeys['private_key']);
+			rename($this->accountKeys['public_key'].'.new', $this->accountKeys['public_key']);
+			
+			$this->getLEAccountData();
 
-            $this->getLEAccountData();
-
-            if ($this->log instanceof \Psr\Log\LoggerInterface) {
-                $this->log->info('Account keys changed.');
-            } elseif ($this->log >= LECLient::LOG_STATUS)
-                LEFunctions::log('Account keys changed.', 'function changeAccountKey');
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+			if($this->log instanceof \Psr\Log\LoggerInterface) 
+			{
+				$this->log->info('Account keys changed.');
+			}
+			elseif($this->log >= LEClient::LOG_STATUS) LEFunctions::log('Account keys changed.', 'function changeAccountKey');
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
     /**
      * Deactivates the LetsEncrypt account.
      *
      * @return boolean	Returns true if the deactivation is successful, false if not.
      */
-    public function deactivateAccount() {
-        $sign = $this->connector->signRequestKid(array('status' => 'deactivated'), $this->connector->accountURL, $this->connector->accountURL);
-        $post = $this->connector->post($this->connector->accountURL, $sign);
-        if (strpos($post['header'], "200 OK") !== false) {
-            $this->connector->accountDeactivated = true;
-            if ($this->log instanceof \Psr\Log\LoggerInterface) {
-                $this->log->info('Account deactivated.');
-            } elseif ($this->log >= LECLient::LOG_STATUS)
-                LEFunctions::log('Account deactivated.', 'function deactivateAccount');
-        }
-        else {
-            return false;
-        }
-    }
-
+	public function deactivateAccount()
+	{
+		$sign = $this->connector->signRequestKid(array('status' => 'deactivated'), $this->connector->accountURL, $this->connector->accountURL);
+		$post = $this->connector->post($this->connector->accountURL, $sign);
+		if($post['status'] === 200)
+		{
+			$this->connector->accountDeactivated = true;
+			if($this->log instanceof \Psr\Log\LoggerInterface) 
+			{
+				$this->log->info('Account deactivated.');
+			}
+			elseif($this->log >= LEClient::LOG_STATUS) LEFunctions::log('Account deactivated.', 'function deactivateAccount');
+			
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
