@@ -107,8 +107,9 @@ final class CF {
         static $run;
 
         // This function can only be run once
-        if ($run === TRUE)
+        if ($run === TRUE) {
             return;
+        }
 
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
@@ -475,17 +476,6 @@ final class CF {
         return $dirs;
     }
 
-    public static function get_config($filename, $domain = null) {
-        $files = self::get_files('config', $filename, $domain);
-        $files = array_reverse($files);
-        $ret = array();
-        foreach ($files as $file) {
-            $cfg = include $file;
-            $ret = array_merge($ret, $cfg);
-        }
-        return $ret;
-    }
-
     /**
      * 
      * @param string $directory
@@ -547,28 +537,16 @@ final class CF {
             //when this domain is org
             if (strlen($org_code) > 0) {
                 //add theme path if theme exists
-                if (strlen($theme) > 0) {
-                    $paths[] = APPPATH . $app_code . DS . $org_code . DS . "themes" . DS . $theme . DS;
-                }
                 $paths[] = APPPATH . $app_code . DS . $org_code . DS;
             }
             if (strlen($app_code) > 0) {
                 //add theme path if theme exists
-                if (strlen($theme) > 0) {
-                    $paths[] = APPPATH . $app_code . DS . 'default' . DS . "themes" . DS . $theme . DS;
-                }
                 $paths[] = APPPATH . $app_code . DS . 'default' . DS;
             }
             foreach ($sharedAppCode as $key => $value) {
                 if (strlen($org_code) > 0) {
                     //add theme path if theme exists
-                    if (strlen($theme) > 0) {
-                        $paths[] = APPPATH . $value . DS . $org_code . DS . "themes" . DS . $theme . DS;
-                    }
                     $paths[] = APPPATH . $value . DS . $org_code . DS;
-                }
-                if (strlen($theme) > 0) {
-                    $paths[] = APPPATH . $value . DS . 'default' . DS . "themes" . DS . $theme . DS;
                 }
                 $paths[] = APPPATH . $value . DS . 'default' . DS;
             }

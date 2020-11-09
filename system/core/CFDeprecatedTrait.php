@@ -59,6 +59,23 @@ trait CFDeprecatedTrait {
     }
 
     /**
+     * 
+     * @param type $filename
+     * @param type $domain
+     * @return type
+     * @deprecated
+     */
+    public static function get_config($filename, $domain = null) {
+        $files = self::getFiles('config', $filename, $domain);
+        $files = array_reverse($files);
+        $ret = array();
+        foreach ($files as $file) {
+            $cfg = include $file;
+            $ret = array_merge($ret, $cfg);
+        }
+        return $ret;
+    }
+    /**
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
      *
