@@ -459,17 +459,6 @@ final class CF {
 
     /**
      * 
-     * @deprecated
-     * @param string $directory
-     * @param string $domain
-     * @return array array of directory
-     */
-    public static function get_dirs($directory, $domain = null) {
-        return self::getDirs($directory, $domain);
-    }
-
-    /**
-     * 
      * @param string $directory
      * @param string $domain
      * @return array array of directory
@@ -498,17 +487,6 @@ final class CF {
     }
 
     /**
-     * @deprecated Please use getFiles
-     * @param string $directory
-     * @param string $filename
-     * @param string $domain
-     * @return string[]
-     */
-    public static function get_files($directory, $filename, $domain = null) {
-        return self::getFiles($directory, $filename, $domain);
-    }
-
-    /**
      * 
      * @param string $directory
      * @param string $filename
@@ -530,18 +508,6 @@ final class CF {
         }
 
         return $result;
-    }
-
-    /**
-     * 
-     * @deprecated
-     * @param string $directory
-     * @param string $filename
-     * @param string $domain
-     * @return string
-     */
-    public static function get_file($directory, $filename, $domain = null) {
-        return self::getFile($directory, $filename, $domain);
     }
 
     /**
@@ -619,22 +585,6 @@ final class CF {
         return self::$paths[$domain];
     }
 
-    public static function include_paths_theme($process = FALSE) {
-
-        return self::include_paths($process, true);
-    }
-
-    /**
-     * Get all include paths. APPPATH is the first path, followed by module
-     * paths in the order they are configured, follow by the SYSPATH.
-     *
-     * @param   boolean  re-process the include paths
-     * @return  array
-     */
-    public static function include_paths($process = FALSE, $with_theme = false) {
-        return self::paths();
-    }
-
     /**
      * Get a config item or group.
      *
@@ -709,7 +659,7 @@ final class CF {
             $found = FALSE;
 
             // find config file at all available paths
-            if ($files = self::find_file('config', 'config', $required)) {
+            if ($files = self::findFile('config', 'config', $required)) {
                 foreach ($files as $file) {
                     if (file_exists($file)) {
                         require $file;
@@ -740,7 +690,7 @@ final class CF {
         // Load matching configs
         $configuration = array();
 
-        if ($files = self::find_file('config', $name, $required)) {
+        if ($files = self::findFile('config', $name, $required)) {
             foreach ($files as $file) {
                 require $file;
 
@@ -1274,7 +1224,7 @@ final class CF {
                     }
                 }
                 if (!$custom_error) {
-                    require self::find_file('views', empty($template) ? 'kohana_error_page' : $template);
+                    require self::findFile('views', empty($template) ? 'kohana_error_page' : $template);
                 }
             } else {
                 // Get the i18n messages
@@ -1282,7 +1232,7 @@ final class CF {
                 $message = self::lang('core.errors_disabled', curl::site(), curl::site(CFRouter::$current_uri));
 
                 // Load the errors_disabled view
-                require self::find_file('views', 'kohana_error_disabled');
+                require self::findFile('views', 'kohana_error_disabled');
             }
 
             if (!CFEvent::has_run('system.shutdown')) {
@@ -1315,8 +1265,9 @@ final class CF {
      * @return  bool
      */
     public static function auto_load($class, $directory = 'libraries') {
-        if (class_exists($class, FALSE))
+        if (class_exists($class, FALSE)) {
             return TRUE;
+        }
 
         if (($suffix = strrpos($class, '_')) > 0) {
             // Find the class suffix
@@ -1354,7 +1305,7 @@ final class CF {
 
         $class_not_found = FALSE;
 
-        if ($filename = self::find_file($type, $file)) {
+        if ($filename = self::findFile($type, $file)) {
             require $filename;
             $class_not_found = TRUE;
             return TRUE;
@@ -1387,7 +1338,7 @@ final class CF {
 
             if ($directory == 'libraries') {
                 // find file at vendor first
-                if ($path = self::find_file('vendor', $routing_file)) {
+                if ($path = self::findFile('vendor', $routing_file)) {
                     // Load the class file
                     require $path;
 
@@ -1398,7 +1349,7 @@ final class CF {
                 }
             }
             // find file at libraries
-            if ($path = self::find_file($directory, $routing_file)) {
+            if ($path = self::findFile($directory, $routing_file)) {
                 // Load the class file
                 require $path;
                 $class_not_found = TRUE;
@@ -1412,7 +1363,7 @@ final class CF {
                     $temp_routing_file[0] = 'helpers';
                     $routing_file = str_replace('Helpers' . DS, '', $routing_file);
                     $directory = 'helpers';
-                    if ($path = self::find_file($directory, $routing_file)) {
+                    if ($path = self::findFile($directory, $routing_file)) {
                         // Load the class file
 
                         require $path;
@@ -1430,7 +1381,7 @@ final class CF {
             return FALSE;
         }
 
-        if ($filename = self::find_file($type, self::$configuration['core']['extension_prefix'] . $class)) {
+        if ($filename = self::findFile($type, self::$configuration['core']['extension_prefix'] . $class)) {
             // Load the class extension
             require $filename;
         } elseif ($suffix !== 'Core' AND class_exists($class . '_Core', FALSE)) {
@@ -1560,18 +1511,6 @@ final class CF {
     }
 
     /**
-     * @deprecated
-     * @param type $directory
-     * @param type $filename
-     * @param type $required
-     * @param type $ext
-     * @return type
-     */
-    public static function find_file($directory, $filename, $required = FALSE, $ext = FALSE) {
-        return static::findFile($directory, $filename, $required, $ext);
-    }
-
-    /**
      * Lists all files and directories in a resource path.
      *
      * @param   string   directory to search
@@ -1634,7 +1573,7 @@ final class CF {
             // Messages for this group
             $messages = array();
 
-            if ($files = self::find_file('i18n', $locale . '/' . $group)) {
+            if ($files = self::findFile('i18n', $locale . '/' . $group)) {
                 foreach ($files as $file) {
                     include $file;
 
@@ -2008,16 +1947,6 @@ final class CF {
 
     /**
      * Get application id for domain
-     * This function is deprecated, use CF::appId
-     *
-     * @return  string
-     */
-    public static function app_id($domain = null) {
-        return self::appId($domain);
-    }
-
-    /**
-     * Get application id for domain
      *
      * @return  string
      */
@@ -2028,35 +1957,12 @@ final class CF {
 
     /**
      * Get application code for domain
-     * This function is deprecated, use CF::appCode
-     * 
-     * @deprecated
-     * @return  string
-     */
-    public static function app_code($domain = null) {
-        return self::appCode($domain);
-    }
-
-    /**
-     * Get application code for domain
      *
      * @return  string
      */
     public static function appCode($domain = null) {
         $data = self::data($domain);
         return isset($data['app_code']) ? $data['app_code'] : null;
-    }
-
-    /**
-     * Get org id for domain
-     * This function is deprecated, use CF::orgId
-     * 
-     * @deprecated
-     * @param string $domain
-     * @return int
-     */
-    public static function org_id($domain = null) {
-        return self::orgId($domain);
     }
 
     /**
@@ -2072,18 +1978,6 @@ final class CF {
 
     /**
      * Get org code for this domain
-     * This function is deprecated, use CF::orgCode
-     *
-     * @deprecated
-     * @param string $domain
-     * @return string
-     */
-    public static function org_code($domain = null) {
-        return self::orgCode($domain);
-    }
-
-    /**
-     * Get org code for this domain
      * 
      * @param string $domain
      * @return string
@@ -2091,17 +1985,6 @@ final class CF {
     public static function orgCode($domain = null) {
         $data = self::data($domain);
         return isset($data['org_code']) ? $data['org_code'] : null;
-    }
-
-    /**
-     * Add Shared App in runtime
-     * This function is deprecated, use CF::addSharedApp
-     * 
-     * @deprecated
-     * @param string $app_code
-     */
-    public static function add_shared_app_code($app_code) {
-        return self::addSharedApp($app_code);
     }
 
     /**
@@ -2172,7 +2055,7 @@ final class CF {
      * @param  string|object  $class
      * @return string
      */
-    public static function class_basename($class) {
+    public static function classBasename($class) {
         return c::classBasename($class);
     }
 
@@ -2182,7 +2065,7 @@ final class CF {
      * @param  object|string  $class
      * @return array
      */
-    public static function class_uses_recursive($class) {
+    public static function classUsesRecursive($class) {
         if (is_object($class)) {
             $class = get_class($class);
         }
@@ -2202,7 +2085,7 @@ final class CF {
      * @param  string  $trait
      * @return array
      */
-    public static function trait_uses_recursive($trait) {
+    public static function traitUsesRecursive($trait) {
         $traits = class_uses($trait);
 
         foreach ($traits as $trait) {
@@ -2375,19 +2258,6 @@ final class CF {
         $appCode = static::appCode($domain);
 
         return DOCROOT . 'application/' . $appCode . '/';
-    }
-
-    /**
-     * Displays a 404 page.
-     *
-     * @throws  C_404_Exception
-     * @param   string  URI of page
-     * @param   string  custom template
-     * @return  void
-     * @deprecated
-     */
-    public static function show_404($page = FALSE, $template = FALSE) {
-        return self::show404($page, $template);
     }
 
     public static function currentController() {
