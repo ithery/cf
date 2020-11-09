@@ -353,7 +353,7 @@ final class CF {
             CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
 
             if (empty(CFRouter::$controller_path)) {
-                CF::show_404();
+                CF::show404();
             }
             // Include the Controller file
             if (strlen(CFRouter::$controller_path) > 0) {
