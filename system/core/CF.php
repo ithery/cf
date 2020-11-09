@@ -201,7 +201,6 @@ final class CF {
         }
 
 
-
         // Enable CF 404 pages
         CFEvent::add('system.404', array('CF', 'show404'));
 
@@ -245,7 +244,8 @@ final class CF {
         }
         CFBenchmark::stop('system.cf.bootstrap');
     }
-
+    
+    
     public static function invoke($uri) {
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
@@ -346,6 +346,7 @@ final class CF {
             if (strlen(CFRouter::$controller_path) > 0) {
                 require_once CFRouter::$controller_path;
             }
+            
             try {
                 // Start validation of the controller
                 $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
@@ -826,6 +827,7 @@ final class CF {
      */
     public static function shutdown() {
         // Close output buffers
+        
         self::close_buffers(TRUE);
 
 
@@ -869,7 +871,13 @@ final class CF {
                     ), $output
             );
         }
+        
+        
+        /*
+        $response = CHTTP::createResponse($output);
+        $response->send();
 
+        */
         if ($level = self::config('core.output_compression') AND ini_get('output_handler') !== 'ob_gzhandler' AND (int) ini_get('zlib.output_compression') === 0) {
             if ($level < 1 OR $level > 9) {
                 // Normalize the level to be an integer between 1 and 9. This
@@ -924,6 +932,8 @@ final class CF {
         if (CFRouter::$current_uri == 'favicon.ico') {
             return false;
         }
+        
+        
         if (isset($_GET['debug_404'])) {
             try {
                 throw new Exception('404');
