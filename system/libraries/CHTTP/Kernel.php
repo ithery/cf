@@ -374,7 +374,7 @@ class CHTTP_Kernel implements CHTTP_KernelInterface {
      * @return void
      */
     protected function reportException(Throwable $e) {
-        $this->app[ExceptionHandler::class]->report($e);
+        $this->app[CException_ExceptionHandler::class]->report($e);
     }
 
     /**
@@ -385,7 +385,7 @@ class CHTTP_Kernel implements CHTTP_KernelInterface {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderException($request, Throwable $e) {
-        return $this->app[ExceptionHandler::class]->render($request, $e);
+        return $this->app[CException_ExceptionHandler::class]->render($request, $e);
     }
 
     /**

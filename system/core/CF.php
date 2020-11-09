@@ -206,8 +206,7 @@ final class CF {
         }
 
         // Enable CF routing
-        CFEvent::add('system.routing', array('CFRouter', 'findUri'));
-        CFEvent::add('system.routing', array('CFRouter', 'setup'));
+
 
         // Enable CF controller initialization
         CFEvent::add('system.execute', array('CF', 'instance'));

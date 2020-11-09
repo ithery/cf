@@ -50,6 +50,8 @@ CFBenchmark::start(SYSTEM_BENCHMARK.'_system_initialization');
 CFEvent::run('system.ready');
 
 // Determine routing
+CFRouter::findUri();
+CFRouter::setup();
 CFEvent::run('system.routing');
 
 // End system_initialization
