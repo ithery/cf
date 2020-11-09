@@ -20,7 +20,7 @@ class CQC_Console_Command_PhpUnitListCommand extends CConsole_Command {
 
         $this->info('show list of phpunit available');
 
-        $group = $this->getOption('group');
+        $group = $this->option('group');
 
         $qcManager = CQC_Manager::instance();
 
@@ -34,8 +34,13 @@ class CQC_Console_Command_PhpUnitListCommand extends CConsole_Command {
         if (is_array($groupKeys) && count($groupKeys) > 0) {
             foreach ($groupKeys as $groupKey) {
                 $this->info($groupKey);
+                if(strlen($group)>0) {
+                    
+                }
             }
         }
+        
+        
     }
 
 }
