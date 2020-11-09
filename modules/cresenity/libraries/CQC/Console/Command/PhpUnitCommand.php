@@ -36,7 +36,7 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
 
         $this->info('Running test on file ' . $fileName);
         $runner = new TestRunner();
-        $suite = $runner->getTest(TBQC_UnitTest_MemberApi_BasicTestMemberApi::class);
+        $suite = $runner->getTest($class);
         try {
             $args = [];
             $args['verbose'] = $this->option('verbose');
