@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 final class CF {
 
+    use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
@@ -2392,9 +2394,10 @@ final class CF {
         return static::$instance;
     }
 
+    /** list of deprecated function */
 }
 
-// End C
+// End CF
 
 /**
  * Creates a generic i18n exception.
@@ -2457,32 +2460,6 @@ class CF_Exception extends Exception {
     public function send_headers() {
         // Send the 500 header
         header('HTTP/1.1 500 Internal Server Error');
-    }
-
-}
-
-// End C Exception
-
-/**
- * Creates a custom exception.
- */
-class CF_User_Exception extends CF_Exception {
-
-    /**
-     * Set exception title and message.
-     *
-     * @param   string  exception title string
-     * @param   string  exception message string
-     * @param   string  custom error template
-     */
-    public function __construct($title, $message, $template = FALSE) {
-        Exception::__construct($message);
-
-        $this->code = $title;
-
-        if ($template !== FALSE) {
-            $this->template = $template;
-        }
     }
 
 }
