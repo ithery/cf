@@ -227,6 +227,12 @@ abstract class CObservable extends CRenderable {
         return $code;
     }
 
+    public function addPdfViewer($id = "") {
+        $code = CElement_Factory::createComponent('PdfViewer', $id);
+        $this->add($code);
+        return $code;
+    }
+
     /**
      * 
      * @return $this
