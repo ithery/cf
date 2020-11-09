@@ -14,12 +14,28 @@ class CQC_Console_Command_PhpUnitListCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'qc:phpunit:list';
+    protected $signature = 'qc:phpunit:list {--group=}';
 
     public function handle() {
 
         $this->info('show list of phpunit available');
-        
+
+        $group = $this->getOption('group');
+
+        $qcManager = CQC_Manager::instance();
+
+
+        $groupKeys = $qcManager->getUnitTestGroupsKey();
+
+        if (strlen($group) > 0) {
+            $groupKeys = [$group];
+        }
+
+        if (is_array($groupKeys) && count($groupKeys) > 0) {
+            foreach ($groupKeys as $groupKey) {
+                $this->info($groupKey);
+            }
+        }
     }
 
 }

@@ -14,12 +14,13 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'qc:phpunit {--class=}';
+    protected $signature = 'qc:phpunit {--class=} {--method=}';
 
     public function handle() {
 
 
         $class = $this->option('class');
+        $method = $this->option('method');
         
         if (strlen($class) > 0) {
             if (!class_exists($class)) {
@@ -39,6 +40,9 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
         try {
             $args = [];
             $args['verbose'] = $this->option('verbose');
+            if(strlen($method)>0) {
+                $args['filter']=$method;
+            }
             $result = $runner->run($suite, $args, [], true);
         } catch (Throwable $t) {
             $this->error($t->getMessage() . PHP_EOL);

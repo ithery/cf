@@ -136,7 +136,7 @@ trait CTrait_Controller_Application_QC_UnitTest {
         $app->title('Test Case of ' . $name);
         $app->addBreadcrumb($this->getTitle(), $this->controllerUrl());
 
-        
+
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
         $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() . static::groupQueryString());
         $rotateAction = $actionContainer->addAction()->setLabel('Run All')->addClass('btn-primary')->setIcon('fas fa-play')
@@ -145,9 +145,9 @@ trait CTrait_Controller_Application_QC_UnitTest {
                 ->setJs("
                     $('.btn-run-method').trigger('click');
                     ");
-                
 
-        
+
+
         $runner = CQC::createUnitTestRunner($class);
         $methods = $runner->getTestMethods();
 
@@ -165,19 +165,26 @@ trait CTrait_Controller_Application_QC_UnitTest {
     }
 
     public function check($className, $method = null) {
-        $runner = CQC::createUnitTestRunner($className);
+
+        $cfCommand = 'qc:phpunit --class=' . $className;
+        if (strlen($method) > 0) {
+            $cfCommand.= ' --method=' . $method;
+        }
+
 
         $errCode = 0;
         $errMessage = '';
         $data = [];
         $output = '';
         try {
-            if ($method != null) {
-                
-                $output = $runner->runMethod($method);
-                
-            } else {
-                $output = $runner->run();
+            $CFCli = new CApp_CFCli();
+
+            $process = $CFCli->run($cfCommand);
+            $errorOutput = $process->getErrorOutput();
+            $output = $process->getOutput();
+            if (strlen($errorOutput) > 0) {
+                $errCode++;
+                $errMessage = $errorOutput;
             }
         } catch (Exception $ex) {
             $errCode++;
@@ -188,7 +195,6 @@ trait CTrait_Controller_Application_QC_UnitTest {
         echo CApp_Base::jsonResponse($errCode, $errMessage, $data);
     }
 
-    
     /**
      * 
      * @return string
@@ -201,4 +207,5 @@ trait CTrait_Controller_Application_QC_UnitTest {
         }
         return $groupQueryString;
     }
+
 }
