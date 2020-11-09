@@ -25,6 +25,17 @@ trait CFDeprecatedTrait {
     }
 
     /**
+     * 
+     * @deprecated
+     * @param string $directory
+     * @param string $domain
+     * @return string|null directory
+     */
+    public static function get_dir($directory = '', $domain = null) {
+        return static::getDir($directory, $domain);
+    }
+
+    /**
      * @deprecated Please use getFiles
      * @param string $directory
      * @param string $filename
@@ -75,6 +86,7 @@ trait CFDeprecatedTrait {
         }
         return $ret;
     }
+
     /**
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
@@ -201,6 +213,21 @@ trait CFDeprecatedTrait {
      */
     public static function find_file($directory, $filename, $required = FALSE, $ext = FALSE) {
         return static::findFile($directory, $filename, $required, $ext);
+    }
+
+    /**
+     * Dual-purpose PHP error and exception handler. Uses the kohana_error_page
+     * view to display the message.
+     *
+     * @param   integer|object  exception object or error code
+     * @param   string          error message
+     * @param   string          filename
+     * @param   integer         line number
+     * @return  void
+     * @deprecated
+     */
+    public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
+        return CF::exceptionHandler($exception, $message, $file, $line);
     }
 
 }

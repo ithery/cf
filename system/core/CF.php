@@ -30,8 +30,6 @@ final class CF {
     private static $paths;
     // Logged messages
     private static $log;
-    // Cache lifetime
-    private static $cache_lifetime;
     // Log levels
     private static $log_levels = array(
         'error' => 1,
@@ -47,9 +45,6 @@ final class CF {
     // Internal caches and write status
     private static $internal_cache = array();
     private static $write_cache;
-    private static $internal_cache_path;
-    private static $internal_cache_key;
-    private static $internal_cache_encrypt;
     private static $data;
     private static $sharedAppCode = array();
     private static $translator;
@@ -153,13 +148,13 @@ final class CF {
         self::$buffer_level = ob_get_level();
 
         // Set autoloader
-        spl_autoload_register(array('CF', 'auto_load'));
+        spl_autoload_register(array('CF', 'autoLoad'));
 
         // Set error handler
-        set_error_handler(array('CF', 'exception_handler'));
+        set_error_handler(array('CF', 'exceptionHandler'));
 
         // Set exception handler
-        set_exception_handler(array('CF', 'exception_handler'));
+        set_exception_handler(array('CF', 'exceptionHandler'));
 
         // Set and test the logger instance, we need to know whats wrong when CF Fail
         self::$logger = CLogger::instance();
@@ -205,17 +200,10 @@ final class CF {
             register_shutdown_function(array(__CLASS__, 'log_save'));
         }
 
-        // Enable CF routing
 
-
-        // Enable CF controller initialization
-        CFEvent::add('system.execute', array('CF', 'instance'));
 
         // Enable CF 404 pages
         CFEvent::add('system.404', array('CF', 'show404'));
-
-        // Enable CF output handling
-        CFEvent::add('system.shutdown', array('CF', 'shutdown'));
 
         static::loadBootstrapFiles();
 
@@ -443,7 +431,7 @@ final class CF {
         return self::$instance;
     }
 
-    public static function get_dir($directory = '', $domain = null) {
+    public static function getDir($directory = '', $domain = null) {
         $include_paths = CF::paths();
         foreach ($include_paths as $p) {
             $path = $p;
@@ -767,7 +755,7 @@ final class CF {
     public static function log_directory($dir = NULL) {
         static $directory;
 
-        $dir = CF::get_dir('logs');
+        $dir = CF::getDir('logs');
 
 
         if (!empty($dir)) {
@@ -788,89 +776,6 @@ final class CF {
         }
 
         return $directory;
-    }
-
-    /**
-     * Load data from a simple cache file. This should only be used internally,
-     * and is NOT a replacement for the Cache library.
-     *
-     * @param   string   unique name of cache
-     * @param   integer  expiration in seconds
-     * @return  mixed
-     */
-    public static function cache($name, $lifetime) {
-        if ($lifetime > 0) {
-            $path = self::$internal_cache_path . 'kohana_' . $name;
-
-            if (is_file($path)) {
-                // Check the file modification time
-                if ((time() - filemtime($path)) < $lifetime) {
-                    // Cache is valid! Now, do we need to decrypt it?
-                    if (self::$internal_cache_encrypt === TRUE) {
-                        $data = file_get_contents($path);
-
-                        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-                        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-
-                        $decrypted_text = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, self::$internal_cache_key, $data, MCRYPT_MODE_ECB, $iv);
-
-                        $cache = unserialize($decrypted_text);
-
-                        // If the key changed, delete the cache file
-                        if (!$cache)
-                            unlink($path);
-
-                        // If cache is false (as above) return NULL, otherwise, return the cache
-                        return ($cache ? $cache : NULL);
-                    }
-                    else {
-                        return unserialize(file_get_contents($path));
-                    }
-                } else {
-                    // Cache is invalid, delete it
-                    unlink($path);
-                }
-            }
-        }
-
-        // No cache found
-        return NULL;
-    }
-
-    /**
-     * Save data to a simple cache file. This should only be used internally, and
-     * is NOT a replacement for the Cache library.
-     *
-     * @param   string   cache name
-     * @param   mixed    data to cache
-     * @param   integer  expiration in seconds
-     * @return  boolean
-     */
-    public static function cache_save($name, $data, $lifetime) {
-        if ($lifetime < 1)
-            return FALSE;
-
-        $path = self::$internal_cache_path . 'kohana_' . $name;
-
-        if ($data === NULL) {
-            // Delete cache
-            return (is_file($path) and unlink($path));
-        } else {
-            // Using encryption? Encrypt the data when we write it
-            if (self::$internal_cache_encrypt === TRUE) {
-                // Encrypt and write data to cache file
-                $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-                $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-
-                // Serialize and encrypt!
-                $encrypted_text = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, self::$internal_cache_key, serialize($data), MCRYPT_MODE_ECB, $iv);
-
-                return (bool) file_put_contents($path, $encrypted_text);
-            } else {
-                // Write data to cache file
-                return (bool) file_put_contents($path, serialize($data));
-            }
-        }
     }
 
     /**
@@ -948,12 +853,12 @@ final class CF {
             // Replace the global template variables
             $output = str_replace(
                     array
-                (
-                '{cf_version}',
-                '{cf_codename}',
-                '{execution_time}',
-                '{memory_usage}',
-                '{included_files}',
+                        (
+                        '{cf_version}',
+                        '{cf_codename}',
+                        '{execution_time}',
+                        '{memory_usage}',
+                        '{included_files}',
                     ), array
                 (
                 CF_VERSION,
@@ -1039,7 +944,7 @@ final class CF {
      * @param   integer         line number
      * @return  void
      */
-    public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
+    public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
         if ($exception instanceof \Pheanstalk\Exception\ServerException) {
             return;
         }
@@ -1145,7 +1050,7 @@ final class CF {
                     header('HTTP/1.1 500 Internal Server Error');
                 }
             } else {
-                if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
+                if (method_exists($exception, 'send_headers') AND!headers_sent()) {
                     // Send the headers if they have not already been sent
                     $exception->send_headers();
                 } else {
@@ -1241,7 +1146,7 @@ final class CF {
      * @param   string  name of class
      * @return  bool
      */
-    public static function auto_load($class, $directory = 'libraries') {
+    public static function autoLoad($class, $directory = 'libraries') {
         if (class_exists($class, FALSE)) {
             return TRUE;
         }
@@ -1611,7 +1516,7 @@ final class CF {
             $key = array_shift($keys);
 
             if (isset($array[$key])) {
-                if (is_array($array[$key]) AND ! empty($keys)) {
+                if (is_array($array[$key]) AND!empty($keys)) {
                     // Dig down to prepare the next loop
                     $array = $array[$key];
                 } else {
@@ -1875,34 +1780,6 @@ final class CF {
         }
 
         return '<ul class="backtrace">' . implode("\n", $output) . '</ul>';
-    }
-
-    /**
-     * Saves the internal caches: configuration, include paths, etc.
-     *
-     * @return  boolean
-     */
-    public static function internal_cache_save() {
-        if (!is_array(self::$write_cache))
-            return FALSE;
-
-        // Get internal cache names
-        $caches = array_keys(self::$write_cache);
-
-        // Nothing written
-        $written = FALSE;
-
-        foreach ($caches as $cache) {
-            if (isset(self::$internal_cache[$cache])) {
-                // Write the cache file
-                self::cache_save($cache, self::$internal_cache[$cache], self::$configuration['core']['internal_cache']);
-
-                // A cache has been written
-                $written = TRUE;
-            }
-        }
-
-        return $written;
     }
 
     /**
