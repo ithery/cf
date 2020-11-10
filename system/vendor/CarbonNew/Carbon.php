@@ -420,74 +420,74 @@ use DateTime;
  * @method        Carbon         subRealMillennia(int $value = 1)                                                      Sub millennia (the $value count passed in) to the instance (using timestamp).
  * @method        Carbon         subRealMillennium()                                                                   Sub one millennium to the instance (using timestamp).
  * @method        CarbonPeriod   millenniaUntil($endDate = null, int $factor = 1)                                      Return an iterable period from current date to given end (string, DateTime or Carbon instance) for each millennium or every X millennia if a factor is given.
- * @method        Carbon         roundYear(float $precision = 1, string $function = "round")                           Round the current instance year with given precision using the given function.
- * @method        Carbon         roundYears(float $precision = 1, string $function = "round")                          Round the current instance year with given precision using the given function.
+ * @method        Carbon         roundYear(float $precision = 1, $function = "round")                           Round the current instance year with given precision using the given function.
+ * @method        Carbon         roundYears(float $precision = 1, $function = "round")                          Round the current instance year with given precision using the given function.
  * @method        Carbon         floorYear(float $precision = 1)                                                       Truncate the current instance year with given precision.
  * @method        Carbon         floorYears(float $precision = 1)                                                      Truncate the current instance year with given precision.
  * @method        Carbon         ceilYear(float $precision = 1)                                                        Ceil the current instance year with given precision.
  * @method        Carbon         ceilYears(float $precision = 1)                                                       Ceil the current instance year with given precision.
- * @method        Carbon         roundMonth(float $precision = 1, string $function = "round")                          Round the current instance month with given precision using the given function.
- * @method        Carbon         roundMonths(float $precision = 1, string $function = "round")                         Round the current instance month with given precision using the given function.
+ * @method        Carbon         roundMonth(float $precision = 1, $function = "round")                          Round the current instance month with given precision using the given function.
+ * @method        Carbon         roundMonths(float $precision = 1, $function = "round")                         Round the current instance month with given precision using the given function.
  * @method        Carbon         floorMonth(float $precision = 1)                                                      Truncate the current instance month with given precision.
  * @method        Carbon         floorMonths(float $precision = 1)                                                     Truncate the current instance month with given precision.
  * @method        Carbon         ceilMonth(float $precision = 1)                                                       Ceil the current instance month with given precision.
  * @method        Carbon         ceilMonths(float $precision = 1)                                                      Ceil the current instance month with given precision.
- * @method        Carbon         roundDay(float $precision = 1, string $function = "round")                            Round the current instance day with given precision using the given function.
- * @method        Carbon         roundDays(float $precision = 1, string $function = "round")                           Round the current instance day with given precision using the given function.
+ * @method        Carbon         roundDay(float $precision = 1, $function = "round")                            Round the current instance day with given precision using the given function.
+ * @method        Carbon         roundDays(float $precision = 1, $function = "round")                           Round the current instance day with given precision using the given function.
  * @method        Carbon         floorDay(float $precision = 1)                                                        Truncate the current instance day with given precision.
  * @method        Carbon         floorDays(float $precision = 1)                                                       Truncate the current instance day with given precision.
  * @method        Carbon         ceilDay(float $precision = 1)                                                         Ceil the current instance day with given precision.
  * @method        Carbon         ceilDays(float $precision = 1)                                                        Ceil the current instance day with given precision.
- * @method        Carbon         roundHour(float $precision = 1, string $function = "round")                           Round the current instance hour with given precision using the given function.
- * @method        Carbon         roundHours(float $precision = 1, string $function = "round")                          Round the current instance hour with given precision using the given function.
+ * @method        Carbon         roundHour(float $precision = 1, $function = "round")                           Round the current instance hour with given precision using the given function.
+ * @method        Carbon         roundHours(float $precision = 1, $function = "round")                          Round the current instance hour with given precision using the given function.
  * @method        Carbon         floorHour(float $precision = 1)                                                       Truncate the current instance hour with given precision.
  * @method        Carbon         floorHours(float $precision = 1)                                                      Truncate the current instance hour with given precision.
  * @method        Carbon         ceilHour(float $precision = 1)                                                        Ceil the current instance hour with given precision.
  * @method        Carbon         ceilHours(float $precision = 1)                                                       Ceil the current instance hour with given precision.
- * @method        Carbon         roundMinute(float $precision = 1, string $function = "round")                         Round the current instance minute with given precision using the given function.
- * @method        Carbon         roundMinutes(float $precision = 1, string $function = "round")                        Round the current instance minute with given precision using the given function.
+ * @method        Carbon         roundMinute(float $precision = 1, $function = "round")                         Round the current instance minute with given precision using the given function.
+ * @method        Carbon         roundMinutes(float $precision = 1, $function = "round")                        Round the current instance minute with given precision using the given function.
  * @method        Carbon         floorMinute(float $precision = 1)                                                     Truncate the current instance minute with given precision.
  * @method        Carbon         floorMinutes(float $precision = 1)                                                    Truncate the current instance minute with given precision.
  * @method        Carbon         ceilMinute(float $precision = 1)                                                      Ceil the current instance minute with given precision.
  * @method        Carbon         ceilMinutes(float $precision = 1)                                                     Ceil the current instance minute with given precision.
- * @method        Carbon         roundSecond(float $precision = 1, string $function = "round")                         Round the current instance second with given precision using the given function.
- * @method        Carbon         roundSeconds(float $precision = 1, string $function = "round")                        Round the current instance second with given precision using the given function.
+ * @method        Carbon         roundSecond(float $precision = 1, $function = "round")                         Round the current instance second with given precision using the given function.
+ * @method        Carbon         roundSeconds(float $precision = 1, $function = "round")                        Round the current instance second with given precision using the given function.
  * @method        Carbon         floorSecond(float $precision = 1)                                                     Truncate the current instance second with given precision.
  * @method        Carbon         floorSeconds(float $precision = 1)                                                    Truncate the current instance second with given precision.
  * @method        Carbon         ceilSecond(float $precision = 1)                                                      Ceil the current instance second with given precision.
  * @method        Carbon         ceilSeconds(float $precision = 1)                                                     Ceil the current instance second with given precision.
- * @method        Carbon         roundMillennium(float $precision = 1, string $function = "round")                     Round the current instance millennium with given precision using the given function.
- * @method        Carbon         roundMillennia(float $precision = 1, string $function = "round")                      Round the current instance millennium with given precision using the given function.
+ * @method        Carbon         roundMillennium(float $precision = 1, $function = "round")                     Round the current instance millennium with given precision using the given function.
+ * @method        Carbon         roundMillennia(float $precision = 1, $function = "round")                      Round the current instance millennium with given precision using the given function.
  * @method        Carbon         floorMillennium(float $precision = 1)                                                 Truncate the current instance millennium with given precision.
  * @method        Carbon         floorMillennia(float $precision = 1)                                                  Truncate the current instance millennium with given precision.
  * @method        Carbon         ceilMillennium(float $precision = 1)                                                  Ceil the current instance millennium with given precision.
  * @method        Carbon         ceilMillennia(float $precision = 1)                                                   Ceil the current instance millennium with given precision.
- * @method        Carbon         roundCentury(float $precision = 1, string $function = "round")                        Round the current instance century with given precision using the given function.
- * @method        Carbon         roundCenturies(float $precision = 1, string $function = "round")                      Round the current instance century with given precision using the given function.
+ * @method        Carbon         roundCentury(float $precision = 1, $function = "round")                        Round the current instance century with given precision using the given function.
+ * @method        Carbon         roundCenturies(float $precision = 1, $function = "round")                      Round the current instance century with given precision using the given function.
  * @method        Carbon         floorCentury(float $precision = 1)                                                    Truncate the current instance century with given precision.
  * @method        Carbon         floorCenturies(float $precision = 1)                                                  Truncate the current instance century with given precision.
  * @method        Carbon         ceilCentury(float $precision = 1)                                                     Ceil the current instance century with given precision.
  * @method        Carbon         ceilCenturies(float $precision = 1)                                                   Ceil the current instance century with given precision.
- * @method        Carbon         roundDecade(float $precision = 1, string $function = "round")                         Round the current instance decade with given precision using the given function.
- * @method        Carbon         roundDecades(float $precision = 1, string $function = "round")                        Round the current instance decade with given precision using the given function.
+ * @method        Carbon         roundDecade(float $precision = 1, $function = "round")                         Round the current instance decade with given precision using the given function.
+ * @method        Carbon         roundDecades(float $precision = 1, $function = "round")                        Round the current instance decade with given precision using the given function.
  * @method        Carbon         floorDecade(float $precision = 1)                                                     Truncate the current instance decade with given precision.
  * @method        Carbon         floorDecades(float $precision = 1)                                                    Truncate the current instance decade with given precision.
  * @method        Carbon         ceilDecade(float $precision = 1)                                                      Ceil the current instance decade with given precision.
  * @method        Carbon         ceilDecades(float $precision = 1)                                                     Ceil the current instance decade with given precision.
- * @method        Carbon         roundQuarter(float $precision = 1, string $function = "round")                        Round the current instance quarter with given precision using the given function.
- * @method        Carbon         roundQuarters(float $precision = 1, string $function = "round")                       Round the current instance quarter with given precision using the given function.
+ * @method        Carbon         roundQuarter(float $precision = 1, $function = "round")                        Round the current instance quarter with given precision using the given function.
+ * @method        Carbon         roundQuarters(float $precision = 1, $function = "round")                       Round the current instance quarter with given precision using the given function.
  * @method        Carbon         floorQuarter(float $precision = 1)                                                    Truncate the current instance quarter with given precision.
  * @method        Carbon         floorQuarters(float $precision = 1)                                                   Truncate the current instance quarter with given precision.
  * @method        Carbon         ceilQuarter(float $precision = 1)                                                     Ceil the current instance quarter with given precision.
  * @method        Carbon         ceilQuarters(float $precision = 1)                                                    Ceil the current instance quarter with given precision.
- * @method        Carbon         roundMillisecond(float $precision = 1, string $function = "round")                    Round the current instance millisecond with given precision using the given function.
- * @method        Carbon         roundMilliseconds(float $precision = 1, string $function = "round")                   Round the current instance millisecond with given precision using the given function.
+ * @method        Carbon         roundMillisecond(float $precision = 1, $function = "round")                    Round the current instance millisecond with given precision using the given function.
+ * @method        Carbon         roundMilliseconds(float $precision = 1, $function = "round")                   Round the current instance millisecond with given precision using the given function.
  * @method        Carbon         floorMillisecond(float $precision = 1)                                                Truncate the current instance millisecond with given precision.
  * @method        Carbon         floorMilliseconds(float $precision = 1)                                               Truncate the current instance millisecond with given precision.
  * @method        Carbon         ceilMillisecond(float $precision = 1)                                                 Ceil the current instance millisecond with given precision.
  * @method        Carbon         ceilMilliseconds(float $precision = 1)                                                Ceil the current instance millisecond with given precision.
- * @method        Carbon         roundMicrosecond(float $precision = 1, string $function = "round")                    Round the current instance microsecond with given precision using the given function.
- * @method        Carbon         roundMicroseconds(float $precision = 1, string $function = "round")                   Round the current instance microsecond with given precision using the given function.
+ * @method        Carbon         roundMicrosecond(float $precision = 1, $function = "round")                    Round the current instance microsecond with given precision using the given function.
+ * @method        Carbon         roundMicroseconds(float $precision = 1, $function = "round")                   Round the current instance microsecond with given precision using the given function.
  * @method        Carbon         floorMicrosecond(float $precision = 1)                                                Truncate the current instance microsecond with given precision.
  * @method        Carbon         floorMicroseconds(float $precision = 1)                                               Truncate the current instance microsecond with given precision.
  * @method        Carbon         ceilMicrosecond(float $precision = 1)                                                 Ceil the current instance microsecond with given precision.
@@ -501,7 +501,7 @@ use DateTime;
  * @method        string         shortRelativeToOtherDiffForHumans(\DateTimeInterface $other = null, int $parts = 1)   Get the difference (short format, 'RelativeToOther' mode) in a human readable format in the current locale. ($other and $parts parameters can be swapped.)
  * @method        string         longRelativeToOtherDiffForHumans(\DateTimeInterface $other = null, int $parts = 1)    Get the difference (long format, 'RelativeToOther' mode) in a human readable format in the current locale. ($other and $parts parameters can be swapped.)
  * @method        static Carbon  createFromImmutable(\DateTimeImmutable $dateTime)                                     Create a new Carbon object from an immutable date.
- * @method        static Carbon  createFromFormat(string $format, string $time, string|\DateTimeZone $timezone = null) Parse a string into a new Carbon object according to the specified format.
+ * @method        static Carbon  createFromFormat($format, $time, string|\DateTimeZone $timezone = null) Parse a string into a new Carbon object according to the specified format.
  * @method        static Carbon  __set_state(array $array)                                                             https://php.net/manual/en/datetime.set-state.php
  *
  * </autodoc>
