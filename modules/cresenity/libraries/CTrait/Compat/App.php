@@ -10,6 +10,27 @@ defined('SYSPATH') OR die('No direct access allowed.');
 trait CTrait_Compat_App {
 
     /**
+     *
+     * @var stdClass|null
+     * @deprecated
+     */
+    private $_store = null;
+
+    /**
+     *
+     * @var stdClass|null
+     * @deprecated
+     */
+    private $_admin = null;
+
+    /**
+     *
+     * @var stdClass|null
+     * @deprecated
+     */
+    private $_member = null;
+
+    /**
      * 
      * @deprecated since version 1.2, please use function addBreadcrumb
      * @param string $caption
@@ -116,9 +137,96 @@ trait CTrait_Compat_App {
         CManager::instance()->register_module($module);
     }
 
+    /**
+     * 
+     * @return bool
+     */
     public function is_user_login() {
         return $this->isUserLogin();
     }
 
+    /**
+     * @deprecated
+     */
+    public function set_view_html() {
+        
+    }
+
+    /**
+     * 
+     * @return type
+     * @deprecated
+     */
+    public function admin() {
+        if ($this->_admin == null) {
+            $session = CSession::instance();
+            $admin = $session->get("admin");
+            if (!$admin)
+                $admin = null;
+            $this->_admin = $admin;
+        }
+        return $this->_admin;
+    }
+
+    /**
+     * 
+     * @return deprecated
+     */
+    public function member() {
+        if ($this->_member = null) {
+            $session = CSession::instance();
+            $member = $session->get("member");
+            if (!$member)
+                $member = null;
+            $this->_member = $member;
+        }
+        return $this->_member;
+    }
+
+    /**
+     * 
+     * @return boolean
+     * @deprecated
+     */
+    public function is_admin_login() {
+        return $this->admin() != null;
+    }
+
+    /**
+     * 
+     * @return boolean
+     * @deprecated
+     */
+    public function is_member_login() {
+        return $this->member() != null;
+    }
+
+    /**
+     * 
+     * @return stdClass
+     * @deprecated
+     */
+    public function store() {
+        if ($this->_store == null) {
+            $store_id = CF::store_id();
+
+            if ($store_id != "") {
+                $this->_store = cstore::get(CF::orgCode(), CF::store_code());
+            }
+        }
+        return $this->_store;
+    }
+
+    /**
+     * 
+     * @return int
+     */
+    public function store_id() {
+        $store = $this->store();
+        if ($store == null) {
+            return null;
+        }
+        return $store->store_id;
+    }
 
 }
