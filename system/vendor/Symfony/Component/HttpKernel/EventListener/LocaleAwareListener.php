@@ -64,7 +64,7 @@ class LocaleAwareListener implements EventSubscriberInterface
         ];
     }
 
-    private function setLocale(string $locale, string $defaultLocale): void
+    private function setLocale($locale, $defaultLocale): void
     {
         foreach ($this->localeAwareServices as $service) {
             try {

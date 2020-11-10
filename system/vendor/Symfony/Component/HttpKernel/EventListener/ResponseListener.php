@@ -26,7 +26,7 @@ class ResponseListener implements EventSubscriberInterface
 {
     private $charset;
 
-    public function __construct(string $charset)
+    public function __construct($charset)
     {
         $this->charset = $charset;
     }

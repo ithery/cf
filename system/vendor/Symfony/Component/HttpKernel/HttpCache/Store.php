@@ -31,7 +31,7 @@ class Store implements StoreInterface
     /**
      * @throws \RuntimeException
      */
-    public function __construct(string $root)
+    public function __construct($root)
     {
         $this->root = $root;
         if (!is_dir($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
@@ -269,7 +269,7 @@ class Store implements StoreInterface
      * @param array       $env1 A Request HTTP header array
      * @param array       $env2 A Request HTTP header array
      */
-    private function requestsMatch(?string $vary, array $env1, array $env2): bool
+    private function requestsMatch($vary, array $env1, array $env2): bool
     {
         if (empty($vary)) {
             return true;
@@ -292,7 +292,7 @@ class Store implements StoreInterface
      *
      * Use this method only if you know what you are doing.
      */
-    private function getMetadata(string $key): array
+    private function getMetadata($key): array
     {
         if (!$entries = $this->load($key)) {
             return [];
@@ -308,7 +308,7 @@ class Store implements StoreInterface
      *
      * @return bool true if the URL exists with either HTTP or HTTPS scheme and has been purged, false otherwise
      */
-    public function purge(string $url)
+    public function purge($url)
     {
         $http = preg_replace('#^https:#', 'http:', $url);
         $https = preg_replace('#^http:#', 'https:', $url);
@@ -322,7 +322,7 @@ class Store implements StoreInterface
     /**
      * Purges data for the given URL.
      */
-    private function doPurge(string $url): bool
+    private function doPurge($url): bool
     {
         $key = $this->getCacheKey(Request::create($url));
         if (isset($this->locks[$key])) {
@@ -343,7 +343,7 @@ class Store implements StoreInterface
     /**
      * Loads data for the given key.
      */
-    private function load(string $key): ?string
+    private function load($key): ?string
     {
         $path = $this->getPath($key);
 
@@ -353,7 +353,7 @@ class Store implements StoreInterface
     /**
      * Save data for the given key.
      */
-    private function save(string $key, string $data, bool $overwrite = true): bool
+    private function save($key, $data, bool $overwrite = true): bool
     {
         $path = $this->getPath($key);
 
@@ -403,7 +403,7 @@ class Store implements StoreInterface
         return true;
     }
 
-    public function getPath(string $key)
+    public function getPath($key)
     {
         return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);
     }
@@ -459,7 +459,7 @@ class Store implements StoreInterface
     /**
      * Restores a Response from the HTTP headers and body.
      */
-    private function restoreResponse(array $headers, string $path = null): Response
+    private function restoreResponse(array $headers, $path = null): Response
     {
         $status = $headers['X-Status'][0];
         unset($headers['X-Status']);

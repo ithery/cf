@@ -22,7 +22,7 @@ class AccessDeniedHttpException extends HttpException
      * @param \Throwable $previous The previous exception
      * @param int        $code     The internal exception code
      */
-    public function __construct(string $message = null, \Throwable $previous = null, int $code = 0, array $headers = [])
+    public function __construct($message = null, \Throwable $previous = null, int $code = 0, array $headers = [])
     {
         parent::__construct(403, $message, $previous, $headers, $code);
     }

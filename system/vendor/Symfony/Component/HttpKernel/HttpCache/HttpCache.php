@@ -686,7 +686,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Records that an event took place.
      */
-    private function record(Request $request, string $event)
+    private function record(Request $request, $event)
     {
         $this->traces[$this->getTraceKey($request)][] = $event;
     }

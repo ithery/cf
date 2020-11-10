@@ -27,7 +27,7 @@ class UriSigner
      * @param string $secret    A secret
      * @param string $parameter Query string parameter to use
      */
-    public function __construct(string $secret, string $parameter = '_hash')
+    public function __construct($secret, $parameter = '_hash')
     {
         $this->secret = $secret;
         $this->parameter = $parameter;
@@ -41,7 +41,7 @@ class UriSigner
      *
      * @return string The signed URI
      */
-    public function sign(string $uri)
+    public function sign($uri)
     {
         $url = parse_url($uri);
         if (isset($url['query'])) {
@@ -61,7 +61,7 @@ class UriSigner
      *
      * @return bool True if the URI is signed correctly, false otherwise
      */
-    public function check(string $uri)
+    public function check($uri)
     {
         $url = parse_url($uri);
         if (isset($url['query'])) {
@@ -88,7 +88,7 @@ class UriSigner
         return $this->check($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo().$qs);
     }
 
-    private function computeHash(string $uri): string
+    private function computeHash($uri): string
     {
         return base64_encode(hash_hmac('sha256', $uri, $this->secret, true));
     }

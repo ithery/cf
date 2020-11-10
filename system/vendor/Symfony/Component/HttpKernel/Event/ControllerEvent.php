@@ -29,7 +29,7 @@ final class ControllerEvent extends KernelEvent
 {
     private $controller;
 
-    public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, ?int $requestType)
+    public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
 

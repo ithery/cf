@@ -31,7 +31,7 @@ final class ControllerArgumentsEvent extends KernelEvent
     private $controller;
     private $arguments;
 
-    public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, ?int $requestType)
+    public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
 

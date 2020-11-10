@@ -26,7 +26,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     private $optionalsEnabled = false;
     private $onlyOptionalsEnabled = false;
 
-    public function __construct(iterable $warmers = [], bool $debug = false, string $deprecationLogsFilepath = null)
+    public function __construct(iterable $warmers = [], bool $debug = false, $deprecationLogsFilepath = null)
     {
         $this->warmers = $warmers;
         $this->debug = $debug;
@@ -48,7 +48,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      *
      * @return string[] A list of classes or files to preload on PHP 7.4+
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp($cacheDir)
     {
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];

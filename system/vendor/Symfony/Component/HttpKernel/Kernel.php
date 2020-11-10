@@ -83,7 +83,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     const END_OF_MAINTENANCE = '07/2021';
     const END_OF_LIFE = '07/2021';
 
-    public function __construct(string $environment, bool $debug)
+    public function __construct($environment, bool $debug)
     {
         $this->environment = $environment;
         $this->debug = $debug;
@@ -131,7 +131,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function reboot(?string $warmupDir)
+    public function reboot($warmupDir)
     {
         $this->shutdown();
         $this->warmupDir = $warmupDir;
@@ -218,7 +218,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function getBundle(string $name)
+    public function getBundle($name)
     {
         if (!isset($this->bundles[$name])) {
             throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the "registerBundles()" method of your "%s.php" file?', $name, get_debug_type($this)));
@@ -230,7 +230,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function locateResource(string $name)
+    public function locateResource($name)
     {
         if ('@' !== $name[0]) {
             throw new \InvalidArgumentException(sprintf('A resource name must start with @ ("%s" given).', $name));
@@ -694,7 +694,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * @param string $class     The name of the class to generate
      * @param string $baseClass The name of the container's base class
      */
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass)
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
         // cache the container
         $dumper = new PhpDumper($container);
@@ -785,7 +785,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return string The PHP string with the comments removed
      */
-    public static function stripComments(string $source)
+    public static function stripComments($source)
     {
         if (!\function_exists('token_get_all')) {
             return $source;

@@ -102,7 +102,7 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @throws \InvalidArgumentException When the controller cannot be created
      */
-    protected function createController(string $controller)
+    protected function createController($controller)
     {
         if (false === strpos($controller, '::')) {
             $controller = $this->instantiateController($controller);
@@ -142,7 +142,7 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @return object
      */
-    protected function instantiateController(string $class)
+    protected function instantiateController($class)
     {
         return new $class();
     }
@@ -213,7 +213,7 @@ class ControllerResolver implements ControllerResolverInterface
     {
         $methods = get_class_methods($classOrObject);
 
-        return array_filter($methods, function (string $method) {
+        return array_filter($methods, function ($method) {
             return 0 !== strncmp($method, '__', 2);
         });
     }

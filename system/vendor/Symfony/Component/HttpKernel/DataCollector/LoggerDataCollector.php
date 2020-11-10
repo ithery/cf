@@ -31,7 +31,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private $currentRequest;
     private $requestStack;
 
-    public function __construct($logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)
+    public function __construct($logger = null, $containerPathPrefix = null, RequestStack $requestStack = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;
@@ -146,7 +146,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $logs;
     }
 
-    private function getContainerCompilerLogs(string $compilerLogsFilepath = null): array
+    private function getContainerCompilerLogs($compilerLogsFilepath = null): array
     {
         if (!is_file($compilerLogsFilepath)) {
             return [];

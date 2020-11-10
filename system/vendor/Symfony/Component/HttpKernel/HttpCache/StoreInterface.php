@@ -72,7 +72,7 @@ interface StoreInterface
      *
      * @return bool true if the URL exists and has been purged, false otherwise
      */
-    public function purge(string $url);
+    public function purge($url);
 
     /**
      * Cleanups storage.

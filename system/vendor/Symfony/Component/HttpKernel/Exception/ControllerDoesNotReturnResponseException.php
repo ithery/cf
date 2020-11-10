@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Exception;
  */
 class ControllerDoesNotReturnResponseException extends \LogicException
 {
-    public function __construct(string $message, callable $controller, string $file, int $line)
+    public function __construct($message, callable $controller, $file, int $line)
     {
         parent::__construct($message);
 
