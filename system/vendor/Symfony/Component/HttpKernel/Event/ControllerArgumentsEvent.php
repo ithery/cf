@@ -39,7 +39,7 @@ final class ControllerArgumentsEvent extends KernelEvent
         $this->arguments = $arguments;
     }
 
-    public function getController(): callable
+    public function getController()
     {
         return $this->controller;
     }
@@ -49,7 +49,7 @@ final class ControllerArgumentsEvent extends KernelEvent
         $this->controller = $controller;
     }
 
-    public function getArguments(): array
+    public function getArguments()
     {
         return $this->arguments;
     }

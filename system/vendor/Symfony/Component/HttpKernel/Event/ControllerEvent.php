@@ -36,12 +36,12 @@ final class ControllerEvent extends KernelEvent
         $this->setController($controller);
     }
 
-    public function getController(): callable
+    public function getController()
     {
         return $this->controller;
     }
 
-    public function setController(callable $controller): void
+    public function setController(callable $controller)
     {
         $this->controller = $controller;
     }

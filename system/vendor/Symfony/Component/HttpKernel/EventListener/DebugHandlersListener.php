@@ -136,7 +136,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
-    private function setDefaultLoggers(ErrorHandler $handler): void
+    private function setDefaultLoggers(ErrorHandler $handler)
     {
         if (\is_array($this->levels)) {
             $levelsDeprecatedOnly = [];
@@ -164,7 +164,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         $events = [KernelEvents::REQUEST => ['configure', 2048]];
 

@@ -84,7 +84,7 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
-    public function removeCspHeader(ResponseEvent $event): void
+    public function removeCspHeader(ResponseEvent $event)
     {
         if ($this->debug && $event->getRequest()->attributes->get('_remove_csp_headers', false)) {
             $event->getResponse()->headers->remove('Content-Security-Policy');
@@ -109,7 +109,7 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         return [
             KernelEvents::CONTROLLER_ARGUMENTS => 'onControllerArguments',
@@ -124,7 +124,7 @@ class ErrorListener implements EventSubscriberInterface
     /**
      * Logs an exception.
      */
-    protected function logException(\Throwable $exception, $message): void
+    protected function logException(\Throwable $exception, $message)
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
@@ -138,7 +138,7 @@ class ErrorListener implements EventSubscriberInterface
     /**
      * Clones the request for the exception.
      */
-    protected function duplicateRequest(\Throwable $exception, Request $request): Request
+    protected function duplicateRequest(\Throwable $exception, Request $request)
     {
         $attributes = [
             '_controller' => $this->controller,

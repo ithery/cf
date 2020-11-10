@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Exception;
  */
 class ControllerDoesNotReturnResponseException extends \LogicException
 {
-    public function __construct($message, callable $controller, $file, int $line)
+    public function __construct($message, callable $controller, $file, $line)
     {
         parent::__construct($message);
 
@@ -36,7 +36,7 @@ class ControllerDoesNotReturnResponseException extends \LogicException
         ], $this->getTrace()));
     }
 
-    private function parseControllerDefinition(callable $controller): ?array
+    private function parseControllerDefinition(callable $controller)
     {
         if (\is_string($controller) && false !== strpos($controller, '::')) {
             $controller = explode('::', $controller);

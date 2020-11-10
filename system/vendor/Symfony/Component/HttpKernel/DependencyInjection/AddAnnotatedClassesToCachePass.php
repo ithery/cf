@@ -56,7 +56,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      * @param array $patterns The class patterns to expand
      * @param array $classes  The existing classes to match against the patterns
      */
-    private function expandClasses(array $patterns, array $classes): array
+    private function expandClasses(array $patterns, array $classes)
     {
         $expanded = [];
 
@@ -82,7 +82,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return array_unique($expanded);
     }
 
-    private function getClassesInComposerClassMaps(): array
+    private function getClassesInComposerClassMaps()
     {
         $classes = [];
 
@@ -103,7 +103,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return array_keys($classes);
     }
 
-    private function patternsToRegexps(array $patterns): array
+    private function patternsToRegexps(array $patterns)
     {
         $regexps = [];
 
@@ -125,7 +125,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return $regexps;
     }
 
-    private function matchAnyRegexps($class, array $regexps): bool
+    private function matchAnyRegexps($class, array $regexps)
     {
         $isTest = false !== strpos($class, 'Test');
 

@@ -269,7 +269,7 @@ class Store implements StoreInterface
      * @param array       $env1 A Request HTTP header array
      * @param array       $env2 A Request HTTP header array
      */
-    private function requestsMatch($vary, array $env1, array $env2): bool
+    private function requestsMatch($vary, array $env1, array $env2)
     {
         if (empty($vary)) {
             return true;
@@ -292,7 +292,7 @@ class Store implements StoreInterface
      *
      * Use this method only if you know what you are doing.
      */
-    private function getMetadata($key): array
+    private function getMetadata($key)
     {
         if (!$entries = $this->load($key)) {
             return [];
@@ -322,7 +322,7 @@ class Store implements StoreInterface
     /**
      * Purges data for the given URL.
      */
-    private function doPurge($url): bool
+    private function doPurge($url)
     {
         $key = $this->getCacheKey(Request::create($url));
         if (isset($this->locks[$key])) {
@@ -343,7 +343,7 @@ class Store implements StoreInterface
     /**
      * Loads data for the given key.
      */
-    private function load($key): ?string
+    private function load($key)
     {
         $path = $this->getPath($key);
 
@@ -353,7 +353,7 @@ class Store implements StoreInterface
     /**
      * Save data for the given key.
      */
-    private function save($key, $data, bool $overwrite = true): bool
+    private function save($key, $data, bool $overwrite = true)
     {
         $path = $this->getPath($key);
 
@@ -428,7 +428,7 @@ class Store implements StoreInterface
     /**
      * Returns a cache key for the given Request.
      */
-    private function getCacheKey(Request $request): string
+    private function getCacheKey(Request $request)
     {
         if (isset($this->keyCache[$request])) {
             return $this->keyCache[$request];
@@ -440,7 +440,7 @@ class Store implements StoreInterface
     /**
      * Persists the Request HTTP headers.
      */
-    private function persistRequest(Request $request): array
+    private function persistRequest(Request $request)
     {
         return $request->headers->all();
     }
@@ -448,7 +448,7 @@ class Store implements StoreInterface
     /**
      * Persists the Response HTTP headers.
      */
-    private function persistResponse(Response $response): array
+    private function persistResponse(Response $response)
     {
         $headers = $response->headers->all();
         $headers['X-Status'] = [$response->getStatusCode()];
@@ -459,7 +459,7 @@ class Store implements StoreInterface
     /**
      * Restores a Response from the HTTP headers and body.
      */
-    private function restoreResponse(array $headers, $path = null): Response
+    private function restoreResponse(array $headers, $path = null)
     {
         $status = $headers['X-Status'][0];
         unset($headers['X-Status']);

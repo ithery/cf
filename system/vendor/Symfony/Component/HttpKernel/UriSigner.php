@@ -80,7 +80,7 @@ class UriSigner
         return hash_equals($this->computeHash($this->buildUrl($url, $params)), $hash);
     }
 
-    public function checkRequest(Request $request): bool
+    public function checkRequest(Request $request)
     {
         $qs = ($qs = $request->server->get('QUERY_STRING')) ? '?'.$qs : '';
 
@@ -88,12 +88,12 @@ class UriSigner
         return $this->check($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo().$qs);
     }
 
-    private function computeHash($uri): string
+    private function computeHash($uri)
     {
         return base64_encode(hash_hmac('sha256', $uri, $this->secret, true));
     }
 
-    private function buildUrl(array $url, array $params = []): string
+    private function buildUrl(array $url, array $params = [])
     {
         ksort($params, SORT_STRING);
         $url['query'] = http_build_query($params, '', '&');

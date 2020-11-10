@@ -176,10 +176,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         if (!$this->booted) {
-            $container = $this->container ?? $this->preBoot();
+            $container = $this->container ?$this->container: $this->preBoot();
 
             if ($container->has('http_cache')) {
                 return $container->get('http_cache')->handle($request, $type, $catch);
@@ -352,7 +352,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Gets the patterns defining the classes to parse and cache for annotations.
      */
-    public function getAnnotatedClassesToCompile(): array
+    public function getAnnotatedClassesToCompile()
     {
         return [];
     }
@@ -434,7 +434,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         try {
             if (is_file($cachePath) && \is_object($this->container = include $cachePath)
-                && (!$this->debug || (self::$freshCache[$cachePath] ?? $cache->isFresh()))
+                && (!$this->debug || (isset(self::$freshCache[$cachePath]) ?self::$freshCache[$cachePath]: $cache->isFresh()))
             ) {
                 self::$freshCache[$cachePath] = true;
                 $this->container->set('kernel', $this);
@@ -506,7 +506,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
                 // Remove frames added by DebugClassLoader.
                 for ($i = \count($backtrace) - 2; 0 < $i; --$i) {
-                    if (\in_array($backtrace[$i]['class'] ?? null, [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
+                    if (\in_array(isset($backtrace[$i]['class']) ?$backtrace[$i]['class']: null, [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
                         $backtrace = [$backtrace[$i + 1]];
                         break;
                     }
@@ -750,7 +750,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return new DelegatingLoader($resolver);
     }
 
-    private function preBoot(): ContainerInterface
+    private function preBoot()
     {
         if ($this->debug) {
             $this->startTime = microtime(true);

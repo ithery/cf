@@ -22,14 +22,14 @@ class UndefinedMethodErrorEnhancer implements ErrorEnhancerInterface
     /**
      * {@inheritdoc}
      */
-    public function enhance(\Throwable $error): ?\Throwable
+    public function enhance(\Throwable $error)
     {
         if ($error instanceof FatalError) {
             return null;
         }
 
         $message = $error->getMessage();
-        preg_match('/^Call to undefined method (.*)::(.*)\(\)$/', $message, $matches);
+        preg_match('/^Call to undefined method (.*)
         if (!$matches) {
             return null;
         }

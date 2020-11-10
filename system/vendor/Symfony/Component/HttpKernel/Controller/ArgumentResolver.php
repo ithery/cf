@@ -43,7 +43,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getArguments(Request $request, callable $controller): array
+    public function getArguments(Request $request, callable $controller)
     {
         $arguments = [];
 
@@ -83,7 +83,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
         return $arguments;
     }
 
-    public static function getDefaultArgumentValueResolvers(): iterable
+    public static function getDefaultArgumentValueResolvers()
     {
         return [
             new RequestAttributeValueResolver(),

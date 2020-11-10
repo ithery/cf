@@ -18,10 +18,10 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-interface ErrorRendererInterface
-{
+interface ErrorRendererInterface {
+
     /**
      * Renders a Throwable as a FlattenException.
      */
-    public function render(\Throwable $exception): FlattenException;
+    public function render( $exception);
 }

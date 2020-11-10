@@ -198,7 +198,7 @@ class Profile
         $child->setParent($this);
     }
 
-    public function getChildByToken($token): ?self
+    public function getChildByToken($token)
     {
         foreach ($this->children as $child) {
             if ($token === $child->getToken()) {

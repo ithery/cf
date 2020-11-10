@@ -220,7 +220,7 @@ class DebugClassLoader
      *
      * @return callable The wrapped class loader
      */
-    public function getClassLoader(): callable
+    public function getClassLoader()
     {
         return $this->classLoader;
     }
@@ -228,7 +228,7 @@ class DebugClassLoader
     /**
      * Wraps all autoloaders.
      */
-    public static function enable(): void
+    public static function enable()
     {
         // Ensures we don't hit https://bugs.php.net/42098
         class_exists('Symfony\Component\ErrorHandler\ErrorHandler');
@@ -254,7 +254,7 @@ class DebugClassLoader
     /**
      * Disables the wrapping.
      */
-    public static function disable(): void
+    public static function disable()
     {
         if (!\is_array($functions = spl_autoload_functions())) {
             return;
@@ -273,7 +273,7 @@ class DebugClassLoader
         }
     }
 
-    public static function checkClasses(): bool
+    public static function checkClasses()
     {
         if (!\is_array($functions = spl_autoload_functions())) {
             return false;
@@ -319,7 +319,7 @@ class DebugClassLoader
         return true;
     }
 
-    public function findFile(string $class): ?string
+    public function findFile($class)
     {
         return $this->isFinder ? ($this->classLoader[0]->findFile($class) ?: null) : null;
     }
@@ -329,7 +329,7 @@ class DebugClassLoader
      *
      * @throws \RuntimeException
      */
-    public function loadClass(string $class): void
+    public function loadClass($class)
     {
         $e = error_reporting(error_reporting() | \E_PARSE | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR);
 
@@ -356,7 +356,7 @@ class DebugClassLoader
         $this->checkClass($class, $file);
     }
 
-    private function checkClass(string $class, string $file = null): void
+    private function checkClass($class, $file = null)
     {
         $exists = null === $file || class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
@@ -404,7 +404,7 @@ class DebugClassLoader
         }
     }
 
-    public function checkAnnotations(\ReflectionClass $refl, string $class): array
+    public function checkAnnotations(\ReflectionClass $refl, $class)
     {
         if (
             'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV7' === $class
@@ -679,7 +679,7 @@ class DebugClassLoader
         return $deprecations;
     }
 
-    public function checkCase(\ReflectionClass $refl, string $file, string $class): ?array
+    public function checkCase(\ReflectionClass $refl, $file, $class)
     {
         $real = explode('\\', $class.strrchr($file, '.'));
         $tail = explode(\DIRECTORY_SEPARATOR, str_replace('/', \DIRECTORY_SEPARATOR, $file));
@@ -718,7 +718,7 @@ class DebugClassLoader
     /**
      * `realpath` on MacOSX doesn't normalize the case of characters.
      */
-    private function darwinRealpath(string $real): string
+    private function darwinRealpath($real)
     {
         $i = 1 + strrpos($real, '/');
         $file = substr($real, $i);
@@ -791,7 +791,7 @@ class DebugClassLoader
      *
      * @return string[]
      */
-    private function getOwnInterfaces(string $class, ?string $parent): array
+    private function getOwnInterfaces($class, $parent)
     {
         $ownInterfaces = class_implements($class, false);
 
@@ -810,7 +810,7 @@ class DebugClassLoader
         return $ownInterfaces;
     }
 
-    private function setReturnType(string $types, \ReflectionMethod $method, ?string $parent): void
+    private function setReturnType($types, \ReflectionMethod $method, $parent)
     {
         $nullable = false;
         $typesMap = [];
@@ -878,7 +878,7 @@ class DebugClassLoader
         self::$returnTypes[$method->class][$method->name] = [$normalizedType, $returnType, $method->class, $method->getFileName()];
     }
 
-    private function normalizeType(string $type, string $class, ?string $parent): string
+    private function normalizeType($type, $class, $parent)
     {
         if (isset(self::SPECIAL_RETURN_TYPES[$lcType = strtolower($type)])) {
             if ('parent' === $lcType = self::SPECIAL_RETURN_TYPES[$lcType]) {
@@ -907,7 +907,7 @@ class DebugClassLoader
     /**
      * Utility method to add @return annotations to the Symfony code-base where it triggers a self-deprecations.
      */
-    private function patchMethod(\ReflectionMethod $method, string $returnType, string $declaringFile, string $normalizedType)
+    private function patchMethod(\ReflectionMethod $method, $returnType, $declaringFile, $normalizedType)
     {
         static $patchedMethods = [];
         static $useStatements = [];
@@ -1004,7 +1004,7 @@ EOTXT;
         $this->fixReturnStatements($method, $nullable.$normalizedType);
     }
 
-    private static function getUseStatements(string $file): array
+    private static function getUseStatements($file)
     {
         $namespace = '';
         $useMap = [];
@@ -1047,7 +1047,7 @@ EOTXT;
         return [$namespace, $useOffset, $useMap];
     }
 
-    private function fixReturnStatements(\ReflectionMethod $method, string $returnType)
+    private function fixReturnStatements(\ReflectionMethod $method, $returnType)
     {
         if ('7.1' === $this->patchTypes['php'] && 'object' === ltrim($returnType, '?') && 'docblock' !== $this->patchTypes['force']) {
             return;
@@ -1061,7 +1061,7 @@ EOTXT;
         $i = (self::$fileOffsets[$file] ?? 0) + $method->getStartLine();
 
         if ('?' !== $returnType && 'docblock' !== $this->patchTypes['force']) {
-            $fixedCode[$i - 1] = preg_replace('/\)(;?\n)/', "): $returnType\\1", $code[$i - 1]);
+            $fixedCode[$i - 1] = preg_replace('/\)(;?\n)/', ")
         }
 
         $end = $method->isGenerator() ? $i : $method->getEndLine();

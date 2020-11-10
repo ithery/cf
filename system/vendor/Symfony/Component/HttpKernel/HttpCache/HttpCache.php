@@ -190,7 +190,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
     {
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
@@ -666,7 +666,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Checks if the Request includes authorization or other sensitive information
      * that should cause the Response to be considered private by default.
      */
-    private function isPrivateRequest(Request $request): bool
+    private function isPrivateRequest(Request $request)
     {
         foreach ($this->options['private_headers'] as $key) {
             $key = strtolower(str_replace('HTTP_', '', $key));
@@ -694,7 +694,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Calculates the key we use in the "trace" array for a given request.
      */
-    private function getTraceKey(Request $request): string
+    private function getTraceKey(Request $request)
     {
         $path = $request->getPathInfo();
         if ($qs = $request->getQueryString()) {
@@ -708,7 +708,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Checks whether the given (cached) response may be served as "stale" when a revalidation
      * is currently in progress.
      */
-    private function mayServeStaleWhileRevalidate(Response $entry): bool
+    private function mayServeStaleWhileRevalidate(Response $entry)
     {
         $timeout = $entry->headers->getCacheControlDirective('stale-while-revalidate');
 
@@ -722,7 +722,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Waits for the store to release a locked entry.
      */
-    private function waitForLock(Request $request): bool
+    private function waitForLock(Request $request)
     {
         $wait = 0;
         while ($this->store->isLocked($request) && $wait < 100) {

@@ -46,7 +46,7 @@ class FileLinkFormatter
         $this->urlFormat = $urlFormat;
     }
 
-    public function format($file, int $line)
+    public function format($file, $line)
     {
         if ($fmt = $this->getFileLinkFormat()) {
             for ($i = 1; isset($fmt[$i]); ++$i) {
@@ -65,7 +65,7 @@ class FileLinkFormatter
     /**
      * @internal
      */
-    public function __sleep(): array
+    public function __sleep()
     {
         $this->fileLinkFormat = $this->getFileLinkFormat();
 
@@ -75,7 +75,7 @@ class FileLinkFormatter
     /**
      * @internal
      */
-    public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString): ?string
+    public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString)
     {
         try {
             return $router->generate($routeName).$queryString;

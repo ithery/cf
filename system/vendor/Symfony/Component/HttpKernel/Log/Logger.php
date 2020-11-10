@@ -86,7 +86,7 @@ class Logger extends AbstractLogger
         }
     }
 
-    private function format($level, $message, array $context, bool $prefixDate = true): string
+    private function format($level, $message, array $context, bool $prefixDate = true)
     {
         if (false !== strpos($message, '{')) {
             $replacements = [];
