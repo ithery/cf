@@ -160,9 +160,7 @@ class CApp {
 
         //$this->renderer = new CApp_Renderer($this);
 
-        if (isset($_COOKIE['capp-profiler'])) {
-            new Profiler();
-        }
+
 
         $db = CDatabase::instance();
 

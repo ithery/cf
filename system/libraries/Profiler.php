@@ -1,5 +1,8 @@
 <?php
 
+cdbg::traceDump();
+die('Profiler is deprecated');
+
 defined('SYSPATH') OR die('No direct access allowed.');
 
 /**

@@ -35,4 +35,8 @@ CFConsole::addCommand([
     CQC_Console_Command_PhpUnitListCommand::class,
 ]);
 
+if (isset($_COOKIE['capp-profiler'])) {
+    CProfiler::enable();
+}
+
 
