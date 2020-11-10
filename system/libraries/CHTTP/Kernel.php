@@ -108,7 +108,7 @@ class CHTTP_Kernel {
     }
 
     public function invokeController(CHTTP_Request $request) {
-        CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_start');
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
         $reflectionClass = $this->getReflectionControllerClass();
         $reflectionMethod = null;
         $arguments = [];
