@@ -146,9 +146,6 @@ trait CApp_Trait_App_Renderer {
 
         $this->registerCoreModules();
 
-
-        CFBenchmark::start('CApp Render');
-
         CFEvent::run('CApp.beforeRender');
 
         if (crequest::is_ajax()) {
@@ -190,8 +187,6 @@ trait CApp_Trait_App_Renderer {
 
         $viewData = $this->getViewData();
         $v->set($viewData);
-
-        $result = CFBenchmark::stop('CApp Render');
 
 
         return $v->render();
