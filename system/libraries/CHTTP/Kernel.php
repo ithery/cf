@@ -5,10 +5,33 @@
  *
  * @author Hery
  */
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+
 class CHTTP_Kernel {
 
     public function __construct() {
         
+    }
+
+    /**
+     * Report the exception to the exception handler.
+     *
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function reportException(Exception $e) {
+        CException::exceptionHandler()->report($e);
+    }
+
+    /**
+     * Render the exception to a response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception  $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function renderException($request, Exception $e) {
+        return CException::exceptionHandler()->render($request, $e);
     }
 
     public function setupRouter() {
@@ -103,9 +126,6 @@ class CHTTP_Kernel {
         // Execute the controller method
         $response = $reflectionMethod->invokeArgs($reflectionClass->newInstance(), $arguments);
 
-        if (!$response instanceof CHTTP_Response) {
-            $response = CHTTP::createResponse($response);
-        }
 
         // Stop the controller execution benchmark
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
@@ -115,33 +135,55 @@ class CHTTP_Kernel {
 
     public function sendRequest($request) {
         $outputBuffer = '';
+
         $outputBufferLevel = ob_get_level();
+
         ob_start(function($output) use (&$outputBuffer) {
             $outputBuffer = $output;
         });
-        $response = $this->invokeController($request);
-        if (ob_get_level() >= $outputBufferLevel) {
-            while (ob_get_level() > $outputBufferLevel) {
-                // Flush 
-                ob_end_flush();
+
+        try {
+            $response = $this->invokeController($request);
+        } catch (Exception $e) {
+
+            throw $e;
+        } finally {
+
+            if (ob_get_level() >= $outputBufferLevel) {
+                while (ob_get_level() > $outputBufferLevel) {
+                    // Flush 
+                    ob_end_flush();
+                }
+                // Store the output buffer
+                ob_end_clean();
             }
-            // Store the C output buffer
-            ob_end_clean();
         }
         if ($response == null) {
             $response = $outputBuffer;
         }
-        
+
         if (!($response instanceof CHTTP_Response)) {
             $response = CHTTP::createResponse($response);
         }
-        
+
         return $response;
     }
 
     public function handle(CHTTP_Request $request) {
-        $this->setupRouter();
-        $response = $this->invokeController($request);
+        try {
+            $this->setupRouter();
+            $response = $this->sendRequest($request);
+        } catch (Exception $e) {
+            $this->reportException($e);
+
+            $response = $this->renderException($request, $e);
+            
+        } catch (Throwable $e) {
+            $this->reportException($e = new FatalThrowableError($e));
+
+            $response = $this->renderException($request, $e);
+        }
+        
         return $response;
     }
 

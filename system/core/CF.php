@@ -14,12 +14,8 @@ final class CF {
     public static $instance;
     // The multiple instance of the controller when callback when routing is failed or redirected
     public static $instances;
-    // Output buffering level
-    private static $buffer_level;
     // Will be set to TRUE when an exception is caught
     public static $has_error = FALSE;
-    // The final output that will displayed by C
-    public static $output = '';
     // The current user agent
     public static $user_agent;
     // The current locale
@@ -164,11 +160,6 @@ final class CF {
         define('E_DATABASE_ERROR', 44);
 
 
-        // Start output buffering
-        ob_start(array(__CLASS__, 'output_buffer'));
-
-        // Save buffering level
-        self::$buffer_level = ob_get_level();
 
         // Set autoloader
         spl_autoload_register(array('CF', 'autoLoad'));
@@ -269,6 +260,7 @@ final class CF {
     }
 
     public static function invoke($uri) {
+        
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
@@ -353,107 +345,6 @@ final class CF {
      *
      * @return  object  instance of controller
      */
-    public static function instance() {
-        $null = NULL;
-        if (defined('CFCLI')) {
-            CFConsole::execute();
-        }
-        if (self::$instance === NULL) {
-            CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
-
-            if (empty(CFRouter::$controller_path)) {
-                CF::show404();
-            }
-            // Include the Controller file
-            if (strlen(CFRouter::$controller_path) > 0) {
-                require_once CFRouter::$controller_path;
-            }
-
-            try {
-                // Start validation of the controller
-                $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
-                $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
-            } catch (ReflectionException $e) {
-                try {
-                    $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
-                    // Start validation of the controller
-                } catch (ReflectionException $e) {
-                    // Controller does not exist
-                    CFEvent::run('system.404');
-                    return $null;
-                }
-            }
-
-            if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
-                // Controller is not allowed to run in production
-                CFEvent::run('system.404');
-                return $null;
-            }
-
-            // Run system.pre_controller
-            CFEvent::run('system.pre_controller');
-
-            // Create a new controller instance
-            if (isset($class)) {
-                $controller = $class->newInstance();
-
-                if (!isset(self::$instances[CFRouter::$current_uri])) {
-                    self::$instances[CFRouter::$current_uri] = $controller;
-                }
-                self::$instance = $controller;
-            }
-
-            // Controller constructor has been executed
-            CFEvent::run('system.post_controller_constructor');
-
-            try {
-                // Load the controller method
-                $method = $class->getMethod(CFRouter::$method);
-
-                // Method exists
-                if (CFRouter::$method[0] === '_') {
-                    // Do not allow access to hidden methods
-                    CFEvent::run('system.404');
-                }
-
-                if ($method->isProtected() or $method->isPrivate()) {
-                    // Do not attempt to invoke protected methods
-                    throw new ReflectionException('protected controller method');
-                }
-
-                // Default arguments
-                $arguments = CFRouter::$arguments;
-            } catch (ReflectionException $e) {
-                // Use __call instead
-                $method = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $arguments = array(CFRouter::$method, CFRouter::$arguments);
-            }
-
-            // Stop the controller setup benchmark
-            CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_setup');
-
-            // Start the controller execution benchmark
-            CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_execution');
-
-
-            // Execute the controller method
-            $method->invokeArgs($controller, $arguments);
-
-
-
-            // Controller method has been executed
-            CFEvent::run('system.post_controller');
-
-            // Stop the controller execution benchmark
-            CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
-        }
-
-
-        return self::$instance;
-    }
-
     public static function getDir($directory = '', $domain = null) {
         $include_paths = CF::paths();
         foreach ($include_paths as $p) {
@@ -786,64 +677,6 @@ final class CF {
     }
 
     /**
-     * C output handler. Called during ob_clean, ob_flush, and their variants.
-     *
-     * @param   string  current output buffer
-     * @return  string
-     */
-    public static function output_buffer($output) {
-        // Could be flushing, so send headers first
-        if (!CFEvent::has_run('system.send_headers')) {
-            // Run the send_headers event
-            CFEvent::run('system.send_headers');
-        }
-        self::$output = $output;
-
-        // Set and return the final output
-        return self::$output;
-    }
-
-    /**
-     * Closes all open output buffers, either by flushing or cleaning, and stores the C
-     * output buffer for display during shutdown.
-     *
-     * @param   boolean  disable to clear buffers, rather than flushing
-     * @return  void
-     */
-    public static function closeBuffers($flush = TRUE) {
-        if (ob_get_level() >= self::$buffer_level) {
-            // Set the close function
-            $close = ($flush === TRUE) ? 'ob_end_flush' : 'ob_end_clean';
-
-            while (ob_get_level() > self::$buffer_level) {
-                // Flush or clean the buffer
-                $close();
-            }
-
-            // Store the C output buffer
-            ob_end_clean();
-        }
-    }
-
-    /**
-     * Triggers the shutdown of C by closing the output buffer, runs the system.display event.
-     *
-     * @return  void
-     */
-    public static function shutdown() {
-        // Close output buffers
-
-        self::closeBuffers(TRUE);
-
-
-        // Run the output event
-        CFEvent::run('system.display', self::$output);
-
-        // Render the final output
-        self::render(self::$output);
-    }
-
-    /**
      * Inserts global C variables into the generated output and prints it.
      *
      * @param   string  final output that will displayed
@@ -1079,10 +912,13 @@ final class CF {
                 }
             }
 
+            /*
             // Close all output buffers except for C
             while (ob_get_level() > self::$buffer_level) {
                 ob_end_clean();
             }
+             * 
+             */
 
             // Test if display_errors is on
             if (self::config('app.error_disabled') !== TRUE) {

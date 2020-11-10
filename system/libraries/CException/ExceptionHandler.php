@@ -2,6 +2,18 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
+use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Whoops\Handler\HandlerInterface;
+use Whoops\Run as Whoops;
+
 /**
  * @author Hery Kurniawan
  * @since Sep 8, 2019, 5:16:49 AM
@@ -55,8 +67,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  CContainer_Container  $container
      * @return void
      */
-    public function __construct(CContainer_Container $container) {
-        $this->container = $container;
+    public function __construct() {
+        $this->container = CContainer_Container::getInstance();
     }
 
     /**
@@ -74,8 +86,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         if (is_callable($reportCallable = [$e, 'report'])) {
             return $this->container->call($reportCallable);
         }
-        
-        CLogger::instance()->add(CLogger::ERROR,$e->getMessage(),null,array_merge($this->context(), ['exception' => $e]));
+
+        CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, array_merge($this->context(), ['exception' => $e]));
 //        try {
 //            CLogger::instance()->add($reportCallable, $message)
 //            $logger = $this->container->make(LoggerInterface::class);
@@ -139,6 +151,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         } elseif ($e instanceof Responsable) {
             return $e->toResponse($request);
         }
+
         $e = $this->prepareException($e);
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
@@ -147,6 +160,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         } elseif ($e instanceof ValidationException) {
             return $this->convertValidationExceptionToResponse($e, $request);
         }
+
         return $request->expectsJson() ? $this->prepareJsonResponse($request, $e) : $this->prepareResponse($request, $e);
     }
 
@@ -229,15 +243,19 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function prepareResponse($request, Exception $e) {
-        if (!$this->isHttpException($e) && config('app.debug')) {
+
+        if (!$this->isHttpException($e) && $this->isDebug()) {
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
         if (!$this->isHttpException($e)) {
             $e = new HttpException(500, $e->getMessage());
         }
-        return $this->toIlluminateResponse(
-                        $this->renderHttpException($e), $e
+
+        $response = $this->toIlluminateResponse(
+                $this->renderHttpException($e), $e
         );
+
+        return $response;
     }
 
     /**
@@ -247,9 +265,12 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function convertExceptionToResponse(Exception $e) {
-        return SymfonyResponse::create(
+
+        $response = SymfonyResponse::create(
                         $this->renderExceptionContent($e), $this->isHttpException($e) ? $e->getStatusCode() : 500, $this->isHttpException($e) ? $e->getHeaders() : []
         );
+
+        return $response;
     }
 
     /**
@@ -260,9 +281,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function renderExceptionContent(Exception $e) {
         try {
-            return config('app.debug') && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, config('app.debug'));
+            return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
+            //return $this->renderExceptionWithSymfony($e, $this->isDebug());
         } catch (Exception $e) {
-            return $this->renderExceptionWithSymfony($e, config('app.debug'));
+            return $this->renderExceptionWithSymfony($e, $this->isDebug());
         }
     }
 
@@ -273,7 +295,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return string
      */
     protected function renderExceptionWithWhoops(Exception $e) {
-        return tap(new Whoops, function ($whoops) {
+        return c::tap(new Whoops, function ($whoops) {
                     $whoops->appendHandler($this->whoopsHandler());
                     $whoops->writeToOutput(false);
                     $whoops->allowQuit(false);
@@ -287,7 +309,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function whoopsHandler() {
         try {
-            return app(HandlerInterface::class);
+            return new \Whoops\Handler\PrettyPageHandler();
         } catch (BindingResolutionException $e) {
             return (new WhoopsHandler)->forDebug();
         }
@@ -301,9 +323,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return string
      */
     protected function renderExceptionWithSymfony(Exception $e, $debug) {
-        return (new SymfonyExceptionHandler($debug))->getHtml(
-                        FlattenException::create($e)
-        );
+        $renderer = new HtmlErrorRenderer($debug);
+
+
+        return $renderer->render($e)->getAsString();
     }
 
     /**
@@ -314,12 +337,19 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function renderHttpException(HttpExceptionInterface $e) {
         $this->registerErrorViewPaths();
-        if (view()->exists($view = "errors::{$e->getStatusCode()}")) {
-            return response()->view($view, [
-                        'errors' => new ViewErrorBag,
-                        'exception' => $e,
-                            ], $e->getStatusCode(), $e->getHeaders());
+        $viewName = 'errors/exception';
+        if (CView::exists('errors/http/' . $e->getStatusCode())) {
+            $viewName = 'errors/http/' . $e->getStatusCode();
         }
+        /*
+          if (view()->exists($view = "errors::{$e->getStatusCode()}")) {
+          return response()->view($view, [
+          'errors' => new ViewErrorBag,
+          'exception' => $e,
+          ], $e->getStatusCode(), $e->getHeaders());
+          }
+         * 
+         */
         return $this->convertExceptionToResponse($e);
     }
 
@@ -329,7 +359,12 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return void
      */
     protected function registerErrorViewPaths() {
-        $paths = collect(config('view.paths'));
+        return c::collect(CF::paths())->map(function($path) {
+                    return $path . 'views';
+                });
+
+
+        $paths = c::collect(CF::paths());
         View::replaceNamespace('errors', $paths->map(function ($path) {
                     return "{$path}/errors";
                 })->push(__DIR__ . '/views')->all());
@@ -343,15 +378,17 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \Illuminate\Http\Response
      */
     protected function toIlluminateResponse($response, Exception $e) {
+
         if ($response instanceof SymfonyRedirectResponse) {
             $response = new RedirectResponse(
                     $response->getTargetUrl(), $response->getStatusCode(), $response->headers->all()
             );
         } else {
-            $response = new Response(
+            $response = new CHTTP_Response(
                     $response->getContent(), $response->getStatusCode(), $response->headers->all()
             );
         }
+
         return $response->withException($e);
     }
 
@@ -375,17 +412,30 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return array
      */
     protected function convertExceptionToArray(Exception $e) {
-        return config('app.debug') ? [
-            'message' => $e->getMessage(),
-            'exception' => get_class($e),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => collect($e->getTrace())->map(function ($trace) {
-                        return Arr::except($trace, ['args']);
-                    })->all(),
-                ] : [
+        $result = [
             'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
         ];
+        if ($this->isDebug()) {
+            $trace = c::collect($e->getTrace())->map(function ($trace) {
+                        return carr::except($trace, ['args']);
+                    })->all();
+            $result = [
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $trace,
+            ];
+        }
+        return $result;
+    }
+
+    protected function isDebug() {
+        $isDebug = ccfg::get('debug');
+        if ($isDebug === null) {
+            $isDebug = CApp_Base::isDevelopment() ? true : false;
+        }
+        return $isDebug;
     }
 
     /**
