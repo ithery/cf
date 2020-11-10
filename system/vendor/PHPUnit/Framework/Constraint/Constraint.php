@@ -11,7 +11,7 @@ namespace PHPUnit\Framework\Constraint;
 
 use function sprintf;
 use Countable;
-use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Exporter\Exporter;

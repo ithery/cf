@@ -9,11 +9,11 @@
  */
 namespace PHPUnit\Runner\Hook;
 
-use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Exception\AssertionFailedError;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Framework\Warning;
+use PHPUnit\Framework\Exception\Warning;
 use PHPUnit\Util\Test as TestUtil;
 use Throwable;
 

@@ -10,6 +10,11 @@
 namespace PHPUnit\Framework;
 
 use Throwable;
+use PHPUnit\Framework\Exception\Warning;
+use PHPUnit\Framework\Exception\AssertionFailedError;
+
+
+
 
 /**
  * @deprecated Use the `TestHook` interfaces instead

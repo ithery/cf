@@ -17,6 +17,9 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
     protected $haveSearch;
     protected $searchPlaceholder;
     protected $radius;
+    protected $draggable;
+    protected $scrollwheel;
+    protected $markerDraggable;
     protected $markerInCenter;
     protected $geoCodingApiKey;
 
@@ -36,6 +39,9 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->searchPlaceholder = 'Search Location';
 
         $this->radius = 300;
+        $this->draggable = true;
+        $this->scrollwheel = true;
+        $this->markerDraggable = true;
         $this->markerInCenter = true;
 
         $this->geoCodingApiKey = CF::config('vendor.google.geocoding_api_key');
@@ -50,6 +56,21 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
 
     public function radius($val) {
         $this->radius = $val;
+        return $this;
+    }
+
+    public function setDraggable($bool = true) {
+        $this->draggable = $bool;
+        return $this;
+    }
+
+    public function setScrollwheel($bool = true) {
+        $this->scrollwheel = $bool;
+        return $this;
+    }
+
+    public function markerDraggable($bool = true) {
+        $this->markerDraggable = $bool;
         return $this;
     }
 
@@ -68,6 +89,9 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         if ($this->haveSearch) {
             $this->searchContainer = $this->wrapperContainer->addDiv()->addClass('mb-3');
             $this->searchControl = $this->searchContainer->addControl($this->id . '-search', 'text')->setPlaceholder($this->searchPlaceholder);
+            if (! $this->markerDraggable) {
+                $this->searchControl->setReadonly();
+            }
         }
 
 
@@ -101,16 +125,15 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
                 enableAutocomplete: true,
                 enableAutocompleteBlur: true,
                 addressFormat: 'street_address',
-                draggable: true,
-                scrollwheel: true,
+                draggable: " . json_encode($this->draggable) . ",
+                scrollwheel: " . json_encode($this->scrollwheel) . ",
                 radius: " . $this->radius . ",
                 onchanged: function (currentLocation, radius, isMarkerDropped) {
                     $('#" . $this->id . "-lat').val(currentLocation.latitude);
                     $('#" . $this->id . "-lng').val(currentLocation.longitude);
                 },
-                
-                markerInCenter: " . $this->markerInCenter . ",
-                scrollwheel: true,     
+                markerDraggable: " . json_encode($this->markerDraggable) . ",
+                markerInCenter: " . json_encode($this->markerInCenter) . ",
             });
         ";
         
