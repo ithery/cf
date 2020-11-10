@@ -5,6 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CApp {
 
     use CTrait_Compat_App,
+        CTrait_Macroable,
         CApp_Trait_App_Breadcrumb,
         CApp_Trait_App_Variables,
         CApp_Trait_App_Renderer,
@@ -31,6 +32,11 @@ class CApp {
     private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
     protected $renderer;
+
+    /**
+     *
+     * @var CApp_Element
+     */
     protected $element;
 
     public function setViewCallback(callable $viewCallback) {
@@ -577,6 +583,10 @@ class CApp {
         if (method_exists($this->element, $method)) {
             return call_user_func_array([$this->element, $method], $parameters);
         }
+        if($this->element->hasMacro($method)) {
+            return call_user_func_array([$this->element, $method], $parameters);
+        }
+        
 
         throw new Exception('undefined method on CApp: ' . $method);
     }
