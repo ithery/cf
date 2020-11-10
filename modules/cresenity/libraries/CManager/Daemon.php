@@ -65,6 +65,12 @@ final class CManager_Daemon {
         return count($this->getGroupsKey()) > 0;
     }
 
+    /**
+     * 
+     * @param string $className
+     * @param string $command
+     * @return \CDaemon
+     */
     protected function getDaemon($className, $command = 'status') {
         $config = array();
         $config['serviceClass'] = $className;
