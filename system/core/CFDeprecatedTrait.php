@@ -7,6 +7,8 @@
  */
 trait CFDeprecatedTrait {
 
+    private static $write_cache;
+
     public static function doDeprecated() {
         if (class_exists('cdbg')) {
             cdbg::deprecated();
@@ -228,6 +230,35 @@ trait CFDeprecatedTrait {
      */
     public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
         return CF::exceptionHandler($exception, $message, $file, $line);
+    }
+
+    /**
+     * Closes all open output buffers, either by flushing or cleaning, and stores the C
+     * output buffer for display during shutdown.
+     *
+     * @param   boolean  disable to clear buffers, rather than flushing
+     * @return  void
+     * @deprecated
+     */
+    public static function close_buffers($flush = TRUE) {
+        return static::closeBuffers($flush);
+    }
+
+    /**
+     * Clears a config group from the cached configuration.
+     *
+     * @param   string  config group
+     * @return  void
+     * @deprecated
+     */
+    public static function config_clear($group) {
+        // Remove the group from config
+        unset(self::$configuration[$group], self::$internal_cache['configuration'][$group]);
+
+        if (!isset(self::$write_cache['configuration'])) {
+            // Cache has changed
+            self::$write_cache['configuration'] = TRUE;
+        }
     }
 
 }

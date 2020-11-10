@@ -44,7 +44,6 @@ final class CF {
     public static $global_xss_filtering = TRUE;
     // Internal caches and write status
     private static $internal_cache = array();
-    private static $write_cache;
     private static $data;
     private static $sharedAppCode = array();
     private static $translator;
@@ -354,7 +353,7 @@ final class CF {
      *
      * @return  object  instance of controller
      */
-    public static function & instance() {
+    public static function instance() {
         $null = NULL;
         if (defined('CFCLI')) {
             CFConsole::execute();
@@ -699,22 +698,6 @@ final class CF {
     }
 
     /**
-     * Clears a config group from the cached configuration.
-     *
-     * @param   string  config group
-     * @return  void
-     */
-    public static function config_clear($group) {
-        // Remove the group from config
-        unset(self::$configuration[$group], self::$internal_cache['configuration'][$group]);
-
-        if (!isset(self::$write_cache['configuration'])) {
-            // Cache has changed
-            self::$write_cache['configuration'] = TRUE;
-        }
-    }
-
-    /**
      * Add a new message to the log.
      *
      * @param   string  type of message
@@ -814,7 +797,6 @@ final class CF {
             // Run the send_headers event
             CFEvent::run('system.send_headers');
         }
-
         self::$output = $output;
 
         // Set and return the final output
@@ -828,7 +810,7 @@ final class CF {
      * @param   boolean  disable to clear buffers, rather than flushing
      * @return  void
      */
-    public static function close_buffers($flush = TRUE) {
+    public static function closeBuffers($flush = TRUE) {
         if (ob_get_level() >= self::$buffer_level) {
             // Set the close function
             $close = ($flush === TRUE) ? 'ob_end_flush' : 'ob_end_clean';
@@ -851,8 +833,8 @@ final class CF {
     public static function shutdown() {
         // Close output buffers
 
-        self::close_buffers(TRUE);
-
+        self::closeBuffers(TRUE);
+        
 
         // Run the output event
         CFEvent::run('system.display', self::$output);
