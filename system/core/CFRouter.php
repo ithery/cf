@@ -36,7 +36,7 @@ class CFRouter {
 
         if (self::$controller === NULL) {
             // No controller was found, so no page can be rendered
-            CFEvent::run('system.404');
+            CF::show404();
         }
     }
 

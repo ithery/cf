@@ -43,7 +43,7 @@ abstract class CController {
      */
     public function __call($method, $args) {
         // Default to showing a 404 page
-        CFEvent::run('system.404');
+        CF::show404();
     }
 
     public static function controllerUrl() {

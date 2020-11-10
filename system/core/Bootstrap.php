@@ -35,6 +35,7 @@ require SYSPATH . 'core/CFEvent' . EXT;
 require SYSPATH . 'core/CFData' . EXT;
 require SYSPATH . 'core/CFRouter' . EXT;
 require SYSPATH . 'core/CFConsole' . EXT;
+require SYSPATH . 'core/CFHTTP' . EXT;
 require SYSPATH . 'core/CFDeprecatedTrait' . EXT;
 require SYSPATH . 'core/CF' . EXT;
 
@@ -46,11 +47,19 @@ CF::setup();
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_cf_loading');
 
 // Start system_initialization
-CFBenchmark::start(SYSTEM_BENCHMARK . '_system_initialization');
-
+//CFBenchmark::start(SYSTEM_BENCHMARK . '_system_initialization');
 // Prepare the system
 CFEvent::run('system.ready');
 
+if (defined('CFCLI')) {
+    CFConsole::execute();
+} else {
+    CFHTTP::execute();
+}
+
+// stop total_execution
+CFBenchmark::stop(SYSTEM_BENCHMARK . '_total_execution');
+/*
 // Determine routing
 CFRouter::findUri();
 CFRouter::setup();
@@ -66,4 +75,4 @@ CFEvent::run('system.execute');
 // Clean up and exit
 CF::shutdown();
 CFEvent::run('system.shutdown');
-
+*/

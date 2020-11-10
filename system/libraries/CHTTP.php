@@ -31,6 +31,44 @@ class CHTTP {
      * @return CHTTP_Response
      */
     public static function createResponse($content = '', $status = 200, array $headers = []) {
+        if (CProfiler::isEnabled()) {
+            $profilerHtml = CProfiler::render();
+            if (stripos($content, '</body>') !== FALSE) {
+                // Closing body tag was found, insert the profiler data before it
+                $content = str_ireplace('</body>', $profilerHtml . '</body>', $content);
+            } else {
+                // Append the profiler data to the output
+                $content .= $profilerHtml;
+            }
+        }
+
+        if (CF::config('core.render_stats') === TRUE) {
+            // Fetch memory usage in MB
+            $memory = function_exists('memory_get_usage') ? (memory_get_usage() / 1024 / 1024) : 0;
+
+            // Fetch benchmark for page execution time
+            $benchmark = CFBenchmark::get(SYSTEM_BENCHMARK . '_total_execution');
+
+            // Replace the global template variables
+            $content = str_replace(
+                    array
+                (
+                '{cf_version}',
+                '{cf_codename}',
+                '{execution_time}',
+                '{memory_usage}',
+                '{included_files}',
+                    ), array
+                (
+                CF_VERSION,
+                CF_CODENAME,
+                $benchmark['time'],
+                number_format($memory, 2) . 'MB',
+                count(get_included_files()),
+                    ), $content
+            );
+        }
+
         return new CHTTP_Response($content, $status, $headers);
     }
 

@@ -5,414 +5,148 @@
  *
  * @author Hery
  */
-class CHTTP_Kernel implements CHTTP_KernelInterface {
+class CHTTP_Kernel {
 
-    /**
-     * The application implementation.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    public function __construct() {
+        
+    }
 
-    /**
-     * The router instance.
-     *
-     * @var \Illuminate\Routing\Router
-     */
-    protected $router;
-
-    /**
-     * The bootstrap classes for the application.
-     *
-     * @var string[]
-     */
-    protected $bootstrappers = [
-        \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
-        \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
-        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
-        \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
-        \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
-        \Illuminate\Foundation\Bootstrap\BootProviders::class,
-    ];
-
-    /**
-     * The application's middleware stack.
-     *
-     * @var array
-     */
-    protected $middleware = [];
-
-    /**
-     * The application's route middleware groups.
-     *
-     * @var array
-     */
-    protected $middlewareGroups = [];
-
-    /**
-     * The application's route middleware.
-     *
-     * @var array
-     */
-    protected $routeMiddleware = [];
-
-    /**
-     * The priority-sorted list of middleware.
-     *
-     * Forces non-global middleware to always be in the given order.
-     *
-     * @var string[]
-     */
-    protected $middlewarePriority = [
-        \Illuminate\Cookie\Middleware\EncryptCookies::class,
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
-        \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        \Illuminate\Session\Middleware\AuthenticateSession::class,
-        \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        \Illuminate\Auth\Middleware\Authorize::class,
-    ];
-
-    /**
-     * Create a new HTTP kernel instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Routing\Router  $router
-     * @return void
-     */
-    public function __construct(CApplication $app, CRouter $router) {
-        $this->app = $app;
-        $this->router = $router;
-
-        $this->syncMiddlewareToRouter();
+    public function setupRouter() {
+        CFRouter::findUri();
+        CFRouter::setup();
     }
 
     /**
-     * Handle an incoming HTTP request.
-     *
-     * @param  CHTTP_Request  $request
-     * @return CHTTP_Response
+     * 
+     * @return ReflectionClass
+     * @throws ReflectionException
      */
-    public function handle($request) {
-        try {
-            $request->enableHttpMethodParameterOverride();
+    public function getReflectionControllerClass() {
 
-            $response = $this->sendRequestThroughRouter($request);
-        } catch (Throwable $e) {
-            $this->reportException($e);
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
+        $reflectionClass = null;
+        // Include the Controller file
+        if (strlen(CFRouter::$controller_path) > 0) {
+            require_once CFRouter::$controller_path;
 
-            $response = $this->renderException($request, $e);
+
+            try {
+                // Start validation of the controller
+                $className = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
+                $reflectionClass = new ReflectionClass('Controller_' . $className . ucfirst(CFRouter::$controller));
+            } catch (ReflectionException $e) {
+                try {
+                    $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
+                    // Start validation of the controller
+                } catch (ReflectionException $e) {
+                    //something went wrong
+                    return null;
+                }
+            }
+
+            if (isset($reflectionClass) && ($reflectionClass->isAbstract() OR ( IN_PRODUCTION AND $reflectionClass->getConstant('ALLOW_PRODUCTION') == FALSE))) {
+                // Controller is not allowed to run in production
+                return null;
+            }
         }
 
-        $this->app['events']->dispatch(
-                new RequestHandled($request, $response)
-        );
+
+        return $reflectionClass;
+    }
+
+    public static function getReflectionControllerMethodAndArguments(ReflectionClass $reflectionClass) {
+        $method = null;
+        $arguments = [];
+        try {
+            // Load the controller method
+            $method = $reflectionClass->getMethod(CFRouter::$method);
+
+            // Method exists
+            if (CFRouter::$method[0] === '_') {
+                return null;
+            }
+
+            if ($method->isProtected() or $method->isPrivate()) {
+                // Do not attempt to invoke protected methods
+                throw new ReflectionException('protected controller method');
+            }
+
+            // Default arguments
+            $arguments = CFRouter::$arguments;
+        } catch (ReflectionException $e) {
+            // Use __call instead
+            $method = $reflectionClass->getMethod('__call');
+
+            // Use arguments in __call format
+            $arguments = array(CFRouter::$method, CFRouter::$arguments);
+        }
+
+        return [$method, $arguments];
+    }
+
+    public function invokeController(CHTTP_Request $request) {
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_start');
+        $reflectionClass = $this->getReflectionControllerClass();
+        $reflectionMethod = null;
+        $arguments = [];
+        if ($reflectionClass) {
+            //class is found then we will try to find the method
+            list($reflectionMethod, $arguments) = $this->getReflectionControllerMethodAndArguments($reflectionClass);
+        }
+        // Stop the controller setup benchmark
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_setup');
+
+        // Start the controller execution benchmark
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_execution');
+
+
+        // Execute the controller method
+        $response = $reflectionMethod->invokeArgs($reflectionClass->newInstance(), $arguments);
+
+        if (!$response instanceof CHTTP_Response) {
+            $response = CHTTP::createResponse($response);
+        }
+
+        // Stop the controller execution benchmark
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
 
         return $response;
     }
 
-    /**
-     * Send the given request through the middleware / router.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    protected function sendRequestThroughRouter($request) {
-        $this->app->instance('request', $request);
-
-        Facade::clearResolvedInstance('request');
-
-        $this->bootstrap();
-
-        return (new Pipeline($this->app))
-                        ->send($request)
-                        ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
-                        ->then($this->dispatchToRouter());
-    }
-
-    /**
-     * Bootstrap the application for HTTP requests.
-     *
-     * @return void
-     */
-    public function bootstrap() {
-        if (!$this->app->hasBeenBootstrapped()) {
-            $this->app->bootstrapWith($this->bootstrappers());
+    public function sendRequest($request) {
+        $outputBuffer = '';
+        $outputBufferLevel = ob_get_level();
+        ob_start(function($output) use (&$outputBuffer) {
+            $outputBuffer = $output;
+        });
+        $response = $this->invokeController($request);
+        if (ob_get_level() >= $outputBufferLevel) {
+            while (ob_get_level() > $outputBufferLevel) {
+                // Flush 
+                ob_end_flush();
+            }
+            // Store the C output buffer
+            ob_end_clean();
         }
+        if ($response == null) {
+            $response = $outputBuffer;
+        }
+        
+        if (!($response instanceof CHTTP_Response)) {
+            $response = CHTTP::createResponse($response);
+        }
+        
+        return $response;
     }
 
-    /**
-     * Get the route dispatcher callback.
-     *
-     * @return \Closure
-     */
-    protected function dispatchToRouter() {
-        return function ($request) {
-            $this->app->instance('request', $request);
-
-            return $this->router->dispatch($request);
-        };
+    public function handle(CHTTP_Request $request) {
+        $this->setupRouter();
+        $response = $this->invokeController($request);
+        return $response;
     }
 
-    /**
-     * Call the terminate method on any terminable middleware.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return void
-     */
     public function terminate($request, $response) {
-        $this->terminateMiddleware($request, $response);
-
-        $this->app->terminate();
-    }
-
-    /**
-     * Call the terminate method on any terminable middleware.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return void
-     */
-    protected function terminateMiddleware($request, $response) {
-        $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_merge(
-                        $this->gatherRouteMiddleware($request), $this->middleware
-        );
-
-        foreach ($middlewares as $middleware) {
-            if (!is_string($middleware)) {
-                continue;
-            }
-
-            list($name) = $this->parseMiddleware($middleware);
-
-            $instance = $this->app->make($name);
-
-            if (method_exists($instance, 'terminate')) {
-                $instance->terminate($request, $response);
-            }
-        }
-    }
-
-    /**
-     * Gather the route middleware for the given request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    protected function gatherRouteMiddleware($request) {
-        if ($route = $request->route()) {
-            return $this->router->gatherRouteMiddleware($route);
-        }
-
-        return [];
-    }
-
-    /**
-     * Parse a middleware string to get the name and parameters.
-     *
-     * @param  string  $middleware
-     * @return array
-     */
-    protected function parseMiddleware($middleware) {
-        list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
-
-        if (is_string($parameters)) {
-            $parameters = explode(',', $parameters);
-        }
-
-        return [$name, $parameters];
-    }
-
-    /**
-     * Determine if the kernel has a given middleware.
-     *
-     * @param  string  $middleware
-     * @return bool
-     */
-    public function hasMiddleware($middleware) {
-        return in_array($middleware, $this->middleware);
-    }
-
-    /**
-     * Add a new middleware to beginning of the stack if it does not already exist.
-     *
-     * @param  string  $middleware
-     * @return $this
-     */
-    public function prependMiddleware($middleware) {
-        if (array_search($middleware, $this->middleware) === false) {
-            array_unshift($this->middleware, $middleware);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add a new middleware to end of the stack if it does not already exist.
-     *
-     * @param  string  $middleware
-     * @return $this
-     */
-    public function pushMiddleware($middleware) {
-        if (array_search($middleware, $this->middleware) === false) {
-            $this->middleware[] = $middleware;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Prepend the given middleware to the given middleware group.
-     *
-     * @param  string  $group
-     * @param  string  $middleware
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function prependMiddlewareToGroup($group, $middleware) {
-        if (!isset($this->middlewareGroups[$group])) {
-            throw new InvalidArgumentException("The [{$group}] middleware group has not been defined.");
-        }
-
-        if (array_search($middleware, $this->middlewareGroups[$group]) === false) {
-            array_unshift($this->middlewareGroups[$group], $middleware);
-        }
-
-        $this->syncMiddlewareToRouter();
-
-        return $this;
-    }
-
-    /**
-     * Append the given middleware to the given middleware group.
-     *
-     * @param  string  $group
-     * @param  string  $middleware
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function appendMiddlewareToGroup($group, $middleware) {
-        if (!isset($this->middlewareGroups[$group])) {
-            throw new InvalidArgumentException("The [{$group}] middleware group has not been defined.");
-        }
-
-        if (array_search($middleware, $this->middlewareGroups[$group]) === false) {
-            $this->middlewareGroups[$group][] = $middleware;
-        }
-
-        $this->syncMiddlewareToRouter();
-
-        return $this;
-    }
-
-    /**
-     * Prepend the given middleware to the middleware priority list.
-     *
-     * @param  string  $middleware
-     * @return $this
-     */
-    public function prependToMiddlewarePriority($middleware) {
-        if (!in_array($middleware, $this->middlewarePriority)) {
-            array_unshift($this->middlewarePriority, $middleware);
-        }
-
-        $this->syncMiddlewareToRouter();
-
-        return $this;
-    }
-
-    /**
-     * Append the given middleware to the middleware priority list.
-     *
-     * @param  string  $middleware
-     * @return $this
-     */
-    public function appendToMiddlewarePriority($middleware) {
-        if (!in_array($middleware, $this->middlewarePriority)) {
-            $this->middlewarePriority[] = $middleware;
-        }
-
-        $this->syncMiddlewareToRouter();
-
-        return $this;
-    }
-
-    /**
-     * Sync the current state of the middleware to the router.
-     *
-     * @return void
-     */
-    protected function syncMiddlewareToRouter() {
-        $this->router->middlewarePriority = $this->middlewarePriority;
-
-        foreach ($this->middlewareGroups as $key => $middleware) {
-            $this->router->middlewareGroup($key, $middleware);
-        }
-
-        foreach ($this->routeMiddleware as $key => $middleware) {
-            $this->router->aliasMiddleware($key, $middleware);
-        }
-    }
-
-    /**
-     * Get the bootstrap classes for the application.
-     *
-     * @return array
-     */
-    protected function bootstrappers() {
-        return $this->bootstrappers;
-    }
-
-    /**
-     * Report the exception to the exception handler.
-     *
-     * @param  \Throwable  $e
-     * @return void
-     */
-    protected function reportException(Throwable $e) {
-        $this->app[CException_ExceptionHandler::class]->report($e);
-    }
-
-    /**
-     * Render the exception to a response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function renderException($request, Throwable $e) {
-        return $this->app[CException_ExceptionHandler::class]->render($request, $e);
-    }
-
-    /**
-     * Get the application's route middleware groups.
-     *
-     * @return array
-     */
-    public function getMiddlewareGroups() {
-        return $this->middlewareGroups;
-    }
-
-    /**
-     * Get the application's route middleware.
-     *
-     * @return array
-     */
-    public function getRouteMiddleware() {
-        return $this->routeMiddleware;
-    }
-
-    /**
-     * Get the Laravel application instance.
-     *
-     * @return \Illuminate\Contracts\Foundation\Application
-     */
-    public function getApplication() {
-        return $this->app;
+        
     }
 
 }

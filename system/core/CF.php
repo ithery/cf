@@ -241,7 +241,7 @@ final class CF {
      * load all bootstrap files
      */
     private static function loadBootstrapFiles() {
-        CFBenchmark::start('system.cf.bootstrap');
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_bootstrap');
 
 
         //try to locate bootstrap files for modules 
@@ -265,7 +265,7 @@ final class CF {
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
-        CFBenchmark::stop('system.cf.bootstrap');
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_bootstrap');
     }
 
     public static function invoke($uri) {
@@ -834,7 +834,7 @@ final class CF {
         // Close output buffers
 
         self::closeBuffers(TRUE);
-        
+
 
         // Run the output event
         CFEvent::run('system.display', self::$output);
@@ -939,6 +939,7 @@ final class CF {
         if (CFRouter::$current_uri == 'favicon.ico') {
             return false;
         }
+
 
 
         if (isset($_GET['debug_404'])) {

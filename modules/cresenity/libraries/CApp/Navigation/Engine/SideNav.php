@@ -33,9 +33,6 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             $icon = carr::get($d, 'icon');
             $class = carr::get($d, 'class');
 
-
-
-
             $childHtml = "";
 
             if (isset($d["subnav"]) && is_array($d["subnav"])) {
