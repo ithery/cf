@@ -59,6 +59,30 @@ final class CF {
      */
     public static $config;
 
+    /**
+     * Check given domain exists or not
+     * 
+     * @param string $domain
+     * @return bool
+     */
+    public static function domainExists($domain) {
+        return CFData::domain($domain) !== null;
+    }
+
+    /**
+     * 
+     * @param type $domain
+     * @param array $domainData
+     * @return bool
+     */
+    public static function createDomain($domain, array $domainData) {
+        if (!static::domainExists($domain)) {
+            CFData::set($domain, $domainData, 'domain');
+            return true;
+        }
+        return false;
+    }
+
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
         $result = array();
@@ -244,8 +268,7 @@ final class CF {
         }
         CFBenchmark::stop('system.cf.bootstrap');
     }
-    
-    
+
     public static function invoke($uri) {
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
@@ -346,7 +369,7 @@ final class CF {
             if (strlen(CFRouter::$controller_path) > 0) {
                 require_once CFRouter::$controller_path;
             }
-            
+
             try {
                 // Start validation of the controller
                 $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
@@ -827,7 +850,7 @@ final class CF {
      */
     public static function shutdown() {
         // Close output buffers
-        
+
         self::close_buffers(TRUE);
 
 
@@ -855,12 +878,12 @@ final class CF {
             // Replace the global template variables
             $output = str_replace(
                     array
-                        (
-                        '{cf_version}',
-                        '{cf_codename}',
-                        '{execution_time}',
-                        '{memory_usage}',
-                        '{included_files}',
+                (
+                '{cf_version}',
+                '{cf_codename}',
+                '{execution_time}',
+                '{memory_usage}',
+                '{included_files}',
                     ), array
                 (
                 CF_VERSION,
@@ -871,13 +894,15 @@ final class CF {
                     ), $output
             );
         }
-        
-        
-        /*
-        $response = CHTTP::createResponse($output);
-        $response->send();
 
-        */
+
+
+
+        /*
+          $response = CHTTP::createResponse($output);
+          $response->send();
+         */
+
         if ($level = self::config('core.output_compression') AND ini_get('output_handler') !== 'ob_gzhandler' AND (int) ini_get('zlib.output_compression') === 0) {
             if ($level < 1 OR $level > 9) {
                 // Normalize the level to be an integer between 1 and 9. This
@@ -932,8 +957,8 @@ final class CF {
         if (CFRouter::$current_uri == 'favicon.ico') {
             return false;
         }
-        
-        
+
+
         if (isset($_GET['debug_404'])) {
             try {
                 throw new Exception('404');
@@ -1060,7 +1085,7 @@ final class CF {
                     header('HTTP/1.1 500 Internal Server Error');
                 }
             } else {
-                if (method_exists($exception, 'send_headers') AND!headers_sent()) {
+                if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
                     // Send the headers if they have not already been sent
                     $exception->send_headers();
                 } else {
@@ -1526,7 +1551,7 @@ final class CF {
             $key = array_shift($keys);
 
             if (isset($array[$key])) {
-                if (is_array($array[$key]) AND!empty($keys)) {
+                if (is_array($array[$key]) AND ! empty($keys)) {
                     // Dig down to prepare the next loop
                     $array = $array[$key];
                 } else {

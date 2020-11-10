@@ -12,6 +12,9 @@ final class CFData {
     public static function domain($domain) {
         return CFData::get($domain, 'domain');
     }
+    
+    
+    
 
     public static function get($dataName, $folder = "") {
         $file = self::path();

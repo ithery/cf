@@ -9,6 +9,32 @@
 class CFConsole {
 
     private static $commands = [];
+    private static $defaultCommands = [
+        CConsole_Command_Domain_DomainSwitchCommand::class,
+        CConsole_Command_Domain_DomainCreateCommand::class,
+        CConsole_Command_Domain_DomainListCommand::class,
+        CConsole_Command_Domain_DomainDeleteCommand::class,
+        CConsole_Command_StatusCommand::class,
+    ];
+
+    public static function execute() {
+
+        $kernel = new CConsole_Kernel();
+
+        $commands = array_merge(static::$defaultCommands, static::$commands);
+        CConsole_Application::starting(function ($cfCli) use ($commands) {
+            $cfCli->resolveCommands($commands);
+        });
+
+        $status = $kernel->handle(
+                $input = new Symfony\Component\Console\Input\ArgvInput, new Symfony\Component\Console\Output\ConsoleOutput
+        );
+
+        $kernel->terminate($input, $status);
+
+
+        exit($status);
+    }
 
     public static function addCommand($classArray) {
         $classArray = carr::wrap($classArray);
@@ -19,29 +45,6 @@ class CFConsole {
 
             static::$commands[] = $class;
         }
-    }
-
-    public static function execute() {
-
-        $kernel = new CConsole_Kernel();
-
-        $commands = array_merge([
-            CConsole_Command_DomainCommand::class,
-            CConsole_Command_StatusCommand::class,
-                ], static::$commands);
-        CConsole_Application::starting(function ($cfCli) use ($commands) {
-            $cfCli->resolveCommands($commands);
-        });
-
-        $status = $kernel->handle(
-                $input = new Symfony\Component\Console\Input\ArgvInput, new Symfony\Component\Console\Output\ConsoleOutput
-        );
-
-
-        $kernel->terminate($input, $status);
-
-
-        exit($status);
     }
 
 }
