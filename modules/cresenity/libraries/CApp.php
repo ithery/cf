@@ -6,6 +6,7 @@ class CApp {
 
     use CTrait_Compat_App,
         CApp_Trait_App_Breadcrumb,
+        CApp_Trait_App_Variables,
         CApp_Trait_App_Renderer,
         CApp_Trait_App_Auth,
         CApp_Trait_App_Title;
