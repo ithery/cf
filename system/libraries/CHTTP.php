@@ -34,4 +34,8 @@ class CHTTP {
         return new CHTTP_Response($content, $status, $headers);
     }
 
+    public static function refresh() {
+        static::$request = null;
+    }
+
 }

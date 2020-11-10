@@ -11,6 +11,11 @@ use \Carbon\Carbon;
 
 class CPeriod {
 
+    
+    const INTERVAL_MONTH = 'month';
+    const INTERVAL_DAY = 'day';
+    const INTERVAL_HOUR = 'hour';
+    
     /** @var \Carbon\Carbon */
     public $startDate;
 

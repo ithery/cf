@@ -13,6 +13,7 @@ class CElement_Helper_Cropper extends CElement_Element {
 
     protected $cropperWidth;
     protected $cropperHeight;
+    protected $cropperResizable;
     protected $owner;
     protected $imgSrc;
 
@@ -28,15 +29,15 @@ class CElement_Helper_Cropper extends CElement_Element {
             ),
         );
         CManager::registerModule('cropper', $dataModule);
+
+        $this->cropperResizable = true;
         
         $this->onBeforeParse(function() {
-
-         
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('cropperWidth', $this->cropperWidth);
             $this->setVar('cropperHeight', $this->cropperHeight);
-
+            $this->setVar('cropperResizable', $this->cropperResizable);
         });
     }
 
@@ -48,6 +49,12 @@ class CElement_Helper_Cropper extends CElement_Element {
     public function setSize($width, $height) {
         $this->cropperWidth = $width;
         $this->cropperHeight = $height;
+        return $this;
+    }
+
+    public function setCropperResizable($bool = true) {
+        $this->cropperResizable = $bool;
+        return $this;
     }
     
     public function getCropperWidth() {
@@ -60,6 +67,10 @@ class CElement_Helper_Cropper extends CElement_Element {
     
     public function getAspectRatio() {
         return $this->cropperWidth/$this->cropperHeight;
+    }
+
+    public function getCropperResizable() {
+        return $this->cropperResizable;
     }
 
     public function html($indent = 0) {

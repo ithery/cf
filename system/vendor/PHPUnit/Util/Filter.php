@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,8 +9,15 @@
  */
 namespace PHPUnit\Util;
 
+use function array_unshift;
+use function defined;
+use function in_array;
+use function is_file;
+use function realpath;
+use function sprintf;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\SyntheticError;
+use Throwable;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -20,7 +27,7 @@ final class Filter
     /**
      * @throws Exception
      */
-    public static function getFilteredStacktrace(\Throwable $t): string
+    public static function getFilteredStacktrace(\Exception $t)
     {
         $filteredStacktrace = '';
 
@@ -43,21 +50,21 @@ final class Filter
         }
 
         if (!self::frameExists($eTrace, $eFile, $eLine)) {
-            \array_unshift(
+            array_unshift(
                 $eTrace,
                 ['file' => $eFile, 'line' => $eLine]
             );
         }
 
-        $prefix    = \defined('__PHPUNIT_PHAR_ROOT__') ? __PHPUNIT_PHAR_ROOT__ : false;
-        $blacklist = new Blacklist;
+        $prefix      = defined('__PHPUNIT_PHAR_ROOT__') ? __PHPUNIT_PHAR_ROOT__ : null;
+        $excludeList = new ExcludeList;
 
         foreach ($eTrace as $frame) {
-            if (self::shouldPrintFrame($frame, $prefix, $blacklist)) {
-                $filteredStacktrace .= \sprintf(
+            if (self::shouldPrintFrame($frame, $prefix, $excludeList)) {
+                $filteredStacktrace .= sprintf(
                     "%s:%s\n",
                     $frame['file'],
-                    $frame['line'] ?? '?'
+                    isset($frame['line']) ? $frame['line']: '?'
                 );
             }
         }
@@ -65,30 +72,38 @@ final class Filter
         return $filteredStacktrace;
     }
 
-    private static function shouldPrintFrame($frame, $prefix, Blacklist $blacklist): bool
+    private static function shouldPrintFrame(array $frame, $prefix, ExcludeList $excludeList)
     {
         if (!isset($frame['file'])) {
             return false;
         }
 
-        $file              = $frame['file'];
-        $fileIsNotPrefixed = $prefix === false || \strpos($file, $prefix) !== 0;
-        $script            = \realpath($GLOBALS['_SERVER']['SCRIPT_NAME']);
+        // @see https://github.com/sebastianbergmann/phpunit/issues/4033
+        $script = '';
 
-        return \is_file($file) &&
-               self::fileIsBlacklisted($file, $blacklist) &&
-               $fileIsNotPrefixed &&
-               $file !== $script;
+        if (isset($GLOBALS['_SERVER']['SCRIPT_NAME'])) {
+            $script = realpath($GLOBALS['_SERVER']['SCRIPT_NAME']);
+        }
+
+        $file = $frame['file'];
+
+        if ($file === $script) {
+            return false;
+        }
+
+        return $prefix === null &&
+               self::fileIsExcluded($file, $excludeList) &&
+               is_file($file);
     }
 
-    private static function fileIsBlacklisted($file, Blacklist $blacklist): bool
+    private static function fileIsExcluded($file, ExcludeList $excludeList)
     {
-        return (empty($GLOBALS['__PHPUNIT_ISOLATION_BLACKLIST']) ||
-                !\in_array($file, $GLOBALS['__PHPUNIT_ISOLATION_BLACKLIST'], true)) &&
-               !$blacklist->isBlacklisted($file);
+        return (empty($GLOBALS['__PHPUNIT_ISOLATION_EXCLUDE_LIST']) ||
+                !in_array($file, $GLOBALS['__PHPUNIT_ISOLATION_EXCLUDE_LIST'], true)) &&
+                !$excludeList->isExcluded($file);
     }
 
-    private static function frameExists(array $trace, string $file, int $line): bool
+    private static function frameExists(array $trace, $file, $line)
     {
         foreach ($trace as $frame) {
             if (isset($frame['file'], $frame['line']) && $frame['file'] === $file && $frame['line'] === $line) {

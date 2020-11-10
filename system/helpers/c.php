@@ -498,6 +498,30 @@ class c {
         return CCarbon::now($tz);
     }
 
+    public static function hrtime($getAsNumber = false) {
+        if (function_exists('hrtime')) {
+            return hrtime($getAsNumber);
+        }
+    
+        if ($getAsNumber) {
+            return microtime(true) * 1e+6;
+        }
+        $mt = microtime();
+        $s = floor($mt);
+        return [$s, ($mt - $s) * 1e+6];
+    }
+
+    public static function html($str) {
+        return chtml::specialchars($str);
+    }
+    
+    public static function dirname($path, $count=1){
+        if ($count > 1){
+           return dirname(static::dirname($path, --$count));
+        }else{
+           return dirname($path);
+        }
+    }
 }
 
 // End c

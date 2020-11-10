@@ -306,7 +306,7 @@ trait CModel_Trait_Event {
      * @param  CEvent_Dispatcher  $dispatcher
      * @return void
      */
-    public static function setEventDispatcher(CEvent_Dispatcher $dispatcher) {
+    public static function setEventDispatcher(CEvent_DispatcherInterface $dispatcher) {
         static::$dispatcher = $dispatcher;
     }
 
@@ -317,6 +317,29 @@ trait CModel_Trait_Event {
      */
     public static function unsetEventDispatcher() {
         static::$dispatcher = null;
+    }
+
+    /**
+     * Execute a callback without firing any model events for any model type.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function withoutEvents(callable $callback)
+    {
+        $dispatcher = static::getEventDispatcher();
+
+        if ($dispatcher) {
+            static::setEventDispatcher(new CEvent_NullDispatcher($dispatcher));
+        }
+
+        try {
+            return $callback();
+        } finally {
+            if ($dispatcher) {
+                static::setEventDispatcher($dispatcher);
+            }
+        }
     }
 
 }

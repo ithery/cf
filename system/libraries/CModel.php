@@ -541,6 +541,19 @@ abstract class CModel implements ArrayAccess {
     }
 
     /**
+     * Save the model to the database without raising any events.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function saveQuietly(array $options = [])
+    {
+        return static::withoutEvents(function () use ($options) {
+            return $this->save($options);
+        });
+    }
+
+    /**
      * Save the model to the database.
      *
      * @param  array  $options

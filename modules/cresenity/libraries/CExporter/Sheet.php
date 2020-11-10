@@ -312,6 +312,19 @@ class CExporter_Sheet {
             $this->autoSize();
         }
 
+        if ($sheetExport instanceof CExporter_Concern_WithStyles) {
+            $styles = $sheetExport->styles($this->worksheet);
+            if (is_array($styles)) {
+                foreach ($styles as $coordinate => $coordinateStyles) {
+                    if (is_numeric($coordinate)) {
+                        $coordinate = 'A' . $coordinate . ':' . $this->worksheet->getHighestColumn($coordinate) . $coordinate;
+                    }
+
+                    $this->worksheet->getStyle($coordinate)->applyFromArray($coordinateStyles);
+                }
+            }
+        }
+
         $this->raise(new CExporter_Event_AfterSheet($this, $this->exportable));
     }
 

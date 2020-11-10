@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -16,21 +16,21 @@ use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
  */
 final class AnyInvokedCount extends InvocationOrder
 {
-    public function toString(): string
+    public function toString()
     {
         return 'invoked zero or more times';
     }
 
-    public function verify(): void
+    public function verify()
     {
     }
 
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         return true;
     }
 
-    protected function invokedDo(BaseInvocation $invocation): void
+    protected function invokedDo(BaseInvocation $invocation)
     {
     }
 }

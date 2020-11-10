@@ -32,6 +32,7 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
         $this->export = $export;
         $this->writerType = $writerType;
         $this->temporaryFile = $temporaryFile;
+        
     }
 
     /**
@@ -50,7 +51,7 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
      */
     public function execute() {
         
-       
+        
         $writer = CExporter::writer();
         $writer->open($this->export);
 

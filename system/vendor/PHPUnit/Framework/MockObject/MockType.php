@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -14,5 +14,5 @@ namespace PHPUnit\Framework\MockObject;
  */
 interface MockType
 {
-    public function generate(): string;
+    public function generate();
 }

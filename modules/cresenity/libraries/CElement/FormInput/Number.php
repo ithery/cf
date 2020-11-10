@@ -21,6 +21,10 @@ class CElement_FormInput_Number extends CElement_FormInput {
     protected function build() {
         $this->setAttr('type',$this->type);
         $this->setAttr('value',$this->value);
+        $this->setAttr('placeholder', $this->placeholder);
+        if ($this->readonly) {
+            $this->setAttr('readonly', 'readonly');
+        }
     }
 
 }

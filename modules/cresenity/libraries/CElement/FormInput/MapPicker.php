@@ -16,6 +16,11 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
     protected $searchControl;
     protected $haveSearch;
     protected $searchPlaceholder;
+    protected $radius;
+    protected $draggable;
+    protected $scrollwheel;
+    protected $markerDraggable;
+    protected $markerInCenter;
     protected $geoCodingApiKey;
 
     public function __construct($id) {
@@ -32,9 +37,14 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->wrapperContainer = $this->addDiv($this->id . '-wrapper')->addClass('map-wrapper');
         $this->haveSearch = true;
         $this->searchPlaceholder = 'Search Location';
-        
+
+        $this->radius = 300;
+        $this->draggable = true;
+        $this->scrollwheel = true;
+        $this->markerDraggable = true;
+        $this->markerInCenter = true;
+
         $this->geoCodingApiKey = CF::config('vendor.google.geocoding_api_key');
-        
     }
 
     public function setValue($val) {
@@ -44,8 +54,33 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->lng = carr::get($latlngArray, 1,0);
     }
 
+    public function radius($val) {
+        $this->radius = $val;
+        return $this;
+    }
+
+    public function setDraggable($bool = true) {
+        $this->draggable = $bool;
+        return $this;
+    }
+
+    public function setScrollwheel($bool = true) {
+        $this->scrollwheel = $bool;
+        return $this;
+    }
+
+    public function markerDraggable($bool = true) {
+        $this->markerDraggable = $bool;
+        return $this;
+    }
+
+    public function markerInCenter($bool = true) {
+        $this->markerInCenter = $bool;
+        return $this;
+    }
+
     public function build() {
-        if(strlen($this->geoCodingApiKey)==0) {
+        if (strlen($this->geoCodingApiKey) == 0) {
             throw new Exception('no api key found in config vendor.google.geocoding_api_key');
         }
        
@@ -54,6 +89,9 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         if ($this->haveSearch) {
             $this->searchContainer = $this->wrapperContainer->addDiv()->addClass('mb-3');
             $this->searchControl = $this->searchContainer->addControl($this->id . '-search', 'text')->setPlaceholder($this->searchPlaceholder);
+            if (! $this->markerDraggable) {
+                $this->searchControl->setReadonly();
+            }
         }
 
 
@@ -70,35 +108,37 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $js = new CStringBuilder();
         $js->setIndent($indent);
 
-        $miniColorJs = "$('#" . $this->id . "-map').locationpicker({
-                    location: {
-                        latitude: " . $this->lat . ",
-                        longitude: " . $this->lng . ",
-                    },
+        $miniColorJs = "
+            $('#" . $this->id . "-map').locationpicker({
+                location: {
+                    latitude: " . $this->lat . ",
+                    longitude: " . $this->lng . ",
+                },
 
-                    inputBinding: {
-                        latitudeInput: $('#" . $this->id . "-lat'),
-                        longitudeInput: $('#" . $this->id . "-lng'),
-                        radiusInput: null,
-                        locationNameInput: $('#" . $this->id . "-search')
-                    },
-                    
-                    enableAutocomplete: true,
-                    enableAutocompleteBlur: true,
-                    draggable: true,
-                    scrollwheel: true,
-                    radius: 300,
-                    onchanged: function (currentLocation, radius, isMarkerDropped) {
-                        $('#" . $this->id . "-lat').val(currentLocation.latitude);
-                        $('#" . $this->id . "-lng').val(currentLocation.longitude);
-                    },
-                    
-                    // markerInCenter: true,
-                    scrollwheel: true,     
-                });";
+                inputBinding: {
+                    latitudeInput: $('#" . $this->id . "-lat'),
+                    longitudeInput: $('#" . $this->id . "-lng'),
+                    radiusInput: null,
+                    locationNameInput: $('#" . $this->id . "-search')
+                },
+                
+                enableAutocomplete: true,
+                enableAutocompleteBlur: true,
+                addressFormat: 'street_address',
+                draggable: " . json_encode($this->draggable) . ",
+                scrollwheel: " . json_encode($this->scrollwheel) . ",
+                radius: " . $this->radius . ",
+                onchanged: function (currentLocation, radius, isMarkerDropped) {
+                    $('#" . $this->id . "-lat').val(currentLocation.latitude);
+                    $('#" . $this->id . "-lng').val(currentLocation.longitude);
+                },
+                markerDraggable: " . json_encode($this->markerDraggable) . ",
+                markerInCenter: " . json_encode($this->markerInCenter) . ",
+            });
+        ";
+        
         $js->appendln($miniColorJs);
         $js->append(parent::js());
-
 
         return $js->text();
     }
