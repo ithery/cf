@@ -124,6 +124,15 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
+     * Determine if the request is the result of an PJAX call.
+     *
+     * @return bool
+     */
+    public function pjax() {
+        return $this->headers->get('X-PJAX') == true;
+    }
+
+    /**
      * Get all of the input and files for the request.
      *
      * @return array
@@ -192,7 +201,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return mixed
      */
     public function __get($key) {
-        
+
         if (array_key_exists($key, $this->all())) {
             return carr::get($this->all(), $key);
         }

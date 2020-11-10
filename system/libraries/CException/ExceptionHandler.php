@@ -395,12 +395,12 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Prepare a JSON response for the given exception.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @param  \Exception $e
-     * @return \Illuminate\Http\JsonResponse
+     * @return CHTTP_JsonResponse
      */
     protected function prepareJsonResponse($request, Exception $e) {
-        return new JsonResponse(
+        return new CHTTP_JsonResponse(
                 $this->convertExceptionToArray($e), $this->isHttpException($e) ? $e->getStatusCode() : 500, $this->isHttpException($e) ? $e->getHeaders() : [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
     }

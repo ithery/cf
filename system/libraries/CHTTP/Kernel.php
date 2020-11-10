@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CHTTP_Kernel {
 
@@ -158,11 +158,12 @@ class CHTTP_Kernel {
                 ob_end_clean();
             }
         }
-        if ($response == null) {
+        if ($response == null || is_bool($response)) {
             $response = $outputBuffer;
         }
 
-        if (!($response instanceof CHTTP_Response)) {
+        if (!($response instanceof SymfonyResponse)) {
+            
             $response = CHTTP::createResponse($response);
         }
 
@@ -175,7 +176,7 @@ class CHTTP_Kernel {
             $response = $this->sendRequest($request);
         } catch (Exception $e) {
             $this->reportException($e);
-
+            
             $response = $this->renderException($request, $e);
             
         } catch (Throwable $e) {
