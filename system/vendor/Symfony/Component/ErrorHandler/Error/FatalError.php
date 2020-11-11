@@ -23,7 +23,6 @@ class FatalError extends \Exception
     public function __construct($message, $code, array $error, $traceOffset = null, $traceArgs = true, array $trace = null)
     {
         parent::__construct($message, $code);
-
         $this->error = $error;
 
         if (null !== $trace) {

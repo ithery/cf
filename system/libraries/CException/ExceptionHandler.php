@@ -79,7 +79,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      *
      * @throws \Exception
      */
-    public function report( $e) {
+    public function report($e) {
         if ($this->shouldntReport($e)) {
             return;
         }
@@ -105,7 +105,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return bool
      */
-    public function shouldReport( $e) {
+    public function shouldReport($e) {
         return !$this->shouldntReport($e);
     }
 
@@ -115,7 +115,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return bool
      */
-    protected function shouldntReport( $e) {
+    protected function shouldntReport($e) {
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
         return !is_null(carr::first($dontReport, function ($type) use ($e) {
                             return $e instanceof $type;
@@ -145,7 +145,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    public function render($request,  $e) {
+    public function render($request, $e) {
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::toResponse($request, $response);
         } elseif ($e instanceof Responsable) {
@@ -170,7 +170,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return \Exception
      */
-    protected function prepareException( $e) {
+    protected function prepareException($e) {
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
@@ -242,7 +242,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function prepareResponse($request,  $e) {
+    protected function prepareResponse($request, $e) {
 
         if (!$this->isHttpException($e) && $this->isDebug()) {
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
@@ -264,7 +264,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function convertExceptionToResponse( $e) {
+    protected function convertExceptionToResponse($e) {
 
         $response = SymfonyResponse::create(
                         $this->renderExceptionContent($e), $this->isHttpException($e) ? $e->getStatusCode() : 500, $this->isHttpException($e) ? $e->getHeaders() : []
@@ -279,7 +279,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return string
      */
-    protected function renderExceptionContent( $e) {
+    protected function renderExceptionContent($e) {
         try {
             return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
             //return $this->renderExceptionWithSymfony($e, $this->isDebug());
@@ -294,7 +294,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return string
      */
-    protected function renderExceptionWithWhoops( $e) {
+    protected function renderExceptionWithWhoops($e) {
         return c::tap(new Whoops, function ($whoops) {
                     $whoops->appendHandler($this->whoopsHandler());
                     $whoops->writeToOutput(false);
@@ -322,7 +322,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  bool  $debug
      * @return string
      */
-    protected function renderExceptionWithSymfony( $e, $debug) {
+    protected function renderExceptionWithSymfony($e, $debug) {
         $renderer = new HtmlErrorRenderer($debug);
 
 
@@ -377,7 +377,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return \Illuminate\Http\Response
      */
-    protected function toIlluminateResponse($response,  $e) {
+    protected function toIlluminateResponse($response, $e) {
 
         if ($response instanceof SymfonyRedirectResponse) {
             $response = new RedirectResponse(
@@ -399,7 +399,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception $e
      * @return CHTTP_JsonResponse
      */
-    protected function prepareJsonResponse($request,  $e) {
+    protected function prepareJsonResponse($request, $e) {
         return new CHTTP_JsonResponse(
                 $this->convertExceptionToArray($e), $this->isHttpException($e) ? $e->getStatusCode() : 500, $this->isHttpException($e) ? $e->getHeaders() : [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
@@ -411,7 +411,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return array
      */
-    protected function convertExceptionToArray( $e) {
+    protected function convertExceptionToArray($e) {
         $result = [
             'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
         ];
@@ -435,7 +435,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         if ($isDebug === null) {
             $isDebug = !CF::isProduction();
         }
-        
+
         return $isDebug;
     }
 
@@ -446,7 +446,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return void
      */
-    public function renderForConsole($output,  $e) {
+    public function renderForConsole($output, $e) {
         (new ConsoleApplication)->renderException($e, $output);
     }
 
@@ -456,7 +456,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @param  \Exception  $e
      * @return bool
      */
-    protected function isHttpException( $e) {
+    protected function isHttpException($e) {
         return $e instanceof HttpExceptionInterface;
     }
 
