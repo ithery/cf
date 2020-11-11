@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CServer {
 
+    const OS_WINNT = 'WINNT';
+
     public static function storage($sshConfig = null) {
         return CServer_Storage::instance($sshConfig);
     }
@@ -119,7 +121,7 @@ class CServer {
      * 
      * @return \CServer_Service_Beanstalkd
      */
-    public static function createBeanstalkd($options=[]) {
+    public static function createBeanstalkd($options = []) {
         return new CServer_Service_Beanstalkd($options);
     }
 
