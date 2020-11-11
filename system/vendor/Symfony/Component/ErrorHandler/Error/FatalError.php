@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ErrorHandler\Error;
 
-class FatalError extends \Error
+class FatalError extends \Exception
 {
     private $error;
 
@@ -73,7 +73,7 @@ class FatalError extends \Error
             'trace' => $trace,
         ] as $property => $value) {
             if (null !== $value) {
-                $refl = new \ReflectionProperty(\Error::class, $property);
+                $refl = new \ReflectionProperty(\Exception::class, $property);
                 $refl->setAccessible(true);
                 $refl->setValue($this, $value);
             }

@@ -69,7 +69,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param  \Throwable  $e
      * @return void
      */
-    public function handleException(Throwable $e) {
+    public function handleException(Exception $e) {
         try {
             self::$reservedMemory = null;
 
