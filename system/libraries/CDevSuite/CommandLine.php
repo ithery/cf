@@ -5,3 +5,6 @@
  *
  * @author Hery
  */
+class CDevSuite_CommandLine {
+    
+}

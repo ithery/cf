@@ -10,6 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CServer {
 
     const OS_WINNT = 'WINNT';
+    const OS_LINUX = 'Linux';
 
     public static function storage($sshConfig = null) {
         return CServer_Storage::instance($sshConfig);

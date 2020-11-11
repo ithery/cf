@@ -16,9 +16,12 @@ class CDevSuite_Nginx implements CDevSuite_Contract_HaveOSDriverInterface {
     
     
     public static function createDriver() {
+        CDevSuite::homePath();
         switch (CServer::getOS()) {
             case CServer::OS_WINNT:
                 return new CDevSuite_Nginx_Driver_WindowsDriver();
+            case CServer::OS_LINUX:
+                return new CDevSuite_Nginx_Driver_LinuxDriver();
             default:
                 throw new Exception('No available nginx driver for OS:' . CServer::getOS());
         }
