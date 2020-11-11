@@ -19,6 +19,8 @@ class CFConsole {
         CConsole_Command_Daemon_DaemonStatusCommand::class,
         CConsole_Command_Daemon_DaemonStopCommand::class,
         CConsole_Command_StatusCommand::class,
+        CConsole_Command_ServeCommand::class,
+        CConsole_Command_DevSuite_DevSuiteInstallCommand::class,
     ];
 
     public static function execute() {

@@ -55,6 +55,22 @@ final class CF {
     public static $config;
 
     /**
+     * 
+     * @return bool
+     */
+    public static function isProduction() {
+        return defined('IN_PRODUCTION') && IN_PRODUCTION;
+    }
+    
+    /**
+     * 
+     * @return bool
+     */
+    public static function isCli() {
+        return defined('CFCLI');
+    }
+
+    /**
      * Check given domain exists or not
      * 
      * @param string $domain
@@ -260,7 +276,7 @@ final class CF {
     }
 
     public static function invoke($uri) {
-        
+
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
@@ -913,10 +929,10 @@ final class CF {
             }
 
             /*
-            // Close all output buffers except for C
-            while (ob_get_level() > self::$buffer_level) {
-                ob_end_clean();
-            }
+              // Close all output buffers except for C
+              while (ob_get_level() > self::$buffer_level) {
+              ob_end_clean();
+              }
              * 
              */
 

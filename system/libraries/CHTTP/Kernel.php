@@ -12,7 +12,7 @@ class CHTTP_Kernel {
     protected $isHandled = false;
     
     public function __construct() {
-        
+        CBootstrap::instance()->boot();
     }
 
     /**
