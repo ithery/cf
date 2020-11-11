@@ -1,5 +1,5 @@
 [Unit]
-Description=Valet DNS Resolution
+Description=DevSuite DNS Resolution
 After=network-online.target
 Wants=network-online.target systemd-networkd-wait-online.service
 

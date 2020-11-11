@@ -51,7 +51,7 @@ class CDevSuite_Bootstrap {
                }) ;
             });
             /*
-             * Relocate config dir to ~/.config/valet/ if found in old location.
+             * Relocate config dir to ~/.config/devsuite/ if found in old location.
              */
             $this->booted = true;
         }

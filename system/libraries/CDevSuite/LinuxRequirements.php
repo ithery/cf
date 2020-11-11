@@ -41,7 +41,7 @@ class CDevSuite_LinuxRequirements {
     }
 
     /**
-     * Verify if valet home is inside /root directory.
+     * Verify if devsuite home is inside /root directory.
      *
      * This usually means the HOME parameters has not been
      * kept using sudo.

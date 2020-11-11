@@ -27,10 +27,10 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
                 CDevSuite::linuxRequirements()->setIgnoreSELinux($ignoreSELinux)->check();
                 CDevSuite::configuration()->install();
                 CDevSuite::nginx()->install();
-                PhpFpm::install();
-                DnsMasq::install(Configuration::read()['domain']);
-                Nginx::restart();
-                Valet::symlinkToUsersBin();
+                CDevSuite::phpFpm->install();
+                CDevSuite::dnsMasq()->install(CDevSuite::configuration()->read()['domain']);
+                CDevSuite::nginx()->restart();
+                CDevSuite::symlinkToUsersBin();
 
                 break;
             case CServer::OS_WINNT:

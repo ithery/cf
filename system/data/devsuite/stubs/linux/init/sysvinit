@@ -15,7 +15,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 PIDFILE=/opt/devsuite-linux/watch.pid
 LOGFILE=/opt/devsuite-linux/watch.log
-DAEMON=/opt/devsuite-linux/valet-dns
+DAEMON=/opt/devsuite-linux/devsuite-dns
 NAME=devsuite-dns
 DESC="DevSuite DNS Resolution"
 

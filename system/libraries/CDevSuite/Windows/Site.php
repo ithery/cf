@@ -123,7 +123,7 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
         }
 
         if ($count > 1) {
-            throw new DomainException("There are {$count} links related to the current directory, please specify the name: valet unlink <name>.");
+            throw new DomainException("There are {$count} links related to the current directory, please specify the name: devsuite unlink <name>.");
         }
     }
 

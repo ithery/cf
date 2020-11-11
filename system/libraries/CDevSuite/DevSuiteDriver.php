@@ -49,7 +49,7 @@ abstract class CDevSuite_DevSuiteDriver
      * @param string $siteName
      * @param string $uri
      *
-     * @return ValetDriver|null
+     * @return CDevSuite_DevSuiteDriver|null
      */
     public static function assign($sitePath, $siteName, $uri)
     {
@@ -81,13 +81,13 @@ abstract class CDevSuite_DevSuiteDriver
      */
     public static function customSiteDriver($sitePath)
     {
-        if (! file_exists($sitePath.'/LocalValetDriver.php')) {
+        if (! file_exists($sitePath.'/LocalDevSuiteDriver.php')) {
             return;
         }
 
-        require_once $sitePath.'/LocalValetDriver.php';
+        require_once $sitePath.'/LocalDevSuiteDriver.php';
 
-        return 'LocalValetDriver';
+        return 'LocalDevSuiteDriver';
     }
 
     /**
@@ -185,7 +185,7 @@ abstract class CDevSuite_DevSuiteDriver
      */
     public function loadServerEnvironmentVariables($sitePath, $siteName)
     {
-        $varFilePath = $sitePath.'/.valet-env.php';
+        $varFilePath = $sitePath.'/.devsuite-env.php';
         if (! file_exists($varFilePath)) {
             return;
         }

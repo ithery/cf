@@ -299,7 +299,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
         $hasSystemd = $this->_hasSystemd();
 
         if ($hasSystemd) {
-            $servicePath = '/etc/systemd/system/valet-dns.service';
+            $servicePath = '/etc/systemd/system/devsuite-dns.service';
             $serviceFile = CDevSuite::stubsPath().'init/systemd';
         }
 

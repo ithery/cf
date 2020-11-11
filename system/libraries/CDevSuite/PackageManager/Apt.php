@@ -71,7 +71,7 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
     }
 
     /**
-     * Configure package manager on valet install.
+     * Configure package manager on devsuite install.
      *
      * @return void
      */

@@ -79,8 +79,8 @@ class CDevSuite_Winsw {
 
         $this->cli->run('cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' uninstall"');
 
-        // $this->files->unlink(VALET_HOME_PATH."/Services/$service.exe");
-        // $this->files->unlink(VALET_HOME_PATH."/Services/$service.xml");
+        // $this->files->unlink(CDevSuite::homePath()."Services/$service.exe");
+        // $this->files->unlink(CDevSuite::homePath()."Services/$service.xml");
     }
 
     /**

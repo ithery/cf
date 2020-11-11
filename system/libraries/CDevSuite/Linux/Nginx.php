@@ -37,8 +37,8 @@ class CDevSuite_Linux_Nginx {
         $this->files = CDevSuite::filesystem();
         $this->configuration = CDevSuite::configuration();
         $this->nginx_conf = '/etc/nginx/nginx.conf';
-        $this->sites_available_conf = '/etc/nginx/sites-available/valet.conf';
-        $this->sites_enabled_conf = '/etc/nginx/sites-enabled/valet.conf';
+        $this->sites_available_conf = '/etc/nginx/sites-available/devsuite.conf';
+        $this->sites_enabled_conf = '/etc/nginx/sites-enabled/devsuite.conf';
     }
 
     /**
