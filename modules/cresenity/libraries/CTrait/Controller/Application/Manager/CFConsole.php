@@ -13,6 +13,7 @@ trait CTrait_Controller_Application_Manager_CFConsole {
 
     public function index() {
 
+
         $app = CApp::instance();
         $app->title($this->getTitle());
 

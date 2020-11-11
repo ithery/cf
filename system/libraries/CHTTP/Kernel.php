@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CHTTP_Kernel {
 
+    protected $isHandled = false;
+    
     public function __construct() {
         
     }
@@ -141,7 +143,27 @@ class CHTTP_Kernel {
         ob_start(function($output) use (&$outputBuffer) {
             $outputBuffer = $output;
         });
+        
+        $kernel = $this;
+        register_shutdown_function(function() use ($outputBufferLevel, $kernel) {
+            if(!$kernel->isHandled()) {
+                //process is terminated when invoke controller
+                $output = '';
+                if (ob_get_level() >= $outputBufferLevel) {
+                    while (ob_get_level() > $outputBufferLevel) {
+                        // Flush 
+                        $output.= ob_get_clean();
+                    }
+                    // Store the output buffer
+                    $output.= ob_get_clean();
 
+                }
+               
+                echo $output;
+            }
+            
+        });
+        
         try {
             $response = $this->invokeController($request);
         } catch (Exception $e) {
@@ -166,6 +188,7 @@ class CHTTP_Kernel {
             
             $response = CHTTP::createResponse($response);
         }
+        
 
         return $response;
     }
@@ -184,12 +207,17 @@ class CHTTP_Kernel {
 
             $response = $this->renderException($request, $e);
         }
+        $this->isHandled = true;
         
         return $response;
     }
 
     public function terminate($request, $response) {
         
+    }
+    
+    public function isHandled() {
+        return $this->isHandled;
     }
 
 }
