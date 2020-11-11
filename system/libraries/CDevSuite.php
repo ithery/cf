@@ -8,9 +8,9 @@
 
 class CDevSuite {
 
-    use CDevSuite_Trait_ConsoleTrait;
-
-    protected static $linuxRequirements;
+    use CDevSuite_Trait_ConsoleTrait,
+        CDevSuite_Trait_WindowsTrait,
+        CDevSuite_Trait_LinuxTrait;
 
     /**
      *
@@ -48,15 +48,50 @@ class CDevSuite {
      */
     protected static $serviceManager;
 
-    public static function homePath() {
-        return DOCROOT . 'data/devsuite/';
+    /**
+     *
+     * @var CDevSuite_Site
+     */
+    protected static $site;
+
+    /**
+     *
+     * @var CDevSuite_PhpFpm
+     */
+    protected static $phpFpm;
+
+    public static function bootstrap() {
+        CDevSuite_Bootstrap::instance()->bootstrap();
     }
 
-    public static function linuxRequirements() {
-        if (static::$linuxRequirements == null) {
-            static::$linuxRequirements = new CDevSuite_LinuxRequirements();
+    public static function homePath() {
+        $path = $_SERVER['HOME'] . DS . '.config' . DS . 'devsuite' . DS;
+        return str_replace('\\', '/', $path);
+    }
+
+    public static function legacyHomePath() {
+        $path = $_SERVER['HOME'] . DS . '.devsuite' . DS;
+        return str_replace('\\', '/', $path);
+    }
+
+    public static function binPath() {
+        $binPath = DOCROOT . 'data' . DS . 'devsuite' . DS . 'bin' . DS;
+        if (CServer::getOS() == CServer::OS_WINNT) {
+            $binPath.='win' . DS;
         }
-        return static::$linuxRequirements;
+        $binPath = str_replace('\\', '/', $binPath);
+        
+        return $binPath;
+    }
+
+    public static function serverPath() {
+        $path = DOCROOT.'index.php';
+        return str_replace('\\', '/', $path);
+    }
+
+    public static function stubsPath() {
+        $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'stubs' . DS;
+        return str_replace('\\', '/', $path);
     }
 
     public static function configuration() {
@@ -64,6 +99,9 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$configuration = new CDevSuite_Linux_Configuration();
+                    break;
+                case CServer::OS_WINNT:
+                    static::$configuration = new CDevSuite_Windows_Configuration();
                     break;
             }
         }
@@ -76,6 +114,9 @@ class CDevSuite {
                 case CServer::OS_LINUX:
                     static::$filesystem = new CDevSuite_Linux_Filesystem();
                     break;
+                case CServer::OS_WINNT:
+                    static::$filesystem = new CDevSuite_Windows_Filesystem();
+                    break;
             }
         }
         return static::$filesystem;
@@ -87,9 +128,26 @@ class CDevSuite {
                 case CServer::OS_LINUX:
                     static::$commandLine = new CDevSuite_Linux_CommandLine();
                     break;
+                case CServer::OS_WINNT:
+                    static::$commandLine = new CDevSuite_Windows_CommandLine();
+                    break;
             }
         }
         return static::$commandLine;
+    }
+
+    public static function site() {
+        if (static::$site == null) {
+            switch (CServer::getOS()) {
+                case CServer::OS_LINUX:
+                    static::$site = new CDevSuite_Linux_Site();
+                    break;
+                case CServer::OS_WINNT:
+                    static::$site = new CDevSuite_Windows_Site();
+                    break;
+            }
+        }
+        return static::$site;
     }
 
     public static function nginx() {
@@ -98,9 +156,26 @@ class CDevSuite {
                 case CServer::OS_LINUX:
                     static::$nginx = new CDevSuite_Linux_Nginx();
                     break;
+                case CServer::OS_WINNT:
+                    static::$nginx = new CDevSuite_Windows_Nginx();
+                    break;
             }
         }
         return static::$nginx;
+    }
+
+    public static function phpFpm() {
+        if (static::$phpFpm == null) {
+            switch (CServer::getOS()) {
+                case CServer::OS_LINUX:
+                    static::$phpFpm = new CDevSuite_Linux_PhpFpm();
+                    break;
+                case CServer::OS_WINNT:
+                    static::$phpFpm = new CDevSuite_Windows_PhpFpm();
+                    break;
+            }
+        }
+        return static::$phpFpm;
     }
 
     public static function packageManager() {
@@ -180,14 +255,6 @@ class CDevSuite {
 
     public static function staticPrefix() {
         return '41c270e4-5535-4daa-b23e-c269744c2f45';
-    }
-
-    public static function serverPath() {
-        return DOCROOT;
-    }
-
-    public static function stubsPath() {
-        return DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'stubs' . DS;
     }
 
 }
