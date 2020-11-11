@@ -1,6 +1,6 @@
 <?php
 
-class SampleDevSuiteDriver extends DevSuiteDriver {
+class SampleDevSuiteDriver extends CDevSuite_DevSuiteDriver {
 
     /**
      * Determine if the driver serves the request.

@@ -85,7 +85,7 @@ class CDevSuite {
     }
 
     public static function serverPath() {
-        $path = DOCROOT.'index.php';
+        $path = DOCROOT.'devsuite.php';
         return str_replace('\\', '/', $path);
     }
 

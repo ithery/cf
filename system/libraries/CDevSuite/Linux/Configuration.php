@@ -70,7 +70,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
 
         $this->files->putAsUser(
                 $driversDirectory . '/SampleDevSuiteDriver.php',
-                $this->files->get(CDevSuite::stubsPath() . 'SampleDevSuiteDriver.php')
+                $this->files->get(CDevSuite::stubsPath() . 'linux/SampleDevSuiteDriver.php')
         );
     }
 
