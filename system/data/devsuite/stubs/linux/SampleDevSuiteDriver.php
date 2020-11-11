@@ -27,7 +27,7 @@ class SampleDevSuiteDriver extends DevSuiteDriver {
      * @return string|false
      */
     public function isStaticFile($sitePath, $siteName, $uri) {
-        if (file_exists($staticFilePath = $sitePath . '/public/' . $uri)) {
+        if (file_exists($staticFilePath = $sitePath . '/' . $uri)) {
             return $staticFilePath;
         }
 
