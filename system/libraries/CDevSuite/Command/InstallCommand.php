@@ -23,7 +23,7 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
                 passthru(dirname(__FILE__) . '/scripts/update.sh'); // Clean up cruft
 
                 $ignoreSELinux = $cfCommand->option('ignore-selinux');
-                
+
                 CDevSuite::linuxRequirements()->setIgnoreSELinux($ignoreSELinux)->check();
                 CDevSuite::configuration()->install();
                 CDevSuite::nginx()->install();
@@ -32,11 +32,28 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
                 Nginx::restart();
                 Valet::symlinkToUsersBin();
 
-                output(PHP_EOL . '<info>Valet installed successfully!</info>');
+                break;
+            case CServer::OS_WINNT:
+                CDevSuite::nginx()->stop();
+                CDevSuite::phpFpm()->stop();
+                CDevSuite::acrylic()->stop();
+
+                CDevSuite::configuration()->install();
+
+                CDevSuite::nginx()->install();
+                CDevSuite::phpFpm()->install();
+
+                $tld = CDevSuite::configuration()->read()['tld'];
+                CDevSuite::acrylic()->install($tld);
+
+                CDevSuite::nginx()->restart();
+
                 break;
             default:
+                throw new Exception('Dev Suite not available for this OS:' . CServer::getOS());
                 break;
         }
+        CDevSuite::output(PHP_EOL . '<info>Dev Suite installed successfully!</info>');
     }
 
 }

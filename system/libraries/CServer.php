@@ -11,6 +11,7 @@ class CServer {
 
     const OS_WINNT = 'WINNT';
     const OS_LINUX = 'Linux';
+    const OS_DARWIN = 'Darwin';
 
     public static function storage($sshConfig = null) {
         return CServer_Storage::instance($sshConfig);

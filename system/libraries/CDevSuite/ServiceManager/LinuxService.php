@@ -284,13 +284,13 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
     }
 
     /**
-     * Install Valet DNS services.
+     * Install DevSuite DNS services.
      *
      * @param Filesystem $files Filesystem object
      *
      * @return void
      */
-    public function installValetDns($files)
+    public function installDevSuiteDns($files)
     {
         CDevSuite::info("Installing devsuite DNS service...");
 

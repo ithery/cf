@@ -64,7 +64,7 @@ class CDevSuite_Linux_Nginx {
      * @return void
      */
     public function installConfiguration() {
-        $contents = $this->files->get(__DIR__ . '/../stubs/nginx.conf');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'linux/nginx.conf');
         $nginx = $this->nginx_conf;
 
         $pid_string = 'pid /run/nginx.pid';
@@ -79,16 +79,16 @@ class CDevSuite_Linux_Nginx {
         $this->files->putAsUser(
                 $nginx,
                 str_array_replace([
-            'VALET_USER' => user(),
-            'VALET_GROUP' => group(),
-            'VALET_HOME_PATH' => VALET_HOME_PATH,
-            'VALET_PID' => $pid_string,
+            'DEVSUITE_USER' => CDevSuite::user(),
+            'DEVSUITE_GROUP' => CDevSuite::group(),
+            'DEVSUITE_HOME_PATH' => CDevSuite::homePath(),
+            'DEVSUITE_PID' => $pid_string,
                         ], $contents)
         );
     }
 
     /**
-     * Install the Valet Nginx server configuration file.
+     * Install the DevSuite Nginx server configuration file.
      *
      * @return void
      */
@@ -98,7 +98,7 @@ class CDevSuite_Linux_Nginx {
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
                         [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
-                        $this->files->get(CDevSuite::stubsPath() . 'valet.conf')
+                        $this->files->get(CDevSuite::stubsPath() . 'linux/devsuite.conf')
                 )
         );
 
@@ -111,12 +111,12 @@ class CDevSuite_Linux_Nginx {
 
         $this->files->putAsUser(
                 '/etc/nginx/fastcgi_params',
-                $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
+                $this->files->get(CDevSuite::stubsPath() . 'linux/fastcgi_params')
         );
     }
 
     /**
-     * Install the Nginx configuration directory to the ~/.valet directory.
+     * Install the Nginx configuration directory to the ~/.devsuite directory.
      *
      * This directory contains all site-specific Nginx servers.
      *
@@ -144,7 +144,7 @@ class CDevSuite_Linux_Nginx {
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
                         [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
-                        $this->files->get(CDevSuite::stubsPath() . 'valet.conf')
+                        $this->files->get(CDevSuite::stubsPath() . 'linux/devsuite.conf')
                 )
         );
     }

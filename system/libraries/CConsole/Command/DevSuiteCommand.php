@@ -37,6 +37,8 @@ class CConsole_Command_DevSuiteCommand extends CConsole_Command {
         if (strlen($signatureArgument) > 0) {
             $this->signature .= ' ' . $signatureArgument;
         }
+        
+        CDevSuite::bootstrap();
         parent::__construct();
     }
 

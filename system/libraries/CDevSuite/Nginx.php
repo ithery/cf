@@ -5,27 +5,6 @@
  *
  * @author Hery
  */
-
-/**
- * @mixin CDevSuite_Nginx_DriverAbstract
- */
-class CDevSuite_Nginx implements CDevSuite_Contract_HaveOSDriverInterface {
-
-    use CDevSuite_Trait_OSDriverTrait;
-
+class CDevSuite_Nginx {
     
-    
-    public static function createDriver() {
-        CDevSuite::homePath();
-        switch (CServer::getOS()) {
-            case CServer::OS_WINNT:
-                return new CDevSuite_Nginx_Driver_WindowsDriver();
-            case CServer::OS_LINUX:
-                return new CDevSuite_Nginx_Driver_LinuxDriver();
-            default:
-                throw new Exception('No available nginx driver for OS:' . CServer::getOS());
-        }
-        return null;
-    }
-
 }

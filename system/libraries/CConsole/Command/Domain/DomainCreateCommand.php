@@ -5,13 +5,10 @@
  *
  * @author Hery
  */
-
 use Symfony\Component\Console\Input\InputArgument;
 
 class CConsole_Command_Domain_DomainCreateCommand extends CConsole_Command {
 
-    
-    
     /**
      * The name and signature of the console command.
      *
@@ -25,15 +22,10 @@ class CConsole_Command_Domain_DomainCreateCommand extends CConsole_Command {
      * @var string
      */
     protected $description = 'Create the domain in data/domain';
-    protected $retryCount = 0;
-    protected $appId = null;
-    protected $appCode = null;
-    protected $orgId = null;
-    protected $orgCode = null;
 
     public function handle() {
-        
-        
+
+
         $domain = $this->argument('domain');
 
         $errCode = 0;
@@ -96,8 +88,4 @@ class CConsole_Command_Domain_DomainCreateCommand extends CConsole_Command {
         return 0;
     }
 
-    
-    
-    
 }
-

@@ -1,19 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Description of Configuration
+ *
+ * @author Hery
  */
-
-class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
+class CDevSuite_Windows_Configuration extends CDevSuite_Configuration {
 
     public $files;
 
     /**
      * Create a new DevSuite configuration class instance.
-     *
-     * @param Filesystem $filesystem
      */
     public function __construct() {
         $this->files = CDevSuite::filesystem();
@@ -31,20 +28,10 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
         $this->createExtensionsDirectory();
         $this->createLogDirectory();
         $this->createCertificatesDirectory();
+        $this->createServicesDirectory();
         $this->writeBaseConfiguration();
 
         $this->files->chown($this->path(), CDevSuite::user());
-    }
-
-    /**
-     * Uninstall the DevSuite configuration folder.
-     *
-     * @return void
-     */
-    public function uninstall() {
-        if ($this->files->isDir(CDevSuite::homePath(), CDevSuite::user())) {
-            $this->files->remove(CDevSuite::homePath());
-        }
     }
 
     /**
@@ -53,6 +40,15 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
      * @return void
      */
     public function createConfigurationDirectory() {
+        $this->files->ensureDirExists(preg_replace('~/devsuite$~', '', CDevSuite::homePath()), CDevSuite::user());
+
+        $oldPath = $_SERVER['HOME'] . '/.devsuite';
+
+        if ($this->files->isDir($oldPath)) {
+            rename($oldPath, CDevSuite::homePath());
+            $this->prependPath(CDevSuite::homePath() . '/Sites');
+        }
+
         $this->files->ensureDirExists(CDevSuite::homePath(), CDevSuite::user());
     }
 
@@ -69,8 +65,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
         $this->files->mkdirAsUser($driversDirectory);
 
         $this->files->putAsUser(
-                $driversDirectory . '/SampleDevSuiteDriver.php',
-                $this->files->get(CDevSuite::stubsPath() . 'SampleDevSuiteDriver.php')
+                $driversDirectory . '/SampleDevSuiteDriver.php', $this->files->get(CDevSuite::stubsPath(). 'win/SampleDevSuiteDriver.php')
         );
     }
 
@@ -113,12 +108,29 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
     }
 
     /**
+     * Create the directory for the Windows services.
+     *
+     * @return void
+     */
+    public function createServicesDirectory() {
+        $this->files->ensureDirExists(CDevSuite::homePath() . '/Services', CDevSuite::user());
+    }
+
+    /**
      * Write the base, initial configuration for DevSuite.
      */
     public function writeBaseConfiguration() {
         if (!$this->files->exists($this->path())) {
-            $this->write(['domain' => 'test', 'paths' => [], 'port' => '80']);
+            $this->write(['tld' => 'test', 'paths' => []]);
         }
+
+        // Migrate old configurations from 'domain' to 'tld'
+        $config = $this->read();
+        if (isset($config['tld'])) {
+            return;
+        }
+
+        $this->updateKey('tld', !empty($config['domain']) ? $config['domain'] : 'test');
     }
 
     /**
@@ -126,13 +138,14 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
      *
      * @param string $path
      * @param bool   $prepend
+     *
      * @return void
      */
     public function addPath($path, $prepend = false) {
         $this->write(c::tap($this->read(), function (&$config) use ($path, $prepend) {
                     $method = $prepend ? 'prepend' : 'push';
 
-                    $config['paths'] = collect($config['paths'])->{$method}($path)->unique()->all();
+                    $config['paths'] = c::collect($config['paths'])->{$method}($path)->unique()->all();
                 }));
     }
 
@@ -140,6 +153,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
      * Prepend the given path to the configuration.
      *
      * @param string $path
+     *
      * @return void
      */
     public function prependPath($path) {
@@ -147,14 +161,15 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
     }
 
     /**
-     * Add the given path to the configuration.
+     * Remove the given path from the configuration.
      *
      * @param string $path
+     *
      * @return void
      */
     public function removePath($path) {
-        $this->write(c::tap($this->read(), function (&$config) use ($path) {
-                    $config['paths'] = c::collect($config['paths'])->reject(function ($value) use ($path) {
+        $this->write(tap($this->read(), function (&$config) use ($path) {
+                    $config['paths'] = collect($config['paths'])->reject(function ($value) use ($path) {
                                 return $value === $path;
                             })->values()->all();
                 }));
@@ -170,7 +185,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
             return;
         }
 
-        $this->write(tap($this->read(), function (&$config) {
+        $this->write(c::tap($this->read(), function (&$config) {
                     $config['paths'] = c::collect($config['paths'])->filter(function ($path) {
                                 return $this->files->isDir($path);
                             })->values()->all();
@@ -187,28 +202,17 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
     }
 
     /**
-     * Get a configuration value.
-     *
-     * @param string $key
-     * @param mixed  $default
-     * @return mixed
-     */
-    public function get($key, $default = null) {
-        $config = $this->read();
-
-        return array_key_exists($key, $config) ? $config[$key] : $default;
-    }
-
-    /**
      * Update a specific key in the configuration file.
      *
      * @param string $key
      * @param mixed  $value
+     *
      * @return array
      */
     public function updateKey($key, $value) {
         return tap($this->read(), function (&$config) use ($key, $value) {
             $config[$key] = $value;
+
             $this->write($config);
         });
     }
@@ -217,12 +221,12 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
      * Write the given configuration to disk.
      *
      * @param array $config
+     *
      * @return void
      */
-    public function write(array $config) {
+    public function write($config) {
         $this->files->putAsUser($this->path(), json_encode(
-                        $config,
-                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                        $config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
                 ) . PHP_EOL);
     }
 

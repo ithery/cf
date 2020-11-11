@@ -1,19 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Description of CommandLine
+ *
+ * @author Hery
  */
-
 use Symfony\Component\Process\Process;
 
-class CDevSuite_Linux_CommandLine extends CDevSuite_CommandLine {
+class CDevSuite_Windows_CommandLine extends CDevSuite_CommandLine {
 
     /**
      * Simple global function to run commands.
      *
      * @param string $command
+     *
      * @return void
      */
     public function quietly($command) {
@@ -24,6 +24,7 @@ class CDevSuite_Linux_CommandLine extends CDevSuite_CommandLine {
      * Simple global function to run commands.
      *
      * @param string $command
+     *
      * @return void
      */
     public function quietlyAsUser($command) {
@@ -34,6 +35,7 @@ class CDevSuite_Linux_CommandLine extends CDevSuite_CommandLine {
      * Pass the command to the command line and display the output.
      *
      * @param string $command
+     *
      * @return void
      */
     public function passthru($command) {
@@ -45,6 +47,7 @@ class CDevSuite_Linux_CommandLine extends CDevSuite_CommandLine {
      *
      * @param string   $command
      * @param callable $onError
+     *
      * @return string
      */
     public function run($command, callable $onError = null) {
@@ -52,10 +55,29 @@ class CDevSuite_Linux_CommandLine extends CDevSuite_CommandLine {
     }
 
     /**
+     * Run the given command and die if fails.
+     *
+     * @param string   $command
+     * @param callable $onError
+     *
+     * @return string
+     */
+    public function runOrDie($command, callable $onError = null) {
+        return $this->run($command, function ($code, $output) use ($onError) {
+                    if ($onError) {
+                        $onError($code, $output);
+                    }
+
+                    exit;
+                });
+    }
+
+    /**
      * Run the given command.
      *
      * @param string   $command
      * @param callable $onError
+     *
      * @return string
      */
     public function runAsUser($command, callable $onError = null) {
@@ -67,17 +89,14 @@ class CDevSuite_Linux_CommandLine extends CDevSuite_CommandLine {
      *
      * @param string   $command
      * @param callable $onError
+     *
      * @return string
      */
-    protected function runCommand($command, callable $onError = null) {
-        $onError = $onError ?: function () {
+    public function runCommand($command, callable $onError = null) {
+        $onError = $onError ? : function () {
             
         };
 
-        // Symfony's 4.x Process component has deprecated passing a command string
-        // to the constructor, but older versions (which DevSuite's Composer
-        // constraints allow) don't have the fromShellCommandLine method.
-        // For more information, see: https://github.com/laravel/valet/pull/761
         if (method_exists(Process::class, 'fromShellCommandline')) {
             $process = Process::fromShellCommandline($command);
         } else {
