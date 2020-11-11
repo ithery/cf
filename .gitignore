@@ -86,3 +86,7 @@ botlog.log
 #ignore vscode
 .vscode
 *.py
+
+.bin/devsuite/win/nginx/conf/fastcgi_params
+.bin/devsuite/win/nginx/conf/nginx.conf
+.bin/devsuite/win/nginx/devsuite/devsuite.conf
