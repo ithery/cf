@@ -75,7 +75,7 @@ class CDevSuite {
     }
 
     public static function binPath() {
-        $binPath = DOCROOT . 'data' . DS . 'devsuite' . DS . 'bin' . DS;
+        $binPath = DOCROOT . '.bin' . DS . 'devsuite' . DS;
         if (CServer::getOS() == CServer::OS_WINNT) {
             $binPath.='win' . DS;
         }
