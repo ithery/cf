@@ -61,7 +61,7 @@ class CHTTP_Kernel {
                 $reflectionClass = new ReflectionClass('Controller_' . $className . ucfirst(CFRouter::$controller));
             } catch (ReflectionException $e) {
                 try {
-                    $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
+                    $reflectionClass = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
                     // Start validation of the controller
                 } catch (ReflectionException $e) {
                     //something went wrong
@@ -124,7 +124,11 @@ class CHTTP_Kernel {
         // Start the controller execution benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_execution');
 
-
+        
+        
+        if($reflectionMethod ==null) {
+            CF::show404();
+        }
         // Execute the controller method
         $response = $reflectionMethod->invokeArgs($reflectionClass->newInstance(), $arguments);
 
@@ -179,6 +183,10 @@ class CHTTP_Kernel {
                 // Store the output buffer
                 ob_end_clean();
             }
+        }
+        
+        if($response instanceof CInterface_Responsable) {
+            $response = $response->toResponse($request);
         }
         if ($response == null || is_bool($response)) {
             $response = $outputBuffer;

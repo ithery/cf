@@ -22,7 +22,7 @@ trait CTrait_Controller_Application_Manager_CFConsole {
         $terminal->setAjaxUrl($this->controllerUrl() . 'command');
         $terminal->setPrompt('CF >');
         $terminal->setGreetings('Welcome to CF Console');
-        echo $app->render();
+        return $app;
     }
 
     public function command() {

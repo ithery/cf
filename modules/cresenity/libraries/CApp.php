@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CApp {
+class CApp implements CInterface_Responsable {
 
     use CTrait_Compat_App,
         CTrait_Macroable,
@@ -583,12 +583,21 @@ class CApp {
         if (method_exists($this->element, $method)) {
             return call_user_func_array([$this->element, $method], $parameters);
         }
-        if($this->element->hasMacro($method)) {
+        if ($this->element->hasMacro($method)) {
             return call_user_func_array([$this->element, $method], $parameters);
         }
-        
+
 
         throw new Exception('undefined method on CApp: ' . $method);
+    }
+
+    /**
+     * 
+     * @param CHTTP_Request $request
+     * @return CHTTP_Response
+     */
+    public function toResponse($request) {
+        return CHTTP::createResponse($this->render());
     }
 
 }
