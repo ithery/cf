@@ -61,7 +61,7 @@ final class CF {
     public static function isProduction() {
         return defined('IN_PRODUCTION') && IN_PRODUCTION;
     }
-    
+
     /**
      * 
      * @return bool
@@ -1176,7 +1176,14 @@ final class CF {
                 }
             }
         } else {
-            $domain = $_SERVER["SERVER_NAME"];
+            if (isset($_SERVER["SERVER_NAME"])) {
+                $domain = $_SERVER["SERVER_NAME"];
+            }
+            if (strlen($domain) == 0) {
+                if (isset($_SERVER['HTTP_HOST'])) {
+                    $domain = $_SERVER["HTTP_HOST"];
+                }
+            }
         }
         return $domain;
     }

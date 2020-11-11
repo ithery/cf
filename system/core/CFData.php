@@ -89,13 +89,13 @@ final class CFData {
     }
 
     public static function string_value($val, $level = 0) {
-
+        $indentString = "    ";
         $str = '';
         $eol = PHP_EOL;
-        $indent = cutils::indent($level, "\t");
+        $indent = cutils::indent($level, $indentString);
         if (is_array($val)) {
             $str .= 'array(' . $eol;
-            $indent2 = cutils::indent($level + 1, "\t");
+            $indent2 = cutils::indent($level + 1, $indentString);
             foreach ($val as $k => $v) {
 
                 $str .= $indent2 . "'" . addslashes($k) . "'=>";

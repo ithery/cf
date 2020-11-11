@@ -55,11 +55,11 @@ class CFRouter {
         if ($uri !== null) {
             $currentUri = $uri;
         }
-
+        
         if ($currentUri === null) {
             $currentUri = self::getUri();
         }
-
+        
         // Load routes
         $routesConfig = CF::config('routes');
         $routesRuntime = self::$routesRuntime;
@@ -75,7 +75,7 @@ class CFRouter {
 
             // Use the default route when no segments exist
             $currentUri = $routes['_default'];
-
+            
             // Default route is in use
             $default_route = TRUE;
         }
@@ -85,7 +85,6 @@ class CFRouter {
 
         // Remove all dot-paths from the URI, they are not valid
         $currentUri = preg_replace('#\.[\s./]*/#', '', $currentUri);
-
 
         if (!isset(self::$routeData[$currentUri])) {
             $data = array();
@@ -247,6 +246,7 @@ class CFRouter {
      * @return string uri
      */
     public static function getUri() {
+        
         $currentUri = '';
         if (PHP_SAPI === 'cli') {
 
@@ -303,6 +303,7 @@ class CFRouter {
         } elseif (isset($_SERVER['REQUEST_URI']) AND $_SERVER['REQUEST_URI']) {
             $currentUri = $_SERVER['REQUEST_URI'];
             $currentUri = strtok($currentUri, '?');
+            
         } elseif (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF']) {
             $currentUri = $_SERVER['PHP_SELF'];
         }

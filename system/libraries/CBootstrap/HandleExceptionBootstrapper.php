@@ -69,7 +69,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param  \Throwable  $e
      * @return void
      */
-    public function handleException(Exception $e) {
+    public function handleException( $e) {
         try {
             self::$reservedMemory = null;
 
@@ -91,7 +91,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param  \Throwable  $e
      * @return void
      */
-    protected function renderForConsole(Throwable $e) {
+    protected function renderForConsole( $e) {
         $this->getExceptionHandler()->renderForConsole(new ConsoleOutput, $e);
     }
 
@@ -101,7 +101,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param  \Throwable  $e
      * @return void
      */
-    protected function renderHttpResponse(Throwable $e) {
+    protected function renderHttpResponse( $e) {
         $this->getExceptionHandler()->render(CHTTP::request(), $e)->send();
     }
 
