@@ -30,7 +30,7 @@ trait CProfiler_Trait_PopulateBenchmarkTrait {
             // Clean unique id from system benchmark names
             $name = ucwords(str_replace(array('_', '-'), ' ', str_replace(SYSTEM_BENCHMARK . '_', '', $name)));
 
-            $data = array($name, number_format($benchmark['time'], 3), $benchmark['count'], number_format($benchmark['memory'] / 1024 / 1024, 2) . 'MB');
+            $data = array($name, number_format((int)$benchmark['time'], 3), (int)$benchmark['count'], number_format((float)$benchmark['memory'] / 1024 / 1024, 2) . 'MB');
             $class = $i % 2 == 0 ? '' : 'kp-altrow';
 
             if ($name == 'Total Execution')
