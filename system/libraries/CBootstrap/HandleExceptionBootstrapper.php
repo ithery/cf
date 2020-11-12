@@ -28,7 +28,8 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
         self::$reservedMemory = str_repeat('x', 10240);
 
 
-        error_reporting(-1);
+        
+        //error_reporting(-1);
 
         set_error_handler([$this, 'handleError']);
 
