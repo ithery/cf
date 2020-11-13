@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
+class CDevSuite_PackageManager_Dnf extends CDevSuite_PackageManager {
 
     public $cli;
 
@@ -21,25 +21,17 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
     }
 
     /**
-     * Get array of installed packages
-     *
-     * @param string $package
-     * @return array
-     */
-    public function packages($package) {
-        $query = "dpkg -l {$package} | grep '^ii' | sed 's/\s\+/ /g' | cut -d' ' -f2";
-
-        return explode(PHP_EOL, $this->cli->run($query));
-    }
-
-    /**
      * Determine if the given package is installed.
      *
      * @param string $package
      * @return bool
      */
     public function installed($package) {
-        return in_array($package, $this->packages($package));
+        $query = "dnf list installed {$package} | grep {$package} | sed 's_  _\\t_g' | sed 's_\\._\\t_g' | cut -f 1";
+
+        $packages = explode(PHP_EOL, $this->cli->run($query));
+
+        return in_array($package, $packages);
     }
 
     /**
@@ -61,12 +53,12 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * @return void
      */
     public function installOrFail($package) {
-        CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Apt...</info> 🍻');
+        CDevsuite::output('<info>[' . $package . '] is not installed, installing it now via Dnf...</info> 🍻');
 
-        $this->cli->run(trim('apt install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
-            CDevSuite::output($errorOutput);
+        $this->cli->run(trim('dnf install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
+            CDevsuite::output($errorOutput);
 
-            throw new DomainException('Apt was unable to install [' . $package . '].');
+            throw new DomainException('Dnf was unable to install [' . $package . '].');
         });
     }
 
@@ -80,10 +72,10 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
     }
 
     /**
-     * Restart dnsmasq in Ubuntu.
+     * Restart dnsmasq in Fedora.
      */
     public function nmRestart($sm) {
-        $sm->restart(['network-manager']);
+        $sm->restart('NetworkManager');
     }
 
     /**
@@ -93,8 +85,8 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      */
     public function isAvailable() {
         try {
-            $output = $this->cli->run('which apt', function ($exitCode, $output) {
-                throw new DomainException('Apt not available');
+            $output = $this->cli->run('which dnf', function ($exitCode, $output) {
+                throw new DomainException('Dnf not available');
             });
 
             return $output != '';

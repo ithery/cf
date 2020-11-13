@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
+class CDevSuite_PackageManager_AptGet extends CDevSuite_PackageManager {
 
     public $cli;
 
@@ -63,7 +63,7 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
     public function installOrFail($package) {
         CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Apt...</info> 🍻');
 
-        $this->cli->run(trim('apt install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
+        $this->cli->run(trim('apt-get install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
             CDevSuite::output($errorOutput);
 
             throw new DomainException('Apt was unable to install [' . $package . '].');
@@ -93,7 +93,7 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      */
     public function isAvailable() {
         try {
-            $output = $this->cli->run('which apt', function ($exitCode, $output) {
+            $output = $this->cli->run('which apt-get', function ($exitCode, $output) {
                 throw new DomainException('Apt not available');
             });
 

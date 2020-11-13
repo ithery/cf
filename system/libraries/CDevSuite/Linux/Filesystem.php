@@ -406,7 +406,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
      * @return void
      */
     public function removeBrokenLinksAt($path) {
-        collect($this->scandir($path))
+        c::collect($this->scandir($path))
                 ->filter(function ($file) use ($path) {
                     return $this->isBrokenLink($path . '/' . $file);
                 })

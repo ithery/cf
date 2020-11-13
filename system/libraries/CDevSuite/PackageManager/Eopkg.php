@@ -6,12 +6,12 @@
  * and open the template in the editor.
  */
 
-class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
+class CDevSuite_PackageManager_Eopkg extends CDevSuite_PackageManager {
 
     public $cli;
 
     /**
-     * Create a new Apt instance.
+     * Create a new Eopkg instance.
      *
      * @param CommandLine $cli
      * @return void
@@ -27,7 +27,7 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * @return array
      */
     public function packages($package) {
-        $query = "dpkg -l {$package} | grep '^ii' | sed 's/\s\+/ /g' | cut -d' ' -f2";
+        $query = "eopkg li | cut -d ' ' -f 1";
 
         return explode(PHP_EOL, $this->cli->run($query));
     }
@@ -61,17 +61,17 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * @return void
      */
     public function installOrFail($package) {
-        CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Apt...</info> 🍻');
+        CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Eopkg...</info> 🍻');
 
-        $this->cli->run(trim('apt install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
+        $this->cli->run(trim('eopkg install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
             CDevSuite::output($errorOutput);
 
-            throw new DomainException('Apt was unable to install [' . $package . '].');
+            throw new DomainException('Eopkg was unable to install [' . $package . '].');
         });
     }
 
     /**
-     * Configure package manager on devsuite install.
+     * Configure package manager on valet install.
      *
      * @return void
      */
@@ -83,7 +83,7 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * Restart dnsmasq in Ubuntu.
      */
     public function nmRestart($sm) {
-        $sm->restart(['network-manager']);
+        $sm->restart(['NetworkManager']);
     }
 
     /**
@@ -93,8 +93,8 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      */
     public function isAvailable() {
         try {
-            $output = $this->cli->run('which apt', function ($exitCode, $output) {
-                throw new DomainException('Apt not available');
+            $output = $this->cli->run('which eopkg', function ($exitCode, $output) {
+                throw new DomainException('Eopkg not available');
             });
 
             return $output != '';

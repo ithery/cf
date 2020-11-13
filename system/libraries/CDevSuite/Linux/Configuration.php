@@ -170,7 +170,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
             return;
         }
 
-        $this->write(tap($this->read(), function (&$config) {
+        $this->write(c::tap($this->read(), function (&$config) {
                     $config['paths'] = c::collect($config['paths'])->filter(function ($path) {
                                 return $this->files->isDir($path);
                             })->values()->all();
@@ -207,7 +207,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
      * @return array
      */
     public function updateKey($key, $value) {
-        return tap($this->read(), function (&$config) use ($key, $value) {
+        return c::tap($this->read(), function (&$config) use ($key, $value) {
             $config[$key] = $value;
             $this->write($config);
         });

@@ -77,20 +77,25 @@ class CDevSuite {
     public static function binPath() {
         $binPath = DOCROOT . '.bin' . DS . 'devsuite' . DS;
         if (CServer::getOS() == CServer::OS_WINNT) {
-            $binPath.='win' . DS;
+            $binPath .= 'win' . DS;
         }
         $binPath = str_replace('\\', '/', $binPath);
-        
+
         return $binPath;
     }
 
     public static function serverPath() {
-        $path = DOCROOT.'devsuite.php';
+        $path = DOCROOT . 'devsuite.php';
         return str_replace('\\', '/', $path);
     }
 
     public static function stubsPath() {
         $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'stubs' . DS;
+        return str_replace('\\', '/', $path);
+    }
+
+    public static function scriptsPath() {
+        $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'scripts' . DS;
         return str_replace('\\', '/', $path);
     }
 
@@ -184,13 +189,16 @@ class CDevSuite {
                 case CServer::OS_LINUX:
                     static::$packageManager = c::collect([
                                 CDevSuite_PackageManager_Apt::class,
+                                CDevSuite_PackageManager_AptGet::class,
                                 CDevSuite_PackageManager_Dnf::class,
                                 CDevSuite_PackageManager_Pacman::class,
                                 CDevSuite_PackageManager_Yum::class,
                                 CDevSuite_PackageManager_PackageKit::class,
                                 CDevSuite_PackageManager_Eopkg::class,
-                            ])->first(static function ($pm) {
-                        return CDevSuite_Helper::resolve($pm)->isAvailable();
+                            ])->map(function($className) {
+                                return CDevSuite_Helper::resolve($className);
+                            })->first(static function ($pm) {
+                        return $pm->isAvailable();
                     }, static function () {
                         throw new DomainException("No compatible package manager found.");
                     });
@@ -207,8 +215,10 @@ class CDevSuite {
                     static::$serviceManager = c::collect([
                                 CDevSuite_ServiceManager_LinuxService::class,
                                 CDevSuite_ServiceManager_Systemd::class,
-                            ])->first(static function ($pm) {
-                        return CDevSuite_Helper::resolve($pm)->isAvailable();
+                            ])->map(function($className) {
+                                return CDevSuite_Helper::resolve($className);
+                            })->first(static function ($pm) {
+                        return $pm->isAvailable();
                     }, static function () {
                         throw new DomainException("No compatible service manager found.");
                     });

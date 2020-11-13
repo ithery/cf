@@ -1,22 +1,23 @@
 <?php
 
-/*
+/* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
-class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
+class CDevSuite_PackageManager_Pacman extends CDevSuite_PackageManager {
 
     public $cli;
 
     /**
-     * Create a new Apt instance.
+     * Create a new Pacman instance.
      *
      * @param CommandLine $cli
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->cli = CDevSuite::commandLine();
     }
 
@@ -26,8 +27,9 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * @param string $package
      * @return array
      */
-    public function packages($package) {
-        $query = "dpkg -l {$package} | grep '^ii' | sed 's/\s\+/ /g' | cut -d' ' -f2";
+    public function packages($package)
+    {
+        $query = "pacman -Qqs {$package}";
 
         return explode(PHP_EOL, $this->cli->run($query));
     }
@@ -38,7 +40,8 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * @param string $package
      * @return bool
      */
-    public function installed($package) {
+    public function installed($package)
+    {
         return in_array($package, $this->packages($package));
     }
 
@@ -48,7 +51,8 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * @param string $package
      * @return void
      */
-    public function ensureInstalled($package) {
+    public function ensureInstalled($package)
+    {
         if (!$this->installed($package)) {
             $this->installOrFail($package);
         }
@@ -60,30 +64,33 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      * @param string $package
      * @return void
      */
-    public function installOrFail($package) {
-        CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Apt...</info> 🍻');
+    public function installOrFail($package)
+    {
+        CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Pacman...</info> 🍻');
 
-        $this->cli->run(trim('apt install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
+        $this->cli->run(trim('pacman --noconfirm --needed -S ' . $package), function ($exitCode, $errorOutput) use ($package) {
             CDevSuite::output($errorOutput);
 
-            throw new DomainException('Apt was unable to install [' . $package . '].');
+            throw new DomainException('Pacman was unable to install [' . $package . '].');
         });
     }
 
     /**
-     * Configure package manager on devsuite install.
+     * Configure package manager on valet install.
      *
      * @return void
      */
-    public function setup() {
+    public function setup()
+    {
         // Nothing to do
     }
 
     /**
      * Restart dnsmasq in Ubuntu.
      */
-    public function nmRestart($sm) {
-        $sm->restart(['network-manager']);
+    public function nmRestart($sm)
+    {
+        $sm->restart('NetworkManager');
     }
 
     /**
@@ -91,10 +98,11 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
      *
      * @return bool
      */
-    public function isAvailable() {
+    public function isAvailable()
+    {
         try {
-            $output = $this->cli->run('which apt', function ($exitCode, $output) {
-                throw new DomainException('Apt not available');
+            $output = $this->cli->run('which pacman', function ($exitCode, $output) {
+                throw new DomainException('Pacman not available');
             });
 
             return $output != '';
@@ -102,5 +110,4 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
             return false;
         }
     }
-
 }

@@ -36,6 +36,11 @@ class CDevSuite_Bootstrap {
             case CServer::OS_DARWIN:
                 $bootstrapper[] = CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker::class;
                 break;
+            case CServer::OS_LINUX:
+                $bootstrapper[] = CDevSuite_Bootstrap_LinuxBootstrapper_DependencyChecker::class;
+                break;
+            
+            
         }
         $bootstrapper[] = CDevSuite_Bootstrap_PruneBootstrapper::class;
         
