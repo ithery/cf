@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-class CDevSuite_Linux_Nginx {
+class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
 
     public $pm;
     public $sm;

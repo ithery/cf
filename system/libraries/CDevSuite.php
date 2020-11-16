@@ -122,6 +122,9 @@ class CDevSuite {
                 case CServer::OS_WINNT:
                     static::$filesystem = new CDevSuite_Windows_Filesystem();
                     break;
+                case CServer::OS_DARWIN:
+                    static::$filesystem = new CDevSuite_Mac_Filesystem();
+                    break;
             }
         }
         return static::$filesystem;
@@ -136,7 +139,11 @@ class CDevSuite {
                 case CServer::OS_WINNT:
                     static::$commandLine = new CDevSuite_Windows_CommandLine();
                     break;
-            }
+                case CServer::OS_DARWIN:
+                    static::$commandLine = new CDevSuite_Mac_CommandLine();
+                    break;
+
+                }
         }
         return static::$commandLine;
     }
@@ -149,6 +156,9 @@ class CDevSuite {
                     break;
                 case CServer::OS_WINNT:
                     static::$site = new CDevSuite_Windows_Site();
+                    break;
+                case CServer::OS_DARWIN:
+                    static::$site = new CDevSuite_Mac_Site();
                     break;
             }
         }
@@ -164,6 +174,9 @@ class CDevSuite {
                 case CServer::OS_WINNT:
                     static::$nginx = new CDevSuite_Windows_Nginx();
                     break;
+                case CServer::OS_DARWIN:
+                    static::$nginx = new CDevSuite_Mac_Nginx();
+                    break;
             }
         }
         return static::$nginx;
@@ -177,6 +190,9 @@ class CDevSuite {
                     break;
                 case CServer::OS_WINNT:
                     static::$phpFpm = new CDevSuite_Windows_PhpFpm();
+                    break;
+                case CServer::OS_DARWIN:
+                    static::$phpFpm = new CDevSuite_Mac_PhpFpm();
                     break;
             }
         }
