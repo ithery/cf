@@ -55,4 +55,30 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         return $data;
     }
 
+    public function temp($post) {
+        $data = $this->request($this->baseUrl . 'Temp', $post);
+        return $data;
+    }
+
+    public function tempFileList($directory) {
+        $post = [];
+        $post['command'] = 'listFile';
+        $post['directory'] = $directory;
+        return $this->temp($post);
+    }
+
+    public function tempContent($file) {
+        $post = [];
+        $post['command'] = 'content';
+        $post['file'] = $file;
+        return $this->temp($post);
+    }
+
+    public function tempDelete($file) {
+        $post = [];
+        $post['command'] = 'content';
+        $post['file'] = $file;
+        return $this->temp($post);
+    }
+
 }

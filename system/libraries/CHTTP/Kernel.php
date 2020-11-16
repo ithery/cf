@@ -17,7 +17,6 @@ class CHTTP_Kernel {
     public function __construct() {
 
         $this->terminated = false;
-        //CBootstrap::instance()->boot();
     }
 
     /**
@@ -119,6 +118,7 @@ class CHTTP_Kernel {
         $reflectionClass = $this->getReflectionControllerClass();
         $reflectionMethod = null;
         $arguments = [];
+        $response = null;
         if ($reflectionClass) {
             //class is found then we will try to find the method
             list($reflectionMethod, $arguments) = $this->getReflectionControllerMethodAndArguments($reflectionClass);
@@ -133,10 +133,10 @@ class CHTTP_Kernel {
 
         if ($reflectionMethod == null) {
             CF::show404();
+        } else {
+            // Execute the controller method
+            $response = $reflectionMethod->invokeArgs($reflectionClass->newInstance(), $arguments);
         }
-        // Execute the controller method
-        $response = $reflectionMethod->invokeArgs($reflectionClass->newInstance(), $arguments);
-
 
         // Stop the controller execution benchmark
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
@@ -184,7 +184,7 @@ class CHTTP_Kernel {
     }
 
     public function handle(CHTTP_Request $request) {
-
+        CBootstrap::instance()->boot();
 
         $response = null;
         try {
@@ -193,7 +193,7 @@ class CHTTP_Kernel {
         } catch (Exception $e) {
 
 
-            //$this->reportException($e);
+            $this->reportException($e);
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {

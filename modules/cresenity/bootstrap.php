@@ -15,12 +15,20 @@ if ($isAppBox) {
     //$whoops->register();
 } else {
 // Set error handler
-    set_error_handler(array('CApp', 'exceptionHandler'));
-
+    //set_error_handler(array('CApp', 'exceptionHandler'));
 // Set exception handler
-    set_exception_handler(array('CApp', 'exceptionHandler'));
+    //set_exception_handler(array('CApp', 'exceptionHandler'));
 }
 
+if (IN_PRODUCTION) {
+    
+}
+if (CF::config('collector.exception')) {
+
+    CException::exceptionHandler()->reportable(function(Exception $e) {
+        CCollector::exception($e);
+    });
+}
 
 if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator") {
 

@@ -21,6 +21,8 @@ use Whoops\Run as Whoops;
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
 
+    use CTrait_ReflectsClosureTrait;
+
     /**
      * The container implementation.
      *
@@ -34,6 +36,20 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @var array
      */
     protected $dontReport = [];
+
+    /**
+     * The callbacks that should be used during reporting.
+     *
+     * @var array
+     */
+    protected $reportCallbacks = [];
+
+    /**
+     * The callbacks that should be used during rendering.
+     *
+     * @var array
+     */
+    protected $renderCallbacks = [];
 
     /**
      * A list of the internal exception types that should not be reported.
@@ -87,6 +103,17 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return $this->container->call($reportCallable);
         }
 
+        
+        foreach ($this->reportCallbacks as $reportCallback) {
+            
+            if ($reportCallback->handles($e)) {
+                
+                if ($reportCallback($e) === false) {
+                    return;
+                }
+            }
+        }
+
         CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, array_merge($this->context(), ['exception' => $e]));
 //        try {
 //            CLogger::instance()->add($reportCallable, $message)
@@ -133,7 +160,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 //                'userId' => Auth::id(),
                     // 'email' => optional(Auth::user())->email,
             ]);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -153,7 +180,19 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         }
 
         $e = $this->prepareException($e);
-        if ($e instanceof HttpResponseException) {
+
+        foreach ($this->renderCallbacks as $renderCallback) {
+            if (is_a($e, $this->firstClosureParameterType($renderCallback))) {
+                $response = $renderCallback($e, $request);
+
+                if (!is_null($response)) {
+                    return $response;
+                }
+            }
+        }
+
+
+        if ($e instanceof CHTTP_Exception_ResponseException) {
             return $e->getResponse();
         } elseif ($e instanceof AuthenticationException) {
             return $this->unauthenticated($request, $e);
@@ -269,7 +308,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         $response = SymfonyResponse::create(
                         $this->renderExceptionContent($e), $this->isHttpException($e) ? $e->getStatusCode() : 500, $this->isHttpException($e) ? $e->getHeaders() : []
         );
-        
+
         return $response;
     }
 
@@ -289,10 +328,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         }
     }
 
-    
-    
-    
-    
     /**
      * Render an exception to a string using "Whoops".
      *
@@ -463,6 +498,31 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function isHttpException($e) {
         return $e instanceof HttpExceptionInterface;
+    }
+
+    /**
+     * Register a reportable callback.
+     *
+     * @param  callable  $reportUsing
+     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
+     */
+    public function reportable(callable $reportUsing) {
+        return c::tap(new CException_ReportableHandler($reportUsing), function ($callback) {
+
+                    $this->reportCallbacks[] = $callback;
+                });
+    }
+
+    /**
+     * Register a renderable callback.
+     *
+     * @param  callable  $renderUsing
+     * @return $this
+     */
+    public function renderable(callable $renderUsing) {
+        $this->renderCallbacks[] = $renderUsing;
+
+        return $this;
     }
 
 }
