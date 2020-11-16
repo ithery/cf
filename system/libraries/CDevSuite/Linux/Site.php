@@ -14,12 +14,8 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     /**
      * Create a new Site instance.
      *
-     * @param Configuration $config
-     * @param CommandLine   $cli
-     * @param Filesystem    $files
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->cli = CDevSuite::commandLine();
         $this->files = CDevSuite::filesystem();
         $this->config = CDevSuite::configuration();
