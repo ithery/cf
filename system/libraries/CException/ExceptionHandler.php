@@ -45,7 +45,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         AuthorizationException::class,
         HttpException::class,
         HttpResponseException::class,
-        ModelNotFoundException::class,
+        CModel_Exception_ModelNotFound::class,
         SuspiciousOperationException::class,
         TokenMismatchException::class,
         ValidationException::class,
@@ -148,7 +148,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     public function render($request, $e) {
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::toResponse($request, $response);
-        } elseif ($e instanceof Responsable) {
+        } elseif ($e instanceof CInterface_Responsable) {
             return $e->toResponse($request);
         }
 
@@ -171,7 +171,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \Exception
      */
     protected function prepareException($e) {
-        if ($e instanceof ModelNotFoundException) {
+        if ($e instanceof CModel_Exception_ModelNotFound) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
@@ -245,13 +245,13 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     protected function prepareResponse($request, $e) {
 
         if (!$this->isHttpException($e) && $this->isDebug()) {
-            return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
+            return $this->toHttpResponse($this->convertExceptionToResponse($e), $e);
         }
         if (!$this->isHttpException($e)) {
             $e = new HttpException(500, $e->getMessage());
         }
 
-        $response = $this->toIlluminateResponse(
+        $response = $this->toHttpResponse(
                 $this->renderHttpException($e), $e
         );
 
@@ -269,7 +269,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         $response = SymfonyResponse::create(
                         $this->renderExceptionContent($e), $this->isHttpException($e) ? $e->getStatusCode() : 500, $this->isHttpException($e) ? $e->getHeaders() : []
         );
-
+        
         return $response;
     }
 
@@ -281,13 +281,18 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function renderExceptionContent($e) {
         try {
-            return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
+            return CException_LegacyExceptionHandler::getContent($e);
+            //return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
             //return $this->renderExceptionWithSymfony($e, $this->isDebug());
         } catch (Exception $e) {
             return $this->renderExceptionWithSymfony($e, $this->isDebug());
         }
     }
 
+    
+    
+    
+    
     /**
      * Render an exception to a string using "Whoops".
      *
@@ -375,9 +380,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      *
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  \Exception  $e
-     * @return \Illuminate\Http\Response
+     * @return CHTTP_Response
      */
-    protected function toIlluminateResponse($response, $e) {
+    protected function toHttpResponse($response, $e) {
 
         if ($response instanceof SymfonyRedirectResponse) {
             $response = new RedirectResponse(

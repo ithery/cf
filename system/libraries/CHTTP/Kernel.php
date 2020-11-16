@@ -9,9 +9,14 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CHTTP_Kernel {
 
+    use CHTTP_Trait_OutputBufferTrait;
+
     protected $isHandled = false;
+    protected $terminated;
 
     public function __construct() {
+
+        $this->terminated = false;
         //CBootstrap::instance()->boot();
     }
 
@@ -140,32 +145,19 @@ class CHTTP_Kernel {
     }
 
     public function sendRequest($request) {
-        $outputBuffer = '';
 
-        $outputBufferLevel = ob_get_level();
+        $this->startOutputBuffering();
 
-        ob_start(function($output) use (&$outputBuffer) {
-            $outputBuffer = $output;
-        });
 
         $kernel = $this;
-        register_shutdown_function(function() use ($outputBufferLevel, $kernel) {
+        register_shutdown_function(function() use ($kernel) {
             if (!$kernel->isHandled()) {
-                //process is terminated when invoke controller
-                $output = '';
-                if (ob_get_level() >= $outputBufferLevel) {
-                    while (ob_get_level() > $outputBufferLevel) {
-                        // Flush 
-                        $output.= ob_get_clean();
-                    }
-                    // Store the output buffer
-                    $output.= ob_get_clean();
-                }
-
+                $output = $kernel->cleanOutputBuffer();
                 echo $output;
             }
         });
-
+        $output = '';
+        $response = null;
         try {
             $response = $this->invokeController($request);
         } catch (Exception $e) {
@@ -173,21 +165,13 @@ class CHTTP_Kernel {
             throw $e;
         } finally {
 
-            if (ob_get_level() >= $outputBufferLevel) {
-                while (ob_get_level() > $outputBufferLevel) {
-                    // Flush 
-                    ob_end_flush();
-                }
-                // Store the output buffer
-                ob_end_clean();
-            }
+            $output = $this->cleanOutputBuffer();
         }
-
         if ($response instanceof CInterface_Responsable) {
             $response = $response->toResponse($request);
         }
         if ($response == null || is_bool($response)) {
-            $response = $outputBuffer;
+            $response = $output;
         }
 
         if (!($response instanceof SymfonyResponse)) {
@@ -200,25 +184,40 @@ class CHTTP_Kernel {
     }
 
     public function handle(CHTTP_Request $request) {
+
+
+        $response = null;
         try {
             $this->setupRouter();
             $response = $this->sendRequest($request);
         } catch (Exception $e) {
-            $this->reportException($e);
+
+
+            //$this->reportException($e);
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
+
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
         }
+
+
+//        if($response->getStatusCode()!=200) {
+//            $this->endOutputBuffering();
+//        }
+
         $this->isHandled = true;
+
 
         return $response;
     }
 
     public function terminate($request, $response) {
-        
+        if (!$this->terminated) {
+            $this->terminated = true;
+        }
     }
 
     public function isHandled() {

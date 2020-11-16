@@ -13,6 +13,7 @@ class CFHTTP {
                 $request = CHTTP_Request::capture()
         )->send();
 
+
         $kernel->terminate($request, $response);
     }
 

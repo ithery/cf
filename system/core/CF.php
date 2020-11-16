@@ -145,6 +145,7 @@ final class CF {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
 
+        
         $capppath = APPPATH;
         $defaultpath = APPPATH;
         if (strlen(self::appCode()) > 0) {
@@ -698,6 +699,7 @@ final class CF {
      * @param   string  final output that will displayed
      * @return  void
      */
+    /*
     public static function render($output) {
         if (self::config('core.render_stats') === TRUE) {
             // Fetch memory usage in MB
@@ -729,11 +731,7 @@ final class CF {
 
 
 
-        /*
-          $response = CHTTP::createResponse($output);
-          $response->send();
-         */
-
+       
         if ($level = self::config('core.output_compression') AND ini_get('output_handler') !== 'ob_gzhandler' AND (int) ini_get('zlib.output_compression') === 0) {
             if ($level < 1 OR $level > 9) {
                 // Normalize the level to be an integer between 1 and 9. This
@@ -775,6 +773,8 @@ final class CF {
 
         echo $output;
     }
+     * 
+     */
 
     /**
      * Displays a 404 page.
@@ -812,9 +812,13 @@ final class CF {
      * @return  void
      */
     public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
+        /*
         if ($exception instanceof \Pheanstalk\Exception\ServerException) {
             return;
         }
+         * 
+         */
+        
         try {
 
             // PHP errors have 5 args, always
@@ -859,7 +863,7 @@ final class CF {
             $uri = '';
 
             if ($PHP_ERROR) {
-
+                
                 $code = $exception;
                 $type = 'PHP Error';
                 $template = 'kohana_error_page';
@@ -914,6 +918,7 @@ final class CF {
 
                 if (!headers_sent()) {
                     // Send the 500 header
+                   
                     header('HTTP/1.1 500 Internal Server Error');
                 }
             } else {
@@ -964,7 +969,7 @@ final class CF {
                         clog::log('error_mail.log', 'error', CF::domain() . " - " . $ex->getMessage());
                     }
                 }
-
+                
                 // Load the error
                 $custom_error = false;
                 if (IN_PRODUCTION) {
