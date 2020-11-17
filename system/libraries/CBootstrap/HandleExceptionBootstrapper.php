@@ -24,11 +24,11 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @return void
      */
     public function bootstrap() {
-        
+
         self::$reservedMemory = str_repeat('x', 10240);
 
 
-        
+
         //error_reporting(-1);
 
         set_error_handler([$this, 'handleError']);
@@ -70,7 +70,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param  \Throwable  $e
      * @return void
      */
-    public function handleException( $e) {
+    public function handleException($e) {
         try {
             self::$reservedMemory = null;
 
@@ -92,7 +92,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param  \Throwable  $e
      * @return void
      */
-    protected function renderForConsole( $e) {
+    protected function renderForConsole($e) {
         $this->getExceptionHandler()->renderForConsole(new ConsoleOutput, $e);
     }
 
@@ -102,7 +102,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param  \Throwable  $e
      * @return void
      */
-    protected function renderHttpResponse( $e) {
+    protected function renderHttpResponse($e) {
         $this->getExceptionHandler()->render(CHTTP::request(), $e)->send();
     }
 
@@ -141,7 +141,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     /**
      * Get an instance of the exception handler.
      *
-     * @return \Illuminate\Contracts\Debug\ExceptionHandler
+     * @return CException_ExceptionHandler
      */
     protected function getExceptionHandler() {
         return CException::exceptionHandler();
