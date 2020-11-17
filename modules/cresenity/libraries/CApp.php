@@ -6,6 +6,7 @@ class CApp implements CInterface_Responsable {
 
     use CTrait_Compat_App,
         CTrait_Macroable,
+        CTrait_RequestInfoTrait,
         CApp_Trait_App_Breadcrumb,
         CApp_Trait_App_Variables,
         CApp_Trait_App_Renderer,
@@ -570,12 +571,12 @@ class CApp implements CInterface_Responsable {
         }
     }
 
-    public static function sendExceptionEmail($email, Exception $exception) {
+    public static function sendExceptionEmail(Exception $exception, $email = null) {
 
 
         if (!($exception instanceof CF_404_Exception)) {
 
-            $html = CApp_ErrorHandler::sendExceptionEmail($email, $exception);
+            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email = null);
         }
     }
 

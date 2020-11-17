@@ -9,21 +9,23 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CApp_ErrorHandler {
 
-    public static function sendExceptionEmail($email, Exception $exception, $subject = null) {
+    public static function sendExceptionEmail(Exception $exception, $email = null, $subject = null) {
         $html = static::getHtml($exception);
         $app = CApp::instance();
         $org = $app->org();
-        $org_name = 'CAPP';
-        $org_email = $org_name;
+        $orgName = 'CAPP';
+        $orgEmail = $orgName;
         if ($org != null) {
-            $org_email = $org->name;
-            $org_name = $org->name;
+            $orgEmail = $org->name;
+            $orgName = $org->name;
         }
+
+        $ymd = date('Ymd');
         if ($subject == null) {
-            $subject = "Error Cresenity APP - " . $org_name . " on " . crouter::complete_uri();
+            $subject = "Error Cresenity APP - " . $orgName . " on " . crouter::complete_uri() . ' [' . $ymd . ']';
         }
-        $headers = "From: " . strip_tags($org_email) . "\r\n";
-        $headers .= "Reply-To: " . strip_tags($org_email) . "\r\n";
+        $headers = "From: " . strip_tags($orgEmail) . "\r\n";
+        $headers .= "Reply-To: " . strip_tags($orgEmail) . "\r\n";
         //$headers .= "CC: susan@example.com\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";

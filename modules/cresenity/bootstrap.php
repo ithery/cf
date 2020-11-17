@@ -30,6 +30,12 @@ if (CF::config('collector.exception')) {
     });
 }
 
+if (CF::config('app.mail_error')) {
+    CException::exceptionHandler()->reportable(function(Exception $e) {
+        CApp::sendExceptionEmail($e);
+    });
+}
+
 if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator") {
 
     //we adjust the the client modules

@@ -49,9 +49,11 @@ $role = $app->role();
                 <tr>
                     <td align="center" valign="top" style="padding:20px 0 20px 0" style="margin:0 auto;">
                         <table bgcolor="#FFFFFF" cellspacing="0" cellpadding="10" border="0" width="650" >
-                            <tr><td >
+                            <tr>
+                                <td >
                                     <div id="framework_error" >
                                         <h3><?php echo chtml::specialchars('CRESENITY APP ERROR') ?></h3>
+                                        <p><strong>Domain</strong>:<?php echo CF::domain(); ?></p>
                                         <?php if ($org != null): ?>
                                             <p><strong>Name</strong>:<?php echo $org->name; ?></p>
                                         <?php endif ?>
@@ -60,18 +62,18 @@ $role = $app->role();
                                             <p><strong>Role name</strong>:<?php echo $role == null ? '' : $role->name; ?></p>
                                         <?php endif ?>
                                         <p><strong>Time</strong>:<?php echo date('Y-m-d H:i:s'); ?></p>
-                                        <p><strong>Browser</strong>:<?php echo crequest::browser(); ?></p>
-                                        <p><strong>Browser Version</strong>:<?php echo crequest::browser_version(); ?></p>
-                                        <p><strong>Platform</strong>:<?php echo crequest::platform(); ?></p>
-                                        <p><strong>Platform Version</strong>:<?php echo crequest::platform_version(); ?></p>
-                                        <p><strong>User Agent</strong>:<?php echo crequest::user_agent(); ?></p>
-                                        <p><strong>Remote Address</strong>:<?php echo crequest::remote_address(); ?></p>
+                                        <p><strong>Browser</strong>:<?php echo CApp::browserName(); ?></p>
+                                        <p><strong>Browser Version</strong>:<?php echo CApp::browserVersion(); ?></p>
+                                        <p><strong>Platform</strong>:<?php echo CApp::platformName(); ?></p>
+                                        <p><strong>Platform Version</strong>:<?php echo CApp::platformVersion(); ?></p>
+                                        <p><strong>User Agent</strong>:<?php echo CApp::userAgent(); ?></p>
+                                        <p><strong>Remote Address</strong>:<?php echo CApp::remoteAddress(); ?></p>
                                         <p><strong>Complete Uri</strong>:<?php echo crouter::complete_uri(); ?></p>
                                         <p><strong>Controller</strong>:<?php echo crouter::controller(); ?></p>
                                         <p><strong>Method</strong>:<?php echo crouter::method(); ?></p>
                                         <h3><?php echo chtml::specialchars($error) ?></h3>
                                         <p><?php echo chtml::specialchars($description) ?></p>
-                                        <?php if (!empty($line) AND!empty($file)): ?>
+                                        <?php if (!empty($line) AND ! empty($file)): ?>
                                             <p><?php echo CF::lang('core.error_file_line', $file, $line) ?></p>
                                         <?php endif ?>
                                         <p>
@@ -85,7 +87,8 @@ $role = $app->role();
                                             <h3><?php echo CF::lang('core.stack_trace') ?></h3>
                                             <?php echo $trace ?>
                                         <?php endif ?>
-                                </td></tr>
+                                </td>
+                            </tr>
                         </table>
                     </td>
                 </tr>
