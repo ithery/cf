@@ -83,21 +83,23 @@ class CLogger {
      *         ':user' => $username,
      *     ));
      *
-     * @param   string  $level       level of message
-     * @param   string  $message     message body
-     * @param   array   $values      values to replace in the message
-     * @param   array   $additional  additional custom parameters to supply to the log writer
+     * @param   string      $level       level of message
+     * @param   string      $message     message body
+     * @param   array       $values      values to replace in the message
+     * @param   array       $context     additional custom parameters to supply to the log writer
+     * @param   Exception   $exception     Exception for log
      * @return  Log
      */
-    public function add($level, $message, array $values = NULL, array $additional = NULL) {
+    public function add($level, $message, array $values = NULL, array $context = [], $exception = NULL) {
         if ($values) {
             // Insert the values into the message
             $message = strtr($message, $values);
         }
 
+        $trace = [];
         // Grab a copy of the trace
-        if (isset($additional['exception'])) {
-            $trace = $additional['exception']->getTrace();
+        if ($exception != null) {
+            $trace = $exception->getTrace();
         } else {
             // Older php version don't have 'DEBUG_BACKTRACE_IGNORE_ARGS', so manually remove the args from the backtrace
             if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
@@ -110,9 +112,7 @@ class CLogger {
             }
         }
 
-        if ($additional == NULL) {
-            $additional = array();
-        }
+
 
         // Create a new message
         $this->_messages[] = array(
@@ -125,7 +125,8 @@ class CLogger {
             'line' => isset($trace[0]['line']) ? $trace[0]['line'] : NULL,
             'class' => isset($trace[0]['class']) ? $trace[0]['class'] : NULL,
             'function' => isset($trace[0]['function']) ? $trace[0]['function'] : NULL,
-            'additional' => $additional,
+            'context' => $context,
+            'exception' => $exception,
         );
 
         if (CLogger::$writeOnAdd) {

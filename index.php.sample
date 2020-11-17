@@ -183,7 +183,10 @@ $file .= $domain . '.php';
 if (file_exists($file)) {
     $content = file_get_contents($file);
     $data = json_decode($content, true);
-    $app_code = $data['app_code'];
+    $app_code='';
+    if(isset($data['app_code'])) {
+        $app_code = $data['app_code'];
+    }
 
     $cf_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
 }

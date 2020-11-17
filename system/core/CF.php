@@ -181,12 +181,6 @@ final class CF {
         // Set autoloader
         spl_autoload_register(array('CF', 'autoLoad'));
 
-        // Set error handler
-        set_error_handler(array('CF', 'exceptionHandler'));
-
-        // Set exception handler
-        set_exception_handler(array('CF', 'exceptionHandler'));
-
         // Set and test the logger instance, we need to know whats wrong when CF Fail
         self::$logger = CLogger::instance();
 
@@ -785,233 +779,40 @@ final class CF {
      * @return  void
      */
     public static function show404($page = FALSE, $template = FALSE) {
-        if (CFRouter::$current_uri == 'favicon.ico') {
-            return false;
+
+        return CF::abort(404);
+    }
+
+    public static function abort($code, $message = '', array $headers = []) {
+        if ($code instanceof CHTTP_Response) {
+            throw new CHttp_Exception_ResponseException($code);
+        } elseif ($code instanceof CInterface_Responsable) {
+            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
         }
 
-
-
-        if (isset($_GET['debug_404'])) {
-            try {
-                throw new Exception('404');
-            } catch (Exception $ex) {
-                cdbg::var_dump(nl2br($ex->getTraceAsString()));
-            }
+        if ($code == 404) {
+            throw new CHTTP_Exception_NotFoundHttpException($message);
         }
-        throw new CF_404_Exception($page, $template);
+
+        throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
     }
 
     /**
-     * Dual-purpose PHP error and exception handler. Uses the kohana_error_page
-     * view to display the message.
+     * Return a new response from the application.
      *
-     * @param   integer|object  exception object or error code
-     * @param   string          error message
-     * @param   string          filename
-     * @param   integer         line number
-     * @return  void
+     * @param  CView|string|array|null  $content
+     * @param  int  $status
+     * @param  array  $headers
+     * @return CHTTP_Response|CHTTP_ResponseFactory
      */
-    public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
-        /*
-          if ($exception instanceof \Pheanstalk\Exception\ServerException) {
-          return;
-          }
-         * 
-         */
+    public static function response($content = '', $status = 200, array $headers = []) {
+        $factory = CHTTP::responseFactory();
 
-        try {
-
-            // PHP errors have 5 args, always
-            $PHP_ERROR = (func_num_args() === 5);
-            if (isset($_GET['debug'])) {
-                if ($PHP_ERROR) {
-                    cdbg::var_dump($message);
-                    try {
-                        throw new Exception('testing');
-                    } catch (Exception $ex) {
-                        cdbg::var_dump($ex->getTraceAsString());
-                    }
-                    die;
-                } else {
-                    cdbg::var_dump($exception);
-                    try {
-                        throw new Exception('testing');
-                    } catch (Exception $ex) {
-                        cdbg::var_dump($ex->getTraceAsString());
-                    }
-                    die;
-                }
-            }
-            $is404 = false;
-            if ($exception instanceof CF_404_Exception) {
-                $is404 = true;
-            }
-
-            // Test to see if errors should be displayed
-            if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
-                return;
-
-            // This is useful for hooks to determine if a page has an error
-            self::$has_error = TRUE;
-
-            if (!is_object($exception)) {
-                $PHP_ERROR = true;
-            }
-
-            // Error handling will use exactly 5 args, every time
-            $trace = '';
-            $uri = '';
-
-            if ($PHP_ERROR) {
-
-                $code = $exception;
-                $type = 'PHP Error';
-                $template = 'kohana_error_page';
-            } else {
-                $code = $exception->getCode();
-                $type = get_class($exception);
-                $message = $exception->getMessage();
-                $file = $exception->getFile();
-                $line = $exception->getLine();
-                $trace = $exception->getTraceAsString();
-                $uri = CFRouter::$current_uri;
-                $template = ($exception instanceof CF_Exception) ? $exception->get_template() : 'kohana_error_page';
-            }
-
-            if (is_numeric($code)) {
-                $codes = self::lang('errors');
-
-                if (!empty($codes[$code])) {
-                    list($level, $error, $description) = $codes[$code];
-                } else {
-                    $level = 1;
-                    $error = $PHP_ERROR ? 'Unknown Error' : get_class($exception);
-                    $description = '';
-                }
-            } else {
-                // Custom error message, this will never be logged
-                $level = 5;
-                $error = $code;
-                $description = '';
-            }
-
-            // Remove the DOCROOT from the path, as a security precaution
-            $file = str_replace('\\', '/', realpath($file));
-            $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
-
-            if ($level <= self::$log_threshold) {
-                // Log the error
-                $need_to_log = true;
-                if (!$PHP_ERROR) {
-                    if ($is404) {
-                        $need_to_log = false;
-                    }
-                }
-                if ($need_to_log) {
-                    self::log(LOG_ERR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
-                }
-            }
-
-            if ($PHP_ERROR) {
-                $description = self::lang('errors.' . E_RECOVERABLE_ERROR);
-                $description = is_array($description) ? $description[2] : '';
-
-                if (!headers_sent()) {
-                    // Send the 500 header
-
-                    header('HTTP/1.1 500 Internal Server Error');
-                }
-            } else {
-                if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
-                    // Send the headers if they have not already been sent
-                    $exception->send_headers();
-                } else {
-                    if (!headers_sent()) {
-                        // Send the 500 header
-                        header('HTTP/1.1 500 Internal Server Error');
-                    }
-                }
-            }
-
-            /*
-              // Close all output buffers except for C
-              while (ob_get_level() > self::$buffer_level) {
-              ob_end_clean();
-              }
-             * 
-             */
-
-            // Test if display_errors is on
-            if (self::config('app.error_disabled') !== TRUE) {
-                /*
-                  if (!IN_PRODUCTION AND $line != FALSE) {
-                  // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                  $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
-
-                  // Beautify backtrace
-                  $trace = self::backtrace($trace);
-                  }
-                 * 
-                 */
-
-                if (IN_PRODUCTION && !$is404) {
-                    $data = array(
-                        'description' => $description,
-                        'error' => $error,
-                        'message' => $message,
-                        'show_debug_error' => '1',
-                    );
-
-                    $view = CView::factory('kohana_error_page', $data);
-                    try {
-                        cmail::error_mail($view->render());
-                    } catch (Exception $ex) {
-                        clog::log('error_mail.log', 'error', CF::domain() . " - " . $ex->getMessage());
-                    }
-                }
-
-                // Load the error
-                $custom_error = false;
-                if (IN_PRODUCTION) {
-                    if (!isset($_GET['show_error'])) {
-                        if (CView::exists('ccore/error_page')) {
-                            $custom_error = true;
-                            echo CView::factory('ccore/error_page')->render();
-                        }
-                    }
-                }
-                if (!$custom_error) {
-                    require self::findFile('views', empty($template) ? 'kohana_error_page' : $template);
-                }
-            } else {
-                // Get the i18n messages
-                $error = self::lang('core.generic_error');
-                $message = self::lang('core.errors_disabled', curl::site(), curl::site(CFRouter::$current_uri));
-
-                // Load the errors_disabled view
-                require self::findFile('views', 'kohana_error_disabled');
-            }
-
-            if (!CFEvent::has_run('system.shutdown')) {
-                // Run the shutdown even to ensure a clean exit
-                CFEvent::run('system.shutdown');
-            }
-
-            // Turn off error reporting
-            error_reporting(0);
-            exit;
-        } catch (Exception $e) {
-
-            if (IN_PRODUCTION) {
-                if (isset($_GET['debug'])) {
-                    die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
-                } else {
-                    die('Fatal Error');
-                }
-            } else {
-                die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
-            }
+        if (func_num_args() === 0) {
+            return $factory;
         }
+
+        return $factory->make($content, $status, $headers);
     }
 
     /**

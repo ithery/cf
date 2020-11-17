@@ -103,11 +103,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return $this->container->call($reportCallable);
         }
 
-        
+
         foreach ($this->reportCallbacks as $reportCallback) {
-            
+
             if ($reportCallback->handles($e)) {
-                
+
                 if ($reportCallback($e) === false) {
                     return;
                 }
@@ -168,11 +168,25 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Render an exception into a response.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \CHTTP_Request $request
      * @param  \Exception  $e
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
+     * @return \CHTTP_Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render($request, $e) {
+
+        if ($this->isHttpException($e)) {
+            if (CView::exists('errors/http/' . $e->getStatusCode())) {
+                return CF::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
+            } else {
+                if ($e->getStatusCode() == 404) {
+                    //backward compatibility old view
+                    if (CView::exists('ccore/404')) {
+                        return CF::response()->view('ccore/404', [], $e->getStatusCode());
+                    }
+                }
+            }
+        }
+
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::toResponse($request, $response);
         } elseif ($e instanceof CInterface_Responsable) {
@@ -287,7 +301,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return $this->toHttpResponse($this->convertExceptionToResponse($e), $e);
         }
         if (!$this->isHttpException($e)) {
-            $e = new HttpException(500, $e->getMessage());
+            $e = new CHTTP_Exception_HttpException(500, $e->getMessage());
         }
 
         $response = $this->toHttpResponse(
@@ -420,7 +434,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     protected function toHttpResponse($response, $e) {
 
         if ($response instanceof SymfonyRedirectResponse) {
-            $response = new RedirectResponse(
+            $response = new CHTTP_RedirectResponse(
                     $response->getTargetUrl(), $response->getStatusCode(), $response->headers->all()
             );
         } else {
@@ -471,7 +485,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     protected function isDebug() {
-        $isDebug = ccfg::get('debug');
+        $isDebug = CF::config('app.debug');
         if ($isDebug === null) {
             $isDebug = !CF::isProduction();
         }
@@ -504,7 +518,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * Register a reportable callback.
      *
      * @param  callable  $reportUsing
-     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
+     * @return CException_ReportableHandler
      */
     public function reportable(callable $reportUsing) {
         return c::tap(new CException_ReportableHandler($reportUsing), function ($callback) {

@@ -217,12 +217,8 @@ class CView {
      * @return  string
      */
     public function __toString() {
-        try {
-            return $this->render();
-        } catch (Exception $e) {
-            // Display the exception using its internal __toString method
-            return (string) $e;
-        }
+
+        return $this->render();
     }
 
     /**

@@ -9,6 +9,19 @@ class CHTTP_ResponseFactory {
 
     use CTrait_Macroable;
 
+    protected static $instance;
+
+    private function __construct() {
+        
+    }
+
+    public static function instance() {
+        if (static::$instance == null) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
+
     /**
      * Create a new response instance.
      *
@@ -17,7 +30,7 @@ class CHTTP_ResponseFactory {
      * @param  array  $headers
      * @return CHTTP_Response
      */
-    public static function make($content = '', $status = 200, array $headers = []) {
+    public function make($content = '', $status = 200, array $headers = []) {
         return CHTTP::createResponse($content, $status, $headers);
     }
 
@@ -28,7 +41,7 @@ class CHTTP_ResponseFactory {
      * @param  array  $headers
      * @return CHTTP_Response
      */
-    public static function noContent($status = 204, array $headers = []) {
+    public function noContent($status = 204, array $headers = []) {
         return $this->make('', $status, $headers);
     }
 
@@ -41,12 +54,12 @@ class CHTTP_ResponseFactory {
      * @param  array  $headers
      * @return CHTTP_Response
      */
-    public static function view($view, $data = [], $status = 200, array $headers = []) {
-        if (is_array($view)) {
-            return $this->make($this->view->first($view, $data), $status, $headers);
+    public function view($view, $data = [], $status = 200, array $headers = []) {
+        if(!$view instanceof CView) {
+            $view = CView::factory($view,$data);
         }
 
-        return $this->make($this->view->make($view, $data), $status, $headers);
+        return $this->make($view, $status, $headers);
     }
 
     /**
@@ -58,8 +71,8 @@ class CHTTP_ResponseFactory {
      * @param  int  $options
      * @return CHTTP_JsonResponse
      */
-    public static function json($data = [], $status = 200, array $headers = [], $options = 0) {
-        return new JsonResponse($data, $status, $headers, $options);
+    public function json($data = [], $status = 200, array $headers = [], $options = 0) {
+        return new CHTTP_JsonResponse($data, $status, $headers, $options);
     }
 
     /**
@@ -72,7 +85,7 @@ class CHTTP_ResponseFactory {
      * @param  int  $options
      * @return CHTTP_JsonResponse
      */
-    public static function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0) {
+    public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0) {
         return $this->json($data, $status, $headers, $options)->setCallback($callback);
     }
 
@@ -84,7 +97,7 @@ class CHTTP_ResponseFactory {
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public static function stream($callback, $status = 200, array $headers = []) {
+    public function stream($callback, $status = 200, array $headers = []) {
         return new StreamedResponse($callback, $status, $headers);
     }
 
@@ -97,7 +110,7 @@ class CHTTP_ResponseFactory {
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public static function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment') {
+    public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment') {
         $response = new StreamedResponse($callback, 200, $headers);
 
         if (!is_null($name)) {
@@ -118,7 +131,7 @@ class CHTTP_ResponseFactory {
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public static function download($file, $name = null, array $headers = [], $disposition = 'attachment') {
+    public function download($file, $name = null, array $headers = [], $disposition = 'attachment') {
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
         if (!is_null($name)) {
@@ -134,7 +147,7 @@ class CHTTP_ResponseFactory {
      * @param  string  $name
      * @return string
      */
-    protected static function fallbackName($name) {
+    protected function fallbackName($name) {
         return str_replace('%', '', cstr::ascii($name));
     }
 
@@ -145,7 +158,7 @@ class CHTTP_ResponseFactory {
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public static function file($file, array $headers = []) {
+    public function file($file, array $headers = []) {
         return new BinaryFileResponse($file, 200, $headers);
     }
 

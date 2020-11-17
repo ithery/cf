@@ -76,4 +76,12 @@ class CHTTP {
         static::$request = null;
     }
 
+    /**
+     * 
+     * @return CHTTP_ResponseFactory
+     */
+    public static function responseFactory() {
+        return CHTTP_ResponseFactory::instance();
+    }
+
 }
