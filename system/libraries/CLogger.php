@@ -96,6 +96,10 @@ class CLogger {
             $message = strtr($message, $values);
         }
 
+        if (strlen($message) == 0 && $exception != null) {
+            $message = get_class($exception);
+        }
+
         $trace = [];
         // Grab a copy of the trace
         if ($exception != null) {

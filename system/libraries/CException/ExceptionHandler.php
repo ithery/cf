@@ -57,14 +57,14 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @var array
      */
     protected $internalDontReport = [
-        AuthenticationException::class,
-        AuthorizationException::class,
+        //AuthenticationException::class,
+        //AuthorizationException::class,
         HttpException::class,
-        HttpResponseException::class,
+        CHTTP_Exception_ResponseException::class,
         CModel_Exception_ModelNotFound::class,
-        SuspiciousOperationException::class,
-        TokenMismatchException::class,
-        ValidationException::class,
+            //SuspiciousOperationException::class,
+            //TokenMismatchException::class,
+            //ValidationException::class,
     ];
 
     /**
@@ -114,7 +114,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             }
         }
 
-        CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, array_merge($this->context(), ['exception' => $e]));
+
+
+        CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, $this->context(), $e);
 //        try {
 //            CLogger::instance()->add($reportCallable, $message)
 //            $logger = $this->container->make(LoggerInterface::class);
@@ -157,8 +159,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     protected function context() {
         try {
             return array_filter([
-//                'userId' => Auth::id(),
-                    // 'email' => optional(Auth::user())->email,
+                'domain' => CF::domain(),
+                'appCode' => CF::appCode(),
+                'appId' => CF::appId(),
+                'orgCode' => CF::orgCode(),
+                'orgId' => CF::orgId(),
             ]);
         } catch (Exception $e) {
             return [];

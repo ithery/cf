@@ -81,8 +81,13 @@ abstract class CLogger_Writer {
 
         if (isset($message['exception']) && $message['exception'] != null) {
             // Re-use as much as possible, just resetting the body to the trace
-            $message['body'] = $message['exception']->getTraceAsString();
-            $message['level'] = $this->_log_levels[CLogger_Writer::$strace_level];
+
+            if (carr::get($message, 'level') >= static::$strace_level) {
+                $message['body'] .= $message['trace'];
+            }
+            if(isset($this->_log_levels[$message['level']])) {
+                $message['level'] = $this->_log_levels[$message['level']];
+            }
 
             $string .= PHP_EOL . strtr($format, array_filter($message, 'is_scalar'));
         }
