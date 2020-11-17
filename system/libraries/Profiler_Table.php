@@ -26,7 +26,7 @@ class Profiler_Table {
 		if ( ! $styles_output)
 		{
 			$styles_output = TRUE;
-			return file_get_contents(CF::find_file('views', 'kohana_profiler_table', FALSE, 'css'));
+			return file_get_contents(CF::findFile('views', 'kohana_profiler_table', FALSE, 'css'));
 		}
 
 		return '';
