@@ -1509,7 +1509,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      */
     public function toArray() {
         return array_map(function ($value) {
-            return $value instanceof Arrayable ? $value->toArray() : $value;
+            return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
         }, $this->items);
     }
 
