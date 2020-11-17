@@ -1151,7 +1151,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null) {
-        return array_reduce($this->items, $callback, $initial);
+        return carr::reduce($this->items, $callback, $initial);
     }
 
     /**
