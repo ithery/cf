@@ -184,10 +184,10 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Set the request instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @return void
      */
-    public function setRequest(Request $request) {
+    public function setRequest(CHTTP_Request $request) {
         $this->request = $request;
     }
 

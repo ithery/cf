@@ -9,12 +9,13 @@ class CConfig {
     protected $configs = array();
 
     protected function __construct($group) {
-        $files = CF::find_file('config', $group);
+        $files = CF::findFile('config', $group);
 
         //add backward compatibility
         //TODO: remove folder config in DOCROOT
-        if (!is_array($files))
+        if (!is_array($files)) {
             $files = array();
+        }
         if (file_exists(DOCROOT . 'config' . DS . $group . EXT)) {
             $files[] = DOCROOT . 'config' . DS . $group . EXT;
         }
@@ -121,7 +122,7 @@ class CConfig {
 
         //we will flatten the array of result Data
         $result = array();
-        $addToResult = function($key, $value, &$result) use($resultFiles,$files) {
+        $addToResult = function($key, $value, &$result) use($resultFiles, $files) {
             $keyParts = explode('.', $key);
             $resultData = array();
             $resultData['key'] = $key;

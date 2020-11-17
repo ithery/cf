@@ -84,4 +84,12 @@ class CHTTP {
         return CHTTP_ResponseFactory::instance();
     }
 
+    /**
+     * 
+     * @return CHTTP_Redirector
+     */
+    public static function redirector() {
+        return CHTTP_Redirector::instance();
+    }
+
 }

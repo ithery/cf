@@ -153,7 +153,9 @@ class CHTTP_Kernel {
         register_shutdown_function(function() use ($kernel) {
             if (!$kernel->isHandled()) {
                 $output = $kernel->cleanOutputBuffer();
-                echo $output;
+                if (strlen($output) > 0) {
+                    echo $output;
+                }
             }
         });
         $output = '';

@@ -274,8 +274,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \Illuminate\Http\Response
      */
     protected function invalid($request, ValidationException $exception) {
-        return redirect(isset($exception->redirectTo) ? $exception->redirectTo : url()->previous())
-                        ->withInput(Arr::except($request->input(), $this->dontFlash))
+        return CF::redirect(isset($exception->redirectTo) ? $exception->redirectTo : url()->previous())
+                        ->withInput(crr::except($request->input(), $this->dontFlash))
                         ->withErrors($exception->errors(), $exception->errorBag);
     }
 

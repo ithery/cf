@@ -680,7 +680,7 @@ final class CF {
                 $directory = str_replace('\\', '/', $dir) . '/';
             } else {
                 // Log directory is invalid
-                throw new CF_Exception('core.log_dir_unwritable', $dir);
+                throw new CException('core.log_dir_unwritable', $dir);
             }
         }
 
@@ -779,7 +779,6 @@ final class CF {
      * @return  void
      */
     public static function show404($page = FALSE, $template = FALSE) {
-
         return CF::abort(404);
     }
 
@@ -795,6 +794,59 @@ final class CF {
         }
 
         throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
+    }
+
+    /**
+     * Throw an HttpException with the given data if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public static function abortIf($boolean, $code, $message = '', array $headers = []) {
+        if ($boolean) {
+            static::abort($code, $message, $headers);
+        }
+    }
+
+    /**
+     * Throw an HttpException with the given data unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public static function abortUnless($boolean, $code, $message = '', array $headers = []) {
+        if (!$boolean) {
+            static::abort($code, $message, $headers);
+        }
+    }
+
+    /**
+     * Get an instance of the redirector.
+     *
+     * @param  string|null  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
+        if (is_null($to)) {
+            return CHTTP::redirector();
+        }
+
+        return CHTTP::redirector()->to($to, $status, $headers, $secure);
     }
 
     /**
@@ -818,7 +870,7 @@ final class CF {
     /**
      * Provides class auto-loading.
      *
-     * @throws  CF_Exception
+     * @throws  CException
      * @param   string  name of class
      * @return  bool
      */
@@ -999,7 +1051,7 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @throws  CF_Exception  if file is required and not found
+     * @throws  CException  if file is required and not found
      * @param   string   directory to search in
      * @param   string   filename to look for (without extension)
      * @param   boolean  file required
@@ -1060,7 +1112,7 @@ final class CF {
                 $directory = 'core.' . inflector::singular($directory);
 
                 // If the file is required, throw an exception
-                throw new CF_Exception('core.resource_not_found', self::lang($directory), $filename);
+                throw new CException('core.resource_not_found', self::lang($directory), $filename);
             } else {
                 // Nothing was found, return FALSE
                 $found = FALSE;
@@ -1809,114 +1861,3 @@ final class CF {
 }
 
 // End CF
-
-/**
- * Creates a generic i18n exception.
- */
-class CF_Exception extends Exception {
-
-    // Template file
-    protected $template = 'kohana_error_page';
-    // Header
-    protected $header = FALSE;
-    // Error code
-    protected $code = E_CF;
-
-    /**
-     * Set exception message.
-     *
-     * @param  string  i18n language key for the message
-     * @param  array   addition line parameters
-     */
-    public function __construct($error) {
-
-        $args = array_slice(func_get_args(), 1);
-
-        // Fetch the error message
-        $message = CF::lang($error, $args);
-
-        if ($message === $error OR empty($message)) {
-            // Unable to locate the message for the error
-            $message = 'Unknown Exception: ' . $error;
-        }
-
-        // Sets $this->message the proper way
-        parent::__construct($message);
-    }
-
-    /**
-     * Magic method for converting an object to a string.
-     *
-     * @return  string  i18n message
-     */
-    public function __toString() {
-        return (string) $this->message;
-    }
-
-    /**
-     * Fetch the template name.
-     *
-     * @return  string
-     */
-    public function get_template() {
-
-        return $this->template;
-    }
-
-    /**
-     * Sends an Internal Server Error header.
-     *
-     * @return  void
-     */
-    public function send_headers() {
-        // Send the 500 header
-        header('HTTP/1.1 500 Internal Server Error');
-    }
-
-}
-
-// End C PHP Exception
-
-/**
- * Creates a Page Not Found exception.
- */
-class CF_404_Exception extends CF_Exception {
-
-    protected $code = E_PAGE_NOT_FOUND;
-
-    /**
-     * Set internal properties.
-     *
-     * @param  string  URL of page
-     * @param  string  custom error template
-     */
-    public function __construct($page = FALSE, $template = FALSE) {
-        if ($page === FALSE) {
-            // Construct the page URI using Router properties
-            $page = CFRouter::$current_uri . CFRouter::$url_suffix . CFRouter::$query_string;
-        }
-
-        if ($template == false) {
-            if (CView::exists('ccore/404')) {
-                $template = 'ccore/404';
-            }
-        }
-
-        Exception::__construct(CF::lang('core.page_not_found', $page));
-
-        $this->template = $template;
-    }
-
-    /**
-     * Sends "File Not Found" headers, to emulate server behavior.
-     *
-     * @return void
-     */
-    public function send_headers() {
-        // Send the 404 header
-        header('HTTP/1.1 404 File Not Found');
-    }
-
-}
-
-// End C 404 Exception
