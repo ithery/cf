@@ -21,8 +21,6 @@ class CConfig {
         }
         //reverse ordering to set priority
         if ($files == null) {
-            //var_dump(debug_backtrace());
-            //throw new CF_Exception('file config '.$group.' not found');
             $files = array();
         }
         $this->group = $group;
@@ -35,6 +33,7 @@ class CConfig {
                 //backward compatibility with older config
                 if (isset($config)) {
                     $cfg = $config;
+                    unset($config);
                 }
             }
             if (!is_array($cfg)) {

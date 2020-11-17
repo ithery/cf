@@ -48,7 +48,7 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new response for a given view.
      *
-     * @param  string|array  $view
+     * @param  string|CView  $view
      * @param  array  $data
      * @param  int  $status
      * @param  array  $headers
@@ -57,6 +57,10 @@ class CHTTP_ResponseFactory {
     public function view($view, $data = [], $status = 200, array $headers = []) {
         if(!$view instanceof CView) {
             $view = CView::factory($view,$data);
+        } else {
+            if(is_array($data) && count($data)>0) {
+                $view->set($data);
+            }
         }
 
         return $this->make($view, $status, $headers);

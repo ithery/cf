@@ -40,7 +40,7 @@ class CView {
     /**
      * Attempts to load a view and pre-load view data.
      *
-     * @throws  CF_Exception  if the requested view cannot be found
+     * @throws  CException  if the requested view cannot be found
      * @param   string  view name
      * @param   array   pre-load data
      * @param   string  type of file: html, css, js, etc.
@@ -86,7 +86,7 @@ class CView {
         } else {
             // Check if the filetype is allowed by the configuration
             if (!in_array($type, CF::config('view.allowed_filetypes')))
-                throw new CF_Exception('core.invalid_filetype', $type);
+                throw new CException('core.invalid_filetype', $type);
 
             // Load the filename and set the content type
             $this->filename = CF::findFile(self::$viewFolder, $name, TRUE, $type);
@@ -264,7 +264,7 @@ class CView {
      */
     public function render($print = FALSE, $renderer = FALSE) {
         if (empty($this->filename)) {
-            throw new CF_Exception('core.view_set_filename');
+            throw new CException('core.view_set_filename');
         }
         if (is_string($this->filetype)) {
 
