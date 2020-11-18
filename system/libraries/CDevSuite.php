@@ -142,8 +142,7 @@ class CDevSuite {
                 case CServer::OS_DARWIN:
                     static::$commandLine = new CDevSuite_Mac_CommandLine();
                     break;
-
-                }
+            }
         }
         return static::$commandLine;
     }
@@ -281,6 +280,20 @@ class CDevSuite {
 
     public static function staticPrefix() {
         return '41c270e4-5535-4daa-b23e-c269744c2f45';
+    }
+
+    public static function osFolder() {
+        $os = CServer::getOs();
+        if ($os == CServer::OS_WINNT) {
+            return "win";
+        }
+        if ($os == CServer::OS_DARWIN) {
+            return "mac";
+        }
+        if ($os == CServer::OS_LINUX) {
+            return "linux";
+        }
+        return "linux";
     }
 
 }
