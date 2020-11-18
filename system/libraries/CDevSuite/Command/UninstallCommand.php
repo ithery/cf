@@ -26,7 +26,7 @@ class CDevSuite_Command_UninstallCommand extends CDevSuite_CommandAbstract {
                 break;
         }
 
-        CDevSuite::uninstall();
+        CDevSuite::devCloud()->uninstall();
         CDevSuite::info('Dev Suite has been uninstalled.');
     }
 
