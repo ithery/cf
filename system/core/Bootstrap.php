@@ -1,16 +1,7 @@
 <?php
 
 defined('SYSPATH') OR die('No direct access allowed.');
-/**
- * CF process control file, loaded by the front controller.
- * 
- * $Id: Bootstrap.php 4409 2009-06-06 00:48:26Z zombor $
- *
- * @package    Core
- * @author     CF Team
- * @copyright  (c) 2007 CF Team
- * @license    http://kohanaphp.com/license.html
- */
+
 define('CF_VERSION', '1.0');
 define('CF_CODENAME', 'CF1.0');
 
@@ -26,7 +17,7 @@ require SYSPATH . 'core/CFBenchmark' . EXT;
 // Start total_execution
 CFBenchmark::start(SYSTEM_BENCHMARK . '_total_execution');
 
-// Start kohana_loading
+// Start CF Loading
 CFBenchmark::start(SYSTEM_BENCHMARK . '_cf_loading');
 
 // Load core files
@@ -43,13 +34,9 @@ require SYSPATH . 'core/CF' . EXT;
 CF::setup();
 
 
-// End kohana_loading
+// End CF Loading
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_cf_loading');
 
-// Start system_initialization
-//CFBenchmark::start(SYSTEM_BENCHMARK . '_system_initialization');
-// Prepare the system
-CFEvent::run('system.ready');
 
 if (defined('CFCLI')) {
     CFConsole::execute();
@@ -59,20 +46,3 @@ if (defined('CFCLI')) {
 
 // stop total_execution
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_total_execution');
-/*
-// Determine routing
-CFRouter::findUri();
-CFRouter::setup();
-CFEvent::run('system.routing');
-
-// End system_initialization
-CFBenchmark::stop(SYSTEM_BENCHMARK . '_system_initialization');
-
-// Make the magic happen!
-$instance = CF::instance();
-CFEvent::run('system.execute');
-
-// Clean up and exit
-CF::shutdown();
-CFEvent::run('system.shutdown');
-*/

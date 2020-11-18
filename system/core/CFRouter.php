@@ -31,9 +31,6 @@ class CFRouter {
     public static function setup() {
         self::resetup(self::$current_uri);
 
-        // Last chance to set routing before a 404 is triggered
-        CFEvent::run('system.post_routing');
-
         if (self::$controller === NULL) {
             // No controller was found, so no page can be rendered
             CF::show404();
@@ -55,11 +52,11 @@ class CFRouter {
         if ($uri !== null) {
             $currentUri = $uri;
         }
-        
+
         if ($currentUri === null) {
             $currentUri = self::getUri();
         }
-        
+
         // Load routes
         $routesConfig = CF::config('routes');
         $routesRuntime = self::$routesRuntime;
@@ -75,7 +72,7 @@ class CFRouter {
 
             // Use the default route when no segments exist
             $currentUri = $routes['_default'];
-            
+
             // Default route is in use
             $default_route = TRUE;
         }
@@ -246,7 +243,7 @@ class CFRouter {
      * @return string uri
      */
     public static function getUri() {
-        
+
         $currentUri = '';
         if (PHP_SAPI === 'cli') {
 
@@ -303,7 +300,6 @@ class CFRouter {
         } elseif (isset($_SERVER['REQUEST_URI']) AND $_SERVER['REQUEST_URI']) {
             $currentUri = $_SERVER['REQUEST_URI'];
             $currentUri = strtok($currentUri, '?');
-            
         } elseif (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF']) {
             $currentUri = $_SERVER['PHP_SELF'];
         }

@@ -226,9 +226,6 @@ final class CF {
         }
 
 
-        // Enable CF 404 pages
-        CFEvent::add('system.404', array('CF', 'show404'));
-
         static::loadBootstrapFiles();
 
         // Setup is complete, prevent it from being run again
@@ -306,7 +303,7 @@ final class CF {
             } catch (ReflectionException $e) {
                 // Controller does not exist
 
-                CFEvent::run('system.404');
+                CF::show404();
             }
         }
 
@@ -348,17 +345,14 @@ final class CF {
     }
 
     /**
-     * Loads the controller and initializes it. Runs the pre_controller,
-     * post_controller_constructor, and post_controller events. Triggers
-     * a system.404 event when the route cannot be mapped to a controller.
-     *
-     * This method is benchmarked as controller_setup and controller_execution.
-     *
-     * @return  object  instance of controller
+     * 
+     * @param type $directory
+     * @param type $domain
+     * @return string
      */
     public static function getDir($directory = '', $domain = null) {
-        $include_paths = CF::paths();
-        foreach ($include_paths as $p) {
+        $includePaths = CF::paths($domain);
+        foreach ($includePaths as $p) {
             $path = $p;
             if (strlen($directory) > 0) {
                 $path = $p . $directory . DS;
@@ -377,9 +371,9 @@ final class CF {
      * @return array array of directory
      */
     public static function getDirs($directory, $domain = null) {
-        $include_paths = CF::paths();
+        $includePaths = CF::paths($domain);
         $dirs = array();
-        foreach ($include_paths as $p) {
+        foreach ($includePaths as $p) {
             $path = $p . $directory . DS;
             if (is_dir($path)) {
                 $dirs[] = $path;
