@@ -16,9 +16,22 @@ class CDevSuite_Command_ShareCommand extends CDevSuite_CommandAbstract {
         $tld = CDevSuite::tld();
         $port = CDevSuite::site()->port("$host.$tld");
         $port = $port === 443 ? 60 : $port;
-        $ngrok = realpath(CDevSuite::binPath() . 'ngrok.exe');
 
-        passthru("start \"$host.$tld\" \"$ngrok\" http $host.$tld:$port -host-header=rewrite");
+        switch (CServer::getOS()) {
+            case CServer::OS_LINUX:
+            case CServer::OS_DARWIN:
+                $ngrok = realpath(CDevSuite::binPath() . 'ngrok');
+                $ngrokCommand = "\"$ngrok\" http $host.$tld:$port -host-header=rewrite";
+                CDevSuite::commandLine()->runAsUser("open \"$host.$tld\" " . $ngrokCommand);
+                break;
+            case CServer::OS_WINNT:
+
+                $ngrok = realpath(CDevSuite::binPath() . 'ngrok.exe');
+
+                $ngrokCommand = "\"$ngrok\" http $host.$tld:$port -host-header=rewrite";
+                passthru("start \"$host.$tld\" " . $ngrokCommand);
+                break;
+        }
     }
 
 }
