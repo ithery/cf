@@ -20,7 +20,6 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     /**
      * Bootstrap the given application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function bootstrap() {

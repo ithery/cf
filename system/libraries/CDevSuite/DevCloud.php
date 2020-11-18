@@ -39,7 +39,9 @@ abstract class CDevSuite_DevCloud {
             }
         }
         foreach ($this->requiredFolders as $folder) {
-            $this->files->mkdir($this->binPath($folder));
+            if(!$this->files->isDir($this->binPath($folder))) {
+                $this->files->mkdir($this->binPath($folder));
+            }
         }
     }
 

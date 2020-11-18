@@ -19,7 +19,9 @@
 <p><code class="block"><?php echo $message ?></code></p>
 <?php if ( ! empty($trace)): ?>
 <h3><?php echo CF::lang('core.stack_trace') ?></h3>
+<pre>
 <?php echo $trace ?>
+</pre>
 <?php endif ?>
 <p class="stats"><?php echo CF::lang('core.stats_footer') ?></p>
 <?php  endif; ?>

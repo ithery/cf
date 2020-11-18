@@ -7,6 +7,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 4, 2019, 9:20:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+CBootstrap::instance()->addBootstrapper([
+    CApp_Bootstrapper_DependencyChecker::class,
+]);
+
 $domain = CF::domain();
 $isAppBox = strpos($domain, 'app.ittron.co.id') !== false || strpos($domain, 'cpanel.ittron.co.id') !== false;
 if ($isAppBox) {
