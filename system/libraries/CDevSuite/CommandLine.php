@@ -5,6 +5,9 @@
  *
  * @author Hery
  */
+
+use Symfony\Component\Process\Process;
+
 abstract class CDevSuite_CommandLine {
 
     /**

@@ -5,7 +5,6 @@
  *
  * @author Hery
  */
-
-class CDevSuite_PhpFpm {
+abstract class CDevSuite_PhpFpm {
     
 }

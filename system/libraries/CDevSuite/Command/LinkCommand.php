@@ -21,6 +21,8 @@ class CDevSuite_Command_LinkCommand extends CDevSuite_CommandAbstract {
         if ($secure) {
             $cfCommand->call('devsuite::secure ' . $name);
         }
+        
+        
     }
 
 }
