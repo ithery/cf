@@ -48,7 +48,7 @@ abstract class CDevSuite_Site {
      * @return string
      */
     public function sitesPath($link = null) {
-        return $this->devSuiteHomePath() . '/Sites' . ($link ? '/' . $link : '');
+        return $this->devSuiteHomePath() . 'Sites' . ($link ? '/' . $link : '');
     }
 
     /**
@@ -57,7 +57,7 @@ abstract class CDevSuite_Site {
      * @return string
      */
     public function caPath($caFile = null) {
-        return $this->devSuiteHomePath() . '/CA' . ($caFile ? '/' . $caFile : '');
+        return $this->devSuiteHomePath() . 'CA' . ($caFile ? '/' . $caFile : '');
     }
 
     /**
@@ -69,14 +69,14 @@ abstract class CDevSuite_Site {
         $url = $url ? '/' . $url : '';
         $extension = $extension ? '.' . $extension : '';
 
-        return $this->devSuiteHomePath() . '/Certificates' . $url . $extension;
+        return $this->devSuiteHomePath() . 'Certificates' . $url . $extension;
     }
 
     /**
      * Get the path to Nginx site configuration files.
      */
     public function nginxPath($additionalPath = null) {
-        return $this->devSuiteHomePath() . '/Nginx' . ($additionalPath ? '/' . $additionalPath : '');
+        return $this->devSuiteHomePath() . 'Nginx' . ($additionalPath ? '/' . $additionalPath : '');
     }
 
     /**

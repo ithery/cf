@@ -34,18 +34,64 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
                 $this->remove(new \FilesystemIterator($file));
 
                 if (true !== @rmdir($file)) {
-                    throw new \Exception(sprintf('Failed to remove directory "%s".', $file), 0, null, $file);
+                    throw new \Exception(sprintf('Failed to remove directory "%s".', $file));
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
                 if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
                     if (true !== @rmdir($file)) {
-                        throw new \Exception(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
+                        throw new \Exception(sprintf('Failed to remove file "%s".', $file));
                     }
                 } else {
                     if (true !== @unlink($file)) {
                         throw new \Exception(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
                     }
+                }
+            }
+        }
+    }
+
+    protected function removeDirectoryAsRoot($file) {
+        $command = sprintf('sudo rm %s -rf', $file);
+        CDevSuite::commandLine()->run($command);
+
+        if (is_dir($file)) {
+            throw new \Exception(sprintf('Failed to remove directory "%s".', $file));
+        }
+    }
+    protected function removeFileAsRoot($file) {
+        $command = sprintf('sudo rm %s -f', $file);
+        CDevSuite::commandLine()->run($command);
+
+        if (file_exists($file)) {
+            throw new \Exception(sprintf('Failed to remove file "%s".', $file));
+        }
+    }
+
+    /**
+     * Delete the specified file or directory with files.
+     *
+     * @param string $files
+     * @return void
+     */
+    public function removeAsRoot($files) {
+        $files = iterator_to_array($this->toIterator($files));
+        $files = array_reverse($files);
+        foreach ($files as $file) {
+            if (!file_exists($file) && !is_link($file)) {
+                continue;
+            }
+
+            if (is_dir($file) && !is_link($file)) {
+                $this->removeAsRoot(new \FilesystemIterator($file));
+
+                $this->removeDirectoryAsRoot($file);
+            } else {
+                // https://bugs.php.net/bug.php?id=52176
+                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
+                    $this->removeDirectoryAsRoot($file);
+                } else {
+                    $this->removeFileAsRoot($file);
                 }
             }
         }
@@ -78,7 +124,26 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
 
         if (!$this->exists($to)) {
             if ($this->exists($file)) {
-                return rename($file, $to);
+                return $this->rename($file, $to);
+            }
+        }
+
+        return false;
+    }
+    
+    
+    /**
+     * Backup the given file.
+     *
+     * @param string $file
+     * @return bool
+     */
+    public function backupAsRoot($file) {
+        $to = $file . '.bak';
+
+        if (!$this->exists($to)) {
+            if ($this->exists($file)) {
+                return $this->renameAsRoot($file, $to);
             }
         }
 
@@ -95,7 +160,23 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
         $from = $file . '.bak';
 
         if ($this->exists($from)) {
-            return rename($from, $file);
+            return $this->rename($from, $file);
+        }
+
+        return false;
+    }
+    
+    /**
+     * Restore a backed up file.
+     *
+     * @param string $file
+     * @return bool
+     */
+    public function restoreAsRoot($file) {
+        $from = $file . '.bak';
+
+        if ($this->exists($from)) {
+            return $this->renameAsRoot($from, $file);
         }
 
         return false;

@@ -58,6 +58,7 @@ class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
         $_SERVER['SERVER_ADDR'] = '127.0.0.1';
         $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
 
+                
         $dynamicCandidates = [
             $this->asActualFile($sitePath, $uri),
             $this->asPhpIndexFileInDirectory($sitePath, $uri),
@@ -80,6 +81,7 @@ class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
             $this->asPublicHtmlIndexFile($sitePath) => $sitePath . '/public',
         ];
 
+        
         foreach ($fixedCandidatesAndDocroots as $candidate => $docroot) {
             if ($this->isActualFile($candidate)) {
                 $_SERVER['SCRIPT_FILENAME'] = $candidate;

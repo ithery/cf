@@ -65,6 +65,8 @@ class CConsole_Command extends SymfonyCommand {
             parent::__construct($this->name);
         }
 
+        
+        
         // Once we have constructed the command, we'll set the description and other
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
@@ -75,6 +77,7 @@ class CConsole_Command extends SymfonyCommand {
         if (!isset($this->signature)) {
             $this->specifyParameters();
         }
+        
     }
 
     /**

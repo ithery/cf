@@ -61,7 +61,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
         $this->events = $events;
 
         
-        //CBootstrap::instance()->boot();
+        CBootstrap::instance()->boot();
         
 //        $this->app->booted(function () {
 //            $this->defineConsoleSchedule();

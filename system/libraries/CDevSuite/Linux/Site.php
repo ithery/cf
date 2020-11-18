@@ -95,14 +95,14 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     public function createCa() {
         $caPemPath = $this->caPath('CFDevSuiteCASelfSigned.pem');
         $caKeyPath = $this->caPath('CFDevSuiteCASelfSigned.key');
-        
+
         if ($this->files->exists($caKeyPath) && $this->files->exists($caPemPath)) {
             return;
         }
-        
+
         $oName = 'CF DevSuite CA Self Signed Organization';
         $cName = 'CF DevSuite CA Self Signed CN';
-        
+
         if ($this->files->exists($caKeyPath)) {
             $this->files->unlink($caKeyPath);
         }
@@ -137,9 +137,11 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         if ($this->files->exists($caSrlPath)) {
             $caSrlParam = ' -CAserial ' . $caSrlPath;
         }
-        $this->cli->runAsUser(sprintf(
+        
+        $commandOpenSSL = sprintf(
                         'openssl x509 -req -sha256 -days 365 -CA "%s" -CAkey "%s"%s -in "%s" -out "%s" -extensions v3_req -extfile "%s"', $caPemPath, $caKeyPath, $caSrlParam, $csrPath, $crtPath, $confPath
-        ));
+        );
+        $this->cli->runAsUser($commandOpenSSL);
 
         $this->trustCertificate($crtPath, $url);
     }
@@ -185,13 +187,21 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * @return void
      */
     public function trustCertificate($crtPath, $url) {
-        $this->cli->run(sprintf(
+        $commandTrust1 = sprintf(
                         'certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "%s" -i "%s"', $url, $crtPath
-        ));
-
-        $this->cli->run(sprintf(
+        ); 
+        
+        $commandTrust2 = sprintf(
                         'certutil -d $HOME/.mozilla/firefox/*.default -A -t TC -n "%s" -i "%s"', $url, $crtPath
-        ));
+        ); 
+        
+        CDevSuite::info('Executing Command:'.$commandTrust1);
+        
+        $this->cli->run($commandTrust1);
+
+        CDevSuite::info('Executing Command:'.$commandTrust2);
+        
+        $this->cli->run($commandTrust2);
     }
 
     /**
@@ -212,19 +222,33 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     public function buildSecureNginxServer($url) {
         $path = $this->certificatesPath();
 
-        return str_array_replace(
+        $content = str_replace(
                 [
-            'DEVSUITE_HOME_PATH' => CDevSuite::homePath(),
-            'DEVSUITE_SERVER_PATH' => CDevSuite::serverPath(),
-            'DEVSUITE_STATIC_PREFIX' => CDevSuite::staticPrefix(),
-            'DEVSUITE_SITE' => $url,
-            'DEVSUITE_CERT' => $path . '/' . $url . '.crt',
-            'DEVSUITE_KEY' => $path . '/' . $url . '.key',
-            'DEVSUITE_HTTP_PORT' => $this->config->get('port', 80),
-            'DEVSUITE_HTTPS_PORT' => $this->config->get('https_port', 443),
-            'DEVSUITE_REDIRECT_PORT' => $this->httpsSuffix(),
-                ], $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
+                    'DEVSUITE_HOME_PATH',
+                    'DEVSUITE_SERVER_PATH',
+                    'DEVSUITE_STATIC_PREFIX',
+                    'DEVSUITE_SITE',
+                    'DEVSUITE_CERT',
+                    'DEVSUITE_KEY',
+                    'DEVSUITE_HTTP_PORT',
+                    'DEVSUITE_HTTPS_PORT',
+                    'DEVSUITE_REDIRECT_PORT',
+                ]
+                , [
+            rtrim(CDevSuite::homePath(), '/'),
+            CDevSuite::serverPath(),
+            CDevSuite::staticPrefix(),
+            $url,
+            $path . '/' . $url . '.crt',
+            $path . '/' . $url . '.key',
+            $this->config->get('port', 80),
+            $this->config->get('https_port', 443),
+            $this->httpsSuffix(),
+                ]
+                , $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
         );
+
+        return $content;
     }
 
     /**

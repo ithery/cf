@@ -72,15 +72,7 @@ class CDevSuite_LinuxRequirements {
         }
     }
 
-    /**
-     * Symlink the DevSuite Bash script into the user's local bin.
-     *
-     * @return void
-     */
-    public function symlinkToUsersBin() {
-        $this->cli->run('ln -snf ' . dirname(__DIR__, 2) . '/devsuite' . ' ' . $this->devsuiteBin);
-    }
-
+  
     /**
      * Unlink the Valet Bash script from the user's local bin
      * and the sudoers.d entry

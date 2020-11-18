@@ -43,7 +43,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
             $this->sm->enable($this->fpmServiceName());
         }
 
-        $this->files->ensureDirExists('/var/log', user());
+        $this->files->ensureDirExists('/var/log', CDevSuite::user());
 
         $this->installConfiguration();
 
@@ -132,12 +132,14 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     public function installConfiguration() {
         $contents = $this->files->get(CDevSuite::stubsPath().'fpm.conf');
 
-        $this->files->putAsUser(
-                $this->fpmConfigPath() . '/devsuite.conf', str_array_replace([
-            'DEVSUITE_USER' => CDevSuite::user(),
-            'DEVSUITE_GROUP' => CDevSuite::group(),
-            'DEVSUITE_HOME_PATH' => CDevSuite::homePath(),
-                        ], $contents)
+                    $contents = str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(),'/')], $contents);
+
+                    
+        $this->files->putAsRoot(
+                $this->fpmConfigPath() . '/devsuite.conf', str_replace(
+                        ['DEVSUITE_USER','DEVSUITE_GROUP', 'DEVSUITE_HOME_PATH'] 
+                        ,[CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(),'/')] 
+                        ,$contents)
         );
 
         if (($this->sm) instanceof CDevSuite_ServiceManager_Systemd) {

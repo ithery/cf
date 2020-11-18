@@ -245,6 +245,7 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
+        
         foreach ($commands as $command) {
             $this->resolve($command);
         }

@@ -6,12 +6,13 @@
 define('DEVSUITE_HOME_PATH', str_replace('\\', '/', $_SERVER['HOME'] . '/.config/devsuite'));
 define('DEVSUITE_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
 
+
 /**
  * Show the Valet 404 "Not Found" page.
  */
 function showDevSuite404() {
     http_response_code(404);
-    require __DIR__ . '/cli/templates/404.html';
+    require __DIR__ . '/system/data/devsuite/template/404.html';
     exit;
 }
 
@@ -43,6 +44,9 @@ $devSuiteConfig = json_decode(
         file_get_contents(DEVSUITE_HOME_PATH . '/config.json'), true
 );
 
+
+
+
 /**
  * Parse the URI and site / host for the incoming request.
  */
@@ -65,6 +69,7 @@ if (strpos($siteName, 'www.') === 0) {
 $devSuiteSitePath = null;
 $domain = array_slice(explode('.', $siteName), -1)[0];
 
+
 foreach ($devSuiteConfig['paths'] as $path) {
     if (is_dir($path . '/' . $siteName)) {
         $devSuiteSitePath = $path . '/' . $siteName;
@@ -77,11 +82,13 @@ foreach ($devSuiteConfig['paths'] as $path) {
     }
 }
 
+
 if (is_null($devSuiteSitePath)) {
     showDevSuite404();
 }
 
 $devSuiteSitePath = realpath($devSuiteSitePath);
+
 
 /**
  * Find the appropriate Valet driver for the request.
@@ -105,6 +112,8 @@ foreach ($driverFiles as $file) {
 
 $devSuiteDriver = CDevSuite_DevSuiteDriver::assign($devSuiteSitePath, $siteName, $uri);
 
+
+
 if (!$devSuiteDriver) {
     showDevSuite404();
 }
@@ -120,6 +129,7 @@ if (isset($_SERVER['HTTP_X_ORIGINAL_HOST']) && !isset($_SERVER['HTTP_X_FORWARDED
  * Allow driver to mutate incoming URL.
  */
 $uri = $devSuiteDriver->mutateUri($uri);
+
 
 
 /**
@@ -145,6 +155,8 @@ $devSuiteDriver->loadServerEnvironmentVariables(
 $frontControllerPath = $devSuiteDriver->frontControllerPath(
         $devSuiteSitePath, $siteName, $uri
 );
+
+
 
 if (!$frontControllerPath) {
     showDevSuite404();

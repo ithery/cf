@@ -9,8 +9,6 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
 
     public $pm;
     public $sm;
-    public $cli;
-    public $files;
     public $rclocal;
     public $configPath;
     public $nmConfigPath;
@@ -27,6 +25,7 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
      * @return void
      */
     public function __construct() {
+        parent::__construct();
         $this->pm = CDevSuite::packageManager();
         $this->sm = CDevSuite::serviceManager();
         $this->rclocal = '/etc/rc.local';
@@ -67,19 +66,22 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         $script = $optDir . '/devsuite-dns';
 
         $this->pm->ensureInstalled('inotify-tools');
-        $this->files->remove($optDir);
-        $this->files->ensureDirExists($optDir);
-        $this->files->put($script, $this->files->get(__DIR__ . '/../stubs/devsuite-dns'));
-        $this->cli->run("chmod +x $script");
+        $this->files->removeAsRoot($optDir);
+        $this->files->ensureDirExistsAsRoot($optDir);
+        
+        $this->files->copyAsRoot(CDevSuite::stubsPath(). 'devsuite-dns',$script);
+        
+        //$this->files->putAsRoot($script, $this->files->get(CDevSuite::stubsPath(). 'devsuite-dns'));
+        $this->cli->run("sudo chmod +x $script");
         $this->sm->installDevSuiteDns($this->files);
 
         if ($this->files->exists($this->rclocal)) {
             $this->files->restore($this->rclocal);
         }
 
-        $this->files->backup($this->resolvconf);
-        $this->files->unlink($this->resolvconf);
-        $this->files->symlink($script, $this->resolvconf);
+        $this->files->backupAsRoot($this->resolvconf);
+        $this->files->unlinkAsRoot($this->resolvconf);
+        $this->files->symlinkAsRoot($script, $this->resolvconf);
 
         return true;
     }
@@ -108,7 +110,7 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
      * @return void
      */
     public function createCustomConfigFile($domain) {
-        $this->files->putAsUser($this->configPath, 'address=/.' . $domain . '/127.0.0.1' . PHP_EOL);
+        $this->files->putAsRoot($this->configPath, 'address=/.' . $domain . '/127.0.0.1' . PHP_EOL);
     }
 
     /**
@@ -143,11 +145,11 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         $this->_mergeDns();
 
         $this->files->unlink('/etc/dnsmasq.d/network-manager');
-        $this->files->backup($this->dnsmasqconf);
+        $this->files->backupAsRoot($this->dnsmasqconf);
 
-        $this->files->putAsUser($this->dnsmasqconf, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq.conf'));
-        $this->files->putAsUser($this->dnsmasqOpts, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq_options'));
-        $this->files->putAsUser($this->nmConfigPath, $this->files->get(CDevSuite::stubsPath() . 'networkmanager.conf'));
+        $this->files->putAsRoot($this->dnsmasqconf, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq.conf'));
+        $this->files->putAsRoot($this->dnsmasqOpts, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq_options'));
+        $this->files->putAsRoot($this->nmConfigPath, $this->files->get(CDevSuite::stubsPath() . 'networkmanager.conf'));
     }
 
     /**
@@ -172,16 +174,16 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         $this->sm->stop('devsuite-dns');
         $this->sm->disable('devsuite-dns');
 
-        $this->cli->passthru('rm -rf /opt/devsuite-linux');
-        $this->files->unlink($this->configPath);
-        $this->files->unlink($this->dnsmasqOpts);
-        $this->files->unlink($this->nmConfigPath);
+        $this->cli->passthru('sudo rm -rf /opt/devsuite-linux');
+        $this->files->unlinkAsRoot($this->configPath);
+        $this->files->unlinkAsRoot($this->dnsmasqOpts);
+        $this->files->unlinkAsRoot($this->nmConfigPath);
         $this->files->restore($this->resolvedConfigPath);
 
         $this->_lockResolvConf(false);
-        $this->files->restore($this->rclocal);
-        $this->files->restore($this->resolvconf);
-        $this->files->restore($this->dnsmasqconf);
+        $this->files->restoreAsRoot($this->rclocal);
+        $this->files->restoreAsRoot($this->resolvconf);
+        $this->files->restoreAsRoot($this->dnsmasqconf);
         $this->files->commentLine('IGNORE_RESOLVCONF', '/etc/default/dnsmasq');
 
         $this->pm->nmRestart($this->sm);

@@ -23,11 +23,11 @@ class CConsole_Command_DevSuiteCommand extends CConsole_Command {
     public function __construct() {
 
         if (strlen($this->devSuiteCommandClass) == 0) {
-            $this->error('no dev suite command class defined in ' . get_called_class());
+            print('no dev suite command class defined in ' . get_called_class());
             return 1;
         }
         if (!class_exists($this->devSuiteCommandClass)) {
-            $this->error('class not found :' . $this->devSuiteCommandClass);
+            print('class not found :' . $this->devSuiteCommandClass);
             return 1;
         }
         $className = $this->devSuiteCommandClass;

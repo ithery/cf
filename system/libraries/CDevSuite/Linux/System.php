@@ -17,7 +17,8 @@ class CDevSuite_Linux_System extends CDevSuite_System {
      * @return void
      */
     public function symlinkToUsersBin() {
-        $this->cli->run('ln -snf ' . dirname(__DIR__, 2) . '/devsuite' . ' ' . $this->devSuiteBin);
+        //die('DD');
+        //$this->cli->run('ln -snf ' . dirname(__DIR__, 2) . '/devsuite' . ' ' . $this->devSuiteBin);
     }
 
     /**

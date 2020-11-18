@@ -1,13 +1,13 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
-class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
-{
+class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
+
     public $cli;
 
     /**
@@ -15,8 +15,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @param CommandLine $cli CommandLine object
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->cli = CDevSuite::commandLine();
     }
 
@@ -27,8 +26,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function start($services)
-    {
+    public function start($services) {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
@@ -44,8 +42,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function stop($services)
-    {
+    public function stop($services) {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
@@ -61,8 +58,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function restart($services)
-    {
+    public function restart($services) {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
@@ -78,14 +74,13 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function printStatus($services)
-    {
+    public function printStatus($services) {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
             if ($this->_hasSystemd()) {
                 $status = $this->cli->run(
-                    'systemctl status ' . $this->getRealService($service) . ' | grep "Active:"'
+                        'systemctl status ' . $this->getRealService($service) . ' | grep "Active:"'
                 );
 
                 $running = strpos(trim($status), 'running');
@@ -108,8 +103,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function status($service)
-    {
+    public function status($service) {
         return $this->cli->run('service ' . $this->getRealService($service) . ' status');
     }
 
@@ -120,8 +114,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return boolean
      */
-    public function disabled($service)
-    {
+    public function disabled($service) {
         $service = $this->getRealService($service);
 
         return (strpos(trim($this->cli->run("systemctl is-enabled {$service}")), 'enabled')) === false;
@@ -134,8 +127,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function disable($services)
-    {
+    public function disable($services) {
         if ($this->_hasSystemd()) {
             $services = is_array($services) ? $services : func_get_args();
 
@@ -175,8 +167,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function enable($services)
-    {
+    public function enable($services) {
         if ($this->_hasSystemd()) {
             $services = is_array($services) ? $services : func_get_args();
 
@@ -186,7 +177,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
 
                     if ($this->disabled($service)) {
                         $this->cli->quietly('sudo systemctl enable ' . $service);
-                        info(ucfirst($service) . ' has been enabled');
+                        CDevSuite::info(ucfirst($service) . ' has been enabled');
 
                         return true;
                     }
@@ -211,7 +202,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
 
                     return true;
                 } catch (DomainException $e) {
-                    warning(ucfirst($service) . ' not available.');
+                    CDevSuite::warning(ucfirst($service) . ' not available.');
 
                     return false;
                 }
@@ -224,14 +215,13 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return bool
      */
-    public function isAvailable()
-    {
+    public function isAvailable() {
         try {
             $output = $this->cli->run(
-                'which service',
-                function ($exitCode, $output) {
-                    throw new DomainException('Service not available');
-                }
+                    'which service',
+                    function ($exitCode, $output) {
+                throw new DomainException('Service not available');
+            }
             );
 
             return $output != '';
@@ -247,18 +237,17 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return string
      */
-    public function getRealService($service)
-    {
+    public function getRealService($service) {
         return c::collect($service)->first(
-            function ($service) {
-                return !strpos(
-                    $this->cli->run('service ' . $service . ' status'),
-                    'not-found'
-                );
-            },
-            function () {
-                throw new DomainException("Unable to determine service name.");
-            }
+                        function ($service) {
+                    return !strpos(
+                                    $this->cli->run('service ' . $service . ' status'),
+                                    'not-found'
+                    );
+                },
+                        function () {
+                    throw new DomainException("Unable to determine service name.");
+                }
         );
     }
 
@@ -267,14 +256,13 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return bool
      */
-    private function _hasSystemd()
-    {
+    private function _hasSystemd() {
         try {
             $this->cli->run(
-                'which systemctl',
-                function ($exitCode, $output) {
-                    throw new DomainException('Systemd not available');
-                }
+                    'which systemctl',
+                    function ($exitCode, $output) {
+                throw new DomainException('Systemd not available');
+            }
             );
 
             return true;
@@ -290,28 +278,25 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
      *
      * @return void
      */
-    public function installDevSuiteDns($files)
-    {
+    public function installDevSuiteDns($files) {
         CDevSuite::info("Installing devsuite DNS service...");
 
         $servicePath = '/etc/init.d/devsuite-dns';
-        $serviceFile = CDevSuite::stubsPath().'init/sysvinit';
+        $serviceFile = CDevSuite::stubsPath() . 'init/sysvinit';
         $hasSystemd = $this->_hasSystemd();
 
         if ($hasSystemd) {
             $servicePath = '/etc/systemd/system/devsuite-dns.service';
-            $serviceFile = CDevSuite::stubsPath().'init/systemd';
+            $serviceFile = CDevSuite::stubsPath() . 'init/systemd';
         }
 
-        $files->put(
-            $servicePath,
-            $files->get($serviceFile)
-        );
+        $files->copyAsRoot($serviceFile,$servicePath);
 
         if (!$hasSystemd) {
-            $this->cli->run("chmod +x $servicePath");
+            $this->cli->run("sudo chmod +x $servicePath");
         }
 
         $this->enable('devsuite-dns');
     }
+
 }

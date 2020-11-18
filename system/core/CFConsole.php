@@ -24,6 +24,9 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteUninstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteLinkCommand::class,
+        CConsole_Command_DevSuite_DevSuiteUnlinkCommand::class,
+        CConsole_Command_DevSuite_DevSuiteSecureCommand::class,
+        CConsole_Command_DevSuite_DevSuiteUnsecureCommand::class,
     ];
 
     public static function execute() {

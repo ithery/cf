@@ -49,8 +49,8 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
     public function install() {
         $this->pm->ensureInstalled('nginx');
         $this->sm->enable('nginx');
-        $this->files->ensureDirExists('/etc/nginx/sites-available');
-        $this->files->ensureDirExists('/etc/nginx/sites-enabled');
+        $this->files->ensureDirExistsAsRoot('/etc/nginx/sites-available');
+        $this->files->ensureDirExistsAsRoot('/etc/nginx/sites-enabled');
 
         $this->stop();
         $this->installConfiguration();
@@ -74,17 +74,14 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
             $pid_string = '# pid /run/nginx.pid';
         }
 
-        $this->files->backup($nginx);
-
-        $this->files->putAsUser(
-                $nginx,
-                str_array_replace([
-            'DEVSUITE_USER' => CDevSuite::user(),
-            'DEVSUITE_GROUP' => CDevSuite::group(),
-            'DEVSUITE_HOME_PATH' => CDevSuite::homePath(),
-            'DEVSUITE_PID' => $pid_string,
-                        ], $contents)
+        $this->files->backupAsRoot($nginx);
+        CDevSuite::info('Creating file:'.$nginx);
+        $this->files->putAsRoot(
+                $nginx, str_replace(['DEVSUITE_USER', 'DEVSUITE_GROUP','DEVSUITE_HOME_PATH', 'DEVSUITE_PID']
+                        , [CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(), '/'),$pid_string]
+                        , $contents)
         );
+
     }
 
     /**
@@ -93,23 +90,25 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function installServer() {
-        $this->files->putAsUser(
+        CDevSuite::info('Creating file:'.$this->sites_available_conf);
+        $this->files->putAsRoot(
                 $this->sites_available_conf,
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
-                        [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
+                        [rtrim(CDevSuite::homePath(),'/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
                         $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
 
         if ($this->files->exists('/etc/nginx/sites-enabled/default')) {
-            $this->files->unlink('/etc/nginx/sites-enabled/default');
+            $this->files->unlinkAsRoot('/etc/nginx/sites-enabled/default');
         }
 
-        $this->cli->run("ln -snf {$this->sites_available_conf} {$this->sites_enabled_conf}");
-        $this->files->backup('/etc/nginx/fastcgi_params');
+        $this->cli->run("sudo ln -snf {$this->sites_available_conf} {$this->sites_enabled_conf}");
+        $this->files->backupAsRoot('/etc/nginx/fastcgi_params');
 
-        $this->files->putAsUser(
+        CDevSuite::info('Creating file:'.'/etc/nginx/fastcgi_params');
+        $this->files->putAsRoot(
                 '/etc/nginx/fastcgi_params',
                 $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
         );
@@ -139,11 +138,11 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function updatePort($newPort) {
-        $this->files->putAsUser(
+        $this->files->putAsRoot(
                 $this->sites_available_conf,
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
-                        [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
+                        [rtrim(CDevSuite::homePath(),'/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
                         $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
@@ -156,7 +155,7 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      */
     public function rewriteSecureNginxFiles() {
         $configuration = $this->configuration->read();
-        $domain = isset($configuration['domain']) ? $configuration['domain'] : null;
+        $domain = isset($configuration['tld']) ? $configuration['tld'] : null;
 
         if (!$domain) {
             return;

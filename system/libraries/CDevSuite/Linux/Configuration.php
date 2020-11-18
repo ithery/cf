@@ -33,7 +33,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
      */
     public function writeBaseConfiguration() {
         if (!$this->files->exists($this->path())) {
-            $this->write(['domain' => 'test', 'paths' => [], 'port' => '80']);
+            $this->write(['tld' => 'test', 'paths' => [], 'port' => '80']);
         }
     }
 

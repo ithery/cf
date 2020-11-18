@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CDevSuite_Windows_DevCloud extends CDevSuite_Devcloud {
+class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
 
     protected $requiredFiles = [
         'winsw.exe',
