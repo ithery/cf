@@ -31,6 +31,9 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteTldCommand::class,
         CConsole_Command_DevSuite_DevSuiteOpenCommand::class,
         CConsole_Command_DevSuite_DevSuiteShareCommand::class,
+        CConsole_Command_DevSuite_DevSuiteStartCommand::class,
+        CConsole_Command_DevSuite_DevSuiteRestartCommand::class,
+        CConsole_Command_DevSuite_DevSuiteStopCommand::class,
     ];
 
     public static function execute() {
