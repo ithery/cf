@@ -9,7 +9,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
 
     public $cli;
     public $files;
-    public $winsw;
+    public $brew;
 
 
     var $taps = [
@@ -27,7 +27,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     function __construct() {
         $this->cli = CDevSuite::commandLine();
         $this->files = CDevSuite::filesystem();
-        $this->winsw = CDevSuite::winsw();
+        $this->brew = CDevSuite::brew();
     }
 
     /**
