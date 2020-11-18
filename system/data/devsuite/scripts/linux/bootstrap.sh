@@ -83,10 +83,10 @@ then
     check_dependencies
 
     HOST="${PWD##*/}"
-    DOMAIN=$(cat "$HOME/.valet/config.json" | jq -r ".domain")
-    PORT=$(cat "$HOME/.valet/config.json" | jq -r ".port")
+    DOMAIN=$(cat "$HOME/.devsuite/config.json" | jq -r ".domain")
+    PORT=$(cat "$HOME/.devsuite/config.json" | jq -r ".port")
 
-    for linkname in ~/.valet/Sites/*; do
+    for linkname in ~/.devsuite/Sites/*; do
         if [[ "$(readlink ${linkname})" = "$PWD" ]]
         then
             HOST="${linkname##*/}"
@@ -95,7 +95,7 @@ then
 
     # Decide the correct PORT to use according if the site has a secure
     # config or not.
-    if grep --no-messages --quiet 443 ~/.valet/Nginx/$HOST*
+    if grep --no-messages --quiet 443 ~/.devsuite/Nginx/$HOST*
     then
         PORT=88
     else
