@@ -1,7 +1,5 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
  * @since Nov 15, 2020 
@@ -52,10 +50,10 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
     function installConfiguration() {
         CDevSuite::info('Installing nginx configuration...');
 
-        $contents = $this->files->get(CDevSuite::stubsPath().'nginx.conf');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'nginx.conf');
 
         $this->files->putAsUser(
-                static::NGINX_CONF, str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(),'/')], $contents)
+                static::NGINX_CONF, str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(), '/')], $contents)
         );
     }
 
@@ -69,13 +67,12 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
 
         $this->files->putAsUser(
                 '/usr/local/etc/nginx/devsuite/devsuite.conf', str_replace(
-                        ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX'], 
-                        [rtrim(CDevSuite::homePath(),'/'), CDevSuite::serverPath(), CDevSuite::staticPrefix()], $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
+                        ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX'], [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix()], $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
 
         $this->files->putAsUser(
-                '/usr/local/etc/nginx/fastcgi_params', $this->files->get(CDevSuite::stubsPath().'fastcgi_params')
+                '/usr/local/etc/nginx/fastcgi_params', $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
         );
     }
 

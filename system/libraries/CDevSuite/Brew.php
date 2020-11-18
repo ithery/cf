@@ -1,7 +1,5 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
  * @since Nov 15, 2020 
@@ -77,7 +75,7 @@ class CDevSuite_Brew {
      */
     function determineAliasedVersion($formula) {
         $details = json_decode($this->cli->runAsUser("brew info $formula --json"));
-        return $details[0]->aliases[0] ?: 'ERROR - NO BREW ALIAS FOUND';
+        return $details[0]->aliases[0] ? : 'ERROR - NO BREW ALIAS FOUND';
     }
 
     /**
@@ -238,7 +236,7 @@ class CDevSuite_Brew {
      */
     function linkedPhp() {
         $matches = $this->getParsedLinkedPhp();
-        $resolvedPhpVersion = $matches[3] ?: $matches[2];
+        $resolvedPhpVersion = $matches[3] ? : $matches[2];
 
         return $this->supportedPhpVersions()->first(
                         function ($version) use ($resolvedPhpVersion) {
@@ -290,8 +288,7 @@ class CDevSuite_Brew {
      */
     function link($formula, $force = false) {
         return $this->cli->runAsUser(
-                        sprintf('brew link %s%s', $formula, $force ? ' --force' : ''),
-                        function ($exitCode, $errorOutput) use ($formula) {
+                        sprintf('brew link %s%s', $formula, $force ? ' --force' : ''), function ($exitCode, $errorOutput) use ($formula) {
                     CDevSuite::output($errorOutput);
 
                     throw new DomainException('Brew was unable to link [' . $formula . '].');
@@ -307,8 +304,7 @@ class CDevSuite_Brew {
      */
     function unlink($formula) {
         return $this->cli->runAsUser(
-                        sprintf('brew unlink %s', $formula),
-                        function ($exitCode, $errorOutput) use ($formula) {
+                        sprintf('brew unlink %s', $formula), function ($exitCode, $errorOutput) use ($formula) {
                     CDevSuite::output($errorOutput);
 
                     throw new DomainException('Brew was unable to unlink [' . $formula . '].');
@@ -323,12 +319,11 @@ class CDevSuite_Brew {
      */
     function getRunningServices() {
         return c::collect(array_filter(explode(PHP_EOL, $this->cli->runAsUser(
-                                        'brew services list | grep started | awk \'{ print $1; }\'',
-                                        function ($exitCode, $errorOutput) {
-                                    CDevSuite::output($errorOutput);
+                                                'brew services list | grep started | awk \'{ print $1; }\'', function ($exitCode, $errorOutput) {
+                                            CDevSuite::output($errorOutput);
 
-                                    throw new DomainException('Brew was unable to check which services are running.');
-                                }
+                                            throw new DomainException('Brew was unable to check which services are running.');
+                                        }
         ))));
     }
 
@@ -363,8 +358,7 @@ class CDevSuite_Brew {
      */
     function cleanupBrew() {
         return $this->cli->runAsUser(
-                        'brew cleanup && brew services cleanup',
-                        function ($exitCode, $errorOutput) {
+                        'brew cleanup && brew services cleanup', function ($exitCode, $errorOutput) {
                     CDevSuite::output($errorOutput);
                 }
         );
