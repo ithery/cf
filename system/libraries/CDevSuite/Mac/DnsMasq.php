@@ -120,7 +120,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     function createTldResolver($tld) {
         $this->files->ensureDirExists($this->resolverPath);
 
-        $this->files->put($this->resolverPath . '/' . $tld, 'nameserver 127.0.0.1' . PHP_EOL);
+        $this->files->putAsRoot($this->resolverPath . '/' . $tld, 'nameserver 127.0.0.1' . PHP_EOL);
     }
 
     /**

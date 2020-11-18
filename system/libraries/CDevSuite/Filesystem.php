@@ -138,6 +138,11 @@ class CDevSuite_Filesystem {
         $this->put($path, $contents, CDevSuite::user());
     }
 
+    public function putAsRoot($path, $contents) {
+        $command = sprintf('sudo echo "%s" > "%s"', addcslashes($contents, "\\\""), $path);
+        CDevSuite::commandLine()->run($command);
+    }
+
     /**
      * Append the contents to the given file.
      *
