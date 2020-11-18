@@ -11,6 +11,8 @@ abstract class CDevSuite_DevCloud {
     protected $baseBinPath;
     protected $requiredFiles = [
     ];
+    protected $requiredFolders = [
+    ];
 
     /**
      *
@@ -28,6 +30,9 @@ abstract class CDevSuite_DevCloud {
     public function install() {
         foreach ($this->requiredFiles as $file) {
             $this->downloadIfNotExists($file);
+        }
+        foreach ($this->requiredFolders as $folder) {
+            $this->files->mkdir($this->binPath($folder));
         }
     }
 

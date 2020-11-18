@@ -48,5 +48,10 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_Devcloud {
         'acrylic/License.txt',
         'acrylic/Readme.txt',
     ];
+    
+    protected $requiredFolders = [
+        'nginx/logs',
+        'nginx/temp',
+    ];
 
 }
