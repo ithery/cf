@@ -50,7 +50,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     function installConfiguration() {
-        info('Installing nginx configuration...');
+        CDevSuite::info('Installing nginx configuration...');
 
         $contents = $this->files->get(CDevSuite::stubsPath().'mac/nginx.conf');
 
@@ -87,7 +87,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     function installNginxDirectory() {
-        info('Installing nginx directory...');
+        CDevSuite::info('Installing nginx directory...');
 
         if (!$this->files->isDir($nginxDirectory = CDevSuite::homePath() . '/Nginx')) {
             $this->files->mkdirAsUser($nginxDirectory);
@@ -137,7 +137,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     function stop() {
-        info('Stopping nginx...');
+        CDevSuite::info('Stopping nginx...');
 
         $this->cli->quietly('sudo brew services stop ' . $this->brew->nginxServiceName());
     }

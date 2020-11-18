@@ -21,6 +21,19 @@ class CDevSuite_Command_UninstallCommand extends CDevSuite_CommandAbstract {
 
 
                 break;
+            case CServer::OS_WINNT:
+                CDevSuite::nginx()->uninstall();
+                CDevSuite::phpFpm()->uninstall();
+                CDevSuite::acrylic()->uninstall();
+
+
+                break;
+            
+             Nginx::uninstall();
+        PhpFpm::uninstall();
+        DnsMasq::uninstall();
+        Configuration::uninstall();
+        Valet::uninstall();
             default:
                 throw new Exception('Dev Suite not available for this OS:' . CServer::getOS());
                 break;

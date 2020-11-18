@@ -10,6 +10,19 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 trait CDevSuite_Trait_ConsoleTrait {
+    /**
+     * Output the given text to the console.
+     *
+     * @param string $output
+     * @return void
+     */
+
+    /**
+     * The output interface implementation.
+     *
+     * @var CConsole_OutputStyle
+     */
+    protected static $outputStyle;
 
     /**
      * Output the given text to the console.
@@ -39,11 +52,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * @return void
      */
     public static function table(array $headers = [], array $rows = []) {
-        $table = new Table(new ConsoleOutput);
-
-        $table->setHeaders($headers)->setRows($rows);
-
-        $table->render();
+        static::getOutputStyle()->table($headers, $rows);
     }
 
     /**
@@ -56,8 +65,43 @@ trait CDevSuite_Trait_ConsoleTrait {
         if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
             return;
         }
+        static::getOutputStyle()->writeln($output);
+    }
 
-        (new ConsoleOutput)->writeln($output);
+    /**
+     * 
+     * @return \CConsole_OutputStyle
+     */
+    protected static function getOutputStyle() {
+        if (static::$outputStyle == null) {
+            static::$outputStyle = new CConsole_OutputStyle(new Symfony\Component\Console\Input\ArgvInput, new Symfony\Component\Console\Output\ConsoleOutput);
+        }
+        return static::$outputStyle;
+    }
+
+    /**
+     * Starts the progress output.
+     *
+     * @param int $max Maximum steps (0 if unknown)
+     */
+    public static function progressStart($max = 0) {
+        static::getOutputStyle()->progressStart($max);
+    }
+
+    /**
+     * Advances the progress output X steps.
+     *
+     * @param int $step Number of steps to advance
+     */
+    public static function progressAdvance($step = 1) {
+        static::getOutputStyle()->progressAdvance($step);
+    }
+
+    /**
+     * Finishes the progress output.
+     */
+    public static function progressFinish() {
+        static::getOutputStyle()->progressFinish();
     }
 
 }

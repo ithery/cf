@@ -12,6 +12,7 @@ class CDevSuite_Winsw {
      * @var CDevSuite_Windows_CommandLine
      */
     protected $cli;
+
     /**
      *
      * @var CDevSuite_Windows_Filesystem
@@ -43,9 +44,9 @@ class CDevSuite_Winsw {
         $bin = realpath(CDevSuite::binPath());
         $this->files->copy("$bin/winsw.exe", CDevSuite::homePath() . "Services/$service.exe");
         $command = 'cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' install"';
-        $this->cli->runOrDie($command, function ($code,$output) use ($service) {
+        $this->cli->runOrDie($command, function ($code, $output) use ($service) {
             CDevSuite::warning("Could not install the $service service. Check ~/.devsuite/Log for errors.");
-            CDevSuite::warning("Output:".$output);
+            CDevSuite::warning("Output:" . $output);
         });
     }
 
@@ -79,8 +80,8 @@ class CDevSuite_Winsw {
 
         $this->cli->run('cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' uninstall"');
 
-        // $this->files->unlink(CDevSuite::homePath()."Services/$service.exe");
-        // $this->files->unlink(CDevSuite::homePath()."Services/$service.xml");
+        $this->files->unlink(CDevSuite::homePath() . "Services/$service.exe");
+        $this->files->unlink(CDevSuite::homePath() . "Services/$service.xml");
     }
 
     /**

@@ -119,6 +119,7 @@ abstract class CDevSuite_DevCloud {
          * local file one chunk at a time.
          */
         $cnt = 0;
+        CDevSuite::progressStart($length);
         while (!feof($i_handle)) {
             $buf = '';
             $buf = fread($i_handle, $chunksize);
@@ -127,6 +128,7 @@ abstract class CDevSuite_DevCloud {
                 return false;
             }
             $cnt += $bytes;
+            CDevSuite::progressAdvance($bytes);
 
             /**
              * We're done reading when we've reached the conent length
@@ -134,6 +136,7 @@ abstract class CDevSuite_DevCloud {
             if ($cnt >= $length)
                 break;
         }
+        CDevSuite::progressFinish();
 
         fclose($i_handle);
         fclose($o_handle);
