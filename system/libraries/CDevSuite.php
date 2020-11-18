@@ -88,10 +88,7 @@ class CDevSuite {
     }
 
     public static function binPath() {
-        $binPath = DOCROOT . '.bin' . DS . 'devsuite' . DS;
-        if (CServer::getOS() == CServer::OS_WINNT) {
-            $binPath .= 'win' . DS;
-        }
+        $binPath = DOCROOT . '.bin' . DS . 'devsuite' . DS . static::osFolder().DS;
         $binPath = str_replace('\\', '/', $binPath);
 
         return $binPath;
@@ -103,7 +100,7 @@ class CDevSuite {
     }
 
     public static function stubsPath() {
-        $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'stubs' . DS;
+        $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'stubs' . DS . static::osFolder() . DS;
         return str_replace('\\', '/', $path);
     }
 

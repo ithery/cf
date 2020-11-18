@@ -174,7 +174,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      */
 
     public function buildCertificateConf($path, $url) {
-        $config = str_replace('DEVSUITE_DOMAIN', $url, $this->files->get(CDevSuite::stubsPath() . 'linux/openssl.conf'));
+        $config = str_replace('DEVSUITE_DOMAIN', $url, $this->files->get(CDevSuite::stubsPath() . 'openssl.conf'));
         $this->files->putAsUser($path, $config);
     }
 
@@ -223,7 +223,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             'DEVSUITE_HTTP_PORT' => $this->config->get('port', 80),
             'DEVSUITE_HTTPS_PORT' => $this->config->get('https_port', 443),
             'DEVSUITE_REDIRECT_PORT' => $this->httpsSuffix(),
-                ], $this->files->get(CDevSuite::stubsPath() . 'linux/secure.devsuite.conf')
+                ], $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
         );
     }
 

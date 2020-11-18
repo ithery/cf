@@ -64,7 +64,7 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function installConfiguration() {
-        $contents = $this->files->get(CDevSuite::stubsPath() . 'linux/nginx.conf');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'nginx.conf');
         $nginx = $this->nginx_conf;
 
         $pid_string = 'pid /run/nginx.pid';
@@ -98,7 +98,7 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
                         [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
-                        $this->files->get(CDevSuite::stubsPath() . 'linux/devsuite.conf')
+                        $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
 
@@ -111,7 +111,7 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
 
         $this->files->putAsUser(
                 '/etc/nginx/fastcgi_params',
-                $this->files->get(CDevSuite::stubsPath() . 'linux/fastcgi_params')
+                $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
         );
     }
 
@@ -144,7 +144,7 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
                         [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
-                        $this->files->get(CDevSuite::stubsPath() . 'linux/devsuite.conf')
+                        $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
     }

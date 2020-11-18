@@ -61,7 +61,7 @@ class CDevSuite_Winsw {
     protected function createConfiguration($service, $args = []) {
         $args['DEVSUITE_HOME_PATH'] = CDevSuite::homePath();
 
-        $contents = $this->files->get(CDevSuite::stubsPath() . "win/$service.xml");
+        $contents = $this->files->get(CDevSuite::stubsPath() . "$service.xml");
 
         $this->files->putAsUser(
                 CDevSuite::homePath() . "/Services/$service.xml", str_replace(array_keys($args), array_values($args), $contents)

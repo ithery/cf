@@ -48,7 +48,7 @@ class CDevSuite_Acrylic {
      * @return void
      */
     public function createHostsFile($tld) {
-        $contents = $this->files->get(CDevSuite::stubsPath() . 'win/AcrylicHosts.txt');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'AcrylicHosts.txt');
 
 
         $this->files->put(

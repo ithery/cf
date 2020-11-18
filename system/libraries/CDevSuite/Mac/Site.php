@@ -240,7 +240,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
      * @return string
      */
     function buildCertificateConf($path, $url) {
-        $config = str_replace('DEVSUITE_DOMAIN', $url, $this->files->get(CDevSuite::stubsPath() . 'mac/openssl.conf'));
+        $config = str_replace('DEVSUITE_DOMAIN', $url, $this->files->get(CDevSuite::stubsPath() . 'openssl.conf'));
         $this->files->putAsUser($path, $config);
     }
 
@@ -253,7 +253,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
      */
     function buildSecureNginxServer($url, $siteConf = null) {
         if ($siteConf === null) {
-            $siteConf = $this->files->get(CDevSuite::stubsPath() . 'mac/secure.devsuite.conf');
+            $siteConf = $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf');
         }
 
         return str_replace(
@@ -338,7 +338,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
             $url .= '.' . $tld;
         }
 
-        $siteConf = $this->files->get(CDevSuite::stubsPath() . 'mac/proxy.devsuite.conf');
+        $siteConf = $this->files->get(CDevSuite::stubsPath() . 'proxy.devsuite.conf');
 
         $siteConf = str_replace(
                 ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_PROXY_HOST'], [$this->devSuiteHomePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $url, $host], $siteConf

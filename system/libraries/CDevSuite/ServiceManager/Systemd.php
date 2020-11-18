@@ -227,7 +227,7 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
 
         $files->put(
                 '/etc/systemd/system/devsuite-dns.service',
-                $files->get(CDevSuite::stubsPath() . 'linux/init/systemd')
+                $files->get(CDevSuite::stubsPath() . 'init/systemd')
         );
 
         $this->enable('devsuite-dns');

@@ -78,7 +78,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
 
         if (false === strpos($fpmConfigFile, '5.6')) {
             // for PHP 7 we can simply drop in a devsuite-specific fpm pool config, and not touch the default config
-            $contents = $this->files->get(CDevSuite::stubsPath() . 'mac/etc-phpfpm-devsuite.conf');
+            $contents = $this->files->get(CDevSuite::stubsPath() . 'etc-phpfpm-devsuite.conf');
             $contents = str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), CDevSuite::homePath()], $contents);
         } else {
             // for PHP 5 we must do a direct edit of the fpm pool config to switch it to DevSuite's needs
@@ -92,7 +92,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
         }
         $this->files->put($fpmConfigFile, $contents);
 
-        $contents = $this->files->get(CDevSuite::stubsPath() . 'mac/php-memory-limits.ini');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'php-memory-limits.ini');
 
         $destFile = dirname($fpmConfigFile);
         $destFile = str_replace('/php-fpm.d', '', $destFile);

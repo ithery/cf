@@ -72,7 +72,7 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
     public function installConfiguration() {
         CDevSuite::info('Installing nginx configuration...');
 
-        $contents = $this->files->get(CDevSuite::stubsPath() . 'win/nginx.conf');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'nginx.conf');
 
         $this->files->putAsUser(
                 $this->path() . '/conf/nginx.conf', str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], 
@@ -91,12 +91,12 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
         $this->files->putAsUser(
                 $this->path() . '/devsuite/devsuite.conf', str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'HOME_PATH'], 
-                        [rtrim(CDevSuite::homePath(),'/'), rtrim(CDevSuite::serverPath(),'/'), CDevSuite::staticPrefix(), $_SERVER['HOME']], $this->files->get(CDevSuite::stubsPath() . 'win/devsuite.conf')
+                        [rtrim(CDevSuite::homePath(),'/'), rtrim(CDevSuite::serverPath(),'/'), CDevSuite::staticPrefix(), $_SERVER['HOME']], $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
 
         $this->files->putAsUser(
-                $this->path() . '/conf/fastcgi_params', $this->files->get(CDevSuite::stubsPath() . 'win/fastcgi_params')
+                $this->path() . '/conf/fastcgi_params', $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
         );
     }
 

@@ -92,7 +92,7 @@ class DnsMasq {
         }
 
         // add a devsuite-specific config file to point to user's home directory devsuite config
-        $contents = $this->files->get(CDevSuite::stubsPath() . 'mac/etc-dnsmasq-devsuite.conf');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'etc-dnsmasq-devsuite.conf');
         $contents = str_replace('DEVSUITE_HOME_PATH', CDevSuite::homePath(), $contents);
         $this->files->ensureDirExists($this->dnsmasqSystemConfDir, user());
         $this->files->putAsUser($this->dnsmasqSystemConfDir . '/dnsmasq-devsuite.conf', $contents);

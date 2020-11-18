@@ -200,7 +200,7 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
         $path = $this->certificatesPath();
 
         return str_replace(
-                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_CERT', 'DEVSUITE_KEY', 'HOME_PATH'], [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $url, $path . '/' . $url . '.crt', $path . '/' . $url . '.key', $_SERVER['HOME']], $this->files->get(CDevSuite::stubsPath() . 'win/secure.devsuite.conf')
+                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_CERT', 'DEVSUITE_KEY', 'HOME_PATH'], [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $url, $path . '/' . $url . '.crt', $path . '/' . $url . '.key', $_SERVER['HOME']], $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
         );
     }
 

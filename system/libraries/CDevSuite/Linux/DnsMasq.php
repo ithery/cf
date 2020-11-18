@@ -145,9 +145,9 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         $this->files->unlink('/etc/dnsmasq.d/network-manager');
         $this->files->backup($this->dnsmasqconf);
 
-        $this->files->putAsUser($this->dnsmasqconf, $this->files->get(CDevSuite::stubsPath() . 'linux/dnsmasq.conf'));
-        $this->files->putAsUser($this->dnsmasqOpts, $this->files->get(CDevSuite::stubsPath() . 'linux/dnsmasq_options'));
-        $this->files->putAsUser($this->nmConfigPath, $this->files->get(CDevSuite::stubsPath() . 'linux/networkmanager.conf'));
+        $this->files->putAsUser($this->dnsmasqconf, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq.conf'));
+        $this->files->putAsUser($this->dnsmasqOpts, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq_options'));
+        $this->files->putAsUser($this->nmConfigPath, $this->files->get(CDevSuite::stubsPath() . 'networkmanager.conf'));
     }
 
     /**
