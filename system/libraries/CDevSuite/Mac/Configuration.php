@@ -21,7 +21,7 @@ class CDevSuite_Mac_Configuration extends CDevSuite_Configuration {
         $this->createCertificatesDirectory();
         $this->writeBaseConfiguration();
 
-        $this->files->chown($this->path(), user());
+        $this->files->chown($this->path(), CDevSuite::user());
     }
 
     /**
@@ -39,7 +39,7 @@ class CDevSuite_Mac_Configuration extends CDevSuite_Configuration {
      * @return void
      */
     public function createConfigurationDirectory() {
-        $this->files->ensureDirExists(preg_replace('~/devsuite$~', '', CDevSuite::homePath()), user());
+        $this->files->ensureDirExists(preg_replace('~/devsuite$~', '', CDevSuite::homePath()), CDevSuite::user());
 
         $oldPath = posix_getpwuid(fileowner(__FILE__))['dir'] . '/.devsuite';
 
@@ -48,7 +48,7 @@ class CDevSuite_Mac_Configuration extends CDevSuite_Configuration {
             $this->prependPath(CDevSuite::homePath() . '/Sites');
         }
 
-        $this->files->ensureDirExists(CDevSuite::homePath(), user());
+        $this->files->ensureDirExists(CDevSuite::homePath(), CDevSuite::user());
     }
 
 }

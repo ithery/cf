@@ -40,7 +40,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
             $this->brew->ensureInstalled('php', [], $this->taps);
         }
 
-        $this->files->ensureDirExists('/usr/local/var/log', user());
+        $this->files->ensureDirExists('/usr/local/var/log', CDevSuite::user());
 
         $this->updateConfiguration();
 
@@ -68,7 +68,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
 
         $fpmConfigFile = $this->fpmConfigPath();
 
-        $this->files->ensureDirExists(dirname($fpmConfigFile), user());
+        $this->files->ensureDirExists(dirname($fpmConfigFile), CDevSuite::user());
 
         // rename (to disable) old FPM Pool configuration, regardless of whether it's a default config or one customized by an older DevSuite version
         $oldFile = dirname($fpmConfigFile) . '/www.conf';
@@ -97,7 +97,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
         $destFile = dirname($fpmConfigFile);
         $destFile = str_replace('/php-fpm.d', '', $destFile);
         $destFile .= '/conf.d/php-memory-limits.ini';
-        $this->files->ensureDirExists(dirname($destFile), user());
+        $this->files->ensureDirExists(dirname($destFile), CDevSuite::user());
 
         $this->files->putAsUser($destFile, $contents);
     }
