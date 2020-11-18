@@ -37,7 +37,7 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
                 CDevSuite::phpFpm()->install();
                 CDevSuite::dnsMasq()->install(CDevSuite::configuration()->read()['domain']);
                 CDevSuite::nginx()->restart();
-                CDevSuite::symlinkToUsersBin();
+                CDevSuite::system()->symlinkToUsersBin();
 
                 break;
             case CServer::OS_WINNT:
