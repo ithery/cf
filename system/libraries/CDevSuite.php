@@ -118,6 +118,9 @@ class CDevSuite {
                 case CServer::OS_WINNT:
                     static::$configuration = new CDevSuite_Windows_Configuration();
                     break;
+                case CServer::OS_DARWIN:
+                    static::$configuration = new CDevSuite_Mac_Configuration();
+                    break;
             }
         }
         return static::$configuration;
