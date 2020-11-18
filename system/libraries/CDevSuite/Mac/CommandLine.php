@@ -74,7 +74,7 @@ class CDevSuite_Mac_CommandLine extends CDevSuite_CommandLine {
         };
 
         // Symfony's 4.x Process component has deprecated passing a command string
-        // to the constructor, but older versions (which Valet's Composer
+        // to the constructor, but older versions (which DevSuite's Composer
         // constraints allow) don't have the fromShellCommandLine method.
         if (method_exists(Process::class, 'fromShellCommandline')) {
             $process = Process::fromShellCommandline($command);

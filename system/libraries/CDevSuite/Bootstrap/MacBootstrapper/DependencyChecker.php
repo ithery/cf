@@ -30,6 +30,8 @@ class CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker extends CDevSuite_Bo
 
             exit(1);
         }
+        
+        define('BREW_PREFIX', CDevSuite::commandLine()->runAsUser('printf $(brew --prefix)'));
     }
 
 }

@@ -30,8 +30,7 @@ class CDevSuite {
      * @var CDevSuite_CommandLine
      */
     protected static $commandLine;
-    
-    
+
     /**
      *
      * @var CDevSuite_DevCloud
@@ -67,6 +66,12 @@ class CDevSuite {
      * @var CDevSuite_PhpFpm
      */
     protected static $phpFpm;
+
+    /**
+     *
+     * @var CDevSuite_DnsMasq
+     */
+    protected static $dnsMasq;
 
     public static function bootstrap() {
         CDevSuite_Bootstrap::instance()->bootstrap();
@@ -154,7 +159,7 @@ class CDevSuite {
         }
         return static::$commandLine;
     }
-    
+
     public static function devCloud() {
         if (static::$devCloud == null) {
             switch (CServer::getOS()) {
@@ -172,6 +177,10 @@ class CDevSuite {
         return static::$devCloud;
     }
 
+    /**
+     * 
+     * @return CDevSuite_Site
+     */
     public static function site() {
         if (static::$site == null) {
             switch (CServer::getOS()) {
@@ -189,6 +198,32 @@ class CDevSuite {
         return static::$site;
     }
 
+    /**
+     * 
+     * @return CDevSuite_DnsMasq
+     * @throws Exception
+     */
+    public static function dnsMasq() {
+        if (static::$dnsMasq == null) {
+            switch (CServer::getOS()) {
+                case CServer::OS_LINUX:
+                    static::$dnsMasq = new CDevSuite_Linux_DnsMasq();
+                    break;
+                case CServer::OS_DARWIN:
+                    static::$dnsMasq = new CDevSuite_Mac_DnsMasq();
+                    break;
+                default:
+                    throw new Exception('Dev Suite DnsMasq not available for this OS:' . CServer::getOS());
+                    break;
+            }
+        }
+        return static::$dnsMasq;
+    }
+
+    /**
+     * 
+     * @return CDevSuite_Nginx
+     */
     public static function nginx() {
         if (static::$nginx == null) {
             switch (CServer::getOS()) {

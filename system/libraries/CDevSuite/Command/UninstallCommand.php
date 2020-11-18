@@ -21,10 +21,12 @@ class CDevSuite_Command_UninstallCommand extends CDevSuite_CommandAbstract {
 
 
                 break;
-            case CServer::OS_WINNT:
+            case CServer::OS_DARWIN:
                 CDevSuite::nginx()->uninstall();
                 CDevSuite::phpFpm()->uninstall();
-                CDevSuite::acrylic()->uninstall();
+                CDevSuite::dnsMasq()->uninstall();
+                CDevSuite::configuration()->uninstall();
+                CDevSuite::configuration()->uninstall();
 
 
                 break;
