@@ -27,7 +27,8 @@ class CDevSuite_Brew {
     ];
     const LATEST_PHP_VERSION = 'php@7.4';
 
-    var $cli, $files;
+    public $cli;
+    public $files;
 
     /**
      * Create a new Brew instance.

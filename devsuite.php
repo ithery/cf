@@ -91,6 +91,7 @@ $devSuiteDriver = null;
 $driverFiles = [
     __DIR__ . '/system/libraries/CDevSuite/Trait/ConsoleTrait.php',
     __DIR__ . '/system/libraries/CDevSuite/Trait/WindowsTrait.php',
+    __DIR__ . '/system/libraries/CDevSuite/Trait/MacTrait.php',
     __DIR__ . '/system/libraries/CDevSuite/Trait/LinuxTrait.php',
     __DIR__ . '/system/libraries/CDevSuite.php',
     __DIR__ . '/system/libraries/CDevSuite/DevSuiteDriver.php',

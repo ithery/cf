@@ -7,9 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Nov 15, 2020 
  * @license Ittron Global Teknologi
  */
-
 trait CDevSuite_Trait_MacTrait {
-     /**
+
+    /**
      *
      * @var CDevSuite_Brew
      */
@@ -19,7 +19,7 @@ trait CDevSuite_Trait_MacTrait {
      * 
      * @return CDevSuite_Brew
      */
-    public static function linuxRequirements() {
+    public static function brew() {
         if (static::$brew == null) {
             static::$brew = new CDevSuite_Brew();
         }

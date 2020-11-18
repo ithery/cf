@@ -10,6 +10,7 @@ class CDevSuite {
 
     use CDevSuite_Trait_ConsoleTrait,
         CDevSuite_Trait_WindowsTrait,
+        CDevSuite_Trait_MacTrait,
         CDevSuite_Trait_LinuxTrait;
 
     /**
