@@ -64,7 +64,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      * @return void
      */
     function updateConfiguration() {
-        info('Updating PHP configuration...');
+        CDevSuite::info('Updating PHP configuration...');
 
         $fpmConfigFile = $this->fpmConfigPath();
 
