@@ -14,6 +14,7 @@ trait CDevSuite_Trait_MacTrait {
      * @var CDevSuite_Brew
      */
     protected static $brew;
+    protected $macDevSuiteBin = '/usr/local/bin/devsuite';
 
     /**
      * 

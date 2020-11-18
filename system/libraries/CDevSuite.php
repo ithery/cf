@@ -42,6 +42,13 @@ class CDevSuite {
      * @var CDevSuite_Nginx
      */
     protected static $nginx;
+    
+    
+     /**
+     *
+     * @var CDevSuite_System
+     */
+    protected static $system;
 
     /**
      *
@@ -175,6 +182,23 @@ class CDevSuite {
             }
         }
         return static::$devCloud;
+    }
+    
+    public static function system() {
+        if (static::$system == null) {
+            switch (CServer::getOS()) {
+                case CServer::OS_LINUX:
+                    static::$system = new CDevSuite_Linux_System();
+                    break;
+                case CServer::OS_WINNT:
+                    static::$system = new CDevSuite_Windows_System();
+                    break;
+                case CServer::OS_DARWIN:
+                    static::$system = new CDevSuite_Mac_System();
+                    break;
+            }
+        }
+        return static::$system;
     }
 
     /**

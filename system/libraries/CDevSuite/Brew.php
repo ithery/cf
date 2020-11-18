@@ -333,7 +333,7 @@ class CDevSuite_Brew {
     }
 
     /**
-     * Tell Homebrew to forcefully remove all PHP versions that Valet supports.
+     * Tell Homebrew to forcefully remove all PHP versions that DevSuite supports.
      * 
      * @return string
      */

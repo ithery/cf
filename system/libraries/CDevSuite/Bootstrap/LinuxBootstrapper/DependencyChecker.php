@@ -21,7 +21,7 @@ class CDevSuite_Bootstrap_LinuxBootstrapper_DependencyChecker extends CDevSuite_
         }
 
         if (version_compare(PHP_VERSION, '5.6', '<')) {
-            echo "Valet requires PHP 5.6 or later.";
+            echo "DevSuite requires PHP 5.6 or later.";
 
             exit(1);
         }
