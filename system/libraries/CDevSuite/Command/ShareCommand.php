@@ -22,7 +22,12 @@ class CDevSuite_Command_ShareCommand extends CDevSuite_CommandAbstract {
             case CServer::OS_DARWIN:
                 $ngrok = realpath(CDevSuite::binPath() . 'ngrok');
                 $ngrokCommand = "\"$ngrok\" http $host.$tld:$port -host-header=rewrite";
-                CDevSuite::commandLine()->runAsUser("open \"$host.$tld\" " . $ngrokCommand);
+                
+                
+                
+                $startNgrokCommand = sprintf('sudo %s',$ngrokCommand);
+                CDevSuite::commandLine()->run($startNgrokCommand);
+                
                 break;
             case CServer::OS_WINNT:
 
