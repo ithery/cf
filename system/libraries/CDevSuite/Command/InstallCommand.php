@@ -65,7 +65,7 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
                 $tld = CDevSuite::configuration()->read()['tld'];
                 CDevSuite::dnsMasq()->install($tld);
                 CDevSuite::nginx()->restart();
-                CDevSuite::symlinkToUsersBin();
+                CDevSuite::system()->symlinkToUsersBin();
 
             default:
                 throw new Exception('Dev Suite not available for this OS:' . CServer::getOS());
