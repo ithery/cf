@@ -29,6 +29,13 @@ class CDevSuite {
      * @var CDevSuite_CommandLine
      */
     protected static $commandLine;
+    
+    
+    /**
+     *
+     * @var CDevSuite_DevCloud
+     */
+    protected static $devCloud;
 
     /**
      *
@@ -145,6 +152,23 @@ class CDevSuite {
             }
         }
         return static::$commandLine;
+    }
+    
+    public static function devCloud() {
+        if (static::$devCloud == null) {
+            switch (CServer::getOS()) {
+                case CServer::OS_LINUX:
+                    static::$devCloud = new CDevSuite_Linux_DevCloud();
+                    break;
+                case CServer::OS_WINNT:
+                    static::$devCloud = new CDevSuite_Windows_DevCloud();
+                    break;
+                case CServer::OS_DARWIN:
+                    static::$devCloud = new CDevSuite_Mac_DevCloud();
+                    break;
+            }
+        }
+        return static::$devCloud;
     }
 
     public static function site() {

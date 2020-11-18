@@ -5,16 +5,36 @@
  *
  * @author Hery
  */
-class CDevSuite_DevCloud {
+abstract class CDevSuite_DevCloud {
 
     protected $baseDownloadUrl;
     protected $baseBinPath;
+    protected $requiredFiles = [
+    ];
+
+    /**
+     *
+     * @var CDevSuite_Filesystem
+     */
+    protected $files;
 
     public function __construct() {
-        $downloadUrl = 'https://cpanel.ittron.co.id/application/devcloud/default/data/bin/' . CDevSuite::osFolder() . '/';
+        $downloadUrl = 'http://cpanel.ittron.co.id/application/devcloud/default/data/bin/devsuite/' . CDevSuite::osFolder() . '/';
         $this->baseDownloadUrl = $downloadUrl;
         $this->baseBinPath = CDevSuite::binPath();
         $this->files = CDevSuite::filesystem();
+    }
+
+    public function install() {
+        foreach ($this->requiredFiles as $file) {
+            $this->downloadIfNotExists($file);
+        }
+    }
+
+    public function uninstall() {
+        foreach ($this->requiredFiles as $file) {
+            $this->binDelete($file);
+        }
     }
 
     /**
@@ -22,9 +42,9 @@ class CDevSuite_DevCloud {
      *
      */
     public function download($file) {
+
+        CDevSuite::info('Downloading ' . $file . '');
         $url = $this->baseDownloadUrl . $file;
-
-
         $targetPath = $this->baseBinPath . $file;
         $targetDir = dirname($targetPath);
         $this->files->ensureDirExists($targetDir);
@@ -69,6 +89,19 @@ class CDevSuite_DevCloud {
         $streamContext = stream_context_create($contextOptions);
 
         return file_get_contents($url, false, $streamContext);
+    }
+
+    public function binPath($file) {
+        return $this->baseBinPath . $file;
+    }
+
+    public function binExists($file) {
+        return $this->files->exists($this->binPath($file));
+    }
+
+    public function binDelete($file) {
+        CDevSuite::info('Deleting ' . $file);
+        return $this->files->unlink($this->binPath($file));
     }
 
 }

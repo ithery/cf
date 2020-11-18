@@ -21,6 +21,7 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
 
 
 
+        CDevSuite::devCloud()->install();
 
         switch (CServer::getOS()) {
             case CServer::OS_LINUX:
