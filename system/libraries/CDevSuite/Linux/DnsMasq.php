@@ -29,8 +29,6 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
     public function __construct() {
         $this->pm = CDevSuite::packageManager();
         $this->sm = CDevSuite::serviceManager();
-        $this->cli = CDevSuite::commandLine();
-        $this->files = CDevSuite::filesystem();
         $this->rclocal = '/etc/rc.local';
         $this->resolvconf = '/etc/resolv.conf';
         $this->dnsmasqconf = '/etc/dnsmasq.conf';
@@ -93,10 +91,10 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
      *
      * @return void
      */
-    public function install($domain = 'test') {
+    public function install($tld = 'test') {
         $this->dnsmasqSetup();
         $this->fixResolved();
-        $this->createCustomConfigFile($domain);
+        $this->createCustomConfigFile($tld);
         $this->pm->nmRestart($this->sm);
         $this->sm->restart('dnsmasq');
         $this->sm->start('devsuite-dns');

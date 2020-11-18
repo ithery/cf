@@ -8,9 +8,6 @@
 class DnsMasq {
 
     public $brew;
-    public $cli;
-    public $files;
-    public $configuration;
     public $dnsmasqMasterConfigFile = BREW_PREFIX . '/etc/dnsmasq.conf';
     public $dnsmasqSystemConfDir = BREW_PREFIX . '/etc/dnsmasq.d';
     public $resolverPath = '/etc/resolver';
@@ -18,11 +15,9 @@ class DnsMasq {
     /**
      * Create a new DnsMasq instance.
      */
-    function __construct() {
-        $this->cli = CDevSuite::commandLine();
+    public function __construct() {
+        parent::__construct();
         $this->brew = CDevSuite::brew();
-        $this->files = CDevSuite::filesystem();
-        $this->configuration = CDevSuite::configuration();
     }
 
     /**
@@ -30,7 +25,7 @@ class DnsMasq {
      *
      * @return void
      */
-    function install($tld = 'test') {
+    public function install($tld = 'test') {
         $this->brew->ensureInstalled('dnsmasq');
 
         // For DnsMasq, we enable its feature of loading *.conf from /usr/local/etc/dnsmasq.d/
