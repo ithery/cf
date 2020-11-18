@@ -30,6 +30,13 @@ abstract class CDevSuite_DevCloud {
     public function install() {
         foreach ($this->requiredFiles as $file) {
             $this->downloadIfNotExists($file);
+            
+            if(CServer::getOS()!=CServer::OS_WINNT) {
+                if($file=='ngrok') {
+                    $command = sprintf('chmod +x %s',$this->binPath($file));
+                    CDevSuite::commandLine()->run($command);
+                }
+            }
         }
         foreach ($this->requiredFolders as $folder) {
             $this->files->mkdir($this->binPath($folder));
