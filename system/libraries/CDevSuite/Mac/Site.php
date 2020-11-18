@@ -258,7 +258,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
 
         return str_replace(
                 ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_CERT', 'DEVSUITE_KEY'], [
-            $this->devSuiteHomePath(),
+            rtrim($this->devSuiteHomePath(),'/'),
             CDevSuite::serverPath(),
             CDevSuite::staticPrefix(),
             $url,
@@ -341,7 +341,8 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
         $siteConf = $this->files->get(CDevSuite::stubsPath() . 'proxy.devsuite.conf');
 
         $siteConf = str_replace(
-                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_PROXY_HOST'], [$this->devSuiteHomePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $url, $host], $siteConf
+                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_PROXY_HOST'], 
+                [rtrim($this->devSuiteHomePath(),'/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $url, $host], $siteConf
         );
 
         $this->secure($url, $siteConf);
