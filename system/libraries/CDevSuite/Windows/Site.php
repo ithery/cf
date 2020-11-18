@@ -72,23 +72,7 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
         );
     }
 
-    /**
-     * Get the port of the given host.
-     *
-     * @param string $url
-     *
-     * @return int
-     */
-    public function port($url) {
-        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/$url.conf")) {
-            if (strpos($this->files->get($path), '443') !== false) {
-                return 443;
-            }
-        }
-
-        return 80;
-    }
-
+    
     /**
      * Create and trust a certificate for the given URL.
      *

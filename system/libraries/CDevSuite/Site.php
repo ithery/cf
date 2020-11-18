@@ -144,7 +144,7 @@ abstract class CDevSuite_Site {
     public function unlink($name) {
         $name = $this->getRealSiteName($name);
 
-        
+
         if ($this->files->exists($path = $this->sitesPath($name))) {
             $this->files->unlink($path);
         }
@@ -354,6 +354,23 @@ abstract class CDevSuite_Site {
                         ->map(function ($file) {
                             return str_replace(['.key', '.csr', '.crt', '.conf'], '', $file);
                         })->unique()->values()->all();
+    }
+
+    /**
+     * Get the port of the given host.
+     *
+     * @param string $url
+     *
+     * @return int
+     */
+    public function port($url) {
+        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/$url.conf")) {
+            if (strpos($this->files->get($path), '443') !== false) {
+                return 443;
+            }
+        }
+
+        return 80;
     }
 
 }
