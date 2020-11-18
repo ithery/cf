@@ -16,7 +16,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      */
     public function getCertificates($path) {
         return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
-                    return ends_with($value, '.crt');
+                    return cstr::endsWith($value, '.crt');
                 })->map(function ($cert) {
                     return substr($cert, 0, -9);
                 })->flip();

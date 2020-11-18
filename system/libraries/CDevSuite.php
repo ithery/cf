@@ -42,9 +42,8 @@ class CDevSuite {
      * @var CDevSuite_Nginx
      */
     protected static $nginx;
-    
-    
-     /**
+
+    /**
      *
      * @var CDevSuite_System
      */
@@ -95,7 +94,7 @@ class CDevSuite {
     }
 
     public static function binPath() {
-        $binPath = DOCROOT . '.bin' . DS . 'devsuite' . DS . static::osFolder().DS;
+        $binPath = DOCROOT . '.bin' . DS . 'devsuite' . DS . static::osFolder() . DS;
         $binPath = str_replace('\\', '/', $binPath);
 
         return $binPath;
@@ -183,7 +182,7 @@ class CDevSuite {
         }
         return static::$devCloud;
     }
-    
+
     public static function system() {
         if (static::$system == null) {
             switch (CServer::getOS()) {
@@ -378,6 +377,10 @@ class CDevSuite {
             return "linux";
         }
         return "linux";
+    }
+
+    public static function tld() {
+        return CDevSuite::configuration()->read()['tld'];
     }
 
 }

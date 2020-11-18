@@ -19,7 +19,7 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
      */
     public function getCertificates($path) {
         return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
-                    return ends_with($value, '.crt');
+                    return cstr::endsWith($value, '.crt');
                 })->map(function ($cert) {
                     $certWithoutSuffix = substr($cert, 0, -4);
 
@@ -63,7 +63,7 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
     public function secure($url) {
         $this->unsecure($url);
 
-        $this->files->ensureDirExists($this->certificatesPath(), user());
+        $this->files->ensureDirExists($this->certificatesPath(), CDevSuite::user());
 
         $this->createCertificate($url);
 

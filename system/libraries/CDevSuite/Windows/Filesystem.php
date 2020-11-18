@@ -40,7 +40,10 @@ class CDevSuite_Windows_Filesystem extends CDevSuite_Filesystem {
             $link = pathinfo($path, PATHINFO_BASENAME);
 
             if (is_dir($path)) {
-                exec("cd \"{$dir}\" && rmdir {$link}");
+                $command = sprintf('rmdir "%s"',$path);
+                CDevSuite::commandLine()->run($command);
+                
+                //exec("cd \"{$dir}\" && rmdir {$link}");
             } else {
                 @unlink($path);
             }
@@ -57,6 +60,14 @@ class CDevSuite_Windows_Filesystem extends CDevSuite_Filesystem {
      * @return bool
      */
     public function isLink($path) {
+
+        $realpath = realpath($path);
+
+        if ($realpath !== $path) {
+            // It is a symlink
+            return true;
+        }
+
         if (is_link($path)) {
             return true;
         }

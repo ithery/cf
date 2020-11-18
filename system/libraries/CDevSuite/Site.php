@@ -144,6 +144,7 @@ abstract class CDevSuite_Site {
     public function unlink($name) {
         $name = $this->getRealSiteName($name);
 
+        
         if ($this->files->exists($path = $this->sitesPath($name))) {
             $this->files->unlink($path);
         }

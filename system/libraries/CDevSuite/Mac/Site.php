@@ -21,14 +21,14 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
         $config = $this->config->read();
 
         return c::collect($this->files->scandir($path))->filter(function ($value, $key) {
-                    return ends_with($value, '.crt');
+                    return cstr::endsWith($value, '.crt');
                 })->map(function ($cert) use ($config) {
                     $certWithoutSuffix = substr($cert, 0, -4);
                     $trimToString = '.';
 
                     // If we have the cert ending in our tld strip that tld specifically
                     // if not then just strip the last segment for  backwards compatibility.
-                    if (ends_with($certWithoutSuffix, $config['tld'])) {
+                    if (cstr::endsWith($certWithoutSuffix, $config['tld'])) {
                         $trimToString .= $config['tld'];
                     }
 
@@ -334,7 +334,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
         }
 
         $tld = $this->config->read()['tld'];
-        if (!ends_with($url, '.' . $tld)) {
+        if (!cstr::endsWith($url, '.' . $tld)) {
             $url .= '.' . $tld;
         }
 
@@ -358,7 +358,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
      */
     function proxyDelete($url) {
         $tld = $this->config->read()['tld'];
-        if (!ends_with($url, '.' . $tld)) {
+        if (!cstr::endsWith($url, '.' . $tld)) {
             $url .= '.' . $tld;
         }
 
