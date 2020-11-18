@@ -222,7 +222,7 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
      *
      * @return void
      */
-    public function installValetDns($files) {
+    public function installDevSuiteDns($files) {
         info("Installing DevSuite DNS service...");
 
         $files->put(

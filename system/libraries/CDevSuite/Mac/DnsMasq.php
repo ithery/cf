@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class DnsMasq {
+class CDevSuite_Mac_DnsMasq {
 
     public $brew;
     public $dnsmasqMasterConfigFile = BREW_PREFIX . '/etc/dnsmasq.conf';

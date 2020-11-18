@@ -67,7 +67,7 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager
     }
 
     /**
-     * Configure package manager on valet install.
+     * Configure package manager on devsuite install.
      *
      * @return void
      */

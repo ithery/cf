@@ -12,7 +12,7 @@ class CDevSuite_Linux_System extends CDevSuite_System {
     public $sudoers = '/etc/sudoers.d/devsuite';
 
     /**
-     * Symlink the Valet Bash script into the user's local bin.
+     * Symlink the DevSuite Bash script into the user's local bin.
      *
      * @return void
      */
@@ -21,13 +21,13 @@ class CDevSuite_Linux_System extends CDevSuite_System {
     }
 
     /**
-     * Unlink the Valet Bash script from the user's local bin
+     * Unlink the DevSuite Bash script from the user's local bin
      * and the sudoers.d entry
      *
      * @return void
      */
     public function uninstall() {
-        $this->files->unlink($this->valetBin);
+        $this->files->unlink($this->devSuiteBin);
         $this->files->unlink($this->sudoers);
     }
 

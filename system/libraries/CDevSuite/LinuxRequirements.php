@@ -73,12 +73,12 @@ class CDevSuite_LinuxRequirements {
     }
 
     /**
-     * Symlink the Valet Bash script into the user's local bin.
+     * Symlink the DevSuite Bash script into the user's local bin.
      *
      * @return void
      */
     public function symlinkToUsersBin() {
-        $this->cli->run('ln -snf ' . dirname(__DIR__, 2) . '/devsuite' . ' ' . $this->valetBin);
+        $this->cli->run('ln -snf ' . dirname(__DIR__, 2) . '/devsuite' . ' ' . $this->devsuiteBin);
     }
 
     /**

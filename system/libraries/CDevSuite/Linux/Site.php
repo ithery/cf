@@ -162,7 +162,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      */
     public function createSigningRequest($url, $keyPath, $csrPath, $confPath) {
         $this->cli->runAsUser(sprintf(
-                        'openssl req -new -key %s -out %s -subj "/C=US/ST=MN/O=DevSuite/localityName=DevSuite/commonName=%s/organizationalUnitName=Valet/emailAddress=devsuite/" -config %s -passin pass:', $keyPath, $csrPath, $url, $confPath
+                        'openssl req -new -key %s -out %s -subj "/C=US/ST=MN/O=DevSuite/localityName=DevSuite/commonName=%s/organizationalUnitName=DevSuite/emailAddress=devsuite/" -config %s -passin pass:', $keyPath, $csrPath, $url, $confPath
         ));
     }
 

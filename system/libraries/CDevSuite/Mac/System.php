@@ -17,7 +17,7 @@ class CDevSuite_Mac_System extends CDevSuite_System {
     public function symlinkToUsersBin() {
         $this->unlinkFromUsersBin();
 
-        $this->cli->runAsUser('ln -s "' . realpath(__DIR__ . '/../../valet') . '" ' . $this->valetBin);
+        $this->cli->runAsUser('ln -s "' . realpath(__DIR__ . '/../../devsuite') . '" ' . $this->devSuiteBin);
     }
 
     /**
@@ -26,11 +26,11 @@ class CDevSuite_Mac_System extends CDevSuite_System {
      * @return void
      */
     public function unlinkFromUsersBin() {
-        $this->cli->quietlyAsUser('rm ' . $this->valetBin);
+        $this->cli->quietlyAsUser('rm ' . $this->devSuiteBin);
     }
 
     /**
-     * Create the "sudoers.d" entry for running Valet.
+     * Create the "sudoers.d" entry for running DevSuite.
      *
      * @return void
      */
@@ -42,7 +42,7 @@ class CDevSuite_Mac_System extends CDevSuite_System {
     }
 
     /**
-     * Remove the "sudoers.d" entry for running Valet.
+     * Remove the "sudoers.d" entry for running DevSuite.
      *
      * @return void
      */

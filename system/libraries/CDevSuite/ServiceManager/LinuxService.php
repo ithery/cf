@@ -312,6 +312,6 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager
             $this->cli->run("chmod +x $servicePath");
         }
 
-        $this->enable('valet-dns');
+        $this->enable('devsuite-dns');
     }
 }

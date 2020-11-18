@@ -40,11 +40,11 @@ class CDevSuite_Command_UninstallCommand extends CDevSuite_CommandAbstract {
                 CDevSuite::nginx()->uninstall();
                 CDevSuite::info('Removing Dnsmasq and configs...');
                 CDevSuite::dnsMasq()->uninstall();
-                CDevSuite::info('Removing Valet configs and customizations...');
+                CDevSuite::info('Removing DevSuite configs and customizations...');
                 CDevSuite::configuration()->uninstall();
                 CDevSuite::info('Removing PHP versions and configs...');
                 CDevSuite::phpFpm()->uninstall();
-                CDevSuite::info('Attempting to unlink Valet from bin path...');
+                CDevSuite::info('Attempting to unlink DevSuite from bin path...');
                 CDevSuite::system()->unlinkFromUsersBin();
                 CDevSuite::info('Removing sudoers entries...');
                 CDevSuite::brew()->removeSudoersEntry();
@@ -52,7 +52,7 @@ class CDevSuite_Command_UninstallCommand extends CDevSuite_CommandAbstract {
                 break;
 
             default:
-                throw new Exception('Dev Suite not available for this OS:' . CServer::getOS());
+                throw new Exception('DevSuite not available for this OS:' . CServer::getOS());
                 break;
         }
 

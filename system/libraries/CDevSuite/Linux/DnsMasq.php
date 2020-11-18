@@ -64,14 +64,14 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
      */
     private function _mergeDns() {
         $optDir = '/opt/devsuite-linux';
-        $script = $optDir . '/valet-dns';
+        $script = $optDir . '/devsuite-dns';
 
         $this->pm->ensureInstalled('inotify-tools');
         $this->files->remove($optDir);
         $this->files->ensureDirExists($optDir);
         $this->files->put($script, $this->files->get(__DIR__ . '/../stubs/devsuite-dns'));
         $this->cli->run("chmod +x $script");
-        $this->sm->installValetDns($this->files);
+        $this->sm->installDevSuiteDns($this->files);
 
         if ($this->files->exists($this->rclocal)) {
             $this->files->restore($this->rclocal);

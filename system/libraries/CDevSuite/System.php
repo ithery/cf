@@ -20,7 +20,7 @@ abstract class CDevSuite_System {
     }
 
     /**
-     * Get the paths to all of the Valet extensions.
+     * Get the paths to all of the DevSuite extensions.
      *
      * @return array
      */
