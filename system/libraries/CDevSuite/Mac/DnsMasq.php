@@ -84,7 +84,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
         $contents = preg_replace('/^conf-file.*devsuite.*$/m', '', $contents);
 
         // save the updated config file
-        $this->files->put($this->dnsmasqMasterConfigFile, $contents);
+        $this->files->putAsRoot($this->dnsmasqMasterConfigFile, $contents);
 
         // remove old ~/.config/devsuite/dnsmasq.conf file because things are moved to the ~/.config/devsuite/dnsmasq.d/ folder now
         if (file_exists($file = dirname($this->dnsmasqUserConfigDir()) . '/dnsmasq.conf')) {
@@ -118,7 +118,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
      * @return void
      */
     function createTldResolver($tld) {
-        $this->files->ensureDirExists($this->resolverPath);
+        $this->files->ensureDirExistsAsRoot($this->resolverPath);
 
         $this->files->putAsRoot($this->resolverPath . '/' . $tld, 'nameserver 127.0.0.1' . PHP_EOL);
     }
