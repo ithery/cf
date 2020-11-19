@@ -177,9 +177,17 @@ trait CApp_Trait_Template {
 
     protected function collectHtmlJs() {
 
-
-        $resultContent = $this->parseTemplate();
-
+        $obLevel = ob_get_level();
+        $resultContent = "";
+        try {
+            $resultContent = $this->parseTemplate();
+        }
+        catch(Exception $ex) {
+            while(ob_get_level() > $obLevel) {
+                ob_end_clean();
+            }
+            throw $ex;
+        }
 
         $this->htmlOutput = carr::get($resultContent, 'html', '');
         $this->jsOutput = carr::get($resultContent, 'js', '');

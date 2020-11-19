@@ -160,7 +160,12 @@ class CTemplate {
      */
     public function render($print = FALSE, $renderer = FALSE) {
         ob_start();
-        $this->getRegistry($this->name)->__invoke($this->data);
+        try {
+            $this->getRegistry($this->name)->__invoke($this->data);
+        } catch (Exception $ex) {
+            ob_end_clean();
+            throw $ex;
+        }
         return ob_get_clean();
     }
 
