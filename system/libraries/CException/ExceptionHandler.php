@@ -306,7 +306,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return $this->toHttpResponse($this->convertExceptionToResponse($e), $e);
         }
         if (!$this->isHttpException($e)) {
-            $e = new CHTTP_Exception_HttpException(500, $e->getMessage());
+            $e = new CHTTP_Exception_HttpException(500, $e->getMessage(), $e);
         }
 
         $response = $this->toHttpResponse(

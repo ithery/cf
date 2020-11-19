@@ -6,5 +6,5 @@
  * @author Hery
  */
 return [
-    'debug' => defined(IN_PRODUCTION) ? !IN_PRODUCTION : false,
+    'debug' => defined('IN_PRODUCTION') ? !IN_PRODUCTION : false,
 ];
