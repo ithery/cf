@@ -144,7 +144,7 @@ class CDevSuite_Brew {
         $formulas = is_array($formulas) ? $formulas : func_get_args();
 
         foreach ($formulas as $formula) {
-            $this->cli->passthru('sudo -u "' . user() . '" brew tap ' . $formula);
+            $this->cli->passthru('sudo -u "' . CDevSuite::user() . '" brew tap ' . $formula);
         }
     }
 
