@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * @package  Cache
  *
@@ -23,10 +25,9 @@
  *             caches are deleted. This is commonly referred to as "garbage collection".
  *             Setting this to 0 or a negative number will disable automatic garbage collection.
  */
-$config['default'] = array
-(
-	'driver'   => 'file',
-	'params'   => APPPATH.'cache',
-	'lifetime' => 1800,
-	'requests' => 1000
+return array(
+    'driver' => 'file',
+    'params' => APPPATH . 'cache',
+    'lifetime' => 1800,
+    'requests' => 1000
 );

@@ -374,12 +374,11 @@ class CSession {
      * @return  mixed   Variable data if key specified, otherwise array containing all session data.
      */
     public function get($key = FALSE, $default = FALSE) {
-        if (empty($key))
+        if (empty($key)) {
             return $_SESSION;
+        }
 
-        $result = isset($_SESSION[$key]) ? $_SESSION[$key] : CF::key_string($_SESSION, $key);
-
-        return ($result === NULL) ? $default : $result;
+        return carr::get($_SESSION, $key, $default);
     }
 
     /**
@@ -389,9 +388,9 @@ class CSession {
      * @param   mixed   default value returned if variable does not exist
      * @return  mixed
      */
-    public function get_once($key, $default = FALSE) {
-        $return = CSession::get($key, $default);
-        CSession::delete($key);
+    public function getOnce($key, $default = FALSE) {
+        $return = $this->get($key, $default);
+        $this->delete($key);
 
         return $return;
     }
@@ -406,8 +405,9 @@ class CSession {
         $args = func_get_args();
 
         foreach ($args as $key) {
-            if (isset(CSession::$protect[$key]))
+            if (isset(CSession::$protect[$key])) {
                 continue;
+            }
 
             // Unset the key
             unset($_SESSION[$key]);
