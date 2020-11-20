@@ -953,7 +953,8 @@ final class CF {
                 $directory = 'core.' . inflector::singular($directory);
 
                 // If the file is required, throw an exception
-                throw new CException('core.resource_not_found', self::lang($directory), $filename);
+                $lang = clang::__('core.resource_not_found', [':directory'=>self::lang($directory), ':filename'=>$filename]);
+                throw new CException($lang);
             } else {
                 // Nothing was found, return FALSE
                 $found = FALSE;

@@ -45,7 +45,7 @@ class CTemplate {
     public function __construct($name, $data = array()) {
         $this->registry = new CTemplate_Registry();
 
-        $filename = CF::find_file($this->templateFolder, $name, TRUE);
+        $filename = CF::findFile($this->templateFolder, $name, TRUE);
         $this->name = $name;
         $this->registry->set($name, $filename);
         if ($data === NULL || !is_array($data)) {
@@ -67,7 +67,7 @@ class CTemplate {
         if ($this->blockRoutingCallback != null && is_callable($this->blockRoutingCallback)) {
             $name = call_user_func_array($this->blockRoutingCallback, array($name));
         }
-        $filename = CF::find_file($this->templateFolder, $name, TRUE);
+        $filename = CF::findFile($this->templateFolder, $name, TRUE);
         $this->registry->set($name, $filename);
         if ($data === NULL || !is_array($data)) {
             $data = array();

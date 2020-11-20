@@ -8,7 +8,7 @@ return array(
     'invalid_method' => 'Invalid method %s called in %s',
     'invalid_property' => 'The %s property does not exist in the %s class.',
     'log_dir_unwritable' => 'The log directory is not writable: %s',
-    'resource_not_found' => 'The requested %s, %s, could not be found',
+    'resource_not_found' => 'The requested :directory, :filename, could not be found',
     'invalid_filetype' => 'The requested filetype, .%s, is not allowed in your view configuration file',
     'view_set_filename' => 'You must set the the view filename before calling render',
     'no_default_route' => 'Please set a default route in config/routes.php',
@@ -30,4 +30,5 @@ return array(
     'driver' => 'driver',
     'model' => 'model',
     'view' => 'view',
+    'template' => 'Template',
 );
