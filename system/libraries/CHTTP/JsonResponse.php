@@ -60,7 +60,7 @@ class CHTTP_JsonResponse extends BaseJsonResponse {
             $this->data = $data->toJson($this->encodingOptions);
         } elseif ($data instanceof JsonSerializable) {
             $this->data = json_encode($data->jsonSerialize(), $this->encodingOptions);
-        } elseif ($data instanceof Arrayable) {
+        } elseif ($data instanceof CInterface_Arrayable) {
             $this->data = json_encode($data->toArray(), $this->encodingOptions);
         } else {
             $this->data = json_encode($data, $this->encodingOptions);

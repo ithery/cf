@@ -7,7 +7,7 @@ class CValidation_Exception extends Exception {
     /**
      * The validator instance.
      *
-     * @var \Illuminate\Contracts\Validation\Validator
+     * @var CValidation_Validator
      */
     public $validator;
 
@@ -48,10 +48,10 @@ class CValidation_Exception extends Exception {
      * @return void
      */
     public function __construct($validator, $response = null, $errorBag = 'default') {
-        parent::__construct('The given data was invalid. '.$validator->getAllErrorString());
+        parent::__construct('The given data was invalid. ' . $validator->getAllErrorString());
 
-        
-       
+
+
 
         $this->response = $response;
         $this->errorBag = $errorBag;

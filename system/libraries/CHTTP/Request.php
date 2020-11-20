@@ -67,7 +67,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * Create a new Illuminate HTTP request from server variables.
+     * Create a new HTTP request from server variables.
      *
      * @return static
      */

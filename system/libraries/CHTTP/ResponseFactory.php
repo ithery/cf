@@ -55,10 +55,10 @@ class CHTTP_ResponseFactory {
      * @return CHTTP_Response
      */
     public function view($view, $data = [], $status = 200, array $headers = []) {
-        if(!$view instanceof CView) {
-            $view = CView::factory($view,$data);
+        if (!$view instanceof CView) {
+            $view = CView::factory($view, $data);
         } else {
-            if(is_array($data) && count($data)>0) {
+            if (is_array($data) && count($data) > 0) {
                 $view->set($data);
             }
         }
@@ -173,7 +173,7 @@ class CHTTP_ResponseFactory {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function redirectTo($path, $status = 302, $headers = [], $secure = null) {
         return $this->redirector->to($path, $status, $headers, $secure);
@@ -186,7 +186,7 @@ class CHTTP_ResponseFactory {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function redirectToRoute($route, $parameters = [], $status = 302, $headers = []) {
         return $this->redirector->route($route, $parameters, $status, $headers);
@@ -199,7 +199,7 @@ class CHTTP_ResponseFactory {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function redirectToAction($action, $parameters = [], $status = 302, $headers = []) {
         return $this->redirector->action($action, $parameters, $status, $headers);
@@ -212,7 +212,7 @@ class CHTTP_ResponseFactory {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function redirectGuest($path, $status = 302, $headers = [], $secure = null) {
         return $this->redirector->guest($path, $status, $headers, $secure);
@@ -225,7 +225,7 @@ class CHTTP_ResponseFactory {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null) {
         return $this->redirector->intended($default, $status, $headers, $secure);

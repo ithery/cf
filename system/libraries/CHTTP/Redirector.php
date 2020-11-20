@@ -9,10 +9,24 @@ class CHTTP_Redirector {
 
     use CTrait_Macroable;
 
+    /**
+     * The URL generator instance.
+     *
+     * @var CRouting_UrlGenerator
+     */
+    protected $generator;
+
+    /**
+     * The session store instance.
+     *
+     * @var CSession
+     */
+    protected $session;
     protected static $instance;
 
     private function __construct() {
         $this->generator = CRouting::urlGenerator();
+        $this->session = CSession::instance();
     }
 
     public static function instance() {
@@ -26,7 +40,7 @@ class CHTTP_Redirector {
      * Create a new redirect response to the "home" route.
      *
      * @param  int  $status
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function home($status = 302) {
         return $this->to($this->generator->route('home'), $status);
@@ -38,7 +52,7 @@ class CHTTP_Redirector {
      * @param  int  $status
      * @param  array  $headers
      * @param  mixed  $fallback
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function back($status = 302, $headers = [], $fallback = false) {
         return $this->createRedirect($this->generator->previous($fallback), $status, $headers);
@@ -49,7 +63,7 @@ class CHTTP_Redirector {
      *
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function refresh($status = 302, $headers = []) {
         return $this->to($this->generator->getRequest()->path(), $status, $headers);
@@ -62,7 +76,7 @@ class CHTTP_Redirector {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function guest($path, $status = 302, $headers = [], $secure = null) {
         $request = $this->generator->getRequest();
@@ -83,7 +97,7 @@ class CHTTP_Redirector {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function intended($default = '/', $status = 302, $headers = [], $secure = null) {
         $path = $this->session->pull('url.intended', $default);
@@ -108,7 +122,7 @@ class CHTTP_Redirector {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function to($path, $status = 302, $headers = [], $secure = null) {
         return $this->createRedirect($this->generator->to($path, [], $secure), $status, $headers);
@@ -120,7 +134,7 @@ class CHTTP_Redirector {
      * @param  string  $path
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function away($path, $status = 302, $headers = []) {
         return $this->createRedirect($path, $status, $headers);
@@ -132,7 +146,7 @@ class CHTTP_Redirector {
      * @param  string  $path
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function secure($path, $status = 302, $headers = []) {
         return $this->to($path, $status, $headers, true);
@@ -145,7 +159,7 @@ class CHTTP_Redirector {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function route($route, $parameters = [], $status = 302, $headers = []) {
         return $this->to($this->generator->route($route, $parameters), $status, $headers);
@@ -159,7 +173,7 @@ class CHTTP_Redirector {
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function signedRoute($route, $parameters = [], $expiration = null, $status = 302, $headers = []) {
         return $this->to($this->generator->signedRoute($route, $parameters, $expiration), $status, $headers);
@@ -173,7 +187,7 @@ class CHTTP_Redirector {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function temporarySignedRoute($route, $expiration, $parameters = [], $status = 302, $headers = []) {
         return $this->to($this->generator->temporarySignedRoute($route, $expiration, $parameters), $status, $headers);
@@ -186,7 +200,7 @@ class CHTTP_Redirector {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return CHTTP_RedirectResponse
      */
     public function action($action, $parameters = [], $status = 302, $headers = []) {
         return $this->to($this->generator->action($action, $parameters), $status, $headers);
@@ -202,18 +216,18 @@ class CHTTP_Redirector {
      */
     protected function createRedirect($path, $status, $headers) {
         return c::tap(new CHTTP_RedirectResponse($path, $status, $headers), function ($redirect) {
-            if (isset($this->session)) {
-                $redirect->setSession($this->session);
-            }
+                    if (isset($this->session)) {
+                        $redirect->setSession($this->session);
+                    }
 
-            $redirect->setRequest($this->generator->getRequest());
-        });
+                    $redirect->setRequest($this->generator->getRequest());
+                });
     }
 
     /**
      * Get the URL generator instance.
      *
-     * @return \Illuminate\Routing\UrlGenerator
+     * @return CRouting_UrlGenerator
      */
     public function getUrlGenerator() {
         return $this->generator;
@@ -222,10 +236,10 @@ class CHTTP_Redirector {
     /**
      * Set the active session store.
      *
-     * @param  \Illuminate\Session\Store  $session
+     * @param  CSession  $session
      * @return void
      */
-    public function setSession(SessionStore $session) {
+    public function setSession(CSession $session) {
         $this->session = $session;
     }
 

@@ -13,14 +13,14 @@ class CRouting_UrlGenerator {
     /**
      * The route collection.
      *
-     * @var \Illuminate\Routing\RouteCollectionInterface
+     * @var CRouting_outeCollectionInterface
      */
     protected $routes;
 
     /**
      * The request instance.
      *
-     * @var \Illuminate\Http\Request
+     * @var CHTTP_Request
      */
     protected $request;
 
@@ -97,7 +97,7 @@ class CRouting_UrlGenerator {
     /**
      * The route URL generator instance.
      *
-     * @var \Illuminate\Routing\RouteUrlGenerator|null
+     * @var CRouting_RouteUrlGenerator|null
      */
     protected $routeGenerator;
 
@@ -121,9 +121,6 @@ class CRouting_UrlGenerator {
     /**
      * Create a new URL Generator instance.
      *
-     * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $assetRoot
      * @return void
      */
     public function __construct() {

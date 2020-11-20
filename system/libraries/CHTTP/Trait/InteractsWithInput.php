@@ -322,7 +322,7 @@ trait CHTTP_Trait_InteractsWithInput {
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return \Illuminate\Http\UploadedFile|array|null
+     * @return CHTTP_UploadedFile|array|null
      */
     public function file($key = null, $default = null) {
         return CF::get($this->allFiles(), $key, $default);
