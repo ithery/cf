@@ -19,7 +19,7 @@ class CLogger {
     const INFO = LOG_INFO;     // 6
     const DEBUG = LOG_DEBUG;    // 7
 
-    private $logLevels = [
+    protected static $logLevels = [
         'emergency' => self::EMERGENCY,
         'alert' => self::ALERT,
         'critical' => self::CRITICAL,

@@ -22,17 +22,18 @@ final class CF {
     public static $locale;
     // Configuration
     private static $configuration;
-    // Include paths
+
+    /**
+     * Include paths cache
+     * @var array
+     */
     private static $paths;
-    // Logged messages
-    private static $log;
-    // Log levels
-    private static $log_levels = array(
-        'error' => 1,
-        'alert' => 2,
-        'info' => 3,
-        'debug' => 4,
-    );
+
+    /**
+     * Chartset used for this application
+     * 
+     * @var string
+     */
     public static $charset = 'utf-8';
 
     /* log threshold default , CLogger::LOG_WARNING (4) */
@@ -40,8 +41,20 @@ final class CF {
     public static $global_xss_filtering = TRUE;
     // Internal caches and write status
     private static $internal_cache = array();
+
+    /**
+     * CF Data domain
+     * 
+     * @var array
+     */
     private static $data;
-    private static $sharedAppCode = array();
+
+    /**
+     * sharedAppCode used for CF
+     * 
+     * @var array
+     */
+    private static $sharedAppCode = [];
     private static $translator;
 
     /**
@@ -216,14 +229,6 @@ final class CF {
 
         // Set locale information
         self::$locale = setlocale(LC_ALL, $locales);
-
-        if (isset(self::$configuration['core']) && isset(self::$configuration['core']['log_threshold']) && self::$configuration['core']['log_threshold'] > 0) {
-            // Set the log directory
-            self::log_directory(self::$configuration['core']['log_directory']);
-
-            // Enable log writing at shutdown
-            register_shutdown_function(array(__CLASS__, 'log_save'));
-        }
 
 
         static::loadBootstrapFiles();
@@ -601,84 +606,9 @@ final class CF {
      * @return  void
      */
     public static function log($level, $message) {
-        if (!is_numeric($level)) {
-            $level = carr::get(self::$log_levels, $level);
+        if (class_exists('CLogger')) {
+            CLogger::instance()->add($level, $message);
         }
-        if (!is_numeric($level)) {
-            $level = CLogger::EMERGENCY;
-        }
-        if ($level <= CF::$log_threshold) {
-            if (class_exists('CLogger')) {
-                CLogger::instance()->add($level, $message);
-            }
-        }
-    }
-
-    /**
-     * Save all currently logged messages.
-     *
-     * @return  void
-     */
-    public static function log_save() {
-        if (empty(self::$log) OR self::$configuration['core']['log_threshold'] < 1)
-            return;
-
-        // Filename of the log
-        $filename = self::log_directory() . date('Y-m-d') . '.log' . EXT;
-
-        if (!static::isFile($filename)) {
-            // Write the SYSPATH checking header
-            file_put_contents($filename, '<?php defined(\'SYSPATH\') or die(\'No direct script access.\'); ?>' . PHP_EOL . PHP_EOL);
-
-            // Prevent external writes
-            chmod($filename, 0644);
-        }
-
-        // Messages to write
-        $messages = array();
-
-        do {
-            // Load the next mess
-            list ($date, $type, $text) = array_shift(self::$log);
-
-            // Add a new message line
-            $messages[] = $date . ' --- ' . $type . ': ' . $text;
-        } while (!empty(self::$log));
-
-        // Write messages to log file
-        file_put_contents($filename, implode(PHP_EOL, $messages) . PHP_EOL, FILE_APPEND);
-    }
-
-    /**
-     * Get or set the logging directory.
-     *
-     * @param   string  new log directory
-     * @return  string
-     */
-    public static function log_directory($dir = NULL) {
-        static $directory;
-
-        $dir = CF::getDir('logs');
-
-
-        if (!empty($dir)) {
-            // Get the directory path
-            $dir = realpath($dir);
-
-            if (!is_dir($dir)) {
-                mkdir($dir);
-            }
-
-            if (is_dir($dir) AND is_writable($dir)) {
-                // Change the log directory
-                $directory = str_replace('\\', '/', $dir) . '/';
-            } else {
-                // Log directory is invalid
-                throw new CException('core.log_dir_unwritable', $dir);
-            }
-        }
-
-        return $directory;
     }
 
     /**
