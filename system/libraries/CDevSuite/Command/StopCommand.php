@@ -16,7 +16,7 @@ class CDevSuite_Command_StopCommand extends CDevSuite_CommandAbstract {
             CDevSuite::acrylic()->stop();
         } else {
             if(CServer::getOS() != CServer::OS_DARWIN) {
-                CDevSuite::dnsMasq()->stop();
+                //CDevSuite::dnsMasq()->stop();
             }
         }
 

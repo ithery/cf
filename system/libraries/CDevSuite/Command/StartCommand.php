@@ -14,7 +14,7 @@ class CDevSuite_Command_StartCommand extends CDevSuite_CommandAbstract {
         if (CServer::getOS() == CServer::OS_WINNT) {
             CDevSuite::acrylic()->restart();
         } else {
-            CDevSuite::dnsMasq()->restart();
+            //CDevSuite::dnsMasq()->restart();
         }
 
 

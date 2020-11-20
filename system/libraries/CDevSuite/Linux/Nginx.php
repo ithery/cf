@@ -198,13 +198,13 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      */
     public function uninstall() {
         $this->stop();
-        $this->files->restore($this->nginx_conf);
-        $this->files->restore('/etc/nginx/fastcgi_params');
-        $this->files->unlink($this->sites_enabled_conf);
-        $this->files->unlink($this->sites_available_conf);
+        $this->files->restoreAsRoot($this->nginx_conf);
+        $this->files->restoreAsRoot('/etc/nginx/fastcgi_params');
+        $this->files->unlinkAsRoot($this->sites_enabled_conf);
+        $this->files->unlinkAsRoot($this->sites_available_conf);
 
         if ($this->files->exists('/etc/nginx/sites-available/default')) {
-            $this->files->symlink('/etc/nginx/sites-available/default', '/etc/nginx/sites-enabled/default');
+            $this->files->symlinkAsRoot('/etc/nginx/sites-available/default', '/etc/nginx/sites-enabled/default');
         }
     }
 

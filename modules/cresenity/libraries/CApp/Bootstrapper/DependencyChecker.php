@@ -15,10 +15,12 @@ class CApp_Bootstrapper_DependencyChecker extends CBootstrap_BootstrapperAbstrac
     public function bootstrap() {
 
 
-
+        /*
         if (!function_exists('curl_init')) {
             throw new Exception("PHP curl extension must be installed/enabled to use CApp.");
         }
+         * 
+         */
     }
 
 }
