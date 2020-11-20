@@ -626,7 +626,7 @@ final class CF {
         // Filename of the log
         $filename = self::log_directory() . date('Y-m-d') . '.log' . EXT;
 
-        if (!is_file($filename)) {
+        if (!static::isFile($filename)) {
             // Write the SYSPATH checking header
             file_put_contents($filename, '<?php defined(\'SYSPATH\') or die(\'No direct script access.\'); ?>' . PHP_EOL . PHP_EOL);
 
@@ -1082,7 +1082,7 @@ final class CF {
             $paths = array_reverse($paths);
 
             foreach ($paths as $path) {
-                if (is_file($path . $search)) {
+                if (static::isFile($path . $search)) {
                     // A matching file has been found
                     $found[] = $path . $search;
                 }
@@ -1090,7 +1090,7 @@ final class CF {
         } else {
 
             foreach ($paths as $path) {
-                if (is_file($path . $search)) {
+                if (static::isFile($path . $search)) {
                     // A matching file has been found
                     $found = $path . $search;
 
@@ -1448,7 +1448,7 @@ final class CF {
      * @param  mixed $value
      * @return boolean
      */
-    private static function is_file($value) {
+    private static function isFile($value) {
         $value = strval(str_replace("\0", "", $value));
 
         return is_file($value);
@@ -1491,7 +1491,7 @@ final class CF {
                 $sep = '';
 
                 while ($arg = array_shift($entry['args'])) {
-                    if (is_string($arg) AND self::is_file($arg)) {
+                    if (is_string($arg) AND self::isFile($arg)) {
                         // Remove docroot from filename
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
@@ -1832,14 +1832,27 @@ final class CF {
         return empty($value);
     }
 
+    /**
+     * 
+     * @return string
+     */
     public static function version() {
         return CF_VERSION;
     }
 
+    /**
+     * 
+     * @return string
+     */
     public static function codeName() {
         return CF_CODENAME;
     }
 
+    /**
+     * 
+     * @param string $domain
+     * @return string
+     */
     public static function appPath($domain = null) {
 
         $appCode = static::appCode($domain);
