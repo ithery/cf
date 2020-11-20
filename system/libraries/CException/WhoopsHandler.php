@@ -50,7 +50,7 @@ class WhoopsHandler
      */
     protected function directoriesExceptVendor()
     {
-        return Arr::except(
+        return carr::except(
             array_flip((new Filesystem)->directories(base_path())),
             [base_path('vendor')]
         );

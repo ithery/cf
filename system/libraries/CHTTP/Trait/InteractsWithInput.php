@@ -157,7 +157,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $results = [];
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            carr::set($results, $key, Arr::get($input, $key));
+            carr::set($results, $key, carr::get($input, $key));
         }
 
         return $results;

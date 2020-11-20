@@ -166,7 +166,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function load($paths) {
-        $paths = array_unique(Arr::wrap($paths));
+        $paths = array_unique(carr::wrap($paths));
 
         $paths = array_filter($paths, function ($path) {
             return is_dir($path);
