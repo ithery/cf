@@ -19,10 +19,20 @@ class CLogger {
     const INFO = LOG_INFO;     // 6
     const DEBUG = LOG_DEBUG;    // 7
 
+    private $logLevels = [
+        'emergency' => self::EMERGENCY,
+        'alert' => self::ALERT,
+        'critical' => self::CRITICAL,
+        'error' => self::ERROR,
+        'warning' => self::WARNING,
+        'notice' => self::NOTICE,
+        'info' => self::INFO,
+        'debug' => self::DEBUG,
+    ];
+
     /**
      * @var  CLogger  Singleton instance container
      */
-
     private static $_instance = NULL;
 
     /**
@@ -91,6 +101,14 @@ class CLogger {
      * @return  Log
      */
     public function add($level, $message, array $values = NULL, array $context = [], $exception = NULL) {
+        if (!is_string($level)) {
+            $level = carr::get(self::$logLevels, $level);
+        }
+
+        if (!is_numeric($level)) {
+            $level = static::EMERGENCY;
+        }
+
         if ($values) {
             // Insert the values into the message
             $message = strtr($message, $values);
