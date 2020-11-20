@@ -158,7 +158,7 @@ class CSession {
             $_SESSION['total_hits'] = 0;
             $_SESSION['_kf_flash_'] = array();
 
-            $_SESSION['user_agent'] = CF::$user_agent;
+            $_SESSION['user_agent'] = CF::userAgent();
             $_SESSION['ip_address'] = $this->input->ip_address();
         }
 
@@ -175,7 +175,7 @@ class CSession {
                 switch ($valid) {
                     // Check user agent for consistency
                     case 'user_agent':
-                        if ($_SESSION[$valid] !== CF::$user_agent)
+                        if ($_SESSION[$valid] !== CF::userAgent())
                             return $this->create();
                         break;
 

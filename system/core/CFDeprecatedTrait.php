@@ -261,4 +261,19 @@ trait CFDeprecatedTrait {
         }
     }
 
+    /**
+     * Retrieves current user agent information:
+     * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
+     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
+     *
+     * @param   string   key or test name
+     * @param   string   used with "accept" tests: user_agent(accept_lang, en)
+     * @return  array    languages and charsets
+     * @return  string   all other keys
+     * @return  boolean  all tests
+     */
+    public static function user_agent($key = 'agent', $compare = NULL) {
+        return static::userAgent($key, $compare);
+    }
+
 }

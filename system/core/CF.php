@@ -1321,9 +1321,6 @@ final class CF {
             $array->exchangeArray($array_copy);
         }
     }
-    
-    
-    
 
     /**
      * Retrieves current user agent information:
@@ -1336,7 +1333,7 @@ final class CF {
      * @return  string   all other keys
      * @return  boolean  all tests
      */
-    public static function user_agent($key = 'agent', $compare = NULL) {
+    public static function userAgent($key = 'agent', $compare = NULL) {
         static $info;
 
         // Return the raw string
