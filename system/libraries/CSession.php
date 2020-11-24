@@ -148,7 +148,9 @@ class CSession {
         session_set_cookie_params(CSession::$config['expiration'], CF::config('cookie.path'), CF::config('cookie.domain'), CF::config('cookie.secure'), CF::config('cookie.httponly'));
 
         // Start the session!
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
 
         // Put session_id in the session variable
         $_SESSION['session_id'] = session_id();
