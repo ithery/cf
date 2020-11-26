@@ -22,3 +22,6 @@
 */config/cresenity.php
 */config/assets.php
 
+vendor
+composer.phar
+composer.lock

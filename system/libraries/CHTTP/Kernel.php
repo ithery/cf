@@ -58,7 +58,8 @@ class CHTTP_Kernel {
         // Include the Controller file
         if (strlen(CFRouter::$controller_path) > 0) {
             require_once CFRouter::$controller_path;
-
+            
+            
 
             try {
                 // Start validation of the controller

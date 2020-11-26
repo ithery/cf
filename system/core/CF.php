@@ -829,6 +829,15 @@ final class CF {
 
         if (!$class_not_found) {
             // The class could not be found
+            $appPath = DOCROOT . 'application' . DS . static::appCode() . DS;
+            if (file_exists($appPath . 'composer.json')) {
+                $composerLoader = require $appPath . 'vendor' . DS . 'autoload.php';
+                $result = $composerLoader->loadClass($class);
+                if ($result === true) {
+                    return true;
+                }
+            }
+
             return FALSE;
         }
 
