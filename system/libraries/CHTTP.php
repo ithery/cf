@@ -16,6 +16,12 @@ class CHTTP {
     protected static $request;
 
     /**
+     *
+     * @var CHTTP_Kernel
+     */
+    protected static $kernel;
+
+    /**
      * 
      * @return CHTTP_Request
      */
@@ -90,6 +96,13 @@ class CHTTP {
      */
     public static function redirector() {
         return CHTTP_Redirector::instance();
+    }
+
+    public static function kernel() {
+        if (self::$kernel == null) {
+            self::$kernel = new CHTTP_Kernel();
+        }
+        return self::$kernel;
     }
 
 }

@@ -953,7 +953,7 @@ final class CF {
                 $directory = 'core.' . inflector::singular($directory);
 
                 // If the file is required, throw an exception
-                $lang = clang::__('core.resource_not_found', [':directory'=>self::lang($directory), ':filename'=>$filename]);
+                $lang = clang::__('core.resource_not_found', [':directory' => self::lang($directory), ':filename' => $filename]);
                 throw new CException($lang);
             } else {
                 // Nothing was found, return FALSE
@@ -1612,10 +1612,21 @@ final class CF {
     }
 
     public static function currentController() {
-        return static::$instance;
+        return CHTTP::kernel()->controller();
     }
 
-    /** list of deprecated function */
+    /**
+     * Dispatch an event and call the listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    public static function event(...$args) {
+        return CEvent::dispatcher()->dispatch(...$args);
+    }
+
 }
 
 // End CF

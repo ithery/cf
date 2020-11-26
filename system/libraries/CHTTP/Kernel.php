@@ -13,6 +13,7 @@ class CHTTP_Kernel {
 
     protected $isHandled = false;
     protected $terminated;
+    protected $controller;
 
     public function __construct() {
 
@@ -135,13 +136,18 @@ class CHTTP_Kernel {
             CF::show404();
         } else {
             // Execute the controller method
-            $response = $reflectionMethod->invokeArgs($reflectionClass->newInstance(), $arguments);
+            $this->controller = $reflectionClass->newInstance();
+            $response = $reflectionMethod->invokeArgs($this->controller, $arguments);
         }
 
         // Stop the controller execution benchmark
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
 
         return $response;
+    }
+
+    public function controller() {
+        return $this->controller;
     }
 
     public function sendRequest($request) {
