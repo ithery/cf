@@ -744,7 +744,6 @@ final class CF {
             $file = str_replace('_', '/', substr($class, 0, -7));
         } elseif ($suffix === 'Interface') {
             $type = 'interface';
-            die($class);
             $file = str_replace('_', '/', substr($class, 0, -10));
 //            die($file);
         } else {
