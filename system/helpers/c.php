@@ -283,7 +283,7 @@ class c {
      * // => ""
      * </code>
      */
-    function get($object, $path, $defaultValue = null) {
+    public static function get($object, $path, $defaultValue = null) {
 
         return ($object !== null ? c::baseGet($object, $path, $defaultValue) : $defaultValue);
     }
@@ -337,7 +337,7 @@ class c {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return new CCollection($value);
+        return CF::collect($value);
     }
 
     /**
@@ -348,13 +348,7 @@ class c {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        if (is_null($callback)) {
-            return new CBase_HigherOrderTapProxy($value);
-        }
-
-        $callback($value);
-
-        return $value;
+        return CF::tap($value, $callback);
     }
 
     /**
@@ -460,7 +454,7 @@ class c {
                 !$exception instanceof Exception) {
             $exception = new FatalThrowableError($exception);
         }
-        $exceptionHandler = new CException_ExceptionHandler();
+        $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
     }
 
@@ -493,7 +487,7 @@ class c {
      * @return CCarbon
      */
     public static function now($tz = null) {
-        return CCarbon::now($tz);
+        return CF::now($tz);
     }
 
     public static function hrtime($getAsNumber = false) {
