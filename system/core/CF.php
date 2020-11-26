@@ -567,7 +567,7 @@ final class CF {
 
             if (!isset($config['site_domain'])) {
                 // Invalid config file
-                die('Your C application configuration file is not valid.');
+                die('Your CF application configuration file is not valid.');
             }
 
             return $config;
@@ -680,7 +680,7 @@ final class CF {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     * @return CHTTP_Redirector|CHttp_RedirectResponse
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
         if (is_null($to)) {
@@ -744,6 +744,7 @@ final class CF {
             $file = str_replace('_', '/', substr($class, 0, -7));
         } elseif ($suffix === 'Interface') {
             $type = 'interface';
+            die($class);
             $file = str_replace('_', '/', substr($class, 0, -10));
 //            die($file);
         } else {
@@ -1387,7 +1388,6 @@ final class CF {
         $callback($value);
 
         return $value;
-        
     }
 
     /**
@@ -1430,7 +1430,7 @@ final class CF {
         $traits = class_uses($trait);
 
         foreach ($traits as $trait) {
-            $traits += self::trait_uses_recursive($trait);
+            $traits += self::traitUsesRecursive($trait);
         }
 
         return $traits;
