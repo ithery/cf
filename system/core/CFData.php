@@ -12,9 +12,6 @@ final class CFData {
     public static function domain($domain) {
         return CFData::get($domain, 'domain');
     }
-    
-    
-    
 
     public static function get($dataName, $folder = "") {
         $file = self::path();
@@ -116,7 +113,7 @@ final class CFData {
     }
 
     public static function save_value($value, $filename = null) {
-        $val = '<?php ' . PHP_EOL . 'return ' . cphp::string_value($value) . ';';
+        $val = '<?php ' . PHP_EOL . 'return ' . static::string_value($value) . ';';
         if ($filename != null) {
             file_put_contents($filename, $val);
         }
