@@ -49,9 +49,9 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
     }
 
     protected function __construct() {
-        $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT,CTracker::populator()->get('request.userAgent'));
+        $this->userAgentParser = new CTracker_Parser_UserAgentParser(DOCROOT, CTracker::populator()->get('request.userAgent'));
         $this->crawlerDetector = new CTracker_Detect_CrawlerDetect(CTracker::populator()->get('request.headers'), CTracker::populator()->get('request.userAgent'));
-        $classArray = CF::class_uses_recursive(get_class());
+        $classArray = CF::classUsesRecursive(get_class());
         foreach ($classArray as $class) {
             $methodName = 'boot' . carr::last(explode('_', $class));
             $this->$methodName();
