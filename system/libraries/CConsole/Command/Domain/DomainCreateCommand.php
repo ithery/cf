@@ -14,7 +14,7 @@ class CConsole_Command_Domain_DomainCreateCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'domain:create {domain : String domain to create} {--appId= : app_id for specified domain} {--appCode= : app_code for specified domain} {--orgId= : org_id for specified domain} {--orgCode= : org_code for specified domain}';
+    protected $signature = 'domain:create {domain : String domain to create} {--appId=1 : app_id for specified domain} {--appCode=cresenity : app_code for specified domain} {--orgId= : org_id for specified domain} {--orgCode= : org_code for specified domain}';
 
     /**
      * The console command description.
