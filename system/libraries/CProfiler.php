@@ -50,15 +50,30 @@ class CProfiler {
 
         $html = '';
         $html.='<style type="text/css">' . $styles . '</style>';
-        $html.='<div id="kohana-profiler">';
+        $html.='<a href="javascript:;" id="cf-profiler-button">Profiler</a>';
+        $html.='<div id="cf-profiler">';
         foreach ($profilerTables as $table) {
             $html.=$table->render();
         }
         $executionTime = microtime(TRUE) - $start;
-        $html.='<p class="kp-meta">Profiler executed in ' . number_format($executionTime, 3) . 's</p>';
+        $html.='<p class="cp-meta">Profiler executed in ' . number_format($executionTime, 3) . 's</p>';
         $html.='</div>';
 
-        return $html;
+        
+        $js = "";
+        $js = "
+            <script>
+            document.getElementById('cf-profiler-button').addEventListener('click', e => {
+                document.getElementById('cf-profiler').classList.toggle('active');
+            });
+            </script>
+
+
+        ";
+
+        
+        
+        return $html.$js;
     }
 
     /**
