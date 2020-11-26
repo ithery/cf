@@ -1380,7 +1380,14 @@ final class CF {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        return c::tap($value, $callback);
+        if (is_null($callback)) {
+            return new CBase_HigherOrderTapProxy($value);
+        }
+
+        $callback($value);
+
+        return $value;
+        
     }
 
     /**
@@ -1533,7 +1540,7 @@ final class CF {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return c::collect($value);
+        return new CCollection($value);
     }
 
     /**
@@ -1625,6 +1632,35 @@ final class CF {
      */
     public static function event(...$args) {
         return CEvent::dispatcher()->dispatch(...$args);
+    }
+
+    /**
+     * Create a new Carbon instance for the current time.
+     *
+     * @param  \DateTimeZone|string|null  $tz
+     * @return CCarbon
+     */
+    public static function now($tz = null) {
+        return CCarbon::now($tz);
+    }
+
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return CValidation_Validator|CValidation_Factory
+     */
+    public static function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = []) {
+        $factory = CValidation_Factory::instance();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($data, $rules, $messages, $customAttributes);
     }
 
 }
