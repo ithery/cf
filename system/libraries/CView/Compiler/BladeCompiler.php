@@ -14,6 +14,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         CView_Compiler_BladeCompiler_CompileLoopTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,
         CView_Compiler_BladeCompiler_CompileErrorTrait,
+        CView_Compiler_BladeCompiler_CompileIncludeTrait,
+        CView_Compiler_BladeCompiler_CompileInjectionTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait;
 
     /*

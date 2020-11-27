@@ -41,7 +41,7 @@ trait CView_Trait_ManageLayoutTrait {
                 $this->sectionStack[] = $section;
             }
         } else {
-            $this->extendSection($section, $content instanceof View ? $content : e($content));
+            $this->extendSection($section, $content instanceof CView_View ? $content : c::e($content));
         }
     }
 

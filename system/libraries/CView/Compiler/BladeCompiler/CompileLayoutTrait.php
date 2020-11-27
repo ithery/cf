@@ -64,7 +64,7 @@ trait CView_Compiler_BladeCompiler_CompileLayoutTrait {
      * @return string
      */
     protected function compileParent() {
-        return ViewFactory::parentPlaceholder($this->lastSection ?: '');
+        return CView::factory()->parentPlaceholder($this->lastSection ?: '');
     }
 
     /**

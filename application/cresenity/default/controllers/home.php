@@ -19,6 +19,10 @@ Class Controller_Home extends CController {
         return CF::response()->view('test');
     }
     
+    public function child() {
+        return CF::response()->view('child');
+    }
+    
     public function app() {
         $app = CApp::instance();
         

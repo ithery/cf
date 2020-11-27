@@ -387,9 +387,10 @@ class CFile {
             $__data = $data;
             $function = static function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
+                
                 return require $__path;
             };
-            $function();
+            return $function();
         }
 
         throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
