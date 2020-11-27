@@ -208,7 +208,7 @@ final class CF {
         self::$user_agent = (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
 
         if (function_exists('date_default_timezone_set')) {
-            $timezone = self::config('locale.timezone');
+            $timezone = self::config('app.timezone');
 
             // Set default timezone, due to increased validation of date settings
             // which cause massive amounts of E_NOTICEs to be generated in PHP 5.2+
@@ -222,13 +222,11 @@ final class CF {
         header('Content-Type: text/html; charset=UTF-8');
 
         // Load locales
-        $locales = self::config('locale.language');
+        $locale = self::config('app.locale');
 
-        // Make first locale UTF-8
-        $locales[0] .= '.UTF-8';
 
         // Set locale information
-        self::$locale = setlocale(LC_ALL, $locales);
+        self::$locale = setlocale(LC_ALL, $locale);
 
 
         static::loadBootstrapFiles();
@@ -483,6 +481,7 @@ final class CF {
      * @return  mixed
      */
     public static function config($group, $default = null, $required = TRUE) {
+
         $path = null;
         if (strpos($group, '.') !== FALSE) {
             // Split the config group and path
@@ -491,6 +490,9 @@ final class CF {
 
         $config = CConfig::instance($group);
 
+        if ($path == null) {
+            return $config;
+        }
         $value = $config->get($path, $default);
 
 
@@ -1029,57 +1031,23 @@ final class CF {
      * @param   array   additional information to insert into the line
      * @return  string  i18n language string, or the requested key if the i18n item is not found
      */
-    public static function lang($key, $args = array()) {
-        // Extract the main group from the key
-        $group = explode('.', $key, 2);
-        $group = $group[0];
-
-        // Get locale name
-        $locale = self::config('locale.language.0');
-
-        if (!isset(self::$internal_cache['language'][$locale][$group])) {
-            // Messages for this group
-            $messages = array();
-
-            if ($files = self::findFile('i18n', $locale . '/' . $group)) {
-                foreach ($files as $file) {
-                    $lang = include $file;
-
-                    // Merge in configuration
-                    if (!empty($lang) AND is_array($lang)) {
-                        foreach ($lang as $k => $v) {
-                            $messages[$k] = $v;
-                        }
-                    }
-                }
-            }
-
-            if (!isset(self::$write_cache['language'])) {
-                // Write language cache
-                self::$write_cache['language'] = TRUE;
-            }
-
-            self::$internal_cache['language'][$locale][$group] = $messages;
+    public static function lang($key = null, array $args = array()) {
+        if ($key == null) {
+            return CTranslation::translator();
         }
 
-        // Get the line from cache
-        $line = self::key_string(self::$internal_cache['language'][$locale], $key);
+        return CTranslation::translator()->trans($key, $args);
+    }
 
-        if ($line === NULL) {
-            self::log('error', 'Missing i18n entry ' . $key . ' for language ' . $locale);
-
-            // Return the key string as fallback
-            return $key;
-        }
-
-        if (is_string($line) AND func_num_args() > 1) {
-            $args = array_slice(func_get_args(), 1);
-
-            // Add the arguments into the line
-            $line = vsprintf($line, is_array($args[0]) ? $args[0] : $args);
-        }
-
-        return $line;
+    /**
+     * Fetch an i18n language item.
+     *
+     * @param   string  language key to fetch
+     * @param   array   additional information to insert into the line
+     * @return  string  i18n language string, or the requested key if the i18n item is not found
+     */
+    public static function trans($key = null, array $args = array()) {
+        static::lang($key, $args);
     }
 
     /**
@@ -1669,6 +1637,28 @@ final class CF {
         }
 
         return $factory->make($data, $rules, $messages, $customAttributes);
+    }
+
+    /**
+     * Get the current application locale.
+     *
+     * @return string
+     */
+    public static function getLocale() {
+
+        return CF::config('app.locale');
+    }
+
+    public static function setLocale($locale) {
+        /*
+          CF::config('app')->set('locale', $locale);
+
+          CTranslation::translator()->setLocale($locale);
+
+          CEvent::dispatch('cf.locale.updated');
+         * 
+         */
+        //$this['events']->dispatch(new CBase_Events_LocaleUpdated($locale));
     }
 
 }

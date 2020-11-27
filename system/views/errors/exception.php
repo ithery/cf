@@ -34,7 +34,7 @@
             <p><?php echo chtml::specialchars($description) ?></p>
             <?php if (!IN_PRODUCTION || (isset($_GET['show_debug_error']) && $_GET['show_debug_error'] == '1') || (isset($show_debug_error) && $show_debug_error )): ?>
                 <?php if (!empty($line) AND ! empty($file)): ?>
-                    <p><?php echo CF::lang('core.error_file_line', $file, $line) ?></p>
+                    <p><?php echo CF::lang('core.error_file_line', ['file'=>$file,'line'=>$line]) ?></p>
                 <?php endif ?>
                 <p><code class="block"><?php echo $message ?></code></p>
                 <?php if (!empty($trace)): ?>

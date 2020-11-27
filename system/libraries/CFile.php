@@ -376,16 +376,23 @@ class CFile {
      * Get the returned value of a file.
      *
      * @param  string  $path
+     * @param  array  $data
      * @return mixed
      *
-     * @throws CFile_Exception_FileNotFoundException
+     * @throws CStorage_Exception_FileNotFoundException
      */
-    public static function getRequire($path) {
+    public static function getRequire($path, array $data = []) {
         if (static::isFile($path)) {
-            return require $path;
+            $__path = $path;
+            $__data = $data;
+            return (static function () use ($__path, $__data) {
+                        extract($__data, EXTR_SKIP);
+
+                        return require $__path;
+                    })();
         }
 
-        throw new CFile_Exception_FileNotFoundException("File does not exist at path {$path}");
+        throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
 
 }

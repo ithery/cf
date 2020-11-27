@@ -530,6 +530,25 @@ class c {
         }
     }
 
+    /**
+     * Encode HTML special characters in a string.
+     *
+     * @param  CBase_DeferringDisplayableValue|CInterface_Htmlable|string  $value
+     * @param  bool  $doubleEncode
+     * @return string
+     */
+    public static function e($value, $doubleEncode = true) {
+        if ($value instanceof CBase_DeferringDisplayableValue) {
+            $value = $value->resolveDisplayableValue();
+        }
+
+        if ($value instanceof CInterface_Htmlable) {
+            return $value->toHtml();
+        }
+
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+    }
+
 }
 
 // End c

@@ -55,11 +55,11 @@ class CHTTP_ResponseFactory {
      * @return CHTTP_Response
      */
     public function view($view, $data = [], $status = 200, array $headers = []) {
-        if (!$view instanceof CView) {
+        if (!$view instanceof CView_View) {
             $view = CView::factory($view, $data);
         } else {
             if (is_array($data) && count($data) > 0) {
-                $view->set($data);
+                $view->with($data);
             }
         }
 

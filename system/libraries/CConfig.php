@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CConfig {
+class CConfig implements CInterface_Arrayable {
 
     protected static $instances = array();
     protected $group = 'app';
@@ -157,6 +157,10 @@ class CConfig {
         $flatten($resultData);
 
         return $result;
+    }
+
+    public function toArray() {
+        return $this->configs;
     }
 
 }

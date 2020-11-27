@@ -59,12 +59,8 @@ class CView_Finder {
      * @param  array|null  $extensions
      * @return void
      */
-    public function __construct(array $paths, array $extensions = null) {
-        $this->paths = array_map([$this, 'resolvePath'], $paths);
-
-        if (isset($extensions)) {
-            $this->extensions = $extensions;
-        }
+    public function __construct() {
+        $this->paths = [];
     }
 
     /**
@@ -92,7 +88,7 @@ class CView_Finder {
      * @return string
      */
     protected function findNamespacedView($name) {
-        [$namespace, $view] = $this->parseNamespaceSegments($name);
+        list($namespace, $view) = $this->parseNamespaceSegments($name);
 
         return $this->findInPaths($view, $this->hints[$namespace]);
     }
@@ -129,9 +125,17 @@ class CView_Finder {
      * @throws \InvalidArgumentException
      */
     protected function findInPaths($name, $paths) {
+        $cfPath = CF::getDirs(CView::VIEW_FOLDER);
+        
+        $paths = array_merge($cfPath,$paths);
+
+
         foreach ((array) $paths as $path) {
+            
             foreach ($this->getPossibleViewFiles($name) as $file) {
-                if ($this->files->exists($viewPath = $path . '/' . $file)) {
+                
+                if (file_exists($viewPath = $path . $file)) {
+                    
                     return $viewPath;
                 }
             }
@@ -248,7 +252,7 @@ class CView_Finder {
      * @return bool
      */
     public function hasHintInformation($name) {
-        return strpos($name, CView_Helper::HINT_PATH_DELIMITER) > 0;
+        return strpos($name, CView::HINT_PATH_DELIMITER) > 0;
     }
 
     /**
