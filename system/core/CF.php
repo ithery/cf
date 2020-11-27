@@ -490,9 +490,6 @@ final class CF {
 
         $config = CConfig::instance($group);
 
-        if ($path == null) {
-            return $config;
-        }
         $value = $config->get($path, $default);
 
 

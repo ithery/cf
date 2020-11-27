@@ -385,11 +385,11 @@ class CFile {
         if (static::isFile($path)) {
             $__path = $path;
             $__data = $data;
-            return (static function () use ($__path, $__data) {
-                        extract($__data, EXTR_SKIP);
-
-                        return require $__path;
-                    })();
+            $function = static function () use ($__path, $__data) {
+                extract($__data, EXTR_SKIP);
+                return require $__path;
+            };
+            $function();
         }
 
         throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");

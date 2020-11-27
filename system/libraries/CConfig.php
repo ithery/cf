@@ -163,4 +163,5 @@ class CConfig implements CInterface_Arrayable {
         return $this->configs;
     }
 
+
 }

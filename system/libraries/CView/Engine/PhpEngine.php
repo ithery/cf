@@ -57,7 +57,7 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
         } catch (Throwable $e) {
             $this->handleViewException($e, $obLevel);
         }
-
+        
         return ltrim(ob_get_clean());
     }
 
@@ -74,7 +74,7 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
         while (ob_get_level() > $obLevel) {
             ob_end_clean();
         }
-
+        
         throw $e;
     }
 
