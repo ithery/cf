@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,13 +8,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Operator;
+
+use PHPUnit\Framework\Constraint\Cardinality\IsEqual;
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-abstract class Operator extends Constraint
-{
+abstract class Operator extends Constraint {
+
     /**
      * Returns the name of this operator.
      */
@@ -34,8 +39,7 @@ abstract class Operator extends Constraint
     /**
      * Validates $constraint argument.
      */
-    protected function checkConstraint($constraint)
-    {
+    protected function checkConstraint($constraint) {
         if (!$constraint instanceof Constraint) {
             return new IsEqual($constraint);
         }
@@ -46,10 +50,10 @@ abstract class Operator extends Constraint
     /**
      * Returns true if the $constraint needs to be wrapped with braces.
      */
-    protected function constraintNeedsParentheses(Constraint $constraint)
-    {
+    protected function constraintNeedsParentheses(Constraint $constraint) {
         return $constraint instanceof self &&
-               $constraint->arity() > 1 &&
-               $this->precedence() <= $constraint->precedence();
+                $constraint->arity() > 1 &&
+                $this->precedence() <= $constraint->precedence();
     }
+
 }
