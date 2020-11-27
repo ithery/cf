@@ -12,7 +12,6 @@ class CView {
     protected $filetype = FALSE;
     // CView variable storage
     protected $local_data = array();
-    protected static $global_data = array();
 
     /**
      * Creates a new CView using the given parameters.
@@ -49,11 +48,11 @@ class CView {
     public function __construct($name = NULL, $data = NULL, $type = NULL) {
         if (is_string($name) AND $name !== '') {
             // Set the filename
-            $this->set_filename($name, $type);
+            $this->setFilename($name, $type);
         }
 
 
-        if (is_array($data) AND ! empty($data)) {
+        if (is_array($data) AND!empty($data)) {
             // Preload data using array_merge, to allow user extensions
             $this->local_data = array_merge($this->local_data, $data);
         }
@@ -77,7 +76,7 @@ class CView {
      * @param   string  view file type
      * @return  object
      */
-    public function set_filename($name, $type = NULL) {
+    public function setFilename($name, $type = NULL) {
 
         if ($type == NULL) {
             // Load the filename and set the content type
@@ -163,23 +162,6 @@ class CView {
         $this->local_data[$name] = & $var;
 
         return $this;
-    }
-
-    /**
-     * Sets a view global variable.
-     *
-     * @param   string|array  name of variable or an array of variables
-     * @param   mixed         value when using a named variable
-     * @return  void
-     */
-    public static function set_global($name, $value = NULL) {
-        if (is_array($name)) {
-            foreach ($name as $key => $value) {
-                self::$global_data[$key] = $value;
-            }
-        } else {
-            self::$global_data[$name] = $value;
-        }
     }
 
     /**
