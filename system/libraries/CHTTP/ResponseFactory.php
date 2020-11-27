@@ -56,10 +56,12 @@ class CHTTP_ResponseFactory {
      */
     public function view($view, $data = [], $status = 200, array $headers = []) {
         if (!$view instanceof CView_View) {
-            $view = CView::factory($view, $data);
+            if (!$view instanceof CView) {
+                $view = CView::factory($view, $data);
+            }
         } else {
             if (is_array($data) && count($data) > 0) {
-                $view->with($data);
+                $view->set($data);
             }
         }
 
