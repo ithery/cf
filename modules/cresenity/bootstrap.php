@@ -51,6 +51,7 @@ if (carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator")
 CFConsole::addCommand([
     CQC_Console_Command_PhpUnitCommand::class,
     CQC_Console_Command_PhpUnitListCommand::class,
+    CQC_Console_Command_PhpStanCommand::class,
 ]);
 
 if (isset($_COOKIE['capp-profiler'])) {

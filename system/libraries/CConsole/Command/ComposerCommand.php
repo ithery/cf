@@ -55,8 +55,9 @@ class CConsole_Command_ComposerCommand extends CConsole_Command {
 
                 $errMessage = $process->getErrorOutput();
                 if (strlen($errMessage) == 0) {
-                    $errMessage = 'Something went wrong on install composer-setup.php, please manually check the installation';
+                    $errMessage = 'Something went wrong on running composer, please manually check the command';
                 }
+                $this->error($errMessage);
             }
         }
     }

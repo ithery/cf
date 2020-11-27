@@ -176,7 +176,7 @@ class CConsole_Command extends SymfonyCommand {
      * @return \Symfony\Component\Console\Input\ArrayInput
      */
     protected function createInputFromArguments(array $arguments) {
-        return tap(new ArrayInput($arguments), function ($input) {
+        return CF::tap(new ArrayInput($arguments), function ($input) {
             if ($input->hasParameterOption(['--no-interaction'], true)) {
                 $input->setInteractive(false);
             }
