@@ -22,3 +22,7 @@
 */config/cresenity.php
 */config/assets.php
 
+/vendor
+composer.lock
+
+

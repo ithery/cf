@@ -87,6 +87,9 @@ botlog.log
 .vscode
 *.py
 
+#phpunit
+.phpunit.result.cache
+
 .bin/*
 
 
