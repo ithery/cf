@@ -11,12 +11,12 @@ namespace PHPUnit\Framework\Constraint\Object;
 
 use function get_class;
 use function is_object;
-use PHPUnit\Framework\ActualValueIsNotAnObjectException;
-use PHPUnit\Framework\ComparisonMethodDoesNotAcceptParameterTypeException;
-use PHPUnit\Framework\ComparisonMethodDoesNotDeclareBoolReturnTypeException;
-use PHPUnit\Framework\ComparisonMethodDoesNotDeclareExactlyOneParameterException;
-use PHPUnit\Framework\ComparisonMethodDoesNotDeclareParameterTypeException;
-use PHPUnit\Framework\ComparisonMethodDoesNotExistException;
+use PHPUnit\Framework\Exception\ActualValueIsNotAnObjectException;
+use PHPUnit\Framework\Exception\ComparisonMethodDoesNotAcceptParameterTypeException;
+use PHPUnit\Framework\Exception\ComparisonMethodDoesNotDeclareBoolReturnTypeException;
+use PHPUnit\Framework\Exception\ComparisonMethodDoesNotDeclareExactlyOneParameterException;
+use PHPUnit\Framework\Exception\ComparisonMethodDoesNotDeclareParameterTypeException;
+use PHPUnit\Framework\Exception\ComparisonMethodDoesNotExistException;
 use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionNamedType;
 use ReflectionObject;
