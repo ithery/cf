@@ -28,7 +28,7 @@ use function range;
 use function realpath;
 use function sprintf;
 use function time;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Runner\Hook\AfterLastTestHook;

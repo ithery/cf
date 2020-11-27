@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+namespace PHPUnit\Framework\Constraint\Object;
 
 use function get_class;
 use function is_object;
@@ -17,6 +17,7 @@ use PHPUnit\Framework\ComparisonMethodDoesNotDeclareBoolReturnTypeException;
 use PHPUnit\Framework\ComparisonMethodDoesNotDeclareExactlyOneParameterException;
 use PHPUnit\Framework\ComparisonMethodDoesNotDeclareParameterTypeException;
 use PHPUnit\Framework\ComparisonMethodDoesNotExistException;
+use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionNamedType;
 use ReflectionObject;
 

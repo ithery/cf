@@ -9,7 +9,7 @@
  */
 namespace PHPUnit\Framework\MockObject;
 
-use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit

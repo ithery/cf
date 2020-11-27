@@ -18,7 +18,7 @@ use EmptyIterator;
 use Generator;
 use Iterator;
 use IteratorAggregate;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use Traversable;
 
 /**

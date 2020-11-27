@@ -11,7 +11,7 @@ namespace PHPUnit\TextUI\XmlConfiguration\PHPUnit;
 
 use function class_exists;
 use function sprintf;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Runner\Hook;
 use ReflectionClass;

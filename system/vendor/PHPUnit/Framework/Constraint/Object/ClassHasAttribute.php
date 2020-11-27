@@ -12,7 +12,7 @@ namespace PHPUnit\Framework\Constraint;
 use function get_class;
 use function is_object;
 use function sprintf;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use ReflectionClass;
 use ReflectionException;
 

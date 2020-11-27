@@ -66,12 +66,13 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
         try {
             $args = [];
             $args['verbose'] = $this->option('verbose');
+            $args['debug'] = $this->option('verbose');
             if (strlen($method) > 0) {
                 $args['filter'] = $method;
             }
             $result = $runner->run($suite, $args, [], true);
         } catch (Throwable $t) {
-            $this->error($t->getMessage() . PHP_EOL);
+            $this->error($t->getMessage() . PHP_EOL.$t->getTraceAsString());
             $return = TestRunner::FAILURE_EXIT;
         }
 

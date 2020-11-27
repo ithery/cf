@@ -10,7 +10,7 @@
 namespace PHPUnit\Framework\Constraint;
 
 use function sprintf;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use ReflectionClass;
 use ReflectionException;
 
