@@ -9,6 +9,9 @@ class CView_Factory {
 
     use CView_Trait_ManageEventTrait,
         CView_Trait_ManageLayoutTrait,
+        CView_Trait_ManageLoopTrait,
+        CView_Trait_ManageTranslationTrait,
+        CView_Trait_ManageComponentTrait,
         CView_Trait_ManageStackTrait;
 
     /**
