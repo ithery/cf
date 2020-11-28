@@ -5,7 +5,7 @@
  */
 define('DEVSUITE_HOME_PATH', str_replace('\\', '/', $_SERVER['HOME'] . '/.config/devsuite'));
 define('DEVSUITE_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
-
+define('CFDEVSUITE',1);
 
 /**
  * Show the Valet 404 "Not Found" page.
