@@ -13,6 +13,7 @@ class CApp implements CInterface_Responsable {
         CTrait_RequestInfoTrait,
         CApp_Trait_App_Breadcrumb,
         CApp_Trait_App_Variables,
+        CApp_Trait_App_View,
         CApp_Trait_App_Renderer,
         CApp_Trait_App_Auth,
         CApp_Trait_App_Title;
@@ -33,9 +34,7 @@ class CApp implements CInterface_Responsable {
     private $ajaxData = array();
     private $renderMessage = true;
     private $keepMessage = false;
-    private $viewName = 'cpage';
-    private $viewLoginName = 'ccore/login';
-    protected static $viewCallback;
+
     protected $renderer;
 
     /**
@@ -44,10 +43,7 @@ class CApp implements CInterface_Responsable {
      */
     protected $element;
 
-    public function setViewCallback(callable $viewCallback) {
-        self::$viewCallback = $viewCallback;
-    }
-
+    
     /**
      * 
      * @param string $domain
@@ -556,13 +552,7 @@ class CApp implements CInterface_Responsable {
         return cjson::encode($data);
     }
 
-    public function setViewName($viewName) {
-        $this->viewName = $viewName;
-    }
-
-    public function setViewLoginName($viewLoginName) {
-        $this->viewLoginName = $viewLoginName;
-    }
+   
 
     /**
      * 
