@@ -75,14 +75,7 @@ final class CF {
         return defined('IN_PRODUCTION') && IN_PRODUCTION;
     }
 
-    /**
-     * 
-     * @return bool
-     */
-    public static function isCli() {
-        return defined('CFCLI');
-    }
-
+   
     /**
      * Check given domain exists or not
      * 
@@ -863,6 +856,24 @@ final class CF {
         return TRUE;
     }
 
+    /**
+     * detect CF is running on console in cf command or not
+     * 
+     * @return boolean
+     */
+    public static function isCFCli() {
+        return defined('CFCLI');
+    }
+    
+    /**
+     * detect CF is running on console or not 
+     * 
+     * @return type
+     */
+    public static function isCli() {
+        return PHP_SAPI === 'cli';
+    }
+    
     public static function cliDomain() {
         $domain = null;
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
@@ -873,9 +884,9 @@ final class CF {
 
     public static function domain() {
         $domain = '';
-        if (PHP_SAPI === 'cli') {
+        if (static::isCli()) {
             // Command line requires a bit of hacking
-            if (defined('CFCLI')) {
+            if (static::isCFCli()) {
                 $domain = static::cliDomain();
             } else {
                 if (isset($_SERVER['argv'][2])) {
@@ -1658,6 +1669,15 @@ final class CF {
         //$this['events']->dispatch(new CBase_Events_LocaleUpdated($locale));
     }
 
+    
+    public static function appDir($appCode=null) {
+        if($appCode==null) {
+            $appCode=static::appCode();
+            if(defined('CFCLI')) {
+                $appCode = CConsole::appCode();
+            }
+        }
+    }
 }
 
 // End CF
