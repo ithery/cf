@@ -387,13 +387,43 @@ class CFile {
             $__data = $data;
             $function = static function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
-                
+
                 return require $__path;
             };
             return $function();
         }
 
         throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
+    }
+
+    public static function phpValue($val, $level = 0) {
+        $indentString = "    ";
+        $str = '';
+        $eol = PHP_EOL;
+        $indent = str_repeat($indentString, $level);
+        if (is_array($val)) {
+            $str .= 'array(' . $eol;
+            $indent2 = str_repeat($indentString, $level + 1);
+            foreach ($val as $k => $v) {
+                $str .= $indent2 . "'" . addslashes($k) . "'=>";
+                $str .= static::phpValue($v, $level + 1);
+                $str .= "," . $eol;
+            }
+            $str .= $indent . ')';
+        } else if (is_null($val)) {
+            $str .= 'NULL';
+        } else if (is_bool($val)) {
+            $str .= ($val === TRUE ? "TRUE" : "FALSE");
+        } else {
+            $str .= "'" . addslashes($val) . "'";
+        }
+        return $str;
+    }
+
+    public static function putPhpValue($filename, $data, $lock = true) {
+        $val = '<?php ' . PHP_EOL . 'return ' . static::phpValue($data) . ';';
+
+        return static::put($filename, $val, $lock);
     }
 
 }
