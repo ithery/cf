@@ -56,6 +56,17 @@ class CElement_Factory {
     public static function createTemplate($id = "") {
         return new CElement_Template($id);
     }
+    
+    /**
+     * 
+     * @param string $id optional
+     * @param CView_View|string|null $view optional
+     * @param array|null $data optional
+     * @return \CElement_View
+     */
+    public static function createView($id = "",$view=null,$data=null) {
+        return new CElement_View($id,$view,$data);
+    }
 
     /**
      * 

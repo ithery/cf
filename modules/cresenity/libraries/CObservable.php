@@ -148,6 +148,26 @@ abstract class CObservable extends CRenderable {
         $this->wrapper->add($template);
         return $template;
     }
+    
+    /**
+     * 
+     * @param type $view
+     * @param string $id
+     * @return type
+     */
+    public function addView($view=null, $data=null, $id=null) {
+        
+        if(strlen($id)==0) {
+            $id = 'view-'.cstr::slug($view).'-'.CObserver::instance()->newId();
+        }
+        
+        $viewElement = CElement_Factory::createView($id,$view,$data);
+        
+        
+        $this->wrapper->add($viewElement);
+        return $viewElement;
+        
+    }
 
     /**
      * Add Form Field
@@ -271,6 +291,10 @@ abstract class CObservable extends CRenderable {
 
         return $element;
     }
+    
+    
+    
+    
 
     /**
      * Add Action Element

@@ -6,7 +6,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Sep 8, 2018, 12:09:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-$db = CDatabase::instance();
+
 $session = CSession::instance();
 $app = CApp::instance();
 
@@ -243,12 +243,4 @@ echo $ready_client_script;
         <!-- CAPP-DEBUGBAR-CODE -->
     </body>
 </html>
-<?php
-if (ccfg::get("log_request")) {
-    $user = CApp::instance()->user();
-    if ($user != null) {
-
-        clog::request($user->user_id);
-    }
-}
-?>
+s

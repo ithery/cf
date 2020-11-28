@@ -75,7 +75,6 @@ final class CF {
         return defined('IN_PRODUCTION') && IN_PRODUCTION;
     }
 
-   
     /**
      * Check given domain exists or not
      * 
@@ -256,9 +255,11 @@ final class CF {
 
 
         //try to locate bootstrap files for org
-        $bootstrapPath .= CF::orgCode() . DS;
-        if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
-            include $bootstrapPath . 'bootstrap' . EXT;
+        if(strlen(CF::orgCode())>0) {
+            $bootstrapPath .= CF::orgCode() . DS;
+            if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+                include $bootstrapPath . 'bootstrap' . EXT;
+            }
         }
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_bootstrap');
     }
@@ -864,7 +865,7 @@ final class CF {
     public static function isCFCli() {
         return defined('CFCLI');
     }
-    
+
     /**
      * detect CF is running on console or not 
      * 
@@ -873,7 +874,7 @@ final class CF {
     public static function isCli() {
         return PHP_SAPI === 'cli';
     }
-    
+
     public static function cliDomain() {
         $domain = null;
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
@@ -1669,15 +1670,18 @@ final class CF {
         //$this['events']->dispatch(new CBase_Events_LocaleUpdated($locale));
     }
 
-    
-    public static function appDir($appCode=null) {
-        if($appCode==null) {
-            $appCode=static::appCode();
-            if(defined('CFCLI')) {
-                $appCode = CConsole::appCode();
-            }
+    public static function appDir($appCode = null) {
+        if ($appCode == null) {
+            $appCode = static::appCode();
         }
+        return DOCROOT . 'application' . DS . $appCode;
     }
+    
+    public static function isDevSuite() {
+        return cstr::endsWith(CF::domain(), '.test');
+    }
+    
+
 }
 
 // End CF

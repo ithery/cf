@@ -98,7 +98,7 @@ class CApp_Navigation_Helper {
         if ($nav === false) {
             return false;
         }
-        if (isset($_COOKIE['capp-administrator'])) {
+        if (CApp::isAdministrator()) {
             return true;
         }
         $db = CDatabase::instance(null, null, $domain);

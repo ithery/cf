@@ -18,7 +18,7 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
 
     public function __construct($options = array()) {
         $app = CApp::instance();
-        $db = CDatabase::instance();
+        
 
         $roleId = carr::get($options, 'role_id');
         $appId = carr::get($options, 'app_id');
@@ -41,13 +41,19 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
         }
 
         $this->navs = $navs;
-
-        $q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
-        if ($roleId == null) {
-            $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
+        
+        $this->roleNavs = [];
+        
+        if(!CApp::isAdministrator()) {
+            $db = CDatabase::instance();
+            $q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
+            if ($roleId == null) {
+                $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
+            }
+            $this->roleNavs = cdbutils::get_array($q);
         }
         
-        $this->roleNavs = cdbutils::get_array($q);
+        
     }
 
 }

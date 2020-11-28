@@ -2,6 +2,10 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
+
+/**
+ * @mixin CElement
+ */
 class CApp implements CInterface_Responsable {
 
     use CTrait_Compat_App,
@@ -165,12 +169,6 @@ class CApp implements CInterface_Responsable {
         $this->_org = corg::get(CF::orgCode());
 
 
-        //$this->renderer = new CApp_Renderer($this);
-
-
-
-        $db = CDatabase::instance();
-
         if (isset($_COOKIE['capp-debugbar'])) {
             CDebug::bar()->enable();
         }
@@ -239,7 +237,7 @@ class CApp implements CInterface_Responsable {
     }
 
     public function controller() {
-        return CF::instance();
+        return CHTTP::kernel()->controller();
     }
 
     public static function config($path, $domain = null) {
@@ -251,8 +249,13 @@ class CApp implements CInterface_Responsable {
         return $this;
     }
 
-    public function isAdmin() {
-        return $this->appId() == 0;
+    /**
+     * 
+     * @deprecated
+     * @return bool
+     */
+    public static function isAdmin() {
+        return static::isAdministrator();
     }
 
     /**
@@ -599,6 +602,10 @@ class CApp implements CInterface_Responsable {
      */
     public function toResponse($request) {
         return CHTTP::createResponse($this->render());
+    }
+
+    public static function isAdministrator() {
+        return carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator";
     }
 
 }
