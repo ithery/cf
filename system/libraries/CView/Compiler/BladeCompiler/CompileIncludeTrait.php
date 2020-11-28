@@ -26,7 +26,7 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     protected function compileInclude($expression) {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->make({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+        return "<?php echo \$__env->make({$expression}, \carr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
     }
 
     /**
@@ -38,7 +38,7 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     protected function compileIncludeIf($expression) {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php if (\$__env->exists({$expression})) echo \$__env->make({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+        return "<?php if (\$__env->exists({$expression})) echo \$__env->make({$expression}, \carr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
     }
 
     /**
@@ -50,7 +50,7 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     protected function compileIncludeWhen($expression) {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->renderWhen($expression, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path'])); ?>";
+        return "<?php echo \$__env->renderWhen($expression, \carr::except(get_defined_vars(), ['__data', '__path'])); ?>";
     }
 
     /**

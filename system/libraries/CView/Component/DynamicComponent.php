@@ -40,7 +40,7 @@ class CView_Component_DynamicComponent extends CView_ComponentAbstract {
     /**
      * Get the view / contents that represent the component.
      *
-     * @return \Illuminate\Contracts\View\View|string
+     * @return \CView_View|string
      */
     public function render() {
         $template = <<<'EOF'

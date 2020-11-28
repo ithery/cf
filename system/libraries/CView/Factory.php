@@ -111,9 +111,9 @@ class CView_Factory {
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $path
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  CInterface_Arrayable|array  $data
      * @param  array  $mergeData
-     * @return \Illuminate\Contracts\View\View
+     * @return CView_View
      */
     public function file($path, $data = [], $mergeData = []) {
         $data = array_merge($mergeData, $this->parseData($data));
@@ -127,9 +127,9 @@ class CView_Factory {
      * Get the first view that actually exists from the given list.
      *
      * @param  array  $views
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  \CInterface_Arrayable|array  $data
      * @param  array  $mergeData
-     * @return \Illuminate\Contracts\View\View
+     * @return \CView_View
      *
      * @throws \InvalidArgumentException
      */
@@ -150,7 +150,7 @@ class CView_Factory {
      *
      * @param  bool  $condition
      * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  \CInterface_Arrayable|array  $data
      * @param  array  $mergeData
      * @return string
      */
@@ -220,8 +220,8 @@ class CView_Factory {
      *
      * @param  string  $view
      * @param  string  $path
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @return \Illuminate\Contracts\View\View
+     * @param  \CInterface_Arrayable|array  $data
+     * @return \CView_View
      */
     protected function viewInstance($view, $path, $data) {
         return new CView_View($this->getEngineFromPath($path), $view, $path, $data);
