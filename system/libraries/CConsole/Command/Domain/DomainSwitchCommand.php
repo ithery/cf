@@ -23,7 +23,7 @@ class CConsole_Command_Domain_DomainSwitchCommand extends CConsole_Command {
                 $this->error('Failed switch domain, ' . $domain . ' not exists');
             } else {
                 $fileData = DOCROOT . 'data/current-domain';
-                cfs::atomic_write($fileData, $domain);
+                CFile::put($fileData, $domain, true);
                 $this->info('Switched to ' . $domain);
             }
         }

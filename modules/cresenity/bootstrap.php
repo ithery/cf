@@ -54,8 +54,16 @@ CFConsole::addCommand([
     CQC_Console_Command_PhpStanCommand::class,
 ]);
 
+CView::blade()->directive('CAppStyles',[CApp_Blade_Directive::class,'styles']);
+CView::blade()->directive('CAppScripts',[CApp_Blade_Directive::class,'scripts']);
+CView::blade()->directive('CAppPageTitle',[CApp_Blade_Directive::class,'pageTitle']);
+CView::blade()->directive('CAppTitle',[CApp_Blade_Directive::class,'title']);
+CView::blade()->directive('CAppContent',[CApp_Blade_Directive::class,'content']);
+
+
 if (isset($_COOKIE['capp-profiler'])) {
     CProfiler::enable();
 }
+
 
 

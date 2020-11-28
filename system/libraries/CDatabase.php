@@ -113,6 +113,7 @@ class CDatabase {
      * @return  CDatabase
      */
     public static function &instance($name = 'default', $config = NULL, $domain = null) {
+        
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();
@@ -129,7 +130,7 @@ class CDatabase {
 
             CDatabase::$instances[$domain][$name] = new CDatabase($config === NULL ? $name : $config, $domain);
         }
-
+        
         return CDatabase::$instances[$domain][$name];
     }
 

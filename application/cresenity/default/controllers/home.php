@@ -16,7 +16,13 @@ Class Controller_Home extends CController {
 
     
     public function test() {
-        return CF::response()->view('test');
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
+        $app->setViewName('test');
+        
+        $app->add("Hallo");
+        echo $app->render();
+        
     }
     
     public function child() {

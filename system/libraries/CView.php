@@ -44,6 +44,10 @@ class CView {
         return CView_Factory::instance()->exists($name);
     }
 
+    
+    public static function blade() {
+        return CView_Compiler_BladeCompiler::instance(); 
+    }
 }
 
 // End CView
