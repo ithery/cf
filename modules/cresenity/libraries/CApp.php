@@ -598,4 +598,8 @@ class CApp implements CInterface_Responsable {
         return carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator";
     }
 
+    
+    public function setTheme($theme) {
+        CManager::theme()->setTheme($theme);
+    }
 }

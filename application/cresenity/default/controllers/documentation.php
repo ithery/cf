@@ -10,8 +10,18 @@ defined('SYSPATH') OR die('No direct access allowed.');
 Class Controller_Documentation extends CController {
 
     public function index() {
-
-        return CF::response()->view('documentation');
+        return $this->page();
+    }
+    
+    public function page($slug=null) {
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
+        $app->setTheme('cfdocs');
+        
+        $app->setView('documentation');
+        
+        return $app;
+        
     }
 
 }

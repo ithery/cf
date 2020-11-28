@@ -113,7 +113,8 @@ class CDatabase {
      * @return  CDatabase
      */
     public static function &instance($name = 'default', $config = NULL, $domain = null) {
-        
+        cdbg::traceDump();
+        die;
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();

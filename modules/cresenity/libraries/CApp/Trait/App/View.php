@@ -14,6 +14,15 @@ trait CApp_Trait_App_View {
     private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
 
+    
+    public function setView($view) {
+        if(!($view instanceof CView_View)) {
+            $view = CView::factory($view);
+        }
+        $this->view = $view;
+        $this->viewName = $view->getName();
+    }
+    
     public function getView() {
         if ($this->view == null) {
             $viewName = $this->viewName;
