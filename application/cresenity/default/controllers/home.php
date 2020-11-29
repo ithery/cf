@@ -17,9 +17,9 @@ Class Controller_Home extends CController {
     public function test() {
         $app = CApp::instance();
         $app->setLoginRequired(false);
-        $app->setViewName('test');
+        $app->setViewName('test2');
         $app->setTheme('cfdocs');
-        $app->addComponent("counter");
+        //$app->addComponent("counter");
         echo $app->render();
     }
 
@@ -47,9 +47,14 @@ Class Controller_Home extends CController {
          */
         CManager::registerModule('bootstrap-4');
        
-        $template = $app->addTemplate()->setTemplate('testing');
+        //$div = $app->addDiv()->setAttr('style','width:100px');
+        //$div->addComponent('member-table');
+        
+        //$template = $app->addTemplate()->setTemplate('testing');
         
 
+        
+        
         return $app;
     }
 

@@ -108,7 +108,7 @@ trait CComponent_Concern_HandlesActionsTrait
 
             case '$set':
                 $prop = array_shift($params);
-                $this->syncInput($prop, head($params), $rehash = false);
+                $this->syncInput($prop, carr::head($params), $rehash = false);
 
                 return;
 

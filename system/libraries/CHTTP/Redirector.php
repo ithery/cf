@@ -217,7 +217,8 @@ class CHTTP_Redirector {
     protected function createRedirect($path, $status, $headers) {
         return c::tap(new CHTTP_RedirectResponse($path, $status, $headers), function ($redirect) {
                     if (isset($this->session)) {
-                        $redirect->setSession($this->session);
+                        
+                        //$redirect->setSession($this->session);
                     }
 
                     $redirect->setRequest($this->generator->getRequest());

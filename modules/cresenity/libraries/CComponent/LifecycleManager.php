@@ -99,7 +99,7 @@ class CComponent_LifecycleManager {
 
         if (method_exists($this->instance, 'mount')) {
             try {
-                CComponent_ImplicitlyBoundMethod::call(app(), [$this->instance, 'mount'], $params);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), [$this->instance, 'mount'], $params);
             } catch (CValidation_Exception $e) {
                 CComponent_Manager::instance()->dispatch('failed-validation', $e->validator);
 

@@ -204,7 +204,7 @@ abstract class CComponent {
             return $this->computedPropertyCache[$property] = app()->call([$this, $computedMethodName]);
         }
 
-        throw new PropertyNotFoundException($property, static::getName());
+        throw new CComponent_Exception_PropertyNotFoundException($property, static::getName());
     }
 
     public function __call($method, $params) {

@@ -9,9 +9,23 @@ class MemberTableComponent extends \CComponent {
     public $sortField = 'name';
     public $sortAsc = true;
     public $search = '';
+    public $foo;
+    
+    protected $queryString = [
+        'foo',
+        'search' => ['except' => ''],
+        'page' => ['except' => 1],
+    ];
     
     public function clear() {
         $this->search='';
+    }
+    
+    public function doRedirect() {
+        //return \CF::redirect(\curl::base().'home/test');
+        //\curl::redirect(\curl::base().'home/test');
+        $this->emit('alert', ['success', 'Record has been updated']);
+        $this->redirectTo = \curl::base().'home';
     }
     
     
@@ -26,6 +40,9 @@ class MemberTableComponent extends \CComponent {
         $this->sortField = $field;
     }
 
+    public function mount() {
+        $this->fill(\CHTTP::request()->only('search', 'page'));
+    }
     
     public function render() {
         return \CView::factory('component.member-table', [

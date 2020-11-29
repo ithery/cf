@@ -33,6 +33,8 @@ trait CApp_Trait_App_Bootstrap {
             });
 
             CView::blade()->directive('component', [CComponent_BladeDirective::class, 'component']);
+            CView::blade()->directive('this', [CComponent_BladeDirective::class, 'this']);
+            CView::blade()->directive('entangle', [CComponent_BladeDirective::class, 'entangle']);
 
             
             CView::engineResolver()->register('blade', function () {

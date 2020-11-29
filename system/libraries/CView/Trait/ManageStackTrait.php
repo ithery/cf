@@ -55,9 +55,9 @@ trait CView_Trait_ManageStackTrait {
     public function stopPush() {
         if (empty($this->pushStack)) {
             throw new InvalidArgumentException('Cannot end a push stack without first starting one.');
-        }
+        }   
 
-        return tap(array_pop($this->pushStack), function ($last) {
+        return c::tap(array_pop($this->pushStack), function ($last) {
             $this->extendPush($last, ob_get_clean());
         });
     }

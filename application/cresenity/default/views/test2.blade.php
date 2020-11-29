@@ -11,7 +11,7 @@
     </div>
     
     
-    <component:member-table />
+    <component:counter />
     
     
     @CAppScripts

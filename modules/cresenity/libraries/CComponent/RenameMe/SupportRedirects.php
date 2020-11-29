@@ -21,7 +21,7 @@ class CComponent_RenameMe_SupportRedirects
                 $redirector = CComponent::manager()->redirector()->component($component);
 
                 if (CSession::instance()) {
-                    $redirector->setSession(CSession::instance());
+                    //$redirector->setSession(CSession::instance());
                 }
 
                 return $redirector;
