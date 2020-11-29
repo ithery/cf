@@ -315,6 +315,9 @@ class CElement_Component_Form extends CElement_Component {
         if ($this->ajax_process_progress) {
             $this->add('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
         }
+        if ($this->validation) {
+            CManager::registerModule('validation');
+        }
     }
 
     public function js($indent = 0) {
@@ -610,6 +613,7 @@ class CElement_Component_Form extends CElement_Component {
             $validation_if_close = '';
 
             if ($this->validation) {
+                
                 $validation_if_open = "if ($('#" . $this->id . "').validationEngine('validate') ) {";
                 $validation_if_close = "					} else {
 						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
