@@ -21,6 +21,11 @@ trait CApp_Trait_App_View {
         }
         $this->view = $view;
         $this->viewName = $view->getName();
+        
+        if($this->isUsingBlade()) {
+            
+            $this->useRequireJs = false;
+        }
     }
     
     public function getView() {
@@ -68,11 +73,25 @@ trait CApp_Trait_App_View {
     }
 
     public function setViewName($viewName) {
-        $this->viewName = $viewName;
+        $this->setView($viewName);
     }
 
     public function setViewLoginName($viewLoginName) {
         $this->viewLoginName = $viewLoginName;
     }
 
+    
+    public function isUsingBlade() {
+        if($view = $this->getView() ) {
+           
+                
+            if($view instanceof CView_View) {
+                
+                if($view->getEngine() instanceof CView_Engine_CompilerEngine) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

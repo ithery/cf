@@ -511,7 +511,7 @@ class CView_Compiler_ComponentTagCompiler {
      * @return string
      */
     protected function attributesToString(array $attributes, $escapeBound = true) {
-        return collect($attributes)
+        return c::collect($attributes)
                         ->map(function ($value, $attribute) use ($escapeBound) {
                             return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && !is_numeric($value) ? "'{$attribute}' => CView_Compiler_BladeCompiler::sanitizeComponentAttribute({$value})" : "'{$attribute}' => {$value}";
                         })

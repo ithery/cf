@@ -11,13 +11,70 @@ trait CApp_Trait_App_Bootstrap {
 
     protected static $registerComponentBooted = false;
     protected static $registerControlBooted = false;
+    protected static $registerBladeBooted = false;
 
     public static function registerComponent() {
         if (!static::$registerComponentBooted) {
-            
+
             CView::blade()->precompiler(function ($string) {
                 return (new CComponent_ComponentTagCompiler())->compile($string);
             });
+
+            CView::blade()->directive('component', [CComponent_BladeDirective::class, 'component']);
+
+            
+            CView::engineResolver()->register('blade', function () {
+                return new CComponent_ComponentCompilerEngine();
+            });
+            CComponent_LifecycleManager::registerHydrationMiddleware([
+                /* This is the core middleware stack of Livewire. It's important */
+                /* to understand that the request goes through each class by the */
+                /* order it is listed in this array, and is reversed on response */
+                /*                                                               */
+                /* ↓    Incoming Request                  Outgoing Response    ↑ */
+                /* ↓                                                           ↑ */
+                /* ↓    Secure Stuff                                           ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_SecureHydrationWithChecksum::class, /* --------------- ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_NormalizeServerMemoSansDataForJavaScript::class, /* -- ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection::class, /* ------- ↑ */
+                /* ↓                                                           ↑ */
+                /* ↓    Hydrate Stuff                                          ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_HydratePublicProperties::class, /* ------------------- ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_CallPropertyHydrationHooks::class, /* ---------------- ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_CallHydrationHooks::class, /* ------------------------ ↑ */
+                /* ↓                                                           ↑ */
+                /* ↓    Update Stuff                                           ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_PerformDataBindingUpdates::class, /* ----------------- ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_PerformActionCalls::class, /* ------------------------ ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_PerformEventEmissions::class, /* --------------------- ↑ */
+                /* ↓                                                           ↑ */
+                /* ↓    Output Stuff                                           ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_RenderView::class, /* -------------------------------- ↑ */
+                /* ↓ */ CComponent_HydrationMiddleware_NormalizeComponentPropertiesForJavaScript::class, /* - ↑ */
+            ]);
+
+            CComponent_LifecycleManager::registerInitialDehydrationMiddleware([
+                /* Initial Response */
+                /* ↑ */ [CComponent_HydrationMiddleware_SecureHydrationWithChecksum::class, 'dehydrate'],
+                /* ↑ */ [CComponent_HydrationMiddleware_NormalizeServerMemoSansDataForJavaScript::class, 'dehydrate'],
+                /* ↑ */ [CComponent_HydrationMiddleware_HydratePublicProperties::class, 'dehydrate'],
+                /* ↑ */ [CComponent_HydrationMiddleware_CallPropertyHydrationHooks::class, 'dehydrate'],
+                /* ↑ */ [CComponent_HydrationMiddleware_CallHydrationHooks::class, 'initialDehydrate'],
+                /* ↑ */ [CComponent_HydrationMiddleware_RenderView::class, 'dehydrate'],
+                /* ↑ */ [CComponent_HydrationMiddleware_NormalizeComponentPropertiesForJavaScript::class, 'dehydrate'],
+            ]);
+
+            CComponent_LifecycleManager::registerInitialHydrationMiddleware([
+                [CComponent_HydrationMiddleware_CallHydrationHooks::class, 'initialHydrate'],
+            ]);
+
+            static::$registerComponentBooted = true;
+        }
+    }
+
+    public static function registerBlade() {
+        if (!static::$registerBladeBooted) {
+
 
             CView::blade()->directive('CAppStyles', [CApp_Blade_Directive::class, 'styles']);
             CView::blade()->directive('CAppScripts', [CApp_Blade_Directive::class, 'scripts']);
@@ -26,7 +83,7 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('CAppContent', [CApp_Blade_Directive::class, 'content']);
 
 
-            static::$registerComponentBooted = true;
+            static::$registerBladeBooted = true;
         }
     }
 

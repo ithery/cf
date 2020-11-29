@@ -8,7 +8,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\Finder\Finder;
-
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Mime\MimeTypes;
 class CFile {
 
     /**
@@ -392,6 +393,7 @@ class CFile {
             };
             return $function();
         }
+        
 
         throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
@@ -426,4 +428,19 @@ class CFile {
         return static::put($filename, $val, $lock);
     }
 
+    
+    /**
+     * Get all of the files from the given directory (recursive).
+     *
+     * @param  string  $directory
+     * @param  bool  $hidden
+     * @return \Symfony\Component\Finder\SplFileInfo[]
+     */
+    public static function allFiles($directory, $hidden = false)
+    {
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
+            false
+        );
+    }
 }

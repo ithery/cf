@@ -32,9 +32,10 @@ trait CApp_Trait_App_Renderer {
         $customJs = carr::get($viewData, 'custom_js', '');
 
 
-
+        $cresJs=curl::base().'media/js/cres/dist/cres.js?v='.md5(CFile::lastModified(DOCROOT.'media/js/cres/dist/cres.js'));
         return <<<HTML
             ${endClientScript}
+            <script src="${cresJs}"></script>
             <script>
                 ${js}
                 ${readyClientScript}
@@ -112,6 +113,7 @@ HTML;
                 $jsScriptFile .= '<script>if(typeof define === "function") define=undefined;</script>';
                 //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
                 $jsScriptFile .= $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
+                
                 $js = $asset->wrapJs($js, true);
             }
 

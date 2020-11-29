@@ -32,6 +32,10 @@ class Controller_Cresenity extends CController {
     public function service() {
         CService::cliRunner();
     }
+    
+    public function component() {
+        return CApp::component()->controllerHandler(func_get_args());
+    }
 
     public function qc($className = null) {
         if ($className == null) {

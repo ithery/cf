@@ -55,6 +55,7 @@ CFConsole::addCommand([
 ]);
 
 
+CApp::registerBlade();
 CApp::registerComponent();
 CApp::registerControl();
 if (isset($_COOKIE['capp-profiler'])) {
