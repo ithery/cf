@@ -608,7 +608,7 @@ class c {
      * @return mixed
      */
     public static function env($key, $default = null) {
-        return Env::get($key, $default);
+        return CEnv::get($key, $default);
     }
 
 }
