@@ -16,6 +16,7 @@ class CApp implements CInterface_Responsable {
         CApp_Trait_App_View,
         CApp_Trait_App_Renderer,
         CApp_Trait_App_Auth,
+        CApp_Trait_App_Bootstrap,
         CApp_Trait_App_Title;
 
     private $content = "";
@@ -34,6 +35,7 @@ class CApp implements CInterface_Responsable {
     private $ajaxData = array();
     private $renderMessage = true;
     private $keepMessage = false;
+    private $useRequireJs = false;
 
     protected $renderer;
 
@@ -157,13 +159,17 @@ class CApp implements CInterface_Responsable {
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
+    
+    public function isUseRequireJs() {
+        return $this->useRequireJs ? true:false;
+    }
     public function __construct($domain = null) {
 
 
         $this->element = new CApp_Element();
 
         $this->_org = corg::get(CF::orgCode());
-
+        $this->useRequireJs = ccfg::get('requireJs');
 
         if (isset($_COOKIE['capp-debugbar'])) {
             CDebug::bar()->enable();
