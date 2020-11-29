@@ -10,6 +10,8 @@ import Url from "./module/Url";
 import Util from "./module/Util";
 import CF from "./CF";
 import ScrollToTop from "./module/ScrollToTop";
+import CUI from "./cui";
+import { dispatch, cfDirectives } from '@/util'
 
 export default class Cresenity {
     constructor() {
@@ -19,8 +21,15 @@ export default class Cresenity {
         this.scrollToTop = new ScrollToTop();
         this.callback = {};
         this.filesAdded = [];
+        this.ui = new CUI();
+
+        this.dispatch('cf:ui:available')
+
     }
 
+    dispatch(eventName) {
+        dispatch(eventName)
+    }
     haveCallback(name) {
         return typeof this.callback[name] == 'function';
     };
