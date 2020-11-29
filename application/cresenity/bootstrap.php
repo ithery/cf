@@ -22,3 +22,5 @@ if (CF::isDevSuite()) {
         ],
     ]);
 }
+
+CApp::component()->registerComponent('counter', \Cresenity\Component\Counter::class);

@@ -7,6 +7,13 @@
 </head>
 <body>
     @CAppContent
+    
+    <component:counter />
+    
+    
     @CAppScripts
+    
+    
+    
 </body>
 </html>

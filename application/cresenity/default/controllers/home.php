@@ -19,7 +19,7 @@ Class Controller_Home extends CController {
         $app = CApp::instance();
         $app->setLoginRequired(false);
         $app->setViewName('test');
-        
+        $app->setTheme('cfdocs');
         $app->add("Hallo");
         echo $app->render();
         
