@@ -124,6 +124,10 @@ class CApp implements CInterface_Responsable {
         return CApp_Lang::__($message, $params, $lang);
     }
 
+    public static function component() {
+        return CComponent_Manager::instance();
+    }
+    
     /**
      * 
      * @return CDatabase
