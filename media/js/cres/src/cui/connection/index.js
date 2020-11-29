@@ -1,4 +1,4 @@
-import store from '@/Store'
+import store from '@/cui/Store'
 import componentStore from '../Store'
 import { getCsrfToken } from '@/util'
 
@@ -22,7 +22,7 @@ export default class Connection {
 
         // Forward the query string for the ajax requests.
         fetch(
-                `${window.livewire_app_url}/livewire/message/${payload.fingerprint.name}`, {
+                `${window.capp.baseUrl}cresenity/component/message/${payload.fingerprint.name}`, {
                     method: 'POST',
                     body: JSON.stringify(payload),
                     // This enables "cookies".
@@ -32,7 +32,7 @@ export default class Connection {
                         'Accept': 'text/html, application/xhtml+xml',
                         'X-CSRF-TOKEN': getCsrfToken(),
                         'X-Socket-ID': this.getSocketId(),
-                        'X-Livewire': true,
+                        'X-Cresenity': true,
 
                         // We'll set this explicitly to mitigate potential interference from ad-blockers/etc.
                         'Referer': window.location.href,
@@ -90,14 +90,14 @@ export default class Connection {
             a.setAttribute('target', '_top')
         )
 
-        let modal = document.getElementById('livewire-error')
+        let modal = document.getElementById('cresenity-error')
 
         if (typeof modal != 'undefined' && modal != null) {
             // Modal already exists.
             modal.innerHTML = ''
         } else {
             modal = document.createElement('div')
-            modal.id = 'livewire-error'
+            modal.id = 'cresenity-error'
             modal.style.position = 'fixed'
             modal.style.width = '100vw'
             modal.style.height = '100vh'

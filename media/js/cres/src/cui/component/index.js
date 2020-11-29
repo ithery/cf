@@ -1,33 +1,33 @@
-import Message from '@/Message'
+import Message from '@/cui/Message'
 import dataGet from 'get-value'
-import PrefetchMessage from '@/PrefetchMessage'
-import { dispatch, debounce, wireDirectives, walk } from '@/util'
-import morphdom from '@/dom/morphdom'
-import DOM from '@/dom/dom'
-import nodeInitializer from '@/node_initializer'
-import store from '@/Store'
+import PrefetchMessage from '@/cui/PrefetchMessage'
+import { dispatch, debounce, cfDirectives, walk } from '@/util'
+import morphdom from '@/cui/dom/morphdom'
+import DOM from '@/cui/dom/dom'
+import nodeInitializer from '@/cui/node_initializer'
+import store from '@/cui/Store'
 import PrefetchManager from './PrefetchManager'
 import UploadManager from './UploadManager'
-import MethodAction from '@/action/method'
-import ModelAction from '@/action/model'
-import DeferredModelAction from '@/action/deferred-model'
+import MethodAction from '@/cui/action/method'
+import ModelAction from '@/cui/action/model'
+import DeferredModelAction from '@/cui/action/deferred-model'
 import MessageBus from '../MessageBus'
 import { alpinifyElementsForMorphdom } from './SupportAlpine'
 
 export default class Component {
     constructor(el, connection) {
-        el.__livewire = this
+        el.__cresenity = this
 
         this.el = el
 
         this.lastFreshHtml = this.el.outerHTML
 
-        this.id = this.el.getAttribute('wire:id')
+        this.id = this.el.getAttribute('cf:id')
 
         this.connection = connection
 
-        const initialData = JSON.parse(this.el.getAttribute('wire:initial-data'))
-        this.el.removeAttribute('wire:initial-data')
+        const initialData = JSON.parse(this.el.getAttribute('cf:initial-data'))
+        this.el.removeAttribute('cf:initial-data')
 
         this.fingerprint = initialData.fingerprint
         this.serverMemo = initialData.serverMemo
@@ -91,7 +91,7 @@ export default class Component {
 
     updateServerMemoFromResponseAndMergeBackIntoResponse(message) {
         // We have to do a fair amount of object merging here, but we can't use expressive syntax like {...}
-        // because browsers mess with the object key order which will break Livewire request checksum checks.
+        // because browsers mess with the object key order which will break Cresenity request checksum checks.
 
         Object.entries(message.response.serverMemo).forEach(([key, value]) => {
             // Because "data" is "partial" from the server, we have to deep merge it.
@@ -101,7 +101,7 @@ export default class Component {
 
                     if (message.shouldSkipWatcherForDataKey(dataKey)) return
 
-                    // Because Livewire (for payload reduction purposes) only returns the data that has changed,
+                    // Because Cresenity (for payload reduction purposes) only returns the data that has changed,
                     // we can use all the data keys from the response as watcher triggers.
                     Object.entries(this.watchers).forEach(([key, watchers]) => {
                         let originalSplitKey = key.split('.')
@@ -253,7 +253,7 @@ export default class Component {
             this.fireMessage()
         }
 
-        dispatch('livewire:update')
+        dispatch('cresenity:update')
     }
 
     handleResponse(message) {
@@ -337,7 +337,7 @@ export default class Component {
 
     forceRefreshDataBoundElementsMarkedAsDirty(dirtyInputs) {
         this.walk(el => {
-            let directives = wireDirectives(el)
+            let directives = cfDirectives(el)
             if (directives.missing('model')) return
 
             const modelValue = directives.get('model').value
@@ -370,10 +370,10 @@ export default class Component {
 
             getNodeKey: node => {
                 // This allows the tracking of elements by the "key" attribute, like in VueJs.
-                return node.hasAttribute(`wire:key`) ?
-                    node.getAttribute(`wire:key`) : // If no "key", then first check for "wire:id", then "id"
-                    node.hasAttribute(`wire:id`) ?
-                    node.getAttribute(`wire:id`) :
+                return node.hasAttribute(`cf:key`) ?
+                    node.getAttribute(`cf:key`) : // If no "key", then first check for "cf:id", then "id"
+                    node.hasAttribute(`cf:id`) ?
+                    node.getAttribute(`cf:id`) :
                     node.id
             },
 
@@ -396,8 +396,8 @@ export default class Component {
             onNodeDiscarded: node => {
                 store.callHook('element.removed', node, this)
 
-                if (node.__livewire) {
-                    store.removeComponent(node.__livewire)
+                if (node.__cresenity) {
+                    store.removeComponent(node.__cresenity)
                 }
 
                 this.morphChanges.removed.push(node)
@@ -417,32 +417,32 @@ export default class Component {
 
                 store.callHook('element.updating', from, to, this)
 
-                // Reset the index of wire:modeled select elements in the
+                // Reset the index of cf:modeled select elements in the
                 // "to" node before doing the diff, so that the options
                 // have the proper in-memory .selected value set.
                 if (
-                    from.hasAttribute('wire:model') &&
+                    from.hasAttribute('cf:model') &&
                     from.tagName.toUpperCase() === 'SELECT'
                 ) {
                     to.selectedIndex = -1
                 }
 
-                let fromDirectives = wireDirectives(from)
+                let fromDirectives = cfDirectives(from)
 
-                // Honor the "wire:ignore" attribute or the .__livewire_ignore element property.
+                // Honor the "cf:ignore" attribute or the .__cresenity_ignore element property.
                 if (
                     fromDirectives.has('ignore') ||
-                    from.__livewire_ignore === true ||
-                    from.__livewire_ignore_self === true
+                    from.__cresenity_ignore === true ||
+                    from.__cresenity_ignore_self === true
                 ) {
                     if (
                         (fromDirectives.has('ignore') &&
                             fromDirectives
                             .get('ignore')
                             .modifiers.includes('self')) ||
-                        from.__livewire_ignore_self === true
+                        from.__cresenity_ignore_self === true
                     ) {
-                        // Don't update children of "wire:ingore.self" attribute.
+                        // Don't update children of "cf:ingore.self" attribute.
                         from.skipElUpdatingButStillUpdateChildren = true
                     } else {
                         return false
@@ -450,12 +450,12 @@ export default class Component {
                 }
 
                 // Children will update themselves.
-                if (DOM.isComponentRootEl(from) && from.getAttribute('wire:id') !== this.id) return false
+                if (DOM.isComponentRootEl(from) && from.getAttribute('cf:id') !== this.id) return false
 
-                // Give the root Livewire "to" element, the same object reference as the "from"
-                // element. This ensures new Alpine magics like $wire and @entangle can
-                // initialize in the context of a real Livewire component object.
-                if (DOM.isComponentRootEl(from)) to.__livewire = this
+                // Give the root Cresenity "to" element, the same object reference as the "from"
+                // element. This ensures new Alpine magics like $cf and @entangle can
+                // initialize in the context of a real Cresenity component object.
+                if (DOM.isComponentRootEl(from)) to.__cresenity = this
 
                 alpinifyElementsForMorphdom(from, to)
             },
@@ -467,7 +467,7 @@ export default class Component {
             },
 
             onNodeAdded: node => {
-                const closestComponentId = DOM.closestRoot(node).getAttribute('wire:id')
+                const closestComponentId = DOM.closestRoot(node).getAttribute('cf:id')
 
                 if (closestComponentId === this.id) {
                     if (nodeInitializer.initialize(node, this) === false) {
@@ -497,7 +497,7 @@ export default class Component {
             }
 
             // If we encounter a nested component, skip walking that tree.
-            if (el.hasAttribute('wire:id')) {
+            if (el.hasAttribute('cf:id')) {
                 callbackWhenNewComponentIsEncountered(el)
 
                 return false
@@ -511,7 +511,7 @@ export default class Component {
 
     modelSyncDebounce(callback, time) {
         // Prepare yourself for what's happening here.
-        // Any text input with wire:model on it should be "debounced" by ~150ms by default.
+        // Any text input with cf:model on it should be "debounced" by ~150ms by default.
         // We can't use a simple debounce function because we need a way to clear all the pending
         // debounces if a user submits a form or performs some other action.
         // This is a modified debounce function that acts just like a debounce, except it stores
@@ -519,7 +519,7 @@ export default class Component {
         // of waiting for their setTimeouts to expire. I know.
         if (!this.modelDebounceCallbacks) this.modelDebounceCallbacks = []
 
-        // This is a "null" callback. Each wire:model will resister one of these upon initialization.
+        // This is a "null" callback. Each cf:model will resister one of these upon initialization.
         let callbackRegister = { callback: () => {} }
         this.modelDebounceCallbacks.push(callbackRegister)
 
@@ -617,7 +617,7 @@ export default class Component {
         )
     }
 
-    get $wire() {
+    get $cf() {
         if (this.dollarWireProxy) return this.dollarWireProxy
 
         let refObj = {}
@@ -629,7 +629,7 @@ export default class Component {
                 if (property === 'entangle') {
                     return (name, defer = false) => ({
                         isDeferred: defer,
-                        livewireEntangle: name,
+                        cresenityEntangle: name,
                         get defer() {
                             this.isDeferred = true
                             return this
@@ -639,7 +639,7 @@ export default class Component {
 
                 if (property === '__instance') return component
 
-                // Forward "emits" to base Livewire object.
+                // Forward "emits" to base Cresenity object.
                 if (typeof property === 'string' && property.match(/^emit.*/)) return function(...args) {
                     if (property === 'emitSelf') return store.emitSelf(component.id, ...args)
 

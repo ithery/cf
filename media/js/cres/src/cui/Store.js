@@ -1,5 +1,5 @@
-import EventAction from '@/action/event'
-import HookManager from '@/HookManager'
+import EventAction from '@/cui/action/event'
+import HookManager from '@/cui/HookManager'
 import MessageBus from './MessageBus'
 import DirectiveManager from './DirectiveManager'
 
@@ -7,8 +7,8 @@ const store = {
     componentsById: {},
     listeners: new MessageBus(),
     initialRenderIsFinished: false,
-    livewireIsInBackground: false,
-    livewireIsOffline: false,
+    cresenityIsInBackground: false,
+    cresenityIsOffline: false,
     sessionHasExpired: false,
     directives: DirectiveManager,
     hooks: HookManager,
@@ -86,12 +86,12 @@ const store = {
     componentsListeningForEventThatAreTreeAncestors(el, event) {
         var parentIds = []
 
-        var parent = el.parentElement.closest('[wire\\:id]')
+        var parent = el.parentElement.closest('[cf\\:id]')
 
         while (parent) {
-            parentIds.push(parent.getAttribute('wire:id'))
+            parentIds.push(parent.getAttribute('cf:id'))
 
-            parent = parent.parentElement.closest('[wire\\:id]')
+            parent = parent.parentElement.closest('[cf\\:id]')
         }
 
         return this.components().filter(component => {

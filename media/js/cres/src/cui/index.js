@@ -1,21 +1,21 @@
-import DOM from '@/dom/dom'
-import '@/dom/polyfills/index'
-import store from '@/store'
-import Connection from '@/connection'
-import Polling from '@/component/Polling'
-import Component from '@/component/index'
-import { dispatch, wireDirectives } from '@/util'
-import FileUploads from '@/component/FileUploads'
-import LaravelEcho from '@/component/LaravelEcho'
-import DirtyStates from '@/component/DirtyStates'
-import DisableForms from '@/component/DisableForms'
-import FileDownloads from '@/component/FileDownloads'
-import LoadingStates from '@/component/LoadingStates'
-import OfflineStates from '@/component/OfflineStates'
-import SyncBrowserHistory from '@/component/SyncBrowserHistory'
-import SupportAlpine from '@/component/SupportAlpine'
+import DOM from '@/cui/dom/dom'
+import '@/cui/dom/polyfills/index'
+import store from '@/cui/Store'
+import Connection from '@/cui/connection'
+import Polling from '@/cui/component/Polling'
+import Component from '@/cui/component/index'
+import { dispatch, cfDirectives } from '@/util'
+import FileUploads from '@/cui/component/FileUploads'
+import LaravelEcho from '@/cui/component/LaravelEcho'
+import DirtyStates from '@/cui/component/DirtyStates'
+import DisableForms from '@/cui/component/DisableForms'
+import FileDownloads from '@/cui/component/FileDownloads'
+import LoadingStates from '@/cui/component/LoadingStates'
+import OfflineStates from '@/cui/component/OfflineStates'
+import SyncBrowserHistory from '@/cui/component/SyncBrowserHistory'
+import SupportAlpine from '@/cui/component/SupportAlpine'
 
-class Cres {
+class CUI {
     constructor() {
         this.connection = new Connection()
         this.components = store
@@ -24,16 +24,16 @@ class Cres {
     }
 
     first() {
-        return Object.values(this.components.componentsById)[0].$wire
+        return Object.values(this.components.componentsById)[0].$cf
     }
 
     find(componentId) {
-        return this.components.componentsById[componentId].$wire
+        return this.components.componentsById[componentId].$cf
     }
 
     all() {
         return Object.values(this.components.componentsById).map(
-            component => component.$wire
+            component => component.$cf
         )
     }
 
@@ -84,12 +84,12 @@ class Cres {
         })
 
         this.onLoadCallback()
-        dispatch('livewire:load')
+        dispatch('cresenity:load')
 
         document.addEventListener(
             'visibilitychange',
             () => {
-                this.components.livewireIsInBackground = document.hidden
+                this.components.cresenityIsInBackground = document.hidden
             },
             false
         )
@@ -99,7 +99,7 @@ class Cres {
 
     rescan(node = null) {
         DOM.rootComponentElementsWithNoParents(node).forEach(el => {
-            const componentId = wireDirectives(el).get('id').value
+            const componentId = cfDirectives(el).get('id').value
 
             if (this.components.hasComponent(componentId)) return
 
@@ -108,9 +108,6 @@ class Cres {
     }
 }
 
-if (!window.Cres) {
-    window.Cres = Cres
-}
 
 SyncBrowserHistory()
 SupportAlpine()
@@ -121,9 +118,6 @@ DisableForms()
 FileUploads()
 LaravelEcho()
 DirtyStates()
-
 Polling()
 
-dispatch('cres:available')
-
-export default Cres
+export default CUI
