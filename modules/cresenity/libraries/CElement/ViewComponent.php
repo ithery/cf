@@ -33,20 +33,8 @@ class CElement_ViewComponent extends CElement {
  
     public function html($indent = 0) {
         if($this->component!=null) {
+            return CApp::component()->getHtml($this->component);
             
-            if (!isset($_instance)) {
-                $html = CApp::component()->mount($this->component)->html();
-            } elseif ($_instance->childHasBeenRendered($cachedKey)) {
-                $componentId = $_instance->getRenderedChildComponentId($cachedKey);
-                $componentTag = $_instance->getRenderedChildComponentTagName($cachedKey);
-                $html = CApp::component()->dummyMount($componentId, $componentTag);
-                $_instance->preserveRenderedChild($cachedKey);
-            } else {
-                $response = CApp::component()->mount($this->component);
-                $html = $response->html();
-                $_instance->logRenderedChild($cachedKey, $response->id(), CApp::component()->getRootElementTagName($html));
-            }
-            return $html;
         }
     }
 

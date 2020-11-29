@@ -47,7 +47,8 @@ Class Controller_Home extends CController {
          */
         CManager::registerModule('bootstrap-4');
        
-        $app->addComponent('member-table');
+        $template = $app->addTemplate()->setTemplate('testing');
+        
 
         return $app;
     }

@@ -318,4 +318,20 @@ HTML;
         return $this->redirector;
     }
 
+    public function getHtml($componentName) {
+        if (!isset($_instance)) {
+            $html = CApp::component()->mount($componentName)->html();
+        } elseif ($_instance->childHasBeenRendered($cachedKey)) {
+            $componentId = $_instance->getRenderedChildComponentId($cachedKey);
+            $componentTag = $_instance->getRenderedChildComponentTagName($cachedKey);
+            $html = CApp::component()->dummyMount($componentId, $componentTag);
+            $_instance->preserveRenderedChild($cachedKey);
+        } else {
+            $response = CApp::component()->mount($componentName);
+            $html = $response->html();
+            $_instance->logRenderedChild($cachedKey, $response->id(), CApp::component()->getRootElementTagName($html));
+        }
+        return $html;
+    }
+
 }

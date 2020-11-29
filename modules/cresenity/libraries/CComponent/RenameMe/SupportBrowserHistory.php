@@ -84,19 +84,21 @@ class CComponent_RenameMe_SupportBrowserHistory
     {
         // If the component is setting $queryString params.
         if (! $this->getQueryParamsFromComponentProperties($component)->isEmpty()) return true;
-
+        /*
         $route = $route ?$route :curl::fullUrl(false);
 
         if (
             $route
             && is_string($action = $route->getActionName())
             // If the component is registered using `Route::get()`.
-            && str($action)->contains(get_class($component))
+            && c::str($action)->contains(get_class($component))
             // AND, the component is tracking route params as its public properties
             && count(array_intersect_key($component->getPublicPropertiesDefinedBySubClass(), $route->parametersWithoutNulls()))
         ) {
             return true;
         }
+         * s
+         */
 
         return false;
     }
