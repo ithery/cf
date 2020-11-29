@@ -16,6 +16,18 @@ trait CApp_Trait_App_Bootstrap {
     public static function registerComponent() {
         if (!static::$registerComponentBooted) {
 
+            CComponent_RenameMe_SupportEvents::init();
+            CComponent_RenameMe_SupportLocales::init();
+            CComponent_RenameMe_SupportChildren::init();
+            CComponent_RenameMe_SupportRedirects::init();
+            CComponent_RenameMe_SupportValidation::init();
+            CComponent_RenameMe_SupportFileUploads::init();
+            CComponent_RenameMe_OptimizeRenderedDom::init();
+            CComponent_RenameMe_SupportFileDownloads::init();
+            CComponent_RenameMe_SupportActionReturns::init();
+            CComponent_RenameMe_SupportBrowserHistory::init();
+            CComponent_RenameMe_SupportComponentTraits::init();
+            
             CView::blade()->precompiler(function ($string) {
                 return (new CComponent_ComponentTagCompiler())->compile($string);
             });

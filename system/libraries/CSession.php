@@ -407,13 +407,16 @@ class CSession {
         $args = func_get_args();
 
         foreach ($args as $key) {
-            if (isset(CSession::$protect[$key])) {
-                continue;
-            }
-
-            // Unset the key
-            unset($_SESSION[$key]);
+            $this->forget($key);
         }
+    }
+
+    public function forget($key) {
+        if (isset(CSession::$protect[$key])) {
+            return false;
+        }
+        // Unset the key
+        unset($_SESSION[$key]);
     }
 
 }

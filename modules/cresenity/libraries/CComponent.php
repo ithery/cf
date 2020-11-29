@@ -62,8 +62,8 @@ abstract class CComponent {
     }
 
     public function initializeTraits() {
-        foreach (class_uses_recursive($class = static::class) as $trait) {
-            if (method_exists($class, $method = 'initialize' . class_basename($trait))) {
+        foreach (c::classUsesRecursive($class = static::class) as $trait) {
+            if (method_exists($class, $method = 'initialize' . c::classBasename($trait))) {
                 $this->{$method}();
             }
         }

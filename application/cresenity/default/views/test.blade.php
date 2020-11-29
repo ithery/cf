@@ -6,9 +6,11 @@
     
 </head>
 <body>
+    <div class="container">
     @CAppContent
+    </div>
     
-    <component:counter />
+    
     
     
     @CAppScripts

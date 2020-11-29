@@ -3,7 +3,8 @@
 
 return array(
     "client_modules" => [
-        'jquery'
+        'jquery',
+        'fontawesome-5'
     ],
     "js"=> [
         

@@ -14,24 +14,53 @@ Class Controller_Home extends CController {
         return CF::response()->view('welcome');
     }
 
-    
     public function test() {
         $app = CApp::instance();
         $app->setLoginRequired(false);
         $app->setViewName('test');
         $app->setTheme('cfdocs');
-        $app->add("Hallo");
+        $app->addComponent("counter");
         echo $app->render();
-        
+    }
+
+    public function member() {
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
+        $app->setViewName('test');
+        $app->setTheme('cfdocs');
+
+        $app->addView('member', [
+            'members' => \Cresenity\Testing\MemberModel::all()
+        ]);
+
+        return $app;
     }
     
+    public function component() {
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
+        $app->setViewName('test');
+        $app->setTheme('cfdocs');
+        /*
+        CManager::registerModule('jquery-3.2.1');
+         *  
+         */
+        CManager::registerModule('bootstrap-4');
+       
+        $app->addComponent('member-table');
+
+        return $app;
+    }
+
+
     public function child() {
         return CF::response()->view('child');
     }
-    
+
     public function app() {
         $app = CApp::instance();
-        
+
         echo $app->render();
     }
+
 }

@@ -4,9 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
+ * @since Nov 30, 2020 
  * @license Ittron Global Teknologi
  */
-trait CComponent_Trait_BypassViewHandlerTrait {
-    //
-}
+
+CPagination_Paginator::useBootstrap();

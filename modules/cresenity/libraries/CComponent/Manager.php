@@ -18,6 +18,7 @@ class CComponent_Manager {
     protected $componentAliases = [];
     protected $queryParamsForTesting = [];
     public static $isLivewireRequestTestingOverride;
+    protected static $redirector = null;
 
     /**
      * 
@@ -95,14 +96,14 @@ class CComponent_Manager {
             $name = $name::getName();
         }
 
-        $response= CComponent_LifecycleManager::fromInitialRequest($name, $id)
-                        ->initialHydrate()
-                        ->mount($params)
-                        ->renderToView()
-                        ->initialDehydrate()
-                        ->toInitialResponse();
-        
-        
+        $response = CComponent_LifecycleManager::fromInitialRequest($name, $id)
+                ->initialHydrate()
+                ->mount($params)
+                ->renderToView()
+                ->initialDehydrate()
+                ->toInitialResponse();
+
+
         return $response;
     }
 
@@ -192,7 +193,7 @@ HTML;
             $devTools = 'window.livewire.devTools(true);';
         }
 
-        $appUrl = CF::config('component.asset_url', rtrim(carr::get($options,'asset_url', ''), '/'));
+        $appUrl = CF::config('component.asset_url', rtrim(carr::get($options, 'asset_url', ''), '/'));
 
         $csrf = csrf_token();
 
@@ -298,17 +299,23 @@ HTML;
     public function registerComponent($alias, $class) {
         CComponent_Finder::instance()->registerComponent($alias, $class);
     }
-    
+
     public function controllerHandler($args) {
-        if(is_array($args) && count($args)>0) {
-            $method=carr::get($args,0);
+        if (is_array($args) && count($args) > 0) {
+            $method = carr::get($args, 0);
             $args = array_slice($args, 1);
             $handler = new CComponent_ControllerHandler($method);
             return $handler->execute($method);
-        } 
-        
+        }
+
         return CF::show404();
-        
+    }
+
+    public function redirector() {
+        if ($this->redirector == null) {
+            $this->redirector = new CComponent_Redirector();
+        }
+        return $this->redirector;
     }
 
 }

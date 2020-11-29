@@ -123,20 +123,21 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
     }
 
     /**
-     * Compile all of the columns for an update statement.
+     * Compile the columns for an update statement.
      *
+     * @param  CDatabase_Query_Builder  $query
      * @param  array  $values
      * @return string
      */
-    protected function compileUpdateColumns($values) {
-        $collection = new CCollection($values);
-        return $collection->map(function ($value, $key) {
-                    if ($this->isJsonSelector($key)) {
-                        return $this->compileJsonUpdateColumn($key, new JsonExpression($value));
-                    } else {
-                        return $this->wrap($key) . ' = ' . $this->parameter($value);
-                    }
-                })->implode(', ');
+    protected function compileUpdateColumns(CDatabase_Query_Builder $query, array $values)
+    {
+        return c::collect($values)->map(function ($value, $key) {
+            if ($this->isJsonSelector($key)) {
+                return $this->compileJsonUpdateColumn($key, $value);
+            }
+
+            return $this->wrap($key).' = '.$this->parameter($value);
+        })->implode(', ');
     }
 
     /**

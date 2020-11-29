@@ -105,6 +105,17 @@ abstract class CObservable extends CRenderable {
     
     /**
      * 
+     * @param type $id
+     * @return CElement_Template
+     */
+    public function addComponent($componentName,$id = "") {
+        $viewComponent = CElement_Factory::createViewComponent($componentName,$id);
+        $this->wrapper->add($viewComponent);
+        return $viewComponent;
+    }
+    
+    /**
+     * 
      * @param type $view
      * @param string $id
      * @return type

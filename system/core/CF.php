@@ -237,7 +237,11 @@ final class CF {
     private static function loadBootstrapFiles() {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_bootstrap');
 
-
+        
+        $bootstrapPath = DOCROOT . 'system' . DS;
+            if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+                include $bootstrapPath . 'bootstrap' . EXT;
+            }
         //try to locate bootstrap files for modules 
         foreach (CF::modules() as $module) {
             $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;

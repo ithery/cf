@@ -9,7 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CComponent_Exception_CorruptComponentPayloadException extends \Exception {
 
-    use CComponent_Trait_BypassViewHandlerTrait;
+    use CComponent_Exception_BypassViewHandlerTrait;
 
     public function __construct($component) {
         parent::__construct(

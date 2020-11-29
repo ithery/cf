@@ -27,7 +27,7 @@ class CComponent_CompilerEngine extends CView_Engine_CompilerEngine {
                 // Don't wrap "abort(500)".
                 || $e instanceof HttpException
                 // Don't wrap most Livewire exceptions.
-                || isset($uses[CComponent_Trait_BypassViewHandlerTrait::class])
+                || isset($uses[CComponent_Exception_BypassViewHandlerTrait::class])
         ) {
             // This is because there is no "parent::parent::".
             CView_Engine_PhpEngine::handleViewException($e, $obLevel);

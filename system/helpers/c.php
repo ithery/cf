@@ -598,8 +598,6 @@ class c {
         return $condition;
     }
 
-    
-   
     /**
      * Gets the value of an environment variable.
      *
@@ -609,6 +607,16 @@ class c {
      */
     public static function env($key, $default = null) {
         return CEnv::get($key, $default);
+    }
+
+    /**
+     * 
+     * @param type $key
+     * @param type $args
+     * @return type
+     */
+    public static function __($key, $args = []) {
+        return CF::lang($key, $args);
     }
 
 }

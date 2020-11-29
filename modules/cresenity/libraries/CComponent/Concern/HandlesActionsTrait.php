@@ -51,7 +51,7 @@ trait CComponent_Concern_HandlesActionsTrait
 
     protected function callBeforeAndAfterSyncHooks($name, $value, $callback)
     {
-        $name = str($name);
+        $name = c::str($name);
 
         $propertyName = $name->studly()->before('.');
         $keyAfterFirstDot = $name->contains('.') ? $name->after('.') : null;

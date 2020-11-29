@@ -102,13 +102,14 @@ class CView_Finder {
      * @throws \InvalidArgumentException
      */
     protected function parseNamespaceSegments($name) {
-        $segments = explode(static::HINT_PATH_DELIMITER, $name);
+        $segments = explode(CView::HINT_PATH_DELIMITER, $name);
 
         if (count($segments) !== 2) {
             throw new InvalidArgumentException("View [{$name}] has an invalid name.");
         }
 
         if (!isset($this->hints[$segments[0]])) {
+            
             throw new InvalidArgumentException("No hint path defined for [{$segments[0]}].");
         }
 

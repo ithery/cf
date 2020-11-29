@@ -9,5 +9,5 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CComponent_Exception_ComponentNotFoundException extends \Exception {
 
-    use CComponent_Trait_BypassViewHandlerTrait;
+    use CComponent_Exception_BypassViewHandlerTrait;
 }

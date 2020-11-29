@@ -126,6 +126,10 @@ class CElement_Factory {
         return new $className($id);
     }
 
+    
+    public static function createViewComponent($componentName,$id) {
+        return new CElement_ViewComponent($id,$componentName);
+    }
 }
 
 ?>
