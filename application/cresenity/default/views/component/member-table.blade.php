@@ -15,7 +15,10 @@
         <div class="col">
             <a cf:click="doRedirect" class="btn btn-primary">Redirect</a>
         </div>
-        <div cf:poll.1s>
+        <div class="col">
+            <a cf:click="doEvent" class="btn btn-primary">Emit Event</a>
+        </div>
+        <div class="col" cf:poll.1s>
             Current time: {{ c::now() }}
         </div>
     </div>
@@ -64,7 +67,7 @@
         </div>
     </div>
 </div>
-
+<div class="message text-white bg-danger p-4 "></div>
 <div x-data="{ open: false }">
     <button @click="open = true">Show More...</button>
 
@@ -99,6 +102,7 @@
                     icon = 'fa fa-info-circle mr-1';
                     break;
             }
+            $('.message').html(message);
             console.log(type, message);
         });
     })

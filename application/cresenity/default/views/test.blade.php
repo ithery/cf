@@ -8,10 +8,11 @@
 <body>
     <div class="container">
     @CAppContent
+    <component:member-table />
     </div>
     
     
-    <component:member-table />
+    
     
     
     @CAppScripts

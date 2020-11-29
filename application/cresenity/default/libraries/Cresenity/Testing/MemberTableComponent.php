@@ -24,8 +24,15 @@ class MemberTableComponent extends \CComponent {
     public function doRedirect() {
         //return \CF::redirect(\curl::base().'home/test');
         //\curl::redirect(\curl::base().'home/test');
-        $this->emit('alert', ['success', 'Record has been updated']);
+        //$this->emit('alert', ['success', 'Record has been updated']);
         $this->redirectTo = \curl::base().'home';
+    }
+    
+    public function doEvent() {
+        //return \CF::redirect(\curl::base().'home/test');
+        //\curl::redirect(\curl::base().'home/test');
+        $this->emit('alert', ['success', 'Record has been updated']);
+        //$this->redirectTo = \curl::base().'home';
     }
     
     
