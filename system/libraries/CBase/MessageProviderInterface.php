@@ -3,11 +3,11 @@
 defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @since Sep 8, 2018, 4:19:56 AM
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @author Hery Kurniawan <hery@itton.co.id>
+ * @since Nov 29, 2020 
+ * @license Ittron Global Teknologi
  */
-interface CApp_Message_Contract_MessageProviderInterface {
+interface CBase_MessageProviderInterface {
 
     /**
      * Get the messages for the instance.

@@ -3,11 +3,11 @@
 defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @since Sep 8, 2018, 4:34:13 AM
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @author Hery Kurniawan <hery@itton.co.id>
+ * @since Nov 29, 2020 
+ * @license Ittron Global Teknologi
  */
-interface CApp_Message_BagInterface extends CInterface_Arrayable {
+interface CBase_MessageBagInterface extends CInterface_Arrayable {
 
     /**
      * Get the keys present in the message bag.

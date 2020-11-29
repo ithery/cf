@@ -549,6 +549,68 @@ class c {
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
     }
 
+    /**
+     * 
+     * @param string $string
+     * @return \cstr|CBase_String
+     */
+    public static function str($string = null) {
+        if (is_null($string)) {
+            return new CBase_ForwarderStaticClass(cstr::class);
+        };
+
+        return cstr::of($string);
+    }
+
+    /**
+     * Throw the given exception unless the given condition is true.
+     *
+     * @param  mixed  $condition
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    public static function throwUnless($condition, $exception, ...$parameters) {
+        if (!$condition) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+
+        return $condition;
+    }
+
+    /**
+     * Throw the given exception if the given condition is true.
+     *
+     * @param  mixed  $condition
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    public static function throwIf($condition, $exception, ...$parameters) {
+        if ($condition) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+
+        return $condition;
+    }
+
+    
+   
+    /**
+     * Gets the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function env($key, $default = null) {
+        return Env::get($key, $default);
+    }
+
 }
 
 // End c

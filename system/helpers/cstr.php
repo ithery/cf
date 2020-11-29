@@ -966,4 +966,14 @@ class cstr {
         return \preg_replace($reRegExpChar, '\\\$0', $string);
     }
 
+    /**
+     * Get a new stringable object from the given string.
+     *
+     * @param  string  $string
+     * @return CBase_String
+     */
+    public static function of($string) {
+        return new CBase_String($string);
+    }
+
 }
