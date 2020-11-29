@@ -80,9 +80,14 @@
 <script>
 
     document.addEventListener('cresenity:load', function () {
-        window.cresenity.ui.on('alert', data => {
+        //window.cresenity.ui.on('alert', data => {
+        @this.on('alert', data => {
             const type = data[0];
-            const message = data[1];
+            let message = data[1];
+            const page = @this.get('page');
+            const sortField = @this.get('sortField');
+            //console.log(sortField);
+            message +=' | sortField:'+ sortField;
 
             let icon = 'fa fa-check mr-1';
             switch (type) {
