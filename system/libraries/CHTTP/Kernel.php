@@ -185,8 +185,8 @@ class CHTTP_Kernel {
             $response = $output;
         }
 
-        $response = $this->toResponse($request,$response);
-       
+        $response = $this->toResponse($request, $response);
+
 
         return $response;
     }
@@ -211,7 +211,7 @@ class CHTTP_Kernel {
             $response = $this->renderException($request, $e);
         }
 
-
+        CEvent::dispatch(new CHTTP_Event_RequestHandled($request, $response));
 //        if($response->getStatusCode()!=200) {
 //            $this->endOutputBuffering();
 //        }

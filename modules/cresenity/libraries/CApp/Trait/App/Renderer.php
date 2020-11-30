@@ -11,8 +11,7 @@ trait CApp_Trait_App_Renderer {
 
     protected $rendered = false;
     protected $viewData = null;
-    
-    
+
     public function renderContent($options = []) {
         $viewData = $this->getViewData();
         return carr::get($viewData, 'content');
@@ -32,7 +31,7 @@ trait CApp_Trait_App_Renderer {
         $customJs = carr::get($viewData, 'custom_js', '');
 
 
-        $cresJs=curl::base().'media/js/cres/dist/cres.js?v='.md5(CFile::lastModified(DOCROOT.'media/js/cres/dist/cres.js'));
+        $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
         return <<<HTML
             ${endClientScript}
             <script src="${cresJs}"></script>
@@ -90,7 +89,7 @@ HTML;
             $css_urls = $asset->getAllCssFileUrl();
             $js_urls = $asset->getAllJsFileUrl();
             $additional_js = "";
-            if ($asset->isUseRequireJs()) {
+            if ($this->isUseRequireJs()) {
 
                 foreach ($css_urls as $url) {
                     $additional_js .= "
@@ -113,7 +112,7 @@ HTML;
                 $jsScriptFile .= '<script>if(typeof define === "function") define=undefined;</script>';
                 //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
                 $jsScriptFile .= $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
-                
+
                 $js = $asset->wrapJs($js, true);
             }
 
@@ -123,6 +122,13 @@ HTML;
 
             if (ccfg::get("minify_js")) {
                 $js = CJSMin::minify($js);
+            }
+
+            if (!$this->isUseRequireJs()) {
+                $bar = CDebug::bar();
+                if ($bar->isEnabled()) {
+                    $js .= $bar->getJavascriptReplaceCode();
+                }
             }
 
             $viewData['js'] = $js;
@@ -185,8 +191,6 @@ HTML;
         return $this->rendered;
     }
 
-    
-
     /**
      * Render the html of this
      * 
@@ -205,7 +209,7 @@ HTML;
 
         CFEvent::run('CApp.beforeRender');
 
-        if (crequest::is_ajax()) {
+        if (c::request()->ajax()) {
             return $this->json();
         }
 

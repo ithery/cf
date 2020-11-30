@@ -129,15 +129,14 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
      * @param  array  $values
      * @return string
      */
-    protected function compileUpdateColumns(CDatabase_Query_Builder $query, array $values)
-    {
+    protected function compileUpdateColumns(CDatabase_Query_Builder $query, array $values) {
         return c::collect($values)->map(function ($value, $key) {
-            if ($this->isJsonSelector($key)) {
-                return $this->compileJsonUpdateColumn($key, $value);
-            }
+                    if ($this->isJsonSelector($key)) {
+                        return $this->compileJsonUpdateColumn($key, $value);
+                    }
 
-            return $this->wrap($key).' = '.$this->parameter($value);
-        })->implode(', ');
+                    return $this->wrap($key) . ' = ' . $this->parameter($value);
+                })->implode(', ');
     }
 
     /**

@@ -14,36 +14,31 @@ trait CApp_Trait_App_View {
     private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
 
-    
     public function setView($view) {
-        if(!($view instanceof CView_View)) {
+        if (!($view instanceof CView_View)) {
             $view = CView::factory($view);
         }
         $this->view = $view;
         $this->viewName = $view->getName();
-        
-        if($this->isUsingBlade()) {
-            
+
+        if ($this->isUsingBlade()) {
+
             $this->useRequireJs = false;
         }
     }
-    
+
     public function getView() {
+        if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
+            $view = $this->viewLoginName;
+            if (!($view instanceof CView_View)) {
+                $view = CView::factory($view);
+            }
+            $this->view = $view;
+            $this->viewName = $view->getName();
+        }
+
         if ($this->view == null) {
             $viewName = $this->viewName;
-            if (ccfg::get("install")) {
-                $viewName = 'cinstall/page';
-            } else if ($this->signup) {
-                $viewName = 'ccore/signup';
-            } else if ($this->resend) {
-                $viewName = 'ccore/resend_activation';
-            } else if ($this->activation) {
-                $viewName = 'ccore/activation';
-            } else if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
-                $viewName = $this->viewLoginName;
-            } else if (!$this->isUserLogin() && $this->config("have_static_login") && $this->loginRequired) {
-                $viewName = 'ccore/static_login';
-            }
 
             if (self::$viewCallback != null && is_callable(self::$viewCallback)) {
                 $viewName = self::$viewCallback($viewName);
@@ -80,18 +75,18 @@ trait CApp_Trait_App_View {
         $this->viewLoginName = $viewLoginName;
     }
 
-    
     public function isUsingBlade() {
-        if($view = $this->getView() ) {
-           
-                
-            if($view instanceof CView_View) {
-                
-                if($view->getEngine() instanceof CView_Engine_CompilerEngine) {
+        if ($view = $this->getView()) {
+
+
+            if ($view instanceof CView_View) {
+
+                if ($view->getEngine() instanceof CView_Engine_CompilerEngine) {
                     return true;
                 }
             }
         }
         return false;
     }
+
 }

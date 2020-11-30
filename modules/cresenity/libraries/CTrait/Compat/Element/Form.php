@@ -133,7 +133,8 @@ trait CTrait_Compat_Element_Form {
      */
     public function set_ajax_datatype($datatype) {
         return $this->setAjaxDataType($datatype);
-     
     }
+
+    
 
 }

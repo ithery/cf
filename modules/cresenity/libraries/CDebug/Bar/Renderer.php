@@ -208,32 +208,41 @@ class CDebug_Bar_Renderer {
     }
 
     public function apply() {
-        CFEvent::add('system.display', function() {
-            $output = CF::$output;
-            if (CHelper::request()->isAjax()) {
-                try {
-                    if (!headers_sent()) {
-                        header('phpdebugbar-body:1');
-                    }
-                    $jsonHelper = CHelper::json();
-                    $json = null;
-                    try {
-                        $json = $jsonHelper->parse($output);
-                    } catch (Exception $ex) {
-                        
-                    }
-                    if (is_array($json)) {
-                        $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
-                        $output = $jsonHelper->stringify($json);
-                    }
-                } catch (Exception $ex) {
-                    
-                }
-            } else {
-                $output = $this->replaceJavascriptCode(CF::$output);
-            }
-            CF::$output = $output;
+        $renderer = $this;
+        CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function($event) use($renderer) {
+            $output = $event->response->getContent();
+            $output = $renderer->replaceJavascriptCode($output);
+            $event->response->setContent($output);
         });
+        /*
+          CFEvent::add('system.display', function() {
+          $output = CF::$output;
+          if (CHelper::request()->isAjax()) {
+          try {
+          if (!headers_sent()) {
+          header('phpdebugbar-body:1');
+          }
+          $jsonHelper = CHelper::json();
+          $json = null;
+          try {
+          $json = $jsonHelper->parse($output);
+          } catch (Exception $ex) {
+
+          }
+          if (is_array($json)) {
+          $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+          $output = $jsonHelper->stringify($json);
+          }
+          } catch (Exception $ex) {
+
+          }
+          } else {
+          $output = $this->replaceJavascriptCode(CF::$output);
+          }
+          CF::$output = $output;
+          });
+
+         */
     }
 
     /**

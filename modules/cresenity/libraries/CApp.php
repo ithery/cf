@@ -2,7 +2,6 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-
 /**
  * @mixin CElement
  */
@@ -36,7 +35,6 @@ class CApp implements CInterface_Responsable {
     private $renderMessage = true;
     private $keepMessage = false;
     private $useRequireJs = false;
-
     protected $renderer;
 
     /**
@@ -45,7 +43,6 @@ class CApp implements CInterface_Responsable {
      */
     protected $element;
 
-    
     /**
      * 
      * @param string $domain
@@ -127,7 +124,7 @@ class CApp implements CInterface_Responsable {
     public static function component() {
         return CComponent_Manager::instance();
     }
-    
+
     /**
      * 
      * @return CDatabase
@@ -163,10 +160,10 @@ class CApp implements CInterface_Responsable {
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
-    
     public function isUseRequireJs() {
-        return $this->useRequireJs ? true:false;
+        return $this->useRequireJs ? true : false;
     }
+
     public function __construct($domain = null) {
 
 
@@ -175,9 +172,7 @@ class CApp implements CInterface_Responsable {
         $this->_org = corg::get(CF::orgCode());
         $this->useRequireJs = ccfg::get('requireJs');
 
-        if (isset($_COOKIE['capp-debugbar'])) {
-            CDebug::bar()->enable();
-        }
+
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
@@ -562,8 +557,6 @@ class CApp implements CInterface_Responsable {
         return cjson::encode($data);
     }
 
-   
-
     /**
      * 
      * @return void
@@ -608,8 +601,8 @@ class CApp implements CInterface_Responsable {
         return carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator";
     }
 
-    
     public function setTheme($theme) {
         CManager::theme()->setTheme($theme);
     }
+
 }

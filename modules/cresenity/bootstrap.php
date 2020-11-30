@@ -61,6 +61,8 @@ CApp::registerControl();
 if (isset($_COOKIE['capp-profiler'])) {
     CProfiler::enable();
 }
-
+if (isset($_COOKIE['capp-debugbar'])) {
+    CDebug::bar()->enable();
+}
 
 
