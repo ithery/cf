@@ -20,7 +20,8 @@ trait CComponent_Concern_ValidatesInputTrait {
     }
 
     public function setErrorBag($bag) {
-        return $this->errorBag = $bag instanceof CBase_MessageBag ? $bag : new CBase_MessageBag($bag);
+        
+        return $this->errorBag = $bag instanceof CBase_MessageBagInterface ? $bag : new CBase_MessageBag($bag);
     }
 
     public function resetErrorBag($field = null) {
@@ -202,7 +203,7 @@ trait CComponent_Concern_ValidatesInputTrait {
     protected function providedOrGlobalRulesMessagesAndAttributes($rules, $messages, $attributes) {
         $rules = is_null($rules) ? $this->getRules() : $rules;
 
-        throw_if(empty($rules), new MissingRulesException($this::getName()));
+        c::throwIf(empty($rules), new CComponent_Exception_MissingRulesException($this::getName()));
 
         $messages = empty($messages) ? $this->getMessages() : $messages;
         $attributes = empty($attributes) ? $this->getValidationAttributes() : $attributes;

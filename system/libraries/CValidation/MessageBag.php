@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 12, 2019, 8:26:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CValidation_MessageBagInterface {
+class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CBase_MessageBagInterface {
 
     /**
      * All of the registered messages.
@@ -79,7 +79,7 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
      * @return $this
      */
     public function merge($messages) {
-        if ($messages instanceof MessageProvider) {
+        if ($messages instanceof CBase_MessageProviderInterface) {
             $messages = $messages->getMessageBag()->getMessages();
         }
 
