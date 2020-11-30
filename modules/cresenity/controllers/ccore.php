@@ -10,23 +10,12 @@ class CCore_Controller extends CController {
 
     public function js($hash = null) {
         header('content-type: application/javascript');
-        if ($hash != null) {
-            echo CClientScript::instance()->js($hash);
-        } else {
-
-            $v = CView::factory('ccore/js');
-            echo $v->render();
-        }
+        return '';
     }
 
     public function css($hash = null) {
         header('content-type: text/css');
-        if ($hash != null) {
-            echo CClientScript::instance()->css($hash);
-        } else {
-            $v = CView::factory('ccore/css');
-            echo $v->render();
-        }
+        return '';
     }
 
     public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
