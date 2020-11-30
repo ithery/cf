@@ -15,7 +15,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
     public function process() {
 
         $db = $this->db();
-        
+
         $request = $this->input;
 
         $qProcess = $this->getFullQuery($withPagination = true);
@@ -37,8 +37,8 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
             "datatable" => $output,
             "js" => cbase64::encode($js),
         );
-        $response = json_encode($data);
-        return $response;
+
+        return $data;
     }
 
 }

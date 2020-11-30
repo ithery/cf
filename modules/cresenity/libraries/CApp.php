@@ -5,7 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * @mixin CElement
  */
-class CApp implements CInterface_Responsable {
+class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
 
     use CTrait_Compat_App,
         CTrait_Macroable,
@@ -525,8 +525,14 @@ class CApp implements CInterface_Responsable {
         }
     }
 
-    //override function json
-    public function json() {
+    /**
+     * Get the collection of items as JSON.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toJson($options = 0) {
+
         $data = array();
         $data["title"] = $this->title;
         $message = '';
@@ -554,7 +560,12 @@ class CApp implements CInterface_Responsable {
         $data["message"] = $messageOrig;
         $data["ajaxData"] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
-        return cjson::encode($data);
+        return $data;
+    }
+
+    //override function json
+    public function json($options = 0) {
+        return $this->toJson($options);
     }
 
     /**
@@ -594,6 +605,9 @@ class CApp implements CInterface_Responsable {
      * @return CHTTP_Response
      */
     public function toResponse($request) {
+        if (c::request()->ajax()) {
+            return c::response()->jsonResponse($this);
+        }
         return CHTTP::createResponse($this->render());
     }
 

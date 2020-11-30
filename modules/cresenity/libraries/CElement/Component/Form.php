@@ -22,7 +22,6 @@ class CElement_Component_Form extends CElement_Component {
     protected $ajax_success_script_callback;
     protected $ajax_datatype;
     protected $ajax_redirect;
-    protected $ajax_upload_progress;
     protected $ajax_redirect_url;
     protected $ajax_submit_handlers;
     protected $ajax_submit_target;
@@ -48,7 +47,6 @@ class CElement_Component_Form extends CElement_Component {
         $this->ajax_submit = false;
         $this->ajax_success_script_callback = "";
         $this->ajax_datatype = "text";
-        $this->ajax_upload_progress = false;
         $this->ajax_redirect = true;
         $this->ajax_redirect_url = "";
         $this->ajax_submit_handlers = array();

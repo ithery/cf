@@ -254,6 +254,7 @@ class CHTTP_Kernel {
                 $response instanceof ArrayObject ||
                 $response instanceof JsonSerializable ||
                 is_array($response))) {
+            
             $response = new CHTTP_JsonResponse($response);
         } elseif (!$response instanceof SymfonyResponse) {
             $response = new CHTTP_Response($response, 200, ['Content-Type' => 'text/html']);

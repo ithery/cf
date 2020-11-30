@@ -33,6 +33,9 @@ class CAjax_Engine_DataTable extends CAjax_Engine {
         $processor = $this->createProcessor($processorType, $data);
         $response = $processor->process();
 
+        if (is_array($response)) {
+            return c::response()->json($response);
+        }
         return $response;
     }
 
