@@ -1,18 +1,14 @@
 <?php
 
+class CComponent_RenameMe_SupportComponentTraits {
 
-
-
-use Livewire\ImplicitlyBoundMethod;
-
-class CComponent_RenameMe_SupportComponentTraits
-{
-    static function init() { return new static; }
+    static function init() {
+        return new static;
+    }
 
     protected $componentIdMethodMap = [];
 
-    function __construct()
-    {
+    function __construct() {
         CComponent_Manager::instance()->listen('component.hydrate', function ($component) {
             $component->initializeTraits();
 
@@ -28,7 +24,7 @@ class CComponent_RenameMe_SupportComponentTraits
                 ];
 
                 foreach ($hooks as $hook) {
-                    $method = $hook.c::classBasename($trait);
+                    $method = $hook . c::classBasename($trait);
 
                     if (method_exists($component, $method)) {
                         $this->componentIdMethodMap[$component->id][$hook][] = [$component, $method];
@@ -36,59 +32,60 @@ class CComponent_RenameMe_SupportComponentTraits
                 }
             }
 
-            $methods = $this->componentIdMethodMap[$component->id]['hydrate'] ?? [];
+            $methods = carr::get($this->componentIdMethodMap, $component->id . '.hydrate', []);
 
             foreach ($methods as $method) {
-                ImplicitlyBoundMethod::call(app(), $method);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), $method);
             }
         });
 
         CComponent_Manager::instance()->listen('component.mount', function ($component, $params) {
-            $methods = $this->componentIdMethodMap[$component->id]['mount'] ?? [];
+            $methods = carr::get($this->componentIdMethodMap, $component->id . '.mount', []);
 
             foreach ($methods as $method) {
-                ImplicitlyBoundMethod::call(app(), $method, $params);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), $method, $params);
             }
         });
 
         CComponent_Manager::instance()->listen('component.updating', function ($component, $name, $value) {
-            $methods = $this->componentIdMethodMap[$component->id]['updating'] ?? [];
+            $methods = carr::get($this->componentIdMethodMap, $component->id . '.updating', []);
 
             foreach ($methods as $method) {
-                ImplicitlyBoundMethod::call(app(), $method, [$name, $value]);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), $method, [$name, $value]);
             }
         });
 
         CComponent_Manager::instance()->listen('component.updated', function ($component, $name, $value) {
-            $methods = $this->componentIdMethodMap[$component->id]['updated'] ?? [];
+            $methods = carr::get($this->componentIdMethodMap, $component->id . '.updated', []);
 
             foreach ($methods as $method) {
-                ImplicitlyBoundMethod::call(app(), $method, [$name, $value]);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), $method, [$name, $value]);
             }
         });
 
         CComponent_Manager::instance()->listen('component.rendering', function ($component) {
-            $methods = $this->componentIdMethodMap[$component->id]['rendering'] ?? [];
+            $methods = carr::get($this->componentIdMethodMap, $component->id . '.rendering', []);
 
             foreach ($methods as $method) {
-                ImplicitlyBoundMethod::call(app(), $method);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), $method);
             }
         });
 
         CComponent_Manager::instance()->listen('component.rendered', function ($component, $view) {
-            $methods = $this->componentIdMethodMap[$component->id]['rendered'] ?? [];
+            $methods = carr::get($this->componentIdMethodMap, $component->id . '.rendered', []);
 
             foreach ($methods as $method) {
-                ImplicitlyBoundMethod::call(app(), $method, [$view]);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), $method, [$view]);
             }
         });
 
         CComponent_Manager::instance()->listen('component.dehydrate', function ($component) {
-            $methods = $this->componentIdMethodMap[$component->id]['dehydrate'] ?? [];
+            $methods = carr::get($this->componentIdMethodMap, $component->id . '.dehydrate', []);
 
             foreach ($methods as $method) {
-                ImplicitlyBoundMethod::call(app(), $method);
+                CComponent_ImplicitlyBoundMethod::call(CContainer::getInstance(), $method);
             }
         });
     }
+
 }

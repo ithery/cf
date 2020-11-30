@@ -21,7 +21,7 @@ class CComponent_RenameMe_OptimizeRenderedDom
         });
 
         CComponent_Manager::instance()->listen('component.dehydrate.subsequent', function ($component, $response) {
-            $oldHash = $this->htmlHashesByComponent[$component->id] ?? null;
+            $oldHash = isset($this->htmlHashesByComponent[$component->id]) ?$this->htmlHashesByComponent[$component->id]: null;
 
             $response->memo['htmlHash'] = $newHash = hash('crc32b', $response->effects['html']);
 

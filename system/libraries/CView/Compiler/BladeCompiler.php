@@ -503,7 +503,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
      * @param  callable  $callback
      * @return void
      */
-    public function if($name, callable $callback) {
+    public function _if($name, callable $callback) {
         $this->conditions[$name] = $callback;
 
         $this->directive($name, function ($expression) use ($name) {
@@ -632,7 +632,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
      * @param  string|null  $alias
      * @return void
      */
-    public function include($path, $alias = null) {
+    public function _include($path, $alias = null) {
         $this->aliasInclude($path, $alias);
     }
 

@@ -39,7 +39,7 @@ class CComponent_RenameMe_SupportFileDownloads
         });
 
         CComponent_Manager::instance()->listen('component.dehydrate.subsequent', function ($component, $response) {
-            if (! $download = $this->downloadsById[$component->id] ?? false) return;
+            if (! $download = (isset($this->downloadsById[$component->id])) ?$this->downloadsById[$component->id]: false) return;
 
             $response->effects['download'] = $download;
         });
