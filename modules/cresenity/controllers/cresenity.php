@@ -73,7 +73,7 @@ class Controller_Cresenity extends CController {
     }
 
     public function change_theme($theme) {
-        ctheme::set_theme($theme);
+        CManager::theme()->setTheme($theme);
         curl::redirect(request::referrer());
     }
 
