@@ -9,7 +9,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CDatabase_Query_Builder {
 
-    use CDatabase_Trait_Builder;
+    use CDatabase_Trait_Builder,
+        CDatabase_Trait_ExplainsQueries,
+        CTrait_ForwardsCalls;
 
     /**
      * The current connection
@@ -528,18 +530,9 @@ class CDatabase_Query_Builder {
      * @return CCollection
      */
     public function get($columns = ['*']) {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-
-        $results = $this->processor->processSelect($this, $this->runSelect());
-
-        $this->columns = $original;
-
-        return CF::collect($results);
+        return c::collect($this->onceWithColumns(carr::wrap($columns), function () {
+                    return $this->processor->processSelect($this, $this->runSelect());
+                }));
     }
 
     /**
@@ -548,6 +541,7 @@ class CDatabase_Query_Builder {
      * @return array
      */
     protected function runSelect() {
+        
         return $this->db->query($this->toSql(), $this->getBindings());
     }
 
@@ -1398,7 +1392,7 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     protected function invalidOperator($operator) {
-        
+
         return !in_array(strtolower($operator), $this->operators, true) &&
                 !in_array(strtolower($operator), $this->grammar->getOperators(), true);
     }
@@ -1511,6 +1505,87 @@ class CDatabase_Query_Builder {
         }
 
         return $this;
+    }
+
+    /**
+     * Set the limit and offset for a given page.
+     *
+     * @param  int  $page
+     * @param  int  $perPage
+     * @return CDatabase_Query_Builder|static
+     */
+    public function forPage($page, $perPage = 15) {
+        
+        return $this->offset(($page - 1) * $perPage)->limit($perPage);
+    }
+
+    /**
+     * Constrain the query to the previous "page" of results before a given ID.
+     *
+     * @param  int  $perPage
+     * @param  int|null  $lastId
+     * @param  string  $column
+     * @return $this
+     */
+    public function forPageBeforeId($perPage = 15, $lastId = 0, $column = 'id') {
+        $this->orders = $this->removeExistingOrdersFor($column);
+
+        if (!is_null($lastId)) {
+            $this->where($column, '<', $lastId);
+        }
+
+        return $this->orderBy($column, 'desc')
+                        ->limit($perPage);
+    }
+
+    /**
+     * Constrain the query to the next "page" of results after a given ID.
+     *
+     * @param  int  $perPage
+     * @param  int|null  $lastId
+     * @param  string  $column
+     * @return $this
+     */
+    public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id') {
+        $this->orders = $this->removeExistingOrdersFor($column);
+
+        if (!is_null($lastId)) {
+            $this->where($column, '>', $lastId);
+        }
+
+        return $this->orderBy($column, 'asc')
+                        ->limit($perPage);
+    }
+
+    /**
+     * Remove all existing orders and optionally add a new order.
+     *
+     * @return $this
+     */
+    public function reorder($column = null, $direction = 'asc') {
+        $this->orders = null;
+        $this->unionOrders = null;
+        $this->bindings['order'] = [];
+        $this->bindings['unionOrder'] = [];
+
+        if ($column) {
+            return $this->orderBy($column, $direction);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get an array with all orders with a given column removed.
+     *
+     * @param  string  $column
+     * @return array
+     */
+    protected function removeExistingOrdersFor($column) {
+        return CCollection::make($this->orders)
+                        ->reject(function ($order) use ($column) {
+                            return isset($order['column']) ? $order['column'] === $column : false;
+                        })->values()->all();
     }
 
     /**
@@ -1699,9 +1774,25 @@ class CDatabase_Query_Builder {
      * @return $this
      */
     public function orderBy($column, $direction = 'asc') {
+
+        if ($this->isQueryable($column)) {
+
+            list($query, $bindings) = $this->createSub($column);
+
+            $column = new CDatabase_Query_Expression('(' . $query . ')');
+
+            $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
+        }
+
+        $direction = strtolower($direction);
+
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
+        }
+
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
-            'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
+            'direction' => $direction,
         ];
 
         return $this;
@@ -1993,10 +2084,23 @@ class CDatabase_Query_Builder {
     /**
      * Get the query grammar instance.
      *
-     * @return \Illuminate\Database\Query\Grammars\Grammar
+     * @return CDatabase_Query_Grammar
      */
     public function getGrammar() {
         return $this->grammar;
+    }
+
+    /**
+     * Determine if the value is a query builder instance or a Closure.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isQueryable($value) {
+        return $value instanceof self ||
+                $value instanceof CModel_Query ||
+                $value instanceof CMolde_Relation ||
+                $value instanceof Closure;
     }
 
     /**
@@ -2026,6 +2130,8 @@ class CDatabase_Query_Builder {
                     }
                 });
     }
+    
+    
 
     /**
      * Insert a new record into the database.
@@ -2219,9 +2325,8 @@ class CDatabase_Query_Builder {
         if (cstr::startsWith($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
         }
-        throw new BadMethodCallException(sprintf(
-                'Method %s::%s does not exist.', static::class, $method
-        ));
+
+        static::throwBadMethodCallException($method);
     }
 
     /**

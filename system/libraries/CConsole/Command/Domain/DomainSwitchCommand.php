@@ -16,11 +16,17 @@ class CConsole_Command_Domain_DomainSwitchCommand extends CConsole_Command {
 
     public function handle() {
         $domain = $this->argument('domain');
-        $this->info('Switching to ' . $domain);
-
-        $fileData = DOCROOT . 'data/current-domain';
-        cfs::atomic_write($fileData, $domain);
-        $this->info('Switched to ' . $domain);
+        if (CConsole::domain() == $domain) {
+            $this->info('You are already on domain:' . $domain);
+        } else {
+            if (!CF::domainExists($domain)) {
+                $this->error('Failed switch domain, ' . $domain . ' not exists');
+            } else {
+                $fileData = DOCROOT . 'data/current-domain';
+                CFile::put($fileData, $domain, true);
+                $this->info('Switched to ' . $domain);
+            }
+        }
     }
 
 }

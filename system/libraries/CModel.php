@@ -7,7 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 25, 2017, 8:42:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CModel implements ArrayAccess {
+abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
 
     use CModel_Trait_GuardsAttributes,
         CModel_Trait_Attributes,
@@ -1266,13 +1266,13 @@ abstract class CModel implements ArrayAccess {
         foreach ($this->getRelations() as $key => $relation) {
             $relations[] = $key;
 
-            if ($relation instanceof QueueableCollection) {
+            if ($relation instanceof CQueue_QueueableCollectionInterface) {
                 foreach ($relation->getQueueableRelations() as $collectionKey => $collectionValue) {
                     $relations[] = $key . '.' . $collectionKey;
                 }
             }
 
-            if ($relation instanceof QueueableEntity) {
+            if ($relation instanceof CQueue_QueueableEntityInterface) {
                 foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
                     $relations[] = $key . '.' . $entityValue;
                 }

@@ -141,5 +141,17 @@ trait CObservable_Trait_ComponentTrait {
         $this->add($pdfViewer);
         return $pdfViewer;
     }
+    
+    
+    /**
+     * 
+     * @param string $id
+     * @return CElement_Component_TreeView
+     */
+    public function addTreeView($id = "") {
+        $treeView = CElement_Factory::createComponent('TreeView', $id);
+        $this->add($treeView);
+        return $treeView;
+    }
 
 }

@@ -164,7 +164,7 @@ class CValidation_RuleParser {
      * @return array
      */
     protected function mergeRulesForAttribute($results, $attribute, $rules) {
-        $merge = head($this->explodeRules([$rules]));
+        $merge = carr::head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
                 isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [], $merge

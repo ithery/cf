@@ -5,6 +5,10 @@
  *
  * @author Hery
  */
+
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 class CHTTP_ResponseFactory {
 
     use CTrait_Macroable;
@@ -55,8 +59,10 @@ class CHTTP_ResponseFactory {
      * @return CHTTP_Response
      */
     public function view($view, $data = [], $status = 200, array $headers = []) {
-        if (!$view instanceof CView) {
-            $view = CView::factory($view, $data);
+        if (!$view instanceof CView_View) {
+            if (!$view instanceof CView) {
+                $view = CView::factory($view, $data);
+            }
         } else {
             if (is_array($data) && count($data) > 0) {
                 $view->set($data);

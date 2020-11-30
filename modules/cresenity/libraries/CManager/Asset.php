@@ -314,7 +314,7 @@ class CManager_Asset {
     }
 
     public function isUseRequireJs() {
-        $isUseRequireJs = ccfg::get('requireJs');
+        $isUseRequireJs = CApp::instance()->isUseRequireJs();
         if ($isUseRequireJs === null) {
             $isUseRequireJs = true;
         }

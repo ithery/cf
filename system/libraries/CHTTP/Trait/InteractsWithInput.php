@@ -190,7 +190,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $placeholder = new stdClass;
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = data_get($input, $key, $placeholder);
+            $value = carr::get($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
                 carr::set($results, $key, $value);

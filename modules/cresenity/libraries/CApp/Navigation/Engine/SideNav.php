@@ -13,7 +13,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
 
     public function render($navs = null, $level = 0, &$child = 0) {
         $domain = CF::domain();
-        $is_admin = CApp::instance()->isAdmin();
+        $is_admin = CApp::isAdministrator();
         if ($navs == null && $level == 0) {
             $navs = $this->navs;
         }
@@ -22,6 +22,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
         }
         $html = "";
         $childCount = 0;
+        
         foreach ($navs as $d) {
 
             $child = 0;
@@ -32,7 +33,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             $label = carr::get($d, 'label');
             $icon = carr::get($d, 'icon');
             $class = carr::get($d, 'class');
-
+            
             $childHtml = "";
 
             if (isset($d["subnav"]) && is_array($d["subnav"])) {

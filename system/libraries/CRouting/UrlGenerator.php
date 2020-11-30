@@ -5,6 +5,8 @@
  *
  * @author Hery
  */
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+
 class CRouting_UrlGenerator {
 
     use CTrait_Helper_InteractsWithTime,
@@ -126,7 +128,12 @@ class CRouting_UrlGenerator {
     public function __construct() {
         //$this->routes = $routes;
         //$this->assetRoot = $assetRoot;
-
+        $this->keyResolver = function () {
+            return CF::config('app.key');
+        };
+        $this->sessionResolver = function() {
+            return c::session();
+        };
         $this->setRequest(CHTTP::request());
     }
 
@@ -237,7 +244,7 @@ class CRouting_UrlGenerator {
         // Once we get the root URL, we will check to see if it contains an index.php
         // file in the paths. If it does, we will remove it since it is not needed
         // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->assetRoot ? : $this->formatRoot($this->formatScheme($secure));
+        $root = $this->assetRoot ?: $this->formatRoot($this->formatScheme($secure));
 
         return $this->removeIndex($root) . '/' . trim($path, '/');
     }
@@ -293,7 +300,7 @@ class CRouting_UrlGenerator {
         }
 
         if (is_null($this->cachedScheme)) {
-            $this->cachedScheme = $this->forceScheme ? : $this->request->getScheme() . '://';
+            $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme() . '://';
         }
 
         return $this->cachedScheme;
@@ -315,7 +322,7 @@ class CRouting_UrlGenerator {
 
         if (array_key_exists('signature', $parameters)) {
             throw new InvalidArgumentException(
-            '"Signature" is a reserved parameter when generating signed routes. Please rename your route parameter.'
+                    '"Signature" is a reserved parameter when generating signed routes. Please rename your route parameter.'
             );
         }
 
@@ -348,34 +355,34 @@ class CRouting_UrlGenerator {
     /**
      * Determine if the given request has a valid signature.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @param  bool  $absolute
      * @return bool
      */
-    public function hasValidSignature(Request $request, $absolute = true) {
+    public function hasValidSignature(CHTTP_Request $request, $absolute = true) {
+        
         return $this->hasCorrectSignature($request, $absolute) && $this->signatureHasNotExpired($request);
     }
 
     /**
      * Determine if the given request has a valid signature for a relative URL.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @return bool
      */
-    public function hasValidRelativeSignature(Request $request) {
+    public function hasValidRelativeSignature(CHTTP_Request $request) {
         return $this->hasValidSignature($request, false);
     }
 
     /**
      * Determine if the signature from the given request matches the URL.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @param  bool  $absolute
      * @return bool
      */
-    public function hasCorrectSignature(Request $request, $absolute = true) {
+    public function hasCorrectSignature(CHTTP_Request $request, $absolute = true) {
         $url = $absolute ? $request->url() : '/' . $request->path();
-
         $original = rtrim($url . '?' . carr::query(
                         carr::except($request->query(), 'signature')
                 ), '?');
@@ -388,13 +395,13 @@ class CRouting_UrlGenerator {
     /**
      * Determine if the expires timestamp from the given request is not from the past.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @return bool
      */
-    public function signatureHasNotExpired(Request $request) {
+    public function signatureHasNotExpired(CHTTP_Request $request) {
         $expires = $request->query('expires');
 
-        return !($expires && Carbon::now()->getTimestamp() > $expires);
+        return !($expires && CCarbon::now()->getTimestamp() > $expires);
     }
 
     /**
@@ -408,8 +415,10 @@ class CRouting_UrlGenerator {
      * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
      */
     public function route($name, $parameters = [], $absolute = true) {
-        if (!is_null($route = $this->routes->getByName($name))) {
-            return $this->toRoute($route, $parameters, $absolute);
+        if ($this->routes != null) {
+            if (!is_null($route = $this->routes->getByName($name))) {
+                return $this->toRoute($route, $parameters, $absolute);
+            }
         }
 
         throw new RouteNotFoundException("Route [{$name}] not defined.");
@@ -516,7 +525,7 @@ class CRouting_UrlGenerator {
     public function formatRoot($scheme, $root = null) {
         if (is_null($root)) {
             if (is_null($this->cachedRoot)) {
-                $this->cachedRoot = $this->forcedRoot ? : $this->request->root();
+                $this->cachedRoot = $this->forcedRoot ?: $this->request->root();
             }
 
             $root = $this->cachedRoot;
@@ -649,7 +658,7 @@ class CRouting_UrlGenerator {
      * @return \Closure
      */
     public function pathFormatter() {
-        return $this->formatPathUsing ? : function ($path) {
+        return $this->formatPathUsing ?: function ($path) {
             return $path;
         };
     }
@@ -657,7 +666,7 @@ class CRouting_UrlGenerator {
     /**
      * Get the request instance.
      *
-     * @return \Illuminate\Http\Request
+     * @return CHTTP_Request
      */
     public function getRequest() {
         return $this->request;
@@ -675,7 +684,7 @@ class CRouting_UrlGenerator {
         $this->cachedRoot = null;
         $this->cachedScheme = null;
 
-        c::tap(c::optional($this->routeGenerator)->defaultParameters ? : [], function ($defaults) {
+        c::tap(c::optional($this->routeGenerator)->defaultParameters ?: [], function ($defaults) {
             $this->routeGenerator = null;
 
             if (!empty($defaults)) {

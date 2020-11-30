@@ -1,6 +1,6 @@
 <?php
 
-class CModel_Collection extends CCollection {
+class CModel_Collection extends CCollection implements CQueue_QueueableCollectionInterface {
 
     /**
      * Find a model in the collection by key.
@@ -376,7 +376,31 @@ class CModel_Collection extends CCollection {
      * @return array
      */
     public function getQueueableIds() {
-        return $this->modelKeys();
+        if ($this->isEmpty()) {
+            return [];
+        }
+        return $this->first() instanceof CQueue_QueueableEntityInterface ? $this->map->getQueueableId()->all() : $this->modelKeys();
+    }
+
+    /**
+     * Get the relationships of the entities being queued.
+     *
+     * @return array
+     */
+    public function getQueueableRelations() {
+        if ($this->isEmpty()) {
+            return [];
+        }
+
+        $relations = $this->map->getQueueableRelations()->all();
+
+        if (count($relations) === 0 || $relations === [[]]) {
+            return [];
+        } elseif (count($relations) === 1) {
+            return reset($relations);
+        } else {
+            return array_intersect(...$relations);
+        }
     }
 
     /**

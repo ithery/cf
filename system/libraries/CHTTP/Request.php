@@ -10,6 +10,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
+/**
+ * @method array validate(array $rules, ...$params)
+ * @method array validateWithBag(string $errorBag, array $rules, ...$params)
+ */
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
 
     use CHTTP_Trait_InteractsWithInput,
@@ -216,6 +220,25 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function root() {
         return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
+    }
+
+    /**
+     * Determine if the given request has a valid signature.
+     *
+     * @param  bool  $absolute
+     * @return bool
+     */
+    public function hasValidSignature($absolute = true) {
+        return CRouting::urlGenerator()->hasValidSignature($this, $absolute);
+    }
+
+    /**
+     * Get the URL (no query string) for the request.
+     *
+     * @return string
+     */
+    public function url() {
+        return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
     }
 
 }

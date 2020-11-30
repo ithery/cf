@@ -149,7 +149,7 @@ class CSession {
 
         // Start the session!
         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+            @session_start();
         }
 
         // Put session_id in the session variable
@@ -407,13 +407,16 @@ class CSession {
         $args = func_get_args();
 
         foreach ($args as $key) {
-            if (isset(CSession::$protect[$key])) {
-                continue;
-            }
-
-            // Unset the key
-            unset($_SESSION[$key]);
+            $this->forget($key);
         }
+    }
+
+    public function forget($key) {
+        if (isset(CSession::$protect[$key])) {
+            return false;
+        }
+        // Unset the key
+        unset($_SESSION[$key]);
     }
 
 }

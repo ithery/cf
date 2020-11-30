@@ -181,12 +181,12 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
         if ($this->isHttpException($e)) {
             if (CView::exists('errors/http/' . $e->getStatusCode())) {
-                return CF::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
+                return c::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
             } else {
                 if ($e->getStatusCode() == 404) {
                     //backward compatibility old view
                     if (CView::exists('ccore/404')) {
-                        return CF::response()->view('ccore/404', [], $e->getStatusCode());
+                        return c::response()->view('ccore/404', [], $e->getStatusCode());
                     }
                 }
             }
@@ -269,12 +269,12 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Convert a validation exception into a response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Validation\ValidationException  $exception
-     * @return \Illuminate\Http\Response
+     * @param  CHTTP_Request  $request
+     * @param  CValidation_Exception  $exception
+     * @return CHTTP_Response
      */
-    protected function invalid($request, ValidationException $exception) {
-        return CF::redirect(isset($exception->redirectTo) ? $exception->redirectTo : url()->previous())
+    protected function invalid($request, CValidation_Exception $exception) {
+        return c::redirect(isset($exception->redirectTo) ? $exception->redirectTo : url()->previous())
                         ->withInput(crr::except($request->input(), $this->dontFlash))
                         ->withErrors($exception->errors(), $exception->errorBag);
     }

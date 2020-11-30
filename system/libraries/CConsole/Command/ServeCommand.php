@@ -5,14 +5,14 @@
  *
  * @author Hery
  */
-
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Carbon\Carbon;
 
 class CConsole_Command_ServeCommand extends CConsole_Command {
-     /**
+
+    /**
      * The console command name.
      *
      * @var string
@@ -40,21 +40,18 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      *
      * @throws \Exception
      */
-    public function handle()
-    {
-        
+    public function handle() {
+
 
         $this->line("<info>Starting CF development server:</info> http://{$this->host()}:{$this->port()}");
 
-        
-        $environmentFile = $this->option('env') ? $this->option('env') : DOCROOT.'.env';
-                            
+
+        $environmentFile = $this->option('env') ? $this->option('env') : DOCROOT . '.env';
+
 
         $hasEnvironment = file_exists($environmentFile);
 
-        $environmentLastModified = $hasEnvironment
-                            ? filemtime($environmentFile)
-                            : Carbon::now()->addDays(30)->getTimestamp();
+        $environmentLastModified = $hasEnvironment ? filemtime($environmentFile) : Carbon::now()->addDays(30)->getTimestamp();
 
         $process = $this->startProcess();
 
@@ -63,9 +60,9 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
                 clearstatcache(false, $environmentFile);
             }
 
-            if (! $this->option('no-reload') &&
-                $hasEnvironment &&
-                filemtime($environmentFile) > $environmentLastModified) {
+            if (!$this->option('no-reload') &&
+                    $hasEnvironment &&
+                    filemtime($environmentFile) > $environmentLastModified) {
                 $environmentLastModified = filemtime($environmentFile);
 
                 $this->comment('Environment modified. Restarting server...');
@@ -94,20 +91,16 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      *
      * @return \Symfony\Component\Process\Process
      */
-    protected function startProcess()
-    {
+    protected function startProcess() {
         $env = c::collect($_ENV)->mapWithKeys(function ($value, $key) {
-            if ($this->option('no-reload')) {
-                return [$key => $value];
-            }
+                    if ($this->option('no-reload')) {
+                        return [$key => $value];
+                    }
 
-            return in_array($key, ['APP_ENV', 'LARAVEL_SAIL'])
-                    ? [$key => $value]
-                    : [$key => false];
-        })->all();
-        $env = [];
-        $process = new Process($this->serverCommand(), null, $env);
+                    return in_array($key, ['APP_ENV', 'LARAVEL_SAIL']) ? [$key => $value] : [$key => false];
+                })->all();
 
+        $process = new Process($this->serverCommand(), null, $env = null);
         $process->start(function ($type, $buffer) {
             $this->output->write($buffer);
         });
@@ -120,13 +113,17 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      *
      * @return array
      */
-    protected function serverCommand()
-    {
+    protected function serverCommand() {
         return [
             (new PhpExecutableFinder)->find(false),
             '-S',
-            $this->host().':'.$this->port(),
-            DOCROOT.'index.php',
+            $this->host() . ':' . $this->port(),
+        ];
+        return [
+            (new PhpExecutableFinder)->find(false),
+            '-S',
+            $this->host() . ':' . $this->port(),
+            DOCROOT . 'index.php',
         ];
     }
 
@@ -135,8 +132,10 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      *
      * @return string
      */
-    protected function host()
-    {
+    protected function host() {
+
+
+
         return $this->input->getOption('host');
     }
 
@@ -145,9 +144,8 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      *
      * @return string
      */
-    protected function port()
-    {
-        $port = $this->input->getOption('port') ?: 8000;
+    protected function port() {
+        $port = $this->input->getOption('port') ? : 8000;
 
         return $port + $this->portOffset;
     }
@@ -157,10 +155,9 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      *
      * @return bool
      */
-    protected function canTryAnotherPort()
-    {
+    protected function canTryAnotherPort() {
         return is_null($this->input->getOption('port')) &&
-               ($this->input->getOption('tries') > $this->portOffset);
+                ($this->input->getOption('tries') > $this->portOffset);
     }
 
     /**
@@ -168,13 +165,17 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      *
      * @return array
      */
-    protected function getOptions()
-    {
+    protected function getOptions() {
+        $domain = CConsole::domain();
+        if ($domain == null) {
+            $domain = 'localhost';
+        }
         return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', 'localhost'],
+            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', $domain],
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', 8080],
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
         ];
     }
+
 }

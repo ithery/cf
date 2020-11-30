@@ -34,6 +34,7 @@ trait CApp_Trait_App_Variables {
         $variables['domain'] = CF::domain();
         $variables['appCode'] = CF::appCode();
         $variables['appId'] = CF::appId();
+        $variables['debug'] = CF::isDevSuite();
 
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
@@ -69,8 +70,10 @@ trait CApp_Trait_App_Variables {
             $variables['theme'] = array();
             $variables['theme']['name'] = CManager::theme()->getCurrentTheme();
             $variables['theme']['data'] = CManager::theme()->getThemeData();
+          
 
             $variables['jsUrl'] = CManager::asset()->getAllJsFileUrl();
+            $variables['cssUrl'] = CManager::asset()->getAllCssFileUrl();
 
             $variables['defaultJQueryUrl'] = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
         }

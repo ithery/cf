@@ -60,7 +60,7 @@ class CFRouter {
         // Load routes
         $routesConfig = CF::config('routes');
         $routesRuntime = self::$routesRuntime;
-        $routes = array_merge($routesConfig, $routesRuntime);
+        $routes = carr::merge($routesConfig, $routesRuntime);
 
         // Default route status
         $default_route = FALSE;

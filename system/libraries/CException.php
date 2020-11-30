@@ -34,11 +34,18 @@ class CException extends Exception {
      * @return  void
      */
     public function __construct($message = "", array $variables = NULL, $code = 0, Exception $previous = NULL) {
+        
         if (is_array($variables)) {
             $message = strtr($message, $variables);
+        } else {
+            if($code instanceof Exception) {
+                $previous = $code;
+                $code = $variables;
+            }
         }
-        // Pass the message and integer code to the parent
+        
         parent::__construct($message, (int) $code, $previous);
+        
     }
 
     /**

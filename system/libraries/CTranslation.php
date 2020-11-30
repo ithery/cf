@@ -10,7 +10,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CTranslation {
 
     public static function translator() {
-        return new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), 'i18n'),clang::getlang());
+        return new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), 'i18n'),CF::getLocale());
     }
 
+    
+    
 }

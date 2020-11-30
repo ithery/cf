@@ -50,9 +50,9 @@ class CManager_Theme {
             $theme = self::getCurrentTheme();
         }
         if (!isset(self::$themeData[$theme])) {
-            $themeFile = CF::get_file('themes', $theme);
+            $themeFile = CF::getFile('themes', $theme);
             $themeAllData = null;
-            if (file_exists($themeFile)) {
+            if (CFile::exists($themeFile)) {
                 $themeAllData = include $themeFile;
             }
             self::$themeData[$theme] = $themeAllData;

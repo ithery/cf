@@ -409,6 +409,12 @@ class carr {
      * @return  array
      */
     public static function merge($array1, $array2) {
+        if($array1 instanceof CInterface_Arrayable) {
+            $array1 = $array1->toArray();
+        }
+        if($array2 instanceof CInterface_Arrayable) {
+            $array2 = $array2->toArray();
+        }
         if (carr::isAssoc($array2)) {
             foreach ($array2 as $key => $value) {
                 if (is_array($value)
@@ -658,7 +664,7 @@ class carr {
      */
     public static function last($array, callable $callback = null, $default = null) {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : end($array);
+            return empty($array) ? c::value($default) : end($array);
         }
 
         return static::first(array_reverse($array, true), $callback, $default);

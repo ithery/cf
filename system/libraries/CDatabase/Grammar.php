@@ -22,7 +22,7 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $table
+     * @param  CDatabase_Query_Expression|string  $table
      * @return string
      */
     public function wrapTable($table) {
@@ -36,7 +36,7 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
+     * @param  CDatabase_Query_Expression|string  $value
      * @param  bool    $prefixAlias
      * @return string
      */
@@ -84,10 +84,10 @@ abstract class CDatabase_Grammar {
      * @return string
      */
     protected function wrapSegments($segments) {
-        $collection = new CCollection($segments);
+        $collection = c::collect($segments);
         return $collection->map(function ($segment, $key) use ($segments) {
-            return $key == 0 && count($segments) > 1 ? $this->wrapTable($segment) : $this->wrapValue($segment);
-        })->implode('.');
+                    return $key == 0 && count($segments) > 1 ? $this->wrapTable($segment) : $this->wrapValue($segment);
+                })->implode('.');
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class CDatabase_Grammar {
     /**
      * Get the value of a raw expression.
      *
-     * @param  \Illuminate\Database\Query\Expression  $expression
+     * @param  CDatabase_Query_Expression  $expression
      * @return string
      */
     public function getValue($expression) {

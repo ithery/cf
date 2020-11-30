@@ -72,7 +72,8 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
     public function storeAs($path, $name, $options = []) {
         $options = $this->parseOptions($options);
         $disk = carr::pull($options, 'disk');
-        return CContainer_Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->putFileAs(
+        
+        return CStorage::instance()->disk($disk)->putFileAs(
                         $path, $this, $name, $options
         );
     }

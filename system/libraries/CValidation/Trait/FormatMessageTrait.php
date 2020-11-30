@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Apr 12, 2019, 8:39:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 trait CValidation_Trait_FormatMessageTrait {
 
     use CValidation_Trait_ReplaceAttributeTrait;

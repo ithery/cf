@@ -49,7 +49,7 @@ use ProxyManager\Proxy\ProxyInterface;
  */
 class DebugClassLoader
 {
-    private const SPECIAL_RETURN_TYPES = [
+     const SPECIAL_RETURN_TYPES = [
         'void' => 'void',
         'null' => 'null',
         'resource' => 'resource',
