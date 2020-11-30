@@ -112,7 +112,7 @@ class CComponent_Manager {
     }
 
     public function visit($browser, $class, $queryString = '') {
-        $url = '/livewire-dusk/' . urlencode($class) . $queryString;
+        $url = '/component-dusk/' . urlencode($class) . $queryString;
 
         return $browser->visit($url)->waitForLivewireToLoad();
     }
@@ -292,8 +292,13 @@ HTML;
         return $this;
     }
 
+    /**
+     * 
+     * @param string $alias
+     * @param string $class
+     */
     public function registerComponent($alias, $class) {
-        CComponent_Finder::instance()->registerComponent($alias, $class);
+        return $this->component($alias, $class);
     }
 
     public function controllerHandler($args) {
