@@ -7,7 +7,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
  */
-
 class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CBase_MessageBagInterface, CBase_MessageProviderInterface {
 
     /**
@@ -76,7 +75,7 @@ class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Js
     /**
      * Merge a new array of messages into the bag.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
+     * @param  CBase_MessageProviderInterface|array  $messages
      * @return $this
      */
     public function merge($messages) {
@@ -224,7 +223,7 @@ class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Js
      * @return array
      */
     protected function transform($messages, $format, $messageKey) {
-        return collect((array) $messages)
+        return c::collect((array) $messages)
                         ->map(function ($message) use ($format, $messageKey) {
                             // We will simply spin through the given messages and transform each one
                             // replacing the :message place holder with the real message allowing
@@ -264,7 +263,7 @@ class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Js
     /**
      * Get the messages for the instance.
      *
-     * @return \Illuminate\Support\MessageBag
+     * @return CBase_MessageBag
      */
     public function getMessageBag() {
         return $this;
@@ -283,7 +282,7 @@ class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Js
      * Set the default message format.
      *
      * @param  string  $format
-     * @return \Illuminate\Support\MessageBag
+     * @return CBase_MessageBag
      */
     public function setFormat($format = ':message') {
         $this->format = $format;

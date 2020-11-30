@@ -13,6 +13,14 @@ Class Controller_Home extends CController {
 
         return CF::response()->view('welcome');
     }
+    
+    public function validate() {
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
+        CManager::registerModule('bootstrap-4');
+        $app->setViewName('test.validate');
+        return $app;
+    }
 
     public function test() {
         $app = CApp::instance();
@@ -28,6 +36,7 @@ Class Controller_Home extends CController {
         $app->setLoginRequired(false);
         $app->setViewName('test');
         $app->setTheme('cfdocs');
+        
 
         $app->addView('member', [
             'members' => \Cresenity\Testing\MemberModel::all()

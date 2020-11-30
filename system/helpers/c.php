@@ -619,6 +619,13 @@ class c {
         return CF::lang($key, $args);
     }
 
+    /**
+     * @return CSession
+     */
+    public static function session() {
+        return CSession::instance();
+    }
+
 }
 
 // End c

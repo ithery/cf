@@ -28,7 +28,7 @@ trait CComponent_Concern_ValidatesInputTrait {
         $fields = (array) $field;
 
         if (empty($fields)) {
-            return $this->errorBag = new MessageBag;
+            return $this->errorBag = new CBase_MessageBag;
         }
 
         $this->setErrorBag(
