@@ -14,8 +14,6 @@ final class CF {
     public static $instance;
     // The multiple instance of the controller when callback when routing is failed or redirected
     public static $instances;
-    // Will be set to TRUE when an exception is caught
-    public static $has_error = FALSE;
     // The current user agent
     public static $user_agent;
     // The current locale
@@ -97,31 +95,6 @@ final class CF {
             return true;
         }
         return false;
-    }
-
-    public static function domain_data($domain) {
-        $data = CFData::get($domain, 'domain');
-        $result = array();
-        $result['app_id'] = '';
-        $result['app_code'] = '';
-        $result['org_id'] = '';
-        $result['org_code'] = '';
-        $result['store_id'] = '';
-        $result['store_code'] = '';
-        $result['shared_app_code'] = array();
-        $result['theme'] = '';
-
-        if ($data != null) {
-            $result['app_id'] = isset($data['app_id']) ? $data['app_id'] : null;
-            $result['app_code'] = isset($data['app_code']) ? $data['app_code'] : null;
-            $result['org_id'] = isset($data['org_id']) ? $data['org_id'] : null;
-            $result['org_code'] = isset($data['org_code']) ? $data['org_code'] : null;
-            $result['store_id'] = isset($data['store_id']) ? $data['store_id'] : null;
-            $result['store_code'] = isset($data['store_code']) ? $data['store_code'] : null;
-            $result['shared_app_code'] = isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
-            $result['theme'] = isset($data['theme']) ? $data['theme'] : null;
-        }
-        return $result;
     }
 
     /**
@@ -507,107 +480,6 @@ final class CF {
     }
 
     /**
-     * Sets a configuration item, if allowed.
-     *
-     * @param   string   config key string
-     * @param   string   config value
-     * @return  boolean
-     */
-    public static function config_set($key, $value) {
-        // Do this to make sure that the config array is already loaded
-        self::config($key);
-
-        if (substr($key, 0, 7) === 'routes.') {
-            // Routes cannot contain sub keys due to possible dots in regex
-            $keys = explode('.', $key, 2);
-        } else {
-            // Convert dot-noted key string to an array
-            $keys = explode('.', $key);
-        }
-
-        // Used for recursion
-        $conf = & self::$configuration;
-        $last = count($keys) - 1;
-
-        foreach ($keys as $i => $k) {
-            if ($i === $last) {
-                $conf[$k] = $value;
-            } else {
-                $conf = & $conf[$k];
-            }
-        }
-
-        if ($key === 'core.modules') {
-            // Reprocess the include paths
-            self::include_paths(TRUE);
-        }
-
-        return TRUE;
-    }
-
-    /**
-     * Load a config file.
-     *
-     * @param   string   config filename, without extension
-     * @param   boolean  is the file required?
-     * @return  array
-     */
-    public static function config_load($name, $required = TRUE) {
-        if ($name === 'core') {
-            $found = FALSE;
-
-            // find config file at all available paths
-            if ($files = self::findFile('config', 'config', $required)) {
-                foreach ($files as $file) {
-                    if (file_exists($file)) {
-                        require $file;
-                        $found = TRUE;
-                    }
-                }
-            }
-
-            if ($found == FALSE) {
-                // Load the application configuration file
-                if (file_exists(DOCROOT . 'config/config' . EXT)) {
-                    require DOCROOT . 'config/config' . EXT;
-                    $found = TRUE;
-                }
-            }
-
-            if (!isset($config['site_domain'])) {
-                // Invalid config file
-                die('Your CF application configuration file is not valid.');
-            }
-
-            return $config;
-        }
-
-        if (isset(self::$internal_cache['configuration'][$name]))
-            return self::$internal_cache['configuration'][$name];
-
-        // Load matching configs
-        $configuration = array();
-
-        if ($files = self::findFile('config', $name, $required)) {
-            foreach ($files as $file) {
-                require $file;
-
-                if (isset($config) AND is_array($config)) {
-                    // Merge in configuration
-                    $configuration = array_merge($configuration, $config);
-                }
-            }
-        }
-
-        if (!isset(self::$write_cache['configuration'])) {
-            // Cache has changed
-            self::$write_cache['configuration'] = TRUE;
-        }
-
-        return self::$internal_cache['configuration'][$name] = $configuration;
-    }
-
-    /**
      * Add a new message to the log.
      *
      * @param   string  type of message
@@ -618,35 +490,6 @@ final class CF {
         if (class_exists('CLogger')) {
             CLogger::instance()->add($level, $message);
         }
-    }
-
-    /**
-     * Get an instance of the redirector.
-     *
-     * @param  string|null  $to
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
-     * @return CHTTP_Redirector|CHttp_RedirectResponse
-     */
-    public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
-        if (is_null($to)) {
-            return CHTTP::redirector();
-        }
-
-        return CHTTP::redirector()->to($to, $status, $headers, $secure);
-    }
-
-    /**
-     * Return a new response from the application.
-     *
-     * @param  CView|string|array|null  $content
-     * @param  int  $status
-     * @param  array  $headers
-     * @return CHTTP_Response|CHTTP_ResponseFactory
-     */
-    public static function response($content = '', $status = 200, array $headers = []) {
-        return c::response($content, $status, $headers);
     }
 
     /**
@@ -938,50 +781,6 @@ final class CF {
     }
 
     /**
-     * Lists all files and directories in a resource path.
-     *
-     * @param   string   directory to search
-     * @param   boolean  list all files to the maximum depth?
-     * @param   string   full path to search (used for recursion, *never* set this manually)
-     * @return  array    filenames and directories
-     */
-    public static function list_files($directory, $recursive = FALSE, $path = FALSE) {
-        $files = array();
-
-        if ($path === FALSE) {
-            $paths = array_reverse(self::include_paths());
-
-            foreach ($paths as $path) {
-                // Recursively get and merge all files
-                $files = array_merge($files, self::list_files($directory, $recursive, $path . $directory));
-            }
-        } else {
-            $path = rtrim($path, '/') . '/';
-
-            if (is_readable($path)) {
-                $items = (array) glob($path . '*');
-
-                if (!empty($items)) {
-                    foreach ($items as $index => $item) {
-                        $files[] = $item = str_replace('\\', '/', $item);
-
-                        // Handle recursion
-                        if (is_dir($item) AND $recursive == TRUE) {
-                            // Filename should only be the basename
-                            $item = pathinfo($item, PATHINFO_BASENAME);
-
-                            // Append sub-directory search
-                            $files = array_merge($files, self::list_files($directory, TRUE, $path . $item));
-                        }
-                    }
-                }
-            }
-        }
-
-        return $files;
-    }
-
-    /**
      * Fetch an i18n language item.
      *
      * @param   string  language key to fetch
@@ -1008,126 +807,6 @@ final class CF {
     }
 
     /**
-     * Retrieves current user agent information:
-     * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
-     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
-     *
-     * @param   string   key or test name
-     * @param   string   used with "accept" tests: user_agent(accept_lang, en)
-     * @return  array    languages and charsets
-     * @return  string   all other keys
-     * @return  boolean  all tests
-     */
-    public static function userAgent($key = 'agent', $compare = NULL) {
-        static $info;
-
-        // Return the raw string
-        if ($key === 'agent')
-            return self::$user_agent;
-
-        if ($info === NULL) {
-            // Parse the user agent and extract basic information
-            $agents = self::config('user_agents');
-
-            foreach ($agents as $type => $data) {
-                foreach ($data as $agent => $name) {
-                    if (stripos(self::$user_agent, $agent) !== FALSE) {
-                        if ($type === 'browser' AND preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', self::$user_agent, $match)) {
-                            // Set the browser version
-                            $info['version'] = $match[1];
-                        }
-
-                        // Set the agent name
-                        $info[$type] = $name;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (empty($info[$key])) {
-            switch ($key) {
-                case 'is_robot':
-                case 'is_browser':
-                case 'is_mobile':
-                    // A boolean result
-                    $return = !empty($info[substr($key, 3)]);
-                    break;
-                case 'languages':
-                    $return = array();
-                    if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                        if (preg_match_all('/[-a-z]{2,}/', strtolower(trim($_SERVER['HTTP_ACCEPT_LANGUAGE'])), $matches)) {
-                            // Found a result
-                            $return = $matches[0];
-                        }
-                    }
-                    break;
-                case 'charsets':
-                    $return = array();
-                    if (!empty($_SERVER['HTTP_ACCEPT_CHARSET'])) {
-                        if (preg_match_all('/[-a-z0-9]{2,}/', strtolower(trim($_SERVER['HTTP_ACCEPT_CHARSET'])), $matches)) {
-                            // Found a result
-                            $return = $matches[0];
-                        }
-                    }
-                    break;
-                case 'referrer':
-                    if (!empty($_SERVER['HTTP_REFERER'])) {
-                        // Found a result
-                        $return = trim($_SERVER['HTTP_REFERER']);
-                    }
-                    break;
-            }
-
-            // Cache the return value
-            isset($return) and $info[$key] = $return;
-        }
-
-        if (!empty($compare)) {
-            // The comparison must always be lowercase
-            $compare = strtolower($compare);
-
-            switch ($key) {
-                case 'accept_lang':
-                    // Check if the lange is accepted
-                    return in_array($compare, self::user_agent('languages'));
-                    break;
-                case 'accept_charset':
-                    // Check if the charset is accepted
-                    return in_array($compare, self::user_agent('charsets'));
-                    break;
-                default:
-                    // Invalid comparison
-                    return FALSE;
-                    break;
-            }
-        }
-
-        // Return the key, if set
-        return isset($info[$key]) ? $info[$key] : NULL;
-    }
-
-    /**
-     * Quick debugging of any variable. Any number of parameters can be set.
-     *
-     * @return  string
-     */
-    public static function debug() {
-        if (func_num_args() === 0)
-            return;
-
-        // Get params
-        $params = func_get_args();
-        $output = array();
-
-        foreach ($params as $var) {
-            $output[] = '<pre>(' . gettype($var) . ') ' . chtml::specialchars(print_r($var, TRUE)) . '</pre>';
-        }
-
-        return implode("\n", $output);
-    }
-
-    /**
      * Checks if given data is file, handles mixed input
      *
      * @param  mixed $value
@@ -1137,63 +816,6 @@ final class CF {
         $value = strval(str_replace("\0", "", $value));
 
         return is_file($value);
-    }
-
-    /**
-     * Displays nice backtrace information.
-     * @see http://php.net/debug_backtrace
-     *
-     * @param   array   backtrace generated by an exception or debug_backtrace
-     * @return  string
-     */
-    public static function backtrace($trace) {
-        if (!is_array($trace))
-            return;
-
-        // Final output
-        $output = array();
-
-        foreach ($trace as $entry) {
-            $temp = '<li>';
-
-            if (isset($entry['file'])) {
-                $temp .= self::lang('core.error_file_line', preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $entry['file']), $entry['line']);
-            }
-
-            $temp .= '<pre>';
-
-            if (isset($entry['class'])) {
-                // Add class and call type
-                $temp .= $entry['class'] . $entry['type'];
-            }
-
-            // Add function
-            $temp .= $entry['function'] . '( ';
-
-            // Add function args
-            if (isset($entry['args']) AND is_array($entry['args'])) {
-                // Separator starts as nothing
-                $sep = '';
-
-                while ($arg = array_shift($entry['args'])) {
-                    if (is_string($arg) AND self::isFile($arg)) {
-                        // Remove docroot from filename
-                        $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
-                    }
-
-                    $temp .= $sep . chtml::specialchars(@print_r($arg, TRUE));
-
-                    // Change separator to a comma
-                    $sep = ', ';
-                }
-            }
-
-            $temp .= ' )</pre></li>';
-
-            $output[] = $temp;
-        }
-
-        return '<ul class="backtrace">' . implode("\n", $output) . '</ul>';
     }
 
     /**
@@ -1314,13 +936,7 @@ final class CF {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        if (is_null($callback)) {
-            return new CBase_HigherOrderTapProxy($value);
-        }
-
-        $callback($value);
-
-        return $value;
+        return c::tap($value, $callback);
     }
 
     /**
@@ -1340,17 +956,7 @@ final class CF {
      * @return array
      */
     public static function classUsesRecursive($class) {
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
-
-        $results = [];
-
-        foreach (array_merge([$class => $class], class_parents($class)) as $class) {
-            $results += self::trait_uses_recursive($class);
-        }
-
-        return array_unique($results);
+        return c::classUsesRecursive($class);
     }
 
     /**
@@ -1360,13 +966,7 @@ final class CF {
      * @return array
      */
     public static function traitUsesRecursive($trait) {
-        $traits = class_uses($trait);
-
-        foreach ($traits as $trait) {
-            $traits += self::traitUsesRecursive($trait);
-        }
-
-        return $traits;
+        return c::traitUsesRecursive($trait);
     }
 
     /**
@@ -1376,7 +976,7 @@ final class CF {
      * @return mixed
      */
     public static function value($value) {
-        return $value instanceof Closure ? $value() : $value;
+        return c::value($value);
     }
 
     /**
@@ -1473,54 +1073,7 @@ final class CF {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return new CCollection($value);
-    }
-
-    /**
-     * Return the given value, optionally passed through the given callback.
-     *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @return mixed
-     */
-    public static function with($value, callable $callback = null) {
-        return is_null($callback) ? $value : $callback($value);
-    }
-
-    /**
-     * Determine if a value is "filled".
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    public static function filled($value) {
-        return !static::blank($value);
-    }
-
-    /**
-     * Determine if the given value is "blank".
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    public static function blank($value) {
-        if (is_null($value)) {
-            return true;
-        }
-
-        if (is_string($value)) {
-            return trim($value) === '';
-        }
-
-        if (is_numeric($value) || is_bool($value)) {
-            return false;
-        }
-
-        if ($value instanceof Countable) {
-            return count($value) === 0;
-        }
-
-        return empty($value);
+        return c::collect($value);
     }
 
     /**
@@ -1553,47 +1106,6 @@ final class CF {
 
     public static function currentController() {
         return CHTTP::kernel()->controller();
-    }
-
-    /**
-     * Dispatch an event and call the listeners.
-     *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @param  bool  $halt
-     * @return array|null
-     */
-    public static function event(...$args) {
-        return CEvent::dispatcher()->dispatch(...$args);
-    }
-
-    /**
-     * Create a new Carbon instance for the current time.
-     *
-     * @param  \DateTimeZone|string|null  $tz
-     * @return CCarbon
-     */
-    public static function now($tz = null) {
-        return CCarbon::now($tz);
-    }
-
-    /**
-     * Create a new Validator instance.
-     *
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
-     * @return CValidation_Validator|CValidation_Factory
-     */
-    public static function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = []) {
-        $factory = CValidation_Factory::instance();
-
-        if (func_num_args() === 0) {
-            return $factory;
-        }
-
-        return $factory->make($data, $rules, $messages, $customAttributes);
     }
 
     /**

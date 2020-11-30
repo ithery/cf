@@ -100,7 +100,7 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
                     return in_array($key, ['APP_ENV', 'LARAVEL_SAIL']) ? [$key => $value] : [$key => false];
                 })->all();
 
-        $process = new Process($this->serverCommand(), null, $env);
+        $process = new Process($this->serverCommand(), null, $env = null);
         $process->start(function ($type, $buffer) {
             $this->output->write($buffer);
         });
@@ -114,6 +114,11 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      * @return array
      */
     protected function serverCommand() {
+        return [
+            (new PhpExecutableFinder)->find(false),
+            '-S',
+            $this->host() . ':' . $this->port(),
+        ];
         return [
             (new PhpExecutableFinder)->find(false),
             '-S',

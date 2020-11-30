@@ -173,7 +173,7 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      * @return \Crypt_RSA
      */
     protected function loadRsaKey(array $auth) {
-        CF::with($key = $this->getKey($auth))->load($this->readRsaKey($auth));
+        c::with($key = $this->getKey($auth))->load($this->readRsaKey($auth));
 
         return $key;
     }
@@ -186,7 +186,7 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      * @return \Crypt_RSA
      */
     protected function getKey(array $auth) {
-        CF::with($key = $this->getNewKey())->setPassword(carr::get($auth, 'keyphrase'));
+        c::with($key = $this->getNewKey())->setPassword(carr::get($auth, 'keyphrase'));
 
         return $key;
     }

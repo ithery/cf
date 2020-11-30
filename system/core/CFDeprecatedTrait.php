@@ -271,6 +271,7 @@ trait CFDeprecatedTrait {
      * @return  array    languages and charsets
      * @return  string   all other keys
      * @return  boolean  all tests
+     * @deprecated
      */
     public static function user_agent($key = 'agent', $compare = NULL) {
         return static::userAgent($key, $compare);
@@ -283,6 +284,7 @@ trait CFDeprecatedTrait {
      * @param   string  dot-noted string: foo.bar.baz
      * @return  string  if the key is found
      * @return  void    if the key is not found
+     * @deprecated
      */
     public static function key_string($array, $keys) {
         if (empty($array))
@@ -296,7 +298,7 @@ trait CFDeprecatedTrait {
             $key = array_shift($keys);
 
             if (isset($array[$key])) {
-                if (is_array($array[$key]) AND ! empty($keys)) {
+                if (is_array($array[$key]) AND!empty($keys)) {
                     // Dig down to prepare the next loop
                     $array = $array[$key];
                 } else {
@@ -319,6 +321,7 @@ trait CFDeprecatedTrait {
      * @param   string  dot-noted string: foo.bar.baz
      * @return  mixed   fill value for the key
      * @return  void
+     * @deprecated
      */
     public static function key_string_set(& $array, $keys, $fill = NULL) {
         if (is_object($array) AND ( $array instanceof ArrayObject)) {
@@ -371,6 +374,344 @@ trait CFDeprecatedTrait {
             // Swap the array back in
             $array->exchangeArray($array_copy);
         }
+    }
+
+    /**
+     * Retrieves current user agent information:
+     * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
+     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
+     *
+     * @param   string   key or test name
+     * @param   string   used with "accept" tests: user_agent(accept_lang, en)
+     * @return  array    languages and charsets
+     * @return  string   all other keys
+     * @return  boolean  all tests
+     * @deprecated
+     */
+    public static function userAgent($key = 'agent', $compare = NULL) {
+        static $info;
+
+        // Return the raw string
+        if ($key === 'agent')
+            return self::$user_agent;
+
+        if ($info === NULL) {
+            // Parse the user agent and extract basic information
+            $agents = self::config('user_agents');
+
+            foreach ($agents as $type => $data) {
+                foreach ($data as $agent => $name) {
+                    if (stripos(self::$user_agent, $agent) !== FALSE) {
+                        if ($type === 'browser' AND preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', self::$user_agent, $match)) {
+                            // Set the browser version
+                            $info['version'] = $match[1];
+                        }
+
+                        // Set the agent name
+                        $info[$type] = $name;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (empty($info[$key])) {
+            switch ($key) {
+                case 'is_robot':
+                case 'is_browser':
+                case 'is_mobile':
+                    // A boolean result
+                    $return = !empty($info[substr($key, 3)]);
+                    break;
+                case 'languages':
+                    $return = array();
+                    if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                        if (preg_match_all('/[-a-z]{2,}/', strtolower(trim($_SERVER['HTTP_ACCEPT_LANGUAGE'])), $matches)) {
+                            // Found a result
+                            $return = $matches[0];
+                        }
+                    }
+                    break;
+                case 'charsets':
+                    $return = array();
+                    if (!empty($_SERVER['HTTP_ACCEPT_CHARSET'])) {
+                        if (preg_match_all('/[-a-z0-9]{2,}/', strtolower(trim($_SERVER['HTTP_ACCEPT_CHARSET'])), $matches)) {
+                            // Found a result
+                            $return = $matches[0];
+                        }
+                    }
+                    break;
+                case 'referrer':
+                    if (!empty($_SERVER['HTTP_REFERER'])) {
+                        // Found a result
+                        $return = trim($_SERVER['HTTP_REFERER']);
+                    }
+                    break;
+            }
+
+            // Cache the return value
+            isset($return) and $info[$key] = $return;
+        }
+
+        if (!empty($compare)) {
+            // The comparison must always be lowercase
+            $compare = strtolower($compare);
+
+            switch ($key) {
+                case 'accept_lang':
+                    // Check if the lange is accepted
+                    return in_array($compare, self::user_agent('languages'));
+                    break;
+                case 'accept_charset':
+                    // Check if the charset is accepted
+                    return in_array($compare, self::user_agent('charsets'));
+                    break;
+                default:
+                    // Invalid comparison
+                    return FALSE;
+                    break;
+            }
+        }
+
+        // Return the key, if set
+        return isset($info[$key]) ? $info[$key] : NULL;
+    }
+
+    /**
+     * Load a config file.
+     *
+     * @param   string   config filename, without extension
+     * @param   boolean  is the file required?
+     * @return  array
+     * @deprecated
+     */
+    public static function config_load($name, $required = TRUE) {
+        if ($name === 'core') {
+            $found = FALSE;
+
+            // find config file at all available paths
+            if ($files = self::findFile('config', 'config', $required)) {
+                foreach ($files as $file) {
+                    if (file_exists($file)) {
+                        require $file;
+                        $found = TRUE;
+                    }
+                }
+            }
+
+            if ($found == FALSE) {
+                // Load the application configuration file
+                if (file_exists(DOCROOT . 'config/config' . EXT)) {
+                    require DOCROOT . 'config/config' . EXT;
+                    $found = TRUE;
+                }
+            }
+
+            if (!isset($config['site_domain'])) {
+                // Invalid config file
+                die('Your CF application configuration file is not valid.');
+            }
+
+            return $config;
+        }
+
+        if (isset(self::$internal_cache['configuration'][$name]))
+            return self::$internal_cache['configuration'][$name];
+
+        // Load matching configs
+        $configuration = array();
+
+        if ($files = self::findFile('config', $name, $required)) {
+            foreach ($files as $file) {
+                require $file;
+
+                if (isset($config) AND is_array($config)) {
+                    // Merge in configuration
+                    $configuration = array_merge($configuration, $config);
+                }
+            }
+        }
+
+        if (!isset(self::$write_cache['configuration'])) {
+            // Cache has changed
+            self::$write_cache['configuration'] = TRUE;
+        }
+
+        return self::$internal_cache['configuration'][$name] = $configuration;
+    }
+
+    /**
+     * Sets a configuration item, if allowed.
+     *
+     * @param   string   config key string
+     * @param   string   config value
+     * @return  boolean
+     * @deprecated
+     */
+    public static function config_set($key, $value) {
+        // Do this to make sure that the config array is already loaded
+        self::config($key);
+
+        if (substr($key, 0, 7) === 'routes.') {
+            // Routes cannot contain sub keys due to possible dots in regex
+            $keys = explode('.', $key, 2);
+        } else {
+            // Convert dot-noted key string to an array
+            $keys = explode('.', $key);
+        }
+
+        // Used for recursion
+        $conf = & self::$configuration;
+        $last = count($keys) - 1;
+
+        foreach ($keys as $i => $k) {
+            if ($i === $last) {
+                $conf[$k] = $value;
+            } else {
+                $conf = & $conf[$k];
+            }
+        }
+
+        if ($key === 'core.modules') {
+            // Reprocess the include paths
+            self::include_paths(TRUE);
+        }
+
+        return TRUE;
+    }
+
+    /**
+     * Displays nice backtrace information.
+     * @see http://php.net/debug_backtrace
+     *
+     * @param   array   backtrace generated by an exception or debug_backtrace
+     * @return  string
+     * @deprecated
+     */
+    public static function backtrace($trace) {
+        if (!is_array($trace))
+            return;
+
+        // Final output
+        $output = array();
+
+        foreach ($trace as $entry) {
+            $temp = '<li>';
+
+            if (isset($entry['file'])) {
+                $temp .= self::lang('core.error_file_line', preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $entry['file']), $entry['line']);
+            }
+
+            $temp .= '<pre>';
+
+            if (isset($entry['class'])) {
+                // Add class and call type
+                $temp .= $entry['class'] . $entry['type'];
+            }
+
+            // Add function
+            $temp .= $entry['function'] . '( ';
+
+            // Add function args
+            if (isset($entry['args']) AND is_array($entry['args'])) {
+                // Separator starts as nothing
+                $sep = '';
+
+                while ($arg = array_shift($entry['args'])) {
+                    if (is_string($arg) AND self::isFile($arg)) {
+                        // Remove docroot from filename
+                        $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
+                    }
+
+                    $temp .= $sep . chtml::specialchars(@print_r($arg, TRUE));
+
+                    // Change separator to a comma
+                    $sep = ', ';
+                }
+            }
+
+            $temp .= ' )</pre></li>';
+
+            $output[] = $temp;
+        }
+
+        return '<ul class="backtrace">' . implode("\n", $output) . '</ul>';
+    }
+
+    /**
+     * Lists all files and directories in a resource path.
+     *
+     * @param   string   directory to search
+     * @param   boolean  list all files to the maximum depth?
+     * @param   string   full path to search (used for recursion, *never* set this manually)
+     * @return  array    filenames and directories
+     * @deprecated
+     */
+    public static function list_files($directory, $recursive = FALSE, $path = FALSE) {
+        $files = array();
+
+        if ($path === FALSE) {
+            $paths = array_reverse(self::include_paths());
+
+            foreach ($paths as $path) {
+                // Recursively get and merge all files
+                $files = array_merge($files, self::list_files($directory, $recursive, $path . $directory));
+            }
+        } else {
+            $path = rtrim($path, '/') . '/';
+
+            if (is_readable($path)) {
+                $items = (array) glob($path . '*');
+
+                if (!empty($items)) {
+                    foreach ($items as $index => $item) {
+                        $files[] = $item = str_replace('\\', '/', $item);
+
+                        // Handle recursion
+                        if (is_dir($item) AND $recursive == TRUE) {
+                            // Filename should only be the basename
+                            $item = pathinfo($item, PATHINFO_BASENAME);
+
+                            // Append sub-directory search
+                            $files = array_merge($files, self::list_files($directory, TRUE, $path . $item));
+                        }
+                    }
+                }
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * 
+     * @param type $domain
+     * @return type
+     * @deprecated
+     */
+    public static function domain_data($domain) {
+        $data = CFData::get($domain, 'domain');
+        $result = array();
+        $result['app_id'] = '';
+        $result['app_code'] = '';
+        $result['org_id'] = '';
+        $result['org_code'] = '';
+        $result['store_id'] = '';
+        $result['store_code'] = '';
+        $result['shared_app_code'] = array();
+        $result['theme'] = '';
+
+        if ($data != null) {
+            $result['app_id'] = isset($data['app_id']) ? $data['app_id'] : null;
+            $result['app_code'] = isset($data['app_code']) ? $data['app_code'] : null;
+            $result['org_id'] = isset($data['org_id']) ? $data['org_id'] : null;
+            $result['org_code'] = isset($data['org_code']) ? $data['org_code'] : null;
+            $result['store_id'] = isset($data['store_id']) ? $data['store_id'] : null;
+            $result['store_code'] = isset($data['store_code']) ? $data['store_code'] : null;
+            $result['shared_app_code'] = isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
+            $result['theme'] = isset($data['theme']) ? $data['theme'] : null;
+        }
+        return $result;
     }
 
 }

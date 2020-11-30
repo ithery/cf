@@ -337,7 +337,7 @@ class c {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return CF::collect($value);
+        return new CCollection($value);
     }
 
     /**
@@ -348,7 +348,13 @@ class c {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        return CF::tap($value, $callback);
+        if (is_null($callback)) {
+            return new CBase_HigherOrderTapProxy($value);
+        }
+
+        $callback($value);
+
+        return $value;
     }
 
     /**
@@ -487,7 +493,7 @@ class c {
      * @return CCarbon
      */
     public static function now($tz = null) {
-        return CF::now($tz);
+        return CCarbon::now($tz);
     }
 
     public static function hrtime($getAsNumber = false) {
@@ -803,6 +809,59 @@ class c {
         }
 
         return $factory->make($content, $status, $headers);
+    }
+
+    /**
+     * Determine if the given value is "blank".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function blank($value) {
+        if (is_null($value)) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Countable) {
+            return count($value) === 0;
+        }
+
+        return empty($value);
+    }
+
+    /**
+     * Determine if a value is "filled".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function filled($value) {
+        return !static::blank($value);
+    }
+
+    /**
+     * Get an instance of the redirector.
+     *
+     * @param  string|null  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @return CHTTP_Redirector|CHttp_RedirectResponse
+     */
+    public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
+        if (is_null($to)) {
+            return CHTTP::redirector();
+        }
+
+        return CHTTP::redirector()->to($to, $status, $headers, $secure);
     }
 
 }
