@@ -181,12 +181,12 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
         if ($this->isHttpException($e)) {
             if (CView::exists('errors/http/' . $e->getStatusCode())) {
-                return CF::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
+                return c::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
             } else {
                 if ($e->getStatusCode() == 404) {
                     //backward compatibility old view
                     if (CView::exists('ccore/404')) {
-                        return CF::response()->view('ccore/404', [], $e->getStatusCode());
+                        return c::response()->view('ccore/404', [], $e->getStatusCode());
                     }
                 }
             }
