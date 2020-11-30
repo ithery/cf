@@ -28,7 +28,7 @@ class CView {
      */
     public static function factory($name = NULL, $data = [], $mergeData = []) {
         if ($name == null) {
-            return CView_factory::instance();
+            return CView_Factory::instance();
         }
         return CView_Factory::instance()->make($name, $data);
         //return new CView($name, $data, $type);
@@ -44,14 +44,14 @@ class CView {
         return CView_Factory::instance()->exists($name);
     }
 
-    
     public static function blade() {
-        return CView_Compiler_BladeCompiler::instance(); 
+        return CView_Compiler_BladeCompiler::instance();
     }
-    
+
     public static function engineResolver() {
         return CView_EngineResolver::instance();
     }
+
 }
 
 // End CView

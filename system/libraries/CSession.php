@@ -149,7 +149,7 @@ class CSession {
 
         // Start the session!
         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+            @session_start();
         }
 
         // Put session_id in the session variable

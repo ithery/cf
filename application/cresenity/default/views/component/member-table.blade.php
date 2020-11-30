@@ -18,9 +18,7 @@
         <div class="col">
             <a cf:click="doEvent" class="btn btn-primary">Emit Event</a>
         </div>
-        <div class="col" cf:poll.1s>
-            Current time: {{ c::now() }}
-        </div>
+        
     </div>
 
     <div class="row">

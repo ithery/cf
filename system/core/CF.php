@@ -346,6 +346,18 @@ final class CF {
     }
 
     /**
+     * Displays a 404 page.
+     *
+     * @throws  C_404_Exception
+     * @param   string  URI of page
+     * @param   string  custom template
+     * @return  void
+     */
+    public static function show404($page = FALSE, $template = FALSE) {
+        return c::abort(404);
+    }
+
+    /**
      * 
      * @param type $directory
      * @param type $domain
@@ -634,7 +646,7 @@ final class CF {
      * @return CHTTP_Response|CHTTP_ResponseFactory
      */
     public static function response($content = '', $status = 200, array $headers = []) {
-        return c::response($content,$status,$headers);
+        return c::response($content, $status, $headers);
     }
 
     /**
