@@ -1,1 +1,0 @@
-<?phpreturn array(    array(        "name" => "ftp",        "label" => "FTP",        "controller" => "ftp",        "method" => "index",    ),);
