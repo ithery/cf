@@ -2,8 +2,8 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-define('CF_VERSION', '1.0');
-define('CF_CODENAME', 'CF1.0');
+define('CF_VERSION', '1.1');
+define('CF_CODENAME', 'CF1.1');
 
 // Test of CF is running in Windows
 define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');
