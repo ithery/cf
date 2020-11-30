@@ -1,9 +1,6 @@
 <?php
 
 return array(
-    "json2" => array(
-        "js" => array("libs" . DS . "json2.js"),
-    ),
     "excanvas" => array(
         "js" => array("libs" . DS . "excanvas.min.js"),
     ),
