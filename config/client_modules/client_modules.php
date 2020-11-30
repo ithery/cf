@@ -27,16 +27,8 @@ return array(
             "libs" . DS . "axios.min.js",
         ),
     ),
-    "underscore" => array(
-        "js" => array(
-            "libs" . DS . "underscore.min.js",
-        ),
-    ),
     "jquery" => array(
-        "js" => array("libs" . DS . "jquery.min.js"),
-    ),
-    "jquery-2.1.1" => array(
-        "js" => array("libs/jquery-2.1.1.min.js"),
+        "js" => array("libs" . DS . "jquery-3.5.1.min.js"),
     ),
     "bootstrap" => array(
         "js" => array("libs" . DS . "bootstrap.min.js"),
@@ -55,10 +47,6 @@ return array(
     "jquery.ui" => array(
         "js" => array("libs" . DS . "jquery.ui.custom.js"),
         "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery.ui.theme.css"),
-    ),
-    "jquery-ui-1.12.1" => array(
-        "js" => array("libs" . DS . "jquery-ui-1.12.1.min.js"),
-        "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.min.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.theme.min.css"),
     ),
     "jquery-ui-1.12.1.custom" => array(
         "js" => array("libs" . DS . "jquery-ui-1.12.1.custom" . DS . "jquery-ui.min.js"),
@@ -139,21 +127,11 @@ return array(
         "js" => array("plugins" . DS . "vkeyboard" . DS . "bootstrap-vkeyboard.js"),
         "css" => array("plugins" . DS . "vkeyboard" . DS . "bootstrap-vkeyboard.css"),
     ),
-    "mockjax" => array(
-        "js" => array("plugins" . DS . "mockjax" . DS . "jquery.mockjax.js"),
-    ),
     "jquery-autocomplete" => array(
         "js" => array("plugins" . DS . "jquery-autocomplete" . DS . "jquery-autocomplete.js"),
     ),
     "fileupload" => array(
         "js" => array("plugins" . DS . "fileupload" . DS . "bootstrap-fileupload.min.js"),
-    ),
-    "jquery-fileupload" => array(
-        "js" => array(
-            "plugins" . DS . "jquery-fileupload" . DS . "jquery.ui.widget.js",
-            "plugins" . DS . "jquery-fileupload" . DS . "jquery.iframe-transport.js",
-            "plugins" . DS . "jquery-fileupload" . DS . "jquery.fileupload.js",
-        ),
     ),
     "peity" => array(
         "js" => array("plugins" . DS . "peity" . DS . "jquery.peity.min.js"),
@@ -239,20 +217,6 @@ return array(
     "easing" => array(
         "js" => array("plugins" . DS . "easing" . DS . "jquery-easing-1.3.js"),
     ),
-    "plupload" => array(
-        "js" => array(
-            "plugins" . DS . "plupload" . DS . "plupload.full.js",
-            "plugins" . DS . "plupload" . DS . "jquery.plupload.queue.js",
-        ),
-        "css" => array("plugins" . DS . "plupload" . DS . "jquery.plupload.queue.css"),
-    ),
-    "servertime" => array(
-        "js" => array("plugins" . DS . "servertime" . DS . "jquery.servertime.js"),
-    ),
-    "uniform" => array(
-        "js" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.js"),
-        "css" => array("plugins" . DS . "uniform" . DS . "jquery-uniform.css"),
-    ),
     "select2_v4" => array(
         "js" => array("plugins" . DS . "select2" . DS . "select2_v4.js"),
         "css" => array("plugins" . DS . "select2" . DS . "select2_v4.css"),
@@ -320,11 +284,6 @@ return array(
     "dropzone" => array(
         "js" => array("plugins" . DS . "dropzone" . DS . "dropzone.js"),
         "css" => array("plugins" . DS . "dropzone" . DS . "dropzone.css"),
-    ),
-    "dhtmlxgantt" => array(
-        "js" => array("plugins" . DS . "dhtmlxgantt" . DS . "dhtmlxgantt.js?v=1"),
-//            "js" => array("http://docs.dhtmlx.com/gantt/codebase/dhtmlxgantt.js"),
-        "css" => array("plugins" . DS . "dhtmlxgantt" . DS . "dhtmlxgantt.css"),
     ),
     "bootstrap-3.3.5" => array(
         "css" => array(
@@ -405,14 +364,6 @@ return array(
             "plugins/slick/slick-theme.css",
         ),
     ),
-    "icheck" => array(
-        "js" => array(
-            "plugins/icheck/icheck.min.js",
-        ),
-        "css" => array(
-            "plugins/iCheck1.0.1/all.css",
-        ),
-    ),
     "datepicker_material" => array(
         "css" => array(
             "plugins/datepicker_material/bootstrap-material-datetimepicker.css",
@@ -430,15 +381,6 @@ return array(
             "plugins/fullcalendar/fullcalendar.min.js",
         ),
     ),
-    "iapp" => array(
-        "css" => array(
-            "sidebar.less",
-//            "skins/skin-blue.min.css",
-//            "skins/skin-blue-light.min.css",
-            "skins/_all-skins.min.css",
-            "iapp.min.css",
-        )
-    ),
     "swiper" => array(
         "css" => array(
             "materialize/swiper/swiper.min.css",
@@ -450,11 +392,6 @@ return array(
     "pace" => array(
         "js" => array(
             "plugins/pace/pace.js",
-        ),
-    ),
-    "metis-menu" => array(
-        "js" => array(
-            "plugins/metisMenu/jquery.metisMenu.js",
         ),
     ),
     "animate" => array(
@@ -645,11 +582,6 @@ return array(
         ),
         "js" => array(
             "plugins/morris/morris.js",
-        ),
-    ),
-    "eve" => array(
-        "js" => array(
-            "plugins/eve/eve.js",
         ),
     ),
     "raphael" => array(
