@@ -76,6 +76,9 @@ trait CApp_Trait_App_View {
     }
 
     public function isUsingBlade() {
+        if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
+            return false;
+        }
         if ($view = $this->getView()) {
 
 

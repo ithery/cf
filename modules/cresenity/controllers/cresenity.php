@@ -73,7 +73,7 @@ class Controller_Cresenity extends CController {
     }
 
     public function change_theme($theme) {
-        ctheme::set_theme($theme);
+        CManager::theme()->setTheme($theme);
         curl::redirect(request::referrer());
     }
 
@@ -104,43 +104,11 @@ class Controller_Cresenity extends CController {
             }
 
 
-            /*
-              if($error==0) {
-              if(strlen($captcha)==0) {
-              $error++;
-              $error_message = "Captcha required";
-              }
-              }
 
-              if($error==0) {
-              $cap_session = $session->get("captcha");
-              if($cap_session!=md5($captcha)."a4xn") {
-              $error++;
-              $error_message = "Verification code invalid".($cap_session);
-
-              }
-              }
-             */
             if ($error == 0) {
                 try {
                     $success_login = false;
-                    //try for superadmin first
-                    /*
-                      if(!$success_login) {
-                      $cdb = CJDB::instance();
-                      $row = $cdb->get('org',array('email'=>$email,'password'=>md5($password)));
-                      if ($row->count()>0){
-                      $data = array(
-                      'username'=>$row[0]->email,
-                      'password'=>$row[0]->password,
-                      'org_id'=>$row[0]->org_id,
-                      );
-                      $data = json_decode(json_encode($data));
-                      $session->set('user',$data);
-                      $success_login = true;
-                      }
-                      }
-                     */
+
                     if (!$success_login) {
                         $additionalWhere = "";
                         if (CApp_Base::isDevelopment() || CApp_Base::isStaging()) {
