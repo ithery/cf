@@ -38,10 +38,11 @@ class CComponent_ComponentCompilerEngine extends CComponent_CompilerEngine {
         // flush out any stray output that might get out before an error occurs or
         // an exception is thrown. This prevents any partial views from leaking.
         try {
-            \Closure::bind(function() use($__path, $__data) {
+            $closure = \Closure::bind(function() use($__path, $__data) {
                 extract($__data, EXTR_SKIP);
                 include $__path;
-            }, $this->component ? $this->component : $this)();
+            }, $this->component ? $this->component : $this);
+            call_user_func($closure);
         } catch (Exception $e) {
             $this->handleViewException($e, $obLevel);
         } catch (Throwable $e) {
