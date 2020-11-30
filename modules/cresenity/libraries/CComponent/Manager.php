@@ -54,14 +54,18 @@ class CComponent_Manager {
         $finder = CComponent_Finder::instance();
 
         $class = false;
-
+        $class = carr::get($this->componentAliases, $alias);
+        if(!$class) {
+            cdbg::traceDump();
+            cdbg::dd($class);
+        }
         $class = $class ?: (
                 // Let's first check if the user registered the component using:
                 // Livewire::component('name', [Livewire component class]);
                 // If not, we'll look in the auto-discovery manifest.
                 carr::get($this->componentAliases, $alias, $finder->find($alias))
                 );
-
+       
         $class = $class ?: (
                 // If none of the above worked, our last-ditch effort will be
                 // to re-generate the auto-discovery manifest and look again.
