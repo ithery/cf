@@ -27,3 +27,4 @@ CApp::component()->registerComponent('counter', \Cresenity\Component\Counter::cl
 
 CApp::component()->registerComponent('member-table', \Cresenity\Testing\MemberTableComponent::class);
 CApp::component()->registerComponent('test-validate', \Cresenity\Testing\ValidateTestComponent::class);
+CApp::component()->registerComponent('test-upload', \Cresenity\Testing\UploadTestComponent::class);

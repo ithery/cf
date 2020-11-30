@@ -237,11 +237,11 @@ final class CF {
     private static function loadBootstrapFiles() {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_bootstrap');
 
-        
+
         $bootstrapPath = DOCROOT . 'system' . DS;
-            if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
-                include $bootstrapPath . 'bootstrap' . EXT;
-            }
+        if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
+            include $bootstrapPath . 'bootstrap' . EXT;
+        }
         //try to locate bootstrap files for modules 
         foreach (CF::modules() as $module) {
             $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;
@@ -259,7 +259,7 @@ final class CF {
 
 
         //try to locate bootstrap files for org
-        if(strlen(CF::orgCode())>0) {
+        if (strlen(CF::orgCode()) > 0) {
             $bootstrapPath .= CF::orgCode() . DS;
             if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
                 include $bootstrapPath . 'bootstrap' . EXT;
@@ -609,68 +609,6 @@ final class CF {
     }
 
     /**
-     * Displays a 404 page.
-     *
-     * @throws  C_404_Exception
-     * @param   string  URI of page
-     * @param   string  custom template
-     * @return  void
-     */
-    public static function show404($page = FALSE, $template = FALSE) {
-        return CF::abort(404);
-    }
-
-    public static function abort($code, $message = '', array $headers = []) {
-        if ($code instanceof CHTTP_Response) {
-            throw new CHttp_Exception_ResponseException($code);
-        } elseif ($code instanceof CInterface_Responsable) {
-            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
-        }
-
-        if ($code == 404) {
-            throw new CHTTP_Exception_NotFoundHttpException($message);
-        }
-
-        throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
-    }
-
-    /**
-     * Throw an HttpException with the given data if the given condition is true.
-     *
-     * @param  bool  $boolean
-     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
-     * @param  string  $message
-     * @param  array  $headers
-     * @return void
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public static function abortIf($boolean, $code, $message = '', array $headers = []) {
-        if ($boolean) {
-            static::abort($code, $message, $headers);
-        }
-    }
-
-    /**
-     * Throw an HttpException with the given data unless the given condition is true.
-     *
-     * @param  bool  $boolean
-     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
-     * @param  string  $message
-     * @param  array  $headers
-     * @return void
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public static function abortUnless($boolean, $code, $message = '', array $headers = []) {
-        if (!$boolean) {
-            static::abort($code, $message, $headers);
-        }
-    }
-
-    /**
      * Get an instance of the redirector.
      *
      * @param  string|null  $to
@@ -696,13 +634,7 @@ final class CF {
      * @return CHTTP_Response|CHTTP_ResponseFactory
      */
     public static function response($content = '', $status = 200, array $headers = []) {
-        $factory = CHTTP::responseFactory();
-
-        if (func_num_args() === 0) {
-            return $factory;
-        }
-
-        return $factory->make($content, $status, $headers);
+        return c::response($content,$status,$headers);
     }
 
     /**
@@ -1044,7 +976,7 @@ final class CF {
      * @param   array   additional information to insert into the line
      * @return  string  i18n language string, or the requested key if the i18n item is not found
      */
-    public static function lang($key = null, array $args = array()) {
+    public static function lang($key = null, array $args = array(), $locale = null) {
         if ($key == null) {
             return CTranslation::translator();
         }
@@ -1680,11 +1612,15 @@ final class CF {
         }
         return DOCROOT . 'application' . DS . $appCode;
     }
-    
+
     public static function isDevSuite() {
         return cstr::endsWith(CF::domain(), '.test');
     }
-    
+
+    public static function isTesting() {
+        //TODO: this should be true when CF is running in phpunit
+        return false;
+    }
 
 }
 

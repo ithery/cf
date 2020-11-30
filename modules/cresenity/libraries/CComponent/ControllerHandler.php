@@ -28,7 +28,9 @@ class CComponent_ControllerHandler {
     }
 
     public function execute($payload) {
-        return $this->handler->__invoke($payload);
+
+        $response = $this->handler->__invoke($payload);
+        return $response;
     }
 
 }

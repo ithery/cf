@@ -37,14 +37,14 @@ abstract class CComponent {
         $componentParams = (new ImplicitRouteBinding($container))
                 ->resolveAllParameters($route, $this);
 
-        $manager = LifecycleManager::fromInitialInstance($this)
+        $manager = CComponent_LifecycleManager::fromInitialInstance($this)
                 ->initialHydrate()
                 ->mount($componentParams)
                 ->renderToView();
 
         $layoutType = isset($this->initialLayoutConfiguration['type']) ? $this->initialLayoutConfiguration['type'] : 'component';
 
-        return app('view')->file(__DIR__ . "/Macros/livewire-view-{$layoutType}.blade.php", [
+        return CView::factory()->file(__DIR__ . "/Macros/livewire-view-{$layoutType}.blade.php", [
                     'view' => isset($this->initialLayoutConfiguration['view']) ? $this->initialLayoutConfiguration['view'] : 'layouts.app',
                     'params' => isset($this->initialLayoutConfiguration['params']) ? $this->initialLayoutConfiguration['params'] : [],
                     'slotOrSection' => isset($this->initialLayoutConfiguration['slotOrSection']) ? $this->initialLayoutConfiguration['slotOrSection'] : [

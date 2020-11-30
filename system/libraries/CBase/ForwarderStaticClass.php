@@ -15,7 +15,7 @@ class CBase_ForwarderStaticClass {
         $this->class = $class;
     }
 
-    public function __call($name, $arguments) {
+    public function __call($method, $arguments) {
         return call_user_func_array([$this->class, $method], $arguments);
     }
 

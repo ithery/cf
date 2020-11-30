@@ -13,7 +13,15 @@ Class Controller_Home extends CController {
 
         return CF::response()->view('welcome');
     }
-    
+
+    public function upload() {
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
+        CManager::registerModule('bootstrap-4');
+        $app->setViewName('test.upload');
+        return $app;
+    }
+
     public function validate() {
         $app = CApp::instance();
         $app->setLoginRequired(false);
@@ -36,7 +44,7 @@ Class Controller_Home extends CController {
         $app->setLoginRequired(false);
         $app->setViewName('test');
         $app->setTheme('cfdocs');
-        
+
 
         $app->addView('member', [
             'members' => \Cresenity\Testing\MemberModel::all()
@@ -44,29 +52,27 @@ Class Controller_Home extends CController {
 
         return $app;
     }
-    
+
     public function component() {
         $app = CApp::instance();
         $app->setLoginRequired(false);
         $app->setViewName('test');
         $app->setTheme('cfdocs');
         /*
-        CManager::registerModule('jquery-3.2.1');
+          CManager::registerModule('jquery-3.2.1');
          *  
          */
         CManager::registerModule('bootstrap-4');
-       
+
         //$div = $app->addDiv()->setAttr('style','width:100px');
         //$div->addComponent('member-table');
-        
         //$template = $app->addTemplate()->setTemplate('testing');
-        
 
-        
-        
+
+
+
         return $app;
     }
-
 
     public function child() {
         return CF::response()->view('child');

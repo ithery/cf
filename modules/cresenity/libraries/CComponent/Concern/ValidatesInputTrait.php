@@ -134,7 +134,7 @@ trait CComponent_Concern_ValidatesInputTrait {
         $data = $this->prepareForValidation(
                 $this->getDataForValidation($rules)
         );
-
+        
         $validator = CValidation::createValidator($data, $rules, $messages, $attributes);
 
         $this->shortenModelAttributes($data, $rules, $validator);

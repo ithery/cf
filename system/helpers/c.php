@@ -610,13 +610,31 @@ class c {
     }
 
     /**
-     * 
-     * @param type $key
-     * @param type $args
-     * @return type
+     * Translate the given message.
+     *
+     * @param  string|null  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return CTranslation_Translator|string|array|null
      */
-    public static function __($key, $args = []) {
-        return CF::lang($key, $args);
+    public static function trans($key = null, $replace = [], $locale = null) {
+        return CF::lang($key, $replace, $locale);
+    }
+
+    /**
+     * Translate the given message.
+     *
+     * @param  string|null  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return string|array|null
+     */
+    function __($key = null, $replace = [], $locale = null) {
+        if (is_null($key)) {
+            return $key;
+        }
+
+        return static::trans($key, $replace, $locale);
     }
 
     /**
@@ -624,6 +642,167 @@ class c {
      */
     public static function session() {
         return CSession::instance();
+    }
+
+    /**
+     * Generate a url for the application.
+     *
+     * @param  string|null  $path
+     * @param  mixed  $parameters
+     * @param  bool|null  $secure
+     * @return CRouting_UrlGenerator|string
+     */
+    public static function url($path = null, $parameters = [], $secure = null) {
+        if (is_null($path)) {
+            return CRouting::urlGenerator();
+        }
+
+        return CRouting::urlGenerator()->to($path, $parameters, $secure);
+    }
+
+    /**
+     * @return CStorage
+     */
+    public static function storage() {
+        return CStorage::instance();
+    }
+
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return CValidation_Validator|CValidation_Factory
+     */
+    public static function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = []) {
+        $factory = CValidation::factory();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($data, $rules, $messages, $customAttributes);
+    }
+
+    /**
+     * Get the evaluated view contents for the given view.
+     *
+     * @param  string|null  $view
+     * @param  CInterface_Arrayable|array  $data
+     * @param  array  $mergeData
+     * @return CView_View|CView_Factory
+     */
+    function view($view = null, $data = [], $mergeData = []) {
+        $factory = CView::factory();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($view, $data, $mergeData);
+    }
+
+    /**
+     * Throw an HttpException with the given data unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public static function abortUnless($boolean, $code, $message = '', array $headers = []) {
+        if (!$boolean) {
+            static::abort($code, $message, $headers);
+        }
+    }
+
+    /**
+     * Displays a 404 page.
+     *
+     * @throws  C_404_Exception
+     * @param   string  URI of page
+     * @param   string  custom template
+     * @return  void
+     */
+    public static function show404($page = FALSE, $template = FALSE) {
+        return CF::abort(404);
+    }
+
+    public static function abort($code, $message = '', array $headers = []) {
+        if ($code instanceof CHTTP_Response) {
+            throw new CHttp_Exception_ResponseException($code);
+        } elseif ($code instanceof CInterface_Responsable) {
+            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
+        }
+
+        if ($code == 404) {
+            throw new CHTTP_Exception_NotFoundHttpException($message);
+        }
+
+        throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
+    }
+
+    /**
+     * Throw an HttpException with the given data if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public static function abortIf($boolean, $code, $message = '', array $headers = []) {
+        if ($boolean) {
+            static::abort($code, $message, $headers);
+        }
+    }
+
+    /**
+     * Get an instance of the current request or an input item from the request.
+     *
+     * @param  array|string|null  $key
+     * @param  mixed  $default
+     * @return CHTTP_Request|string|array
+     */
+    function request($key = null, $default = null) {
+        if (is_null($key)) {
+            return CHTTP::request();
+        }
+
+        if (is_array($key)) {
+            return CHTTP::request()->only($key);
+        }
+
+        $value = CHTTP::request()->__get($key);
+
+        return is_null($value) ? c::value($default) : $value;
+    }
+
+    /**
+     * Return a new response from the application.
+     *
+     * @param  CView|string|array|null  $content
+     * @param  int  $status
+     * @param  array  $headers
+     * @return CHTTP_Response|CHTTP_ResponseFactory
+     */
+    public static function response($content = '', $status = 200, array $headers = []) {
+        $factory = CHTTP::responseFactory();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($content, $status, $headers);
     }
 
 }

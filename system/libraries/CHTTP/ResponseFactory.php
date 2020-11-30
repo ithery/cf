@@ -5,6 +5,10 @@
  *
  * @author Hery
  */
+
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 class CHTTP_ResponseFactory {
 
     use CTrait_Macroable;

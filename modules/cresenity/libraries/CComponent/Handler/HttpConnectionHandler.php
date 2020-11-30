@@ -11,7 +11,7 @@ class CComponent_Handler_HttpConnectionHandler extends CComponent_Handler_Connec
 
     public function __invoke() {
         return $this->handle(
-                        CHTTP::request([
+                        c::request([
                             'fingerprint',
                             'serverMemo',
                             'updates',

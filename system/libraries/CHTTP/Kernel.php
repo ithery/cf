@@ -6,6 +6,8 @@
  * @author Hery
  */
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 
 class CHTTP_Kernel {
 
@@ -58,8 +60,8 @@ class CHTTP_Kernel {
         // Include the Controller file
         if (strlen(CFRouter::$controller_path) > 0) {
             require_once CFRouter::$controller_path;
-            
-            
+
+
 
             try {
                 // Start validation of the controller
@@ -183,11 +185,8 @@ class CHTTP_Kernel {
             $response = $output;
         }
 
-        if (!($response instanceof SymfonyResponse)) {
-
-            $response = CHTTP::createResponse($response);
-        }
-
+        $response = $this->toResponse($request,$response);
+       
 
         return $response;
     }
@@ -231,6 +230,40 @@ class CHTTP_Kernel {
 
     public function isHandled() {
         return $this->isHandled;
+    }
+
+    /**
+     * Static version of prepareResponse.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  mixed  $response
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public static function toResponse($request, $response) {
+        if ($response instanceof CInterface_Responsable) {
+            $response = $response->toResponse($request);
+        }
+
+        if ($response instanceof PsrResponseInterface) {
+            $response = (new HttpFoundationFactory)->createResponse($response);
+        } elseif ($response instanceof CModel && $response->wasRecentlyCreated) {
+            $response = new CHTTP_JsonResponse($response, 201);
+        } elseif (!$response instanceof SymfonyResponse &&
+                ($response instanceof CInterface_Arrayable ||
+                $response instanceof CInterface_Jsonable ||
+                $response instanceof ArrayObject ||
+                $response instanceof JsonSerializable ||
+                is_array($response))) {
+            $response = new CHTTP_JsonResponse($response);
+        } elseif (!$response instanceof SymfonyResponse) {
+            $response = new CHTTP_Response($response, 200, ['Content-Type' => 'text/html']);
+        }
+
+        if ($response->getStatusCode() === CHTTP_Response::HTTP_NOT_MODIFIED) {
+            $response->setNotModified();
+        }
+
+        return $response->prepare($request);
     }
 
 }

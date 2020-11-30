@@ -15,7 +15,7 @@ class CComponent_RenameMe_SupportFileUploads
             if (! in_array(CComponent_Trait_WithFileUploads::class, $uses)) return;
 
             if (CComponent_TemporaryUploadedFile::canUnserialize($value)) {
-                $component->{$property} = TemporaryUploadedFile::unserializeFromLivewireRequest($value);
+                $component->{$property} = CComponent_TemporaryUploadedFile::unserializeFromComponentRequest($value);
             }
         });
 
