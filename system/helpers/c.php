@@ -12,8 +12,6 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class c {
 
-    
-    
     public static function urShift($a, $b) {
         if ($b == 0) {
             return $a;
@@ -285,7 +283,7 @@ class c {
      * // => ""
      * </code>
      */
-    function get($object, $path, $defaultValue = null) {
+    public static function get($object, $path, $defaultValue = null) {
 
         return ($object !== null ? c::baseGet($object, $path, $defaultValue) : $defaultValue);
     }
@@ -339,7 +337,7 @@ class c {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return new CCollection($value);
+        return CF::collect($value);
     }
 
     /**
@@ -350,13 +348,7 @@ class c {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        if (is_null($callback)) {
-            return new CBase_HigherOrderTapProxy($value);
-        }
-
-        $callback($value);
-
-        return $value;
+        return CF::tap($value, $callback);
     }
 
     /**
@@ -408,7 +400,7 @@ class c {
 
         return array_unique($results);
     }
-    
+
     /**
      * Returns true of traits is used by a class, its subclasses and trait of their traits.
      *
@@ -416,7 +408,7 @@ class c {
      * @param  string  $trait
      * @return array
      */
-    public static function hasTrait($class,$trait) {
+    public static function hasTrait($class, $trait) {
         return in_array($trait, static::classUsesRecursive($class));
     }
 
@@ -439,7 +431,7 @@ class c {
             return static::value($rescue);
         }
     }
-    
+
     /**
      * Return the given value, optionally passed through the given callback.
      *
@@ -462,7 +454,7 @@ class c {
                 !$exception instanceof Exception) {
             $exception = new FatalThrowableError($exception);
         }
-        $exceptionHandler = new CException_ExceptionHandler();
+        $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
     }
 
@@ -495,14 +487,14 @@ class c {
      * @return CCarbon
      */
     public static function now($tz = null) {
-        return CCarbon::now($tz);
+        return CF::now($tz);
     }
 
     public static function hrtime($getAsNumber = false) {
         if (function_exists('hrtime')) {
             return hrtime($getAsNumber);
         }
-    
+
         if ($getAsNumber) {
             return microtime(true) * 1e+6;
         }
@@ -514,14 +506,30 @@ class c {
     public static function html($str) {
         return chtml::specialchars($str);
     }
-    
-    public static function dirname($path, $count=1){
-        if ($count > 1){
-           return dirname(static::dirname($path, --$count));
-        }else{
-           return dirname($path);
+
+    public static function dirname($path, $count = 1) {
+        if ($count > 1) {
+            return dirname(static::dirname($path, --$count));
+        } else {
+            return dirname($path);
         }
     }
+
+    /**
+     * Provide access to optional objects.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function optional($value = null, callable $callback = null) {
+        if (is_null($callback)) {
+            return new COptional($value);
+        } elseif (!is_null($value)) {
+            return $callback($value);
+        }
+    }
+
 }
 
 // End c

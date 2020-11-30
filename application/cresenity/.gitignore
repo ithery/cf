@@ -1,29 +1,28 @@
 /nbproject/private/
 /nbproject/*
-/default/sessions/
-/default/logs/
-/*/resources/*
-/default/resources/
-/default/resources/*
-/default/iosData/
-/default/lang/
-/default/files/
-/artfiliate/files/
+
+/*/sessions/
+/*/logs/
+/*/resources/
+/*/json/
+/*/lang/
+/*/files/
 
 
-
-/*
-!/default
-!/cresenity.php
-!/bootstrap.php
-!/.gitignore
-
-*/config/api.php
 */config/app.php
 */config/app_setting.php
 */config/database.php
 */config/resources.php
 */config/resource.php
-*/config/cookie.php
-*.DS_Store
+*/config/elastic.php
+*/config/storage.php
+*/config/renderer.php
+*/config/queue.php
+*/config/backup.php
+*/config/cresenity.php
+*/config/assets.php
+
+/vendor
+composer.lock
+
 

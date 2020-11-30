@@ -19,7 +19,7 @@ use function json_decode;
 use function json_encode;
 use function json_last_error;
 use function ksort;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit

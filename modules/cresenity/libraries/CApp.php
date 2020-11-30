@@ -2,10 +2,13 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class CApp extends CObservable {
+class CApp implements CInterface_Responsable {
 
     use CTrait_Compat_App,
+        CTrait_Macroable,
+        CTrait_RequestInfoTrait,
         CApp_Trait_App_Breadcrumb,
+        CApp_Trait_App_Variables,
         CApp_Trait_App_Renderer,
         CApp_Trait_App_Auth,
         CApp_Trait_App_Title;
@@ -19,12 +22,8 @@ class CApp extends CObservable {
     private $signup = false;
     private $activation = false;
     private $resend = false;
-    private $_store = null;
     private $_org = null;
-    private $_admin = null;
-    private $_member = null;
-    public static $_instance = null;
-    protected $rendered = false;
+    public static $instance = null;
     private $header_body = '';
     private $additional_head = '';
     private $ajaxData = array();
@@ -34,6 +33,11 @@ class CApp extends CObservable {
     private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
     protected $renderer;
+
+    /**
+     *
+     * @var CApp_Element
+     */
     protected $element;
 
     public function setViewCallback(callable $viewCallback) {
@@ -155,17 +159,15 @@ class CApp extends CObservable {
 
     public function __construct($domain = null) {
 
-        parent::__construct();
 
+        $this->element = new CApp_Element();
 
         $this->_org = corg::get(CF::orgCode());
 
 
         //$this->renderer = new CApp_Renderer($this);
 
-        if (isset($_COOKIE['capp-profiler'])) {
-            new Profiler();
-        }
+
 
         $db = CDatabase::instance();
 
@@ -272,13 +274,13 @@ class CApp extends CObservable {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        if (self::$_instance == null) {
-            self::$_instance = array();
+        if (self::$instance == null) {
+            self::$instance = array();
         }
-        if (!isset(self::$_instance[$domain])) {
-            self::$_instance[$domain] = new CApp($domain);
+        if (!isset(self::$instance[$domain])) {
+            self::$instance[$domain] = new CApp($domain);
         }
-        return self::$_instance[$domain];
+        return self::$instance[$domain];
     }
 
     public function signup($bool = true) {
@@ -299,10 +301,6 @@ class CApp extends CObservable {
     public function addCustomJs($js) {
         $this->custom_js .= $js;
         return $this;
-    }
-
-    public function set_view_html() {
-        
     }
 
     public function registerCoreModules() {
@@ -342,71 +340,10 @@ class CApp extends CObservable {
         $this->additional_head = $str;
     }
 
-    public function rendered() {
-        return $this->rendered;
-    }
-
     public function reset() {
         $this->rendered = false;
-        $this->renderable = new CCollection();
+        $this->element->clear();
         return $this;
-    }
-
-    public function render() {
-
-        if ($this->rendered) {
-            throw new CException('CApp already Rendered' . cdbg::getTraceString());
-        }
-        $this->rendered = true;
-
-        $this->registerCoreModules();
-
-
-        CFEvent::run('CApp.beforeRender');
-
-        if (crequest::is_ajax()) {
-            return $this->json();
-        }
-        $v = null;
-
-        $viewName = $this->viewName;
-        if (ccfg::get("install")) {
-            $viewName = 'cinstall/page';
-        } else if ($this->signup) {
-            $viewName = 'ccore/signup';
-        } else if ($this->resend) {
-            $viewName = 'ccore/resend_activation';
-        } else if ($this->activation) {
-            $viewName = 'ccore/activation';
-        } else if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
-            $viewName = $this->viewLoginName;
-        } else if (!$this->isUserLogin() && $this->config("have_static_login") && $this->loginRequired) {
-            $viewName = 'ccore/static_login';
-        }
-
-        if (self::$viewCallback != null && is_callable(self::$viewCallback)) {
-            $viewName = self::$viewCallback($viewName);
-        }
-
-        $themePath = CManager::theme()->getThemePath();
-
-        if (CView::exists($themePath . $viewName)) {
-            $v = CView::factory($themePath . $viewName);
-        }
-        if ($v == null) {
-            if (!CView::exists($viewName)) {
-                throw new CApp_Exception('view :viewName not exists', array(':viewName' => $viewName));
-            }
-            $v = CView::factory($viewName);
-        }
-
-
-        $viewData = $this->getViewData();
-        $v->set($viewData);
-
-
-
-        return $v->render();
     }
 
     public function addCustomData($key, $value) {
@@ -441,28 +378,6 @@ class CApp extends CObservable {
         return $js;
     }
 
-    public function admin() {
-        if ($this->_admin == null) {
-            $session = CSession::instance();
-            $admin = $session->get("admin");
-            if (!$admin)
-                $admin = null;
-            $this->_admin = $admin;
-        }
-        return $this->_admin;
-    }
-
-    public function member() {
-        if ($this->_member = null) {
-            $session = CSession::instance();
-            $member = $session->get("member");
-            if (!$member)
-                $member = null;
-            $this->_member = $member;
-        }
-        return $this->_member;
-    }
-
     public function org() {
 
         if ($this->_org == null) {
@@ -479,32 +394,6 @@ class CApp extends CObservable {
         if ($org == null)
             return null;
         return $org->org_id;
-    }
-
-    public function is_admin_login() {
-        return $this->admin() != null;
-    }
-
-    public function is_member_login() {
-        return $this->member() != null;
-    }
-
-    public function store() {
-        if ($this->_store == null) {
-            $store_id = CF::store_id();
-
-            if ($store_id != "") {
-                $this->_store = cstore::get(CF::orgCode(), CF::store_code());
-            }
-        }
-        return $this->_store;
-    }
-
-    public function store_id() {
-        $store = $this->store();
-        if ($store == null)
-            return null;
-        return $store->store_id;
     }
 
     public function getRoleChildList($roleId = null, $orgId = null, $type = null) {
@@ -682,13 +571,34 @@ class CApp extends CObservable {
         }
     }
 
-    public static function sendExceptionEmail($email, Exception $exception) {
+    public static function sendExceptionEmail(Exception $exception, $email = null) {
 
 
         if (!($exception instanceof CF_404_Exception)) {
 
-            $html = CApp_ErrorHandler::sendExceptionEmail($email, $exception);
+            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email = null);
         }
+    }
+
+    public function __call($method, $parameters) {
+        if (method_exists($this->element, $method)) {
+            return call_user_func_array([$this->element, $method], $parameters);
+        }
+        if ($this->element->hasMacro($method)) {
+            return call_user_func_array([$this->element, $method], $parameters);
+        }
+
+
+        throw new Exception('undefined method on CApp: ' . $method);
+    }
+
+    /**
+     * 
+     * @param CHTTP_Request $request
+     * @return CHTTP_Response
+     */
+    public function toResponse($request) {
+        return CHTTP::createResponse($this->render());
     }
 
 }

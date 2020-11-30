@@ -7,6 +7,8 @@
  */
 trait CFDeprecatedTrait {
 
+    private static $write_cache;
+
     public static function doDeprecated() {
         if (class_exists('cdbg')) {
             cdbg::deprecated();
@@ -22,6 +24,17 @@ trait CFDeprecatedTrait {
      */
     public static function get_dirs($directory, $domain = null) {
         return self::getDirs($directory, $domain);
+    }
+
+    /**
+     * 
+     * @deprecated
+     * @param string $directory
+     * @param string $domain
+     * @return string|null directory
+     */
+    public static function get_dir($directory = '', $domain = null) {
+        return static::getDir($directory, $domain);
     }
 
     /**
@@ -75,6 +88,7 @@ trait CFDeprecatedTrait {
         }
         return $ret;
     }
+
     /**
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
@@ -201,6 +215,162 @@ trait CFDeprecatedTrait {
      */
     public static function find_file($directory, $filename, $required = FALSE, $ext = FALSE) {
         return static::findFile($directory, $filename, $required, $ext);
+    }
+
+    /**
+     * Dual-purpose PHP error and exception handler. Uses the kohana_error_page
+     * view to display the message.
+     *
+     * @param   integer|object  exception object or error code
+     * @param   string          error message
+     * @param   string          filename
+     * @param   integer         line number
+     * @return  void
+     * @deprecated
+     */
+    public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
+        return CF::exceptionHandler($exception, $message, $file, $line);
+    }
+
+    /**
+     * Closes all open output buffers, either by flushing or cleaning, and stores the C
+     * output buffer for display during shutdown.
+     *
+     * @param   boolean  disable to clear buffers, rather than flushing
+     * @return  void
+     * @deprecated
+     */
+    public static function close_buffers($flush = TRUE) {
+        return static::closeBuffers($flush);
+    }
+
+    /**
+     * Clears a config group from the cached configuration.
+     *
+     * @param   string  config group
+     * @return  void
+     * @deprecated
+     */
+    public static function config_clear($group) {
+        // Remove the group from config
+        unset(self::$configuration[$group], self::$internal_cache['configuration'][$group]);
+
+        if (!isset(self::$write_cache['configuration'])) {
+            // Cache has changed
+            self::$write_cache['configuration'] = TRUE;
+        }
+    }
+
+    /**
+     * Retrieves current user agent information:
+     * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
+     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
+     *
+     * @param   string   key or test name
+     * @param   string   used with "accept" tests: user_agent(accept_lang, en)
+     * @return  array    languages and charsets
+     * @return  string   all other keys
+     * @return  boolean  all tests
+     */
+    public static function user_agent($key = 'agent', $compare = NULL) {
+        return static::userAgent($key, $compare);
+    }
+
+    /**
+     * Returns the value of a key, defined by a 'dot-noted' string, from an array.
+     *
+     * @param   array   array to search
+     * @param   string  dot-noted string: foo.bar.baz
+     * @return  string  if the key is found
+     * @return  void    if the key is not found
+     */
+    public static function key_string($array, $keys) {
+        if (empty($array))
+            return NULL;
+
+        // Prepare for loop
+        $keys = explode('.', $keys);
+
+        do {
+            // Get the next key
+            $key = array_shift($keys);
+
+            if (isset($array[$key])) {
+                if (is_array($array[$key]) AND ! empty($keys)) {
+                    // Dig down to prepare the next loop
+                    $array = $array[$key];
+                } else {
+                    // Requested key was found
+                    return $array[$key];
+                }
+            } else {
+                // Requested key is not set
+                break;
+            }
+        } while (!empty($keys));
+
+        return NULL;
+    }
+
+    /**
+     * Sets values in an array by using a 'dot-noted' string.
+     *
+     * @param   array   array to set keys in (reference)
+     * @param   string  dot-noted string: foo.bar.baz
+     * @return  mixed   fill value for the key
+     * @return  void
+     */
+    public static function key_string_set(& $array, $keys, $fill = NULL) {
+        if (is_object($array) AND ( $array instanceof ArrayObject)) {
+            // Copy the array
+            $array_copy = $array->getArrayCopy();
+
+            // Is an object
+            $array_object = TRUE;
+        } else {
+            if (!is_array($array)) {
+                // Must always be an array
+                $array = (array) $array;
+            }
+
+            // Copy is a reference to the array
+            $array_copy = & $array;
+        }
+
+        if (empty($keys))
+            return $array;
+
+        // Create keys
+        $keys = explode('.', $keys);
+
+        // Create reference to the array
+        $row = & $array_copy;
+
+        for ($i = 0, $end = count($keys) - 1; $i <= $end; $i++) {
+            // Get the current key
+            $key = $keys[$i];
+
+            if (!isset($row[$key])) {
+                if (isset($keys[$i + 1])) {
+                    // Make the value an array
+                    $row[$key] = array();
+                } else {
+                    // Add the fill key
+                    $row[$key] = $fill;
+                }
+            } elseif (isset($keys[$i + 1])) {
+                // Make the value an array
+                $row[$key] = (array) $row[$key];
+            }
+
+            // Go down a level, creating a new row reference
+            $row = & $row[$key];
+        }
+
+        if (isset($array_object)) {
+            // Swap the array back in
+            $array->exchangeArray($array_copy);
+        }
     }
 
 }

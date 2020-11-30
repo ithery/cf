@@ -19,10 +19,20 @@ class CLogger {
     const INFO = LOG_INFO;     // 6
     const DEBUG = LOG_DEBUG;    // 7
 
+    protected static $logLevels = [
+        'emergency' => self::EMERGENCY,
+        'alert' => self::ALERT,
+        'critical' => self::CRITICAL,
+        'error' => self::ERROR,
+        'warning' => self::WARNING,
+        'notice' => self::NOTICE,
+        'info' => self::INFO,
+        'debug' => self::DEBUG,
+    ];
+
     /**
      * @var  CLogger  Singleton instance container
      */
-
     private static $_instance = NULL;
 
     /**
@@ -83,21 +93,35 @@ class CLogger {
      *         ':user' => $username,
      *     ));
      *
-     * @param   string  $level       level of message
-     * @param   string  $message     message body
-     * @param   array   $values      values to replace in the message
-     * @param   array   $additional  additional custom parameters to supply to the log writer
+     * @param   string      $level       level of message
+     * @param   string      $message     message body
+     * @param   array       $values      values to replace in the message
+     * @param   array       $context     additional custom parameters to supply to the log writer
+     * @param   Exception   $exception     Exception for log
      * @return  Log
      */
-    public function add($level, $message, array $values = NULL, array $additional = NULL) {
+    public function add($level, $message, array $values = NULL, array $context = [], $exception = NULL) {
+        if (!is_string($level)) {
+            $level = carr::get(self::$logLevels, $level);
+        }
+
+        if (!is_numeric($level)) {
+            $level = static::EMERGENCY;
+        }
+
         if ($values) {
             // Insert the values into the message
             $message = strtr($message, $values);
         }
 
+        if (strlen($message) == 0 && $exception != null) {
+            $message = get_class($exception);
+        }
+
+        $trace = [];
         // Grab a copy of the trace
-        if (isset($additional['exception'])) {
-            $trace = $additional['exception']->getTrace();
+        if ($exception != null) {
+            $trace = $exception->getTrace();
         } else {
             // Older php version don't have 'DEBUG_BACKTRACE_IGNORE_ARGS', so manually remove the args from the backtrace
             if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
@@ -110,9 +134,7 @@ class CLogger {
             }
         }
 
-        if ($additional == NULL) {
-            $additional = array();
-        }
+
 
         // Create a new message
         $this->_messages[] = array(
@@ -125,7 +147,8 @@ class CLogger {
             'line' => isset($trace[0]['line']) ? $trace[0]['line'] : NULL,
             'class' => isset($trace[0]['class']) ? $trace[0]['class'] : NULL,
             'function' => isset($trace[0]['function']) ? $trace[0]['function'] : NULL,
-            'additional' => $additional,
+            'context' => $context,
+            'exception' => $exception,
         );
 
         if (CLogger::$writeOnAdd) {

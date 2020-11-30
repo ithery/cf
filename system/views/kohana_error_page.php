@@ -7,7 +7,6 @@
 </style>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <title><?php echo $error ?></title>
-<base href="http://php.net/" />
 </head>
 <body>
 <div id="framework_error" style="width:42em;margin:20px auto;">
@@ -20,7 +19,9 @@
 <p><code class="block"><?php echo $message ?></code></p>
 <?php if ( ! empty($trace)): ?>
 <h3><?php echo CF::lang('core.stack_trace') ?></h3>
+<pre>
 <?php echo $trace ?>
+</pre>
 <?php endif ?>
 <p class="stats"><?php echo CF::lang('core.stats_footer') ?></p>
 <?php  endif; ?>

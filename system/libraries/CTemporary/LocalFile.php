@@ -45,9 +45,9 @@ class CTemporary_LocalFile {
         if ($suffix !== null) {
             $filename .= $suffix;
         }
-        
-        if($folder==null) {
-            $folder='common';
+
+        if ($folder == null) {
+            $folder = 'common';
         }
 
         $this->_fileName = CTemporary::local()->put($content, $folder, $filename);
@@ -115,6 +115,14 @@ class CTemporary_LocalFile {
      */
     public function __toString() {
         return $this->getFileName();
+    }
+
+    public function delete() {
+        $filename = $this->getFileName();
+        if (file_exists($filename)) {
+            return @unlink($filename);
+        }
+        return false;
     }
 
 }

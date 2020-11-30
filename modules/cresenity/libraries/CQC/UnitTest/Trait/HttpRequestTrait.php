@@ -132,22 +132,22 @@ trait CQC_UnitTest_Trait_HttpRequestTrait {
 
             return $this;
         }
-        
+
         //TODO:CApp middleware
         /*
 
-        foreach ((array) $middleware as $abstract) {
-            $this->app->instance($abstract, new class {
-            public
+          foreach ((array) $middleware as $abstract) {
+          $this->app->instance($abstract, new class {
+          public
 
-            function handle($request, $next) {
-                return $next($request);
-            }
+          function handle($request, $next) {
+          return $next($request);
+          }
 
-            });
-        }
+          });
+          }
 
-        */
+         */
         return $this;
     }
 
@@ -190,7 +190,7 @@ trait CQC_UnitTest_Trait_HttpRequestTrait {
      * @param  string  $value
      * @return $this
      */
-    public function withCookie( $name, $value) {
+    public function withCookie($name, $value) {
         $this->defaultCookies[$name] = $value;
 
         return $this;
@@ -215,7 +215,7 @@ trait CQC_UnitTest_Trait_HttpRequestTrait {
      * @param  string  $value
      * @return $this
      */
-    public function withUnencryptedCookie( $name,  $value) {
+    public function withUnencryptedCookie($name, $value) {
         $this->unencryptedCookies[$name] = $value;
 
         return $this;
@@ -260,7 +260,7 @@ trait CQC_UnitTest_Trait_HttpRequestTrait {
      * @param  string  $url
      * @return $this
      */
-    public function from( $url) {
+    public function from($url) {
         $this->app['session']->setPreviousUrl($url);
 
         return $this->withHeader('referer', $url);
@@ -472,7 +472,7 @@ trait CQC_UnitTest_Trait_HttpRequestTrait {
                         $this->prepareUrlForRequest($uri), $method, $parameters, $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
-        
+
         $response = $kernel->handle(
                 $request = CHTTP_Request::createFromBase($symfonyRequest)
         );
@@ -497,7 +497,7 @@ trait CQC_UnitTest_Trait_HttpRequestTrait {
             $uri = substr($uri, 1);
         }
 
-        return trim(url($uri), '/');
+        return trim(curl::base($uri), '/');
     }
 
     /**

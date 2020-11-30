@@ -16,7 +16,7 @@ use function is_dir;
 use function is_file;
 use function strpos;
 use function version_compare;
-use PHPUnit\Framework\Exception as FrameworkException;
+use PHPUnit\Framework\Exception\Exception as FrameworkException;
 use PHPUnit\Framework\TestSuite as TestSuiteObject;
 use PHPUnit\TextUI\XmlConfiguration\TestSuiteCollection;
 use SebastianBergmann\FileIterator\Facade;

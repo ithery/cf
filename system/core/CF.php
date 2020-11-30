@@ -14,44 +14,47 @@ final class CF {
     public static $instance;
     // The multiple instance of the controller when callback when routing is failed or redirected
     public static $instances;
-    // Output buffering level
-    private static $buffer_level;
     // Will be set to TRUE when an exception is caught
     public static $has_error = FALSE;
-    // The final output that will displayed by C
-    public static $output = '';
     // The current user agent
     public static $user_agent;
     // The current locale
     public static $locale;
     // Configuration
     private static $configuration;
-    // Include paths
+
+    /**
+     * Include paths cache
+     * @var array
+     */
     private static $paths;
-    // Logged messages
-    private static $log;
-    // Cache lifetime
-    private static $cache_lifetime;
-    // Log levels
-    private static $log_levels = array(
-        'error' => 1,
-        'alert' => 2,
-        'info' => 3,
-        'debug' => 4,
-    );
+
+    /**
+     * Chartset used for this application
+     * 
+     * @var string
+     */
     public static $charset = 'utf-8';
 
     /* log threshold default , CLogger::LOG_WARNING (4) */
-    public static $log_threshold = 4;
+    public static $log_threshold = LOG_WARNING; // 4
     public static $global_xss_filtering = TRUE;
     // Internal caches and write status
     private static $internal_cache = array();
-    private static $write_cache;
-    private static $internal_cache_path;
-    private static $internal_cache_key;
-    private static $internal_cache_encrypt;
+
+    /**
+     * CF Data domain
+     * 
+     * @var array
+     */
     private static $data;
-    private static $sharedAppCode = array();
+
+    /**
+     * sharedAppCode used for CF
+     * 
+     * @var array
+     */
+    private static $sharedAppCode = [];
     private static $translator;
 
     /**
@@ -63,6 +66,46 @@ final class CF {
      * @var  CConfig  config object
      */
     public static $config;
+
+    /**
+     * 
+     * @return bool
+     */
+    public static function isProduction() {
+        return defined('IN_PRODUCTION') && IN_PRODUCTION;
+    }
+
+    /**
+     * 
+     * @return bool
+     */
+    public static function isCli() {
+        return defined('CFCLI');
+    }
+
+    /**
+     * Check given domain exists or not
+     * 
+     * @param string $domain
+     * @return bool
+     */
+    public static function domainExists($domain) {
+        return CFData::domain($domain) !== null;
+    }
+
+    /**
+     * 
+     * @param type $domain
+     * @param array $domainData
+     * @return bool
+     */
+    public static function createDomain($domain, array $domainData) {
+        if (!static::domainExists($domain)) {
+            CFData::set($domain, $domainData, 'domain');
+            return true;
+        }
+        return false;
+    }
 
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
@@ -115,6 +158,7 @@ final class CF {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
 
+
         $capppath = APPPATH;
         $defaultpath = APPPATH;
         if (strlen(self::appCode()) > 0) {
@@ -146,20 +190,9 @@ final class CF {
         define('E_DATABASE_ERROR', 44);
 
 
-        // Start output buffering
-        ob_start(array(__CLASS__, 'output_buffer'));
-
-        // Save buffering level
-        self::$buffer_level = ob_get_level();
 
         // Set autoloader
-        spl_autoload_register(array('CF', 'auto_load'));
-
-        // Set error handler
-        set_error_handler(array('CF', 'exception_handler'));
-
-        // Set exception handler
-        set_exception_handler(array('CF', 'exception_handler'));
+        spl_autoload_register(array('CF', 'autoLoad'));
 
         // Set and test the logger instance, we need to know whats wrong when CF Fail
         self::$logger = CLogger::instance();
@@ -197,26 +230,6 @@ final class CF {
         // Set locale information
         self::$locale = setlocale(LC_ALL, $locales);
 
-        if (isset(self::$configuration['core']) && isset(self::$configuration['core']['log_threshold']) && self::$configuration['core']['log_threshold'] > 0) {
-            // Set the log directory
-            self::log_directory(self::$configuration['core']['log_directory']);
-
-            // Enable log writing at shutdown
-            register_shutdown_function(array(__CLASS__, 'log_save'));
-        }
-
-        // Enable CF routing
-        CFEvent::add('system.routing', array('CFRouter', 'findUri'));
-        CFEvent::add('system.routing', array('CFRouter', 'setup'));
-
-        // Enable CF controller initialization
-        CFEvent::add('system.execute', array('CF', 'instance'));
-
-        // Enable CF 404 pages
-        CFEvent::add('system.404', array('CF', 'show404'));
-
-        // Enable CF output handling
-        CFEvent::add('system.shutdown', array('CF', 'shutdown'));
 
         static::loadBootstrapFiles();
 
@@ -232,7 +245,7 @@ final class CF {
      * load all bootstrap files
      */
     private static function loadBootstrapFiles() {
-        CFBenchmark::start('system.cf.bootstrap');
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_bootstrap');
 
 
         //try to locate bootstrap files for modules 
@@ -256,10 +269,11 @@ final class CF {
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
-        CFBenchmark::stop('system.cf.bootstrap');
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_bootstrap');
     }
 
     public static function invoke($uri) {
+
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
@@ -294,7 +308,7 @@ final class CF {
             } catch (ReflectionException $e) {
                 // Controller does not exist
 
-                CFEvent::run('system.404');
+                CF::show404();
             }
         }
 
@@ -336,117 +350,14 @@ final class CF {
     }
 
     /**
-     * Loads the controller and initializes it. Runs the pre_controller,
-     * post_controller_constructor, and post_controller events. Triggers
-     * a system.404 event when the route cannot be mapped to a controller.
-     *
-     * This method is benchmarked as controller_setup and controller_execution.
-     *
-     * @return  object  instance of controller
+     * 
+     * @param type $directory
+     * @param type $domain
+     * @return string
      */
-    public static function & instance() {
-        $null = NULL;
-        if (defined('CFCLI')) {
-            CFConsole::execute();
-        }
-        if (self::$instance === NULL) {
-            CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
-
-            if (empty(CFRouter::$controller_path)) {
-                CF::show404();
-            }
-            // Include the Controller file
-            if (strlen(CFRouter::$controller_path) > 0) {
-                require_once CFRouter::$controller_path;
-            }
-            try {
-                // Start validation of the controller
-                $class_name = str_replace('/', '_', CFRouter::$controller_dir_ucfirst);
-                $class = new ReflectionClass('Controller_' . $class_name . ucfirst(CFRouter::$controller));
-            } catch (ReflectionException $e) {
-                try {
-                    $class = new ReflectionClass(ucfirst(CFRouter::$controller) . '_Controller');
-                    // Start validation of the controller
-                } catch (ReflectionException $e) {
-                    // Controller does not exist
-                    CFEvent::run('system.404');
-                    return $null;
-                }
-            }
-
-            if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
-                // Controller is not allowed to run in production
-                CFEvent::run('system.404');
-                return $null;
-            }
-
-            // Run system.pre_controller
-            CFEvent::run('system.pre_controller');
-
-            // Create a new controller instance
-            if (isset($class)) {
-                $controller = $class->newInstance();
-
-                if (!isset(self::$instances[CFRouter::$current_uri])) {
-                    self::$instances[CFRouter::$current_uri] = $controller;
-                }
-                self::$instance = $controller;
-            }
-
-            // Controller constructor has been executed
-            CFEvent::run('system.post_controller_constructor');
-
-            try {
-                // Load the controller method
-                $method = $class->getMethod(CFRouter::$method);
-
-                // Method exists
-                if (CFRouter::$method[0] === '_') {
-                    // Do not allow access to hidden methods
-                    CFEvent::run('system.404');
-                }
-
-                if ($method->isProtected() or $method->isPrivate()) {
-                    // Do not attempt to invoke protected methods
-                    throw new ReflectionException('protected controller method');
-                }
-
-                // Default arguments
-                $arguments = CFRouter::$arguments;
-            } catch (ReflectionException $e) {
-                // Use __call instead
-                $method = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $arguments = array(CFRouter::$method, CFRouter::$arguments);
-            }
-
-            // Stop the controller setup benchmark
-            CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_setup');
-
-            // Start the controller execution benchmark
-            CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_execution');
-
-
-            // Execute the controller method
-            $method->invokeArgs($controller, $arguments);
-
-
-
-            // Controller method has been executed
-            CFEvent::run('system.post_controller');
-
-            // Stop the controller execution benchmark
-            CFBenchmark::stop(SYSTEM_BENCHMARK . '_controller_execution');
-        }
-
-
-        return self::$instance;
-    }
-
-    public static function get_dir($directory = '', $domain = null) {
-        $include_paths = CF::paths();
-        foreach ($include_paths as $p) {
+    public static function getDir($directory = '', $domain = null) {
+        $includePaths = CF::paths($domain);
+        foreach ($includePaths as $p) {
             $path = $p;
             if (strlen($directory) > 0) {
                 $path = $p . $directory . DS;
@@ -465,9 +376,9 @@ final class CF {
      * @return array array of directory
      */
     public static function getDirs($directory, $domain = null) {
-        $include_paths = CF::paths();
+        $includePaths = CF::paths($domain);
         $dirs = array();
-        foreach ($include_paths as $p) {
+        foreach ($includePaths as $p) {
             $path = $p . $directory . DS;
             if (is_dir($path)) {
                 $dirs[] = $path;
@@ -656,7 +567,7 @@ final class CF {
 
             if (!isset($config['site_domain'])) {
                 // Invalid config file
-                die('Your C application configuration file is not valid.');
+                die('Your CF application configuration file is not valid.');
             }
 
             return $config;
@@ -688,22 +599,6 @@ final class CF {
     }
 
     /**
-     * Clears a config group from the cached configuration.
-     *
-     * @param   string  config group
-     * @return  void
-     */
-    public static function config_clear($group) {
-        // Remove the group from config
-        unset(self::$configuration[$group], self::$internal_cache['configuration'][$group]);
-
-        if (!isset(self::$write_cache['configuration'])) {
-            // Cache has changed
-            self::$write_cache['configuration'] = TRUE;
-        }
-    }
-
-    /**
      * Add a new message to the log.
      *
      * @param   string  type of message
@@ -711,301 +606,9 @@ final class CF {
      * @return  void
      */
     public static function log($level, $message) {
-        if (!is_numeric($level)) {
-            $level = carr::get(self::$log_levels, $level);
+        if (class_exists('CLogger')) {
+            CLogger::instance()->add($level, $message);
         }
-        if (!is_numeric($level)) {
-            $level = CLogger::EMERGENCY;
-        }
-        if ($level <= CF::$log_threshold) {
-            if (class_exists('CLogger')) {
-                CLogger::instance()->add($level, $message);
-            }
-        }
-    }
-
-    /**
-     * Save all currently logged messages.
-     *
-     * @return  void
-     */
-    public static function log_save() {
-        if (empty(self::$log) OR self::$configuration['core']['log_threshold'] < 1)
-            return;
-
-        // Filename of the log
-        $filename = self::log_directory() . date('Y-m-d') . '.log' . EXT;
-
-        if (!is_file($filename)) {
-            // Write the SYSPATH checking header
-            file_put_contents($filename, '<?php defined(\'SYSPATH\') or die(\'No direct script access.\'); ?>' . PHP_EOL . PHP_EOL);
-
-            // Prevent external writes
-            chmod($filename, 0644);
-        }
-
-        // Messages to write
-        $messages = array();
-
-        do {
-            // Load the next mess
-            list ($date, $type, $text) = array_shift(self::$log);
-
-            // Add a new message line
-            $messages[] = $date . ' --- ' . $type . ': ' . $text;
-        } while (!empty(self::$log));
-
-        // Write messages to log file
-        file_put_contents($filename, implode(PHP_EOL, $messages) . PHP_EOL, FILE_APPEND);
-    }
-
-    /**
-     * Get or set the logging directory.
-     *
-     * @param   string  new log directory
-     * @return  string
-     */
-    public static function log_directory($dir = NULL) {
-        static $directory;
-
-        $dir = CF::get_dir('logs');
-
-
-        if (!empty($dir)) {
-            // Get the directory path
-            $dir = realpath($dir);
-
-            if (!is_dir($dir)) {
-                mkdir($dir);
-            }
-
-            if (is_dir($dir) AND is_writable($dir)) {
-                // Change the log directory
-                $directory = str_replace('\\', '/', $dir) . '/';
-            } else {
-                // Log directory is invalid
-                throw new CF_Exception('core.log_dir_unwritable', $dir);
-            }
-        }
-
-        return $directory;
-    }
-
-    /**
-     * Load data from a simple cache file. This should only be used internally,
-     * and is NOT a replacement for the Cache library.
-     *
-     * @param   string   unique name of cache
-     * @param   integer  expiration in seconds
-     * @return  mixed
-     */
-    public static function cache($name, $lifetime) {
-        if ($lifetime > 0) {
-            $path = self::$internal_cache_path . 'kohana_' . $name;
-
-            if (is_file($path)) {
-                // Check the file modification time
-                if ((time() - filemtime($path)) < $lifetime) {
-                    // Cache is valid! Now, do we need to decrypt it?
-                    if (self::$internal_cache_encrypt === TRUE) {
-                        $data = file_get_contents($path);
-
-                        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-                        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-
-                        $decrypted_text = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, self::$internal_cache_key, $data, MCRYPT_MODE_ECB, $iv);
-
-                        $cache = unserialize($decrypted_text);
-
-                        // If the key changed, delete the cache file
-                        if (!$cache)
-                            unlink($path);
-
-                        // If cache is false (as above) return NULL, otherwise, return the cache
-                        return ($cache ? $cache : NULL);
-                    }
-                    else {
-                        return unserialize(file_get_contents($path));
-                    }
-                } else {
-                    // Cache is invalid, delete it
-                    unlink($path);
-                }
-            }
-        }
-
-        // No cache found
-        return NULL;
-    }
-
-    /**
-     * Save data to a simple cache file. This should only be used internally, and
-     * is NOT a replacement for the Cache library.
-     *
-     * @param   string   cache name
-     * @param   mixed    data to cache
-     * @param   integer  expiration in seconds
-     * @return  boolean
-     */
-    public static function cache_save($name, $data, $lifetime) {
-        if ($lifetime < 1)
-            return FALSE;
-
-        $path = self::$internal_cache_path . 'kohana_' . $name;
-
-        if ($data === NULL) {
-            // Delete cache
-            return (is_file($path) and unlink($path));
-        } else {
-            // Using encryption? Encrypt the data when we write it
-            if (self::$internal_cache_encrypt === TRUE) {
-                // Encrypt and write data to cache file
-                $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-                $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-
-                // Serialize and encrypt!
-                $encrypted_text = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, self::$internal_cache_key, serialize($data), MCRYPT_MODE_ECB, $iv);
-
-                return (bool) file_put_contents($path, $encrypted_text);
-            } else {
-                // Write data to cache file
-                return (bool) file_put_contents($path, serialize($data));
-            }
-        }
-    }
-
-    /**
-     * C output handler. Called during ob_clean, ob_flush, and their variants.
-     *
-     * @param   string  current output buffer
-     * @return  string
-     */
-    public static function output_buffer($output) {
-        // Could be flushing, so send headers first
-        if (!CFEvent::has_run('system.send_headers')) {
-            // Run the send_headers event
-            CFEvent::run('system.send_headers');
-        }
-
-        self::$output = $output;
-
-        // Set and return the final output
-        return self::$output;
-    }
-
-    /**
-     * Closes all open output buffers, either by flushing or cleaning, and stores the C
-     * output buffer for display during shutdown.
-     *
-     * @param   boolean  disable to clear buffers, rather than flushing
-     * @return  void
-     */
-    public static function close_buffers($flush = TRUE) {
-        if (ob_get_level() >= self::$buffer_level) {
-            // Set the close function
-            $close = ($flush === TRUE) ? 'ob_end_flush' : 'ob_end_clean';
-
-            while (ob_get_level() > self::$buffer_level) {
-                // Flush or clean the buffer
-                $close();
-            }
-
-            // Store the C output buffer
-            ob_end_clean();
-        }
-    }
-
-    /**
-     * Triggers the shutdown of C by closing the output buffer, runs the system.display event.
-     *
-     * @return  void
-     */
-    public static function shutdown() {
-        // Close output buffers
-        self::close_buffers(TRUE);
-
-
-        // Run the output event
-        CFEvent::run('system.display', self::$output);
-
-        // Render the final output
-        self::render(self::$output);
-    }
-
-    /**
-     * Inserts global C variables into the generated output and prints it.
-     *
-     * @param   string  final output that will displayed
-     * @return  void
-     */
-    public static function render($output) {
-        if (self::config('core.render_stats') === TRUE) {
-            // Fetch memory usage in MB
-            $memory = function_exists('memory_get_usage') ? (memory_get_usage() / 1024 / 1024) : 0;
-
-            // Fetch benchmark for page execution time
-            $benchmark = CFBenchmark::get(SYSTEM_BENCHMARK . '_total_execution');
-
-            // Replace the global template variables
-            $output = str_replace(
-                    array
-                (
-                '{cf_version}',
-                '{cf_codename}',
-                '{execution_time}',
-                '{memory_usage}',
-                '{included_files}',
-                    ), array
-                (
-                CF_VERSION,
-                CF_CODENAME,
-                $benchmark['time'],
-                number_format($memory, 2) . 'MB',
-                count(get_included_files()),
-                    ), $output
-            );
-        }
-
-        if ($level = self::config('core.output_compression') AND ini_get('output_handler') !== 'ob_gzhandler' AND (int) ini_get('zlib.output_compression') === 0) {
-            if ($level < 1 OR $level > 9) {
-                // Normalize the level to be an integer between 1 and 9. This
-                // step must be done to prevent gzencode from triggering an error
-                $level = max(1, min($level, 9));
-            }
-
-            if (stripos(@$_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE) {
-                $compress = 'gzip';
-            } elseif (stripos(@$_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate') !== FALSE) {
-                $compress = 'deflate';
-            }
-        }
-
-        if (isset($compress) AND $level > 0) {
-            switch ($compress) {
-                case 'gzip':
-                    // Compress output using gzip
-                    $output = gzencode($output, $level);
-                    break;
-                case 'deflate':
-                    // Compress output using zlib (HTTP deflate)
-                    $output = gzdeflate($output, $level);
-                    break;
-            }
-
-            // This header must be sent with compressed content to prevent
-            // browser caches from breaking
-            header('Vary: Accept-Encoding');
-
-            // Send the content encoding header
-            header('Content-Encoding: ' . $compress);
-
-            // Sending Content-Length in CGI can result in unexpected behavior
-            if (stripos(PHP_SAPI, 'cgi') === FALSE) {
-                header('Content-Length: ' . strlen($output));
-            }
-        }
-
-        echo $output;
     }
 
     /**
@@ -1017,232 +620,102 @@ final class CF {
      * @return  void
      */
     public static function show404($page = FALSE, $template = FALSE) {
-        if (CFRouter::$current_uri == 'favicon.ico') {
-            return false;
+        return CF::abort(404);
+    }
+
+    public static function abort($code, $message = '', array $headers = []) {
+        if ($code instanceof CHTTP_Response) {
+            throw new CHttp_Exception_ResponseException($code);
+        } elseif ($code instanceof CInterface_Responsable) {
+            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
         }
-        if (isset($_GET['debug_404'])) {
-            try {
-                throw new Exception('404');
-            } catch (Exception $ex) {
-                cdbg::var_dump(nl2br($ex->getTraceAsString()));
-            }
+
+        if ($code == 404) {
+            throw new CHTTP_Exception_NotFoundHttpException($message);
         }
-        throw new CF_404_Exception($page, $template);
+
+        throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
     }
 
     /**
-     * Dual-purpose PHP error and exception handler. Uses the kohana_error_page
-     * view to display the message.
+     * Throw an HttpException with the given data if the given condition is true.
      *
-     * @param   integer|object  exception object or error code
-     * @param   string          error message
-     * @param   string          filename
-     * @param   integer         line number
-     * @return  void
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
-        if ($exception instanceof \Pheanstalk\Exception\ServerException) {
-            return;
+    public static function abortIf($boolean, $code, $message = '', array $headers = []) {
+        if ($boolean) {
+            static::abort($code, $message, $headers);
         }
-        try {
+    }
 
-            // PHP errors have 5 args, always
-            $PHP_ERROR = (func_num_args() === 5);
-            if (isset($_GET['debug'])) {
-                if ($PHP_ERROR) {
-                    cdbg::var_dump($message);
-                    try {
-                        throw new Exception('testing');
-                    } catch (Exception $ex) {
-                        cdbg::var_dump($ex->getTraceAsString());
-                    }
-                    die;
-                } else {
-                    cdbg::var_dump($exception);
-                    try {
-                        throw new Exception('testing');
-                    } catch (Exception $ex) {
-                        cdbg::var_dump($ex->getTraceAsString());
-                    }
-                    die;
-                }
-            }
-            $is404 = false;
-            if ($exception instanceof CF_404_Exception) {
-                $is404 = true;
-            }
-
-            // Test to see if errors should be displayed
-            if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
-                return;
-
-            // This is useful for hooks to determine if a page has an error
-            self::$has_error = TRUE;
-
-            if (!is_object($exception)) {
-                $PHP_ERROR = true;
-            }
-
-            // Error handling will use exactly 5 args, every time
-            $trace = '';
-            $uri = '';
-
-            if ($PHP_ERROR) {
-
-                $code = $exception;
-                $type = 'PHP Error';
-                $template = 'kohana_error_page';
-            } else {
-                $code = $exception->getCode();
-                $type = get_class($exception);
-                $message = $exception->getMessage();
-                $file = $exception->getFile();
-                $line = $exception->getLine();
-                $trace = $exception->getTraceAsString();
-                $uri = CFRouter::$current_uri;
-                $template = ($exception instanceof CF_Exception) ? $exception->get_template() : 'kohana_error_page';
-            }
-
-            if (is_numeric($code)) {
-                $codes = self::lang('errors');
-
-                if (!empty($codes[$code])) {
-                    list($level, $error, $description) = $codes[$code];
-                } else {
-                    $level = 1;
-                    $error = $PHP_ERROR ? 'Unknown Error' : get_class($exception);
-                    $description = '';
-                }
-            } else {
-                // Custom error message, this will never be logged
-                $level = 5;
-                $error = $code;
-                $description = '';
-            }
-
-            // Remove the DOCROOT from the path, as a security precaution
-            $file = str_replace('\\', '/', realpath($file));
-            $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
-
-            if ($level <= self::$log_threshold) {
-                // Log the error
-                $need_to_log = true;
-                if (!$PHP_ERROR) {
-                    if ($is404) {
-                        $need_to_log = false;
-                    }
-                }
-                if ($need_to_log) {
-                    self::log(LOG_ERR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
-                }
-            }
-
-            if ($PHP_ERROR) {
-                $description = self::lang('errors.' . E_RECOVERABLE_ERROR);
-                $description = is_array($description) ? $description[2] : '';
-
-                if (!headers_sent()) {
-                    // Send the 500 header
-                    header('HTTP/1.1 500 Internal Server Error');
-                }
-            } else {
-                if (method_exists($exception, 'send_headers') AND ! headers_sent()) {
-                    // Send the headers if they have not already been sent
-                    $exception->send_headers();
-                } else {
-                    if (!headers_sent()) {
-                        // Send the 500 header
-                        header('HTTP/1.1 500 Internal Server Error');
-                    }
-                }
-            }
-
-            // Close all output buffers except for C
-            while (ob_get_level() > self::$buffer_level) {
-                ob_end_clean();
-            }
-
-            // Test if display_errors is on
-            if (self::config('app.error_disabled') !== TRUE) {
-                /*
-                  if (!IN_PRODUCTION AND $line != FALSE) {
-                  // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                  $trace = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
-
-                  // Beautify backtrace
-                  $trace = self::backtrace($trace);
-                  }
-                 * 
-                 */
-
-                if (IN_PRODUCTION && !$is404) {
-                    $data = array(
-                        'description' => $description,
-                        'error' => $error,
-                        'message' => $message,
-                        'show_debug_error' => '1',
-                    );
-
-                    $view = CView::factory('kohana_error_page', $data);
-                    try {
-                        cmail::error_mail($view->render());
-                    } catch (Exception $ex) {
-                        clog::log('error_mail.log', 'error', CF::domain() . " - " . $ex->getMessage());
-                    }
-                }
-
-                // Load the error
-                $custom_error = false;
-                if (IN_PRODUCTION) {
-                    if (!isset($_GET['show_error'])) {
-                        if (CView::exists('ccore/error_page')) {
-                            $custom_error = true;
-                            echo CView::factory('ccore/error_page')->render();
-                        }
-                    }
-                }
-                if (!$custom_error) {
-                    require self::findFile('views', empty($template) ? 'kohana_error_page' : $template);
-                }
-            } else {
-                // Get the i18n messages
-                $error = self::lang('core.generic_error');
-                $message = self::lang('core.errors_disabled', curl::site(), curl::site(CFRouter::$current_uri));
-
-                // Load the errors_disabled view
-                require self::findFile('views', 'kohana_error_disabled');
-            }
-
-            if (!CFEvent::has_run('system.shutdown')) {
-                // Run the shutdown even to ensure a clean exit
-                CFEvent::run('system.shutdown');
-            }
-
-            // Turn off error reporting
-            error_reporting(0);
-            exit;
-        } catch (Exception $e) {
-
-            if (IN_PRODUCTION) {
-                if (isset($_GET['debug'])) {
-                    die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
-                } else {
-                    die('Fatal Error');
-                }
-            } else {
-                die('Fatal Error: ' . $e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
-            }
+    /**
+     * Throw an HttpException with the given data unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public static function abortUnless($boolean, $code, $message = '', array $headers = []) {
+        if (!$boolean) {
+            static::abort($code, $message, $headers);
         }
+    }
+
+    /**
+     * Get an instance of the redirector.
+     *
+     * @param  string|null  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @return CHTTP_Redirector|CHttp_RedirectResponse
+     */
+    public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
+        if (is_null($to)) {
+            return CHTTP::redirector();
+        }
+
+        return CHTTP::redirector()->to($to, $status, $headers, $secure);
+    }
+
+    /**
+     * Return a new response from the application.
+     *
+     * @param  CView|string|array|null  $content
+     * @param  int  $status
+     * @param  array  $headers
+     * @return CHTTP_Response|CHTTP_ResponseFactory
+     */
+    public static function response($content = '', $status = 200, array $headers = []) {
+        $factory = CHTTP::responseFactory();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($content, $status, $headers);
     }
 
     /**
      * Provides class auto-loading.
      *
-     * @throws  CF_Exception
+     * @throws  CException
      * @param   string  name of class
      * @return  bool
      */
-    public static function auto_load($class, $directory = 'libraries') {
+    public static function autoLoad($class, $directory = 'libraries') {
         if (class_exists($class, FALSE)) {
             return TRUE;
         }
@@ -1402,7 +875,14 @@ final class CF {
                 }
             }
         } else {
-            $domain = $_SERVER["SERVER_NAME"];
+            if (isset($_SERVER["SERVER_NAME"])) {
+                $domain = $_SERVER["SERVER_NAME"];
+            }
+            if (strlen($domain) == 0) {
+                if (isset($_SERVER['HTTP_HOST'])) {
+                    $domain = $_SERVER["HTTP_HOST"];
+                }
+            }
         }
         return $domain;
     }
@@ -1412,7 +892,7 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @throws  CF_Exception  if file is required and not found
+     * @throws  CException  if file is required and not found
      * @param   string   directory to search in
      * @param   string   filename to look for (without extension)
      * @param   boolean  file required
@@ -1449,7 +929,7 @@ final class CF {
             $paths = array_reverse($paths);
 
             foreach ($paths as $path) {
-                if (is_file($path . $search)) {
+                if (static::isFile($path . $search)) {
                     // A matching file has been found
                     $found[] = $path . $search;
                 }
@@ -1457,7 +937,7 @@ final class CF {
         } else {
 
             foreach ($paths as $path) {
-                if (is_file($path . $search)) {
+                if (static::isFile($path . $search)) {
                     // A matching file has been found
                     $found = $path . $search;
 
@@ -1473,7 +953,8 @@ final class CF {
                 $directory = 'core.' . inflector::singular($directory);
 
                 // If the file is required, throw an exception
-                throw new CF_Exception('core.resource_not_found', self::lang($directory), $filename);
+                $lang = clang::__('core.resource_not_found', [':directory' => self::lang($directory), ':filename' => $filename]);
+                throw new CException($lang);
             } else {
                 // Nothing was found, return FALSE
                 $found = FALSE;
@@ -1593,103 +1074,6 @@ final class CF {
     }
 
     /**
-     * Returns the value of a key, defined by a 'dot-noted' string, from an array.
-     *
-     * @param   array   array to search
-     * @param   string  dot-noted string: foo.bar.baz
-     * @return  string  if the key is found
-     * @return  void    if the key is not found
-     */
-    public static function key_string($array, $keys) {
-        if (empty($array))
-            return NULL;
-
-        // Prepare for loop
-        $keys = explode('.', $keys);
-
-        do {
-            // Get the next key
-            $key = array_shift($keys);
-
-            if (isset($array[$key])) {
-                if (is_array($array[$key]) AND ! empty($keys)) {
-                    // Dig down to prepare the next loop
-                    $array = $array[$key];
-                } else {
-                    // Requested key was found
-                    return $array[$key];
-                }
-            } else {
-                // Requested key is not set
-                break;
-            }
-        } while (!empty($keys));
-
-        return NULL;
-    }
-
-    /**
-     * Sets values in an array by using a 'dot-noted' string.
-     *
-     * @param   array   array to set keys in (reference)
-     * @param   string  dot-noted string: foo.bar.baz
-     * @return  mixed   fill value for the key
-     * @return  void
-     */
-    public static function key_string_set(& $array, $keys, $fill = NULL) {
-        if (is_object($array) AND ( $array instanceof ArrayObject)) {
-            // Copy the array
-            $array_copy = $array->getArrayCopy();
-
-            // Is an object
-            $array_object = TRUE;
-        } else {
-            if (!is_array($array)) {
-                // Must always be an array
-                $array = (array) $array;
-            }
-
-            // Copy is a reference to the array
-            $array_copy = & $array;
-        }
-
-        if (empty($keys))
-            return $array;
-
-        // Create keys
-        $keys = explode('.', $keys);
-
-        // Create reference to the array
-        $row = & $array_copy;
-
-        for ($i = 0, $end = count($keys) - 1; $i <= $end; $i++) {
-            // Get the current key
-            $key = $keys[$i];
-
-            if (!isset($row[$key])) {
-                if (isset($keys[$i + 1])) {
-                    // Make the value an array
-                    $row[$key] = array();
-                } else {
-                    // Add the fill key
-                    $row[$key] = $fill;
-                }
-            } elseif (isset($keys[$i + 1])) {
-                // Make the value an array
-                $row[$key] = (array) $row[$key];
-            }
-
-            // Go down a level, creating a new row reference
-            $row = & $row[$key];
-        }
-
-        if (isset($array_object)) {
-            // Swap the array back in
-            $array->exchangeArray($array_copy);
-        }
-    }
-
-    /**
      * Retrieves current user agent information:
      * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
      * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
@@ -1700,7 +1084,7 @@ final class CF {
      * @return  string   all other keys
      * @return  boolean  all tests
      */
-    public static function user_agent($key = 'agent', $compare = NULL) {
+    public static function userAgent($key = 'agent', $compare = NULL) {
         static $info;
 
         // Return the raw string
@@ -1815,7 +1199,7 @@ final class CF {
      * @param  mixed $value
      * @return boolean
      */
-    private static function is_file($value) {
+    private static function isFile($value) {
         $value = strval(str_replace("\0", "", $value));
 
         return is_file($value);
@@ -1858,7 +1242,7 @@ final class CF {
                 $sep = '';
 
                 while ($arg = array_shift($entry['args'])) {
-                    if (is_string($arg) AND self::is_file($arg)) {
+                    if (is_string($arg) AND self::isFile($arg)) {
                         // Remove docroot from filename
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
@@ -1876,34 +1260,6 @@ final class CF {
         }
 
         return '<ul class="backtrace">' . implode("\n", $output) . '</ul>';
-    }
-
-    /**
-     * Saves the internal caches: configuration, include paths, etc.
-     *
-     * @return  boolean
-     */
-    public static function internal_cache_save() {
-        if (!is_array(self::$write_cache))
-            return FALSE;
-
-        // Get internal cache names
-        $caches = array_keys(self::$write_cache);
-
-        // Nothing written
-        $written = FALSE;
-
-        foreach ($caches as $cache) {
-            if (isset(self::$internal_cache[$cache])) {
-                // Write the cache file
-                self::cache_save($cache, self::$internal_cache[$cache], self::$configuration['core']['internal_cache']);
-
-                // A cache has been written
-                $written = TRUE;
-            }
-        }
-
-        return $written;
     }
 
     /**
@@ -2024,7 +1380,13 @@ final class CF {
      * @return mixed
      */
     public static function tap($value, $callback = null) {
-        return c::tap($value, $callback);
+        if (is_null($callback)) {
+            return new CBase_HigherOrderTapProxy($value);
+        }
+
+        $callback($value);
+
+        return $value;
     }
 
     /**
@@ -2067,7 +1429,7 @@ final class CF {
         $traits = class_uses($trait);
 
         foreach ($traits as $trait) {
-            $traits += self::trait_uses_recursive($trait);
+            $traits += self::traitUsesRecursive($trait);
         }
 
         return $traits;
@@ -2177,7 +1539,7 @@ final class CF {
      * @return CCollection
      */
     public static function collect($value = null) {
-        return c::collect($value);
+        return new CCollection($value);
     }
 
     /**
@@ -2227,10 +1589,27 @@ final class CF {
         return empty($value);
     }
 
+    /**
+     * 
+     * @return string
+     */
     public static function version() {
         return CF_VERSION;
     }
 
+    /**
+     * 
+     * @return string
+     */
+    public static function codeName() {
+        return CF_CODENAME;
+    }
+
+    /**
+     * 
+     * @param string $domain
+     * @return string
+     */
     public static function appPath($domain = null) {
 
         $appCode = static::appCode($domain);
@@ -2239,121 +1618,50 @@ final class CF {
     }
 
     public static function currentController() {
-        return static::$instance;
+        return CHTTP::kernel()->controller();
     }
 
-    /** list of deprecated function */
-}
-
-// End CF
-
-/**
- * Creates a generic i18n exception.
- */
-class CF_Exception extends Exception {
-
-    // Template file
-    protected $template = 'kohana_error_page';
-    // Header
-    protected $header = FALSE;
-    // Error code
-    protected $code = E_CF;
+    /**
+     * Dispatch an event and call the listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    public static function event(...$args) {
+        return CEvent::dispatcher()->dispatch(...$args);
+    }
 
     /**
-     * Set exception message.
+     * Create a new Carbon instance for the current time.
      *
-     * @param  string  i18n language key for the message
-     * @param  array   addition line parameters
+     * @param  \DateTimeZone|string|null  $tz
+     * @return CCarbon
      */
-    public function __construct($error) {
+    public static function now($tz = null) {
+        return CCarbon::now($tz);
+    }
 
-        $args = array_slice(func_get_args(), 1);
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return CValidation_Validator|CValidation_Factory
+     */
+    public static function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = []) {
+        $factory = CValidation_Factory::instance();
 
-        // Fetch the error message
-        $message = CF::lang($error, $args);
-
-        if ($message === $error OR empty($message)) {
-            // Unable to locate the message for the error
-            $message = 'Unknown Exception: ' . $error;
+        if (func_num_args() === 0) {
+            return $factory;
         }
 
-        // Sets $this->message the proper way
-        parent::__construct($message);
-    }
-
-    /**
-     * Magic method for converting an object to a string.
-     *
-     * @return  string  i18n message
-     */
-    public function __toString() {
-        return (string) $this->message;
-    }
-
-    /**
-     * Fetch the template name.
-     *
-     * @return  string
-     */
-    public function get_template() {
-
-        return $this->template;
-    }
-
-    /**
-     * Sends an Internal Server Error header.
-     *
-     * @return  void
-     */
-    public function send_headers() {
-        // Send the 500 header
-        header('HTTP/1.1 500 Internal Server Error');
+        return $factory->make($data, $rules, $messages, $customAttributes);
     }
 
 }
 
-// End C PHP Exception
-
-/**
- * Creates a Page Not Found exception.
- */
-class CF_404_Exception extends CF_Exception {
-
-    protected $code = E_PAGE_NOT_FOUND;
-
-    /**
-     * Set internal properties.
-     *
-     * @param  string  URL of page
-     * @param  string  custom error template
-     */
-    public function __construct($page = FALSE, $template = FALSE) {
-        if ($page === FALSE) {
-            // Construct the page URI using Router properties
-            $page = CFRouter::$current_uri . CFRouter::$url_suffix . CFRouter::$query_string;
-        }
-
-        if ($template == false) {
-            if (CView::exists('ccore/404')) {
-                $template = 'ccore/404';
-            }
-        }
-
-        Exception::__construct(CF::lang('core.page_not_found', $page));
-
-        $this->template = $template;
-    }
-
-    /**
-     * Sends "File Not Found" headers, to emulate server behavior.
-     *
-     * @return void
-     */
-    public function send_headers() {
-        // Send the 404 header
-        header('HTTP/1.1 404 File Not Found');
-    }
-
-}
-
-// End C 404 Exception
+// End CF

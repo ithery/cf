@@ -20,7 +20,7 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * The redirector instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var CHTTP_Redirector
      */
     protected $redirector;
 
@@ -76,10 +76,10 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Create the default validator instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Factory  $factory
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @param  CValidation_Factory  $factory
+     * @return CValidation_Validator
      */
-    protected function createDefaultValidator(ValidationFactory $factory) {
+    protected function createDefaultValidator(CValidation_Factory $factory) {
         return $factory->make(
                         $this->validationData(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
         );
@@ -97,13 +97,13 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param  CValidation_Validator  $validator
      * @return void
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \CValidation_Exception
      */
-    protected function failedValidation(Validator $validator) {
-        throw (new ValidationException($validator))
+    protected function failedValidation(CValidation_Validator $validator) {
+        throw (new CValidation_Exception($validator))
                 ->errorBag($this->errorBag)
                 ->redirectTo($this->getRedirectUrl());
     }

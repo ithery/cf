@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+namespace PHPUnit\Framework\Constraint\Type;
 
 use function gettype;
 use function is_array;
@@ -21,6 +21,8 @@ use function is_object;
 use function is_scalar;
 use function is_string;
 use function sprintf;
+use PHPUnit\Framework\Constraint\Constraint;
+
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
@@ -95,7 +97,7 @@ final class IsType extends Constraint
     /**
      * @var array<string,bool>
      */
-    public $KNOWN_TYPES = [
+    public static $KNOWN_TYPES = [
         'array'             => true,
         'boolean'           => true,
         'bool'              => true,
@@ -126,9 +128,9 @@ final class IsType extends Constraint
     public function __construct($type)
     {
         if (!isset(self::$KNOWN_TYPES[$type])) {
-            throw new \PHPUnit\Framework\Exception(
+            throw new \PHPUnit\Framework\Exception\Exception(
                 sprintf(
-                    'Type specified for PHPUnit\Framework\Constraint\IsType <%s> ' .
+                    'Type specified for PHPUnit\Framework\Constraint\Type\IsType <%s> ' .
                     'is not a valid type.',
                     $type
                 )

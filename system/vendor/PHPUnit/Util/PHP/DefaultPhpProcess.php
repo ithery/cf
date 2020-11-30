@@ -26,7 +26,7 @@ use function stream_select;
 use function sys_get_temp_dir;
 use function tempnam;
 use function unlink;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit

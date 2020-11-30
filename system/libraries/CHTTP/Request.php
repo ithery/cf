@@ -67,7 +67,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * Create a new Illuminate HTTP request from server variables.
+     * Create a new HTTP request from server variables.
      *
      * @return static
      */
@@ -121,6 +121,15 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function ajax() {
         return $this->isXmlHttpRequest();
+    }
+
+    /**
+     * Determine if the request is the result of an PJAX call.
+     *
+     * @return bool
+     */
+    public function pjax() {
+        return $this->headers->get('X-PJAX') == true;
     }
 
     /**
@@ -192,12 +201,21 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return mixed
      */
     public function __get($key) {
-        
+
         if (array_key_exists($key, $this->all())) {
             return carr::get($this->all(), $key);
         }
         return null;
         //return $this->route($key);
+    }
+
+    /**
+     * Get the root URL for the application.
+     *
+     * @return string
+     */
+    public function root() {
+        return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
     }
 
 }

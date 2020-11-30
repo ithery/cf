@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-$processHoursFunction = function (\Carbon\CarbonInterface $date, string $format) {
+$processHoursFunction = function (\Carbon\CarbonInterface $date, $format) {
     return $format.'о'.($date->hour === 11 ? 'б' : '').'] LT';
 };
 

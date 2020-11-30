@@ -9,80 +9,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CApp_Trait_App_Renderer {
 
-    protected static $variables;
-
-    public static function variables() {
-        $variables = array();
-        $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['decimalSeparator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['thousand_separator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['thousandSeparator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['decimal_digit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
-        $variables['decimalDigit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
-        $variables['have_clock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-        $variables['haveScrollToTop'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-        $variables['CFVersion'] = CF::version();
-        $variables['domain'] = CF::domain();
-        $variables['appCode'] = CF::appCode();
-        $variables['appId'] = CF::appId();
-
-        $bootstrap = ccfg::get('bootstrap');
-        $themeData = CManager::instance()->getThemeData();
-        if (isset($themeData) && strlen(carr::get($themeData, 'bootstrap')) > 0) {
-            $bootstrap = carr::get($themeData, 'bootstrap');
-        }
-
-        if (strlen($bootstrap) == 0) {
-            $bootstrap = '2.3';
-        }
-        $variables['bootstrap'] = $bootstrap;
-
-        $variables['base_url'] = curl::base();
-        $variables['baseUrl'] = curl::base();
-        $variables['label_confirm'] = clang::__("Are you sure ?");
-        $variables['labelConfirm'] = clang::__("Are you sure ?");
-        $variables['label_ok'] = clang::__("OK");
-        $variables['labelOk'] = clang::__("OK");
-        $variables['label_cancel'] = clang::__("Cancel");
-        $variables['labelCancel'] = clang::__("Cancel");
-
-        $asset = CManager::asset();
-        $variables['requireJs'] = $asset->isUseRequireJs();
-        if (!$asset->isUseRequireJs()) {
-
-
-            $variables['requireJs'] = false;
-
-
-            //we collect all client modules data
-            $allModules = CManager::asset()->module()->allModules();
-            $variables['modules'] = $allModules;
-            $variables['theme'] = array();
-            $variables['theme']['name'] = CManager::theme()->getCurrentTheme();
-            $variables['theme']['data'] = CManager::theme()->getThemeData();
-
-            $variables['jsUrl'] = CManager::asset()->getAllJsFileUrl();
-
-            $variables['defaultJQueryUrl'] = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
-        }
-        if (is_array(static::$variables)) {
-            $variables = array_merge($variables, static::$variables);
-        }
-        return $variables;
-    }
-
-    public static function getVariables() {
-        return static::variables();
-    }
-
-    public static function setVariable($key, $value) {
-        if (static::$variables == null) {
-            static::$variables = [];
-        }
-        static::$variables[$key] = $value;
-    }
+    protected $rendered = false;
 
     public function getViewData() {
         $theme_path = '';
@@ -100,8 +27,8 @@ trait CApp_Trait_App_Renderer {
             }
         }
         $viewData = array();
-        $this->content = parent::html();
-        $this->js = parent::js();
+        $this->content = $this->element->html();
+        $this->js = $this->element->js();
 
         $viewData['content'] = $this->content;
         $viewData['header_body'] = $this->header_body;
@@ -197,6 +124,72 @@ trait CApp_Trait_App_Renderer {
                 }
             }
         }
+    }
+
+    public function rendered() {
+        return $this->rendered;
+    }
+
+    /**
+     * Render the html of this
+     * 
+     * @return void
+     * @throws CException
+     * @throws CApp_Exception
+     */
+    public function render() {
+
+        if ($this->rendered) {
+            throw new CException('CApp already Rendered' . cdbg::getTraceString());
+        }
+        $this->rendered = true;
+
+        $this->registerCoreModules();
+
+        CFEvent::run('CApp.beforeRender');
+
+        if (crequest::is_ajax()) {
+            return $this->json();
+        }
+        $v = null;
+
+        $viewName = $this->viewName;
+        if (ccfg::get("install")) {
+            $viewName = 'cinstall/page';
+        } else if ($this->signup) {
+            $viewName = 'ccore/signup';
+        } else if ($this->resend) {
+            $viewName = 'ccore/resend_activation';
+        } else if ($this->activation) {
+            $viewName = 'ccore/activation';
+        } else if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
+            $viewName = $this->viewLoginName;
+        } else if (!$this->isUserLogin() && $this->config("have_static_login") && $this->loginRequired) {
+            $viewName = 'ccore/static_login';
+        }
+
+        if (self::$viewCallback != null && is_callable(self::$viewCallback)) {
+            $viewName = self::$viewCallback($viewName);
+        }
+
+        $themePath = CManager::theme()->getThemePath();
+
+        if (CView::exists($themePath . $viewName)) {
+            $v = CView::factory($themePath . $viewName);
+        }
+        if ($v == null) {
+            if (!CView::exists($viewName)) {
+                throw new CApp_Exception('view :viewName not exists', array(':viewName' => $viewName));
+            }
+            $v = CView::factory($viewName);
+        }
+
+
+        $viewData = $this->getViewData();
+        $v->set($viewData);
+
+
+        return $v->render();
     }
 
 }

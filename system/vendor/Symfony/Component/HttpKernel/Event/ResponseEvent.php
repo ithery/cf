@@ -28,19 +28,19 @@ final class ResponseEvent extends KernelEvent
 {
     private $response;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, Response $response)
+    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, Response $response)
     {
         parent::__construct($kernel, $request, $requestType);
 
         $this->setResponse($response);
     }
 
-    public function getResponse(): Response
+    public function getResponse()
     {
         return $this->response;
     }
 
-    public function setResponse(Response $response): void
+    public function setResponse(Response $response)
     {
         $this->response = $response;
     }

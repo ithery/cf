@@ -29,7 +29,7 @@ class SilencedErrorContext implements \JsonSerializable
     private $line;
     private $trace;
 
-    public function __construct(int $severity, string $file, int $line, array $trace = [], int $count = 1)
+    public function __construct(int $severity, $file, $line, array $trace = [], $count = 1)
     {
         $this->severity = $severity;
         $this->file = $file;

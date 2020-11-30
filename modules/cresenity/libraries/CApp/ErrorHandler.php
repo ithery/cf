@@ -9,21 +9,23 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CApp_ErrorHandler {
 
-    public static function sendExceptionEmail($email, Exception $exception, $subject = null) {
+    public static function sendExceptionEmail(Exception $exception, $email = null, $subject = null) {
         $html = static::getHtml($exception);
         $app = CApp::instance();
         $org = $app->org();
-        $org_name = 'CAPP';
-        $org_email = $org_name;
+        $orgName = 'CAPP';
+        $orgEmail = $orgName;
         if ($org != null) {
-            $org_email = $org->name;
-            $org_name = $org->name;
+            $orgEmail = $org->name;
+            $orgName = $org->name;
         }
+
+        $ymd = date('Ymd');
         if ($subject == null) {
-            $subject = "Error Cresenity APP - " . $org_name . " on " . crouter::complete_uri();
+            $subject = "Error Cresenity APP - " . $orgName . " on " . crouter::complete_uri() . ' [' . $ymd . ']';
         }
-        $headers = "From: " . strip_tags($org_email) . "\r\n";
-        $headers .= "Reply-To: " . strip_tags($org_email) . "\r\n";
+        $headers = "From: " . strip_tags($orgEmail) . "\r\n";
+        $headers .= "Reply-To: " . strip_tags($orgEmail) . "\r\n";
         //$headers .= "CC: susan@example.com\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
@@ -32,32 +34,32 @@ class CApp_ErrorHandler {
         if ($email == null) {
             $email = ccfg::get("admin_email");
         }
-        $arr_options = array();
+        $smtpOptions = array();
         if (ccfg::get("mail_error_smtp")) {
-            $smtp_username = ccfg::get('smtp_username_error');
-            $smtp_password = ccfg::get('smtp_password_error');
-            $smtp_host = ccfg::get('smtp_host_error');
-            $smtp_port = ccfg::get('smtp_port_error');
+            $smtpUsername = ccfg::get('smtp_username_error');
+            $smtpPassword = ccfg::get('smtp_password_error');
+            $smtpHost = ccfg::get('smtp_host_error');
+            $smtpPort = ccfg::get('smtp_port_error');
             $secure = ccfg::get('smtp_secure_error');
 
-            if (strlen($smtp_username) > 0) {
-                $arr_options['smtp_username'] = $smtp_username;
+            if (strlen($smtpUsername) > 0) {
+                $smtpOptions['smtp_username'] = $smtpUsername;
             }
-            if (strlen($smtp_password) > 0) {
-                $arr_options['smtp_password'] = $smtp_password;
+            if (strlen($smtpPassword) > 0) {
+                $smtpOptions['smtp_password'] = $smtpPassword;
             }
-            if (strlen($smtp_host) > 0) {
-                $arr_options['smtp_host'] = $smtp_host;
+            if (strlen($smtpHost) > 0) {
+                $smtpOptions['smtp_host'] = $smtpHost;
             }
-            if (strlen($smtp_port) > 0) {
-                $arr_options['smtp_port'] = $smtp_port;
+            if (strlen($smtpPort) > 0) {
+                $smtpOptions['smtp_port'] = $smtpPort;
             }
             if (strlen($secure) > 0) {
-                $arr_options['smtp_secure'] = $secure;
+                $smtpOptions['smtp_secure'] = $secure;
             }
         }
 
-        $ret = cmail::send_smtp($email, $subject . " [FOR ADMINISTRATOR]", $message, array(), array(), array(), $arr_options);
+        $ret = cmail::send_smtp($email, $subject . " [FOR ADMINISTRATOR]", $message, array(), array(), array(), $smtpOptions);
     }
 
     public static function getHtml(Exception $exception) {

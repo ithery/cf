@@ -59,7 +59,7 @@ class CarbonTimeZone extends DateTimeZone
      *
      * @return DateTimeZone
      */
-    public function cast(string $className)
+    public function cast($className)
     {
         if (!method_exists($className, 'instance')) {
             if (is_a($className, DateTimeZone::class, true)) {

@@ -4,6 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 class CView {
 
+    use CTrait_Compat_View;
+
     protected static $viewFolder = 'views';
     // The view file name and type
     protected $filename = FALSE;
@@ -31,14 +33,14 @@ class CView {
      * @return  boolean
      */
     public static function exists($name) {
-        $filename = CF::find_file(self::$viewFolder, $name, false);
+        $filename = CF::findFile(self::$viewFolder, $name, false);
         return strlen($filename) > 0;
     }
 
     /**
      * Attempts to load a view and pre-load view data.
      *
-     * @throws  CF_Exception  if the requested view cannot be found
+     * @throws  CException  if the requested view cannot be found
      * @param   string  view name
      * @param   array   pre-load data
      * @param   string  type of file: html, css, js, etc.
@@ -79,15 +81,15 @@ class CView {
 
         if ($type == NULL) {
             // Load the filename and set the content type
-            $this->filename = CF::find_file(self::$viewFolder, $name, TRUE);
+            $this->filename = CF::findFile(self::$viewFolder, $name, TRUE);
             $this->filetype = EXT;
         } else {
             // Check if the filetype is allowed by the configuration
             if (!in_array($type, CF::config('view.allowed_filetypes')))
-                throw new CF_Exception('core.invalid_filetype', $type);
+                throw new CException('core.invalid_filetype', $type);
 
             // Load the filename and set the content type
-            $this->filename = CF::find_file(self::$viewFolder, $name, TRUE, $type);
+            $this->filename = CF::findFile(self::$viewFolder, $name, TRUE, $type);
             $this->filetype = CF::config('mimes.' . $type);
 
             if ($this->filetype == NULL) {
@@ -215,12 +217,8 @@ class CView {
      * @return  string
      */
     public function __toString() {
-        try {
-            return $this->render();
-        } catch (Exception $e) {
-            // Display the exception using its internal __toString method
-            return (string) $e;
-        }
+
+        return $this->render();
     }
 
     /**
@@ -230,21 +228,23 @@ class CView {
      * @param   input_data  data to pass to view
      * @return  string    
      */
-    public static function load_view($view_filename, $input_data) {
-        if ($view_filename == '')
+    public static function loadView($viewFilename, $inputData) {
+        if ($viewFilename == '') {
             return;
+        }
+
 
         // Buffering on
         ob_start();
 
         // Import the view variables to local namespace
-        extract($input_data, EXTR_SKIP);
+        extract($inputData, EXTR_SKIP);
 
         // Views are straight HTML pages with embedded PHP, so importing them
         // this way insures that $this can be accessed as if the user was in
         // the controller, which gives the easiest access to libraries in views
         try {
-            include $view_filename;
+            include $viewFilename;
         } catch (Exception $e) {
             ob_end_clean();
             throw $e;
@@ -264,15 +264,15 @@ class CView {
      */
     public function render($print = FALSE, $renderer = FALSE) {
         if (empty($this->filename)) {
-            throw new CF_Exception('core.view_set_filename');
+            throw new CException('core.view_set_filename');
         }
         if (is_string($this->filetype)) {
+
             // Merge global and local data, local overrides global with the same name
             $data = array_merge(self::$global_data, $this->local_data);
 
-//            var_dump(CF::$instance);
             // Load the view in the controller for access to $this
-            $output = self::load_view($this->filename, $data);
+            $output = static::loadView($this->filename, $data);
 
             if ($renderer !== FALSE AND is_callable($renderer, TRUE)) {
                 // Pass the output through the user defined renderer

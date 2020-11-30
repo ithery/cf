@@ -2,16 +2,6 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-/**
- * HTML helper class.
- *
- * $Id: html.php 4376 2009-06-01 11:40:39Z samsoir $
- *
- * @package    Core
- * @author     Kohana Team
- * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license.html
- */
 class chtml {
 
     // Enable or disable automatic setting of target="_blank"

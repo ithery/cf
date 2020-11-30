@@ -31,12 +31,9 @@ class CFRouter {
     public static function setup() {
         self::resetup(self::$current_uri);
 
-        // Last chance to set routing before a 404 is triggered
-        CFEvent::run('system.post_routing');
-
         if (self::$controller === NULL) {
             // No controller was found, so no page can be rendered
-            CFEvent::run('system.404');
+            CF::show404();
         }
     }
 
@@ -85,7 +82,6 @@ class CFRouter {
 
         // Remove all dot-paths from the URI, they are not valid
         $currentUri = preg_replace('#\.[\s./]*/#', '', $currentUri);
-
 
         if (!isset(self::$routeData[$currentUri])) {
             $data = array();
@@ -247,6 +243,7 @@ class CFRouter {
      * @return string uri
      */
     public static function getUri() {
+
         $currentUri = '';
         if (PHP_SAPI === 'cli') {
 
