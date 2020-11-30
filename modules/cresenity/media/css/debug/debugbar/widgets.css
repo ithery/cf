@@ -99,7 +99,8 @@ div.phpdebugbar-widgets-messages div.phpdebugbar-widgets-toolbar {
     background: #fff;
 }
 div.phpdebugbar-widgets-messages div.phpdebugbar-widgets-toolbar input {
-    border: 0;
+    padding: 0!important;
+    border: 0!important;
     margin: 0;
     margin-left: 7px;
     width: 50%;
