@@ -146,7 +146,7 @@ class CComponent_Manager {
     }
 
     public function scripts($options = []) {
-        $debug = config('app.debug');
+        $debug = CF::config('app.debug');
 
         $scripts = $this->javaScriptAssets($options);
 
