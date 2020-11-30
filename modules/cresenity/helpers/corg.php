@@ -30,16 +30,6 @@ class corg {
             $data->name = $data->org_name;
 
         return $data;
-
-        /*
-          $db = CJDB::instance();
-          $result = $db->get("org",array("org_id"=>$id));
-
-          $value = null;
-          if ($result->count() > 0)
-          $value = $result[0];
-          return $value;
-         */
     }
 
     public static function data($org_id, $data = null) {
@@ -52,13 +42,6 @@ class corg {
             cdata::set($org->code, $org_data, 'org_data');
         }
         return $org_data;
-    }
-
-    public static function get_stores($org_id) {
-        $db = CJDB::instance();
-        $result = $db->get("store", array("org_id" => $org_id));
-
-        return $result;
     }
 
 }

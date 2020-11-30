@@ -15,10 +15,10 @@ class cdata {
                 if (strlen($row) == 0) {
                     continue;
                 }
-                $file.=$row . DS;
+                $file .= $row . DS;
             }
         }
-        $file.=$data_name;
+        $file .= $data_name;
         if (!file_exists($file . EXT))
             return null;
         return cphp::load_value($file . EXT);
@@ -34,13 +34,13 @@ class cdata {
                 if (strlen($row) == 0) {
                     continue;
                 }
-                $file.=$row . DS;
+                $file .= $row . DS;
                 if (!is_dir($file)) {
                     mkdir($file);
                 }
             }
         }
-        $file.=$data_name . EXT;
+        $file .= $data_name . EXT;
         //$json = cjson::encode($data);
         cphp::save_value($data, $file);
         //file_put_contents($file,$json);
@@ -55,13 +55,13 @@ class cdata {
                 if (strlen($row) == 0) {
                     continue;
                 }
-                $file.=$row . DIRECTORY_SEPARATOR;
+                $file .= $row . DIRECTORY_SEPARATOR;
                 if (!is_dir($file)) {
                     mkdir($file);
                 }
             }
         }
-        $file.=$data_name . EXT;
+        $file .= $data_name . EXT;
         if (file_exists($file)) {
             unlink($file);
         }
