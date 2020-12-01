@@ -565,7 +565,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     //override function json
     public function json($options = 0) {
-        return $this->toJson($options,);
+        return $this->toJson($options);
     }
 
     /**
