@@ -599,7 +599,7 @@ trait CFDeprecatedTrait {
             $temp = '<li>';
 
             if (isset($entry['file'])) {
-                $temp .= self::lang('core.error_file_line', preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $entry['file']), $entry['line']);
+                $temp .= self::lang('core.error_file_line', ['file' => preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $entry['file']), 'line' => $entry['line']]);
             }
 
             $temp .= '<pre>';

@@ -560,12 +560,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $data["message"] = $messageOrig;
         $data["ajaxData"] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
-        return $data;
+        return json_encode($data,$options);
     }
 
     //override function json
     public function json($options = 0) {
-        return $this->toJson($options);
+        return $this->toJson($options,);
     }
 
     /**
