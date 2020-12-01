@@ -102,7 +102,7 @@ class CView_Factory {
         // the caller for rendering or performing other view manipulations on this.
         $data = array_merge($mergeData, $this->parseData($data));
 
-        return CF::tap($this->viewInstance($view, $path, $data), function ($view) {
+        return c::tap($this->viewInstance($view, $path, $data), function ($view) {
                     $this->callCreator($view);
                 });
     }
@@ -118,7 +118,7 @@ class CView_Factory {
     public function file($path, $data = [], $mergeData = []) {
         $data = array_merge($mergeData, $this->parseData($data));
 
-        return CF::tap($this->viewInstance($path, $path, $data), function ($view) {
+        return c::tap($this->viewInstance($path, $path, $data), function ($view) {
                     $this->callCreator($view);
                 });
     }
