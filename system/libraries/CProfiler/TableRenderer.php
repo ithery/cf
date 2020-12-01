@@ -41,22 +41,22 @@ class CProfiler_TableRenderer {
         $columns = $this->columns;
 
         $html = '';
-        $html.='<table class="kp-table">';
+        $html .= '<table class="kp-table">';
         foreach ($rows as $row) {
 
             $class = empty($row['class']) ? '' : ' class="' . $row['class'] . '"';
             $style = empty($row['style']) ? '' : ' style="' . $row['style'] . '"';
-            $html.='<tr' . $class . $style . '>';
+            $html .= '<tr' . $class . $style . '>';
             foreach ($columns as $index => $column) {
                 $class = empty($column['class']) ? '' : ' class="' . $column['class'] . '"';
                 $style = empty($column['style']) ? '' : ' style="' . $column['style'] . '"';
                 $value = $row['data'][$index];
-                $value = (is_array($value) OR is_object($value)) ? '<pre>' . chtml::specialchars(print_r($value, TRUE)) . '</pre>' : chtml::specialchars($value);
-                $html.='<td' . $style . $class . '>' . $value . '</td>';
+                $value = (is_array($value) OR is_object($value)) ? '<pre>' . c::e(print_r($value, TRUE)) . '</pre>' : c::e($value);
+                $html .= '<td' . $style . $class . '>' . $value . '</td>';
             }
-            $html.='</tr>';
+            $html .= '</tr>';
         }
-        $html.='</table>';
+        $html .= '</table>';
         return $html;
     }
 
