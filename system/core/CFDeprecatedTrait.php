@@ -639,51 +639,6 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * Lists all files and directories in a resource path.
-     *
-     * @param   string   directory to search
-     * @param   boolean  list all files to the maximum depth?
-     * @param   string   full path to search (used for recursion, *never* set this manually)
-     * @return  array    filenames and directories
-     * @deprecated
-     */
-    public static function list_files($directory, $recursive = FALSE, $path = FALSE) {
-        $files = array();
-
-        if ($path === FALSE) {
-            $paths = array_reverse(self::include_paths());
-
-            foreach ($paths as $path) {
-                // Recursively get and merge all files
-                $files = array_merge($files, self::list_files($directory, $recursive, $path . $directory));
-            }
-        } else {
-            $path = rtrim($path, '/') . '/';
-
-            if (is_readable($path)) {
-                $items = (array) glob($path . '*');
-
-                if (!empty($items)) {
-                    foreach ($items as $index => $item) {
-                        $files[] = $item = str_replace('\\', '/', $item);
-
-                        // Handle recursion
-                        if (is_dir($item) AND $recursive == TRUE) {
-                            // Filename should only be the basename
-                            $item = pathinfo($item, PATHINFO_BASENAME);
-
-                            // Append sub-directory search
-                            $files = array_merge($files, self::list_files($directory, TRUE, $path . $item));
-                        }
-                    }
-                }
-            }
-        }
-
-        return $files;
-    }
-
-    /**
      * 
      * @param type $domain
      * @return type
